@@ -144,21 +144,12 @@ class SignalHandler(QtQuick.QQuickView):
         (
             _,
             self.max_measurement_id,
-        ) = DataSetReader.detect_new_measurements(
-            0,
-            project=self._data_filter.project,
-            set_up=self._data_filter.set_up,
-            sample=self._data_filter.sample,
-        )
+        ) = DataSetReader.detect_new_measurements(0)
         self.update_date_model()
         self.update_date_selection(0)
 
     def update_date_model(self):
-        dates = DataSetReader.get_all_dates_with_measurements(
-            self._data_filter.project,
-            self._data_filter.set_up,
-            self._data_filter.sample,
-        )
+        dates = DataSetReader.get_all_dates_with_measurements()
 
         self.date_model.reset_data(dates)
         obj = self.win.findChild(QtCore.QObject, "date_list_view")
@@ -170,12 +161,7 @@ class SignalHandler(QtQuick.QQuickView):
         self.load_data_table(date)
 
     def load_data_table(self, date):
-        data = DataSetReader.get_results_for_date(
-            date,
-            project=self._data_filter.project,
-            set_up=self._data_filter.set_up,
-            sample=self._data_filter.sample,
-        )
+        data = DataSetReader.get_results_for_date(date)
         model_data = m_result_overview(data)
         self.data_overview_model.reset_data(model_data)
 
@@ -190,12 +176,7 @@ class SignalHandler(QtQuick.QQuickView):
             (
                 update,
                 self.max_measurement_id,
-            ) = DataSetReader.detect_new_measurements(
-                max_id,
-                project=self._data_filter.project,
-                set_up=self._data_filter.set_up,
-                sample=self._data_filter.sample,
-            )
+            ) = DataSetReader.detect_new_measurements(max_id)
 
             if update == True:
                 self.update_date_model()
