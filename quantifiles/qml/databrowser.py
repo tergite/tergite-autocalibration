@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-import dataclasses
 from pathlib import Path
 
 from PyQt5 import QtCore, QtWidgets, QtQml, QtGui
 import os
 import platform
 import ctypes
+
+from quantify_core.data.handling import set_datadir
 
 from quantifiles.qml.gui_control import DataFilter, SignalHandler
 from quantifiles.qml.models import date_model, data_overview_model, combobox_model
@@ -16,11 +17,12 @@ import quantifiles.qml as qml_in
 class DataBrowser:
     def __init__(
         self,
-        data_dir: str | Path | None = None,
+        data_dir: str | Path,
         window_location=None,
         window_size=None,
         live_plotting_enabled=True,
     ):
+        set_datadir(data_dir)
         set_app_icon()
 
         self.app = QtCore.QCoreApplication.instance()
@@ -96,4 +98,4 @@ def set_app_icon():
 
 
 if __name__ == "__main__":
-    databrowser = DataBrowser()
+    databrowser = DataBrowser(r"C:\Users\Damie\PycharmProjects\quantifiles\test_data")

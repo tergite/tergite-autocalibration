@@ -9,13 +9,10 @@ import logging
 
 from filelock import FileLock
 from quantify_core.data.handling import get_datadir, load_dataset, DATASET_NAME
-from quantify_core.data.handling import set_datadir
 from quantify_core.data.types import TUID
 from quantify_core.measurement.control import _DATASET_LOCKS_DIR
 
 logger = logging.getLogger(__name__)
-
-set_datadir(r"C:\Users\Damie\PycharmProjects\quantifiles\test_data")
 
 
 @dataclass
