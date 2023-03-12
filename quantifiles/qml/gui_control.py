@@ -1,6 +1,6 @@
 import logging
+
 from PyQt5 import QtCore, QtQuick
-from quantify_core.data.handling import load_dataset
 from quantify_core.data.types import TUID
 
 from quantifiles.data_browser_models.result_table_data_class import m_result_overview
@@ -111,14 +111,6 @@ class SignalHandler(QtQuick.QQuickView):
     def init_gui_variables(self, win):
         self.win = win
 
-        obj = self.win.findChild(QtCore.QObject, "local_conn")
-        # state = SQL_conn_info_local.host == "localhost"
-        obj.setProperty("local_conn_status", True)
-        #
-        obj = self.win.findChild(QtCore.QObject, "remote_conn")
-        # state = SQL_conn_info_remote.host != "localhost"
-        obj.setProperty("remote_conn_status", False)
-
         obj = self.win.findChild(QtCore.QObject, "enable_liveplotting")
         obj.setProperty("checked", self.live_plotting_enabled)
 
@@ -149,17 +141,6 @@ class SignalHandler(QtQuick.QQuickView):
     def pro_set_sample_info_state_change_loc(
         self, index_project, index_set_up, index_sample
     ):
-        self._data_filter.set_indices(index_project, index_set_up, index_sample)
-
-        obj = self.win.findChild(QtCore.QObject, "combobox_project")
-        obj.setProperty("currentIndex", self._data_filter.project_index)
-
-        obj = self.win.findChild(QtCore.QObject, "combobox_set_up")
-        obj.setProperty("currentIndex", self._data_filter.set_up_index)
-
-        obj = self.win.findChild(QtCore.QObject, "combobox_sample")
-        obj.setProperty("currentIndex", self._data_filter.sample_index)
-
         (
             _,
             self.max_measurement_id,
@@ -227,7 +208,7 @@ class SignalHandler(QtQuick.QQuickView):
     def plot_ds(self, uuid: TUID):
         # let the garbage collector collect the old plots
         try:
-            ds = load_dataset(uuid)
+            ds = DataSetReader.safe_load_dataset(uuid)
         except Exception:
             logger.error(f"Failed to load dataset {uuid}", exc_info=True)
             return

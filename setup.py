@@ -26,7 +26,7 @@ setup(
         "qcodes",
         "pyqtgraph",
         "pyqt5",
-        "quantify-core"
+        "quantify-core",
     ],
     python_requires=">=3.7",
 )

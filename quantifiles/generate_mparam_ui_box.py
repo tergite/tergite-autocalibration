@@ -103,7 +103,9 @@ class slider_mgr:
 
         def slider_change(idx):
             self.label_slider_content.setText(
-                format_value_and_unit(self.data_var.values[idx], self.data_var.attrs["units"])
+                format_value_and_unit(
+                    self.data_var.values[idx], self.data_var.attrs["units"]
+                )
             )
             conn(idx)
 
@@ -115,8 +117,8 @@ class slider_mgr:
 
 class data_mgr_4_plot:
     def __init__(self, dataset, y_key: str = "y0"):
-        self.ds_raw = dataset
-        self.ds = None
+        self.dataset = dataset
+        self._dataset = None
         self.y_key = y_key
 
         self.properties_selector_raw = []
@@ -141,13 +143,13 @@ class data_mgr_4_plot:
         properties = self.properties_selector_raw[:-1][::-1]
 
         self.properties_selector = []
-        self.ds = self.ds_raw
+        self._dataset = self.dataset
 
         for prop in properties:
             if prop.avg:
-                self.ds = self.ds.average(prop.name)
+                self._dataset = self._dataset.average(prop.name)
             elif prop.slc:
-                self.ds = self.ds.slice(prop.name, prop.slider_val)
+                self._dataset = self._dataset.slice(prop.name, prop.slider_val)
             else:
                 self.properties_selector.append(prop)
 
@@ -177,13 +179,13 @@ class data_mgr_4_plot:
         return self.__check_log(2)
 
     def __check_log(self, dim):
-        if dim > len(self.ds.coords):
+        if dim > len(self._dataset.coords):
             return None
         return False  # FIXME: implement log scale
 
     @property
     def n_dim(self):
-        return len(self.ds.coords)
+        return len(self._dataset.coords)
 
     def __add__(self, other):
         if isinstance(other, n_th_dimension_prop):
@@ -233,16 +235,20 @@ class single_m_param_m_descriptor(QtWidgets.QVBoxLayout):
         self.sp.setChecked(True)
         self.sp.clicked.connect(partial(self.cb_callback, self.sp, "show_plot"))
 
-        settables = [name for name in dataset.variables.mapping.keys() if name.startswith("x")]
+        settables = [
+            name for name in dataset.variables.mapping.keys() if name.startswith("x")
+        ]
         self.sliders = []
         for idx, settable in enumerate(settables):
-            m_sec_property, slider = self.generate_m_section(dataset[settable].long_name, idx * 2 + 2,
-                                                             dataset[settable])
+            m_sec_property, slider = self.generate_m_section(
+                dataset[settable].long_name, idx * 2 + 2, dataset[settable]
+            )
             self.plot_data_mgr += m_sec_property
             self.sliders += [slider]
 
-        m_sec_property, slider = self.generate_m_section(m_name, len(settables) * 2 + 4, self.dataset[y_param],
-                                                         parent=True)
+        m_sec_property, slider = self.generate_m_section(
+            m_name, len(settables) * 2 + 4, self.dataset[y_param], parent=True
+        )
         self.plot_data_mgr += m_sec_property
         self.sliders += [slider]
 
@@ -337,7 +343,10 @@ class single_m_param_m_descriptor(QtWidgets.QVBoxLayout):
         _translate = QtCore.QCoreApplication.translate
         letter.setText(_translate("MainWindow", param.name))
         name.setText(
-            _translate("MainWindow", "{} ({})".format(param.attrs["long_name"], param.attrs["units"]))
+            _translate(
+                "MainWindow",
+                "{} ({})".format(param.attrs["long_name"], param.attrs["units"]),
+            )
         )
 
         self.local_parent.addWidget(letter, level, 0, 1, 1)
@@ -355,7 +364,12 @@ class single_m_param_m_descriptor(QtWidgets.QVBoxLayout):
             slc.hide()
 
         m_param_set_prop = n_th_dimension_prop(
-            param.name, "{} ({})".format(param.long_name, param.attrs["units"]), avg, slc, log, slider
+            param.name,
+            "{} ({})".format(param.long_name, param.attrs["units"]),
+            avg,
+            slc,
+            log,
+            slider,
         )
 
         return m_param_set_prop, slider.hbox

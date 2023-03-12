@@ -1,7 +1,11 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import pyqtgraph as pg
 
-from quantifiles.plots.unit_management import return_unit_scaler, format_unit, format_value_and_unit
+from quantifiles.plots.unit_management import (
+    return_unit_scaler,
+    format_unit,
+    format_value_and_unit,
+)
 
 graph_color = list()
 graph_color += [
@@ -138,15 +142,22 @@ class _1D_plot:
 
         # Removed loop over multiple values
         curve = self.plot.plot(
-            *self.get_x_and_y(dataset, y_key), **graph_color[0], name=dataset[y_key].name, connect="finite"
+            *self.get_x_and_y(dataset, y_key),
+            **graph_color[0],
+            name=dataset[y_key].name,
+            connect="finite"
         )
         self.curves.append(curve)
 
         self.plot.setLabel(
-            "left", self.dataset[y_key].long_name, units=format_unit(self.dataset[y_key].attrs["units"])
+            "left",
+            self.dataset[y_key].long_name,
+            units=format_unit(self.dataset[y_key].attrs["units"]),
         )
         self.plot.setLabel(
-            "bottom", self.dataset.x0.long_name, units=format_unit(self.dataset.x0.attrs["units"])
+            "bottom",
+            self.dataset.x0.long_name,
+            units=format_unit(self.dataset.x0.attrs["units"]),
         )
         self.plot.setLogMode(**logmode)
         self.plot.showGrid(True, True)
@@ -172,9 +183,9 @@ class _1D_plot:
         return name[:-1]
 
     def get_x_and_y(self, ds, y_key: str):
-        return ds.x0.values * return_unit_scaler(ds.x0.attrs["units"]), ds[y_key].values * return_unit_scaler(
-            ds[y_key].attrs["units"]
-        )
+        return ds.x0.values * return_unit_scaler(ds.x0.attrs["units"]), ds[
+            y_key
+        ].values * return_unit_scaler(ds[y_key].attrs["units"])
 
     def mouseMoved(self, evt):
         vb = self.plot.getPlotItem().vb
@@ -193,6 +204,8 @@ class _1D_plot:
             self.label.setText(
                 "x={}, y={}".format(
                     format_value_and_unit(x_val, self.dataset.x0.attrs["units"]),
-                    format_value_and_unit(y_val, self.dataset[self.y_key].attrs["units"]),
+                    format_value_and_unit(
+                        y_val, self.dataset[self.y_key].attrs["units"]
+                    ),
                 )
             )

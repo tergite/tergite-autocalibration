@@ -2,6 +2,7 @@ from PyQt5 import QtCore, QtWidgets
 import logging
 from datetime import datetime, timedelta
 
+from quantifiles.data_handling import DataSetReader
 from quantifiles.generate_mparam_ui_box import single_m_param_m_descriptor
 from quantifiles.plots._1D_plotting import _1D_plot
 from quantifiles.plots._2D_plotting import _2D_plot
@@ -86,12 +87,14 @@ class ui_box_mgr:
             if item.show_plot:
                 if item.n_dim == 1 and item.enable:
                     plot_widget = _1D_plot(
-                        item.ds, item.y_key, {"x": item.x_log, "y": item.y_log}
+                        item._dataset, item.y_key, {"x": item.x_log, "y": item.y_log}
                     )
                     plot_widgets.append(plot_widget)
 
                 if item.n_dim == 2 and item.enable:
-                    plot_widget = _2D_plot(item.ds, y_key=item.y_key, logmode={"z": item.z_log})
+                    plot_widget = _2D_plot(
+                        item._dataset, y_key=item.y_key, logmode={"z": item.z_log}
+                    )
                     plot_widgets.append(plot_widget)
                     histogram = plot_widget.img_view.ui.histogram
                     if not item.show_histogram:
@@ -123,10 +126,11 @@ class ui_box_mgr:
         # if self.ds.completed:  # TODO: fix this
         #     self.timer.stop()
 
-        # self.ds.sync()
+        self.ds = DataSetReader.safe_load_dataset(self.ds.tuid)
 
         for plot in self.plot_widgets:
             try:
+                plot._dataset = self.ds
                 plot.update()
             except:
                 logger.error(f"Plot update failed", exc_info=True)

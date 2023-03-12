@@ -13,15 +13,15 @@ import QtQuick.Window 2.12
 import QtQuick.Controls.Material 2.12
 import QtQuick.Shapes 1.12
 
-ApplicationWindow{
-	title: "Data Browser"
-	width: 1600
+ApplicationWindow {
+    title: "Data Browser"
+    width: 1600
     height: 800
     visible: true
     Material.theme: Material.Light
 
     TabBar {
-    	id : tabBar_databrowser
+        id : tabBar_databrowser
         height: 50
         anchors.left: parent.left
         anchors.leftMargin: 0
@@ -55,91 +55,16 @@ ApplicationWindow{
         anchors.bottom: measurement_overview_state_info.top
         anchors.top: tabBar_databrowser.bottom
 
-        Item{
-        	ColumnLayout{
+        Item {
+            ColumnLayout {
                 id: overview_tab_col_layout
                 anchors.fill: parent
                 transformOrigin: Item.TopLeft
 
                 RowLayout {
-                    id: overview_select_sample
-                    Layout.leftMargin: 20
-                    Layout.rightMargin: 30
-                    transformOrigin: Item.TopLeft
-                    Layout.fillHeight: false
-                    Layout.fillWidth: true
-
-                    RowLayout {
-                        Text {
-                            Layout.preferredWidth: 70
-                            height: 30
-                            text: 'Project'
-                            font.pixelSize: 16
-                        }
-
-                        ComboBox {
-                            objectName : 'combobox_project'
-                            id: combobox_project
-                            model : combobox_project_model
-                            Layout.preferredWidth: 250
-                            Layout.margins: 2
-                            onActivated : signal_handler.pro_set_sample_info_state_change(combobox_project.currentIndex, combobox_set_up.currentIndex, combobox_sample.currentIndex);
-
-                        }
-                    }
-
-                    Item {
-                        Layout.fillWidth: true
-                    }
-
-                    RowLayout {
-                        Text {
-                            Layout.preferredWidth: 70
-                            height: 30
-                            text: 'Set up'
-                            font.pixelSize: 16
-                        }
-
-                        ComboBox {
-                            objectName : 'combobox_set_up'
-                            id: combobox_set_up
-                            model : combobox_set_up_model
-                            Layout.preferredWidth: 250
-                            Layout.margins: 2
-                            onActivated : signal_handler.pro_set_sample_info_state_change(combobox_project.currentIndex, combobox_set_up.currentIndex, combobox_sample.currentIndex);
-                        }
-                    }
-
-                    Item {
-                        Layout.fillWidth: true
-                    }
-
-                    RowLayout {
-                        Text {
-                            Layout.preferredWidth: 70
-                            height: 30
-                            text: 'Sample'
-                            font.pixelSize: 16
-                        }
-
-                        ComboBox {
-                            objectName : 'combobox_sample'
-                            id: combobox_sample
-                            model : combobox_sample_model
-                            Layout.preferredWidth: 250
-                            Layout.margins: 2
-                            onActivated : signal_handler.pro_set_sample_info_state_change(combobox_project.currentIndex, combobox_set_up.currentIndex, combobox_sample.currentIndex);
-
-                        }
-                    }
-
-
-                }
-
-                RowLayout {
                     id: measurement_overview_layout
-                    Rectangle{
-                    	color: "#FFFFFFFF"
+                    Rectangle {
+                        color: "#FFFFFFFF"
                         Layout.fillHeight: true
                         Layout.leftMargin: 10
                         Layout.rightMargin: 10
@@ -147,150 +72,152 @@ ApplicationWindow{
                         radius : 5
 
                         ListView {
-                        	Component {
-	                            id : date_list_delegate
-	                            Item {
-	                                width: parent.width
-	                                height: 36
+                            Component {
+                                id : date_list_delegate
+                                Item {
+                                    width: parent.width
+                                    height: 36
 
-	                                Rectangle {
-	                                    id: r
-	                                    width: parent.width-20
-	                                    x: 10
-	                                    height: 36
-	                                    radius : 5
-	                                    color: 'transparent'
+                                    Rectangle {
+                                        id: r
+                                        width: parent.width-20
+                                        x: 10
+                                        height: 36
+                                        radius : 5
+                                        color: 'transparent'
 
-	                                    RowLayout {
-	                                        width: 100
-	                                        height: 34
-	                                        spacing : 10
-	                                        Rectangle {
-	                                            id : rec_ind
-	                                            width: 12
-	                                            radius : 5
-	                                            height : 34
-	                                            color: "transparent"
-	                                            Layout.fillHeight: true
-	                                        }
+                                        RowLayout {
+                                            width: 100
+                                            height: 34
+                                            spacing : 10
+                                            Rectangle {
+                                                id : rec_ind
+                                                width: 12
+                                                radius : 5
+                                                height : 34
+                                                color: "transparent"
+                                                Layout.fillHeight: true
+                                            }
 
-	                                        Text {
-	                                            text: date
-	                                            Layout.alignment: Qt.AlignHLeft | Qt.AlignVCenter
-	                                            Layout.fillHeight: false
-	                                            font.pixelSize: 16
-	                                        }
+                                            Text {
+                                                text: date
+                                                Layout.alignment: Qt.AlignHLeft | Qt.AlignVCenter
+                                                Layout.fillHeight: false
+                                                font.pixelSize: 16
+                                            }
 
-	                                    }
-	                                }
+                                        }
+                                    }
 
-	                                Rectangle {
-	                                    y : 36
-	                                    width: parent.width
-	                                    height: 5
-	                                    color: "transparent"
-	                                }
+                                    Rectangle {
+                                        y : 36
+                                        width: parent.width
+                                        height: 5
+                                        color: "transparent"
+                                    }
 
-	                                function hover_in(){
-	                                    if (date_list_view.currentIndex != index){
-	                                        r.color = "#FAFAFA"
-	                                        rec_ind.color = "#F8BBD0"
-	                                    }
-	                                }
-	                                function hover_out(){
-	                                    if (date_list_view.currentIndex != index){
-	                                        r.color = "transparent"
-	                                        rec_ind.color = "transparent"
-	                                    }
-	                                }
+                                    function hover_in() {
+                                        if (date_list_view.currentIndex != index) {
+                                            r.color = "#FAFAFA"
+                                            rec_ind.color = "#F8BBD0"
+                                        }
+                                    }
+                                    function hover_out() {
+                                        if (date_list_view.currentIndex != index) {
+                                            r.color = "transparent"
+                                            rec_ind.color = "transparent"
+                                        }
+                                    }
 
-	                                function my_click(){
-	                                    r.color = "transparent"
-	                                    rec_ind.color = "transparent"
-	                                    date_list_view.currentIndex = index;
-	                                }
-	                                MouseArea {
-	                                    anchors.fill: parent
-	                                    hoverEnabled: true
-	                                    onClicked: {my_click(); focus=true}
-	                                    onEntered: hover_in()
-	                                    onExited: hover_out()
-	                                }
-	                            }
-	                        }
+                                    function my_click() {
+                                        r.color = "transparent"
+                                        rec_ind.color = "transparent"
+                                        date_list_view.currentIndex = index;
+                                    }
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        onClicked: {
+                                            my_click(); focus=true
+                                        }
+                                        onEntered: hover_in()
+                                        onExited: hover_out()
+                                    }
+                                }
+                            }
 
-	                        Component {
-	                            id: date_list_highlight
+                            Component {
+                                id: date_list_highlight
 
-	                            Rectangle {
-	                            	id : date_list_highlight_box
-	                                height: 0
-	                                color: "transparent"
-	                                width: measurement_overview_layout.width
+                                Rectangle {
+                                    id : date_list_highlight_box
+                                    height: 0
+                                    color: "transparent"
+                                    width: measurement_overview_layout.width
                                     x: 10
 
-	                                RowLayout {
-	                                    height: 36
-	                                    Rectangle {
-	                                    	x : 10
-	                                        width: 12
-	                                        radius : 5
-	                                        color: Material.color(Material.Pink)
-	                                        Layout.fillHeight: true
-	                                    }
-	                                    Rectangle {
-	                                        width: 210
-	                                        radius : 5
-	                                        color: "#F5F5F5"
-	                                        Layout.fillHeight: true
-	                                    }
-	                                    spacing : 0
-	                                }
-	                            }
-	                        }
+                                    RowLayout {
+                                        height: 36
+                                        Rectangle {
+                                            x : 10
+                                            width: 12
+                                            radius : 5
+                                            color: Material.color(Material.Pink)
+                                            Layout.fillHeight: true
+                                        }
+                                        Rectangle {
+                                            width: 210
+                                            radius : 5
+                                            color: "#F5F5F5"
+                                            Layout.fillHeight: true
+                                        }
+                                        spacing : 0
+                                    }
+                                }
+                            }
 
-	                        Component{
-	                            id : date_list_header
+                            Component {
+                                id : date_list_header
 
-	                            Rectangle {
-	                                id: header_car
-	                                color: "#FFFFFF"
+                                Rectangle {
+                                    id: header_car
+                                    color: "#FFFFFF"
 
-	                                width: parent.width
-	                                height : 40 + 20
-	                                radius : 5
+                                    width: parent.width
+                                    height : 40 + 20
+                                    radius : 5
 
-	                                Rectangle {
-	                                    id: header
-	                                    width: parent.width-10
-	                                    height: 40
-	                                    x : 10
-	                                    y : 10
+                                    Rectangle {
+                                        id: header
+                                        width: parent.width-10
+                                        height: 40
+                                        x : 10
+                                        y : 10
 
-	                                    radius : 5
-	                                    color: "#8e24aa"
+                                        radius : 5
+                                        color: "#8e24aa"
 
-	                                    Text {
-	                                        width: parent.width
-	                                        height: 30
-	                                        color : "#FFFFFF"
-	                                        text: qsTr("Date")
-	                                        anchors.leftMargin: 25
-	                                        anchors.fill: parent
-	                                        verticalAlignment: Text.AlignVCenter
-	                                        horizontalAlignment: Text.AlignLeft
-	                                        font.bold: true
-	                                        font.pixelSize: 16
-	                                    }
-	                                    MouseArea {
-	                                        anchors.fill: parent
-	                                        hoverEnabled: true
-	                                        onEntered: header.color= "#9C27B0"
-	                                        onExited: header.color= "#8e24aa"
-	                                    }
-	                                }
-	                            }
-	                        }
+                                        Text {
+                                            width: parent.width
+                                            height: 30
+                                            color : "#FFFFFF"
+                                            text: qsTr("Date")
+                                            anchors.leftMargin: 25
+                                            anchors.fill: parent
+                                            verticalAlignment: Text.AlignVCenter
+                                            horizontalAlignment: Text.AlignLeft
+                                            font.bold: true
+                                            font.pixelSize: 16
+                                        }
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            onEntered: header.color= "#9C27B0"
+                                            onExited: header.color= "#8e24aa"
+                                        }
+                                    }
+                                }
+                            }
                             objectName : 'date_list_view'
                             id: date_list_view
                             width: parent.width
@@ -320,7 +247,7 @@ ApplicationWindow{
                             spacing: 10
                             clip : true
 
-                        	Component {
+                            Component {
                                 id : data_content_view_delegate
 
                                 Rectangle {
@@ -335,13 +262,13 @@ ApplicationWindow{
                                         width: row_overview.width
                                         height: row_overview.height
 
-                                        Rectangle{
+                                        Rectangle {
                                             width : 20
                                             height : 20
                                             Layout.leftMargin : 15
                                             Layout.topMargin : 4
                                             color : 'transparent'
-                                            Star_shape{
+                                            Star_shape {
                                                 anchors.fill: parent
                                                 size : 20
                                                 uuid_ : uuid
@@ -375,9 +302,9 @@ ApplicationWindow{
                                             Layout.preferredWidth: 100
                                         }
 
-                                        Item{
+                                        Item {
                                             height: 36
-                                            TextInput{
+                                            TextInput {
                                                 id : text_field_measurment_overview
                                                 z : 1
                                                 y : (36-18)/2
@@ -389,7 +316,7 @@ ApplicationWindow{
                                                 selectedTextColor : '#FFFFFF'
                                                 selectionColor : '#EC407A'
                                                 onEditingFinished : {
-                                                    if (name != text_field_measurment_overview.text){
+                                                    if (name != text_field_measurment_overview.text) {
                                                         signal_handler.update_name_meaurement(uuid,text_field_measurment_overview.text);
                                                     }
                                                 }
@@ -424,99 +351,99 @@ ApplicationWindow{
 
                             }
 
-                            Component{
+                            Component {
                                 id : data_content_view_header
-                                Rectangle{
+                                Rectangle {
                                     anchors.right: parent.right
                                     anchors.left: parent.left
 
                                     height : 40+20
 
-	                                Rectangle {
-	                                    id: data_content_view_header_box
-	                                    height: 40
+                                    Rectangle {
+                                        id: data_content_view_header_box
+                                        height: 40
 
-	                                    color: "#8E24AA"
-	                                    anchors.left: parent.left
-	                                    anchors.right: parent.right
-	                                    anchors.top: parent.top
-	                                    anchors.topMargin: 10
-	                                    radius : 5
-	                                    RowLayout {
-	                                        id: rowLayout
-	                                        width: data_content_view_header_box.width
-	                                        height: data_content_view_header_box.height
+                                        color: "#8E24AA"
+                                        anchors.left: parent.left
+                                        anchors.right: parent.right
+                                        anchors.top: parent.top
+                                        anchors.topMargin: 10
+                                        radius : 5
+                                        RowLayout {
+                                            id: rowLayout
+                                            width: data_content_view_header_box.width
+                                            height: data_content_view_header_box.height
 
-	                                        Rectangle{
-	                                            width : 20
-	                                            height : 20
-	                                            Layout.leftMargin : 15
-	                                            Layout.topMargin : 4
-	                                            color : 'transparent'
-	                                            Star_shape{
-	                                                anchors.fill: parent
-	                                                size : 20
-	                                            }
-	                                        }
+                                            Rectangle {
+                                                width : 20
+                                                height : 20
+                                                Layout.leftMargin : 15
+                                                Layout.topMargin : 4
+                                                color : 'transparent'
+                                                Star_shape {
+                                                    anchors.fill: parent
+                                                    size : 20
+                                                }
+                                            }
 
-	                                        Text {
-	                                            text: qsTr("ID")
-	                                            color : 'white'
-	                                            Layout.leftMargin: 20
-	                                            Layout.preferredWidth: 80
-	                                            font.bold: true
-	                                            font.pixelSize: 16
-	                                        }
+                                            Text {
+                                                text: qsTr("ID")
+                                                color : 'white'
+                                                Layout.leftMargin: 20
+                                                Layout.preferredWidth: 80
+                                                font.bold: true
+                                                font.pixelSize: 16
+                                            }
 
-	                                        Text {
-	                                            text: qsTr("UUID")
-	                                            color : 'white'
-	                                            Layout.preferredWidth: 200
-	                                            font.bold: true
-	                                            font.pixelSize: 16
-	                                        }
-
-
-	                                        Text {
-	                                            text: qsTr("Time")
-	                                            color : 'white'
-	                                            Layout.preferredWidth: 100
-	                                            Layout.fillWidth: false
-	                                            font.bold: true
-	                                            font.pixelSize: 16
-	                                        }
-
-	                                        Text {
-	                                            text: qsTr("Name")
-	                                            color : 'white'
-	                                            font.bold: true
-	                                            font.pixelSize: 16
-	                                        }
+                                            Text {
+                                                text: qsTr("UUID")
+                                                color : 'white'
+                                                Layout.preferredWidth: 200
+                                                font.bold: true
+                                                font.pixelSize: 16
+                                            }
 
 
-	                                        Item {
-	                                            width: 200
-	                                            height: data_content_view_header_box.height
-	                                            Layout.fillWidth: true
-	                                        }
+                                            Text {
+                                                text: qsTr("Time")
+                                                color : 'white'
+                                                Layout.preferredWidth: 100
+                                                Layout.fillWidth: false
+                                                font.bold: true
+                                                font.pixelSize: 16
+                                            }
 
-	                                        Text {
-	                                            text: qsTr("Keywords")
-	                                            color : 'white'
-	                                            Layout.rightMargin: 20
-	                                            font.bold: true
-	                                            font.pixelSize: 16
-	                                        }
+                                            Text {
+                                                text: qsTr("Name")
+                                                color : 'white'
+                                                font.bold: true
+                                                font.pixelSize: 16
+                                            }
 
-	                                    }
 
-	                                    MouseArea {
-	                                        anchors.fill: parent
-	                                        hoverEnabled: true
-	                                        onEntered: data_content_view_header_box.color= "#9C27B0"
-	                                        onExited: data_content_view_header_box.color= "#8e24aa"
-	                                    }
-	                                }
+                                            Item {
+                                                width: 200
+                                                height: data_content_view_header_box.height
+                                                Layout.fillWidth: true
+                                            }
+
+                                            Text {
+                                                text: qsTr("Keywords")
+                                                color : 'white'
+                                                Layout.rightMargin: 20
+                                                font.bold: true
+                                                font.pixelSize: 16
+                                            }
+
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            onEntered: data_content_view_header_box.color= "#9C27B0"
+                                            onExited: data_content_view_header_box.color= "#8e24aa"
+                                        }
+                                    }
                                 }
                             }
 
@@ -533,11 +460,11 @@ ApplicationWindow{
                 }
 
 
-			}
+            }
         }
 
-        Item{
-        	id: search_tab
+        Item {
+            id: search_tab
             Layout.fillHeight: true
             Layout.fillWidth: true
 
@@ -564,7 +491,7 @@ ApplicationWindow{
                 radius : 5
 
                 ListView {
-                	Component{
+                    Component {
                         id : data_content_search_view_delegate
 
                         Rectangle {
@@ -582,13 +509,13 @@ ApplicationWindow{
                                 width: row_overview.width
                                 height: row_overview.height
 
-                                Rectangle{
+                                Rectangle {
                                     width : 20
                                     height : 20
                                     Layout.leftMargin : 15
                                     Layout.topMargin : (42-20)/4
                                     color : 'transparent'
-                                    Star_shape{
+                                    Star_shape {
                                         anchors.fill: parent
                                         size : 20
                                         uuid_ : uuid
@@ -644,9 +571,9 @@ ApplicationWindow{
 
                     }
 
-                    Component{
+                    Component {
                         id : data_content_search_view_header
-                        Rectangle{
+                        Rectangle {
                             anchors.right: parent.right
                             anchors.left: parent.left
 
@@ -669,13 +596,13 @@ ApplicationWindow{
                                     width: data_content_search_view_header_box.width
                                     height: data_content_search_view_header_box.height
 
-                                    Rectangle{
+                                    Rectangle {
                                         width : 20
                                         height : 20
                                         Layout.leftMargin : 15
                                         Layout.topMargin : (42-20)/4
                                         color : 'transparent'
-                                        Star_shape{
+                                        Star_shape {
                                             anchors.fill: parent
                                             size : 20
 
@@ -787,54 +714,12 @@ ApplicationWindow{
     }
 
     RowLayout {
-    	id: measurement_overview_state_info
+        id: measurement_overview_state_info
         height: 50
 
         anchors.right: parent.right
         anchors.left: parent.left
         anchors.bottom: parent.bottom
-
-        Rectangle {
-            width: 250
-            height: 50
-            color : "transparent"
-            Layout.preferredWidth: 250
-
-            RadioButton {
-                objectName : 'local_conn'
-                id : local_conn
-                property var local_conn_status
-                Material.accent: (local_conn.local_conn_status == true) ? Material.Teal : Material.Red
-                width: 250
-                height: 50
-                text: " Local Connection"
-                leftPadding: 15
-                checkable: false
-                display: AbstractButton.TextBesideIcon
-                checked: true
-            }
-        }
-
-        Rectangle {
-            width: 250
-            height: 50
-            Layout.alignment: Qt.AlignLeft | Qt.AlignTop
-            Layout.preferredWidth: 250
-            color : "transparent"
-
-            RadioButton {
-                objectName : 'remote_conn'
-                id : remote_conn
-                property var remote_conn_status
-                Material.accent: (remote_conn.remote_conn_status == true) ? Material.Teal : Material.Red
-                width: 250
-                height: 50
-                text: 'Remote Connection'
-                leftPadding: 15
-                checkable: false
-                checked: true
-            }
-        }
 
         Item {
             Layout.fillWidth: true

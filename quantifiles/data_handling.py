@@ -5,9 +5,15 @@ import os
 from dataclasses import dataclass
 from datetime import datetime
 
-from quantify_core.data.handling import get_datadir
+import logging
+
+from filelock import FileLock
+from quantify_core.data.handling import get_datadir, load_dataset, DATASET_NAME
 from quantify_core.data.handling import set_datadir
 from quantify_core.data.types import TUID
+from quantify_core.measurement.control import _DATASET_LOCKS_DIR
+
+logger = logging.getLogger(__name__)
 
 set_datadir(r"C:\Users\Damie\PycharmProjects\quantifiles\test_data")
 
@@ -39,6 +45,16 @@ class DataSetReader:
     number_of_tuids = 0
 
     @staticmethod
+    def safe_load_dataset(uuid: TUID):
+        lockfile = os.path.join(
+            _DATASET_LOCKS_DIR, uuid[:26] + "-" + DATASET_NAME + ".lock"
+        )
+        with FileLock(lockfile, 5):
+            logger.info(f"Loading dataset {uuid}.")
+            ds = load_dataset(uuid)
+        return ds
+
+    @staticmethod
     def get_results_for_date(date: datetime | None, *args, **kwargs):
         if date is None:
             return []
@@ -49,7 +65,11 @@ class DataSetReader:
             raise ValueError(f"Path {path} does not exist")
 
         sub_dirs = os.listdir(path)
-        tuid_names = [os.path.basename(sub_dir) for sub_dir in sub_dirs if os.path.isdir(os.path.join(path, sub_dir))]
+        tuid_names = [
+            os.path.basename(sub_dir)
+            for sub_dir in sub_dirs
+            if os.path.isdir(os.path.join(path, sub_dir))
+        ]
 
         results = [
             ResultsEntry(
@@ -91,8 +111,3 @@ class DataSetReader:
                 pass
 
         return sorted(list(set(parsed_dates)), reverse=True)
-
-
-if __name__ == "__main__":
-    print(glob.glob(os.path.join(get_datadir(), "**/*.hdf5"), recursive=True))
-    print(_get_all_tuids())
