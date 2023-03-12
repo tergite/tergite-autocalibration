@@ -613,14 +613,14 @@ ApplicationWindow {
                                         text: qsTr("ID")
                                         color : 'white'
                                         Layout.leftMargin: 20
-                                        Layout.preferredWidth: 80
+                                        Layout.preferredWidth: 40
                                         font.pixelSize: 22
                                     }
 
                                     Text {
-                                        text: qsTr("UUID")
+                                        text: qsTr("TUID")
                                         color : 'white'
-                                        Layout.preferredWidth: 200
+                                        Layout.preferredWidth: 240
                                         font.pixelSize: 22
                                     }
 
