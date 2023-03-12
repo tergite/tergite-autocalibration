@@ -32,12 +32,12 @@ class _2D_plot:
         self.logmode = {"x": False, "y": False, "z": False}
         self.logmode.update(logmode)
 
-        self.ds = dataset
+        self.dataset = dataset
         self.y_key = y_key
 
-        self.x0_unit_scaler = return_unit_scaler(self.ds.x0.attrs["units"])
-        self.x1_unit_scaler = return_unit_scaler(self.ds.x1.attrs["units"])
-        self.value_unit_scaler = return_unit_scaler(self.ds[y_key].attrs["units"])
+        self.x0_unit_scaler = return_unit_scaler(self.dataset.x0.attrs["units"])
+        self.x1_unit_scaler = return_unit_scaler(self.dataset.x1.attrs["units"])
+        self.value_unit_scaler = return_unit_scaler(self.dataset[y_key].attrs["units"])
 
         pg.setConfigOption("background", None)
         pg.setConfigOption("foreground", "k")
@@ -46,8 +46,16 @@ class _2D_plot:
         self.layout = QtWidgets.QVBoxLayout()
 
         self.plot = pg.PlotItem()
-        self.plot.setLabel("bottom", self.ds.x1.long_name, units=format_unit(self.ds.x1.attrs["units"]))
-        self.plot.setLabel("left", self.ds.x0.long_name, units=format_unit(self.ds.x0.attrs["units"]))
+        self.plot.setLabel(
+            "bottom",
+            self.dataset.x1.long_name,
+            units=format_unit(self.dataset.x1.attrs["units"]),
+        )
+        self.plot.setLabel(
+            "left",
+            self.dataset.x0.long_name,
+            units=format_unit(self.dataset.x0.attrs["units"]),
+        )
         self.img = pg.ImageItem()
         # set some image data. This is required for pyqtgraph > 0.11
         self.img.setImage(np.zeros((1, 1)))
@@ -75,8 +83,8 @@ class _2D_plot:
     def update(self):
         try:
             # logger.info(f'updating {self.ds.name} {self.ds.y.name} vs {self.ds.x0.name} ')
-            x0 = np.unique(self.ds.x0.values * self.x0_unit_scaler)
-            x1 = np.unique(self.ds.x1.values * self.x1_unit_scaler)
+            x0 = np.unique(self.dataset.x0.values * self.x0_unit_scaler)
+            x1 = np.unique(self.dataset.x1.values * self.x1_unit_scaler)
 
             if self.detect_log_mode(x0):
                 self.logmode["y"] = True
@@ -95,7 +103,7 @@ class _2D_plot:
             y_limit = [np.min(y_args), np.max(y_args)]
             y_limit_num = (x1[y_limit[0]], x1[y_limit[1]])
 
-            data = self.ds[self.y_key].values.reshape(-1, len(x1))
+            data = self.dataset[self.y_key].values.reshape(-1, len(x1))
 
             data_cp = np.empty(data.shape)
             data_cp[:, :] = np.nan
@@ -152,11 +160,11 @@ class _2D_plot:
             vb = self.plot.vb
             pos = evt[0]  ## using signal proxy turns original arguments into a tuple
             if self.plot.sceneBoundingRect().contains(pos):
-                mousePoint = vb.mapSceneToView(pos)
-                x_val = mousePoint.x()
+                mouse_point = vb.mapSceneToView(pos)
+                x_val = mouse_point.x()
                 if self.logmode["x"]:
                     x_val = 10**x_val
-                y_val = mousePoint.y()
+                y_val = mouse_point.y()
                 if self.logmode["y"]:
                     y_val = 10**y_val
 
@@ -165,20 +173,20 @@ class _2D_plot:
                 y = x_val
                 x = y_val
 
-                ds = self.ds
+                ds = self.dataset
                 x_dist = np.abs(ds.x0 * self.x0_unit_scaler - x)
                 y_dist = np.abs(ds.x1 * self.x1_unit_scaler - y)
                 c = np.maximum(x_dist, y_dist)
-                ([xloc,],) = np.where(c == np.min(c))
+                (
+                    [
+                        xloc,
+                    ],
+                ) = np.where(c == np.min(c))
 
                 point_ds = ds[self.y_key][xloc]
 
                 value = point_ds.values
-                value_formatted = (
-                    str(value)
-                    if not np.isnan(value)
-                    else "NaN "
-                )
+                value_formatted = str(value) if not np.isnan(value) else "NaN "
 
                 self.label.setText(
                     "x={}, y={}: {}".format(
@@ -192,13 +200,13 @@ class _2D_plot:
 
 
 def get_color_map():
-    numofLines = 5
-    cMapType = "viridis"
-    colorMap = get_cmap(cMapType)  # get_cmap is matplotlib object
+    num_of_lines = 5
+    c_map_type = "viridis"
+    color_map = get_cmap(c_map_type)  # get_cmap is matplotlib object
 
-    colorList = np.linspace(0, 1, numofLines)
-    lineColors = colorMap(colorList)
+    color_list = np.linspace(0, 1, num_of_lines)
+    line_colors = color_map(color_list)
 
-    lineColors = lineColors * 255
-    lineColors = lineColors.astype(int)
-    return pg.ColorMap(pos=np.linspace(0.0, 1.0, numofLines), color=lineColors)
+    line_colors = line_colors * 255
+    line_colors = line_colors.astype(int)
+    return pg.ColorMap(pos=np.linspace(0.0, 1.0, num_of_lines), color=line_colors)

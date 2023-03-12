@@ -15,11 +15,11 @@ import quantifiles.qml as qml_in
 
 class DataBrowser:
     def __init__(
-            self,
-            data_dir: str | Path | None = None,
-            window_location=None,
-            window_size=None,
-            live_plotting_enabled=True,
+        self,
+        data_dir: str | Path | None = None,
+        window_location=None,
+        window_size=None,
+        live_plotting_enabled=True,
     ):
         set_app_icon()
 
@@ -74,7 +74,7 @@ class DataBrowser:
         )
 
         # grab directory from the import!
-        filename = os.path.join(qml_in.__file__[:-11], "data_browser.qml")
+        filename = os.path.join(os.path.dirname(qml_in.__file__), "data_browser.qml")
 
         self.engine.load(QtCore.QUrl.fromLocalFile(filename))
         self.win = self.engine.rootObjects()[0]
