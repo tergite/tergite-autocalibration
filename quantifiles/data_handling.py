@@ -52,7 +52,16 @@ class DataSetReader:
         return ds
 
     @staticmethod
-    def get_results_for_date(date: datetime | None, *args, **kwargs):
+    def get_results_for_date(date: datetime | None):
+        def get_kwds(tuid: str):
+            try:
+                ds = DataSetReader.safe_load_dataset(TUID(tuid[:26]))
+                x_vals = [val.long_name for val in list(ds.coords.values())]
+                y_vals = [val.long_name for val in list(ds.data_vars.values())]
+                return x_vals + y_vals
+            except Exception as e:
+                return [str(e)]
+
         if date is None:
             return []
 
@@ -68,6 +77,8 @@ class DataSetReader:
             if os.path.isdir(os.path.join(path, sub_dir))
         ]
 
+        keywords = list(map(get_kwds, tuid_names))
+
         results = [
             ResultsEntry(
                 my_id=idx,
@@ -78,14 +89,14 @@ class DataSetReader:
                 set_up="",
                 sample="",
                 starred="",
-                _keywords=[],
+                _keywords=kwd,
             )
-            for idx, tuid_name in enumerate(tuid_names)
+            for idx, (tuid_name, kwd) in enumerate(zip(tuid_names, keywords))
         ]
         return sorted(results, key=lambda x: x.uuid)
 
     @staticmethod
-    def detect_new_measurements(*args, **kwargs):
+    def detect_new_measurements(max_id: int):
         n_tuids = len(_get_all_tuids())
         if n_tuids > DataSetReader.number_of_tuids:
             DataSetReader.number_of_tuids = n_tuids
@@ -93,7 +104,7 @@ class DataSetReader:
         return False, 0
 
     @staticmethod
-    def get_all_dates_with_measurements(*args, **kwargs):
+    def get_all_dates_with_measurements():
         paths = _get_all_dataset_paths()
 
         dirnames = [os.path.dirname(path) for path in paths]

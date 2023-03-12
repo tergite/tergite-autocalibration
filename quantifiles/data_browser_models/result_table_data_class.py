@@ -33,15 +33,13 @@ class m_result_item:
     def keywords(self):
         kw = ""
         if isinstance(self._keywords, list):
-            for i in self._keywords:
-                if "raw" not in i:
-                    kw += str(i) + ", "
+            kw = ", ".join(self._keywords)
         if len(kw) == 0:
             return kw
 
         if len(kw) > 80:
             kw = kw[:80] + " ...."
-        return kw[:-2]
+        return kw
 
     @property
     def date(self):
