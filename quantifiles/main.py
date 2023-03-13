@@ -6,17 +6,16 @@ import os
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Sequence, cast, Mapping
+from typing import Sequence, Mapping
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 from numpy import rint
 from quantify_core.data.handling import set_datadir
 from quantify_core.data.types import TUID
 
 from quantifiles.data_handling import (
-    DataSetReader,
     get_results_for_date,
-    safe_load_dataset,
+    safe_load_dataset, get_all_dates_with_measurements,
 )
 from quantifiles.plot_mgr import data_plotter
 
@@ -269,7 +268,7 @@ class DataDirInspector(QtWidgets.QMainWindow):
         self._datadir_label.updateDataDir(self.datadir)
         set_datadir(self.datadir)
 
-        dates = DataSetReader.get_all_dates_with_measurements()
+        dates = get_all_dates_with_measurements()
         self.dateList.updateDates([date.strftime("%Y-%m-%d") for date in dates])
         self.dateList.setCurrentRow(0)
 

@@ -1,4 +1,4 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 import pyqtgraph as pg
 
 from quantifiles.plots.unit_management import (
@@ -7,7 +7,7 @@ from quantifiles.plots.unit_management import (
     format_value_and_unit,
 )
 
-graph_color = list()
+graph_color = []
 graph_color += [
     {
         "pen": (0, 114, 189),
