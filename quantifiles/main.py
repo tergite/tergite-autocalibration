@@ -17,7 +17,7 @@ from quantifiles.data_handling import (
     get_results_for_date,
     safe_load_dataset, get_all_dates_with_measurements,
 )
-from quantifiles.plot_mgr import data_plotter
+from quantifiles.plots.plot_mgr import data_plotter
 
 
 class DateList(QtWidgets.QListWidget):
