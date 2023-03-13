@@ -176,8 +176,6 @@ class _1D_plot:
     @property
     def name(self):
         name = "Plotting "
-        # for ds in self.ds_list:
-        #     name += " {} +".format(ds.name)
         name += " {}".format(self.dataset.name)
 
         return name[:-1]
