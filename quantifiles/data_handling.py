@@ -78,9 +78,7 @@ def get_results_for_date(date: datetime | None) -> dict[str, DateResults]:
 
 def safe_load_dataset(tuid: str):
     tuid = tuid[:26]
-    lockfile = os.path.join(
-        _DATASET_LOCKS_DIR, tuid + "-" + DATASET_NAME + ".lock"
-    )
+    lockfile = os.path.join(_DATASET_LOCKS_DIR, tuid + "-" + DATASET_NAME + ".lock")
     with FileLock(lockfile, 5):
         logger.info(f"Loading dataset {tuid}.")
         ds = load_dataset(TUID(tuid))
@@ -102,4 +100,3 @@ def get_all_dates_with_measurements():
             pass
 
     return sorted(list(set(parsed_dates)), reverse=True)
-

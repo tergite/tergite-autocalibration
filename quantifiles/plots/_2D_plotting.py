@@ -7,7 +7,11 @@ import pyqtgraph as pg
 import numpy as np
 import logging
 
-from quantifiles.plots.unit_management import return_unit_scaler, format_unit
+from quantifiles.plots.unit_management import (
+    return_unit_scaler,
+    format_unit,
+    format_value_and_unit,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -186,13 +190,12 @@ class _2D_plot:
                 point_ds = ds[self.y_key][xloc]
 
                 value = point_ds.values
-                value_formatted = str(value) if not np.isnan(value) else "NaN "
 
                 self.label.setText(
                     "x={}, y={}: {}".format(
-                        x,
-                        y,
-                        value_formatted + format_unit(ds[self.y_key].attrs["units"]),
+                        format_value_and_unit(x, ds.x0.attrs["units"]),
+                        format_value_and_unit(y, ds.x1.attrs["units"]),
+                        format_value_and_unit(value, ds[self.y_key].attrs["units"]),
                     )
                 )
         except:

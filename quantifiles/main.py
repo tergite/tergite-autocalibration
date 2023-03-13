@@ -15,7 +15,8 @@ from quantify_core.data.types import TUID
 
 from quantifiles.data_handling import (
     get_results_for_date,
-    safe_load_dataset, get_all_dates_with_measurements,
+    safe_load_dataset,
+    get_all_dates_with_measurements,
 )
 from quantifiles.plots.plot_mgr import data_plotter
 
@@ -24,13 +25,9 @@ class DateList(QtWidgets.QListWidget):
     """Displays a list of dates for which there are runs in the database."""
 
     datesSelected = QtCore.pyqtSignal(list)
-    fileDropped = QtCore.pyqtSignal(str)
 
     def __init__(self, parent: QtWidgets.QWidget | None = None):
         super().__init__(parent)
-
-        # self.setAcceptDrops(True)
-        # self.setDefaultDropAction(QtCore.Qt.CopyAction)
 
         self.setSelectionMode(QtWidgets.QListView.ExtendedSelection)
         self.itemSelectionChanged.connect(self.sendSelectedDates)
@@ -94,7 +91,7 @@ class RunList(QtWidgets.QTreeWidget):
         if action == copy_action:
             QtWidgets.QApplication.clipboard().setText(item.text(model_index.column()))
 
-    def addRun(self, tuid: TUID, **vals: str) -> None:
+    def addRun(self, tuid: TUID | str, **vals: str) -> None:
         lst = [str(tuid)]
         lst.append(vals.get("name", ""))
         lst.append(vals.get("date", ""))
@@ -118,13 +115,13 @@ class RunList(QtWidgets.QTreeWidget):
         for i in range(len(self.cols)):
             self.resizeColumnToContents(i)
 
-    def updateRuns(self, selection: Mapping[int, Mapping[str, str]]) -> None:
+    def updateRuns(self, selection: Mapping[str, Mapping[str, str]]) -> None:
         run_added = False
-        for runId, record in selection.items():
-            item = self.findItems(str(runId), QtCore.Qt.MatchExactly)
+        for tuid, record in selection.items():
+            item = self.findItems(str(tuid), QtCore.Qt.MatchExactly)
             if len(item) == 0:
                 self.setSortingEnabled(False)
-                self.addRun(runId, **record)
+                self.addRun(tuid, **record)
                 run_added = True
             elif len(item) == 1:
                 completed = (
@@ -139,7 +136,7 @@ class RunList(QtWidgets.QTreeWidget):
                 if num_records != item[0].text(7):
                     item[0].setText(7, num_records)
             else:
-                raise RuntimeError(f"More than one runs found with runId: " f"{runId}")
+                raise RuntimeError(f"More than one runs found with runId: " f"{tuid}")
 
         if run_added:
             self.setSortingEnabled(True)
@@ -224,8 +221,8 @@ class DataDirInspector(QtWidgets.QMainWindow):
 
         # action: updates from the db file
         refreshAction = QtWidgets.QAction("&Reload", self)
-        refreshAction.setShortcut("Ctrl+R")
-        # refreshAction.triggered.connect(self.refreshDB)
+        refreshAction.setShortcut("R")
+        refreshAction.triggered.connect(self.reload_datadir)
         fileMenu.addAction(refreshAction)
 
         # ---- end menu bar ----
@@ -250,6 +247,14 @@ class DataDirInspector(QtWidgets.QMainWindow):
         self.plots.append(p)
 
     @QtCore.pyqtSlot()
+    def reload_datadir(self) -> None:
+        self._datadir_label.updateDataDir(self.datadir)
+        set_datadir(self.datadir)
+
+        dates = get_all_dates_with_measurements()
+        self.dateList.updateDates([date.strftime("%Y-%m-%d") for date in dates])
+
+    @QtCore.pyqtSlot()
     def configure_datadir(self) -> None:
         curdir = self.datadir if self.datadir is not None else os.getcwd()
 
@@ -265,11 +270,7 @@ class DataDirInspector(QtWidgets.QMainWindow):
             self.datadirSelected.emit(path)
 
     def update_datadir(self) -> None:
-        self._datadir_label.updateDataDir(self.datadir)
-        set_datadir(self.datadir)
-
-        dates = get_all_dates_with_measurements()
-        self.dateList.updateDates([date.strftime("%Y-%m-%d") for date in dates])
+        self.reload_datadir()
         self.dateList.setCurrentRow(0)
 
     @QtCore.pyqtSlot(list)
@@ -293,6 +294,8 @@ def main(
     datadir: str | Path | None = None, log_level: int | str = logging.WARNING
 ) -> None:
     app = QtWidgets.QApplication([])
+    logging.basicConfig(level=log_level)
+    app.setApplicationName("Quantifiles")
 
     win = DataDirInspector(datadir=datadir)
     win.show()
