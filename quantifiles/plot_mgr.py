@@ -1,8 +1,7 @@
 from PyQt5 import QtCore, QtWidgets
 import logging
-from datetime import datetime, timedelta
 
-from quantifiles.data_handling import DataSetReader
+from quantifiles.data_handling import safe_load_dataset
 from quantifiles.generate_mparam_ui_box import single_m_param_m_descriptor
 from quantifiles.plots._1D_plotting import _1D_plot
 from quantifiles.plots._2D_plotting import _2D_plot
@@ -126,7 +125,7 @@ class ui_box_mgr:
         # if self.ds.completed:  # TODO: fix this
         #     self.timer.stop()
 
-        self.ds = DataSetReader.safe_load_dataset(self.ds.tuid)
+        self.ds = safe_load_dataset(self.ds.tuid)
 
         for plot in self.plot_widgets:
             try:

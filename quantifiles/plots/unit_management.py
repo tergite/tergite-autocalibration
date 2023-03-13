@@ -27,11 +27,11 @@ def fix_units(unit):
     return unit, scaler
 
 
-def format_value_and_unit(value, unit, precision=1):
+def format_value_and_unit(value, unit):
     unit, scaler = fix_units(unit)
     if np.isnan(value):
         value = 0
-    return str(value * scaler) + unit  # removed si_format
+    return f"{value * scaler: .4e}" + unit
 
 
 def format_unit(unit):
