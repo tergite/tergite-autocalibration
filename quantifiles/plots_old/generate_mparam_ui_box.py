@@ -1,10 +1,10 @@
 """
 This is a bit of messy file written in a hurry.
 """
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 from functools import partial
 
-from quantifiles.plots.unit_management import format_value_and_unit
+from quantifiles.units import format_value_and_unit
 
 
 class check_box_descriptor:

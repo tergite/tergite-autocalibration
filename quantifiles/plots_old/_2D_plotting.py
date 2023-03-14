@@ -7,7 +7,7 @@ import pyqtgraph as pg
 import numpy as np
 import logging
 
-from quantifiles.plots.unit_management import (
+from quantifiles.units import (
     return_unit_scaler,
     format_unit,
     format_value_and_unit,
