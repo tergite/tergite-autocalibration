@@ -22,14 +22,14 @@ def autoplot(dataset: xr.Dataset) -> QtWidgets.QMainWindow:
             "grid_2d_uniformly_spaced", dataset.attrs.get("2D-grid", False)
         ):
             plot_widget = ColorPlot(dataset, x="x0", y="x1", z=gettable, parent=plot_window)
-            plot_window.add_plot(plot_widget)
+            plot_window.add_plot(gettable, plot_widget)
         else:
             for settable in settables:
                 settable = cast(str, settable)
                 plot_widget = LinePlot(
                     dataset, x_key=settable, y_keys=gettable, parent=plot_window
                 )
-                plot_window.add_plot(plot_widget)
+                plot_window.add_plot(gettable, plot_widget)
 
     return plot_window
 
@@ -37,9 +37,9 @@ def autoplot(dataset: xr.Dataset) -> QtWidgets.QMainWindow:
 if __name__ == "__main__":
     set_datadir(r"C:\Users\Damie\PycharmProjects\quantifiles\test_data")
 
-    dataset = safe_load_dataset("20230312-182213-487-38d5f1")
+    # dataset = safe_load_dataset("20230312-182213-487-38d5f1")
     # dataset = safe_load_dataset("20200504-191556-002-4209ee")
-    # dataset = safe_load_dataset("20220930-104712-924-d6f761")
+    dataset = safe_load_dataset("20220930-104712-924-d6f761")
 
     print(dataset)
 

@@ -34,7 +34,7 @@ class ColorPlot(QtWidgets.QWidget):
             y_data = dataset[y].values[:: dataset.attrs["xlen"]]
             z_data = np.reshape(
                 dataset[z].values, (len(x_data), len(y_data)), order="F"
-            ).T
+            )
             self.set_image(x_data, y_data, z_data)
         else:
             raise NotImplementedError(
