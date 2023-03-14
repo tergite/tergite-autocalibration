@@ -1,7 +1,7 @@
 from PyQt5 import QtCore, QtWidgets
 import pyqtgraph as pg
 
-from quantifiles.plots.unit_management import (
+from quantifiles.units import (
     return_unit_scaler,
     format_unit,
     format_value_and_unit,

@@ -13,12 +13,12 @@ from numpy import rint
 from quantify_core.data.handling import set_datadir
 from quantify_core.data.types import TUID
 
-from quantifiles.data_handling import (
+from quantifiles.data import (
     get_results_for_date,
     safe_load_dataset,
     get_all_dates_with_measurements,
 )
-from quantifiles.plots.plot_mgr import data_plotter
+from quantifiles.plot.autoplot import autoplot
 
 
 class DateList(QtWidgets.QListWidget):
@@ -243,8 +243,9 @@ class DataDirInspector(QtWidgets.QMainWindow):
     @QtCore.pyqtSlot(str)
     def open_plots(self, tuid: str) -> None:
         ds = safe_load_dataset(tuid)
-        p = data_plotter(ds)
+        p = autoplot(ds)
         self.plots.append(p)
+        p.show()
 
     @QtCore.pyqtSlot()
     def reload_datadir(self) -> None:

@@ -1,10 +1,10 @@
 from PyQt5 import QtCore, QtWidgets
 import logging
 
-from quantifiles.data_handling import safe_load_dataset
-from quantifiles.plots.generate_mparam_ui_box import single_m_param_m_descriptor
-from quantifiles.plots._1D_plotting import _1D_plot
-from quantifiles.plots._2D_plotting import _2D_plot
+from quantifiles.data import safe_load_dataset
+from quantifiles.plots_old.generate_mparam_ui_box import single_m_param_m_descriptor
+from quantifiles.plots_old._1D_plotting import _1D_plot
+from quantifiles.plots_old._2D_plotting import _2D_plot
 from quantifiles.ui_files import plotter_basic_autgen
 
 logger = logging.getLogger(__name__)
@@ -38,7 +38,7 @@ class data_plotter(QtWidgets.QMainWindow, plotter_basic_autgen.Ui_MainWindow):
             )
             self.data_content_layout.addItem(verticalSpacer)
 
-            # render plots
+            # render plots_old
             self.ui_box_mgr.draw_plots()
 
             self.show()
