@@ -13,6 +13,7 @@ from numpy import rint
 from quantify_core.data.handling import set_datadir
 from quantify_core.data.types import TUID
 
+from quantifiles.path import load_icon
 from quantifiles.data import (
     get_results_for_date,
     safe_load_dataset,
@@ -187,6 +188,7 @@ class DataDirInspector(QtWidgets.QMainWindow):
         self.plots = []
 
         self.setWindowTitle(self._WINDOW_TITLE)
+        self.setWindowIcon(load_icon("icon.png"))
 
         # ---- widgets ----
         self.dateList = DateList()

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+
 from quantifiles.main import main
 
 from pathlib import Path
