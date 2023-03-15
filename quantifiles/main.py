@@ -233,7 +233,7 @@ class DataDirInspector(QtWidgets.QMainWindow):
 
         # signals
         self.runList.runActivated.connect(self.open_plots)
-        self.dateList.datesSelected.connect(self.setDateSelection)
+        self.dateList.datesSelected.connect(self.set_date_selection)
         self.datadirSelected.connect(self.update_datadir)
 
         # set the datadir
@@ -255,6 +255,8 @@ class DataDirInspector(QtWidgets.QMainWindow):
         dates = get_all_dates_with_measurements()
         self.dateList.updateDates([date.strftime("%Y-%m-%d") for date in dates])
 
+        self.set_date_selection(self._selected_dates)  # reselect the dates to update
+
     @QtCore.pyqtSlot()
     def configure_datadir(self) -> None:
         curdir = self.datadir if self.datadir is not None else os.getcwd()
@@ -275,7 +277,7 @@ class DataDirInspector(QtWidgets.QMainWindow):
         self.dateList.setCurrentRow(0)
 
     @QtCore.pyqtSlot(list)
-    def setDateSelection(self, dates: Sequence[str]) -> None:
+    def set_date_selection(self, dates: Sequence[str]) -> None:
         if len(dates) > 0:
             selection_dict = {}
             for date in dates:
