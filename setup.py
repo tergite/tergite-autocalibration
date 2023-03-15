@@ -9,7 +9,7 @@ with open("LICENSE") as f:
 
 setup(
     name="quantifiles",
-    version="0.0.1",
+    version="0.0.2",
     description="Simple databrowser for quantify datasets.",
     long_description=readme,
     author="Damien Crielaard",
