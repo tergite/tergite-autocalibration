@@ -4,8 +4,6 @@ import pyqtgraph
 import numpy as np
 import xarray as xr
 
-from quantifiles.units import format_unit
-
 COLORMAP = "viridis"
 
 
@@ -46,12 +44,12 @@ class ColorPlot(QtWidgets.QWidget):
         self.plot.setLabel(
             "left",
             self.dataset[y].long_name,
-            units=format_unit(self.dataset[y].attrs["units"]),
+            units=self.dataset[y].attrs["units"],
         )
         self.plot.setLabel(
             "bottom",
             self.dataset[x].long_name,
-            units=format_unit(self.dataset[x].attrs["units"]),
+            units=self.dataset[x].attrs["units"],
         )
 
     def set_image(self, x_data: np.ndarray, y_data: np.ndarray, z_data: np.ndarray):

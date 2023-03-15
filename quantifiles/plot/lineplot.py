@@ -3,12 +3,10 @@ from __future__ import annotations
 from itertools import cycle
 from typing import Sequence
 
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets
 import pyqtgraph
 
 import xarray as xr
-
-from quantifiles.units import format_unit
 
 _OPTIONS = [
     {
@@ -118,12 +116,12 @@ class LinePlot(QtWidgets.QWidget):
         self.plot.setLabel(
             "left",
             self.dataset[self.y_keys[0]].long_name,
-            units=format_unit(self.dataset[self.y_keys[0]].attrs["units"]),
+            units=self.dataset[self.y_keys[0]].attrs["units"],
         )
         self.plot.setLabel(
             "bottom",
             self.dataset[x_key].long_name,
-            units=format_unit(self.dataset[x_key].attrs["units"]),
+            units=self.dataset[x_key].attrs["units"],
         )
 
         self.plot.showGrid(x=True, y=True)
