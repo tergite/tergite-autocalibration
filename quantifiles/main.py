@@ -209,8 +209,6 @@ class DataDirInspector(QtWidgets.QMainWindow):
         self.toolbar.addWidget(self._datadir_label)
         self.toolbar.setMovable(False)
 
-        # self.toolbar.addSeparator()
-
         # ---- menu bar ----
         menu = self.menuBar()
         fileMenu = menu.addMenu("&File")
