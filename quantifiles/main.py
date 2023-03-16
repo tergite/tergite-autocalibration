@@ -71,14 +71,14 @@ class ExperimentList(QtWidgets.QTreeWidget):
         self.setColumnCount(len(self.cols))
         self.setHeaderLabels(self.cols)
 
-        self.itemSelectionChanged.connect(self.selectRun)
-        self.itemActivated.connect(self.activateRun)
+        self.itemSelectionChanged.connect(self.select_experiment)
+        self.itemActivated.connect(self.activate_experiment)
 
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.customContextMenuRequested.connect(self.showContextMenu)
+        self.customContextMenuRequested.connect(self.show_context_menu)
 
     @QtCore.pyqtSlot(QtCore.QPoint)
-    def showContextMenu(self, position: QtCore.QPoint) -> None:
+    def show_context_menu(self, position: QtCore.QPoint) -> None:
         model_index = self.indexAt(position)
         item = self.itemFromIndex(model_index)
         assert item is not None
@@ -92,7 +92,7 @@ class ExperimentList(QtWidgets.QTreeWidget):
         if action == copy_action:
             QtWidgets.QApplication.clipboard().setText(item.text(model_index.column()))
 
-    def addRun(self, tuid: TUID | str, **vals: str) -> None:
+    def add_experiment(self, tuid: TUID | str, **vals: str) -> None:
         lst = [str(tuid)]
         lst.append(vals.get("name", ""))
         lst.append(vals.get("date", ""))
@@ -102,28 +102,28 @@ class ExperimentList(QtWidgets.QTreeWidget):
         item = QtWidgets.QTreeWidgetItem(lst)
         self.addTopLevelItem(item)
 
-    def setRuns(self, selection: Mapping[str, Mapping[str, str]]) -> None:
+    def set_experiments(self, selection: Mapping[str, Mapping[str, str]]) -> None:
         self.clear()
 
         # disable sorting before inserting values to avoid performance hit
         self.setSortingEnabled(False)
 
         for tuid, record in selection.items():
-            self.addRun(tuid, **record)
+            self.add_experiment(tuid, **record)
 
         self.setSortingEnabled(True)
 
         for i in range(len(self.cols)):
             self.resizeColumnToContents(i)
 
-    def updateRuns(self, selection: Mapping[str, Mapping[str, str]]) -> None:
-        run_added = False
+    def update_experiments(self, selection: Mapping[str, Mapping[str, str]]) -> None:
+        new_item_found = False
         for tuid, record in selection.items():
             item = self.findItems(str(tuid), QtCore.Qt.MatchExactly)
             if len(item) == 0:
                 self.setSortingEnabled(False)
-                self.addRun(tuid, **record)
-                run_added = True
+                self.add_experiment(tuid, **record)
+                new_item_found = True
             elif len(item) == 1:
                 completed = (
                     record.get("completed_date", "")
@@ -137,15 +137,15 @@ class ExperimentList(QtWidgets.QTreeWidget):
                 if num_records != item[0].text(7):
                     item[0].setText(7, num_records)
             else:
-                raise RuntimeError(f"More than one runs found with runId: " f"{tuid}")
+                raise RuntimeError(f"More than one dataset found with tuid: " f"{tuid}")
 
-        if run_added:
+        if new_item_found:
             self.setSortingEnabled(True)
             for i in range(len(self.cols)):
                 self.resizeColumnToContents(i)
 
     @QtCore.pyqtSlot()
-    def selectRun(self) -> None:
+    def select_experiment(self) -> None:
         selection = self.selectedItems()
         if len(selection) == 0:
             return
@@ -154,7 +154,7 @@ class ExperimentList(QtWidgets.QTreeWidget):
         self.runSelected.emit(tuid)
 
     @QtCore.pyqtSlot(QtWidgets.QTreeWidgetItem, int)
-    def activateRun(self, item: QtWidgets.QTreeWidgetItem, _: int) -> None:
+    def activate_experiment(self, item: QtWidgets.QTreeWidgetItem, _: int) -> None:
         tuid = item.text(0)
         self.runActivated.emit(tuid)
 
@@ -196,7 +196,7 @@ class DataDirInspector(QtWidgets.QMainWindow):
         splitter = QtWidgets.QSplitter()
         splitter.addWidget(self.date_list)
         splitter.addWidget(self.experiment_list)
-        splitter.setSizes([100, 800])
+        splitter.setSizes([80, 820])
 
         self.setCentralWidget(splitter)
 
@@ -212,13 +212,11 @@ class DataDirInspector(QtWidgets.QMainWindow):
         menu = self.menuBar()
         fileMenu = menu.addMenu("&File")
 
-        # action: load db file
         loadAction = QtWidgets.QAction("&Open", self)
         loadAction.setShortcut("Ctrl+O")
         loadAction.triggered.connect(self.configure_datadir)
         fileMenu.addAction(loadAction)
 
-        # action: updates from the db file
         refreshAction = QtWidgets.QAction("&Reload", self)
         refreshAction.setShortcut("R")
         refreshAction.triggered.connect(self.reload_datadir)
@@ -227,8 +225,8 @@ class DataDirInspector(QtWidgets.QMainWindow):
         # ---- end menu bar ----
 
         # sizing
-        scaledSize = int(self._WINDOW_SIZE * rint(self.logicalDpiX() / 96.0))
-        self.resize(2 * scaledSize, scaledSize)
+        scaling = int(self._WINDOW_SIZE * rint(self.logicalDpiX() / 96.0))
+        self.resize(2 * scaling, scaling)
 
         # signals
         self.experiment_list.runActivated.connect(self.open_plots)
@@ -285,7 +283,7 @@ class DataDirInspector(QtWidgets.QMainWindow):
                     {tuid: dataclasses.asdict(data) for tuid, data in results.items()}
                 )
 
-            self.experiment_list.setRuns(selection_dict)
+            self.experiment_list.set_experiments(selection_dict)
             self._selected_dates = tuple(dates)
         else:
             self._selected_dates = ()

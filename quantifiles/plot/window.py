@@ -41,14 +41,20 @@ class SingleGettableBox(QtWidgets.QFrame):
 
             label_short_name = QtWidgets.QLabel(str(settable_name))
             label_long_name = QtWidgets.QLabel(str(settable_long_name))
+            label_settable_unit = QtWidgets.QLabel(str(dataset[gettable_name][settable_name].attrs["units"]))
+
             param_table_layout.addWidget(label_short_name, idx, 0)
             param_table_layout.addWidget(label_long_name, idx, 1)
+            param_table_layout.addWidget(label_settable_unit, idx, 2)
 
         label_short_name = QtWidgets.QLabel(str(gettable_name))
         label_long_name = QtWidgets.QLabel(str(gettable_long_name))
+        label_settable_unit = QtWidgets.QLabel(str(dataset[gettable_name].attrs["units"]))
         number_of_settables = len(dataset[gettable_name].coords.keys())
+
         param_table_layout.addWidget(label_short_name, number_of_settables + 1, 0)
         param_table_layout.addWidget(label_long_name, number_of_settables + 1, 1)
+        param_table_layout.addWidget(label_settable_unit, number_of_settables + 1, 2)
 
         self.setLayout(grid_layout)
 
