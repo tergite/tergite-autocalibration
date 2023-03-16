@@ -1,6 +1,7 @@
 import numpy as np
 
 known_units = {
+    "A": 1,
     "mA": 1e-3,
     "uA": 1e-6,
     "nA": 1e-9,
@@ -9,24 +10,29 @@ known_units = {
     "nV": 1e-9,
     "uV": 1e-6,
     "mV": 1e-3,
+    "V": 1,
     "kV": 1e3,
     "MV": 1e6,
     "GV": 1e9,
     "nT": 1e-9,
     "uT": 1e-6,
     "mT": 1e-3,
+    "T": 1,
     "kT": 1e3,
     "MT": 1e6,
     "GT": 1e9,
     "nH": 1e-9,
     "uH": 1e-6,
     "mH": 1e-3,
+    "H": 1,
     "kH": 1e3,
     "MH": 1e6,
     "GH": 1e9,
     "ns": 1e-9,
     "us": 1e-6,
     "ms": 1e-3,
+    "s": 1,
+    "Hz": 1,
     "kHz": 1e3,
     "MHz": 1e6,
     "GHz": 1e9,
@@ -34,12 +40,12 @@ known_units = {
 
 
 def get_si_unit_and_scaling(unit: str) -> (str, float):
-    scaler = 1
     if unit in known_units.keys():
-        scaler = known_units[unit]
-        unit = unit[1:]
-
-    return unit, scaler
+        scaling = known_units[unit]
+        si_unit = unit if scaling == 1 else unit[1:]
+        return si_unit, scaling
+    else:
+        return None, 1.0
 
 
 def format_value_and_unit(value: float, unit: str) -> str:
@@ -47,14 +53,6 @@ def format_value_and_unit(value: float, unit: str) -> str:
     if np.isnan(value):
         value = 0
     return f"{value * scaler: .4e}" + unit
-
-
-def get_si_unit(unit: str) -> str:
-    return get_si_unit_and_scaling(unit)[0]
-
-
-def get_unit_scaling(unit) -> float:
-    return get_si_unit_and_scaling(unit)[1]
 
 
 if __name__ == "__main__":

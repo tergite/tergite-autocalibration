@@ -8,6 +8,9 @@ import pyqtgraph
 
 import xarray as xr
 
+from quantifiles.plot import utils
+from quantifiles.units import get_si_unit_and_scaling
+
 _OPTIONS = [
     {
         "pen": (0, 114, 189),
@@ -113,32 +116,41 @@ class LinePlot(QtWidgets.QWidget):
         self.plot.addLegend()
         self.curves = self.create_curves()
 
-        self.plot.setLabel(
-            "left",
-            self.dataset[self.y_keys[0]].long_name,
-            units=self.dataset[self.y_keys[0]].attrs["units"],
+        x_unit, x_scaling = get_si_unit_and_scaling(self.dataset[x_key].attrs["units"])
+        y_unit, y_scaling = get_si_unit_and_scaling(
+            self.dataset[self.y_keys[0]].attrs["units"]
         )
-        self.plot.setLabel(
+
+        utils.set_label(
+            self.plot,
             "bottom",
             self.dataset[x_key].long_name,
-            units=self.dataset[x_key].attrs["units"],
+            x_unit,
+            self.dataset[x_key].attrs["units"],
+        )
+        utils.set_label(
+            self.plot,
+            "left",
+            self.dataset[self.y_keys[0]].long_name,
+            y_unit,
+            self.dataset[self.y_keys[0]].attrs["units"],
         )
 
         self.plot.showGrid(x=True, y=True)
-        if self.dataset[self.y_keys[0]].attrs["units"] == "%" and len(y_keys) == 1:
+        if all([self.dataset[key].attrs["units"] == "%" for key in self.y_keys]):
             self.plot.setYRange(0, 1)
 
         layout.addWidget(self.plot)
         self.setLayout(layout)
 
-    def create_curves(self):
+    def create_curves(self, x_scaling: float = 1, y_scaling: float = 1):
         options_generator = cycle(_OPTIONS)
         curves = []
         for y_var in self.y_keys:
             curve_name = f"{self.dataset[y_var].name}: {self.dataset[y_var].long_name}"
             curve = self.plot.plot(
-                self.dataset[self.x_key].values,
-                self.dataset[y_var].values,
+                x_scaling*self.dataset[self.x_key].values,
+                y_scaling*self.dataset[y_var].values,
                 **next(options_generator),
                 name=curve_name,
                 connect="finite",
