@@ -59,7 +59,7 @@ class DateList(QtWidgets.QListWidget):
         self.datesSelected.emit(selection)
 
 
-class RunList(QtWidgets.QTreeWidget):
+class ExperimentList(QtWidgets.QTreeWidget):
     cols = ["TUID", "Name", "Date", "Time", "Keywords"]
 
     runSelected = QtCore.pyqtSignal(str)
@@ -188,15 +188,14 @@ class DataDirInspector(QtWidgets.QMainWindow):
         self.plots = []
 
         self.setWindowTitle(self._WINDOW_TITLE)
-        self.setWindowIcon(load_icon("icon.png"))
 
         # ---- widgets ----
-        self.dateList = DateList()
-        self.runList = RunList()
+        self.experiment_list = ExperimentList()
+        self.date_list = DateList()
 
         splitter = QtWidgets.QSplitter()
-        splitter.addWidget(self.dateList)
-        splitter.addWidget(self.runList)
+        splitter.addWidget(self.date_list)
+        splitter.addWidget(self.experiment_list)
         splitter.setSizes([100, 800])
 
         self.setCentralWidget(splitter)
@@ -232,8 +231,8 @@ class DataDirInspector(QtWidgets.QMainWindow):
         self.resize(2 * scaledSize, scaledSize)
 
         # signals
-        self.runList.runActivated.connect(self.open_plots)
-        self.dateList.datesSelected.connect(self.set_date_selection)
+        self.experiment_list.runActivated.connect(self.open_plots)
+        self.date_list.datesSelected.connect(self.set_date_selection)
         self.datadirSelected.connect(self.update_datadir)
 
         # set the datadir
@@ -253,7 +252,7 @@ class DataDirInspector(QtWidgets.QMainWindow):
         set_datadir(self.datadir)
 
         dates = get_all_dates_with_measurements()
-        self.dateList.updateDates([date.strftime("%Y-%m-%d") for date in dates])
+        self.date_list.updateDates([date.strftime("%Y-%m-%d") for date in dates])
 
         self.set_date_selection(self._selected_dates)  # reselect the dates to update
 
@@ -263,7 +262,7 @@ class DataDirInspector(QtWidgets.QMainWindow):
 
         path = QtWidgets.QFileDialog.getExistingDirectory(
             self,
-            "Open quantify datadirectory",
+            "Open quantify data directory",
             curdir,
             options=QtWidgets.QFileDialog.ShowDirsOnly,
         )
@@ -274,7 +273,7 @@ class DataDirInspector(QtWidgets.QMainWindow):
 
     def update_datadir(self) -> None:
         self.reload_datadir()
-        self.dateList.setCurrentRow(0)
+        self.date_list.setCurrentRow(0)
 
     @QtCore.pyqtSlot(list)
     def set_date_selection(self, dates: Sequence[str]) -> None:
@@ -286,11 +285,11 @@ class DataDirInspector(QtWidgets.QMainWindow):
                     {tuid: dataclasses.asdict(data) for tuid, data in results.items()}
                 )
 
-            self.runList.setRuns(selection_dict)
+            self.experiment_list.setRuns(selection_dict)
             self._selected_dates = tuple(dates)
         else:
             self._selected_dates = ()
-            self.runList.clear()
+            self.experiment_list.clear()
 
 
 def main(
@@ -299,6 +298,7 @@ def main(
     app = QtWidgets.QApplication([])
     logging.basicConfig(level=log_level)
     app.setApplicationName("Quantifiles")
+    app.setWindowIcon(load_icon("icon.png"))
 
     win = DataDirInspector(datadir=datadir)
     win.show()
