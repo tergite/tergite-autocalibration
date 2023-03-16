@@ -15,16 +15,6 @@ from quantify_core.measurement.control import _DATASET_LOCKS_DIR
 logger = logging.getLogger(__name__)
 
 
-def _get_all_dataset_paths():
-    return glob.glob(os.path.join(get_datadir(), "**/*.hdf5"), recursive=True)
-
-
-def _get_all_tuids():
-    paths = _get_all_dataset_paths()
-    dirnames = [os.path.dirname(path) for path in paths]
-    return {os.path.basename(dirname) for dirname in dirnames}
-
-
 @dataclasses.dataclass
 class DateResults:
     name: str
@@ -86,11 +76,9 @@ def safe_load_dataset(tuid: str):
 
 
 def get_all_dates_with_measurements():
-    paths = _get_all_dataset_paths()
+    dirnames = glob.glob(os.path.join(get_datadir(), "*/"), recursive=False)
 
-    dirnames = [os.path.dirname(path) for path in paths]
-
-    dates = [os.path.basename(dirname)[:8] for dirname in dirnames]
+    dates = [os.path.basename(os.path.abspath(dirname))[:8] for dirname in dirnames]
 
     parsed_dates = []
     for date in dates:
