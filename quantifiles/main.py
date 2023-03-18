@@ -25,7 +25,7 @@ from quantifiles.plot.autoplot import autoplot
 class DateList(QtWidgets.QListWidget):
     """Displays a list of dates for which there are runs in the database."""
 
-    datesSelected = QtCore.pyqtSignal(list)
+    dates_selected = QtCore.pyqtSignal(list)
 
     def __init__(self, parent: QtWidgets.QWidget | None = None):
         super().__init__(parent)
@@ -56,14 +56,14 @@ class DateList(QtWidgets.QListWidget):
     @QtCore.pyqtSlot()
     def sendSelectedDates(self) -> None:
         selection = [item.text() for item in self.selectedItems()]
-        self.datesSelected.emit(selection)
+        self.dates_selected.emit(selection)
 
 
 class ExperimentList(QtWidgets.QTreeWidget):
     cols = ["TUID", "Name", "Date", "Time", "Keywords"]
 
-    runSelected = QtCore.pyqtSignal(str)
-    runActivated = QtCore.pyqtSignal(str)
+    experiment_selected = QtCore.pyqtSignal(str)
+    experiment_activated = QtCore.pyqtSignal(str)
 
     def __init__(self, parent: QtWidgets.QWidget | None = None):
         super().__init__(parent)
@@ -93,13 +93,15 @@ class ExperimentList(QtWidgets.QTreeWidget):
             QtWidgets.QApplication.clipboard().setText(item.text(model_index.column()))
 
     def add_experiment(self, tuid: TUID | str, **vals: str) -> None:
-        lst = [str(tuid)]
-        lst.append(vals.get("name", ""))
-        lst.append(vals.get("date", ""))
-        lst.append(vals.get("time", ""))
-        lst.append(vals.get("keywords_", ""))
-
-        item = QtWidgets.QTreeWidgetItem(lst)
+        item = QtWidgets.QTreeWidgetItem(
+            [
+                str(tuid),
+                vals.get("name", ""),
+                vals.get("date", ""),
+                vals.get("time", ""),
+                vals.get("keywords_", ""),
+            ]
+        )
         self.addTopLevelItem(item)
 
     def set_experiments(self, selection: Mapping[str, Mapping[str, str]]) -> None:
@@ -151,12 +153,12 @@ class ExperimentList(QtWidgets.QTreeWidget):
             return
 
         tuid = selection[0].text(0)
-        self.runSelected.emit(tuid)
+        self.experiment_selected.emit(tuid)
 
     @QtCore.pyqtSlot(QtWidgets.QTreeWidgetItem, int)
     def activate_experiment(self, item: QtWidgets.QTreeWidgetItem, _: int) -> None:
         tuid = item.text(0)
-        self.runActivated.emit(tuid)
+        self.experiment_activated.emit(tuid)
 
 
 class DataDirLabel(QtWidgets.QLabel):
@@ -229,8 +231,8 @@ class DataDirInspector(QtWidgets.QMainWindow):
         self.resize(2 * scaling, scaling)
 
         # signals
-        self.experiment_list.runActivated.connect(self.open_plots)
-        self.date_list.datesSelected.connect(self.set_date_selection)
+        self.experiment_list.experiment_activated.connect(self.open_plots)
+        self.date_list.dates_selected.connect(self.set_date_selection)
         self.datadirSelected.connect(self.update_datadir)
 
         # set the datadir
