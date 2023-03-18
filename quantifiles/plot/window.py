@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from functools import partial
+
 import xarray as xr
 
 from PyQt5 import QtWidgets, QtCore
@@ -125,6 +127,10 @@ class NameAndTuidBox(QtWidgets.QFrame):
             QtWidgets.QFrame.Panel | QtWidgets.QFrame.Sunken
         )
         self.name_label_content.setWordWrap(True)
+        self.name_label_content.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.name_label_content.customContextMenuRequested.connect(
+            partial(self.show_copy_context_menu, self.name)
+        )
 
         self.tuid_label = QtWidgets.QLabel("TUID:")
         self.tuid_label_content = QtWidgets.QLabel(self.tuid)
@@ -133,6 +139,10 @@ class NameAndTuidBox(QtWidgets.QFrame):
             QtWidgets.QFrame.Panel | QtWidgets.QFrame.Sunken
         )
         self.tuid_label_content.setWordWrap(True)
+        self.tuid_label_content.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.tuid_label_content.customContextMenuRequested.connect(
+            partial(self.show_copy_context_menu, self.tuid)
+        )
 
         # --- Add to layout ---
         layout.addWidget(self.name_label)
@@ -142,6 +152,15 @@ class NameAndTuidBox(QtWidgets.QFrame):
         layout.addWidget(self.tuid_label_content)
 
         self.setLayout(layout)
+
+    def show_copy_context_menu(self, value: str, pos: QtCore.QPoint):
+        menu = QtWidgets.QMenu()
+
+        copy_action = menu.addAction("Copy")
+        action = menu.exec_(self.tuid_label_content.mapToGlobal(pos))
+        if action == copy_action:
+            clipboard = QtWidgets.QApplication.clipboard()
+            clipboard.setText(value)
 
 
 class PlotWindowContent(QtWidgets.QWidget):
