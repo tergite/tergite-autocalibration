@@ -10,9 +10,11 @@ from quantifiles.plot.utils import set_label
 COLORMAP = "viridis"
 
 
-class ColorPlot(QtWidgets.QWidget):
+class ColorPlot(QtWidgets.QFrame):
     def __init__(self, dataset: xr.Dataset, x: str, y: str, z: str, parent=None):
         super().__init__(parent)
+        self.setFrameStyle(QtWidgets.QFrame.StyledPanel | QtWidgets.QFrame.Plain)
+        self.setStyleSheet("background-color:white;")
 
         self.dataset = dataset
         self.x = x

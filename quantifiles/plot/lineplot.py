@@ -92,7 +92,7 @@ _OPTIONS = [
 ]
 
 
-class LinePlot(QtWidgets.QWidget):
+class LinePlot(QtWidgets.QFrame):
     def __init__(
         self,
         dataset: xr.Dataset,
@@ -101,6 +101,9 @@ class LinePlot(QtWidgets.QWidget):
         parent=None,
     ):
         super().__init__(parent)
+        self.setFrameStyle(QtWidgets.QFrame.StyledPanel | QtWidgets.QFrame.Plain)
+        self.setStyleSheet("background-color:white;")
+
         self.y_keys = [y_keys] if isinstance(y_keys, str) else y_keys
         self.x_key = x_key
 

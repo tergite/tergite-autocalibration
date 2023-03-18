@@ -41,7 +41,9 @@ class SingleGettableBox(QtWidgets.QFrame):
 
             label_short_name = QtWidgets.QLabel(str(settable_name))
             label_long_name = QtWidgets.QLabel(str(settable_long_name))
-            label_settable_unit = QtWidgets.QLabel(str(dataset[gettable_name][settable_name].attrs["units"]))
+            label_settable_unit = QtWidgets.QLabel(
+                str(dataset[gettable_name][settable_name].attrs["units"])
+            )
 
             param_table_layout.addWidget(label_short_name, idx, 0)
             param_table_layout.addWidget(label_long_name, idx, 1)
@@ -49,7 +51,9 @@ class SingleGettableBox(QtWidgets.QFrame):
 
         label_short_name = QtWidgets.QLabel(str(gettable_name))
         label_long_name = QtWidgets.QLabel(str(gettable_long_name))
-        label_settable_unit = QtWidgets.QLabel(str(dataset[gettable_name].attrs["units"]))
+        label_settable_unit = QtWidgets.QLabel(
+            str(dataset[gettable_name].attrs["units"])
+        )
         number_of_settables = len(dataset[gettable_name].coords.keys())
 
         param_table_layout.addWidget(label_short_name, number_of_settables + 1, 0)
@@ -60,7 +64,6 @@ class SingleGettableBox(QtWidgets.QFrame):
 
 
 class GettableSelectBox(QtWidgets.QFrame):
-
     gettable_toggled = QtCore.pyqtSignal(str, bool)
 
     def __init__(
@@ -85,13 +88,11 @@ class GettableSelectBox(QtWidgets.QFrame):
 
         self._gettable_checkboxes = {}
         for idx, gettable_name in enumerate(dataset.data_vars.keys()):
-            gettable_box = SingleGettableBox(gettable_name=gettable_name, dataset=dataset)
-            gettable_box.checkbox.stateChanged.connect(
-                self.gettable_select_mapper.map
+            gettable_box = SingleGettableBox(
+                gettable_name=gettable_name, dataset=dataset
             )
-            self.gettable_select_mapper.setMapping(
-                gettable_box.checkbox, gettable_name
-            )
+            gettable_box.checkbox.stateChanged.connect(self.gettable_select_mapper.map)
+            self.gettable_select_mapper.setMapping(gettable_box.checkbox, gettable_name)
             self._gettable_checkboxes[gettable_name] = gettable_box.checkbox
 
             layout.addWidget(
@@ -104,15 +105,64 @@ class GettableSelectBox(QtWidgets.QFrame):
         self.gettable_toggled.emit(name, enabled)
 
 
+class NameAndTuidBox(QtWidgets.QFrame):
+    def __init__(self, name: str, tuid: str):
+        super().__init__()
+        self.name = name
+        self.tuid = tuid
+
+        # --- Set up frame ---
+        self.setFrameStyle(QtWidgets.QFrame.StyledPanel | QtWidgets.QFrame.Plain)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
+
+        layout = QtWidgets.QVBoxLayout(self)
+
+        # --- Name and TUID labels ---
+        self.name_label = QtWidgets.QLabel("Name:")
+        self.name_label_content = QtWidgets.QLabel(self.name)
+        self.name_label_content.setMargin(5)
+        self.name_label_content.setFrameStyle(
+            QtWidgets.QFrame.Panel | QtWidgets.QFrame.Sunken
+        )
+        self.name_label_content.setWordWrap(True)
+
+        self.tuid_label = QtWidgets.QLabel("TUID:")
+        self.tuid_label_content = QtWidgets.QLabel(self.tuid)
+        self.tuid_label_content.setMargin(5)
+        self.tuid_label_content.setFrameStyle(
+            QtWidgets.QFrame.Panel | QtWidgets.QFrame.Sunken
+        )
+        self.tuid_label_content.setWordWrap(True)
+
+        # --- Add to layout ---
+        layout.addWidget(self.name_label)
+        layout.addWidget(self.name_label_content)
+
+        layout.addWidget(self.tuid_label)
+        layout.addWidget(self.tuid_label_content)
+
+        self.setLayout(layout)
+
+
 class PlotWindowContent(QtWidgets.QWidget):
     def __init__(
         self, parent: QtWidgets.QWidget | None = None, dataset: xr.Dataset | None = None
     ):
         super().__init__(parent)
         self.gettable_select_box = GettableSelectBox(dataset=dataset)
+        self.name_and_tuid_box = NameAndTuidBox(name=dataset.name, tuid=dataset.tuid)
+
         layout = QtWidgets.QHBoxLayout(self)
-        layout.addWidget(self.gettable_select_box)
+
+        left_column_layout = QtWidgets.QVBoxLayout(self)
+        left_column_layout.addWidget(self.name_and_tuid_box)
+        left_column_layout.addWidget(self.gettable_select_box)
+
+        layout.addLayout(left_column_layout)
         self.setLayout(layout)
+
+    def add_plot(self, plot: QtWidgets.QWidget):
+        self.layout().addWidget(plot)
 
 
 class PlotWindow(QtWidgets.QMainWindow):
@@ -125,7 +175,8 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.plots = {}
 
         tuid = self.dataset.tuid if hasattr(self.dataset, "tuid") else "no tuid"
-        self.setWindowTitle(f"{self._WINDOW_TITLE} | {tuid}")
+        name = self.dataset.name if hasattr(self.dataset, "name") else "no name"
+        self.setWindowTitle(f"{self._WINDOW_TITLE} | {name} | {tuid}")
 
         canvas = PlotWindowContent(self, dataset=dataset)
         self.canvas = canvas
@@ -137,7 +188,7 @@ class PlotWindow(QtWidgets.QMainWindow):
         canvas.gettable_select_box.gettable_toggled.connect(self.toggle_gettable)
 
     def add_plot(self, name: str, plot: QtWidgets.QWidget):
-        self.canvas.layout().addWidget(plot)
+        self.canvas.add_plot(plot)
         self.plots[name] = plot
 
     @QtCore.pyqtSlot(str, bool)
