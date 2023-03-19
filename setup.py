@@ -12,7 +12,7 @@ setup(
     version="0.0.4",
     description="Simple databrowser for quantify datasets.",
     long_description=readme,
-    long_description_content_type='text/markdown',
+    long_description_content_type="text/markdown",
     author="Damien Crielaard",
     author_email="damiencrielaard@gmail.com",
     url="https://gitlab.com/dcrielaard/quantifiles",
