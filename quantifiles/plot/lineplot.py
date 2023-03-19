@@ -123,7 +123,9 @@ class LinePlot(QtWidgets.QFrame):
         self.curves = self.create_curves()
 
         # Create a 'Copy to Clipboard' QAction and add it to the plot's context menu
-        self.copy_action = QtGui.QAction("Copy to Clipboard", self.plot.plotItem.vb.menu)
+        self.copy_action = QtGui.QAction(
+            "Copy to Clipboard", self.plot.plotItem.vb.menu
+        )
         self.copy_action.triggered.connect(partial(copy_to_clipboard, self))
         self.plot.plotItem.vb.menu.addSeparator()
         self.plot.plotItem.vb.menu.addAction(self.copy_action)
@@ -161,8 +163,8 @@ class LinePlot(QtWidgets.QFrame):
         for y_var in self.y_keys:
             curve_name = f"{self.dataset[y_var].name}: {self.dataset[y_var].long_name}"
             curve = self.plot.plot(
-                x_scaling*self.dataset[self.x_key].values,
-                y_scaling*self.dataset[y_var].values,
+                x_scaling * self.dataset[self.x_key].values,
+                y_scaling * self.dataset[y_var].values,
                 **next(options_generator),
                 name=curve_name,
                 connect="finite",

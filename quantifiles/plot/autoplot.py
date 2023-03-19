@@ -21,7 +21,9 @@ def autoplot(dataset: xr.Dataset) -> QtWidgets.QMainWindow:
         if num_settables == 2 and dataset.attrs.get(
             "grid_2d_uniformly_spaced", dataset.attrs.get("2D-grid", False)
         ):
-            plot_widget = ColorPlot(dataset, x="x0", y="x1", z=gettable, parent=plot_window)
+            plot_widget = ColorPlot(
+                dataset, x="x0", y="x1", z=gettable, parent=plot_window
+            )
             plot_window.add_plot(gettable, plot_widget)
         else:
             for settable in settables:
