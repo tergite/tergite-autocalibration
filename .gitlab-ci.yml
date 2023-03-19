@@ -9,6 +9,7 @@ test:
     PYTHONPATH: "${CI_PROJECT_DIR}"
   before_script:
     # Install dependencies.
+    - apt-get update && apt-get install libgl1 -y
     - pip install -e .[test]
   script:
     # Run black to check the code formatting.
