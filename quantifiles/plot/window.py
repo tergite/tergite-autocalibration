@@ -76,7 +76,7 @@ class GettableSelectBox(QtWidgets.QFrame):
 
         label = QtWidgets.QLabel("Dataset contents:")
         spacer = QtWidgets.QSpacerItem(
-            20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
+            25, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
         )
         layout.addSpacerItem(spacer)
         layout.addWidget(label)
