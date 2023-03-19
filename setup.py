@@ -30,6 +30,6 @@ setup(
         "pyqt5",
         "quantify-core",
     ],
-    tests_require=["pytest"],
+    tests_require=["black", "pytest"],
     python_requires=">=3.7",
 )
