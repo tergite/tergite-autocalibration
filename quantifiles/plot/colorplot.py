@@ -59,7 +59,9 @@ class ColorPlot(QtWidgets.QFrame):
         self.colorbar = pyqtgraph.ColorBarItem()
 
         # Create a 'Copy to Clipboard' QAction and add it to the plot's context menu
-        self.copy_action = QtGui.QAction("Copy to Clipboard", self.plot.plotItem.vb.menu)
+        self.copy_action = QtGui.QAction(
+            "Copy to Clipboard", self.plot.plotItem.vb.menu
+        )
         self.copy_action.triggered.connect(partial(copy_to_clipboard, self))
         self.plot.plotItem.vb.menu.addSeparator()
         self.plot.plotItem.vb.menu.addAction(self.copy_action)
