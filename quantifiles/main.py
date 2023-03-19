@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Sequence, Mapping
 
 from PyQt5 import QtCore, QtWidgets
-from numpy import rint
+from PyQt5.QtWidgets import QDesktopWidget
 from quantify_core.data.handling import set_datadir
 from quantify_core.data.types import TUID
 
@@ -22,77 +22,98 @@ from quantifiles.data import (
 from quantifiles.plot.autoplot import autoplot
 
 
-class DateList(QtWidgets.QListWidget):
-    """Displays a list of dates for which there are runs in the database."""
+logger = logging.getLogger(__name__)
 
+
+class DateList(QtWidgets.QListWidget):
     dates_selected = QtCore.pyqtSignal(list)
 
     def __init__(self, parent: QtWidgets.QWidget | None = None):
         super().__init__(parent)
 
         self.setSelectionMode(QtWidgets.QListView.ExtendedSelection)
-        self.itemSelectionChanged.connect(self.sendSelectedDates)
+        self.itemSelectionChanged.connect(self.date_selection_changed)
 
     @QtCore.pyqtSlot(list)
-    def updateDates(self, dates: Sequence[str]) -> None:
+    def update_date_list(self, dates: Sequence[str]) -> None:
+        # Add new dates to the list
         for d in dates:
-            if len(self.findItems(d, QtCore.Qt.MatchExactly)) == 0:
+            if not self.findItems(d, QtCore.Qt.MatchExactly):
                 self.insertItem(0, d)
 
-        i = 0
-        while i < self.count():
+        # Remove dates that are no longer in the list
+        i = self.count() - 1
+        while i >= 0:
             elem = self.item(i)
             if elem is not None and elem.text() not in dates:
-                item = self.takeItem(i)
-                del item
-            else:
-                i += 1
+                self.takeItem(i)
+                del elem
+            i -= 1
 
-            if i >= self.count():
-                break
-
+        # Sort the list in descending order
         self.sortItems(QtCore.Qt.DescendingOrder)
 
     @QtCore.pyqtSlot()
-    def sendSelectedDates(self) -> None:
+    def date_selection_changed(self) -> None:
         selection = [item.text() for item in self.selectedItems()]
         self.dates_selected.emit(selection)
 
 
 class ExperimentList(QtWidgets.QTreeWidget):
+    """A widget that displays a list of experiments for the selected dates."""
+
+    # Define the columns to display in the tree view
     cols = ["TUID", "Name", "Date", "Time", "Keywords"]
 
+    # Define signals emitted by this widget
     experiment_selected = QtCore.pyqtSignal(str)
     experiment_activated = QtCore.pyqtSignal(str)
 
     def __init__(self, parent: QtWidgets.QWidget | None = None):
         super().__init__(parent)
 
+        # Set the number of columns and their labels
         self.setColumnCount(len(self.cols))
         self.setHeaderLabels(self.cols)
 
+        # Connect signals to corresponding slots
         self.itemSelectionChanged.connect(self.select_experiment)
         self.itemActivated.connect(self.activate_experiment)
 
+        # Set up context menu
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.show_context_menu)
 
     @QtCore.pyqtSlot(QtCore.QPoint)
     def show_context_menu(self, position: QtCore.QPoint) -> None:
+        """
+        Show a context menu when the user right-clicks on an item in the tree.
+        """
+        # Get the index and item at the given position
         model_index = self.indexAt(position)
         item = self.itemFromIndex(model_index)
         assert item is not None
 
+        # Create the context menu
         menu = QtWidgets.QMenu()
 
         copy_icon = self.style().standardIcon(QtWidgets.QStyle.SP_DialogSaveButton)
         copy_action = menu.addAction(copy_icon, "Copy")
 
+        # Execute the selected action
         action = menu.exec_(self.mapToGlobal(position))
         if action == copy_action:
             QtWidgets.QApplication.clipboard().setText(item.text(model_index.column()))
 
     def add_experiment(self, tuid: TUID | str, **vals: str) -> None:
+        """
+        Add a new experiment to the tree.
+
+        Args:
+            tuid: The TUID of the experiment.
+            vals: The values to display in the tree.
+        """
+        # Create a new tree widget item with the specified values.
         item = QtWidgets.QTreeWidgetItem(
             [
                 str(tuid),
@@ -105,41 +126,36 @@ class ExperimentList(QtWidgets.QTreeWidget):
         self.addTopLevelItem(item)
 
     def set_experiments(self, selection: Mapping[str, Mapping[str, str]]) -> None:
+        # Clear the existing items in the list
         self.clear()
 
         # disable sorting before inserting values to avoid performance hit
         self.setSortingEnabled(False)
 
+        # Add each experiment as a new item in the list
         for tuid, record in selection.items():
             self.add_experiment(tuid, **record)
 
+        # Re-enable sorting and resize the columns
         self.setSortingEnabled(True)
-
         for i in range(len(self.cols)):
             self.resizeColumnToContents(i)
 
     def update_experiments(self, selection: Mapping[str, Mapping[str, str]]) -> None:
         new_item_found = False
+
+        # Update each experiment in the list
         for tuid, record in selection.items():
-            item = self.findItems(str(tuid), QtCore.Qt.MatchExactly)
-            if len(item) == 0:
+            items = self.findItems(str(tuid), QtCore.Qt.MatchExactly)
+
+            # If the experiment is not already in the list,
+            # add it to the list
+            if not items:
                 self.setSortingEnabled(False)
                 self.add_experiment(tuid, **record)
                 new_item_found = True
-            elif len(item) == 1:
-                completed = (
-                    record.get("completed_date", "")
-                    + " "
-                    + record.get("completed_time", "")
-                )
-                if completed != item[0].text(6):
-                    item[0].setText(6, completed)
-
-                num_records = str(record.get("records", ""))
-                if num_records != item[0].text(7):
-                    item[0].setText(7, num_records)
             else:
-                raise RuntimeError(f"More than one dataset found with tuid: " f"{tuid}")
+                raise logger.error(f"More than one dataset found with tuid: " f"{tuid}")
 
         if new_item_found:
             self.setSortingEnabled(True)
@@ -162,12 +178,33 @@ class ExperimentList(QtWidgets.QTreeWidget):
 
 
 class DataDirLabel(QtWidgets.QLabel):
+    """
+    A label that displays the currently selected data directory.
+
+    Args:
+        datadir (str): The path to the currently selected data directory.
+        parent (QtWidgets.QWidget, optional): The parent widget of the label.
+    """
+
     def __init__(self, datadir: str, parent: QtWidgets.QWidget | None = None):
+        """
+        Initializes the DataDirLabel widget.
+
+        Args:
+            datadir (str): The path to the currently selected data directory.
+            parent (QtWidgets.QWidget, optional): The parent widget of the label.
+        """
         super().__init__(parent)
 
-        self.updateDataDir(datadir)
+        self.update_datadir(datadir)
 
-    def updateDataDir(self, datadir: str) -> None:
+    def update_datadir(self, datadir: str) -> None:
+        """
+        Updates the label to display the current data directory.
+
+        Args:
+            datadir (str): The path to the currently selected data directory.
+        """
         if datadir is None:
             self.setText("No data directory selected")
         else:
@@ -175,91 +212,108 @@ class DataDirLabel(QtWidgets.QLabel):
 
 
 class DataDirInspector(QtWidgets.QMainWindow):
-    _WINDOW_TITLE: str = "Quantifiles | Quantify dataset browser"
-    _WINDOW_SIZE: int = 640
+    """
+    A window that displays the contents of a data directory.
 
-    datadirSelected = QtCore.pyqtSignal(str)
+    This is the main window of the application.
+    """
+
+    _WINDOW_TITLE: str = "Quantifiles | Quantify dataset browser"
+
+    # Signal that is emitted when a new data directory is selected
+    new_datadir_selected = QtCore.pyqtSignal(str)
 
     def __init__(
         self, datadir: str | None = None, parent: QtWidgets.QWidget | None = None
     ):
         super().__init__(parent)
 
+        # Set the data directory
         self.datadir = datadir
+
+        # Set the selected dates to an empty tuple
         self._selected_dates: tuple[str, ...] = ()
+
+        # Initialize the plots list
         self.plots = []
 
         self.setWindowTitle(self._WINDOW_TITLE)
 
-        # ---- widgets ----
+        # create widgets
         self.experiment_list = ExperimentList()
         self.date_list = DateList()
 
+        # create splitter for widgets
         splitter = QtWidgets.QSplitter()
         splitter.addWidget(self.date_list)
         splitter.addWidget(self.experiment_list)
         splitter.setSizes([80, 820])
 
+        # set splitter as central widget
         self.setCentralWidget(splitter)
 
-        # ---- end widgets ----
-
-        self._datadir_label = DataDirLabel(datadir)
-
-        self.toolbar = self.addToolBar("Datadir toolbar")
-        self.toolbar.addWidget(self._datadir_label)
+        # create data directory label and toolbar
+        self.datadir_label = QtWidgets.QLabel(datadir)
+        self.toolbar = self.addToolBar("Data Directory")
+        self.toolbar.addWidget(self.datadir_label)
         self.toolbar.setMovable(False)
 
-        # ---- menu bar ----
+        # create menu bar
         menu = self.menuBar()
         fileMenu = menu.addMenu("&File")
 
-        loadAction = QtWidgets.QAction("&Open", self)
-        loadAction.setShortcut("Ctrl+O")
-        loadAction.triggered.connect(self.configure_datadir)
-        fileMenu.addAction(loadAction)
+        # create Open and Reload actions
+        open_action = QtWidgets.QAction("&Open", self)
+        open_action.setShortcut("Ctrl+O")
+        open_action.triggered.connect(self.configure_datadir)
+        fileMenu.addAction(open_action)
 
-        refreshAction = QtWidgets.QAction("&Reload", self)
-        refreshAction.setShortcut("R")
-        refreshAction.triggered.connect(self.reload_datadir)
-        fileMenu.addAction(refreshAction)
+        reload_action = QtWidgets.QAction("&Reload", self)
+        reload_action.setShortcut("R")
+        reload_action.triggered.connect(self.reload_datadir)
+        fileMenu.addAction(reload_action)
 
-        # ---- end menu bar ----
+        # set window size
+        screen = QDesktopWidget().screenGeometry()
+        self.resize(screen.width() * 0.6, screen.height() * 0.6)
 
-        # sizing
-        scaling = int(self._WINDOW_SIZE * rint(self.logicalDpiX() / 96.0))
-        self.resize(2 * scaling, scaling)
-
-        # signals
+        # connect signals and slots
         self.experiment_list.experiment_activated.connect(self.open_plots)
         self.date_list.dates_selected.connect(self.set_date_selection)
-        self.datadirSelected.connect(self.update_datadir)
+        self.new_datadir_selected.connect(self.update_datadir)
 
-        # set the datadir
+        # update data directory if provided
         if datadir is not None:
             self.update_datadir()
 
     @QtCore.pyqtSlot(str)
     def open_plots(self, tuid: str) -> None:
+        # Load the dataset and create a plot
         ds = safe_load_dataset(tuid)
         p = autoplot(ds)
+
+        # Add the plot to the list of plots and show it
         self.plots.append(p)
         p.show()
 
     @QtCore.pyqtSlot()
     def reload_datadir(self) -> None:
-        self._datadir_label.updateDataDir(self.datadir)
+        # Update the datadir label and set the datadir
+        self.datadir_label.setText(self.datadir)
         set_datadir(self.datadir)
 
+        # Update the list of dates
         dates = get_all_dates_with_measurements()
-        self.date_list.updateDates([date.strftime("%Y-%m-%d") for date in dates])
+        date_strings = [date.strftime("%Y-%m-%d") for date in dates]
+        self.date_list.update_date_list(date_strings)
 
-        self.set_date_selection(self._selected_dates)  # reselect the dates to update
+        # Reselect the dates to update
+        self.set_date_selection(self._selected_dates)
 
     @QtCore.pyqtSlot()
     def configure_datadir(self) -> None:
+        # Open a file dialog to select the data directory
         curdir = self.datadir if self.datadir is not None else os.getcwd()
-
         path = QtWidgets.QFileDialog.getExistingDirectory(
             self,
             "Open quantify data directory",
@@ -267,9 +321,10 @@ class DataDirInspector(QtWidgets.QMainWindow):
             options=QtWidgets.QFileDialog.ShowDirsOnly,
         )
 
+        # If a directory was selected, update the datadir
         if path:
             self.datadir = path
-            self.datadirSelected.emit(path)
+            self.new_datadir_selected.emit(path)
 
     def update_datadir(self) -> None:
         self.reload_datadir()
