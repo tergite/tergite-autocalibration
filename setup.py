@@ -29,6 +29,5 @@ setup(
         "pyqt5",
         "quantify-core",
     ],
-    options={"build_exe": {"include_files": ["icon.png"]}},
     python_requires=">=3.7",
 )
