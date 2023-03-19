@@ -24,10 +24,12 @@ setup(
         "scipy",
         "pandas",
         "xarray",
+        "filelock",
         "qcodes",
         "pyqtgraph",
         "pyqt5",
         "quantify-core",
     ],
+    tests_require=["pytest"],
     python_requires=">=3.7",
 )

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import numpy as np
 
 known_units = {
@@ -39,7 +41,16 @@ known_units = {
 }
 
 
-def get_si_unit_and_scaling(unit: str) -> (str, float):
+def get_si_unit_and_scaling(unit: str) -> (str | None, float):
+    """
+    Given a string unit, return its SI unit and scaling factor.
+
+    Args:
+        unit: The unit to convert.
+
+    Returns:
+        A tuple containing the SI unit and scaling factor.
+    """
     if unit in known_units.keys():
         scaling = known_units[unit]
         si_unit = unit if scaling == 1 else unit[1:]
@@ -53,8 +64,3 @@ def format_value_and_unit(value: float, unit: str) -> str:
     if np.isnan(value):
         value = 0
     return f"{value * scaler: .4e}" + unit
-
-
-if __name__ == "__main__":
-    s = format_value_and_unit(50, "mV")
-    print(s)
