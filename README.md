@@ -36,6 +36,8 @@ from quantifiles import quantifiles
 quantifiles()  # This will start the application, optionally you can pass the data directory as an argument.
 ```
 
+**Tip:** The plots can be copied to the clipboard by right-clicking on them.
+
 ## Contributing
 
 Feel free to dive in! [Open an issue](https://gitlab.com/dcrielaard/quantifiles/issues/new) or submit PRs.
