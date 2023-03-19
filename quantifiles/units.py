@@ -63,4 +63,4 @@ def format_value_and_unit(value: float, unit: str) -> str:
     unit, scaler = get_si_unit_and_scaling(unit)
     if np.isnan(value):
         value = 0
-    return f"{value * scaler: .4e}" + unit
+    return f"{value * scaler:.4e}" + unit
