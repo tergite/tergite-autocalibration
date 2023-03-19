@@ -36,9 +36,6 @@ from quantifiles import quantifiles
 quantifiles()  # This will start the application, optionally you can pass the data directory as an argument.
 ```
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
 ## Contributing
 
 Feel free to dive in! [Open an issue](https://gitlab.com/dcrielaard/quantifiles/issues/new) or submit PRs.

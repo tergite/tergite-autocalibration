@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import partial
 from itertools import cycle
 from typing import Sequence
 
@@ -7,8 +8,10 @@ from PyQt5 import QtWidgets
 import pyqtgraph
 
 import xarray as xr
+from pyqtgraph.Qt import QtGui
 
 from quantifiles.plot import utils
+from quantifiles.plot.utils import copy_to_clipboard
 from quantifiles.units import get_si_unit_and_scaling
 
 _OPTIONS = [
@@ -118,6 +121,12 @@ class LinePlot(QtWidgets.QFrame):
         self.plot = pyqtgraph.PlotWidget()
         self.plot.addLegend()
         self.curves = self.create_curves()
+
+        # Create a 'Copy to Clipboard' QAction and add it to the plot's context menu
+        self.copy_action = QtGui.QAction("Copy to Clipboard", self.plot.plotItem.vb.menu)
+        self.copy_action.triggered.connect(partial(copy_to_clipboard, self))
+        self.plot.plotItem.vb.menu.addSeparator()
+        self.plot.plotItem.vb.menu.addAction(self.copy_action)
 
         x_unit, x_scaling = get_si_unit_and_scaling(self.dataset[x_key].attrs["units"])
         y_unit, y_scaling = get_si_unit_and_scaling(
