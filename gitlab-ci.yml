@@ -1,0 +1,17 @@
+stages:
+  - test
+
+test:
+  stage: test
+  image: python:3.9
+  variables:
+    # Set the PYTHONPATH environment variable so that pytest can find the source code.
+    PYTHONPATH: "${CI_PROJECT_DIR}"
+  before_script:
+    # Install dependencies.
+    - pip install -e .[test]
+  script:
+    # Run black to check the code formatting.
+    - black --check .
+    # Run pytest to run the tests.
+    - pytest tests/

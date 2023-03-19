@@ -38,4 +38,16 @@ def set_label(
 
 
 def copy_to_clipboard(widget: QtWidgets.QWidget) -> None:
+    """
+    Copy the given widget to the clipboard as an image.
+
+    Parameters
+    ----------
+    widget:
+        The widget to copy to the clipboard.
+
+    Returns
+    -------
+    None
+    """
     QApplication.clipboard().setImage(widget.grab().toImage())
