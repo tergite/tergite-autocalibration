@@ -209,16 +209,16 @@ class SnapshotTab(QtWidgets.QWidget):
         self.setLayout(layout)
 
     def add_snapshot_to_tree(
-        self, tree: QtWidgets.QTreeWidget, snapshot: dict[str, any]
+        self, tree: QtWidgets.QTreeWidget, snapshot: dict[str, any], parent_key: str = ''
     ):
         for key, value in snapshot.items():
             if isinstance(value, dict):
                 item = QtWidgets.QTreeWidgetItem(tree)
                 item.setText(0, key)
-                self.add_snapshot_to_tree(item, value)
+                self.add_snapshot_to_tree(item, value, key)
             else:
                 item = QtWidgets.QTreeWidgetItem(tree)
-                item.setText(0, key)
+                item.setText(0, f"{parent_key}.{key}" if parent_key else key)
                 item.setText(1, str(value))
 
     def show_copy_context_menu(self, pos: QtCore.QPoint):
@@ -227,8 +227,18 @@ class SnapshotTab(QtWidgets.QWidget):
         copy_action = menu.addAction("Copy")
         action = menu.exec_(self.snapshot_tree.mapToGlobal(pos))
         if action == copy_action:
-            clipboard = QtWidgets.QApplication.clipboard()
-            clipboard.setText(self.snapshot_tree.currentItem().text(1))
+            current_item = self.snapshot_tree.currentItem()
+            item_parent = current_item.parent()
+            if item_parent is not None:
+                dict_copy = {}
+                for i in range(item_parent.childCount()):
+                    child_item = item_parent.child(i)
+                    key = child_item.text(0).split(".", 1)[-1]  # Strip parent key from child key
+                    value = child_item.text(1)
+                    dict_copy[key] = value
+                clipboard = QtWidgets.QApplication.clipboard()
+                clipboard.setText(str(dict_copy))
+
 
 
 class PlotWindowContent(QtWidgets.QWidget):
