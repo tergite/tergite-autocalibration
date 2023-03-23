@@ -2,13 +2,19 @@ from __future__ import annotations
 
 import dataclasses
 import glob
+import json
 import os
 from datetime import datetime
 
 import logging
 
 from filelock import FileLock
-from quantify_core.data.handling import get_datadir, load_dataset, DATASET_NAME
+from quantify_core.data.handling import (
+    get_datadir,
+    load_dataset,
+    DATASET_NAME,
+    locate_experiment_container,
+)
 from quantify_core.data.types import TUID
 from quantify_core.measurement.control import _DATASET_LOCKS_DIR
 
@@ -150,3 +156,24 @@ def get_all_dates_with_measurements():
             pass
 
     return sorted(list(set(parsed_dates)), reverse=True)
+
+
+def get_snapshot_as_dict(tuid: str | TUID) -> dict[str, any] | None:
+    """
+    Get a snapshot of a dataset as a dictionary.
+
+    Parameters
+    ----------
+    tuid
+        The tuid of the dataset to load.
+
+    Returns
+    -------
+        The snapshot of the dataset. None if no snapshot is found.
+    """
+    exp_container = locate_experiment_container(tuid)
+    snapshot_path = os.path.join(exp_container, "snapshot.json")
+    if os.path.exists(snapshot_path):
+        with open(snapshot_path, "r") as f:
+            return json.load(f)
+    return None
