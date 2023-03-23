@@ -39,9 +39,9 @@ def autoplot(dataset: xr.Dataset) -> QtWidgets.QMainWindow:
 if __name__ == "__main__":
     set_datadir(r"C:\Users\Damie\PycharmProjects\quantifiles\test_data")
 
-    # dataset = safe_load_dataset("20230312-182213-487-38d5f1")
+    dataset = safe_load_dataset("20230312-182213-487-38d5f1")
     # dataset = safe_load_dataset("20200504-191556-002-4209ee")
-    dataset = safe_load_dataset("20220930-104712-924-d6f761")
+    # dataset = safe_load_dataset("20220930-104712-924-d6f761")
 
     print(dataset)
 
