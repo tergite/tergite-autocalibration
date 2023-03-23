@@ -12,6 +12,7 @@ from quantifiles.data import get_snapshot_as_dict
 
 logger = logging.getLogger(__name__)
 
+
 class SingleGettableBox(QtWidgets.QFrame):
     def __init__(
         self,
@@ -277,6 +278,7 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.snapshot = get_snapshot_as_dict(tuid)
 
         self.setWindowTitle(f"{self._WINDOW_TITLE} | {name} | {tuid}")
+        logger.debug(f"Initialized {self.__class__.__name__} with title: {self.windowTitle()}")
 
         canvas = PlotWindowContent(self, dataset=dataset, snapshot=self.snapshot)
         self.canvas = canvas
@@ -293,6 +295,10 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.canvas.add_plot(plot)
         self.plots[name] = plot
 
+        logger.debug(f"Added plot with name {name} to {self.__class__.__name__}")
+
     @QtCore.pyqtSlot(str, bool)
     def toggle_gettable(self, name: str, enabled: bool):
         self.plots[name].setVisible(enabled)
+
+        logger.debug(f"Toggled visibility of plot with name {name} to {enabled}")
