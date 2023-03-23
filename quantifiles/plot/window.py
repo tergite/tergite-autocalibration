@@ -22,7 +22,8 @@ class SingleGettableBox(QtWidgets.QFrame):
     ):
         super().__init__(parent)
         gettable_long_name = dataset[gettable_name].long_name
-        box_title = f"{gettable_name} ({gettable_long_name})"
+        gettable_units = dataset[gettable_name].attrs["units"]
+        box_title = f"{gettable_name} {gettable_long_name} ({gettable_units})"
 
         self.setFrameStyle(QtWidgets.QFrame.StyledPanel | QtWidgets.QFrame.Plain)
 
@@ -55,17 +56,6 @@ class SingleGettableBox(QtWidgets.QFrame):
             param_table_layout.addWidget(label_short_name, idx, 0)
             param_table_layout.addWidget(label_long_name, idx, 1)
             param_table_layout.addWidget(label_settable_unit, idx, 2)
-
-        label_short_name = QtWidgets.QLabel(str(gettable_name))
-        label_long_name = QtWidgets.QLabel(str(gettable_long_name))
-        label_settable_unit = QtWidgets.QLabel(
-            str(dataset[gettable_name].attrs["units"])
-        )
-        number_of_settables = len(dataset[gettable_name].coords.keys())
-
-        param_table_layout.addWidget(label_short_name, number_of_settables + 1, 0)
-        param_table_layout.addWidget(label_long_name, number_of_settables + 1, 1)
-        param_table_layout.addWidget(label_settable_unit, number_of_settables + 1, 2)
 
         self.setLayout(grid_layout)
 
@@ -197,6 +187,7 @@ class SnapshotTab(QtWidgets.QWidget):
 
         self.snapshot_tree = QtWidgets.QTreeWidget()
         self.snapshot_tree.setHeaderLabels(["Name", "Value"])
+        self.snapshot_tree.setColumnWidth(0, 200)
         self.snapshot_tree.setSortingEnabled(True)
         self.snapshot_tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.snapshot_tree.customContextMenuRequested.connect(
