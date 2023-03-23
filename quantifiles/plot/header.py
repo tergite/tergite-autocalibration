@@ -35,14 +35,13 @@ class PlotHeader(QtWidgets.QWidget):
         # Create the name label widget
         self._name_label = QtWidgets.QLabel(f"Name: {name}", parent=self)
         self._name_label.setStyleSheet("font-size: 12px;")
-        self._name_label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self._name_label.setWordWrap(True)
 
         # Create the TUID label widget
         self._tuid_label = QtWidgets.QLabel(f"TUID: {str(tuid)}", parent=self)
         self._tuid_label.setStyleSheet("font-size: 12px;")
-        self._name_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
         self._tuid_label.setWordWrap(True)
+        self._tuid_label.setAlignment(QtCore.Qt.AlignRight)
 
         # Create the additional information label widget
         self._additional_info_label = QtWidgets.QLabel(additional_info, parent=self)
