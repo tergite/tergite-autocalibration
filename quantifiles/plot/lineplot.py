@@ -11,6 +11,7 @@ import xarray as xr
 from pyqtgraph.Qt import QtGui
 
 from quantifiles.plot import utils
+from quantifiles.plot.header import PlotHeader
 from quantifiles.plot.utils import copy_to_clipboard
 from quantifiles.units import get_si_unit_and_scaling
 
@@ -116,7 +117,7 @@ class LinePlot(QtWidgets.QFrame):
         pyqtgraph.setConfigOption("background", None)
         pyqtgraph.setConfigOption("foreground", "k")
 
-        layout = QtWidgets.QVBoxLayout()
+        self.plot_header = PlotHeader(self.dataset.name, self.dataset.tuid, parent=self)
 
         self.plot = pyqtgraph.PlotWidget()
         self.plot.addLegend()
@@ -154,6 +155,8 @@ class LinePlot(QtWidgets.QFrame):
         if all([self.dataset[key].attrs["units"] == "%" for key in self.y_keys]):
             self.plot.setYRange(0, 1)
 
+        layout = QtWidgets.QVBoxLayout()
+        layout.addWidget(self.plot_header)
         layout.addWidget(self.plot)
         self.setLayout(layout)
 
