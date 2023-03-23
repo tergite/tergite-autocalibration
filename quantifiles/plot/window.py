@@ -57,7 +57,17 @@ class SingleGettableBox(QtWidgets.QFrame):
             param_table_layout.addWidget(label_long_name, idx, 1)
             param_table_layout.addWidget(label_settable_unit, idx, 2)
 
-        self.setLayout(grid_layout)
+        content = QtWidgets.QWidget(self)
+        content.setLayout(grid_layout)
+        spacer = QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
+        )
+
+        content_layout = QtWidgets.QHBoxLayout(self)
+        content_layout.addSpacerItem(spacer)
+        content_layout.addWidget(content)
+        content_layout.addSpacerItem(spacer)
+        self.setLayout(content_layout)
 
 
 class GettableSelectBox(QtWidgets.QFrame):
