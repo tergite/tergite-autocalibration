@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QApplication
 from pyqtgraph.Qt import QtGui
 
 from quantifiles import units
+from quantifiles.plot.header import PlotHeader
 from quantifiles.plot.utils import set_label, copy_to_clipboard
 
 
@@ -57,6 +58,12 @@ class ColorPlot(QtWidgets.QFrame):
         self.plot = pyqtgraph.PlotWidget()
         self.img.setColorMap(pyqtgraph.colormap.get(colormap))
         self.colorbar = pyqtgraph.ColorBarItem()
+        self.header = PlotHeader(
+            name=dataset.name,
+            tuid=dataset.tuid,
+            additional_info=f"{dataset[z].long_name} ({dataset[z].attrs['units']})",
+            parent=self,
+        )
 
         # Create a 'Copy to Clipboard' QAction and add it to the plot's context menu
         self.copy_action = QtGui.QAction(
@@ -90,6 +97,7 @@ class ColorPlot(QtWidgets.QFrame):
                 "Plotting of non-uniformly spaced 2D data is not yet implemented."
             )
         self.setLayout(QtWidgets.QVBoxLayout())
+        self.layout().addWidget(self.header)
         self.layout().addWidget(self.plot)
         set_label(
             self.plot, "bottom", dataset[x].long_name, x_unit, dataset[x].attrs["units"]
