@@ -209,7 +209,10 @@ class SnapshotTab(QtWidgets.QWidget):
         self.setLayout(layout)
 
     def add_snapshot_to_tree(
-        self, tree: QtWidgets.QTreeWidget, snapshot: dict[str, any], parent_key: str = ''
+        self,
+        tree: QtWidgets.QTreeWidget,
+        snapshot: dict[str, any],
+        parent_key: str = "",
     ):
         for key, value in snapshot.items():
             if isinstance(value, dict):
@@ -233,12 +236,13 @@ class SnapshotTab(QtWidgets.QWidget):
                 dict_copy = {}
                 for i in range(item_parent.childCount()):
                     child_item = item_parent.child(i)
-                    key = child_item.text(0).split(".", 1)[-1]  # Strip parent key from child key
+                    key = child_item.text(0).split(".", 1)[
+                        -1
+                    ]  # Strip parent key from child key
                     value = child_item.text(1)
                     dict_copy[key] = value
                 clipboard = QtWidgets.QApplication.clipboard()
                 clipboard.setText(str(dict_copy))
-
 
 
 class PlotWindowContent(QtWidgets.QWidget):
@@ -288,7 +292,9 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.snapshot = get_snapshot_as_dict(tuid)
 
         self.setWindowTitle(f"{self._WINDOW_TITLE} | {name} | {tuid}")
-        logger.debug(f"Initialized {self.__class__.__name__} with title: {self.windowTitle()}")
+        logger.debug(
+            f"Initialized {self.__class__.__name__} with title: {self.windowTitle()}"
+        )
 
         canvas = PlotWindowContent(self, dataset=dataset, snapshot=self.snapshot)
         self.canvas = canvas
