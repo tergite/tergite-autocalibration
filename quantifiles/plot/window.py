@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from functools import partial
 
 import xarray as xr
@@ -7,6 +8,9 @@ import xarray as xr
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import QSignalMapper
 
+from quantifiles.data import get_snapshot_as_dict
+
+logger = logging.getLogger(__name__)
 
 class SingleGettableBox(QtWidgets.QFrame):
     def __init__(
@@ -163,11 +167,10 @@ class NameAndTuidBox(QtWidgets.QFrame):
             clipboard.setText(value)
 
 
-class PlotWindowContent(QtWidgets.QWidget):
-    def __init__(
-        self, parent: QtWidgets.QWidget | None = None, dataset: xr.Dataset | None = None
-    ):
-        super().__init__(parent)
+class PlotTab(QtWidgets.QWidget):
+    def __init__(self, dataset: xr.Dataset | None):
+        super().__init__()
+        self.dataset = dataset
         self.gettable_select_box = GettableSelectBox(dataset=dataset)
         self.name_and_tuid_box = NameAndTuidBox(name=dataset.name, tuid=dataset.tuid)
 
@@ -184,6 +187,82 @@ class PlotWindowContent(QtWidgets.QWidget):
         self.layout().addWidget(plot)
 
 
+class SnapshotTab(QtWidgets.QWidget):
+    def __init__(self, snapshot: dict[str, any]):
+        super().__init__()
+        self.snapshot = snapshot
+
+        layout = QtWidgets.QVBoxLayout(self)
+
+        self.snapshot_tree = QtWidgets.QTreeWidget()
+        self.snapshot_tree.setHeaderLabels(["Name", "Value"])
+        self.snapshot_tree.setSortingEnabled(True)
+        self.snapshot_tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.snapshot_tree.customContextMenuRequested.connect(
+            self.show_copy_context_menu
+        )
+
+        self.add_snapshot_to_tree(self.snapshot_tree, self.snapshot)
+
+        layout.addWidget(self.snapshot_tree)
+        self.setLayout(layout)
+
+    def add_snapshot_to_tree(
+        self, tree: QtWidgets.QTreeWidget, snapshot: dict[str, any]
+    ):
+        for key, value in snapshot.items():
+            if isinstance(value, dict):
+                item = QtWidgets.QTreeWidgetItem(tree)
+                item.setText(0, key)
+                self.add_snapshot_to_tree(item, value)
+            else:
+                item = QtWidgets.QTreeWidgetItem(tree)
+                item.setText(0, key)
+                item.setText(1, str(value))
+
+    def show_copy_context_menu(self, pos: QtCore.QPoint):
+        menu = QtWidgets.QMenu()
+
+        copy_action = menu.addAction("Copy")
+        action = menu.exec_(self.snapshot_tree.mapToGlobal(pos))
+        if action == copy_action:
+            clipboard = QtWidgets.QApplication.clipboard()
+            clipboard.setText(self.snapshot_tree.currentItem().text(1))
+
+
+class PlotWindowContent(QtWidgets.QWidget):
+    def __init__(
+        self,
+        parent: QtWidgets.QWidget | None = None,
+        dataset: xr.Dataset | None = None,
+        snapshot: dict[str, any] | None = None,
+    ):
+        super().__init__(parent)
+
+        # Create the tab widget
+        tab_widget = QtWidgets.QTabWidget()
+        tab_widget.setTabPosition(QtWidgets.QTabWidget.West)
+        tab_widget.setTabShape(QtWidgets.QTabWidget.Rounded)
+
+        # Create the tab content
+        self.plot_tab = PlotTab(dataset=dataset)
+
+        # Add the tabs
+        tab_widget.addTab(self.plot_tab, "Plots")
+        if snapshot is not None:
+            logger.debug("Adding snapshot tab")
+            tab_widget.addTab(SnapshotTab(snapshot=snapshot), "Snapshot")
+
+        # Set the layout
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.addWidget(tab_widget)
+
+        self.setLayout(layout)
+
+    def add_plot(self, plot: QtWidgets.QWidget):
+        self.plot_tab.add_plot(plot)
+
+
 class PlotWindow(QtWidgets.QMainWindow):
     _WINDOW_TITLE: str = "Quantifiles plot window"
     _WINDOW_SIZE: int = 200
@@ -195,16 +274,20 @@ class PlotWindow(QtWidgets.QMainWindow):
 
         tuid = self.dataset.tuid if hasattr(self.dataset, "tuid") else "no tuid"
         name = self.dataset.name if hasattr(self.dataset, "name") else "no name"
+        self.snapshot = get_snapshot_as_dict(tuid)
+
         self.setWindowTitle(f"{self._WINDOW_TITLE} | {name} | {tuid}")
 
-        canvas = PlotWindowContent(self, dataset=dataset)
+        canvas = PlotWindowContent(self, dataset=dataset, snapshot=self.snapshot)
         self.canvas = canvas
         self.setCentralWidget(canvas)
 
         self.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         self.setMinimumSize(self._WINDOW_SIZE, self._WINDOW_SIZE)
 
-        canvas.gettable_select_box.gettable_toggled.connect(self.toggle_gettable)
+        canvas.plot_tab.gettable_select_box.gettable_toggled.connect(
+            self.toggle_gettable
+        )
 
     def add_plot(self, name: str, plot: QtWidgets.QWidget):
         self.canvas.add_plot(plot)
