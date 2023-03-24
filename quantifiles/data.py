@@ -8,6 +8,7 @@ from datetime import datetime
 
 import logging
 
+import xarray
 from filelock import FileLock
 from quantify_core.data.handling import (
     get_datadir,
@@ -119,7 +120,7 @@ def get_results_for_date(date: datetime | None) -> dict[str, DateResults]:
     return results
 
 
-def safe_load_dataset(tuid: str):
+def safe_load_dataset(tuid: str | TUID) -> xarray.Dataset:
     """
     Load a dataset in a safe manner.
 
