@@ -13,7 +13,7 @@ from quantifiles.data import get_snapshot_as_dict
 logger = logging.getLogger(__name__)
 
 
-class GettableSelector(QtWidgets.QFrame):
+class GettableSelector(QtWidgets.QWidget):
     def __init__(
         self,
         parent: QtWidgets.QWidget | None = None,
@@ -23,27 +23,33 @@ class GettableSelector(QtWidgets.QFrame):
         super().__init__(parent)
         gettable_long_name = dataset[gettable_name].long_name
         gettable_units = dataset[gettable_name].attrs["units"]
-        box_title = f"{gettable_name} {gettable_long_name} ({gettable_units})"
+        box_title = f"{gettable_long_name} ({gettable_units})"
 
-        self.setFrameStyle(QtWidgets.QFrame.StyledPanel | QtWidgets.QFrame.Plain)
-
-        grid_layout = QtWidgets.QGridLayout(self)
-        param_table_layout = QtWidgets.QVBoxLayout()
+        main_layout = QtWidgets.QHBoxLayout(self)
+        main_layout.setContentsMargins(0, 0, 0, 0)
 
         self.checkbox = QtWidgets.QCheckBox()
         self.checkbox.setChecked(True)
-        self.checkbox.setToolTip("Select to include in plot")
+        self.checkbox.setToolTip(f"Select to include {gettable_name} in plot")
+        self.checkbox.setSizePolicy(
+            QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum
+        )
+
+        checkbox_layout = QtWidgets.QVBoxLayout()
+        checkbox_layout.addWidget(self.checkbox)
+        checkbox_layout.setAlignment(QtCore.Qt.AlignRight)
+
+        grid_layout = QtWidgets.QGridLayout()
+        grid_layout.setHorizontalSpacing(10)
+        grid_layout.setVerticalSpacing(5)
 
         label = QtWidgets.QLabel(box_title)
         underline = QtWidgets.QFrame()
         underline.setFrameShape(QtWidgets.QFrame.HLine)
         underline.setFrameShadow(QtWidgets.QFrame.Sunken)
 
-        grid_layout.addWidget(self.checkbox, 0, 0)
-        grid_layout.addWidget(label, 0, 1)
-        grid_layout.addWidget(underline, 1, 1)
-
-        grid_layout.addLayout(param_table_layout, 2, 1)
+        grid_layout.addWidget(label, 0, 0)
+        grid_layout.addWidget(underline, 1, 0)
 
         for row_index, settable_name in enumerate(dataset[gettable_name].coords.keys()):
             settable_long_name = dataset[gettable_name][settable_name].long_name
@@ -57,24 +63,21 @@ class GettableSelector(QtWidgets.QFrame):
             label_short_name.setToolTip("name attribute")
             label_long_name.setToolTip("long_name attribute")
 
-            param_row_layout = QtWidgets.QHBoxLayout()
-            param_row_layout.addWidget(label_short_name)
-            param_row_layout.addWidget(label_long_name)
-            param_row_layout.addWidget(label_settable_unit)
+            grid_layout.addWidget(label_short_name, row_index + 2, 0)
+            grid_layout.addWidget(label_long_name, row_index + 2, 1)
+            grid_layout.addWidget(label_settable_unit, row_index + 2, 2)
 
-            param_table_layout.addLayout(param_row_layout)
+        grid_layout.setContentsMargins(10, 5, 10, 5)
 
-        content = QtWidgets.QWidget(self)
-        content.setLayout(grid_layout)
-        spacer = QtWidgets.QSpacerItem(
-            0, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
+        grid_frame = QtWidgets.QFrame(self)
+        grid_frame.setFrameStyle(QtWidgets.QFrame.StyledPanel | QtWidgets.QFrame.Sunken)
+        grid_frame.setLayout(grid_layout)
+        grid_frame.setSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
         )
 
-        content_layout = QtWidgets.QHBoxLayout(self)
-        content_layout.addSpacerItem(spacer)
-        content_layout.addWidget(content)
-        content_layout.addSpacerItem(spacer)
-        self.setLayout(content_layout)
+        main_layout.addLayout(checkbox_layout)
+        main_layout.addWidget(grid_frame)
 
 
 class GettableSelectBox(QtWidgets.QFrame):
