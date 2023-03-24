@@ -27,7 +27,6 @@ class DateResults:
     """
     A dataclass to store the results for a given date.
     """
-
     name: str
     """The name of the dataset."""
     date: str
