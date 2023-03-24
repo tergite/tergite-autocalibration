@@ -27,7 +27,6 @@ class DateResults:
     """
     A dataclass to store the results for a given date.
     """
-
     name: str
     """The name of the dataset."""
     date: str
@@ -42,10 +41,13 @@ def get_results_for_date(date: datetime | None) -> dict[str, DateResults]:
     """
     Retrieves a dictionary of results for a given date.
 
-    Args:
-        date: A datetime object representing the date to retrieve results for.
+    Parameters
+    ----------
+    date
+        A datetime object representing the date to retrieve results for.
 
-    Returns:
+    Returns
+    -------
         A dictionary of results, where each key is a TUID and each value is a DateResults object.
     """
 
@@ -53,10 +55,13 @@ def get_results_for_date(date: datetime | None) -> dict[str, DateResults]:
         """
         Retrieves keywords for a given TUID.
 
-        Args:
-            tuid: A string representing the TUID to retrieve keywords for.
+        Parameters
+        ----------
+        tuid
+            A string representing the TUID to retrieve keywords for.
 
-        Returns:
+        Returns
+        -------
             A list of keywords (as strings) if retrieval is successful, or a list with a single string element
             containing an error message if retrieval fails.
         """
@@ -144,7 +149,15 @@ def safe_load_dataset(tuid: str | TUID) -> xarray.Dataset:
     return ds
 
 
-def get_all_dates_with_measurements():
+def get_all_dates_with_measurements() -> list[datetime]:
+    """
+    Get a list of all dates with measurements.
+
+    Returns
+    -------
+    list[datetime]
+        A list of all dates with measurements.
+    """
     dirnames = glob.glob(os.path.join(get_datadir(), "*/"), recursive=False)
 
     dates = [os.path.basename(os.path.abspath(dirname))[:8] for dirname in dirnames]
