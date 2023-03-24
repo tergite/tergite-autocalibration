@@ -19,7 +19,7 @@ setup(
     url="https://gitlab.com/dcrielaard/quantifiles",
     license=license,
     packages=find_packages(exclude=("test_data",)),
-    entry_points={"gui_scripts": ["quantifiles=quantifiles.main:main"]},
+    entry_points={"gui_scripts": ["quantifiles=quantifiles.__init__:entry_point"]},
     install_requires=[
         "numpy",
         "matplotlib",
