@@ -28,10 +28,11 @@ class SingleGettableBox(QtWidgets.QFrame):
         self.setFrameStyle(QtWidgets.QFrame.StyledPanel | QtWidgets.QFrame.Plain)
 
         grid_layout = QtWidgets.QGridLayout(self)
-        param_table_layout = QtWidgets.QGridLayout(self)
+        param_table_layout = QtWidgets.QVBoxLayout()
 
         self.checkbox = QtWidgets.QCheckBox()
         self.checkbox.setChecked(True)
+        self.checkbox.setToolTip("Select to include in plot")
 
         label = QtWidgets.QLabel(box_title)
         underline = QtWidgets.QFrame()
@@ -44,7 +45,7 @@ class SingleGettableBox(QtWidgets.QFrame):
 
         grid_layout.addLayout(param_table_layout, 2, 1)
 
-        for idx, settable_name in enumerate(dataset[gettable_name].coords.keys()):
+        for row_index, settable_name in enumerate(dataset[gettable_name].coords.keys()):
             settable_long_name = dataset[gettable_name][settable_name].long_name
 
             label_short_name = QtWidgets.QLabel(str(settable_name))
@@ -53,9 +54,15 @@ class SingleGettableBox(QtWidgets.QFrame):
                 str(dataset[gettable_name][settable_name].attrs["units"])
             )
 
-            param_table_layout.addWidget(label_short_name, idx, 0)
-            param_table_layout.addWidget(label_long_name, idx, 1)
-            param_table_layout.addWidget(label_settable_unit, idx, 2)
+            label_short_name.setToolTip("name attribute")
+            label_long_name.setToolTip("long_name attribute")
+
+            param_row_layout = QtWidgets.QHBoxLayout()
+            param_row_layout.addWidget(label_short_name)
+            param_row_layout.addWidget(label_long_name)
+            param_row_layout.addWidget(label_settable_unit)
+
+            param_table_layout.addLayout(param_row_layout)
 
         content = QtWidgets.QWidget(self)
         content.setLayout(grid_layout)
