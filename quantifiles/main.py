@@ -386,4 +386,4 @@ def main(
 
 
 if __name__ == "__main__":
-    qf = main(r"C:\Users\Damie\PycharmProjects\quantifiles\test_data")
+    main(r"C:\Users\Damie\PycharmProjects\quantifiles\test_data")
