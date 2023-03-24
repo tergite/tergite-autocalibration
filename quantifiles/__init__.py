@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import argparse
 
+from quantifiles import version
 from quantifiles.main import main
 
 from pathlib import Path
 
 __all__ = ["quantifiles", "__version__"]
 
-__version__ = "0.0.5"
+__version__ = version.__version__
 
 _static_reference = None
 
