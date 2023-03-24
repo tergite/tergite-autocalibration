@@ -45,11 +45,21 @@ def get_si_unit_and_scaling(unit: str) -> (str | None, float):
     """
     Given a string unit, return its SI unit and scaling factor.
 
-    Args:
-        unit: The unit to convert.
+    Parameters
+    ----------
+    unit : str
+        The unit to convert.
 
-    Returns:
-        A tuple containing the SI unit and scaling factor.
+    Returns
+    -------
+    tuple[str | None, float]
+        A tuple containing the SI unit and scaling factor. If the input unit is not in the known_units
+        dictionary, the function returns None for the SI unit and a scaling factor of 1.0.
+
+    Examples
+    --------
+    >>> get_si_unit_and_scaling('mV')
+    ('V', 0.001)
     """
     if unit in known_units.keys():
         scaling = known_units[unit]
@@ -60,6 +70,30 @@ def get_si_unit_and_scaling(unit: str) -> (str | None, float):
 
 
 def format_value_and_unit(value: float, unit: str) -> str:
+    """
+    Given a value and a unit, return a formatted string of the value and the unit with SI scaling.
+
+    Parameters
+    ----------
+    value : float
+        The value to format.
+    unit : str
+        The unit to format.
+
+    Returns
+    -------
+    str
+        A formatted string with the value and the unit with SI scaling. If the input value is NaN, it is
+        replaced with 0.
+
+    Examples
+    --------
+    >>> format_value_and_unit(500, 'mA')
+    '5.0000e-01A'
+
+    >>> format_value_and_unit(np.nan, 'mA')
+    '0.0000e+00A'
+    """
     unit, scaler = get_si_unit_and_scaling(unit)
     if np.isnan(value):
         value = 0
