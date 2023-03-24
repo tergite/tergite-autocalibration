@@ -72,4 +72,3 @@ class PlotHeader(QtWidgets.QWidget):
             The text to set as the additional information label.
         """
         self._additional_info_label.setText(text)
-
