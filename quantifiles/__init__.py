@@ -4,7 +4,7 @@ from quantifiles.main import main
 
 from pathlib import Path
 
-__all__ = ["quantifiles"]
+__all__ = ["quantifiles", "__version__"]
 
 __version__ = "0.0.5"
 
