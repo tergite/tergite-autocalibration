@@ -1,7 +1,5 @@
 from setuptools import setup, find_packages
 
-from quantifiles.version import __version__
-
 with open("README.md") as f:
     readme = f.read()
 
@@ -10,7 +8,7 @@ with open("LICENSE") as f:
 
 setup(
     name="quantifiles",
-    version=__version__,
+    version="0.0.5",
     description="Simple databrowser for quantify datasets.",
     long_description=readme,
     long_description_content_type="text/markdown",
