@@ -6,7 +6,7 @@ from quantifiles.main import main
 
 from pathlib import Path
 
-__all__ = ["quantifiles"]
+__all__ = ["quantifiles", "__version__"]
 
 __version__ = "0.0.5"
 
@@ -21,7 +21,6 @@ def quantifiles(data_dir: str | Path | None = None):
 
     return _static_reference
 
-
 def entry_point():
     parser = argparse.ArgumentParser(
         description="Quantifiles - The quantify data browser."
@@ -32,7 +31,6 @@ def entry_point():
     args = parser.parse_args()
 
     quantifiles(args.datadir)
-
 
 if __name__ == "__main__":
     entry_point()
