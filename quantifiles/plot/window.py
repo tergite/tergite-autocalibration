@@ -13,7 +13,7 @@ from quantifiles.data import get_snapshot_as_dict
 logger = logging.getLogger(__name__)
 
 
-class SingleGettableBox(QtWidgets.QFrame):
+class GettableSelector(QtWidgets.QFrame):
     def __init__(
         self,
         parent: QtWidgets.QWidget | None = None,
@@ -102,7 +102,7 @@ class GettableSelectBox(QtWidgets.QFrame):
 
         self._gettable_checkboxes = {}
         for idx, gettable_name in enumerate(dataset.data_vars.keys()):
-            gettable_box = SingleGettableBox(
+            gettable_box = GettableSelector(
                 gettable_name=gettable_name, dataset=dataset
             )
             gettable_box.checkbox.stateChanged.connect(self.gettable_select_mapper.map)
