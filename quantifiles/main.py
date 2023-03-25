@@ -225,7 +225,10 @@ class DataDirInspector(QtWidgets.QMainWindow):
     new_datadir_selected = QtCore.pyqtSignal(str)
 
     def __init__(
-        self, datadir: str | None = None, auto_open_plots: bool = False, parent: QtWidgets.QWidget | None = None
+        self,
+        datadir: str | None = None,
+        auto_open_plots: bool = False,
+        parent: QtWidgets.QWidget | None = None,
     ):
         super().__init__(parent)
 
@@ -289,7 +292,9 @@ class DataDirInspector(QtWidgets.QMainWindow):
         self.experiment_list.experiment_activated.connect(self.open_plots)
         self.date_list.dates_selected.connect(self.set_date_selection)
         self.new_datadir_selected.connect(self.update_datadir)
-        self._today_folder_monitor.new_measurement_found.connect(self._on_new_measurement)
+        self._today_folder_monitor.new_measurement_found.connect(
+            self._on_new_measurement
+        )
 
         # update data directory if provided
         if datadir is not None:
