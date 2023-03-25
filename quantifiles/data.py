@@ -108,9 +108,13 @@ def get_results_for_date(date: datetime | None) -> dict[str, DateResults]:
     keywords = list(map(get_kwds, tuid_names))
 
     # Convert TUID names to datetime objects
-    datetimes = [
-        datetime.strptime(tuid_name[:15], "%Y%m%d-%H%M%S") for tuid_name in tuid_names
-    ]
+    datetimes = []
+    for tuid_name in tuid_names:
+        try:
+            dt = datetime.strptime(tuid_name[:15], "%Y%m%d-%H%M%S")
+            datetimes.append(dt)
+        except ValueError:
+            pass  # Ignore TUIDs that do not match the expected format
 
     # Create dictionary of results, where each key is a TUID and each value is a DateResults object
     results = {
