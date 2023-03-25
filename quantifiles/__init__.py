@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import logging
 
 from quantifiles import version
 from quantifiles.main import main
@@ -11,24 +12,43 @@ __all__ = ["quantifiles", "__version__"]
 
 __version__ = version.__version__
 
-_static_reference = None
 
+def quantifiles(
+    data_dir: str | Path | None = None, log_level: int | str = logging.WARNING
+) -> None:
+    """
+    Entry point for the quantifiles from python.
 
-def quantifiles(data_dir: str | Path | None = None):
-    global _static_reference
+    Parameters
+    ----------
+    data_dir
+        The data directory to open the gui with.
+    log_level
+        The level to configure the logger to.
 
-    if _static_reference is None:
-        _static_reference = main(data_dir)
-
-    return _static_reference
+    Returns
+    -------
+    None
+    """
+    main(data_dir, log_level)
 
 
 def entry_point():
+    """
+    Entry point for the quantifiles command line interface.
+
+    Returns
+    -------
+    None
+    """
     parser = argparse.ArgumentParser(
         description="Quantifiles - The quantify data browser."
     )
     parser.add_argument(
         "--datadir", default=None, help="Data directory to open the gui with."
+    )
+    parser.add_argument(
+        "--log_level", default="WARNING", help="The level to configure the logger to."
     )
     args = parser.parse_args()
 
