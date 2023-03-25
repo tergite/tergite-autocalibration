@@ -11,8 +11,11 @@ from pyqtgraph.Qt import QtGui
 from quantifiles import units
 from quantifiles.data import safe_load_dataset
 from quantifiles.plot.header import PlotHeader
-from quantifiles.plot.utils import set_label, copy_to_clipboard
-from quantifiles.watcher import get_file_monitor_for_dataset
+from quantifiles.plot.utils import (
+    set_label,
+    copy_to_clipboard,
+    get_file_monitor_for_dataset,
+)
 
 
 class ColorPlot(QtWidgets.QFrame):
