@@ -116,7 +116,9 @@ class LinePlot(QtWidgets.QFrame):
 
         self.parent = parent
         self.dataset = dataset
-        x_unit, self.x_scaling = get_si_unit_and_scaling(self.dataset[x_key].attrs["units"])
+        x_unit, self.x_scaling = get_si_unit_and_scaling(
+            self.dataset[x_key].attrs["units"]
+        )
         y_unit, self.y_scaling = get_si_unit_and_scaling(
             self.dataset[self.y_keys[0]].attrs["units"]
         )
@@ -173,8 +175,8 @@ class LinePlot(QtWidgets.QFrame):
         for curve in self.curves:
             for yvar in self.y_keys:
                 curve.setData(
-                    self.x_scaling*self.dataset[self.x_key].values,
-                    self.y_scaling*self.dataset[yvar].values,
+                    self.x_scaling * self.dataset[self.x_key].values,
+                    self.y_scaling * self.dataset[yvar].values,
                 )
 
     def create_curves(self, x_scaling: float = 1, y_scaling: float = 1):
