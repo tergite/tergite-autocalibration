@@ -5,12 +5,14 @@ import pyqtgraph
 
 import numpy as np
 import xarray as xr
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtCore import pyqtSlot
 from pyqtgraph.Qt import QtGui
 
 from quantifiles import units
+from quantifiles.data import safe_load_dataset
 from quantifiles.plot.header import PlotHeader
 from quantifiles.plot.utils import set_label, copy_to_clipboard
+from quantifiles.watcher import get_file_monitor_for_dataset
 
 
 class ColorPlot(QtWidgets.QFrame):
@@ -53,17 +55,22 @@ class ColorPlot(QtWidgets.QFrame):
         pyqtgraph.setConfigOption("background", None)
         pyqtgraph.setConfigOption("foreground", "k")
 
+        self._file_monitor = get_file_monitor_for_dataset(self.dataset)
+        self._file_monitor.file_modified.connect(self._reload_data)
+        self._file_monitor.start()
+
         # Create the widgets
-        self.img = pyqtgraph.ImageItem()
-        self.plot = pyqtgraph.PlotWidget()
-        self.img.setColorMap(pyqtgraph.colormap.get(colormap))
-        self.colorbar = pyqtgraph.ColorBarItem()
         self.header = PlotHeader(
             name=dataset.name,
             tuid=dataset.tuid,
             additional_info=f"{dataset[z].long_name} ({dataset[z].attrs['units']})",
             parent=self,
         )
+        self.img = pyqtgraph.ImageItem()
+        self.plot = pyqtgraph.PlotWidget()
+        self.img.setColorMap(pyqtgraph.colormap.get(colormap))
+        self.colorbar = pyqtgraph.ColorBarItem()
+        self.plot.addItem(self.img)
 
         # Create a 'Copy to Clipboard' QAction and add it to the plot's context menu
         self.copy_action = QtGui.QAction(
@@ -79,23 +86,16 @@ class ColorPlot(QtWidgets.QFrame):
         assert "long_name" in dataset[y].attrs, f"{y} attribute 'long_name' not found"
         assert "units" in dataset[y].attrs, f"{y} attribute 'units' not found"
 
-        x_unit, x_scaling = units.get_si_unit_and_scaling(dataset[x].attrs["units"])
-        y_unit, y_scaling = units.get_si_unit_and_scaling(dataset[y].attrs["units"])
-
-        is_uniformly_spaced = dataset and dataset.attrs.get(
-            "grid_2d_uniformly_spaced", dataset.attrs.get("2D-grid", False)
+        x_unit, self.x_scaling = units.get_si_unit_and_scaling(
+            dataset[x].attrs["units"]
         )
-        if is_uniformly_spaced:
-            x_data = x_scaling * dataset[x].values[: dataset.attrs["xlen"]]
-            y_data = y_scaling * dataset[y].values[:: dataset.attrs["xlen"]]
-            z_data = np.reshape(
-                dataset[z].values, (len(x_data), len(y_data)), order="F"
-            )
-            self.set_image(x_data, y_data, z_data)
-        else:
-            raise NotImplementedError(
-                "Plotting of non-uniformly spaced 2D data is not yet implemented."
-            )
+        y_unit, self.y_scaling = units.get_si_unit_and_scaling(
+            dataset[y].attrs["units"]
+        )
+
+        # Set the data
+        self.set_data(dataset)
+
         self.setLayout(QtWidgets.QVBoxLayout())
         self.layout().addWidget(self.header)
         self.layout().addWidget(self.plot)
@@ -105,6 +105,46 @@ class ColorPlot(QtWidgets.QFrame):
         set_label(
             self.plot, "left", dataset[y].long_name, y_unit, dataset[y].attrs["units"]
         )
+
+    @pyqtSlot()
+    def _reload_data(self) -> None:
+        """
+        Callback for when the file is modified.
+
+        Returns
+        -------
+        None
+        """
+        self.set_data(safe_load_dataset(self.dataset.tuid))
+
+    def set_data(self, dataset: xr.Dataset) -> None:
+        """
+        Set the data to be displayed in the plot.
+
+        Parameters
+        ----------
+        dataset: xr.Dataset
+            The dataset to plot.
+
+        Returns
+        -------
+        None
+        """
+
+        is_uniformly_spaced = dataset and dataset.attrs.get(
+            "grid_2d_uniformly_spaced", dataset.attrs.get("2D-grid", False)
+        )
+        if is_uniformly_spaced:
+            x_data = self.x_scaling * dataset[self.x].values[: dataset.attrs["xlen"]]
+            y_data = self.y_scaling * dataset[self.y].values[:: dataset.attrs["xlen"]]
+            z_data = np.reshape(
+                dataset[self.z].values, (len(x_data), len(y_data)), order="F"
+            )
+            self.set_image(x_data, y_data, z_data)
+        else:
+            raise NotImplementedError(
+                "Plotting of non-uniformly spaced 2D data is not yet implemented."
+            )
 
     def set_image(
         self, x_data: np.ndarray, y_data: np.ndarray, z_data: np.ndarray
@@ -125,7 +165,6 @@ class ColorPlot(QtWidgets.QFrame):
         -------
         None
         """
-        self.plot.addItem(self.img)
         self.img.setImage(z_data)
         self.img.setRect(
             QtCore.QRectF(
