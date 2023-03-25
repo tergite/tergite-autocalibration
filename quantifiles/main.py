@@ -225,7 +225,7 @@ class DataDirInspector(QtWidgets.QMainWindow):
     new_datadir_selected = QtCore.pyqtSignal(str)
 
     def __init__(
-        self, datadir: str | None = None, auto_open_plots: bool = True, parent: QtWidgets.QWidget | None = None
+        self, datadir: str | None = None, auto_open_plots: bool = False, parent: QtWidgets.QWidget | None = None
     ):
         super().__init__(parent)
 

@@ -8,12 +8,15 @@ from PyQt5 import QtWidgets
 import pyqtgraph
 
 import xarray as xr
+from PyQt5.QtCore import pyqtSlot
 from pyqtgraph.Qt import QtGui
 
+from quantifiles.data import safe_load_dataset
 from quantifiles.plot import utils
 from quantifiles.plot.header import PlotHeader
 from quantifiles.plot.utils import copy_to_clipboard
 from quantifiles.units import get_si_unit_and_scaling
+from quantifiles.watcher import get_file_monitor_for_dataset
 
 _OPTIONS = [
     {
@@ -113,15 +116,23 @@ class LinePlot(QtWidgets.QFrame):
 
         self.parent = parent
         self.dataset = dataset
+        x_unit, self.x_scaling = get_si_unit_and_scaling(self.dataset[x_key].attrs["units"])
+        y_unit, self.y_scaling = get_si_unit_and_scaling(
+            self.dataset[self.y_keys[0]].attrs["units"]
+        )
 
         pyqtgraph.setConfigOption("background", None)
         pyqtgraph.setConfigOption("foreground", "k")
+
+        self._file_monitor = get_file_monitor_for_dataset(self.dataset)
+        self._file_monitor.file_modified.connect(self._reload_data)
+        self._file_monitor.start()
 
         self.plot_header = PlotHeader(self.dataset.name, self.dataset.tuid, parent=self)
 
         self.plot = pyqtgraph.PlotWidget()
         self.plot.addLegend()
-        self.curves = self.create_curves()
+        self.curves = self.create_curves(self.x_scaling, self.y_scaling)
 
         # Create a 'Copy to Clipboard' QAction and add it to the plot's context menu
         self.copy_action = QtGui.QAction(
@@ -130,11 +141,6 @@ class LinePlot(QtWidgets.QFrame):
         self.copy_action.triggered.connect(partial(copy_to_clipboard, self))
         self.plot.plotItem.vb.menu.addSeparator()
         self.plot.plotItem.vb.menu.addAction(self.copy_action)
-
-        x_unit, x_scaling = get_si_unit_and_scaling(self.dataset[x_key].attrs["units"])
-        y_unit, y_scaling = get_si_unit_and_scaling(
-            self.dataset[self.y_keys[0]].attrs["units"]
-        )
 
         utils.set_label(
             self.plot,
@@ -159,6 +165,17 @@ class LinePlot(QtWidgets.QFrame):
         layout.addWidget(self.plot_header)
         layout.addWidget(self.plot)
         self.setLayout(layout)
+
+    @pyqtSlot()
+    def _reload_data(self):
+        tuid = self.dataset.tuid
+        self.dataset = safe_load_dataset(tuid)
+        for curve in self.curves:
+            for yvar in self.y_keys:
+                curve.setData(
+                    self.x_scaling*self.dataset[self.x_key].values,
+                    self.y_scaling*self.dataset[yvar].values,
+                )
 
     def create_curves(self, x_scaling: float = 1, y_scaling: float = 1):
         options_generator = cycle(_OPTIONS)

@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import os
 from pathlib import Path
+import xarray as xr
 
 from PyQt5.QtCore import (
     QObject,
@@ -13,6 +14,8 @@ from PyQt5.QtCore import (
     QTime,
     QDate,
 )
+from quantify_core.data.handling import locate_experiment_container, DATASET_NAME
+from quantify_core.data.types import TUID
 
 from quantifiles.data import safe_load_dataset
 
@@ -332,3 +335,23 @@ class FileMonitor(QObject):
         if current_modified > self.last_modified:
             self.last_modified = current_modified
             self.file_modified.emit()
+
+
+def get_file_monitor_for_dataset(dataset: xr.Dataset) -> FileMonitor:
+    """
+    Get a FileMonitor for a dataset.
+
+    Parameters
+    ----------
+    dataset : DataSet
+        The dataset to get a FileMonitor for.
+
+    Returns
+    -------
+    FileMonitor
+        The FileMonitor for the dataset.
+    """
+    tuid = TUID(dataset.attrs["tuid"])
+    directory = Path(locate_experiment_container(tuid))
+    monitor = FileMonitor(directory / DATASET_NAME)
+    return monitor
