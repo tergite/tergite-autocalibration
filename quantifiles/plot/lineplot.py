@@ -14,9 +14,8 @@ from pyqtgraph.Qt import QtGui
 from quantifiles.data import safe_load_dataset
 from quantifiles.plot import utils
 from quantifiles.plot.header import PlotHeader
-from quantifiles.plot.utils import copy_to_clipboard
+from quantifiles.plot.utils import copy_to_clipboard, get_file_monitor_for_dataset
 from quantifiles.units import get_si_unit_and_scaling
-from quantifiles.watcher import get_file_monitor_for_dataset
 
 _OPTIONS = [
     {
