@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import os
 from pathlib import Path
 
@@ -12,9 +13,10 @@ from PyQt5.QtCore import (
     QTime,
     QDate,
 )
-from quantify_core.data.types import TUID
 
 from quantifiles.data import safe_load_dataset
+
+logger = logging.getLogger(__name__)
 
 
 class MidnightTimer(QObject):
@@ -63,7 +65,7 @@ class MidnightTimer(QObject):
         """
         Starts the timer.
         """
-        self.timer.start(self._msecs_until_midnight())
+        self.timer.start(self._msecs_until_midnight() + 1)
 
     def stop_timer(self):
         """
@@ -71,7 +73,7 @@ class MidnightTimer(QObject):
         """
         self.timer.stop()
 
-    def _msecs_until_midnight(self):
+    def _msecs_until_midnight(self) -> int:
         """
         Calculates the number of milliseconds until midnight.
 
@@ -81,12 +83,12 @@ class MidnightTimer(QObject):
             The number of milliseconds until midnight.
         """
         current_time = QTime.currentTime()
-        midnight_time = QTime(0, 0, 0)
+        midnight_time = QTime(23, 59, 59, 999)
 
         if current_time < midnight_time:
             msecs_until_midnight = current_time.msecsTo(midnight_time)
         else:
-            msecs_until_midnight = current_time.msecsTo(QTime(24, 0, 0))
+            msecs_until_midnight = 1
 
         return msecs_until_midnight
 
@@ -95,6 +97,7 @@ class MidnightTimer(QObject):
         Emits the midnight_signal and starts the timer again.
         """
         self.midnight_signal.emit()
+        self.timer.stop()
         self.start_timer()
 
 
@@ -113,7 +116,7 @@ class SubDirectoryMonitor(QObject):
         the path of the new subdirectory.
     """
 
-    dir_created = pyqtSignal(str)
+    dir_created = pyqtSignal(Path)
 
     def __init__(self, folder: str | Path) -> None:
         """Constructor for SubDirectoryMonitor.
@@ -124,10 +127,10 @@ class SubDirectoryMonitor(QObject):
             The path to the directory to monitor.
         """
         super().__init__()
-        self._folder = str(folder)
-        self.fs_watcher = QFileSystemWatcher([self._folder])
+        self.folder = str(folder)
+        self.fs_watcher = QFileSystemWatcher([self.folder])
         self.fs_watcher.directoryChanged.connect(self._on_dir_change)
-        self.subdirectories = set(os.listdir(self._folder))
+        self.subdirectories = set(os.listdir(self.folder))
 
     @pyqtSlot(str)
     def _on_dir_change(self, path: str) -> None:
@@ -142,12 +145,16 @@ class SubDirectoryMonitor(QObject):
         path (str):
             The path of the directory that was changed.
         """
-        # Check if the path is a subdirectory and not a file
-        if path in self.subdirectories:
-            return
-        if os.path.isdir(path):
-            self.subdirectories.add(path)
-            self.dir_created.emit(path)
+        assert path == self.folder
+
+        subdirectories = set(os.listdir(self.folder))
+        new_subdirectories = subdirectories - self.subdirectories
+        self.subdirectories = subdirectories
+
+        for new_subdirectory in new_subdirectories:
+            new_subdirectory = Path(path) / new_subdirectory
+            if new_subdirectory.is_dir():
+                self.dir_created.emit(new_subdirectory)
 
     def set_folder_to_monitor(self, datadir: str | Path) -> None:
         """Change the directory being monitored.
@@ -162,10 +169,10 @@ class SubDirectoryMonitor(QObject):
             The path to the new directory to monitor.
         """
         datadir = str(datadir)
-        self.fs_watcher.removePath(self._folder)
+        self.fs_watcher.removePath(self.folder)
 
         self.fs_watcher.addPath(datadir)
-        self._folder = datadir
+        self.folder = datadir
 
         self.subdirectories = set(os.listdir(datadir))
 
@@ -178,22 +185,12 @@ class TodayFolderMonitor(QObject):
     ----------
     datadir : str or Path
         The path to the directory to be monitored.
-
-    Signals
-    -------
-    new_subdir_found : Path
-        Emitted when a new subdirectory is found in today's folder.
-    new_measurement_found : TUID
-        Emitted when a new measurement is found in today's folder.
-    today_folder_changed : Path
-        Emitted when today's folder changes.
     """
 
-    new_subdir_found = pyqtSignal(Path)
-    new_measurement_found = pyqtSignal(TUID)
+    new_measurement_found = pyqtSignal(str)
     today_folder_changed = pyqtSignal(Path)
 
-    def __init__(self, datadir: str | Path):
+    def __init__(self, datadir: str | Path, parent: QObject = None):
         """
         Initialize the TodayFolderMonitor.
 
@@ -202,7 +199,7 @@ class TodayFolderMonitor(QObject):
         datadir : str or Path
             The path to the directory to be monitored.
         """
-        super().__init__()
+        super().__init__(parent=parent)
         self._datadir: Path = Path(datadir) if isinstance(datadir, str) else datadir
 
         # Set today's folder based on current date
@@ -243,15 +240,16 @@ class TodayFolderMonitor(QObject):
         subdir : Path
             The path to the new subdirectory.
         """
+        logger.debug(f"New subdirectory found: {subdir}")
         if not subdir.is_dir():
             return
-        tuid = subdir.name[:26]
+        tuid = str(subdir.name[:26])
         try:
             _ = safe_load_dataset(tuid)
-            self.new_measurement_found.emit(TUID(tuid))
+            logger.info(f"New measurement found: {tuid}")
+            self.new_measurement_found.emit(str(tuid))
         except FileNotFoundError:
             pass
-
 
     @pyqtSlot()
     def _configure_today_folder(self):
@@ -259,23 +257,27 @@ class TodayFolderMonitor(QObject):
         Configure the TodayFolderMonitor to monitor today's folder.
         """
         # Set today's folder based on current date
-        self._today_folder = self._datadir / QDate.currentDate().toString("yyyyMMdd")
+        today_folder = self._datadir / QDate.currentDate().toString("yyyyMMdd")
 
-        # Create a SubDirectoryMonitor for today's folder if it exists, otherwise start a refresh timer
-        self._folder_monitor = (
-            SubDirectoryMonitor(self._today_folder)
-            if self._today_folder.exists()
-            else None
-        )
+        # Create a SubDirectoryMonitor for today's folder if it exists
+        if today_folder.exists():
+            self._refresh_timer.stop()
+            if today_folder == self._today_folder and self._folder_monitor is not None:
+                return
 
-        # Connect the dir_created signal from the SubDirectoryMonitor to the new_subdir_found signal
-        if self._folder_monitor:
-            self._folder_monitor.dir_created.connect(self.new_subdir_found.emit)
+            self._today_folder = today_folder
+            logger.info(f"Monitoring today's folder: {self._today_folder}")
+
+            self._folder_monitor = SubDirectoryMonitor(self._today_folder)
+
+            # Connect the dir_created signal from the SubDirectoryMonitor to the new_subdir_found signal
+            self._folder_monitor.dir_created.connect(self._on_new_subdir_found)
+
+            # Emit the today_folder_changed signal
+            self.today_folder_changed.emit(self._today_folder)
         else:
-            self._refresh_timer.start(1000)
-
-        # Emit the today_folder_changed signal
-        self.today_folder_changed.emit(self._today_folder)
+            self._folder_monitor = None
+            self._refresh_timer.start(2000)
 
 
 class FileMonitor(QObject):

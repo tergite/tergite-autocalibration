@@ -20,7 +20,7 @@ from quantifiles.data import (
     get_all_dates_with_measurements,
 )
 from quantifiles.plot.autoplot import autoplot
-
+from quantifiles.watcher import TodayFolderMonitor
 
 logger = logging.getLogger(__name__)
 
@@ -219,23 +219,20 @@ class DataDirInspector(QtWidgets.QMainWindow):
     """
 
     _WINDOW_TITLE: str = "Quantifiles | Quantify dataset browser"
+    _DATE_LIST_REFRESH_INTERVAL: int = 2000
 
     # Signal that is emitted when a new data directory is selected
     new_datadir_selected = QtCore.pyqtSignal(str)
 
     def __init__(
-        self, datadir: str | None = None, parent: QtWidgets.QWidget | None = None
+        self, datadir: str | None = None, auto_open_plots: bool = True, parent: QtWidgets.QWidget | None = None
     ):
         super().__init__(parent)
 
-        # Set the data directory
         self.datadir = datadir
-
-        # Set the selected dates to an empty tuple
         self._selected_dates: tuple[str, ...] = ()
-
-        # Initialize the plots list
         self.plots = []
+        self._auto_open_plots = auto_open_plots
 
         self.setWindowTitle(self._WINDOW_TITLE)
 
@@ -279,6 +276,11 @@ class DataDirInspector(QtWidgets.QMainWindow):
         exit_action.triggered.connect(self.close)
         file_menu.addAction(exit_action)
 
+        self._today_folder_monitor = TodayFolderMonitor(self.datadir, parent=self)
+        self._date_list_timer = QtCore.QTimer()
+        self._date_list_timer.timeout.connect(self._update_date_list)
+        self._date_list_timer.start(self._DATE_LIST_REFRESH_INTERVAL)
+
         # set window size
         screen = QDesktopWidget().screenGeometry()
         self.resize(int(screen.width() * 0.6), int(screen.height() * 0.6))
@@ -287,6 +289,7 @@ class DataDirInspector(QtWidgets.QMainWindow):
         self.experiment_list.experiment_activated.connect(self.open_plots)
         self.date_list.dates_selected.connect(self.set_date_selection)
         self.new_datadir_selected.connect(self.update_datadir)
+        self._today_folder_monitor.new_measurement_found.connect(self._on_new_measurement)
 
         # update data directory if provided
         if datadir is not None:
@@ -308,13 +311,17 @@ class DataDirInspector(QtWidgets.QMainWindow):
         self.datadir_label.setText(self.datadir)
         set_datadir(self.datadir)
 
-        # Update the list of dates
-        dates = get_all_dates_with_measurements()
-        date_strings = [date.strftime("%Y-%m-%d") for date in dates]
-        self.date_list.update_date_list(date_strings)
+        self._update_date_list()
+        self._today_folder_monitor.set_datadir(self.datadir)
 
         # Reselect the dates to update
         self.set_date_selection(self._selected_dates)
+
+    @QtCore.pyqtSlot()
+    def _update_date_list(self) -> None:
+        dates = get_all_dates_with_measurements()
+        date_strings = [date.strftime("%Y-%m-%d") for date in dates]
+        self.date_list.update_date_list(date_strings)
 
     @QtCore.pyqtSlot()
     def configure_datadir(self) -> None:
@@ -335,6 +342,12 @@ class DataDirInspector(QtWidgets.QMainWindow):
     def update_datadir(self) -> None:
         self.reload_datadir()
         self.date_list.setCurrentRow(0)
+
+    @QtCore.pyqtSlot(str)
+    def _on_new_measurement(self, tuid: str):
+        self.set_date_selection(self._selected_dates)
+        if self._auto_open_plots:
+            self.open_plots(tuid)
 
     @QtCore.pyqtSlot(list)
     def set_date_selection(self, dates: Sequence[str]) -> None:
