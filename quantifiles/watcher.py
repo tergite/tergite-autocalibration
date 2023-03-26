@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import os
+from datetime import date
 from pathlib import Path
 
 from PyQt5.QtCore import (
@@ -11,7 +12,6 @@ from PyQt5.QtCore import (
     QFileSystemWatcher,
     pyqtSlot,
     QTime,
-    QDate,
 )
 
 from quantifiles.data import safe_load_dataset
@@ -183,27 +183,27 @@ class TodayFolderMonitor(QObject):
 
     Parameters
     ----------
-    datadir : str or Path
+    datadir : str
         The path to the directory to be monitored.
     """
 
     new_measurement_found = pyqtSignal(str)
-    today_folder_changed = pyqtSignal(Path)
+    today_folder_changed = pyqtSignal(str)
 
-    def __init__(self, datadir: str | Path, parent: QObject = None):
+    def __init__(self, datadir: str):
         """
         Initialize the TodayFolderMonitor.
 
         Parameters
         ----------
-        datadir : str or Path
+        datadir : str
             The path to the directory to be monitored.
         """
-        super().__init__(parent=parent)
-        self._datadir: Path = Path(datadir) if isinstance(datadir, str) else datadir
+        super().__init__()
+        self._datadir: str = str(datadir)
 
         # Set today's folder based on current date
-        self._today_folder = self._datadir / QDate.currentDate().toString("yyyyMMdd")
+        self._today_folder = os.path.join(self._datadir, date.today().strftime("%Y%M%d"))
 
         # Timer to refresh today's folder
         self._refresh_timer = QTimer(self)
@@ -218,16 +218,16 @@ class TodayFolderMonitor(QObject):
         self._midnight_timer.midnight_signal.connect(self._configure_today_folder)
 
     @pyqtSlot(str)
-    def set_datadir(self, datadir: str | Path):
+    def set_datadir(self, datadir: str):
         """
         Set the data directory to be monitored.
 
         Parameters
         ----------
-        datadir : str or Path
+        datadir : str
             The path to the directory to be monitored.
         """
-        self._datadir = Path(datadir) if isinstance(datadir, str) else datadir
+        self._datadir = datadir
         self._configure_today_folder()
 
     @pyqtSlot(Path)
@@ -257,10 +257,10 @@ class TodayFolderMonitor(QObject):
         Configure the TodayFolderMonitor to monitor today's folder.
         """
         # Set today's folder based on current date
-        today_folder = self._datadir / QDate.currentDate().toString("yyyyMMdd")
+        today_folder = os.path.join(self._datadir, date.today().strftime("%Y%M%d"))
 
         # Create a SubDirectoryMonitor for today's folder if it exists
-        if today_folder.exists():
+        if os.path.exists(today_folder):
             self._refresh_timer.stop()
             if today_folder == self._today_folder and self._folder_monitor is not None:
                 return
