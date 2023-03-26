@@ -13,7 +13,9 @@ __version__ = "0.0.5"
 
 
 def quantifiles(
-    data_dir: str | Path | None = None, log_level: int | str = logging.WARNING
+    data_dir: str | Path | None = None,
+    liveplotting: bool = False,
+    log_level: int | str = logging.WARNING,
 ) -> None:
     """
     Entry point for the quantifiles from python.
@@ -22,6 +24,8 @@ def quantifiles(
     ----------
     data_dir
         The data directory to open the gui with.
+    liveplotting
+        Whether to automatically open plots for new measurements.
     log_level
         The level to configure the logger to.
 
@@ -29,7 +33,7 @@ def quantifiles(
     -------
     None
     """
-    main(data_dir, log_level)
+    main(data_dir, liveplotting, log_level)
 
 
 def entry_point():
@@ -47,11 +51,14 @@ def entry_point():
         "--datadir", default=None, help="Data directory to open the gui with."
     )
     parser.add_argument(
+        "--liveplotting", action="store_true", help="enable live plotting"
+    )
+    parser.add_argument(
         "--log_level", default="WARNING", help="The level to configure the logger to."
     )
     args = parser.parse_args()
 
-    quantifiles(args.datadir)
+    quantifiles(args.datadir, args.liveplotting, args.log_level)
 
 
 if __name__ == "__main__":
