@@ -91,7 +91,7 @@ pipenv install git+https://gitlab.com/dcrielaard/quantifiles.git#egg=quantifiles
 You can launch the application by running the following command in your terminal:
 
 ```bash
-quantifiles [--datadir DATADIR]
+quantifiles [--datadir DATADIR] [--liveplotting] [--loglevel LOGLEVEL]
 ```
 
 If you don't specify the data directory, you can still access it by selecting File->Open in the application.
