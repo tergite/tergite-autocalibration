@@ -233,9 +233,9 @@ class DataDirInspector(QtWidgets.QMainWindow):
         super().__init__(parent)
 
         self.datadir = datadir
+        self._auto_open_plots = auto_open_plots
         self._selected_dates: tuple[str, ...] = ()
         self.plots = []
-        self._auto_open_plots = auto_open_plots
 
         self.setWindowTitle(self._WINDOW_TITLE)
 
@@ -253,8 +253,8 @@ class DataDirInspector(QtWidgets.QMainWindow):
         self.setCentralWidget(splitter)
 
         # create data directory label and toolbar
-        self.datadir_label = QtWidgets.QLabel(datadir)
         self.toolbar = self.addToolBar("Data Directory")
+        self.datadir_label = DataDirLabel(datadir, parent=self.toolbar)
         self.toolbar.addWidget(self.datadir_label)
         self.toolbar.setMovable(False)
 
@@ -313,7 +313,7 @@ class DataDirInspector(QtWidgets.QMainWindow):
     @QtCore.pyqtSlot()
     def reload_datadir(self) -> None:
         # Update the datadir label and set the datadir
-        self.datadir_label.setText(self.datadir)
+        self.datadir_label.update_datadir(self.datadir)
         set_datadir(self.datadir)
 
         self._update_date_list()
