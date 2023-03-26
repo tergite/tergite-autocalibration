@@ -279,7 +279,7 @@ class DataDirInspector(QtWidgets.QMainWindow):
         exit_action.triggered.connect(self.close)
         file_menu.addAction(exit_action)
 
-        self._today_folder_monitor = TodayFolderMonitor(self.datadir, parent=self)
+        self._today_folder_monitor = TodayFolderMonitor(self.datadir)
         self._date_list_timer = QtCore.QTimer()
         self._date_list_timer.timeout.connect(self._update_date_list)
         self._date_list_timer.start(self._DATE_LIST_REFRESH_INTERVAL)
