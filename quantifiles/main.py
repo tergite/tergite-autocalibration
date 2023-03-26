@@ -248,6 +248,7 @@ class TopBar(QtWidgets.QWidget):
     def update_datadir(self, datadir: str) -> None:
         self.datadir_label.update_datadir(datadir)
 
+    @QtCore.pyqtSlot(int)
     def _on_checkbox_changed(self, state: QtCore.Qt.CheckState) -> None:
         self.liveplotting_changed.emit(state == QtCore.Qt.Checked)
 
