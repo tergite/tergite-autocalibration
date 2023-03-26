@@ -203,7 +203,9 @@ class TodayFolderMonitor(QObject):
         self._datadir: str = str(datadir)
 
         # Set today's folder based on current date
-        self._today_folder = os.path.join(self._datadir, date.today().strftime("%Y%m%d"))
+        self._today_folder = os.path.join(
+            self._datadir, date.today().strftime("%Y%m%d")
+        )
 
         # Timer to refresh today's folder
         self._refresh_timer = QTimer(self)
