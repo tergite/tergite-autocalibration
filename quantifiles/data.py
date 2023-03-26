@@ -258,13 +258,11 @@ def safe_load_dataset(tuid: str | TUID) -> xarray.Dataset:
     xarray.Dataset
         The loaded dataset.
     """
-    tuid = tuid[
-        :26
-    ]  # remove the name of the dataset, if it is present. Only the tuid is needed.
-    lockfile = os.path.join(_DATASET_LOCKS_DIR, tuid + "-" + DATASET_NAME + ".lock")
+    tuid = SplitTuid(tuid)
+    lockfile = os.path.join(_DATASET_LOCKS_DIR, tuid.tuid + "-" + DATASET_NAME + ".lock")
     with FileLock(lockfile, 5):
-        logger.info(f"Loading dataset {tuid}.")
-        ds = load_dataset(TUID(tuid))
+        logger.info(f"Loading dataset {tuid.full_tuid}.")
+        ds = load_dataset(TUID(tuid.tuid))
     return ds
 
 
