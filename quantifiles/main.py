@@ -8,7 +8,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Sequence, Mapping
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QDesktopWidget
 from quantify_core.data.handling import set_datadir
 from quantify_core.data.types import TUID
@@ -195,6 +195,14 @@ class DataDirLabel(QtWidgets.QLabel):
             parent (QtWidgets.QWidget, optional): The parent widget of the label.
         """
         super().__init__(parent)
+        self.setWordWrap(True)
+        self.setSizePolicy(
+            QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
+        )
+
+        font = QtGui.QFont()
+        font.setPointSize(8)
+        self.setFont(font)
 
         self.update_datadir(datadir)
 
@@ -209,6 +217,39 @@ class DataDirLabel(QtWidgets.QLabel):
             self.setText("No data directory selected")
         else:
             self.setText(f"Data directory: {datadir}")
+
+
+class TopBar(QtWidgets.QWidget):
+    liveplotting_changed = QtCore.pyqtSignal(bool)
+
+    def __init__(
+        self,
+        datadir: str,
+        liveplotting: bool = False,
+        parent: QtWidgets.QWidget | None = None,
+    ):
+        super().__init__(parent)
+        self.setSizePolicy(
+            QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
+        )
+
+        self.datadir_label = DataDirLabel(datadir)
+        checkbox = QtWidgets.QCheckBox("Live updating")
+        checkbox.setChecked(liveplotting)
+        checkbox.stateChanged.connect(self._on_checkbox_changed)
+
+        hbox = QtWidgets.QHBoxLayout(self)
+        hbox.addWidget(self.datadir_label)
+        hbox.addWidget(checkbox, alignment=QtCore.Qt.AlignRight)
+        hbox.setStretchFactor(self.datadir_label, 1)
+
+        self.setLayout(hbox)
+
+    def update_datadir(self, datadir: str) -> None:
+        self.datadir_label.update_datadir(datadir)
+
+    def _on_checkbox_changed(self, state: QtCore.Qt.CheckState) -> None:
+        self.liveplotting_changed.emit(state == QtCore.Qt.Checked)
 
 
 class DataDirInspector(QtWidgets.QMainWindow):
@@ -249,14 +290,8 @@ class DataDirInspector(QtWidgets.QMainWindow):
         splitter.addWidget(self.experiment_list)
         splitter.setSizes([80, 820])
 
-        # set splitter as central widget
-        self.setCentralWidget(splitter)
-
         # create data directory label and toolbar
-        self.toolbar = self.addToolBar("Data Directory")
-        self.datadir_label = DataDirLabel(datadir, parent=self.toolbar)
-        self.toolbar.addWidget(self.datadir_label)
-        self.toolbar.setMovable(False)
+        self.top_bar = TopBar(datadir, liveplotting=auto_open_plots, parent=self)
 
         # create menu bar
         menu = self.menuBar()
@@ -295,10 +330,25 @@ class DataDirInspector(QtWidgets.QMainWindow):
         self._today_folder_monitor.new_measurement_found.connect(
             self._on_new_measurement
         )
+        self.top_bar.liveplotting_changed.connect(self._liveplotting_changed)
 
         # update data directory if provided
         if datadir is not None:
             self.update_datadir()
+
+        # set content as central widget
+        content = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout()
+        layout.addWidget(self.top_bar)
+        layout.addWidget(splitter)
+        layout.setStretchFactor(splitter, 1)
+        content.setLayout(layout)
+
+        self.setCentralWidget(content)
+
+    @QtCore.pyqtSlot(bool)
+    def _liveplotting_changed(self, liveplotting: bool) -> None:
+        self._auto_open_plots = liveplotting
 
     @QtCore.pyqtSlot(str)
     def open_plots(self, tuid: str) -> None:
@@ -313,7 +363,7 @@ class DataDirInspector(QtWidgets.QMainWindow):
     @QtCore.pyqtSlot()
     def reload_datadir(self) -> None:
         # Update the datadir label and set the datadir
-        self.datadir_label.update_datadir(self.datadir)
+        self.top_bar.update_datadir(self.datadir)
         set_datadir(self.datadir)
 
         self._update_date_list()
