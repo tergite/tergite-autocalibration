@@ -372,7 +372,9 @@ class DataDirInspector(QtWidgets.QMainWindow):
 
 
 def main(
-    datadir: str | Path | None = None, liveplotting: bool = False, log_level: int | str = logging.WARNING
+    datadir: str | Path | None = None,
+    liveplotting: bool = False,
+    log_level: int | str = logging.WARNING,
 ) -> None:
     """
     The main function for the Quantifiles application. Initializes the Qt application,
