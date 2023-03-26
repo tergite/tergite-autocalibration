@@ -261,7 +261,7 @@ class DataDirInspector(QtWidgets.QMainWindow):
     """
 
     _WINDOW_TITLE: str = "Quantifiles | Quantify dataset browser"
-    _DATE_LIST_REFRESH_INTERVAL: int = 2000
+    _DATE_LIST_REFRESH_INTERVAL: int = 3000
 
     # Signal that is emitted when a new data directory is selected
     new_datadir_selected = QtCore.pyqtSignal(str)
