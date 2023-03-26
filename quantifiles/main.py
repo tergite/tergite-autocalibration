@@ -242,6 +242,8 @@ class TopBar(QtWidgets.QWidget):
         hbox.addWidget(self.datadir_label)
         hbox.addWidget(checkbox, alignment=QtCore.Qt.AlignRight)
         hbox.setStretchFactor(self.datadir_label, 1)
+        hbox.setStretchFactor(checkbox, 0)
+        hbox.setContentsMargins(0, 0, 0, 0)
 
         self.setLayout(hbox)
 
