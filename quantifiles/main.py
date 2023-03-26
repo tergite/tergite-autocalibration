@@ -372,7 +372,7 @@ class DataDirInspector(QtWidgets.QMainWindow):
 
 
 def main(
-    datadir: str | Path | None = None, log_level: int | str = logging.WARNING
+    datadir: str | Path | None = None, liveplotting: bool = False, log_level: int | str = logging.WARNING
 ) -> None:
     """
     The main function for the Quantifiles application. Initializes the Qt application,
@@ -383,6 +383,7 @@ def main(
     ----------
     datadir: str | Path | None, optional (default: None) Path to the data directory to open on launch. If None, the
     user will have to select a data directory manually.
+    liveplotting: bool, optional (default: False) Whether to automatically open plots for new measurements.
     log_level: int | str, optional (default: logging.WARNING) The logging level to use. Can be an integer or a string.
 
     Returns
@@ -394,7 +395,7 @@ def main(
     app.setApplicationName("Quantifiles")
     app.setWindowIcon(load_icon("icon.png"))
 
-    win = DataDirInspector(datadir=datadir)
+    win = DataDirInspector(datadir=datadir, auto_open_plots=liveplotting)
     win.show()
 
     if (sys.flags.interactive != 1) or not hasattr(QtCore, "PYQT_VERSION"):

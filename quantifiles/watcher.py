@@ -203,7 +203,7 @@ class TodayFolderMonitor(QObject):
         self._datadir: str = str(datadir)
 
         # Set today's folder based on current date
-        self._today_folder = os.path.join(self._datadir, date.today().strftime("%Y%M%d"))
+        self._today_folder = os.path.join(self._datadir, date.today().strftime("%Y%m%d"))
 
         # Timer to refresh today's folder
         self._refresh_timer = QTimer(self)
@@ -228,6 +228,7 @@ class TodayFolderMonitor(QObject):
             The path to the directory to be monitored.
         """
         self._datadir = datadir
+        self._folder_monitor = None
         self._configure_today_folder()
 
     @pyqtSlot(Path)
@@ -257,7 +258,7 @@ class TodayFolderMonitor(QObject):
         Configure the TodayFolderMonitor to monitor today's folder.
         """
         # Set today's folder based on current date
-        today_folder = os.path.join(self._datadir, date.today().strftime("%Y%M%d"))
+        today_folder = os.path.join(self._datadir, date.today().strftime("%Y%m%d"))
 
         # Create a SubDirectoryMonitor for today's folder if it exists
         if os.path.exists(today_folder):
