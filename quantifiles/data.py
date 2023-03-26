@@ -22,6 +22,120 @@ from quantify_core.measurement.control import _DATASET_LOCKS_DIR
 logger = logging.getLogger(__name__)
 
 
+class SplitTuid:
+    """
+    A class representing a split tuid.
+
+    Attributes
+    ----------
+    _tuid : str
+        The full tuid string.
+
+    Methods
+    -------
+    date() -> str
+        Returns the date portion of the tuid.
+    time() -> str
+        Returns the time portion of the tuid.
+    name() -> str
+        Returns the name portion of the tuid.
+    tuid() -> str
+        Returns the full tuid string.
+    tuid(tuid: str)
+        Sets the value of the full tuid string.
+    """
+
+    def __init__(self, full_tuid: str | TUID) -> None:
+        """
+        Parameters
+        ----------
+        full_tuid : str | TUID
+            The full tuid string to split.
+        """
+        self._tuid = str(full_tuid)
+
+    def __str__(self) -> str:
+        """
+        Returns
+        -------
+        str
+            The full tuid string.
+        """
+        return self._tuid
+
+    @property
+    def date(self) -> str:
+        """
+        Returns
+        -------
+        str
+            The date portion of the tuid.
+        """
+        return self._tuid[:8]
+
+    @property
+    def time(self) -> str:
+        """
+        Returns
+        -------
+        str
+            The time portion of the tuid.
+        """
+        return self._tuid[9:15]
+
+    @property
+    def timestamp(self) -> datetime:
+        """
+        Returns
+        -------
+        datetime
+            The timestamp of the tuid.
+        """
+        return datetime.strptime(self._tuid[0:15], "%Y%m%d-%H%M%S")
+
+    @property
+    def name(self) -> str:
+        """
+        Returns
+        -------
+        str
+            The name portion of the tuid.
+        """
+        return self._tuid[27:]
+
+    @property
+    def tuid(self) -> str:
+        """
+        Returns
+        -------
+        str
+            The full tuid string.
+        """
+        return self._tuid[:26]
+
+    @property
+    def full_tuid(self) -> str:
+        """
+        Returns
+        -------
+        str
+            The full tuid string including name.
+        """
+        return self._tuid
+
+    @full_tuid.setter
+    def full_tuid(self, tuid: str) -> None:
+        """
+        Sets the value of the full tuid string.
+
+        Parameters
+        ----------
+        tuid : str
+            The new value for the full tuid string.
+        """
+        self._tuid = tuid
+
+
 @dataclasses.dataclass
 class DateResults:
     """
@@ -52,7 +166,7 @@ def get_results_for_date(date: datetime | None) -> dict[str, DateResults]:
         A dictionary of results, where each key is a TUID and each value is a DateResults object.
     """
 
-    def get_kwds(tuid: str) -> list[str] | list[tuple[str, str]]:
+    def get_kwds(tuid: SplitTuid) -> list[str] | list[tuple[str, str]]:
         """
         Retrieves keywords for a given TUID.
 
@@ -68,7 +182,7 @@ def get_results_for_date(date: datetime | None) -> dict[str, DateResults]:
         """
         try:
             # Load dataset using TUID
-            ds = safe_load_dataset(TUID(tuid[:26]))
+            ds = safe_load_dataset(tuid.tuid)
 
             # Get x and y values from dataset coordinates and data variables
             x_vals = [val.long_name for val in list(ds.coords.values())]
@@ -99,7 +213,7 @@ def get_results_for_date(date: datetime | None) -> dict[str, DateResults]:
 
     # Get list of TUID names from subdirectories
     tuid_names = [
-        os.path.basename(sub_dir)
+        SplitTuid(os.path.basename(sub_dir))
         for sub_dir in sub_dirs
         if os.path.isdir(os.path.join(path, sub_dir))
     ]
@@ -111,20 +225,20 @@ def get_results_for_date(date: datetime | None) -> dict[str, DateResults]:
     datetimes = []
     for tuid_name in tuid_names:
         try:
-            dt = datetime.strptime(tuid_name[:15], "%Y%m%d-%H%M%S")
-            datetimes.append(dt)
+            datetimes.append(tuid_name.timestamp)
         except ValueError:
-            pass  # Ignore TUIDs that do not match the expected format
+            # Ignore TUIDs that do not match the expected format
+            tuid_names.remove(tuid_name)
 
     # Create dictionary of results, where each key is a TUID and each value is a DateResults object
     results = {
-        TUID(tuid_name[:26]): DateResults(
-            name=tuid_name[27:],
+        TUID(tuid_name.tuid): DateResults(
+            name=tuid_name.name,
             date=dt.strftime("%Y-%m-%d"),
             time=dt.strftime("%H:%M:%S"),
             keywords_=str(kwd),
         )
-        for idx, (tuid_name, dt, kwd) in enumerate(zip(tuid_names, datetimes, keywords))
+        for (tuid_name, dt, kwd) in zip(tuid_names, datetimes, keywords)
     }
 
     return results
