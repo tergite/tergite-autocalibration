@@ -220,6 +220,24 @@ class DataDirLabel(QtWidgets.QLabel):
 
 
 class TopBar(QtWidgets.QWidget):
+    """
+    A class representing a widget for a top bar with a data directory label and a checkbox for live updating.
+
+    Attributes
+    ----------
+    liveplotting_changed : QtCore.pyqtSignal
+        A PyQt signal emitted when the live plotting state changes.
+
+    Methods
+    -------
+    __init__(datadir: str, liveplotting: bool = False, parent: QtWidgets.QWidget | None = None)
+        Constructs a new TopBar object with the given data directory and liveplotting state.
+    update_datadir(datadir: str) -> None
+        Updates the data directory label with the given value.
+    _on_checkbox_changed(state: QtCore.Qt.CheckState) -> None
+        A PyQt slot called when the checkbox is changed.
+    """
+
     liveplotting_changed = QtCore.pyqtSignal(bool)
 
     def __init__(
@@ -228,30 +246,62 @@ class TopBar(QtWidgets.QWidget):
         liveplotting: bool = False,
         parent: QtWidgets.QWidget | None = None,
     ):
+        """
+        Constructs a new TopBar object with the given data directory and liveplotting state.
+
+        Parameters
+        ----------
+        datadir : str
+            The data directory string to display.
+        liveplotting : bool, optional
+            Whether to enable live updating (default is False).
+        parent : QtWidgets.QWidget | None, optional
+            The parent widget (default is None).
+        """
+
         super().__init__(parent)
         self.setSizePolicy(
             QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
         )
 
+        # Create DataDirLabel widget and checkbox
         self.datadir_label = DataDirLabel(datadir)
         checkbox = QtWidgets.QCheckBox("Live updating")
         checkbox.setChecked(liveplotting)
         checkbox.stateChanged.connect(self._on_checkbox_changed)
 
+        # Create horizontal layout and add widgets
         hbox = QtWidgets.QHBoxLayout(self)
         hbox.addWidget(self.datadir_label)
         hbox.addWidget(checkbox, alignment=QtCore.Qt.AlignRight)
+
+        # Set stretch factors, contents margins, and layout
         hbox.setStretchFactor(self.datadir_label, 1)
         hbox.setStretchFactor(checkbox, 0)
         hbox.setContentsMargins(0, 0, 0, 0)
-
         self.setLayout(hbox)
 
     def update_datadir(self, datadir: str) -> None:
+        """
+        Updates the data directory label with the given value.
+
+        Parameters
+        ----------
+        datadir : str
+            The new data directory string to display.
+        """
         self.datadir_label.update_datadir(datadir)
 
     @QtCore.pyqtSlot(int)
     def _on_checkbox_changed(self, state: QtCore.Qt.CheckState) -> None:
+        """
+        A PyQt slot called when the checkbox is changed.
+
+        Parameters
+        ----------
+        state : QtCore.Qt.CheckState
+            The new state of the checkbox.
+        """
         self.liveplotting_changed.emit(state == QtCore.Qt.Checked)
 
 
