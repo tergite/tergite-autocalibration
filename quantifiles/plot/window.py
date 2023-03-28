@@ -9,6 +9,7 @@ from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import QSignalMapper
 
 from quantifiles.data import get_snapshot_as_dict
+from quantifiles.plot.baseplot import BasePlot
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +44,7 @@ class GettableSelector(QtWidgets.QWidget):
         # Get the long name and units of the data variable.
         gettable_long_name = dataset[gettable_name].long_name
         gettable_units = dataset[gettable_name].attrs["units"]
-        box_title = f"{gettable_long_name} ({gettable_units})"
+        box_title = f"{gettable_name}: {gettable_long_name} ({gettable_units})"
 
         # Set up the main layout of the widget.
         main_layout = QtWidgets.QHBoxLayout(self)
@@ -78,7 +79,7 @@ class GettableSelector(QtWidgets.QWidget):
             settable_long_name = dataset[gettable_name][settable_name].long_name
             settable_units = dataset[gettable_name][settable_name].attrs["units"]
             settable_label = QtWidgets.QLabel(
-                f"{settable_name} - {settable_long_name} ({settable_units})"
+                f"{settable_name}: {settable_long_name} ({settable_units})"
             )
             box_layout.addWidget(settable_label)
 
@@ -103,9 +104,7 @@ class GettableSelectBox(QtWidgets.QFrame):
     gettable_toggled = QtCore.pyqtSignal(str, bool)
 
     def __init__(
-        self,
-        parent: QtWidgets.QWidget | None = None,
-        dataset: xr.Dataset | None = None
+        self, parent: QtWidgets.QWidget | None = None, dataset: xr.Dataset | None = None
     ):
         """
         Initialize the GettableSelectBox widget.
@@ -144,7 +143,9 @@ class GettableSelectBox(QtWidgets.QFrame):
 
         # Add a GettableSelector widget for each data variable in the dataset
         for idx, gettable_name in enumerate(dataset.data_vars.keys()):
-            gettable_box = GettableSelector(gettable_name=gettable_name, dataset=dataset)
+            gettable_box = GettableSelector(
+                gettable_name=gettable_name, dataset=dataset
+            )
 
             # Connect the checkbox in the GettableSelector widget to the signal mapper
             gettable_box.checkbox.stateChanged.connect(self.gettable_select_mapper.map)
@@ -154,8 +155,23 @@ class GettableSelectBox(QtWidgets.QFrame):
 
             layout.addWidget(gettable_box)
 
-        # Add another spacer to push the widgets so they are centered
+        # Add another spacer to push the widgets so that they are centered
         layout.addSpacerItem(spacer)
+
+        underline = QtWidgets.QFrame()
+        underline.setFrameShape(QtWidgets.QFrame.HLine)
+        underline.setFrameShadow(QtWidgets.QFrame.Sunken)
+        layout.addWidget(underline)
+
+        self.mouse_pos_label = QtWidgets.QLabel()
+        self.mouse_pos_label.setWordWrap(True)
+        self.mouse_pos_label.setSizePolicy(
+            QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed
+        )
+        layout.addWidget(self.mouse_pos_label)
+
+    def on_new_mouse_pos_text(self, text: str):
+        self.mouse_pos_label.setText(f"Mouse at: {text}")
 
     def gettable_state_changed(self, name: str):
         """
@@ -168,7 +184,6 @@ class GettableSelectBox(QtWidgets.QFrame):
         """
         enabled = self._gettable_checkboxes[name].isChecked()
         self.gettable_toggled.emit(name, enabled)
-
 
 
 class NameAndTuidBox(QtWidgets.QFrame):
@@ -367,9 +382,12 @@ class PlotWindow(QtWidgets.QMainWindow):
             self.toggle_gettable
         )
 
-    def add_plot(self, name: str, plot: QtWidgets.QWidget):
+    def add_plot(self, name: str, plot: BasePlot):
         self.canvas.add_plot(plot)
         self.plots[name] = plot
+        plot.mouse_text_changed.connect(
+            self.canvas.plot_tab.gettable_select_box.on_new_mouse_pos_text
+        )
 
         logger.debug(f"Added plot with name {name} to {self.__class__.__name__}")
 

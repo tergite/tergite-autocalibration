@@ -43,8 +43,6 @@ if __name__ == "__main__":
     # dataset = safe_load_dataset("20200504-191556-002-4209ee")
     # dataset = safe_load_dataset("20220930-104712-924-d6f761")
 
-    print(dataset)
-
     app = QtWidgets.QApplication([])
     window = autoplot(dataset)
     window.show()
