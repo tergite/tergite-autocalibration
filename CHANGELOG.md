@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.1] - 2023-03-28
+
+### Added
+
+- Added a label displaying the current mouse position to the plots, allowing users to see the precise coordinates of their mouse cursor while interacting with the plot.
+
 ## [0.1.0] - 2023-03-26
 
 ### Added
