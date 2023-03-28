@@ -1,24 +1,15 @@
-from functools import partial
-
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtCore
 import pyqtgraph
 
 import numpy as np
 import xarray as xr
-from PyQt5.QtCore import pyqtSlot
-from pyqtgraph.Qt import QtGui
 
 from quantifiles import units
-from quantifiles.data import safe_load_dataset
-from quantifiles.plot.header import PlotHeader
-from quantifiles.plot.utils import (
-    set_label,
-    copy_to_clipboard,
-    get_file_monitor_for_dataset,
-)
+from quantifiles.plot.baseplot import BasePlot
+from quantifiles.plot.utils import set_label
 
 
-class ColorPlot(QtWidgets.QFrame):
+class ColorPlot(BasePlot):
     def __init__(
         self,
         dataset: xr.Dataset,
@@ -46,42 +37,20 @@ class ColorPlot(QtWidgets.QFrame):
         parent: QtWidgets.QWidget, optional
             The parent widget of this widget. By default, `None`.
         """
-        super().__init__(parent)
-        self.setFrameStyle(QtWidgets.QFrame.StyledPanel | QtWidgets.QFrame.Plain)
-        self.setStyleSheet("background-color:white;")
+        super().__init__(dataset, parent=parent)
+        self.header.set_additional_info(
+            f"{dataset[z].long_name} ({dataset[z].attrs['units']})"
+        )
 
-        self.dataset = dataset
         self.x = x
         self.y = y
         self.z = z
 
-        pyqtgraph.setConfigOption("background", None)
-        pyqtgraph.setConfigOption("foreground", "k")
-
-        self._file_monitor = get_file_monitor_for_dataset(self.dataset)
-        self._file_monitor.file_modified.connect(self._reload_data)
-        self._file_monitor.start()
-
-        # Create the widgets
-        self.header = PlotHeader(
-            name=dataset.name,
-            tuid=dataset.tuid,
-            additional_info=f"{dataset[z].long_name} ({dataset[z].attrs['units']})",
-            parent=self,
-        )
         self.img = pyqtgraph.ImageItem()
-        self.plot = pyqtgraph.PlotWidget()
         self.img.setColorMap(pyqtgraph.colormap.get(colormap))
         self.colorbar = pyqtgraph.ColorBarItem()
-        self.plot.addItem(self.img)
 
-        # Create a 'Copy to Clipboard' QAction and add it to the plot's context menu
-        self.copy_action = QtGui.QAction(
-            "Copy to Clipboard", self.plot.plotItem.vb.menu
-        )
-        self.copy_action.triggered.connect(partial(copy_to_clipboard, self))
-        self.plot.plotItem.vb.menu.addSeparator()
-        self.plot.plotItem.vb.menu.addAction(self.copy_action)
+        self.plot.addItem(self.img)
 
         # Check that necessary attributes are present in the dataset
         assert "long_name" in dataset[x].attrs, f"{x} attribute 'long_name' not found"
@@ -99,26 +68,12 @@ class ColorPlot(QtWidgets.QFrame):
         # Set the data
         self.set_data(dataset)
 
-        self.setLayout(QtWidgets.QVBoxLayout())
-        self.layout().addWidget(self.header)
-        self.layout().addWidget(self.plot)
         set_label(
             self.plot, "bottom", dataset[x].long_name, x_unit, dataset[x].attrs["units"]
         )
         set_label(
             self.plot, "left", dataset[y].long_name, y_unit, dataset[y].attrs["units"]
         )
-
-    @pyqtSlot()
-    def _reload_data(self) -> None:
-        """
-        Callback for when the file is modified.
-
-        Returns
-        -------
-        None
-        """
-        self.set_data(safe_load_dataset(self.dataset.tuid))
 
     def set_data(self, dataset: xr.Dataset) -> None:
         """
@@ -176,4 +131,39 @@ class ColorPlot(QtWidgets.QFrame):
                 np.max(x_data) - np.min(x_data),
                 np.max(y_data) - np.min(y_data),
             )
+        )
+
+    def get_mouse_position_text(self, x: float, y: float) -> str:
+        """
+        Get the text to display when the mouse is moved over the plot.
+
+        Parameters
+        ----------
+        x: float
+            The x-coordinate of the mouse.
+        y: float
+            The y-coordinate of the mouse.
+
+        Returns
+        -------
+        str
+            The text to display.
+        """
+        index_pos = self.img.getViewBox().mapFromViewToItem(
+            self.img, QtCore.QPointF(x, y)
+        )
+        try:
+            x_idx, y_idx = int(round(index_pos.x())), int(round(index_pos.y()))
+            x_idx = max(0, min(x_idx, self.img.image.shape[0] - 1))
+            y_idx = max(0, min(y_idx, self.img.image.shape[1] - 1))
+            z_value = self.img.image[x_idx, y_idx]
+        except IndexError:
+            z_value = np.nan
+
+        x_unit = self.dataset[self.x].attrs["units"]
+        y_unit = self.dataset[self.y].attrs["units"]
+        z_unit = self.dataset[self.z].attrs["units"]
+
+        return (
+            f"\nx = {x:.2e} {x_unit}\ny = {y:.2e} {y_unit}\nz = {z_value:.2e} {z_unit}"
         )

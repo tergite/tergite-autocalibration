@@ -1,20 +1,14 @@
 from __future__ import annotations
 
-from functools import partial
 from itertools import cycle
 from typing import Sequence
 
 from PyQt5 import QtWidgets
-import pyqtgraph
 
 import xarray as xr
-from PyQt5.QtCore import pyqtSlot
-from pyqtgraph.Qt import QtGui
 
-from quantifiles.data import safe_load_dataset
 from quantifiles.plot import utils
-from quantifiles.plot.header import PlotHeader
-from quantifiles.plot.utils import copy_to_clipboard, get_file_monitor_for_dataset
+from quantifiles.plot.baseplot import BasePlot
 from quantifiles.units import get_si_unit_and_scaling
 
 _OPTIONS = [
@@ -98,23 +92,19 @@ _OPTIONS = [
 ]
 
 
-class LinePlot(QtWidgets.QFrame):
+class LinePlot(BasePlot):
     def __init__(
         self,
         dataset: xr.Dataset,
         x_key: str,
         y_keys: Sequence[str] | str,
-        parent=None,
+        parent: QtWidgets.QWidget = None,
     ):
-        super().__init__(parent)
-        self.setFrameStyle(QtWidgets.QFrame.StyledPanel | QtWidgets.QFrame.Plain)
-        self.setStyleSheet("background-color:white;")
+        super().__init__(dataset, parent=parent)
 
         self.y_keys = [y_keys] if isinstance(y_keys, str) else y_keys
         self.x_key = x_key
 
-        self.parent = parent
-        self.dataset = dataset
         x_unit, self.x_scaling = get_si_unit_and_scaling(
             self.dataset[x_key].attrs["units"]
         )
@@ -122,26 +112,9 @@ class LinePlot(QtWidgets.QFrame):
             self.dataset[self.y_keys[0]].attrs["units"]
         )
 
-        pyqtgraph.setConfigOption("background", None)
-        pyqtgraph.setConfigOption("foreground", "k")
-
-        self._file_monitor = get_file_monitor_for_dataset(self.dataset)
-        self._file_monitor.file_modified.connect(self._reload_data)
-        self._file_monitor.start()
-
-        self.plot_header = PlotHeader(self.dataset.name, self.dataset.tuid, parent=self)
-
-        self.plot = pyqtgraph.PlotWidget()
-        self.plot.addLegend()
         self.curves = self.create_curves(self.x_scaling, self.y_scaling)
-
-        # Create a 'Copy to Clipboard' QAction and add it to the plot's context menu
-        self.copy_action = QtGui.QAction(
-            "Copy to Clipboard", self.plot.plotItem.vb.menu
-        )
-        self.copy_action.triggered.connect(partial(copy_to_clipboard, self))
-        self.plot.plotItem.vb.menu.addSeparator()
-        self.plot.plotItem.vb.menu.addAction(self.copy_action)
+        if len(self.y_keys) > 1:
+            self.plot.addLegend()
 
         utils.set_label(
             self.plot,
@@ -159,18 +132,14 @@ class LinePlot(QtWidgets.QFrame):
         )
 
         self.plot.showGrid(x=True, y=True)
+
         if all([self.dataset[key].attrs["units"] == "%" for key in self.y_keys]):
             self.plot.setYRange(0, 1)
 
-        layout = QtWidgets.QVBoxLayout()
-        layout.addWidget(self.plot_header)
-        layout.addWidget(self.plot)
-        self.setLayout(layout)
+        self.set_data(self.dataset)
 
-    @pyqtSlot()
-    def _reload_data(self):
-        tuid = self.dataset.tuid
-        self.dataset = safe_load_dataset(tuid)
+    def set_data(self, dataset: xr.Dataset):
+        self.dataset = dataset
         for curve in self.curves:
             for yvar in self.y_keys:
                 curve.setData(
@@ -192,3 +161,10 @@ class LinePlot(QtWidgets.QFrame):
             )
             curves.append(curve)
         return curves
+
+    def get_mouse_position_text(self, x: float, y: float) -> str:
+        text = (
+            f"\nx = {x:.3e} {self.dataset[self.x_key].attrs['units']} "
+            f"\ny = {y:.3e} {self.dataset[self.y_keys[0]].attrs['units']}"
+        )
+        return text
