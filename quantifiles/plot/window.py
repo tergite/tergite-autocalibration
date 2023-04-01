@@ -284,7 +284,7 @@ class SnapshotTab(QtWidgets.QWidget):
 
         self.snapshot_tree = QtWidgets.QTreeWidget()
         self.snapshot_tree.setHeaderLabels(["Name", "Value"])
-        self.snapshot_tree.setColumnWidth(0, 200)
+        self.snapshot_tree.setColumnWidth(0, 256)
         self.snapshot_tree.setSortingEnabled(True)
         self.snapshot_tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.snapshot_tree.customContextMenuRequested.connect(
@@ -369,7 +369,7 @@ class PlotWindowContent(QtWidgets.QWidget):
 class PlotWindow(QtWidgets.QMainWindow):
     _WINDOW_TITLE: str = "Quantifiles plot window"
     _WINDOW_HEIGHT: int = 600
-    _WINDOW_WIDTH: int = 1024
+    _WINDOW_WIDTH: int = 300
 
     def __init__(self, dataset: xr.Dataset, parent: QtWidgets.QWidget | None = None):
         super().__init__(parent)
@@ -389,11 +389,6 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.canvas = canvas
         self.setCentralWidget(canvas)
 
-        self.setSizePolicy(
-            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
-        )
-        self.setMinimumSize(self._WINDOW_WIDTH, self._WINDOW_HEIGHT)
-
         canvas.plot_tab.gettable_select_box.gettable_toggled.connect(
             self.toggle_gettable
         )
@@ -405,7 +400,7 @@ class PlotWindow(QtWidgets.QMainWindow):
             self.canvas.plot_tab.gettable_select_box.on_new_mouse_pos_text
         )
 
-        self.resize(self.width() + 300 * (len(self.plots) - 1), self.height())
+        self.resize(self._WINDOW_WIDTH + self._WINDOW_HEIGHT * len(self.plots), self._WINDOW_HEIGHT)
 
         logger.debug(f"Added plot with name {name} to {self.__class__.__name__}")
 
