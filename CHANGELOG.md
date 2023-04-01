@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- Added splitter to the plot window, allowing users to resize the left and right panels.
+
 ## [0.1.1] - 2023-03-28
 
 ### Added
