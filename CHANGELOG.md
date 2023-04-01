@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - Added splitter to the plot window, allowing users to resize the left and right panels.
+- Made the auto plot windows pop up as active windows on some operating systems.
 
 ## [0.1.1] - 2023-03-28
 
