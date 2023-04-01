@@ -171,7 +171,7 @@ class GettableSelectBox(QtWidgets.QFrame):
         layout.addWidget(self.mouse_pos_label)
 
     def on_new_mouse_pos_text(self, text: str):
-        self.mouse_pos_label.setText(f"Mouse at: {text}")
+        self.mouse_pos_label.setText(str(text))
 
     def gettable_state_changed(self, name: str):
         """
@@ -249,17 +249,30 @@ class PlotTab(QtWidgets.QWidget):
         self.gettable_select_box = GettableSelectBox(dataset=dataset)
         self.name_and_tuid_box = NameAndTuidBox(name=dataset.name, tuid=dataset.tuid)
 
-        layout = QtWidgets.QHBoxLayout(self)
-
         left_column_layout = QtWidgets.QVBoxLayout(self)
         left_column_layout.addWidget(self.name_and_tuid_box)
         left_column_layout.addWidget(self.gettable_select_box)
 
-        layout.addLayout(left_column_layout)
+        column_container = QtWidgets.QWidget()
+        column_container.setLayout(left_column_layout)
+
+        self.plot_layout = QtWidgets.QHBoxLayout(self)
+        plot_container = QtWidgets.QWidget()
+        plot_container.setLayout(self.plot_layout)
+
+        splitter = QtWidgets.QSplitter(QtCore.Qt.Horizontal)
+        splitter.addWidget(column_container)
+        splitter.addWidget(plot_container)
+
+        layout = QtWidgets.QHBoxLayout(self)
+        layout.addWidget(splitter)
         self.setLayout(layout)
 
     def add_plot(self, plot: QtWidgets.QWidget):
-        self.layout().addWidget(plot)
+        self.plot_layout.addWidget(plot)
+        plot.setSizePolicy(
+            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
+        )
 
 
 class SnapshotTab(QtWidgets.QWidget):
@@ -355,7 +368,8 @@ class PlotWindowContent(QtWidgets.QWidget):
 
 class PlotWindow(QtWidgets.QMainWindow):
     _WINDOW_TITLE: str = "Quantifiles plot window"
-    _WINDOW_SIZE: int = 200
+    _WINDOW_HEIGHT: int = 600
+    _WINDOW_WIDTH: int = 1024
 
     def __init__(self, dataset: xr.Dataset, parent: QtWidgets.QWidget | None = None):
         super().__init__(parent)
@@ -375,8 +389,10 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.canvas = canvas
         self.setCentralWidget(canvas)
 
-        self.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
-        self.setMinimumSize(self._WINDOW_SIZE, self._WINDOW_SIZE)
+        self.setSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
+        )
+        self.setMinimumSize(self._WINDOW_WIDTH, self._WINDOW_HEIGHT)
 
         canvas.plot_tab.gettable_select_box.gettable_toggled.connect(
             self.toggle_gettable
@@ -388,6 +404,8 @@ class PlotWindow(QtWidgets.QMainWindow):
         plot.mouse_text_changed.connect(
             self.canvas.plot_tab.gettable_select_box.on_new_mouse_pos_text
         )
+
+        self.resize(self.width() + 300 * (len(self.plots) - 1), self.height())
 
         logger.debug(f"Added plot with name {name} to {self.__class__.__name__}")
 
