@@ -263,6 +263,7 @@ class PlotTab(QtWidgets.QWidget):
         splitter = QtWidgets.QSplitter(QtCore.Qt.Horizontal)
         splitter.addWidget(column_container)
         splitter.addWidget(plot_container)
+        splitter.setSizes([80, 640])
 
         layout = QtWidgets.QHBoxLayout(self)
         layout.addWidget(splitter)
