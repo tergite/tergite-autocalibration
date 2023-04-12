@@ -48,7 +48,8 @@ class ColorPlot(BasePlot):
 
         self.img = pyqtgraph.ImageItem()
         self.img.setColorMap(pyqtgraph.colormap.get(colormap))
-        self.colorbar = pyqtgraph.ColorBarItem()
+
+        self.colorbar = pyqtgraph.ColorBarItem(width=16, cmap=colormap)
 
         self.plot.addItem(self.img)
 
@@ -132,6 +133,7 @@ class ColorPlot(BasePlot):
                 np.max(y_data) - np.min(y_data),
             )
         )
+        self.colorbar.setImageItem(self.img, insert_in=self.plot.plotItem)
 
     def get_mouse_position_text(self, x: float, y: float) -> str:
         """
