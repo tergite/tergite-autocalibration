@@ -407,7 +407,10 @@ class PlotWindow(QtWidgets.QMainWindow):
             self.canvas.plot_tab.gettable_select_box.on_new_mouse_pos_text
         )
 
-        self.resize(self._WINDOW_WIDTH + self._WINDOW_HEIGHT * len(self.plots), self._WINDOW_HEIGHT)
+        self.resize(
+            self._WINDOW_WIDTH + self._WINDOW_HEIGHT * len(self.plots),
+            self._WINDOW_HEIGHT,
+        )
 
         logger.debug(f"Added plot with name {name} to {self.__class__.__name__}")
 
