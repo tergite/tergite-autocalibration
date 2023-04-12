@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Sequence, Mapping
 
 from PyQt5 import QtCore, QtWidgets, QtGui
-from PyQt5.QtWidgets import QDesktopWidget
+from PyQt5.QtWidgets import QDesktopWidget, QMessageBox
 from quantify_core.data.handling import set_datadir
 from quantify_core.data.types import TUID
 
@@ -450,6 +450,13 @@ class DataDirInspector(QtWidgets.QMainWindow):
     def update_datadir(self) -> None:
         self.reload_datadir()
         self.date_list.setCurrentRow(0)
+        if self.date_list.count() == 0:
+            QMessageBox.warning(
+                self,
+                "No measurements found",
+                "No measurements were found in the selected data directory.\n\nEither no measurements have been taken "
+                "yet or the selected directory is not a valid quantify data directory.",
+            )
 
     @QtCore.pyqtSlot(str)
     def _on_new_measurement(self, tuid: str):
