@@ -1,9 +1,14 @@
 # Changelog
 
-## [Unreleased]
+## [0.2.0] - 2023-04-12
+
+### Added
 
 - Added splitter to the plot window, allowing users to resize the left and right panels.
 - Made the auto plot windows pop up as active windows on some operating systems.
+- Added colorbar to the 2d plots.
+- Added a warning on selecting an invalid data directory.
+- Added a "Close all plots" action to the browser window under the "File" menu for convenience.
 
 ## [0.1.1] - 2023-03-28
 
