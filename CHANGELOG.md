@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Added labels to the colorbar in the 2d plots.
+
 ## [0.2.0] - 2023-04-12
 
 ### Added
