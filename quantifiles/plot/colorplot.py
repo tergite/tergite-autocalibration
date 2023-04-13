@@ -135,7 +135,9 @@ class ColorPlot(BasePlot):
             )
         )
         self.colorbar.setImageItem(self.img, insert_in=self.plot.plotItem)
-        self.colorbar.setLevels((np.min(z_data), np.max(z_data)))
+
+        limits = (np.nanmin(z_data), np.nanmax(z_data))
+        self.colorbar.setLevels(limits)
 
     def get_mouse_position_text(self, x: float, y: float) -> str:
         """
