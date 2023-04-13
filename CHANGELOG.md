@@ -10,6 +10,7 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 ### Added
 
 - Added labels to the colorbar in the 2d plots.
+- Added a search function to the snapshot treeview, allowing users to search for specific keys in the snapshot.
 
 ### Bug Fixes
 - Fixed bug where the colorbar levels were sometimes not being set correctly.
