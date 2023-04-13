@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project follows versions of format `{year}.{month}.{patch_number}`.
 
+## [Unreleased]
+
+### Added
+
+- Added labels to the colorbar in the 2d plots.
+
 ## [0.2.0] - 2023-04-12
 
 ### Added
