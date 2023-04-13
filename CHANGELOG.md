@@ -11,6 +11,9 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 
 - Added labels to the colorbar in the 2d plots.
 
+### Bug Fixes
+- Fixed bug where the colorbar levels were sometimes not being set correctly.
+
 ## [0.2.0] - 2023-04-12
 
 ### Added
