@@ -50,7 +50,9 @@ class ColorPlot(BasePlot):
         self.img.setColorMap(pyqtgraph.colormap.get(colormap))
 
         self.colorbar = pyqtgraph.ColorBarItem(width=16, cmap=colormap)
-        self.colorbar.setLabels(right=f"{dataset[z].long_name} ({dataset[z].attrs['units']})")
+        self.colorbar.setLabels(
+            right=f"{dataset[z].long_name} ({dataset[z].attrs['units']})"
+        )
 
         self.plot.addItem(self.img)
 
