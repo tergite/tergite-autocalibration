@@ -1,29 +1,14 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+### Operation ###
 
-### What is this repository for? ###
+* This server expects calibration instructions, sent by the tergite-calibration-supervisor.
+* Currently operates only on Qblox instruments
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+### Run it ###
+On a computer that is on the same local network with the cluster go to the cloned repo directory and start it as
+`.\start_uvicorn.ps1`
 
-### How do I get set up? ###
-
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+### To find the `dns` name ###
+run `ipconfig /all`  to find the IPv4 address.
+run `nslookup <IPv4>`  to find the DNS name.
