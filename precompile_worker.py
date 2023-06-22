@@ -1,0 +1,2 @@
+def precompile():
+    print('precompiling!!!')
