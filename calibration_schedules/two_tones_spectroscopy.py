@@ -11,7 +11,7 @@ from measurements_base import Measurement_base
 from transmon_element import Measure_1
 
 
-class Two_Tones_Spectroscopy_NCO(Measurement_base):
+class Two_Tones_Spectroscopy(Measurement_base):
 
     def __init__(self,transmons,connections,qubit_state:int=0):
         super().__init__(transmons,connections)

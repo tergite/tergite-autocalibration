@@ -4,7 +4,7 @@ from quantify_scheduler.operations.pulse_library import DRAGPulse
 from quantify_scheduler.operations.gate_library import Measure, Reset
 from measurements_base import Measurement_base
 
-class DRAG_amplitude_BATCHED(Measurement_base):
+class DRAG_amplitude(Measurement_base):
 
     def __init__(self,transmons,connections):
         super().__init__(transmons,connections)

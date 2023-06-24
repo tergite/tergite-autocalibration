@@ -7,7 +7,7 @@ from measurements_base import Measurement_base
 from transmon_element import Measure_1
 import numpy as np
 
-class Ramsey_fringes_BATCHED(Measurement_base):
+class Ramsey_fringes(Measurement_base):
 
     def __init__(self,transmons,connections,qubit_state:int=0):
         super().__init__(transmons,connections)

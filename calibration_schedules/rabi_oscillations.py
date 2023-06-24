@@ -7,7 +7,7 @@ from measurements_base import Measurement_base
 
 from transmon_element import Measure_1
 
-class Rabi_Oscillations_BATCHED(Measurement_base):
+class Rabi_Oscillations(Measurement_base):
 
     def __init__(self,transmons,connections,qubit_state:int=0):
         super().__init__(transmons,connections)

@@ -6,9 +6,9 @@ from quantify_scheduler.operations.gate_library import Reset, X, Measure
 from quantify_scheduler.resources import ClockResource
 from transmon_element import Measure_1
 
-from measurements_base import Measurement_base
+from measurement_base import Measurement
 
-class Resonator_Spectroscopy_NCO(Measurement_base):
+class Resonator_Spectroscopy(Measurement):
 
     def __init__(self,transmons,connections,qubit_state:int=0):
         super().__init__(transmons,connections)
@@ -18,20 +18,20 @@ class Resonator_Spectroscopy_NCO(Measurement_base):
         self.transmons = transmons
 
         self.static_kwargs = {
-            'pulse_amplitudes': self._get_attributes('ro_pulse_amp'),
-            'pulse_durations' : self._get_attributes('ro_pulse_duration'),
-            'acquisition_delays': self._get_attributes('ro_acq_delay'),
-            'integration_times': self._get_attributes('ro_acq_integration_time'),
-            'mw_ef_amp180s': self._get_attributes('mw_ef_amp180'),
-            'mw_pulse_durations': self._get_attributes('mw_pulse_duration'),
-            'mw_clocks_12': self._get_attributes('mw_12_clock'),
-            'mw_pulse_ports': self._get_attributes('mw_port'),
-            'freqs_12': self._get_attributes('freq_12'),
+            'pulse_amplitudes': self.attributes_dictionary('ro_pulse_amp'),
+            'pulse_durations' : self.attributes_dictionary('ro_pulse_duration'),
+            'acquisition_delays': self.attributes_dictionary('ro_acq_delay'),
+            'integration_times': self.attributes_dictionary('ro_acq_integration_time'),
+            'mw_ef_amp180s': self.attributes_dictionary('mw_ef_amp180'),
+            'mw_pulse_durations': self.attributes_dictionary('mw_pulse_duration'),
+            'mw_clocks_12': self.attributes_dictionary('mw_12_clock'),
+            'mw_pulse_ports': self.attributes_dictionary('mw_port'),
+            'freqs_12': self.attributes_dictionary('freq_12'),
             'qubits': self.qubits,
-            'ports': self._get_attributes('ro_port'),
-            'clocks': self._get_attributes('ro_clock'),
-            'clocks_1': self._get_attributes('ro_clock_1'),
-            'clocks_2': self._get_attributes('ro_clock_2'),
+            'ports': self.attributes_dictionary('ro_port'),
+            'clocks': self.attributes_dictionary('ro_clock'),
+            'clocks_1': self.attributes_dictionary('ro_clock_1'),
+            'clocks_2': self.attributes_dictionary('ro_clock_2'),
         }
 
     def settables_dictionary(self):
