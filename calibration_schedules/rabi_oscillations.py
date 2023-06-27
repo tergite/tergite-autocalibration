@@ -3,11 +3,11 @@ from quantify_scheduler.enums import BinMode
 from quantify_scheduler import Schedule
 from quantify_scheduler.operations.pulse_library import DRAGPulse
 from quantify_scheduler.operations.gate_library import Measure, Reset, X
-from measurements_base import Measurement_base
+from calibration_schedules.measurement_base import Measurement
 
-from transmon_element import Measure_1
+# from transmon_element import Measure_1
 
-class Rabi_Oscillations(Measurement_base):
+class Rabi_Oscillations(Measurement):
 
     def __init__(self,transmons,connections,qubit_state:int=0):
         super().__init__(transmons,connections)

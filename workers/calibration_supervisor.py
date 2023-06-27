@@ -2,7 +2,7 @@
 
 from rq import Queue
 from utilities.status import DataStatus
-from precompile_worker import precompile
+from compilation_worker import precompile
 import utilities.user_input as user_input
 
 import toml

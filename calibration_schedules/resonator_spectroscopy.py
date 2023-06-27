@@ -4,17 +4,15 @@ from quantify_scheduler.operations.pulse_library import  SquarePulse, SetClockFr
 from quantify_scheduler.operations.acquisition_library import SSBIntegrationComplex
 from quantify_scheduler.operations.gate_library import Reset, X, Measure
 from quantify_scheduler.resources import ClockResource
-from transmon_element import Measure_1
+# from transmon_element import Measure_1
 
-from measurement_base import Measurement
+from calibration_schedules.measurement_base import Measurement
 
 class Resonator_Spectroscopy(Measurement):
 
-    def __init__(self,transmons,connections,qubit_state:int=0):
-        super().__init__(transmons,connections)
-        self.experiment_parameters = ['ro_freq_NCO']
+    def __init__(self,transmons,qubit_state:int=0):
+        super().__init__(transmons)
         self.qubit_state = qubit_state
-        self.gettable_batched = True
         self.transmons = transmons
 
         self.static_kwargs = {

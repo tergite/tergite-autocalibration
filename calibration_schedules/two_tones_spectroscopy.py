@@ -7,8 +7,8 @@ from quantify_scheduler.operations.pulse_library import (SetClockFrequency,
 from quantify_scheduler.resources import ClockResource
 from quantify_scheduler.schedules.schedule import Schedule
 
-from measurements_base import Measurement_base
-from transmon_element import Measure_1
+from calibration_schedules.measurement_base import Measurement
+# from transmon_element import Measure_1
 
 
 class Two_Tones_Spectroscopy(Measurement_base):
