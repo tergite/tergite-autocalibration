@@ -1,4 +1,5 @@
 from typing import List
+import numpy as np
 import redis
 from uuid import uuid4
 import logging
@@ -8,20 +9,20 @@ import logging
 red = redis.Redis(decode_responses=True)
 
 nodes = [
-        "resonator_spectroscopy_NCO",
-        # "punchout_BATCHED",
-        "qubit_01_spectroscopy_pulsed_NCO",
-        "rabi_oscillations_BATCHED",
-        "ramsey_correction_BATCHED",
-        "motzoi_parameter_BATCHED",
-        # "DRAG_amplitude_BATCHED",
+        "resonator_spectroscopy",
+        # "punchout",
+        "qubit_01_spectroscopy_pulsed",
+        "rabi_oscillations",
+        "ramsey_correction",
+        "motzoi_parameter",
+        # "DRAG_amplitude",
         "SSRO_simple",
         # "randomized_benchmarking",
-        "resonator_spectroscopy_1_NCO",
-        "qubit_12_spectroscopy_pulsed_NCO",
-        "rabi_oscillations_12_BATCHED",
-        # "ramsey_correction_12_BATCHED",
-        "resonator_spectroscopy_2_NCO",
+        "resonator_spectroscopy_1",
+        "qubit_12_spectroscopy_pulsed",
+        "rabi_oscillations_12",
+        # "ramsey_correction_12",
+        "resonator_spectroscopy_2",
         ]
 
 VNA_resonator_frequencies_A = {'q1' : 6.4796e9, 'q2' : 6.2576e9}
@@ -103,7 +104,7 @@ def resonator_samples(qubit:str, punchout=False):
     min_freq =  VNA_frequency - sweep_range / 2
     min_freq =  min_freq if not punchout else min_freq - punchout_range
     max_freq =  VNA_frequency + sweep_range / 2
-    return { "sweep_min": min_freq, "sweep_max": max_freq, "samples": res_spec_samples }
+    return np.linspace(min_freq, max_freq, res_spec_samples)
 
 def qubit_samples(qubit:str, transition:str = '01'):
     sweep_range = 5e6
@@ -123,12 +124,12 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     TODO this will change it's simpler to sinply pass the whole samples array.
     Dictionary that contains the parameter space for each calibration node.
     The keys order is : 1. Node key 2. Sweep parameter key 3. qubit key.
-    For example, if the calibrtation node is 'resonator_spectroscopy_NCO'
+    For example, if the calibrtation node is 'resonator_spectroscopy'
     and we have two qubits labeled 'q1' and 'q2',
     it returns the dictionary:
     sweep_parameters = {
-        'resonator_spectroscopy_NCO': {
-             'ro_freq_NCO':
+        'resonator_spectroscopy': {
+             'ro_freq':
                   {'q1': {'sweep_min': ..., 'sweep_max': ..., 'samples': ...},
                    'q2': {'sweep_min': ..., 'sweep_max': ..., 'samples': ...}
                   }
@@ -136,41 +137,41 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     }
     '''
     sweep_parameters = {
-            'resonator_spectroscopy_NCO': {'ro_freq_NCO': {qubit: resonator_samples(qubit) for qubit in qubits}},
+            'resonator_spectroscopy': {'ro_freq': {qubit: resonator_samples(qubit) for qubit in qubits}},
 
-            'punchout_BATCHED': {'ro_freq_NCO': {qubit: resonator_samples(qubit, punchout=True) for qubit in qubits},
-                                 'ro_ampl_BATCHED':{qubit : {"sweep_min": 1e-3, "sweep_max":2.5e-2, "samples": 21} for qubit in qubits}},
+            'punchout': {'ro_freq': {qubit: resonator_samples(qubit, punchout=True) for qubit in qubits},
+                                 'ro_ampl':{qubit : {"sweep_min": 1e-3, "sweep_max":2.5e-2, "samples": 21} for qubit in qubits}},
 
-            'qubit_01_spectroscopy_pulsed_NCO': {'freq_01_NCO': {qubit: qubit_samples(qubit) for qubit in qubits}},
-            'qubit_01_spectroscopy_cw_NCO': {'lo_freq_BATCHED': {qubit: qubit_samples(qubit) for qubit in qubits},
+            'qubit_01_spectroscopy_pulsed': {'freq_01': {qubit: qubit_samples(qubit) for qubit in qubits}},
+            'qubit_01_spectroscopy_cw': {'lo_freq': {qubit: qubit_samples(qubit) for qubit in qubits},
                                          'att': {qubit : {"sweep_min": 4, "sweep_max": -1, "step"  : -2 } for qubit in qubits}},
             'qubit_01_spectroscopy_cw': {'lo_freq': {qubit: qubit_samples(qubit) for qubit in qubits},
                                          'att': {qubit : {"sweep_min": 4, "sweep_max": -1, "step"  : -2 } for qubit in qubits}},
-            'rabi_oscillations_BATCHED': {'mw_amp180_BATCHED': { qubit :{"sweep_min": 0.002, "sweep_max": 0.22, "samples": 41} for qubit in qubits}},
-            'ramsey_correction_BATCHED': {
-                'ramsey_delay_BATCHED': {
+            'rabi_oscillations': {'mw_amp180': { qubit :{"sweep_min": 0.002, "sweep_max": 0.22, "samples": 41} for qubit in qubits}},
+            'ramsey_correction': {
+                'ramsey_delay': {
                     qubit :{"sweep_min": 4e-9, "sweep_max": 2048e-9, "step": 6*8e-9} for qubit in qubits
                     }
                 },
-            'motzoi_parameter_BATCHED': {'mw_motzoi_BATCHED':{qubit : {"sweep_min": -0.45, "sweep_max": 0.45, "samples": 41} for qubit in qubits},
+            'motzoi_parameter': {'mw_motzoi':{qubit : {"sweep_min": -0.45, "sweep_max": 0.45, "samples": 41} for qubit in qubits},
                                          'X_repetition': {qubit : {"sweep_min": 2, "sweep_max":17, "step": 2} for qubit in qubits}},
-            'DRAG_amplitude_BATCHED': {'mw_amp180_BATCHED':{qubit : {"sweep_min": 0.002, "sweep_max": 0.10, "samples": 41} for qubit in qubits},
+            'DRAG_amplitude': {'mw_amp180':{qubit : {"sweep_min": 0.002, "sweep_max": 0.10, "samples": 41} for qubit in qubits},
                                          'X_repetition': {qubit : {"sweep_min": 1, "sweep_max":17, "step": 2} for qubit in qubits}},
-            'resonator_spectroscopy_1_NCO': {'ro_freq_1_NCO': {qubit: resonator_samples(qubit) for qubit in qubits}},
-            'qubit_12_spectroscopy_pulsed_NCO': {'freq_12_NCO': {qubit: qubit_samples(qubit,transition='12') for qubit in qubits}},
-            'rabi_oscillations_12_BATCHED': {'mw_amp180_BATCHED': { qubit :{"sweep_min": 0.002, "sweep_max": 0.22, "samples": 51} for qubit in qubits}},
-            'ramsey_correction_12_BATCHED': {
-                'ramsey_delay_BATCHED': {
+            'resonator_spectroscopy_1': {'ro_freq_1': {qubit: resonator_samples(qubit) for qubit in qubits}},
+            'qubit_12_spectroscopy_pulsed': {'freq_12': {qubit: qubit_samples(qubit,transition='12') for qubit in qubits}},
+            'rabi_oscillations_12': {'mw_amp180': { qubit :{"sweep_min": 0.002, "sweep_max": 0.22, "samples": 51} for qubit in qubits}},
+            'ramsey_correction_12': {
+                'ramsey_delay': {
                     qubit :{"sweep_min": 4e-9, "sweep_max": 5*2048e-9, "step": 12*1e-9} for qubit in qubits
                     }
                 },
-            'resonator_spectroscopy_2_NCO': {'ro_freq_2_NCO': {qubit: resonator_samples(qubit) for qubit in qubits}},
+            'resonator_spectroscopy_2': {'ro_freq_2': {qubit: resonator_samples(qubit) for qubit in qubits}},
 
             'SSRO_simple': { 'state_level': {qubit : {"rng": 'rng', "shots": 2000} for qubit in qubits } },
 
             'randomized_benchmarking': {'number_cliffords': {qubit : {"rb": 'rb', "max_cliffords": 2048} for qubit in qubits } }, #TODO this is aweful
 
-            'state_discrimination_BATCHED': {'ro_freq_NCO':{qubit: resonator_samples(qubit) for qubit in qubits},
+            'state_discrimination': {'ro_freq':{qubit: resonator_samples(qubit) for qubit in qubits},
                                              'ro_pulse_amp_cus': {qubit : {"sweep_min": 0.005, "sweep_max": 0.011, "samples": 5 } for qubit in qubits },
                                              'state_level': {qubit : {"rng": 'rng', "shots": 9 } for qubit in qubits } #TODO this is awful
                                             },
@@ -186,7 +187,7 @@ def box(func):
         print(u"\u255a" + u"\u2550" * (len(text)+margin) + u"\u255d")
     return wrapper
 
-node_to_be_calibrated = "SSRO_simple"
+node_to_be_calibrated = "resonator_spectroscopy"
 box_print = box(print)
 box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 

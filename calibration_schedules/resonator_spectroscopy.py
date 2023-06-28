@@ -16,55 +16,39 @@ class Resonator_Spectroscopy(Measurement):
         self.transmons = transmons
 
         self.static_kwargs = {
-            'pulse_amplitudes': self.attributes_dictionary('ro_pulse_amp'),
-            'pulse_durations' : self.attributes_dictionary('ro_pulse_duration'),
-            'acquisition_delays': self.attributes_dictionary('ro_acq_delay'),
-            'integration_times': self.attributes_dictionary('ro_acq_integration_time'),
-            'mw_ef_amp180s': self.attributes_dictionary('mw_ef_amp180'),
-            'mw_pulse_durations': self.attributes_dictionary('mw_pulse_duration'),
-            'mw_clocks_12': self.attributes_dictionary('mw_12_clock'),
-            'mw_pulse_ports': self.attributes_dictionary('mw_port'),
-            'freqs_12': self.attributes_dictionary('freq_12'),
+            'pulse_amplitudes': self.attributes_dictionary('pulse_amp'),
+            'pulse_durations' : self.attributes_dictionary('pulse_duration'),
+            'acquisition_delays': self.attributes_dictionary('acq_delay'),
+            'integration_times': self.attributes_dictionary('integration_time'),
+            # 'mw_ef_amp180s': self.attributes_dictionary('mw_ef_amp180'),
+            # 'mw_pulse_durations': self.attributes_dictionary('mw_pulse_duration'),
+            # 'mw_clocks_12': self.attributes_dictionary('mw_12_clock'),
+            # 'mw_pulse_ports': self.attributes_dictionary('mw_port'),
+            # 'freqs_12': self.attributes_dictionary('freq_12'),
             'qubits': self.qubits,
-            'ports': self.attributes_dictionary('ro_port'),
-            'clocks': self.attributes_dictionary('ro_clock'),
-            'clocks_1': self.attributes_dictionary('ro_clock_1'),
-            'clocks_2': self.attributes_dictionary('ro_clock_2'),
+            'ports': self.attributes_dictionary('readout'),
+            # 'clocks': self.attributes_dictionary('ro_clock'),
+            # 'clocks_1': self.attributes_dictionary('ro_clock_1'),
+            # 'clocks_2': self.attributes_dictionary('ro_clock_2'),
         }
 
-    def settables_dictionary(self):
-        parameters = self.experiment_parameters
-        manual_parameter = 'ro_freq_NCO'
-        assert( manual_parameter in self.experiment_parameters )
-        mp_data = {
-            manual_parameter : {
-                'name': manual_parameter,
-                'initial_value': 2e9,
-                'unit': 'Hz',
-                'batched': True
-            }
-        }
-        return self._settables_dictionary(parameters, isBatched=self.gettable_batched, mp_data=mp_data)
-
-    def setpoints_array(self):
-        return self._setpoints_1d_array()
 
     def schedule_function(
             self,
             pulse_amplitudes: dict[str,float],
             pulse_durations: dict[str,float],
-            mw_ef_amp180s: dict[str,float],
-            mw_pulse_durations: dict[str,float],
-            mw_clocks_12: dict[str,str],
-            mw_pulse_ports: dict[str,str],
-            freqs_12:  dict[str,float],
+            # mw_ef_amp180s: dict[str,float],
+            # mw_pulse_durations: dict[str,float],
+            # mw_clocks_12: dict[str,str],
+            # mw_pulse_ports: dict[str,str],
+            # freqs_12:  dict[str,float],
             acquisition_delays: dict[str,float],
             integration_times: dict[str,float],
             qubits: list[str],
             ports: dict[str,str],
-            clocks: dict[str,str],
-            clocks_1: dict[str,str],
-            clocks_2: dict[str,str],
+            # clocks: dict[str,str],
+            # clocks_1: dict[str,str],
+            # clocks_2: dict[str,str],
             repetitions: int = 1024,
 
             **ro_frequencies

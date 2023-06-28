@@ -18,5 +18,11 @@ class Measurement():
         """ Create a dictionary, with qubits as keys and parameters as values.
         The values are actual values str or float, not qcodes references.
         """
-        attr_dict = {qubit: self.transmons[qubit][parameter]() for qubit in self.qubits}
+        attr_dict = {}
+        for transmon in self.transmons:
+            qubit = transmon.name
+            for submodule in transmon.submodules.values():
+                if parameter in submodule.parameters:
+                    attr_dict[qubit] = submodule.parameters[parameter]()
+
         return attr_dict

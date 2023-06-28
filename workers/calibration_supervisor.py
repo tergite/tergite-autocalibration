@@ -2,11 +2,11 @@
 
 from rq import Queue
 from utilities.status import DataStatus
-from compilation_worker import precompile
+from workers.compilation_worker import precompile
+
 import utilities.user_input as user_input
 
 import toml
-# import settings
 import redis
 import logging
 import logging.handlers
@@ -22,7 +22,6 @@ module_logger.addHandler(syslog)
 
 module_logger.info('Initialize')
 
-# redis connection
 redis_connection = redis.Redis(decode_responses=True)
 rq_supervisor = Queue(
         'calibration_supervisor', connection=redis_connection
@@ -82,7 +81,7 @@ def inspect_node(node:str):
     status = DataStatus.undefined
 
     for qubit in qubits:
-        # the calibrated , not_calibrated flags may be not necessary,
+        # the calibrated, not_calibrated flags may be not necessary,
         # just store the DataStatus on Redis
         is_Calibrated = redis_connection.hget(f"cs:{qubit}", node)
         if is_Calibrated == 'not_calibrated':
@@ -110,12 +109,14 @@ def calibrate_node(node:str):
     # Load the latest transmons state onto the job
     device_config = {}
     for qubit in qubits:
-        device_config[qubit] = redis_connection.hgetall(f"transmons:{qubit}" )
+        device_config[qubit] = redis_connection.hgetall(f"transmons:{qubit}")
+
     job["device_config"] = device_config
-
     job_id = job["job_id"]
+    #TODO this not a proper way to extract the samplespace
+    samplespace = list(job['experiment_params'][node].values())[0]
 
-    rq_supervisor.enqueue(precompile)
+    rq_supervisor.enqueue(precompile, args=(node, samplespace))
 
 
 
