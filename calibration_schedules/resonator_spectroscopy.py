@@ -26,7 +26,7 @@ class Resonator_Spectroscopy(Measurement):
             # 'mw_pulse_ports': self.attributes_dictionary('mw_port'),
             # 'freqs_12': self.attributes_dictionary('freq_12'),
             'qubits': self.qubits,
-            'ports': self.attributes_dictionary('readout'),
+            'ports': self.attributes_dictionary('readout_port'),
             # 'clocks': self.attributes_dictionary('ro_clock'),
             # 'clocks_1': self.attributes_dictionary('ro_clock_1'),
             # 'clocks_2': self.attributes_dictionary('ro_clock_2'),
@@ -59,64 +59,64 @@ class Resonator_Spectroscopy(Measurement):
         # Initialize the clock for each qubit
         for ro_key, ro_array_val in ro_frequencies.items():
             this_qubit = [qubit for qubit in qubits if qubit in ro_key][0]
-            if self.qubit_state==0:
-                this_clock = clocks[this_qubit]
-            elif self.qubit_state==1:
-                this_clock = clocks_1[this_qubit]
-            elif self.qubit_state==2:
-                this_clock = clocks_2[this_qubit]
+            # if self.qubit_state==0:
+            #     this_clock = clocks[this_qubit]
+            # elif self.qubit_state==1:
+            #     this_clock = clocks_1[this_qubit]
+            # elif self.qubit_state==2:
+            #     this_clock = clocks_2[this_qubit]
 
             #Initialize ClockResource with the first frequency value
-            sched.add_resource( ClockResource(name=this_clock, freq=ro_array_val[0]) )
+            sched.add_resource( ClockResource(name=f'{this_qubit}.ro', freq=ro_array_val[0]) )
 
-        if self.qubit_state == 2:
-            for this_qubit, ef_f_val in freqs_12.items():
-                sched.add_resource( ClockResource( name=mw_clocks_12[this_qubit], freq=ef_f_val) )
+        # if self.qubit_state == 2:
+        #     for this_qubit, ef_f_val in freqs_12.items():
+        #         sched.add_resource( ClockResource( name=mw_clocks_12[this_qubit], freq=ef_f_val) )
 
         root_relaxation = sched.add(Reset(*qubits), label="Reset")
 
         # The first for loop iterates over all qubits:
         for acq_cha, (ro_f_key, ro_f_values) in enumerate(ro_frequencies.items()):
             this_qubit = [qubit for qubit in qubits if qubit in ro_f_key][0]
-            if self.qubit_state==0:
-                this_clock = clocks[this_qubit]
-            elif self.qubit_state==1:
-                this_clock = clocks_1[this_qubit]
-            elif self.qubit_state==2:
-                this_clock = clocks_2[this_qubit]
+            # if self.qubit_state==0:
+            #     this_clock = clocks[this_qubit]
+            # elif self.qubit_state==1:
+            #     this_clock = clocks_1[this_qubit]
+            # elif self.qubit_state==2:
+            #     this_clock = clocks_2[this_qubit]
             # The second for loop iterates over all frequency values in the frequency batch:
             relaxation = root_relaxation
             for acq_index, ro_frequency in enumerate(ro_f_values):
                 set_frequency = sched.add(
-                    SetClockFrequency(clock=this_clock, clock_freq_new=ro_frequency),
+                    SetClockFrequency(clock=f'{this_qubit}.ro', clock_freq_new=ro_frequency),
                     label=f"set_freq_{this_qubit}_{acq_index}",
                     ref_op=relaxation, ref_pt='end'
                 )
 
                 if self.qubit_state == 0:
                     excitation_pulse = set_frequency
-                elif self.qubit_state == 1:
-                    excitation_pulse = sched.add(X(this_qubit), ref_op=set_frequency, ref_pt='end')
-                elif self.qubit_state == 2:
-                    excitation_pulse_1 = sched.add(X(this_qubit), ref_op=set_frequency, ref_pt='end')
-                    excitation_pulse = sched.add(
-                        DRAGPulse(
-                            duration=mw_pulse_durations[this_qubit],
-                            G_amp=mw_ef_amp180s[this_qubit],
-                            D_amp=0,
-                            port=mw_pulse_ports[this_qubit],
-                            clock=mw_clocks_12[this_qubit],
-                            phase=0,
-                        ),
-                        label=f"rabi_pulse_{this_qubit}_{acq_index}", ref_op=excitation_pulse_1, ref_pt="end",
-                    )
+                # elif self.qubit_state == 1:
+                #     excitation_pulse = sched.add(X(this_qubit), ref_op=set_frequency, ref_pt='end')
+                # elif self.qubit_state == 2:
+                #     excitation_pulse_1 = sched.add(X(this_qubit), ref_op=set_frequency, ref_pt='end')
+                #     excitation_pulse = sched.add(
+                #         DRAGPulse(
+                #             duration=mw_pulse_durations[this_qubit],
+                #             G_amp=mw_ef_amp180s[this_qubit],
+                #             D_amp=0,
+                #             port=mw_pulse_ports[this_qubit],
+                #             clock=mw_clocks_12[this_qubit],
+                #             phase=0,
+                #         ),
+                #         label=f"rabi_pulse_{this_qubit}_{acq_index}", ref_op=excitation_pulse_1, ref_pt="end",
+                #     )
 
                 pulse = sched.add(
                     SquarePulse(
                         duration=pulse_durations[this_qubit],
                         amp=pulse_amplitudes[this_qubit],
                         port=ports[this_qubit],
-                        clock=this_clock,
+                        clock=f'{this_qubit}.ro',
                     ),
                     label=f"spec_pulse_{this_qubit}_{acq_index}", ref_op=excitation_pulse, ref_pt="end",
                 )
@@ -125,7 +125,7 @@ class Resonator_Spectroscopy(Measurement):
                     SSBIntegrationComplex(
                         duration=integration_times[this_qubit],
                         port=ports[this_qubit],
-                        clock=this_clock,
+                        clock=f'{this_qubit}.ro',
                         acq_index=acq_index,
                         acq_channel=acq_cha,
                         bin_mode=BinMode.AVERAGE

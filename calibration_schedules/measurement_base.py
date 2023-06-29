@@ -4,9 +4,9 @@ np.set_printoptions(precision=3, linewidth=125)
 
 class Measurement():
 
-    def __init__(self,transmons,connections):
+    def __init__(self,transmons):
         self.transmons = transmons
-        self.connection_mapping = connections
+        # self.connection_mapping = connections
         self.dimensions = {}
         self.batch_parameter_space = {}
         self.gettable_real_imag = False
@@ -19,10 +19,13 @@ class Measurement():
         The values are actual values str or float, not qcodes references.
         """
         attr_dict = {}
-        for transmon in self.transmons:
+        for transmon in self.transmons.values():
             qubit = transmon.name
-            for submodule in transmon.submodules.values():
-                if parameter in submodule.parameters:
-                    attr_dict[qubit] = submodule.parameters[parameter]()
+            if parameter=='readout_port':
+               attr_dict[qubit] = transmon.ports.readout()
+            else:
+               for submodule in transmon.submodules.values():
+                   if parameter in submodule.parameters:
+                       attr_dict[qubit] = submodule.parameters[parameter]()
 
         return attr_dict
