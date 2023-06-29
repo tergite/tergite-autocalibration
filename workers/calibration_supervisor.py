@@ -2,27 +2,18 @@
 
 from rq import Queue
 from utilities.status import DataStatus
+from logger.tac_logger import logger
 from workers.compilation_worker import precompile
 
 import utilities.user_input as user_input
 
 import toml
 import redis
-import logging
-import logging.handlers
 
-# setting up the logger
-module_logger = logging.getLogger(__name__)
-module_logger.setLevel(logging.INFO)
-syslog = logging.StreamHandler()
-formatter=logging.Formatter("%(asctime)s ▪ %(levelname)s ▪ %(message)s")
-syslog.setFormatter(formatter)
-module_logger.addHandler(syslog)
-# module_logger.propagate
+logger.info('Initialize')
 
-module_logger.info('Initialize')
-
-redis_connection = redis.Redis(decode_responses=True)
+redis_connection = redis.Redis('localhost',6379,decode_responses=True)
+# redis_connection = redis.Redis(decode_responses=True)
 rq_supervisor = Queue(
         'calibration_supervisor', connection=redis_connection
         )
@@ -33,7 +24,7 @@ transmon_configuration = toml.load('./transmons_config.toml')
 qubits = user_input.qubits
 
 def calibrate_system():
-    module_logger.info('Starting System Calibration')
+    logger.info('Starting System Calibration')
     nodes = user_input.nodes
     node_to_be_calibrated = user_input.node_to_be_calibrated
     topo_order = nodes[:nodes.index(node_to_be_calibrated) + 1]
@@ -68,7 +59,7 @@ def calibrate_system():
 
 
 def inspect_node(node:str):
-    module_logger.info(f'Inspecting node {node}')
+    logger.info(f'Inspecting node {node}')
 
     #Populate the Redis database with node specific parameter values
     if node in transmon_configuration:
@@ -103,7 +94,7 @@ def inspect_node(node:str):
 
 
 def calibrate_node(node:str):
-    module_logger.info(f'Calibrating node {node}')
+    logger.info(f'Calibrating node {node}')
     job = user_input.user_requested_calibration(node)
 
     # Load the latest transmons state onto the job
@@ -121,3 +112,4 @@ def calibrate_node(node:str):
 
 
 calibrate_system()
+print('EXITING MAIN')
