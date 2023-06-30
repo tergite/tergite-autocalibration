@@ -1,9 +1,10 @@
 # This code is part of Tergite
 
+from time import sleep
 from rq import Queue
 from utilities.status import DataStatus
 from logger.tac_logger import logger
-from workers.compilation_worker import precompile
+from workers.compilation_worker import precompile, test
 
 import utilities.user_input as user_input
 
@@ -12,8 +13,8 @@ import redis
 
 logger.info('Initialize')
 
-redis_connection = redis.Redis('localhost',6379,decode_responses=True)
-# redis_connection = redis.Redis(decode_responses=True)
+# redis_connection = redis.Redis('localhost',6379,decode_responses=True)
+redis_connection = redis.Redis(decode_responses=True)
 rq_supervisor = Queue(
         'calibration_supervisor', connection=redis_connection
         )
@@ -106,10 +107,14 @@ def calibrate_node(node:str):
     job_id = job["job_id"]
     #TODO this not a proper way to extract the samplespace
     samplespace = list(job['experiment_params'][node].values())[0]
+    # breakpoint()
 
     rq_supervisor.enqueue(precompile, args=(node, samplespace))
+    # rq_supervisor.enqueue(test, args=('hej',))
 
 
 
 calibrate_system()
+sleep(100)
 print('EXITING MAIN')
+

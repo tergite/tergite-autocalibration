@@ -13,8 +13,8 @@ from workers.post_processing_worker import post_process
 import redis
 from rq import Queue
 
-redis_connection = redis.Redis('localhost',6379,decode_responses=True)
-# redis_connection = redis.Redis('localhost',6789,decode_responses=True)
+redis_connection = redis.Redis(decode_responses=True)
+# redis_connection = redis.Redis('localhost',6379,decode_responses=True)
 rq_supervisor = Queue(
         'calibration_supervisor', connection=redis_connection
         )

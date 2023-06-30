@@ -40,8 +40,8 @@ node_map = {
     # 'resonator_spectroscopy_2': Resonator_Spectroscopy,
 }
 
-redis_connection = redis.Redis('localhost',6379,decode_responses=True)
-# redis_connection = redis.Redis('localhost',6789,decode_responses=True)
+redis_connection = redis.Redis(decode_responses=True)
+# redis_connection = redis.Redis('localhost',6379,decode_responses=True)
 rq_supervisor = Queue(
         'calibration_supervisor', connection=redis_connection
         )
@@ -70,6 +70,9 @@ def load_redis_config(transmon: BasicTransmonElement, channel:int):
     transmon.measure.integration_time(float(redis_config['ro_acq_integration_time']))
     return
 
+
+def test(message:str):
+    print(message)
 
 def precompile(node:str, samplespace: dict[str,np.ndarray]):
     logger.info('Starting precompile')
