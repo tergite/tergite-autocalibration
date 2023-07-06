@@ -1,5 +1,6 @@
 '''Retrieve the compiled schedule and run it'''
 
+import asyncio
 from logger.tac_logger import logger
 logger.info('entering execution module')
 
@@ -9,6 +10,8 @@ from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 import xarray
 from workers.post_processing_worker import post_process
+
+# from syncer import sync
 
 import redis
 from rq import Queue
@@ -43,6 +46,27 @@ def measure(compiled_schedule: Schedule) -> xarray.Dataset:
 
     loki_ic.stop()
 
-    rq_supervisor.enqueue(post_process, args=(result_dataset,))
+    rq_supervisor.enqueue(
+            post_process,
+            args=(result_dataset,),
+            on_success=postprocessing_success_callback
+            )
 
     return result_dataset
+
+
+LOCALHOST = '127.0.0.1'
+CALIBRATION_SUPERVISOR_PORT = 8006
+
+async def notify_job_done(job_id: str):
+    reader, writer = await asyncio.open_connection(
+        LOCALHOST, CALIBRATION_SUPERVISOR_PORT
+    )
+    message = ("job_done:" + job_id).encode()
+    print(f"notify_job_done: {message=}")
+    writer.write(message)
+    writer.close()
+
+def postprocessing_success_callback(_rq_job, _rq_connection, result):
+    logger.info('post call back')
+    # sync(notify_job_done('ID'))

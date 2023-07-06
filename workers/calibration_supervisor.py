@@ -4,7 +4,7 @@ from time import sleep
 from rq import Queue
 from utilities.status import DataStatus
 from logger.tac_logger import logger
-from workers.compilation_worker import precompile, test
+from workers.compilation_worker import precompile
 
 import utilities.user_input as user_input
 
@@ -19,12 +19,11 @@ rq_supervisor = Queue(
         'calibration_supervisor', connection=redis_connection
         )
 
-
 # Settings
 transmon_configuration = toml.load('./transmons_config.toml')
 qubits = user_input.qubits
 
-def calibrate_system():
+async def calibrate_system(job_done_event):
     logger.info('Starting System Calibration')
     nodes = user_input.nodes
     node_to_be_calibrated = user_input.node_to_be_calibrated
@@ -56,10 +55,10 @@ def calibrate_system():
             redis_connection.hset(f"transmons:{qubit}", parameter_key, parameter_value)
 
     for node in topo_order:
-        inspect_node(node)
+        await inspect_node(node,job_done_event)
 
 
-def inspect_node(node:str):
+async def inspect_node(node:str, job_done_event):
     logger.info(f'Inspecting node {node}')
 
     #Populate the Redis database with node specific parameter values
@@ -90,11 +89,10 @@ def inspect_node(node:str):
 
     if status == DataStatus.out_of_spec:
        print(u'\u2691\u2691\u2691 '+ f'Calibration required for Node {node}')
-       calibrate_node(node)
-       return
+       await calibrate_node(node, job_done_event)
 
 
-def calibrate_node(node:str):
+async def calibrate_node(node:str, job_done_event):
     logger.info(f'Calibrating node {node}')
     job = user_input.user_requested_calibration(node)
 
@@ -110,11 +108,45 @@ def calibrate_node(node:str):
     # breakpoint()
 
     rq_supervisor.enqueue(precompile, args=(node, samplespace))
-    # rq_supervisor.enqueue(test, args=('hej',))
+    await job_done_event.wait()
+    job_done_event.clear()
 
 
+import asyncio
 
-calibrate_system()
-sleep(100)
-print('EXITING MAIN')
+class CalibrationProtocol(asyncio.Protocol):
+    def __init__(self, job_event) -> None:
+        self.job = job_event
+        logger.info(f'Initializing server')
 
+    def connection_made(self, transport) -> None:
+        self.transport = transport
+        peername = transport.get_extra_info('peername')
+        print(f'{ peername = }')
+
+    def data_received(self, data) -> None:
+        # print(f'{ data = }')
+        message = data.decode()
+        # print(f'{ message = }')
+        # self.transport.write(data)
+
+async def initiate_server(job_done_event, host, port):
+    loop = asyncio.get_running_loop()
+    server = await loop.create_server(
+            lambda: CalibrationProtocol(job_done_event),
+            host,port
+            )
+    async with server:
+        await server.serve_forever()
+
+async def main(host,port):
+    job_done_event = asyncio.Event()
+
+    server_task = asyncio.create_task(initiate_server(job_done_event,host,port))
+    calibration_task = asyncio.create_task(calibrate_system(job_done_event))
+
+    await server_task
+    await calibration_task
+
+
+asyncio.run(main('127.0.0.1',8006))
