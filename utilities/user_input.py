@@ -117,7 +117,7 @@ def qubit_samples(qubit:str, transition:str = '01'):
     else : print('Invalid Transition')
     min_freq =  VNA_frequency - sweep_range / 2
     max_freq =  VNA_frequency + sweep_range / 2
-    return   { "sweep_min": min_freq, "sweep_max": max_freq, "samples": qub_spec_samples }
+    return np.linspace(min_freq, max_freq, qub_spec_samples)
 
 def experiment_parameters(node:str, qubits:List[str]) -> dict:
     '''
@@ -143,11 +143,9 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
                                  'ro_ampl':{qubit : {"sweep_min": 1e-3, "sweep_max":2.5e-2, "samples": 21} for qubit in qubits}},
 
             'qubit_01_spectroscopy_pulsed': {'freq_01': {qubit: qubit_samples(qubit) for qubit in qubits}},
-            'qubit_01_spectroscopy_cw': {'lo_freq': {qubit: qubit_samples(qubit) for qubit in qubits},
-                                         'att': {qubit : {"sweep_min": 4, "sweep_max": -1, "step"  : -2 } for qubit in qubits}},
-            'qubit_01_spectroscopy_cw': {'lo_freq': {qubit: qubit_samples(qubit) for qubit in qubits},
-                                         'att': {qubit : {"sweep_min": 4, "sweep_max": -1, "step"  : -2 } for qubit in qubits}},
+
             'rabi_oscillations': {'mw_amp180': { qubit :{"sweep_min": 0.002, "sweep_max": 0.22, "samples": 41} for qubit in qubits}},
+
             'ramsey_correction': {
                 'ramsey_delay': {
                     qubit :{"sweep_min": 4e-9, "sweep_max": 2048e-9, "step": 6*8e-9} for qubit in qubits
@@ -187,7 +185,7 @@ def box(func):
         print(u"\u255a" + u"\u2550" * (len(text)+margin) + u"\u255d")
     return wrapper
 
-node_to_be_calibrated = "resonator_spectroscopy"
+node_to_be_calibrated = "qubit_01_spectroscopy_pulsed"
 box_print = box(print)
 box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 

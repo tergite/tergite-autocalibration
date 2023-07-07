@@ -52,7 +52,6 @@ init_duration = 100e-6
 init_duration = 100e-6
 
 [resonator_spectroscopy_2.all]
-
 init_duration = 100e-6
 
 [qubit_01_spectroscopy_pulsed.all]

@@ -11,8 +11,6 @@ from quantify_scheduler.instrument_coordinator.components.qblox import ClusterCo
 import xarray
 from workers.post_processing_worker import post_process
 
-# from syncer import sync
-
 import redis
 from rq import Queue
 
@@ -69,4 +67,6 @@ async def notify_job_done(job_id: str):
 
 def postprocessing_success_callback(_rq_job, _rq_connection, result):
     logger.info('post call back')
-    # sync(notify_job_done('ID'))
+    # ensure that the notification is sent otherwise the main will stop it
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(notify_job_done('ID'))

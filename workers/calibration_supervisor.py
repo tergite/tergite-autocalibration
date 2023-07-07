@@ -56,6 +56,7 @@ async def calibrate_system(job_done_event):
 
     for node in topo_order:
         await inspect_node(node,job_done_event)
+        logger.info(f'{node} node is completed')
 
 
 async def inspect_node(node:str, job_done_event):
@@ -116,7 +117,7 @@ import asyncio
 
 class CalibrationProtocol(asyncio.Protocol):
     def __init__(self, job_event) -> None:
-        self.job = job_event
+        self.job_done_event = job_event
         logger.info(f'Initializing server')
 
     def connection_made(self, transport) -> None:
@@ -125,10 +126,14 @@ class CalibrationProtocol(asyncio.Protocol):
         print(f'{ peername = }')
 
     def data_received(self, data) -> None:
-        # print(f'{ data = }')
         message = data.decode()
-        # print(f'{ message = }')
-        # self.transport.write(data)
+        message_parts = message.split(":")
+        if len(message_parts) == 2 and message_parts[0] == "job_done":
+            self.job_done_event.set()
+            print(f'{ self.job_done_event = }')
+        else:
+            print(f'Received unexpected "job_done" message')
+
 
 async def initiate_server(job_done_event, host, port):
     loop = asyncio.get_running_loop()

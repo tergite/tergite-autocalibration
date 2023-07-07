@@ -1,9 +1,7 @@
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.acquisition_library import SSBIntegrationComplex
 from quantify_scheduler.operations.gate_library import Measure, Reset, X
-from quantify_scheduler.operations.pulse_library import (SetClockFrequency,
-                                                         SoftSquarePulse,
-                                                         SquarePulse)
+from quantify_scheduler.operations.pulse_library import SetClockFrequency, SoftSquarePulse
 from quantify_scheduler.resources import ClockResource
 from quantify_scheduler.schedules.schedule import Schedule
 
@@ -11,66 +9,32 @@ from calibration_schedules.measurement_base import Measurement
 # from transmon_element import Measure_1
 
 
-class Two_Tones_Spectroscopy(Measurement_base):
+class Two_Tones_Spectroscopy(Measurement):
 
-    def __init__(self,transmons,connections,qubit_state:int=0):
-        super().__init__(transmons,connections)
-        if qubit_state == 0:
-            spec_clock = 'spec_pulse_clock'
-            self.experiment_parameters = 'freq_01_NCO'
-        elif qubit_state == 1:
-            spec_clock = 'mw_12_clock'
-            self.experiment_parameters = 'freq_12_NCO'
-        else:
-            raise ValueError(f'Invalid qubit state: {qubit_state}')
+    def __init__(self,transmons,qubit_state:int=0):
+        super().__init__(transmons)
 
-        self.gettable_batched = True
         self.qubit_state = qubit_state
+        self.transmons = transmons
+
         self.static_kwargs = {
             'qubits': self.qubits,
-            'spec_pulse_durations': self._get_attributes('spec_pulse_duration'),
-            'spec_pulse_amps': self._get_attributes('spec_pulse_amp'),
-            'spec_pulse_ports': self._get_attributes('mw_port'),
-            'spec_clocks': self._get_attributes(f'{spec_clock}'),
 
-            'ro_pulse_amplitudes': self._get_attributes('ro_pulse_amp'),
-            'ro_pulse_durations' : self._get_attributes('ro_pulse_duration'),
-            'ro_frequencies': self._get_attributes('ro_freq'),
-            'ro_frequencies_1': self._get_attributes('ro_freq_1'),
-            'integration_times': self._get_attributes('ro_acq_integration_time'),
-            'acquisition_delays': self._get_attributes('ro_acq_delay'),
-            'clocks': self._get_attributes('ro_clock'),
-            'clocks_1': self._get_attributes('ro_clock_1'),
-            'ports': self._get_attributes('ro_port'),
+            'ro_pulse_amplitudes': self.attributes_dictionary('ro_pulse_amp'),
+            'ro_pulse_durations' : self.attributes_dictionary('ro_pulse_duration'),
+            'ro_frequencies': self.attributes_dictionary('ro_freq'),
+            'ro_frequencies_1': self.attributes_dictionary('ro_freq_1'),
+            'integration_times': self.attributes_dictionary('ro_acq_integration_time'),
+            'acquisition_delays': self.attributes_dictionary('ro_acq_delay'),
+            'clocks': self.attributes_dictionary('ro_clock'),
+            'clocks_1': self.attributes_dictionary('ro_clock_1'),
+            'ports': self.attributes_dictionary('ro_port'),
         }
 
-    def settables_dictionary(self):
-        if self.qubit_state == 0: manual_parameter = 'freq_01_NCO'
-        elif self.qubit_state == 1: manual_parameter = 'freq_12_NCO'
-        else:
-            raise ValueError(f'Invalid qubit state: {self.qubit_state}')
-        parameters = self.experiment_parameters
-        assert( manual_parameter in self.experiment_parameters )
-        mp_data = {
-            manual_parameter : {
-                'name': manual_parameter,
-                'initial_value': 2e9,
-                'unit': 'Hz',
-                'batched': True
-            }
-        }
-        return self._settables_dictionary(parameters, isBatched=self.gettable_batched, mp_data=mp_data)
-
-    def setpoints_array(self):
-        return self._setpoints_1d_array()
 
     def schedule_function(
             self,
             qubits: list[str],
-            spec_pulse_ports: dict[str,str],
-            spec_clocks: dict[str,str],
-            spec_pulse_durations: dict[str,float],
-            spec_pulse_amps: dict[str,float],
 
             ro_pulse_amplitudes: dict[str,float],
             ro_pulse_durations: dict[str,float],
@@ -88,6 +52,7 @@ class Two_Tones_Spectroscopy(Measurement_base):
 
         # if port_out is None: port_out = port
         sched = Schedule("multiplexed_qubit_spec_NCO",repetitions)
+        print(f'{ spec_clocks = }')
         # Initialize the clock for each qubit
         for spec_key, spec_array_val in spec_pulse_frequencies.items():
             this_qubit = [qubit for qubit in qubits if qubit in spec_key][0]
@@ -143,8 +108,8 @@ class Two_Tones_Spectroscopy(Measurement_base):
 
                 if self.qubit_state == 0:
                     measure_function = Measure
-                elif self.qubit_state == 1:
-                    measure_function = Measure_1
+                # elif self.qubit_state == 1:
+                #     measure_function = Measure_1
 
                 sched.add(
                     measure_function(this_qubit, acq_channel=acq_cha, acq_index=acq_index,bin_mode=BinMode.AVERAGE),
