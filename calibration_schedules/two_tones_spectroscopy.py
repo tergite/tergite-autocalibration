@@ -19,6 +19,10 @@ class Two_Tones_Spectroscopy(Measurement):
 
         self.static_kwargs = {
             'qubits': self.qubits,
+            'mw_pulse_durations': self.attributes_dictionary('duration'),
+            'mw_pulse_amplitudes': self.attributes_dictionary('amp180'),
+            'mw_pulse_ports': self.attributes_dictionary('microwave'),
+            'mw_clocks': self.attributes_dictionary('f01'),
 
             'ro_pulse_amplitudes': self.attributes_dictionary('ro_pulse_amp'),
             'ro_pulse_durations' : self.attributes_dictionary('ro_pulse_duration'),
@@ -26,8 +30,6 @@ class Two_Tones_Spectroscopy(Measurement):
             'ro_frequencies_1': self.attributes_dictionary('ro_freq_1'),
             'integration_times': self.attributes_dictionary('ro_acq_integration_time'),
             'acquisition_delays': self.attributes_dictionary('ro_acq_delay'),
-            'clocks': self.attributes_dictionary('ro_clock'),
-            'clocks_1': self.attributes_dictionary('ro_clock_1'),
             'ports': self.attributes_dictionary('ro_port'),
         }
 
@@ -35,6 +37,10 @@ class Two_Tones_Spectroscopy(Measurement):
     def schedule_function(
             self,
             qubits: list[str],
+            mw_pulse_durations: dict[str,float],
+            mw_pulse_amplitudes: dict[str,float],
+            mw_pulse_ports: dict[str,str],
+            mw_clocks: dict[str,str],
 
             ro_pulse_amplitudes: dict[str,float],
             ro_pulse_durations: dict[str,float],
@@ -42,8 +48,6 @@ class Two_Tones_Spectroscopy(Measurement):
             ro_frequencies_1: dict[str,float],
             integration_times: dict[str,float],
             acquisition_delays: dict[str,float],
-            clocks: dict[str,str],
-            clocks_1: dict[str,str],
             ports: dict[str,str],
 
             repetitions: int = 1024,
@@ -52,13 +56,12 @@ class Two_Tones_Spectroscopy(Measurement):
 
         # if port_out is None: port_out = port
         sched = Schedule("multiplexed_qubit_spec_NCO",repetitions)
-        print(f'{ spec_clocks = }')
         # Initialize the clock for each qubit
         for spec_key, spec_array_val in spec_pulse_frequencies.items():
             this_qubit = [qubit for qubit in qubits if qubit in spec_key][0]
 
             sched.add_resource(
-                ClockResource( name=spec_clocks[this_qubit], freq=spec_array_val[0]),
+                ClockResource( name=f'{this_qubit}.01', freq=spec_array_val[0]),
             )
 
         #This is the common reference operation so the qubits can be operated in parallel
@@ -67,23 +70,22 @@ class Two_Tones_Spectroscopy(Measurement):
         # The first for loop iterates over all qubits:
         for acq_cha, (spec_key, spec_array_val) in enumerate(spec_pulse_frequencies.items()):
             this_qubit = [qubit for qubit in qubits if qubit in spec_key][0]
-            if self.qubit_state==0:
-                this_clock = clocks[this_qubit]
-                this_ro_frequency = ro_frequencies[this_qubit]
-            elif self.qubit_state==1:
-                this_clock = clocks_1[this_qubit]
-                this_ro_frequency = ro_frequencies_1[this_qubit]
-            else:
-                raise ValueError(f'Invalid qubit state: {self.qubit_state}')
 
-            sched.add_resource( ClockResource(name=this_clock, freq=this_ro_frequency) )
+            #if self.qubit_state==0:
+            #    this_ro_frequency = ro_frequencies[this_qubit]
+            #elif self.qubit_state==1:
+            #    this_ro_frequency = ro_frequencies_1[this_qubit]
+            #else:
+            #    raise ValueError(f'Invalid qubit state: {self.qubit_state}')
+
+            #sched.add_resource( ClockResource(name=f'{this_qubit}.ro', freq=this_ro_frequency) )
 
             # The second for loop iterates over all frequency values in the frequency batch:
             relaxation = root_relaxation #To enforce parallelism we refer to the root relaxation
             for acq_index, spec_pulse_frequency in enumerate(spec_array_val):
                 #reset the clock frequency for the qubit pulse
                 set_frequency = sched.add(
-                    SetClockFrequency(clock=spec_clocks[this_qubit], clock_freq_new=spec_pulse_frequency),
+                    SetClockFrequency(clock=f'{this_qubit}.01', clock_freq_new=spec_pulse_frequency),
                     label=f"set_freq_{this_qubit}_{acq_index}",
                     ref_op=relaxation, ref_pt='end'
                 )
@@ -98,10 +100,10 @@ class Two_Tones_Spectroscopy(Measurement):
                 #spectroscopy pulse
                 spec_pulse = sched.add(
                     SoftSquarePulse(
-                        duration=spec_pulse_durations[this_qubit],
-                        amp=spec_pulse_amps[this_qubit],
-                        port=spec_pulse_ports[this_qubit],
-                        clock=spec_clocks[this_qubit],
+                        duration= mw_pulse_durations[this_qubit],
+                        amp= mw_pulse_amplitudes[this_qubit],
+                        port= mw_pulse_ports[this_qubit],
+                        clock=f'{this_qubit}.01',
                     ),
                     label=f"spec_pulse_{this_qubit}_{acq_index}", ref_op=excitation_pulse, ref_pt="end",
                 )

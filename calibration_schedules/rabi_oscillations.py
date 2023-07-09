@@ -67,15 +67,11 @@ class Rabi_Oscillations(Measurement):
 
         for this_qubit, mw_f_val in mw_frequencies.items():
             sched.add_resource(
-                ClockResource(
-                    name=mw_clocks[this_qubit],
-                    freq=mw_f_val)
+                ClockResource( name=f'{this_qubit}.01', freq=mw_f_val)
             )
         for this_qubit, mw_f_val in mw_frequencies_12.items():
             sched.add_resource(
-                ClockResource(
-                    name=mw_clocks_12[this_qubit],
-                    freq=mw_f_val)
+                ClockResource( name=f'{this_qubit}.12', freq=mw_f_val)
             )
 
         #This is the common reference operation so the qubits can be operated in parallel
