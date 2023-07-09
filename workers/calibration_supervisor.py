@@ -1,6 +1,5 @@
 # This code is part of Tergite
 
-from time import sleep
 from rq import Queue
 from utilities.status import DataStatus
 from logger.tac_logger import logger

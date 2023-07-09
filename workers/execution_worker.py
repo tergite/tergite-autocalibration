@@ -1,6 +1,8 @@
 '''Retrieve the compiled schedule and run it'''
 
 import asyncio
+
+from quantify_scheduler.instrument_coordinator.instrument_coordinator import CompiledSchedule
 from logger.tac_logger import logger
 logger.info('entering execution module')
 
