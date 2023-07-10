@@ -83,7 +83,6 @@ def precompile(node:str, samplespace: dict[str,np.ndarray]):
     device.hardware_config(hardware_config)
     qubits = samplespace.keys()
 
-
     transmons = {}
 
     for channel, qubit in enumerate(qubits):
@@ -104,6 +103,8 @@ def precompile(node:str, samplespace: dict[str,np.ndarray]):
     compiler = SerialCompiler(name=f'{node}_compiler')
     logger.info('Starting Compiling')
     compiled_schedule = compiler.compile(schedule=schedule, config=device.generate_compilation_config())
+
     logger.info('finished Compiling')
+    compiled_schedule.plot_pulse_diagram()
 
     rq_supervisor.enqueue(measure, args=(compiled_schedule,))
