@@ -71,9 +71,6 @@ def load_redis_config(transmon: BasicTransmonElement, channel:int):
     return
 
 
-def test(message:str):
-    print(message)
-
 def precompile(node:str, samplespace: dict[str,np.ndarray]):
     logger.info('Starting precompile')
 
@@ -81,6 +78,7 @@ def precompile(node:str, samplespace: dict[str,np.ndarray]):
     # hardware_configuration
     device = QuantumDevice('Loki')
     device.hardware_config(hardware_config)
+    device.cfg_sched_repetitions(1024)
     qubits = samplespace.keys()
 
     transmons = {}
@@ -105,6 +103,6 @@ def precompile(node:str, samplespace: dict[str,np.ndarray]):
     compiled_schedule = compiler.compile(schedule=schedule, config=device.generate_compilation_config())
 
     logger.info('finished Compiling')
-    compiled_schedule.plot_pulse_diagram()
+    # compiled_schedule.plot_pulse_diagram(plot_backend='plotly')
 
     rq_supervisor.enqueue(measure, args=(compiled_schedule,))
