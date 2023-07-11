@@ -185,7 +185,7 @@ def box(func):
         print(u"\u255a" + u"\u2550" * (len(text)+margin) + u"\u255d")
     return wrapper
 
-node_to_be_calibrated = "qubit_01_spectroscopy_pulsed"
+node_to_be_calibrated = "resonator_spectroscopy"
 box_print = box(print)
 box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 
