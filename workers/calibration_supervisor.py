@@ -110,8 +110,8 @@ async def calibrate_node(node:str, job_done_event):
 
     job["device_config"] = device_config
     job_id = job["job_id"]
-    #TODO this not a proper way to extract the samplespace
-    samplespace = list(job['experiment_params'][node].values())[0]
+
+    samplespace = job['experiment_params'][node]
     # breakpoint()
 
     rq_supervisor.enqueue(precompile, args=(node, samplespace))

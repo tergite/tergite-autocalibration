@@ -71,7 +71,7 @@ def load_redis_config(transmon: BasicTransmonElement, channel:int):
     return
 
 
-def precompile(node:str, samplespace: dict[str,np.ndarray]):
+def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
     logger.info('Starting precompile')
 
     # device_configuration
@@ -79,7 +79,9 @@ def precompile(node:str, samplespace: dict[str,np.ndarray]):
     device = QuantumDevice('Loki')
     device.hardware_config(hardware_config)
     device.cfg_sched_repetitions(1024)
-    qubits = samplespace.keys()
+    sweep_quantity = list(samplespace.keys())[0]
+    sweep_parameters = list(samplespace.values())[0]
+    qubits = sweep_parameters.keys()
 
     transmons = {}
 
@@ -94,9 +96,9 @@ def precompile(node:str, samplespace: dict[str,np.ndarray]):
     schedule_function = node_class.schedule_function
     static_parameters = node_class.static_kwargs
 
-    sweep_parameters = { node+'_'+qubit : samplespace[qubit] for qubit in samplespace }
+    node_sweep_parameters = { node+'_'+qubit : sweep_parameters[qubit] for qubit in sweep_parameters }
 
-    schedule = schedule_function(**static_parameters , **sweep_parameters)
+    schedule = schedule_function(**static_parameters , **node_sweep_parameters)
 
     compiler = SerialCompiler(name=f'{node}_compiler')
     logger.info('Starting Compiling')
@@ -105,4 +107,4 @@ def precompile(node:str, samplespace: dict[str,np.ndarray]):
     logger.info('finished Compiling')
     # compiled_schedule.plot_pulse_diagram(plot_backend='plotly')
 
-    rq_supervisor.enqueue(measure, args=(compiled_schedule,))
+    rq_supervisor.enqueue(measure, args=(compiled_schedule,sweep_parameters,sweep_quantity))

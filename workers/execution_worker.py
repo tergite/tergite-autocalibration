@@ -22,14 +22,14 @@ rq_supervisor = Queue(
 
 Cluster.close_all()
 
-# dummy = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1,16)}
-# dummy["16"] = ClusterType.CLUSTER_QRM_RF
-# dummy["17"] = ClusterType.CLUSTER_QRM_RF
-# clusterA = Cluster("clusterA", dummy_cfg=dummy)
-# clusterB = Cluster("clusterB", dummy_cfg=dummy)
+dummy = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1,16)}
+dummy["16"] = ClusterType.CLUSTER_QRM_RF
+dummy["17"] = ClusterType.CLUSTER_QRM_RF
+clusterA = Cluster("clusterA", dummy_cfg=dummy)
+clusterB = Cluster("clusterB", dummy_cfg=dummy)
 
-clusterB = Cluster("clusterB", '192.0.2.141')
-clusterA = Cluster("clusterA", '192.0.2.72')
+# clusterB = Cluster("clusterB", '192.0.2.141')
+# clusterA = Cluster("clusterA", '192.0.2.72')
 
 loki_ic = InstrumentCoordinator('loki_ic')
 loki_ic.add_component(ClusterComponent(clusterA))
@@ -42,7 +42,28 @@ def box_print(text: str):
     print(u"\u255a" + u"\u2550" * (len(text)+margin) + u"\u255d")
     return
 
-def measure(compiled_schedule: Schedule) -> xarray.Dataset:
+def configure_dataset(
+        raw_ds: xarray.Dataset,
+        sweep_parameters:dict,
+        sweep_quantity:str
+        ) -> xarray.Dataset:
+    dataset = xarray.Dataset()
+    keys = sorted(list(raw_ds.data_vars.keys()))
+    sweep_values = list(sweep_parameters.values())
+    qubits = list(sweep_parameters.keys())
+
+    for key in keys:
+        partial_ds = xarray.Dataset(coords={f'{sweep_quantity}_{qubits[key]}':('f',sweep_values[key])})
+        dataset = xarray.merge([dataset,partial_ds])
+        dataset[f'y{key}'] = ('f', raw_ds[key].values, {'qubit': qubits[key]})
+
+    return dataset
+
+
+
+
+
+def measure( compiled_schedule: Schedule, sweep_parameters: dict, sweep_quantity: str) -> xarray.Dataset:
     logger.info('Starting measurement')
     box_print('Measuring')
     loki_ic.prepare(compiled_schedule)
@@ -51,7 +72,10 @@ def measure(compiled_schedule: Schedule) -> xarray.Dataset:
 
     loki_ic.wait_done(timeout_sec=15)
 
-    result_dataset = loki_ic.retrieve_acquisition()
+    raw_dataset: xarray.Dataset = loki_ic.retrieve_acquisition()
+
+    result_dataset = configure_dataset(raw_dataset, sweep_parameters, sweep_quantity)
+    breakpoint()
 
     loki_ic.stop()
 
