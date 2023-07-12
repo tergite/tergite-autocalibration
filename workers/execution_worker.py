@@ -54,9 +54,9 @@ def configure_dataset(
     qubits = list(sweep_parameters.keys())
 
     for key in keys:
-        partial_ds = xarray.Dataset(coords={f'{sweep_quantity}_{qubits[key]}':('f',sweep_values[key])})
+        partial_ds = xarray.Dataset(coords={f'{sweep_quantity}_{qubits[key]}':(f'y{key}',sweep_values[key])})
         dataset = xarray.merge([dataset,partial_ds])
-        dataset[f'y{key}'] = ('f', raw_ds[key].values[0], {'qubit': qubits[key]})
+        dataset[f'y{key}'] = (f'y{key}', raw_ds[key].values[0], {'qubit': qubits[key]})
 
     return dataset
 
