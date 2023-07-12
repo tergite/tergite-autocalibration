@@ -15,21 +15,20 @@ import redis
 from rq import Queue
 
 redis_connection = redis.Redis(decode_responses=True)
-# redis_connection = redis.Redis('localhost',6379,decode_responses=True)
 rq_supervisor = Queue(
         'calibration_supervisor', connection=redis_connection
         )
 
 Cluster.close_all()
 
-dummy = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1,16)}
-dummy["16"] = ClusterType.CLUSTER_QRM_RF
-dummy["17"] = ClusterType.CLUSTER_QRM_RF
-clusterA = Cluster("clusterA", dummy_cfg=dummy)
-clusterB = Cluster("clusterB", dummy_cfg=dummy)
+#dummy = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1,16)}
+#dummy["16"] = ClusterType.CLUSTER_QRM_RF
+#dummy["17"] = ClusterType.CLUSTER_QRM_RF
+#clusterA = Cluster("clusterA", dummy_cfg=dummy)
+#clusterB = Cluster("clusterB", dummy_cfg=dummy)
 
-# clusterB = Cluster("clusterB", '192.0.2.141')
-# clusterA = Cluster("clusterA", '192.0.2.72')
+clusterB = Cluster("clusterB", '192.0.2.141')
+clusterA = Cluster("clusterA", '192.0.2.72')
 
 loki_ic = InstrumentCoordinator('loki_ic')
 loki_ic.add_component(ClusterComponent(clusterA))
@@ -55,12 +54,9 @@ def configure_dataset(
     for key in keys:
         partial_ds = xarray.Dataset(coords={f'{sweep_quantity}_{qubits[key]}':('f',sweep_values[key])})
         dataset = xarray.merge([dataset,partial_ds])
-        dataset[f'y{key}'] = ('f', raw_ds[key].values, {'qubit': qubits[key]})
+        dataset[f'y{key}'] = ('f', raw_ds[key].values[0], {'qubit': qubits[key]})
 
     return dataset
-
-
-
 
 
 def measure( compiled_schedule: Schedule, sweep_parameters: dict, sweep_quantity: str) -> xarray.Dataset:
@@ -75,13 +71,17 @@ def measure( compiled_schedule: Schedule, sweep_parameters: dict, sweep_quantity
     raw_dataset: xarray.Dataset = loki_ic.retrieve_acquisition()
 
     result_dataset = configure_dataset(raw_dataset, sweep_parameters, sweep_quantity)
-    breakpoint()
+    result_dict = result_dataset.to_dict()
+    with open('example_ds.py','w') as f:
+        f.write(str(result_dict))
 
     loki_ic.stop()
+    logger.info('Finished measurement')
+    print(result_dataset)
 
     rq_supervisor.enqueue(
             post_process,
-            args=(result_dataset,'resonator_spectroscopy'),
+            args=(result_dataset,'resonator_spectroscopy',),
             on_success=postprocessing_success_callback
             )
 

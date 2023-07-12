@@ -94,7 +94,7 @@ qubits = ['q12', 'q14', 'q16', 'q17', 'q18', 'q19', 'q20',
 
 N_qubits = len(qubits)
 
-res_spec_samples = 55
+res_spec_samples = 10
 qub_spec_samples =101
 
 def resonator_samples(qubit:str, punchout=False):
