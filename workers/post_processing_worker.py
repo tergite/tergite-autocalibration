@@ -30,6 +30,7 @@ rq_supervisor = Queue(
 def post_process(result_dataset: xr.Dataset, node: str):
     logger.info('Starting post process')
     analysis_class = ANALYSIS_MAP[node]
+    node = "resonator_spectroscopy"
     analysis = analysis_class(result_dataset, node)
 
     fig = plt.gcf()

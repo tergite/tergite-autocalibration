@@ -81,7 +81,7 @@ def measure( compiled_schedule: Schedule, sweep_parameters: dict, sweep_quantity
 
     rq_supervisor.enqueue(
             post_process,
-            args=(result_dataset,),
+            args=(result_dataset,'resonator_spectroscopy'),
             on_success=postprocessing_success_callback
             )
 
