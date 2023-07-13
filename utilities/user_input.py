@@ -2,6 +2,7 @@ from typing import List
 import numpy as np
 import redis
 from uuid import uuid4
+from utilities.visuals import box_print
 import logging
 #logging.basicConfig(level=logging.DEBUG,
         #format='File: %(filename)s -- %(funcName)s --%(message)s')
@@ -177,16 +178,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     return sweep_parameters
 
 
-def box(func):
-    def wrapper(text):
-        margin = 20
-        print(u"\u2554" + u"\u2550" * (len(text)+margin) + u"\u2557")
-        print(u"\u2551" + margin//2*" " + text + margin//2*" " + u"\u2551")
-        print(u"\u255a" + u"\u2550" * (len(text)+margin) + u"\u255d")
-    return wrapper
-
 node_to_be_calibrated = "resonator_spectroscopy"
-box_print = box(print)
 box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 
 def user_requested_calibration(node: str):

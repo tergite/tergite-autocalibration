@@ -12,6 +12,7 @@ from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 import xarray
 from workers.post_processing_worker import post_process
+from utilities.visuals import box_print
 
 import redis
 from rq import Queue
@@ -36,18 +37,13 @@ loki_ic = InstrumentCoordinator('loki_ic')
 loki_ic.add_component(ClusterComponent(clusterA))
 loki_ic.add_component(ClusterComponent(clusterB))
 
-def box_print(text: str):
-    margin = 20
-    print(u"\u2554" + u"\u2550" * (len(text)+margin) + u"\u2557")
-    print(u"\u2551" + margin//2*" " + text + margin//2*" " + u"\u2551")
-    print(u"\u255a" + u"\u2550" * (len(text)+margin) + u"\u255d")
-    return
-
 def configure_dataset(
         raw_ds: xarray.Dataset,
-        sweep_parameters:dict,
-        sweep_quantity:str
+        sweep_parameters: dict,
+        sweep_quantity: str
         ) -> xarray.Dataset:
+    '''The dataset retrieved from the instrument coordinator  is
+       too bare-bones. Here we configure the dims, coords and data_vars'''
     dataset = xarray.Dataset()
     keys = sorted(list(raw_ds.data_vars.keys()))
     sweep_values = list(sweep_parameters.values())
@@ -63,9 +59,8 @@ def configure_dataset(
 
 def measure( compiled_schedule: Schedule, sweep_parameters: dict, sweep_quantity: str, node: str) -> xarray.Dataset:
     logger.info('Starting measurement')
-    box_print('Measuring')
+    box_print(f'Measuring node: {node}')
     loki_ic.prepare(compiled_schedule)
-    print(f'{ sweep_parameters = }')
 
     loki_ic.start()
 
@@ -74,9 +69,9 @@ def measure( compiled_schedule: Schedule, sweep_parameters: dict, sweep_quantity
     raw_dataset: xarray.Dataset = loki_ic.retrieve_acquisition()
 
     result_dataset = configure_dataset(raw_dataset, sweep_parameters, sweep_quantity)
-    result_dict = result_dataset.to_dict()
-    with open('example_ds.py','w') as f:
-        f.write(str(result_dict))
+    # result_dict = result_dataset.to_dict()
+    # with open('example_ds.py','w') as f:
+    #     f.write(str(result_dict))
 
     loki_ic.stop()
     logger.info('Finished measurement')
