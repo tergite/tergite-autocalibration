@@ -107,4 +107,4 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
     logger.info('finished Compiling')
     # compiled_schedule.plot_pulse_diagram(plot_backend='plotly')
 
-    rq_supervisor.enqueue(measure, args=(compiled_schedule,sweep_parameters,sweep_quantity))
+    rq_supervisor.enqueue(measure, args=(compiled_schedule,sweep_parameters,sweep_quantity,node))

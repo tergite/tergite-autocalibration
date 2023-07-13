@@ -58,15 +58,14 @@ def configure_dataset(
         partial_ds = xarray.Dataset(coords={dim :(dim,sweep_values[key], {'qubit':qubits[key]} )})
         dataset[f'y{key}'] = (dim, raw_ds[key].values[0], {'qubit': qubits[key]})
         dataset = xarray.merge([dataset,partial_ds])
-    print(f'{ dataset["y10"] = }')
-    print(f'{ dataset.coords["ro_freq_q18"] = }')
     return dataset
 
 
-def measure( compiled_schedule: Schedule, sweep_parameters: dict, sweep_quantity: str) -> xarray.Dataset:
+def measure( compiled_schedule: Schedule, sweep_parameters: dict, sweep_quantity: str, node: str) -> xarray.Dataset:
     logger.info('Starting measurement')
     box_print('Measuring')
     loki_ic.prepare(compiled_schedule)
+    print(f'{ sweep_parameters = }')
 
     loki_ic.start()
 
@@ -85,7 +84,7 @@ def measure( compiled_schedule: Schedule, sweep_parameters: dict, sweep_quantity
 
     rq_supervisor.enqueue(
             post_process,
-            args=(result_dataset,'resonator_spectroscopy',),
+            args=(result_dataset,node,),
             on_success=postprocessing_success_callback
             )
 

@@ -36,7 +36,7 @@ class BaseAnalysis():
         self.node_result.update({this_qubit: self.qoi})
 
 class Multiplexed_Resonator_Spectroscopy_Analysis(BaseAnalysis):
-    def __init__(self, result_dataset: xr.Dataset, node_name: str):
+    def __init__(self, result_dataset: xr.Dataset, node: str):
         super().__init__(result_dataset)
         for indx, var in enumerate(result_dataset.data_vars):
             this_qubit = result_dataset[var].attrs['qubit']
@@ -68,26 +68,25 @@ class Multiplexed_Resonator_Spectroscopy_Analysis(BaseAnalysis):
             fitting_model.plot_fit(this_axis,numpoints = self.fit_numpoints,xlabel=None, title=None)
             this_axis.axvline(minimum_freq,c='blue',ls='solid',label='frequency at min')
             this_axis.axvline(fitted_resonator_frequency,c='magenta',ls='dotted',label='fitted frequency')
-            # this_axis.set_title(f'{node_name} for {this_qubit}')
+            # this_axis.set_title(f'{node} for {this_qubit}')
             latex = '' # Todo
 
-            print(f'\n-------->{ fitted_resonator_frequency = }<--------\n')
+            # print(f'\n-------->{ fitted_resonator_frequency = }<--------\n')
 
-            if node_name == 'resonator_frequency' or node_name == 'resonator_spectroscopy_NCO':
-                self.update_redis_trusted_values(node_name, this_qubit,'ro_freq')
-            if node_name == 'resonator_frequency_1' or node_name == 'resonator_spectroscopy_1_NCO':
-                self.update_redis_trusted_values(node_name, this_qubit,'ro_freq_1')
-            if node_name == 'resonator_frequency_2' or node_name == 'resonator_spectroscopy_2_NCO':
-                self.update_redis_trusted_values(node_name, this_qubit,'ro_freq_2')
+            self.update_redis_trusted_values(node, this_qubit,'ro_freq')
 
-            if node_name == 'resonator_frequency_1' or node_name == 'resonator_spectroscopy_1_NCO':
-               res_freq_0 = float(redis_connection.hget(f"transmons:{this_qubit}","ro_freq"))
-               this_axis.axvline(res_freq_0,lw=3,c='green',ls='dashed',label='qubit at $|0\\rangle$')
-            if node_name == 'resonator_frequency_2' or node_name == 'resonator_spectroscopy_2_NCO':
-               res_freq_0 = float(redis_connection.hget(f"transmons:{this_qubit}","ro_freq"))
-               res_freq_1 = float(redis_connection.hget(f"transmons:{this_qubit}","ro_freq_1"))
-               this_axis.axvline(res_freq_0,lw=3,c='green',ls='dashed',label='qubit at $|0\\rangle$')
-               this_axis.axvline(res_freq_1,lw=3,c='lightgreen',ls='dotted',label='qubit at $|1\\rangle$')
+            # if node == 'resonator_frequency_1' or node == 'resonator_spectroscopy_1_NCO':
+            #     self.update_redis_trusted_values(node, this_qubit,'ro_freq_1')
+            # if node == 'resonator_frequency_2' or node == 'resonator_spectroscopy_2_NCO':
+            #     self.update_redis_trusted_values(node, this_qubit,'ro_freq_2')
+            # if node == 'resonator_frequency_1' or node == 'resonator_spectroscopy_1_NCO':
+            #    res_freq_0 = float(redis_connection.hget(f"transmons:{this_qubit}","ro_freq"))
+            #    this_axis.axvline(res_freq_0,lw=3,c='green',ls='dashed',label='qubit at $|0\\rangle$')
+            # if node == 'resonator_frequency_2' or node == 'resonator_spectroscopy_2_NCO':
+            #    res_freq_0 = float(redis_connection.hget(f"transmons:{this_qubit}","ro_freq"))
+            #    res_freq_1 = float(redis_connection.hget(f"transmons:{this_qubit}","ro_freq_1"))
+            #    this_axis.axvline(res_freq_0,lw=3,c='green',ls='dashed',label='qubit at $|0\\rangle$')
+            #    this_axis.axvline(res_freq_1,lw=3,c='lightgreen',ls='dotted',label='qubit at $|1\\rangle$')
 
             handles, labels = this_axis.get_legend_handles_labels()
             patch = mpatches.Patch(color='red', label=f'{this_qubit}')
