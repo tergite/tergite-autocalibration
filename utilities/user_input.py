@@ -15,20 +15,7 @@ nodes = [
         "qubit_01_spectroscopy_pulsed",
         "rabi_oscillations",
         "ramsey_correction",
-        "motzoi_parameter",
-        # "DRAG_amplitude",
-        "SSRO_simple",
-        # "randomized_benchmarking",
-        "resonator_spectroscopy_1",
-        "qubit_12_spectroscopy_pulsed",
-        "rabi_oscillations_12",
-        # "ramsey_correction_12",
-        "resonator_spectroscopy_2",
         ]
-
-VNA_resonator_frequencies_A = {'q1' : 6.4796e9, 'q2' : 6.2576e9}
-VNA_qubit_frequencies_A = {'q1' : 3.870e9, 'q2' : 3.4035e9}
-VNA_f12_frequencies_A = {'q1' : 3.620e9, 'q2' : 3.200e9}
 
 VNA_resonator_frequencies = {
         'q11': 6.934e9, 'q12': 6.605e9, 'q13': 6.688e9, 'q14': 6.332e9, 'q15': 6.933e9,
@@ -73,24 +60,9 @@ VNA_f12_frequencies= {
         }
 
 
-# assert(list(VNA_resonator_frequencies.keys()) == list(VNA_qubit_frequencies.keys()))
-# qubits = list(VNA_resonator_frequencies.keys())
-#qubits = [
-#        'q11', 'q12', 'q14', 'q15', #****q11, q15, q13 got the axe ****
-#        'q16', 'q17', 'q18', 'q19', 'q20',
-#        'q21', 'q22', 'q23', 'q24', 'q25'
-#        ]
-# qubits = [ 'q13']
-# qubits = ['q12', 'q18', 'q23']
-# qubits = ['q12','q18','q19','q20','q23','q25']
-# qubits = ['q19','q25']
-# qubits = ['q16','q17']
-# qubits = ['q16']
-
 qubits = ['q12', 'q14', 'q16', 'q17', 'q18', 'q19', 'q20',
           'q21', 'q22', 'q23', 'q24', 'q25' ]
 
-# qubits = ['q21','q23']
 # qubits = ['q23']
 
 N_qubits = len(qubits)
@@ -115,7 +87,9 @@ def qubit_samples(qubit:str, transition:str = '01'):
         # rough_anharmonicity = 200e6 if int(qubit[1:])%2==0 else 170e6
         # VNA_frequency = VNA_qubit_frequencies[qubit] - rough_anharmonicity
         VNA_frequency = VNA_f12_frequencies[qubit]
-    else : print('Invalid Transition')
+    else :
+        raise ValueError('Invalid transition')
+
     min_freq =  VNA_frequency - sweep_range / 2
     max_freq =  VNA_frequency + sweep_range / 2
     return np.linspace(min_freq, max_freq, qub_spec_samples)
@@ -152,33 +126,11 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
                     qubit :{"sweep_min": 4e-9, "sweep_max": 2048e-9, "step": 6*8e-9} for qubit in qubits
                     }
                 },
-            'motzoi_parameter': {'mw_motzoi':{qubit : {"sweep_min": -0.45, "sweep_max": 0.45, "samples": 41} for qubit in qubits},
-                                         'X_repetition': {qubit : {"sweep_min": 2, "sweep_max":17, "step": 2} for qubit in qubits}},
-            'DRAG_amplitude': {'mw_amp180':{qubit : {"sweep_min": 0.002, "sweep_max": 0.10, "samples": 41} for qubit in qubits},
-                                         'X_repetition': {qubit : {"sweep_min": 1, "sweep_max":17, "step": 2} for qubit in qubits}},
-            'resonator_spectroscopy_1': {'ro_freq_1': {qubit: resonator_samples(qubit) for qubit in qubits}},
-            'qubit_12_spectroscopy_pulsed': {'freq_12': {qubit: qubit_samples(qubit,transition='12') for qubit in qubits}},
-            'rabi_oscillations_12': {'mw_amp180': { qubit :{"sweep_min": 0.002, "sweep_max": 0.22, "samples": 51} for qubit in qubits}},
-            'ramsey_correction_12': {
-                'ramsey_delay': {
-                    qubit :{"sweep_min": 4e-9, "sweep_max": 5*2048e-9, "step": 12*1e-9} for qubit in qubits
-                    }
-                },
-            'resonator_spectroscopy_2': {'ro_freq_2': {qubit: resonator_samples(qubit) for qubit in qubits}},
-
-            'SSRO_simple': { 'state_level': {qubit : {"rng": 'rng', "shots": 2000} for qubit in qubits } },
-
-            'randomized_benchmarking': {'number_cliffords': {qubit : {"rb": 'rb', "max_cliffords": 2048} for qubit in qubits } }, #TODO this is aweful
-
-            'state_discrimination': {'ro_freq':{qubit: resonator_samples(qubit) for qubit in qubits},
-                                             'ro_pulse_amp_cus': {qubit : {"sweep_min": 0.005, "sweep_max": 0.011, "samples": 5 } for qubit in qubits },
-                                             'state_level': {qubit : {"rng": 'rng', "shots": 9 } for qubit in qubits } #TODO this is awful
-                                            },
     }
     return sweep_parameters
 
 
-node_to_be_calibrated = "resonator_spectroscopy"
+node_to_be_calibrated = "qubit_01_spectroscopy_pulsed"
 box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 
 def user_requested_calibration(node: str):
