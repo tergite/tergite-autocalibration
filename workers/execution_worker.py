@@ -23,14 +23,14 @@ rq_supervisor = Queue(
 
 Cluster.close_all()
 
-#dummy = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1,16)}
-#dummy["16"] = ClusterType.CLUSTER_QRM_RF
-#dummy["17"] = ClusterType.CLUSTER_QRM_RF
-#clusterA = Cluster("clusterA", dummy_cfg=dummy)
-#clusterB = Cluster("clusterB", dummy_cfg=dummy)
+dummy = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1,16)}
+dummy["16"] = ClusterType.CLUSTER_QRM_RF
+dummy["17"] = ClusterType.CLUSTER_QRM_RF
+clusterA = Cluster("clusterA", dummy_cfg=dummy)
+clusterB = Cluster("clusterB", dummy_cfg=dummy)
 
-clusterB = Cluster("clusterB", '192.0.2.141')
-clusterA = Cluster("clusterA", '192.0.2.72')
+# clusterB = Cluster("clusterB", '192.0.2.141')
+# clusterA = Cluster("clusterA", '192.0.2.72')
 
 loki_ic = InstrumentCoordinator('loki_ic')
 loki_ic.add_component(ClusterComponent(clusterA))
@@ -54,10 +54,12 @@ def configure_dataset(
     qubits = list(sweep_parameters.keys())
 
     for key in keys:
-        partial_ds = xarray.Dataset(coords={f'{sweep_quantity}_{qubits[key]}':(f'y{key}',sweep_values[key])})
+        dim = f'{sweep_quantity}_{qubits[key]}'
+        partial_ds = xarray.Dataset(coords={dim :(dim,sweep_values[key], {'qubit':qubits[key]} )})
+        dataset[f'y{key}'] = (dim, raw_ds[key].values[0], {'qubit': qubits[key]})
         dataset = xarray.merge([dataset,partial_ds])
-        dataset[f'y{key}'] = (f'y{key}', raw_ds[key].values[0], {'qubit': qubits[key]})
-
+    print(f'{ dataset["y10"] = }')
+    print(f'{ dataset.coords["ro_freq_q18"] = }')
     return dataset
 
 
