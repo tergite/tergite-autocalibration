@@ -66,7 +66,7 @@ class QubitSpectroscopyAnalysis():
         print( f'{Fore.RED}WARNING MOCK DATA IN analysis/qubit_spectroscopy_analysis{Style.RESET_ALL}')
         self.S21 = np.array([1+1j for _ in self.S21])
         ########################
-        self.frequencies = dataset[coord].values
+        self.independents = dataset[coord].values
         self.fit_results = {}
         self.qubit = dataset[data_var].attrs['qubit']
 
@@ -79,7 +79,7 @@ class QubitSpectroscopyAnalysis():
     def run_fitting(self):
         model = LorentzianModel()
         self.magnitudes = np.absolute(self.S21)
-        frequencies = self.frequencies
+        frequencies = self.independents
         self.fit_freqs = np.linspace( frequencies[0], frequencies[-1], 1000)
 
         guess = model.guess(self.magnitudes, x=frequencies)
@@ -87,19 +87,12 @@ class QubitSpectroscopyAnalysis():
         fit_result = model.fit(self.magnitudes, params=guess, x=frequencies)
 
         self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_freqs})
-        # self.dataset['fit_freqs'] = self.fit_freqs
-        # self.dataset['fit_y'] = ('fit_freqs',fit_y)
         return fit_result.params['x0'].value
 
     def plotter(self,ax):
-        # ax.plot( self.dataset['fit_freqs'].values , self.dataset['fit_y'].values,'r-',lw=3.0)
-        # ax.plot( self.dataset.x0, self.magnitudes,'bo-',ms=3.0)
         ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0)
-        ax.plot( self.frequencies, self.magnitudes,'bo-',ms=3.0)
+        ax.plot( self.independents, self.magnitudes,'bo-',ms=3.0)
         ax.set_title(f'Qubit Spectroscopy for {self.qubit}')
         ax.set_xlabel('frequency (Hz)')
         ax.set_ylabel('|S21| (V)')
         ax.grid()
-        #plt.tight_layout()
-        #plt.savefig('qubit_two_tones.png')
-        #plt.show()

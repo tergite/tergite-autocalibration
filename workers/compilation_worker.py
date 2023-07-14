@@ -13,7 +13,7 @@ import redis
 from workers.execution_worker import measure
 from calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
 from calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
-# from calibration_schedules.rabi_oscillations import Rabi_Oscillations
+from calibration_schedules.rabi_oscillations import Rabi_Oscillations
 # from calibration_schedules.ramsey_fringes import Ramsey_fringes
 # from calibration_schedules.drag_amplitude import DRAG_amplitude
 # from calibration_schedules.motzoi_paramerter import Motzoi_parameter
@@ -30,7 +30,7 @@ set_datadir('.')
 node_map = {
     'resonator_spectroscopy': Resonator_Spectroscopy,
     'qubit_01_spectroscopy_pulsed': Two_Tones_Spectroscopy,
-    # 'rabi_oscillations': Rabi_Oscillations,
+    'rabi_oscillations': Rabi_Oscillations,
     # 'ramsey_correction': Ramsey_fringes,
     # 'motzoi_parameter': Motzoi_parameter,
     # 'drag_amplitude': DRAG_amplitude,

@@ -1,5 +1,6 @@
 from analysis.resonator_spectroscopy_analysis import ResonatorSpectroscopyAnalysis
 from analysis.qubit_spectroscopy_analysis import QubitSpectroscopyAnalysis
+from analysis.rabi_analysis import RabiAnalysis
 from quantify_core.data.handling import set_datadir
 # from quantify_analysis import qubit_spectroscopy_analysis, rabi_analysis, T1_analysis, XY_crosstalk_analysis, ramsey_analysis, SSRO_analysis
 # from quantify_core.analysis.calibration import rotate_to_calibrated_axis
@@ -41,9 +42,9 @@ class Multiplexed_Resonator_Spectroscopy_Analysis(BaseAnalysis):
         for indx, var in enumerate(result_dataset.data_vars):
             this_qubit = result_dataset[var].attrs['qubit']
             ds = result_dataset[var].to_dataset()
-            fitted_resonator_frequency = ResonatorSpectroscopyAnalysis(dataset=ds)
-            fitted_resonator_frequency.run_fitting()
-            fitting_results = fitted_resonator_frequency.fit_results
+            node_analysis = ResonatorSpectroscopyAnalysis(dataset=ds)
+            node_analysis.run_fitting()
+            fitting_results = node_analysis.fit_results
             fitting_model = fitting_results['hanger_func_complex_SI']
             fit_result = fitting_model.values
 
@@ -89,16 +90,16 @@ class Multiplexed_Two_Tones_Spectroscopy_Analysis(BaseAnalysis):
 
             this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
             # this_axis.set_title(f'{node_name} for {this_qubit}')
-            qubit_spec_analysis = QubitSpectroscopyAnalysis(ds)
-            rough_qubit_frequency = qubit_spec_analysis.run_fitting()
+            node_analysis = QubitSpectroscopyAnalysis(ds)
+            rough_qubit_frequency = node_analysis.run_fitting()
 
             self.qoi = rough_qubit_frequency
 
-            qubit_spec_analysis.plotter(this_axis)
+            node_analysis.plotter(this_axis)
 
             self.update_redis_trusted_values(node, this_qubit,'freq_01')
 
-            hasPeak=qubit_spec_analysis.has_peak()
+            hasPeak=node_analysis.has_peak()
             handles, labels = this_axis.get_legend_handles_labels()
             patch = mpatches.Patch(color='red', label=f'{this_qubit}')
             patch2 = mpatches.Patch(color='blue', label=f'Peak Found:{hasPeak}')
@@ -106,3 +107,29 @@ class Multiplexed_Two_Tones_Spectroscopy_Analysis(BaseAnalysis):
             handles.append(patch2)
             this_axis.set(title=None)
             this_axis.legend(handles=handles)
+
+class Multiplexed_Rabi_Analysis(BaseAnalysis):
+    def __init__(self, result_dataset: xr.Dataset, node: str):
+        super().__init__(result_dataset)
+        for indx, var in enumerate(result_dataset.data_vars):
+            this_qubit = result_dataset[var].attrs['qubit']
+            ds = result_dataset[var].to_dataset()
+
+            this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
+            # this_axis.set_title(f'{node_name} for {this_qubit}')
+            node_analysis = RabiAnalysis(ds)
+            pi_pulse_amplitude = node_analysis.run_fitting()
+
+            self.qoi = pi_pulse_amplitude
+
+            node_analysis.plotter(this_axis)
+
+            self.update_redis_trusted_values(node, this_qubit,'mw_amp180')
+
+            handles, labels = this_axis.get_legend_handles_labels()
+            patch = mpatches.Patch(color='red', label=f'{this_qubit}')
+            handles.append(patch)
+            this_axis.set(title=None)
+            this_axis.legend(handles=handles)
+
+

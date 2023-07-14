@@ -70,7 +70,7 @@ N_qubits = len(qubits)
 res_spec_samples = 10
 qub_spec_samples =101
 
-def resonator_samples(qubit:str, punchout=False):
+def resonator_samples(qubit:str, punchout=False) -> np.ndarray:
     sweep_range = 4.5e6
     punchout_range = 2e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
@@ -79,7 +79,7 @@ def resonator_samples(qubit:str, punchout=False):
     max_freq =  VNA_frequency + sweep_range / 2
     return np.linspace(min_freq, max_freq, res_spec_samples)
 
-def qubit_samples(qubit:str, transition:str = '01'):
+def qubit_samples(qubit:str, transition:str = '01') -> np.ndarray:
     sweep_range = 5e6
     if transition=='01':
         VNA_frequency = VNA_qubit_frequencies[qubit]
@@ -126,7 +126,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
                 },
 
             'rabi_oscillations': {
-                'mw_amp180': { qubit :{"sweep_min": 0.002, "sweep_max": 0.22, "samples": 41} for qubit in qubits}
+                'mw_amp180': { qubit : np.linspace(0.002,0.22,41) for qubit in qubits}
                 },
 
             'ramsey_correction': {
@@ -136,7 +136,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     return sweep_parameters
 
 
-node_to_be_calibrated = "qubit_01_spectroscopy_pulsed"
+node_to_be_calibrated = "rabi_oscillations"
 print()
 box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 
