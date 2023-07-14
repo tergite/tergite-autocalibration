@@ -44,6 +44,7 @@ def configure_dataset(
         ) -> xarray.Dataset:
     '''The dataset retrieved from the instrument coordinator  is
        too bare-bones. Here we configure the dims, coords and data_vars'''
+    logger.info('Configurinf Dataset')
     dataset = xarray.Dataset()
     keys = sorted(list(raw_ds.data_vars.keys()))
     sweep_values = list(sweep_parameters.values())

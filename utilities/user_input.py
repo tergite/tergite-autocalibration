@@ -130,7 +130,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     return sweep_parameters
 
 
-node_to_be_calibrated = "qubit_01_spectroscopy_pulsed"
+node_to_be_calibrated = "resonator_spectroscopy"
 box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 
 def user_requested_calibration(node: str):
