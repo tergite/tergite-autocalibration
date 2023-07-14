@@ -112,34 +112,40 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     }
     '''
     sweep_parameters = {
-            'resonator_spectroscopy': {'ro_freq': {qubit: resonator_samples(qubit) for qubit in qubits}},
+            'resonator_spectroscopy': {
+                'ro_freq': {qubit: resonator_samples(qubit) for qubit in qubits}
+                },
 
-            'punchout': {'ro_freq': {qubit: resonator_samples(qubit, punchout=True) for qubit in qubits},
-                                 'ro_ampl':{qubit : {"sweep_min": 1e-3, "sweep_max":2.5e-2, "samples": 21} for qubit in qubits}},
+            'punchout': {
+                'ro_freq': {qubit: resonator_samples(qubit, punchout=True) for qubit in qubits},
+                'ro_ampl': {qubit : {"sweep_min": 1e-3, "sweep_max":2.5e-2, "samples": 21} for qubit in qubits}
+                },
 
-            'qubit_01_spectroscopy_pulsed': {'freq_01': {qubit: qubit_samples(qubit) for qubit in qubits}},
+            'qubit_01_spectroscopy_pulsed': {
+                'freq_01': {qubit: qubit_samples(qubit) for qubit in qubits}
+                },
 
-            'rabi_oscillations': {'mw_amp180': { qubit :{"sweep_min": 0.002, "sweep_max": 0.22, "samples": 41} for qubit in qubits}},
+            'rabi_oscillations': {
+                'mw_amp180': { qubit :{"sweep_min": 0.002, "sweep_max": 0.22, "samples": 41} for qubit in qubits}
+                },
 
             'ramsey_correction': {
-                'ramsey_delay': {
-                    qubit :{"sweep_min": 4e-9, "sweep_max": 2048e-9, "step": 6*8e-9} for qubit in qubits
-                    }
+                'ramsey_delay': { qubit :{"sweep_min": 4e-9, "sweep_max": 2048e-9, "step": 6*8e-9} for qubit in qubits }
                 },
     }
     return sweep_parameters
 
 
-node_to_be_calibrated = "resonator_spectroscopy"
+node_to_be_calibrated = "qubit_01_spectroscopy_pulsed"
+print()
 box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 
 def user_requested_calibration(node: str):
     job = {
         "job_id": str(uuid4()),
-        "is_calibration_sup_job": True,
         "name": node,
         "qubits": qubits,
+        "experiment_params": experiment_parameters(node,qubits),
     }
-    job["experiment_params"] = experiment_parameters(node,qubits)
 
     return job

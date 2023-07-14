@@ -1,4 +1,5 @@
 from analysis.resonator_spectroscopy_analysis import ResonatorSpectroscopyAnalysis
+from analysis.qubit_spectroscopy_analysis import QubitSpectroscopyAnalysis
 from quantify_core.data.handling import set_datadir
 # from quantify_analysis import qubit_spectroscopy_analysis, rabi_analysis, T1_analysis, XY_crosstalk_analysis, ramsey_analysis, SSRO_analysis
 # from quantify_core.analysis.calibration import rotate_to_calibrated_axis
@@ -6,7 +7,6 @@ import matplotlib.patches as mpatches
 import numpy as np
 import xarray as xr
 import matplotlib.pyplot as plt
-import json
 import redis
 set_datadir('.')
 
@@ -69,27 +69,40 @@ class Multiplexed_Resonator_Spectroscopy_Analysis(BaseAnalysis):
             this_axis.axvline(minimum_freq,c='blue',ls='solid',label='frequency at min')
             this_axis.axvline(fitted_resonator_frequency,c='magenta',ls='dotted',label='fitted frequency')
             # this_axis.set_title(f'{node} for {this_qubit}')
-            latex = '' # Todo
 
-            # print(f'\n-------->{ fitted_resonator_frequency = }<--------\n')
 
             self.update_redis_trusted_values(node, this_qubit,'ro_freq')
-
-            # if node == 'resonator_frequency_1' or node == 'resonator_spectroscopy_1_NCO':
-            #     self.update_redis_trusted_values(node, this_qubit,'ro_freq_1')
-            # if node == 'resonator_frequency_2' or node == 'resonator_spectroscopy_2_NCO':
-            #     self.update_redis_trusted_values(node, this_qubit,'ro_freq_2')
-            # if node == 'resonator_frequency_1' or node == 'resonator_spectroscopy_1_NCO':
-            #    res_freq_0 = float(redis_connection.hget(f"transmons:{this_qubit}","ro_freq"))
-            #    this_axis.axvline(res_freq_0,lw=3,c='green',ls='dashed',label='qubit at $|0\\rangle$')
-            # if node == 'resonator_frequency_2' or node == 'resonator_spectroscopy_2_NCO':
-            #    res_freq_0 = float(redis_connection.hget(f"transmons:{this_qubit}","ro_freq"))
-            #    res_freq_1 = float(redis_connection.hget(f"transmons:{this_qubit}","ro_freq_1"))
-            #    this_axis.axvline(res_freq_0,lw=3,c='green',ls='dashed',label='qubit at $|0\\rangle$')
-            #    this_axis.axvline(res_freq_1,lw=3,c='lightgreen',ls='dotted',label='qubit at $|1\\rangle$')
 
             handles, labels = this_axis.get_legend_handles_labels()
             patch = mpatches.Patch(color='red', label=f'{this_qubit}')
             handles.append(patch)
+            this_axis.set(title=None)
+            this_axis.legend(handles=handles)
+
+
+class Multiplexed_Two_Tones_Spectroscopy_Analysis(BaseAnalysis):
+    def __init__(self, result_dataset: xr.Dataset, node: str):
+        super().__init__(result_dataset)
+        for indx, var in enumerate(result_dataset.data_vars):
+            this_qubit = result_dataset[var].attrs['qubit']
+            ds = result_dataset[var].to_dataset()
+
+            this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
+            # this_axis.set_title(f'{node_name} for {this_qubit}')
+            qubit_spec_analysis = QubitSpectroscopyAnalysis(ds)
+            rough_qubit_frequency = qubit_spec_analysis.run_fitting()
+
+            self.qoi = rough_qubit_frequency
+
+            qubit_spec_analysis.plotter(this_axis)
+
+            self.update_redis_trusted_values(node, this_qubit,'freq_01')
+
+            hasPeak=qubit_spec_analysis.has_peak()
+            handles, labels = this_axis.get_legend_handles_labels()
+            patch = mpatches.Patch(color='red', label=f'{this_qubit}')
+            patch2 = mpatches.Patch(color='blue', label=f'Peak Found:{hasPeak}')
+            handles.append(patch)
+            handles.append(patch2)
             this_axis.set(title=None)
             this_axis.legend(handles=handles)

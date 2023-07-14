@@ -2,11 +2,12 @@
 
 import matplotlib.pyplot as plt
 from logger.tac_logger import logger
-from analysis.tac_quantify_analysis import Multiplexed_Resonator_Spectroscopy_Analysis
+from analysis.tac_quantify_analysis import (
+        Multiplexed_Resonator_Spectroscopy_Analysis,
+        Multiplexed_Two_Tones_Spectroscopy_Analysis,
+        )
+
 logger.info('entering post_process module')
-#TODO this is temporary
-qubits = ['q12', 'q14', 'q16', 'q17', 'q18', 'q19', 'q20',
-          'q21', 'q22', 'q23', 'q24', 'q25' ]
 
 import xarray as xr
 
@@ -19,7 +20,8 @@ import redis
 from rq import Queue
 
 ANALYSIS_MAP = {
-        'resonator_spectroscopy': Multiplexed_Resonator_Spectroscopy_Analysis
+        'resonator_spectroscopy': Multiplexed_Resonator_Spectroscopy_Analysis,
+        'qubit_01_spectroscopy_pulsed': Multiplexed_Two_Tones_Spectroscopy_Analysis,
         }
 
 redis_connection = redis.Redis(decode_responses=True)

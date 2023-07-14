@@ -85,7 +85,7 @@ class Two_Tones_Spectroscopy(Measurement):
                 if self.qubit_state == 0:
                     measure_function = Measure
                 else:
-                    raise ValueError('Invalid qubit state')
+                    raise ValueError(f'Invalid qubit state: {self.qubit_state}')
                 # elif self.qubit_state == 1:
                 #     measure_function = Measure_1
 

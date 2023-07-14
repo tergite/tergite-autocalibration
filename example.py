@@ -25,6 +25,7 @@ ds_0 = ds.y0.to_dataset()
 # rkey =  list(ds.y0.coords.keys())[0]
 # print( ds[rkey].values )
 print( list(ds_0.data_vars.keys()))
+print( ds_0.y0.attrs)
 
 #---
 for var in ds.data_vars:
