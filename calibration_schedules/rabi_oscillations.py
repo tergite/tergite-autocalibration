@@ -4,6 +4,7 @@ from quantify_scheduler import Schedule
 from quantify_scheduler.operations.pulse_library import DRAGPulse
 from quantify_scheduler.operations.gate_library import Measure, Reset, X
 from calibration_schedules.measurement_base import Measurement
+import numpy as np
 
 # from transmon_element import Measure_1
 
@@ -28,8 +29,8 @@ class Rabi_Oscillations(Measurement):
         mw_frequencies: dict[str,float],
         mw_pulse_durations: dict[str,float],
         mw_pulse_ports: dict[str,str],
+        mw_amplitudes: dict[str, np.ndarray],
         repetitions: int = 1024,
-        **mw_amplitudes,
         ) -> Schedule:
 
         if self.qubit_state == 0:
@@ -56,8 +57,7 @@ class Rabi_Oscillations(Measurement):
         #This is the common reference operation so the qubits can be operated in parallel
         root_relaxation = sched.add(Reset(*qubits), label="Reset")
 
-        for acq_cha, (mw_amp_key, mw_amp_array_val) in enumerate(mw_amplitudes.items()):
-            this_qubit = [qubit for qubit in qubits if qubit in mw_amp_key][0]
+        for this_qubit, mw_amp_array_val in mw_amplitudes.items():
             if self.qubit_state == 0:
                 this_clock = f'{this_qubit}.01'
             # elif self.qubit_state == 1:

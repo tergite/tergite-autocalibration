@@ -112,7 +112,7 @@ async def calibrate_node(node:str, job_done_event):
     samplespace = job['experiment_params'][node]
     # breakpoint()
 
-    rq_supervisor.enqueue(precompile, args=(node, samplespace))
+    rq_supervisor.enqueue(precompile, job_timeout = 240, args=(node, samplespace))
     await job_done_event.wait()
     job_done_event.clear()
 

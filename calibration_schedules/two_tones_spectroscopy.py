@@ -4,6 +4,7 @@ from quantify_scheduler.operations.gate_library import Measure, Reset, X
 from quantify_scheduler.operations.pulse_library import SetClockFrequency, SoftSquarePulse
 from quantify_scheduler.resources import ClockResource
 from quantify_scheduler.schedules.schedule import Schedule
+import numpy as np
 
 from calibration_schedules.measurement_base import Measurement
 # from transmon_element import Measure_1
@@ -26,21 +27,20 @@ class Two_Tones_Spectroscopy(Measurement):
 
 
     def schedule_function(
-            self,
-            qubits: list[str],
-            mw_pulse_durations: dict[str,float],
-            mw_pulse_amplitudes: dict[str,float],
-            mw_pulse_ports: dict[str,str],
+        self,
+        qubits: list[str],
+        mw_pulse_durations: dict[str,float],
+        mw_pulse_amplitudes: dict[str,float],
+        mw_pulse_ports: dict[str,str],
+        mw_frequencies: dict[str,np.ndarray],
 
-            repetitions: int = 1024,
-            **spec_pulse_frequencies,
+        repetitions: int = 1024,
         ) -> Schedule:
 
         # if port_out is None: port_out = port
-        sched = Schedule("multiplexed_qubit_spec_NCO",repetitions)
+        sched = Schedule("multiplexed_qubit_spec",repetitions)
         # Initialize the clock for each qubit
-        for spec_key, spec_array_val in spec_pulse_frequencies.items():
-            this_qubit = [qubit for qubit in qubits if qubit in spec_key][0]
+        for this_qubit, spec_array_val in mw_frequencies.items():
 
             sched.add_resource(
                 ClockResource( name=f'{this_qubit}.01', freq=spec_array_val[0]),
@@ -50,9 +50,7 @@ class Two_Tones_Spectroscopy(Measurement):
         root_relaxation = sched.add(Reset(*qubits), label="Reset")
 
         # The first for loop iterates over all qubits:
-        for acq_cha, (spec_key, spec_array_val) in enumerate(spec_pulse_frequencies.items()):
-            this_qubit = [qubit for qubit in qubits if qubit in spec_key][0]
-
+        for this_qubit, spec_array_val in mw_frequencies.items():
 
             # The second for loop iterates over all frequency values in the frequency batch:
             relaxation = root_relaxation #To enforce parallelism we refer to the root relaxation

@@ -81,6 +81,7 @@ def measure( compiled_schedule: Schedule, sweep_parameters: dict, sweep_quantity
     rq_supervisor.enqueue(
             post_process,
             args=(result_dataset,node,),
+            job_timeout=360,
             on_success=postprocessing_success_callback
             )
 

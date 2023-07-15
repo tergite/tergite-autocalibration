@@ -81,6 +81,7 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
     device.cfg_sched_repetitions(1024)
     sweep_quantity = list(samplespace.keys())[0]
     sweep_parameters = list(samplespace.values())[0]
+    #TODO this not the best way to aquire the qubits list
     qubits = sweep_parameters.keys()
 
     transmons = {}
@@ -96,9 +97,7 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
     schedule_function = node_class.schedule_function
     static_parameters = node_class.static_kwargs
 
-    node_sweep_parameters = { node+'_'+qubit : sweep_parameters[qubit] for qubit in sweep_parameters }
-
-    schedule = schedule_function(**static_parameters , **node_sweep_parameters)
+    schedule = schedule_function(**static_parameters , **samplespace)
 
     compiler = SerialCompiler(name=f'{node}_compiler')
     logger.info('Starting Compiling')
@@ -107,4 +106,4 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
     logger.info('finished Compiling')
     # compiled_schedule.plot_pulse_diagram(plot_backend='plotly')
 
-    rq_supervisor.enqueue(measure, args=(compiled_schedule,sweep_parameters,sweep_quantity,node))
+    rq_supervisor.enqueue(measure, job_timeout=240, args=(compiled_schedule,sweep_parameters,sweep_quantity,node))

@@ -7,6 +7,7 @@ from quantify_scheduler.resources import ClockResource
 # from transmon_element import Measure_1
 
 from calibration_schedules.measurement_base import Measurement
+import numpy as np
 
 class Resonator_Spectroscopy(Measurement):
 
@@ -27,34 +28,26 @@ class Resonator_Spectroscopy(Measurement):
             # 'freqs_12': self.attributes_dictionary('freq_12'),
             'qubits': self.qubits,
             'ports': self.attributes_dictionary('readout_port'),
-            # 'clocks': self.attributes_dictionary('ro_clock'),
-            # 'clocks_1': self.attributes_dictionary('ro_clock_1'),
-            # 'clocks_2': self.attributes_dictionary('ro_clock_2'),
         }
 
 
     def schedule_function(
-            self,
-            pulse_amplitudes: dict[str,float],
-            pulse_durations: dict[str,float],
-            # mw_ef_amp180s: dict[str,float],
-            # mw_pulse_durations: dict[str,float],
-            # mw_clocks_12: dict[str,str],
-            # mw_pulse_ports: dict[str,str],
-            # freqs_12:  dict[str,float],
-            acquisition_delays: dict[str,float],
-            integration_times: dict[str,float],
-            qubits: list[str],
-            ports: dict[str,str],
-            # clocks: dict[str,str],
-            # clocks_1: dict[str,str],
-            # clocks_2: dict[str,str],
-            repetitions: int = 1024,
-
-            **ro_frequencies
+        self,
+        pulse_amplitudes: dict[str,float],
+        pulse_durations: dict[str,float],
+        # mw_ef_amp180s: dict[str,float],
+        # mw_pulse_durations: dict[str,float],
+        # mw_clocks_12: dict[str,str],
+        # mw_pulse_ports: dict[str,str],
+        # freqs_12:  dict[str,float],
+        acquisition_delays: dict[str,float],
+        integration_times: dict[str,float],
+        qubits: list[str],
+        ports: dict[str,str],
+        ro_frequencies: dict[str,np.ndarray],
+        repetitions: int = 1024,
         ) -> Schedule:
 
-        # if port_out is None: port_out = port
         sched = Schedule("multiplexed_resonator_spec_NCO",repetitions)
         # Initialize the clock for each qubit
         for ro_key, ro_array_val in ro_frequencies.items():
@@ -76,8 +69,7 @@ class Resonator_Spectroscopy(Measurement):
         root_relaxation = sched.add(Reset(*qubits), label="Reset")
 
         # The first for loop iterates over all qubits:
-        for acq_cha, (ro_f_key, ro_f_values) in enumerate(ro_frequencies.items()):
-            this_qubit = [qubit for qubit in qubits if qubit in ro_f_key][0]
+        for acq_cha, (this_qubit, ro_f_values) in enumerate(ro_frequencies.items()):
             # if self.qubit_state==0:
             #     this_clock = clocks[this_qubit]
             # elif self.qubit_state==1:

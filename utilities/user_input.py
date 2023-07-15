@@ -115,7 +115,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     '''
     sweep_parameters = {
         'resonator_spectroscopy': {
-            'ro_freq': {qubit: resonator_samples(qubit) for qubit in qubits}
+            'ro_frequencies': {qubit: resonator_samples(qubit) for qubit in qubits}
         },
 
         'punchout': {
@@ -124,16 +124,16 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
         },
 
         'qubit_01_spectroscopy_pulsed': {
-            'freq_01': {qubit: qubit_samples(qubit) for qubit in qubits}
+            'mw_frequencies': {qubit: qubit_samples(qubit) for qubit in qubits}
         },
 
         'rabi_oscillations': {
-            'mw_amp180': { qubit : np.linspace(0.002,0.22,41) for qubit in qubits}
+            'mw_amplitudes': { qubit : np.linspace(0.002,0.22,41) for qubit in qubits}
         },
 
         'XY_cross_talk': {
-            'mw_amp180': { qubit : np.linspace(0.002,0.22,5) for qubit in qubits },
-            'mw_pulse_duration': { qubit : np.arange(20e-9,300e-9,41) for qubit in qubits },
+            'mw_amplitudes': { qubit : np.linspace(0.002,0.22,5) for qubit in qubits },
+            'mw_pulse_durations': { qubit : np.arange(20e-9,300e-9,41) for qubit in qubits },
             'drive_qubit': 'q16'
         },
 
