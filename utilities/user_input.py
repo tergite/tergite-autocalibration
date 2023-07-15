@@ -14,6 +14,7 @@ nodes = [
         # "punchout",
         "qubit_01_spectroscopy_pulsed",
         "rabi_oscillations",
+        "XY_cross_talk",
         "ramsey_correction",
         ]
 
@@ -96,41 +97,48 @@ def qubit_samples(qubit:str, transition:str = '01') -> np.ndarray:
 
 def experiment_parameters(node:str, qubits:List[str]) -> dict:
     '''
-    TODO this will change it's simpler to sinply pass the whole samples array.
     Dictionary that contains the parameter space for each calibration node.
-    The keys order is : 1. Node key 2. Sweep parameter key 3. qubit key.
+    The keys order is: 
+    1. Node key 
+    2. Sweep parameter key 
+    3. qubit key
     For example, if the calibrtation node is 'resonator_spectroscopy'
-    and we have two qubits labeled 'q1' and 'q2',
-    it returns the dictionary:
+    and we have two qubits labeled 'q1' and 'q2', it returns the dictionary:
     sweep_parameters = {
         'resonator_spectroscopy': {
              'ro_freq':
-                  {'q1': {'sweep_min': ..., 'sweep_max': ..., 'samples': ...},
-                   'q2': {'sweep_min': ..., 'sweep_max': ..., 'samples': ...}
+                  {'q1': array_of_frequencies,
+                   'q2': array_of_frequencies
                   }
         }
     }
     '''
     sweep_parameters = {
-            'resonator_spectroscopy': {
-                'ro_freq': {qubit: resonator_samples(qubit) for qubit in qubits}
-                },
+        'resonator_spectroscopy': {
+            'ro_freq': {qubit: resonator_samples(qubit) for qubit in qubits}
+        },
 
-            'punchout': {
-                'ro_freq': {qubit: resonator_samples(qubit, punchout=True) for qubit in qubits},
-                'ro_ampl': {qubit : {"sweep_min": 1e-3, "sweep_max":2.5e-2, "samples": 21} for qubit in qubits}
-                },
+        'punchout': {
+            'ro_freq': {qubit: resonator_samples(qubit, punchout=True) for qubit in qubits},
+            'ro_ampl': {qubit : {"sweep_min": 1e-3, "sweep_max":2.5e-2, "samples": 21} for qubit in qubits}
+        },
 
-            'qubit_01_spectroscopy_pulsed': {
-                'freq_01': {qubit: qubit_samples(qubit) for qubit in qubits}
-                },
+        'qubit_01_spectroscopy_pulsed': {
+            'freq_01': {qubit: qubit_samples(qubit) for qubit in qubits}
+        },
 
-            'rabi_oscillations': {
-                'mw_amp180': { qubit : np.linspace(0.002,0.22,41) for qubit in qubits}
-                },
+        'rabi_oscillations': {
+            'mw_amp180': { qubit : np.linspace(0.002,0.22,41) for qubit in qubits}
+        },
 
-            'ramsey_correction': {
-                'ramsey_delay': { qubit :{"sweep_min": 4e-9, "sweep_max": 2048e-9, "step": 6*8e-9} for qubit in qubits }
+        'XY_cross_talk': {
+            'mw_amp180': { qubit : np.linspace(0.002,0.22,5) for qubit in qubits },
+            'mw_pulse_duration': { qubit : np.arange(20e-9,300e-9,41) for qubit in qubits },
+            'drive_qubit': 'q16'
+        },
+
+        'ramsey_correction': {
+            'ramsey_delay': { qubit :{"sweep_min": 4e-9, "sweep_max": 2048e-9, "step": 6*8e-9} for qubit in qubits }
                 },
     }
     return sweep_parameters
