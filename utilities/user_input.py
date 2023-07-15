@@ -14,7 +14,7 @@ nodes = [
         # "punchout",
         "qubit_01_spectroscopy_pulsed",
         "rabi_oscillations",
-        "XY_cross_talk",
+        "XY_crosstalk",
         "ramsey_correction",
         ]
 
@@ -131,10 +131,10 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
             'mw_amplitudes': { qubit : np.linspace(0.002,0.22,41) for qubit in qubits}
         },
 
-        'XY_cross_talk': {
+        'XY_crosstalk': {
             'mw_amplitudes': { qubit : np.linspace(0.002,0.22,5) for qubit in qubits },
             'mw_pulse_durations': { qubit : np.arange(20e-9,300e-9,41) for qubit in qubits },
-            'drive_qubit': 'q16'
+            'drive_qubit': 'q18'
         },
 
         'ramsey_correction': {
@@ -144,7 +144,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     return sweep_parameters
 
 
-node_to_be_calibrated = "rabi_oscillations"
+node_to_be_calibrated = "XY_crosstalk"
 print()
 box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 

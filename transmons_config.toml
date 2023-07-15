@@ -15,6 +15,7 @@ motzoi_parameter.mw_motzoi = nan
 rabi_oscillations_12.mw_ef_amp180 = nan
 randomized_benchmarking.fidelity = nan
 SSRO_simple.discriminator = nan
+XY_crosstalk.selectivity = nan
 
 [initials.all]
 ro_acq_delay = 300e-9

@@ -7,13 +7,14 @@ logger.info('entering precompile module')
 
 from math import isnan
 import numpy as np
-from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
+from quantify_scheduler.device_under_test.quantum_device import Instrument, QuantumDevice
 import redis
 
 from workers.execution_worker import measure
 from calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
 from calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
 from calibration_schedules.rabi_oscillations import Rabi_Oscillations
+from calibration_schedules.XY_crosstalk import XY_cross
 # from calibration_schedules.ramsey_fringes import Ramsey_fringes
 # from calibration_schedules.drag_amplitude import DRAG_amplitude
 # from calibration_schedules.motzoi_paramerter import Motzoi_parameter
@@ -31,6 +32,7 @@ node_map = {
     'resonator_spectroscopy': Resonator_Spectroscopy,
     'qubit_01_spectroscopy_pulsed': Two_Tones_Spectroscopy,
     'rabi_oscillations': Rabi_Oscillations,
+    'XY_crosstalk': XY_cross,
     # 'ramsey_correction': Ramsey_fringes,
     # 'motzoi_parameter': Motzoi_parameter,
     # 'drag_amplitude': DRAG_amplitude,
@@ -73,15 +75,14 @@ def load_redis_config(transmon: BasicTransmonElement, channel:int):
 
 def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
     logger.info('Starting precompile')
+    Instrument.close_all()
 
-    # device_configuration
-    # hardware_configuration
     device = QuantumDevice('Loki')
     device.hardware_config(hardware_config)
     device.cfg_sched_repetitions(1024)
     sweep_quantity = list(samplespace.keys())[0]
     sweep_parameters = list(samplespace.values())[0]
-    #TODO this not the best way to aquire the qubits list
+    #TODO this not the best way to acquire the qubits list
     qubits = sweep_parameters.keys()
 
     transmons = {}
