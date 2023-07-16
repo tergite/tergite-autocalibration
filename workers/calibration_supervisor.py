@@ -24,7 +24,7 @@ rq_supervisor = Queue(
         )
 
 # Settings
-transmon_configuration = toml.load('.config_files/transmons_config.toml')
+transmon_configuration = toml.load('./config_files/transmons_config.toml')
 qubits = user_input.qubits
 
 async def calibrate_system(job_done_event):
@@ -111,8 +111,9 @@ async def calibrate_node(node:str, job_done_event):
 
     samplespace = job['experiment_params'][node]
     # breakpoint()
+    logger.info(f'Sending to precompile')
 
-    rq_supervisor.enqueue(precompile, job_timeout = 240, args=(node, samplespace))
+    rq_supervisor.enqueue(precompile, args=(node, samplespace),job_timeout = 240, )
     await job_done_event.wait()
     job_done_event.clear()
 

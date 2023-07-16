@@ -20,7 +20,7 @@ from calibration_schedules.XY_crosstalk import XY_cross
 # from calibration_schedules.motzoi_paramerter import Motzoi_parameter
 from quantify_scheduler.device_under_test.transmon_element import BasicTransmonElement
 from quantify_scheduler.backends import SerialCompiler
-from config_files.pretty_hw import hardware_config
+from config_files.IF_hw_config import hardware_config
 from quantify_core.data.handling import set_datadir
 
 logger.info('finished imports')
@@ -94,7 +94,6 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
         transmons[qubit] = q
 
     node_class = node_map[node](transmons)
-
     schedule_function = node_class.schedule_function
     static_parameters = node_class.static_kwargs
 

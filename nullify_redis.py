@@ -7,7 +7,7 @@ red = redis.Redis(decode_responses=True)
 qubits = user_input.qubits
 nodes = user_input.nodes
 
-transmon_configuration = toml.load('.config_files/transmons_config.toml')
+transmon_configuration = toml.load('./config_files/transmons_config.toml')
 quantities_of_interest = transmon_configuration['qoi']
 remove_node = sys.argv[1]
 print(f'{ remove_node = }')

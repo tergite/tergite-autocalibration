@@ -34,18 +34,21 @@ class XY_cross(Measurement):
 
         # for this_qubit, mw_f_val in mw_frequencies.items():
             # print('sorry for spamming', this_qubit)
-        schedule.add_resource(
-            # Initialiaze the clock, at the drive port. The frequency value doesn't matter
-            ClockResource( name=f'{drive_qubit}.01', freq=4e9)
-        )
+        # schedule.add_resource(
+        #     # Initialiaze the clock, at the drive port. The frequency value doesn't matter
+        #     ClockResource( name=f'{drive_qubit}.01', freq=4.2e9)
+        # )
 
         schedule.add(Reset(*qubits), label="Reset")
 
         #On the outer loop we loop over all qubits
         for this_qubit in qubits:
             # !!! We set the drive port clock but with the measure qubit frequency !!!:
-            schedule.add(
-                SetClockFrequency(clock=f'{drive_qubit}.01', clock_freq_new=mw_frequencies[this_qubit])
+            # schedule.add(
+            #     SetClockFrequency(clock=f'{drive_qubit}.01', clock_freq_new=mw_frequencies[this_qubit])
+            # )
+            schedule.add_resource(
+                ClockResource(name=f'{drive_qubit}.01', freq=mw_frequencies[this_qubit])
             )
 
             #On the middle loop we loop over all amplitudes for each qubit
