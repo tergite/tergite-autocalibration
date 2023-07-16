@@ -24,7 +24,7 @@ rq_supervisor = Queue(
         )
 
 # Settings
-transmon_configuration = toml.load('./transmons_config.toml')
+transmon_configuration = toml.load('.config_files/transmons_config.toml')
 qubits = user_input.qubits
 
 async def calibrate_system(job_done_event):

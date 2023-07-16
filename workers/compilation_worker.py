@@ -20,7 +20,7 @@ from calibration_schedules.XY_crosstalk import XY_cross
 # from calibration_schedules.motzoi_paramerter import Motzoi_parameter
 from quantify_scheduler.device_under_test.transmon_element import BasicTransmonElement
 from quantify_scheduler.backends import SerialCompiler
-from pretty_hw import hardware_config
+from config_files.pretty_hw import hardware_config
 from quantify_core.data.handling import set_datadir
 
 logger.info('finished imports')
