@@ -2,6 +2,7 @@
 fetch and compile the appropriate schedule'''
 
 from rq import Queue
+from scipy.optimize import brent
 from logger.tac_logger import logger
 logger.info('entering precompile module')
 
@@ -15,6 +16,7 @@ from calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
 from calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
 from calibration_schedules.rabi_oscillations import Rabi_Oscillations
 from calibration_schedules.XY_crosstalk import XY_cross
+from calibration_schedules.punchout import Punchout
 # from calibration_schedules.ramsey_fringes import Ramsey_fringes
 # from calibration_schedules.drag_amplitude import DRAG_amplitude
 # from calibration_schedules.motzoi_paramerter import Motzoi_parameter
@@ -33,6 +35,7 @@ node_map = {
     'qubit_01_spectroscopy_pulsed': Two_Tones_Spectroscopy,
     'rabi_oscillations': Rabi_Oscillations,
     'XY_crosstalk': XY_cross,
+    'punchout': Punchout,
     # 'ramsey_correction': Ramsey_fringes,
     # 'motzoi_parameter': Motzoi_parameter,
     # 'drag_amplitude': DRAG_amplitude,
@@ -43,7 +46,6 @@ node_map = {
 }
 
 redis_connection = redis.Redis(decode_responses=True)
-# redis_connection = redis.Redis('localhost',6379,decode_responses=True)
 rq_supervisor = Queue(
         'calibration_supervisor', connection=redis_connection
         )
@@ -80,10 +82,10 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
     device = QuantumDevice('Loki')
     device.hardware_config(hardware_config)
     device.cfg_sched_repetitions(1024)
-    sweep_quantity = list(samplespace.keys())[0]
-    sweep_parameters = list(samplespace.values())[0]
+    sweep_quantities = list(samplespace.keys())
+    sweep_parameters = list(samplespace.values())
     #TODO this not the best way to acquire the qubits list
-    qubits = sweep_parameters.keys()
+    qubits = sweep_parameters[0].keys()
 
     transmons = {}
 
@@ -108,4 +110,4 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
     logger.info('finished Compiling')
     # compiled_schedule.plot_pulse_diagram(plot_backend='plotly')
 
-    rq_supervisor.enqueue(measure, job_timeout=240, args=(compiled_schedule,sweep_parameters,sweep_quantity,node))
+    rq_supervisor.enqueue(measure, job_timeout=240, args=(compiled_schedule,samplespace,node))

@@ -8,8 +8,8 @@ import logging
         #format='File: %(filename)s -- %(funcName)s --%(message)s')
 
 nodes = [
-        "resonator_spectroscopy",
-        # "punchout",
+        # "resonator_spectroscopy",
+        "punchout",
         "qubit_01_spectroscopy_pulsed",
         "rabi_oscillations",
         "XY_crosstalk",
@@ -40,7 +40,7 @@ qubits = ['q13', 'q16', 'q17', 'q18', 'q19', 'q21', 'q22', 'q23']
 
 N_qubits = len(qubits)
 
-res_spec_samples = 200
+res_spec_samples = 5
 qub_spec_samples =101
 
 def resonator_samples(qubit:str, punchout=False) -> np.ndarray:
@@ -91,8 +91,8 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
         },
 
         'punchout': {
-            'ro_freq': {qubit: resonator_samples(qubit, punchout=True) for qubit in qubits},
-            'ro_ampl': {qubit : {"sweep_min": 1e-3, "sweep_max":2.5e-2, "samples": 21} for qubit in qubits}
+            'ro_frequencies': {qubit: resonator_samples(qubit, punchout=True) for qubit in qubits},
+            'ro_amplitudes': {qubit : np.linspace(1e-3, 2.5e-2, 3) for qubit in qubits}
         },
 
         'qubit_01_spectroscopy_pulsed': {
@@ -116,7 +116,11 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     return sweep_parameters
 
 
+<<<<<<< HEAD
 node_to_be_calibrated = "resonator_spectroscopy"
+=======
+node_to_be_calibrated = "punchout"
+>>>>>>> feat: punchout node
 print()
 box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 

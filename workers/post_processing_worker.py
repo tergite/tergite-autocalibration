@@ -6,6 +6,7 @@ from analysis.tac_quantify_analysis import (
         Multiplexed_Resonator_Spectroscopy_Analysis,
         Multiplexed_Two_Tones_Spectroscopy_Analysis,
         Multiplexed_Rabi_Analysis,
+        Multiplexed_Punchout_Analysis,
         )
 
 logger.info('entering post_process module')
@@ -24,6 +25,7 @@ ANALYSIS_MAP = {
         'resonator_spectroscopy': Multiplexed_Resonator_Spectroscopy_Analysis,
         'qubit_01_spectroscopy_pulsed': Multiplexed_Two_Tones_Spectroscopy_Analysis,
         'rabi_oscillations': Multiplexed_Rabi_Analysis,
+        'punchout': Multiplexed_Punchout_Analysis,
         }
 
 redis_connection = redis.Redis(decode_responses=True)

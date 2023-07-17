@@ -4,51 +4,24 @@ from quantify_scheduler.resources import ClockResource
 from quantify_scheduler import Schedule
 from quantify_scheduler.operations.pulse_library import SquarePulse, SetClockFrequency
 from quantify_scheduler.operations.gate_library import Reset
-from measurements_base import Measurement_base
+from calibration_schedules.measurement_base import Measurement
+import numpy as np
 
 
-class Punchout_BATCHED(Measurement_base):
+class Punchout(Measurement):
 
-    def __init__(self,transmons,connections):
-        super().__init__(transmons,connections)
-        self.experiment_parameters = ['ro_freq_NCO', 'ro_ampl_BATCHED'] # The order maters
-        self.parameter_order = ['ro_freq_NCO', 'ro_ampl_BATCHED'] # The order maters
-        self.gettable_batched = True
+    def __init__(self,transmons):
+        super().__init__(transmons)
+        self.transmons = transmons
+
         self.static_kwargs = {
             'qubits': self.qubits,
-            'pulse_durations': self._get_attributes('ro_pulse_duration'),
-            'acquisition_delays': self._get_attributes('ro_acq_delay'),
-            'integration_times': self._get_attributes('ro_acq_integration_time'),
-            'ports': self._get_attributes('ro_port'),
-            'clocks': self._get_attributes('ro_clock'),
+            'pulse_durations': self.attributes_dictionary('pulse_duration'),
+            'acquisition_delays': self.attributes_dictionary('acq_delay'),
+            'integration_times': self.attributes_dictionary('integration_time'),
+            'ports': self.attributes_dictionary('readout_port'),
         }
 
-    def settables_dictionary(self):
-        parameters = self.experiment_parameters
-        manual_parameter = 'ro_freq_NCO'
-        assert( manual_parameter in self.experiment_parameters )
-        mp_data = {
-            manual_parameter : {
-                'name': manual_parameter,
-                'initial_value': 2e9,
-                'unit': 'Hz',
-                'batched': True
-            }
-        }
-        manual_parameter = 'ro_ampl_BATCHED'
-        assert( manual_parameter in self.experiment_parameters )
-        mp_data.update( {
-            manual_parameter: {
-                'name': manual_parameter,
-                'initial_value': 1e-4,
-                'unit': 'V',
-                'batched': False
-            }
-        })
-        return self._settables_dictionary(parameters, isBatched=self.gettable_batched, mp_data=mp_data)
-
-    def setpoints_array(self):
-        return self._setpoints_Nd_array()
 
     def schedule_function(
             self,
@@ -57,72 +30,68 @@ class Punchout_BATCHED(Measurement_base):
             acquisition_delays: dict[str,float],
             integration_times: dict[str,float],
             ports: dict[str,str],
-            clocks: dict[str,str],
+            ro_frequencies: dict[str,np.ndarray],
+            ro_amplitudes: dict[str,np.ndarray],
             repetitions: int = 1024,
-            **punchout_parameters,
         ) -> Schedule:
         schedule = Schedule("mltplx_punchout",repetitions)
 
-        values = {qubit:{} for qubit in qubits}
+        # Initialize the clock for each qubit
+        for ro_key, ro_array_val in ro_frequencies.items():
+            this_qubit = [qubit for qubit in qubits if qubit in ro_key][0]
 
-        for punchout_key, punchout_val in punchout_parameters.items():
-            this_qubit = [q for q in qubits if q in punchout_key][0]
-            if 'freq' in punchout_key:
-               values[this_qubit].update({'ro_freq':punchout_val})
-               schedule.add_resource(
-                    ClockResource(
-                        name=clocks[this_qubit],
-                        freq=punchout_val[0]) #Initialize ClockResource with the first frequency value
-                )
-            if 'ampl' in punchout_key:
-               values[this_qubit].update({'ro_ampl':punchout_val})
+            #Initialize ClockResource with the first frequency value
+            schedule.add_resource( ClockResource(name=f'{this_qubit}.ro', freq=ro_array_val[0]) )
 
         #This is the common reference operation so the qubits can be operated in parallel
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
-        for acq_cha, (values_key, values_val) in enumerate(values.items()):
-            this_qubit = [q for q in qubits if q in values_key][0]
-            this_clock = clocks[this_qubit]
+        # The outer loop, iterates over all qubits
+        for acq_cha, (this_qubit, ro_amplitude_values) in enumerate(ro_amplitudes.items()):
+            this_clock = f'{this_qubit}.ro'
 
-            ro_frequencies_values = values_val['ro_freq']
-            ro_amplitude = values_val['ro_ampl']
+            frequency_values = ro_frequencies[this_qubit]
+            number_of_freqs = len(frequency_values)
 
-            relaxation = schedule.add(
-                Reset(*qubits), label=f'Reset_{acq_cha}', ref_op=root_relaxation, ref_pt_new='end'
+            schedule.add(
+                    Reset(*qubits), ref_op=root_relaxation, ref_pt_new='end'
             ) #To enforce parallelism we refer to the root relaxation
 
-            #The second for loop iterates over all frequency values in the frequency batch:
-            for acq_index, ro_freq in enumerate(ro_frequencies_values):
+            # The intermediate loop, iterates over all ro ro_amplitudes
+            for ampl_indx, ro_amplitude in enumerate(ro_amplitude_values):
 
-                schedule.add(
-                    SetClockFrequency(clock=this_clock, clock_freq_new=ro_freq),
-                    label=f"set_freq_{this_qubit}_{acq_index}",
-                )
+                #The inner for loop iterates over all frequency values in the frequency batch:
+                for acq_index, ro_freq in enumerate(ro_frequencies[this_qubit]):
+                    this_index = ampl_indx*number_of_freqs + acq_index
 
-                schedule.add(
-                    SquarePulse(
-                        duration=pulse_durations[this_qubit],
-                        amp=ro_amplitude,
-                        port=ports[this_qubit],
-                        clock=this_clock,
-                    ),
-                    label=f"ro_spec_pulse_{this_qubit}_{acq_index}", ref_pt="end",
-                )
+                    schedule.add(
+                        SetClockFrequency(clock=this_clock, clock_freq_new=ro_freq),
+                    )
 
-                schedule.add(
-                    SSBIntegrationComplex(
-                        duration=integration_times[this_qubit],
-                        port=ports[this_qubit],
-                        clock=this_clock,
-                        acq_index=acq_index,
-                        acq_channel=acq_cha,
-                        bin_mode=BinMode.AVERAGE
-                    ),
-                    ref_pt="start",
-                    rel_time=acquisition_delays[this_qubit],
-                    label=f"acquisition_{this_qubit}_{acq_index}",
-                )
+                    schedule.add(
+                        SquarePulse(
+                            duration=pulse_durations[this_qubit],
+                            amp=ro_amplitude,
+                            port=ports[this_qubit],
+                            clock=this_clock,
+                        ),
+                        ref_pt="end",
+                    )
 
-                schedule.add(Reset(this_qubit))
+                    schedule.add(
+                        SSBIntegrationComplex(
+                            duration=integration_times[this_qubit],
+                            port=ports[this_qubit],
+                            clock=this_clock,
+                            acq_index=this_index,
+                            acq_channel=acq_cha,
+                            bin_mode=BinMode.AVERAGE
+                        ),
+                        ref_pt="start",
+                        rel_time=acquisition_delays[this_qubit],
+                        label=f"acquisition_{this_qubit}_{this_index}",
+                    )
+
+                    schedule.add(Reset(this_qubit))
 
         return schedule

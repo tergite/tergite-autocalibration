@@ -40,26 +40,34 @@ loki_ic.timeout(222)
 
 def configure_dataset(
         raw_ds: xarray.Dataset,
-        sweep_parameters: dict,
-        sweep_quantity: str
+        samplespace: dict,
+        # sweep_parameters: dict,
+        # sweep_quantity: str
         ) -> xarray.Dataset:
     '''The dataset retrieved from the instrument coordinator  is
        too bare-bones. Here we configure the dims, coords and data_vars'''
     logger.info('Configurinf Dataset')
     dataset = xarray.Dataset()
     keys = sorted(list(raw_ds.data_vars.keys()))
+    sweep_quantities = samplespace.keys()
+    sweep_parameters = list(samplespace.values())[0]
     sweep_values = list(sweep_parameters.values())
     qubits = list(sweep_parameters.keys())
 
     for key in keys:
-        dim = f'{sweep_quantity}_{qubits[key]}'
-        partial_ds = xarray.Dataset(coords={dim :(dim,sweep_values[key], {'qubit':qubits[key]} )})
-        dataset[f'y{key}'] = (dim, raw_ds[key].values[0], {'qubit': qubits[key]})
+        breakpoint()
+        # dim = f'{sweep_quantity}_{qubits[key]}'
+        coords_dict = {quantity+qubits[key]: samplespace[quantity][qubits[key]]
+                       for quantity in sweep_quantities}
+        # partial_ds = xarray.Dataset(coords={dim :(dim,sweep_values[key], {'qubit':qubits[key]} )})
+        partial_ds = xarray.Dataset(coords=(coords_dict, {'qubit':qubits[key]} ))
+        # dataset[f'y{key}'] = (dim, raw_ds[key].values[0], {'qubit': qubits[key]})
         dataset = xarray.merge([dataset,partial_ds])
     return dataset
 
 
-def measure( compiled_schedule: Schedule, sweep_parameters: dict, sweep_quantity: str, node: str) -> xarray.Dataset:
+# def measure( compiled_schedule: Schedule, sweep_parameters: dict, sweep_quantities: list[str], node: str) -> xarray.Dataset:
+def measure( compiled_schedule: Schedule, samplespace: dict, node: str) -> xarray.Dataset:
     logger.info('Starting measurement')
     box_print(f'Measuring node: {node}')
     loki_ic.prepare(compiled_schedule)
@@ -69,11 +77,14 @@ def measure( compiled_schedule: Schedule, sweep_parameters: dict, sweep_quantity
     loki_ic.wait_done(timeout_sec=15)
 
     raw_dataset: xarray.Dataset = loki_ic.retrieve_acquisition()
+    logger.info('Raw dataset acquired')
 
-    result_dataset = configure_dataset(raw_dataset, sweep_parameters, sweep_quantity)
-    # result_dict = result_dataset.to_dict()
-    # with open('example_ds.py','w') as f:
-    #     f.write(str(result_dict))
+    result_dict = raw_dataset.to_dict()
+    with open('example_ds.py','w') as f:
+        f.write(str(result_dict))
+
+    result_dataset = configure_dataset(raw_dataset, samplespace)
+
 
     loki_ic.stop()
     logger.info('Finished measurement')
