@@ -24,14 +24,14 @@ rq_supervisor = Queue(
 
 Cluster.close_all()
 
-#dummy = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1,16)}
-#dummy["16"] = ClusterType.CLUSTER_QRM_RF
-#dummy["17"] = ClusterType.CLUSTER_QRM_RF
-#clusterA = Cluster("clusterA", dummy_cfg=dummy)
-#clusterB = Cluster("clusterB", dummy_cfg=dummy)
+dummy = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1,16)}
+dummy["16"] = ClusterType.CLUSTER_QRM_RF
+dummy["17"] = ClusterType.CLUSTER_QRM_RF
+clusterA = Cluster("clusterA", dummy_cfg=dummy)
+clusterB = Cluster("clusterB", dummy_cfg=dummy)
 
-clusterB = Cluster("clusterB", '192.0.2.141')
-clusterA = Cluster("clusterA", '192.0.2.72')
+# clusterB = Cluster("clusterB", '192.0.2.141')
+# clusterA = Cluster("clusterA", '192.0.2.72')
 
 loki_ic = InstrumentCoordinator('loki_ic')
 loki_ic.add_component(ClusterComponent(clusterA))
@@ -54,14 +54,17 @@ def configure_dataset(
     sweep_values = list(sweep_parameters.values())
     qubits = list(sweep_parameters.keys())
 
+
     for key in keys:
-        breakpoint()
         # dim = f'{sweep_quantity}_{qubits[key]}'
-        coords_dict = {quantity+qubits[key]: samplespace[quantity][qubits[key]]
-                       for quantity in sweep_quantities}
-        # partial_ds = xarray.Dataset(coords={dim :(dim,sweep_values[key], {'qubit':qubits[key]} )})
-        partial_ds = xarray.Dataset(coords=(coords_dict, {'qubit':qubits[key]} ))
-        # dataset[f'y{key}'] = (dim, raw_ds[key].values[0], {'qubit': qubits[key]})
+        coords_dict = {}
+        for quantity in sweep_quantities :
+            coord_key = quantity+qubits[key]
+            coords_dict[coord_key] = (coord_key, samplespace[quantity][qubits[key]])
+        partial_ds = xarray.Dataset(coords=coords_dict)
+        reshaping = [len(samplespace[quantity][qubits[key]]) for quantity in sweep_quantities]
+        data_values = raw_ds[key].values[0].reshape(*reshaping)
+        partial_ds[f'y{key}'] = (tuple(coords_dict.keys()), data_values, {'qubit': qubits[key]})
         dataset = xarray.merge([dataset,partial_ds])
     return dataset
 

@@ -115,12 +115,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     }
     return sweep_parameters
 
-
-<<<<<<< HEAD
-node_to_be_calibrated = "resonator_spectroscopy"
-=======
 node_to_be_calibrated = "punchout"
->>>>>>> feat: punchout node
 print()
 box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 

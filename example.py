@@ -14,8 +14,8 @@ print(ds)
 # print( ds_0.y0.attrs)
 
 #---
-for var in ds.data_vars:
-    print( ds[var].attrs['qubit'])
+# for var in ds.data_vars:
+#     print( ds[var].attrs['qubit'])
 
 #---
 
