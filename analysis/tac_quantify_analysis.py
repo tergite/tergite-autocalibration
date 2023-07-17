@@ -8,6 +8,8 @@ import matplotlib.patches as mpatches
 import numpy as np
 import xarray as xr
 import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('tkagg')
 import redis
 set_datadir('.')
 

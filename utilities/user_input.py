@@ -17,9 +17,9 @@ nodes = [
         ]
 
 VNA_resonator_frequencies = {
-        'q13': 6.737e9, 'q14': 6.393e9, 'q15': 6.944e9,
-        'q16': 6.325e9, 'q17': 6.690e9, 'q18': 6.987e9, 'q19': 6.751e9,
-        'q21': 6.572e9, 'q22': 6.317e9, 'q23': 6.966e9,
+        'q13': 6.740e9, 'q14': 6.393e9, 'q15': 6.944e9,
+        'q16': 6.386e9, 'q17': 6.620e9, 'q18': 7.030e9, 'q19': 6.711e9,
+        'q21': 6.551e9, 'q22': 6.387e9, 'q23': 7.026e9,
         }
 
 VNA_qubit_frequencies = {
@@ -35,16 +35,16 @@ VNA_qubit_frequencies = {
         'q23': 3.941e9,
         }
 
-qubits = ['q13', 'q14', 'q15', 'q16', 'q17', 'q18', 'q19', 'q21', 'q22', 'q23']
+qubits = ['q13', 'q16', 'q17', 'q18', 'q19', 'q21', 'q22', 'q23']
 # qubits = ['q23']
 
 N_qubits = len(qubits)
 
-res_spec_samples = 10
+res_spec_samples = 200
 qub_spec_samples =101
 
 def resonator_samples(qubit:str, punchout=False) -> np.ndarray:
-    sweep_range = 4.5e6
+    sweep_range = 10e6
     punchout_range = 2e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
     min_freq =  VNA_frequency - sweep_range / 2
@@ -116,7 +116,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     return sweep_parameters
 
 
-node_to_be_calibrated = "XY_crosstalk"
+node_to_be_calibrated = "resonator_spectroscopy"
 print()
 box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 

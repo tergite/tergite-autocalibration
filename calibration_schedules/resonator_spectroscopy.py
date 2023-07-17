@@ -45,7 +45,8 @@ class Resonator_Spectroscopy(Measurement):
         qubits: list[str],
         ports: dict[str,str],
         ro_frequencies: dict[str,np.ndarray],
-        repetitions: int = 1024,
+        repetitions: int = 512,
+        #TODO re adjust repetions
         ) -> Schedule:
 
         sched = Schedule("multiplexed_resonator_spec_NCO",repetitions)

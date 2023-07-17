@@ -24,18 +24,19 @@ rq_supervisor = Queue(
 
 Cluster.close_all()
 
-dummy = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1,16)}
-dummy["16"] = ClusterType.CLUSTER_QRM_RF
-dummy["17"] = ClusterType.CLUSTER_QRM_RF
-clusterA = Cluster("clusterA", dummy_cfg=dummy)
-clusterB = Cluster("clusterB", dummy_cfg=dummy)
+#dummy = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1,16)}
+#dummy["16"] = ClusterType.CLUSTER_QRM_RF
+#dummy["17"] = ClusterType.CLUSTER_QRM_RF
+#clusterA = Cluster("clusterA", dummy_cfg=dummy)
+#clusterB = Cluster("clusterB", dummy_cfg=dummy)
 
-# clusterB = Cluster("clusterB", '192.0.2.141')
-# clusterA = Cluster("clusterA", '192.0.2.72')
+clusterB = Cluster("clusterB", '192.0.2.141')
+clusterA = Cluster("clusterA", '192.0.2.72')
 
 loki_ic = InstrumentCoordinator('loki_ic')
 loki_ic.add_component(ClusterComponent(clusterA))
 loki_ic.add_component(ClusterComponent(clusterB))
+loki_ic.timeout(222)
 
 def configure_dataset(
         raw_ds: xarray.Dataset,

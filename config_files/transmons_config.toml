@@ -18,7 +18,7 @@ SSRO_simple.discriminator = nan
 XY_crosstalk.selectivity = nan
 
 [initials.all]
-ro_acq_delay = 300e-9
+ro_acq_delay = 200e-9
 ro_pulse_delay = 4e-9
 ro_pulse_duration = 3.0e-6
 ro_acq_integration_time = 2.5e-6
@@ -27,24 +27,24 @@ spec_pulse_duration = 4e-6
 init_duration = 600e-6
 min_calibration_point = 0
 max_calibration_point = 0
-att = 12
+att = 0
 
 [initials]
-q11.ro_pulse_amp = 3.5e-3
-q12.ro_pulse_amp = 3.3e-3
-q13.ro_pulse_amp = 1.3e-3
-q14.ro_pulse_amp = 4.7e-3
-q15.ro_pulse_amp = 3.0e-3
-q16.ro_pulse_amp = 3.2e-3
-q17.ro_pulse_amp = 2.3e-3
-q18.ro_pulse_amp = 2.1e-3
-q19.ro_pulse_amp = 3.6e-3
-q20.ro_pulse_amp = 2.7e-3
-q21.ro_pulse_amp = 2.3e-3
-q22.ro_pulse_amp = 4.9e-3
-q23.ro_pulse_amp = 4.0e-3
-q24.ro_pulse_amp = 3.0e-3
-q25.ro_pulse_amp = 4.0e-3
+q11.ro_pulse_amp = 4.0e-3
+q12.ro_pulse_amp = 4.3e-3
+q13.ro_pulse_amp = 4.8e-3
+q14.ro_pulse_amp = 5.5e-3
+q15.ro_pulse_amp = 4.0e-3
+q16.ro_pulse_amp = 4.2e-3
+q17.ro_pulse_amp = 5.0e-3
+q18.ro_pulse_amp = 4.1e-3
+q19.ro_pulse_amp = 4.6e-3
+q20.ro_pulse_amp = 4.2e-3
+q21.ro_pulse_amp = 3.8e-3
+q22.ro_pulse_amp = 5.7e-3
+q23.ro_pulse_amp = 5.5e-3
+q24.ro_pulse_amp = 4.5e-3
+q25.ro_pulse_amp = 5.0e-3
 
 [resonator_spectroscopy.all]
 init_duration = 100e-6

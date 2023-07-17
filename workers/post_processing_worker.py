@@ -35,6 +35,8 @@ def post_process(result_dataset: xr.Dataset, node: str):
     logger.info('Starting post process')
     analysis_class = ANALYSIS_MAP[node]
     analysis = analysis_class(result_dataset, node)
+    #figure_manager = plt.get_current_fig_manager()
+    #figure_manager.window.showMaximized()
 
     fig = plt.gcf()
     fig.set_tight_layout(True)
