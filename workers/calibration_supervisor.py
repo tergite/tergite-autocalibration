@@ -9,7 +9,6 @@ from colorama import Fore
 from colorama import Style
 colorama_init()
 
-
 import utilities.user_input as user_input
 
 import toml
@@ -17,7 +16,6 @@ import redis
 
 logger.info('Initialize')
 
-# redis_connection = redis.Redis('localhost',6379,decode_responses=True)
 redis_connection = redis.Redis(decode_responses=True)
 rq_supervisor = Queue(
         'calibration_supervisor', connection=redis_connection
