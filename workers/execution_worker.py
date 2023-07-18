@@ -7,12 +7,12 @@ from logger.tac_logger import logger
 logger.info('entering execution module')
 
 from qblox_instruments import Cluster, ClusterType
-from quantify_scheduler import Schedule
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 import xarray
 from workers.post_processing_worker import post_process
 from utilities.visuals import box_print
+import numpy as np
 
 import redis
 from rq import Queue
@@ -40,18 +40,15 @@ loki_ic.timeout(222)
 
 def configure_dataset(
         raw_ds: xarray.Dataset,
-        samplespace: dict,
-        # sweep_parameters: dict,
-        # sweep_quantity: str
+        samplespace: dict[str, dict[str,np.ndarray]],
         ) -> xarray.Dataset:
     '''The dataset retrieved from the instrument coordinator  is
        too bare-bones. Here we configure the dims, coords and data_vars'''
-    logger.info('Configurinf Dataset')
+    logger.info('Configuring Dataset')
     dataset = xarray.Dataset()
     keys = sorted(list(raw_ds.data_vars.keys()))
-    sweep_quantities = samplespace.keys()
+    sweep_quantities = samplespace.keys() # for example 'ro_frequencies', 'ro_amplitudes' ,...
     sweep_parameters = list(samplespace.values())[0]
-    sweep_values = list(sweep_parameters.values())
     qubits = list(sweep_parameters.keys())
 
 
@@ -69,8 +66,7 @@ def configure_dataset(
     return dataset
 
 
-# def measure( compiled_schedule: Schedule, sweep_parameters: dict, sweep_quantities: list[str], node: str) -> xarray.Dataset:
-def measure( compiled_schedule: Schedule, samplespace: dict, node: str) -> xarray.Dataset:
+def measure( compiled_schedule: CompiledSchedule, samplespace: dict, node: str) -> xarray.Dataset:
     logger.info('Starting measurement')
     box_print(f'Measuring node: {node}')
     loki_ic.prepare(compiled_schedule)
@@ -82,16 +78,15 @@ def measure( compiled_schedule: Schedule, samplespace: dict, node: str) -> xarra
     raw_dataset: xarray.Dataset = loki_ic.retrieve_acquisition()
     logger.info('Raw dataset acquired')
 
-    result_dict = raw_dataset.to_dict()
-    with open('example_ds.py','w') as f:
-        f.write(str(result_dict))
+    # result_dict = raw_dataset.to_dict()
+    # with open('example_ds.py','w') as f:
+    #     f.write(str(result_dict))
 
     result_dataset = configure_dataset(raw_dataset, samplespace)
 
-
     loki_ic.stop()
     logger.info('Finished measurement')
-    print(result_dataset)
+    # print(result_dataset)
 
     rq_supervisor.enqueue(
             post_process,

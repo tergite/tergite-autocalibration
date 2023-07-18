@@ -7,8 +7,8 @@ from rq.command import send_shutdown_command
 # import library_that_you_want_preloaded
 # setting decode_responses to False because of decoding error
 redis_connection = redis.Redis(decode_responses=False)
+redis_connection.flushdb()
 queue = Queue('calibration_supervisor', connection=redis_connection)
-
 
 # Start fresh:
 queue.empty()

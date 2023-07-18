@@ -142,21 +142,18 @@ class Multiplexed_Punchout_Analysis(BaseAnalysis):
             this_qubit = result_dataset[var].attrs['qubit']
             ds = result_dataset[var].to_dataset()
 
-        # for indx, this_qubit in enumerate(qubits):
-        #     ds = _from_qubit_to_dataset(this_qubit, result_dataset)
-        #     N_amplitudes = ds.dims['ro_ampl_BATCHED']
-        #     norm_factors = np.array([max(ds.y0[ampl].values) for ampl in range(N_amplitudes)])
-        #     ds['y0_norm'] = ds.y0 / norm_factors[:,None]
-        #
-        #     this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
-        #
-        #     ds.y0_norm.plot(ax=this_axis)
-        #     # self.qoi = optimal_motzoi
-        #     # self.update_redis_trusted_values(node_name, this_qubit,'mw_motzoi','')
-        #     # this_axis.set_title(f'{node_name} for {this_qubit}')
-        #
-        #     handles, labels = this_axis.get_legend_handles_labels()
-        #     patch = mpatches.Patch(color='red', label=f'{this_qubit}')
-        #     handles.append(patch)
-        #     this_axis.set(title=None)
-        #     this_axis.legend(handles=handles)
+            N_amplitudes = ds.dims[f'ro_amplitudes{this_qubit}']
+            # print(f'{ N_amplitudes = }')
+            # norm_factors = np.array([max(ds.y0[ampl].values) for ampl in range(N_amplitudes)])
+            # ds['y0_norm'] = ds.y0 / norm_factors[:,None]
+
+            this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
+
+            # ds.y0_norm.plot(ax=this_axis)
+            # this_axis.set_title(f'{node_name} for {this_qubit}')
+
+            handles, labels = this_axis.get_legend_handles_labels()
+            patch = mpatches.Patch(color='red', label=f'{this_qubit}')
+            handles.append(patch)
+            this_axis.set(title=None)
+            this_axis.legend(handles=handles)

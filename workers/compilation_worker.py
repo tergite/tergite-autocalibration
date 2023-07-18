@@ -46,6 +46,7 @@ node_map = {
 }
 
 redis_connection = redis.Redis(decode_responses=True)
+
 rq_supervisor = Queue(
         'calibration_supervisor', connection=redis_connection
         )
@@ -104,10 +105,11 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
     compiler = SerialCompiler(name=f'{node}_compiler')
     logger.info('Starting Compiling')
     compiled_schedule = compiler.compile(schedule=schedule, config=device.generate_compilation_config())
-    schedule_duration = compiled_schedule.get_schedule_duration()
-    print(f'{schedule_duration=}')
+    #print(f'{schedule_duration=}')
 
     logger.info('finished Compiling')
     # compiled_schedule.plot_pulse_diagram(plot_backend='plotly')
+    schedule_duration = compiled_schedule.get_schedule_duration()
 
     rq_supervisor.enqueue(measure, job_timeout=240, args=(compiled_schedule,samplespace,node))
+    return

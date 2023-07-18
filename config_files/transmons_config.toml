@@ -16,6 +16,7 @@ rabi_oscillations_12.mw_ef_amp180 = nan
 randomized_benchmarking.fidelity = nan
 SSRO_simple.discriminator = nan
 XY_crosstalk.selectivity = nan
+punchout.ro_ampl = nan
 
 [initials.all]
 ro_acq_delay = 200e-9

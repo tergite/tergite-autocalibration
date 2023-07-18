@@ -16,7 +16,7 @@ if not remove_node == 'all':
     # print('remove_fields', remove_fields)
 
 #TODO Why flush?
-red.flushdb()
+#red.flushdb()
 for qubit in qubits:
     fields =  red.hgetall(f'transmons:{qubit}').keys()
     key = f'transmons:{qubit}'
