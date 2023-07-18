@@ -24,14 +24,14 @@ rq_supervisor = Queue(
 
 Cluster.close_all()
 
-dummy = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1,16)}
-dummy["16"] = ClusterType.CLUSTER_QRM_RF
-dummy["17"] = ClusterType.CLUSTER_QRM_RF
-clusterA = Cluster("clusterA", dummy_cfg=dummy)
-clusterB = Cluster("clusterB", dummy_cfg=dummy)
+#dummy = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1,16)}
+#dummy["16"] = ClusterType.CLUSTER_QRM_RF
+#dummy["17"] = ClusterType.CLUSTER_QRM_RF
+#clusterA = Cluster("clusterA", dummy_cfg=dummy)
+#clusterB = Cluster("clusterB", dummy_cfg=dummy)
 
-# clusterB = Cluster("clusterB", '192.0.2.141')
-# clusterA = Cluster("clusterA", '192.0.2.72')
+clusterB = Cluster("clusterB", '192.0.2.141')
+clusterA = Cluster("clusterA", '192.0.2.72')
 
 loki_ic = InstrumentCoordinator('loki_ic')
 loki_ic.add_component(ClusterComponent(clusterA))
@@ -61,7 +61,7 @@ def configure_dataset(
         partial_ds = xarray.Dataset(coords=coords_dict)
         reshaping = [len(samplespace[quantity][qubits[key]]) for quantity in sweep_quantities]
         data_values = raw_ds[key].values[0].reshape(*reshaping)
-        partial_ds[f'y{key}'] = (tuple(coords_dict.keys()), data_values, {'qubit': qubits[key]})
+        partial_ds[f'y{qubits[key]}'] = (tuple(coords_dict.keys()), data_values, {'qubit': qubits[key]})
         dataset = xarray.merge([dataset,partial_ds])
     return dataset
 
@@ -73,7 +73,7 @@ def measure( compiled_schedule: CompiledSchedule, samplespace: dict, node: str) 
 
     loki_ic.start()
 
-    loki_ic.wait_done(timeout_sec=15)
+    loki_ic.wait_done(timeout_sec=600)
 
     raw_dataset: xarray.Dataset = loki_ic.retrieve_acquisition()
     logger.info('Raw dataset acquired')

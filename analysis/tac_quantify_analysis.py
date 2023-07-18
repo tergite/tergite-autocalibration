@@ -141,15 +141,17 @@ class Multiplexed_Punchout_Analysis(BaseAnalysis):
         for indx, var in enumerate(result_dataset.data_vars):
             this_qubit = result_dataset[var].attrs['qubit']
             ds = result_dataset[var].to_dataset()
+            #breakpoint()
 
             N_amplitudes = ds.dims[f'ro_amplitudes{this_qubit}']
             # print(f'{ N_amplitudes = }')
             # norm_factors = np.array([max(ds.y0[ampl].values) for ampl in range(N_amplitudes)])
-            # ds['y0_norm'] = ds.y0 / norm_factors[:,None]
+            # ds[f'y{this_qubit}'] = ds.y0 / norm_factors[:,None]
+            ds[f'y{this_qubit}'].values = np.abs(ds[f'y{this_qubit}'].values)
 
             this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
 
-            # ds.y0_norm.plot(ax=this_axis)
+            ds[f'y{this_qubit}'].plot(x=f'ro_frequencies{this_qubit}', ax=this_axis)
             # this_axis.set_title(f'{node_name} for {this_qubit}')
 
             handles, labels = this_axis.get_legend_handles_labels()

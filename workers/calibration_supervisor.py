@@ -28,6 +28,7 @@ qubits = user_input.qubits
 
 async def calibrate_system(job_done_event):
     logger.info('Starting System Calibration')
+    #breakpoint()
     nodes = user_input.nodes
     node_to_be_calibrated = user_input.node_to_be_calibrated
     topo_order = nodes[:nodes.index(node_to_be_calibrated) + 1]
