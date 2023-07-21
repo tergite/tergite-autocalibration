@@ -13,6 +13,7 @@ import xarray
 from workers.post_processing_worker import post_process
 from utilities.visuals import box_print
 import numpy as np
+from utilities.root_path import data_directory
 
 import redis
 from rq import Queue
@@ -24,14 +25,14 @@ rq_supervisor = Queue(
 
 Cluster.close_all()
 
-#dummy = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1,16)}
-#dummy["16"] = ClusterType.CLUSTER_QRM_RF
-#dummy["17"] = ClusterType.CLUSTER_QRM_RF
-#clusterA = Cluster("clusterA", dummy_cfg=dummy)
-#clusterB = Cluster("clusterB", dummy_cfg=dummy)
+dummy = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1,16)}
+dummy["16"] = ClusterType.CLUSTER_QRM_RF
+dummy["17"] = ClusterType.CLUSTER_QRM_RF
+clusterA = Cluster("clusterA", dummy_cfg=dummy)
+clusterB = Cluster("clusterB", dummy_cfg=dummy)
 
-clusterB = Cluster("clusterB", '192.0.2.141')
-clusterA = Cluster("clusterA", '192.0.2.72')
+# clusterB = Cluster("clusterB", '192.0.2.141')
+# clusterA = Cluster("clusterA", '192.0.2.72')
 
 loki_ic = InstrumentCoordinator('loki_ic')
 loki_ic.add_component(ClusterComponent(clusterA))
@@ -61,10 +62,32 @@ def configure_dataset(
         partial_ds = xarray.Dataset(coords=coords_dict)
         reshaping = [len(samplespace[quantity][qubits[key]]) for quantity in sweep_quantities]
         data_values = raw_ds[key].values[0].reshape(*reshaping)
-        partial_ds[f'y{qubits[key]}'] = (tuple(coords_dict.keys()), data_values, {'qubit': qubits[key]})
+        partial_ds[f'y{qubits[key]}_real'] = (tuple(coords_dict.keys()), data_values.real, {'qubit': qubits[key]})
+        partial_ds[f'y{qubits[key]}_imag'] = (tuple(coords_dict.keys()), data_values.imag, {'qubit': qubits[key]})
         dataset = xarray.merge([dataset,partial_ds])
     return dataset
 
+def to_complex_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
+    dataset_dict = {}
+    complex_ds = xarray.Dataset(coords=iq_dataset.coords)
+    for var in iq_dataset.data_vars.keys():
+        this_qubit = iq_dataset[var].attrs['qubit']
+        #TODO this could be better:
+        if not this_qubit in dataset_dict:
+            dataset_dict[this_qubit] = {}
+        current_values = iq_dataset[var].values
+        if 'real' in var: 
+            dataset_dict[this_qubit]['real'] = current_values
+        elif 'imag' in var: 
+            dataset_dict[this_qubit]['imag'] = current_values
+        
+        if 'real' in dataset_dict[this_qubit] and 'imag' in dataset_dict[this_qubit]:
+            qubit_coords = iq_dataset[f'y{this_qubit}_real'].coords
+            complex_values = dataset_dict[this_qubit]['real'] + 1j*dataset_dict[this_qubit]['imag'] 
+            complex_ds[f'y{this_qubit}'] = (qubit_coords, complex_values, {'qubit': this_qubit})
+
+
+    return complex_ds        
 
 def measure( compiled_schedule: CompiledSchedule, samplespace: dict, node: str) -> xarray.Dataset:
     logger.info('Starting measurement')
@@ -83,6 +106,10 @@ def measure( compiled_schedule: CompiledSchedule, samplespace: dict, node: str) 
     #     f.write(str(result_dict))
 
     result_dataset = configure_dataset(raw_dataset, samplespace)
+    datetime_uid = datetime_
+    result_dataset.to_netcdf(data_directory / node)
+
+    result_dataset_complex = to_complex_dataset(result_dataset) 
 
     loki_ic.stop()
     logger.info('Finished measurement')
@@ -90,7 +117,7 @@ def measure( compiled_schedule: CompiledSchedule, samplespace: dict, node: str) 
 
     rq_supervisor.enqueue(
             post_process,
-            args=(result_dataset,node,),
+            args=(result_dataset_complex,node,),
             job_timeout=360,
             on_success=postprocessing_success_callback
             )
