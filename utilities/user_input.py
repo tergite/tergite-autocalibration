@@ -40,7 +40,11 @@ qubits = ['q16', 'q18', 'q19', 'q21', 'q22', 'q23']
 
 N_qubits = len(qubits)
 
+<<<<<<< HEAD
 res_spec_samples = 60
+=======
+res_spec_samples = 30
+>>>>>>> f857169 (test: user input)
 qub_spec_samples =1100
 
 def resonator_samples(qubit:str, punchout=False) -> np.ndarray:
