@@ -1,6 +1,8 @@
 '''Retrieve the compiled schedule and run it'''
 
 import asyncio
+from datetime import datetime
+from uuid import uuid4
 
 from quantify_scheduler.instrument_coordinator.instrument_coordinator import CompiledSchedule
 from logger.tac_logger import logger
@@ -106,8 +108,8 @@ def measure( compiled_schedule: CompiledSchedule, samplespace: dict, node: str) 
     #     f.write(str(result_dict))
 
     result_dataset = configure_dataset(raw_dataset, samplespace)
-    datetime_uid = datetime_
-    result_dataset.to_netcdf(data_directory / node)
+    eventid = datetime.now().strftime('%Y%m-%d-%H%M%S-') + f'{node}-'+ str(uuid4())
+    result_dataset.to_netcdf(data_directory / eventid)
 
     result_dataset_complex = to_complex_dataset(result_dataset) 
 
