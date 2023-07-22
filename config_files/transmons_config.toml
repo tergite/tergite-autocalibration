@@ -31,21 +31,21 @@ max_calibration_point = 0
 att = 12
 
 [initials]
-q11.ro_pulse_amp = 2.5e-3
-q12.ro_pulse_amp = 2.8e-3
-q13.ro_pulse_amp = 3.2e-3
-q14.ro_pulse_amp = 4.0e-3
-q15.ro_pulse_amp = 2.5e-3
-q16.ro_pulse_amp = 2.7e-3
-q17.ro_pulse_amp = 3.5e-3
-q18.ro_pulse_amp = 2.6e-3
-q19.ro_pulse_amp = 3.1e-3
-q20.ro_pulse_amp = 2.7e-3
-q21.ro_pulse_amp = 2.3e-3
-q22.ro_pulse_amp = 4.0e-3
-q23.ro_pulse_amp = 4.0e-3
-q24.ro_pulse_amp = 3.0e-3
-q25.ro_pulse_amp = 3.5e-3
+q11.ro_pulse_amp = 96.5e-3
+q12.ro_pulse_amp = 96.8e-3
+q13.ro_pulse_amp = 97.2e-3
+q14.ro_pulse_amp = 98.0e-3
+q15.ro_pulse_amp = 96.5e-3
+q16.ro_pulse_amp = 96.7e-3
+q17.ro_pulse_amp = 97.5e-3
+q18.ro_pulse_amp = 96.6e-3
+q19.ro_pulse_amp = 97.1e-3
+q20.ro_pulse_amp = 96.7e-3
+q21.ro_pulse_amp = 96.3e-3
+q22.ro_pulse_amp = 98.0e-3
+q23.ro_pulse_amp = 98.0e-3
+q24.ro_pulse_amp = 97.0e-3
+q25.ro_pulse_amp = 97.5e-3
 
 [resonator_spectroscopy.all]
 init_duration = 100e-6
@@ -58,7 +58,7 @@ init_duration = 100e-6
 
 [qubit_01_spectroscopy_pulsed.all]
 mw_pulse_duration = 4e-6
-mw_amp180 = 2.0e-4
+mw_amp180 = 6.0e-4
 
 [qubit_12_spectroscopy_pulsed.all]
 spec_pulse_amp = 2e-4

@@ -4,10 +4,10 @@ from rq import Queue
 from utilities.status import DataStatus
 from logger.tac_logger import logger
 from workers.compilation_worker import precompile
-from colorama import init as colorama_init
-from colorama import Fore
-from colorama import Style
-colorama_init()
+#from colorama import init as colorama_init
+#from colorama import Fore
+#from colorama import Style
+#colorama_init()
 
 import utilities.user_input as user_input
 
@@ -89,11 +89,13 @@ async def inspect_node(node:str, job_done_event):
             raise ValueError(f'status: {status}')
 
     if status == DataStatus.in_spec:
-       print(u' \u2705 ' + f'{Fore.GREEN}Node {node} in spec{Style.RESET_ALL}')
+       #print(u' \u2705 ' + f'{Fore.GREEN}Node {node} in spec{Style.RESET_ALL}')
+       print(u' \u2705 ' + f'Node {node} in spec')
        return
 
     if status == DataStatus.out_of_spec:
-       print(u'\u2691\u2691\u2691 '+ f'{Fore.RED}Calibration required for Node {node}{Style.RESET_ALL}')
+       #print(u'\u2691\u2691\u2691 '+ f'{Fore.RED}Calibration required for Node {node}{Style.RESET_ALL}')
+       print(u'\u2691\u2691\u2691 '+ f'Calibration required for Node {node}')
        await calibrate_node(node, job_done_event)
 
 

@@ -147,7 +147,9 @@ class Multiplexed_Punchout_Analysis(BaseAnalysis):
             # print(f'{ N_amplitudes = }')
             # norm_factors = np.array([max(ds.y0[ampl].values) for ampl in range(N_amplitudes)])
             # ds[f'y{this_qubit}'] = ds.y0 / norm_factors[:,None]
-            ds[f'y{this_qubit}'].values = np.abs(ds[f'y{this_qubit}'].values)
+            raw_values = np.abs(ds[f'y{this_qubit}'].values)
+            normalized_values = raw_values / raw_values.max(axis=0)
+            ds[f'y{this_qubit}'].values = normalized_values
 
             this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
 

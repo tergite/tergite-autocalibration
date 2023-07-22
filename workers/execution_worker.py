@@ -13,7 +13,7 @@ from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 import xarray
 from workers.post_processing_worker import post_process
-from utilities.visuals import box_print
+#from utilities.visuals import box_print
 import numpy as np
 from utilities.root_path import data_directory
 
@@ -27,14 +27,35 @@ rq_supervisor = Queue(
 
 Cluster.close_all()
 
-dummy = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1,16)}
-dummy["16"] = ClusterType.CLUSTER_QRM_RF
-dummy["17"] = ClusterType.CLUSTER_QRM_RF
-clusterA = Cluster("clusterA", dummy_cfg=dummy)
-clusterB = Cluster("clusterB", dummy_cfg=dummy)
+#dummy = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1,16)}
+#dummy["16"] = ClusterType.CLUSTER_QRM_RF
+#dummy["17"] = ClusterType.CLUSTER_QRM_RF
+#clusterA = Cluster("clusterA", dummy_cfg=dummy)
+#clusterB = Cluster("clusterB", dummy_cfg=dummy)
 
-# clusterB = Cluster("clusterB", '192.0.2.141')
-# clusterA = Cluster("clusterA", '192.0.2.72')
+clusterB = Cluster("clusterB", '192.0.2.141')
+clusterA = Cluster("clusterA", '192.0.2.72')
+clusterA.start_adc_calib(16)
+clusterA.start_adc_calib(17)
+clusterB.start_adc_calib(17)
+clusterA.module16.sequencer0.nco_prop_delay_comp_en(True)
+clusterA.module16.sequencer1.nco_prop_delay_comp_en(True)
+clusterA.module16.sequencer2.nco_prop_delay_comp_en(True)
+clusterA.module16.sequencer3.nco_prop_delay_comp_en(True)
+clusterA.module16.sequencer4.nco_prop_delay_comp_en(True)
+clusterA.module16.sequencer5.nco_prop_delay_comp_en(True)
+clusterA.module17.sequencer0.nco_prop_delay_comp_en(True)
+clusterA.module17.sequencer1.nco_prop_delay_comp_en(True)
+clusterA.module17.sequencer2.nco_prop_delay_comp_en(True)
+clusterA.module17.sequencer3.nco_prop_delay_comp_en(True)
+clusterA.module17.sequencer4.nco_prop_delay_comp_en(True)
+clusterA.module17.sequencer5.nco_prop_delay_comp_en(True)
+clusterB.module17.sequencer0.nco_prop_delay_comp_en(True)
+clusterB.module17.sequencer1.nco_prop_delay_comp_en(True)
+clusterB.module17.sequencer2.nco_prop_delay_comp_en(True)
+clusterB.module17.sequencer3.nco_prop_delay_comp_en(True)
+clusterB.module17.sequencer4.nco_prop_delay_comp_en(True)
+clusterB.module17.sequencer5.nco_prop_delay_comp_en(True)
 
 loki_ic = InstrumentCoordinator('loki_ic')
 loki_ic.add_component(ClusterComponent(clusterA))
@@ -62,8 +83,9 @@ def configure_dataset(
             coord_key = quantity+qubits[key]
             coords_dict[coord_key] = (coord_key, samplespace[quantity][qubits[key]])
         partial_ds = xarray.Dataset(coords=coords_dict)
-        reshaping = [len(samplespace[quantity][qubits[key]]) for quantity in sweep_quantities]
+        reshaping = list(reversed([len(samplespace[quantity][qubits[key]]) for quantity in sweep_quantities]))
         data_values = raw_ds[key].values[0].reshape(*reshaping)
+        data_values = np.transpose(data_values)
         partial_ds[f'y{qubits[key]}_real'] = (tuple(coords_dict.keys()), data_values.real, {'qubit': qubits[key]})
         partial_ds[f'y{qubits[key]}_imag'] = (tuple(coords_dict.keys()), data_values.imag, {'qubit': qubits[key]})
         dataset = xarray.merge([dataset,partial_ds])
@@ -93,7 +115,8 @@ def to_complex_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
 
 def measure( compiled_schedule: CompiledSchedule, samplespace: dict, node: str) -> xarray.Dataset:
     logger.info('Starting measurement')
-    box_print(f'Measuring node: {node}')
+    #box_print(f'Measuring node: {node}')
+    logger.info(f'Measuring node: {node}')
     loki_ic.prepare(compiled_schedule)
 
     loki_ic.start()

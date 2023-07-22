@@ -8,8 +8,8 @@ import logging
         #format='File: %(filename)s -- %(funcName)s --%(message)s')
 
 nodes = [
-        "resonator_spectroscopy",
-        #"punchout",
+        #"resonator_spectroscopy",
+        "punchout",
         "qubit_01_spectroscopy_pulsed",
         "rabi_oscillations",
         "XY_crosstalk",
@@ -40,16 +40,16 @@ qubits = ['q16', 'q18', 'q19', 'q21', 'q22', 'q23']
 
 N_qubits = len(qubits)
 
-res_spec_samples = 65
+res_spec_samples = 60
 qub_spec_samples =1100
 
 def resonator_samples(qubit:str, punchout=False) -> np.ndarray:
-    sweep_range = 5e6
-    punchout_range = 2e6
+    sweep_range = 7e6
+    punchout_range = 0e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
     min_freq =  VNA_frequency - sweep_range / 2
-    min_freq =  min_freq if not punchout else min_freq - punchout_range
-    max_freq =  VNA_frequency + sweep_range / 2
+    #min_freq =  min_freq if not punchout else min_freq - punchout_range
+    max_freq =  VNA_frequency + sweep_range / 2 - 2e6
     return np.linspace(min_freq, max_freq, res_spec_samples)
 
 def qubit_samples(qubit:str, transition:str = '01') -> np.ndarray:
@@ -92,7 +92,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
 
         'punchout': {
             'ro_frequencies': {qubit: resonator_samples(qubit, punchout=True) for qubit in qubits},
-            'ro_amplitudes': {qubit : np.linspace(1e-3, 2.5e-2, 13) for qubit in qubits}
+            'ro_amplitudes': {qubit : np.linspace(5e-3, 1e-1, 9) for qubit in qubits}
         },
 
         'qubit_01_spectroscopy_pulsed': {
@@ -115,7 +115,8 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     }
     return sweep_parameters
 
-node_to_be_calibrated = "resonator_spectroscopy"
+#node_to_be_calibrated = "resonator_spectroscopy"
+node_to_be_calibrated = "punchout"
 print()
 box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 
