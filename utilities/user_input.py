@@ -8,8 +8,8 @@ import logging
         #format='File: %(filename)s -- %(funcName)s --%(message)s')
 
 nodes = [
-        #"resonator_spectroscopy",
-        "punchout",
+        "resonator_spectroscopy",
+        #"punchout",
         "qubit_01_spectroscopy_pulsed",
         "rabi_oscillations",
         "XY_crosstalk",
@@ -26,38 +26,36 @@ VNA_qubit_frequencies = {
         'q13': 3.720e9,
         'q14': 3.341e9,
         'q15': 3.748e9,
-        'q16': 3.262e9,
+        'q16': 3.230e9,
         'q17': 3.357e9,
         'q18': 4.077e9,
         'q19': 3.835e9,
         'q21': 3.783e9,
         'q22': 3.406e9,
-        'q23': 3.941e9,
+        'q23': 3.980e9,
         }
 
-qubits = ['q16', 'q18', 'q19', 'q21', 'q22', 'q23']
+qubits = [ 'q16', 'q23']
+#qubits = ['q16', 'q18', 'q19', 'q23']
 # qubits = ['q23']
 
 N_qubits = len(qubits)
 
-<<<<<<< HEAD
-res_spec_samples = 60
-=======
-res_spec_samples = 30
->>>>>>> f857169 (test: user input)
-qub_spec_samples =1100
+res_spec_samples = 70
+qub_spec_samples = 80
 
 def resonator_samples(qubit:str, punchout=False) -> np.ndarray:
-    sweep_range = 7e6
+    sweep_range = 7.5e6
     punchout_range = 0e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
     min_freq =  VNA_frequency - sweep_range / 2
     #min_freq =  min_freq if not punchout else min_freq - punchout_range
-    max_freq =  VNA_frequency + sweep_range / 2 - 2e6
+    #max_freq =  VNA_frequency + sweep_range / 2 - 2e6
+    max_freq =  VNA_frequency + sweep_range / 2
     return np.linspace(min_freq, max_freq, res_spec_samples)
 
 def qubit_samples(qubit:str, transition:str = '01') -> np.ndarray:
-    sweep_range = 200e6
+    sweep_range = 8e6
     if transition=='01':
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition=='12':
@@ -67,8 +65,8 @@ def qubit_samples(qubit:str, transition:str = '01') -> np.ndarray:
     else :
         raise ValueError('Invalid transition')
 
-    min_freq =  VNA_frequency - sweep_range / 2
-    max_freq =  VNA_frequency + sweep_range / 2
+    min_freq =  VNA_frequency - sweep_range / 2 + 0*sweep_range
+    max_freq =  VNA_frequency + sweep_range / 2 + 0*sweep_range 
     return np.linspace(min_freq, max_freq, qub_spec_samples)
 
 def experiment_parameters(node:str, qubits:List[str]) -> dict:
@@ -96,7 +94,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
 
         'punchout': {
             'ro_frequencies': {qubit: resonator_samples(qubit, punchout=True) for qubit in qubits},
-            'ro_amplitudes': {qubit : np.linspace(5e-3, 1e-1, 9) for qubit in qubits}
+            'ro_amplitudes': {qubit : np.linspace(5e-3, 0.8e-1, 11) for qubit in qubits}
         },
 
         'qubit_01_spectroscopy_pulsed': {
@@ -104,7 +102,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
         },
 
         'rabi_oscillations': {
-            'mw_amplitudes': { qubit : np.linspace(0.002,0.22,41) for qubit in qubits}
+            'mw_amplitudes': { qubit : np.linspace(0.002,0.20,41) for qubit in qubits}
         },
 
         'XY_crosstalk': {
@@ -120,7 +118,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     return sweep_parameters
 
 #node_to_be_calibrated = "resonator_spectroscopy"
-node_to_be_calibrated = "punchout"
+node_to_be_calibrated = "rabi_oscillations"
 print()
 box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 

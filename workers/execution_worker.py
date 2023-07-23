@@ -143,7 +143,7 @@ def measure( compiled_schedule: CompiledSchedule, samplespace: dict, node: str) 
     rq_supervisor.enqueue(
             post_process,
             args=(result_dataset_complex,node,),
-            job_timeout=360,
+            job_timeout=472,
             on_success=postprocessing_success_callback
             )
 

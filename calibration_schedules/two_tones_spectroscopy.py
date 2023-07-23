@@ -48,6 +48,8 @@ class Two_Tones_Spectroscopy(Measurement):
 
         #This is the common reference operation so the qubits can be operated in parallel
         root_relaxation = sched.add(Reset(*qubits), label="Reset")
+        print(f'{mw_pulse_durations=}')
+        print(f'{mw_pulse_amplitudes=}')
 
         # The first for loop iterates over all qubits:
         for this_qubit, spec_array_val in mw_frequencies.items():

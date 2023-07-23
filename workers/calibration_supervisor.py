@@ -65,6 +65,12 @@ async def calibrate_system(job_done_event):
 
 async def inspect_node(node:str, job_done_event):
     logger.info(f'Inspecting node {node}')
+    #breakpoint()
+    #Reapply the all initials. This is because of two tones messing with mw_duration
+    initial_parameters = transmon_configuration['initials']
+    for qubit in qubits:
+        for parameter_key, parameter_value in initial_parameters['all'].items():
+            redis_connection.hset(f"transmons:{qubit}", parameter_key, parameter_value)
 
     #Populate the Redis database with node specific parameter values
     if node in transmon_configuration:

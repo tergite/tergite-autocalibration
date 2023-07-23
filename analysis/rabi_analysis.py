@@ -54,9 +54,9 @@ class RabiAnalysis():
         coord = list(dataset[data_var].coords.keys())[0]
         self.S21 = dataset[data_var].values
         ########################
-        print( "")
-        print( f'{Fore.RED}WARNING MOCK DATA IN analysis/qubit_spectroscopy_analysis{Style.RESET_ALL}')
-        self.S21 = np.array([1+1j for _ in self.S21])
+        #print( "")
+        #print( f'{Fore.RED}WARNING MOCK DATA IN analysis/qubit_spectroscopy_analysis{Style.RESET_ALL}')
+        #self.S21 = np.array([1+1j for _ in self.S21])
         ########################
         self.independents = dataset[coord].values
         self.fit_results = {}
