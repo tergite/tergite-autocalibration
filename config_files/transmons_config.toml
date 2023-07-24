@@ -28,7 +28,7 @@ spec_pulse_duration = 4e-6
 init_duration = 400e-6
 min_calibration_point = 0
 max_calibration_point = 0
-att = 12
+att = 0
 
 [initials]
 q11.ro_pulse_amp = 6.5e-3
@@ -57,8 +57,8 @@ init_duration = 100e-6
 init_duration = 100e-6
 
 [qubit_01_spectroscopy_pulsed.all]
-mw_pulse_duration = 4e-6
-mw_amp180 = 3.0e-4
+mw_pulse_duration = 2e-6
+mw_amp180 = 2.5e-4
 
 [qubit_12_spectroscopy_pulsed.all]
 spec_pulse_amp = 2e-4

@@ -36,16 +36,17 @@ VNA_qubit_frequencies = {
         }
 
 qubits = [ 'q16', 'q23']
+#qubits = ['q18', 'q19']
 #qubits = ['q16', 'q18', 'q19', 'q23']
 # qubits = ['q23']
 
 N_qubits = len(qubits)
 
-res_spec_samples = 70
-qub_spec_samples = 80
+res_spec_samples = 80
+qub_spec_samples = 100
 
 def resonator_samples(qubit:str, punchout=False) -> np.ndarray:
-    sweep_range = 7.5e6
+    sweep_range = 6.5e6
     punchout_range = 0e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
     min_freq =  VNA_frequency - sweep_range / 2
@@ -55,7 +56,7 @@ def resonator_samples(qubit:str, punchout=False) -> np.ndarray:
     return np.linspace(min_freq, max_freq, res_spec_samples)
 
 def qubit_samples(qubit:str, transition:str = '01') -> np.ndarray:
-    sweep_range = 8e6
+    sweep_range = 18e6
     if transition=='01':
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition=='12':
