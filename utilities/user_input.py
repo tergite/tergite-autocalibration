@@ -32,11 +32,11 @@ VNA_qubit_frequencies = {
         'q18': 4.077e9,
         'q19': 3.835e9,
         'q21': 3.783e9,
-        'q22': 3.406e9,
+        'q22': 3.355e9,
         'q23': 3.980e9,
         }
 
-qubits = [ 'q16', 'q23']
+qubits = [ 'q16', 'q22', 'q23']
 #qubits = ['q18', 'q19']
 #qubits = ['q16', 'q18', 'q19', 'q23']
 # qubits = ['q23']
@@ -108,7 +108,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
         },
 
         'T1': {
-            'delay': { qubit :{"sweep_min": 16e-9, "sweep_max": 250e-6, "step": 2e-6} for qubit in qubits}
+            'delays': { qubit : np.arange(16e-9,250e-6,4e-6) for qubit in qubits}
         },
 
         'XY_crosstalk': {
@@ -124,7 +124,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     return sweep_parameters
 
 #node_to_be_calibrated = "resonator_spectroscopy"
-node_to_be_calibrated = "rabi_oscillations"
+node_to_be_calibrated = "T1"
 print()
 box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 
