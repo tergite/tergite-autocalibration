@@ -1,6 +1,7 @@
 from analysis.resonator_spectroscopy_analysis import ResonatorSpectroscopyAnalysis
 from analysis.qubit_spectroscopy_analysis import QubitSpectroscopyAnalysis
 from analysis.rabi_analysis import RabiAnalysis
+from analysis.T1_analysis import T1Analysis
 from quantify_core.data.handling import set_datadir
 # from quantify_analysis import qubit_spectroscopy_analysis, rabi_analysis, T1_analysis, XY_crosstalk_analysis, ramsey_analysis, SSRO_analysis
 # from quantify_core.analysis.calibration import rotate_to_calibrated_axis
@@ -134,6 +135,40 @@ class Multiplexed_Rabi_Analysis(BaseAnalysis):
             this_axis.set(title=None)
             this_axis.legend(handles=handles)
 
+
+class Multiplexed_T1_Analysis(BaseAnalysis):
+    def __init__(self,result_dataset,node_name):
+        super().__init__(result_dataset)
+        for indx, this_coord in enumerate(result_dataset.coords):
+            ds = _from_coord_to_dataset(this_coord, result_dataset)
+
+            this_qubit = ds.attrs['qubit_name']
+            this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
+            # this_axis.set_title(f'{node_name} for {this_qubit}')
+            T1_result = T1_analysis.T1Analysis(ds)
+            T1_time = T1_result.model_fit()
+            T1_micros=T1_time*1e6
+
+            self.qoi = T1_time
+            print(f'{ node_name = }')
+            latex = ''
+
+            T1_result.plotter(this_axis)
+
+            handles, labels = this_axis.get_legend_handles_labels()
+            patch = mpatches.Patch(color='red', label=f'{this_qubit}')
+            handles.append(patch)
+            patch2=mpatches.Patch(color='green', label=f'{T1_micros} μs')
+            handles.append(patch2)
+            this_axis.set(title=None)
+            this_axis.legend(handles=handles)
+
+            #if node_name == 'rabi_frequency' or node_name == 'rabi_oscillations_BATCHED':
+            #    self.update_redis_trusted_values(node_name, this_qubit,'mw_amp180',latex)
+            #if node_name == 'rabi_12_frequency' or node_name == 'rabi_oscillations_12_BATCHED':
+            #    self.update_redis_trusted_values(node_name, this_qubit,'mw_ef_amp180',latex)
+
+        self.node_result.update({'measurement_dataset':result_dataset.to_dict()})
 
 class Multiplexed_Punchout_Analysis(BaseAnalysis):
     def __init__(self, result_dataset: xr.Dataset, node: str):

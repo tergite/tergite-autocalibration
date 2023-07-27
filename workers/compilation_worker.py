@@ -15,6 +15,8 @@ from workers.execution_worker import measure
 from calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
 from calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
 from calibration_schedules.rabi_oscillations import Rabi_Oscillations
+from calibration_schedules.T1 import T1_BATCHED
+from calibration_schedules.time_of_flight import Time_Of_Flight
 from calibration_schedules.XY_crosstalk import XY_cross
 from calibration_schedules.punchout import Punchout
 # from calibration_schedules.ramsey_fringes import Ramsey_fringes
@@ -34,6 +36,7 @@ node_map = {
     'resonator_spectroscopy': Resonator_Spectroscopy,
     'qubit_01_spectroscopy_pulsed': Two_Tones_Spectroscopy,
     'rabi_oscillations': Rabi_Oscillations,
+    'T1': T1_BATCHED,
     'XY_crosstalk': XY_cross,
     'punchout': Punchout,
     # 'ramsey_correction': Ramsey_fringes,

@@ -6,6 +6,7 @@ from analysis.tac_quantify_analysis import (
         Multiplexed_Resonator_Spectroscopy_Analysis,
         Multiplexed_Two_Tones_Spectroscopy_Analysis,
         Multiplexed_Rabi_Analysis,
+        Multiplexed_T1_Analysis,
         Multiplexed_Punchout_Analysis,
         )
 
@@ -25,6 +26,7 @@ ANALYSIS_MAP = {
         'resonator_spectroscopy': Multiplexed_Resonator_Spectroscopy_Analysis,
         'qubit_01_spectroscopy_pulsed': Multiplexed_Two_Tones_Spectroscopy_Analysis,
         'rabi_oscillations': Multiplexed_Rabi_Analysis,
+        'T1': Multiplexed_T1_Analysis,
         'punchout': Multiplexed_Punchout_Analysis,
         }
 

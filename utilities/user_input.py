@@ -12,6 +12,7 @@ nodes = [
         #"punchout",
         "qubit_01_spectroscopy_pulsed",
         "rabi_oscillations",
+        "T1",
         "XY_crosstalk",
         "ramsey_correction",
         ]
@@ -104,6 +105,10 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
 
         'rabi_oscillations': {
             'mw_amplitudes': { qubit : np.linspace(0.002,0.20,41) for qubit in qubits}
+        },
+
+        'T1': {
+            'delay': { qubit :{"sweep_min": 16e-9, "sweep_max": 250e-6, "step": 2e-6} for qubit in qubits}
         },
 
         'XY_crosstalk': {
