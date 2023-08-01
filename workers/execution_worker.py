@@ -17,6 +17,8 @@ from workers.post_processing_worker import post_process
 import numpy as np
 from utilities.root_path import data_directory
 
+from calibration_schedules.time_of_flight import Time_Of_Flight
+
 import redis
 from rq import Queue
 
@@ -115,6 +117,16 @@ def to_complex_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
 
 def measure( compiled_schedule: CompiledSchedule, samplespace: dict, node: str) -> xarray.Dataset:
     logger.info('Starting measurement')
+
+    #Runs time of flight calibration
+    #TODO this is a very bad way of running TOF
+    # ideally TOF would be its own node, but this requires custom input variables (only the cluster nothing else)
+    #if node == 'resonator_spectroscopy': 
+    #        # Performs time of flight measurement
+    #        TOF_plotting=False
+    #        TOF=Time_Of_Flight(Cluster("cluster", '192.0.2.72'), TOF_plotting)
+    #        logger.info(f'Time of flight: {TOF}')
+    
     #box_print(f'Measuring node: {node}')
     logger.info(f'Measuring node: {node}')
     loki_ic.prepare(compiled_schedule)
