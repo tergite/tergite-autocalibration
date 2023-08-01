@@ -124,6 +124,6 @@ def Time_Of_Flight(cluster, plotting):
         
         
     
-    print('Time of flight = ', tof, ' ns')
+    #print('Time of flight = ', tof, ' ns')
     return tof*1e-9
 
