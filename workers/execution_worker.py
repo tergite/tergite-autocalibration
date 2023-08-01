@@ -170,7 +170,7 @@ async def notify_job_done(job_id: str):
         LOCALHOST, CALIBRATION_SUPERVISOR_PORT
     )
     message = ("job_done:" + job_id).encode()
-    print(f"notify_job_done: {message=}")
+    #print(f"notify_job_done: {message=}")
     writer.write(message)
     writer.close()
 

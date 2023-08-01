@@ -8,6 +8,7 @@ from workers.compilation_worker import precompile
 #from colorama import Fore
 #from colorama import Style
 #colorama_init()
+import sys
 
 import utilities.user_input as user_input
 
@@ -65,6 +66,8 @@ async def calibrate_system(job_done_event):
 
 async def inspect_node(node:str, job_done_event):
     logger.info(f'Inspecting node {node}')
+    isatty = sys.stdout.isatty()
+    logger.info(f'is a TTY {isatty}')
     #breakpoint()
     #Reapply the all initials. This is because of two tones messing with mw_duration
     initial_parameters = transmon_configuration['initials']
@@ -136,16 +139,17 @@ class CalibrationProtocol(asyncio.Protocol):
     def connection_made(self, transport) -> None:
         self.transport = transport
         peername = transport.get_extra_info('peername')
-        print(f'{ peername = }')
+        #print(f'{ peername = }')
 
     def data_received(self, data) -> None:
         message = data.decode()
         message_parts = message.split(":")
         if len(message_parts) == 2 and message_parts[0] == "job_done":
             self.job_done_event.set()
-            print(f'{ self.job_done_event = }')
+            #print(f'{ self.job_done_event = }')
         else:
-            print(f'Received unexpected "job_done" message')
+            pass
+            #print(f'Received unexpected "job_done" message')
 
 
 async def initiate_server(job_done_event, host, port):

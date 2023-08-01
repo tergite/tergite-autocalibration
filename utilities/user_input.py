@@ -123,9 +123,8 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     }
     return sweep_parameters
 
-#node_to_be_calibrated = "rabi_oscillations"
-node_to_be_calibrated = "T1"
-print()
+node_to_be_calibrated = "rabi_oscillations"
+#node_to_be_calibrated = "T1"
 box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 
 def user_requested_calibration(node: str):

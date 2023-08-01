@@ -43,8 +43,8 @@ class Rabi_Oscillations(Measurement):
             raise ValueError(f'Invalid qubit state: {self.qubit_state}')
 
         sched = Schedule(schedule_title,repetitions)
-        print(f'{mw_frequencies=}')
-        print(f'{mw_pulse_durations=}')
+        #print(f'{mw_frequencies=}')
+        #print(f'{mw_pulse_durations=}')
 
         for this_qubit, mw_f_val in mw_frequencies.items():
             sched.add_resource(
