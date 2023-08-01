@@ -34,7 +34,7 @@ class BaseAnalysis():
        self.qoi = 0 # quantity of interest
 
     def update_redis_trusted_values(self,node:str, this_qubit:str,transmon_parameter:str):
-        print(f'\n--------> {transmon_parameter} = { self.qoi }<--------\n')
+        #print(f'\n--------> {transmon_parameter} = { self.qoi }<--------\n')
         redis_connection.hset(f"transmons:{this_qubit}",f"{transmon_parameter}",self.qoi)
         redis_connection.hset(f"cs:{this_qubit}",node,'calibrated')
         self.node_result.update({this_qubit: self.qoi})

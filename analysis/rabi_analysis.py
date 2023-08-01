@@ -2,9 +2,9 @@ import numpy as np
 import lmfit
 from quantify_core.analysis.fitting_models import fft_freq_phase_guess
 import xarray as xr
-from colorama import init as colorama_init
-from colorama import Fore
-from colorama import Style
+#from colorama import init as colorama_init
+#from colorama import Fore
+#from colorama import Style
 
 def cos_func(
     drive_amp: float,

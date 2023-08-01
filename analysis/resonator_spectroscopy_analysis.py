@@ -1,10 +1,10 @@
 import numpy as np
 from quantify_core.analysis import fitting_models as fm
 import xarray as xr
-from colorama import init as colorama_init
-from colorama import Fore
-from colorama import Style
-colorama_init()
+#from colorama import init as colorama_init
+#from colorama import Fore
+#from colorama import Style
+#colorama_init()
 
 model = fm.ResonatorModel()
 

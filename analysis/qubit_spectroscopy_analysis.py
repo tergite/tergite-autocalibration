@@ -1,8 +1,8 @@
 import numpy as np
 import xarray as xr
-from colorama import init as colorama_init
-from colorama import Fore
-from colorama import Style
+#from colorama import init as colorama_init
+#from colorama import Fore
+#from colorama import Style
 from scipy import signal
 import lmfit
 
