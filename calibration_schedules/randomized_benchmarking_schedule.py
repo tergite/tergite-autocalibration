@@ -1,3 +1,6 @@
+"""
+Module containing a schedule class for randomized benchmarking measurement.
+"""
 import numpy as np
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.gate_library import Measure, Reset, Rxy
@@ -35,11 +38,35 @@ class Randomized_Benchmarking_BATCHED(Measurement_base):
         return self._setpoints_1d_array()
 
     def schedule_function(
-            self,
+            self, #Note, this is not used in the schedule
             qubits: list[str],
             repetitions: int = 128,
             **number_of_cliffords_operations,
         ) -> Schedule:
+        """
+        Generate a schedule for performing a randomized benchmarking test using Clifford gates.
+        The goal is to get a measure of the total error of the calibrated qubits.
+
+        Schedule sequence
+            Reset -> Apply Clifford operations-> Apply inverse of all Clifford operations -> Measure
+        
+        Parameters
+        ----------
+        self
+            Contains all qubit states.
+        qubits
+            The list of qubits on which to perform the experiment.
+        repetitions
+            The amount of times the Schedule will be repeated.
+        **number_of_cliffords_operations
+            The number of random Clifford operations applied and then inverted on each qubit state.
+            This parameter is swept over.
+        
+        Returns
+        -------
+        :
+            An experiment schedule.
+        """
 
         # if port_out is None: port_out = port
         sched = Schedule("multiplexed_RB",repetitions)

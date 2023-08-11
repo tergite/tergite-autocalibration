@@ -1,3 +1,6 @@
+"""
+Module containing a schedule class for Rabi calibration.
+"""
 from quantify_scheduler.resources import ClockResource
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler import Schedule
@@ -32,7 +35,32 @@ class Rabi_Oscillations(Measurement):
         mw_amplitudes: dict[str, np.ndarray],
         repetitions: int = 1024,
         ) -> Schedule:
+        """
+        Generate a schedule for performing a Rabi oscillation measurement on multiple qubits using a Gaussian pulse.
 
+        Schedule sequence
+            Reset -> Gaussian pulse -> Measure
+        
+        Parameters
+        ----------
+        self
+            Contains all qubit states.
+        qubits
+            The list of qubits on which to perform the experiment.
+        mw_pulse_durations
+            Duration of the Gaussian shaped Rabi pulse for each qubit.
+        mw_pulse_ports
+            Location on the device where the Rabi pulse is applied for each qubit.
+        mw_amplitudes
+            Array of the sweeping amplitudes of the Rabi pulse for each qubit.
+        repetitions
+            The amount of times the Schedule will be repeated.
+        
+        Returns
+        -------
+        :
+            An experiment schedule.
+        """
         if self.qubit_state == 0:
             schedule_title = "multiplexed_rabi_01"
             measure_function = Measure

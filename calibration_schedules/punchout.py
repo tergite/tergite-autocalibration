@@ -1,3 +1,6 @@
+"""
+Module containing a schedule class for punchout (readout amplitude) calibration.
+"""
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.acquisition_library import SSBIntegrationComplex
 from quantify_scheduler.resources import ClockResource
@@ -24,7 +27,7 @@ class Punchout(Measurement):
 
 
     def schedule_function(
-            self,
+            self, #Note, this is not used in the schedule
             qubits: list[str],
             pulse_durations: dict[str,float],
             acquisition_delays: dict[str,float],
@@ -34,6 +37,40 @@ class Punchout(Measurement):
             ro_amplitudes: dict[str,np.ndarray],
             repetitions: int = 1024,
         ) -> Schedule:
+        """
+        Generate a schedule for performing a punchout spectroscopy mainly used to calibrate the amplitude of the readout pulse.
+
+        Schedule sequence
+            Reset -> Spectroscopy readout pulse -> SSBIntegrationComplex (Measurement)
+        Note: Similar to resonator spectroscopy, but here the amplitude of the readout pulse is also a sweeping parameter.
+
+        Parameters
+        ----------
+        self
+            Contains all qubit states.
+        qubits
+            The list of qubits on which to perform the experiment.
+        pulse_durations
+            Duration of the readout pulse for each qubit.
+        acquisition_delays
+            Start of data acquisition relative to the start of the readout pulse for each qubit.
+        integration_times
+            Integration time of the data acquisition for each qubit.
+        ports
+            Location on the device where the readout pulse is applied for each qubit.
+        ro_frequencies
+            Array of the sweeping frequencies of the readout pulse for each qubit.
+        ro_amplitudes
+            Array of the sweeping amplitudes of the readout pulse for each qubit.
+        repetitions
+            The amount of times the Schedule will be repeated.
+        
+        Returns
+        -------
+        :
+            An experiment schedule.
+        """
+
         schedule = Schedule("mltplx_punchout",repetitions)
 
         # Initialize the clock for each qubit

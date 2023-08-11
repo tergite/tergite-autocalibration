@@ -1,3 +1,6 @@
+"""
+Module containing a schedule class for state discrimination calibration.
+"""
 import numpy as np
 from quantify_scheduler.operations.gate_library import Reset, X, Rxy
 from quantify_scheduler.operations.pulse_library import SquarePulse, SetClockFrequency
@@ -85,6 +88,21 @@ class SSRO_BATCHED(Measurement_base):
             repetitions: int = 1,
             **ro_optimizations
         ) -> Schedule:
+        """
+        Generate a schedule for performing a state discrimination calibration measurement.
+
+        Schedule sequence
+            Reset -> Adjustment pulse depending on state level -> Spectroscopy readout pulse -> SSBIntegrationComplex (Measurement)
+
+        Parameters
+        ----------
+        #TODO schedule will be reworked, add this after
+        
+        Returns
+        -------
+        :
+            An experiment schedule.
+        """
         repetitions = 1 # TODO Remove Hardcoding
         schedule = Schedule("State_discrimination_schedule", repetitions)
         # print(f'{ repetitions = }')

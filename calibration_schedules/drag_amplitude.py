@@ -1,3 +1,6 @@
+"""
+Module containing a schedule class for DRAG amplitude calibration.
+"""
 from quantify_scheduler.resources import ClockResource
 from quantify_scheduler import Schedule
 from quantify_scheduler.operations.pulse_library import DRAGPulse
@@ -8,8 +11,8 @@ class DRAG_amplitude(Measurement_base):
 
     def __init__(self,transmons,connections):
         super().__init__(transmons,connections)
-        self.experiment_parameters = ['mw_amp180_BATCHED', 'X_repetition'] # The order maters
-        self.parameter_order = ['mw_amp180_BATCHED', 'X_repetition'] # The order maters
+        self.experiment_parameters = ['mw_amp180_BATCHED', 'X_repetition'] # The order matters
+        self.parameter_order = ['mw_amp180_BATCHED', 'X_repetition'] # The order matters
         self.gettable_batched = True
         self.static_kwargs = {
             'qubits': self.qubits,
@@ -48,7 +51,7 @@ class DRAG_amplitude(Measurement_base):
         return self._setpoints_Nd_array()
 
     def schedule_function(
-            self,
+            self, #Note, this is not used in the schedule
             qubits: list[str],
             mw_frequencies: dict[str,float],
             mw_motzois: dict[str,float],
@@ -58,6 +61,41 @@ class DRAG_amplitude(Measurement_base):
             repetitions: int = 1024,
             **mw_amplitudes,
         ) -> Schedule:
+        """
+        Generate a schedule for a DRAG pulse calibration measurement that optimizes the amplitude parameter.
+
+        Schedule sequence
+            Reset -> DRAG pulse -> Measure
+        Note: Step 2 is repeated X_repetition amount of times
+        
+        Parameters
+        ----------
+        self
+            Contains all qubit states.
+        qubits
+            The list of qubits on which to perform the experiment.
+        mw_frequencies
+            Frequency of the DRAG pulse for each qubit.
+        mw_motzois
+           The motzoi parameter of the DRAG pulse for each qubit
+        mw_pulse_ports
+            Location on the device where the DRAG pulse is applied.
+        mw_clocks
+            Clock that the frequency of the DRAG pulse is assigned to for each qubit.
+        mw_pulse_durations
+            Duration of the DRAG pulse for each qubit.
+        repetitions
+            The amount of times the Schedule will be repeated.
+        **mw_amplitudes
+            2D sweeping parameter arrays.
+            X_repetition: The amount of times that the DRAG pulses are applied.
+            mw_amp180: The amplitudes of the DRAG pulses.
+        
+        Returns
+        -------
+        :
+            An experiment schedule.
+        """
         schedule = Schedule("mltplx_motzoi",repetitions)
 
         for mw_f_key, mw_f_val in mw_frequencies.items():

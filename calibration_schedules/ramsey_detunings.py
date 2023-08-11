@@ -1,3 +1,6 @@
+"""
+Module containing a schedule class for Ramsey calibration.
+"""
 from quantify_scheduler.resources import ClockResource
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler import Schedule
@@ -11,8 +14,8 @@ class Ramsey_Detunings(Measurement_base):
 
     def __init__(self,transmons,connections,qubit_state:int=0):
         super().__init__(transmons,connections)
-        self.experiment_parameters = ['ramsey_delay_BATCHED', 'artificial_detuning'] # The order maters
-        self.parameter_order = ['ramsey_delay_BATCHED', 'artificial_detuning'] # The order maters
+        self.experiment_parameters = ['ramsey_delay_BATCHED', 'artificial_detuning'] # The order matters
+        self.parameter_order = ['ramsey_delay_BATCHED', 'artificial_detuning'] # The order matters
         self.gettable_batched = True
         self.qubit_state = qubit_state
         self.static_kwargs = {
@@ -64,6 +67,43 @@ class Ramsey_Detunings(Measurement_base):
         repetitions: int = 1024,
         **ramsey_detunings_and_delays,
         ) -> Schedule:
+        """
+        Generate a schedule for performing a Ramsey fringe measurement on multiple qubits. 
+        Can be used both to finetune the qubit frequency and to measure the qubit dephasing time T_2.
+
+        Schedule sequence
+            Reset -> pi/2 pulse -> Idle(tau) -> pi/2 pulse -> Measure
+        
+        Parameters
+        ----------
+        self
+            Contains all qubit states.
+        qubits
+            The list of qubits on which to perform the experiment.
+        mw_clocks_12
+            Clocks for the 12 transition frequency of the qubits.
+        mw_ef_amps180
+            Amplitudes used for the excitation of the qubits to calibrate for the 12 transition.
+        mw_frequencies_12
+            Frequencies used for the excitation of the qubits to calibrate for the 12 transition.
+        mw_pulse_ports
+            Location on the device where the pulsed used for excitation of the qubits to calibrate for the 12 transition is located.
+        mw_pulse_durations
+            Pulse durations used for the excitation of the qubits to calibrate for the 12 transition.
+        repetitions
+            The amount of times the Schedule will be repeated.
+        **ramsey_detunings_and_delays
+            2D sweeping parameter arrays.
+            Delays: The wait times tau between the pi/2 pulses
+            Detunings: The artificial detunings of the qubit frequencies, which is implemented by changing 
+            the phase of the second pi/2 pulse. 
+            
+
+        Returns
+        -------
+        :
+            An experiment schedule.
+        """
 
         PI = 3.14159265359
 

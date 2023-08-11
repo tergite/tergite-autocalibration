@@ -1,3 +1,6 @@
+"""
+Module containing a schedule class for XY cross-talk measurement.
+"""
 from quantify_scheduler.resources import ClockResource
 from quantify_scheduler import Schedule
 from quantify_scheduler.operations.pulse_library import DRAGPulse, SetClockFrequency
@@ -19,7 +22,7 @@ class XY_cross(Measurement):
             # 'mw_pulse_durations': self.attributes_dictionary('mw_pulse_duration'),
         }
 
-
+    #TODO this schedule isn't complete yet, see the todo's in XY_crosstalk.py in the tergite-auto-calibration-server.
     def schedule_function(
             self,
             drive_qubit: str,
@@ -28,8 +31,32 @@ class XY_cross(Measurement):
             mw_amplitudes: dict[str,np.ndarray],
             mw_pulse_ports: dict[str,str],
             mw_pulse_durations: dict[str,np.ndarray],
-            repetitions: int = 1024,
+            repetitions: int = 1024, #TODO missing the cross_case Boolean parameter (implemented in the tergite-auto-calibration-server)
         ) -> Schedule:
+        """
+        Generate a schedule for performing an XY cross-talk measurement which is used
+        to find the qubit control line sensitivity between certain qubits.
+
+        Schedule sequence
+            Reset -> Gaussian pulse -> Measure
+        This is the same sequence as for the Rabi schedule, however this time
+        the Rabi experiment is performed multiple times for different pulse amplitudes.
+        Note also that the input and output qubits will differ in this case.
+        
+        For more details on crosstalk measurments see the following article:
+        P. A. Spring, S. Cao, T. Tsunoda, et al., “High coherence and low cross-talk in a tileable 3d integrated 
+        superconducting circuit architecture,” Science Advances, vol. 8, no. 16, 2022.
+
+        Parameters
+        ----------
+        #TODO explain parameters after the schedule has been completed.
+
+        Returns
+        -------
+        :
+            An experiment schedule.
+        """
+
         schedule = Schedule("XY_cross_talk",repetitions)
 
         # for this_qubit, mw_f_val in mw_frequencies.items():

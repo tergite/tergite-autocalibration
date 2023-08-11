@@ -1,3 +1,6 @@
+"""
+Module containing a base class that defines the basic principles used in all calibration schedule classes.
+"""
 import numpy as np
 from qcodes.instrument.parameter import ManualParameter
 np.set_printoptions(precision=3, linewidth=125)

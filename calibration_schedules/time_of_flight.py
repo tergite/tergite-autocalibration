@@ -1,3 +1,6 @@
+"""
+Module containing a function for time of flight calibration.
+"""
 import json
 import math
 
@@ -7,7 +10,25 @@ import numpy as np
 from qcodes import Instrument
 from qblox_instruments import Cluster
 
+
+#TODO Many variables of this routine are hard coded for clusterA in loki and need to be generalized by integrating the cluster variables from the server into this function
+#TODO Ideally this should be able to be run as a separate node on the server, even though it doesn't use the same quantify_scheduler.schedules format as the other nodes
 def Time_Of_Flight(cluster, plotting):
+    """
+        A full routine for measuring the time of flight for the readout pulse of a given cluster.
+
+        Parameters
+        ----------
+        cluster
+            The cluster for which the readout line will be time of flight calibrated.
+        plotting
+            Boolean determining if the resulting plots of the calibration should be displayed or not.
+        
+        Returns
+        -------
+        :
+           The calibrated time of flight parameter (readout acquisition delay) in units of s.
+    """
 
     readout_module = cluster.module16
 

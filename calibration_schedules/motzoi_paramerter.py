@@ -1,3 +1,7 @@
+"""
+Module containing a schedule class for DRAG pulse motzoi parameter calibration.
+"""
+#TODO the name of this file has a typo (paramerter -> parameter)
 from quantify_scheduler.resources import ClockResource
 from quantify_scheduler import Schedule
 from quantify_scheduler.operations.pulse_library import DRAGPulse
@@ -8,8 +12,8 @@ class Motzoi_parameter(Measurement_base):
 
     def __init__(self,transmons,connections):
         super().__init__(transmons,connections)
-        self.experiment_parameters = ['mw_motzoi_BATCHED', 'X_repetition'] # The order maters
-        self.parameter_order = ['mw_motzoi_BATCHED', 'X_repetition'] # The order maters
+        self.experiment_parameters = ['mw_motzoi_BATCHED', 'X_repetition'] # The order matters
+        self.parameter_order = ['mw_motzoi_BATCHED', 'X_repetition'] # The order matters
         self.gettable_batched = True
         self.static_kwargs = {
             'qubits': self.qubits,
@@ -48,7 +52,7 @@ class Motzoi_parameter(Measurement_base):
         return self._setpoints_Nd_array()
 
     def schedule_function(
-            self,
+            self, #Note, this is not used in the schedule
             qubits: list[str],
             mw_frequencies: dict[str,float],
             mw_amplitudes: dict[str,float],
@@ -58,6 +62,45 @@ class Motzoi_parameter(Measurement_base):
             repetitions: int = 1024,
             **mw_motzois,
         ) -> Schedule:
+        """
+        Generate a schedule for a DRAG pulse calibration measurement that gives the optimized motzoi parameter.
+        This calibrates the drive pulse as to account for errors caused by higher order excitations of the qubits.
+
+        Schedule sequence
+            Reset -> DRAG pulse -> Inverse DRAG pulse -> Measure
+        Note: Step 2 and 3 are repeated X_repetition amount of times
+        
+        For more details on the motzoi parameter and DRAG pulse calibration see the following article:
+        S. Balasiu, “Single-qubit gates calibration in pycqed using superconducting qubits,” ETH, 2017.
+
+        Parameters
+        ----------
+        self
+            Contains all qubit states.
+        qubits
+            The list of qubits on which to perform the experiment.
+        mw_frequencies
+            Frequency of the DRAG pulse for each qubit.
+        mw_amplitudes
+           Amplitude of the DRAG pulse for each qubit.
+        mw_pulse_ports
+            Location on the device where the DRAG pulse is applied.
+        mw_clocks
+            Clock that the frequency of the DRAG pulse is assigned to for each qubit.
+        mw_pulse_durations
+            Duration of the DRAG pulse for each qubit.
+        repetitions
+            The amount of times the Schedule will be repeated.
+        **mw_motzois
+            2D sweeping parameter arrays.
+            X_repetition: The amount of times that the DRAG pulse and inverse DRAG pulse are applied
+            mw_motzoi: The mozoi parameter values of the DRAG (and inverse DRAG) pulses.
+        
+        Returns
+        -------
+        :
+            An experiment schedule.
+        """
         schedule = Schedule("mltplx_motzoi",repetitions)
 
         for mw_f_key, mw_f_val in mw_frequencies.items():

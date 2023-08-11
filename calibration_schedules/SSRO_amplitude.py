@@ -1,3 +1,6 @@
+"""
+Module containing a schedule class for single shot readout (SSRO) amplitude calibration.
+"""
 from quantify_scheduler.resources import ClockResource
 from quantify_scheduler import Schedule
 from quantify_scheduler.operations.pulse_library import DRAGPulse, SquarePulse
@@ -71,6 +74,22 @@ class SSRO_amplitude_BATCHED(Measurement_base):
             repetitions: int = 1,
             **ro_optimizations
         ) -> Schedule:
+        """
+        Generate a schedule for performing a single shot readout amplitude calibration.
+
+        Schedule sequence
+            Reset -> Adjustment pulse depending on state level -> Spectroscopy readout pulse -> SSBIntegrationComplex (Measurement)
+
+        Parameters
+        ----------
+        #TODO schedule will be reworked, add this after
+        
+        Returns
+        -------
+        :
+            An experiment schedule.
+        """
+
         repetitions = 1 # TODO Remove Hardcoding
         schedule = Schedule("State_discrimination_schedule", repetitions)
 

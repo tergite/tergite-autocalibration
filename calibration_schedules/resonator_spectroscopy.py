@@ -1,3 +1,7 @@
+"""
+Module containing a schedule class for resonator spectroscopy calibration.
+"""
+
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.schedules.schedule import Schedule
 from quantify_scheduler.operations.pulse_library import  SquarePulse, SetClockFrequency, DRAGPulse
@@ -48,6 +52,38 @@ class Resonator_Spectroscopy(Measurement):
         repetitions: int = 512,
         #TODO re adjust repetions
         ) -> Schedule:
+        """
+        Generate a schedule for performing resonator spectroscopy to locate the resonators resonance frequency for multiple qubits.
+
+        Schedule sequence
+            Reset -> Spectroscopy pulse -> SSBIntegrationComplex (Measurement)
+
+        Parameters
+        ----------
+        self
+            Contains all qubit states.
+        pulse_amplitudes
+            Amplitude of the spectroscopy square pulse.
+        pulse_durations
+            Duration of the spectroscopy square pulse.
+        acquisition_delays
+            Start of data acquisition relative to the start of the spectroscopy pulse.
+        integration_times
+            Integration time of the data acquisition.
+        qubits
+            The list of qubits that are calibrated.
+        ports
+            Location on the device where the spectroscopy pulse is applied for each qubit.
+        ro_frequencies
+            The sweeping frequencies of the spectroscopy pulse for each qubit.
+        repetitions
+            The amount of times the Schedule will be repeated.
+
+        Returns
+        -------
+        :
+            An experiment schedule.
+        """
 
         sched = Schedule("multiplexed_resonator_spec_NCO",repetitions)
         # Initialize the clock for each qubit
@@ -104,6 +140,7 @@ class Resonator_Spectroscopy(Measurement):
                 #         label=f"rabi_pulse_{this_qubit}_{acq_index}", ref_op=excitation_pulse_1, ref_pt="end",
                 #     )
 
+                #spectroscopy pulse
                 pulse = sched.add(
                     SquarePulse(
                         duration=pulse_durations[this_qubit],

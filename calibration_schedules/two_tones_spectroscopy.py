@@ -1,3 +1,6 @@
+"""
+Module containing a schedule class for two-tone (qubit) spectroscopy calibration.
+"""
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.acquisition_library import SSBIntegrationComplex
 from quantify_scheduler.operations.gate_library import Measure, Reset, X
@@ -36,6 +39,34 @@ class Two_Tones_Spectroscopy(Measurement):
 
         repetitions: int = 1024,
         ) -> Schedule:
+        """
+        Generate a schedule for performing two-tone (qubit) spectroscopy to locate the qubits resonance frequency for multiple qubits.
+
+        Schedule sequence
+            Reset -> Spectroscopy pulse -> Measure
+        
+        Parameters
+        ----------
+        self
+            Contains all qubit states.
+        qubits
+            The list of qubits that are calibrated.
+        mw_pulse_durations
+            Duration of the spectroscopy pulse for each qubit.
+        mw_pulse_amplitudes
+            Amplitude of the spectroscopy pulse for each qubit.
+        mw_pulse_ports
+            Location on the device where the spectroscopy pulse is applied for each qubit.
+        mw_frequencies
+            The sweeping frequencies of the spectroscopy pulse for each qubit.
+        repetitions
+            The amount of times the Schedule will be repeated.
+        
+        Returns
+        -------
+        :
+            An experiment schedule.
+        """
 
         # if port_out is None: port_out = port
         sched = Schedule("multiplexed_qubit_spec",repetitions)
