@@ -1,14 +1,19 @@
+"""
+Module containing a class that fits data from a resonator spectroscopy experiment.
+"""
 import numpy as np
-from quantify_core.analysis import fitting_models as fm
+from quantify_core.analysis.fitting_models import ResonatorModel
 import xarray as xr
 #from colorama import init as colorama_init
 #from colorama import Fore
 #from colorama import Style
 #colorama_init()
 
-model = fm.ResonatorModel()
 
 class ResonatorSpectroscopyAnalysis():
+    """
+    Analysis that fits the data of a resonator spectroscopy experiment.
+    """
     def __init__(self, dataset: xr.Dataset):
         data_var = list(dataset.data_vars.keys())[0]
         print('data_var', data_var)
@@ -24,10 +29,15 @@ class ResonatorSpectroscopyAnalysis():
         self.fit_results = {}
 
     def run_fitting(self):
+        #Initialize the Rabi model
+        model = ResonatorModel()
+
+        #Fetch the resulting measurement variables from self
         S21 = self.S21
         frequencies = self.frequencies
-        guess = model.guess(S21, f=frequencies)
 
+        # Gives an initial guess for the model parameters and then fits the model to the data.
+        guess = model.guess(S21, f=frequencies)
         fit_result = model.fit(S21, params=guess, f=frequencies)
 
         self.fit_results.update({"hanger_func_complex_SI": fit_result})

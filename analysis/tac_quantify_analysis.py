@@ -1,3 +1,6 @@
+"""
+Module containing analysis classes for every calibration experiment
+"""
 from analysis.resonator_spectroscopy_analysis import ResonatorSpectroscopyAnalysis
 from analysis.qubit_spectroscopy_analysis import QubitSpectroscopyAnalysis
 from analysis.rabi_analysis import RabiAnalysis
@@ -18,6 +21,9 @@ redis_connection = redis.Redis(decode_responses=True)
 
 
 class BaseAnalysis():
+    """
+    Base class that defines plotting and qoi which is common to all analysis classes.
+    """
     def __init__(self, result_dataset: xr.Dataset):
        self.result_dataset = result_dataset
 
@@ -40,17 +46,22 @@ class BaseAnalysis():
         self.node_result.update({this_qubit: self.qoi})
 
 class Multiplexed_Resonator_Spectroscopy_Analysis(BaseAnalysis):
+    """
+    Analysis for resonator spectroscopy calibrations.
+    """
     def __init__(self, result_dataset: xr.Dataset, node: str):
         super().__init__(result_dataset)
         for indx, var in enumerate(result_dataset.data_vars):
+            # Fetch measurement data set
             this_qubit = result_dataset[var].attrs['qubit']
             ds = result_dataset[var].to_dataset()
+            # Fits model to data set
             node_analysis = ResonatorSpectroscopyAnalysis(dataset=ds)
             node_analysis.run_fitting()
             fitting_results = node_analysis.fit_results
             fitting_model = fitting_results['hanger_func_complex_SI']
             fit_result = fitting_model.values
-
+            # Determines frequency at the amplitude dip minimum
             fitted_resonator_frequency = fit_fr = fit_result['fr']
             fit_Ql = fit_result['Ql']
             fit_Qe = fit_result['Qe']
@@ -65,17 +76,15 @@ class Multiplexed_Resonator_Spectroscopy_Analysis(BaseAnalysis):
                                     - 4*fit_Qe*fit_Ql*np.cos(fit_ph)
                                     + fit_Ql**2 )
                           )
-
+            # Updates quantities of interest
             self.qoi = minimum_freq
+            self.update_redis_trusted_values(node, this_qubit,'ro_freq')
+
             # PLOT THE FIT -- ONLY FOR S21 MAGNITUDE
             this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
             fitting_model.plot_fit(this_axis,numpoints = self.fit_numpoints,xlabel=None, title=None)
             this_axis.axvline(minimum_freq,c='blue',ls='solid',label='frequency at min')
             this_axis.axvline(fitted_resonator_frequency,c='magenta',ls='dotted',label='fitted frequency')
-            # this_axis.set_title(f'{node} for {this_qubit}')
-
-
-            self.update_redis_trusted_values(node, this_qubit,'ro_freq')
 
             handles, labels = this_axis.get_legend_handles_labels()
             patch = mpatches.Patch(color='red', label=f'{this_qubit}')
@@ -85,24 +94,29 @@ class Multiplexed_Resonator_Spectroscopy_Analysis(BaseAnalysis):
 
 
 class Multiplexed_Two_Tones_Spectroscopy_Analysis(BaseAnalysis):
+    """
+    Analysis for qubit (two tone) spectroscopy calibrations.
+    """
     def __init__(self, result_dataset: xr.Dataset, node: str):
         super().__init__(result_dataset)
         for indx, var in enumerate(result_dataset.data_vars):
+            # Fetch measurement data set
             this_qubit = result_dataset[var].attrs['qubit']
             ds = result_dataset[var].to_dataset()
 
-            this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
-            # this_axis.set_title(f'{node_name} for {this_qubit}')
+            
+            # Fits model to data set
             node_analysis = QubitSpectroscopyAnalysis(ds)
             rough_qubit_frequency = node_analysis.run_fitting()
 
+            # Updates quantities of interest
             self.qoi = rough_qubit_frequency
-
-            node_analysis.plotter(this_axis)
-
             self.update_redis_trusted_values(node, this_qubit,'freq_01')
 
-            hasPeak=node_analysis.has_peak()
+            # Plots the fit
+            this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
+            node_analysis.plotter(this_axis)
+            hasPeak=node_analysis.has_peak() # Determines if data contains a peak or not
             handles, labels = this_axis.get_legend_handles_labels()
             patch = mpatches.Patch(color='red', label=f'{this_qubit}')
             patch2 = mpatches.Patch(color='blue', label=f'Peak Found:{hasPeak}')
@@ -112,23 +126,27 @@ class Multiplexed_Two_Tones_Spectroscopy_Analysis(BaseAnalysis):
             this_axis.legend(handles=handles)
 
 class Multiplexed_Rabi_Analysis(BaseAnalysis):
+    """
+    Analysis for Rabi oscillation calibrations.
+    """
     def __init__(self, result_dataset: xr.Dataset, node: str):
         super().__init__(result_dataset)
         for indx, var in enumerate(result_dataset.data_vars):
+            # Fetch measurement data set
             this_qubit = result_dataset[var].attrs['qubit']
             ds = result_dataset[var].to_dataset()
 
-            this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
-            # this_axis.set_title(f'{node_name} for {this_qubit}')
+            # Fits model to data set
             node_analysis = RabiAnalysis(ds)
             pi_pulse_amplitude = node_analysis.run_fitting()
 
+            # Updates quantities of interest
             self.qoi = pi_pulse_amplitude
-
-            node_analysis.plotter(this_axis)
-
             self.update_redis_trusted_values(node, this_qubit,'mw_amp180')
-
+            
+            # Plots the fit
+            this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
+            node_analysis.plotter(this_axis)
             handles, labels = this_axis.get_legend_handles_labels()
             patch = mpatches.Patch(color='red', label=f'{this_qubit}')
             handles.append(patch)
@@ -137,22 +155,28 @@ class Multiplexed_Rabi_Analysis(BaseAnalysis):
 
 
 class Multiplexed_T1_Analysis(BaseAnalysis):
+    """
+    Analysis for T1 relaxation time measurements.
+    """
     def __init__(self, result_dataset: xr.Dataset, node: str):
         super().__init__(result_dataset)
         for indx, var in enumerate(result_dataset.data_vars):
+            # Fetch measurement data set
             this_qubit = result_dataset[var].attrs['qubit']
             ds = result_dataset[var].to_dataset()
 
-            this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
-            # this_axis.set_title(f'{node_name} for {this_qubit}')
+            # Fits model to data set
             node_analysis = T1Analysis(ds)
             T1_time = node_analysis.model_fit()
-            T1_micros=T1_time*1e6
-
+            T1_micros=T1_time*1e6 #result displayed in units of micro seconds
+            
+            # Updates quantities of interest
             self.qoi = T1_time
+            self.update_redis_trusted_values(node, this_qubit,'relaxation_time')
 
+            # Plots the fit
+            this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
             node_analysis.plotter(this_axis)
-
             handles, labels = this_axis.get_legend_handles_labels()
             patch = mpatches.Patch(color='red', label=f'{this_qubit}')
             handles.append(patch)
@@ -161,21 +185,19 @@ class Multiplexed_T1_Analysis(BaseAnalysis):
             this_axis.set(title=None)
             this_axis.legend(handles=handles)
 
-            #if node_name == 'rabi_frequency' or node_name == 'rabi_oscillations_BATCHED':
-            #    self.update_redis_trusted_values(node_name, this_qubit,'mw_amp180',latex)
-            #if node_name == 'rabi_12_frequency' or node_name == 'rabi_oscillations_12_BATCHED':
-            #    self.update_redis_trusted_values(node_name, this_qubit,'mw_ef_amp180',latex)
-
-        #self.node_result.update({'measurement_dataset':result_dataset.to_dict()})
-
 class Multiplexed_Punchout_Analysis(BaseAnalysis):
+    """
+    Analysis for punchout calibration.
+    """
     def __init__(self, result_dataset: xr.Dataset, node: str):
         super().__init__(result_dataset)
         for indx, var in enumerate(result_dataset.data_vars):
+            # Fetch measurement data set
             this_qubit = result_dataset[var].attrs['qubit']
             ds = result_dataset[var].to_dataset()
             #breakpoint()
 
+            # Normalizes data set values
             N_amplitudes = ds.dims[f'ro_amplitudes{this_qubit}']
             # print(f'{ N_amplitudes = }')
             # norm_factors = np.array([max(ds.y0[ampl].values) for ampl in range(N_amplitudes)])
@@ -184,13 +206,14 @@ class Multiplexed_Punchout_Analysis(BaseAnalysis):
             normalized_values = raw_values / raw_values.max(axis=0)
             ds[f'y{this_qubit}'].values = normalized_values
 
+            # Plots data
             this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
-
             ds[f'y{this_qubit}'].plot(x=f'ro_frequencies{this_qubit}', ax=this_axis)
-            # this_axis.set_title(f'{node_name} for {this_qubit}')
-
             handles, labels = this_axis.get_legend_handles_labels()
             patch = mpatches.Patch(color='red', label=f'{this_qubit}')
             handles.append(patch)
             this_axis.set(title=None)
             this_axis.legend(handles=handles)
+
+# TODO Add more analysis classes for calibration schedules that don't have them yet (wait until the schedules are fully implemented)
+# Ramsey, Crosstalk, DRAG, SSRO...
