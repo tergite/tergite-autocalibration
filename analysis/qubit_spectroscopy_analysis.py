@@ -1,8 +1,8 @@
 import numpy as np
 import xarray as xr
-#from colorama import init as colorama_init
-#from colorama import Fore
-#from colorama import Style
+from colorama import init as colorama_init
+from colorama import Fore
+from colorama import Style
 from scipy import signal
 import lmfit
 
@@ -62,9 +62,9 @@ class QubitSpectroscopyAnalysis():
         coord = list(dataset[data_var].coords.keys())[0]
         self.S21 = dataset[data_var].values
         ########################
-        #print( "")
-        #print( f'{Fore.RED}WARNING MOCK DATA IN analysis/qubit_spectroscopy_analysis{Style.RESET_ALL}')
-        #self.S21 = np.array([1+1j for _ in self.S21])
+        print( "")
+        print( f'{Fore.RED}WARNING MOCK DATA IN analysis/qubit_spectroscopy_analysis{Style.RESET_ALL}')
+        self.S21 = np.array([1+1j for _ in self.S21])
         ########################
         self.independents = dataset[coord].values
         self.fit_results = {}

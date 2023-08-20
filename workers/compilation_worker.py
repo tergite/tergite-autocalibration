@@ -4,18 +4,10 @@ fetch and compile the appropriate schedule'''
 from rq import Queue
 from logger.tac_logger import logger
 logger.info('finished imports')
-
 from math import isnan
 import numpy as np
 from quantify_scheduler.device_under_test.quantum_device import Instrument, QuantumDevice
 import redis
-import sys
-#import logging.config
-#logging.config.dictConfig({
-#        'version': 1,
-#            'disable_existing_loggers': True,
-#            })
-from workers.execution_worker import measure
 from calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
 from calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
 from calibration_schedules.rabi_oscillations import Rabi_Oscillations
@@ -83,8 +75,6 @@ def load_redis_config(transmon: BasicTransmonElement, channel:int):
 
 def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
     logger.info('Starting precompile')
-    isatty = sys.stdout.isatty()
-    logger.info(f'is a TTY {isatty}')
     Instrument.close_all()
 
     device = QuantumDevice('Loki')
@@ -118,13 +108,9 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
                  ).to_html()
              )
 
-
     schedule_duration = compiled_schedule.get_schedule_duration()
 
-    logger.info(f'finished Compiling , {schedule_duration = }')
-    isatty = sys.stdout.isatty()
-    logger.info(f'is a TTY {isatty}')
+    logger.info(f'finished Compiling')
     # compiled_schedule.plot_pulse_diagram(plot_backend='plotly')
 
-    rq_supervisor.enqueue(measure, job_timeout=840, args=(compiled_schedule,samplespace,node))
-    return
+    return compiled_schedule, schedule_duration

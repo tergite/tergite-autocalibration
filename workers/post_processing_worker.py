@@ -14,13 +14,7 @@ logger.info('entering post_process module')
 
 import xarray as xr
 
-import asyncio
-from pathlib import Path
-import xarray as xr
-
-
 import redis
-from rq import Queue
 
 ANALYSIS_MAP = {
         'resonator_spectroscopy': Multiplexed_Resonator_Spectroscopy_Analysis,
@@ -31,9 +25,6 @@ ANALYSIS_MAP = {
         }
 
 redis_connection = redis.Redis(decode_responses=True)
-rq_supervisor = Queue(
-        'calibration_supervisor', connection=redis_connection
-        )
 
 def post_process(result_dataset: xr.Dataset, node: str):
     logger.info('Starting post process')

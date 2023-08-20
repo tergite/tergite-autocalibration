@@ -56,7 +56,8 @@ class Multiplexed_Resonator_Spectroscopy_Analysis(BaseAnalysis):
             fit_Qe = fit_result['Qe']
             fit_ph = fit_result['theta']
             # print(f'{ fit_Ql = }')
-
+            
+            # analytical expression, probably an interpolation of the fit would be better
             minimum_freq = fit_fr / (4*fit_Qe*fit_Ql*np.sin(fit_ph)) * (
                             4*fit_Qe*fit_Ql*np.sin(fit_ph)
                           - 2*fit_Qe*np.cos(fit_ph)

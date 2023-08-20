@@ -1,8 +1,12 @@
 '''Retrieve the compiled schedule and run it'''
 
-import asyncio
 from datetime import datetime
+from time import sleep
 from uuid import uuid4
+from colorama import init as colorama_init
+from colorama import Fore
+from colorama import Style
+colorama_init()
 
 from quantify_scheduler.instrument_coordinator.instrument_coordinator import CompiledSchedule
 from logger.tac_logger import logger
@@ -12,57 +16,45 @@ from qblox_instruments import Cluster, ClusterType
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 import xarray
-from workers.post_processing_worker import post_process
 #from utilities.visuals import box_print
 import numpy as np
+import threading
+import tqdm
 from utilities.root_path import data_directory
 
 from calibration_schedules.time_of_flight import Time_Of_Flight
 
 import redis
-from rq import Queue
 
 redis_connection = redis.Redis(decode_responses=True)
-rq_supervisor = Queue(
-        'calibration_supervisor', connection=redis_connection
-        )
 
 Cluster.close_all()
 
-#dummy = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1,16)}
-#dummy["16"] = ClusterType.CLUSTER_QRM_RF
-#dummy["17"] = ClusterType.CLUSTER_QRM_RF
-#clusterA = Cluster("clusterA", dummy_cfg=dummy)
-#clusterB = Cluster("clusterB", dummy_cfg=dummy)
 
-clusterB = Cluster("clusterB", '192.0.2.141')
-clusterA = Cluster("clusterA", '192.0.2.72')
-clusterA.start_adc_calib(16)
-clusterA.start_adc_calib(17)
-clusterB.start_adc_calib(17)
-clusterA.module16.sequencer0.nco_prop_delay_comp_en(True)
-clusterA.module16.sequencer1.nco_prop_delay_comp_en(True)
-clusterA.module16.sequencer2.nco_prop_delay_comp_en(True)
-clusterA.module16.sequencer3.nco_prop_delay_comp_en(True)
-clusterA.module16.sequencer4.nco_prop_delay_comp_en(True)
-clusterA.module16.sequencer5.nco_prop_delay_comp_en(True)
-clusterA.module17.sequencer0.nco_prop_delay_comp_en(True)
-clusterA.module17.sequencer1.nco_prop_delay_comp_en(True)
-clusterA.module17.sequencer2.nco_prop_delay_comp_en(True)
-clusterA.module17.sequencer3.nco_prop_delay_comp_en(True)
-clusterA.module17.sequencer4.nco_prop_delay_comp_en(True)
-clusterA.module17.sequencer5.nco_prop_delay_comp_en(True)
-clusterB.module17.sequencer0.nco_prop_delay_comp_en(True)
-clusterB.module17.sequencer1.nco_prop_delay_comp_en(True)
-clusterB.module17.sequencer2.nco_prop_delay_comp_en(True)
-clusterB.module17.sequencer3.nco_prop_delay_comp_en(True)
-clusterB.module17.sequencer4.nco_prop_delay_comp_en(True)
-clusterB.module17.sequencer5.nco_prop_delay_comp_en(True)
+# clusterB = Cluster("clusterB", '192.0.2.141')
+# clusterA = Cluster("clusterA", '192.0.2.72')
+# clusterA.start_adc_calib(16)
+# clusterA.start_adc_calib(17)
+# clusterB.start_adc_calib(17)
+# clusterA.module16.sequencer0.nco_prop_delay_comp_en(True)
+# clusterA.module16.sequencer1.nco_prop_delay_comp_en(True)
+# clusterA.module16.sequencer2.nco_prop_delay_comp_en(True)
+# clusterA.module16.sequencer3.nco_prop_delay_comp_en(True)
+# clusterA.module16.sequencer4.nco_prop_delay_comp_en(True)
+# clusterA.module16.sequencer5.nco_prop_delay_comp_en(True)
+# clusterA.module17.sequencer0.nco_prop_delay_comp_en(True)
+# clusterA.module17.sequencer1.nco_prop_delay_comp_en(True)
+# clusterA.module17.sequencer2.nco_prop_delay_comp_en(True)
+# clusterA.module17.sequencer3.nco_prop_delay_comp_en(True)
+# clusterA.module17.sequencer4.nco_prop_delay_comp_en(True)
+# clusterA.module17.sequencer5.nco_prop_delay_comp_en(True)
+# clusterB.module17.sequencer0.nco_prop_delay_comp_en(True)
+# clusterB.module17.sequencer1.nco_prop_delay_comp_en(True)
+# clusterB.module17.sequencer2.nco_prop_delay_comp_en(True)
+# clusterB.module17.sequencer3.nco_prop_delay_comp_en(True)
+# clusterB.module17.sequencer4.nco_prop_delay_comp_en(True)
+# clusterB.module17.sequencer5.nco_prop_delay_comp_en(True)
 
-loki_ic = InstrumentCoordinator('loki_ic')
-loki_ic.add_component(ClusterComponent(clusterA))
-loki_ic.add_component(ClusterComponent(clusterB))
-loki_ic.timeout(222)
 
 def configure_dataset(
         raw_ds: xarray.Dataset,
@@ -115,7 +107,7 @@ def to_complex_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
 
     return complex_ds        
 
-def measure( compiled_schedule: CompiledSchedule, samplespace: dict, node: str) -> xarray.Dataset:
+def measure( compiled_schedule: CompiledSchedule, schedule_duration: float, samplespace: dict, node: str) -> xarray.Dataset:
     logger.info('Starting measurement')
 
     #Runs time of flight calibration
@@ -128,12 +120,33 @@ def measure( compiled_schedule: CompiledSchedule, samplespace: dict, node: str) 
     #        logger.info(f'Time of flight: {TOF}')
     
     #box_print(f'Measuring node: {node}')
-    logger.info(f'Measuring node: {node}')
-    loki_ic.prepare(compiled_schedule)
+    print(f'{Fore.CYAN}{Style.BRIGHT}Measuring node: {node} , duration: {schedule_duration:.2f}s{Style.RESET_ALL}')
+    dummy = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1,16)}
+    dummy["16"] = ClusterType.CLUSTER_QRM_RF
+    dummy["17"] = ClusterType.CLUSTER_QRM_RF
+    clusterA = Cluster("clusterA", dummy_cfg=dummy)
+    clusterB = Cluster("clusterB", dummy_cfg=dummy)
+    loki_ic = InstrumentCoordinator('loki_ic')
+    loki_ic.add_component(ClusterComponent(clusterA))
+    loki_ic.add_component(ClusterComponent(clusterB))
+    loki_ic.timeout(222)
 
-    loki_ic.start()
+    def run_measurement() -> None:
+        loki_ic.prepare(compiled_schedule)
+        loki_ic.start()
+        loki_ic.wait_done(timeout_sec=600)
 
-    loki_ic.wait_done(timeout_sec=600)
+    def display_progress():
+        steps = int(schedule_duration * 5)
+        for _ in tqdm.tqdm(range(steps), desc=node, colour='cyan'):
+            sleep(.1)
+
+    thread_loki = threading.Thread(target=run_measurement)
+    thread_loki.start()
+    thread_tqdm = threading.Thread(target=display_progress)
+    thread_tqdm.start()
+    thread_loki.join()
+    thread_tqdm.join()
 
     raw_dataset: xarray.Dataset = loki_ic.retrieve_acquisition()
     logger.info('Raw dataset acquired')
@@ -152,30 +165,4 @@ def measure( compiled_schedule: CompiledSchedule, samplespace: dict, node: str) 
     logger.info('Finished measurement')
     # print(result_dataset)
 
-    rq_supervisor.enqueue(
-            post_process,
-            args=(result_dataset_complex,node,),
-            job_timeout=472,
-            on_success=postprocessing_success_callback
-            )
-
-    return result_dataset
-
-
-LOCALHOST = '127.0.0.1'
-CALIBRATION_SUPERVISOR_PORT = 8006
-
-async def notify_job_done(job_id: str):
-    _, writer = await asyncio.open_connection(
-        LOCALHOST, CALIBRATION_SUPERVISOR_PORT
-    )
-    message = ("job_done:" + job_id).encode()
-    #print(f"notify_job_done: {message=}")
-    writer.write(message)
-    writer.close()
-
-def postprocessing_success_callback(_rq_job, _rq_connection, result):
-    logger.info('post call back')
-    # ensure that the notification is sent otherwise the main will stop it
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(notify_job_done('ID'))
+    return result_dataset_complex
