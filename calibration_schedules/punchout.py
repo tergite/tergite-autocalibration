@@ -37,8 +37,7 @@ class Punchout(Measurement):
         schedule = Schedule("mltplx_punchout",repetitions)
 
         # Initialize the clock for each qubit
-        for ro_key, ro_array_val in ro_frequencies.items():
-            this_qubit = [qubit for qubit in qubits if qubit in ro_key][0]
+        for this_qubit, ro_array_val in ro_frequencies.items():
 
             #Initialize ClockResource with the first frequency value
             schedule.add_resource( ClockResource(name=f'{this_qubit}.ro', freq=ro_array_val[0]) )
