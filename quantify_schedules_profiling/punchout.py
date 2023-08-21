@@ -4,7 +4,7 @@ from quantify_scheduler.resources import ClockResource
 from quantify_scheduler import Schedule
 from quantify_scheduler.operations.pulse_library import SquarePulse, SetClockFrequency
 from quantify_scheduler.operations.gate_library import Reset
-from calibration_schedules.measurement_base import Measurement
+from measurement_base import Measurement
 import numpy as np
 
 

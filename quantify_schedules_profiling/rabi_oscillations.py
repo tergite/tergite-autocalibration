@@ -3,7 +3,7 @@ from quantify_scheduler.enums import BinMode
 from quantify_scheduler import Schedule
 from quantify_scheduler.operations.pulse_library import DRAGPulse
 from quantify_scheduler.operations.gate_library import Measure, Reset, X
-from calibration_schedules.measurement_base import Measurement
+from measurement_base import Measurement
 import numpy as np
 
 # from transmon_element import Measure_1
