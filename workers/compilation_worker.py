@@ -74,7 +74,6 @@ def load_redis_config(transmon: BasicTransmonElement, channel:int):
 
 
 def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
-    logger.info('Starting precompile')
     Instrument.close_all()
 
     device = QuantumDevice('Loki')

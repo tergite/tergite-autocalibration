@@ -28,32 +28,6 @@ import redis
 
 redis_connection = redis.Redis(decode_responses=True)
 
-Cluster.close_all()
-
-
-# clusterB = Cluster("clusterB", '192.0.2.141')
-# clusterA = Cluster("clusterA", '192.0.2.72')
-# clusterA.start_adc_calib(16)
-# clusterA.start_adc_calib(17)
-# clusterB.start_adc_calib(17)
-# clusterA.module16.sequencer0.nco_prop_delay_comp_en(True)
-# clusterA.module16.sequencer1.nco_prop_delay_comp_en(True)
-# clusterA.module16.sequencer2.nco_prop_delay_comp_en(True)
-# clusterA.module16.sequencer3.nco_prop_delay_comp_en(True)
-# clusterA.module16.sequencer4.nco_prop_delay_comp_en(True)
-# clusterA.module16.sequencer5.nco_prop_delay_comp_en(True)
-# clusterA.module17.sequencer0.nco_prop_delay_comp_en(True)
-# clusterA.module17.sequencer1.nco_prop_delay_comp_en(True)
-# clusterA.module17.sequencer2.nco_prop_delay_comp_en(True)
-# clusterA.module17.sequencer3.nco_prop_delay_comp_en(True)
-# clusterA.module17.sequencer4.nco_prop_delay_comp_en(True)
-# clusterA.module17.sequencer5.nco_prop_delay_comp_en(True)
-# clusterB.module17.sequencer0.nco_prop_delay_comp_en(True)
-# clusterB.module17.sequencer1.nco_prop_delay_comp_en(True)
-# clusterB.module17.sequencer2.nco_prop_delay_comp_en(True)
-# clusterB.module17.sequencer3.nco_prop_delay_comp_en(True)
-# clusterB.module17.sequencer4.nco_prop_delay_comp_en(True)
-# clusterB.module17.sequencer5.nco_prop_delay_comp_en(True)
 
 
 def configure_dataset(
@@ -121,14 +95,40 @@ def measure( compiled_schedule: CompiledSchedule, schedule_duration: float, samp
     
     #box_print(f'Measuring node: {node}')
     print(f'{Fore.CYAN}{Style.BRIGHT}Measuring node: {node} , duration: {schedule_duration:.2f}s{Style.RESET_ALL}')
-    dummy = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1,16)}
-    dummy["16"] = ClusterType.CLUSTER_QRM_RF
-    dummy["17"] = ClusterType.CLUSTER_QRM_RF
-    clusterA = Cluster("clusterA", dummy_cfg=dummy)
-    clusterB = Cluster("clusterB", dummy_cfg=dummy)
+
+    #dummy = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1,16)}
+    #dummy["16"] = ClusterType.CLUSTER_QRM_RF
+    #dummy["17"] = ClusterType.CLUSTER_QRM_RF
+    #clusterA = Cluster("clusterA", dummy_cfg=dummy)
+    #clusterB = Cluster("clusterB", dummy_cfg=dummy)
+    Cluster.close_all()
+    #clusterB = Cluster("clusterB", '192.0.2.141')
+    clusterA = Cluster("clusterA", '192.0.2.72')
+    #clusterA.start_adc_calib(16)
+    #clusterA.start_adc_calib(17)
+    #clusterB.start_adc_calib(17)
+    #clusterA.module16.sequencer0.nco_prop_delay_comp_en(True)
+    #clusterA.module16.sequencer1.nco_prop_delay_comp_en(True)
+    #clusterA.module16.sequencer2.nco_prop_delay_comp_en(True)
+    #clusterA.module16.sequencer3.nco_prop_delay_comp_en(True)
+    #clusterA.module16.sequencer4.nco_prop_delay_comp_en(True)
+    #clusterA.module16.sequencer5.nco_prop_delay_comp_en(True)
+    #clusterA.module17.sequencer0.nco_prop_delay_comp_en(True)
+    #clusterA.module17.sequencer1.nco_prop_delay_comp_en(True)
+    #clusterA.module17.sequencer2.nco_prop_delay_comp_en(True)
+    #clusterA.module17.sequencer3.nco_prop_delay_comp_en(True)
+    #clusterA.module17.sequencer4.nco_prop_delay_comp_en(True)
+    #clusterA.module17.sequencer5.nco_prop_delay_comp_en(True)
+    #clusterB.module17.sequencer0.nco_prop_delay_comp_en(True)
+    #clusterB.module17.sequencer1.nco_prop_delay_comp_en(True)
+    #clusterB.module17.sequencer2.nco_prop_delay_comp_en(True)
+    #clusterB.module17.sequencer3.nco_prop_delay_comp_en(True)
+    #clusterB.module17.sequencer4.nco_prop_delay_comp_en(True)
+    #clusterB.module17.sequencer5.nco_prop_delay_comp_en(True)
+
     loki_ic = InstrumentCoordinator('loki_ic')
     loki_ic.add_component(ClusterComponent(clusterA))
-    loki_ic.add_component(ClusterComponent(clusterB))
+    #loki_ic.add_component(ClusterComponent(clusterB))
     loki_ic.timeout(222)
 
     def run_measurement() -> None:
@@ -139,12 +139,12 @@ def measure( compiled_schedule: CompiledSchedule, schedule_duration: float, samp
     def display_progress():
         steps = int(schedule_duration * 5)
         for _ in tqdm.tqdm(range(steps), desc=node, colour='cyan'):
-            sleep(.1)
+            sleep(.2)
 
-    thread_loki = threading.Thread(target=run_measurement)
-    thread_loki.start()
     thread_tqdm = threading.Thread(target=display_progress)
     thread_tqdm.start()
+    thread_loki = threading.Thread(target=run_measurement)
+    thread_loki.start()
     thread_loki.join()
     thread_tqdm.join()
 

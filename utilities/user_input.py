@@ -36,10 +36,10 @@ VNA_qubit_frequencies = {
         'q23': 3.980e9,
         }
 
-#qubits = [ 'q16', 'q22', 'q23']
+qubits = [ 'q16', 'q22', 'q23']
 #qubits = ['q18', 'q19']
 #qubits = ['q16', 'q18', 'q19', 'q23']
-qubits = ['q16']
+#qubits = ['q16']
 
 N_qubits = len(qubits)
 
