@@ -4,7 +4,7 @@ from rabi_oscillations import Rabi_Oscillations
 from punchout import Punchout
 from quantify_scheduler.device_under_test.transmon_element import BasicTransmonElement
 from quantify_scheduler.backends import SerialCompiler
-from test_hw_config import hardware_config
+from profiling_hw_config import hardware_config
 from quantify_core.data.handling import set_datadir
 from datetime import datetime
 set_datadir('.')
