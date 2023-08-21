@@ -1,10 +1,10 @@
 import numpy as np
 from quantify_scheduler.device_under_test.quantum_device import Instrument, QuantumDevice
-from calibration_schedules.rabi_oscillations import Rabi_Oscillations
-from calibration_schedules.punchout import Punchout
+from rabi_oscillations import Rabi_Oscillations
+from punchout import Punchout
 from quantify_scheduler.device_under_test.transmon_element import BasicTransmonElement
 from quantify_scheduler.backends import SerialCompiler
-from config_files.test_hw_config import hardware_config
+from test_hw_config import hardware_config
 from quantify_core.data.handling import set_datadir
 from datetime import datetime
 set_datadir('.')
@@ -13,8 +13,18 @@ schedule_map = {
     'rabi_oscillations': Rabi_Oscillations,
     'punchout': Punchout,
 }
+
+
 node = 'punchout'
-qubits = [f'q{i}' for i in range(10)]
+############### uncomment here the desired node. either rabi_oscillations or punchout
+# node = 'rabi_oscillations'
+#####################################################################################
+print(f'compiling node: {node}')
+
+########### Select the number of qubits ##########
+number_qubits = 10
+###################################################
+qubits = [f'q{i}' for i in range(number_qubits)]
 
 if node == 'punchout':
     samplespace = {
@@ -51,6 +61,7 @@ device = QuantumDevice('Loki')
 device.hardware_config(hardware_config)
 device.cfg_sched_repetitions(1024)
 
+# dict with the qubit name as key and the corresponding BTE as value
 transmons = {}
 
 for channel, qubit in enumerate(qubits):
@@ -71,7 +82,7 @@ t0 = datetime.now()
 compiled_schedule = compiler.compile(schedule=schedule, config=device.generate_compilation_config())
 t1 = datetime.now()
 delta = t1-t0
-print(delta)
+print(f'compilation time: {delta}')
 
 # with open(f'TIMING_TABLE_rabi.html', 'w') as file:
 #      file.write(
