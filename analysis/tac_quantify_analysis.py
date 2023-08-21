@@ -1,6 +1,7 @@
 from analysis.resonator_spectroscopy_analysis import ResonatorSpectroscopyAnalysis
 from analysis.qubit_spectroscopy_analysis import QubitSpectroscopyAnalysis
 from analysis.rabi_analysis import RabiAnalysis
+from analysis.ramsey_analysis import RamseyAnalysis
 from analysis.T1_analysis import T1Analysis
 from quantify_core.data.handling import set_datadir
 # from quantify_analysis import qubit_spectroscopy_analysis, rabi_analysis, T1_analysis, XY_crosstalk_analysis, ramsey_analysis, SSRO_analysis
@@ -56,7 +57,7 @@ class Multiplexed_Resonator_Spectroscopy_Analysis(BaseAnalysis):
             fit_Qe = fit_result['Qe']
             fit_ph = fit_result['theta']
             # print(f'{ fit_Ql = }')
-            
+
             # analytical expression, probably an interpolation of the fit would be better
             minimum_freq = fit_fr / (4*fit_Qe*fit_Ql*np.sin(fit_ph)) * (
                             4*fit_Qe*fit_Ql*np.sin(fit_ph)
@@ -136,6 +137,29 @@ class Multiplexed_Rabi_Analysis(BaseAnalysis):
             this_axis.set(title=None)
             this_axis.legend(handles=handles)
 
+class Multiplexed_Ramsey_Analysis(BaseAnalysis):
+    def __init__(self, result_dataset: xr.Dataset, node: str):
+        super().__init__(result_dataset)
+        for indx, var in enumerate(result_dataset.data_vars):
+            this_qubit = result_dataset[var].attrs['qubit']
+            ds = result_dataset[var].to_dataset()
+
+            this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
+            # this_axis.set_title(f'{node_name} for {this_qubit}')
+            node_analysis = RamseyAnalysis(ds)
+            qubit_frequency = node_analysis.run_fitting()
+
+            self.qoi = qubit_frequency
+
+            node_analysis.plotter(this_axis)
+
+            self.update_redis_trusted_values(node, this_qubit,'freq_01')
+
+            handles, labels = this_axis.get_legend_handles_labels()
+            patch = mpatches.Patch(color='red', label=f'{this_qubit}')
+            handles.append(patch)
+            this_axis.set(title=None)
+            this_axis.legend(handles=handles)
 
 class Multiplexed_T1_Analysis(BaseAnalysis):
     def __init__(self, result_dataset: xr.Dataset, node: str):
