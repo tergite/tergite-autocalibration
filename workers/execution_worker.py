@@ -92,7 +92,7 @@ def measure( compiled_schedule: CompiledSchedule, schedule_duration: float, samp
     #        TOF=Time_Of_Flight(Cluster("cluster", '192.0.2.72'), TOF_plotting)
     #        logger.info(f'Time of flight: {TOF}')
 
-    print(f'{Fore.CYAN}{Style.BRIGHT}Measuring node: {node} , duration: {schedule_duration:.2f}s{Style.RESET_ALL}')
+    print(f'{Fore.BLUE}{Style.BRIGHT}Measuring node: {node} , duration: {schedule_duration:.2f}s{Style.RESET_ALL}')
 
     Cluster.close_all()
     if cluster_status == ClusterStatus.dummy:

@@ -15,7 +15,7 @@ from calibration_schedules.T1 import T1_BATCHED
 from calibration_schedules.time_of_flight import Time_Of_Flight
 from calibration_schedules.XY_crosstalk import XY_cross
 from calibration_schedules.punchout import Punchout
-# from calibration_schedules.ramsey_fringes import Ramsey_fringes
+from calibration_schedules.ramsey_fringes import Ramsey_fringes
 # from calibration_schedules.drag_amplitude import DRAG_amplitude
 # from calibration_schedules.motzoi_paramerter import Motzoi_parameter
 from quantify_scheduler.device_under_test.transmon_element import BasicTransmonElement
@@ -33,7 +33,7 @@ node_map = {
     'T1': T1_BATCHED,
     'XY_crosstalk': XY_cross,
     'punchout': Punchout,
-    # 'ramsey_correction': Ramsey_fringes,
+    'ramsey_correction': Ramsey_fringes,
     # 'motzoi_parameter': Motzoi_parameter,
     # 'drag_amplitude': DRAG_amplitude,
     # 'resonator_spectroscopy_1': Resonator_Spectroscopy,

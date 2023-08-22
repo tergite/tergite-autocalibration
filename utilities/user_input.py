@@ -12,8 +12,8 @@ nodes = [
         #"punchout",
         "qubit_01_spectroscopy_pulsed",
         "rabi_oscillations",
-        "T1",
-        "XY_crosstalk",
+        #"T1",
+        #"XY_crosstalk",
         "ramsey_correction",
         ]
 
@@ -118,12 +118,12 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
         },
 
         'ramsey_correction': {
-            'ramsey_delay': { qubit :{"sweep_min": 4e-9, "sweep_max": 2048e-9, "step": 6*8e-9} for qubit in qubits }
+            'ramsey_delays': { qubit : np.arange(4e-9, 2048e-9, 6*8e-9) for qubit in qubits }
                 },
     }
     return sweep_parameters
 
-node_to_be_calibrated = "rabi_oscillations"
+node_to_be_calibrated = "ramsey_correction"
 #node_to_be_calibrated = "T1"
 box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 

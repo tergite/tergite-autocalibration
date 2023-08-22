@@ -6,12 +6,10 @@ from analysis.tac_quantify_analysis import (
         Multiplexed_Resonator_Spectroscopy_Analysis,
         Multiplexed_Two_Tones_Spectroscopy_Analysis,
         Multiplexed_Rabi_Analysis,
+        Multiplexed_Ramsey_Analysis,
         Multiplexed_T1_Analysis,
         Multiplexed_Punchout_Analysis,
         )
-
-logger.info('entering post_process module')
-
 import xarray as xr
 
 import redis
@@ -22,12 +20,12 @@ ANALYSIS_MAP = {
         'rabi_oscillations': Multiplexed_Rabi_Analysis,
         'T1': Multiplexed_T1_Analysis,
         'punchout': Multiplexed_Punchout_Analysis,
+        'ramsey_correction': Multiplexed_Ramsey_Analysis,
         }
 
 redis_connection = redis.Redis(decode_responses=True)
 
 def post_process(result_dataset: xr.Dataset, node: str):
-    logger.info('Starting post process')
     analysis_class = ANALYSIS_MAP[node]
     analysis = analysis_class(result_dataset, node)
     #figure_manager = plt.get_current_fig_manager()

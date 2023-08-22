@@ -143,6 +143,7 @@ class Multiplexed_Ramsey_Analysis(BaseAnalysis):
         for indx, var in enumerate(result_dataset.data_vars):
             this_qubit = result_dataset[var].attrs['qubit']
             ds = result_dataset[var].to_dataset()
+            ds.attrs['qubit'] = this_qubit
 
             this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
             # this_axis.set_title(f'{node_name} for {this_qubit}')

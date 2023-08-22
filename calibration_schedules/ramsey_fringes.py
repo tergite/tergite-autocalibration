@@ -11,12 +11,11 @@ class Ramsey_fringes(Measurement):
 
     def __init__(self,transmons,qubit_state:int=0):
         super().__init__(transmons)
-        artificial_detuning = 3.0e6 #TODO remove hardcoding
         self.qubit_state = qubit_state
 
         self.static_kwargs = {
             'qubits': self.qubits,
-            'artificial_detuning': artificial_detuning,
+            'artificial_detunings': self.attributes_dictionary('artificial_detuning'),
 
             # 'mw_ef_amps180': self._get_attributes('mw_ef_amp180'),
             # 'mw_frequencies': self.attributes_dictionary('f01'),
@@ -28,12 +27,12 @@ class Ramsey_fringes(Measurement):
     def schedule_function(
         self,
         qubits: list[str],
+        artificial_detunings: dict[str,float],
         # mw_ef_amps180: dict[str,float],
         # mw_frequencies: dict[str,float],
         # mw_pulse_ports: dict[str,str],
         # mw_pulse_durations: dict[str,float],
-        intermediate_delays: dict[str,np.ndarray],
-        artificial_detuning: float = 0,
+        ramsey_delays: dict[str,np.ndarray],
         repetitions: int = 1024,
         ) -> Schedule:
 
@@ -56,9 +55,10 @@ class Ramsey_fringes(Measurement):
         #This is the common reference operation so the qubits can be operated in parallel
         root_relaxation = sched.add(Reset(*qubits), label="Reset")
 
-        for this_qubit, delay_array_val in intermediate_delays.items():
+        for this_qubit, delay_array_val in ramsey_delays.items():
             # The second for loop iterates over all frequency values in the frequency batch:
             relaxation = root_relaxation #To enforce parallelism we refer to the root relaxation
+            artificial_detuning = artificial_detunings[this_qubit]
 
             for acq_index, ramsey_delay in enumerate(delay_array_val):
                 recovery_phase = np.rad2deg(2 * np.pi * artificial_detuning * ramsey_delay)

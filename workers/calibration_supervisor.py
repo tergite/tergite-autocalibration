@@ -15,8 +15,6 @@ import utilities.user_input as user_input
 import toml
 import redis
 
-logger.info('Initialize')
-
 redis_connection = redis.Redis(decode_responses=True)
 
 # Settings
