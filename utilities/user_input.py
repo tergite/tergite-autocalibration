@@ -15,6 +15,7 @@ nodes = [
         #"T1",
         #"XY_crosstalk",
         "ramsey_correction",
+        "motzoi_parameter",
         ]
 
 VNA_resonator_frequencies = {
@@ -120,10 +121,15 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
         'ramsey_correction': {
             'ramsey_delays': { qubit : np.arange(4e-9, 2048e-9, 6*8e-9) for qubit in qubits }
                 },
+
+        'motzoi_parameter': {
+            'mw_motzois': {qubit: np.linspace(-0.45,0.45,31) for qubit in qubits},
+            'X_repetitions': {qubit : np.arange(2, 17, 2) for qubit in qubits}
+        },
     }
     return sweep_parameters
 
-node_to_be_calibrated = "ramsey_correction"
+node_to_be_calibrated = "motzoi_parameter"
 #node_to_be_calibrated = "T1"
 box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 

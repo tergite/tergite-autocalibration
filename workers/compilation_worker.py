@@ -17,7 +17,7 @@ from calibration_schedules.XY_crosstalk import XY_cross
 from calibration_schedules.punchout import Punchout
 from calibration_schedules.ramsey_fringes import Ramsey_fringes
 # from calibration_schedules.drag_amplitude import DRAG_amplitude
-# from calibration_schedules.motzoi_paramerter import Motzoi_parameter
+from calibration_schedules.motzoi_paramerter import Motzoi_parameter
 from quantify_scheduler.device_under_test.transmon_element import BasicTransmonElement
 from quantify_scheduler.backends import SerialCompiler
 from config_files.IF_hw_config import hardware_config
@@ -34,7 +34,7 @@ node_map = {
     'XY_crosstalk': XY_cross,
     'punchout': Punchout,
     'ramsey_correction': Ramsey_fringes,
-    # 'motzoi_parameter': Motzoi_parameter,
+    'motzoi_parameter': Motzoi_parameter,
     # 'drag_amplitude': DRAG_amplitude,
     # 'resonator_spectroscopy_1': Resonator_Spectroscopy,
     # 'qubit_12_spectroscopy_pulsed': Two_Tones_Spectroscopy,

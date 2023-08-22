@@ -14,7 +14,7 @@ class Motzoi_parameter(Measurement):
         self.static_kwargs = {
             'qubits': self.qubits,
             'mw_frequencies': self.attributes_dictionary('f01'),
-            'mw_amplitudes': self.attributes_dictionary('mw_amp180'),
+            'mw_amplitudes': self.attributes_dictionary('amp180'),
             'mw_pulse_durations': self.attributes_dictionary('duration'),
             'mw_pulse_ports': self.attributes_dictionary('microwave'),
         }
