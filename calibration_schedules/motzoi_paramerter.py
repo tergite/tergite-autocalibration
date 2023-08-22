@@ -1,8 +1,10 @@
+from quantify_scheduler.enums import BinMode
 from quantify_scheduler.resources import ClockResource
 from quantify_scheduler import Schedule
 from quantify_scheduler.operations.pulse_library import DRAGPulse
 from quantify_scheduler.operations.gate_library import Measure, Reset
 from calibration_schedules.measurement_base import Measurement
+import numpy as np
 
 class Motzoi_parameter(Measurement):
 
@@ -40,46 +42,48 @@ class Motzoi_parameter(Measurement):
 
         # The outer loop, iterates over all qubits
         for acq_cha, (this_qubit, X_values) in enumerate(X_repetitions.items()):
+            this_clock = f'{this_qubit}.01'
 
             motzoi_parameter_values = mw_motzois[this_qubit]
             number_of_motzois = len(motzoi_parameter_values)
 
-            # The second for loop iterates over all frequency values in the frequency batch:
             schedule.add(
                 Reset(*qubits), ref_op=root_relaxation, ref_pt_new='end'
             ) #To enforce parallelism we refer to the root relaxation
 
+            # The intermediate loop iterates over all motzoi values:
             for motzoi_index, mw_motzoi in enumerate(motzoi_parameter_values):
-                for x_index in range(X_values):
-                    schedule.add(
-                        DRAGPulse(
-                            duration=mw_pulse_durations[this_qubit],
-                            G_amp=mw_amplitudes[this_qubit],
-                            D_amp=mw_motzoi,
-                            port=mw_pulse_ports[this_qubit],
-                            clock=mw_clocks[this_qubit],
-                            phase=0,
-                        ),
-                        label=f"motzoi_drag_pulse_{this_qubit}_{x_index}_{acq_index}",
-                    )
-                    # inversion pulse requires 180 deg phase
-                    schedule.add(
-                        DRAGPulse(
-                            duration=mw_pulse_durations[this_qubit],
-                            G_amp=mw_amplitudes[this_qubit],
-                            D_amp=mw_motzoi,
-                            port=mw_pulse_ports[this_qubit],
-                            clock=mw_clocks[this_qubit],
-                            phase=180,
-                        ),
-                        label=f"motzoi_inverse_drag_pulse_{this_qubit}_{x_index}_{acq_index}",
-                    )
 
-                schedule.add(
-                    Measure(this_qubit, acq_channel=acq_cha, acq_index=acq_index),
-                    label=f"Measurement_{acq_index}_{acq_cha}_{this_qubit}"
-                )
+                # The inner for loop iterates over all frequency values in the frequency batch:
+                for acq_index, this_x in enumerate(X_values):
+                    this_index = motzoi_index*number_of_motzois + acq_index
+                    for _ in range(this_x):
+                        schedule.add(
+                                DRAGPulse(
+                                    duration=mw_pulse_durations[this_qubit],
+                                    G_amp=mw_amplitudes[this_qubit],
+                                    D_amp=mw_motzoi,
+                                    port=mw_pulse_ports[this_qubit],
+                                    clock=this_clock,
+                                    phase=0,
+                                    ),
+                                )
+                        # inversion pulse requires 180 deg phase
+                        schedule.add(
+                                DRAGPulse(
+                                    duration=mw_pulse_durations[this_qubit],
+                                    G_amp=mw_amplitudes[this_qubit],
+                                    D_amp=mw_motzoi,
+                                    port=mw_pulse_ports[this_qubit],
+                                    clock=this_clock,
+                                    phase=180,
+                                    ),
+                                )
 
-                schedule.add(Reset(this_qubit), label=f"Reset_{this_qubit}_{acq_index}")
+                    schedule.add(
+                            Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
+                            )
+
+                    schedule.add(Reset(this_qubit))
 
         return schedule

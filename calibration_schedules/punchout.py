@@ -56,7 +56,7 @@ class Punchout(Measurement):
                     Reset(*qubits), ref_op=root_relaxation, ref_pt_new='end'
             ) #To enforce parallelism we refer to the root relaxation
 
-            # The intermediate loop, iterates over all ro ro_amplitudes
+            # The intermediate loop, iterates over all ro_amplitudes
             for ampl_indx, ro_amplitude in enumerate(ro_amplitude_values):
 
                 #The inner for loop iterates over all frequency values in the frequency batch:
