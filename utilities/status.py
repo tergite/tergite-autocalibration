@@ -1,5 +1,4 @@
 # This code is part of Tergite
-
 from enum import Enum
 
 # Used by check_data to indicate outcome
@@ -8,3 +7,8 @@ class DataStatus(Enum):
     out_of_spec = 2
     bad_data = 3
     undefined = 4
+
+# Used to distinguish running on dummy or real clusters
+class ClusterStatus(Enum):
+    dummy = 1
+    real = 2

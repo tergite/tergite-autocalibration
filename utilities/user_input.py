@@ -43,7 +43,7 @@ qubits = [ 'q16', 'q22', 'q23']
 
 N_qubits = len(qubits)
 
-res_spec_samples = 80
+res_spec_samples = 50
 qub_spec_samples = 100
 
 def resonator_samples(qubit:str, punchout=False) -> np.ndarray:
@@ -68,7 +68,7 @@ def qubit_samples(qubit:str, transition:str = '01') -> np.ndarray:
         raise ValueError('Invalid transition')
 
     min_freq =  VNA_frequency - sweep_range / 2 + 0*sweep_range
-    max_freq =  VNA_frequency + sweep_range / 2 + 0*sweep_range 
+    max_freq =  VNA_frequency + sweep_range / 2 + 0*sweep_range
     return np.linspace(min_freq, max_freq, qub_spec_samples)
 
 def experiment_parameters(node:str, qubits:List[str]) -> dict:
