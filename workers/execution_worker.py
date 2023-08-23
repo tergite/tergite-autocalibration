@@ -123,8 +123,12 @@ def measure( compiled_schedule: CompiledSchedule, schedule_duration: float, samp
 
     def display_progress():
         steps = int(schedule_duration * 5)
+        if cluster_status == ClusterStatus.dummy:
+            progress_sleep = 0.01
+        elif cluster_status == ClusterStatus.real :
+            progress_sleep = 0.2
         for _ in tqdm.tqdm(range(steps), desc=node, colour='blue'):
-            sleep(.02)
+            sleep(progress_sleep)
 
 
     thread_tqdm = threading.Thread(target=display_progress)
