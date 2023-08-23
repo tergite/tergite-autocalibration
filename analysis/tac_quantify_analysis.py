@@ -2,6 +2,7 @@ from analysis.resonator_spectroscopy_analysis import ResonatorSpectroscopyAnalys
 from analysis.qubit_spectroscopy_analysis import QubitSpectroscopyAnalysis
 from analysis.rabi_analysis import RabiAnalysis
 from analysis.ramsey_analysis import RamseyAnalysis
+# from analysis.motzoi_analysis import MotzoiAnalysis
 from analysis.T1_analysis import T1Analysis
 from quantify_core.data.handling import set_datadir
 # from quantify_analysis import qubit_spectroscopy_analysis, rabi_analysis, T1_analysis, XY_crosstalk_analysis, ramsey_analysis, SSRO_analysis
@@ -35,7 +36,6 @@ class BaseAnalysis():
        self.qoi = 0 # quantity of interest
 
     def update_redis_trusted_values(self,node:str, this_qubit:str,transmon_parameter:str):
-        #print(f'\n--------> {transmon_parameter} = { self.qoi }<--------\n')
         redis_connection.hset(f"transmons:{this_qubit}",f"{transmon_parameter}",self.qoi)
         redis_connection.hset(f"cs:{this_qubit}",node,'calibrated')
         self.node_result.update({this_qubit: self.qoi})
@@ -136,6 +136,50 @@ class Multiplexed_Rabi_Analysis(BaseAnalysis):
             handles.append(patch)
             this_axis.set(title=None)
             this_axis.legend(handles=handles)
+
+class Multiplexed_Motzoi_Analysis(BaseAnalysis):
+    def __init__(self, result_dataset: xr.Dataset, node: str):
+        super().__init__(result_dataset)
+        for indx, var in enumerate(result_dataset.data_vars):
+            this_qubit = result_dataset[var].attrs['qubit']
+            ds = result_dataset[var].to_dataset()
+            ds.attrs['qubit'] = this_qubit
+            motzoi_key = 'mw_motzois'+this_qubit
+
+            motzois = ds[motzoi_key].size
+            sums = []
+            for this_motzoi_index in range(motzois):
+                this_sum = sum(np.abs(ds[f'y{this_qubit}'][this_motzoi_index].values))
+                sums.append(this_sum)
+
+            index_of_min = np.argmin(np.array(sums))
+            # breakpoint()
+            optimal_motzoi = float(ds[motzoi_key][index_of_min].values)
+
+            this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
+
+            # ds.y0.plot(ax=this_axis)
+            # this_axis.axvline(optimal_motzoi, c='red', lw=4)
+            self.qoi = optimal_motzoi
+            self.update_redis_trusted_values(node, this_qubit, 'mw_motzoi')
+            # this_axis.set_title(f'{node_name} for {this_qubit}')
+
+            # this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
+            # # this_axis.set_title(f'{node_name} for {this_qubit}')
+            # node_analysis = MotzoiAnalysis(ds)
+            # motzoi_parameter = node_analysis.run_fitting()
+            #
+            # self.qoi = motzoi_parameter
+            #
+            # node_analysis.plotter(this_axis)
+            #
+            # self.update_redis_trusted_values(node, this_qubit,'mw_motzoi')
+            #
+            # handles, labels = this_axis.get_legend_handles_labels()
+            # patch = mpatches.Patch(color='red', label=f'{this_qubit}')
+            # handles.append(patch)
+            # this_axis.set(title=None)
+            # this_axis.legend(handles=handles)
 
 class Multiplexed_Ramsey_Analysis(BaseAnalysis):
     def __init__(self, result_dataset: xr.Dataset, node: str):

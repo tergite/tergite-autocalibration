@@ -9,6 +9,7 @@ from analysis.tac_quantify_analysis import (
         Multiplexed_Ramsey_Analysis,
         Multiplexed_T1_Analysis,
         Multiplexed_Punchout_Analysis,
+        Multiplexed_Motzoi_Analysis,
         )
 import xarray as xr
 
@@ -21,6 +22,7 @@ ANALYSIS_MAP = {
         'T1': Multiplexed_T1_Analysis,
         'punchout': Multiplexed_Punchout_Analysis,
         'ramsey_correction': Multiplexed_Ramsey_Analysis,
+        'motzoi_parameter': Multiplexed_Motzoi_Analysis,
         }
 
 redis_connection = redis.Redis(decode_responses=True)

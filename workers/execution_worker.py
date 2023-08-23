@@ -99,8 +99,10 @@ def measure( compiled_schedule: CompiledSchedule, schedule_duration: float, samp
        dummy = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1,16)}
        dummy["16"] = ClusterType.CLUSTER_QRM_RF
        dummy["17"] = ClusterType.CLUSTER_QRM_RF
-       sweep_parameters = list(samplespace.values())[0]
-       dimension = len(list(sweep_parameters.values())[0])
+       dimension = 1
+       for subspace in samplespace.values():
+           dimension *= len( list(subspace.values())[0] )
+
        dummy_data = [ DummyBinnedAcquisitionData(data=(8,16),thres=1,avg_cnt=1) for _ in range(dimension) ]
        clusterA = Cluster("clusterA", dummy_cfg=dummy)
 

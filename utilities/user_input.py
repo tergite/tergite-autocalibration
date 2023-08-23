@@ -37,10 +37,10 @@ VNA_qubit_frequencies = {
         'q23': 3.980e9,
         }
 
-qubits = [ 'q16', 'q22', 'q23']
+#qubits = [ 'q16', 'q22', 'q23']
 #qubits = ['q18', 'q19']
 #qubits = ['q16', 'q18', 'q19', 'q23']
-#qubits = ['q16']
+qubits = ['q16']
 
 N_qubits = len(qubits)
 
@@ -123,8 +123,8 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
                 },
 
         'motzoi_parameter': {
-            'mw_motzois': {qubit: np.linspace(-0.45,0.45,31) for qubit in qubits},
-            'X_repetitions': {qubit : np.arange(2, 17, 2) for qubit in qubits}
+            'mw_motzois': {qubit: np.linspace(-0.45,0.45,9) for qubit in qubits},
+            'X_repetitions': {qubit : np.arange(2, 17, 4) for qubit in qubits}
         },
     }
     return sweep_parameters
