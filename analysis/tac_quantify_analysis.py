@@ -18,7 +18,6 @@ set_datadir('.')
 
 redis_connection = redis.Redis(decode_responses=True)
 
-
 class BaseAnalysis():
     def __init__(self, result_dataset: xr.Dataset):
        self.result_dataset = result_dataset
@@ -40,102 +39,47 @@ class BaseAnalysis():
         redis_connection.hset(f"cs:{this_qubit}",node,'calibrated')
         self.node_result.update({this_qubit: self.qoi})
 
-class Multiplexed_Resonator_Spectroscopy_Analysis(BaseAnalysis):
+
+class Multiplexed_Analysis(BaseAnalysis):
     def __init__(self, result_dataset: xr.Dataset, node: str):
         super().__init__(result_dataset)
         for indx, var in enumerate(result_dataset.data_vars):
             this_qubit = result_dataset[var].attrs['qubit']
             ds = result_dataset[var].to_dataset()
-            node_analysis = ResonatorSpectroscopyAnalysis(dataset=ds)
-            node_analysis.run_fitting()
-            fitting_results = node_analysis.fit_results
-            fitting_model = fitting_results['hanger_func_complex_SI']
-            fit_result = fitting_model.values
-
-            fitted_resonator_frequency = fit_fr = fit_result['fr']
-            fit_Ql = fit_result['Ql']
-            fit_Qe = fit_result['Qe']
-            fit_ph = fit_result['theta']
-            # print(f'{ fit_Ql = }')
-
-            # analytical expression, probably an interpolation of the fit would be better
-            minimum_freq = fit_fr / (4*fit_Qe*fit_Ql*np.sin(fit_ph)) * (
-                            4*fit_Qe*fit_Ql*np.sin(fit_ph)
-                          - 2*fit_Qe*np.cos(fit_ph)
-                          + fit_Ql
-                          + np.sqrt(  4*fit_Qe**2
-                                    - 4*fit_Qe*fit_Ql*np.cos(fit_ph)
-                                    + fit_Ql**2 )
-                          )
-
-            self.qoi = minimum_freq
-            # PLOT THE FIT -- ONLY FOR S21 MAGNITUDE
-            this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
-            fitting_model.plot_fit(this_axis,numpoints = self.fit_numpoints,xlabel=None, title=None)
-            this_axis.axvline(minimum_freq,c='blue',ls='solid',label='frequency at min')
-            this_axis.axvline(fitted_resonator_frequency,c='magenta',ls='dotted',label='fitted frequency')
-            # this_axis.set_title(f'{node} for {this_qubit}')
-
-
-            self.update_redis_trusted_values(node, this_qubit,'ro_freq')
-
-            handles, labels = this_axis.get_legend_handles_labels()
-            patch = mpatches.Patch(color='red', label=f'{this_qubit}')
-            handles.append(patch)
-            this_axis.set(title=None)
-            this_axis.legend(handles=handles)
-
-
-class Multiplexed_Two_Tones_Spectroscopy_Analysis(BaseAnalysis):
-    def __init__(self, result_dataset: xr.Dataset, node: str):
-        super().__init__(result_dataset)
-        for indx, var in enumerate(result_dataset.data_vars):
-            this_qubit = result_dataset[var].attrs['qubit']
-            ds = result_dataset[var].to_dataset()
+            ds.attrs['qubit'] = this_qubit
 
             this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
             # this_axis.set_title(f'{node_name} for {this_qubit}')
-            node_analysis = QubitSpectroscopyAnalysis(ds)
-            rough_qubit_frequency = node_analysis.run_fitting()
+            if node == 'resonator_spectroscopy':
+                analysis_class = ResonatorSpectroscopyAnalysis
+                redis_field = 'ro_freq'
+            elif node == 'qubit_01_spectroscopy_pulsed':
+                analysis_class = QubitSpectroscopyAnalysis
+                redis_field = 'freq_01'
+            elif node == 'rabi_oscillations':
+                analysis_class = RabiAnalysis
+                redis_field = 'mw_amp180'
+            elif node == 'ramsey_correction':
+                analysis_class = RamseyAnalysis
+                redis_field = 'freq_01'
 
-            self.qoi = rough_qubit_frequency
-
-            node_analysis.plotter(this_axis)
-
-            self.update_redis_trusted_values(node, this_qubit,'freq_01')
-
-            hasPeak=node_analysis.has_peak()
-            handles, labels = this_axis.get_legend_handles_labels()
-            patch = mpatches.Patch(color='red', label=f'{this_qubit}')
-            patch2 = mpatches.Patch(color='blue', label=f'Peak Found:{hasPeak}')
-            handles.append(patch)
-            handles.append(patch2)
-            this_axis.set(title=None)
-            this_axis.legend(handles=handles)
-
-class Multiplexed_Rabi_Analysis(BaseAnalysis):
-    def __init__(self, result_dataset: xr.Dataset, node: str):
-        super().__init__(result_dataset)
-        for indx, var in enumerate(result_dataset.data_vars):
-            this_qubit = result_dataset[var].attrs['qubit']
-            ds = result_dataset[var].to_dataset()
-
-            this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
-            # this_axis.set_title(f'{node_name} for {this_qubit}')
-            node_analysis = RabiAnalysis(ds)
-            pi_pulse_amplitude = node_analysis.run_fitting()
-
-            self.qoi = pi_pulse_amplitude
+            node_analysis = analysis_class(ds)
+            self.qoi = node_analysis.run_fitting()
 
             node_analysis.plotter(this_axis)
 
-            self.update_redis_trusted_values(node, this_qubit,'mw_amp180')
+            self.update_redis_trusted_values(node, this_qubit,redis_field)
 
             handles, labels = this_axis.get_legend_handles_labels()
+            if node == 'qubit_01_spectroscopy_pulsed':
+                hasPeak=node_analysis.has_peak()
+                patch2 = mpatches.Patch(color='blue', label=f'Peak Found:{hasPeak}')
+                handles.append(patch2)
             patch = mpatches.Patch(color='red', label=f'{this_qubit}')
             handles.append(patch)
             this_axis.set(title=None)
             this_axis.legend(handles=handles)
+
 
 class Multiplexed_Motzoi_Analysis(BaseAnalysis):
     def __init__(self, result_dataset: xr.Dataset, node: str):
@@ -180,31 +124,6 @@ class Multiplexed_Motzoi_Analysis(BaseAnalysis):
             # handles.append(patch)
             # this_axis.set(title=None)
             # this_axis.legend(handles=handles)
-
-class Multiplexed_Ramsey_Analysis(BaseAnalysis):
-    def __init__(self, result_dataset: xr.Dataset, node: str):
-        super().__init__(result_dataset)
-        for indx, var in enumerate(result_dataset.data_vars):
-            this_qubit = result_dataset[var].attrs['qubit']
-            ds = result_dataset[var].to_dataset()
-            ds.attrs['qubit'] = this_qubit
-
-            this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
-            # this_axis.set_title(f'{node_name} for {this_qubit}')
-            node_analysis = RamseyAnalysis(ds)
-            qubit_frequency = node_analysis.run_fitting()
-
-            self.qoi = qubit_frequency
-
-            node_analysis.plotter(this_axis)
-
-            self.update_redis_trusted_values(node, this_qubit,'freq_01')
-
-            handles, labels = this_axis.get_legend_handles_labels()
-            patch = mpatches.Patch(color='red', label=f'{this_qubit}')
-            handles.append(patch)
-            this_axis.set(title=None)
-            this_axis.legend(handles=handles)
 
 class Multiplexed_T1_Analysis(BaseAnalysis):
     def __init__(self, result_dataset: xr.Dataset, node: str):

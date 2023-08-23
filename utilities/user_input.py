@@ -129,7 +129,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     }
     return sweep_parameters
 
-node_to_be_calibrated = "motzoi_parameter"
+node_to_be_calibrated = "ramsey_correction"
 #node_to_be_calibrated = "T1"
 box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 
