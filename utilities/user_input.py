@@ -37,10 +37,10 @@ VNA_qubit_frequencies = {
         'q23': 3.980e9,
         }
 
-#qubits = [ 'q16', 'q22', 'q23']
+qubits = [ 'q16', 'q22', 'q23']
 #qubits = ['q18', 'q19']
 #qubits = ['q16', 'q18', 'q19', 'q23']
-qubits = ['q16']
+# qubits = ['q16']
 
 N_qubits = len(qubits)
 
@@ -129,7 +129,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     }
     return sweep_parameters
 
-node_to_be_calibrated = "ramsey_correction"
+node_to_be_calibrated = "motzoi_parameter"
 #node_to_be_calibrated = "T1"
 box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 

@@ -1,8 +1,8 @@
+from analysis.motzoi_analysis import MotzoiAnalysis
 from analysis.resonator_spectroscopy_analysis import ResonatorSpectroscopyAnalysis
 from analysis.qubit_spectroscopy_analysis import QubitSpectroscopyAnalysis
 from analysis.rabi_analysis import RabiAnalysis
 from analysis.ramsey_analysis import RamseyAnalysis
-# from analysis.motzoi_analysis import MotzoiAnalysis
 from analysis.T1_analysis import T1Analysis
 from quantify_core.data.handling import set_datadir
 # from quantify_analysis import qubit_spectroscopy_analysis, rabi_analysis, T1_analysis, XY_crosstalk_analysis, ramsey_analysis, SSRO_analysis
@@ -62,6 +62,9 @@ class Multiplexed_Analysis(BaseAnalysis):
             elif node == 'ramsey_correction':
                 analysis_class = RamseyAnalysis
                 redis_field = 'freq_01'
+            elif node == 'motzoi_parameter':
+                analysis_class = MotzoiAnalysis
+                redis_field = 'mw_motzoi'
 
             node_analysis = analysis_class(ds)
             self.qoi = node_analysis.run_fitting()
@@ -81,105 +84,105 @@ class Multiplexed_Analysis(BaseAnalysis):
             this_axis.legend(handles=handles)
 
 
-class Multiplexed_Motzoi_Analysis(BaseAnalysis):
-    def __init__(self, result_dataset: xr.Dataset, node: str):
-        super().__init__(result_dataset)
-        for indx, var in enumerate(result_dataset.data_vars):
-            this_qubit = result_dataset[var].attrs['qubit']
-            ds = result_dataset[var].to_dataset()
-            ds.attrs['qubit'] = this_qubit
-            motzoi_key = 'mw_motzois'+this_qubit
+# class Multiplexed_Motzoi_Analysis(BaseAnalysis):
+#     def __init__(self, result_dataset: xr.Dataset, node: str):
+#         super().__init__(result_dataset)
+#         for indx, var in enumerate(result_dataset.data_vars):
+#             this_qubit = result_dataset[var].attrs['qubit']
+#             ds = result_dataset[var].to_dataset()
+#             ds.attrs['qubit'] = this_qubit
+#             motzoi_key = 'mw_motzois'+this_qubit
+#
+#             motzois = ds[motzoi_key].size
+#             sums = []
+#             for this_motzoi_index in range(motzois):
+#                 this_sum = sum(np.abs(ds[f'y{this_qubit}'][this_motzoi_index].values))
+#                 sums.append(this_sum)
+#
+#             index_of_min = np.argmin(np.array(sums))
+#             # breakpoint()
+#             optimal_motzoi = float(ds[motzoi_key][index_of_min].values)
+#
+#             this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
+#
+#             # ds.y0.plot(ax=this_axis)
+#             # this_axis.axvline(optimal_motzoi, c='red', lw=4)
+#             self.qoi = optimal_motzoi
+#             self.update_redis_trusted_values(node, this_qubit, 'mw_motzoi')
+#             # this_axis.set_title(f'{node_name} for {this_qubit}')
+#
+#             # this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
+#             # # this_axis.set_title(f'{node_name} for {this_qubit}')
+#             # node_analysis = MotzoiAnalysis(ds)
+#             # motzoi_parameter = node_analysis.run_fitting()
+#             #
+#             # self.qoi = motzoi_parameter
+#             #
+#             # node_analysis.plotter(this_axis)
+#             #
+#             # self.update_redis_trusted_values(node, this_qubit,'mw_motzoi')
+#             #
+#             # handles, labels = this_axis.get_legend_handles_labels()
+#             # patch = mpatches.Patch(color='red', label=f'{this_qubit}')
+#             # handles.append(patch)
+#             # this_axis.set(title=None)
+#             # this_axis.legend(handles=handles)
 
-            motzois = ds[motzoi_key].size
-            sums = []
-            for this_motzoi_index in range(motzois):
-                this_sum = sum(np.abs(ds[f'y{this_qubit}'][this_motzoi_index].values))
-                sums.append(this_sum)
-
-            index_of_min = np.argmin(np.array(sums))
-            # breakpoint()
-            optimal_motzoi = float(ds[motzoi_key][index_of_min].values)
-
-            this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
-
-            # ds.y0.plot(ax=this_axis)
-            # this_axis.axvline(optimal_motzoi, c='red', lw=4)
-            self.qoi = optimal_motzoi
-            self.update_redis_trusted_values(node, this_qubit, 'mw_motzoi')
-            # this_axis.set_title(f'{node_name} for {this_qubit}')
-
-            # this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
-            # # this_axis.set_title(f'{node_name} for {this_qubit}')
-            # node_analysis = MotzoiAnalysis(ds)
-            # motzoi_parameter = node_analysis.run_fitting()
-            #
-            # self.qoi = motzoi_parameter
-            #
-            # node_analysis.plotter(this_axis)
-            #
-            # self.update_redis_trusted_values(node, this_qubit,'mw_motzoi')
-            #
-            # handles, labels = this_axis.get_legend_handles_labels()
-            # patch = mpatches.Patch(color='red', label=f'{this_qubit}')
-            # handles.append(patch)
-            # this_axis.set(title=None)
-            # this_axis.legend(handles=handles)
-
-class Multiplexed_T1_Analysis(BaseAnalysis):
-    def __init__(self, result_dataset: xr.Dataset, node: str):
-        super().__init__(result_dataset)
-        for indx, var in enumerate(result_dataset.data_vars):
-            this_qubit = result_dataset[var].attrs['qubit']
-            ds = result_dataset[var].to_dataset()
-
-            this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
-            # this_axis.set_title(f'{node_name} for {this_qubit}')
-            node_analysis = T1Analysis(ds)
-            T1_time = node_analysis.model_fit()
-            T1_micros=T1_time*1e6
-
-            self.qoi = T1_time
-
-            node_analysis.plotter(this_axis)
-
-            handles, labels = this_axis.get_legend_handles_labels()
-            patch = mpatches.Patch(color='red', label=f'{this_qubit}')
-            handles.append(patch)
-            patch2=mpatches.Patch(color='green', label=f'{T1_micros} μs')
-            handles.append(patch2)
-            this_axis.set(title=None)
-            this_axis.legend(handles=handles)
-
-            #if node_name == 'rabi_frequency' or node_name == 'rabi_oscillations_BATCHED':
-            #    self.update_redis_trusted_values(node_name, this_qubit,'mw_amp180',latex)
-            #if node_name == 'rabi_12_frequency' or node_name == 'rabi_oscillations_12_BATCHED':
-            #    self.update_redis_trusted_values(node_name, this_qubit,'mw_ef_amp180',latex)
-
-        #self.node_result.update({'measurement_dataset':result_dataset.to_dict()})
-
-class Multiplexed_Punchout_Analysis(BaseAnalysis):
-    def __init__(self, result_dataset: xr.Dataset, node: str):
-        super().__init__(result_dataset)
-        for indx, var in enumerate(result_dataset.data_vars):
-            this_qubit = result_dataset[var].attrs['qubit']
-            ds = result_dataset[var].to_dataset()
-            #breakpoint()
-
-            N_amplitudes = ds.dims[f'ro_amplitudes{this_qubit}']
-            # print(f'{ N_amplitudes = }')
-            # norm_factors = np.array([max(ds.y0[ampl].values) for ampl in range(N_amplitudes)])
-            # ds[f'y{this_qubit}'] = ds.y0 / norm_factors[:,None]
-            raw_values = np.abs(ds[f'y{this_qubit}'].values)
-            normalized_values = raw_values / raw_values.max(axis=0)
-            ds[f'y{this_qubit}'].values = normalized_values
-
-            this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
-
-            ds[f'y{this_qubit}'].plot(x=f'ro_frequencies{this_qubit}', ax=this_axis)
-            # this_axis.set_title(f'{node_name} for {this_qubit}')
-
-            handles, labels = this_axis.get_legend_handles_labels()
-            patch = mpatches.Patch(color='red', label=f'{this_qubit}')
-            handles.append(patch)
-            this_axis.set(title=None)
-            this_axis.legend(handles=handles)
+#class Multiplexed_T1_Analysis(BaseAnalysis):
+#    def __init__(self, result_dataset: xr.Dataset, node: str):
+#        super().__init__(result_dataset)
+#        for indx, var in enumerate(result_dataset.data_vars):
+#            this_qubit = result_dataset[var].attrs['qubit']
+#            ds = result_dataset[var].to_dataset()
+#
+#            this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
+#            # this_axis.set_title(f'{node_name} for {this_qubit}')
+#            node_analysis = T1Analysis(ds)
+#            T1_time = node_analysis.model_fit()
+#            T1_micros=T1_time*1e6
+#
+#            self.qoi = T1_time
+#
+#            node_analysis.plotter(this_axis)
+#
+#            handles, labels = this_axis.get_legend_handles_labels()
+#            patch = mpatches.Patch(color='red', label=f'{this_qubit}')
+#            handles.append(patch)
+#            patch2=mpatches.Patch(color='green', label=f'{T1_micros} μs')
+#            handles.append(patch2)
+#            this_axis.set(title=None)
+#            this_axis.legend(handles=handles)
+#
+#            #if node_name == 'rabi_frequency' or node_name == 'rabi_oscillations_BATCHED':
+#            #    self.update_redis_trusted_values(node_name, this_qubit,'mw_amp180',latex)
+#            #if node_name == 'rabi_12_frequency' or node_name == 'rabi_oscillations_12_BATCHED':
+#            #    self.update_redis_trusted_values(node_name, this_qubit,'mw_ef_amp180',latex)
+#
+#        #self.node_result.update({'measurement_dataset':result_dataset.to_dict()})
+#
+#class Multiplexed_Punchout_Analysis(BaseAnalysis):
+#    def __init__(self, result_dataset: xr.Dataset, node: str):
+#        super().__init__(result_dataset)
+#        for indx, var in enumerate(result_dataset.data_vars):
+#            this_qubit = result_dataset[var].attrs['qubit']
+#            ds = result_dataset[var].to_dataset()
+#            #breakpoint()
+#
+#            N_amplitudes = ds.dims[f'ro_amplitudes{this_qubit}']
+#            # print(f'{ N_amplitudes = }')
+#            # norm_factors = np.array([max(ds.y0[ampl].values) for ampl in range(N_amplitudes)])
+#            # ds[f'y{this_qubit}'] = ds.y0 / norm_factors[:,None]
+#            raw_values = np.abs(ds[f'y{this_qubit}'].values)
+#            normalized_values = raw_values / raw_values.max(axis=0)
+#            ds[f'y{this_qubit}'].values = normalized_values
+#
+#            this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
+#
+#            ds[f'y{this_qubit}'].plot(x=f'ro_frequencies{this_qubit}', ax=this_axis)
+#            # this_axis.set_title(f'{node_name} for {this_qubit}')
+#
+#            handles, labels = this_axis.get_legend_handles_labels()
+#            patch = mpatches.Patch(color='red', label=f'{this_qubit}')
+#            handles.append(patch)
+#            this_axis.set(title=None)
+#            this_axis.legend(handles=handles)
