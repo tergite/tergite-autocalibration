@@ -19,6 +19,7 @@ from calibration_schedules.ramsey_fringes import Ramsey_fringes
 # from calibration_schedules.drag_amplitude import DRAG_amplitude
 from calibration_schedules.motzoi_paramerter import Motzoi_parameter
 from quantify_scheduler.device_under_test.transmon_element import BasicTransmonElement
+from utilities.extended_transmon_element import ExtendedTransmon
 from quantify_scheduler.backends import SerialCompiler
 from config_files.IF_hw_config import hardware_config
 from quantify_core.data.handling import set_datadir
@@ -48,7 +49,7 @@ rq_supervisor = Queue(
         'calibration_supervisor', connection=redis_connection
         )
 
-def load_redis_config(transmon: BasicTransmonElement, channel:int):
+def load_redis_config(transmon: ExtendedTransmon, channel:int):
     qubit = transmon.name
     redis_config = redis_connection.hgetall(f"transmons:{qubit}")
     transmon.reset.duration(float(redis_config['init_duration']))
@@ -66,10 +67,15 @@ def load_redis_config(transmon: BasicTransmonElement, channel:int):
     transmon.clock_freqs.readout(float(redis_config['ro_freq']))
     transmon.measure.pulse_amp(float(redis_config['ro_pulse_amp']))
     transmon.measure.pulse_duration(float(redis_config['ro_pulse_duration']))
-    # transmon.measure.pulse_type(redis_config['ro_pulse_type'])
     transmon.measure.acq_channel(channel)
     transmon.measure.acq_delay(float(redis_config['ro_acq_delay']))
     transmon.measure.integration_time(float(redis_config['ro_acq_integration_time']))
+    transmon.measure_1.pulse_amp(float(redis_config['ro_pulse_amp']))
+    transmon.measure_1.pulse_duration(float(redis_config['ro_pulse_duration']))
+    transmon.measure_1.acq_channel(channel)
+    transmon.measure_1.acq_delay(float(redis_config['ro_acq_delay']))
+    transmon.measure_1.integration_time(float(redis_config['ro_acq_integration_time']))
+    # transmon.measure.pulse_type(redis_config['ro_pulse_type'])
     return
 
 
@@ -87,10 +93,11 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
     transmons = {}
 
     for channel, qubit in enumerate(qubits):
-        q = BasicTransmonElement(qubit)
-        load_redis_config(q,channel)
-        device.add_element(q)
-        transmons[qubit] = q
+        transmon = ExtendedTransmon(qubit)
+        # breakpoint()
+        load_redis_config(transmon,channel)
+        device.add_element(transmon)
+        transmons[qubit] = transmon
 
     node_class = node_map[node](transmons)
     schedule_function = node_class.schedule_function

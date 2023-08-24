@@ -116,7 +116,6 @@ def calibrate_node(node:str):
     # breakpoint()
     logger.info(f'Sending to precompile')
 
-    # rq_supervisor.enqueue(precompile, args=(node, samplespace),job_timeout = 240, )
     compiled_schedule, schedule_duration = precompile(node, samplespace)
     logger.info(f'schedule compiled')
     result_dataset = measure(compiled_schedule, schedule_duration, samplespace, node)
@@ -126,77 +125,4 @@ def calibrate_node(node:str):
 
 
 #main
-
 calibrate_system()
-
-
-# import asyncio
-#
-# class CalibrationProtocol(asyncio.Protocol):
-#     def __init__(self, compilation_event, execution_event, analysis_event, job_event) -> None:
-#         self.job_event = job_event
-#         self.compilation_event = compilation_event
-#         self.execution_event = execution_event
-#         self.analysis_event = analysis_event
-#         logger.info(f'Initializing server')
-#
-#     def connection_made(self, transport) -> None:
-#         self.transport = transport
-#         peername = transport.get_extra_info('peername')
-#         #print(f'{ peername = }')
-#
-#     def data_received(self, data) -> None:
-#         message = data.decode()
-#         message_parts = message.split(":")
-#         if len(message_parts) == 2 and message_parts[0] == "job_done":
-#             self.job_event.set()
-#             #print(f'{ self.job_done_event = }')
-#         elif len(message_parts) == 2 and message_parts[0] == "compilation_done":
-#             self.compilation_event.set()
-#         elif len(message_parts) == 2 and message_parts[0] == "execution_done":
-#             self.execution_event.set()
-#         elif len(message_parts) == 2 and message_parts[0] == "analysis_done":
-#             self.analysis_event.set()
-#         else:
-#             pass
-#             #print(f'Received unexpected "job_done" message')
-#
-#
-# async def initiate_server(compilation_event, execution_event, analysis_event, job_done_event, host, port):
-#
-#     loop = asyncio.get_running_loop()
-#     server = await loop.create_server(
-#             lambda: CalibrationProtocol(
-#             compilation_event,
-#             execution_event,
-#             analysis_event,
-#             job_done_event,
-#         ),
-#         host,port
-#     )
-#     async with server:
-#         await server.serve_forever()
-#
-# async def main(host,port):
-#     compilation_event = asyncio.Event()
-#     execution_event = asyncio.Event()
-#     analysis_event = asyncio.Event()
-#     job_done_event = asyncio.Event()
-#
-#     server_task = asyncio.create_task(
-#         initiate_server(
-#             compilation_event,
-#             execution_event,
-#             analysis_event,
-#             job_done_event,
-#             host,
-#             port
-#         )
-#     )
-#     calibration_task = asyncio.create_task(calibrate_system(job_done_event))
-#
-#     await server_task
-#     await calibration_task
-#
-#
-# asyncio.run(main('127.0.0.1',8006))

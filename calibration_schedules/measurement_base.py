@@ -21,6 +21,7 @@ class Measurement():
         The values are actual values str or float, not qcodes references.
         """
         attr_dict = {}
+        # breakpoint()
         for transmon in self.transmons.values():
             qubit = transmon.name
             if parameter=='readout_port':
@@ -33,4 +34,5 @@ class Measurement():
                    if parameter in submodule.parameters:
                        attr_dict[qubit] = submodule.parameters[parameter]()
 
+        # print(f'{ attr_dict = }')
         return attr_dict
