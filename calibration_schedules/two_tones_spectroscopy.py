@@ -1,9 +1,9 @@
 from quantify_scheduler.enums import BinMode
-from quantify_scheduler.operations.acquisition_library import SSBIntegrationComplex
 from quantify_scheduler.operations.gate_library import Measure, Reset, X
 from quantify_scheduler.operations.pulse_library import SetClockFrequency, SoftSquarePulse
 from quantify_scheduler.resources import ClockResource
 from quantify_scheduler.schedules.schedule import Schedule
+from utilities.extended_transmon_element import Measure_RO1
 import numpy as np
 
 from calibration_schedules.measurement_base import Measurement
@@ -38,28 +38,37 @@ class Two_Tones_Spectroscopy(Measurement):
         ) -> Schedule:
 
         # if port_out is None: port_out = port
-        sched = Schedule("multiplexed_qubit_spec",repetitions)
+        schedule = Schedule("multiplexed_qubit_spec",repetitions)
         # Initialize the clock for each qubit
         for this_qubit, spec_array_val in mw_frequencies.items():
-
-            sched.add_resource(
-                ClockResource( name=f'{this_qubit}.01', freq=spec_array_val[0]),
+            if self.qubit_state == 0:
+                this_clock = f'{this_qubit}.01'
+            elif self.qubit_state == 1:
+                this_clock = f'{this_qubit}.12'
+            else:
+                raise ValueError(f'Invalid qubit state: {self.qubit_state}')
+            schedule.add_resource(
+                ClockResource( name=this_clock, freq=spec_array_val[0]),
             )
 
         #This is the common reference operation so the qubits can be operated in parallel
-        root_relaxation = sched.add(Reset(*qubits), label="Reset")
-        #print(f'{mw_pulse_durations=}')
-        #print(f'{mw_pulse_amplitudes=}')
+        root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
         # The first for loop iterates over all qubits:
         for this_qubit, spec_array_val in mw_frequencies.items():
+            if self.qubit_state == 0:
+                this_clock = f'{this_qubit}.01'
+            elif self.qubit_state == 1:
+                this_clock = f'{this_qubit}.12'
+            else:
+                raise ValueError(f'Invalid qubit state: {self.qubit_state}')
 
             # The second for loop iterates over all frequency values in the frequency batch:
             relaxation = root_relaxation #To enforce parallelism we refer to the root relaxation
             for acq_index, spec_pulse_frequency in enumerate(spec_array_val):
                 #reset the clock frequency for the qubit pulse
-                set_frequency = sched.add(
-                    SetClockFrequency(clock=f'{this_qubit}.01', clock_freq_new=spec_pulse_frequency),
+                set_frequency = schedule.add(
+                    SetClockFrequency(clock=this_clock, clock_freq_new=spec_pulse_frequency),
                     label=f"set_freq_{this_qubit}_{acq_index}",
                     ref_op=relaxation, ref_pt='end'
                 )
@@ -67,37 +76,36 @@ class Two_Tones_Spectroscopy(Measurement):
                 if self.qubit_state == 0:
                     excitation_pulse = set_frequency
                 elif self.qubit_state == 1:
-                    excitation_pulse = sched.add(X(this_qubit), ref_op=set_frequency, ref_pt='end')
+                    excitation_pulse = schedule.add(X(this_qubit), ref_op=set_frequency, ref_pt='end')
                 else:
                     raise ValueError(f'Invalid qubit state: {self.qubit_state}')
 
                 #spectroscopy pulse
-                spec_pulse = sched.add(
+                spec_pulse = schedule.add(
                     SoftSquarePulse(
                         duration= mw_pulse_durations[this_qubit],
                         amp= mw_pulse_amplitudes[this_qubit],
                         port= mw_pulse_ports[this_qubit],
-                        clock=f'{this_qubit}.01',
+                        clock=this_clock,
                     ),
                     label=f"spec_pulse_{this_qubit}_{acq_index}", ref_op=excitation_pulse, ref_pt="end",
                 )
 
                 if self.qubit_state == 0:
                     measure_function = Measure
+                elif self.qubit_state == 1:
+                    measure_function = Measure_RO1
                 else:
                     raise ValueError(f'Invalid qubit state: {self.qubit_state}')
-                # elif self.qubit_state == 1:
-                #     measure_function = Measure_1
 
-                sched.add(
+                schedule.add(
                     measure_function(this_qubit, acq_index=acq_index,bin_mode=BinMode.AVERAGE),
                     ref_op=spec_pulse,
                     ref_pt='end',
                     label=f'Measurement_{this_qubit}_{acq_index}'
                 )
 
-
                 # update the relaxation for the next batch point
-                relaxation = sched.add(Reset(this_qubit), label=f"Reset_{this_qubit}_{acq_index}")
+                relaxation = schedule.add(Reset(this_qubit), label=f"Reset_{this_qubit}_{acq_index}")
 
-        return sched
+        return schedule

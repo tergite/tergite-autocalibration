@@ -17,7 +17,6 @@ from calibration_schedules.punchout import Punchout
 from calibration_schedules.ramsey_fringes import Ramsey_fringes
 # from calibration_schedules.drag_amplitude import DRAG_amplitude
 from calibration_schedules.motzoi_paramerter import Motzoi_parameter
-from quantify_scheduler.device_under_test.transmon_element import BasicTransmonElement
 from utilities.extended_transmon_element import ExtendedTransmon
 from quantify_scheduler.backends import SerialCompiler
 from config_files.IF_hw_config import hardware_config
@@ -37,7 +36,7 @@ node_map = {
     'motzoi_parameter': Motzoi_parameter,
     # 'drag_amplitude': DRAG_amplitude,
     'resonator_spectroscopy_1': Resonator_Spectroscopy,
-    # 'qubit_12_spectroscopy_pulsed': Two_Tones_Spectroscopy,
+    'qubit_12_spectroscopy_pulsed': Two_Tones_Spectroscopy,
     # 'rabi_oscillations_12': Rabi_Oscillations,
     # 'resonator_spectroscopy_2': Resonator_Spectroscopy,
 }
@@ -64,6 +63,7 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
     transmon.clock_freqs.f01(float(redis_config['freq_01']))
     transmon.clock_freqs.f12(float(redis_config['freq_12']))
     transmon.clock_freqs.readout(float(redis_config['ro_freq']))
+    transmon.extended_clock_freqs.readout_1(float(redis_config['ro_freq_1']))
     transmon.measure.pulse_amp(float(redis_config['ro_pulse_amp']))
     transmon.measure.pulse_duration(float(redis_config['ro_pulse_duration']))
     transmon.measure.acq_channel(channel)
@@ -93,13 +93,14 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
 
     for channel, qubit in enumerate(qubits):
         transmon = ExtendedTransmon(qubit)
-        # breakpoint()
+        #breakpoint()
         load_redis_config(transmon,channel)
         device.add_element(transmon)
         transmons[qubit] = transmon
 
     qubit_state = 0
-    if node == 'resonator_spectroscopy_1': qubit_state = 1
+    if node in ['resonator_spectroscopy_1','qubit_12_spectroscopy_pulsed']:
+        qubit_state = 1
     node_class = node_map[node](transmons, qubit_state)
     schedule_function = node_class.schedule_function
     static_parameters = node_class.static_kwargs

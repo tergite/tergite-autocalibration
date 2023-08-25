@@ -16,6 +16,7 @@ nodes = [
         "motzoi_parameter",
         "motzoi_parameter",
         "resonator_spectroscopy_1",
+        "qubit_12_spectroscopy_pulsed",
         ]
 
 VNA_resonator_frequencies = {
@@ -38,9 +39,6 @@ VNA_qubit_frequencies = {
         }
 
 qubits = [ 'q16', 'q22', 'q23']
-#qubits = ['q18', 'q19']
-#qubits = ['q16', 'q18', 'q19', 'q23']
-# qubits = ['q16']
 
 N_qubits = len(qubits)
 
@@ -62,9 +60,9 @@ def qubit_samples(qubit:str, transition:str = '01') -> np.ndarray:
     if transition=='01':
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition=='12':
-        # rough_anharmonicity = 200e6 if int(qubit[1:])%2==0 else 170e6
-        # VNA_frequency = VNA_qubit_frequencies[qubit] - rough_anharmonicity
-        VNA_frequency = VNA_f12_frequencies[qubit]
+        rough_anharmonicity = 200e6 if int(qubit[1:])%2==0 else 170e6
+        VNA_frequency = VNA_qubit_frequencies[qubit] - rough_anharmonicity
+        # VNA_frequency = VNA_f12_frequencies[qubit]
     else :
         raise ValueError('Invalid transition')
 
@@ -83,7 +81,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     and we have two qubits labeled 'q1' and 'q2', it returns the dictionary:
     sweep_parameters = {
         'resonator_spectroscopy': {
-             'ro_freq':
+             'ro_frequencies':
                   {'q1': array_of_frequencies,
                    'q2': array_of_frequencies
                   }
@@ -94,10 +92,10 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
         'resonator_spectroscopy': {
             'ro_frequencies': {qubit: resonator_samples(qubit) for qubit in qubits}
         },
+
         'resonator_spectroscopy_1': {
             'ro_frequencies': {qubit: resonator_samples(qubit) for qubit in qubits}
         },
-
 
         'punchout': {
             'ro_frequencies': {qubit: resonator_samples(qubit, punchout=True) for qubit in qubits},
@@ -106,6 +104,10 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
 
         'qubit_01_spectroscopy_pulsed': {
             'mw_frequencies': {qubit: qubit_samples(qubit) for qubit in qubits}
+        },
+
+        'qubit_12_spectroscopy_pulsed': {
+            'mw_frequencies': {qubit: qubit_samples(qubit,'12') for qubit in qubits}
         },
 
         'rabi_oscillations': {
@@ -133,7 +135,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     }
     return sweep_parameters
 
-node_to_be_calibrated = "resonator_spectroscopy_1"
+node_to_be_calibrated = "qubit_12_spectroscopy_pulsed"
 #node_to_be_calibrated = "T1"
 # box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 draw_arrow_chart(f'Qubits: {N_qubits}', nodes)

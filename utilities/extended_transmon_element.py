@@ -25,7 +25,7 @@ class ExtendedClocksFrequencies(InstrumentChannel):
 class Measure_RO1(Measure):
     def __init__(
         self,
-        qubits: str,
+        *qubits: str,
         acq_index: int | None = None,
         # These are the currently supported acquisition protocols.
         acq_protocol: Optional[
@@ -39,12 +39,11 @@ class Measure_RO1(Measure):
         ] = None,
         bin_mode: BinMode | None = None,
     ):
-        super().__init__(qubits, acq_index=acq_index, bin_mode=bin_mode)
-        print(f'{ qubits = }')
+        super().__init__(qubits[0], acq_index=acq_index, bin_mode=bin_mode)
         plot_func = "quantify_scheduler.schedules._visualization.circuit_diagram.meter"
         self.data.update(
             {
-                "name": f"Measure_1 {', '.join(qubits)}",
+                "name": f"Measure_RO1 {', '.join(qubits)}",
                 "gate_info": {
                     "unitary": None,
                     "plot_func": plot_func,
@@ -58,7 +57,6 @@ class Measure_RO1(Measure):
             }
         )
         self._update()
-
 
 
 class ExtendedTransmon(BasicTransmonElement):
@@ -81,7 +79,7 @@ class ExtendedTransmon(BasicTransmonElement):
                 ),
             )
 
-    def generate_dev_config(self) -> DeviceCompilationConfig:
+    def generate_device_config(self) -> DeviceCompilationConfig:
         cfg_dict = {
             "backend": "quantify_scheduler.backends"
             ".circuit_to_device.compile_circuit_to_device",
