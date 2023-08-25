@@ -1,8 +1,10 @@
 import numpy as np
 from quantify_core.analysis import fitting_models as fm
+import redis
 import xarray as xr
 
 model = fm.ResonatorModel()
+redis_connection = redis.Redis(decode_responses=True)
 
 class ResonatorSpectroscopyAnalysis():
     def __init__(self, dataset: xr.Dataset):
@@ -20,9 +22,6 @@ class ResonatorSpectroscopyAnalysis():
 
         self.fitting_model = model.fit(S21, params=guess, f=frequencies)
 
-        # self.fit_results.update({"hanger_func_complex_SI": fit_result})
-        # fitting_results = node_analysis.fit_results
-        # fitting_model = fitting_results['hanger_func_complex_SI']
         fit_result = self.fitting_model.values
 
         fitted_resonator_frequency = fit_fr = fit_result['fr']
@@ -39,16 +38,26 @@ class ResonatorSpectroscopyAnalysis():
                                 - 4*fit_Qe*fit_Ql*np.cos(fit_ph)
                                 + fit_Ql**2 )
                       )
-
         return self.minimum_freq
 
     def plotter(self,ax):
-        # ax.plot( self.fit_amplitudes , self.fit_y,'r-',lw=3.0)
-        # ax.plot( self.independents, self.magnitudes,'bo-',ms=3.0)
-        # ax.set_title(f'Rabi Oscillations for {self.qubit}')
         ax.set_xlabel('Frequency (Hz)')
         ax.set_ylabel('|S21| (V)')
         self.fitting_model.plot_fit(ax,numpoints = 400,xlabel=None, title=None)
         ax.axvline(self.minimum_freq,c='blue',ls='solid',label='frequency at min')
-        # ax.axvline(fitted_resonator_frequency,c='magenta',ls='dotted',label='fitted frequency')
+        ax.grid()
+
+class ResonatorSpectroscopy_1_Analysis(ResonatorSpectroscopyAnalysis):
+    def __init__(self, dataset: xr.Dataset):
+        self.dataset = dataset
+        super().__init__(self.dataset)
+    def plotter(self,ax):
+        print( 'IN DAUGFHTER CLASS')
+        this_qubit = self.dataset.attrs['qubit']
+        ax.set_xlabel('Frequency (Hz)')
+        ax.set_ylabel('|S21| (V)')
+        ro_freq = redis_connection.hget(f'transmons:{this_qubit}', 'ro_freq')
+        self.fitting_model.plot_fit(ax,numpoints = 400,xlabel=None, title=None)
+        ax.axvline(self.minimum_freq,c='blue',ls='solid',label='frequency |1> ')
+        ax.axvline(ro_freq,c='green',ls='solid',label='frequency |0>')
         ax.grid()

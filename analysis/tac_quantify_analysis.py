@@ -1,5 +1,5 @@
 from analysis.motzoi_analysis import MotzoiAnalysis
-from analysis.resonator_spectroscopy_analysis import ResonatorSpectroscopyAnalysis
+from analysis.resonator_spectroscopy_analysis import ResonatorSpectroscopyAnalysis, ResonatorSpectroscopy_1_Analysis
 from analysis.qubit_spectroscopy_analysis import QubitSpectroscopyAnalysis
 from analysis.rabi_analysis import RabiAnalysis
 from analysis.ramsey_analysis import RamseyAnalysis
@@ -65,8 +65,8 @@ class Multiplexed_Analysis(BaseAnalysis):
             elif node == 'motzoi_parameter':
                 analysis_class = MotzoiAnalysis
                 redis_field = 'mw_motzoi'
-            if node == 'resonator_spectroscopy_1':
-                analysis_class = ResonatorSpectroscopyAnalysis
+            elif node == 'resonator_spectroscopy_1':
+                analysis_class = ResonatorSpectroscopy_1_Analysis
                 redis_field = 'ro_freq_1'
 
             node_analysis = analysis_class(ds)
