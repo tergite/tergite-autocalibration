@@ -10,7 +10,6 @@ colorama_init()
 
 from quantify_scheduler.instrument_coordinator.instrument_coordinator import CompiledSchedule
 from logger.tac_logger import logger
-logger.info('entering execution module')
 
 from qblox_instruments import Cluster, ClusterType
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator

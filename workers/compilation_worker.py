@@ -3,7 +3,6 @@ fetch and compile the appropriate schedule'''
 
 from rq import Queue
 from logger.tac_logger import logger
-logger.info('finished imports')
 from math import isnan
 import numpy as np
 from quantify_scheduler.device_under_test.quantum_device import Instrument, QuantumDevice

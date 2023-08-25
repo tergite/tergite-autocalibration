@@ -2,7 +2,7 @@ from typing import List
 import numpy as np
 import redis
 from uuid import uuid4
-from utilities.visuals import box_print
+from utilities.visuals import box_print, draw_arrow_chart
 import logging
 #logging.basicConfig(level=logging.DEBUG,
         #format='File: %(filename)s -- %(funcName)s --%(message)s')
@@ -131,7 +131,8 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
 
 node_to_be_calibrated = "motzoi_parameter"
 #node_to_be_calibrated = "T1"
-box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
+# box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
+draw_arrow_chart(f'Qubits: {N_qubits}', nodes)
 
 def user_requested_calibration(node: str):
     job = {
