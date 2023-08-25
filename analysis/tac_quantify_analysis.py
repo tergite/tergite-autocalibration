@@ -65,6 +65,9 @@ class Multiplexed_Analysis(BaseAnalysis):
             elif node == 'motzoi_parameter':
                 analysis_class = MotzoiAnalysis
                 redis_field = 'mw_motzoi'
+            if node == 'resonator_spectroscopy_1':
+                analysis_class = ResonatorSpectroscopyAnalysis
+                redis_field = 'ro_freq_1'
 
             node_analysis = analysis_class(ds)
             self.qoi = node_analysis.run_fitting()

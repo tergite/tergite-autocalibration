@@ -15,7 +15,6 @@ class Resonator_Spectroscopy(Measurement):
         super().__init__(transmons)
         self.qubit_state = qubit_state
         self.transmons = transmons
-
         self.static_kwargs = {
             'pulse_amplitudes': self.attributes_dictionary('pulse_amp'),
             'pulse_durations' : self.attributes_dictionary('pulse_duration'),
@@ -49,19 +48,15 @@ class Resonator_Spectroscopy(Measurement):
         #TODO re adjust repetions
         ) -> Schedule:
 
-        sched = Schedule("multiplexed_resonator_spec_NCO",repetitions)
+        sched = Schedule("multiplexed_resonator_spectroscopy",repetitions)
         # Initialize the clock for each qubit
-        for ro_key, ro_array_val in ro_frequencies.items():
-            this_qubit = [qubit for qubit in qubits if qubit in ro_key][0]
-            # if self.qubit_state==0:
-            #     this_clock = clocks[this_qubit]
-            # elif self.qubit_state==1:
-            #     this_clock = clocks_1[this_qubit]
-            # elif self.qubit_state==2:
-            #     this_clock = clocks_2[this_qubit]
-
+        for this_qubit, ro_array_val in ro_frequencies.items():
             #Initialize ClockResource with the first frequency value
-            sched.add_resource( ClockResource(name=f'{this_qubit}.ro', freq=ro_array_val[0]) )
+            if self.qubit_state==0:
+                this_clock = f'{this_qubit}.ro'
+            elif self.qubit_state==1:
+                this_clock = f'{this_qubit}.ro1'
+            sched.add_resource( ClockResource(name=this_clock, freq=ro_array_val[0]) )
 
         # if self.qubit_state == 2:
         #     for this_qubit, ef_f_val in freqs_12.items():
@@ -71,25 +66,23 @@ class Resonator_Spectroscopy(Measurement):
 
         # The first for loop iterates over all qubits:
         for acq_cha, (this_qubit, ro_f_values) in enumerate(ro_frequencies.items()):
-            # if self.qubit_state==0:
-            #     this_clock = clocks[this_qubit]
-            # elif self.qubit_state==1:
-            #     this_clock = clocks_1[this_qubit]
-            # elif self.qubit_state==2:
-            #     this_clock = clocks_2[this_qubit]
             # The second for loop iterates over all frequency values in the frequency batch:
             relaxation = root_relaxation
+            if self.qubit_state==0:
+                this_clock = f'{this_qubit}.ro'
+            elif self.qubit_state==1:
+                this_clock = f'{this_qubit}.ro1'
             for acq_index, ro_frequency in enumerate(ro_f_values):
                 set_frequency = sched.add(
-                    SetClockFrequency(clock=f'{this_qubit}.ro', clock_freq_new=ro_frequency),
+                    SetClockFrequency(clock=this_clock, clock_freq_new=ro_frequency),
                     label=f"set_freq_{this_qubit}_{acq_index}",
                     ref_op=relaxation, ref_pt='end'
                 )
 
                 if self.qubit_state == 0:
                     excitation_pulse = set_frequency
-                # elif self.qubit_state == 1:
-                #     excitation_pulse = sched.add(X(this_qubit), ref_op=set_frequency, ref_pt='end')
+                elif self.qubit_state == 1:
+                    excitation_pulse = sched.add(X(this_qubit), ref_op=set_frequency, ref_pt='end')
                 # elif self.qubit_state == 2:
                 #     excitation_pulse_1 = sched.add(X(this_qubit), ref_op=set_frequency, ref_pt='end')
                 #     excitation_pulse = sched.add(
@@ -109,16 +102,15 @@ class Resonator_Spectroscopy(Measurement):
                         duration=pulse_durations[this_qubit],
                         amp=pulse_amplitudes[this_qubit],
                         port=ports[this_qubit],
-                        clock=f'{this_qubit}.ro',
+                        clock=this_clock,
                     ),
-                    label=f"spec_pulse_{this_qubit}_{acq_index}", ref_op=excitation_pulse, ref_pt="end",
                 )
 
                 sched.add(
                     SSBIntegrationComplex(
                         duration=integration_times[this_qubit],
                         port=ports[this_qubit],
-                        clock=f'{this_qubit}.ro',
+                        clock=this_clock,
                         acq_index=acq_index,
                         acq_channel=acq_cha,
                         bin_mode=BinMode.AVERAGE

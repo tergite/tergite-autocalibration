@@ -1,11 +1,9 @@
 from typing import List
 import numpy as np
-import redis
+# import redis
 from uuid import uuid4
-from utilities.visuals import box_print, draw_arrow_chart
-import logging
-#logging.basicConfig(level=logging.DEBUG,
-        #format='File: %(filename)s -- %(funcName)s --%(message)s')
+from utilities.visuals import draw_arrow_chart
+# import logging
 
 nodes = [
         "resonator_spectroscopy",
@@ -16,6 +14,8 @@ nodes = [
         #"XY_crosstalk",
         "ramsey_correction",
         "motzoi_parameter",
+        "motzoi_parameter",
+        "resonator_spectroscopy_1",
         ]
 
 VNA_resonator_frequencies = {
@@ -94,6 +94,10 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
         'resonator_spectroscopy': {
             'ro_frequencies': {qubit: resonator_samples(qubit) for qubit in qubits}
         },
+        'resonator_spectroscopy_1': {
+            'ro_frequencies': {qubit: resonator_samples(qubit) for qubit in qubits}
+        },
+
 
         'punchout': {
             'ro_frequencies': {qubit: resonator_samples(qubit, punchout=True) for qubit in qubits},
@@ -129,7 +133,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     }
     return sweep_parameters
 
-node_to_be_calibrated = "motzoi_parameter"
+node_to_be_calibrated = "resonator_spectroscopy_1"
 #node_to_be_calibrated = "T1"
 # box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 draw_arrow_chart(f'Qubits: {N_qubits}', nodes)

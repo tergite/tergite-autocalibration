@@ -36,7 +36,7 @@ node_map = {
     'ramsey_correction': Ramsey_fringes,
     'motzoi_parameter': Motzoi_parameter,
     # 'drag_amplitude': DRAG_amplitude,
-    # 'resonator_spectroscopy_1': Resonator_Spectroscopy,
+    'resonator_spectroscopy_1': Resonator_Spectroscopy,
     # 'qubit_12_spectroscopy_pulsed': Two_Tones_Spectroscopy,
     # 'rabi_oscillations_12': Rabi_Oscillations,
     # 'resonator_spectroscopy_2': Resonator_Spectroscopy,
@@ -98,7 +98,9 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
         device.add_element(transmon)
         transmons[qubit] = transmon
 
-    node_class = node_map[node](transmons)
+    qubit_state = 0
+    if node == 'resonator_spectroscopy_1': qubit_state = 1
+    node_class = node_map[node](transmons, qubit_state)
     schedule_function = node_class.schedule_function
     static_parameters = node_class.static_kwargs
 

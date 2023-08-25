@@ -8,7 +8,7 @@ import numpy as np
 
 class Motzoi_parameter(Measurement):
 
-    def __init__(self,transmons):
+    def __init__(self,transmons,qubit_state=0):
         super().__init__(transmons)
         self.transmons = transmons
         self.static_kwargs = {
