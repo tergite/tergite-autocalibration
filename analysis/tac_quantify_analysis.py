@@ -42,6 +42,11 @@ class BaseAnalysis():
 
 class Multiplexed_Analysis(BaseAnalysis):
     def __init__(self, result_dataset: xr.Dataset, node: str):
+        if node == 'tof':
+            print()
+            plot()
+            return
+
         super().__init__(result_dataset)
         for indx, var in enumerate(result_dataset.data_vars):
             this_qubit = result_dataset[var].attrs['qubit']

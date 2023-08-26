@@ -11,7 +11,6 @@ from calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
 from calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
 from calibration_schedules.rabi_oscillations import Rabi_Oscillations
 from calibration_schedules.T1 import T1_BATCHED
-from calibration_schedules.time_of_flight import Time_Of_Flight
 from calibration_schedules.XY_crosstalk import XY_cross
 from calibration_schedules.punchout import Punchout
 from calibration_schedules.ramsey_fringes import Ramsey_fringes
@@ -79,6 +78,9 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
 
 
 def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
+    if node == 'tof':
+        return None, 1
+
     Instrument.close_all()
 
     device = QuantumDevice('Loki')
@@ -104,7 +106,6 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
     node_class = node_map[node](transmons, qubit_state)
     schedule_function = node_class.schedule_function
     static_parameters = node_class.static_kwargs
-
     schedule = schedule_function(**static_parameters , **samplespace)
 
     compiler = SerialCompiler(name=f'{node}_compiler')

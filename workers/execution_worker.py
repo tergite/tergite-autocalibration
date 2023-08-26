@@ -20,8 +20,9 @@ import numpy as np
 import threading
 import tqdm
 from utilities.root_path import data_directory
+from calibration_schedules.time_of_flight import measure_time_of_flight
 
-from calibration_schedules.time_of_flight import Time_Of_Flight
+from calibration_schedules.time_of_flight import measure_time_of_flight
 
 import redis
 
@@ -110,6 +111,12 @@ def measure( compiled_schedule: CompiledSchedule, schedule_duration: float, samp
        #clusterB = Cluster("clusterB", '192.0.2.141')
        clusterA = Cluster("clusterA", '192.0.2.72')
 
+
+
+    if node == 'tof':
+        result_dataset = measure_time_of_flight(clusterA)
+        print('result_dataset', result_dataset)
+        return result_dataset
     loki_ic = InstrumentCoordinator('loki_ic')
     loki_ic.add_component(ClusterComponent(clusterA))
     #loki_ic.add_component(ClusterComponent(clusterB))

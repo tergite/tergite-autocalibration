@@ -6,6 +6,7 @@ from utilities.visuals import draw_arrow_chart
 # import logging
 
 nodes = [
+        "tof",
         "resonator_spectroscopy",
         #"punchout",
         "qubit_01_spectroscopy_pulsed",
@@ -89,6 +90,10 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     }
     '''
     sweep_parameters = {
+        'tof': {
+            'ro_acq_delay': {qubit: np.array([1,1]) for qubit in qubits}
+        },
+
         'resonator_spectroscopy': {
             'ro_frequencies': {qubit: resonator_samples(qubit) for qubit in qubits}
         },
@@ -135,10 +140,10 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     }
     return sweep_parameters
 
-node_to_be_calibrated = "qubit_12_spectroscopy_pulsed"
-#node_to_be_calibrated = "T1"
+node_to_be_calibrated = "resonator_spectroscopy"
+
 # box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
-draw_arrow_chart(f'Qubits: {N_qubits}', nodes)
+draw_arrow_chart(f'Qubits: {N_qubits}', nodes[:nodes.index(node_to_be_calibrated)+1])
 
 def user_requested_calibration(node: str):
     job = {

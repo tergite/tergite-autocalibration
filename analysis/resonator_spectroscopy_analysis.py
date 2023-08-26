@@ -52,7 +52,6 @@ class ResonatorSpectroscopy_1_Analysis(ResonatorSpectroscopyAnalysis):
         self.dataset = dataset
         super().__init__(self.dataset)
     def plotter(self,ax):
-        print( 'IN DAUGFHTER CLASS')
         this_qubit = self.dataset.attrs['qubit']
         ax.set_xlabel('Frequency (Hz)')
         ax.set_ylabel('|S21| (V)')

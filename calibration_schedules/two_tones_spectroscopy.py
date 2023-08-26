@@ -7,8 +7,6 @@ from utilities.extended_transmon_element import Measure_RO1
 import numpy as np
 
 from calibration_schedules.measurement_base import Measurement
-# from transmon_element import Measure_1
-
 
 class Two_Tones_Spectroscopy(Measurement):
 
@@ -47,6 +45,8 @@ class Two_Tones_Spectroscopy(Measurement):
                 this_clock = f'{this_qubit}.12'
             else:
                 raise ValueError(f'Invalid qubit state: {self.qubit_state}')
+            print(f'{this_clock = }')
+            print(f'{spec_array_val[0] = }')
             schedule.add_resource(
                 ClockResource( name=this_clock, freq=spec_array_val[0]),
             )
