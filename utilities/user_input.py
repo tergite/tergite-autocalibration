@@ -6,12 +6,12 @@ from utilities.visuals import draw_arrow_chart
 # import logging
 
 nodes = [
-        "tof",
+        # "tof",
         "resonator_spectroscopy",
         #"punchout",
         "qubit_01_spectroscopy_pulsed",
         "rabi_oscillations",
-        #"T1",
+        "T1",
         #"XY_crosstalk",
         "ramsey_correction",
         "motzoi_parameter",
@@ -140,7 +140,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     }
     return sweep_parameters
 
-node_to_be_calibrated = "resonator_spectroscopy"
+node_to_be_calibrated = "T1"
 
 # box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 draw_arrow_chart(f'Qubits: {N_qubits}', nodes[:nodes.index(node_to_be_calibrated)+1])

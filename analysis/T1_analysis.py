@@ -8,16 +8,11 @@ class T1Analysis():
         data_var = list(dataset.data_vars.keys())[0]
         coord = list(dataset[data_var].coords.keys())[0]
         self.S21 = dataset[data_var].values
-        ########################
-        #print( "")
-        #print( f'{Fore.RED}WARNING MOCK DATA IN analysis/qubit_spectroscopy_analysis{Style.RESET_ALL}')
-        #self.S21 = np.array([1+1j for _ in self.S21])
-        ########################
         self.independents = dataset[coord].values
         self.fit_results = {}
         self.qubit = dataset[data_var].attrs['qubit']
 
-    def model_fit(self):
+    def run_fitting(self):
         model = ExpDecayModel()
         
         self.magnitudes = np.absolute(self.S21)

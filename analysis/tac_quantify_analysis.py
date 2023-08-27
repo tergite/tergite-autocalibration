@@ -3,6 +3,7 @@ from analysis.resonator_spectroscopy_analysis import ResonatorSpectroscopyAnalys
 from analysis.qubit_spectroscopy_analysis import QubitSpectroscopyAnalysis
 from analysis.rabi_analysis import RabiAnalysis
 from analysis.ramsey_analysis import RamseyAnalysis
+from analysis.tof_analysis import analyze_tof
 from analysis.T1_analysis import T1Analysis
 from quantify_core.data.handling import set_datadir
 # from quantify_analysis import qubit_spectroscopy_analysis, rabi_analysis, T1_analysis, XY_crosstalk_analysis, ramsey_analysis, SSRO_analysis
@@ -43,8 +44,8 @@ class BaseAnalysis():
 class Multiplexed_Analysis(BaseAnalysis):
     def __init__(self, result_dataset: xr.Dataset, node: str):
         if node == 'tof':
-            print()
-            plot()
+            tof = analyze_tof(result_dataset)
+            print(tof)
             return
 
         super().__init__(result_dataset)
@@ -73,6 +74,9 @@ class Multiplexed_Analysis(BaseAnalysis):
             elif node == 'resonator_spectroscopy_1':
                 analysis_class = ResonatorSpectroscopy_1_Analysis
                 redis_field = 'ro_freq_1'
+            elif node == 'T1':
+                analysis_class = T1Analysis
+                redis_field = 'ti_time'
 
             node_analysis = analysis_class(ds)
             self.qoi = node_analysis.run_fitting()
