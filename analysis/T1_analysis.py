@@ -26,7 +26,9 @@ class T1Analysis():
         self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_delays})
         #self.dataset['fit_delays'] = self.fit_delays
         #self.dataset['fit_y'] = ('fit_delays',fit_y)
-        return fit_result.params['tau'].value
+        T1_time = fit_result.params['tau'].value
+        print(T1_time)
+        return  T1_time
 
     def plotter(self,ax):
     	
@@ -37,4 +39,3 @@ class T1Analysis():
         ax.set_ylabel('|S21| (V)')
         
         ax.grid()
- 

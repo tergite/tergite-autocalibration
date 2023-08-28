@@ -8,8 +8,6 @@ class T1_BATCHED(Measurement):
 
     def __init__(self,transmons,qubit_state:int=0):
         super().__init__(transmons)
-        #self.experiment_parameters = 'delay'
-        #self.gettable_batched = True
         self.qubit_state = qubit_state
         self.transmons = transmons
 
@@ -22,7 +20,6 @@ class T1_BATCHED(Measurement):
         qubits: list[str],
         delays: dict[str, np.ndarray],
         repetitions: int = 1024,
-        #**delays
     ) -> Schedule:
         schedule = Schedule("multiplexed_T1",repetitions)
         root_relaxation = schedule.add(Reset(*qubits), label="Start")
@@ -40,4 +37,3 @@ class T1_BATCHED(Measurement):
                 )
                 prev_relax=relaxation
         return schedule
-

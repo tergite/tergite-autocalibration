@@ -2,6 +2,7 @@ import json
 
 import matplotlib.pyplot as plt
 import numpy as np
+import xarray as xr
 
 def measure_time_of_flight(cluster):
 
@@ -79,7 +80,10 @@ def measure_time_of_flight(cluster):
     p1 = np.array(
         readout_module.get_acquisitions(0)["single"]["acquisition"]["scope"]["path1"]["data"]
     )
-    return p0, p1
+    ds = xr.Dataset()
+    ds['p0'] = p0
+    ds['p1'] = p1
+    return ds
     
     # Analysis
 def analyze_tof(p0,p1):

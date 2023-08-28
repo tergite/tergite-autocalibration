@@ -44,8 +44,7 @@ class BaseAnalysis():
 class Multiplexed_Analysis(BaseAnalysis):
     def __init__(self, result_dataset: xr.Dataset, node: str):
         if node == 'tof':
-            tof = analyze_tof(result_dataset)
-            print(tof)
+            tof = analyze_tof(result_dataset, True)
             return
 
         super().__init__(result_dataset)
@@ -76,7 +75,7 @@ class Multiplexed_Analysis(BaseAnalysis):
                 redis_field = 'ro_freq_1'
             elif node == 'T1':
                 analysis_class = T1Analysis
-                redis_field = 'ti_time'
+                redis_field = 't1_time'
 
             node_analysis = analysis_class(ds)
             self.qoi = node_analysis.run_fitting()
@@ -90,43 +89,15 @@ class Multiplexed_Analysis(BaseAnalysis):
                 hasPeak=node_analysis.has_peak()
                 patch2 = mpatches.Patch(color='blue', label=f'Peak Found:{hasPeak}')
                 handles.append(patch2)
+            if node == 'T1':
+                T1_micros = self.qoi*1e6
+                patch2 = mpatches.Patch(color='blue', label=f'T1 = {T1_micros:.2f}')
+                handles.append(patch2)
             patch = mpatches.Patch(color='red', label=f'{this_qubit}')
             handles.append(patch)
             this_axis.set(title=None)
             this_axis.legend(handles=handles)
 
-#class Multiplexed_T1_Analysis(BaseAnalysis):
-#    def __init__(self, result_dataset: xr.Dataset, node: str):
-#        super().__init__(result_dataset)
-#        for indx, var in enumerate(result_dataset.data_vars):
-#            this_qubit = result_dataset[var].attrs['qubit']
-#            ds = result_dataset[var].to_dataset()
-#
-#            this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
-#            # this_axis.set_title(f'{node_name} for {this_qubit}')
-#            node_analysis = T1Analysis(ds)
-#            T1_time = node_analysis.model_fit()
-#            T1_micros=T1_time*1e6
-#
-#            self.qoi = T1_time
-#
-#            node_analysis.plotter(this_axis)
-#
-#            handles, labels = this_axis.get_legend_handles_labels()
-#            patch = mpatches.Patch(color='red', label=f'{this_qubit}')
-#            handles.append(patch)
-#            patch2=mpatches.Patch(color='green', label=f'{T1_micros} μs')
-#            handles.append(patch2)
-#            this_axis.set(title=None)
-#            this_axis.legend(handles=handles)
-#
-#            #if node_name == 'rabi_frequency' or node_name == 'rabi_oscillations_BATCHED':
-#            #    self.update_redis_trusted_values(node_name, this_qubit,'mw_amp180',latex)
-#            #if node_name == 'rabi_12_frequency' or node_name == 'rabi_oscillations_12_BATCHED':
-#            #    self.update_redis_trusted_values(node_name, this_qubit,'mw_ef_amp180',latex)
-#
-#        #self.node_result.update({'measurement_dataset':result_dataset.to_dict()})
-#
 #class Multiplexed_Punchout_Analysis(BaseAnalysis):
 #    def __init__(self, result_dataset: xr.Dataset, node: str):
 #        super().__init__(result_dataset)

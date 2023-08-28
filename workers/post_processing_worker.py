@@ -16,4 +16,5 @@ def post_process(result_dataset: xr.Dataset, node: str):
     fig = plt.gcf()
     fig.set_tight_layout(True)
     plt.show()
-    analysis.node_result.update({'measurement_dataset':result_dataset.to_dict()})
+    if node != 'tof':
+        analysis.node_result.update({'measurement_dataset':result_dataset.to_dict()})

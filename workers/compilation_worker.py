@@ -51,6 +51,7 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
     redis_config = redis_connection.hgetall(f"transmons:{qubit}")
     transmon.reset.duration(float(redis_config['init_duration']))
     transmon.rxy.amp180(float(redis_config['mw_amp180']))
+    print(f'{transmon.rxy.amp180()=}')
     motzoi_val = float(redis_config['mw_motzoi'])
     if isnan(motzoi_val):
         motzoi_val = 0
@@ -95,10 +96,10 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
 
     for channel, qubit in enumerate(qubits):
         transmon = ExtendedTransmon(qubit)
-        #breakpoint()
         load_redis_config(transmon,channel)
         device.add_element(transmon)
         transmons[qubit] = transmon
+        #breakpoint()
 
     qubit_state = 0
     if node in ['resonator_spectroscopy_1','qubit_12_spectroscopy_pulsed']:

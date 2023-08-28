@@ -79,7 +79,7 @@ def to_complex_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
     return complex_ds
 
 def measure( compiled_schedule: CompiledSchedule, schedule_duration: float, samplespace: dict, node: str) -> xarray.Dataset:
-    cluster_status = ClusterStatus.dummy
+    cluster_status = ClusterStatus.real
 
     logger.info('Starting measurement')
 
@@ -115,7 +115,6 @@ def measure( compiled_schedule: CompiledSchedule, schedule_duration: float, samp
 
     if node == 'tof':
         result_dataset = measure_time_of_flight(clusterA)
-        print('result_dataset', result_dataset)
         return result_dataset
     loki_ic = InstrumentCoordinator('loki_ic')
     loki_ic.add_component(ClusterComponent(clusterA))

@@ -6,7 +6,7 @@ from utilities.visuals import draw_arrow_chart
 # import logging
 
 nodes = [
-        # "tof",
+        "tof",
         "resonator_spectroscopy",
         #"punchout",
         "qubit_01_spectroscopy_pulsed",
@@ -14,7 +14,6 @@ nodes = [
         "T1",
         #"XY_crosstalk",
         "ramsey_correction",
-        "motzoi_parameter",
         "motzoi_parameter",
         "resonator_spectroscopy_1",
         "qubit_12_spectroscopy_pulsed",
@@ -44,7 +43,7 @@ qubits = [ 'q16', 'q22', 'q23']
 N_qubits = len(qubits)
 
 res_spec_samples = 50
-qub_spec_samples = 100
+qub_spec_samples = 70
 
 def resonator_samples(qubit:str, punchout=False) -> np.ndarray:
     sweep_range = 6.5e6
@@ -57,7 +56,7 @@ def resonator_samples(qubit:str, punchout=False) -> np.ndarray:
     return np.linspace(min_freq, max_freq, res_spec_samples)
 
 def qubit_samples(qubit:str, transition:str = '01') -> np.ndarray:
-    sweep_range = 18e6
+    sweep_range = 10e6
     if transition=='01':
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition=='12':
