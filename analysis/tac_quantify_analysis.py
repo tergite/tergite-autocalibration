@@ -76,6 +76,9 @@ class Multiplexed_Analysis(BaseAnalysis):
             elif node == 'T1':
                 analysis_class = T1Analysis
                 redis_field = 't1_time'
+            elif node == 'qubit_12_spectroscopy_pulsed':
+                analysis_class = QubitSpectroscopyAnalysis
+                redis_field = 'freq_12'
 
             node_analysis = analysis_class(ds)
             self.qoi = node_analysis.run_fitting()

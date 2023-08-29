@@ -6,7 +6,7 @@ from utilities.visuals import draw_arrow_chart
 # import logging
 
 nodes = [
-        "tof",
+        # "tof",
         "resonator_spectroscopy",
         #"punchout",
         "qubit_01_spectroscopy_pulsed",
@@ -139,7 +139,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     }
     return sweep_parameters
 
-node_to_be_calibrated = "T1"
+node_to_be_calibrated = "qubit_12_spectroscopy_pulsed"
 
 # box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 draw_arrow_chart(f'Qubits: {N_qubits}', nodes[:nodes.index(node_to_be_calibrated)+1])

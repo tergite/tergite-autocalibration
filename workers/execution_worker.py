@@ -82,15 +82,6 @@ def measure( compiled_schedule: CompiledSchedule, schedule_duration: float, samp
 
     logger.info('Starting measurement')
 
-    #Runs time of flight calibration
-    #TODO this is a very bad way of running TOF
-    # ideally TOF would be its own node, but this requires custom input variables (only the cluster nothing else)
-    #if node == 'resonator_spectroscopy':
-    #        # Performs time of flight measurement
-    #        TOF_plotting=False
-    #        TOF=Time_Of_Flight(Cluster("cluster", '192.0.2.72'), TOF_plotting)
-    #        logger.info(f'Time of flight: {TOF}')
-
     print(f'{Fore.BLUE}{Style.BRIGHT}Measuring node: {node} , duration: {schedule_duration:.2f}s{Style.RESET_ALL}')
 
     Cluster.close_all()
