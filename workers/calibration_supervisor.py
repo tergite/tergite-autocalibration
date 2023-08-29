@@ -68,7 +68,9 @@ def inspect_node(node:str):
             redis_connection.hset(f"transmons:{qubit}", parameter_key, parameter_value)
 
     #Populate the Redis database with node specific parameter values
-    if node in transmon_configuration:
+    # TODO ONLY IF NODE ISNOT CALIBRATED
+    is_node_calibrated = all([redis_connection.hget(f"cs:{qubit}", node) == 'calibrated' for qubit in qubits])
+    if node in transmon_configuration and not is_node_calibrated:
         node_specific_dict = transmon_configuration[node]['all']
         for field_key, field_value in node_specific_dict.items():
             for qubit in qubits:

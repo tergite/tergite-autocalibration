@@ -21,8 +21,7 @@ import threading
 import tqdm
 from utilities.root_path import data_directory
 from calibration_schedules.time_of_flight import measure_time_of_flight
-
-from calibration_schedules.time_of_flight import measure_time_of_flight
+from config_files.settings import lokiA_IP
 
 import redis
 
@@ -79,7 +78,7 @@ def to_complex_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
     return complex_ds
 
 def measure( compiled_schedule: CompiledSchedule, schedule_duration: float, samplespace: dict, node: str) -> xarray.Dataset:
-    cluster_status = ClusterStatus.real
+    cluster_status = ClusterStatus.dummy
 
     logger.info('Starting measurement')
 
@@ -109,7 +108,7 @@ def measure( compiled_schedule: CompiledSchedule, schedule_duration: float, samp
        # clusterB = Cluster("clusterB", dummy_cfg=dummy)
     elif cluster_status == ClusterStatus.real:
        #clusterB = Cluster("clusterB", '192.0.2.141')
-       clusterA = Cluster("clusterA", '192.0.2.72')
+       clusterA = Cluster("clusterA", lokiA_IP)
 
 
 

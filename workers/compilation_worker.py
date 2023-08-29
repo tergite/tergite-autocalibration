@@ -18,7 +18,7 @@ from calibration_schedules.ramsey_fringes import Ramsey_fringes
 from calibration_schedules.motzoi_paramerter import Motzoi_parameter
 from utilities.extended_transmon_element import ExtendedTransmon
 from quantify_scheduler.backends import SerialCompiler
-from config_files.IF_hw_config import hardware_config
+from config_files.settings import hw_config
 from quantify_core.data.handling import set_datadir
 
 set_datadir('.')
@@ -85,7 +85,7 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
     Instrument.close_all()
 
     device = QuantumDevice('Loki')
-    device.hardware_config(hardware_config)
+    device.hardware_config(hw_config)
     device.cfg_sched_repetitions(1024)
     sweep_quantities = list(samplespace.keys())
     sweep_parameters = list(samplespace.values())
