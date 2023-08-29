@@ -6,7 +6,6 @@ from analysis.ramsey_analysis import RamseyAnalysis
 from analysis.tof_analysis import analyze_tof
 from analysis.T1_analysis import T1Analysis
 from quantify_core.data.handling import set_datadir
-# from quantify_analysis import qubit_spectroscopy_analysis, rabi_analysis, T1_analysis, XY_crosstalk_analysis, ramsey_analysis, SSRO_analysis
 # from quantify_core.analysis.calibration import rotate_to_calibrated_axis
 import matplotlib.patches as mpatches
 import numpy as np
@@ -79,6 +78,11 @@ class Multiplexed_Analysis(BaseAnalysis):
             elif node == 'qubit_12_spectroscopy_pulsed':
                 analysis_class = QubitSpectroscopyAnalysis
                 redis_field = 'freq_12'
+            elif node == 'rabi_oscillations_12':
+                analysis_class = RabiAnalysis
+                redis_field = 'mw_ef_amp180'
+            else:
+                raise ValueError(f'Invalid node: {node}')
 
             node_analysis = analysis_class(ds)
             self.qoi = node_analysis.run_fitting()

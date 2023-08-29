@@ -17,6 +17,9 @@ nodes = [
         "motzoi_parameter",
         "resonator_spectroscopy_1",
         "qubit_12_spectroscopy_pulsed",
+        "rabi_oscillations_12",
+        "ramsey_correction_12",
+        "resonator_spectroscopy_2",
         ]
 
 VNA_resonator_frequencies = {
@@ -101,6 +104,10 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
             'ro_frequencies': {qubit: resonator_samples(qubit) for qubit in qubits}
         },
 
+        'resonator_spectroscopy_2': {
+            'ro_frequencies': {qubit: resonator_samples(qubit) for qubit in qubits}
+        },
+
         'punchout': {
             'ro_frequencies': {qubit: resonator_samples(qubit, punchout=True) for qubit in qubits},
             'ro_amplitudes': {qubit : np.linspace(5e-3, 0.8e-1, 11) for qubit in qubits}
@@ -118,6 +125,10 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
             'mw_amplitudes': { qubit : np.linspace(0.002,0.20,41) for qubit in qubits}
         },
 
+        'rabi_oscillations_12': {
+            'mw_amplitudes': { qubit : np.linspace(0.002,0.20,41) for qubit in qubits}
+        },
+
         'T1': {
             'delays': { qubit : np.arange(16e-9,250e-6,4e-6) for qubit in qubits}
         },
@@ -130,7 +141,11 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
 
         'ramsey_correction': {
             'ramsey_delays': { qubit : np.arange(4e-9, 2048e-9, 6*8e-9) for qubit in qubits }
-                },
+        },
+
+        'ramsey_correction_12': {
+            'ramsey_delays': { qubit : np.arange(4e-9, 2048e-9, 6*8e-9) for qubit in qubits }
+        },
 
         'motzoi_parameter': {
             'mw_motzois': {qubit: np.linspace(-0.45,0.45,9) for qubit in qubits},
@@ -139,7 +154,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     }
     return sweep_parameters
 
-node_to_be_calibrated = "qubit_12_spectroscopy_pulsed"
+node_to_be_calibrated = "ramsey_correction_12"
 
 # box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 draw_arrow_chart(f'Qubits: {N_qubits}', nodes[:nodes.index(node_to_be_calibrated)+1])

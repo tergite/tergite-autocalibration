@@ -3,7 +3,7 @@ import math
 from qcodes.instrument.channel import InstrumentChannel
 from qcodes.instrument.parameter import ManualParameter
 from quantify_scheduler.enums import BinMode
-from quantify_scheduler.device_under_test.transmon_element import BasicTransmonElement, ClocksFrequencies, DispersiveMeasurement, InstrumentBase, measurement_factories, pulse_library
+from quantify_scheduler.device_under_test.transmon_element import BasicTransmonElement, ClocksFrequencies, DispersiveMeasurement, InstrumentBase, measurement_factories, pulse_factories, pulse_library
 from quantify_scheduler.backends.circuit_to_device import OperationCompilationConfig, DeviceCompilationConfig
 from quantify_scheduler.helpers.validators import Numbers
 from quantify_scheduler.operations.gate_library import Measure
@@ -21,6 +21,24 @@ class ExtendedClocksFrequencies(InstrumentChannel):
             initial_value=kwargs.get("readout_1", math.nan),
             vals=Numbers(min_value=0, max_value=1e12, allow_nan=True),
         )
+
+class R12(InstrumentChannel):
+    """
+    Submodule containing parameters for performing an R12 operations
+    """
+
+    def __init__(self, parent: InstrumentBase, name: str, **kwargs: Any) -> None:
+        super().__init__(parent=parent, name=name)
+        self.ef_amp180 = ManualParameter(
+            name="ef_amp180",
+            instrument=self,
+            label=r"$\pi-pulse amplitude for 12$",
+            initial_value=kwargs.get("ef_amp180", math.nan),
+            unit="",
+            vals=Numbers(min_value=-10, max_value=10, allow_nan=True),
+        )
+
+
 
 class Measure_RO1(Measure):
     def __init__(
@@ -45,14 +63,14 @@ class Measure_RO1(Measure):
             {
                 "name": f"Measure_RO1 {', '.join(qubits)}",
                 "gate_info": {
-                    "unitary": None,
-                    "plot_func": plot_func,
-                    "tex": r"$\langle0|$",
-                    "qubits": list(qubits),
-                    "acq_index": acq_index,
-                    "acq_protocol": acq_protocol,
-                    "bin_mode": bin_mode,
-                    "operation_type": "measure_1",
+                    'unitary': None,
+                    'plot_func': plot_func,
+                    'tex': r'$\langle0|$',
+                    'qubits': list(qubits),
+                    'acq_index': acq_index,
+                    'acq_protocol': acq_protocol,
+                    'bin_mode': bin_mode,
+                    'operation_type': 'measure_1',
                 },
             }
         )
@@ -63,8 +81,9 @@ class ExtendedTransmon(BasicTransmonElement):
     def __init__(self, name: str, **kwargs):
 
         submodules_to_add = {
-            "measure_1": DispersiveMeasurement,
-            "extended_clock_freqs": ExtendedClocksFrequencies,
+            'measure_1': DispersiveMeasurement,
+            'r12': R12,
+            'extended_clock_freqs': ExtendedClocksFrequencies,
         }
         submodule_data = {
             sub_name: kwargs.pop(sub_name, {}) for sub_name in submodules_to_add.keys()
@@ -115,6 +134,17 @@ class ExtendedTransmon(BasicTransmonElement):
                         "acq_weights_sampling_rate": self.measure.acq_weights_sampling_rate(),
                         # "acq_rotation": self.measure.acq_rotation(),
                         # "acq_threshold": self.measure.acq_threshold(),
+                    },
+                    gate_info_factory_kwargs=["acq_index", "bin_mode", "acq_protocol"],
+                )
+        cfg_dict["elements"][f"{self.name}"]["r12"] = OperationCompilationConfig(
+                    factory_func=pulse_factories.rxy_drag_pulse,
+                    factory_kwargs={
+                        "ef_amp180": self.r12.ef_amp180(),
+                        # "motzoi": self.rxy.motzoi(),
+                        "port": self.ports.microwave(),
+                        "clock": f"{self.name}.12",
+                        # "duration": self.rxy.duration(),
                     },
                     gate_info_factory_kwargs=["acq_index", "bin_mode", "acq_protocol"],
                 )

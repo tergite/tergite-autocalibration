@@ -36,8 +36,9 @@ node_map = {
     # 'drag_amplitude': DRAG_amplitude,
     'resonator_spectroscopy_1': Resonator_Spectroscopy,
     'qubit_12_spectroscopy_pulsed': Two_Tones_Spectroscopy,
-    # 'rabi_oscillations_12': Rabi_Oscillations,
-    # 'resonator_spectroscopy_2': Resonator_Spectroscopy,
+    'rabi_oscillations_12': Rabi_Oscillations,
+    'ramsey_correction_12': Ramsey_fringes,
+    'resonator_spectroscopy_2': Resonator_Spectroscopy,
 }
 
 redis_connection = redis.Redis(decode_responses=True)
@@ -51,7 +52,8 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
     redis_config = redis_connection.hgetall(f"transmons:{qubit}")
     transmon.reset.duration(float(redis_config['init_duration']))
     transmon.rxy.amp180(float(redis_config['mw_amp180']))
-    print(f'{transmon.rxy.amp180()=}')
+    transmon.r12.ef_amp180(float(redis_config['mw_ef_amp180']))
+    #print(f'{transmon.rxy.amp180()=}')
     motzoi_val = float(redis_config['mw_motzoi'])
     if isnan(motzoi_val):
         motzoi_val = 0
@@ -102,7 +104,8 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
         #breakpoint()
 
     qubit_state = 0
-    if node in ['resonator_spectroscopy_1','qubit_12_spectroscopy_pulsed']:
+    if node in ['resonator_spectroscopy_1','qubit_12_spectroscopy_pulsed',
+                'rabi_oscillations_12', 'ramsey_correction_12']:
         qubit_state = 1
     node_class = node_map[node](transmons, qubit_state)
     schedule_function = node_class.schedule_function
