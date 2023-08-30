@@ -65,6 +65,9 @@ mw_amp180 = 2.5e-4
 [ramsey_correction.all]
 artificial_detuning = 3e6
 
+[ramsey_correction_12.all]
+artificial_detuning = 3e6
+
 [qubit_12_spectroscopy_pulsed.all]
 mw_pulse_duration = 2e-6
 mw_amp180 = 2.5e-4
