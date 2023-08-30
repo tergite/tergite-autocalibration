@@ -60,3 +60,19 @@ class ResonatorSpectroscopy_1_Analysis(ResonatorSpectroscopyAnalysis):
         ax.axvline(self.minimum_freq,c='blue',ls='solid',label='frequency |1> ')
         ax.axvline(ro_freq,c='green',ls='solid',label='frequency |0>')
         ax.grid()
+
+class ResonatorSpectroscopy_2_Analysis(ResonatorSpectroscopyAnalysis):
+    def __init__(self, dataset: xr.Dataset):
+        self.dataset = dataset
+        super().__init__(self.dataset)
+    def plotter(self,ax):
+        this_qubit = self.dataset.attrs['qubit']
+        ax.set_xlabel('Frequency (Hz)')
+        ax.set_ylabel('|S21| (V)')
+        ro_freq = redis_connection.hget(f'transmons:{this_qubit}', 'ro_freq')
+        ro_freq_1 = redis_connection.hget(f'transmons:{this_qubit}', 'ro_freq_1')
+        self.fitting_model.plot_fit(ax,numpoints = 400,xlabel=None, title=None)
+        ax.axvline(self.minimum_freq,c='blue',ls='solid',label='frequency |2>')
+        ax.axvline(ro_freq_1,c='magenta',ls='dashed',label='frequency |1>')
+        ax.axvline(ro_freq,c='green',ls='dashed',label='frequency |0>')
+        ax.grid()

@@ -2,7 +2,7 @@
 import matplotlib.pyplot as plt
 import xarray as xr
 from analysis.motzoi_analysis import MotzoiAnalysis
-from analysis.resonator_spectroscopy_analysis import ResonatorSpectroscopyAnalysis, ResonatorSpectroscopy_1_Analysis
+from analysis.resonator_spectroscopy_analysis import ResonatorSpectroscopyAnalysis, ResonatorSpectroscopy_1_Analysis, ResonatorSpectroscopy_2_Analysis
 from analysis.qubit_spectroscopy_analysis import QubitSpectroscopyAnalysis
 from analysis.rabi_analysis import RabiAnalysis
 from analysis.ramsey_analysis import RamseyAnalysis
@@ -104,6 +104,9 @@ class Multiplexed_Analysis(BaseAnalysis):
             elif node == 'ramsey_correction_12':
                 analysis_class = RamseyAnalysis
                 redis_field = 'freq_12'
+            elif node == 'resonator_spectroscopy_2':
+                analysis_class = ResonatorSpectroscopy_2_Analysis
+                redis_field = 'ro_freq_2'
             else:
                 raise ValueError(f'Invalid node: {node}')
 

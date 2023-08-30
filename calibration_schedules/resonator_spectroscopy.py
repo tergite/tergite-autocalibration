@@ -47,11 +47,12 @@ class Resonator_Spectroscopy(Measurement):
         sched = Schedule("multiplexed_resonator_spectroscopy",repetitions)
         # Initialize the clock for each qubit
 
-        if self.qubit_state == 0: ro_str = 'ro' 
-        elif self.qubit_state == 1: ro_str = 'ro1' 
-        elif self.qubit_state == 2: ro_str = 'ro2' 
+        if self.qubit_state == 0: ro_str = 'ro'
+        elif self.qubit_state == 1: ro_str = 'ro1'
+        elif self.qubit_state == 2: ro_str = 'ro2'
         else:
             raise ValueError('error state')
+
         #Initialize ClockResource with the first frequency value
         for this_qubit, ro_array_val in ro_frequencies.items():
             this_ro_clock = f'{this_qubit}.' + ro_str
@@ -66,7 +67,6 @@ class Resonator_Spectroscopy(Measurement):
 
         # The first for loop iterates over all qubits:
         for acq_cha, (this_qubit, ro_f_values) in enumerate(ro_frequencies.items()):
-            # The second for loop iterates over all frequency values in the frequency batch:
 
             sched.add(
                 Reset(*qubits), ref_op=root_relaxation, ref_pt_new='end'
@@ -74,6 +74,8 @@ class Resonator_Spectroscopy(Measurement):
 
             this_ro_clock = f'{this_qubit}.' + ro_str
             this_mw_clock = f'{this_qubit}.12'
+
+            # The second for loop iterates over all frequency values in the frequency batch:
             for acq_index, ro_frequency in enumerate(ro_f_values):
                 sched.add(
                     SetClockFrequency(clock=this_ro_clock, clock_freq_new=ro_frequency),
