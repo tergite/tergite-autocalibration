@@ -32,7 +32,7 @@ class Two_Tones_Spectroscopy(Measurement):
         mw_pulse_ports: dict[str,str],
         mw_frequencies: dict[str,np.ndarray],
 
-        repetitions: int = 1024,
+        repetitions: int = 512,
         ) -> Schedule:
 
         # if port_out is None: port_out = port

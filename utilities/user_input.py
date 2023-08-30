@@ -63,7 +63,8 @@ def qubit_samples(qubit:str, transition:str = '01') -> np.ndarray:
     if transition=='01':
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition=='12':
-        rough_anharmonicity = 200e6 if int(qubit[1:])%2==0 else 170e6
+        rough_anharmonicity = 200e6
+        #rough_anharmonicity = 200e6 if int(qubit[1:])%2==0 else 170e6
         VNA_frequency = VNA_qubit_frequencies[qubit] - rough_anharmonicity
         # VNA_frequency = VNA_f12_frequencies[qubit]
     else :
