@@ -115,11 +115,11 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
         },
 
         'qubit_01_spectroscopy_pulsed': {
-            'mw_frequencies': {qubit: qubit_samples(qubit) for qubit in qubits}
+            'spec_frequencies': {qubit: qubit_samples(qubit) for qubit in qubits}
         },
 
         'qubit_12_spectroscopy_pulsed': {
-            'mw_frequencies': {qubit: qubit_samples(qubit,'12') for qubit in qubits}
+            'spec_frequencies': {qubit: qubit_samples(qubit,'12') for qubit in qubits}
         },
 
         'rabi_oscillations': {
@@ -155,7 +155,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     }
     return sweep_parameters
 
-node_to_be_calibrated = "qubit_12_spectroscopy_pulsed"
+node_to_be_calibrated = "rabi_oscillations"
 
 # box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 draw_arrow_chart(f'Qubits: {N_qubits}', nodes[:nodes.index(node_to_be_calibrated)+1])

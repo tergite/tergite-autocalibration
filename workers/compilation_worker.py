@@ -60,6 +60,8 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
     transmon.rxy.motzoi(motzoi_val)
     transmon.rxy.duration(float(redis_config['mw_pulse_duration']))
 
+    transmon.spec.spec_amp(float(redis_config['spec_amp']))
+    transmon.spec.spec_duration(float(redis_config['spec_pulse_duration']))
     # transmon.ports.microwave(redis_config['mw_port'])
     # transmon.ports.readout(redis_config['ro_port'])
     transmon.clock_freqs.f01(float(redis_config['freq_01']))

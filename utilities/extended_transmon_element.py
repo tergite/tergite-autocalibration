@@ -2,6 +2,7 @@ from __future__ import annotations
 import math
 from qcodes.instrument.channel import InstrumentChannel
 from qcodes.instrument.parameter import ManualParameter
+from qcodes.utils import validators
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.device_under_test.transmon_element import BasicTransmonElement, ClocksFrequencies, DispersiveMeasurement, InstrumentBase, measurement_factories, pulse_factories, pulse_library
 from quantify_scheduler.backends.circuit_to_device import OperationCompilationConfig, DeviceCompilationConfig
@@ -38,6 +39,28 @@ class R12(InstrumentChannel):
             vals=Numbers(min_value=-10, max_value=10, allow_nan=True),
         )
 
+class Spec(InstrumentChannel):
+    """
+    Submodule containing parameters for performing qubit spectroscopy measurements
+    """
+    def __init__(self, parent: InstrumentBase, name: str, **kwargs: Any) -> None:
+        super().__init__(parent=parent, name=name)
+        self.spec_amp = ManualParameter(
+            name="spec_amp",
+            instrument=self,
+            label=r"amplitude for the qubit spectroscopy pulse",
+            initial_value=kwargs.get("spec_amp", math.nan),
+            unit="",
+            vals=Numbers(min_value=-10, max_value=10, allow_nan=True),
+        )
+
+        self.spec_duration = ManualParameter(
+            name="spec_duration",
+            instrument=self,
+            initial_value=kwargs.get("spec_duration", 20e-9),
+            unit="s",
+            vals=validators.Numbers(min_value=0, max_value=1),
+        )
 
 
 class Measure_RO1(Measure):
@@ -83,6 +106,7 @@ class ExtendedTransmon(BasicTransmonElement):
         submodules_to_add = {
             'measure_1': DispersiveMeasurement,
             'r12': R12,
+            'spec': Spec,
             'extended_clock_freqs': ExtendedClocksFrequencies,
         }
         submodule_data = {
@@ -146,8 +170,18 @@ class ExtendedTransmon(BasicTransmonElement):
                         "clock": f"{self.name}.12",
                         # "duration": self.rxy.duration(),
                     },
-                    gate_info_factory_kwargs=["acq_index", "bin_mode", "acq_protocol"],
+                    gate_info_factory_kwargs=["theta", "phi"],
                 )
+
+        cfg_dict["elements"][f"{self.name}"]["spec"] = OperationCompilationConfig(
+                    factory_func=pulse_factories.rxy_drag_pulse,
+                    factory_kwargs={
+                        "spec_amp": self.spec.spec_amp(),
+                        "spec_duration": self.spec.spec_duration(),
+                    },
+                    gate_info_factory_kwargs=["theta", "phi"],
+                )
+
         dev_cfg = DeviceCompilationConfig.parse_obj(cfg_dict)
 
         return dev_cfg

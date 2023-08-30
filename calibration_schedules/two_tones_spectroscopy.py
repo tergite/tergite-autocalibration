@@ -18,8 +18,8 @@ class Two_Tones_Spectroscopy(Measurement):
 
         self.static_kwargs = {
             'qubits': self.qubits,
-            'mw_pulse_durations': self.attributes_dictionary('duration'),
-            'mw_pulse_amplitudes': self.attributes_dictionary('amp180'),
+            'spec_pulse_durations': self.attributes_dictionary('spec_duration'),
+            'spec_pulse_amplitudes': self.attributes_dictionary('spec_amp'),
             'mw_pulse_ports': self.attributes_dictionary('microwave'),
         }
 
@@ -27,18 +27,18 @@ class Two_Tones_Spectroscopy(Measurement):
     def schedule_function(
         self,
         qubits: list[str],
-        mw_pulse_durations: dict[str,float],
-        mw_pulse_amplitudes: dict[str,float],
+        spec_pulse_durations: dict[str,float],
+        spec_pulse_amplitudes: dict[str,float],
         mw_pulse_ports: dict[str,str],
-        mw_frequencies: dict[str,np.ndarray],
+        spec_frequencies: dict[str,np.ndarray],
 
-        repetitions: int = 512,
+        repetitions: int = 1024,
         ) -> Schedule:
 
         # if port_out is None: port_out = port
         schedule = Schedule("multiplexed_qubit_spec",repetitions)
         # Initialize the clock for each qubit
-        for this_qubit, spec_array_val in mw_frequencies.items():
+        for this_qubit, spec_array_val in spec_frequencies.items():
             if self.qubit_state == 0:
                 this_clock = f'{this_qubit}.01'
             elif self.qubit_state == 1:
@@ -55,7 +55,7 @@ class Two_Tones_Spectroscopy(Measurement):
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
         # The first for loop iterates over all qubits:
-        for this_qubit, spec_array_val in mw_frequencies.items():
+        for this_qubit, spec_array_val in spec_frequencies.items():
             if self.qubit_state == 0:
                 this_clock = f'{this_qubit}.01'
             elif self.qubit_state == 1:
@@ -81,12 +81,12 @@ class Two_Tones_Spectroscopy(Measurement):
                     raise ValueError(f'Invalid qubit state: {self.qubit_state}')
 
                 #spectroscopy pulse
-                print(f'{mw_pulse_durations=}')
+                print(f'{spec_pulse_durations=}')
                 print(f'{this_clock=}')
                 spec_pulse = schedule.add(
                     SoftSquarePulse(
-                        duration= mw_pulse_durations[this_qubit],
-                        amp= mw_pulse_amplitudes[this_qubit],
+                        duration= spec_pulse_durations[this_qubit],
+                        amp= spec_pulse_amplitudes[this_qubit],
                         port= mw_pulse_ports[this_qubit],
                         clock=this_clock,
                     ),
