@@ -6,9 +6,8 @@ from quantify_scheduler.enums import BinMode
 from quantify_scheduler.schedules.schedule import Schedule
 from quantify_scheduler.operations.pulse_library import  SquarePulse, SetClockFrequency, DRAGPulse
 from quantify_scheduler.operations.acquisition_library import SSBIntegrationComplex
-from quantify_scheduler.operations.gate_library import Reset, X, Measure
+from quantify_scheduler.operations.gate_library import Reset, X
 from quantify_scheduler.resources import ClockResource
-# from transmon_element import Measure_1
 
 from calibration_schedules.measurement_base import Measurement
 import numpy as np
@@ -19,19 +18,17 @@ class Resonator_Spectroscopy(Measurement):
         super().__init__(transmons)
         self.qubit_state = qubit_state
         self.transmons = transmons
-
         self.static_kwargs = {
+            'qubits': self.qubits,
             'pulse_amplitudes': self.attributes_dictionary('pulse_amp'),
             'pulse_durations' : self.attributes_dictionary('pulse_duration'),
             'acquisition_delays': self.attributes_dictionary('acq_delay'),
             'integration_times': self.attributes_dictionary('integration_time'),
-            # 'mw_ef_amp180s': self.attributes_dictionary('mw_ef_amp180'),
-            # 'mw_pulse_durations': self.attributes_dictionary('mw_pulse_duration'),
-            # 'mw_clocks_12': self.attributes_dictionary('mw_12_clock'),
-            # 'mw_pulse_ports': self.attributes_dictionary('mw_port'),
-            # 'freqs_12': self.attributes_dictionary('freq_12'),
-            'qubits': self.qubits,
-            'ports': self.attributes_dictionary('readout_port'),
+            'mw_pulse_durations': self.attributes_dictionary('duration'),
+            'mw_pulse_ports': self.attributes_dictionary('microwave'),
+            'mw_frequencies_12': self.attributes_dictionary('f12'),
+            'mw_ef_amps180': self.attributes_dictionary('ef_amp180'),
+            'ro_ports': self.attributes_dictionary('readout_port'),
         }
 
 
@@ -39,18 +36,16 @@ class Resonator_Spectroscopy(Measurement):
         self,
         pulse_amplitudes: dict[str,float],
         pulse_durations: dict[str,float],
-        # mw_ef_amp180s: dict[str,float],
-        # mw_pulse_durations: dict[str,float],
-        # mw_clocks_12: dict[str,str],
-        # mw_pulse_ports: dict[str,str],
-        # freqs_12:  dict[str,float],
+        mw_ef_amps180: dict[str,float],
+        mw_pulse_durations: dict[str,float],
+        mw_pulse_ports: dict[str,str],
+        mw_frequencies_12:  dict[str,float],
         acquisition_delays: dict[str,float],
         integration_times: dict[str,float],
         qubits: list[str],
-        ports: dict[str,str],
+        ro_ports: dict[str,str],
         ro_frequencies: dict[str,np.ndarray],
-        repetitions: int = 512,
-        #TODO re adjust repetions
+        repetitions: int = 1024,
         ) -> Schedule:
         """
         Generate a schedule for performing resonator spectroscopy to locate the resonators resonance frequency for multiple qubits.
@@ -85,94 +80,82 @@ class Resonator_Spectroscopy(Measurement):
             An experiment schedule.
         """
 
-        sched = Schedule("multiplexed_resonator_spec_NCO",repetitions)
+        sched = Schedule("multiplexed_resonator_spectroscopy",repetitions)
         # Initialize the clock for each qubit
-        for ro_key, ro_array_val in ro_frequencies.items():
-            this_qubit = [qubit for qubit in qubits if qubit in ro_key][0]
-            # if self.qubit_state==0:
-            #     this_clock = clocks[this_qubit]
-            # elif self.qubit_state==1:
-            #     this_clock = clocks_1[this_qubit]
-            # elif self.qubit_state==2:
-            #     this_clock = clocks_2[this_qubit]
 
-            #Initialize ClockResource with the first frequency value
-            sched.add_resource( ClockResource(name=f'{this_qubit}.ro', freq=ro_array_val[0]) )
+        if self.qubit_state == 0: ro_str = 'ro'
+        elif self.qubit_state == 1: ro_str = 'ro1'
+        elif self.qubit_state == 2: ro_str = 'ro2'
+        else:
+            raise ValueError('error state')
 
-        # if self.qubit_state == 2:
-        #     for this_qubit, ef_f_val in freqs_12.items():
-        #         sched.add_resource( ClockResource( name=mw_clocks_12[this_qubit], freq=ef_f_val) )
+        #Initialize ClockResource with the first frequency value
+        for this_qubit, ro_array_val in ro_frequencies.items():
+            this_ro_clock = f'{this_qubit}.' + ro_str
+            sched.add_resource( ClockResource(name=this_ro_clock, freq=ro_array_val[0]) )
+
+        if self.qubit_state == 2:
+            for this_qubit, ef_f_val in mw_frequencies_12.items():
+                this_clock = f'{this_qubit}.12'
+                sched.add_resource(ClockResource(name=this_clock, freq=ef_f_val))
 
         root_relaxation = sched.add(Reset(*qubits), label="Reset")
 
         # The first for loop iterates over all qubits:
         for acq_cha, (this_qubit, ro_f_values) in enumerate(ro_frequencies.items()):
-            # if self.qubit_state==0:
-            #     this_clock = clocks[this_qubit]
-            # elif self.qubit_state==1:
-            #     this_clock = clocks_1[this_qubit]
-            # elif self.qubit_state==2:
-            #     this_clock = clocks_2[this_qubit]
+
+            sched.add(
+                Reset(*qubits), ref_op=root_relaxation, ref_pt_new='end'
+            ) #To enforce parallelism we refer to the root relaxation
+
+            this_ro_clock = f'{this_qubit}.' + ro_str
+            this_mw_clock = f'{this_qubit}.12'
+
             # The second for loop iterates over all frequency values in the frequency batch:
-            relaxation = root_relaxation
             for acq_index, ro_frequency in enumerate(ro_f_values):
-                set_frequency = sched.add(
-                    SetClockFrequency(clock=f'{this_qubit}.ro', clock_freq_new=ro_frequency),
-                    label=f"set_freq_{this_qubit}_{acq_index}",
-                    ref_op=relaxation, ref_pt='end'
+                sched.add(
+                    SetClockFrequency(clock=this_ro_clock, clock_freq_new=ro_frequency),
                 )
 
                 if self.qubit_state == 0:
-                    excitation_pulse = set_frequency
-                # elif self.qubit_state == 1:
-                #     excitation_pulse = sched.add(X(this_qubit), ref_op=set_frequency, ref_pt='end')
-                # elif self.qubit_state == 2:
-                #     excitation_pulse_1 = sched.add(X(this_qubit), ref_op=set_frequency, ref_pt='end')
-                #     excitation_pulse = sched.add(
-                #         DRAGPulse(
-                #             duration=mw_pulse_durations[this_qubit],
-                #             G_amp=mw_ef_amp180s[this_qubit],
-                #             D_amp=0,
-                #             port=mw_pulse_ports[this_qubit],
-                #             clock=mw_clocks_12[this_qubit],
-                #             phase=0,
-                #         ),
-                #         label=f"rabi_pulse_{this_qubit}_{acq_index}", ref_op=excitation_pulse_1, ref_pt="end",
-                #     )
+                    pass
+                elif self.qubit_state == 1:
+                    sched.add(X(this_qubit))
+                elif self.qubit_state == 2:
+                    sched.add(X(this_qubit))
+                    sched.add(
+                        DRAGPulse(
+                            duration=mw_pulse_durations[this_qubit],
+                            G_amp=mw_ef_amps180[this_qubit],
+                            D_amp=0,
+                            port=mw_pulse_ports[this_qubit],
+                            clock=this_mw_clock,
+                            phase=0,
+                        ),
+                    )
 
-                #spectroscopy pulse
-                pulse = sched.add(
+                ro_pulse = sched.add(
                     SquarePulse(
                         duration=pulse_durations[this_qubit],
                         amp=pulse_amplitudes[this_qubit],
-                        port=ports[this_qubit],
-                        clock=f'{this_qubit}.ro',
+                        port=ro_ports[this_qubit],
+                        clock=this_ro_clock,
                     ),
-                    label=f"spec_pulse_{this_qubit}_{acq_index}", ref_op=excitation_pulse, ref_pt="end",
                 )
 
                 sched.add(
                     SSBIntegrationComplex(
                         duration=integration_times[this_qubit],
-                        port=ports[this_qubit],
-                        clock=f'{this_qubit}.ro',
+                        port=ro_ports[this_qubit],
+                        clock=this_ro_clock,
                         acq_index=acq_index,
                         acq_channel=acq_cha,
                         bin_mode=BinMode.AVERAGE
                     ),
-                    ref_op=pulse, ref_pt="start",
+                    ref_op=ro_pulse, ref_pt="start",
                     rel_time=acquisition_delays[this_qubit],
-                    label=f"acquisition_{this_qubit}_{acq_index}",
                 )
 
-                #sched.add(
-                #    Measure(this_qubit, acq_index=acq_index, acq_channel=acq_cha, bin_mode=BinMode.AVERAGE),
-                #    label=f'Measurement_{this_qubit}_{acq_index}',
-                #    ref_op=excitation_pulse,
-                #    ref_pt="end",
-                #)
-
-                # update the relaxation for the next batch point
-                relaxation = sched.add(Reset(this_qubit), label=f"Reset_{this_qubit}_{acq_index}")
+                sched.add(Reset(this_qubit))
 
         return sched

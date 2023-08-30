@@ -66,4 +66,3 @@ class T1_BATCHED(Measurement):
                 )
                 prev_relax=relaxation
         return schedule
-

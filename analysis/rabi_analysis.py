@@ -5,9 +5,6 @@ import numpy as np
 import lmfit
 from quantify_core.analysis.fitting_models import fft_freq_phase_guess
 import xarray as xr
-#from colorama import init as colorama_init
-#from colorama import Fore
-#from colorama import Style
 
 # Cosine function that is fit to Rabi oscillations
 def cos_func(

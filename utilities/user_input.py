@@ -1,20 +1,25 @@
 from typing import List
 import numpy as np
-import redis
+# import redis
 from uuid import uuid4
-from utilities.visuals import box_print
-import logging
-#logging.basicConfig(level=logging.DEBUG,
-        #format='File: %(filename)s -- %(funcName)s --%(message)s')
+from utilities.visuals import draw_arrow_chart
+# import logging
 
 nodes = [
+        # "tof",
         "resonator_spectroscopy",
         #"punchout",
         "qubit_01_spectroscopy_pulsed",
         "rabi_oscillations",
-        "T1",
-        "XY_crosstalk",
-        "ramsey_correction",
+        #"T1",
+        #"XY_crosstalk",
+        #"ramsey_correction",
+        #"motzoi_parameter",
+        "resonator_spectroscopy_1",
+        "qubit_12_spectroscopy_pulsed",
+        "rabi_oscillations_12",
+        "ramsey_correction_12",
+        "resonator_spectroscopy_2",
         ]
 
 VNA_resonator_frequencies = {
@@ -36,15 +41,12 @@ VNA_qubit_frequencies = {
         'q23': 3.980e9,
         }
 
-#qubits = [ 'q16', 'q22', 'q23']
-#qubits = ['q18', 'q19']
-#qubits = ['q16', 'q18', 'q19', 'q23']
-qubits = ['q16']
+qubits = [ 'q16', 'q22', 'q23']
 
 N_qubits = len(qubits)
 
-res_spec_samples = 80
-qub_spec_samples = 100
+res_spec_samples = 50
+qub_spec_samples = 70
 
 def resonator_samples(qubit:str, punchout=False) -> np.ndarray:
     sweep_range = 6.5e6
@@ -57,18 +59,19 @@ def resonator_samples(qubit:str, punchout=False) -> np.ndarray:
     return np.linspace(min_freq, max_freq, res_spec_samples)
 
 def qubit_samples(qubit:str, transition:str = '01') -> np.ndarray:
-    sweep_range = 18e6
+    sweep_range = 10e6
     if transition=='01':
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition=='12':
-        # rough_anharmonicity = 200e6 if int(qubit[1:])%2==0 else 170e6
-        # VNA_frequency = VNA_qubit_frequencies[qubit] - rough_anharmonicity
-        VNA_frequency = VNA_f12_frequencies[qubit]
+        rough_anharmonicity = 200e6
+        #rough_anharmonicity = 200e6 if int(qubit[1:])%2==0 else 170e6
+        VNA_frequency = VNA_qubit_frequencies[qubit] - rough_anharmonicity
+        # VNA_frequency = VNA_f12_frequencies[qubit]
     else :
         raise ValueError('Invalid transition')
 
     min_freq =  VNA_frequency - sweep_range / 2 + 0*sweep_range
-    max_freq =  VNA_frequency + sweep_range / 2 + 0*sweep_range 
+    max_freq =  VNA_frequency + sweep_range / 2 + 0*sweep_range
     return np.linspace(min_freq, max_freq, qub_spec_samples)
 
 def experiment_parameters(node:str, qubits:List[str]) -> dict:
@@ -82,7 +85,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     and we have two qubits labeled 'q1' and 'q2', it returns the dictionary:
     sweep_parameters = {
         'resonator_spectroscopy': {
-             'ro_freq':
+             'ro_frequencies':
                   {'q1': array_of_frequencies,
                    'q2': array_of_frequencies
                   }
@@ -90,7 +93,19 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     }
     '''
     sweep_parameters = {
+        'tof': {
+            'ro_acq_delay': {qubit: np.array([1,1]) for qubit in qubits}
+        },
+
         'resonator_spectroscopy': {
+            'ro_frequencies': {qubit: resonator_samples(qubit) for qubit in qubits}
+        },
+
+        'resonator_spectroscopy_1': {
+            'ro_frequencies': {qubit: resonator_samples(qubit) for qubit in qubits}
+        },
+
+        'resonator_spectroscopy_2': {
             'ro_frequencies': {qubit: resonator_samples(qubit) for qubit in qubits}
         },
 
@@ -100,10 +115,18 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
         },
 
         'qubit_01_spectroscopy_pulsed': {
-            'mw_frequencies': {qubit: qubit_samples(qubit) for qubit in qubits}
+            'spec_frequencies': {qubit: qubit_samples(qubit) for qubit in qubits}
+        },
+
+        'qubit_12_spectroscopy_pulsed': {
+            'spec_frequencies': {qubit: qubit_samples(qubit,'12') for qubit in qubits}
         },
 
         'rabi_oscillations': {
+            'mw_amplitudes': { qubit : np.linspace(0.002,0.20,41) for qubit in qubits}
+        },
+
+        'rabi_oscillations_12': {
             'mw_amplitudes': { qubit : np.linspace(0.002,0.20,41) for qubit in qubits}
         },
 
@@ -118,14 +141,24 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
         },
 
         'ramsey_correction': {
-            'ramsey_delay': { qubit :{"sweep_min": 4e-9, "sweep_max": 2048e-9, "step": 6*8e-9} for qubit in qubits }
-                },
+            'ramsey_delays': { qubit : np.arange(4e-9, 2048e-9, 6*8e-9) for qubit in qubits }
+        },
+
+        'ramsey_correction_12': {
+            'ramsey_delays': { qubit : np.arange(4e-9, 2048e-9, 6*8e-9) for qubit in qubits }
+        },
+
+        'motzoi_parameter': {
+            'mw_motzois': {qubit: np.linspace(-0.45,0.45,9) for qubit in qubits},
+            'X_repetitions': {qubit : np.arange(2, 17, 4) for qubit in qubits}
+        },
     }
     return sweep_parameters
 
 node_to_be_calibrated = "rabi_oscillations"
-#node_to_be_calibrated = "T1"
-box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
+
+# box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
+draw_arrow_chart(f'Qubits: {N_qubits}', nodes[:nodes.index(node_to_be_calibrated)+1])
 
 def user_requested_calibration(node: str):
     job = {
