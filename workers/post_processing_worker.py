@@ -73,6 +73,7 @@ class Multiplexed_Analysis(BaseAnalysis):
             ds.attrs['qubit'] = this_qubit
 
             this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
+            kw_args = {}
             # this_axis.set_title(f'{node_name} for {this_qubit}')
             if node == 'resonator_spectroscopy':
                 analysis_class = ResonatorSpectroscopyAnalysis
@@ -104,13 +105,14 @@ class Multiplexed_Analysis(BaseAnalysis):
             elif node == 'ramsey_correction_12':
                 analysis_class = RamseyAnalysis
                 redis_field = 'freq_12'
+                kw_args = {'redis_field': redis_field}
             elif node == 'resonator_spectroscopy_2':
                 analysis_class = ResonatorSpectroscopy_2_Analysis
                 redis_field = 'ro_freq_2'
             else:
                 raise ValueError(f'Invalid node: {node}')
 
-            node_analysis = analysis_class(ds)
+            node_analysis = analysis_class(ds, **kw_args)
             self.qoi = node_analysis.run_fitting()
 
             node_analysis.plotter(this_axis)

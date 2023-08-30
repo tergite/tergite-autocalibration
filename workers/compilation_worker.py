@@ -15,7 +15,7 @@ from calibration_schedules.XY_crosstalk import XY_cross
 from calibration_schedules.punchout import Punchout
 from calibration_schedules.ramsey_fringes import Ramsey_fringes
 # from calibration_schedules.drag_amplitude import DRAG_amplitude
-from calibration_schedules.motzoi_paramerter import Motzoi_parameter
+from calibration_schedules.motzoi_parameter import Motzoi_parameter
 from utilities.extended_transmon_element import ExtendedTransmon
 from quantify_scheduler.backends import SerialCompiler
 from config_files.settings import hw_config

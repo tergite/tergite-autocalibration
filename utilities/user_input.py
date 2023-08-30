@@ -41,6 +41,9 @@ VNA_qubit_frequencies = {
         'q23': 3.980e9,
         }
 
+VNA_f12_frequencies = { 'q16': 3.026e9, 'q22': 3.160e9, 'q23':3.753e9 }
+
+
 qubits = [ 'q16', 'q22', 'q23']
 
 N_qubits = len(qubits)
@@ -63,10 +66,10 @@ def qubit_samples(qubit:str, transition:str = '01') -> np.ndarray:
     if transition=='01':
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition=='12':
-        rough_anharmonicity = 200e6
+        #rough_anharmonicity = 200e6
         #rough_anharmonicity = 200e6 if int(qubit[1:])%2==0 else 170e6
-        VNA_frequency = VNA_qubit_frequencies[qubit] - rough_anharmonicity
-        # VNA_frequency = VNA_f12_frequencies[qubit]
+        #VNA_frequency = VNA_qubit_frequencies[qubit] - rough_anharmonicity
+        VNA_frequency = VNA_f12_frequencies[qubit]
     else :
         raise ValueError('Invalid transition')
 
@@ -145,7 +148,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
         },
 
         'ramsey_correction_12': {
-            'ramsey_delays': { qubit : np.arange(4e-9, 2048e-9, 6*8e-9) for qubit in qubits }
+            'ramsey_delays': { qubit : np.arange(4e-9, 6*2048e-9, 4*8e-9) for qubit in qubits }
         },
 
         'motzoi_parameter': {
@@ -155,7 +158,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     }
     return sweep_parameters
 
-node_to_be_calibrated = "rabi_oscillations"
+node_to_be_calibrated = "resonator_spectroscopy_2"
 
 # box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 draw_arrow_chart(f'Qubits: {N_qubits}', nodes[:nodes.index(node_to_be_calibrated)+1])
