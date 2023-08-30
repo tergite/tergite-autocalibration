@@ -1,5 +1,4 @@
 # This code is part of Tergite
-
 from utilities.status import DataStatus
 from logger.tac_logger import logger
 from workers.compilation_worker import precompile

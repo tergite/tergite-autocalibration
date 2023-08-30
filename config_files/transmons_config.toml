@@ -66,4 +66,5 @@ mw_amp180 = 2.5e-4
 artificial_detuning = 3e6
 
 [qubit_12_spectroscopy_pulsed.all]
-spec_pulse_amp = 2e-4
+mw_pulse_duration = 2e-6
+mw_amp180 = 2.5e-4
