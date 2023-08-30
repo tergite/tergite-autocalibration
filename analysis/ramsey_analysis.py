@@ -48,7 +48,7 @@ class RamseyModel(lmfit.model.Model):
 
 
 class RamseyAnalysis():
-    def  __init__( self,dataset: xr.Dataset,):
+    def  __init__( self,dataset: xr.Dataset, redis_field='freq_01'):
         this_qubit = dataset.attrs['qubit']
         redis_key = f'transmons:{this_qubit}'
 
@@ -58,14 +58,14 @@ class RamseyAnalysis():
         self.independents = dataset[coord].values
         self.fit_results = {}
         self.qubit = dataset[data_var].attrs['qubit']
-        self.qubit_frequency = float(redis_connection.hget(f'{redis_key}','freq_01'))
+        self.qubit_frequency = float(redis_connection.hget(f'{redis_key}',redis_field))
         self.artificial_detuning = float(redis_connection.hget(f'{redis_key}','artificial_detuning'))
 
     def run_fitting(self):
         model = RamseyModel()
         self.magnitudes = np.absolute(self.S21)
         ramsey_delays = self.independents
-        self.fit_ramsey_delays = np.linspace( ramsey_delays[0], ramsey_delays[-1], 400)
+        self.fit_ramsey_delays = np.linspace(ramsey_delays[0], ramsey_delays[-1], 400)
 
         guess = model.guess(self.magnitudes, t=ramsey_delays)
         # print(f'{ guess = }')

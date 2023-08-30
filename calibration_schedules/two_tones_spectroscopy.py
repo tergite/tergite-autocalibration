@@ -81,8 +81,8 @@ class Two_Tones_Spectroscopy(Measurement):
                     raise ValueError(f'Invalid qubit state: {self.qubit_state}')
 
                 #spectroscopy pulse
-                print(f'{spec_pulse_durations=}')
-                print(f'{this_clock=}')
+                # print(f'{spec_pulse_durations=}')
+                # print(f'{this_clock=}')
                 spec_pulse = schedule.add(
                     SoftSquarePulse(
                         duration= spec_pulse_durations[this_qubit],

@@ -53,6 +53,10 @@ class Resonator_Spectroscopy(Measurement):
         else:
             raise ValueError('error state')
 
+        # print(f'{ mw_ef_amps180 = }')
+        # print(f'{ mw_frequencies_12 = }')
+        # print(f'{ self.qubit_state = }')
+
         #Initialize ClockResource with the first frequency value
         for this_qubit, ro_array_val in ro_frequencies.items():
             this_ro_clock = f'{this_qubit}.' + ro_str
