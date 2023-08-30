@@ -78,7 +78,7 @@ def to_complex_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
     return complex_ds
 
 def measure( compiled_schedule: CompiledSchedule, schedule_duration: float, samplespace: dict, node: str) -> xarray.Dataset:
-    cluster_status = ClusterStatus.dummy
+    cluster_status = ClusterStatus.real
 
     logger.info('Starting measurement')
 

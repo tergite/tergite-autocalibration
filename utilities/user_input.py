@@ -11,10 +11,10 @@ nodes = [
         #"punchout",
         "qubit_01_spectroscopy_pulsed",
         "rabi_oscillations",
-        "T1",
+        #"T1",
         #"XY_crosstalk",
-        "ramsey_correction",
-        "motzoi_parameter",
+        #"ramsey_correction",
+        #"motzoi_parameter",
         "resonator_spectroscopy_1",
         "qubit_12_spectroscopy_pulsed",
         "rabi_oscillations_12",
@@ -154,7 +154,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     }
     return sweep_parameters
 
-node_to_be_calibrated = "resonator_spectroscopy_2"
+node_to_be_calibrated = "qubit_12_spectroscopy_pulsed"
 
 # box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 draw_arrow_chart(f'Qubits: {N_qubits}', nodes[:nodes.index(node_to_be_calibrated)+1])

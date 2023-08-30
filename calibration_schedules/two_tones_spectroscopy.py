@@ -48,7 +48,7 @@ class Two_Tones_Spectroscopy(Measurement):
             #print(f'{this_clock = }')
             #print(f'{spec_array_val[0] = }')
             schedule.add_resource(
-                ClockResource( name=this_clock, freq=spec_array_val[0]),
+                ClockResource(name=this_clock, freq=spec_array_val[0]),
             )
 
         #This is the common reference operation so the qubits can be operated in parallel
@@ -81,6 +81,8 @@ class Two_Tones_Spectroscopy(Measurement):
                     raise ValueError(f'Invalid qubit state: {self.qubit_state}')
 
                 #spectroscopy pulse
+                print(f'{mw_pulse_durations=}')
+                print(f'{this_clock=}')
                 spec_pulse = schedule.add(
                     SoftSquarePulse(
                         duration= mw_pulse_durations[this_qubit],
