@@ -46,10 +46,16 @@ class Resonator_Spectroscopy(Measurement):
 
         sched = Schedule("multiplexed_resonator_spectroscopy",repetitions)
         # Initialize the clock for each qubit
+
+        if self.qubit_state == 0: ro_str = 'ro' 
+        elif self.qubit_state == 1: ro_str = 'ro1' 
+        elif self.qubit_state == 2: ro_str = 'ro2' 
+        else:
+            raise ValueError('error state')
+        #Initialize ClockResource with the first frequency value
         for this_qubit, ro_array_val in ro_frequencies.items():
-            #Initialize ClockResource with the first frequency value
-            this_clock = f'{this_qubit}.ro'
-            sched.add_resource( ClockResource(name=this_clock, freq=ro_array_val[0]) )
+            this_ro_clock = f'{this_qubit}.' + ro_str
+            sched.add_resource( ClockResource(name=this_ro_clock, freq=ro_array_val[0]) )
 
         if self.qubit_state == 2:
             for this_qubit, ef_f_val in mw_frequencies_12.items():
@@ -66,7 +72,7 @@ class Resonator_Spectroscopy(Measurement):
                 Reset(*qubits), ref_op=root_relaxation, ref_pt_new='end'
             ) #To enforce parallelism we refer to the root relaxation
 
-            this_ro_clock = f'{this_qubit}.ro'
+            this_ro_clock = f'{this_qubit}.' + ro_str
             this_mw_clock = f'{this_qubit}.12'
             for acq_index, ro_frequency in enumerate(ro_f_values):
                 sched.add(

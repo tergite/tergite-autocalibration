@@ -107,6 +107,8 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
     if node in ['resonator_spectroscopy_1','qubit_12_spectroscopy_pulsed',
                 'rabi_oscillations_12', 'ramsey_correction_12']:
         qubit_state = 1
+    if node in ['resonator_spectroscopy_2']:
+        qubit_state = 2
     node_class = node_map[node](transmons, qubit_state)
     schedule_function = node_class.schedule_function
     static_parameters = node_class.static_kwargs
