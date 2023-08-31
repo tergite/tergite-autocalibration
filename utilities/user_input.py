@@ -11,9 +11,9 @@ nodes = [
         # "punchout",
         "qubit_01_spectroscopy_pulsed",
         "rabi_oscillations",
-        #"T1",
+        "T1",
         #"XY_crosstalk",
-        #"ramsey_correction",
+        "ramsey_correction",
         #"motzoi_parameter",
         "resonator_spectroscopy_1",
         "qubit_12_spectroscopy_pulsed",
@@ -153,7 +153,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
         },
 
         'ramsey_correction_12': {
-            'ramsey_delays': { qubit : np.arange(4e-9, 6*2048e-9, 4*8e-9) for qubit in qubits }
+            'ramsey_delays': { qubit : np.arange(4e-9, 1*2048e-9, 4*8e-9) for qubit in qubits }
         },
 
         'motzoi_parameter': {
