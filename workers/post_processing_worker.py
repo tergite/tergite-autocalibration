@@ -109,6 +109,9 @@ class Multiplexed_Analysis(BaseAnalysis):
             elif node == 'resonator_spectroscopy_2':
                 analysis_class = ResonatorSpectroscopy_2_Analysis
                 redis_field = 'ro_freq_2'
+            elif node == 'ro_frequency_optimization':
+                analysis_class = ...
+                redis_field = 'ro_freq_opt'
             else:
                 raise ValueError(f'Invalid node: {node}')
 

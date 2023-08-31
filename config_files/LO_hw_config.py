@@ -61,7 +61,12 @@ hardware_config = {
                {'port': 'q17:res', 'clock': 'q17.ro2', 'mixer_amp_ratio': 1, 'mixer_phase_error_deg': 0},
                {'port': 'q18:res', 'clock': 'q18.ro2', 'mixer_amp_ratio': 1, 'mixer_phase_error_deg': 0},
                {'port': 'q19:res', 'clock': 'q19.ro2', 'mixer_amp_ratio': 1, 'mixer_phase_error_deg': 0},
-               {'port': 'q20:res', 'clock': 'q20.ro2', 'mixer_amp_ratio': 1, 'mixer_phase_error_deg': 0}
+               {'port': 'q20:res', 'clock': 'q20.ro_opt', 'mixer_amp_ratio': 1, 'mixer_phase_error_deg': 0},
+               {'port': 'q16:res', 'clock': 'q16.ro_opt', 'mixer_amp_ratio': 1, 'mixer_phase_error_deg': 0},
+               {'port': 'q17:res', 'clock': 'q17.ro_opt', 'mixer_amp_ratio': 1, 'mixer_phase_error_deg': 0},
+               {'port': 'q18:res', 'clock': 'q18.ro_opt', 'mixer_amp_ratio': 1, 'mixer_phase_error_deg': 0},
+               {'port': 'q19:res', 'clock': 'q19.ro_opt', 'mixer_amp_ratio': 1, 'mixer_phase_error_deg': 0},
+               {'port': 'q20:res', 'clock': 'q20.ro_opt', 'mixer_amp_ratio': 1, 'mixer_phase_error_deg': 0}
             ]
          }
       },
@@ -86,7 +91,12 @@ hardware_config = {
                {'port': 'q22:res', 'clock': 'q22.ro2', 'mixer_amp_ratio': 1, 'mixer_phase_error_deg': 0},
                {'port': 'q23:res', 'clock': 'q23.ro2', 'mixer_amp_ratio': 1, 'mixer_phase_error_deg': 0},
                {'port': 'q24:res', 'clock': 'q24.ro2', 'mixer_amp_ratio': 1, 'mixer_phase_error_deg': 0},
-               {'port': 'q25:res', 'clock': 'q25.ro2', 'mixer_amp_ratio': 1, 'mixer_phase_error_deg': 0}
+               {'port': 'q25:res', 'clock': 'q25.ro2', 'mixer_amp_ratio': 1, 'mixer_phase_error_deg': 0},
+               {'port': 'q21:res', 'clock': 'q21.ro_opt', 'mixer_amp_ratio': 1, 'mixer_phase_error_deg': 0},
+               {'port': 'q22:res', 'clock': 'q22.ro_opt', 'mixer_amp_ratio': 1, 'mixer_phase_error_deg': 0},
+               {'port': 'q23:res', 'clock': 'q23.ro_opt', 'mixer_amp_ratio': 1, 'mixer_phase_error_deg': 0},
+               {'port': 'q24:res', 'clock': 'q24.ro_opt', 'mixer_amp_ratio': 1, 'mixer_phase_error_deg': 0},
+               {'port': 'q25:res', 'clock': 'q25.ro_opt', 'mixer_amp_ratio': 1, 'mixer_phase_error_deg': 0}
             ]
          }
       }

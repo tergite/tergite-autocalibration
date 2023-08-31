@@ -8,7 +8,7 @@ def extract_ds_date(filename:str) -> int:
     date = int(ym + day + time)
     return date
 
-def load_multiplexed_dataset(user_substr: str):
+def load_multiplexed_dataset(user_substr: str) -> xr.Dataset:
     _, _, filenames = next(walk((data_directory)))
     matched_list = list(filter(lambda x: user_substr in x, filenames))
     latest_file = max(matched_list, key=extract_ds_date)

@@ -20,6 +20,7 @@ nodes = [
         "rabi_oscillations_12",
         "ramsey_correction_12",
         "resonator_spectroscopy_2",
+        "ro_frequency_optimization",
         ]
 
 VNA_resonator_frequencies = {
@@ -112,6 +113,10 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
             'ro_frequencies': {qubit: resonator_samples(qubit) for qubit in qubits}
         },
 
+        'ro_frequency_optimization': {
+            'ro_frequencies': {qubit: resonator_samples(qubit) for qubit in qubits}
+        },
+
         'punchout': {
             'ro_frequencies': {qubit: resonator_samples(qubit, punchout=True) for qubit in qubits},
             'ro_amplitudes': {qubit : np.linspace(5e-3, 0.8e-1, 11) for qubit in qubits}
@@ -158,7 +163,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     }
     return sweep_parameters
 
-node_to_be_calibrated = "resonator_spectroscopy_2"
+node_to_be_calibrated = "ro_frequency_optimization"
 
 # box_print(f'Target Node: {node_to_be_calibrated}, Qubits: {N_qubits}')
 draw_arrow_chart(f'Qubits: {N_qubits}', nodes[:nodes.index(node_to_be_calibrated)+1])

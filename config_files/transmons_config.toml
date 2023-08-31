@@ -3,7 +3,7 @@ tof.ro_acq_delay = nan
 resonator_spectroscopy.ro_freq = nan
 resonator_spectroscopy_1.ro_freq_1 = nan
 resonator_spectroscopy_2.ro_freq_2 = nan
-SSRO.ro_freq_opt = nan
+ro_frequency_optimization.ro_freq_opt = nan
 SSRO.ro_pulse_amp_opt = nan
 qubit_01_spectroscopy_pulsed.freq_01 = nan
 ramsey_correction.freq_01 = nan
@@ -57,7 +57,7 @@ init_duration = 100e-6
 init_duration = 100e-6
 
 [resonator_spectroscopy_2.all]
-init_duration = 100e-6
+init_duration = 300e-6
 
 [qubit_01_spectroscopy_pulsed.all]
 spec_pulse_duration = 2e-6

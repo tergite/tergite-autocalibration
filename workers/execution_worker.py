@@ -45,14 +45,14 @@ def configure_dataset(
         # dim = f'{sweep_quantity}_{qubits[key]}'
         coords_dict = {}
         for quantity in sweep_quantities :
-            coord_key = quantity+qubits[key]
-            coords_dict[coord_key] = (coord_key, samplespace[quantity][qubits[key]])
+            coord_key = quantity+qubits[key%3]
+            coords_dict[coord_key] = (coord_key, samplespace[quantity][qubits[key%3]])
         partial_ds = xarray.Dataset(coords=coords_dict)
-        reshaping = list(reversed([len(samplespace[quantity][qubits[key]]) for quantity in sweep_quantities]))
+        reshaping = list(reversed([len(samplespace[quantity][qubits[key%3]]) for quantity in sweep_quantities]))
         data_values = raw_ds[key].values[0].reshape(*reshaping)
         data_values = np.transpose(data_values)
-        partial_ds[f'y{qubits[key]}_real'] = (tuple(coords_dict.keys()), data_values.real, {'qubit': qubits[key]})
-        partial_ds[f'y{qubits[key]}_imag'] = (tuple(coords_dict.keys()), data_values.imag, {'qubit': qubits[key]})
+        partial_ds[f'y{qubits[key%3]}_real_{key}'] = (tuple(coords_dict.keys()), data_values.real, {'qubit': qubits[key%3]})
+        partial_ds[f'y{qubits[key%3]}_imag_{key}'] = (tuple(coords_dict.keys()), data_values.imag, {'qubit': qubits[key%3]})
         dataset = xarray.merge([dataset,partial_ds])
     return dataset
 
@@ -120,7 +120,7 @@ def measure( compiled_schedule: CompiledSchedule, schedule_duration: float, samp
     def display_progress():
         steps = int(schedule_duration * 5)
         if cluster_status == ClusterStatus.dummy:
-            progress_sleep = 0.01
+            progress_sleep = 0.004
         elif cluster_status == ClusterStatus.real :
             progress_sleep = 0.2
         for _ in tqdm.tqdm(range(steps), desc=node, colour='blue'):
@@ -147,6 +147,7 @@ def measure( compiled_schedule: CompiledSchedule, schedule_duration: float, samp
     #     f.write(str(result_dict))
 
     result_dataset = configure_dataset(raw_dataset, samplespace)
+    print(f'{ result_dataset = }')
     eventid = datetime.now().strftime('%Y%m-%d-%H%M%S-') + f'{node}-'+ str(uuid4()) + '.nc'
     result_dataset.to_netcdf(data_directory / eventid )
 

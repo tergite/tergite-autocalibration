@@ -14,6 +14,7 @@ from calibration_schedules.T1 import T1_BATCHED
 from calibration_schedules.XY_crosstalk import XY_cross
 from calibration_schedules.punchout import Punchout
 from calibration_schedules.ramsey_fringes import Ramsey_fringes
+from calibration_schedules.ro_frequency_optimization import RO_frequency_optimization
 # from calibration_schedules.drag_amplitude import DRAG_amplitude
 from calibration_schedules.motzoi_parameter import Motzoi_parameter
 from utilities.extended_transmon_element import ExtendedTransmon
@@ -39,6 +40,7 @@ node_map = {
     'rabi_oscillations_12': Rabi_Oscillations,
     'ramsey_correction_12': Ramsey_fringes,
     'resonator_spectroscopy_2': Resonator_Spectroscopy,
+    'ro_frequency_optimization': RO_frequency_optimization,
 }
 
 redis_connection = redis.Redis(decode_responses=True)
@@ -68,6 +70,7 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
     transmon.clock_freqs.f12(float(redis_config['freq_12']))
     transmon.clock_freqs.readout(float(redis_config['ro_freq']))
     transmon.extended_clock_freqs.readout_1(float(redis_config['ro_freq_1']))
+    transmon.extended_clock_freqs.readout_opt(float(redis_config['ro_freq_opt']))
     transmon.measure.pulse_amp(float(redis_config['ro_pulse_amp']))
     transmon.measure.pulse_duration(float(redis_config['ro_pulse_duration']))
     transmon.measure.acq_channel(channel)
