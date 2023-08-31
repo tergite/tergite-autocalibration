@@ -79,7 +79,7 @@ def to_complex_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
 
 def measure( compiled_schedule: CompiledSchedule, schedule_duration: float, samplespace: dict, node: str) -> xarray.Dataset:
 
-    cluster_status = ClusterStatus.real
+    cluster_status = ClusterStatus.dummy
 
     logger.info('Starting measurement')
 
@@ -147,8 +147,8 @@ def measure( compiled_schedule: CompiledSchedule, schedule_duration: float, samp
     #     f.write(str(result_dict))
 
     result_dataset = configure_dataset(raw_dataset, samplespace)
-    eventid = datetime.now().strftime('%Y%m-%d-%H%M%S-') + f'{node}-'+ str(uuid4())
-    result_dataset.to_netcdf(data_directory / eventid)
+    eventid = datetime.now().strftime('%Y%m-%d-%H%M%S-') + f'{node}-'+ str(uuid4()) + '.nc'
+    result_dataset.to_netcdf(data_directory / eventid )
 
     result_dataset_complex = to_complex_dataset(result_dataset)
 
