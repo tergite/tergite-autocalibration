@@ -61,11 +61,6 @@ class RabiAnalysis():
         data_var = list(dataset.data_vars.keys())[0]
         coord = list(dataset[data_var].coords.keys())[0]
         self.S21 = dataset[data_var].values
-        ########################
-        #print( "")
-        #print( f'{Fore.RED}WARNING MOCK DATA IN analysis/qubit_spectroscopy_analysis{Style.RESET_ALL}')
-        #self.S21 = np.array([1+1j for _ in self.S21])
-        ########################
         self.independents = dataset[coord].values
         self.fit_results = {}
         self.qubit = dataset[data_var].attrs['qubit']
@@ -77,7 +72,7 @@ class RabiAnalysis():
         #Fetch the resulting measurement variables from self
         self.magnitudes = np.absolute(self.S21)
         amplitudes = self.independents
-        
+
         self.fit_amplitudes = np.linspace( amplitudes[0], amplitudes[-1], 400) # x-values for plotting
 
         # Gives an initial guess for the model parameters and then fits the model to the data.
@@ -86,7 +81,7 @@ class RabiAnalysis():
 
         self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_amplitudes})
         return fit_result.params['amp180'].value
-    
+
     def plotter(self,ax):
         # Plots the data and the fitted model of a Rabi experiment
         ax.plot( self.fit_amplitudes , self.fit_y,'r-',lw=3.0)

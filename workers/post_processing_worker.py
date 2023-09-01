@@ -1,4 +1,5 @@
 '''Analyze the measured dataset and extract the qoi (quantity of interest)'''
+import collections
 import matplotlib.pyplot as plt
 import xarray as xr
 from analysis.motzoi_analysis import MotzoiAnalysis
@@ -66,10 +67,20 @@ class Multiplexed_Analysis(BaseAnalysis):
             return
 
         super().__init__(result_dataset)
+        data_vars_dict = collections.defaultdict(set)
+        for var in result_dataset.data_vars:
+            this_qubit = result_dataset[var].attrs['qubit']
+            data_vars_dict[this_qubit].add(var)
+
         for indx, var in enumerate(result_dataset.data_vars):
             this_qubit = result_dataset[var].attrs['qubit']
-            ds = result_dataset[var].to_dataset()
+            # ds = result_dataset[var].to_dataset()
+            ds = xr.Dataset()
+            for var in data_vars_dict[this_qubit]:
+                ds = xr.merge([ds,result_dataset[var]])
+
             ds.attrs['qubit'] = this_qubit
+            # breakpoint()
 
             this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
             kw_args = {}
