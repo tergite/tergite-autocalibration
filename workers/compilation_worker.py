@@ -130,7 +130,7 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
 
     schedule_duration = compiled_schedule.get_schedule_duration()
 
-    logger.info(f'finished Compiling')
+    logger.info(f'Finished Compiling')
     # compiled_schedule.plot_pulse_diagram(plot_backend='plotly')
 
     return compiled_schedule, schedule_duration

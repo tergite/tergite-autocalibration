@@ -44,7 +44,7 @@ class RO_frequency_optimization(Measurement):
         integration_times: dict[str,float],
         qubits: list[str],
         ro_ports: dict[str,str],
-        ro_frequencies: dict[str,np.ndarray],
+        ro_opt_frequencies: dict[str,np.ndarray],
         repetitions: int = 1024,
         ) -> Schedule:
 
@@ -55,7 +55,7 @@ class RO_frequency_optimization(Measurement):
         ro_str = 'ro_opt'
 
         #Initialize ClockResource with the first frequency value
-        for this_qubit, ro_array_val in ro_frequencies.items():
+        for this_qubit, ro_array_val in ro_opt_frequencies.items():
             this_ro_clock = f'{this_qubit}.' + ro_str
             sched.add_resource( ClockResource(name=this_ro_clock, freq=ro_array_val[0]) )
 
@@ -66,7 +66,7 @@ class RO_frequency_optimization(Measurement):
         root_relaxation = sched.add(Reset(*qubits), label="Reset")
 
         # The first for loop iterates over all qubits:
-        for acq_cha, (this_qubit, ro_f_values) in enumerate(ro_frequencies.items()):
+        for acq_cha, (this_qubit, ro_f_values) in enumerate(ro_opt_frequencies.items()):
 
             sched.add(
                 Reset(*qubits), ref_op=root_relaxation, ref_pt_new='end'

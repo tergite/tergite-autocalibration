@@ -4,6 +4,7 @@ import xarray as xr
 from analysis.motzoi_analysis import MotzoiAnalysis
 from analysis.resonator_spectroscopy_analysis import ResonatorSpectroscopyAnalysis, ResonatorSpectroscopy_1_Analysis, ResonatorSpectroscopy_2_Analysis
 from analysis.qubit_spectroscopy_analysis import QubitSpectroscopyAnalysis
+from analysis.optimum_ro_frequency_analysis import OptimalROFrequencyAnalysis
 from analysis.rabi_analysis import RabiAnalysis
 from analysis.ramsey_analysis import RamseyAnalysis
 from analysis.tof_analysis import analyze_tof
@@ -34,8 +35,6 @@ def post_process(result_dataset: xr.Dataset, node: str):
     plt.show()
     if node != 'tof':
         analysis.node_result.update({'measurement_dataset':result_dataset.to_dict()})
-
-
 
 
 class BaseAnalysis():
@@ -110,7 +109,7 @@ class Multiplexed_Analysis(BaseAnalysis):
                 analysis_class = ResonatorSpectroscopy_2_Analysis
                 redis_field = 'ro_freq_2'
             elif node == 'ro_frequency_optimization':
-                analysis_class = ...
+                analysis_class = OptimalROFrequencyAnalysis
                 redis_field = 'ro_freq_opt'
             else:
                 raise ValueError(f'Invalid node: {node}')

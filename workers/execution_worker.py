@@ -6,6 +6,7 @@ from colorama import init as colorama_init
 from colorama import Fore
 from colorama import Style
 from qblox_instruments.ieee488_2 import DummyBinnedAcquisitionData
+from qcodes.utils.helpers import attribute_set_to
 colorama_init()
 
 from quantify_scheduler.instrument_coordinator.instrument_coordinator import CompiledSchedule
@@ -39,20 +40,25 @@ def configure_dataset(
     sweep_quantities = samplespace.keys() # for example 'ro_frequencies', 'ro_amplitudes' ,...
     sweep_parameters = list(samplespace.values())[0]
     qubits = list(sweep_parameters.keys())
-
+    n_qubits = len(qubits)
+    if 'ro_opt_frequencies' in list(sweep_quantities):
+        qubit_states = [0,1,2]
 
     for key in keys:
-        # dim = f'{sweep_quantity}_{qubits[key]}'
+        key_indx = key%n_qubits
         coords_dict = {}
         for quantity in sweep_quantities :
-            coord_key = quantity+qubits[key%3]
-            coords_dict[coord_key] = (coord_key, samplespace[quantity][qubits[key%3]])
+            coord_key = quantity+qubits[key_indx]
+            coords_dict[coord_key] = (coord_key, samplespace[quantity][qubits[key_indx]])
         partial_ds = xarray.Dataset(coords=coords_dict)
-        reshaping = list(reversed([len(samplespace[quantity][qubits[key%3]]) for quantity in sweep_quantities]))
-        data_values = raw_ds[key].values[0].reshape(*reshaping)
+        reshaping = list(reversed([len(samplespace[quantity][qubits[key_indx]]) for quantity in sweep_quantities]))
+        data_values = raw_ds[key_indx].values[0].reshape(*reshaping)
         data_values = np.transpose(data_values)
-        partial_ds[f'y{qubits[key%3]}_real_{key}'] = (tuple(coords_dict.keys()), data_values.real, {'qubit': qubits[key%3]})
-        partial_ds[f'y{qubits[key%3]}_imag_{key}'] = (tuple(coords_dict.keys()), data_values.imag, {'qubit': qubits[key%3]})
+        attributes = {'qubit': qubits[key_indx]}
+        if 'ro_opt_frequencies' in list(sweep_quantities):
+            attributes['qubit_state'] = qubit_states[key // n_qubits]
+        partial_ds[f'y{qubits[key_indx]}_real_{key // n_qubits}'] = (tuple(coords_dict.keys()), data_values.real, attributes)
+        partial_ds[f'y{qubits[key_indx]}_imag_{key // n_qubits}'] = (tuple(coords_dict.keys()), data_values.imag, attributes)
         dataset = xarray.merge([dataset,partial_ds])
     return dataset
 
@@ -61,6 +67,13 @@ def to_complex_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
     complex_ds = xarray.Dataset(coords=iq_dataset.coords)
     for var in iq_dataset.data_vars.keys():
         this_qubit = iq_dataset[var].attrs['qubit']
+        attributes = {'qubit': this_qubit}
+        this_state = ''
+        if 'qubit_state' in iq_dataset[var].attrs:
+            qubit_state = iq_dataset[var].attrs["qubit_state"]
+            this_state = f'_{qubit_state}'
+            attributes['qubit_state'] = qubit_state
+
         #TODO this could be better:
         if not this_qubit in dataset_dict:
             dataset_dict[this_qubit] = {}
@@ -71,13 +84,13 @@ def to_complex_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
             dataset_dict[this_qubit]['imag'] = current_values
 
         if 'real' in dataset_dict[this_qubit] and 'imag' in dataset_dict[this_qubit]:
-            qubit_coords = iq_dataset[f'y{this_qubit}_real'].coords
+            qubit_coords = iq_dataset[f'y{this_qubit}_real{this_state}'].coords
             complex_values = dataset_dict[this_qubit]['real'] + 1j*dataset_dict[this_qubit]['imag']
-            complex_ds[f'y{this_qubit}'] = (qubit_coords, complex_values, {'qubit': this_qubit})
+            complex_ds[f'y{this_qubit}{this_state}'] = (qubit_coords, complex_values, attributes)
 
     return complex_ds
 
-def measure( compiled_schedule: CompiledSchedule, schedule_duration: float, samplespace: dict, node: str) -> xarray.Dataset:
+def measure(compiled_schedule: CompiledSchedule, schedule_duration: float, samplespace: dict, node: str) -> xarray.Dataset:
 
     cluster_status = ClusterStatus.dummy
 
@@ -94,7 +107,7 @@ def measure( compiled_schedule: CompiledSchedule, schedule_duration: float, samp
        for subspace in samplespace.values():
            dimension *= len( list(subspace.values())[0] )
 
-       dummy_data = [ DummyBinnedAcquisitionData(data=(8,16),thres=1,avg_cnt=1) for _ in range(dimension) ]
+       dummy_data = [ DummyBinnedAcquisitionData(data=(2,6),thres=1,avg_cnt=2) for _ in range(dimension) ]
        clusterA = Cluster("clusterA", dummy_cfg=dummy)
 
        # clusterB = Cluster("clusterB", dummy_cfg=dummy)
@@ -142,14 +155,11 @@ def measure( compiled_schedule: CompiledSchedule, schedule_duration: float, samp
     raw_dataset: xarray.Dataset = loki_ic.retrieve_acquisition()
     logger.info('Raw dataset acquired')
 
-    # result_dict = raw_dataset.to_dict()
-    # with open('example_ds.py','w') as f:
-    #     f.write(str(result_dict))
 
     result_dataset = configure_dataset(raw_dataset, samplespace)
-    print(f'{ result_dataset = }')
+
     eventid = datetime.now().strftime('%Y%m-%d-%H%M%S-') + f'{node}-'+ str(uuid4()) + '.nc'
-    result_dataset.to_netcdf(data_directory / eventid )
+    result_dataset.to_netcdf(data_directory / eventid)
 
     result_dataset_complex = to_complex_dataset(result_dataset)
 

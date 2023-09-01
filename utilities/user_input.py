@@ -114,7 +114,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
         },
 
         'ro_frequency_optimization': {
-            'ro_frequencies': {qubit: resonator_samples(qubit) for qubit in qubits}
+            'ro_opt_frequencies': {qubit: resonator_samples(qubit) for qubit in qubits}
         },
 
         'punchout': {

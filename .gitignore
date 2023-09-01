@@ -9,6 +9,9 @@ send_to_lefteris.ps1
 #test python files
 test*py
 
+#data files
+*.nc
+
 #local develpoment
 local/
 
@@ -56,4 +59,3 @@ Thumbs.db
 *.flv
 *.mov
 *.wmv
-
