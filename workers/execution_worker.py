@@ -50,12 +50,12 @@ def configure_dataset(
         coords_dict = {}
         for quantity in sweep_quantities :
             coord_key = quantity+qubits[key_indx]
-            coords_dict[coord_key] = (coord_key, samplespace[quantity][qubits[key_indx]])
+            coords_dict[coord_key] = (coord_key, samplespace[quantity][qubits[key_indx]], {'long_name': f'x{coord_key}', 'units': 'NA'} )
         partial_ds = xarray.Dataset(coords=coords_dict)
         reshaping = list(reversed([len(samplespace[quantity][qubits[key_indx]]) for quantity in sweep_quantities]))
         data_values = raw_ds[key_indx].values[0].reshape(*reshaping)
         data_values = np.transpose(data_values)
-        attributes = {'qubit': qubits[key_indx]}
+        attributes = {'qubit': qubits[key_indx], 'long_name': f'y{qubits[key_indx]}', 'units': 'NA'}
         if 'ro_opt_frequencies' in list(sweep_quantities):
             attributes['qubit_state'] = qubit_states[key // n_qubits]
         partial_ds[f'y{qubits[key_indx]}_real_{key // n_qubits}'] = (tuple(coords_dict.keys()), data_values.real, attributes)
@@ -161,9 +161,14 @@ def measure(compiled_schedule: CompiledSchedule, schedule_duration: float, sampl
 
     measurement_date = datetime.now()
     measurements_today = measurement_date.date().strftime('%Y%m%d')
-    measurement_id = measurement_date.strftime('%Y%m%d-%H%M%S-') + f'{node}-'+ str(uuid4())
-    pathlib.Path(data_directory / measurements_today / measurement_id )
-    result_dataset.to_netcdf(data_directory / eventid)
+    measurement_id = measurement_date.strftime('%Y%m%d-%H%M%S-%f')[:19] + '-' + str(uuid4())[:6] + f'-{node}'
+    data_path = pathlib.Path(data_directory / measurements_today / measurement_id)
+    data_path.mkdir(parents=True, exist_ok=True)
+
+    result_dataset = result_dataset.assign_attrs({'name': node, 'tuid': measurement_id})
+    breakpoint()
+
+    result_dataset.to_netcdf(data_path / 'dataset.hdf5')
 
     result_dataset_complex = to_complex_dataset(result_dataset)
 
