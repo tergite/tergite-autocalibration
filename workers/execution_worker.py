@@ -1,5 +1,6 @@
 '''Retrieve the compiled schedule and run it'''
 from datetime import datetime
+import pathlib
 from time import sleep
 from uuid import uuid4
 from colorama import init as colorama_init
@@ -158,7 +159,10 @@ def measure(compiled_schedule: CompiledSchedule, schedule_duration: float, sampl
 
     result_dataset = configure_dataset(raw_dataset, samplespace)
 
-    eventid = datetime.now().strftime('%Y%m-%d-%H%M%S-') + f'{node}-'+ str(uuid4()) + '.nc'
+    measurement_date = datetime.now()
+    measurements_today = measurement_date.date().strftime('%Y%m%d')
+    measurement_id = measurement_date.strftime('%Y%m%d-%H%M%S-') + f'{node}-'+ str(uuid4())
+    pathlib.Path(data_directory / measurements_today / measurement_id )
     result_dataset.to_netcdf(data_directory / eventid)
 
     result_dataset_complex = to_complex_dataset(result_dataset)
