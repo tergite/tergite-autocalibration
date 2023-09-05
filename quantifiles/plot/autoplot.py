@@ -26,12 +26,25 @@ def autoplot(dataset: xr.Dataset) -> QtWidgets.QMainWindow:
             )
             plot_window.add_plot(gettable, plot_widget)
         else:
-            for settable in settables:
-                settable = cast(str, settable)
-                plot_widget = LinePlot(
-                    dataset, x_key=settable, y_keys=gettable, parent=plot_window
-                )
-                plot_window.add_plot(gettable, plot_widget)
+            pass
+            # for settable in settables:
+            #     settable = cast(str, settable)
+            #     plot_widget = LinePlot(
+            #         dataset, x_key=settable, y_keys=gettable, parent=plot_window
+            #     )
+            #     print(f'{ gettable = }')
+            #     print(f'{ settable = }')
+            #     plot_window.add_plot(gettable, plot_widget)
+        print( 'Warning Hardcoding')
+        settables = list(dataset[gettable].coords.keys())
+        if len(settables) == 1:
+            settable = cast(str, settables[0])
+        else:
+            raise ValueError('Cant plot 2d datasets :(')
+        plot_widget = LinePlot(
+            dataset, x_key=settable, y_keys=gettable, parent=plot_window
+        )
+        plot_window.add_plot(gettable, plot_widget)
 
     return plot_window
 
