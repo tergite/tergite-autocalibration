@@ -50,7 +50,7 @@ def configure_dataset(
         coords_dict = {}
         for quantity in sweep_quantities :
             coord_key = quantity+qubits[key_indx]
-            coords_dict[coord_key] = (coord_key, samplespace[quantity][qubits[key_indx]], {'long_name': f'x{coord_key}', 'units': 'NA'} )
+            coords_dict[coord_key] = (coord_key, samplespace[quantity][qubits[key_indx]], {'long_name': f'{coord_key}', 'units': 'NA'} )
         partial_ds = xarray.Dataset(coords=coords_dict)
         reshaping = list(reversed([len(samplespace[quantity][qubits[key_indx]]) for quantity in sweep_quantities]))
         data_values = raw_ds[key_indx].values[0].reshape(*reshaping)
@@ -166,7 +166,6 @@ def measure(compiled_schedule: CompiledSchedule, schedule_duration: float, sampl
     data_path.mkdir(parents=True, exist_ok=True)
 
     result_dataset = result_dataset.assign_attrs({'name': node, 'tuid': measurement_id})
-    breakpoint()
 
     result_dataset.to_netcdf(data_path / 'dataset.hdf5')
 
