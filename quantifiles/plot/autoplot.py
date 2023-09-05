@@ -35,7 +35,6 @@ def autoplot(dataset: xr.Dataset) -> QtWidgets.QMainWindow:
             #     print(f'{ gettable = }')
             #     print(f'{ settable = }')
             #     plot_window.add_plot(gettable, plot_widget)
-        print( 'Warning Hardcoding')
         settables = list(dataset[gettable].coords.keys())
         if len(settables) == 1:
             settable = cast(str, settables[0])
