@@ -74,7 +74,8 @@ def get_file_monitor_for_dataset(dataset: xr.Dataset) -> FileMonitor:
     FileMonitor
         The FileMonitor for the dataset.
     """
-    tuid = TUID(dataset.attrs["tuid"])
+    tuid = dataset.attrs["tuid"]
+    # tuid = TUID(dataset.attrs["tuid"])
     directory = Path(locate_experiment_container(tuid))
     monitor = FileMonitor(directory / DATASET_NAME)
     return monitor
