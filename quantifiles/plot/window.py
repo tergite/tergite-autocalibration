@@ -5,7 +5,7 @@ from functools import partial
 
 import xarray as xr
 
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtGui, QtWidgets, QtCore
 from PyQt5.QtCore import QSignalMapper
 
 from quantifiles.data import get_snapshot_as_dict
@@ -84,6 +84,8 @@ class GettableSelector(QtWidgets.QWidget):
             )
             box_layout.addWidget(settable_label)
 
+
+
         # Set up the box frame and add it to the main layout.
         box_frame = QtWidgets.QFrame(self)
         box_frame.setFrameStyle(QtWidgets.QFrame.StyledPanel | QtWidgets.QFrame.Sunken)
@@ -95,6 +97,96 @@ class GettableSelector(QtWidgets.QWidget):
         main_layout.addLayout(checkbox_layout)
         main_layout.addWidget(box_frame)
 
+class CustomSelector(QtWidgets.QWidget):
+    """
+    A widget for selecting independentley the dependent and independentley
+    variables for plotting.
+
+    Parameters
+    ----------
+    parent : QtWidgets.QWidget or None, optional
+        The parent widget of the selector. If None, it will be a top-level widget.
+    dataset : xarray.Dataset or None, optional
+        The xarray dataset containing the data variable to be selected.
+    """
+
+    def __init__(
+        self,
+        parent: QtWidgets.QWidget | None = None,
+        dataset: xr.Dataset | None = None,
+    ):
+        super().__init__(parent)
+
+
+        # # Get the long name and units of the data variable.
+        # gettable_long_name = dataset[gettable_name].long_name
+        # gettable_units = dataset[gettable_name].attrs["units"]
+        # box_title = f"{gettable_name}: {gettable_long_name} ({gettable_units})"
+
+        # Set up the main layout of the widget.
+        main_layout = QtWidgets.QHBoxLayout(self)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+
+        # Set up the checkbox for selecting the data variable.
+        self.checkbox = QtWidgets.QCheckBox()
+        self.checkbox.setChecked(True)
+        self.checkbox.setToolTip(f"Select to include gettable_name in plot")
+        self.checkbox.setSizePolicy(
+            QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum
+        )
+        checkbox_layout = QtWidgets.QVBoxLayout()
+        checkbox_layout.addWidget(self.checkbox)
+        checkbox_layout.setAlignment(QtCore.Qt.AlignRight)
+
+        # Set up the box containing the variable selection options.
+        box_layout = QtWidgets.QVBoxLayout()
+
+        # Add the title label and underline.
+        # label = QtWidgets.QLabel(box_title)
+        # underline = QtWidgets.QFrame()
+        # underline.setFrameShape(QtWidgets.QFrame.HLine)
+        # underline.setFrameShadow(QtWidgets.QFrame.Sunken)
+
+        # box_layout.addWidget(label)
+        # box_layout.addWidget(underline)
+
+        # Add a label for each settable variable.
+        # for row_index, settable_name in enumerate(dataset[gettable_name].coords.keys()):
+        #     settable_long_name = dataset[gettable_name][settable_name].long_name
+        #     settable_units = dataset[gettable_name][settable_name].attrs["units"]
+        #     settable_label = QtWidgets.QLabel(
+        #         f"{settable_name}: {settable_long_name} ({settable_units})"
+        #     )
+        #     box_layout.addWidget(settable_label)
+
+        settables = list(dataset.coords.keys())
+        print(f'{ settables = }')
+        gettables = list(dataset.data_vars.keys())
+        print(f'{ gettables = }')
+        set_combo_box = QtWidgets.QComboBox()
+        get_combo_box = QtWidgets.QComboBox()
+        set_combo_box.addItems(settables)
+        get_combo_box.addItems(gettables)
+
+        # # Add the title label and underline.
+        # custom_label = QtWidgets.QLabel('Custom')
+        # custom_underline = QtWidgets.QFrame()
+        # # custom_underline.setFrameShape(QtWidgets.QFrame.HLine)
+        # custom_underline.setFrameShadow(QtWidgets.QFrame.Sunken)
+        # custom_box_layout.addWidget(custom_label)
+        box_layout.addWidget(set_combo_box)
+        box_layout.addWidget(get_combo_box)
+        # custom_box_layout.addWidget(custom_underline)
+        # Set up the box frame and add it to the main layout.
+        box_frame = QtWidgets.QFrame()
+        box_frame.setLayout(box_layout)
+        box_frame.setFrameStyle(QtWidgets.QFrame.StyledPanel | QtWidgets.QFrame.Sunken)
+        box_frame.setSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
+        )
+
+        main_layout.addLayout(checkbox_layout)
+        main_layout.addWidget(box_frame)
 
 class GettableSelectBox(QtWidgets.QFrame):
     """
@@ -156,6 +248,7 @@ class GettableSelectBox(QtWidgets.QFrame):
 
             layout.addWidget(gettable_box)
 
+        layout.addWidget(CustomSelector(dataset=dataset))
         # Add another spacer to push the widgets so that they are centered
         layout.addSpacerItem(spacer)
 
