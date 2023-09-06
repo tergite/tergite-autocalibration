@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from functools import partial
+from typing import cast
 
 import xarray as xr
 
@@ -143,7 +144,7 @@ class CustomSelector(QtWidgets.QWidget):
 
         # Set up the checkbox for selecting the data variable.
         self.checkbox = QtWidgets.QCheckBox()
-        self.checkbox.setChecked(True)
+        self.checkbox.setChecked(False)
         self.checkbox.setToolTip(f"Select to include gettable_name in plot")
         self.checkbox.setSizePolicy(
             QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum
@@ -174,20 +175,22 @@ class CustomSelector(QtWidgets.QWidget):
         #     box_layout.addWidget(settable_label)
 
         settables = list(dataset.coords.keys())
-        print(f'{ settables = }')
         gettables = list(dataset.data_vars.keys())
-        print(f'{ gettables = }')
+        settables = [cast(str,s) for s in settables]
+        gettables = [cast(str,g) for g in gettables]
         set_combo_box = QtWidgets.QComboBox()
         get_combo_box = QtWidgets.QComboBox()
-        set_combo_box.addItems(settables)
-        get_combo_box.addItems(gettables)
+        set_combo_box.addItems(settables+gettables)
+        get_combo_box.addItems(settables+gettables)
+
+        set_combo_box.activated[str].connect(lambda x: print(x))
 
         # # Add the title label and underline.
-        # custom_label = QtWidgets.QLabel('Custom')
+        label = QtWidgets.QLabel('select dependent and independent variables:')
         # custom_underline = QtWidgets.QFrame()
         # # custom_underline.setFrameShape(QtWidgets.QFrame.HLine)
         # custom_underline.setFrameShadow(QtWidgets.QFrame.Sunken)
-        # custom_box_layout.addWidget(custom_label)
+        box_layout.addWidget(label)
         box_layout.addWidget(set_combo_box)
         box_layout.addWidget(get_combo_box)
         # custom_box_layout.addWidget(custom_underline)
@@ -262,7 +265,9 @@ class GettableSelectBox(QtWidgets.QFrame):
 
             layout.addWidget(gettable_box)
 
-        layout.addWidget(CustomSelector(dataset=dataset))
+        custom_select_box = CustomSelector(dataset=dataset)
+        custom_select_box.checkbox.stateChanged.connect(self.gettable_select_mapper.map)
+        layout.addWidget(custom_select_box)
         # Add another spacer to push the widgets so that they are centered
         layout.addSpacerItem(spacer)
 
