@@ -4,9 +4,6 @@ from a qubit (two tone) spectroscopy experiment.
 """
 import numpy as np
 import xarray as xr
-from colorama import init as colorama_init
-from colorama import Fore
-from colorama import Style
 from scipy import signal
 import lmfit
 
@@ -72,11 +69,6 @@ class QubitSpectroscopyAnalysis():
         data_var = list(dataset.data_vars.keys())[0]
         coord = list(dataset[data_var].coords.keys())[0]
         self.S21 = dataset[data_var].values
-        ########################
-        #print( "")
-        #print( f'{Fore.RED}WARNING MOCK DATA IN analysis/qubit_spectroscopy_analysis{Style.RESET_ALL}')
-        #self.S21 = np.array([1+1j for _ in self.S21])
-        ########################
         self.independents = dataset[coord].values
         self.fit_results = {}
         self.qubit = dataset[data_var].attrs['qubit']
@@ -88,7 +80,7 @@ class QubitSpectroscopyAnalysis():
         #Fetch the resulting measurement variables from self
         self.magnitudes = np.absolute(self.S21)
         frequencies = self.independents
-        
+
         self.fit_freqs = np.linspace( frequencies[0], frequencies[-1], 1000) # x-values for plotting
 
         # Gives an initial guess for the model parameters and then fits the model to the data.
@@ -97,21 +89,21 @@ class QubitSpectroscopyAnalysis():
 
         self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_freqs})
         return fit_result.params['x0'].value
-    
-    def reject_outliers(x, m = 3.):
+
+    def reject_outliers(self, x, m = 3.):
         #Filters out datapoints in x that deviate too far from the median
         d = np.abs(x - np.median(x))
         mdev = np.median(d)
         s = d/mdev if mdev else np.zeros(len(d))
         return x[s<m]
-    
+
     def has_peak(self, prom_coef: float = 21, wid_coef: float = 2.4, outlier_median: float = 3.):
         # Determines if the data contains one distinct peak or only noise
         x= self.S21
-        x_filtered= reject_outliers(x, outlier_median)
-        peaks, properties=sp.signal.find_peaks(x, prominence=np.std(x_filtered)*prom_coef, width=wid_coef)
+        x_filtered= self.reject_outliers(x, outlier_median)
+        peaks, properties=signal.find_peaks(x, prominence=np.std(x_filtered)*prom_coef, width=wid_coef)
         return peaks.size==1
-    
+
     def plotter(self,ax):
         # Plots the data and the fitted model of a qubit spectroscopy experiment
         ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0)

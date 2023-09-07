@@ -56,10 +56,12 @@ def configure_dataset(
         data_values = raw_ds[key_indx].values[0].reshape(*reshaping)
         data_values = np.transpose(data_values)
         attributes = {'qubit': qubits[key_indx], 'long_name': f'y{qubits[key_indx]}', 'units': 'NA'}
+        qubit_state = ''
         if 'ro_opt_frequencies' in list(sweep_quantities):
-            attributes['qubit_state'] = qubit_states[key // n_qubits]
-        partial_ds[f'y{qubits[key_indx]}_real_{key // n_qubits}'] = (tuple(coords_dict.keys()), data_values.real, attributes)
-        partial_ds[f'y{qubits[key_indx]}_imag_{key // n_qubits}'] = (tuple(coords_dict.keys()), data_values.imag, attributes)
+            qubit_state = qubit_states[key // n_qubits]
+            attributes['qubit_state'] = qubit_state
+        partial_ds[f'y{qubits[key_indx]}_real{qubit_state}'] = (tuple(coords_dict.keys()), data_values.real, attributes)
+        partial_ds[f'y{qubits[key_indx]}_imag{qubit_state}'] = (tuple(coords_dict.keys()), data_values.imag, attributes)
         dataset = xarray.merge([dataset,partial_ds])
     return dataset
 
