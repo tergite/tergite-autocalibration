@@ -11,6 +11,7 @@ from PyQt5.QtCore import QSignalMapper
 
 from quantifiles.data import get_snapshot_as_dict
 from quantifiles.plot.baseplot import BasePlot
+from quantifiles.plot.lineplot import LinePlot
 from quantifiles.plot.snapshot import SnapshotTab
 
 logger = logging.getLogger(__name__)
@@ -85,8 +86,6 @@ class GettableSelector(QtWidgets.QWidget):
             )
             box_layout.addWidget(settable_label)
 
-
-
         # Set up the box frame and add it to the main layout.
         box_frame = QtWidgets.QFrame(self)
         box_frame.setFrameStyle(QtWidgets.QFrame.StyledPanel | QtWidgets.QFrame.Sunken)
@@ -110,6 +109,9 @@ class CustomSelector(QtWidgets.QWidget):
     dataset : xarray.Dataset or None, optional
         The xarray dataset containing the data variable to be selected.
     """
+    # Custom signal that is emitted when a settable and gettable
+    # is selected from the two combo boxes
+    combo_selected = QtCore.pyqtSignal(str,str)
 
     def __init__(
         self,
@@ -117,7 +119,6 @@ class CustomSelector(QtWidgets.QWidget):
         dataset: xr.Dataset | None = None,
     ):
         super().__init__(parent)
-
 
         # # Get the long name and units of the data variable.
         # gettable_long_name = dataset[gettable_name].long_name
@@ -164,12 +165,15 @@ class CustomSelector(QtWidgets.QWidget):
         gettables = list(dataset.data_vars.keys())
         settables = [cast(str,s) for s in settables]
         gettables = [cast(str,g) for g in gettables]
-        set_combo_box = QtWidgets.QComboBox()
-        get_combo_box = QtWidgets.QComboBox()
-        set_combo_box.addItems(settables+gettables)
-        get_combo_box.addItems(settables+gettables)
+        self.set_combo_box = QtWidgets.QComboBox()
+        self.get_combo_box = QtWidgets.QComboBox()
+        self.set_combo_box.addItems(settables+gettables)
+        self.get_combo_box.addItems(settables+gettables)
 
-        set_combo_box.activated[str].connect(lambda x: print(x))
+        # self.set_combo_box.activated[str].connect(lambda x: print(dataset[x]))
+        # self.get_combo_box.activated[str].connect(lambda x: print(dataset[x]))
+        self.set_combo_box.activated[str].connect(self.combo_option_selected)
+        self.get_combo_box.activated[str].connect(self.combo_option_selected)
 
         # # Add the title label and underline.
         label = QtWidgets.QLabel('select dependent and independent variables:')
@@ -177,8 +181,8 @@ class CustomSelector(QtWidgets.QWidget):
         # # custom_underline.setFrameShape(QtWidgets.QFrame.HLine)
         # custom_underline.setFrameShadow(QtWidgets.QFrame.Sunken)
         box_layout.addWidget(label)
-        box_layout.addWidget(set_combo_box)
-        box_layout.addWidget(get_combo_box)
+        box_layout.addWidget(self.set_combo_box)
+        box_layout.addWidget(self.get_combo_box)
         # custom_box_layout.addWidget(custom_underline)
         # Set up the box frame and add it to the main layout.
         box_frame = QtWidgets.QFrame()
@@ -191,6 +195,23 @@ class CustomSelector(QtWidgets.QWidget):
         main_layout.addLayout(checkbox_layout)
         main_layout.addWidget(box_frame)
 
+    def combo_option_selected(self):
+        """
+        Emit the gettable_toggled signal with the name of the toggled checkbox and its state.
+
+        Parameters
+        ----------
+        name : str
+            The name of the variable associated with the selection in the comboboxes.
+        """
+        set_selected = self.set_combo_box.currentText()
+        get_selected = self.get_combo_box.currentText()
+        self.combo_selected.emit(set_selected, get_selected)
+        # self.gettable_toggled.emit(name, enabled)
+        # # set_combo_box.activated[str].connect(lambda x: print(dataset[x]))
+        # # get_combo_box.activated[str].connect(lambda x: print(dataset[x]))
+
+
 class GettableSelectBox(QtWidgets.QFrame):
     """
     A widget for selecting data variables from an xarray Dataset.
@@ -198,6 +219,7 @@ class GettableSelectBox(QtWidgets.QFrame):
 
     # Custom signal that is emitted when a checkbox is toggled
     gettable_toggled = QtCore.pyqtSignal(str, bool)
+
 
     def __init__(
         self, parent: QtWidgets.QWidget | None = None, dataset: xr.Dataset | None = None
@@ -251,9 +273,9 @@ class GettableSelectBox(QtWidgets.QFrame):
 
             layout.addWidget(gettable_box)
 
-        custom_select_box = CustomSelector(dataset=dataset)
-        custom_select_box.checkbox.stateChanged.connect(self.gettable_select_mapper.map)
-        layout.addWidget(custom_select_box)
+        self.custom_select_box = CustomSelector(dataset=dataset)
+        self.custom_select_box.checkbox.stateChanged.connect(self.gettable_select_mapper.map)
+        layout.addWidget(self.custom_select_box)
         # Add another spacer to push the widgets so that they are centered
         layout.addSpacerItem(spacer)
 
@@ -283,7 +305,6 @@ class GettableSelectBox(QtWidgets.QFrame):
         """
         enabled = self._gettable_checkboxes[name].isChecked()
         self.gettable_toggled.emit(name, enabled)
-
 
 class NameAndTuidBox(QtWidgets.QFrame):
     def __init__(self, name: str, tuid: str):
@@ -416,6 +437,8 @@ class PlotWindow(QtWidgets.QMainWindow):
     def __init__(self, dataset: xr.Dataset, parent: QtWidgets.QWidget | None = None):
         super().__init__(parent)
         self.dataset = dataset
+
+        self.N_gettables = len(list(dataset.data_vars.keys()))
         self.plots = {}
 
         tuid = self.dataset.tuid if hasattr(self.dataset, "tuid") else "no tuid"
@@ -433,6 +456,10 @@ class PlotWindow(QtWidgets.QMainWindow):
 
         canvas.plot_tab.gettable_select_box.gettable_toggled.connect(
             self.toggle_gettable
+        )
+
+        canvas.plot_tab.gettable_select_box.custom_select_box.combo_selected.connect(
+            self.plot_custom_graph
         )
 
         # make sure the window is on top, and that it is activated. Does not always work on Windows due to Windows not
@@ -455,8 +482,32 @@ class PlotWindow(QtWidgets.QMainWindow):
 
         logger.debug(f"Added plot with name {name} to {self.__class__.__name__}")
 
+    def add_custom_plot(self, plot: BasePlot):
+        current_layout = self.canvas.plot_tab.plot_layout
+
+        current_custom_plot = current_layout.itemAt(self.N_gettables)
+        if current_custom_plot != None:
+            widget = current_custom_plot.widget()
+            if widget != None:
+                current_layout.removeWidget(widget)
+                widget.deleteLater()
+
+        self.canvas.add_plot(plot)
+        plot.mouse_text_changed.connect(
+            self.canvas.plot_tab.gettable_select_box.on_new_mouse_pos_text
+        )
+
+        self.resize(
+            self._WINDOW_WIDTH + self._WINDOW_HEIGHT * (1+len(self.plots)),
+            self._WINDOW_HEIGHT,
+        )
+
     @QtCore.pyqtSlot(str, bool)
     def toggle_gettable(self, name: str, enabled: bool):
         self.plots[name].setVisible(enabled)
-
         logger.debug(f"Toggled visibility of plot with name {name} to {enabled}")
+
+    @QtCore.pyqtSlot(str, str)
+    def plot_custom_graph(self, x_variable: str, y_variable: str):
+        custom_plot = LinePlot(self.dataset, x_key=x_variable, y_keys=y_variable)
+        self.add_custom_plot(custom_plot)
