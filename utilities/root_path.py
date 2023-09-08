@@ -7,4 +7,6 @@ def get_data_directory() -> Path:
     return get_project_root() / 'data_directory'
 
 
-data_directory = get_data_directory()    
+data_directory = get_data_directory()
+
+project_root = get_project_root()
