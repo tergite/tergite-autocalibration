@@ -6,6 +6,9 @@
 #script to scp files
 send_to_lefteris.ps1
 
+#dataset folders
+202[3456789]*/
+
 #test python files
 test*py
 

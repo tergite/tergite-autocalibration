@@ -1,0 +1,181 @@
+{
+   "backend": "quantify_scheduler.backends.qblox_backend.hardware_compile",
+   "clusterA": {
+      "ref": "internal",
+      "instrument_type": "Cluster"
+   },
+   "clusterA_module6": {
+      "instrument_type": "QCM_RF",
+      "complex_output_0": {
+         "lo_freq": 3793740000.0,
+         "dc_mixer_offset_I": -0.008974600000000001,
+         "dc_mixer_offset_Q": -7.240000000000001e-05,
+         "portclock_configs": [
+            {
+               "port": "q6:mw",
+               "clock": "q6.01",
+               "mixer_amp_ratio": 0.9844,
+               "mixer_phase_error_deg": -23.81146
+            },
+            {
+               "port": "q6:mw",
+               "clock": "q6.12",
+               "mixer_amp_ratio": 0.9844,
+               "mixer_phase_error_deg": -23.81146
+            }
+         ]
+      }
+   },
+   "clusterA_module7": {
+      "instrument_type": "QCM_RF",
+      "complex_output_0": {
+         "lo_freq": 3441770000.0,
+         "dc_mixer_offset_I": -0.0103496,
+         "dc_mixer_offset_Q": -0.007237599999999999,
+         "portclock_configs": [
+            {
+               "port": "q7:mw",
+               "clock": "q7.01",
+               "mixer_amp_ratio": 1.0111,
+               "mixer_phase_error_deg": -23.30484
+            },
+            {
+               "port": "q7:mw",
+               "clock": "q7.12",
+               "mixer_amp_ratio": 1.0111,
+               "mixer_phase_error_deg": -23.30484
+            }
+         ]
+      }
+   },
+   "clusterA_module8": {
+      "instrument_type": "QCM_RF",
+      "complex_output_0": {
+         "lo_freq": 3666900000.0,
+         "dc_mixer_offset_I": -0.0103497,
+         "dc_mixer_offset_Q": -0.0024246,
+         "portclock_configs": [
+            {
+               "port": "q8:mw",
+               "clock": "q8.01",
+               "mixer_amp_ratio": 0.9955,
+               "mixer_phase_error_deg": -10.63916
+            },
+            {
+               "port": "q8:mw",
+               "clock": "q8.12",
+               "mixer_amp_ratio": 0.9955,
+               "mixer_phase_error_deg": -10.63916
+            }
+         ]
+      }
+   },
+   "clusterA_module9": {
+      "instrument_type": "QCM_RF",
+      "complex_output_0": {
+         "lo_freq": 3406770000.0,
+         "dc_mixer_offset_I": -0.010639200000000001,
+         "dc_mixer_offset_Q": -0.0101687,
+         "portclock_configs": [
+            {
+               "port": "q9:mw",
+               "clock": "q9.01",
+               "mixer_amp_ratio": 1.0188,
+               "mixer_phase_error_deg": -18.96232
+            },
+            {
+               "port": "q9:mw",
+               "clock": "q9.12",
+               "mixer_amp_ratio": 1.0188,
+               "mixer_phase_error_deg": -18.96232
+            }
+         ]
+      }
+   },
+   "clusterA_module10": {
+      "instrument_type": "QCM_RF",
+      "complex_output_0": {
+         "lo_freq": 3952580000.0,
+         "dc_mixer_offset_I": -0.0054282,
+         "dc_mixer_offset_Q": -0.0010132000000000001,
+         "portclock_configs": [
+            {
+               "port": "q10:mw",
+               "clock": "q10.01",
+               "mixer_amp_ratio": 0.986,
+               "mixer_phase_error_deg": -17.51481
+            },
+            {
+               "port": "q10:mw",
+               "clock": "q10.12",
+               "mixer_amp_ratio": 0.986,
+               "mixer_phase_error_deg": -17.51481
+            }
+         ]
+      }
+   },
+   "clusterA_module17": {
+      "instrument_type": "QRM_RF",
+      "complex_output_0": {
+         "lo_freq": 6740000000.0,
+         "dc_mixer_offset_I": -0.0073461,
+         "dc_mixer_offset_Q": -0.006332900000000001,
+         "portclock_configs": [
+            {
+               "port": "q1:res",
+               "clock": "q1.ro",
+               "mixer_amp_ratio": 1.0,
+               "mixer_phase_error_deg": 0.0
+            },
+            {
+               "port": "q2:res",
+               "clock": "q2.ro",
+               "mixer_amp_ratio": 1.0,
+               "mixer_phase_error_deg": 0.0
+            },
+            {
+               "port": "q3:res",
+               "clock": "q3.ro",
+               "mixer_amp_ratio": 1.0,
+               "mixer_phase_error_deg": 0.0
+            },
+            {
+               "port": "q1:res",
+               "clock": "q1.ro1",
+               "mixer_amp_ratio": 1.0,
+               "mixer_phase_error_deg": 0.0
+            },
+            {
+               "port": "q2:res",
+               "clock": "q2.ro1",
+               "mixer_amp_ratio": 1.0,
+               "mixer_phase_error_deg": 0.0
+            },
+            {
+               "port": "q3:res",
+               "clock": "q3.ro1",
+               "mixer_amp_ratio": 1.0,
+               "mixer_phase_error_deg": 0.0
+            },
+            {
+               "port": "q1:res",
+               "clock": "q1.ro2",
+               "mixer_amp_ratio": 1.0,
+               "mixer_phase_error_deg": 0.0
+            },
+            {
+               "port": "q2:res",
+               "clock": "q2.ro2",
+               "mixer_amp_ratio": 1.0,
+               "mixer_phase_error_deg": 0.0
+            },
+            {
+               "port": "q3:res",
+               "clock": "q3.ro2",
+               "mixer_amp_ratio": 1.0,
+               "mixer_phase_error_deg": 0.0
+            }
+         ]
+      }
+   }
+}
