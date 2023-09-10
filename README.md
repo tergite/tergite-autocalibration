@@ -9,11 +9,12 @@ To install WSL, it is required **Windows 10** of version at least **1903**.
 After setting up your ssh key, clone the repo:
 ```git clone```
 
-### Create your local environment ###
-```Conda create```
+### Create your local environment. Here the environment is named `tac` ###
+```conda create --name tac python=3.9```  
+```conda activate tac```
 
 ### Install the required packages from the requirements.txt file ###
-```ip install req```
+```pip install -r requirements.txt```
 
 ### Install the repository in editable mode so all your changes are applied whithout the need of reinstall ###
 ```pip install -e .```
@@ -27,13 +28,17 @@ To reset a particular node:
 **```python worker/calibration supervisor```**  
 
 ## Configuration files
+The sample-space for each node. Also here is the target node declared.  
 `utilities/user_input.py`  
+Qblox cluster configuration file:
 `configuration_files/hardware_configuration.py`  
-`configuration_files/transmon_element.toml`  
+A collection of reasonable initial values for the device:
+`configuration_files/device.toml`  
 
 ## Structure
-Compilation execution post processing  
+For each calibration node: 
+Compilation -> execution -> post-processing  
 
 ## Data browsing
-Datasets are stored in data directory
-Can be viewed with dataset viewer
+Datasets are stored in `data_directory`
+Can be browsed with the dataset browser (coming soon)
