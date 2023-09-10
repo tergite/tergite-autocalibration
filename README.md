@@ -31,9 +31,9 @@ To reset a particular node:
 The sample-space for each node. Also here is the target node declared.  
 `utilities/user_input.py`  
 Qblox cluster configuration file:
-`configuration_files/hardware_configuration.py`  
+`config_files/hardware_configuration.py`  
 A collection of reasonable initial values for the device:
-`configuration_files/device.toml`  
+`config_files/device_config.toml`  
 
 ## Structure
 For each calibration node: 

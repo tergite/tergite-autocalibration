@@ -17,7 +17,7 @@ import redis
 redis_connection = redis.Redis(decode_responses=True)
 
 # Settings
-transmon_configuration = toml.load('./config_files/transmons_config.toml')
+transmon_configuration = toml.load('./config_files/device_config.toml')
 qubits = user_input.qubits
 
 def calibrate_system():
