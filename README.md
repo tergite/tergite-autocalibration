@@ -1,21 +1,21 @@
 # README #
-This project contains an orchistration manager, a collection of callibration schedules and a collection of post-processing & analysis routines.
-It is tailored for the tune-up of the 25 qubits QPU at Chalmers, QTL.
+This project contains an orchistration manager, a collection of callibration schedules and a collection of post-processing & analysis routines.\
+It is tailored for the tune-up of the 25 qubits QPU at Chalmers, QTL.\
 This repository utilizes **`redis`** for on memory data storage.
-As redis operates only on Linux systems, this repo can only work either on Linux distributions or WSL (Windows Subsystem for Linux) environments, installed on a Windows system.
+As redis operates only on Linux systems, this repo can only work either on Linux distributions or WSL (Windows Subsystem for Linux) environments, installed on a Windows system.\
 To install WSL, it is required **Windows 10** of version at least **1903**.
 
 ## Repository installation:
-After setting up your ssh key, clone the repo:
+After setting up your ssh key, clone the repo:\
 ```git clone git@bitbucket.org:qtlteam/tergite-autocalibration-lite.git```
 
 
 ### Create your local environment. Here the environment is named `tac` ###
-```conda create --name tac python=3.9```
+```conda create --name tac python=3.9```\
 ```conda activate tac```
 
-Enter the project root directory:
-```cd tergite-autocalibration-lite/```
+Enter the project root directory:\
+```cd tergite-autocalibration-lite/```\
 **From now on, it is assumed that all commands are executed from the project root directory.**
 
 
@@ -26,28 +26,28 @@ Enter the project root directory:
 ```pip install -e .```
 
 ## Operation: ##
-To delete all redis entries:
-```python reset_redis.py all```
-To reset a particular node:
-```python reset_redis <nodename>```
-For example to reset the node `rabi_oscillations`:
+To delete all redis entries:\
+```python reset_redis.py all```\
+To reset a particular node:\
+```python reset_redis <nodename>```\
+For example to reset the node `rabi_oscillations`:\
 ```python reset_redis rabi_oscillations```
 
-**To start a new calibration sequence according to the configuration files:**
+**To start a new calibration sequence according to the configuration files:**\
 **```python worker/calibration supervisor```**
 
 ## Configuration files
-The sample-space for each node. Also here the target node is declared:
-`utilities/user_input.py`
-Qblox Cluster configuration file:
-`config_files/settings.py`
-A collection of reasonable initial values for the device:
-`config_files/device_config.toml`
+The sample-space for each node. Also here the target node is declared:\
+`utilities/user_input.py`\
+Qblox Cluster configuration file:\
+`config_files/settings.py`\
+A collection of reasonable initial values for the device:\
+`config_files/device_config.toml`\
 
 ## Structure
-For each calibration node:
+For each calibration node:\
 compilation -> execution -> post-processing -> redis updating
 
 ## Data browsing
-Datasets are stored in `data_directory`
+Datasets are stored in `data_directory`\
 Can be browsed with the dataset browser (coming soon)
