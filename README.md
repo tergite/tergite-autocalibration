@@ -30,12 +30,12 @@ Here `.` is the current directory (i.e. the directory that contains the `setup.p
 To delete all redis entries:  
 ```python reset_redis.py all```  
 To reset a particular node:  
-```python reset_redis <nodename>```  
+```python reset_redis.py <nodename>```  
 For example to reset the node `rabi_oscillations`:  
-```python reset_redis rabi_oscillations```
+```python reset_redis.py rabi_oscillations```
 
 **To start a new calibration sequence according to the configuration files:**  
-**```python worker/calibration supervisor```**
+**```python worker/calibration_supervisor.py```**
 
 ## Configuration files
 The sample-space for each node. Also here the target node is declared:  
