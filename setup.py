@@ -5,7 +5,7 @@ with open("requirements.txt", mode="r") as _f:
 
 setuptools.setup(
     name="tergite_auto_calibration_lite",
-    version="0.1.0",
+    version="0.3.0",
     author="Eleftherios Moschandreou",
     author_email="elemos@chalmers.se",
     description="Communication handling for automatic calibration of multi-qubit devices using Qblox instruments. Minimal experimental version",
