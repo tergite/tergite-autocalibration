@@ -7,6 +7,7 @@ from analysis.resonator_spectroscopy_analysis import ResonatorSpectroscopyAnalys
 from analysis.qubit_spectroscopy_analysis import QubitSpectroscopyAnalysis
 from analysis.optimum_ro_frequency_analysis import OptimalROFrequencyAnalysis
 from analysis.rabi_analysis import RabiAnalysis
+from analysis.punchout_analysis import PunchoutAnalysis
 from analysis.ramsey_analysis import RamseyAnalysis
 from analysis.tof_analysis import analyze_tof
 from analysis.T1_analysis import T1Analysis
@@ -85,6 +86,7 @@ class Multiplexed_Analysis(BaseAnalysis):
             this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
             kw_args = {}
             # this_axis.set_title(f'{node_name} for {this_qubit}')
+
             if node == 'resonator_spectroscopy':
                 analysis_class = ResonatorSpectroscopyAnalysis
                 redis_field = 'ro_freq'
@@ -122,6 +124,9 @@ class Multiplexed_Analysis(BaseAnalysis):
             elif node == 'ro_frequency_optimization':
                 analysis_class = OptimalROFrequencyAnalysis
                 redis_field = 'ro_freq_opt'
+            elif node == 'punchout':
+                analysis_class = PunchoutAnalysis
+                redis_field = 'ro_amp'
             else:
                 raise ValueError(f'Invalid node: {node}')
 
