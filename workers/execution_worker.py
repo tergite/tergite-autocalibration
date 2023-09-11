@@ -7,7 +7,6 @@ from colorama import init as colorama_init
 from colorama import Fore
 from colorama import Style
 from qblox_instruments.ieee488_2 import DummyBinnedAcquisitionData
-from qcodes.utils.helpers import attribute_set_to
 colorama_init()
 
 from quantify_scheduler.instrument_coordinator.instrument_coordinator import CompiledSchedule
@@ -37,7 +36,9 @@ def configure_dataset(
        too bare-bones. Here we configure the dims, coords and data_vars'''
     logger.info('Configuring Dataset')
     dataset = xarray.Dataset()
-    keys = sorted(list(raw_ds.data_vars.keys()))
+    # keys = sorted(list(raw_ds.data_vars.keys()))
+    #TODO instead of doing all these gymnastics just set attributes to the samplespace
+    keys = raw_ds.data_vars.keys()
     sweep_quantities = samplespace.keys() # for example 'ro_frequencies', 'ro_amplitudes' ,...
     sweep_parameters = list(samplespace.values())[0]
     qubits = list(sweep_parameters.keys())
@@ -50,18 +51,25 @@ def configure_dataset(
         coords_dict = {}
         for quantity in sweep_quantities :
             coord_key = quantity+qubits[key_indx]
-            coords_dict[coord_key] = (coord_key, samplespace[quantity][qubits[key_indx]], {'long_name': f'{coord_key}', 'units': 'NA'} )
+            settable_values = samplespace[quantity][qubits[key_indx]]
+            coord_attrs = {'long_name': f'{coord_key}', 'units': 'NA'}
+            coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
         partial_ds = xarray.Dataset(coords=coords_dict)
-        reshaping = list(reversed([len(samplespace[quantity][qubits[key_indx]]) for quantity in sweep_quantities]))
-        data_values = raw_ds[key_indx].values[0].reshape(*reshaping)
+        this_qubit = qubits[key_indx]
+        dimensions = [len(samplespace[quantity][this_qubit]) for quantity in sweep_quantities]
+        # TODO this is not safe:
+        # This assumes that the inner settable variable is placed
+        # at the first position in the samplespace
+        reshaping = reversed(dimensions)
+        data_values = raw_ds[key_indx].values.reshape(*reshaping)
         data_values = np.transpose(data_values)
-        attributes = {'qubit': qubits[key_indx], 'long_name': f'y{qubits[key_indx]}', 'units': 'NA'}
+        attributes = {'qubit': this_qubit, 'long_name': f'y{this_qubit}', 'units': 'NA'}
         qubit_state = ''
         if 'ro_opt_frequencies' in list(sweep_quantities):
             qubit_state = qubit_states[key // n_qubits]
             attributes['qubit_state'] = qubit_state
-        partial_ds[f'y{qubits[key_indx]}_real{qubit_state}'] = (tuple(coords_dict.keys()), data_values.real, attributes)
-        partial_ds[f'y{qubits[key_indx]}_imag{qubit_state}'] = (tuple(coords_dict.keys()), data_values.imag, attributes)
+        partial_ds[f'y{this_qubit}_real{qubit_state}'] = (tuple(coords_dict.keys()), data_values.real, attributes)
+        partial_ds[f'y{this_qubit}_imag{qubit_state}'] = (tuple(coords_dict.keys()), data_values.imag, attributes)
         dataset = xarray.merge([dataset,partial_ds])
     return dataset
 
@@ -78,6 +86,8 @@ def to_complex_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
             attributes['qubit_state'] = qubit_state
 
         #TODO this could be better:
+        #TODO since the retrieved dataset is already complex
+        # there is no point in converting to (real, imag) and then back to complex
         if not this_qubit in dataset_dict:
             dataset_dict[this_qubit] = {}
         current_values = iq_dataset[var].values
@@ -103,35 +113,36 @@ def measure(compiled_schedule: CompiledSchedule, schedule_duration: float, sampl
 
     Cluster.close_all()
     if cluster_status == ClusterStatus.dummy:
-       dummy = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1,16)}
-       dummy["16"] = ClusterType.CLUSTER_QRM_RF
-       dummy["17"] = ClusterType.CLUSTER_QRM_RF
-       dimension = 1
-       for subspace in samplespace.values():
-           dimension *= len( list(subspace.values())[0] )
+        dummy = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1,16)}
+        dummy["16"] = ClusterType.CLUSTER_QRM_RF
+        dummy["17"] = ClusterType.CLUSTER_QRM_RF
+        dimension = 1
+        for subspace in samplespace.values():
+            dimension *= len( list(subspace.values())[0] )
 
-       dummy_data = [ DummyBinnedAcquisitionData(data=(2,6),thres=1,avg_cnt=2) for _ in range(dimension) ]
-       clusterA = Cluster("clusterA", dummy_cfg=dummy)
+        dummy_data = [ DummyBinnedAcquisitionData(data=(2,6),thres=1,avg_cnt=1) for _ in range(dimension) ]
+        clusterA = Cluster("clusterA", dummy_cfg=dummy)
+        clusterA.set_dummy_binned_acquisition_data(16,sequencer=0,acq_index_name='0',data=dummy_data)
+        clusterA.set_dummy_binned_acquisition_data(17,sequencer=0,acq_index_name='1',data=dummy_data)
+        clusterA.set_dummy_binned_acquisition_data(17,sequencer=1,acq_index_name='2',data=dummy_data)
 
-       # clusterB = Cluster("clusterB", dummy_cfg=dummy)
+        # clusterB = Cluster("clusterB", dummy_cfg=dummy)
     elif cluster_status == ClusterStatus.real:
-       #clusterB = Cluster("clusterB", '192.0.2.141')
-       clusterA = Cluster("clusterA", lokiA_IP)
-
-
+        #clusterB = Cluster("clusterB", '192.0.2.141')
+        clusterA = Cluster("clusterA", lokiA_IP)
 
     if node == 'tof':
         result_dataset = measure_time_of_flight(clusterA)
         return result_dataset
-    loki_ic = InstrumentCoordinator('loki_ic')
-    loki_ic.add_component(ClusterComponent(clusterA))
-    #loki_ic.add_component(ClusterComponent(clusterB))
-    loki_ic.timeout(222)
+    lab_ic = InstrumentCoordinator('lab_ic')
+    lab_ic.add_component(ClusterComponent(clusterA))
+    #lab_ic.add_component(ClusterComponent(clusterB))
+    lab_ic.timeout(222)
 
     def run_measurement() -> None:
-        loki_ic.prepare(compiled_schedule)
-        loki_ic.start()
-        loki_ic.wait_done(timeout_sec=600)
+        lab_ic.prepare(compiled_schedule)
+        lab_ic.start()
+        lab_ic.wait_done(timeout_sec=600)
 
     def display_progress():
         steps = int(schedule_duration * 5)
@@ -145,19 +156,13 @@ def measure(compiled_schedule: CompiledSchedule, schedule_duration: float, sampl
 
     thread_tqdm = threading.Thread(target=display_progress)
     thread_tqdm.start()
-    thread_loki = threading.Thread(target=run_measurement)
-    thread_loki.start()
-    thread_loki.join()
+    thread_lab = threading.Thread(target=run_measurement)
+    thread_lab.start()
+    thread_lab.join()
     thread_tqdm.join()
 
-    if cluster_status == ClusterStatus.dummy:
-        clusterA.set_dummy_binned_acquisition_data(16,sequencer=0,acq_index_name='0',data=dummy_data)
-        clusterA.set_dummy_binned_acquisition_data(17,sequencer=0,acq_index_name='1',data=dummy_data)
-        clusterA.set_dummy_binned_acquisition_data(17,sequencer=1,acq_index_name='2',data=dummy_data)
-
-    raw_dataset: xarray.Dataset = loki_ic.retrieve_acquisition()
+    raw_dataset: xarray.Dataset = lab_ic.retrieve_acquisition()
     logger.info('Raw dataset acquired')
-
 
     result_dataset = configure_dataset(raw_dataset, samplespace)
 
@@ -173,8 +178,7 @@ def measure(compiled_schedule: CompiledSchedule, schedule_duration: float, sampl
 
     result_dataset_complex = to_complex_dataset(result_dataset)
 
-    loki_ic.stop()
+    lab_ic.stop()
     logger.info('Finished measurement')
-    # print(result_dataset)
 
     return result_dataset_complex

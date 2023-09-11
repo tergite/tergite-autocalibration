@@ -13,8 +13,9 @@ import numpy as np
 
 class Punchout(Measurement):
 
-    def __init__(self,transmons):
+    def __init__(self,transmons,qubit_state:int=0):
         super().__init__(transmons)
+        self.qubit_state = qubit_state
         self.transmons = transmons
 
         self.static_kwargs = {
@@ -64,7 +65,7 @@ class Punchout(Measurement):
             Array of the sweeping amplitudes of the readout pulse for each qubit.
         repetitions
             The amount of times the Schedule will be repeated.
-        
+
         Returns
         -------
         :
