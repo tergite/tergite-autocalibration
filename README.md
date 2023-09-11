@@ -31,20 +31,24 @@ Here `.` is the current directory (i.e. the directory that contains the `setup.p
 
 ## Operation: ##
 To delete all redis entries:  
-```python reset_redis.py all```  
+```python reset_redis.py all``` 
+
 To reset a particular node:  
 ```python reset_redis.py <nodename>```  
+
 For example to reset the node `rabi_oscillations`:  
 ```python reset_redis.py rabi_oscillations```
 
 **To start a new calibration sequence according to the configuration files:**  
-**```python worker/calibration_supervisor.py```**
+**```python workers/calibration_supervisor.py```**
 
 ## Configuration files
 The sample-space for each node. Also here the target node is declared:  
 `utilities/user_input.py`  
+
 Qblox Cluster configuration file:  
 `config_files/settings.py`  
+
 A collection of reasonable initial values for the device:  
 `config_files/device_config.toml`  
 
