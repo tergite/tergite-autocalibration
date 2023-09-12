@@ -82,7 +82,7 @@ def to_complex_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
         this_state = ''
         if 'qubit_state' in iq_dataset[var].attrs:
             qubit_state = iq_dataset[var].attrs["qubit_state"]
-            this_state = f'_{qubit_state}'
+            this_state = qubit_state
             attributes['qubit_state'] = qubit_state
 
         #TODO this could be better:
@@ -122,9 +122,13 @@ def measure(compiled_schedule: CompiledSchedule, schedule_duration: float, sampl
 
         dummy_data = [ DummyBinnedAcquisitionData(data=(2,6),thres=1,avg_cnt=1) for _ in range(dimension) ]
         clusterA = Cluster("clusterA", dummy_cfg=dummy)
-        clusterA.set_dummy_binned_acquisition_data(16,sequencer=0,acq_index_name='0',data=dummy_data)
-        clusterA.set_dummy_binned_acquisition_data(17,sequencer=0,acq_index_name='1',data=dummy_data)
-        clusterA.set_dummy_binned_acquisition_data(17,sequencer=1,acq_index_name='2',data=dummy_data)
+        clusterA.set_dummy_binned_acquisition_data(16,sequencer=0,acq_index_name="0",data=dummy_data)
+        clusterA.set_dummy_binned_acquisition_data(17,sequencer=0,acq_index_name="1",data=dummy_data)
+        clusterA.set_dummy_binned_acquisition_data(17,sequencer=1,acq_index_name="2",data=dummy_data)
+
+        clusterA.set_dummy_binned_acquisition_data(16,sequencer=0,acq_index_name="3",data=dummy_data)
+        clusterA.set_dummy_binned_acquisition_data(17,sequencer=0,acq_index_name="4",data=dummy_data)
+        clusterA.set_dummy_binned_acquisition_data(17,sequencer=1,acq_index_name="5",data=dummy_data)
 
         # clusterB = Cluster("clusterB", dummy_cfg=dummy)
     elif cluster_status == ClusterStatus.real:
@@ -162,6 +166,7 @@ def measure(compiled_schedule: CompiledSchedule, schedule_duration: float, sampl
     thread_tqdm.join()
 
     raw_dataset: xarray.Dataset = lab_ic.retrieve_acquisition()
+    print(f'{ raw_dataset = }')
     logger.info('Raw dataset acquired')
 
     result_dataset = configure_dataset(raw_dataset, samplespace)

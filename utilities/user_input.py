@@ -7,8 +7,8 @@ from utilities.visuals import draw_arrow_chart
 
 nodes = [
         # "tof",
-        # "resonator_spectroscopy",
-        "punchout",
+        "resonator_spectroscopy",
+        # "punchout",
         "qubit_01_spectroscopy_pulsed",
         "rabi_oscillations",
         #"T1",
@@ -163,7 +163,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     }
     return sweep_parameters
 
-node_to_be_calibrated = "punchout"
+node_to_be_calibrated = "ro_frequency_optimization"
 
 draw_arrow_chart(f'Qubits: {N_qubits}', nodes[:nodes.index(node_to_be_calibrated)+1])
 
