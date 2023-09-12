@@ -120,7 +120,7 @@ def measure(compiled_schedule: CompiledSchedule, schedule_duration: float, sampl
         for subspace in samplespace.values():
             dimension *= len( list(subspace.values())[0] )
 
-        dummy_data = [ DummyBinnedAcquisitionData(data=(2,6),thres=1,avg_cnt=1) for _ in range(dimension) ]
+        dummy_data = [ DummyBinnedAcquisitionData(data=(1,6),thres=1,avg_cnt=1) for _ in range(dimension) ]
         clusterA = Cluster("clusterA", dummy_cfg=dummy)
         clusterA.set_dummy_binned_acquisition_data(16,sequencer=0,acq_index_name="0",data=dummy_data)
         clusterA.set_dummy_binned_acquisition_data(17,sequencer=0,acq_index_name="1",data=dummy_data)
@@ -182,6 +182,11 @@ def measure(compiled_schedule: CompiledSchedule, schedule_duration: float, sampl
     result_dataset.to_netcdf(data_path / 'dataset.hdf5')
 
     result_dataset_complex = to_complex_dataset(result_dataset)
+
+    def handle_ro_freq_optimization():
+        result_dataset_complex.yq160.expand_dims(dim={'st':[1]})
+        xarray.concat([result_dataset_complex.yq160, result_dataset_complex.yq161],'ro_opt_frequenciesq16', combine_attrs='drop_conflicts')
+
 
     lab_ic.stop()
     logger.info('Finished measurement')
