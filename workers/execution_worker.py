@@ -145,9 +145,10 @@ def measure(compiled_schedule: CompiledSchedule, schedule_duration: float, sampl
         clusterA.set_dummy_binned_acquisition_data(17,sequencer=0,acq_index_name="1",data=dummy_data)
         clusterA.set_dummy_binned_acquisition_data(17,sequencer=1,acq_index_name="2",data=dummy_data)
 
-        clusterA.set_dummy_binned_acquisition_data(16,sequencer=0,acq_index_name="3",data=dummy_data)
-        clusterA.set_dummy_binned_acquisition_data(17,sequencer=0,acq_index_name="4",data=dummy_data)
-        clusterA.set_dummy_binned_acquisition_data(17,sequencer=1,acq_index_name="5",data=dummy_data)
+        if node=='ro_frequency_optimization':
+            clusterA.set_dummy_binned_acquisition_data(16,sequencer=0,acq_index_name="3",data=dummy_data)
+            clusterA.set_dummy_binned_acquisition_data(17,sequencer=0,acq_index_name="4",data=dummy_data)
+            clusterA.set_dummy_binned_acquisition_data(17,sequencer=1,acq_index_name="5",data=dummy_data)
 
         # clusterB = Cluster("clusterB", dummy_cfg=dummy)
     elif cluster_status == ClusterStatus.real:
@@ -202,9 +203,6 @@ def measure(compiled_schedule: CompiledSchedule, schedule_duration: float, sampl
     result_dataset_complex = to_complex_dataset(result_dataset)
     if node=='ro_frequency_optimization':
         result_dataset_complex = handle_ro_freq_optimization(result_dataset_complex)
-
-    print(f'{ result_dataset_complex = }')
-
 
     lab_ic.stop()
     logger.info('Finished measurement')

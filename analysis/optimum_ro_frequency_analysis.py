@@ -15,18 +15,16 @@ class OptimalROFrequencyAnalysis():
     and extractst the optimal RO frequency.
     """
     def __init__(self, dataset: xr.Dataset):
-        data_var = dataset.data_vars.keys()
+        data_var = list(dataset.data_vars.keys())[0]
+        self.S21_0 = dataset[data_var][0].values
+        self.S21_1 = dataset[data_var][1].values  
 
-        for data_var in dataset.data_vars:
-            var = dataset[data_var]
-            if var.attrs['qubit_state'] == 0:
-                self.S21_0 = var.values
-            elif  var.attrs['qubit_state'] == 1:
-                self.S21_1 = var.values
-            else :
-               raise ValueError('Invalid state')
+        # self.frequencies = [ dataset.coords.values())[0].values
+        for coord in dataset.coords:
+            if 'frequencies' in str(coord):
+                self.frequencies = dataset[coord].values
+            
 
-        self.frequencies = list(dataset.coords.values())[0].values
 
         self.fit_results = {}
 
