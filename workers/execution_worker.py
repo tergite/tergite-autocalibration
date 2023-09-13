@@ -6,7 +6,9 @@ from uuid import uuid4
 from colorama import init as colorama_init
 from colorama import Fore
 from colorama import Style
+from pandas.core.construction import com
 from qblox_instruments.ieee488_2 import DummyBinnedAcquisitionData
+from scipy.sparse import coo
 colorama_init()
 
 from quantify_scheduler.instrument_coordinator.instrument_coordinator import CompiledSchedule
@@ -52,7 +54,7 @@ def configure_dataset(
         for quantity in sweep_quantities :
             coord_key = quantity+qubits[key_indx]
             settable_values = samplespace[quantity][qubits[key_indx]]
-            coord_attrs = {'long_name': f'{coord_key}', 'units': 'NA'}
+            coord_attrs = {'qubit':qubits[key_indx], 'long_name': f'{coord_key}', 'units': 'NA'}
             coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
         partial_ds = xarray.Dataset(coords=coords_dict)
         this_qubit = qubits[key_indx]
@@ -102,6 +104,23 @@ def to_complex_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
             complex_ds[f'y{this_qubit}{this_state}'] = (qubit_coords, complex_values, attributes)
 
     return complex_ds
+
+def handle_ro_freq_optimization(complex_dataset: xarray.Dataset) -> xarray.Dataset:
+    new_ds = xarray.Dataset(coords=complex_dataset.coords, attrs=complex_dataset.attrs)
+    new_ds = new_ds.expand_dims(dim={'qubit_state': [0,1]})
+    #TODO this for every var and every coord. It might cause
+    # performance issues for larger datasets
+    for coord in complex_dataset.coords:
+        this_qubit = complex_dataset[coord].attrs['qubit']
+        attributes = {'qubit': this_qubit}
+        values = []
+        for var in complex_dataset.data_vars:
+            if coord in complex_dataset[var].coords:
+                values.append(complex_dataset[var].values)
+        new_ds[f'y{this_qubit}'] = (('qubit_state',coord), np.vstack(values), attributes)
+
+    return new_ds
+    # xarray.concat([result_dataset_complex.yq160, result_dataset_complex.yq161],'ro_opt_frequenciesq16', combine_attrs='drop_conflicts')
 
 def measure(compiled_schedule: CompiledSchedule, schedule_duration: float, samplespace: dict, node: str) -> xarray.Dataset:
 
@@ -166,7 +185,6 @@ def measure(compiled_schedule: CompiledSchedule, schedule_duration: float, sampl
     thread_tqdm.join()
 
     raw_dataset: xarray.Dataset = lab_ic.retrieve_acquisition()
-    print(f'{ raw_dataset = }')
     logger.info('Raw dataset acquired')
 
     result_dataset = configure_dataset(raw_dataset, samplespace)
@@ -182,10 +200,10 @@ def measure(compiled_schedule: CompiledSchedule, schedule_duration: float, sampl
     result_dataset.to_netcdf(data_path / 'dataset.hdf5')
 
     result_dataset_complex = to_complex_dataset(result_dataset)
+    if node=='ro_frequency_optimization':
+        result_dataset_complex = handle_ro_freq_optimization(result_dataset_complex)
 
-    def handle_ro_freq_optimization():
-        result_dataset_complex.yq160.expand_dims(dim={'st':[1]})
-        xarray.concat([result_dataset_complex.yq160, result_dataset_complex.yq161],'ro_opt_frequenciesq16', combine_attrs='drop_conflicts')
+    print(f'{ result_dataset_complex = }')
 
 
     lab_ic.stop()
