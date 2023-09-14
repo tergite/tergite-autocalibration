@@ -54,13 +54,10 @@ QPU = [
 #     ax.axvline(x=f12)
 # plt.show()
 
-def distance(element_1, element_2):
+def distance(element_1, element_2) -> int:
      x_distance = np.abs(element_1.grid_coords[0] - element_2.grid_coords[0])
      y_distance = np.abs(element_1.grid_coords[1] - element_2.grid_coords[1])
      return x_distance + y_distance
-
-
-
 
 
 LO_group = 3.644e9
@@ -68,7 +65,7 @@ def hits_neighbors(qubit:str, lo_freq:float):
     for q in QPU:
         if q.label == qubit:
             element = q
-    print(f'{ element = }')
+    # print(f'{ element = }')
 
     # Code by Stefan Hill:
     neighbour_qubits = list(filter(lambda element_: distance(element, element_)==1, QPU))
@@ -84,8 +81,18 @@ def hits_neighbors(qubit:str, lo_freq:float):
     l_harm_3 = lo_freq + 3*i_freq
     harmonics = [mirror, h_harm_2, h_harm_3, l_harm_2, l_harm_3]
     for harmonic in harmonics:
-        if np.abs(harmonic-f12) < 5e6:
+        if np.abs(harmonic-f12) < 10e6:
             print(f'harmonic {harmonic} hits f12')
 
+    for neighbour_element in neighbour_qubits:
+        neighbour_qubit = neighbour_element.label
+        neighbour_f01 = VNA_f01_frequencies[neighbour_qubit]
+        neighbour_f12 = VNA_f12_frequencies[neighbour_qubit]
+        for harmonic in harmonics:
+            if np.abs(harmonic-neighbour_f01) < 10e6:
+                print(f'harmonic {harmonic} hits neighbour_f01 of {neighbour_qubit}')
+            if np.abs(harmonic-neighbour_f12) < 10e6:
+                print(f'harmonic {harmonic} hits neighbour_f12 of {neighbour_qubit}')
 
-hits_neighbors('q25', LO_group)
+
+hits_neighbors('q23', LO_group)
