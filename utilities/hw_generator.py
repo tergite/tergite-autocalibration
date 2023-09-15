@@ -77,13 +77,13 @@ with open(mixer_file) as csvfile:
                         qubits, module=module, lo=lo_freq,
                         off_I=off_I, off_Q=off_Q, amp_ratio=amp_ratio, phase=phase_error_deg
                         )
-                HW_CONFIG[f'clusterA_{module}'] = qrm_config
+                HW_CONFIG['clusterA'][f'clusterA_{module}'] = qrm_config
             else:
                 qcm_config = qcm_hw(
                         module=module, lo=lo_freq,
                         off_I=off_I, off_Q=off_Q, amp_ratio=amp_ratio, phase=phase_error_deg
                         )
-                HW_CONFIG[f'clusterA_{module}'] = qcm_config
+                HW_CONFIG['clusterA'][f'clusterA_{module}'] = qcm_config
 
 
 with open(json_config_file,'w') as f:
