@@ -1,15 +1,19 @@
 import redis
-import sys
 import toml
+import argparse
 from utilities import user_input
 
 red = redis.Redis(decode_responses=True)
 qubits = user_input.qubits
 nodes = user_input.nodes
 
+parser = argparse.ArgumentParser()
+parser.add_argument('node', choices=['all']+nodes)
+args = parser.parse_args()
+
 transmon_configuration = toml.load('./config_files/device_config.toml')
 quantities_of_interest = transmon_configuration['qoi']
-remove_node = sys.argv[1]
+remove_node = args.node
 print(f'{ remove_node = }')
 if not remove_node == 'all':
     remove_fields = quantities_of_interest[remove_node].keys()

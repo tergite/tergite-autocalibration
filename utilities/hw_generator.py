@@ -12,20 +12,18 @@ HW_CONFIG['clusterA'] = {
 }
 
 module_to_qubit_map = {
-        'module1': 'q1',
-        'module2': 'q2',
-        'module3': 'q3',
-        'module4': 'q4',
-        'module5': 'q5',
-        'module6': 'q6',
-        'module7': 'q7',
-        'module8': 'q8',
-        'module9': 'q9',
-        'module10':'q10',
-        'module11':'q11',
-        'module12':'q12',
+        'module1': 'q16',
+        'module2': 'q17',
+        'module3': 'q18',
+        'module4': 'q19',
+        'module5': 'q20',
+        'module6': 'q21',
+        'module7': 'q22',
+        'module8': 'q23',
+        'module9': 'q24',
+        'module10':'q25',
         }
-qubits = ['q1','q2','q3']
+qubits = module_to_qubit_map.values()
 
 def qrm_hw(qubits,cluster='clusterA', module='module16', lo=6e9, off_I=0.0, off_Q=0.0, amp_ratio=1., phase=0.0):
    hw = {}
