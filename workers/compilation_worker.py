@@ -1,12 +1,12 @@
 '''Given the requested node
 fetch and compile the appropriate schedule'''
 
-from rq import Queue
 from logger.tac_logger import logger
 from math import isnan
 import numpy as np
 from quantify_scheduler.device_under_test.quantum_device import Instrument, QuantumDevice
 import redis
+import json
 from calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
 from calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
 from calibration_schedules.rabi_oscillations import Rabi_Oscillations
@@ -19,11 +19,13 @@ from calibration_schedules.ro_frequency_optimization import RO_frequency_optimiz
 from calibration_schedules.motzoi_parameter import Motzoi_parameter
 from utilities.extended_transmon_element import ExtendedTransmon
 from quantify_scheduler.backends import SerialCompiler
-from config_files.settings import hw_config
+from config_files.settings import hw_config_json
 from quantify_core.data.handling import set_datadir
 
 set_datadir('.')
 
+with open(hw_config_json) as hw:
+    hw_config = json.load(hw)
 
 node_map = {
     'resonator_spectroscopy': Resonator_Spectroscopy,
@@ -44,10 +46,6 @@ node_map = {
 }
 
 redis_connection = redis.Redis(decode_responses=True)
-
-rq_supervisor = Queue(
-        'calibration_supervisor', connection=redis_connection
-        )
 
 def load_redis_config(transmon: ExtendedTransmon, channel:int):
     qubit = transmon.name
