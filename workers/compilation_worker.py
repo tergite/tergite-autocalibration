@@ -120,6 +120,10 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
     compiler = SerialCompiler(name=f'{node}_compiler')
     logger.info('Starting Compiling')
     compiled_schedule = compiler.compile(schedule=schedule, config=device.generate_compilation_config())
+
+    #TODO
+    #ic.retrieve_hardware_logs
+
     with open(f'TIMING_TABLE_{node}.html', 'w') as file:
          file.write(
              compiled_schedule.timing_table.hide(['is_acquisition','wf_idx'],axis="columns"

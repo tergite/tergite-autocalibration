@@ -124,7 +124,7 @@ def handle_ro_freq_optimization(complex_dataset: xarray.Dataset) -> xarray.Datas
 
 def measure(compiled_schedule: CompiledSchedule, schedule_duration: float, samplespace: dict, node: str) -> xarray.Dataset:
 
-    cluster_status = ClusterStatus.dummy
+    cluster_status = ClusterStatus.real
 
     logger.info('Starting measurement')
 

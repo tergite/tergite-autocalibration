@@ -138,10 +138,10 @@ class Multiplexed_Analysis(BaseAnalysis):
             self.update_redis_trusted_values(node, this_qubit,redis_field)
 
             handles, labels = this_axis.get_legend_handles_labels()
-            if node == 'qubit_01_spectroscopy_pulsed':
-                hasPeak=node_analysis.has_peak()
-                patch2 = mpatches.Patch(color='blue', label=f'Peak Found:{hasPeak}')
-                handles.append(patch2)
+            #if node == 'qubit_01_spectroscopy_pulsed':
+            #    hasPeak=node_analysis.has_peak()
+            #    patch2 = mpatches.Patch(color='blue', label=f'Peak Found:{hasPeak}')
+            #    handles.append(patch2)
             if node == 'T1':
                 T1_micros = self.qoi*1e6
                 patch2 = mpatches.Patch(color='blue', label=f'T1 = {T1_micros:.2f}')

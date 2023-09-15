@@ -163,7 +163,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     }
     return sweep_parameters
 
-node_to_be_calibrated = "ro_frequency_optimization"
+node_to_be_calibrated = "rabi_oscillations"
 
 draw_arrow_chart(f'Qubits: {N_qubits}', nodes[:nodes.index(node_to_be_calibrated)+1])
 
