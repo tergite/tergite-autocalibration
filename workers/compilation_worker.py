@@ -20,13 +20,14 @@ from calibration_schedules.motzoi_parameter import Motzoi_parameter
 from utilities.extended_transmon_element import ExtendedTransmon
 from quantify_scheduler.backends import SerialCompiler
 from config_files.settings import hw_config_json
+from config_files.settings import hw_config
 from quantify_core.data.handling import set_datadir
 from quantify_scheduler.json_utils import ScheduleJSONEncoder
 
 set_datadir('.')
 
-with open(hw_config_json) as hw:
-    hw_config = json.load(hw)
+# with open(hw_config_json) as hw:
+#     hw_config = json.load(hw)
 
 node_map = {
     'resonator_spectroscopy': Resonator_Spectroscopy,
