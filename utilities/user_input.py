@@ -24,15 +24,11 @@ nodes = [
         ]
 
 VNA_resonator_frequencies = {
-        'q13': 6.740e9, 'q14': 6.393e9, 'q15': 6.944e9,
         'q16': 6.386e9, 'q17': 6.620e9, 'q18': 7.030e9, 'q19': 6.711e9,
         'q21': 6.551e9, 'q22': 6.387e9, 'q23': 7.026e9,
         }
 
 VNA_qubit_frequencies = {
-        'q13': 3.720e9,
-        'q14': 3.341e9,
-        'q15': 3.748e9,
         'q16': 3.230e9,
         'q17': 3.357e9,
         'q18': 4.077e9,
@@ -46,10 +42,11 @@ VNA_f12_frequencies = { 'q16': 3.026e9, 'q22': 3.160e9, 'q23':3.753e9 }
 
 
 qubits = [ 'q16', 'q22', 'q23']
+qubits = [ 'q16']
 
 N_qubits = len(qubits)
 
-res_spec_samples = 21
+res_spec_samples = 1
 qub_spec_samples = 70
 
 def resonator_samples(qubit:str, punchout=False) -> np.ndarray:

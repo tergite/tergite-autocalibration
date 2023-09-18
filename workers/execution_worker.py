@@ -150,9 +150,7 @@ def measure(compiled_schedule: CompiledSchedule, schedule_duration: float, sampl
             clusterA.set_dummy_binned_acquisition_data(17,sequencer=0,acq_index_name="4",data=dummy_data)
             clusterA.set_dummy_binned_acquisition_data(17,sequencer=1,acq_index_name="5",data=dummy_data)
 
-        # clusterB = Cluster("clusterB", dummy_cfg=dummy)
     elif cluster_status == ClusterStatus.real:
-        #clusterB = Cluster("clusterB", '192.0.2.141')
         clusterA = Cluster("clusterA", lokiA_IP)
 
     if node == 'tof':
@@ -160,7 +158,6 @@ def measure(compiled_schedule: CompiledSchedule, schedule_duration: float, sampl
         return result_dataset
     lab_ic = InstrumentCoordinator('lab_ic')
     lab_ic.add_component(ClusterComponent(clusterA))
-    #lab_ic.add_component(ClusterComponent(clusterB))
     lab_ic.timeout(222)
 
     def run_measurement() -> None:

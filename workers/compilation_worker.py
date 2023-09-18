@@ -21,6 +21,7 @@ from utilities.extended_transmon_element import ExtendedTransmon
 from quantify_scheduler.backends import SerialCompiler
 from config_files.settings import hw_config_json
 from quantify_core.data.handling import set_datadir
+from quantify_scheduler.json_utils import ScheduleJSONEncoder
 
 set_datadir('.')
 
@@ -106,6 +107,11 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
         transmons[qubit] = transmon
         #breakpoint()
 
+    for element_name in device.elements():
+                element = device.get_element(element_name)
+                with open(f"{element_name}.json","w") as fp:
+                    element_str = json.dump(element,fp, cls=ScheduleJSONEncoder)
+
     qubit_state = 0
     if node in ['resonator_spectroscopy_1','qubit_12_spectroscopy_pulsed',
                 'rabi_oscillations_12', 'ramsey_correction_12']:
@@ -120,6 +126,7 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
     compiler = SerialCompiler(name=f'{node}_compiler')
     logger.info('Starting Compiling')
     compiled_schedule = compiler.compile(schedule=schedule, config=device.generate_compilation_config())
+    #breakpoint()
 
     #TODO
     #ic.retrieve_hardware_logs
