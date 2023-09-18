@@ -243,8 +243,8 @@
                   "mixer_phase_error_deg": 11.20603
                },
                {
-                  "port": "q18:res",
-                  "clock": "q18.ro",
+                  "port": "q16:res",
+                  "clock": "q16.ro",
                   "mixer_amp_ratio": 0.9986,
                   "mixer_phase_error_deg": 11.20603
                },
@@ -261,36 +261,6 @@
                   "mixer_phase_error_deg": 11.20603
                },
                {
-                  "port": "q21:res",
-                  "clock": "q21.ro",
-                  "mixer_amp_ratio": 0.9986,
-                  "mixer_phase_error_deg": 11.20603
-               },
-               {
-                  "port": "q22:res",
-                  "clock": "q22.ro",
-                  "mixer_amp_ratio": 0.9986,
-                  "mixer_phase_error_deg": 11.20603
-               },
-               {
-                  "port": "q23:res",
-                  "clock": "q23.ro",
-                  "mixer_amp_ratio": 0.9986,
-                  "mixer_phase_error_deg": 11.20603
-               },
-               {
-                  "port": "q24:res",
-                  "clock": "q24.ro",
-                  "mixer_amp_ratio": 0.9986,
-                  "mixer_phase_error_deg": 11.20603
-               },
-               {
-                  "port": "q25:res",
-                  "clock": "q25.ro",
-                  "mixer_amp_ratio": 0.9986,
-                  "mixer_phase_error_deg": 11.20603
-               },
-               {
                   "port": "q16:res",
                   "clock": "q16.ro1",
                   "mixer_amp_ratio": 0.9986,
@@ -303,8 +273,8 @@
                   "mixer_phase_error_deg": 11.20603
                },
                {
-                  "port": "q18:res",
-                  "clock": "q18.ro1",
+                  "port": "q16:res",
+                  "clock": "q16.ro1",
                   "mixer_amp_ratio": 0.9986,
                   "mixer_phase_error_deg": 11.20603
                },
@@ -321,36 +291,6 @@
                   "mixer_phase_error_deg": 11.20603
                },
                {
-                  "port": "q21:res",
-                  "clock": "q21.ro1",
-                  "mixer_amp_ratio": 0.9986,
-                  "mixer_phase_error_deg": 11.20603
-               },
-               {
-                  "port": "q22:res",
-                  "clock": "q22.ro1",
-                  "mixer_amp_ratio": 0.9986,
-                  "mixer_phase_error_deg": 11.20603
-               },
-               {
-                  "port": "q23:res",
-                  "clock": "q23.ro1",
-                  "mixer_amp_ratio": 0.9986,
-                  "mixer_phase_error_deg": 11.20603
-               },
-               {
-                  "port": "q24:res",
-                  "clock": "q24.ro1",
-                  "mixer_amp_ratio": 0.9986,
-                  "mixer_phase_error_deg": 11.20603
-               },
-               {
-                  "port": "q25:res",
-                  "clock": "q25.ro1",
-                  "mixer_amp_ratio": 0.9986,
-                  "mixer_phase_error_deg": 11.20603
-               },
-               {
                   "port": "q16:res",
                   "clock": "q16.ro2",
                   "mixer_amp_ratio": 0.9986,
@@ -363,8 +303,8 @@
                   "mixer_phase_error_deg": 11.20603
                },
                {
-                  "port": "q18:res",
-                  "clock": "q18.ro2",
+                  "port": "q16:res",
+                  "clock": "q16.ro2",
                   "mixer_amp_ratio": 0.9986,
                   "mixer_phase_error_deg": 11.20603
                },
@@ -377,36 +317,6 @@
                {
                   "port": "q20:res",
                   "clock": "q20.ro2",
-                  "mixer_amp_ratio": 0.9986,
-                  "mixer_phase_error_deg": 11.20603
-               },
-               {
-                  "port": "q21:res",
-                  "clock": "q21.ro2",
-                  "mixer_amp_ratio": 0.9986,
-                  "mixer_phase_error_deg": 11.20603
-               },
-               {
-                  "port": "q22:res",
-                  "clock": "q22.ro2",
-                  "mixer_amp_ratio": 0.9986,
-                  "mixer_phase_error_deg": 11.20603
-               },
-               {
-                  "port": "q23:res",
-                  "clock": "q23.ro2",
-                  "mixer_amp_ratio": 0.9986,
-                  "mixer_phase_error_deg": 11.20603
-               },
-               {
-                  "port": "q24:res",
-                  "clock": "q24.ro2",
-                  "mixer_amp_ratio": 0.9986,
-                  "mixer_phase_error_deg": 11.20603
-               },
-               {
-                  "port": "q25:res",
-                  "clock": "q25.ro2",
                   "mixer_amp_ratio": 0.9986,
                   "mixer_phase_error_deg": 11.20603
                }
@@ -421,36 +331,6 @@
             "dc_mixer_offset_Q": 0.0012191,
             "portclock_configs": [
                {
-                  "port": "q16:res",
-                  "clock": "q16.ro",
-                  "mixer_amp_ratio": 0.9647,
-                  "mixer_phase_error_deg": 0.42903
-               },
-               {
-                  "port": "q17:res",
-                  "clock": "q17.ro",
-                  "mixer_amp_ratio": 0.9647,
-                  "mixer_phase_error_deg": 0.42903
-               },
-               {
-                  "port": "q18:res",
-                  "clock": "q18.ro",
-                  "mixer_amp_ratio": 0.9647,
-                  "mixer_phase_error_deg": 0.42903
-               },
-               {
-                  "port": "q19:res",
-                  "clock": "q19.ro",
-                  "mixer_amp_ratio": 0.9647,
-                  "mixer_phase_error_deg": 0.42903
-               },
-               {
-                  "port": "q20:res",
-                  "clock": "q20.ro",
-                  "mixer_amp_ratio": 0.9647,
-                  "mixer_phase_error_deg": 0.42903
-               },
-               {
                   "port": "q21:res",
                   "clock": "q21.ro",
                   "mixer_amp_ratio": 0.9647,
@@ -481,36 +361,6 @@
                   "mixer_phase_error_deg": 0.42903
                },
                {
-                  "port": "q16:res",
-                  "clock": "q16.ro1",
-                  "mixer_amp_ratio": 0.9647,
-                  "mixer_phase_error_deg": 0.42903
-               },
-               {
-                  "port": "q17:res",
-                  "clock": "q17.ro1",
-                  "mixer_amp_ratio": 0.9647,
-                  "mixer_phase_error_deg": 0.42903
-               },
-               {
-                  "port": "q18:res",
-                  "clock": "q18.ro1",
-                  "mixer_amp_ratio": 0.9647,
-                  "mixer_phase_error_deg": 0.42903
-               },
-               {
-                  "port": "q19:res",
-                  "clock": "q19.ro1",
-                  "mixer_amp_ratio": 0.9647,
-                  "mixer_phase_error_deg": 0.42903
-               },
-               {
-                  "port": "q20:res",
-                  "clock": "q20.ro1",
-                  "mixer_amp_ratio": 0.9647,
-                  "mixer_phase_error_deg": 0.42903
-               },
-               {
                   "port": "q21:res",
                   "clock": "q21.ro1",
                   "mixer_amp_ratio": 0.9647,
@@ -537,36 +387,6 @@
                {
                   "port": "q25:res",
                   "clock": "q25.ro1",
-                  "mixer_amp_ratio": 0.9647,
-                  "mixer_phase_error_deg": 0.42903
-               },
-               {
-                  "port": "q16:res",
-                  "clock": "q16.ro2",
-                  "mixer_amp_ratio": 0.9647,
-                  "mixer_phase_error_deg": 0.42903
-               },
-               {
-                  "port": "q17:res",
-                  "clock": "q17.ro2",
-                  "mixer_amp_ratio": 0.9647,
-                  "mixer_phase_error_deg": 0.42903
-               },
-               {
-                  "port": "q18:res",
-                  "clock": "q18.ro2",
-                  "mixer_amp_ratio": 0.9647,
-                  "mixer_phase_error_deg": 0.42903
-               },
-               {
-                  "port": "q19:res",
-                  "clock": "q19.ro2",
-                  "mixer_amp_ratio": 0.9647,
-                  "mixer_phase_error_deg": 0.42903
-               },
-               {
-                  "port": "q20:res",
-                  "clock": "q20.ro2",
                   "mixer_amp_ratio": 0.9647,
                   "mixer_phase_error_deg": 0.42903
                },

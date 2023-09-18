@@ -23,6 +23,8 @@ module_to_qubit_map = {
         'module9': 'q24',
         'module10':'q25',
         }
+module_16_qubits = [ 'q16','q17','q16','q19','q20']
+module_17_qubits = [ 'q21','q22','q23','q24','q25']
 qubits = module_to_qubit_map.values()
 
 def qrm_hw(qubits,cluster='clusterA', module='module16', lo=6e9, off_I=0.0, off_Q=0.0, amp_ratio=1., phase=0.0):
@@ -73,8 +75,10 @@ with open(mixer_file) as csvfile:
             phase_error_deg = float(phase_error_deg)
 
             if module == 'module16' or module == 'module17':
+                if module == 'module16': qrm_qubits = module_16_qubits
+                if module == 'module17': qrm_qubits = module_17_qubits
                 qrm_config = qrm_hw(
-                        qubits, module=module, lo=lo_freq,
+                        qrm_qubits, module=module, lo=lo_freq,
                         off_I=off_I, off_Q=off_Q, amp_ratio=amp_ratio, phase=phase_error_deg
                         )
                 HW_CONFIG['clusterA'][f'clusterA_{module}'] = qrm_config
