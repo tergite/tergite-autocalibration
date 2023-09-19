@@ -6,9 +6,7 @@ from uuid import uuid4
 from colorama import init as colorama_init
 from colorama import Fore
 from colorama import Style
-from pandas.core.construction import com
 from qblox_instruments.ieee488_2 import DummyBinnedAcquisitionData
-from scipy.sparse import coo
 colorama_init()
 
 from quantify_scheduler.instrument_coordinator.instrument_coordinator import CompiledSchedule
@@ -50,6 +48,8 @@ def configure_dataset(
 
     for key in keys:
         key_indx = key%n_qubits
+        if 'ro_opt_frequencies' in list(sweep_quantities):
+            key_indx = key//n_qubits
         coords_dict = {}
         for quantity in sweep_quantities :
             coord_key = quantity+qubits[key_indx]
