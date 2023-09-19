@@ -33,13 +33,14 @@ def qrm_hw(qubits,cluster='clusterA', module='module16', lo=6e9, off_I=0.0, off_
    ro = [{"port": f"{qubit}:res", "clock": f"{qubit}.ro" , 'mixer_amp_ratio': amp_ratio, 'mixer_phase_error_deg': phase} for qubit in qubits]
    ro1= [{"port": f"{qubit}:res", "clock": f"{qubit}.ro1", 'mixer_amp_ratio': amp_ratio, 'mixer_phase_error_deg': phase} for qubit in qubits]
    ro2= [{"port": f"{qubit}:res", "clock": f"{qubit}.ro2", 'mixer_amp_ratio': amp_ratio, 'mixer_phase_error_deg': phase} for qubit in qubits]
+   ro_opt=[{"port":f"{qubit}:res","clock": f"{qubit}.ro_opt", 'mixer_amp_ratio': amp_ratio, 'mixer_phase_error_deg': phase} for qubit in qubits]
    hw = {
        'instrument_type': 'QRM_RF',
        'complex_output_0': {
            'lo_freq': lo,
            'dc_mixer_offset_I': off_I*1e-3,
            'dc_mixer_offset_Q': off_Q*1e-3,
-           'portclock_configs': ro + ro1 + ro2,
+           'portclock_configs': ro + ro1 + ro2 + ro_opt,
        },
    }
    return hw
