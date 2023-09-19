@@ -23,7 +23,7 @@ module_to_qubit_map = {
         'module9': 'q24',
         'module10':'q25',
         }
-module_16_qubits = [ 'q16','q17','q16','q19','q20']
+module_16_qubits = [ 'q16','q17','q18','q19','q20']
 module_17_qubits = [ 'q21','q22','q23','q24','q25']
 qubits = module_to_qubit_map.values()
 

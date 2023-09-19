@@ -1,8 +1,8 @@
 from typing import List
 import numpy as np
-# import redis
 from uuid import uuid4
 from utilities.visuals import draw_arrow_chart
+from config_files.VNA_values import VNA_resonator_frequencies, VNA_qubit_frequencies, VNA_f12_frequencies
 # import logging
 
 nodes = [
@@ -15,37 +15,24 @@ nodes = [
         #"XY_crosstalk",
         "ramsey_correction",
         #"motzoi_parameter",
-        "resonator_spectroscopy_1",
-        "qubit_12_spectroscopy_pulsed",
-        "rabi_oscillations_12",
-        "ramsey_correction_12",
-        "resonator_spectroscopy_2",
+        #"resonator_spectroscopy_1",
+        #"qubit_12_spectroscopy_pulsed",
+        #"rabi_oscillations_12",
+        #"ramsey_correction_12",
+        #"resonator_spectroscopy_2",
         "ro_frequency_optimization",
         ]
 
-VNA_resonator_frequencies = {
-        'q16': 6.491e9, 'q17': 7.059e9, 'q18': 6.712e9, 'q19': 6.818e9, 'q20': 6.494e9,
-        'q21': 6.751e9, 'q22': 6.477e9, 'q23': 7.052e9, 'q24': 6.583e9, 'q25': 6.853e9,
-        }
-
-VNA_qubit_frequencies = {
-        'q16': 3.195e9, 'q17': 3.948e9, 'q18': 3.264e9, 'q19': 3.939e9, 'q20': 3.350e9,
-        'q21': 3.784e9, 'q22': 3.340e9, 'q23': 3.933e9, 'q24': 3.286e9, 'q25': 4.024e9,
-        }
-
-VNA_f12_frequencies = { 
-        'q16': 3.195e9, 'q17': 3.948e9, 'q18': 3.264e9, 'q19': 3.939e9, 'q20': 3.350e9,
-        'q21': 3.784e9, 'q22': 3.340e9, 'q23': 3.933e9, 'q24': 3.286e9, 'q25': 4.024e9,
-
-        }
 
 
 qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
+qubits = [ 'q16','q17','q19','q21','q22','q23','q25']
+#qubits = ['q17']
 
 N_qubits = len(qubits)
 
 res_spec_samples = 50
-qub_spec_samples = 70
+qub_spec_samples = 100
 
 def resonator_samples(qubit:str, punchout=False) -> np.ndarray:
     sweep_range = 6.5e6
@@ -58,13 +45,10 @@ def resonator_samples(qubit:str, punchout=False) -> np.ndarray:
     return np.linspace(min_freq, max_freq, res_spec_samples)
 
 def qubit_samples(qubit:str, transition:str = '01') -> np.ndarray:
-    sweep_range = 10e6
+    sweep_range = 15e6
     if transition=='01':
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition=='12':
-        #rough_anharmonicity = 200e6
-        #rough_anharmonicity = 200e6 if int(qubit[1:])%2==0 else 170e6
-        #VNA_frequency = VNA_qubit_frequencies[qubit] - rough_anharmonicity
         VNA_frequency = VNA_f12_frequencies[qubit]
     else :
         raise ValueError('Invalid transition')
@@ -158,7 +142,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     }
     return sweep_parameters
 
-node_to_be_calibrated = "rabi_oscillations"
+node_to_be_calibrated = "ro_frequency_optimization"
 
 draw_arrow_chart(f'Qubits: {N_qubits}', nodes[:nodes.index(node_to_be_calibrated)+1])
 
