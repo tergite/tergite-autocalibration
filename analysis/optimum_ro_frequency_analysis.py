@@ -5,6 +5,7 @@ import numpy as np
 from quantify_core.analysis import fitting_models as fm
 import redis
 import xarray as xr
+redis_connection = redis.Redis(decode_responses=True)
 
 model = fm.ResonatorModel()
 redis_connection = redis.Redis(decode_responses=True)
@@ -15,6 +16,7 @@ class OptimalROFrequencyAnalysis():
     and extractst the optimal RO frequency.
     """
     def __init__(self, dataset: xr.Dataset):
+        self.dataset = dataset
         data_var = list(dataset.data_vars.keys())[0]
         self.S21_0 = dataset[data_var][0].values
         self.S21_1 = dataset[data_var][1].values
@@ -45,6 +47,7 @@ class OptimalROFrequencyAnalysis():
         return self.optimal_frequency
 
     def plotter(self,ax):
+        this_qubit = self.dataset.attrs['qubit']
         ax.set_xlabel('I quadrature (V)')
         ax.set_ylabel('Q quadrature (V)')
         ax.plot(self.fit_IQ_0.real, self.fit_IQ_0.imag)
@@ -52,6 +55,13 @@ class OptimalROFrequencyAnalysis():
         f0 = self.fit_IQ_0[self.index_of_max_distance]
         f1 = self.fit_IQ_1[self.index_of_max_distance]
 
-        ax.scatter([f0.real, f1.real], [f0.imag, f1.imag], marker='*', label=f'opt_freq: {self.optimal_frequency}')
-        # ax.axvline(self.minimum_freq,c='blue',ls='solid',label='frequency at min')
+        ro_freq = float(redis_connection.hget(f'transmons:{this_qubit}', 'ro_freq'))
+        ro_freq_1 = float(redis_connection.hget(f'transmons:{this_qubit}', 'ro_freq_1'))
+
+        label_text = f'opt_ro: {int(self.optimal_frequency)}\n|0>_ro: {int(ro_freq)}\n|1>_ro: {int(ro_freq_1)}' 
+
+        ax.scatter(
+            [f0.real, f1.real], [f0.imag, f1.imag], 
+            marker='*',c='red', s=64,  label=label_text
+        )
         ax.grid()
