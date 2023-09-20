@@ -21,6 +21,7 @@ nodes = [
         #"ramsey_correction_12",
         #"resonator_spectroscopy_2",
         "ro_frequency_optimization",
+        "ro_amplitude_optimization",
         "state_discrimination",
         ]
 
@@ -116,6 +117,10 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
 
         'rabi_oscillations_12': {
             'mw_amplitudes': { qubit : np.linspace(0.002,0.20,41) for qubit in qubits}
+        },
+
+        'ro_amplitude_optimization': {
+            'ro_amplitudes': { qubit : np.linspace(0.001,0.009,11) for qubit in qubits}
         },
 
         'T1': {

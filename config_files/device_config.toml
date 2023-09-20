@@ -4,6 +4,7 @@ resonator_spectroscopy.ro_freq = nan
 resonator_spectroscopy_1.ro_freq_1 = nan
 resonator_spectroscopy_2.ro_freq_2 = nan
 ro_frequency_optimization.ro_freq_opt = nan
+ro_amplitude_optimization.ro_ampl_opt = nan
 SSRO.ro_pulse_amp_opt = nan
 qubit_01_spectroscopy_pulsed.freq_01 = nan
 ramsey_correction.freq_01 = nan
