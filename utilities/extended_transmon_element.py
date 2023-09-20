@@ -144,9 +144,6 @@ class Measure_RO_Opt(Measure):
         self._update()
 
 
-
-
-
 class ExtendedTransmon(BasicTransmonElement):
     def __init__(self, name: str, **kwargs):
 

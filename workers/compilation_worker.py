@@ -83,6 +83,12 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
     transmon.measure_1.acq_channel(channel)
     transmon.measure_1.acq_delay(float(redis_config['ro_acq_delay']))
     transmon.measure_1.integration_time(float(redis_config['ro_acq_integration_time']))
+
+    transmon.measure_opt.pulse_amp(float(redis_config['ro_pulse_amp']))
+    transmon.measure_opt.pulse_duration(float(redis_config['ro_pulse_duration']))
+    transmon.measure_opt.acq_channel(channel)
+    transmon.measure_opt.acq_delay(float(redis_config['ro_acq_delay']))
+    transmon.measure_opt.integration_time(float(redis_config['ro_acq_integration_time']))
     # transmon.measure.pulse_type(redis_config['ro_pulse_type'])
     return
 
@@ -92,8 +98,7 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
         return None, 1
 
     Instrument.close_all()
-
-    device = QuantumDevice('Loki')
+     device = QuantumDevice('Loki')
     device.hardware_config(hw_config)
     device.cfg_sched_repetitions(1024)
     sweep_quantities = list(samplespace.keys())
