@@ -50,7 +50,7 @@ class Single_Shots_RO(Measurement):
             for level_index, state_level in enumerate(levels):
                 # require an integer
                 # state_level = int(state_level+1e-2)
-                assert(type(state_level)==int)
+                assert(type(state_level)==np.int64)
 
                 if state_level == 0:
                     # Not really necessary to use Rxy(0,0) we can just pass

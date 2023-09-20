@@ -13,7 +13,7 @@ nodes = [
         "rabi_oscillations",
         # "T1",
         #"XY_crosstalk",
-        # "ramsey_correction",
+        "ramsey_correction",
         #"motzoi_parameter",
         "resonator_spectroscopy_1",
         "qubit_12_spectroscopy_pulsed",
@@ -141,12 +141,12 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
             'X_repetitions': {qubit : np.arange(2, 17, 4) for qubit in qubits}
         },
         'state_discrimination': {
-            'qubit_states': {qubit: np.random.randint(0,high=2,size=100) for qubit in qubits},
+            'qubit_states': {qubit: np.random.randint(0,high=2,size=700) for qubit in qubits},
         },
     }
     return sweep_parameters
 
-target_node = "ro_frequency_optimization"
+target_node = "state_discrimination"
 
 draw_arrow_chart(f'Qubits: {N_qubits}', nodes[:nodes.index(target_node)+1])
 

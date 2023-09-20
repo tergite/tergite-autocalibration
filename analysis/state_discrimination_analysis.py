@@ -20,7 +20,7 @@ class StateDiscrimination():
         self.qubit = dataset[data_var].attrs['qubit']
 
     def run_fitting(self):
-        pass
+        return 0
 
         # #Initialize the Rabi model
         # model = RabiModel()
@@ -36,7 +36,7 @@ class StateDiscrimination():
 
     def plotter(self,ax):
         # Plots the data and the fitted model of a Rabi experiment
-        ax.scatter( self.I , self.Q, size=36)
+        ax.scatter( self.I , self.Q, s=36)
         ax.set_title(f'State Discrimination for {self.qubit}')
         ax.set_xlabel('I (V)')
         ax.set_ylabel('Q (V)')
