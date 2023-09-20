@@ -107,12 +107,52 @@ class Measure_RO1(Measure):
         )
         self._update()
 
+class Measure_RO_Opt(Measure):
+    def __init__(
+        self,
+        *qubits: str,
+        acq_index: int | None = None,
+        # These are the currently supported acquisition protocols.
+        acq_protocol: Optional[
+            Literal[
+                "SSBIntegrationComplex",
+                "Trace",
+                "TriggerCount",
+                "NumericalWeightedIntegrationComplex",
+                "ThresholdedAcquisition",
+            ]
+        ] = None,
+        bin_mode: BinMode | None = None,
+    ):
+        super().__init__(qubits[0], acq_index=acq_index, bin_mode=bin_mode)
+        plot_func = "quantify_scheduler.schedules._visualization.circuit_diagram.meter"
+        self.data.update(
+            {
+                "name": f"Measure_RO_Opt {', '.join(qubits)}",
+                "gate_info": {
+                    'unitary': None,
+                    'plot_func': plot_func,
+                    'tex': r'$\langle0|$',
+                    'qubits': list(qubits),
+                    'acq_index': acq_index,
+                    'acq_protocol': acq_protocol,
+                    'bin_mode': bin_mode,
+                    'operation_type': 'measure_opt',
+                },
+            }
+        )
+        self._update()
+
+
+
+
 
 class ExtendedTransmon(BasicTransmonElement):
     def __init__(self, name: str, **kwargs):
 
         submodules_to_add = {
             'measure_1': DispersiveMeasurement,
+            'measure_opt': DispersiveMeasurement,
             'r12': R12,
             'spec': Spec,
             'extended_clock_freqs': ExtendedClocksFrequencies,
@@ -132,63 +172,89 @@ class ExtendedTransmon(BasicTransmonElement):
 
     def generate_device_config(self) -> DeviceCompilationConfig:
         cfg_dict = {
-            "backend": "quantify_scheduler.backends"
-            ".circuit_to_device.compile_circuit_to_device",
-            "elements": self._generate_config(),
-            "clocks": {
-                f"{self.name}.01": self.clock_freqs.f01(),
-                f"{self.name}.12": self.clock_freqs.f12(),
-                f"{self.name}.ro": self.clock_freqs.readout(),
-                f"{self.name}.ro1": self.extended_clock_freqs.readout_1(),
-                f"{self.name}.ro_opt": self.extended_clock_freqs.readout_opt()
+            'backend': 'quantify_scheduler.backends'
+            '.circuit_to_device.compile_circuit_to_device',
+            'elements': self._generate_config(),
+            'clocks': {
+                f'{self.name}.01': self.clock_freqs.f01(),
+                f'{self.name}.12': self.clock_freqs.f12(),
+                f'{self.name}.ro': self.clock_freqs.readout(),
+                f'{self.name}.ro1': self.extended_clock_freqs.readout_1(),
+                f'{self.name}.ro_opt': self.extended_clock_freqs.readout_opt()
             },
-            "edges": {},
+            'edges': {},
         }
-        cfg_dict["elements"][f"{self.name}"]["measure_1"] = OperationCompilationConfig(
+        cfg_dict['elements'][f'{self.name}']['measure_1'] = OperationCompilationConfig(
                     factory_func=measurement_factories.dispersive_measurement,
                     factory_kwargs={
-                        "port": self.ports.readout(),
+                        'port': self.ports.readout(),
                         # use different clock: ####
-                        "clock": f"{self.name}.ro1",
+                        'clock': f'{self.name}.ro1',
                         ############################
-                        "pulse_type": self.measure.pulse_type(),
-                        "pulse_amp": self.measure.pulse_amp(),
-                        "pulse_duration": self.measure.pulse_duration(),
-                        "acq_delay": self.measure.acq_delay(),
-                        "acq_duration": self.measure.integration_time(),
-                        "acq_channel": self.measure.acq_channel(),
-                        "acq_protocol_default": "SSBIntegrationComplex",
-                        "reset_clock_phase": self.measure.reset_clock_phase(),
-                        "reference_magnitude": pulse_library.ReferenceMagnitude.from_parameter(
+                        'pulse_type': self.measure.pulse_type(),
+                        'pulse_amp': self.measure.pulse_amp(),
+                        'pulse_duration': self.measure.pulse_duration(),
+                        'acq_delay': self.measure.acq_delay(),
+                        'acq_duration': self.measure.integration_time(),
+                        'acq_channel': self.measure.acq_channel(),
+                        'acq_protocol_default': 'SSBIntegrationComplex',
+                        'reset_clock_phase': self.measure.reset_clock_phase(),
+                        'reference_magnitude': pulse_library.ReferenceMagnitude.from_parameter(
                             self.measure.reference_magnitude
                         ),
-                        "acq_weights_a": self.measure.acq_weights_a(),
-                        "acq_weights_b": self.measure.acq_weights_b(),
-                        "acq_weights_sampling_rate": self.measure.acq_weights_sampling_rate(),
-                        # "acq_rotation": self.measure.acq_rotation(),
-                        # "acq_threshold": self.measure.acq_threshold(),
+                        'acq_weights_a': self.measure.acq_weights_a(),
+                        'acq_weights_b': self.measure.acq_weights_b(),
+                        'acq_weights_sampling_rate': self.measure.acq_weights_sampling_rate(),
+                        # 'acq_rotation': self.measure.acq_rotation(),
+                        # 'acq_threshold': self.measure.acq_threshold(),
                     },
-                    gate_info_factory_kwargs=["acq_index", "bin_mode", "acq_protocol"],
+                    gate_info_factory_kwargs=['acq_index', 'bin_mode', 'acq_protocol'],
                 )
-        cfg_dict["elements"][f"{self.name}"]["r12"] = OperationCompilationConfig(
+        cfg_dict['elements'][f'{self.name}']['measure_opt'] = OperationCompilationConfig(
+                    factory_func=measurement_factories.dispersive_measurement,
+                    factory_kwargs={
+                        'port': self.ports.readout(),
+                        # use different clock: ####
+                        'clock': f'{self.name}.ro_opt',
+                        ############################
+                        'pulse_type': self.measure.pulse_type(),
+                        'pulse_amp': self.measure.pulse_amp(),
+                        'pulse_duration': self.measure.pulse_duration(),
+                        'acq_delay': self.measure.acq_delay(),
+                        'acq_duration': self.measure.integration_time(),
+                        'acq_channel': self.measure.acq_channel(),
+                        'acq_protocol_default': 'SSBIntegrationComplex',
+                        'reset_clock_phase': self.measure.reset_clock_phase(),
+                        'reference_magnitude': pulse_library.ReferenceMagnitude.from_parameter(
+                            self.measure.reference_magnitude
+                        ),
+                        'acq_weights_a': self.measure.acq_weights_a(),
+                        'acq_weights_b': self.measure.acq_weights_b(),
+                        'acq_weights_sampling_rate': self.measure.acq_weights_sampling_rate(),
+                        # 'acq_rotation': self.measure.acq_rotation(),
+                        # 'acq_threshold': self.measure.acq_threshold(),
+                    },
+                    gate_info_factory_kwargs=['acq_index', 'bin_mode', 'acq_protocol'],
+                )
+        cfg_dict['elements'][f'{self.name}']['r12'] = OperationCompilationConfig(
                     factory_func=pulse_factories.rxy_drag_pulse,
                     factory_kwargs={
-                        "ef_amp180": self.r12.ef_amp180(),
-                        # "motzoi": self.rxy.motzoi(),
-                        "port": self.ports.microwave(),
-                        "clock": f"{self.name}.12",
-                        # "duration": self.rxy.duration(),
+                        'ef_amp180': self.r12.ef_amp180(),
+                        # 'motzoi': self.rxy.motzoi(),
+                        'port': self.ports.microwave(),
+                        'clock': f'{self.name}.12',
+                        # 'duration': self.rxy.duration(),
                     },
-                    gate_info_factory_kwargs=["theta", "phi"],
+                    gate_info_factory_kwargs=['theta', 'phi'],
                 )
 
-        cfg_dict["elements"][f"{self.name}"]["spec"] = OperationCompilationConfig(
+        cfg_dict['elements'][f'{self.name}']['spec'] = OperationCompilationConfig(
                     factory_func=pulse_factories.rxy_drag_pulse,
                     factory_kwargs={
-                        "spec_amp": self.spec.spec_amp(),
-                        "spec_duration": self.spec.spec_duration(),
+                        'spec_amp': self.spec.spec_amp(),
+                        'spec_duration': self.spec.spec_duration(),
                     },
-                    gate_info_factory_kwargs=["theta", "phi"],
+                    gate_info_factory_kwargs=['theta', 'phi'],
                 )
 
         dev_cfg = DeviceCompilationConfig.parse_obj(cfg_dict)

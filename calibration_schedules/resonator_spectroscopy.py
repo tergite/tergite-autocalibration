@@ -1,7 +1,6 @@
 """
 Module containing a schedule class for resonator spectroscopy calibration.
 """
-
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.schedules.schedule import Schedule
 from quantify_scheduler.operations.pulse_library import  SquarePulse, SetClockFrequency, DRAGPulse
@@ -101,7 +100,7 @@ class Resonator_Spectroscopy(Measurement):
 
         root_relaxation = sched.add(Reset(*qubits), label="Reset")
 
-        # The first for loop iterates over all qubits:
+        # The outer for loop iterates over all qubits:
         for acq_cha, (this_qubit, ro_f_values) in enumerate(ro_frequencies.items()):
 
             sched.add(
@@ -114,6 +113,7 @@ class Resonator_Spectroscopy(Measurement):
             # The second for loop iterates over all frequency values in the frequency batch:
             for acq_index, ro_frequency in enumerate(ro_f_values):
                 sched.add(
+
                     SetClockFrequency(clock=this_ro_clock, clock_freq_new=ro_frequency),
                 )
 
