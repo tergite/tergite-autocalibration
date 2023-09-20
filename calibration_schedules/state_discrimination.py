@@ -1,4 +1,4 @@
-from quantify_scheduler.operations.gate_library import Reset, X, Rxy
+from quantify_scheduler.operations.gate_library import Reset, X, Rxy, Measure
 from quantify_scheduler.operations.pulse_library import SquarePulse, SetClockFrequency
 from quantify_scheduler.operations.acquisition_library import SSBIntegrationComplex
 from quantify_scheduler.schedules.schedule import Schedule
@@ -77,7 +77,7 @@ class Single_Shots_RO(Measurement):
                     raise ValueError('State Input Error')
 
                 schedule.add(
-                    Measure_RO_Opt(
+                    Measure(
                     this_qubit,
                     acq_index=level_index,
                     bin_mode=BinMode.APPEND

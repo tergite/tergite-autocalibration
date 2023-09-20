@@ -98,7 +98,7 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
         return None, 1
 
     Instrument.close_all()
-     device = QuantumDevice('Loki')
+    device = QuantumDevice('Loki')
     device.hardware_config(hw_config)
     device.cfg_sched_repetitions(1024)
     sweep_quantities = list(samplespace.keys())
