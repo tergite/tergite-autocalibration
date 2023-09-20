@@ -6,6 +6,7 @@ from analysis.motzoi_analysis import MotzoiAnalysis
 from analysis.resonator_spectroscopy_analysis import ResonatorSpectroscopyAnalysis, ResonatorSpectroscopy_1_Analysis, ResonatorSpectroscopy_2_Analysis
 from analysis.qubit_spectroscopy_analysis import QubitSpectroscopyAnalysis
 from analysis.optimum_ro_frequency_analysis import OptimalROFrequencyAnalysis
+from analysis.state_discrimination_analysis import StateDiscrimination
 from analysis.rabi_analysis import RabiAnalysis
 from analysis.punchout_analysis import PunchoutAnalysis
 from analysis.ramsey_analysis import RamseyAnalysis
@@ -127,6 +128,9 @@ class Multiplexed_Analysis(BaseAnalysis):
             elif node == 'punchout':
                 analysis_class = PunchoutAnalysis
                 redis_field = 'ro_amp'
+            elif node == 'state_discrimination':
+                analysis_class = StateDiscrimination
+                redis_field = 'discrimimator'
             else:
                 raise ValueError(f'Invalid node: {node}')
 
