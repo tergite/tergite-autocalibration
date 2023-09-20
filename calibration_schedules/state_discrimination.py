@@ -7,6 +7,7 @@ from quantify_scheduler.resources import ClockResource
 from calibration_schedules.measurement_base import Measurement
 from quantify_scheduler.enums import BinMode
 from utilities.extended_transmon_element import Measure_RO_Opt
+import numpy as np
 
 class Single_Shots_RO(Measurement):
 
@@ -30,8 +31,8 @@ class Single_Shots_RO(Measurement):
             mw_ef_amp180s: dict[str,float],
             mw_pulse_durations: dict[str,float],
             mw_pulse_ports: dict[str,str],
+            qubit_states: dict[str,np.ndarray],
             repetitions: int = 1,
-            qubit_states: dict[str,int]
         ) -> Schedule:
         schedule = Schedule("State_discrimination_schedule", repetitions)
         print(f'{ repetitions = }')
@@ -39,14 +40,14 @@ class Single_Shots_RO(Measurement):
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
         # The outer for-loop iterates over all qubits:
-        for acq_cha, (this_qubit, levels) in enumerate(state_levels.items()):
+        for this_qubit, levels in qubit_states.items():
 
             schedule.add(
                 Reset(*qubits), ref_op=root_relaxation, ref_pt_new='end'
             ) #To enforce parallelism we refer to the root relaxation
 
             # The inner for-loop iterates over all qubit levels:
-            for rng_index, state_level in enumerate(levels):
+            for level_index, state_level in enumerate(levels):
                 # require an integer
                 # state_level = int(state_level+1e-2)
                 assert(type(state_level)==int)
@@ -78,7 +79,7 @@ class Single_Shots_RO(Measurement):
                 schedule.add(
                     Measure_RO_Opt(
                     this_qubit,
-                    acq_index=rng_index,
+                    acq_index=level_index,
                     bin_mode=BinMode.APPEND
                     ),
                 )
