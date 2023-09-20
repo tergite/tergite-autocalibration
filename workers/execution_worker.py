@@ -120,9 +120,13 @@ def handle_ro_freq_optimization(complex_dataset: xarray.Dataset) -> xarray.Datas
     return new_ds
     # xarray.concat([result_dataset_complex.yq160, result_dataset_complex.yq161],'ro_opt_frequenciesq16', combine_attrs='drop_conflicts')
 
-def measure(compiled_schedule: CompiledSchedule, schedule_duration: float, samplespace: dict, node: str) -> xarray.Dataset:
-
-    cluster_status = ClusterStatus.real
+def measure(
+        compiled_schedule: CompiledSchedule,
+        schedule_duration: float,
+        samplespace: dict,
+        node: str,
+        cluster_status: ClusterStatus = ClusterStatus.real
+    ) -> xarray.Dataset:
 
     logger.info('Starting measurement')
 
@@ -138,15 +142,16 @@ def measure(compiled_schedule: CompiledSchedule, schedule_duration: float, sampl
             dimension *= len( list(subspace.values())[0] )
 
         dummy_data = [ DummyBinnedAcquisitionData(data=(1,6),thres=1,avg_cnt=1) for _ in range(dimension) ]
+        dummy_data_1 = [ DummyBinnedAcquisitionData(data=(1,3),thres=1,avg_cnt=1) for _ in range(dimension) ]
         clusterA = Cluster("clusterA", dummy_cfg=dummy)
         clusterA.set_dummy_binned_acquisition_data(16,sequencer=0,acq_index_name="0",data=dummy_data)
-        clusterA.set_dummy_binned_acquisition_data(17,sequencer=0,acq_index_name="1",data=dummy_data)
-        clusterA.set_dummy_binned_acquisition_data(17,sequencer=1,acq_index_name="2",data=dummy_data)
+        clusterA.set_dummy_binned_acquisition_data(16,sequencer=1,acq_index_name="1",data=dummy_data)
+        clusterA.set_dummy_binned_acquisition_data(16,sequencer=2,acq_index_name="2",data=dummy_data)
 
         if node=='ro_frequency_optimization':
-            clusterA.set_dummy_binned_acquisition_data(16,sequencer=0,acq_index_name="3",data=dummy_data)
-            clusterA.set_dummy_binned_acquisition_data(17,sequencer=0,acq_index_name="4",data=dummy_data)
-            clusterA.set_dummy_binned_acquisition_data(17,sequencer=1,acq_index_name="5",data=dummy_data)
+            clusterA.set_dummy_binned_acquisition_data(16,sequencer=0,acq_index_name="3",data=dummy_data_1)
+            clusterA.set_dummy_binned_acquisition_data(16,sequencer=1,acq_index_name="4",data=dummy_data_1)
+            clusterA.set_dummy_binned_acquisition_data(16,sequencer=2,acq_index_name="5",data=dummy_data_1)
 
     elif cluster_status == ClusterStatus.real:
         clusterA = Cluster("clusterA", lokiA_IP)

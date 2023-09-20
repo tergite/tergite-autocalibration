@@ -11,13 +11,13 @@ nodes = [
         # "punchout",
         "qubit_01_spectroscopy_pulsed",
         "rabi_oscillations",
-        "T1",
+        # "T1",
         #"XY_crosstalk",
-        "ramsey_correction",
+        # "ramsey_correction",
         #"motzoi_parameter",
-        #"resonator_spectroscopy_1",
-        #"qubit_12_spectroscopy_pulsed",
-        #"rabi_oscillations_12",
+        "resonator_spectroscopy_1",
+        "qubit_12_spectroscopy_pulsed",
+        "rabi_oscillations_12",
         #"ramsey_correction_12",
         #"resonator_spectroscopy_2",
         "ro_frequency_optimization",
@@ -27,7 +27,7 @@ nodes = [
 
 qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
 qubits = [ 'q16','q17','q19','q21','q22','q23','q25']
-qubits = [ 'q16','q17']
+qubits = [ 'q16','q17', 'q19']
 
 N_qubits = len(qubits)
 
@@ -142,9 +142,9 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     }
     return sweep_parameters
 
-node_to_be_calibrated = "ro_frequency_optimization"
+target_node = "ro_frequency_optimization"
 
-draw_arrow_chart(f'Qubits: {N_qubits}', nodes[:nodes.index(node_to_be_calibrated)+1])
+draw_arrow_chart(f'Qubits: {N_qubits}', nodes[:nodes.index(target_node)+1])
 
 def user_requested_calibration(node: str):
     job = {

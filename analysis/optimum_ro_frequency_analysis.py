@@ -17,14 +17,11 @@ class OptimalROFrequencyAnalysis():
     def __init__(self, dataset: xr.Dataset):
         data_var = list(dataset.data_vars.keys())[0]
         self.S21_0 = dataset[data_var][0].values
-        self.S21_1 = dataset[data_var][1].values  
+        self.S21_1 = dataset[data_var][1].values
 
-        # self.frequencies = [ dataset.coords.values())[0].values
         for coord in dataset.coords:
             if 'frequencies' in str(coord):
                 self.frequencies = dataset[coord].values
-            
-
 
         self.fit_results = {}
 
@@ -41,57 +38,20 @@ class OptimalROFrequencyAnalysis():
         fit_values_0 = self.fit_result_0.values
         fit_values_1 = self.fit_result_1.values
 
-        # fitted_resonator_frequency = fit_fr = fit_values['fr']
-        # fit_Ql = fit_values['Ql']
-        # fit_Qe = fit_values['Qe']
-        # fit_ph = fit_values['theta']
-        # # analytical expression, probably an interpolation of the fit would be better
-        # self.minimum_freq = fit_fr / (4*fit_Qe*fit_Ql*np.sin(fit_ph)) * (
-        #                 4*fit_Qe*fit_Ql*np.sin(fit_ph)
-        #               - 2*fit_Qe*np.cos(fit_ph)
-        #               + fit_Ql
-        #               + np.sqrt(  4*fit_Qe**2
-        #                         - 4*fit_Qe*fit_Ql*np.cos(fit_ph)
-        #                         + fit_Ql**2 )
-        #               )
-        # return self.minimum_freq
-        return 0
+        distances = self.fit_IQ_1 - self.fit_IQ_0
+        self.index_of_max_distance = np.argmax(np.abs(distances))
+        self.optimal_frequency = fit_frequencies[self.index_of_max_distance]
+
+        return self.optimal_frequency
 
     def plotter(self,ax):
         ax.set_xlabel('I quadrature (V)')
         ax.set_ylabel('Q quadrature (V)')
         ax.plot(self.fit_IQ_0.real, self.fit_IQ_0.imag)
         ax.plot(self.fit_IQ_1.real, self.fit_IQ_1.imag)
+        f0 = self.fit_IQ_0[self.index_of_max_distance]
+        f1 = self.fit_IQ_1[self.index_of_max_distance]
+
+        ax.scatter([f0.real, f1.real], [f0.imag, f1.imag], marker='*', label=f'opt_freq: {self.optimal_frequency}')
         # ax.axvline(self.minimum_freq,c='blue',ls='solid',label='frequency at min')
         ax.grid()
-
-#class ResonatorSpectroscopy_1_Analysis(ResonatorSpectroscopyAnalysis):
-#    def __init__(self, dataset: xr.Dataset):
-#        self.dataset = dataset
-#        super().__init__(self.dataset)
-#    def plotter(self,ax):
-#        #breakpoint()
-#        this_qubit = self.dataset.attrs['qubit']
-#        ax.set_xlabel('Frequency (Hz)')
-#        ax.set_ylabel('|S21| (V)')
-#        ro_freq = float(redis_connection.hget(f'transmons:{this_qubit}', 'ro_freq'))
-#        self.fitting_model.plot_fit(ax,numpoints = 400,xlabel=None, title=None)
-#        ax.axvline(self.minimum_freq,c='green',ls='solid',label='frequency |1> ')
-#        ax.axvline(ro_freq,c='blue',ls='dashed',label='frequency |0>')
-#        ax.grid()
-#
-#class ResonatorSpectroscopy_2_Analysis(ResonatorSpectroscopyAnalysis):
-#    def __init__(self, dataset: xr.Dataset):
-#        self.dataset = dataset
-#        super().__init__(self.dataset)
-#    def plotter(self,ax):
-#        this_qubit = self.dataset.attrs['qubit']
-#        ax.set_xlabel('Frequency (Hz)')
-#        ax.set_ylabel('|S21| (V)')
-#        ro_freq = float(redis_connection.hget(f'transmons:{this_qubit}', 'ro_freq'))
-#        ro_freq_1 = float(redis_connection.hget(f'transmons:{this_qubit}', 'ro_freq_1'))
-#        self.fitting_model.plot_fit(ax,numpoints = 400,xlabel=None, title=None)
-#        ax.axvline(self.minimum_freq,c='red',ls='solid',label='frequency |2>')
-#        ax.axvline(ro_freq_1,c='green',ls='dashed',label='frequency |1>')
-#        ax.axvline(ro_freq,c='blue',ls='dashed',label='frequency |0>')
-#        ax.grid()

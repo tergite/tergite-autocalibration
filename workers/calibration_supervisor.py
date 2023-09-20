@@ -1,9 +1,11 @@
 # This code is part of Tergite
+import argparse
 from utilities.status import DataStatus
 from logger.tac_logger import logger
 from workers.compilation_worker import precompile
 from workers.execution_worker import measure
 from workers.post_processing_worker import post_process
+from utilities.status import ClusterStatus
 from colorama import init as colorama_init
 from colorama import Fore
 from colorama import Style
@@ -15,6 +17,11 @@ import toml
 import redis
 
 redis_connection = redis.Redis(decode_responses=True)
+parser = argparse.ArgumentParser(
+        prog='Tergite Automatic Calibration',
+        )
+parser.add_argument('--d', dest='cluster_status', action='store_const',const=ClusterStatus.dummy,default=ClusterStatus.real)
+args = parser.parse_args()
 
 # Settings
 transmon_configuration = toml.load('./config_files/device_config.toml')
@@ -24,7 +31,7 @@ def calibrate_system():
     logger.info('Starting System Calibration')
     #breakpoint()
     nodes = user_input.nodes
-    node_to_be_calibrated = user_input.node_to_be_calibrated
+    node_to_be_calibrated = user_input.target_node
     topo_order = nodes[:nodes.index(node_to_be_calibrated) + 1]
     initial_parameters = transmon_configuration['initials']
 
@@ -119,7 +126,7 @@ def calibrate_node(node:str):
     logger.info(f'Sending to precompile')
 
     compiled_schedule, schedule_duration = precompile(node, samplespace)
-    result_dataset = measure(compiled_schedule, schedule_duration, samplespace, node)
+    result_dataset = measure(compiled_schedule, schedule_duration, samplespace, node, cluster_status=args.cluster_status)
     logger.info(f'measurement completed')
     post_process(result_dataset, node)
     logger.info(f'analysis completed')
