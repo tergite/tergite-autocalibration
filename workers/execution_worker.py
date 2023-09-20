@@ -48,22 +48,20 @@ def configure_dataset(
 
     for key in keys:
         key_indx = key%n_qubits
-        if 'ro_opt_frequencies' in list(sweep_quantities):
-            key_indx = key//n_qubits
         coords_dict = {}
+        this_qubit = qubits[key_indx]
         for quantity in sweep_quantities :
-            coord_key = quantity+qubits[key_indx]
-            settable_values = samplespace[quantity][qubits[key_indx]]
-            coord_attrs = {'qubit':qubits[key_indx], 'long_name': f'{coord_key}', 'units': 'NA'}
+            coord_key = quantity+this_qubit
+            settable_values = samplespace[quantity][this_qubit]
+            coord_attrs = {'qubit':this_qubit, 'long_name': f'{coord_key}', 'units': 'NA'}
             coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
         partial_ds = xarray.Dataset(coords=coords_dict)
-        this_qubit = qubits[key_indx]
         dimensions = [len(samplespace[quantity][this_qubit]) for quantity in sweep_quantities]
         # TODO this is not safe:
         # This assumes that the inner settable variable is placed
         # at the first position in the samplespace
         reshaping = reversed(dimensions)
-        data_values = raw_ds[key_indx].values.reshape(*reshaping)
+        data_values = raw_ds[key].values.reshape(*reshaping)
         data_values = np.transpose(data_values)
         attributes = {'qubit': this_qubit, 'long_name': f'y{this_qubit}', 'units': 'NA'}
         qubit_state = ''

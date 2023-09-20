@@ -27,11 +27,11 @@ nodes = [
 
 qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
 qubits = [ 'q16','q17','q19','q21','q22','q23','q25']
-#qubits = ['q17']
+qubits = [ 'q16','q17']
 
 N_qubits = len(qubits)
 
-res_spec_samples = 50
+res_spec_samples = 44
 qub_spec_samples = 100
 
 def resonator_samples(qubit:str, punchout=False) -> np.ndarray:
