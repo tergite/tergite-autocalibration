@@ -25,7 +25,6 @@ class Ramsey_fringes(Measurement):
             'mw_frequencies_12': self.attributes_dictionary('f12'),
         }
 
-
     def schedule_function(
             self,
             qubits: list[str],

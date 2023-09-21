@@ -13,7 +13,7 @@ nodes = [
         "rabi_oscillations",
         # "T1",
         #"XY_crosstalk",
-        #"ramsey_correction",
+        "ramsey_correction",
         #"motzoi_parameter",
         "resonator_spectroscopy_1",
         #"qubit_12_spectroscopy_pulsed",
@@ -29,7 +29,7 @@ nodes = [
 
 qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
 qubits = [ 'q16','q17','q19','q21','q22','q23','q25']
-#qubits = [ 'q16','q17', 'q19']
+qubits = [ 'q16','q17', 'q19']
 
 N_qubits = len(qubits)
 
@@ -134,7 +134,8 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
         },
 
         'ramsey_correction': {
-            'ramsey_delays': { qubit : np.arange(4e-9, 2048e-9, 6*8e-9) for qubit in qubits }
+            'ramsey_delays': { qubit : np.arange(4e-9, 2048e-9, 32*8e-9) for qubit in qubits },
+            'artificial_detunings': { qubit : np.arange(-2, 3) * 1e-6 for qubit in qubits },
         },
 
         'ramsey_correction_12': {
@@ -151,7 +152,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     }
     return sweep_parameters
 
-target_node = "ro_frequency_optimization"
+target_node = "ramsey_correction"
 
 draw_arrow_chart(f'Qubits: {N_qubits}', nodes[:nodes.index(target_node)+1])
 
