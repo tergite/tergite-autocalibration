@@ -19,7 +19,6 @@ class Ramsey_fringes(Measurement):
 
         self.static_kwargs = {
             'qubits': self.qubits,
-            'artificial_detunings': self.attributes_dictionary('artificial_detuning'),
             'mw_pulse_durations': self.attributes_dictionary('duration'),
             'mw_pulse_ports': self.attributes_dictionary('microwave'),
             'mw_ef_amps180': self.attributes_dictionary('ef_amp180'),
@@ -30,11 +29,11 @@ class Ramsey_fringes(Measurement):
     def schedule_function(
             self,
             qubits: list[str],
-            artificial_detunings: dict[str,float],
             mw_ef_amps180: dict[str,float],
             mw_frequencies_12: dict[str,float],
             mw_pulse_ports: dict[str,str],
             mw_pulse_durations: dict[str,float],
+            artificial_detunings: dict[str,np.ndarray],
             ramsey_delays: dict[str,np.ndarray],
             repetitions: int = 1024,
         ) -> Schedule:
@@ -70,13 +69,12 @@ class Ramsey_fringes(Measurement):
         **intermediate_delays
             The wait times tau between the pi/2 pulses for each qubit
 
-
         Returns
         -------
         :
             An experiment schedule.
         """
-        sched = Schedule("multiplexed_ramsey_BATCHED",repetitions)
+        schedule = Schedule("multiplexed_ramsey",repetitions)
 
         if self.qubit_state == 0:
             schedule_title = "multiplexed_ramsey_01"
@@ -87,20 +85,18 @@ class Ramsey_fringes(Measurement):
         else:
             raise ValueError(f'Invalid qubit state: {self.qubit_state}')
 
-        sched = Schedule(schedule_title,repetitions)
+        schedule = Schedule(schedule_title,repetitions)
 
         for this_qubit, mw_f_val in mw_frequencies_12.items():
-            sched.add_resource(
+            schedule.add_resource(
                 ClockResource(name=f'{this_qubit}.12', freq=mw_f_val)
             )
 
         #This is the common reference operation so the qubits can be operated in parallel
-        root_relaxation = sched.add(Reset(*qubits), label="Reset")
+        root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
-        for this_qubit, delay_array_val in ramsey_delays.items():
-            # The second for loop iterates over all frequency values in the frequency batch:
-            relaxation = root_relaxation # To enforce parallelism we refer to the root relaxation
-            artificial_detuning = artificial_detunings[this_qubit]
+        # The outer loop, iterates over all qubits
+        for this_qubit, artificial_detunings_values in artificial_detunings.items():
 
             if self.qubit_state == 1:
                 this_clock = f'{this_qubit}.12'
@@ -111,56 +107,62 @@ class Ramsey_fringes(Measurement):
             else:
                 raise ValueError(f'Invalid qubit state: {self.qubit_state}')
 
-            for acq_index, ramsey_delay in enumerate(delay_array_val):
-                recovery_phase = np.rad2deg(2 * np.pi * artificial_detuning * ramsey_delay)
+            schedule.add(
+                    Reset(*qubits), ref_op=root_relaxation, ref_pt_new='end'
+            ) #To enforce parallelism we refer to the root relaxation
 
-                if self.qubit_state == 1:
-                    first_excitation = sched.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
-                    f12_amp = mw_ef_amps180[this_qubit]
-                    first_X90 = sched.add(
-                        DRAGPulse(
-                            duration=mw_pulse_durations[this_qubit],
-                            G_amp=f12_amp/2,
-                            D_amp=0,
-                            port=mw_pulse_ports[this_qubit],
-                            clock=this_clock,
-                            phase=0,
-                        ),
-                        ref_op=first_excitation, ref_pt="end",
+            ramsey_delays_values = ramsey_delays[this_qubit]
+            number_of_delays = len(ramsey_delays_values)
+
+            # The intermediate loop, iterates over all detunings
+            for detuning_index, detuning in enumerate(artificial_detunings_values):
+
+                # The inner for loop iterates over all delays
+                for acq_index, ramsey_delay in enumerate(ramsey_delays_values):
+
+                    this_index = detuning_index*number_of_delays + acq_index
+
+                    recovery_phase = np.rad2deg(2 * np.pi * detuning * ramsey_delay)
+
+                    if self.qubit_state == 1:
+                        schedule.add(X(this_qubit))
+                        f12_amp = mw_ef_amps180[this_qubit]
+                        schedule.add(
+                            DRAGPulse(
+                                duration=mw_pulse_durations[this_qubit],
+                                G_amp=f12_amp/2,
+                                D_amp=0,
+                                port=mw_pulse_ports[this_qubit],
+                                clock=this_clock,
+                                phase=0,
+                            ),
+                        )
+
+                        schedule.add(
+                            DRAGPulse(
+                                duration=mw_pulse_durations[this_qubit],
+                                G_amp=f12_amp/2,
+                                D_amp=0,
+                                port=mw_pulse_ports[this_qubit],
+                                clock=this_clock,
+
+                                phase=recovery_phase,
+                            ),
+                            rel_time=ramsey_delay
+                        )
+
+                    if self.qubit_state == 0:
+
+                        schedule.add(X90(this_qubit))
+
+                        schedule.add(
+                            Rxy(theta=90, phi=recovery_phase, qubit=this_qubit),
+                            rel_time=ramsey_delay
+                        )
+
+                    schedule.add(
+                        measure_function(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
                     )
 
-                    second_X90 = sched.add(
-                        DRAGPulse(
-                            duration=mw_pulse_durations[this_qubit],
-                            G_amp=f12_amp/2,
-                            D_amp=0,
-                            port=mw_pulse_ports[this_qubit],
-                            clock=this_clock,
-
-                            phase=recovery_phase,
-                        ),
-                        rel_time=ramsey_delay, ref_op=first_X90, ref_pt="end",
-                    )
-
-                if self.qubit_state == 0:
-
-                    first_X90 = sched.add(X90(this_qubit), ref_op=relaxation, ref_pt='end')
-
-                    # the phase of the second pi/2 phase progresses to propagate
-                    second_X90 = sched.add(
-                        Rxy(theta=90, phi=recovery_phase, qubit=this_qubit),
-                        ref_op=first_X90,
-                        ref_pt="end",
-                        rel_time=ramsey_delay
-                    )
-
-                sched.add(
-                    measure_function(this_qubit, acq_index=acq_index, bin_mode=BinMode.AVERAGE),
-                    ref_op=second_X90,
-                    ref_pt="end",
-                )
-
-                # update the relaxation for the next batch point
-                relaxation = sched.add(Reset(this_qubit), label=f"Reset_{this_qubit}_{acq_index}")
-
-        return sched
+                    schedule.add(Reset(this_qubit))
+        return schedule
