@@ -139,7 +139,7 @@ class Multiplexed_Analysis(BaseAnalysis):
                 raise ValueError(f'Invalid node: {node}')
 
             node_analysis = analysis_class(ds, **kw_args)
-            self.qoi = node_analysis.run_fitting()
+            #self.qoi = node_analysis.run_fitting()
 
             node_analysis.plotter(this_axis)
 

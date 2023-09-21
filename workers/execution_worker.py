@@ -56,10 +56,12 @@ def configure_dataset(
             coord_attrs = {'qubit':this_qubit, 'long_name': f'{coord_key}', 'units': 'NA'}
             coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
         partial_ds = xarray.Dataset(coords=coords_dict)
+        #breakpoint()
         dimensions = [len(samplespace[quantity][this_qubit]) for quantity in sweep_quantities]
         # TODO this is not safe:
         # This assumes that the inner settable variable is placed
         # at the first position in the samplespace
+
         reshaping = reversed(dimensions)
         data_values = raw_ds[key].values.reshape(*reshaping)
         data_values = np.transpose(data_values)

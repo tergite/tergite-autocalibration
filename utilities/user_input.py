@@ -34,7 +34,7 @@ qubits = [ 'q16','q17', 'q19']
 N_qubits = len(qubits)
 
 res_spec_samples = 44
-qub_spec_samples = 100
+qub_spec_samples = 66
 
 def resonator_samples(qubit:str, punchout=False) -> np.ndarray:
     sweep_range = 6.5e6
@@ -47,7 +47,7 @@ def resonator_samples(qubit:str, punchout=False) -> np.ndarray:
     return np.linspace(min_freq, max_freq, res_spec_samples)
 
 def qubit_samples(qubit:str, transition:str = '01') -> np.ndarray:
-    sweep_range = 15e6
+    sweep_range = 10e6
     if transition=='01':
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition=='12':
@@ -112,11 +112,11 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
         },
 
         'rabi_oscillations': {
-            'mw_amplitudes': { qubit : np.linspace(0.002,0.20,41) for qubit in qubits}
+            'mw_amplitudes': { qubit : np.linspace(0.002,0.20,31) for qubit in qubits}
         },
 
         'rabi_oscillations_12': {
-            'mw_amplitudes': { qubit : np.linspace(0.002,0.20,41) for qubit in qubits}
+            'mw_amplitudes': { qubit : np.linspace(0.002,0.20,31) for qubit in qubits}
         },
 
         'ro_amplitude_optimization': {
@@ -134,8 +134,8 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
         },
 
         'ramsey_correction': {
-            'ramsey_delays': { qubit : np.arange(4e-9, 2048e-9, 32*8e-9) for qubit in qubits },
-            'artificial_detunings': { qubit : np.arange(-2, 3) * 1e-6 for qubit in qubits },
+            'ramsey_delays': { qubit : np.arange(4e-9, 2048e-9,  8*8e-9) for qubit in qubits },
+            'artificial_detunings': { qubit : np.arange(-2.1, 2.1, 0.8) * 1e6 for qubit in qubits },
         },
 
         'ramsey_correction_12': {

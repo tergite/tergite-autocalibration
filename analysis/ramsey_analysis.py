@@ -48,19 +48,17 @@ class RamseyModel(lmfit.model.Model):
 
 class RamseyAnalysis():
     def  __init__( self,dataset: xr.Dataset, redis_field='freq_01'):
-        this_qubit = dataset.attrs['qubit']
-        redis_key = f'transmons:{this_qubit}'
+        self.qubit = dataset.attrs['qubit']
+        redis_key = f'transmons:{self.qubit}'
 
-        data_var = list(dataset.data_vars.keys())[0]
-        coord = list(dataset[data_var].coords.keys())[0]
-        self.S21 = dataset[data_var].values
-        self.independents = dataset[coord].values
-        for coord in dataset[data_var].coords:
+        self.data_var = list(dataset.data_vars.keys())[0]
+        coord = list(dataset[self.data_var].coords.keys())[0]
+        for coord in dataset[self.data_var].coords:
             if 'delay' in coord: self.delay_coord = coord
             elif 'detuning' in coord: self.detuning_coord = coord
+        dataset[self.data_var] = ((self.delay_coord, self.detuning_coord), np.abs(dataset[self.data_var].values))
+        self.S21 = dataset[self.data_var].values
         self.fit_results = {}
-        breakpoint()
-        self.qubit = dataset[data_var].attrs['qubit']
         self.qubit_frequency = float(redis_connection.hget(f'{redis_key}',redis_field))
         self.dataset = dataset
 
@@ -83,10 +81,10 @@ class RamseyAnalysis():
         # # print(f'{ self.artificial_detuning/1e6 = }')
         # self.corrected_qubit_frequency = self.qubit_frequency - (self.fitted_detuning - self.artificial_detuning)
         # return self.corrected_qubit_frequency
-        return 0
+        return
 
     def plotter(self,ax):
-        self.dataset.plot(ax=ax, x='self.delay_coord')
+        self.dataset[self.data_var].plot(ax=ax, x=self.delay_coord)
         # ax.plot( self.fit_ramsey_delays , self.fit_y,'r-',lw=3.0)
         # ax.plot( self.independents, self.magnitudes,'bo-',ms=3.0)
         # ax.set_title(f'Ramsey Oscillations for {self.qubit}')
