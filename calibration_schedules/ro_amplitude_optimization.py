@@ -9,7 +9,7 @@ from quantify_scheduler.enums import BinMode
 from utilities.extended_transmon_element import Measure_RO_Opt
 import numpy as np
 
-class Single_Shots_RO(Measurement):
+class RO_amplitude_optimization(Measurement):
 
     def __init__(self,transmons,qubit_state:int=0):
         super().__init__(transmons)

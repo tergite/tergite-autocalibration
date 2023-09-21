@@ -15,6 +15,7 @@ from calibration_schedules.XY_crosstalk import XY_cross
 from calibration_schedules.punchout import Punchout
 from calibration_schedules.ramsey_fringes import Ramsey_fringes
 from calibration_schedules.ro_frequency_optimization import RO_frequency_optimization
+from calibration_schedules.ro_amplitude_optimization import RO_amplitude_optimization
 from calibration_schedules.state_discrimination import Single_Shots_RO
 # from calibration_schedules.drag_amplitude import DRAG_amplitude
 from calibration_schedules.motzoi_parameter import Motzoi_parameter
@@ -46,6 +47,7 @@ node_map = {
     'ramsey_correction_12': Ramsey_fringes,
     'resonator_spectroscopy_2': Resonator_Spectroscopy,
     'ro_frequency_optimization': RO_frequency_optimization,
+    'ro_amplitude_optimization': RO_amplitude_optimization,
     'state_discrimination': Single_Shots_RO,
 }
 
