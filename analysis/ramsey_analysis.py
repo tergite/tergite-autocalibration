@@ -28,7 +28,6 @@ class RamseyModel(lmfit.model.Model):
             raise ValueError(
                 'Time variable "t" must be specified in order to guess parameters'
             )
-            return None
 
         amp_guess = abs(max(data) - min(data)) / 2  # amp is positive by convention
         exp_offs_guess = np.mean(data)
