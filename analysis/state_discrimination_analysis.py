@@ -47,6 +47,8 @@ class StateDiscrimination():
         self.IQ0_positives = [IQ0_tp,IQ0_fp]
         self.IQ1_positives = [IQ1_tp,IQ1_fp]
         self.IQ2_positives = [IQ2_tp,IQ2_fp]
+        
+        return 0
 
             # SSRO_analysis.single_plotter(this_axis, lda, IQ0_positives, IQ1_positives, IQ2_positives)
 
@@ -73,12 +75,12 @@ class StateDiscrimination():
         mark_size = 40
         ax.scatter(IQ0_tp[:, 0], IQ0_tp[:, 1], marker=".", s=mark_size, color="red")
         ax.scatter(IQ0_fp[:, 0], IQ0_fp[:, 1], marker="x", s=mark_size, color="orange",
-                # label=f'errors when reading |0>: {err_wr_0:.4f}'
+                label=f'errors when reading |0>: {err_wr_0:.4f}'
                 )
         # When reading 1 , dots are correct and crosses are in error
         ax.scatter(IQ1_tp[:, 0], IQ1_tp[:, 1], marker=".", s=mark_size, color="blue")
         ax.scatter(IQ1_fp[:, 0], IQ1_fp[:, 1], marker="x", s=mark_size, color="dodgerblue",
-                # label=f'errors when reading |1>: {err_wr_1:.4f}'
+                label=f'errors when reading |1>: {err_wr_1:.4f}'
                 )
         # When reading 2 , dots are correct and crosses are in error
         ax.scatter(IQ2_tp[:, 0], IQ2_tp[:, 1], marker=".", s=mark_size, color="green")

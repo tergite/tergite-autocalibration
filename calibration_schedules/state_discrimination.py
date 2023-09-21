@@ -32,7 +32,7 @@ class Single_Shots_RO(Measurement):
             mw_pulse_durations: dict[str,float],
             mw_pulse_ports: dict[str,str],
             qubit_states: dict[str,np.ndarray],
-            repetitions: int = 1,
+            repetitions: int = 1
         ) -> Schedule:
         schedule = Schedule("State_discrimination_schedule", repetitions)
         print(f'{ repetitions = }')
@@ -48,9 +48,6 @@ class Single_Shots_RO(Measurement):
 
             # The inner for-loop iterates over all qubit levels:
             for level_index, state_level in enumerate(levels):
-                # require an integer
-                # state_level = int(state_level+1e-2)
-                assert(type(state_level)==np.int64)
 
                 if state_level == 0:
                     # Not really necessary to use Rxy(0,0) we can just pass
@@ -59,6 +56,7 @@ class Single_Shots_RO(Measurement):
                     )
                 elif state_level == 1:
                     schedule.add(X(this_qubit))
+
                 elif state_level == 2:
                     pass
                     # schedule.add(X(qubit = this_qubit))
@@ -77,10 +75,10 @@ class Single_Shots_RO(Measurement):
                     raise ValueError('State Input Error')
 
                 schedule.add(
-                    Measure(
+                    Measure_RO_Opt(
                     this_qubit,
                     acq_index=level_index,
-                    bin_mode=BinMode.APPEND
+                    bin_mode=BinMode.AVERAGE
                     ),
                 )
                 # update the root operation
