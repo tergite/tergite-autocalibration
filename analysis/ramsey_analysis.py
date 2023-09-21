@@ -56,6 +56,7 @@ class RamseyAnalysis():
         for coord in dataset[self.data_var].coords:
             if 'delay' in coord: self.delay_coord = coord
             elif 'detuning' in coord: self.detuning_coord = coord
+        self.artificial_detunings = dataset.coords[self.detuning_coord].values
         dataset[self.data_var] = ((self.delay_coord, self.detuning_coord), np.abs(dataset[self.data_var].values))
         self.S21 = dataset[self.data_var].values
         self.fit_results = {}
@@ -63,19 +64,26 @@ class RamseyAnalysis():
         self.dataset = dataset
 
     def run_fitting(self):
-        # model = RamseyModel()
-        # self.magnitudes = np.absolute(self.S21)
-        # ramsey_delays = self.independents
-        # self.fit_ramsey_delays = np.linspace(ramsey_delays[0], ramsey_delays[-1], 400)
-        #
-        # guess = model.guess(self.magnitudes, t=ramsey_delays)
-        # # print(f'{ guess = }')
-        # fit_result = model.fit(self.magnitudes, params=guess, t=ramsey_delays)
-        #
-        # self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_ramsey_delays})
+        model = RamseyModel()
+        ramsey_delays = self.dataset.coords[self.delay_coord].values
+        self.fit_ramsey_delays = np.linspace(ramsey_delays[0], ramsey_delays[-1], 400)
+
+        fitted_detunings = []
+        for indx, detuning in enumerate(self.dataset.coords[self.detuning_coord]):
+            values = self.dataset[self.data_var].isel(detuning_coord=indx)
+            magnitudes = np.absolute(values)
+            guess = model.guess(magnitudes, t=ramsey_delays)
+            fit_result = model.fit(magnitudes, params=guess, t=ramsey_delays)
+            fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_ramsey_delays})
+            fitted_detuning = fit_result.params['frequency'].value
+            fitted_detunings.append(fitted_detuning)
+        index_of_min = np.argmin(fitted_detunings)    
+        self.fitted_detunings = np.concatenate(
+            np.array(fitted_detunings[:index_of_min])*(-1), np.array(fitted_detunings[index_of_min:])
+        )
+
         # # self.dataset['fit_ramsey_delays'] = self.fit_ramsey_delays
         # # self.dataset['fit_y'] = ('fit_ramsey_delays',fit_y)
-        # self.fitted_detuning = fit_result.params['frequency'].value
         # # print(f'{ self.qubit_frequency/1e6 = }')
         # # print(f'{ self.fitted_detuning/1e6 = }')
         # # print(f'{ self.artificial_detuning/1e6 = }')
@@ -84,10 +92,11 @@ class RamseyAnalysis():
         return
 
     def plotter(self,ax):
-        self.dataset[self.data_var].plot(ax=ax, x=self.delay_coord)
+        ax.plot(self.artificial_detunings , self.fitted_detunings,'bo',ms=3.0)
+        #self.dataset[self.data_var].plot(ax=ax, x=self.delay_coord)
         # ax.plot( self.fit_ramsey_delays , self.fit_y,'r-',lw=3.0)
         # ax.plot( self.independents, self.magnitudes,'bo-',ms=3.0)
         # ax.set_title(f'Ramsey Oscillations for {self.qubit}')
         # ax.set_xlabel('Intermediate (s)')
         # ax.set_ylabel('|S21| (V)')
-        # ax.grid()
+        ax.grid()
