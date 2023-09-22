@@ -16,12 +16,12 @@ nodes = [
         "ramsey_correction",
         #"motzoi_parameter",
         "resonator_spectroscopy_1",
-        #"qubit_12_spectroscopy_pulsed",
-        #"rabi_oscillations_12",
+        "qubit_12_spectroscopy_pulsed",
+        "rabi_oscillations_12",
         #"ramsey_correction_12",
         #"resonator_spectroscopy_2",
         "ro_frequency_optimization",
-        "ro_amplitude_optimization",
+        #"ro_amplitude_optimization",
         "state_discrimination",
         ]
 
@@ -29,7 +29,7 @@ nodes = [
 
 qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
 qubits = [ 'q16','q17','q19','q21','q22','q23','q25']
-qubits = [ 'q16','q17', 'q19']
+#qubits = [ 'q16','q17', 'q19']
 
 N_qubits = len(qubits)
 
@@ -134,7 +134,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
         },
 
         'ramsey_correction': {
-            'ramsey_delays': { qubit : np.arange(4e-9, 2048e-9,  8*8e-9) for qubit in qubits },
+            'ramsey_delays': { qubit : np.arange(4e-9, 2048e-9, 8*8e-9) for qubit in qubits },
             'artificial_detunings': { qubit : np.arange(-2.1, 2.1, 0.8) * 1e6 for qubit in qubits },
         },
 
@@ -152,7 +152,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     }
     return sweep_parameters
 
-target_node = "ramsey_correction"
+target_node = "state_discrimination"
 
 draw_arrow_chart(f'Qubits: {N_qubits}', nodes[:nodes.index(target_node)+1])
 

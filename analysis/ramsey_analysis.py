@@ -68,35 +68,40 @@ class RamseyAnalysis():
         ramsey_delays = self.dataset.coords[self.delay_coord].values
         self.fit_ramsey_delays = np.linspace(ramsey_delays[0], ramsey_delays[-1], 400)
 
-        fitted_detunings = []
+        fits = []
         for indx, detuning in enumerate(self.dataset.coords[self.detuning_coord]):
-            values = self.dataset[self.data_var].isel(detuning_coord=indx)
-            magnitudes = np.absolute(values)
+            complex_values = self.dataset[self.data_var].isel({self.detuning_coord:[indx]})
+            magnitudes = np.array(np.absolute(complex_values.values).flat)
             guess = model.guess(magnitudes, t=ramsey_delays)
             fit_result = model.fit(magnitudes, params=guess, t=ramsey_delays)
             fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_ramsey_delays})
             fitted_detuning = fit_result.params['frequency'].value
-            fitted_detunings.append(fitted_detuning)
-        index_of_min = np.argmin(fitted_detunings)    
-        self.fitted_detunings = np.concatenate(
-            np.array(fitted_detunings[:index_of_min])*(-1), np.array(fitted_detunings[index_of_min:])
-        )
+            fits.append(fitted_detuning)
+        fits = np.array(fits)
+        index_of_min = np.argmin(fits)    
+        self.fitted_detunings = np.concatenate((fits[:index_of_min]*(-1), fits[index_of_min:]))
 
-        # # self.dataset['fit_ramsey_delays'] = self.fit_ramsey_delays
-        # # self.dataset['fit_y'] = ('fit_ramsey_delays',fit_y)
-        # # print(f'{ self.qubit_frequency/1e6 = }')
-        # # print(f'{ self.fitted_detuning/1e6 = }')
-        # # print(f'{ self.artificial_detuning/1e6 = }')
-        # self.corrected_qubit_frequency = self.qubit_frequency - (self.fitted_detuning - self.artificial_detuning)
-        # return self.corrected_qubit_frequency
-        return
+        m, b = np.polyfit(self.artificial_detunings, self.fitted_detunings, 1)
+        self.poly1d_fn = np.poly1d((m,b))
+        self.frequency_correction = -b/m
+
+        # self.dataset['fit_ramsey_delays'] = self.fit_ramsey_delays
+        # self.dataset['fit_y'] = ('fit_ramsey_delays',fit_y)
+        self.corrected_qubit_frequency = self.qubit_frequency + self.frequency_correction
+        return self.corrected_qubit_frequency
 
     def plotter(self,ax):
-        ax.plot(self.artificial_detunings , self.fitted_detunings,'bo',ms=3.0)
+        ax.plot(self.artificial_detunings , self.fitted_detunings,'bo',ms=5.0)
         #self.dataset[self.data_var].plot(ax=ax, x=self.delay_coord)
         # ax.plot( self.fit_ramsey_delays , self.fit_y,'r-',lw=3.0)
         # ax.plot( self.independents, self.magnitudes,'bo-',ms=3.0)
         # ax.set_title(f'Ramsey Oscillations for {self.qubit}')
+        ax.axvline(self.frequency_correction,color='red',label=f'correction: {int(self.frequency_correction)}Hz')
+        ax.plot(self.artificial_detunings, self.poly1d_fn(self.artificial_detunings),'--b',lw=1)
+        ax.axhline(0, color='black', lw=1)
+        ax.axvline(0, color='black', lw=1)
+        ax.set_xlabel('Artificial detuning (Hz)')
+        ax.set_ylabel('Fitted detuning (Hz)')
         # ax.set_xlabel('Intermediate (s)')
         # ax.set_ylabel('|S21| (V)')
         ax.grid()
