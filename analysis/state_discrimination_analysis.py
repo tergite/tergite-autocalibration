@@ -5,6 +5,7 @@ import numpy as np
 import lmfit
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 import xarray as xr
+import pickle
 
 class StateDiscrimination():
     """
@@ -19,11 +20,17 @@ class StateDiscrimination():
         self.independents = dataset[coord].values
         self.fit_results = {}
         self.qubit = dataset[data_var].attrs['qubit']
-
+           
     def run_fitting(self):
         y = self.independents
         IQ = np.array([self.I, self.Q]).T
         lda = LinearDiscriminantAnalysis(solver = "svd", store_covariance=True)
+
+        # Save the LDA model, datapoints and states
+        if self.qubit == 'q25':
+            with open(f'state-disc-q25.disc', 'wb') as f:
+                pickle.dump(lda, f, protocol=pickle.HIGHEST_PROTOCOL)
+                f.close()
 
         # run the discrimination, y_pred are the predicted levels
         y_pred = lda.fit(IQ,y).predict(IQ)

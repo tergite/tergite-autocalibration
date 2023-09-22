@@ -7,17 +7,17 @@ from config_files.VNA_values import VNA_resonator_frequencies, VNA_qubit_frequen
 
 nodes = [
         # "tof",
-        "resonator_spectroscopy",
-        # "punchout",
+        #"resonator_spectroscopy",
+        "punchout",
         "qubit_01_spectroscopy_pulsed",
         "rabi_oscillations",
         # "T1",
         #"XY_crosstalk",
         "ramsey_correction",
         #"motzoi_parameter",
-        "resonator_spectroscopy_1",
-        "qubit_12_spectroscopy_pulsed",
-        "rabi_oscillations_12",
+        #"resonator_spectroscopy_1",
+        #"qubit_12_spectroscopy_pulsed",
+        #"rabi_oscillations_12",
         #"ramsey_correction_12",
         #"resonator_spectroscopy_2",
         "ro_frequency_optimization",
@@ -152,7 +152,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     }
     return sweep_parameters
 
-target_node = "state_discrimination"
+target_node = "punchout"
 
 draw_arrow_chart(f'Qubits: {N_qubits}', nodes[:nodes.index(target_node)+1])
 

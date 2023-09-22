@@ -22,12 +22,10 @@ class PunchoutAnalysis():
         #
         # index_of_min = np.argmin(np.array(sums))
         # self.optimal_motzoi = float(self.dataset[motzoi_key][index_of_min].values)
-
-        pass
+        return 0
 
     def plotter(self,axis):
         datarray = self.dataset[f'y{self.qubit}']
         qubit = self.qubit
 
         datarray.plot()
-
