@@ -26,7 +26,6 @@ class RO_amplitude_optimization(Measurement):
             'ro_ports': self.attributes_dictionary('readout_port'),
         }
 
-
     def schedule_function(
         self,
         qubits : list[str],
@@ -39,12 +38,11 @@ class RO_amplitude_optimization(Measurement):
         integration_times: dict[str,float],
         ro_ports: dict[str,str],
         ro_amplitudes: dict[str,np.ndarray],
+        qubit_states: dict[str,np.ndarray],
         repetitions: int = 1,
         ) -> Schedule:
         schedule = Schedule("ro_amplitude_optimization", repetitions)
 
-        n_levels = 300
-        qubit_states = np.concatenate((np.zeros(n_levels,dtype=np.int16), np.ones(n_levels,dtype=np.int16)))
         number_of_levels = len(qubit_states)
 
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")

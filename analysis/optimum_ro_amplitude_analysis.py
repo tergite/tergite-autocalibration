@@ -2,7 +2,6 @@
 Module containing a class that fits data from a resonator spectroscopy experiment.
 """
 import numpy as np
-from quantify_core.analysis import fitting_models as fm
 import redis
 import xarray as xr
 redis_connection = redis.Redis(decode_responses=True)
@@ -13,19 +12,25 @@ class OptimalROAmplitudeAnalysis():
     """
     def __init__(self, dataset: xr.Dataset):
         self.dataset = dataset
-        data_var = list(dataset.data_vars.keys())[0]
-        self.S21_0 = dataset[data_var][0].values
-        self.S21_1 = dataset[data_var][1].values
+        self.qubit = dataset.attrs['qubit']
+        self.data_var = list(dataset.data_vars.keys())[0]
 
         for coord in dataset.coords:
             if 'amplitudes' in str(coord):
-                self.amplitudes = dataset[coord].values
+                self.amplitude_coord = coord
+            elif 'state' in str(coord):
+                self.state_coord = coord
 
-        self.fit_results = {}
+            self.fit_results = {}
 
     def run_fitting(self):
-        self.optimal_amplitude = 0
-        return self.optimal_amplitude
+        for indx, ro_amplitude in enumerate(self.dataset.coords[self.amplitude_coord]):
+            IQ_complex = self.dataset[self.data_var].isel({self.amplitude_coord:[indx]})
+            I = IQ_complex.real
+            Q = IQ_complex.imag
+            IQ = np.array([I,Q])
+        # self.optimal_amplitude = 0
+        # return self.optimal_amplitude
 
     def plotter(self,ax):
         # this_qubit = self.dataset.attrs['qubit']

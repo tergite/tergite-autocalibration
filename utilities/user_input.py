@@ -120,7 +120,8 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
         },
 
         'ro_amplitude_optimization': {
-            'ro_amplitudes': { qubit : np.linspace(0.001,0.009,11) for qubit in qubits}
+            'qubit_states': {qubit: np.random.randint(0,high=2,size=700) for qubit in qubits},
+            'ro_amplitudes': {qubit : np.linspace(0.001,0.009,11) for qubit in qubits}
         },
 
         'T1': {
@@ -135,7 +136,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
 
         'ramsey_correction': {
             'ramsey_delays': { qubit : np.arange(4e-9, 2048e-9, 8*8e-9) for qubit in qubits },
-            'artificial_detunings': { qubit : np.arange(-2.1, 2.1, 0.8) * 1e6 for qubit in qubits },
+            'artificial_detunings': { qubit : np.arange(-2.1, 2.1, 0.8)*1e6 for qubit in qubits },
         },
 
         'ramsey_correction_12': {
