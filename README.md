@@ -12,10 +12,17 @@ To install WSL, it is required **Windows 10** of version at least **1903**.
 #### Install Redis: ####
 https://redis.io/docs/getting-started/installation/install-redis-on-linux/  
 
+#### After installing redis, start the service, type from terminal: ####
+```redis-server```  
+
 #### Create your local environment.   ####
 For example, here the environment is named `tac`  
 ```conda create --name tac python=3.9```  
+#### Activate your local environment.   ####
 ```conda activate tac```
+
+#### If you are not using conda, activate the environment with:   ####
+```source activate tac```
 
 #### Enter the project root directory:  ####
 ```cd tergite-autocalibration-lite/```  
@@ -63,7 +70,7 @@ Can be browsed with the dataset browser (coming soon)
 ## Development ##
 When submitting  contributions, please prepend your commit messages with:
 `fix:` for bug fixes  
-`feat:` for introducing a new feature (e.g. a new measurement node or a new analysis class)
-`chore:` for refractoring changes or any change that doesn't affect the functionality of the code
-`docs:` for changes in the README, docstrings etc
-`test:` or `dev:` for testing or development changes (e.g. profiling scripts)
+`feat:` for introducing a new feature (e.g. a new measurement node or a new analysis class)  
+`chore:` for refractoring changes or any change that doesn't affect the functionality of the code  
+`docs:` for changes in the README, docstrings etc  
+`test:` or `dev:` for testing or development changes (e.g. profiling scripts)  
