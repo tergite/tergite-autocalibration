@@ -53,7 +53,7 @@ For example to reset the node `rabi_oscillations`:
 The sample-space for each node. Also here the target node is declared:  
 `utilities/user_input.py`  
 
-Qblox Cluster configuration file:  
+Qblox Cluster configuration file (including IP address):  
 `config_files/settings.py`  
 
 A collection of reasonable initial values for the device:  
