@@ -33,6 +33,7 @@ class ExtendedClocksFrequencies(InstrumentChannel):
 
 class R12(InstrumentChannel):
     """
+
     Submodule containing parameters for performing an R12 operations
     """
 
@@ -132,7 +133,7 @@ class Measure_RO_Opt(Measure):
                 "gate_info": {
                     'unitary': None,
                     'plot_func': plot_func,
-                    'tex': r'$\langle0|$',
+                    'tex': r'$\langle opt|$',
                     'qubits': list(qubits),
                     'acq_index': acq_index,
                     'acq_protocol': acq_protocol,

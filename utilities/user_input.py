@@ -7,21 +7,21 @@ from config_files.VNA_values import VNA_resonator_frequencies, VNA_qubit_frequen
 
 nodes = [
         # "tof",
-        #"resonator_spectroscopy",
-        "punchout",
+        "resonator_spectroscopy",
+        #"punchout",
         "qubit_01_spectroscopy_pulsed",
         "rabi_oscillations",
         # "T1",
         #"XY_crosstalk",
         "ramsey_correction",
         #"motzoi_parameter",
-        #"resonator_spectroscopy_1",
+        "resonator_spectroscopy_1",
         #"qubit_12_spectroscopy_pulsed",
         #"rabi_oscillations_12",
         #"ramsey_correction_12",
         #"resonator_spectroscopy_2",
         "ro_frequency_optimization",
-        #"ro_amplitude_optimization",
+        "ro_amplitude_optimization",
         "state_discrimination",
         ]
 
@@ -37,7 +37,7 @@ res_spec_samples = 44
 qub_spec_samples = 66
 
 def resonator_samples(qubit:str, punchout=False) -> np.ndarray:
-    sweep_range = 6.5e6
+    sweep_range = 5.5e6
     punchout_range = 0e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
     min_freq =  VNA_frequency - sweep_range / 2
@@ -100,7 +100,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
 
         'punchout': {
             'ro_frequencies': {qubit: resonator_samples(qubit, punchout=True) for qubit in qubits},
-            'ro_amplitudes': {qubit : np.linspace(5e-3, 0.8e-1, 3) for qubit in qubits}
+            'ro_amplitudes': {qubit : np.linspace(4e-3, 1.2e-1, 11) for qubit in qubits}
         },
 
         'qubit_01_spectroscopy_pulsed': {
@@ -120,8 +120,8 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
         },
 
         'ro_amplitude_optimization': {
-            'qubit_states': {qubit: np.random.randint(0,high=2,size=700) for qubit in qubits},
-            'ro_amplitudes': {qubit : np.linspace(0.001,0.009,11) for qubit in qubits}
+            'qubit_states': {qubit: np.random.randint(0,high=2,size=200) for qubit in qubits},
+            'ro_amplitudes': {qubit : np.linspace(0.005,0.039,5) for qubit in qubits}
         },
 
         'T1': {
@@ -153,7 +153,7 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
     }
     return sweep_parameters
 
-target_node = "punchout"
+target_node = "state_discrimination"
 
 draw_arrow_chart(f'Qubits: {N_qubits}', nodes[:nodes.index(target_node)+1])
 

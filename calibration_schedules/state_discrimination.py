@@ -75,6 +75,7 @@ class Single_Shots_RO(Measurement):
                     raise ValueError('State Input Error')
 
                 schedule.add(
+                    #Measure(
                     Measure_RO_Opt(
                     this_qubit,
                     acq_index=level_index,

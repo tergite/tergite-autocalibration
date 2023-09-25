@@ -20,7 +20,7 @@ class RO_amplitude_optimization(Measurement):
             'mw_ef_amp180s': self.attributes_dictionary('ef_amp180'),
             'mw_pulse_durations': self.attributes_dictionary('duration'),
             'mw_pulse_ports': self.attributes_dictionary('microwave'),
-            'pulse_amplitudes': self.attributes_dictionary('pulse_amp'),
+            'pulse_durations': self.attributes_dictionary('pulse_duration'),
             'acquisition_delays': self.attributes_dictionary('acq_delay'),
             'integration_times': self.attributes_dictionary('integration_time'),
             'ro_ports': self.attributes_dictionary('readout_port'),
@@ -43,7 +43,6 @@ class RO_amplitude_optimization(Measurement):
         ) -> Schedule:
         schedule = Schedule("ro_amplitude_optimization", repetitions)
 
-        number_of_levels = len(qubit_states)
 
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
@@ -51,6 +50,8 @@ class RO_amplitude_optimization(Measurement):
         for acq_cha, (this_qubit, ro_amplitude_values) in enumerate(ro_amplitudes.items()):
 
             this_ro_clock = f'{this_qubit}.' + 'ro_opt'
+            qubit_levels = qubit_states[this_qubit]
+            number_of_levels = len(qubit_levels)
 
             schedule.add(
                 Reset(*qubits), ref_op=root_relaxation, ref_pt_new='end'
@@ -59,7 +60,7 @@ class RO_amplitude_optimization(Measurement):
             # The intermediate for-loop iterates over all ro_amplitudes:
             for ampl_indx, ro_amplitude in enumerate(ro_amplitude_values):
                 # The inner for-loop iterates over all qubit levels:
-                for level_index, state_level in enumerate(qubit_states):
+                for level_index, state_level in enumerate(qubit_levels):
                     this_index = ampl_indx*number_of_levels + level_index
 
                     # require an integer
