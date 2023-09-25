@@ -188,6 +188,7 @@ def measure(
     thread_tqdm.join()
 
     raw_dataset: xarray.Dataset = lab_ic.retrieve_acquisition()
+    print(f'{ raw_dataset = }')
     logger.info('Raw dataset acquired')
 
     result_dataset = configure_dataset(raw_dataset, samplespace)

@@ -9,12 +9,11 @@ from utilities.status import ClusterStatus
 from colorama import init as colorama_init
 from colorama import Fore
 from colorama import Style
-colorama_init()
-
 import utilities.user_input as user_input
-
 import toml
 import redis
+
+colorama_init()
 
 redis_connection = redis.Redis(decode_responses=True)
 parser = argparse.ArgumentParser(
@@ -111,7 +110,10 @@ def inspect_node(node:str):
 
 def calibrate_node(node:str):
     logger.info(f'Calibrating node {node}')
-    job = user_input.user_requested_calibration(node)
+    dummy = False
+    if args.cluster_status == ClusterStatus.dummy:
+        dummy = True
+    job = user_input.user_requested_calibration(node,dummy)
 
     # Load the latest transmons state onto the job
     device_config = {}
@@ -122,13 +124,18 @@ def calibrate_node(node:str):
     job_id = job["job_id"]
 
     samplespace = job['experiment_params'][node]
-    logger.info(f'Sending to precompile')
+    logger.info('Sending to precompile')
 
     compiled_schedule, schedule_duration = precompile(node, samplespace)
-    result_dataset = measure(compiled_schedule, schedule_duration, samplespace, node, cluster_status=args.cluster_status)
-    logger.info(f'measurement completed')
+    result_dataset = measure(
+            compiled_schedule,
+            schedule_duration,
+            samplespace, node,
+            cluster_status=args.cluster_status
+            )
+    logger.info('measurement completed')
     post_process(result_dataset, node)
-    logger.info(f'analysis completed')
+    logger.info('analysis completed')
 
 
 #main

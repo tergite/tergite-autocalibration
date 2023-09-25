@@ -2,8 +2,9 @@ from typing import List
 import numpy as np
 from uuid import uuid4
 from utilities.visuals import draw_arrow_chart
-from config_files.VNA_values import VNA_resonator_frequencies, VNA_qubit_frequencies, VNA_f12_frequencies
-# import logging
+from config_files.VNA_values import (
+     VNA_resonator_frequencies, VNA_qubit_frequencies, VNA_f12_frequencies
+)
 
 nodes = [
         # "tof",
@@ -13,7 +14,7 @@ nodes = [
         "rabi_oscillations",
         # "T1",
         #"XY_crosstalk",
-        "ramsey_correction",
+        # "ramsey_correction",
         #"motzoi_parameter",
         "resonator_spectroscopy_1",
         #"qubit_12_spectroscopy_pulsed",
@@ -59,7 +60,7 @@ def qubit_samples(qubit:str, transition:str = '01') -> np.ndarray:
     max_freq =  VNA_frequency + sweep_range / 2 + 0*sweep_range
     return np.linspace(min_freq, max_freq, qub_spec_samples)
 
-def experiment_parameters(node:str, qubits:List[str]) -> dict:
+def experiment_parameters(node:str, qubits:List[str], dummy:bool=False) -> dict:
     '''
     Dictionary that contains the parameter space for each calibration node.
     The keys order is:
@@ -77,6 +78,9 @@ def experiment_parameters(node:str, qubits:List[str]) -> dict:
         }
     }
     '''
+    if dummy:
+        qubits = [ 'q16','q17', 'q19']
+
     sweep_parameters = {
         'tof': {
             'ro_acq_delay': {qubit: np.array([1,1]) for qubit in qubits}
@@ -157,12 +161,12 @@ target_node = "state_discrimination"
 
 draw_arrow_chart(f'Qubits: {N_qubits}', nodes[:nodes.index(target_node)+1])
 
-def user_requested_calibration(node: str):
+def user_requested_calibration(node: str, dummy:bool=False):
     job = {
         "job_id": str(uuid4()),
         "name": node,
         "qubits": qubits,
-        "experiment_params": experiment_parameters(node,qubits),
+        "experiment_params": experiment_parameters(node,qubits,dummy),
     }
 
     return job
