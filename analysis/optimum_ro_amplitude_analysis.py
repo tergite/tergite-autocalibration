@@ -4,6 +4,7 @@ Module containing a class that fits data from a resonator spectroscopy experimen
 import numpy as np
 import redis
 import xarray as xr
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 redis_connection = redis.Redis(decode_responses=True)
 
 class OptimalROAmplitudeAnalysis():
@@ -20,34 +21,52 @@ class OptimalROAmplitudeAnalysis():
                 self.amplitude_coord = coord
             elif 'state' in str(coord):
                 self.state_coord = coord
-
-            self.fit_results = {}
+        self.independents = dataset[self.state_coord].values
+        self.amplitudes = dataset.coords[self.amplitude_coord]
+        self.fit_results = {}
 
     def run_fitting(self):
-        for indx, ro_amplitude in enumerate(self.dataset.coords[self.amplitude_coord]):
+        self.fidelities = []
+        for indx, ro_amplitude in enumerate(self.amplitudes):
+            y = self.independents
             IQ_complex = self.dataset[self.data_var].isel({self.amplitude_coord:[indx]})
-            I = IQ_complex.real
-            Q = IQ_complex.imag
-            IQ = np.array([I,Q])
+            I = IQ_complex.values.real.flatten()
+            Q = IQ_complex.values.imag.flatten()
+            IQ = np.array([I,Q]).T
+            lda = LinearDiscriminantAnalysis(solver = "svd", store_covariance=True)
+            y_pred = lda.fit(IQ,y).predict(IQ)
+
+            tp = y == y_pred # True Positive
+            tp0 = tp[y == 0] # true positive levels when reading 0
+            tp1 = tp[y == 1] # true positive levels when reading 1
+            tp2 = tp[y == 2] # true positive levels when reading 2
+
+            IQ0 = IQ[y == 0] # IQ when reading 0
+            IQ1 = IQ[y == 1] # IQ when reading 1
+            IQ2 = IQ[y == 2] # IQ when reading 2
+
+            IQ0_tp = IQ0[ tp0] # True Positive when sending 0
+            IQ0_fp = IQ0[~tp0]
+            IQ1_tp = IQ1[ tp1] # True Positive when sending 1
+            IQ1_fp = IQ1[~tp1]
+            IQ2_tp = IQ2[ tp2] # True Positive when sending 2
+            IQ2_fp = IQ2[~tp2]
+
+            err_wr_0 = len(IQ0_fp) / (len(IQ0_fp) + len(IQ0_tp))
+            err_wr_1 = len(IQ1_fp) / (len(IQ1_fp) + len(IQ1_tp))
+
+            assignment = 1 - 1/2 * (err_wr_0 + err_wr_1)
+            self.fidelities.append(assignment)
+
+
+
         # self.optimal_amplitude = 0
         # return self.optimal_amplitude
 
     def plotter(self,ax):
-        # this_qubit = self.dataset.attrs['qubit']
-        # ax.set_xlabel('I quadrature (V)')
-        # ax.set_ylabel('Q quadrature (V)')
-        # ax.plot(self.fit_IQ_0.real, self.fit_IQ_0.imag)
-        # ax.plot(self.fit_IQ_1.real, self.fit_IQ_1.imag)
-        # f0 = self.fit_IQ_0[self.index_of_max_distance]
-        # f1 = self.fit_IQ_1[self.index_of_max_distance]
-        #
-        # ro_freq = float(redis_connection.hget(f'transmons:{this_qubit}', 'ro_freq'))
-        # ro_freq_1 = float(redis_connection.hget(f'transmons:{this_qubit}', 'ro_freq_1'))
-        #
-        # label_text = f'opt_ro: {int(self.optimal_frequency)}\n|0>_ro: {int(ro_freq)}\n|1>_ro: {int(ro_freq_1)}' 
-        #
-        # ax.scatter(
-        #     [f0.real, f1.real], [f0.imag, f1.imag], 
-        #     marker='*',c='red', s=64,  label=label_text
-        # )
+        this_qubit = self.dataset.attrs['qubit']
+        ax.set_xlabel('RO amplitude')
+        ax.set_ylabel('assignment fidelity')
+        ax.plot(self.amplitudes, self.fidelities)
+
         ax.grid()

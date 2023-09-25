@@ -124,8 +124,8 @@ def experiment_parameters(node:str, qubits:List[str], dummy:bool=False) -> dict:
         },
 
         'ro_amplitude_optimization': {
-            'qubit_states': {qubit: np.random.randint(0,high=2,size=200) for qubit in qubits},
-            'ro_amplitudes': {qubit : np.linspace(0.005,0.039,5) for qubit in qubits}
+            'qubit_states': {qubit: np.random.randint(0,high=2,size=20) for qubit in qubits},
+            'ro_amplitudes': {qubit : np.linspace(0.005,0.039,3) for qubit in qubits}
         },
 
         'T1': {

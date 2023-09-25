@@ -188,14 +188,14 @@ def measure(
     thread_tqdm.join()
 
     raw_dataset: xarray.Dataset = lab_ic.retrieve_acquisition()
-    print(f'{ raw_dataset = }')
     logger.info('Raw dataset acquired')
 
     result_dataset = configure_dataset(raw_dataset, samplespace)
 
     measurement_date = datetime.now()
     measurements_today = measurement_date.date().strftime('%Y%m%d')
-    measurement_id = measurement_date.strftime('%Y%m%d-%H%M%S-%f')[:19] + '-' + str(uuid4())[:6] + f'-{node}'
+    time_id = measurement_date.strftime('%Y%m%d-%H%M%S-%f')[:19]
+    measurement_id = time_id + '-' + str(uuid4())[:6] + f'-{node}'
     data_path = pathlib.Path(data_directory / measurements_today / measurement_id)
     data_path.mkdir(parents=True, exist_ok=True)
 

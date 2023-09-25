@@ -2,7 +2,6 @@
 Module containing classes that model, fit and plot data from a Rabi experiment.
 """
 import numpy as np
-import lmfit
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 import xarray as xr
 import pickle
@@ -27,10 +26,10 @@ class StateDiscrimination():
         lda = LinearDiscriminantAnalysis(solver = "svd", store_covariance=True)
 
         # Save the LDA model, datapoints and states
-        if self.qubit == 'q25':
-            with open(f'state-disc-q25.disc', 'wb') as f:
-                pickle.dump(lda, f, protocol=pickle.HIGHEST_PROTOCOL)
-                f.close()
+        # if self.qubit == 'q25':
+        #     with open(f'state-disc-q25.disc', 'wb') as f:
+        #         pickle.dump(lda, f, protocol=pickle.HIGHEST_PROTOCOL)
+        #         f.close()
 
         # run the discrimination, y_pred are the predicted levels
         y_pred = lda.fit(IQ,y).predict(IQ)
