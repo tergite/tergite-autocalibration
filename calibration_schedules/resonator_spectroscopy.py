@@ -54,8 +54,6 @@ class Resonator_Spectroscopy(Measurement):
 
         Parameters
         ----------
-        self
-            Contains all qubit states.
         pulse_amplitudes
             Amplitude of the spectroscopy square pulse.
         pulse_durations

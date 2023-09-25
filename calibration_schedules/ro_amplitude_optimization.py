@@ -20,6 +20,7 @@ class RO_amplitude_optimization(Measurement):
             'mw_ef_amp180s': self.attributes_dictionary('ef_amp180'),
             'mw_pulse_durations': self.attributes_dictionary('duration'),
             'mw_pulse_ports': self.attributes_dictionary('microwave'),
+            'ro_freqs': self.attributes_dictionary('readout_opt'),
             'pulse_durations': self.attributes_dictionary('pulse_duration'),
             'acquisition_delays': self.attributes_dictionary('acq_delay'),
             'integration_times': self.attributes_dictionary('integration_time'),
@@ -37,6 +38,7 @@ class RO_amplitude_optimization(Measurement):
         acquisition_delays: dict[str,float],
         integration_times: dict[str,float],
         ro_ports: dict[str,str],
+        ro_freqs: dict[str,float],
         ro_amplitudes: dict[str,np.ndarray],
         qubit_states: dict[str,np.ndarray],
         repetitions: int = 1,
@@ -49,7 +51,9 @@ class RO_amplitude_optimization(Measurement):
         # The outer for-loop iterates over all qubits:
         for acq_cha, (this_qubit, ro_amplitude_values) in enumerate(ro_amplitudes.items()):
 
-            this_ro_clock = f'{this_qubit}.' + 'ro_opt'
+            this_ro_clock = this_qubit + '.ro_opt'
+            ro_frequency = ro_freqs[this_qubit]
+            schedule.add_resource(ClockResource(name=this_ro_clock, freq=ro_frequency))
             qubit_levels = qubit_states[this_qubit]
             number_of_levels = len(qubit_levels)
 
