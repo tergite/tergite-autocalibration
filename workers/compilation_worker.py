@@ -128,9 +128,26 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
         qubit_state = 1
     if node in ['resonator_spectroscopy_2']:
         qubit_state = 2
+    if 'qubit_states' in samplespace: #this means we have single Single_Shots_
+        shots = 1
+        for subspace in samplespace.values():
+            shots *= len( list(subspace.values())[0] )
+        INSTRUCTIONS_PER_SHOT = 12
+        total_instructions = INSTRUCTIONS_PER_SHOT * shots
+        QRM_instructions = 12200
+        if total_instructions > QRM_instructions:
+            partition = [QRM_instructions] * total_instructions//QRM_instructions
+            partition += [total_instructions % QRM_instructions]
+        if len(samplespace) == 2:
+            for coord in samplespace.keys():
+                if coord != 'qubit_states'
+                   outer_coordinate = coord
+
+
     node_class = node_map[node](transmons, qubit_state)
     schedule_function = node_class.schedule_function
     static_parameters = node_class.static_kwargs
+    breakpoint()
     schedule = schedule_function(**static_parameters , **samplespace)
 
     compiler = SerialCompiler(name=f'{node}_compiler')
