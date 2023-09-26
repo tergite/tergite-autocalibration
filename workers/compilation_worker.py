@@ -128,6 +128,18 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
         qubit_state = 1
     if node in ['resonator_spectroscopy_2']:
         qubit_state = 2
+
+    node_class = node_map[node](transmons, qubit_state)
+    schedule_function = node_class.schedule_function
+    static_parameters = node_class.static_kwargs
+
+    compiler = SerialCompiler(name=f'{node}_compiler')
+
+    def chunks(lst, n):
+        """Yield successive n-sized chunks from lst."""
+        for i in range(0, len(lst), n):
+            yield lst[i:i + n]
+
     if 'qubit_states' in samplespace: #this means we have single Single_Shots_
         shots = 1
         for subspace in samplespace.values():
@@ -136,33 +148,42 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
         total_instructions = INSTRUCTIONS_PER_SHOT * shots
         QRM_instructions = 12200
         if total_instructions > QRM_instructions:
-            partition = [QRM_instructions] * total_instructions//QRM_instructions
+            partition = [QRM_instructions] * (total_instructions//QRM_instructions)
             partition += [total_instructions % QRM_instructions]
         if len(samplespace) == 2:
-            for coord in samplespace.keys():
-                if coord != 'qubit_states'
-                   outer_coordinate = coord
+            for coord, subspace in samplespace.items():
+                if coord == 'qubit_states':
+                    inner_dimension = len(list(subspace.values())[0])
+                if coord != 'qubit_states':
+                    outer_coordinate = coord
+                    outer_dimension = len(list(subspace.values())[0])
+            breakpoint()
+            outer_batch = int(QRM_instructions/inner_dimension /INSTRUCTIONS_PER_SHOT)
+            outer_partition = [0] + [outer_batch] * (outer_dimension // outer_batch)
+            outer_partition += [outer_dimension % outer_batch]
+            outer_partition = list(set(np.cumsum(outer_partition)))
+            slicing = chunks(outer_partition,2)
+            partial_samplespace = {outer_coordinate : {}}
+            for qubit, outer_samples in samplespace[outer_coordinate].items():
+                this_slice = slice(*next(slicing))
+                values = np.array(outer_samples)
+                partial_samples = values[this_slice]
+                partial_samplespace[outer_coordinate][qubit] = partial_samples
+            print(f'{ partial_samplespace = }')
 
-
-    node_class = node_map[node](transmons, qubit_state)
-    schedule_function = node_class.schedule_function
-    static_parameters = node_class.static_kwargs
-    breakpoint()
     schedule = schedule_function(**static_parameters , **samplespace)
 
-    compiler = SerialCompiler(name=f'{node}_compiler')
     logger.info('Starting Compiling')
     compiled_schedule = compiler.compile(schedule=schedule, config=device.generate_compilation_config())
     #breakpoint()
 
     #TODO
     #ic.retrieve_hardware_logs
-
-    with open(f'TIMING_TABLE_{node}.html', 'w') as file:
-         file.write(
-             compiled_schedule.timing_table.hide(['is_acquisition','wf_idx'],axis="columns"
-                 ).to_html()
-             )
+    # with open(f'TIMING_TABLE_{node}.html', 'w') as file:
+    #      file.write(
+    #          compiled_schedule.timing_table.hide(['is_acquisition','wf_idx'],axis="columns"
+    #              ).to_html()
+    #          )
 
     schedule_duration = compiled_schedule.get_schedule_duration()
 
