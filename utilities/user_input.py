@@ -133,8 +133,13 @@ def experiment_parameters(node:str, qubits:List[str], dummy:bool=False) -> dict:
         },
 
         'ro_amplitude_optimization': {
+<<<<<<< HEAD
             'qubit_states': {qubit: np.random.randint(0,high=2,size=900) for qubit in qubits},
             'ro_amplitudes': {qubit : np.linspace(0.005,0.060,15) for qubit in qubits}
+=======
+            'qubit_states': {qubit: np.random.randint(0,high=2,size=400) for qubit in qubits},
+            'ro_amplitudes': {qubit : np.linspace(0.005,0.039,8) for qubit in qubits}
+>>>>>>> fd5dcc4 (dev: resolve conflicts before merge)
         },
 
         'T1': {
@@ -167,7 +172,7 @@ def experiment_parameters(node:str, qubits:List[str], dummy:bool=False) -> dict:
     }
     return sweep_parameters
 
-target_node = "motzoi_parameter"
+target_node = "ro_amplitude_optimization"
 
 draw_arrow_chart(f'Qubits: {N_qubits}', nodes[:nodes.index(target_node)+1])
 
