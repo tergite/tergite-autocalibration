@@ -1,6 +1,7 @@
 # This code is part of Tergite
 import argparse
 from utilities.status import DataStatus
+import xarray as xr
 from logger.tac_logger import logger
 from workers.compilation_worker import precompile
 from workers.execution_worker import measure
@@ -124,19 +125,22 @@ def calibrate_node(node:str):
     job_id = job["job_id"]
 
     samplespace = job['experiment_params'][node]
-    logger.info('Sending to precompile')
 
-    compiled_schedule, schedule_duration = precompile(node, samplespace)
-    result_dataset = measure(
-            compiled_schedule,
-            schedule_duration,
-            samplespace, node,
-            cluster_status=args.cluster_status
-            )
+    #TODO this terrible
+    compiled_schedules, schedule_durations, partial_samplespaces = precompile(node, samplespace)
+    compilation_zip = zip(compiled_schedules, schedule_durations, partial_samplespaces)
+    result_dataset = xr.Dataset()
+    for compilation in compilation_zip:
+        compiled_schedule, schedule_duration, samplespace = compilation
+        result_dataset = measure(
+                compiled_schedule,
+                schedule_duration,
+                samplespace, node,
+                cluster_status=args.cluster_status
+                )
     logger.info('measurement completed')
     post_process(result_dataset, node)
     logger.info('analysis completed')
-
 
 #main
 calibrate_system()

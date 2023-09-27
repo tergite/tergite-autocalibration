@@ -25,6 +25,7 @@ from config_files.settings import hw_config_json
 #from config_files.settings import hw_config
 from quantify_core.data.handling import set_datadir
 from quantify_scheduler.json_utils import ScheduleJSONEncoder
+from itertools import tee
 
 set_datadir('.')
 
@@ -134,47 +135,66 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
     static_parameters = node_class.static_kwargs
 
     compiler = SerialCompiler(name=f'{node}_compiler')
+    compilation_config = device.generate_compilation_config()
 
-    def chunks(lst, n):
-        """Yield successive n-sized chunks from lst."""
-        for i in range(0, len(lst), n):
-            yield lst[i:i + n]
 
-    if 'qubit_states' in samplespace: #this means we have single Single_Shots_
+    if 'qubit_states' in samplespace: #this means we have single shots
         shots = 1
         for subspace in samplespace.values():
             shots *= len( list(subspace.values())[0] )
         INSTRUCTIONS_PER_SHOT = 12
-        total_instructions = INSTRUCTIONS_PER_SHOT * shots
         QRM_instructions = 12200
-        if total_instructions > QRM_instructions:
-            partition = [QRM_instructions] * (total_instructions//QRM_instructions)
-            partition += [total_instructions % QRM_instructions]
+
+        def pairwise(iterable):
+            #TODO after python 3.10 this will be replaced by itertools.pairwise
+            # pairwise('ABCDEFG') --> AB BC CD DE EF FG
+            a, b = tee(iterable)
+            next(b, None)
+            return zip(a, b)
+
         if len(samplespace) == 2:
+            compiled_schedules = []
+            schedule_durations = []
+            samplespaces = []
             for coord, subspace in samplespace.items():
                 if coord == 'qubit_states':
                     inner_dimension = len(list(subspace.values())[0])
                 if coord != 'qubit_states':
                     outer_coordinate = coord
                     outer_dimension = len(list(subspace.values())[0])
-            breakpoint()
             outer_batch = int(QRM_instructions/inner_dimension /INSTRUCTIONS_PER_SHOT)
+            # make a partion like: [0,2,2,2,2]:
             outer_partition = [0] + [outer_batch] * (outer_dimension // outer_batch)
+            # add the leftover partition: [0,2,2,2,2,0]:
             outer_partition += [outer_dimension % outer_batch]
+            # take the cumulative sum: [0,2,4,6,8,8] 
+            # and with set() discard duplicates {0,2,4,6,8} then make a list:
             outer_partition = list(set(np.cumsum(outer_partition)))
-            slicing = chunks(outer_partition,2)
-            partial_samplespace = {outer_coordinate : {}}
-            for qubit, outer_samples in samplespace[outer_coordinate].items():
-                this_slice = slice(*next(slicing))
-                values = np.array(outer_samples)
-                partial_samples = values[this_slice]
-                partial_samplespace[outer_coordinate][qubit] = partial_samples
-            print(f'{ partial_samplespace = }')
+            inner_samplespace = samplespace['qubit_states']
+            partial_samplespace = {}
+            partial_samplespace['qubit_states'] = inner_samplespace
+            partial_samplespace[outer_coordinate] = {}
+            slicing = pairwise(outer_partition)
+            for slice_ in slicing:
+                 for qubit, outer_samples in samplespace[outer_coordinate].items():
+                    this_slice = slice(*slice_)
+                    partial_samples = np.array(outer_samples)[this_slice]
+                    partial_samplespace[outer_coordinate][qubit] = partial_samples
+                 schedule = schedule_function(**static_parameters,**partial_samplespace)
+                 logger.info('Starting Partial Compiling')
+                 compiled_schedule = compiler.compile(
+                         schedule=schedule, config=compilation_config
+                         )
+                 logger.info('Finished Partial Compiling')
+                 compiled_schedules.append(compiled_schedule)
+                 schedule_durations.append(compiled_schedule.get_schedule_duration())
+                 samplespaces.append(partial_samplespace)
+            return compiled_schedules, schedule_durations, samplespaces
 
-    schedule = schedule_function(**static_parameters , **samplespace)
+    schedule = schedule_function(**static_parameters, **samplespace)
 
     logger.info('Starting Compiling')
-    compiled_schedule = compiler.compile(schedule=schedule, config=device.generate_compilation_config())
+    compiled_schedule = compiler.compile(schedule=schedule, config=compilation_config)
     #breakpoint()
 
     #TODO
@@ -187,7 +207,7 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
 
     schedule_duration = compiled_schedule.get_schedule_duration()
 
-    logger.info(f'Finished Compiling')
+    logger.info('Finished Compiling')
     # compiled_schedule.plot_pulse_diagram(plot_backend='plotly')
 
-    return compiled_schedule, schedule_duration
+    return [compiled_schedule], [schedule_duration], [samplespace]
