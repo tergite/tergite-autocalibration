@@ -15,13 +15,13 @@ nodes = [
         # "T1",
         #"XY_crosstalk",
         # "ramsey_correction",
-        #"motzoi_parameter",
-        "resonator_spectroscopy_1",
+        "motzoi_parameter",
+        #"resonator_spectroscopy_1",
         #"qubit_12_spectroscopy_pulsed",
         #"rabi_oscillations_12",
         #"ramsey_correction_12",
         #"resonator_spectroscopy_2",
-        "ro_frequency_optimization",
+        #"ro_frequency_optimization",
         "ro_amplitude_optimization",
         "state_discrimination",
         ]
@@ -148,8 +148,8 @@ def experiment_parameters(node:str, qubits:List[str], dummy:bool=False) -> dict:
         },
 
         'motzoi_parameter': {
-            'mw_motzois': {qubit: np.linspace(-0.45,0.45,9) for qubit in qubits},
-            'X_repetitions': {qubit : np.arange(2, 17, 4) for qubit in qubits}
+            'mw_motzois': {qubit: np.linspace(-0.45,0.45,59) for qubit in qubits},
+            'X_repetitions': {qubit : np.arange(2, 17, 4) for qubit in qubits},
         },
         'state_discrimination': {
             'qubit_states': {qubit: np.random.randint(0,high=2,size=700) for qubit in qubits},
@@ -157,7 +157,7 @@ def experiment_parameters(node:str, qubits:List[str], dummy:bool=False) -> dict:
     }
     return sweep_parameters
 
-target_node = "state_discrimination"
+target_node = "motzoi_parameter"
 
 draw_arrow_chart(f'Qubits: {N_qubits}', nodes[:nodes.index(target_node)+1])
 

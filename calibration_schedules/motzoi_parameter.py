@@ -87,18 +87,18 @@ class Motzoi_parameter(Measurement):
             this_clock = f'{this_qubit}.01'
 
             motzoi_parameter_values = mw_motzois[this_qubit]
-            number_of_X = len(X_values)
+            number_of_motzois = len(motzoi_parameter_values)
 
             schedule.add(
                 Reset(*qubits), ref_op=root_relaxation, ref_pt_new='end'
             ) #To enforce parallelism we refer to the root relaxation
 
-            # The intermediate loop iterates over all motzoi values:
-            for acq_index, this_x in enumerate(X_values):
+            # The intermediate loop iterates over all numbers of X pulses
+            for x_index, this_x in enumerate(X_values):
 
-                # The inner for loop iterates over all frequency values in the frequency batch:
+                # The inner for loop iterates over all motzoi values
                 for motzoi_index, mw_motzoi in enumerate(motzoi_parameter_values):
-                    this_index = motzoi_index*number_of_X + acq_index
+                    this_index = x_index*number_of_motzois + motzoi_index
                     for _ in range(this_x):
                         schedule.add(
                                 DRAGPulse(
