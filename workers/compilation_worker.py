@@ -60,7 +60,6 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
     transmon.reset.duration(float(redis_config['init_duration']))
     transmon.rxy.amp180(float(redis_config['mw_amp180']))
     transmon.r12.ef_amp180(float(redis_config['mw_ef_amp180']))
-    #print(f'{transmon.rxy.amp180()=}')
     motzoi_val = float(redis_config['mw_motzoi'])
     if isnan(motzoi_val):
         motzoi_val = 0
@@ -92,22 +91,17 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
     transmon.measure_opt.acq_channel(channel)
     transmon.measure_opt.acq_delay(float(redis_config['ro_acq_delay']))
     transmon.measure_opt.integration_time(float(redis_config['ro_acq_integration_time']))
-    # transmon.measure.pulse_type(redis_config['ro_pulse_type'])
     return
 
 
-def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
+def precompile(node:str, qubits: list[str], samplespace: dict[str,dict[str,np.ndarray]]):
     if node == 'tof':
         return None, 1
 
     Instrument.close_all()
     device = QuantumDevice('Loki')
     device.hardware_config(hw_config)
-    device.cfg_sched_repetitions(1024)
-    sweep_quantities = list(samplespace.keys())
     sweep_parameters = list(samplespace.values())
-    #TODO this not the best way to acquire the qubits list
-    qubits = sweep_parameters[0].keys()
 
     transmons = {}
 
@@ -167,7 +161,7 @@ def precompile(node:str, samplespace: dict[str,dict[str,np.ndarray]]):
             outer_partition = [0] + [outer_batch] * (outer_dimension // outer_batch)
             # add the leftover partition: [0,2,2,2,2,0]:
             outer_partition += [outer_dimension % outer_batch]
-            # take the cumulative sum: [0,2,4,6,8,8] 
+            # take the cumulative sum: [0,2,4,6,8,8]
             # and with set() discard duplicates {0,2,4,6,8} then make a list:
             outer_partition = list(set(np.cumsum(outer_partition)))
             inner_samplespace = samplespace['qubit_states']

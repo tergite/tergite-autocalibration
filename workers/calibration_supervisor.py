@@ -127,7 +127,7 @@ def calibrate_node(node:str):
     samplespace = job['experiment_params'][node]
 
     #TODO this terrible
-    compiled_schedules, schedule_durations, partial_samplespaces = precompile(node, samplespace)
+    compiled_schedules, schedule_durations, partial_samplespaces = precompile(node, qubits, samplespace)
     compilation_zip = zip(compiled_schedules, schedule_durations, partial_samplespaces)
     result_dataset = xr.Dataset()
     for compilation in compilation_zip:
