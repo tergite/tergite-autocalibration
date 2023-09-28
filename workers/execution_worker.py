@@ -1,17 +1,6 @@
 '''Retrieve the compiled schedule and run it'''
-from datetime import datetime
-import pathlib
-from time import sleep
-from uuid import uuid4
-from colorama import init as colorama_init
-from colorama import Fore
-from colorama import Style
-from qblox_instruments.ieee488_2 import DummyBinnedAcquisitionData
-colorama_init()
-
 from quantify_scheduler.instrument_coordinator.instrument_coordinator import CompiledSchedule
 from logger.tac_logger import logger
-
 from qblox_instruments import Cluster, ClusterType
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
@@ -23,8 +12,16 @@ import tqdm
 from utilities.root_path import data_directory
 from calibration_schedules.time_of_flight import measure_time_of_flight
 from config_files.settings import lokiA_IP
-
 import redis
+from datetime import datetime
+import pathlib
+from time import sleep
+from uuid import uuid4
+from colorama import init as colorama_init
+from colorama import Fore
+from colorama import Style
+from qblox_instruments.ieee488_2 import DummyBinnedAcquisitionData
+colorama_init()
 
 redis_connection = redis.Redis(decode_responses=True)
 
@@ -37,7 +34,6 @@ def configure_dataset(
     logger.info('Configuring Dataset')
     dataset = xarray.Dataset()
     # keys = sorted(list(raw_ds.data_vars.keys()))
-    #TODO instead of doing all these gymnastics just set attributes to the samplespace
     keys = raw_ds.data_vars.keys()
     sweep_quantities = samplespace.keys() # for example 'ro_frequencies', 'ro_amplitudes' ,...
     sweep_parameters = list(samplespace.values())[0]
@@ -47,17 +43,17 @@ def configure_dataset(
         qubit_states = [0,1,2]
 
     for key in keys:
-        key_indx = key%n_qubits
+        key_indx = key%n_qubits # this is to handle ro_opt_frequencies node where
+        # there are 2 or 3 measurements (i.e 2 or 3 Datarrays) for each qubit
         coords_dict = {}
-        this_qubit = qubits[key_indx]
+        qubit = qubits[key_indx]
         for quantity in sweep_quantities :
-            coord_key = quantity+this_qubit
-            settable_values = samplespace[quantity][this_qubit]
-            coord_attrs = {'qubit':this_qubit, 'long_name': f'{coord_key}', 'units': 'NA'}
+            coord_key = quantity+qubit
+            settable_values = samplespace[quantity][qubit]
+            coord_attrs = {'qubit':qubit, 'long_name': f'{coord_key}', 'units': 'NA'}
             coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
         partial_ds = xarray.Dataset(coords=coords_dict)
-        #breakpoint()
-        dimensions = [len(samplespace[quantity][this_qubit]) for quantity in sweep_quantities]
+        dimensions = [len(samplespace[quantity][qubit]) for quantity in sweep_quantities]
         # TODO this is not safe:
         # This assumes that the inner settable variable is placed
         # at the first position in the samplespace
@@ -65,13 +61,13 @@ def configure_dataset(
         reshaping = reversed(dimensions)
         data_values = raw_ds[key].values.reshape(*reshaping)
         data_values = np.transpose(data_values)
-        attributes = {'qubit': this_qubit, 'long_name': f'y{this_qubit}', 'units': 'NA'}
+        attributes = {'qubit': qubit, 'long_name': f'y{qubit}', 'units': 'NA'}
         qubit_state = ''
         if 'ro_opt_frequencies' in list(sweep_quantities):
             qubit_state = qubit_states[key // n_qubits]
             attributes['qubit_state'] = qubit_state
-        partial_ds[f'y{this_qubit}_real{qubit_state}'] = (tuple(coords_dict.keys()), data_values.real, attributes)
-        partial_ds[f'y{this_qubit}_imag{qubit_state}'] = (tuple(coords_dict.keys()), data_values.imag, attributes)
+        partial_ds[f'y{qubit}_real{qubit_state}'] = (tuple(coords_dict.keys()), data_values.real, attributes)
+        partial_ds[f'y{qubit}_imag{qubit_state}'] = (tuple(coords_dict.keys()), data_values.imag, attributes)
         dataset = xarray.merge([dataset,partial_ds])
     return dataset
 
@@ -127,12 +123,19 @@ def measure(
         schedule_duration: float,
         samplespace: dict,
         node: str,
+        measurement_index: [int, int] = [0,0],
         cluster_status: ClusterStatus = ClusterStatus.real
     ) -> xarray.Dataset:
 
     logger.info('Starting measurement')
 
-    print(f'{Fore.BLUE}{Style.BRIGHT}Measuring node: {node} , duration: {schedule_duration:.2f}s{Style.RESET_ALL}')
+    current_measurement = ''
+    if measurement_index[1] > 1:
+        current_measurement = f'{measurement_index[0]} / {measurement_index[1]}'
+
+    print_message = f'{Fore.BLUE}{Style.BRIGHT}Measuring node: {node} {current_measurement}'
+    print_message += f'duration: {schedule_duration:.2f}s{Style.RESET_ALL}'
+    print(print_message)
 
     Cluster.close_all()
     if cluster_status == ClusterStatus.dummy:

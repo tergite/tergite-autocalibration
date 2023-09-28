@@ -130,14 +130,18 @@ def calibrate_node(node:str):
     compiled_schedules, schedule_durations, partial_samplespaces = precompile(node, qubits, samplespace)
     compilation_zip = zip(compiled_schedules, schedule_durations, partial_samplespaces)
     result_dataset = xr.Dataset()
-    for compilation in compilation_zip:
+    for compilation_indx, compilation in enumerate(compilation_zip):
         compiled_schedule, schedule_duration, samplespace = compilation
-        result_dataset = measure(
+        dataset = measure(
                 compiled_schedule,
                 schedule_duration,
-                samplespace, node,
+                samplespace, 
+                node,
+                [compilation_indx, len(compilation_zip)],
                 cluster_status=args.cluster_status
                 )
+        breakpoint()
+        result_dataset = xr.merge([result_dataset,dataset])
     logger.info('measurement completed')
     post_process(result_dataset, node)
     logger.info('analysis completed')

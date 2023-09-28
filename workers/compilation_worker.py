@@ -169,13 +169,13 @@ def precompile(node:str, qubits: list[str], samplespace: dict[str,dict[str,np.nd
             partial_samplespace['qubit_states'] = inner_samplespace
             partial_samplespace[outer_coordinate] = {}
             slicing = pairwise(outer_partition)
-            for slice_ in slicing:
+            for slice_indx, slice_ in enumerate(slicing):
                  for qubit, outer_samples in samplespace[outer_coordinate].items():
                     this_slice = slice(*slice_)
                     partial_samples = np.array(outer_samples)[this_slice]
                     partial_samplespace[outer_coordinate][qubit] = partial_samples
                  schedule = schedule_function(**static_parameters,**partial_samplespace)
-                 logger.info('Starting Partial Compiling')
+                 logger.info(f'Starting Partial {slice_indx}/{len(slicing)} Compiling')
                  compiled_schedule = compiler.compile(
                          schedule=schedule, config=compilation_config
                          )

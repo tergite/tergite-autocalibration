@@ -9,7 +9,7 @@ from config_files.VNA_values import (
 nodes = [
         # "tof",
         "resonator_spectroscopy",
-        #"punchout",
+        # "punchout",
         "qubit_01_spectroscopy_pulsed",
         "rabi_oscillations",
         # "T1",
