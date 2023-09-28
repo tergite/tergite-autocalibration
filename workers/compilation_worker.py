@@ -165,17 +165,19 @@ def precompile(node:str, qubits: list[str], samplespace: dict[str,dict[str,np.nd
             # and with set() discard duplicates {0,2,4,6,8} then make a list:
             outer_partition = list(set(np.cumsum(outer_partition)))
             inner_samplespace = samplespace['qubit_states']
-            partial_samplespace = {}
-            partial_samplespace['qubit_states'] = inner_samplespace
-            partial_samplespace[outer_coordinate] = {}
-            slicing = pairwise(outer_partition)
+            slicing = list(pairwise(outer_partition))
             for slice_indx, slice_ in enumerate(slicing):
+                 partial_samplespace = {}
+                 partial_samplespace['qubit_states'] = inner_samplespace
+                 # we need to initialize every time, dict is mutable!!
+                 partial_samplespace[outer_coordinate] = {} 
                  for qubit, outer_samples in samplespace[outer_coordinate].items():
                     this_slice = slice(*slice_)
                     partial_samples = np.array(outer_samples)[this_slice]
                     partial_samplespace[outer_coordinate][qubit] = partial_samples
                  schedule = schedule_function(**static_parameters,**partial_samplespace)
-                 logger.info(f'Starting Partial {slice_indx}/{len(slicing)} Compiling')
+                 logger.info(f'Starting Partial {slice_indx+1}/{len(list(slicing))} Compiling')
+                 #logger.info(f'Starting Partial Compiling')
                  compiled_schedule = compiler.compile(
                          schedule=schedule, config=compilation_config
                          )

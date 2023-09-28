@@ -51,7 +51,8 @@ def configure_dataset(
             coord_key = quantity+qubit
             settable_values = samplespace[quantity][qubit]
             coord_attrs = {'qubit':qubit, 'long_name': f'{coord_key}', 'units': 'NA'}
-            coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
+            coords_dict[coord_key] = (quantity, settable_values, coord_attrs)
+            #coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
         partial_ds = xarray.Dataset(coords=coords_dict)
         dimensions = [len(samplespace[quantity][qubit]) for quantity in sweep_quantities]
         # TODO this is not safe:
@@ -66,8 +67,16 @@ def configure_dataset(
         if 'ro_opt_frequencies' in list(sweep_quantities):
             qubit_state = qubit_states[key // n_qubits]
             attributes['qubit_state'] = qubit_state
+        #breakpoint()
+        #real_data_array = xarray.DataArray(
+        #                      data=data_values.real, 
+        #                      coords=tuple(coords_dict.keys()),
+        #                      dims='ro_frequencies',
+        #                      attrs=attributes
+        #                 )
         partial_ds[f'y{qubit}_real{qubit_state}'] = (tuple(coords_dict.keys()), data_values.real, attributes)
         partial_ds[f'y{qubit}_imag{qubit_state}'] = (tuple(coords_dict.keys()), data_values.imag, attributes)
+        #breakpoint()
         dataset = xarray.merge([dataset,partial_ds])
     return dataset
 
@@ -94,6 +103,7 @@ def to_complex_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
         elif 'imag' in var:
             dataset_dict[this_qubit]['imag'] = current_values
 
+        breakpoint()
         if 'real' in dataset_dict[this_qubit] and 'imag' in dataset_dict[this_qubit]:
             qubit_coords = iq_dataset[f'y{this_qubit}_real{this_state}'].coords
             complex_values = dataset_dict[this_qubit]['real'] + 1j*dataset_dict[this_qubit]['imag']
@@ -129,6 +139,7 @@ def measure(
 
     logger.info('Starting measurement')
 
+    print(f'{ measurement_index = }')
     current_measurement = ''
     if measurement_index[1] > 1:
         current_measurement = f'{measurement_index[0]} / {measurement_index[1]}'

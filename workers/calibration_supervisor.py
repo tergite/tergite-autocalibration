@@ -100,12 +100,10 @@ def inspect_node(node:str):
 
     if status == DataStatus.in_spec:
        print(u' \u2705 ' + f'{Fore.GREEN}{Style.BRIGHT}Node {node} in spec{Style.RESET_ALL}')
-       # print(u' \u2705 ' + f'Node {node} in spec')
        return
 
     if status == DataStatus.out_of_spec:
        print(u'\u2691\u2691\u2691 '+ f'{Fore.RED}{Style.BRIGHT}Calibration required for Node {node}{Style.RESET_ALL}')
-       # print(u'\u2691\u2691\u2691 '+ f'Calibration required for Node {node}')
        calibrate_node(node)
 
 
@@ -128,19 +126,18 @@ def calibrate_node(node:str):
 
     #TODO this terrible
     compiled_schedules, schedule_durations, partial_samplespaces = precompile(node, qubits, samplespace)
-    compilation_zip = zip(compiled_schedules, schedule_durations, partial_samplespaces)
+    compilation_zip = list(zip(compiled_schedules, schedule_durations, partial_samplespaces))
     result_dataset = xr.Dataset()
-    for compilation_indx, compilation in enumerate(compilation_zip):
+    for compilation in compilation_zip:
         compiled_schedule, schedule_duration, samplespace = compilation
         dataset = measure(
                 compiled_schedule,
                 schedule_duration,
                 samplespace, 
                 node,
-                [compilation_indx, len(compilation_zip)],
+                #[compilation_indx, len(list(compilation_zip))],
                 cluster_status=args.cluster_status
                 )
-        breakpoint()
         result_dataset = xr.merge([result_dataset,dataset])
     logger.info('measurement completed')
     post_process(result_dataset, node)
