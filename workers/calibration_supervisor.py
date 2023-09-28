@@ -127,14 +127,14 @@ def calibrate_node(node:str):
     logger.info('Sending to precompile')
 
     compiled_schedule, schedule_duration = precompile(node, samplespace)
-    result_dataset = measure(
+    result_dataset,data_path = measure(
             compiled_schedule,
             schedule_duration,
             samplespace, node,
             cluster_status=args.cluster_status
             )
     logger.info('measurement completed')
-    post_process(result_dataset, node)
+    post_process(result_dataset, node,data_path)
     logger.info('analysis completed')
 
 

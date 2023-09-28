@@ -17,7 +17,7 @@ from calibration_schedules.ramsey_fringes import Ramsey_fringes
 from calibration_schedules.ro_frequency_optimization import RO_frequency_optimization
 from calibration_schedules.ro_amplitude_optimization import RO_amplitude_optimization
 from calibration_schedules.state_discrimination import Single_Shots_RO
-# from calibration_schedules.drag_amplitude import DRAG_amplitude
+from calibration_schedules.n_rabi_oscillations import N_Rabi_Oscillations
 from calibration_schedules.motzoi_parameter import Motzoi_parameter
 from utilities.extended_transmon_element import ExtendedTransmon
 from quantify_scheduler.backends import SerialCompiler
@@ -40,7 +40,7 @@ node_map = {
     'punchout': Punchout,
     'ramsey_correction': Ramsey_fringes,
     'motzoi_parameter': Motzoi_parameter,
-    # 'drag_amplitude': DRAG_amplitude,
+    'n_rabi_oscillations': N_Rabi_Oscillations,
     'resonator_spectroscopy_1': Resonator_Spectroscopy,
     'qubit_12_spectroscopy_pulsed': Two_Tones_Spectroscopy,
     'rabi_oscillations_12': Rabi_Oscillations,

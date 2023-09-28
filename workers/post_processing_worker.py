@@ -3,6 +3,7 @@ import collections
 import matplotlib.pyplot as plt
 import xarray as xr
 from analysis.motzoi_analysis import MotzoiAnalysis
+from analysis.n_rabi_analysis import NRabiAnalysis
 from analysis.resonator_spectroscopy_analysis import ResonatorSpectroscopyAnalysis, ResonatorSpectroscopy_1_Analysis, ResonatorSpectroscopy_2_Analysis
 from analysis.qubit_spectroscopy_analysis import QubitSpectroscopyAnalysis
 from analysis.optimum_ro_frequency_analysis import OptimalROFrequencyAnalysis
@@ -17,6 +18,7 @@ from quantify_core.data.handling import set_datadir
 # from quantify_core.analysis.calibration import rotate_to_calibrated_axis
 import matplotlib.patches as mpatches
 import numpy as np
+from logger.tac_logger import logger
 
 import matplotlib
 matplotlib.use('tkagg')
@@ -24,15 +26,11 @@ import redis
 set_datadir('.')
 redis_connection = redis.Redis(decode_responses=True)
 
-import redis
+def post_process(result_dataset: xr.Dataset, node: str, data_path: str):
+    analysis = Multiplexed_Analysis(result_dataset, node, data_path)
 
-redis_connection = redis.Redis(decode_responses=True)
-
-def post_process(result_dataset: xr.Dataset, node: str):
-    analysis = Multiplexed_Analysis(result_dataset, node)
-
-    #figure_manager = plt.get_current_fig_manager()
-    #figure_manager.window.showMaximized()
+    # figure_manager = plt.get_current_fig_manager()
+    # figure_manager.window.showMaximized()
 
     fig = plt.gcf()
     fig.set_tight_layout(True)
@@ -42,8 +40,9 @@ def post_process(result_dataset: xr.Dataset, node: str):
 
 
 class BaseAnalysis():
-    def __init__(self, result_dataset: xr.Dataset):
+    def __init__(self, result_dataset: xr.Dataset, data_path: str):
        self.result_dataset = result_dataset
+       self.data_path = data_path
 
        self.n_vars = len(self.result_dataset.data_vars)
        self.n_coords = len(self.result_dataset.coords)
@@ -53,7 +52,7 @@ class BaseAnalysis():
 
        self.node_result = {}
        self.fig, self.axs = plt.subplots(
-            nrows=self.rows, ncols=np.min((self.n_coords, self.column_grid)), squeeze=False
+            nrows=self.rows, ncols=np.min((self.n_coords, self.column_grid)), squeeze=False,figsize=(self.column_grid*5,self.rows*5)
         )
        self.qoi = 0 # quantity of interest
 
@@ -64,12 +63,12 @@ class BaseAnalysis():
 
 
 class Multiplexed_Analysis(BaseAnalysis):
-    def __init__(self, result_dataset: xr.Dataset, node: str):
+    def __init__(self, result_dataset: xr.Dataset, node: str, data_path: str):
         if node == 'tof':
             tof = analyze_tof(result_dataset, True)
             return
 
-        super().__init__(result_dataset)
+        super().__init__(result_dataset, data_path)
         data_vars_dict = collections.defaultdict(set)
         for var in result_dataset.data_vars:
             this_qubit = result_dataset[var].attrs['qubit']
@@ -104,6 +103,9 @@ class Multiplexed_Analysis(BaseAnalysis):
             elif node == 'motzoi_parameter':
                 analysis_class = MotzoiAnalysis
                 redis_field = 'mw_motzoi'
+            elif node == 'n_rabi_oscillations':
+                analysis_class = NRabiAnalysis
+                redis_field = 'mw_amp180'
             elif node == 'resonator_spectroscopy_1':
                 analysis_class = ResonatorSpectroscopy_1_Analysis
                 redis_field = 'ro_freq_1'
@@ -158,6 +160,8 @@ class Multiplexed_Analysis(BaseAnalysis):
             handles.append(patch)
             this_axis.set(title=None)
             this_axis.legend(handles=handles)
+            self.fig.savefig(f'{self.data_path}/{node}.png', bbox_inches='tight', dpi=600)
+            # logger.info(f'Analysis for the {node} of {this_qubit} is done, saved at {self.data_path}')
 
 #class Multiplexed_Punchout_Analysis(BaseAnalysis):
 #    def __init__(self, result_dataset: xr.Dataset, node: str):

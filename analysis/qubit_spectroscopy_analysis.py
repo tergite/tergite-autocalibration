@@ -54,7 +54,7 @@ class LorentzianModel(lmfit.model.Model):
         self.set_param_hint("c", value=c_guess)
 
         # Calculate A_guess from difference between the peak and the backround level
-        A_guess = (np.max(data) - c_guess)
+        A_guess = (np.max(data) - c_guess)/10
         self.set_param_hint("A", value=A_guess)
 
         params = self.make_params()

@@ -26,20 +26,20 @@ ro_acq_delay = 200e-9
 ro_pulse_delay = 4e-9
 ro_pulse_duration = 3.0e-6
 ro_acq_integration_time = 2.5e-6
-mw_pulse_duration = 52e-9
+mw_pulse_duration = 20e-9
 init_duration = 300e-6
 min_calibration_point = 0
 max_calibration_point = 0
-spec_pulse_duration = 2e-6
-spec_amp = 2.5e-4
+spec_pulse_duration = 5e-6
+spec_amp = 3e-4
 att = 0
 
 [initials]
-q11.ro_pulse_amp = 6.5e-3
-q12.ro_pulse_amp = 6.8e-3
-q13.ro_pulse_amp = 7.2e-3
-q14.ro_pulse_amp = 8.0e-3
-q15.ro_pulse_amp = 6.5e-3
+q11.ro_pulse_amp = 20e-3
+q12.ro_pulse_amp = 20e-3
+q13.ro_pulse_amp = 20e-3
+q14.ro_pulse_amp = 20e-3
+q15.ro_pulse_amp = 20e-3
 q16.ro_pulse_amp = 15.0e-3
 q17.ro_pulse_amp = 15.0e-3
 q18.ro_pulse_amp = 6.6e-3
@@ -61,8 +61,8 @@ init_duration = 100e-6
 init_duration = 300e-6
 
 [qubit_01_spectroscopy_pulsed.all]
-spec_pulse_duration = 2e-6
-spec_amp = 3.5e-4
+spec_pulse_duration = 5e-6
+spec_amp = 40e-4
 
 [ramsey_correction.all]
 artificial_detuning = 3e6
@@ -71,5 +71,5 @@ artificial_detuning = 3e6
 artificial_detuning = 3e6
 
 [qubit_12_spectroscopy_pulsed.all]
-spec_pulse_duration = 2.0e-6
+spec_pulse_duration = 5e-6
 spec_amp = 3.5e-4
