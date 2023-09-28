@@ -128,7 +128,7 @@ def calibrate_node(node:str):
     compiled_schedules, schedule_durations, partial_samplespaces = precompile(node, qubits, samplespace)
     compilation_zip = list(zip(compiled_schedules, schedule_durations, partial_samplespaces))
     result_dataset = xr.Dataset()
-    for compilation in compilation_zip:
+    for compilation_indx, compilation in enumerate(compilation_zip):
         compiled_schedule, schedule_duration, samplespace = compilation
         dataset = measure(
                 compiled_schedule,
@@ -138,7 +138,17 @@ def calibrate_node(node:str):
                 #[compilation_indx, len(list(compilation_zip))],
                 cluster_status=args.cluster_status
                 )
-        result_dataset = xr.merge([result_dataset,dataset])
+        if compilation_indx == 0:
+            result_dataset = dataset
+        else:
+            for var in result_dataset.data_vars:
+                coords = result_dataset[var]
+                [concat_coord := coord for coord in coords if 'qubit_state' in coord]
+                darray = xr.concat([result_dataset[var], dataset[var]], dim=concat_coord)
+                result_dataset[var] = darray
+        print(f'{result_dataset=}')
+
+
     logger.info('measurement completed')
     post_process(result_dataset, node)
     logger.info('analysis completed')
