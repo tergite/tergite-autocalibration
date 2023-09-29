@@ -51,8 +51,8 @@ def configure_dataset(
             coord_key = quantity+qubit
             settable_values = samplespace[quantity][qubit]
             coord_attrs = {'qubit':qubit, 'long_name': f'{coord_key}', 'units': 'NA'}
-            coords_dict[coord_key] = (quantity, settable_values, coord_attrs)
-            #coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
+            #coords_dict[coord_key] = (quantity, settable_values, coord_attrs)
+            coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
         partial_ds = xarray.Dataset(coords=coords_dict)
         dimensions = [len(samplespace[quantity][qubit]) for quantity in sweep_quantities]
         # TODO this is not safe:
@@ -103,7 +103,6 @@ def to_complex_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
         elif 'imag' in var:
             dataset_dict[this_qubit]['imag'] = current_values
 
-        breakpoint()
         if 'real' in dataset_dict[this_qubit] and 'imag' in dataset_dict[this_qubit]:
             qubit_coords = iq_dataset[f'y{this_qubit}_real{this_state}'].coords
             complex_values = dataset_dict[this_qubit]['real'] + 1j*dataset_dict[this_qubit]['imag']

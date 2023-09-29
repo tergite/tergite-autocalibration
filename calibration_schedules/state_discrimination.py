@@ -50,7 +50,7 @@ class Single_Shots_RO(Measurement):
             for level_index, state_level in enumerate(levels):
 
                 if state_level == 0:
-                    # Not really necessary to use Rxy(0,0) we can just pass
+                     #Not really necessary to use Rxy(0,0) we can just pass
                     schedule.add(
                         Rxy(theta=0, phi=0, qubit=this_qubit),
                     )

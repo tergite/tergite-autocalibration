@@ -142,11 +142,17 @@ def calibrate_node(node:str):
             result_dataset = dataset
         else:
             for var in result_dataset.data_vars:
-                coords = result_dataset[var]
-                [concat_coord := coord for coord in coords if 'qubit_state' in coord]
+                coords = result_dataset[var].coords
+                for coord in coords:
+                    if 'qubit_state' not in coord:
+                        concat_coord = coord
+                        break
+
+                #breakpoint()
                 darray = xr.concat([result_dataset[var], dataset[var]], dim=concat_coord)
+                result_dataset = result_dataset.drop_vars(var)
+                result_dataset = result_dataset.drop_dims(concat_coord)
                 result_dataset[var] = darray
-        print(f'{result_dataset=}')
 
 
     logger.info('measurement completed')
