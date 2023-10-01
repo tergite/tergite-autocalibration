@@ -68,15 +68,16 @@ def configure_dataset(
             qubit_state = qubit_states[key // n_qubits]
             attributes['qubit_state'] = qubit_state
         #breakpoint()
-        #real_data_array = xarray.DataArray(
-        #                      data=data_values.real, 
-        #                      coords=tuple(coords_dict.keys()),
-        #                      dims='ro_frequencies',
-        #                      attrs=attributes
-        #                 )
-        partial_ds[f'y{qubit}_real{qubit_state}'] = (tuple(coords_dict.keys()), data_values.real, attributes)
-        partial_ds[f'y{qubit}_imag{qubit_state}'] = (tuple(coords_dict.keys()), data_values.imag, attributes)
-        #breakpoint()
+        real_data_array = xarray.DataArray(
+                             data=data_values.real, 
+                             coords=coords_dict,
+                             dims='ro_frequencies',
+                             attrs=attributes
+                        )
+        partial_ds[f'y{qubit}_real{qubit_state}'] = real_data_array
+        # partial_ds[f'y{qubit}_real{qubit_state}'] = (tuple(coords_dict.keys()), data_values.real, attributes)
+        # partial_ds[f'y{qubit}_imag{qubit_state}'] = (tuple(coords_dict.keys()), data_values.imag, attributes)
+        breakpoint()
         dataset = xarray.merge([dataset,partial_ds])
     return dataset
 
@@ -95,7 +96,7 @@ def to_complex_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
         #TODO this could be better:
         #TODO since the retrieved dataset is already complex
         # there is no point in converting to (real, imag) and then back to complex
-        if not this_qubit in dataset_dict:
+        if this_qubit not in dataset_dict:
             dataset_dict[this_qubit] = {}
         current_values = iq_dataset[var].values
         if 'real' in var:

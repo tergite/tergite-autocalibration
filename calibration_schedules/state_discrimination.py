@@ -58,19 +58,17 @@ class Single_Shots_RO(Measurement):
                     schedule.add(X(this_qubit))
 
                 elif state_level == 2:
-                    pass
-                    # schedule.add(X(qubit = this_qubit))
-                    # schedule.add(
-                    #     #TODO DRAG optimize for 1 <-> 2
-                    #     DRAGPulse(
-                    #         duration=mw_pulse_durations[this_qubit],
-                    #         G_amp=mw_ef_amp180s[this_qubit],
-                    #         D_amp=0,
-                    #         port=mw_pulse_ports[this_qubit],
-                    #         clock=mw_clocks_12[this_qubit],
-                    #         phase=0,
-                    #     ),
-                    # )
+                    schedule.add(X(qubit = this_qubit))
+                    schedule.add(
+                        DRAGPulse(
+                            duration=mw_pulse_durations[this_qubit],
+                            G_amp=mw_ef_amp180s[this_qubit],
+                            D_amp=0,
+                            port=mw_pulse_ports[this_qubit],
+                            clock=f'{this_qubit:mw}',
+                            phase=0,
+                        ),
+                    )
                 else:
                     raise ValueError('State Input Error')
 
