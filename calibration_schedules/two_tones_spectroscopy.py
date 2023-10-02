@@ -115,16 +115,16 @@ class Two_Tones_Spectroscopy(Measurement):
                 #spectroscopy pulse
                 # print(f'{spec_pulse_durations=}')
                 # print(f'{this_clock=}')
-                spec_pulse = schedule.add(
-                     long_square_pulse(
-                        duration= spec_pulse_durations[this_qubit],
-                        amp= spec_pulse_amplitudes[this_qubit],
-                        port= mw_pulse_ports[this_qubit],
-                        clock=this_clock,
-                    ),
-                    label=f"spec_pulse_{this_qubit}_{acq_index}", ref_op=excitation_pulse, ref_pt="end",
-                )
-                """  
+                #spec_pulse = schedule.add(
+                #     long_square_pulse(
+                #        duration= spec_pulse_durations[this_qubit],
+                #        amp= spec_pulse_amplitudes[this_qubit],
+                #        port= mw_pulse_ports[this_qubit],
+                #        clock=this_clock,
+                #    ),
+                #    label=f"spec_pulse_{this_qubit}_{acq_index}", ref_op=excitation_pulse, ref_pt="end",
+                #)
+
                 spec_pulse = schedule.add(
                     SoftSquarePulse(
                         duration= spec_pulse_durations[this_qubit],
@@ -134,7 +134,7 @@ class Two_Tones_Spectroscopy(Measurement):
                     ),
                     label=f"spec_pulse_{this_qubit}_{acq_index}", ref_op=excitation_pulse, ref_pt="end",
                 )
-                """
+
                 if self.qubit_state == 0:
                     measure_function = Measure
                 elif self.qubit_state == 1:

@@ -25,7 +25,7 @@ nodes = [
         #"ro_frequency_optimization",
         "ro_frequency_optimization_gef",
         "ro_amplitude_optimization",
-        #"state_discrimination",
+        "state_discrimination",
         ]
 
 qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
@@ -134,7 +134,7 @@ def experiment_parameters(node:str, qubits:List[str], dummy:bool=False) -> dict:
 
         'ro_amplitude_optimization': {
             'qubit_states': {qubit: np.random.randint(0,high=2,size=850) for qubit in qubits},
-            'ro_amplitudes': {qubit : np.linspace(0.050,0.150,5) for qubit in qubits}
+            'ro_amplitudes': {qubit : np.linspace(0.005,0.020,5) for qubit in qubits}
         },
 
         'T1': {
@@ -167,7 +167,7 @@ def experiment_parameters(node:str, qubits:List[str], dummy:bool=False) -> dict:
     }
     return sweep_parameters
 
-target_node = "ro_frequency_optimization_gef"
+target_node = "resonator_spectroscopy_2"
 
 draw_arrow_chart(f'Qubits: {N_qubits}', nodes[:nodes.index(target_node)+1])
 

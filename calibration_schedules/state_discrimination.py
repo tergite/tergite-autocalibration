@@ -13,7 +13,6 @@ class Single_Shots_RO(Measurement):
 
     def __init__(self,transmons,qubit_state:int=0):
         super().__init__(transmons)
-
         self.transmons = transmons
         self.static_kwargs = {
             'qubits': self.qubits,
@@ -50,7 +49,7 @@ class Single_Shots_RO(Measurement):
             for level_index, state_level in enumerate(levels):
 
                 if state_level == 0:
-                     #Not really necessary to use Rxy(0,0) we can just pass
+                    #Not really necessary to use Rxy(0,0) we can just pass
                     schedule.add(
                         Rxy(theta=0, phi=0, qubit=this_qubit),
                     )
@@ -65,7 +64,7 @@ class Single_Shots_RO(Measurement):
                             G_amp=mw_ef_amp180s[this_qubit],
                             D_amp=0,
                             port=mw_pulse_ports[this_qubit],
-                            clock=f'{this_qubit:mw}',
+                            clock=f'{this_qubit}.12',
                             phase=0,
                         ),
                     )
@@ -80,7 +79,7 @@ class Single_Shots_RO(Measurement):
                     bin_mode=BinMode.AVERAGE
                     ),
                 )
-                # update the root operation
+
                 schedule.add(Reset(this_qubit))
 
         return schedule
