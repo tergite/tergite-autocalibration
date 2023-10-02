@@ -10,7 +10,7 @@ nodes = [
         # "tof",
         "resonator_spectroscopy",
         # "punchout",
-        "two_tone_multidim",
+        #"two_tone_multidim",
         "qubit_01_spectroscopy_pulsed",
         "rabi_oscillations",
         # "T1",
@@ -18,11 +18,11 @@ nodes = [
         "ramsey_correction",
         #"motzoi_parameter",
         "resonator_spectroscopy_1",
-        #"qubit_12_spectroscopy_pulsed",
-        #"rabi_oscillations_12",
-        #"ramsey_correction_12",
-        #"resonator_spectroscopy_2",
-        "ro_frequency_optimization",
+        "qubit_12_spectroscopy_pulsed",
+        "rabi_oscillations_12",
+        "ramsey_correction_12",
+        "resonator_spectroscopy_2",
+        #"ro_frequency_optimization",
         "ro_frequency_optimization_gef",
         "ro_amplitude_optimization",
         #"state_discrimination",
@@ -153,7 +153,8 @@ def experiment_parameters(node:str, qubits:List[str], dummy:bool=False) -> dict:
         },
 
         'ramsey_correction_12': {
-            'ramsey_delays': { qubit : np.arange(4e-9, 1*2048e-9, 4*8e-9) for qubit in qubits }
+            'ramsey_delays': { qubit : np.arange(4e-9, 1*2048e-9, 4*8e-9) for qubit in qubits },
+            'artificial_detunings': { qubit : np.arange(-2.1, 2.1, 0.8)*1e6 for qubit in qubits },
         },
 
         'motzoi_parameter': {
@@ -166,7 +167,7 @@ def experiment_parameters(node:str, qubits:List[str], dummy:bool=False) -> dict:
     }
     return sweep_parameters
 
-target_node = "qubit_01_spectroscopy_pulsed"
+target_node = "ro_frequency_optimization_gef"
 
 draw_arrow_chart(f'Qubits: {N_qubits}', nodes[:nodes.index(target_node)+1])
 

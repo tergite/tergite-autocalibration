@@ -68,16 +68,15 @@ def configure_dataset(
             qubit_state = qubit_states[key // n_qubits]
             attributes['qubit_state'] = qubit_state
         #breakpoint()
-        real_data_array = xarray.DataArray(
-                             data=data_values.real, 
-                             coords=coords_dict,
-                             dims='ro_frequencies',
-                             attrs=attributes
-                        )
-        partial_ds[f'y{qubit}_real{qubit_state}'] = real_data_array
-        # partial_ds[f'y{qubit}_real{qubit_state}'] = (tuple(coords_dict.keys()), data_values.real, attributes)
-        # partial_ds[f'y{qubit}_imag{qubit_state}'] = (tuple(coords_dict.keys()), data_values.imag, attributes)
-        breakpoint()
+        #real_data_array = xarray.DataArray(
+        #                     data=data_values.real, 
+        #                     coords=coords_dict,
+        #                     dims='ro_frequencies',
+        #                     attrs=attributes
+        #                )
+        #partial_ds[f'y{qubit}_real{qubit_state}'] = real_data_array
+        partial_ds[f'y{qubit}_real{qubit_state}'] = (tuple(coords_dict.keys()), data_values.real, attributes)
+        partial_ds[f'y{qubit}_imag{qubit_state}'] = (tuple(coords_dict.keys()), data_values.imag, attributes)
         dataset = xarray.merge([dataset,partial_ds])
     return dataset
 
@@ -111,9 +110,9 @@ def to_complex_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
 
     return complex_ds
 
-def handle_ro_freq_optimization(complex_dataset: xarray.Dataset) -> xarray.Dataset:
+def handle_ro_freq_optimization(complex_dataset: xarray.Dataset, states: list[int]) -> xarray.Dataset:
     new_ds = xarray.Dataset(coords=complex_dataset.coords, attrs=complex_dataset.attrs)
-    new_ds = new_ds.expand_dims(dim={'qubit_state': [0,1]})
+    new_ds = new_ds.expand_dims(dim={'qubit_state': states})
     #TODO this for every var and every coord. It might cause
     # performance issues for larger datasets
     for coord in complex_dataset.coords:
@@ -139,7 +138,6 @@ def measure(
 
     logger.info('Starting measurement')
 
-    print(f'{ measurement_index = }')
     current_measurement = ''
     if measurement_index[1] > 1:
         current_measurement = f'{measurement_index[0]} / {measurement_index[1]}'
@@ -219,7 +217,9 @@ def measure(
 
     result_dataset_complex = to_complex_dataset(result_dataset)
     if node=='ro_frequency_optimization':
-        result_dataset_complex = handle_ro_freq_optimization(result_dataset_complex)
+        result_dataset_complex = handle_ro_freq_optimization(result_dataset_complex,states=[0,1])
+    elif node=='ro_frequency_optimization_gef':
+        result_dataset_complex = handle_ro_freq_optimization(result_dataset_complex,states=[0,1,2])
 
     lab_ic.stop()
     logger.info('Finished measurement')

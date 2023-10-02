@@ -73,6 +73,7 @@ class OptimalRO_012_FrequencyAnalysis(OptimalROFrequencyAnalysis):
         data_var = list(dataset.data_vars.keys())[0]
         self.S21_2 = dataset[data_var][2].values
         super().__init__(self.dataset)
+        super().run_fitting()
 
     def run_fitting(self):
         guess_2 = model.guess(self.S21_2, f=self.frequencies)
@@ -102,7 +103,7 @@ class OptimalRO_012_FrequencyAnalysis(OptimalROFrequencyAnalysis):
         optimal_distance = self.total_distance[self.index_of_max_distance]
 
         ax.scatter(
-            [self.optimal_frequency, optimal_distance],
+            self.optimal_frequency, optimal_distance,
             marker='*',c='red', s=64,
         )
         ax.grid()
