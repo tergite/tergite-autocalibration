@@ -23,11 +23,10 @@ nodes = [
         #"ramsey_correction_12",
         #"resonator_spectroscopy_2",
         "ro_frequency_optimization",
+        "ro_frequency_optimization_gef",
         "ro_amplitude_optimization",
         #"state_discrimination",
         ]
-
- 
 
 qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
 qubits = [ 'q16','q17','q19','q21','q22','q23','q25']
@@ -103,6 +102,10 @@ def experiment_parameters(node:str, qubits:List[str], dummy:bool=False) -> dict:
             'ro_opt_frequencies': {qubit: resonator_samples(qubit) for qubit in qubits}
         },
 
+        'ro_frequency_optimization_gef': {
+            'ro_opt_frequencies': {qubit: resonator_samples(qubit) for qubit in qubits}
+        },
+
         'punchout': {
             'ro_frequencies': {qubit: resonator_samples(qubit, punchout=True) for qubit in qubits},
             'ro_amplitudes': {qubit : np.linspace(4e-3, 1.2e-1, 11) for qubit in qubits}
@@ -116,7 +119,7 @@ def experiment_parameters(node:str, qubits:List[str], dummy:bool=False) -> dict:
         'qubit_01_spectroscopy_pulsed': {
             'spec_frequencies': {qubit: qubit_samples(qubit) for qubit in qubits}
         },
-        
+
         'qubit_12_spectroscopy_pulsed': {
             'spec_frequencies': {qubit: qubit_samples(qubit,'12') for qubit in qubits}
         },

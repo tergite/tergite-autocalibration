@@ -74,7 +74,7 @@ class RO_frequency_optimization(Measurement):
 
             this_ro_clock = f'{this_qubit}.' + ro_str
 
-            # this_mw_clock = f'{this_qubit}.12'
+            this_mw_clock = f'{this_qubit}.12'
 
             # The second for loop iterates over all frequency values in the frequency batch:
             for acq_index, ro_frequency in enumerate(ro_f_values):
@@ -140,47 +140,45 @@ class RO_frequency_optimization(Measurement):
 
                 sched.add(Reset(this_qubit))
 
-        return sched
+            if self.qubit_state == 2:
+                #shift the acquisition channel
+                acq_cha += len(qubits)
+                #repeat for when the qubit is at |2>
+                for acq_index, ro_frequency in enumerate(ro_f_values):
+                    sched.add(X(this_qubit))
+                    sched.add(
+                        DRAGPulse(
+                            duration=mw_pulse_durations[this_qubit],
+                            G_amp=mw_ef_amps180[this_qubit],
+                            D_amp=0,
+                            port=mw_pulse_ports[this_qubit],
+                            clock=this_mw_clock,
+                            phase=0,
+                        ),
+                    )
 
-        #         if self.qubit_state == 0:
-        #             pass
-        #         elif self.qubit_state == 1:
-        #             sched.add(X(this_qubit))
-        #         elif self.qubit_state == 2:
-        #             sched.add(X(this_qubit))
-        #             sched.add(
-        #                 DRAGPulse(
-        #                     duration=mw_pulse_durations[this_qubit],
-        #                     G_amp=mw_ef_amps180[this_qubit],
-        #                     D_amp=0,
-        #                     port=mw_pulse_ports[this_qubit],
-        #                     clock=this_mw_clock,
-        #                     phase=0,
-        #                 ),
-        #             )
-        #
-        #         ro_pulse = sched.add(
-        #             SquarePulse(
-        #                 duration=pulse_durations[this_qubit],
-        #                 amp=pulse_amplitudes[this_qubit],
-        #                 port=ro_ports[this_qubit],
-        #                 clock=this_ro_clock,
-        #             ),
-        #         )
-        #
-        #         sched.add(
-        #             SSBIntegrationComplex(
-        #                 duration=integration_times[this_qubit],
-        #                 port=ro_ports[this_qubit],
-        #                 clock=this_ro_clock,
-        #                 acq_index=acq_index,
-        #                 acq_channel=acq_cha,
-        #                 bin_mode=BinMode.AVERAGE
-        #             ),
-        #             ref_op=ro_pulse, ref_pt="start",
-        #             rel_time=acquisition_delays[this_qubit],
-        #         )
-        #
-        #         sched.add(Reset(this_qubit))
-        #
-        # return sched
+                    ro_pulse = sched.add(
+                        SquarePulse(
+                            duration=pulse_durations[this_qubit],
+                            amp=pulse_amplitudes[this_qubit],
+                            port=ro_ports[this_qubit],
+                            clock=this_ro_clock,
+                        ),
+                    )
+
+                    sched.add(
+                        SSBIntegrationComplex(
+                            duration=integration_times[this_qubit],
+                            port=ro_ports[this_qubit],
+                            clock=this_ro_clock,
+                            acq_index=acq_index,
+                            acq_channel=acq_cha,
+                            bin_mode=BinMode.AVERAGE
+                        ),
+                        ref_op=ro_pulse, ref_pt="start",
+                        rel_time=acquisition_delays[this_qubit],
+                    )
+
+                    sched.add(Reset(this_qubit))
+
+        return sched

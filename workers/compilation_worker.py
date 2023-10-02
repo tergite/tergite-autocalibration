@@ -50,6 +50,7 @@ node_map = {
     'ramsey_correction_12': Ramsey_fringes,
     'resonator_spectroscopy_2': Resonator_Spectroscopy,
     'ro_frequency_optimization': RO_frequency_optimization,
+    'ro_frequency_optimization_gef': RO_frequency_optimization,
     'ro_amplitude_optimization': RO_amplitude_optimization,
     'state_discrimination': Single_Shots_RO,
 }
@@ -112,18 +113,12 @@ def precompile(node:str, qubits: list[str], samplespace: dict[str,dict[str,np.nd
         load_redis_config(transmon,channel)
         device.add_element(transmon)
         transmons[qubit] = transmon
-        #breakpoint()
-
-    #for element_name in device.elements():
-    #            element = device.get_element(element_name)
-    #            with open(f"{element_name}.json","w") as fp:
-    #                element_str = json.dump(element,fp, cls=ScheduleJSONEncoder)
 
     qubit_state = 0
     if node in ['resonator_spectroscopy_1','qubit_12_spectroscopy_pulsed',
                 'rabi_oscillations_12', 'ramsey_correction_12']:
         qubit_state = 1
-    if node in ['resonator_spectroscopy_2']:
+    if node in ['resonator_spectroscopy_2', 'ro_frequency_optimization_gef']:
         qubit_state = 2
 
     node_class = node_map[node](transmons, qubit_state)
@@ -169,24 +164,24 @@ def precompile(node:str, qubits: list[str], samplespace: dict[str,dict[str,np.nd
             inner_samplespace = samplespace['qubit_states']
             slicing = list(pairwise(outer_partition))
             for slice_indx, slice_ in enumerate(slicing):
-                 partial_samplespace = {}
-                 partial_samplespace['qubit_states'] = inner_samplespace
-                 # we need to initialize every time, dict is mutable!!
-                 partial_samplespace[outer_coordinate] = {} 
-                 for qubit, outer_samples in samplespace[outer_coordinate].items():
+                partial_samplespace = {}
+                partial_samplespace['qubit_states'] = inner_samplespace
+                # we need to initialize every time, dict is mutable!!
+                partial_samplespace[outer_coordinate] = {} 
+                for qubit, outer_samples in samplespace[outer_coordinate].items():
                     this_slice = slice(*slice_)
                     partial_samples = np.array(outer_samples)[this_slice]
                     partial_samplespace[outer_coordinate][qubit] = partial_samples
-                 schedule = schedule_function(**static_parameters,**partial_samplespace)
-                 logger.info(f'Starting Partial {slice_indx+1}/{len(list(slicing))} Compiling')
-                 #logger.info(f'Starting Partial Compiling')
-                 compiled_schedule = compiler.compile(
-                         schedule=schedule, config=compilation_config
-                         )
-                 logger.info('Finished Partial Compiling')
-                 compiled_schedules.append(compiled_schedule)
-                 schedule_durations.append(compiled_schedule.get_schedule_duration())
-                 samplespaces.append(partial_samplespace)
+                schedule = schedule_function(**static_parameters,**partial_samplespace)
+                logger.info(f'Starting Partial {slice_indx+1}/{len(list(slicing))} Compiling')
+                #logger.info(f'Starting Partial Compiling')
+                compiled_schedule = compiler.compile(
+                    schedule=schedule, config=compilation_config
+                )
+                logger.info('Finished Partial Compiling')
+                compiled_schedules.append(compiled_schedule)
+                schedule_durations.append(compiled_schedule.get_schedule_duration())
+                samplespaces.append(partial_samplespace)
             return compiled_schedules, schedule_durations, samplespaces
 
     schedule = schedule_function(**static_parameters, **samplespace)

@@ -3,10 +3,17 @@ import collections
 import matplotlib.pyplot as plt
 import xarray as xr
 from analysis.motzoi_analysis import MotzoiAnalysis
-from analysis.resonator_spectroscopy_analysis import ResonatorSpectroscopyAnalysis, ResonatorSpectroscopy_1_Analysis, ResonatorSpectroscopy_2_Analysis
+from analysis.resonator_spectroscopy_analysis import (
+    ResonatorSpectroscopyAnalysis,
+    ResonatorSpectroscopy_1_Analysis,
+    ResonatorSpectroscopy_2_Analysis
+)
 from analysis.qubit_spectroscopy_analysis import QubitSpectroscopyAnalysis
 from analysis.qubit_spectroscopy_multidim import QubitSpectroscopyMultidim
-from analysis.optimum_ro_frequency_analysis import OptimalROFrequencyAnalysis
+from analysis.optimum_ro_frequency_analysis import (
+    OptimalROFrequencyAnalysis,
+    OptimalRO_012_FrequencyAnalysis
+)
 from analysis.optimum_ro_amplitude_analysis import OptimalROAmplitudeAnalysis
 from analysis.state_discrimination_analysis import StateDiscrimination
 from analysis.rabi_analysis import RabiAnalysis
@@ -129,6 +136,9 @@ class Multiplexed_Analysis(BaseAnalysis):
                 redis_field = 'ro_freq_2'
             elif node == 'ro_frequency_optimization':
                 analysis_class = OptimalROFrequencyAnalysis
+                redis_field = 'ro_freq_opt'
+            elif node == 'ro_frequency_optimization_gef':
+                analysis_class = OptimalRO_012_FrequencyAnalysis
                 redis_field = 'ro_freq_opt'
             elif node == 'ro_amplitude_optimization':
                 analysis_class = OptimalROAmplitudeAnalysis
