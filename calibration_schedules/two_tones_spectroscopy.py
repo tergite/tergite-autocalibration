@@ -4,6 +4,7 @@ Module containing a schedule class for two-tone (qubit) spectroscopy calibration
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.gate_library import Measure, Reset, X
 from quantify_scheduler.operations.pulse_library import SetClockFrequency, SoftSquarePulse
+from quantify_scheduler.operations.pulse_factories import long_square_pulse
 from quantify_scheduler.resources import ClockResource
 from quantify_scheduler.schedules.schedule import Schedule
 from utilities.extended_transmon_element import Measure_RO1
@@ -115,6 +116,16 @@ class Two_Tones_Spectroscopy(Measurement):
                 # print(f'{spec_pulse_durations=}')
                 # print(f'{this_clock=}')
                 spec_pulse = schedule.add(
+                     long_square_pulse(
+                        duration= spec_pulse_durations[this_qubit],
+                        amp= spec_pulse_amplitudes[this_qubit],
+                        port= mw_pulse_ports[this_qubit],
+                        clock=this_clock,
+                    ),
+                    label=f"spec_pulse_{this_qubit}_{acq_index}", ref_op=excitation_pulse, ref_pt="end",
+                )
+                """  
+                spec_pulse = schedule.add(
                     SoftSquarePulse(
                         duration= spec_pulse_durations[this_qubit],
                         amp= spec_pulse_amplitudes[this_qubit],
@@ -123,7 +134,7 @@ class Two_Tones_Spectroscopy(Measurement):
                     ),
                     label=f"spec_pulse_{this_qubit}_{acq_index}", ref_op=excitation_pulse, ref_pt="end",
                 )
-
+                """
                 if self.qubit_state == 0:
                     measure_function = Measure
                 elif self.qubit_state == 1:

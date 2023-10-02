@@ -10,6 +10,7 @@ nodes = [
         # "tof",
         "resonator_spectroscopy",
         # "punchout",
+        "two_tone_multidim",
         "qubit_01_spectroscopy_pulsed",
         "rabi_oscillations",
         # "T1",
@@ -26,7 +27,7 @@ nodes = [
         #"state_discrimination",
         ]
 
-
+ 
 
 qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
 qubits = [ 'q16','q17','q19','q21','q22','q23','q25']
@@ -107,10 +108,15 @@ def experiment_parameters(node:str, qubits:List[str], dummy:bool=False) -> dict:
             'ro_amplitudes': {qubit : np.linspace(4e-3, 1.2e-1, 11) for qubit in qubits}
         },
 
+        'two_tone_multidim': {
+            'spec_frequencies': {qubit: qubit_samples(qubit) for qubit in qubits},
+            'spec_pulse_amplitudes': {qubit : np.linspace(4e-3, 1.2e-1, 2) for qubit in qubits}
+        },
+
         'qubit_01_spectroscopy_pulsed': {
             'spec_frequencies': {qubit: qubit_samples(qubit) for qubit in qubits}
         },
-
+        
         'qubit_12_spectroscopy_pulsed': {
             'spec_frequencies': {qubit: qubit_samples(qubit,'12') for qubit in qubits}
         },
@@ -157,7 +163,7 @@ def experiment_parameters(node:str, qubits:List[str], dummy:bool=False) -> dict:
     }
     return sweep_parameters
 
-target_node = "ro_amplitude_optimization"
+target_node = "qubit_01_spectroscopy_pulsed"
 
 draw_arrow_chart(f'Qubits: {N_qubits}', nodes[:nodes.index(target_node)+1])
 

@@ -9,6 +9,7 @@ import redis
 import json
 from calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
 from calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
+from calibration_schedules.two_tone_multidim import Two_Tones_Multidim
 from calibration_schedules.rabi_oscillations import Rabi_Oscillations
 from calibration_schedules.T1 import T1_BATCHED
 from calibration_schedules.XY_crosstalk import XY_cross
@@ -34,6 +35,7 @@ with open(hw_config_json) as hw:
 
 node_map = {
     'resonator_spectroscopy': Resonator_Spectroscopy,
+    "two_tone_multidim": Two_Tones_Multidim,
     'qubit_01_spectroscopy_pulsed': Two_Tones_Spectroscopy,
     'rabi_oscillations': Rabi_Oscillations,
     'T1': T1_BATCHED,

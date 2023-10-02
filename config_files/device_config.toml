@@ -61,7 +61,7 @@ init_duration = 100e-6
 init_duration = 300e-6
 
 [qubit_01_spectroscopy_pulsed.all]
-spec_pulse_duration = 2e-6
+spec_pulse_duration = 100e-6
 spec_amp = 3.5e-4
 
 [ramsey_correction.all]
