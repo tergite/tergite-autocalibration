@@ -2,8 +2,8 @@ import json
 from utilities.root_path import project_root
 import csv
 
-mixer_file = project_root / 'utilities/230915_mixercorrectionTwoQubitSample.csv'
-json_config_file = project_root / 'config_files/HARDWARE_CONFIGURATION_15092023.json'
+mixer_file = project_root / 'utilities/231002_mixercorrectionTwoQubitSample.csv'
+json_config_file = project_root / 'config_files/HARDWARE_CONFIGURATION_02102023.json'
 HW_CONFIG = {}
 HW_CONFIG['backend'] = "quantify_scheduler.backends.qblox_backend.hardware_compile"
 HW_CONFIG['clusterA'] = {
