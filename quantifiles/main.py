@@ -341,7 +341,7 @@ class DataDirInspector(QtWidgets.QMainWindow):
         splitter = QtWidgets.QSplitter()
         splitter.addWidget(self.date_list)
         splitter.addWidget(self.experiment_list)
-        splitter.setSizes([80, 820])
+        splitter.setSizes([80, 920])
 
         # create data directory label and toolbar
         self.top_bar = TopBar(datadir, liveplotting=auto_open_plots, parent=self)

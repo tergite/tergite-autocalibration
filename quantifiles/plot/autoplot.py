@@ -15,27 +15,15 @@ def autoplot(dataset: xr.Dataset) -> QtWidgets.QMainWindow:
 
     gettables = [k for k in dataset.keys() if k.startswith("y")]
     settables = [k for k in dataset.variables.keys() if k.startswith("x")]
-    num_settables = len(settables)
+    for var in dataset.data_vars.keys():
+        print(f'{ var = }')
+    for coord in dataset.coords.keys():
+        print(f'{ coord = }')
+
+
     for gettable in gettables:
         gettable = cast(str, gettable)
-        if num_settables == 2 and dataset.attrs.get(
-            "grid_2d_uniformly_spaced", dataset.attrs.get("2D-grid", False)
-        ):
-            plot_widget = ColorPlot(
-                dataset, x="x0", y="x1", z=gettable, parent=plot_window
-            )
-            plot_window.add_plot(gettable, plot_widget)
-        else:
-            pass
-            # for settable in settables:
-            #     settable = cast(str, settable)
-            #     plot_widget = LinePlot(
-            #         dataset, x_key=settable, y_keys=gettable, parent=plot_window
-            #     )
-            #     print(f'{ gettable = }')
-            #     print(f'{ settable = }')
-            #     plot_window.add_plot(gettable, plot_widget)
-        settables = list(dataset[gettable].coords.keys())
+
         if len(settables) == 1:
             settable = cast(str, settables[0])
         else:
