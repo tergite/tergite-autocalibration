@@ -91,7 +91,6 @@ _OPTIONS = [
     },
 ]
 
-
 class LinePlot(BasePlot):
     def __init__(
         self,
