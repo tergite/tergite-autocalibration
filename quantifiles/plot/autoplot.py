@@ -7,31 +7,29 @@ from quantify_core.data.handling import set_datadir
 from quantifiles.data import safe_load_dataset
 from quantifiles.plot.colorplot import ColorPlot
 from quantifiles.plot.lineplot import LinePlot
-from quantifiles.plot.window import PlotWindow
+# from quantifiles.plot.window import PlotWindow
+from quantifiles.plot.loki_window import PlotWindow
 
 
+#rename it to initial_plot
 def autoplot(dataset: xr.Dataset) -> QtWidgets.QMainWindow:
     plot_window = PlotWindow(dataset)
 
-    # gettables = [k for k in dataset.keys() if k.startswith("y")]
-    # settables = [k for k in dataset.variables.keys() if k.startswith("x")]
-    # for var in dataset.data_vars.keys():
-    #     print(f'{ var = }')
-    # for coord in dataset.coords.keys():
-    #     print(f'{ coord = }')
-    #
-    #
-    # for gettable in gettables:
-    #     gettable = cast(str, gettable)
-    #
-    #     if len(settables) == 1:
-    #         settable = cast(str, settables[0])
-    #     else:
-    #         raise ValueError('Cant plot 2d datasets :(')
-    #     plot_widget = LinePlot(
-    #         dataset, x_key=settable, y_keys=gettable, parent=plot_window
-    #     )
-    #     plot_window.add_plot(gettable, plot_widget)
+    for var in dataset.data_vars:
+        qubit = dataset[var].attrs['qubit']
+        gettable = cast(str, var)
+        print(f'{ gettable = }')
+        settables = list(dataset[var].coords.keys())
+        print(f'{ settables = }')
+
+        if len(settables) == 1:
+            settable = cast(str, settables[0])
+        else:
+            raise ValueError('Cant plot 2d datasets :(')
+        plot_widget = LinePlot(
+            dataset, x_key=settable, y_keys=gettable, parent=plot_window
+        )
+        plot_window.add_plot(qubit, plot_widget)
 
     return plot_window
 
