@@ -13,25 +13,25 @@ from quantifiles.plot.window import PlotWindow
 def autoplot(dataset: xr.Dataset) -> QtWidgets.QMainWindow:
     plot_window = PlotWindow(dataset)
 
-    gettables = [k for k in dataset.keys() if k.startswith("y")]
-    settables = [k for k in dataset.variables.keys() if k.startswith("x")]
-    for var in dataset.data_vars.keys():
-        print(f'{ var = }')
-    for coord in dataset.coords.keys():
-        print(f'{ coord = }')
-
-
-    for gettable in gettables:
-        gettable = cast(str, gettable)
-
-        if len(settables) == 1:
-            settable = cast(str, settables[0])
-        else:
-            raise ValueError('Cant plot 2d datasets :(')
-        plot_widget = LinePlot(
-            dataset, x_key=settable, y_keys=gettable, parent=plot_window
-        )
-        plot_window.add_plot(gettable, plot_widget)
+    # gettables = [k for k in dataset.keys() if k.startswith("y")]
+    # settables = [k for k in dataset.variables.keys() if k.startswith("x")]
+    # for var in dataset.data_vars.keys():
+    #     print(f'{ var = }')
+    # for coord in dataset.coords.keys():
+    #     print(f'{ coord = }')
+    #
+    #
+    # for gettable in gettables:
+    #     gettable = cast(str, gettable)
+    #
+    #     if len(settables) == 1:
+    #         settable = cast(str, settables[0])
+    #     else:
+    #         raise ValueError('Cant plot 2d datasets :(')
+    #     plot_widget = LinePlot(
+    #         dataset, x_key=settable, y_keys=gettable, parent=plot_window
+    #     )
+    #     plot_window.add_plot(gettable, plot_widget)
 
     return plot_window
 
