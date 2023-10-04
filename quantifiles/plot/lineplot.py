@@ -135,7 +135,7 @@ class LinePlot(BasePlot):
         if all([self.dataset[key].attrs["units"] == "%" for key in self.y_keys]):
             self.plot.setYRange(0, 1)
 
-        self.set_data(self.dataset)
+        # self.set_data(self.dataset)
 
     def set_data(self, dataset: xr.Dataset):
         self.dataset = dataset
@@ -151,9 +151,17 @@ class LinePlot(BasePlot):
         curves = []
         for y_var in self.y_keys:
             curve_name = f"{self.dataset[y_var].name}: {self.dataset[y_var].long_name}"
+            print(f'{x_scaling = }')
+            print(f'{y_scaling = }')
+            print(f'{self.dataset[self.x_key].values.shape = }')
+            # print(f'{self.dataset[y_var].values = }')
+
             curve = self.plot.plot(
-                x_scaling * self.dataset[self.x_key].values,
-                y_scaling * self.dataset[y_var].values,
+                [1,2,3,4],
+                [1,2,3,4],
+                # x_scaling * self.dataset[self.x_key].values,
+                # x_scaling * self.dataset[self.x_key].values,
+                # y_scaling * self.dataset[y_var].values.isel(ReIm=0),
                 **next(options_generator),
                 name=curve_name,
                 connect="finite",
