@@ -7,9 +7,9 @@ from config_files.VNA_values import (
 )
 
 nodes = [
+        #"punchout",
         # "tof",
         "resonator_spectroscopy",
-        # "punchout",
         #"two_tone_multidim",
         "qubit_01_spectroscopy_pulsed",
         "rabi_oscillations",
@@ -17,25 +17,25 @@ nodes = [
         #"XY_crosstalk",
         "ramsey_correction",
         #"motzoi_parameter",
-        "resonator_spectroscopy_1",
+	"resonator_spectroscopy_1",
         "qubit_12_spectroscopy_pulsed",
         "rabi_oscillations_12",
-        "ramsey_correction_12",
+        #"ramsey_correction_12",
         "resonator_spectroscopy_2",
-        #"ro_frequency_optimization",
-        "ro_frequency_optimization_gef",
-        "ro_amplitude_optimization",
+        "ro_frequency_optimization",
+        #"ro_frequency_optimization_gef",
+        #"ro_amplitude_optimization",
         "state_discrimination",
         ]
 
 qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
-qubits = [ 'q16','q17','q19','q21','q22','q23','q25']
+#qubits = [ 'q16','q17','q19','q21','q22','q23','q25']
 #qubits = [ 'q22','q23', 'q25']
 
 N_qubits = len(qubits)
 
-res_spec_samples = 44
-qub_spec_samples = 66
+res_spec_samples = 55
+qub_spec_samples = 77
 
 def resonator_samples(qubit:str, punchout=False) -> np.ndarray:
     sweep_range = 5.5e6
@@ -108,12 +108,12 @@ def experiment_parameters(node:str, qubits:List[str], dummy:bool=False) -> dict:
 
         'punchout': {
             'ro_frequencies': {qubit: resonator_samples(qubit, punchout=True) for qubit in qubits},
-            'ro_amplitudes': {qubit : np.linspace(4e-3, 1.2e-1, 11) for qubit in qubits}
+            'ro_amplitudes': {qubit : np.linspace(4e-3, 1.2e-1, 13) for qubit in qubits}
         },
 
         'two_tone_multidim': {
             'spec_frequencies': {qubit: qubit_samples(qubit) for qubit in qubits},
-            'spec_pulse_amplitudes': {qubit : np.linspace(4e-3, 1.2e-1, 2) for qubit in qubits}
+            'spec_pulse_amplitudes': {qubit : np.linspace(4e-3, 1.2e-1, 5) for qubit in qubits}
         },
 
         'qubit_01_spectroscopy_pulsed': {
@@ -133,8 +133,8 @@ def experiment_parameters(node:str, qubits:List[str], dummy:bool=False) -> dict:
         },
 
         'ro_amplitude_optimization': {
-            'qubit_states': {qubit: np.random.randint(0,high=2,size=850) for qubit in qubits},
-            'ro_amplitudes': {qubit : np.linspace(0.005,0.020,5) for qubit in qubits}
+            'qubit_states': {qubit: np.random.randint(0,high=2,size=900) for qubit in qubits},
+            'ro_amplitudes': {qubit : np.linspace(0.005,0.060,9) for qubit in qubits}
         },
 
         'T1': {
@@ -162,12 +162,12 @@ def experiment_parameters(node:str, qubits:List[str], dummy:bool=False) -> dict:
             'X_repetitions': {qubit : np.arange(2, 17, 4) for qubit in qubits}
         },
         'state_discrimination': {
-            'qubit_states': {qubit: np.random.randint(0,high=2,size= 900) for qubit in qubits},
+            'qubit_states': {qubit: np.random.randint(0,high=3,size= 900) for qubit in qubits},
         },
     }
     return sweep_parameters
 
-target_node = "resonator_spectroscopy_2"
+target_node = "state_discrimination"
 
 draw_arrow_chart(f'Qubits: {N_qubits}', nodes[:nodes.index(target_node)+1])
 

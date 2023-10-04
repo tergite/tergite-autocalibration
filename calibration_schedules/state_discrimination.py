@@ -22,7 +22,6 @@ class Single_Shots_RO(Measurement):
             'mw_pulse_ports': self.attributes_dictionary('microwave'),
         }
 
-
     def schedule_function(
             self,
             qubits : list[str],
@@ -34,7 +33,6 @@ class Single_Shots_RO(Measurement):
             repetitions: int = 1
         ) -> Schedule:
         schedule = Schedule("State_discrimination_schedule", repetitions)
-        print(f'{ repetitions = }')
 
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 

@@ -23,7 +23,6 @@ from calibration_schedules.motzoi_parameter import Motzoi_parameter
 from utilities.extended_transmon_element import ExtendedTransmon
 from quantify_scheduler.backends import SerialCompiler
 from config_files.settings import hw_config_json
-#from config_files.settings import hw_config
 from quantify_core.data.handling import set_datadir
 from quantify_scheduler.json_utils import ScheduleJSONEncoder
 from itertools import tee
@@ -188,7 +187,6 @@ def precompile(node:str, qubits: list[str], samplespace: dict[str,dict[str,np.nd
 
     logger.info('Starting Compiling')
     compiled_schedule = compiler.compile(schedule=schedule, config=compilation_config)
-    #breakpoint()
 
     #TODO
     #ic.retrieve_hardware_logs

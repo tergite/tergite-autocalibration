@@ -83,6 +83,7 @@ class Two_Tones_Multidim(Measurement):
             this_clock = f'{this_qubit}.01'
 
             frequency_values = spec_frequencies[this_qubit]
+       
             number_of_freqs = len(frequency_values)
 
             schedule.add(
@@ -103,6 +104,7 @@ class Two_Tones_Multidim(Measurement):
                     #spectroscopy pulse
                     # print(f'{spec_pulse_durations=}')
                     # print(f'{this_clock=}')
+                    """ 
                     spec_pulse = schedule.add(
                         long_square_pulse(
                             duration= spec_pulse_durations[this_qubit],
@@ -111,18 +113,19 @@ class Two_Tones_Multidim(Measurement):
                             clock=this_clock,
                         ),
                         label=f"spec_pulse_multidim_{this_qubit}_{this_index}", ref_op=set_frequency, ref_pt="end",
-                    )
-                    """  
+                    ) 
+                    """
+                    
                     spec_pulse = schedule.add(
                         SoftSquarePulse(
                             duration= spec_pulse_durations[this_qubit],
-                            amp= spec_pulse_amplitudes[this_qubit],
+                            amp= spec_pulse_amplitude,
                             port= mw_pulse_ports[this_qubit],
                             clock=this_clock,
                         ),
-                        label=f"spec_pulse_{this_qubit}_{this_index}", ref_op=excitation_pulse, ref_pt="end",
+                        label=f"spec_pulse_{this_qubit}_{this_index}", ref_op=set_frequency, ref_pt="end",
                     )
-                    """
+                    
                     if self.qubit_state == 0:
                         measure_function = Measure
                     elif self.qubit_state == 1:
@@ -132,12 +135,9 @@ class Two_Tones_Multidim(Measurement):
 
                     schedule.add(
                         measure_function(this_qubit, acq_index=this_index,bin_mode=BinMode.AVERAGE),
-                        ref_op=spec_pulse,
-                        ref_pt='end',
-                        label=f'Measurement_{this_qubit}_{this_index}'
                     )
 
                     # update the relaxation for the next batch point
-                    relaxation = schedule.add(Reset(this_qubit), label=f"Reset_{this_qubit}_{this_index}")
+                    schedule.add(Reset(this_qubit))
 
         return schedule
