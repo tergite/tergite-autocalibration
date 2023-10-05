@@ -11,7 +11,7 @@ import numpy as np
 import threading
 import tqdm
 from utilities.root_path import data_directory
-from workers.dummy_cluster import dummy_cluster
+from workers.dummy_setup import dummy_cluster
 from calibration_schedules.time_of_flight import measure_time_of_flight
 from config_files.settings import lokiA_IP
 import redis
@@ -109,4 +109,4 @@ def measure(
     lab_ic.stop()
     logger.info('Finished measurement')
 
-    return result_dataset_complex
+    return result_dataset

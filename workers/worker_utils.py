@@ -1,4 +1,5 @@
 import xarray
+import numpy as np
 
 def configure_dataset(
         raw_ds: xarray.Dataset,
@@ -56,24 +57,25 @@ def configure_dataset(
     return dataset
 
 def to_real_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
-    dataset_dict = {}
-    real_ds = xarray.Dataset(coords=iq_dataset.coords)
-    for var in iq_dataset.data_vars.keys():
-        this_qubit = iq_dataset[var].attrs['qubit']
-        attributes = {'qubit': this_qubit}
-        this_state = ''
-        if 'qubit_state' in iq_dataset[var].attrs:
-            qubit_state = iq_dataset[var].attrs["qubit_state"]
-            this_state = qubit_state
-            attributes['qubit_state'] = qubit_state
+    #dataset_dict = {}
+    #real_ds = xarray.Dataset(coords=iq_dataset.coords)
+    #for var in iq_dataset.data_vars.keys():
+    #    this_qubit = iq_dataset[var].attrs['qubit']
+    #    attributes = {'qubit': this_qubit}
+    #    this_state = ''
+    #    if 'qubit_state' in iq_dataset[var].attrs:
+    #        qubit_state = iq_dataset[var].attrs["qubit_state"]
+    #        this_state = qubit_state
+    #        attributes['qubit_state'] = qubit_state
 
-        qubit_coords = iq_dataset[f'y{this_qubit}_{this_state}'].coords
-        values = iq_dataset[var].values
-        qubit_key = f'y{this_qubit}_{this_state}'
-        real_ds[qubit_key+'_real'] = (qubit_coords, values.real, attributes)
-        real_ds[qubit_key+'_imag'] = (qubit_coords, values.imag, attributes)
-
-    return real_ds
+    #    qubit_coords = iq_dataset[f'y{this_qubit}_{this_state}'].coords
+    #    values = iq_dataset[var].values
+    #    qubit_key = f'y{this_qubit}_{this_state}'
+    #    real_ds[qubit_key+'_real'] = (qubit_coords, values.real, attributes)
+    #    real_ds[qubit_key+'_imag'] = (qubit_coords, values.imag, attributes)
+    ds = iq_dataset.expand_dims('ReIm', axis=-1) # Add ReIm axis at the end
+    ds = xarray.concat([ds.real, ds.imag], dim='ReIm')
+    return ds
 
 def handle_ro_freq_optimization(complex_dataset: xarray.Dataset, states: list[int]) -> xarray.Dataset:
     new_ds = xarray.Dataset(coords=complex_dataset.coords, attrs=complex_dataset.attrs)
