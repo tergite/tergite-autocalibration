@@ -1,6 +1,7 @@
 # This code is part of Tergite
 import argparse
 from utilities.status import DataStatus
+import xarray as xr
 from logger.tac_logger import logger
 from workers.compilation_worker import precompile
 from workers.execution_worker import measure
@@ -99,12 +100,10 @@ def inspect_node(node:str):
 
     if status == DataStatus.in_spec:
        print(u' \u2705 ' + f'{Fore.GREEN}{Style.BRIGHT}Node {node} in spec{Style.RESET_ALL}')
-       # print(u' \u2705 ' + f'Node {node} in spec')
        return
 
     if status == DataStatus.out_of_spec:
        print(u'\u2691\u2691\u2691 '+ f'{Fore.RED}{Style.BRIGHT}Calibration required for Node {node}{Style.RESET_ALL}')
-       # print(u'\u2691\u2691\u2691 '+ f'Calibration required for Node {node}')
        calibrate_node(node)
 
 
@@ -124,19 +123,41 @@ def calibrate_node(node:str):
     job_id = job["job_id"]
 
     samplespace = job['experiment_params'][node]
-    logger.info('Sending to precompile')
 
-    compiled_schedule, schedule_duration = precompile(node, samplespace)
-    result_dataset = measure(
-            compiled_schedule,
-            schedule_duration,
-            samplespace, node,
-            cluster_status=args.cluster_status
-            )
+    #TODO this terrible
+    compiled_schedules, schedule_durations, partial_samplespaces = precompile(node, qubits, samplespace)
+    compilation_zip = list(zip(compiled_schedules, schedule_durations, partial_samplespaces))
+    result_dataset = xr.Dataset()
+    for compilation_indx, compilation in enumerate(compilation_zip):
+        compiled_schedule, schedule_duration, samplespace = compilation
+        dataset = measure(
+                compiled_schedule,
+                schedule_duration,
+                samplespace, 
+                node,
+                #[compilation_indx, len(list(compilation_zip))],
+                cluster_status=args.cluster_status
+                )
+        if compilation_indx == 0:
+            result_dataset = dataset
+        else:
+            for var in result_dataset.data_vars:
+                coords = result_dataset[var].coords
+                for coord in coords:
+                    if 'qubit_state' not in coord:
+                        concat_coord = coord
+                        break
+
+                #breakpoint()
+                darray = xr.concat([result_dataset[var], dataset[var]], dim=concat_coord)
+                result_dataset = result_dataset.drop_vars(var)
+                result_dataset = result_dataset.drop_dims(concat_coord)
+                result_dataset[var] = darray
+
+
     logger.info('measurement completed')
     post_process(result_dataset, node)
     logger.info('analysis completed')
-
 
 #main
 calibrate_system()

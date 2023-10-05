@@ -3,9 +3,17 @@ import collections
 import matplotlib.pyplot as plt
 import xarray as xr
 from analysis.motzoi_analysis import MotzoiAnalysis
-from analysis.resonator_spectroscopy_analysis import ResonatorSpectroscopyAnalysis, ResonatorSpectroscopy_1_Analysis, ResonatorSpectroscopy_2_Analysis
+from analysis.resonator_spectroscopy_analysis import (
+    ResonatorSpectroscopyAnalysis,
+    ResonatorSpectroscopy_1_Analysis,
+    ResonatorSpectroscopy_2_Analysis
+)
 from analysis.qubit_spectroscopy_analysis import QubitSpectroscopyAnalysis
-from analysis.optimum_ro_frequency_analysis import OptimalROFrequencyAnalysis
+from analysis.qubit_spectroscopy_multidim import QubitSpectroscopyMultidim
+from analysis.optimum_ro_frequency_analysis import (
+    OptimalROFrequencyAnalysis,
+    OptimalRO_012_FrequencyAnalysis
+)
 from analysis.optimum_ro_amplitude_analysis import OptimalROAmplitudeAnalysis
 from analysis.state_discrimination_analysis import StateDiscrimination
 from analysis.rabi_analysis import RabiAnalysis
@@ -110,6 +118,9 @@ class Multiplexed_Analysis(BaseAnalysis):
             elif node == 'T1':
                 analysis_class = T1Analysis
                 redis_field = 't1_time'
+            elif node == 'two_tone_multidim':
+                analysis_class = QubitSpectroscopyMultidim
+                redis_field = 'freq_01'
             elif node == 'qubit_12_spectroscopy_pulsed':
                 analysis_class = QubitSpectroscopyAnalysis
                 redis_field = 'freq_12'
@@ -126,9 +137,12 @@ class Multiplexed_Analysis(BaseAnalysis):
             elif node == 'ro_frequency_optimization':
                 analysis_class = OptimalROFrequencyAnalysis
                 redis_field = 'ro_freq_opt'
+            elif node == 'ro_frequency_optimization_gef':
+                analysis_class = OptimalRO_012_FrequencyAnalysis
+                redis_field = 'ro_freq_opt'
             elif node == 'ro_amplitude_optimization':
                 analysis_class = OptimalROAmplitudeAnalysis
-                redis_field = 'ro_freq_opt'
+                redis_field = 'ro_pulse_amp_opt'
             elif node == 'punchout':
                 analysis_class = PunchoutAnalysis
                 redis_field = 'ro_amp'
@@ -158,30 +172,3 @@ class Multiplexed_Analysis(BaseAnalysis):
             handles.append(patch)
             this_axis.set(title=None)
             this_axis.legend(handles=handles)
-
-#class Multiplexed_Punchout_Analysis(BaseAnalysis):
-#    def __init__(self, result_dataset: xr.Dataset, node: str):
-#        super().__init__(result_dataset)
-#        for indx, var in enumerate(result_dataset.data_vars):
-#            this_qubit = result_dataset[var].attrs['qubit']
-#            ds = result_dataset[var].to_dataset()
-#            #breakpoint()
-#
-#            N_amplitudes = ds.dims[f'ro_amplitudes{this_qubit}']
-#            # print(f'{ N_amplitudes = }')
-#            # norm_factors = np.array([max(ds.y0[ampl].values) for ampl in range(N_amplitudes)])
-#            # ds[f'y{this_qubit}'] = ds.y0 / norm_factors[:,None]
-#            raw_values = np.abs(ds[f'y{this_qubit}'].values)
-#            normalized_values = raw_values / raw_values.max(axis=0)
-#            ds[f'y{this_qubit}'].values = normalized_values
-#
-#            this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
-#
-#            ds[f'y{this_qubit}'].plot(x=f'ro_frequencies{this_qubit}', ax=this_axis)
-#            # this_axis.set_title(f'{node_name} for {this_qubit}')
-#
-#            handles, labels = this_axis.get_legend_handles_labels()
-#            patch = mpatches.Patch(color='red', label=f'{this_qubit}')
-#            handles.append(patch)
-#            this_axis.set(title=None)
-#            this_axis.legend(handles=handles)

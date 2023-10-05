@@ -13,7 +13,6 @@ class Single_Shots_RO(Measurement):
 
     def __init__(self,transmons,qubit_state:int=0):
         super().__init__(transmons)
-
         self.transmons = transmons
         self.static_kwargs = {
             'qubits': self.qubits,
@@ -22,7 +21,6 @@ class Single_Shots_RO(Measurement):
             'mw_pulse_durations': self.attributes_dictionary('duration'),
             'mw_pulse_ports': self.attributes_dictionary('microwave'),
         }
-
 
     def schedule_function(
             self,
@@ -35,7 +33,6 @@ class Single_Shots_RO(Measurement):
             repetitions: int = 1
         ) -> Schedule:
         schedule = Schedule("State_discrimination_schedule", repetitions)
-        print(f'{ repetitions = }')
 
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
@@ -50,7 +47,7 @@ class Single_Shots_RO(Measurement):
             for level_index, state_level in enumerate(levels):
 
                 if state_level == 0:
-                    # Not really necessary to use Rxy(0,0) we can just pass
+                    #Not really necessary to use Rxy(0,0) we can just pass
                     schedule.add(
                         Rxy(theta=0, phi=0, qubit=this_qubit),
                     )
@@ -58,19 +55,17 @@ class Single_Shots_RO(Measurement):
                     schedule.add(X(this_qubit))
 
                 elif state_level == 2:
-                    pass
-                    # schedule.add(X(qubit = this_qubit))
-                    # schedule.add(
-                    #     #TODO DRAG optimize for 1 <-> 2
-                    #     DRAGPulse(
-                    #         duration=mw_pulse_durations[this_qubit],
-                    #         G_amp=mw_ef_amp180s[this_qubit],
-                    #         D_amp=0,
-                    #         port=mw_pulse_ports[this_qubit],
-                    #         clock=mw_clocks_12[this_qubit],
-                    #         phase=0,
-                    #     ),
-                    # )
+                    schedule.add(X(qubit = this_qubit))
+                    schedule.add(
+                        DRAGPulse(
+                            duration=mw_pulse_durations[this_qubit],
+                            G_amp=mw_ef_amp180s[this_qubit],
+                            D_amp=0,
+                            port=mw_pulse_ports[this_qubit],
+                            clock=f'{this_qubit}.12',
+                            phase=0,
+                        ),
+                    )
                 else:
                     raise ValueError('State Input Error')
 
@@ -82,7 +77,7 @@ class Single_Shots_RO(Measurement):
                     bin_mode=BinMode.AVERAGE
                     ),
                 )
-                # update the root operation
+
                 schedule.add(Reset(this_qubit))
 
         return schedule
