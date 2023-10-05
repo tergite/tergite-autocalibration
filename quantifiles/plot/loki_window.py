@@ -39,7 +39,7 @@ class QubitSelector(QtWidgets.QWidget):
         self.checkbox.setChecked(True)
         self.checkbox.setToolTip(f"Select to include {qubit_name} in plot")
         self.checkbox.setSizePolicy(
-            QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum
+            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
         )
 
         checkbox_layout = QtWidgets.QVBoxLayout()
@@ -73,7 +73,7 @@ class QubitSelector(QtWidgets.QWidget):
         box_frame.setFrameStyle(QtWidgets.QFrame.StyledPanel | QtWidgets.QFrame.Sunken)
         box_frame.setLayout(box_layout)
         box_frame.setSizePolicy(
-            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
+            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
         )
 
         main_layout.addLayout(checkbox_layout)
@@ -112,13 +112,13 @@ class QubitSelectBox(QtWidgets.QFrame):
 
         # Add a spacer to push the rest of the widgets down
         spacer = QtWidgets.QSpacerItem(
-            25, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
+            25, 40, QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
         )
         layout.addSpacerItem(spacer)
 
         # Set the style and size policy of this widget
         self.setFrameStyle(QtWidgets.QFrame.StyledPanel | QtWidgets.QFrame.Plain)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         self.setLayout(layout)
 
         # Create a signal mapper to map signals from the checkbox to the gettable name
@@ -192,7 +192,7 @@ class NameAndTuidBox(QtWidgets.QFrame):
 
         # --- Set up frame ---
         self.setFrameStyle(QtWidgets.QFrame.StyledPanel | QtWidgets.QFrame.Plain)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
 
         layout = QtWidgets.QVBoxLayout(self)
 
@@ -243,8 +243,14 @@ class PlotTab(QtWidgets.QWidget):
     def __init__(self, dataset: xr.Dataset | None):
         super().__init__()
         self.dataset = dataset
+        # self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.gettable_select_box = QubitSelectBox(dataset=dataset)
         self.name_and_tuid_box = NameAndTuidBox(name=dataset.name, tuid=dataset.tuid)
+
+        splitter = QtWidgets.QSplitter(QtCore.Qt.Horizontal)
+        # splitter.setSizePolicy(
+        #     QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
+        # )
 
         left_column_layout = QtWidgets.QVBoxLayout(self)
         left_column_layout.addWidget(self.name_and_tuid_box)
@@ -252,24 +258,32 @@ class PlotTab(QtWidgets.QWidget):
 
         column_container = QtWidgets.QWidget()
         column_container.setLayout(left_column_layout)
+        column_container.setSizePolicy(
+            QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed
+        )
 
         self.plot_layout = QtWidgets.QHBoxLayout(self)
         plot_container = QtWidgets.QWidget()
         plot_container.setLayout(self.plot_layout)
+        plot_container.setSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
+        )
 
-        splitter = QtWidgets.QSplitter(QtCore.Qt.Horizontal)
         splitter.addWidget(column_container)
         splitter.addWidget(plot_container)
-        splitter.setSizes([5, 295])
+        # splitter.setSizes([5, 295])
+
 
         layout = QtWidgets.QHBoxLayout(self)
-        layout.addWidget(splitter)
+        layout.addWidget(column_container)
+        layout.addWidget(plot_container)
+        # layout.addWidget(splitter)
         self.setLayout(layout)
 
     def add_plot(self, plot: QtWidgets.QWidget):
         self.plot_layout.addWidget(plot)
         plot.setSizePolicy(
-            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred
         )
 
 
@@ -289,6 +303,9 @@ class PlotWindowContent(QtWidgets.QWidget):
 
         # Create the tab content
         self.plot_tab = PlotTab(dataset=dataset)
+        self.plot_tab.setSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred
+        )
 
         # Add the tabs
         tab_widget.addTab(self.plot_tab, "Plots")
