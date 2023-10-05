@@ -5,11 +5,13 @@ from typing import Sequence
 
 from PyQt5 import QtWidgets
 
+import numpy as np
 import xarray as xr
 
 from quantifiles.plot import utils
 from quantifiles.plot.baseplot import BasePlot
 from quantifiles.units import get_si_unit_and_scaling
+
 
 _OPTIONS = [
     {
@@ -151,17 +153,13 @@ class LinePlot(BasePlot):
         curves = []
         for y_var in self.y_keys:
             curve_name = f"{self.dataset[y_var].name}: {self.dataset[y_var].long_name}"
-            print(f'{x_scaling = }')
-            print(f'{y_scaling = }')
-            print(f'{self.dataset[self.x_key].values.shape = }')
-            # print(f'{self.dataset[y_var].values = }')
+            real_values = self.dataset[y_var].isel(ReIm=0).values
+            imag_values = self.dataset[y_var].isel(ReIm=1).values
+            magnitudes = np.sqrt(real_values**2 + imag_values**2)
 
             curve = self.plot.plot(
-                [1,2,3,4],
-                [1,2,3,4],
-                # x_scaling * self.dataset[self.x_key].values,
-                # x_scaling * self.dataset[self.x_key].values,
-                # y_scaling * self.dataset[y_var].values.isel(ReIm=0),
+                x_scaling * self.dataset[self.x_key].values,
+                y_scaling * magnitudes ,
                 **next(options_generator),
                 name=curve_name,
                 connect="finite",

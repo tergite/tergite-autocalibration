@@ -57,7 +57,7 @@ class QubitSelector(QtWidgets.QWidget):
         underline.setFrameShadow(QtWidgets.QFrame.Sunken)
 
         box_layout.addWidget(label)
-        box_layout.addWidget(underline)
+        # box_layout.addWidget(underline)
 
         # Add a label for each settable variable.
         # for row_index, settable_name in enumerate(dataset[gettable_name].coords.keys()):
@@ -127,13 +127,15 @@ class QubitSelectBox(QtWidgets.QFrame):
 
         self._gettable_checkboxes = {}
 
-        # Add a GettableSelector widget for each data variable in the dataset
-        qubits = [] 
-        for coord in dataset.coords:
-            qubit = dataset[coord].attrs['qubit']
-            qubits.append(qubit)
+        all_qubits_box = QubitSelector(qubit_name='all qubits', dataset=dataset)
+        all_qubits_box.checkbox.stateChanged.connect(self.gettable_select_mapper.map)
+        self.gettable_select_mapper.setMapping(all_qubits_box.checkbox, 'all qubits')
+        self._gettable_checkboxes['all qubits'] = all_qubits_box.checkbox
+        layout.addWidget(all_qubits_box)
 
-        for idx, qubit_name in enumerate(qubits):
+        # Add a GettableSelector widget for each data variable in the dataset
+        for coord in dataset.coords:
+            qubit_name = dataset[coord].attrs['qubit']
             qubit_box = QubitSelector(
                 qubit_name=qubit_name, dataset=dataset
             )
@@ -258,7 +260,7 @@ class PlotTab(QtWidgets.QWidget):
         splitter = QtWidgets.QSplitter(QtCore.Qt.Horizontal)
         splitter.addWidget(column_container)
         splitter.addWidget(plot_container)
-        splitter.setSizes([80, 640])
+        splitter.setSizes([5, 295])
 
         layout = QtWidgets.QHBoxLayout(self)
         layout.addWidget(splitter)
@@ -380,7 +382,11 @@ class PlotWindow(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot(str, bool)
     def toggle_gettable(self, name: str, enabled: bool):
-        self.plots[name].setVisible(enabled)
+        if name == 'all qubits':
+            for name in self.plots.keys():
+                self.plots[name].setVisible(enabled)
+        else:
+            self.plots[name].setVisible(enabled)
         # logger.debug(f"Toggled visibility of plot with name {name} to {enabled}")
 
     # @QtCore.pyqtSlot(str, str)

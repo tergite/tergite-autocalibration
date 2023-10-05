@@ -18,9 +18,7 @@ def autoplot(dataset: xr.Dataset) -> QtWidgets.QMainWindow:
     for var in dataset.data_vars:
         qubit = dataset[var].attrs['qubit']
         gettable = cast(str, var)
-        print(f'{ gettable = }')
         settables = list(dataset[var].coords.keys())
-        print(f'{ settables = }')
 
         if len(settables) == 1:
             settable = cast(str, settables[0])
