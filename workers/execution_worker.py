@@ -26,7 +26,6 @@ colorama_init()
 
 redis_connection = redis.Redis(decode_responses=True)
 
-
 def measure(
         compiled_schedule: CompiledSchedule,
         schedule_duration: float,
