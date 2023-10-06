@@ -45,11 +45,11 @@ nodes = {
         redis_field = 'ro_freq',
         measurement_obj = Resonator_Spectroscopy,
         analysis_obj = ResonatorSpectroscopyAnalysis
-        ),
-    'resonator_spectroscopy': Node(
+    ),
+    'qubit_01_spectroscopy_pulsed': Node(
         name = 'qubit_01_spectroscopy_pulsed',
         redis_field = 'f01',
         measurement_obj = Two_Tones_Spectroscopy,
         analysis_obj = QubitSpectroscopyAnalysis
-        )
-    }
+    )
+}
