@@ -113,7 +113,7 @@ node_definitions = {
         analysis_obj = RabiAnalysis
     ),
     'ramsey_correction_12': Node(
-        name =ramsey_correction_12',
+        name ='ramsey_correction_12',
         redis_field = 'freq_12',
         qubit_state = 1,
         measurement_obj = Ramsey_fringes,

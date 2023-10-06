@@ -120,42 +120,56 @@ def calibrate_node(node_label:str):
     for qubit in qubits:
         device_config[qubit] = redis_connection.hgetall(f"transmons:{qubit}")
 
-    #job["device_config"] = device_config
-    #job_id = job["job_id"]
-
     samplespace = job['experiment_params'][node_label]
-    
+
     node = node_definitions[node_label]
 
-    #TODO this terrible
+    #TODO this is terrible
     compiled_schedules, schedule_durations, partial_samplespaces = precompile(node, qubits, samplespace)
     compilation_zip = list(zip(compiled_schedules, schedule_durations, partial_samplespaces))
     result_dataset = xr.Dataset()
-    for compilation_indx, compilation in enumerate(compilation_zip):
-        compiled_schedule, schedule_duration, samplespace = compilation
-        dataset = measure(
+    if node.name == 'coupler_spectroscopy':
+        dc_currents = samplespace['dc_currents']
+        compiled_schedule = compiled_schedules[0]
+        schedule_duration = schedule_durations[0]
+        logger.info('Starting coupler spectroscopy')
+        for current in dc_currents:
+            set_current()
+            dataset = measure(
                 compiled_schedule,
                 schedule_duration,
-                samplespace, 
+                samplespace,
                 node.name,
                 #[compilation_indx, len(list(compilation_zip))],
                 cluster_status=args.cluster_status
-                )
-        if compilation_indx == 0:
-            result_dataset = dataset
-        else:
-            for var in result_dataset.data_vars:
-                coords = result_dataset[var].coords
-                for coord in coords:
-                    if 'qubit_state' not in coord:
-                        concat_coord = coord
-                        break
+            )
+            xr.merge(result_dataset,dataset)
+    else:
+        for compilation_indx, compilation in enumerate(compilation_zip):
+            compiled_schedule, schedule_duration, samplespace = compilation
+            dataset = measure(
+                compiled_schedule,
+                schedule_duration,
+                samplespace,
+                node.name,
+                #[compilation_indx, len(list(compilation_zip))],
+                cluster_status=args.cluster_status
+            )
+            if compilation_indx == 0:
+                result_dataset = dataset
+            else:
+                for var in result_dataset.data_vars:
+                    coords = result_dataset[var].coords
+                    for coord in coords:
+                        if 'qubit_state' not in coord:
+                            concat_coord = coord
+                            break
 
-                #breakpoint()
-                darray = xr.concat([result_dataset[var], dataset[var]], dim=concat_coord)
-                result_dataset = result_dataset.drop_vars(var)
-                result_dataset = result_dataset.drop_dims(concat_coord)
-                result_dataset[var] = darray
+                    #breakpoint()
+                    darray = xr.concat([result_dataset[var], dataset[var]], dim=concat_coord)
+                    result_dataset = result_dataset.drop_vars(var)
+                    result_dataset = result_dataset.drop_dims(concat_coord)
+                    result_dataset[var] = darray
 
 
     logger.info('measurement completed')
