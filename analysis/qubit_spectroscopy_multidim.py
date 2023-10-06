@@ -72,19 +72,11 @@ class QubitSpectroscopyMultidim():
         for coord in dataset[data_var].coords:
             if 'frequencies' in coord: self.frequencies = coord
             elif 'amplitudes' in coord: self.amplitudes = coord
-        dataset[f'y{self.qubit}'].values = np.abs(self.S21)
+        #dataset[f'y{self.qubit}'].values = np.abs(self.S21)
+        breakpoint()
         self.data_var = data_var
         self.fit_results = {}
         self.dataset = dataset
-    """  
-   def  __init__(self,dataset: xr.Dataset):
-        data_var = list(dataset.data_vars.keys())[0]
-        coord = list(dataset[data_var].coords.keys())[0]
-        self.S21 = dataset[data_var].values
-        self.independents = dataset[coord].values
-        self.fit_results = {}
-        self.qubit = dataset[data_var].attrs['qubit'] 
-    """
 
     def run_fitting(self):
         #Initialize the Lorentzian model
