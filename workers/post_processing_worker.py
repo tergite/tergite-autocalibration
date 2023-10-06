@@ -73,10 +73,9 @@ class Multiplexed_Analysis(BaseAnalysis):
             this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
             kw_args = {}
             # this_axis.set_title(f'{node_name} for {this_qubit}')
-            analysis_class = node.analysis_obj
             redis_field = node.redis_field
 
-            node_analysis = analysis_class(ds, **kw_args)
+            node_analysis = node.analysis_obj(ds, **kw_args)
             self.qoi = node_analysis.run_fitting()
 
             node_analysis.plotter(this_axis)
