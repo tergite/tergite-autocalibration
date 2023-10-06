@@ -5,6 +5,7 @@ import xarray as xr
 from logger.tac_logger import logger
 from workers.compilation_worker import precompile
 from workers.execution_worker import measure
+from nodes.node import node_definitions
 from workers.post_processing_worker import post_process
 from utilities.status import ClusterStatus
 from colorama import init as colorama_init
@@ -107,22 +108,24 @@ def inspect_node(node:str):
        calibrate_node(node)
 
 
-def calibrate_node(node:str):
-    logger.info(f'Calibrating node {node}')
+def calibrate_node(node_label:str):
+    logger.info(f'Calibrating node {node_label}')
     dummy = False
     if args.cluster_status == ClusterStatus.dummy:
         dummy = True
-    job = user_input.user_requested_calibration(node,dummy)
+    job = user_input.user_requested_calibration(node_label,dummy)
 
     # Load the latest transmons state onto the job
     device_config = {}
     for qubit in qubits:
         device_config[qubit] = redis_connection.hgetall(f"transmons:{qubit}")
 
-    job["device_config"] = device_config
-    job_id = job["job_id"]
+    #job["device_config"] = device_config
+    #job_id = job["job_id"]
 
-    samplespace = job['experiment_params'][node]
+    samplespace = job['experiment_params'][node_label]
+    
+    node = node_definitions[node_label]
 
     #TODO this terrible
     compiled_schedules, schedule_durations, partial_samplespaces = precompile(node, qubits, samplespace)
@@ -134,7 +137,7 @@ def calibrate_node(node:str):
                 compiled_schedule,
                 schedule_duration,
                 samplespace, 
-                node,
+                node.name,
                 #[compilation_indx, len(list(compilation_zip))],
                 cluster_status=args.cluster_status
                 )

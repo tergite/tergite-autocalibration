@@ -96,8 +96,8 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
     return
 
 
-def precompile(node:str, qubits: list[str], samplespace: dict[str,dict[str,np.ndarray]]):
-    if node == 'tof':
+def precompile(node, qubits: list[str], samplespace: dict[str,dict[str,np.ndarray]]):
+    if node.name == 'tof':
         return None, 1
 
     Instrument.close_all()
@@ -114,17 +114,18 @@ def precompile(node:str, qubits: list[str], samplespace: dict[str,dict[str,np.nd
         transmons[qubit] = transmon
 
     qubit_state = 0
-    if node in ['resonator_spectroscopy_1','qubit_12_spectroscopy_pulsed',
+    if node.name in ['resonator_spectroscopy_1','qubit_12_spectroscopy_pulsed',
                 'rabi_oscillations_12', 'ramsey_correction_12']:
         qubit_state = 1
-    if node in ['resonator_spectroscopy_2', 'ro_frequency_optimization_gef']:
+    if node.name in ['resonator_spectroscopy_2', 'ro_frequency_optimization_gef']:
         qubit_state = 2
 
-    node_class = node_map[node](transmons, qubit_state)
+    #node_class = node_map[node](transmons, qubit_state)
+    node_class = node.measurement_obj(transmons, qubit_state)
     schedule_function = node_class.schedule_function
     static_parameters = node_class.static_kwargs
 
-    compiler = SerialCompiler(name=f'{node}_compiler')
+    compiler = SerialCompiler(name=f'{node.name}_compiler')
     compilation_config = device.generate_compilation_config()
 
     if 'qubit_states' in samplespace: #this means we have single shots

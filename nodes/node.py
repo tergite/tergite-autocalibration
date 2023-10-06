@@ -32,14 +32,13 @@ from analysis.T1_analysis import T1Analysis
 # from calibration_schedules.drag_amplitude import DRAG_amplitude
 from calibration_schedules.motzoi_parameter import Motzoi_parameter
 class Node():
-    def __init__(self, name:str, field:str, measurement_obj, analysis_obj):
+    def __init__(self, name:str, redis_field:str, measurement_obj, analysis_obj):
         self.name = name
-        self.redis_field = field
-        self.measurement = measurement_obj
-        self.analysis = analysis_obj
+        self.redis_field = redis_field
+        self.measurement_obj = measurement_obj
+        self.analysis_obj = analysis_obj
 
-
-nodes = {
+node_definitions = {
     'resonator_spectroscopy': Node(
         name = 'resonator_spectroscopy',
         redis_field = 'ro_freq',

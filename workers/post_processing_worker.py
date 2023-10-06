@@ -36,7 +36,7 @@ import redis
 
 redis_connection = redis.Redis(decode_responses=True)
 
-def post_process(result_dataset: xr.Dataset, node: str):
+def post_process(result_dataset: xr.Dataset, node):
     analysis = Multiplexed_Analysis(result_dataset, node)
 
     #figure_manager = plt.get_current_fig_manager()
@@ -45,7 +45,7 @@ def post_process(result_dataset: xr.Dataset, node: str):
     fig = plt.gcf()
     fig.set_tight_layout(True)
     plt.show()
-    if node != 'tof':
+    if node.name != 'tof':
         analysis.node_result.update({'measurement_dataset':result_dataset.to_dict()})
 
 
@@ -72,7 +72,7 @@ class BaseAnalysis():
 
 
 class Multiplexed_Analysis(BaseAnalysis):
-    def __init__(self, result_dataset: xr.Dataset, node: str):
+    def __init__(self, result_dataset: xr.Dataset, node):
         if node == 'tof':
             tof = analyze_tof(result_dataset, True)
             return
@@ -96,75 +96,77 @@ class Multiplexed_Analysis(BaseAnalysis):
             this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
             kw_args = {}
             # this_axis.set_title(f'{node_name} for {this_qubit}')
+            analysis_class = node.analysis_obj
+            redis_field = node.redis_field
 
-            if node == 'resonator_spectroscopy':
-                analysis_class = ResonatorSpectroscopyAnalysis
-                redis_field = 'ro_freq'
-            elif node == 'qubit_01_spectroscopy_pulsed':
-                analysis_class = QubitSpectroscopyAnalysis
-                redis_field = 'freq_01'
-            elif node == 'rabi_oscillations':
-                analysis_class = RabiAnalysis
-                redis_field = 'mw_amp180'
-            elif node == 'ramsey_correction':
-                analysis_class = RamseyAnalysis
-                redis_field = 'freq_01'
-            elif node == 'motzoi_parameter':
-                analysis_class = MotzoiAnalysis
-                redis_field = 'mw_motzoi'
-            elif node == 'resonator_spectroscopy_1':
-                analysis_class = ResonatorSpectroscopy_1_Analysis
-                redis_field = 'ro_freq_1'
-            elif node == 'T1':
-                analysis_class = T1Analysis
-                redis_field = 't1_time'
-            elif node == 'two_tone_multidim':
-                analysis_class = QubitSpectroscopyMultidim
-                redis_field = 'freq_01'
-            elif node == 'qubit_12_spectroscopy_pulsed':
-                analysis_class = QubitSpectroscopyAnalysis
-                redis_field = 'freq_12'
-            elif node == 'rabi_oscillations_12':
-                analysis_class = RabiAnalysis
-                redis_field = 'mw_ef_amp180'
-            elif node == 'ramsey_correction_12':
-                analysis_class = RamseyAnalysis
-                redis_field = 'freq_12'
-                kw_args = {'redis_field': redis_field}
-            elif node == 'resonator_spectroscopy_2':
-                analysis_class = ResonatorSpectroscopy_2_Analysis
-                redis_field = 'ro_freq_2'
-            elif node == 'ro_frequency_optimization':
-                analysis_class = OptimalROFrequencyAnalysis
-                redis_field = 'ro_freq_opt'
-            elif node == 'ro_frequency_optimization_gef':
-                analysis_class = OptimalRO_012_FrequencyAnalysis
-                redis_field = 'ro_freq_opt'
-            elif node == 'ro_amplitude_optimization':
-                analysis_class = OptimalROAmplitudeAnalysis
-                redis_field = 'ro_pulse_amp_opt'
-            elif node == 'punchout':
-                analysis_class = PunchoutAnalysis
-                redis_field = 'ro_amp'
-            elif node == 'state_discrimination':
-                analysis_class = StateDiscrimination
-                redis_field = 'discrimimator'
-            else:
-                raise ValueError(f'Invalid node: {node}')
+#            if node == 'resonator_spectroscopy':
+#                analysis_class = ResonatorSpectroscopyAnalysis
+#                redis_field = 'ro_freq'
+#            elif node == 'qubit_01_spectroscopy_pulsed':
+#                analysis_class = QubitSpectroscopyAnalysis
+#                redis_field = 'freq_01'
+#            elif node == 'rabi_oscillations':
+#                analysis_class = RabiAnalysis
+#                redis_field = 'mw_amp180'
+#            elif node == 'ramsey_correction':
+#                analysis_class = RamseyAnalysis
+#                redis_field = 'freq_01'
+#            elif node == 'motzoi_parameter':
+#                analysis_class = MotzoiAnalysis
+#                redis_field = 'mw_motzoi'
+#            elif node == 'resonator_spectroscopy_1':
+#                analysis_class = ResonatorSpectroscopy_1_Analysis
+#                redis_field = 'ro_freq_1'
+#            elif node == 'T1':
+#                analysis_class = T1Analysis
+#                redis_field = 't1_time'
+#            elif node == 'two_tone_multidim':
+#                analysis_class = QubitSpectroscopyMultidim
+#                redis_field = 'freq_01'
+#            elif node == 'qubit_12_spectroscopy_pulsed':
+#                analysis_class = QubitSpectroscopyAnalysis
+#                redis_field = 'freq_12'
+#            elif node == 'rabi_oscillations_12':
+#                analysis_class = RabiAnalysis
+#                redis_field = 'mw_ef_amp180'
+#            elif node == 'ramsey_correction_12':
+#                analysis_class = RamseyAnalysis
+#                redis_field = 'freq_12'
+#                kw_args = {'redis_field': redis_field}
+#            elif node == 'resonator_spectroscopy_2':
+#                analysis_class = ResonatorSpectroscopy_2_Analysis
+#                redis_field = 'ro_freq_2'
+#            elif node == 'ro_frequency_optimization':
+#                analysis_class = OptimalROFrequencyAnalysis
+#                redis_field = 'ro_freq_opt'
+#            elif node == 'ro_frequency_optimization_gef':
+#                analysis_class = OptimalRO_012_FrequencyAnalysis
+#                redis_field = 'ro_freq_opt'
+#            elif node == 'ro_amplitude_optimization':
+#                analysis_class = OptimalROAmplitudeAnalysis
+#                redis_field = 'ro_pulse_amp_opt'
+#            elif node == 'punchout':
+#                analysis_class = PunchoutAnalysis
+#                redis_field = 'ro_amp'
+#            elif node == 'state_discrimination':
+#                analysis_class = StateDiscrimination
+#                redis_field = 'discrimimator'
+#            else:
+#                raise ValueError(f'Invalid node: {node}')
 
             node_analysis = analysis_class(ds, **kw_args)
             self.qoi = node_analysis.run_fitting()
 
             node_analysis.plotter(this_axis)
 
-            self.update_redis_trusted_values(node, this_qubit,redis_field)
+            self.update_redis_trusted_values(node.name, this_qubit,redis_field)
 
             handles, labels = this_axis.get_legend_handles_labels()
             #if node == 'qubit_01_spectroscopy_pulsed':
             #    hasPeak=node_analysis.has_peak()
             #    patch2 = mpatches.Patch(color='blue', label=f'Peak Found:{hasPeak}')
             #    handles.append(patch2)
-            if node == 'T1':
+            if node.name == 'T1':
                 T1_micros = self.qoi*1e6
                 patch2 = mpatches.Patch(color='blue', label=f'T1 = {T1_micros:.2f}')
                 handles.append(patch2)
