@@ -79,15 +79,6 @@ class QubitSpectroscopyMultidim():
         self.data_var = data_var
         self.fit_results = {}
         self.dataset = dataset
-    """  
-   def  __init__(self,dataset: xr.Dataset):
-        data_var = list(dataset.data_vars.keys())[0]
-        coord = list(dataset[data_var].coords.keys())[0]
-        self.S21 = dataset[data_var].values
-        self.independents = dataset[coord].values
-        self.fit_results = {}
-        self.qubit = dataset[data_var].attrs['qubit'] 
-    """
 
     def run_fitting(self):
         #Initialize the Lorentzian model
