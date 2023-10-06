@@ -5,6 +5,8 @@ from utilities.visuals import draw_arrow_chart
 from config_files.VNA_values import (
      VNA_resonator_frequencies, VNA_f01_frequencies, VNA_f12_frequencies
 )
+# import redis
+
 
 nodes = [
         # "tof",
@@ -17,11 +19,11 @@ nodes = [
         "ramsey_correction",
         "motzoi_parameter",
         "n_rabi_oscillations",
-        #"resonator_spectroscopy_1",
-        #"qubit_12_spectroscopy_pulsed",
-        #"rabi_oscillations_12",
-        #"ramsey_correction_12",
-        #"resonator_spectroscopy_2",
+        "resonator_spectroscopy_1",
+        "qubit_12_spectroscopy_pulsed",
+        "rabi_oscillations_12",
+        "ramsey_correction_12",
+        "resonator_spectroscopy_2",
         #"ro_frequency_optimization",
         #"ro_amplitude_optimization",
         #"state_discrimination",
@@ -36,10 +38,17 @@ qubits = [ 'q11','q12','q13','q14','q15']
 N_qubits = len(qubits)
 
 res_spec_samples = 41
-qub_spec_samples = 41
+qub_spec_samples = 201
+
+# def refine_sweep_samples(qubit:str,param:str,sweep_range:np.array) -> np.ndarray:
+#     redis_connection = redis.Redis(decode_responses=True)
+#     redis_config = redis_connection.hgetall(f"transmons:{qubit}")
+#     start_value = redis_config[param]
+#     start_value = 0 if np.isnan(start_value) else start_value
+#     return sweep_range + start_value
 
 def resonator_samples(qubit:str, punchout=False) -> np.ndarray:
-    sweep_range = 1e6
+    sweep_range = 5e6
     punchout_range = 0e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
     min_freq =  VNA_frequency - sweep_range / 2
@@ -49,7 +58,7 @@ def resonator_samples(qubit:str, punchout=False) -> np.ndarray:
     return np.linspace(min_freq, max_freq, res_spec_samples)
 
 def qubit_samples(qubit:str, transition:str = '01') -> np.ndarray:
-    sweep_range = 20e6
+    sweep_range = 100e6
     if transition=='01':
         VNA_frequency = VNA_f01_frequencies[qubit]
     elif transition=='12':
@@ -57,8 +66,8 @@ def qubit_samples(qubit:str, transition:str = '01') -> np.ndarray:
     else :
         raise ValueError('Invalid transition')
 
-    min_freq =  VNA_frequency - sweep_range / 2+ 0*sweep_range
-    max_freq =  VNA_frequency + sweep_range / 2+ 0*sweep_range
+    min_freq =  VNA_frequency - sweep_range / 2 - 0*sweep_range
+    max_freq =  VNA_frequency + sweep_range / 2 + 0*sweep_range
     return np.linspace(min_freq, max_freq, qub_spec_samples)
 
 def experiment_parameters(node:str, qubits:List[str], dummy:bool=False) -> dict:
@@ -145,16 +154,17 @@ def experiment_parameters(node:str, qubits:List[str], dummy:bool=False) -> dict:
         },
 
         'ramsey_correction_12': {
-            'ramsey_delays': { qubit : np.arange(4e-9, 1*2048e-9, 4*8e-9) for qubit in qubits }
+            'ramsey_delays': { qubit : np.arange(4e-9, 1*2048e-9, 4*8e-9) for qubit in qubits },
+            'artificial_detunings': { qubit : np.arange(-2.1, 2.1, 0.8)*1e6 for qubit in qubits },
         },
 
         'motzoi_parameter': {
-            'mw_motzois': {qubit: np.linspace(-1,1,41) for qubit in qubits},
+            'mw_motzois': {qubit: np.linspace(-0.5,0.5,61) for qubit in qubits},
             'X_repetitions': {qubit : np.arange(2, 17, 4) for qubit in qubits}
         },
         'n_rabi_oscillations': {
-            'mw_amplitudes': {qubit: np.linspace(0.002,0.1,41) for qubit in qubits},
-            'X_repetitions': {qubit : np.arange(3, 18, 4) for qubit in qubits}
+            'mw_amplitudes_sweep': {qubit: np.linspace(-0.2,0.2,61) for qubit in qubits},
+            'X_repetitions': {qubit : np.arange(1, 16, 4) for qubit in qubits}
         },
         'state_discrimination': {
             'qubit_states': {qubit: np.random.randint(0,high=2,size=700) for qubit in qubits},
@@ -163,7 +173,7 @@ def experiment_parameters(node:str, qubits:List[str], dummy:bool=False) -> dict:
     return sweep_parameters
 
 # target_node = "state_discrimination"
-target_node = "n_rabi_oscillations"
+target_node = nodes[-1]
 
 draw_arrow_chart(f'Qubits: {N_qubits}', nodes[:nodes.index(target_node)+1])
 

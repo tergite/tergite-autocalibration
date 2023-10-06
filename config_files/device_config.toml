@@ -12,7 +12,7 @@ qubit_12_spectroscopy_pulsed.freq_12 = nan
 ramsey_correction_12.freq_12 = nan
 qubit_12_spectroscopy_pulsed.anharmonicity = nan
 rabi_oscillations.mw_amp180 = nan
-DRAG_amplitude.mw_amp180 = nan
+n_rabi_oscillations.mw_amp180 = nan
 motzoi_parameter.mw_motzoi = nan
 rabi_oscillations_12.mw_ef_amp180 = nan
 randomized_benchmarking.fidelity = nan
@@ -39,7 +39,7 @@ q11.ro_pulse_amp = 20e-3
 q12.ro_pulse_amp = 20e-3
 q13.ro_pulse_amp = 20e-3
 q14.ro_pulse_amp = 20e-3
-q15.ro_pulse_amp = 20e-3
+q15.ro_pulse_amp = 10e-3
 q16.ro_pulse_amp = 15.0e-3
 q17.ro_pulse_amp = 15.0e-3
 q18.ro_pulse_amp = 6.6e-3
@@ -72,4 +72,4 @@ artificial_detuning = 3e6
 
 [qubit_12_spectroscopy_pulsed.all]
 spec_pulse_duration = 5e-6
-spec_amp = 3.5e-4
+spec_amp = 40e-4

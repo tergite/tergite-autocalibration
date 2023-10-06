@@ -1,5 +1,6 @@
 import numpy as np
 import xarray as xr
+from utilities.redis_helper import fetch_redis_params
 
 class NRabiAnalysis():
     def  __init__(self,dataset: xr.Dataset):
@@ -13,7 +14,7 @@ class NRabiAnalysis():
         self.dataset = dataset
 
     def run_fitting(self):
-        motzoi_key = 'mw_amplitudes'+self.qubit
+        motzoi_key = 'mw_amplitudes_sweep'+self.qubit
         motzois = self.dataset[motzoi_key].size
         sums = []
         for this_motzoi_index in range(motzois):
@@ -21,7 +22,7 @@ class NRabiAnalysis():
             sums.append(this_sum)
 
         index_of_min = np.argmax(np.array(sums))
-        self.optimal_motzoi = float(self.dataset[motzoi_key][index_of_min].values)
+        self.optimal_motzoi = float(self.dataset[motzoi_key][index_of_min].values)+fetch_redis_params('mw_amp180',self.qubit)
 
         return self.optimal_motzoi
 
@@ -30,5 +31,5 @@ class NRabiAnalysis():
         qubit = self.qubit
 
 
-        datarray.plot(ax=axis, x=f'mw_amplitudes{qubit}')
-        axis.axvline(self.optimal_motzoi, c='red', lw=4)
+        datarray.plot(ax=axis, x=f'mw_amplitudes_sweep{qubit}')
+        axis.axvline(self.optimal_motzoi-fetch_redis_params('mw_amp180',self.qubit), c='red', lw=4)

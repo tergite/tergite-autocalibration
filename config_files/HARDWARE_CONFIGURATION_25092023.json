@@ -160,7 +160,7 @@
       "clusterA_module8": {
          "instrument_type": "QCM_RF",
          "complex_output_0": {
-            "lo_freq": 3431000000.0,
+            "lo_freq": 3685000000.0,
             "dc_mixer_offset_I": -0.0119717,
             "dc_mixer_offset_Q": -0.0048634,
             "portclock_configs": [
@@ -204,7 +204,7 @@
       "clusterA_module10": {
          "instrument_type": "QCM_RF",
          "complex_output_0": {
-            "lo_freq": 3431000000.0,
+            "lo_freq": 3977000000.0,
             "dc_mixer_offset_I": -0.0099609,
             "dc_mixer_offset_Q": -0.005269,
             "portclock_configs": [

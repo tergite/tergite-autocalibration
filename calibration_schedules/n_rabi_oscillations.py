@@ -17,6 +17,7 @@ class N_Rabi_Oscillations(Measurement):
         self.static_kwargs = {
             'qubits': self.qubits,
             'mw_frequencies': self.attributes_dictionary('f01'),
+            'mw_amplitudes': self.attributes_dictionary('amp180'),
             'mw_pulse_durations': self.attributes_dictionary('duration'),
             'mw_pulse_ports': self.attributes_dictionary('microwave'),
             'mw_motzois': self.attributes_dictionary('motzoi'),
@@ -26,10 +27,11 @@ class N_Rabi_Oscillations(Measurement):
             self, #Note, this is not used in the schedule
             qubits: list[str],
             mw_frequencies: dict[str,float],
-            mw_amplitudes: dict[str,np.ndarray],
+            mw_amplitudes: dict[str,float],
             mw_pulse_ports: dict[str,str],
             mw_pulse_durations: dict[str,float],
             mw_motzois: dict[str,float],
+            mw_amplitudes_sweep: dict[str,np.ndarray],
             X_repetitions: dict[str,np.ndarray],
             repetitions: int = 1024,
         ) -> Schedule:
@@ -87,24 +89,24 @@ class N_Rabi_Oscillations(Measurement):
         for this_qubit, X_values in X_repetitions.items():
             this_clock = f'{this_qubit}.01'
 
-            mw_amplitudes_values = mw_amplitudes[this_qubit]
-            number_of_X = len(X_values)
+            mw_amplitudes_values = mw_amplitudes_sweep[this_qubit]
+            number_of_amplitudes = len(mw_amplitudes_values)
 
             schedule.add(
                 Reset(*qubits), ref_op=root_relaxation, ref_pt_new='end'
             ) #To enforce parallelism we refer to the root relaxation
 
             # The intermediate loop iterates over all amplitude values:
-            for acq_index, this_x in enumerate(X_values):
+            for x_index, this_x in enumerate(X_values):
 
                 # The inner for loop iterates over all frequency values in the frequency batch:
-                for motzoi_index, mw_amplitude in enumerate(mw_amplitudes_values):
-                    this_index = motzoi_index*number_of_X + acq_index
+                for mw_amplitude_index, mw_amplitude_sweep in enumerate(mw_amplitudes_values):
+                    this_index = x_index*number_of_amplitudes + mw_amplitude_index
                     for _ in range(this_x):
                         schedule.add(
                                 DRAGPulse(
                                     duration=mw_pulse_durations[this_qubit],
-                                    G_amp=mw_amplitude,
+                                    G_amp=mw_amplitudes[this_qubit]+mw_amplitude_sweep,
                                     D_amp=mw_motzois[this_qubit],
                                     port=mw_pulse_ports[this_qubit],
                                     clock=this_clock,
@@ -112,16 +114,16 @@ class N_Rabi_Oscillations(Measurement):
                                     ),
                                 )
                         # identical inversion pulse
-                        schedule.add(
-                                DRAGPulse(
-                                    duration=mw_pulse_durations[this_qubit],
-                                    G_amp=mw_amplitude,
-                                    D_amp=mw_motzois[this_qubit],
-                                    port=mw_pulse_ports[this_qubit],
-                                    clock=this_clock,
-                                    phase=0,
-                                    ),
-                                )
+                        # schedule.add(
+                        #         DRAGPulse(
+                        #             duration=mw_pulse_durations[this_qubit],
+                        #             G_amp=mw_amplitudes[this_qubit]+mw_amplitude_sweep,
+                        #             D_amp=mw_motzois[this_qubit],
+                        #             port=mw_pulse_ports[this_qubit],
+                        #             clock=this_clock,
+                        #             phase=0,
+                        #             ),
+                        #         )
 
                     schedule.add(
                             Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
