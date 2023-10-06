@@ -14,6 +14,8 @@ from colorama import Style
 import utilities.user_input as user_input
 import toml
 import redis
+from qblox_instruments import SpiRack
+from qblox_instruments.qcodes_drivers.spi_rack_modules import S4gModule
 
 colorama_init()
 
@@ -124,17 +126,26 @@ def calibrate_node(node_label:str):
 
     node = node_definitions[node_label]
 
+
+
     #TODO this is terrible
     compiled_schedules, schedule_durations, partial_samplespaces = precompile(node, qubits, samplespace)
     compilation_zip = list(zip(compiled_schedules, schedule_durations, partial_samplespaces))
     result_dataset = xr.Dataset()
     if node.name == 'coupler_spectroscopy':
+        spi = SpiRack("loki_rack", "COM99")
+        spi.add_spi_module(1, "S4g")
+        spi.module1.dac0.ramp_rate(200e-6)
+
+        def set_current(current_value: float):
+            spi.module1.dac0.current(1e-3)
+
         dc_currents = samplespace['dc_currents']
         compiled_schedule = compiled_schedules[0]
         schedule_duration = schedule_durations[0]
         logger.info('Starting coupler spectroscopy')
         for current in dc_currents:
-            set_current()
+            set_current(current)
             dataset = measure(
                 compiled_schedule,
                 schedule_duration,
@@ -144,6 +155,7 @@ def calibrate_node(node_label:str):
                 cluster_status=args.cluster_status
             )
             xr.merge(result_dataset,dataset)
+        spi.module1.set_dacs_zero()
     else:
         for compilation_indx, compilation in enumerate(compilation_zip):
             compiled_schedule, schedule_duration, samplespace = compilation

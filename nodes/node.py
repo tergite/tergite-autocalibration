@@ -17,6 +17,7 @@ from analysis.resonator_spectroscopy_analysis import (
 )
 from analysis.qubit_spectroscopy_analysis import QubitSpectroscopyAnalysis
 from analysis.qubit_spectroscopy_multidim import QubitSpectroscopyMultidim
+from analysis.coupler_spectroscopy_multidim import CouplerSpectroscopyAnalysis
 from analysis.optimum_ro_frequency_analysis import (
     OptimalROFrequencyAnalysis,
     OptimalRO_012_FrequencyAnalysis
@@ -160,5 +161,12 @@ node_definitions = {
         qubit_state = 0, #doesn't matter
         measurement_obj = Single_Shots_RO,
         analysis_obj = StateDiscrimination
+    ),
+    'coupler_spectroscopy': Node(
+        name = 'coupler_spectroscopy',
+        redis_field = '',
+        qubit_state = 0,
+        measurement_obj = Two_Tones_Spectroscopy,
+        analysis_obj = CouplerSpectroscopyAnalysis
     ),
 }
