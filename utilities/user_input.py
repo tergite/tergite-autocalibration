@@ -39,7 +39,7 @@ res_spec_samples = 41
 qub_spec_samples = 201
 
 def resonator_samples(qubit:str, punchout=False) -> np.ndarray:
-    sweep_range = 5e6
+    sweep_range = 1e6
     punchout_range = 0e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
     min_freq =  VNA_frequency - sweep_range / 2
