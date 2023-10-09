@@ -7,7 +7,7 @@ hardware_config = {
          'instrument_type': 'QCM_RF',
          'complex_output_0': {
             'lo_freq':None,
-            'dc_mixer_offset_I': -0.009517300000000001,
+            'dc_mixer_offset_I': -0.0095173,
             'dc_mixer_offset_Q': -0.0013028,
             'portclock_configs': [
                {'port': 'q0:mw', 'clock': 'q0.01', 'mixer_amp_ratio': 1.0685, 'mixer_phase_error_deg': -16.21206, "interm_freq":-100e6,},
@@ -16,7 +16,7 @@ hardware_config = {
          },
          'complex_output_1': {
             'lo_freq':None,
-            'dc_mixer_offset_I': -0.009517300000000001,
+            'dc_mixer_offset_I': -0.0095173,
             'dc_mixer_offset_Q': -0.0013028,
             'portclock_configs': [
                {'port': 'q10:mw', 'clock': 'q10.01', 'mixer_amp_ratio': 1.0685, 'mixer_phase_error_deg': -16.21206, "interm_freq":-100e6,},

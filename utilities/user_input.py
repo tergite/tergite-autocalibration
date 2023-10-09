@@ -5,7 +5,6 @@ from utilities.visuals import draw_arrow_chart
 from config_files.VNA_values import (
      VNA_resonator_frequencies, VNA_f01_frequencies, VNA_f12_frequencies
 )
-# import redis
 
 
 nodes = [
@@ -29,7 +28,6 @@ nodes = [
         #"state_discrimination",
         ]
 
-# qubits = [ 'q15']
 qubits = [ 'q11','q12','q13','q14','q15']
 #qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
 #qubits = [ 'q16','q17','q19','q21','q22','q23','q25']
@@ -39,13 +37,6 @@ N_qubits = len(qubits)
 
 res_spec_samples = 41
 qub_spec_samples = 201
-
-# def refine_sweep_samples(qubit:str,param:str,sweep_range:np.array) -> np.ndarray:
-#     redis_connection = redis.Redis(decode_responses=True)
-#     redis_config = redis_connection.hgetall(f"transmons:{qubit}")
-#     start_value = redis_config[param]
-#     start_value = 0 if np.isnan(start_value) else start_value
-#     return sweep_range + start_value
 
 def resonator_samples(qubit:str, punchout=False) -> np.ndarray:
     sweep_range = 5e6
