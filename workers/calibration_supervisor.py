@@ -8,6 +8,9 @@ from workers.execution_worker import measure
 from nodes.node import node_definitions
 from workers.post_processing_worker import post_process
 from utilities.status import ClusterStatus
+from nodes.node import filtered_topological_order
+from utilities.visuals import draw_arrow_chart
+
 from colorama import init as colorama_init
 from colorama import Fore
 from colorama import Style
@@ -18,10 +21,10 @@ import redis
 colorama_init()
 
 redis_connection = redis.Redis(decode_responses=True)
-parser = argparse.ArgumentParser(
-        prog='Tergite Automatic Calibration',
-        )
-parser.add_argument('--d', dest='cluster_status', action='store_const',const=ClusterStatus.dummy,default=ClusterStatus.real)
+parser = argparse.ArgumentParser(prog = 'Tergite Automatic Calibration',)
+parser.add_argument(
+    '--d', dest='cluster_status', action='store_const',const=ClusterStatus.dummy,default=ClusterStatus.real
+)
 args = parser.parse_args()
 
 # Settings
@@ -30,10 +33,10 @@ qubits = user_input.qubits
 
 def calibrate_system():
     logger.info('Starting System Calibration')
-    #breakpoint()
-    nodes = user_input.nodes
-    node_to_be_calibrated = user_input.target_node
-    topo_order = nodes[:nodes.index(node_to_be_calibrated) + 1]
+    target_node = user_input.target_node
+    topo_order = filtered_topological_order(target_node)
+    N_qubits = len(qubits)
+    draw_arrow_chart(f'Qubits: {N_qubits}', topo_order)
     initial_parameters = transmon_configuration['initials']
 
     #Populate the Redis database with the quantities of interest, at Nan value
@@ -120,11 +123,8 @@ def calibrate_node(node_label:str):
     for qubit in qubits:
         device_config[qubit] = redis_connection.hgetall(f"transmons:{qubit}")
 
-    #job["device_config"] = device_config
-    #job_id = job["job_id"]
-
     samplespace = job['experiment_params'][node_label]
-    
+
     node = node_definitions[node_label]
 
     #TODO this terrible
@@ -136,7 +136,7 @@ def calibrate_node(node_label:str):
         dataset = measure(
                 compiled_schedule,
                 schedule_duration,
-                samplespace, 
+                samplespace,
                 node.name,
                 #[compilation_indx, len(list(compilation_zip))],
                 cluster_status=args.cluster_status
