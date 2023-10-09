@@ -6,7 +6,11 @@ from analysis.motzoi_analysis import MotzoiAnalysis
 from analysis.n_rabi_analysis import NRabiAnalysis
 from analysis.resonator_spectroscopy_analysis import ResonatorSpectroscopyAnalysis, ResonatorSpectroscopy_1_Analysis, ResonatorSpectroscopy_2_Analysis
 from analysis.qubit_spectroscopy_analysis import QubitSpectroscopyAnalysis
-from analysis.optimum_ro_frequency_analysis import OptimalROFrequencyAnalysis
+from analysis.qubit_spectroscopy_multidim import QubitSpectroscopyMultidim
+from analysis.optimum_ro_frequency_analysis import (
+    OptimalROFrequencyAnalysis,
+    OptimalRO_012_FrequencyAnalysis
+)
 from analysis.optimum_ro_amplitude_analysis import OptimalROAmplitudeAnalysis
 from analysis.state_discrimination_analysis import StateDiscrimination
 from analysis.rabi_analysis import RabiAnalysis
@@ -112,6 +116,9 @@ class Multiplexed_Analysis(BaseAnalysis):
             elif node == 'T1':
                 analysis_class = T1Analysis
                 redis_field = 't1_time'
+            elif node == 'two_tone_multidim':
+                analysis_class = QubitSpectroscopyMultidim
+                redis_field = 'freq_01'
             elif node == 'qubit_12_spectroscopy_pulsed':
                 analysis_class = QubitSpectroscopyAnalysis
                 redis_field = 'freq_12'
@@ -128,9 +135,12 @@ class Multiplexed_Analysis(BaseAnalysis):
             elif node == 'ro_frequency_optimization':
                 analysis_class = OptimalROFrequencyAnalysis
                 redis_field = 'ro_freq_opt'
+            elif node == 'ro_frequency_optimization_gef':
+                analysis_class = OptimalRO_012_FrequencyAnalysis
+                redis_field = 'ro_freq_opt'
             elif node == 'ro_amplitude_optimization':
                 analysis_class = OptimalROAmplitudeAnalysis
-                redis_field = 'ro_freq_opt'
+                redis_field = 'ro_pulse_amp_opt'
             elif node == 'punchout':
                 analysis_class = PunchoutAnalysis
                 redis_field = 'ro_amp'

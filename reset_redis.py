@@ -17,7 +17,7 @@ remove_node = args.node
 print(f'{ remove_node = }')
 if not remove_node == 'all':
     remove_fields = quantities_of_interest[remove_node].keys()
-    # print('remove_fields', remove_fields)
+    #print('remove_fields', remove_fields)
 
 #TODO Why flush?
 #red.flushdb()
