@@ -104,7 +104,7 @@ class Two_Tones_Multidim(Measurement):
                     #spectroscopy pulse
                     # print(f'{spec_pulse_durations=}')
                     # print(f'{this_clock=}')
-                    """ 
+                    
                     spec_pulse = schedule.add(
                         long_square_pulse(
                             duration= spec_pulse_durations[this_qubit],
@@ -114,8 +114,8 @@ class Two_Tones_Multidim(Measurement):
                         ),
                         label=f"spec_pulse_multidim_{this_qubit}_{this_index}", ref_op=set_frequency, ref_pt="end",
                     ) 
-                    """
                     
+                    """
                     spec_pulse = schedule.add(
                         SoftSquarePulse(
                             duration= spec_pulse_durations[this_qubit],
@@ -125,7 +125,7 @@ class Two_Tones_Multidim(Measurement):
                         ),
                         label=f"spec_pulse_{this_qubit}_{this_index}", ref_op=set_frequency, ref_pt="end",
                     )
-                    
+                    """
                     if self.qubit_state == 0:
                         measure_function = Measure
                     elif self.qubit_state == 1:

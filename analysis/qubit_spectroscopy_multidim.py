@@ -70,12 +70,15 @@ class QubitSpectroscopyMultidim():
         self.qubit = dataset[data_var].attrs['qubit']
         self.S21 = dataset[data_var].values
         for coord in dataset[data_var].coords:
-            if 'frequencies' in coord: self.frequencies = coord
-            elif 'amplitudes' in coord: self.amplitudes = coord
+            if 'frequencies' in coord: self.frequency_coords = coord
+            elif 'amplitudes' in coord: self.amplitude_coords = coord
+        self.frequencies = dataset.coords[self.frequency_coords].values
+        self.amplitudes = dataset.coords[self.amplitude_coords].values
         #dataset[f'y{self.qubit}'].values = np.abs(self.S21)
-        breakpoint()
-        self.data_var = data_var
+        #breakpoint()
+
         self.fit_results = {}
+        self.data_var = data_var
         self.dataset = dataset
 
     def run_fitting(self):
@@ -87,18 +90,19 @@ class QubitSpectroscopyMultidim():
         frequencies = self.frequencies
         amplitudes = self.amplitudes
 
-        print(np.shape(frequencies))
-        print(np.shape(amplitudes))
-        print(amplitudes[0])
+        #print(np.shape(self.magnitudes))
+        #print(np.shape(frequencies))
+        #print(np.shape(amplitudes))
+        #print(amplitudes[0])
 
-        self.fit_freqs = np.linspace( frequencies[0], frequencies[-1], 1000) # x-values for plotting
+        #self.fit_freqs = np.linspace( frequencies[0], frequencies[-1], 1000) # x-values for plotting
 
         # Gives an initial guess for the model parameters and then fits the model to the data.
-        guess = model.guess(self.magnitudes, x=frequencies)
-        fit_result = model.fit(self.magnitudes, params=guess, x=frequencies)
+        #guess = model.guess(self.magnitudes, x=frequencies)
+        #fit_result = model.fit(self.magnitudes, params=guess, x=frequencies)
 
-        self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_freqs})
-        return fit_result.params['x0'].value
+        #self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_freqs})
+        return 0
 
     def reject_outliers(self, x, m = 3.):
         #Filters out datapoints in x that deviate too far from the median
@@ -116,9 +120,11 @@ class QubitSpectroscopyMultidim():
 
     def plotter(self,ax):
         # Plots the data and the fitted model of a qubit spectroscopy experiment
-        ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0)
-        ax.plot( self.frequencies, self.magnitudes,'bo-',ms=3.0)
-        ax.set_title(f'Qubit Spectroscopy for {self.qubit}')
-        ax.set_xlabel('frequency (Hz)')
-        ax.set_ylabel('|S21| (V)')
-        ax.grid()
+        #ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0)
+        for i,a in enumerate(self.amplitudes):
+            #self.dataset[self.data_var].plot(ax=ax, x=self.frequencies, y=self.magnitudes[:,i])
+            ax.plot(self.frequencies, self.magnitudes[:,i],'bo-',ms=3.0)
+            ax.set_title(f'Amplitude {a}')
+            ax.set_xlabel('frequency (Hz)')
+            ax.set_ylabel('|S21| (V)')
+            ax.grid()
