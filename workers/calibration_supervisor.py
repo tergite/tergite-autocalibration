@@ -9,6 +9,10 @@ from nodes.node import node_definitions
 from workers.post_processing_worker import post_process
 from utilities.status import ClusterStatus
 from qcodes import validators
+
+from nodes.node import filtered_topological_order
+from utilities.visuals import draw_arrow_chart
+
 from colorama import init as colorama_init
 from colorama import Fore
 from colorama import Style
@@ -21,10 +25,10 @@ from qblox_instruments.qcodes_drivers.spi_rack_modules import S4gModule
 colorama_init()
 
 redis_connection = redis.Redis(decode_responses=True)
-parser = argparse.ArgumentParser(
-        prog='Tergite Automatic Calibration',
-        )
-parser.add_argument('--d', dest='cluster_status', action='store_const',const=ClusterStatus.dummy,default=ClusterStatus.real)
+parser = argparse.ArgumentParser(prog = 'Tergite Automatic Calibration',)
+parser.add_argument(
+    '--d', dest='cluster_status', action='store_const',const=ClusterStatus.dummy,default=ClusterStatus.real
+)
 args = parser.parse_args()
 
 # Settings
@@ -33,10 +37,10 @@ qubits = user_input.qubits
 
 def calibrate_system():
     logger.info('Starting System Calibration')
-    #breakpoint()
-    nodes = user_input.nodes
-    node_to_be_calibrated = user_input.target_node
-    topo_order = nodes[:nodes.index(node_to_be_calibrated) + 1]
+    target_node = user_input.target_node
+    topo_order = filtered_topological_order(target_node)
+    N_qubits = len(qubits)
+    draw_arrow_chart(f'Qubits: {N_qubits}', topo_order)
     initial_parameters = transmon_configuration['initials']
 
     #Populate the Redis database with the quantities of interest, at Nan value
@@ -103,7 +107,7 @@ def inspect_node(node:str):
             raise ValueError(f'status: {status}')
 
     if status == DataStatus.in_spec:
-       print(u' \u2705 ' + f'{Fore.GREEN}{Style.BRIGHT}Node {node} in spec{Style.RESET_ALL}')
+       print(u' \u2714 ' + f'{Fore.GREEN}{Style.BRIGHT}Node {node} in spec{Style.RESET_ALL}')
        return
 
     if status == DataStatus.out_of_spec:
