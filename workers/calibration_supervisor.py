@@ -103,7 +103,7 @@ def inspect_node(node:str):
             raise ValueError(f'status: {status}')
 
     if status == DataStatus.in_spec:
-       print(u' \u2705 ' + f'{Fore.GREEN}{Style.BRIGHT}Node {node} in spec{Style.RESET_ALL}')
+       print(u' \u2714 ' + f'{Fore.GREEN}{Style.BRIGHT}Node {node} in spec{Style.RESET_ALL}')
        return
 
     if status == DataStatus.out_of_spec:

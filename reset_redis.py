@@ -2,10 +2,13 @@ import redis
 import toml
 import argparse
 from utilities import user_input
+#TODO this is a bit slow so better just keep a copy of the nodes here
+#from nodes.node import all_nodes
+nodes = ['tof', 'resonator_spectroscopy', 'qubit_01_spectroscopy_pulsed', 'qubit_01_spectroscopy_multidim', 'rabi_oscillations', 'ramsey_correction', 'resonator_spectroscopy_1', 'ro_frequency_optimization', 'T1', 'qubit_12_spectroscopy_pulsed', 'ro_amplitude_optimization', 'rabi_oscillations_12', 'state_discrimination', 'ramsey_correction_12']
 
+#nodes = all_nodes
 red = redis.Redis(decode_responses=True)
 qubits = user_input.qubits
-nodes = user_input.nodes
 
 parser = argparse.ArgumentParser()
 parser.add_argument('node', choices=['all']+nodes)

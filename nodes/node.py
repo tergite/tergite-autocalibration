@@ -68,6 +68,8 @@ graph.add_node('ro_amplitude_optimization', type='refine')
 graph['resonator_spectroscopy']['qubit_01_spectroscopy_pulsed']['weight'] = 1
 graph['resonator_spectroscopy']['qubit_01_spectroscopy_multidim']['weight'] = 2
 
+all_nodes = list(nx.topological_sort(graph))
+
 def filtered_topological_order(target_node: str):
     topo_order = nx.shortest_path(
         graph, 'resonator_spectroscopy', target_node, weight='weight'
