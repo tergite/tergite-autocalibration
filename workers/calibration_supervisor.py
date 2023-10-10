@@ -8,6 +8,7 @@ from workers.execution_worker import measure
 from nodes.node import node_definitions
 from workers.post_processing_worker import post_process
 from utilities.status import ClusterStatus
+from qcodes import validators
 from colorama import init as colorama_init
 from colorama import Fore
 from colorama import Style
@@ -133,12 +134,20 @@ def calibrate_node(node_label:str):
     compilation_zip = list(zip(compiled_schedules, schedule_durations, partial_samplespaces))
     result_dataset = xr.Dataset()
     if node.name == 'coupler_spectroscopy':
-        spi = SpiRack("loki_rack", "COM99")
-        spi.add_spi_module(1, "S4g")
-        spi.module1.dac0.ramp_rate(200e-6)
+        in_prompt = str(input('Run coupler spectroscopy: Y/N ?'))
+        assert(in_prompt=='Y')
+        spi_mod_number = 4
+        spi_mod_name = f'module{spi_mod_number}'
+        dac_name = 'dac0'
+
+        spi = SpiRack("loki_rack", "COM99") ###
+        spi.add_spi_module(spi_mod_number, "S4g")
+        spi.instrument_modules[spi_mod_name][dac_name].ramp_rate(200e-6)
+        for dac_name, dac in spi.instrument_modules[spi_mod_name].submodules.items():
+            dac.current.vals=validators.Numbers(min_value=-4e-3, max_value=4e-3)
 
         def set_current(current_value: float):
-            spi.module1.dac0.current(1e-3)
+            spi.instrument_modules[spi_mod_name][dac_name].current(current_value)
 
         dc_currents = samplespace['dc_currents']
         compiled_schedule = compiled_schedules[0]
@@ -154,8 +163,8 @@ def calibrate_node(node_label:str):
                 #[compilation_indx, len(list(compilation_zip))],
                 cluster_status=args.cluster_status
             )
-            xr.merge(result_dataset,dataset)
-        spi.module1.set_dacs_zero()
+            dataset = xr.merge([result_dataset,dataset])
+        spi.instrument_modules[spi_mod_name].set_dacs_zero()
     else:
         for compilation_indx, compilation in enumerate(compilation_zip):
             compiled_schedule, schedule_duration, samplespace = compilation
@@ -182,7 +191,6 @@ def calibrate_node(node_label:str):
                     result_dataset = result_dataset.drop_vars(var)
                     result_dataset = result_dataset.drop_dims(concat_coord)
                     result_dataset[var] = darray
-
 
     logger.info('measurement completed')
     post_process(result_dataset, node)
