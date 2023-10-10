@@ -128,7 +128,6 @@ def calibrate_node(node_label:str):
     node = node_definitions[node_label]
 
 
-
     #TODO this is terrible
     compiled_schedules, schedule_durations, partial_samplespaces = precompile(node, qubits, samplespace)
     compilation_zip = list(zip(compiled_schedules, schedule_durations, partial_samplespaces))
@@ -148,7 +147,10 @@ def calibrate_node(node_label:str):
 
         def set_current(current_value: float):
             spi.instrument_modules[spi_mod_name][dac_name].current(current_value)
-
+	    while spi.module4.dac0.is_ramping():
+	        print('ramping')
+	        time.sleep(1)
+	    print('Finished ramping')
         dc_currents = samplespace['dc_currents']
         compiled_schedule = compiled_schedules[0]
         schedule_duration = schedule_durations[0]
