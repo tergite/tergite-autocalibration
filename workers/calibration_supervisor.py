@@ -9,10 +9,11 @@ from nodes.node import node_definitions
 from workers.post_processing_worker import post_process
 from utilities.status import ClusterStatus
 from qcodes import validators
-import math
+from qblox_instruments import Cluster
 
 from nodes.node import filtered_topological_order
 from utilities.visuals import draw_arrow_chart
+from config_files.settings import lokiA_IP
 
 from colorama import init as colorama_init
 from colorama import Fore
@@ -26,15 +27,24 @@ from qblox_instruments.qcodes_drivers.spi_rack_modules import S4gModule
 
 colorama_init()
 
+
 redis_connection = redis.Redis(decode_responses=True)
-parser = argparse.ArgumentParser(prog = 'Tergite Automatic Calibration',)
+parser = argparse.ArgumentParser(prog='Tergite Automatic Calibration',)
 parser.add_argument(
-    '--d', dest='cluster_status', action='store_const',const=ClusterStatus.dummy,default=ClusterStatus.real
+    '--d', dest='cluster_status',
+    action='store_const',
+    const=ClusterStatus.dummy, default=ClusterStatus.real
 )
 args = parser.parse_args()
 # Settings
 transmon_configuration = toml.load('./config_files/device_config.toml')
 qubits = user_input.qubits
+
+if args.cluster_status == ClusterStatus.real:
+    Cluster.close_all()
+    # if cluster_status == ClusterStatus.real:
+    clusterA = Cluster("clusterA", lokiA_IP)
+
 
 def calibrate_system():
     logger.info('Starting System Calibration')
@@ -44,8 +54,8 @@ def calibrate_system():
     draw_arrow_chart(f'Qubits: {N_qubits}', topo_order)
     initial_parameters = transmon_configuration['initials']
 
-    #Populate the Redis database with the quantities of interest, at Nan value
-    #Only if the key does NOT already exist
+    # Populate the Redis database with the quantities of interest, at Nan value
+    # Only if the key does NOT already exist
     quantities_of_interest = transmon_configuration['qoi']
     for node, node_parameters_dictionary in quantities_of_interest.items():
         # named field as Redis calls them fields
@@ -58,9 +68,9 @@ def calibrate_system():
                     redis_connection.hset(f'transmons:{qubit}', field_key, field_value)
             # flag for the calibration supervisor
             if not redis_connection.hexists(calibration_supervisor_key, node):
-                redis_connection.hset(f'cs:{qubit}', node, 'not_calibrated' )
+                redis_connection.hset(f'cs:{qubit}', node, 'not_calibrated')
 
-    #Populate the Redis database with the initial 'reasonable' parameter values
+    # Populate the Redis database with the initial 'reasonable' parameter values
     for qubit in qubits:
         for parameter_key, parameter_value in initial_parameters['all'].items():
             redis_connection.hset(f"transmons:{qubit}", parameter_key, parameter_value)
@@ -73,19 +83,19 @@ def calibrate_system():
         logger.info(f'{node} node is completed')
 
 
-def inspect_node(node:str):
+def inspect_node(node: str):
     logger.info(f'Inspecting node {node}')
-    #breakpoint()
-    #Reapply the all initials. This is because of two tones messing with mw_duration
-    #TODO: is that necessary?
+    # breakpoint()
+    # Reapply the all initials. This is because of two tones messing with mw_duration
+    # TODO: is that necessary?
     initial_parameters = transmon_configuration['initials']
     for qubit in qubits:
         for parameter_key, parameter_value in initial_parameters['all'].items():
             redis_connection.hset(f"transmons:{qubit}", parameter_key, parameter_value)
 
-    #Populate the Redis database with node specific parameter values
+    # Populate the Redis database with node specific parameter values
     qubits_statuses = [redis_connection.hget(f"cs:{qubit}", node) == 'calibrated' for qubit in qubits]
-    #node is calibrated only when all qubits have the node calibrated:
+    # node is calibrated only when all qubits have the node calibrated:
     is_node_calibrated = all(qubits_statuses)
     if node in transmon_configuration and not is_node_calibrated:
         node_specific_dict = transmon_configuration[node]['all']
@@ -93,7 +103,7 @@ def inspect_node(node:str):
             for qubit in qubits:
                 redis_connection.hset(f'transmons:{qubit}', field_key, field_value)
 
-    #Check Redis if node is calibrated
+    # Check Redis if node is calibrated
     status = DataStatus.undefined
 
     for qubit in qubits:
@@ -102,27 +112,27 @@ def inspect_node(node:str):
         is_Calibrated = redis_connection.hget(f"cs:{qubit}", node)
         if is_Calibrated == 'not_calibrated':
             status = DataStatus.out_of_spec
-            break #even if a single qubit is not_calibrated mark as out_of_spec
+            break  # even if a single qubit is not_calibrated mark as out_of_spec
         elif is_Calibrated == 'calibrated':
             status = DataStatus.in_spec
         else:
             raise ValueError(f'status: {status}')
 
     if status == DataStatus.in_spec:
-       print(u' \u2714 ' + f'{Fore.GREEN}{Style.BRIGHT}Node {node} in spec{Style.RESET_ALL}')
-       return
+        print(u' \u2714 ' + f'{Fore.GREEN}{Style.BRIGHT}Node {node} in spec{Style.RESET_ALL}')
+        return
 
     if status == DataStatus.out_of_spec:
-       print(u'\u2691\u2691\u2691 '+ f'{Fore.RED}{Style.BRIGHT}Calibration required for Node {node}{Style.RESET_ALL}')
-       calibrate_node(node)
+        print(u'\u2691\u2691\u2691 ' + f'{Fore.RED}{Style.BRIGHT}Calibration required for Node {node}{Style.RESET_ALL}')
+        calibrate_node(node)
 
 
-def calibrate_node(node_label:str):
+def calibrate_node(node_label: str):
     logger.info(f'Calibrating node {node_label}')
     dummy = False
     if args.cluster_status == ClusterStatus.dummy:
         dummy = True
-    job = user_input.user_requested_calibration(node_label,dummy)
+    job = user_input.user_requested_calibration(node_label, dummy)
 
     # Load the latest transmons state onto the job
     device_config = {}
@@ -133,30 +143,30 @@ def calibrate_node(node_label:str):
 
     node = node_definitions[node_label]
 
-    #TODO this is terrible
+    # TODO this is terrible
     compiled_schedules, schedule_durations, partial_samplespaces = precompile(node, qubits, samplespace)
     compilation_zip = list(zip(compiled_schedules, schedule_durations, partial_samplespaces))
     result_dataset = xr.Dataset()
     if node.name == 'coupler_spectroscopy':
-        #in_prompt = str(input('Run coupler spectroscopy: Y/N ?'))
-        #assert(in_prompt=='Y')
+        # in_prompt = str(input('Run coupler spectroscopy: Y/N ?'))
+        # assert(in_prompt=='Y')
         spi_mod_number = 3
         spi_mod_name = f'module{spi_mod_number}'
         dac_name = 'dac3'
+        spi = SpiRack('loki_rack', '/dev/ttyACM0')
+        spi.add_spi_module(spi_mod_number, S4gModule)
+        this_dac = spi.instrument_modules[spi_mod_name].instrument_modules[dac_name]
+        this_dac.ramping_enabled(True)
+        # ramp_rate = math.copysign(200e-6, current_value)
+        # print(f'{ ramp_rate = }')
+        this_dac.ramp_rate(100e-6)
+        this_dac.ramp_max_step(50e-6)
+        for dac in spi.instrument_modules[spi_mod_name].submodules.values():
+            dac.current.vals = validators.Numbers(min_value=-4e-3, max_value=4e-3)
 
         def set_current(current_value: float):
-            spi = SpiRack('loki_rack', '/dev/ttyACM0')
-            spi.add_spi_module(spi_mod_number, S4gModule)
-            this_dac = spi.instrument_modules[spi_mod_name].instrument_modules[dac_name]
-            this_dac.ramping_enabled(True)
-            #ramp_rate = math.copysign(200e-6, current_value)
-            #print(f'{ ramp_rate = }')
-            this_dac.ramp_rate(100e-6)
-            this_dac.ramp_max_step(50e-6)
             print(f'{ current_value = }')
             print(f'{ this_dac.current() = }')
-            for dac in spi.instrument_modules[spi_mod_name].submodules.values():
-                dac.current.vals = validators.Numbers(min_value=-4e-3, max_value=4e-3)
             this_dac.current(current_value)
             while this_dac.is_ramping():
                 print('ramping')
@@ -176,7 +186,8 @@ def calibrate_node(node_label:str):
                 schedule_duration,
                 samplespace,
                 node.name,
-                #[compilation_indx, len(list(compilation_zip))],
+                clusterA,
+                # [compilation_indx, len(list(compilation_zip))],
                 cluster_status=args.cluster_status
             )
 
@@ -186,8 +197,8 @@ def calibrate_node(node_label:str):
             if indx == 0:
                 result_dataset = dataset
             else:
-                result_dataset = xr.concat([result_dataset,dataset], dim='dc_currents')
-        #spi.instrument_modules[spi_mod_name].set_dacs_zero()
+                result_dataset = xr.concat([result_dataset, dataset], dim='dc_currents')
+        # spi.instrument_modules[spi_mod_name].set_dacs_zero()
     else:
         for compilation_indx, compilation in enumerate(compilation_zip):
             compiled_schedule, schedule_duration, samplespace = compilation
@@ -196,7 +207,8 @@ def calibrate_node(node_label:str):
                 schedule_duration,
                 samplespace,
                 node.name,
-                #[compilation_indx, len(list(compilation_zip))],
+                clusterA,
+                # [compilation_indx, len(list(compilation_zip))],
                 cluster_status=args.cluster_status
             )
             if compilation_indx == 0:
@@ -219,5 +231,6 @@ def calibrate_node(node_label:str):
     post_process(result_dataset, node)
     logger.info('analysis completed')
 
-#main
+
+# main
 calibrate_system()

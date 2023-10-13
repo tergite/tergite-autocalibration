@@ -1,13 +1,12 @@
 '''Retrieve the compiled schedule and run it'''
 from quantify_scheduler.instrument_coordinator.instrument_coordinator import CompiledSchedule
 from logger.tac_logger import logger
-from qblox_instruments import Cluster, ClusterType
+from qblox_instruments import Cluster
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 import xarray
 from utilities.status import ClusterStatus
 from workers.worker_utils import configure_dataset, handle_ro_freq_optimization, to_real_dataset
-import numpy as np
 import threading
 import tqdm
 from utilities.root_path import data_directory
@@ -26,14 +25,16 @@ colorama_init()
 
 redis_connection = redis.Redis(decode_responses=True)
 
+
 def measure(
         compiled_schedule: CompiledSchedule,
         schedule_duration: float,
         samplespace: dict,
         node: str,
-        measurement_index: [int, int] = [0,0],
+        cluster_object,
+        measurement_index: [int, int] = [0, 0],
         cluster_status: ClusterStatus = ClusterStatus.real
-    ) -> xarray.Dataset:
+) -> xarray.Dataset:
 
     logger.info('Starting measurement')
 
@@ -45,13 +46,8 @@ def measure(
     print_message += f'duration: {schedule_duration:.2f}s{Style.RESET_ALL}'
     print(print_message)
 
-    Cluster.close_all()
-
     if cluster_status == ClusterStatus.dummy:
         clusterA = dummy_cluster(samplespace)
-
-    elif cluster_status == ClusterStatus.real:
-        clusterA = Cluster("clusterA", lokiA_IP)
 
     if node == 'tof':
         result_dataset = measure_time_of_flight(clusterA)
@@ -69,7 +65,7 @@ def measure(
         steps = int(schedule_duration * 5)
         if cluster_status == ClusterStatus.dummy:
             progress_sleep = 0.004
-        elif cluster_status == ClusterStatus.real :
+        elif cluster_status == ClusterStatus.real:
             progress_sleep = 0.2
         for _ in tqdm.tqdm(range(steps), desc=node, colour='blue'):
             sleep(progress_sleep)
