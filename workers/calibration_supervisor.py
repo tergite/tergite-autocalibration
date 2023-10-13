@@ -14,6 +14,7 @@ from qblox_instruments import Cluster
 from nodes.node import filtered_topological_order
 from utilities.visuals import draw_arrow_chart
 from config_files.settings import lokiA_IP
+from workers.dummy_setup import dummy_cluster
 
 from colorama import init as colorama_init
 from colorama import Fore
@@ -51,7 +52,6 @@ if args.cluster_status == ClusterStatus.real:
 
 
 def calibrate_system():
-    #breakpoint()
     logger.info('Starting System Calibration')
     target_node = user_input.target_node
     topo_order = filtered_topological_order(target_node)
@@ -133,7 +133,6 @@ def inspect_node(node: str):
 
 
 def calibrate_node(node_label: str):
-    # breakpoint()
     logger.info(f'Calibrating node {node_label}')
     dummy = False
     if args.cluster_status == ClusterStatus.dummy:
@@ -146,6 +145,10 @@ def calibrate_node(node_label: str):
         device_config[qubit] = redis_connection.hgetall(f"transmons:{qubit}")
 
     samplespace = job['experiment_params'][node_label]
+    if args.cluster_status == ClusterStatus.dummy:
+        clusterA = dummy_cluster(samplespace)
+        lab_ic = InstrumentCoordinator('lab_ic')
+        lab_ic.add_component(ClusterComponent(clusterA))
 
     node = node_definitions[node_label]
 
@@ -165,7 +168,7 @@ def calibrate_node(node_label: str):
         this_dac.ramping_enabled(True)
         # ramp_rate = math.copysign(200e-6, current_value)
         # print(f'{ ramp_rate = }')
-        this_dac.ramp_rate( 50e-6)
+        this_dac.ramp_rate(50e-6)
         this_dac.ramp_max_step(25e-6)
         for dac in spi.instrument_modules[spi_mod_name].submodules.values():
             dac.current.vals = validators.Numbers(min_value=-4e-3, max_value=4e-3)
@@ -230,7 +233,6 @@ def calibrate_node(node_label: str):
                             concat_coord = coord
                             break
 
-                    #breakpoint()
                     darray = xr.concat([result_dataset[var], dataset[var]], dim=concat_coord)
                     result_dataset = result_dataset.drop_vars(var)
                     result_dataset = result_dataset.drop_dims(concat_coord)

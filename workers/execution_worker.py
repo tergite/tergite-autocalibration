@@ -1,18 +1,13 @@
 '''Retrieve the compiled schedule and run it'''
 from quantify_scheduler.instrument_coordinator.instrument_coordinator import CompiledSchedule
 from logger.tac_logger import logger
-from qblox_instruments import Cluster
-from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
-from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 import xarray
 from utilities.status import ClusterStatus
 from workers.worker_utils import configure_dataset, handle_ro_freq_optimization, to_real_dataset
 import threading
 import tqdm
 from utilities.root_path import data_directory
-from workers.dummy_setup import dummy_cluster
 from calibration_schedules.time_of_flight import measure_time_of_flight
-from config_files.settings import lokiA_IP
 import redis
 from datetime import datetime
 import pathlib
@@ -47,8 +42,8 @@ def measure(
     print_message += f'duration: {schedule_duration:.2f}s{Style.RESET_ALL}'
     print(print_message)
 
-    if cluster_status == ClusterStatus.dummy:
-        clusterA = dummy_cluster(samplespace)
+    # if cluster_status == ClusterStatus.dummy:
+    #     clusterA = dummy_cluster(samplespace)
 
     if node == 'tof':
         result_dataset = measure_time_of_flight(clusterA)
