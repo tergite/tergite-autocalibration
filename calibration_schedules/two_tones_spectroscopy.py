@@ -27,7 +27,6 @@ class Two_Tones_Spectroscopy(Measurement):
             'mw_pulse_ports': self.attributes_dictionary('microwave'),
         }
 
-
     def schedule_function(
         self,
         qubits: list[str],
@@ -35,6 +34,9 @@ class Two_Tones_Spectroscopy(Measurement):
         spec_pulse_amplitudes: dict[str,float],
         mw_pulse_ports: dict[str,str],
         spec_frequencies: dict[str,np.ndarray],
+
+        # This doesnt do anything, but makes configuring the dataset easier
+        dc_currents: dict[str,np.ndarray],
 
         repetitions: int = 1024,
         ) -> Schedule:
@@ -125,6 +127,8 @@ class Two_Tones_Spectroscopy(Measurement):
                 #    label=f"spec_pulse_{this_qubit}_{acq_index}", ref_op=excitation_pulse, ref_pt="end",
                 #)
 
+                print(f'{ spec_pulse_amplitudes[this_qubit] = }')
+                print(f'{ spec_pulse_durations[this_qubit] = }')
                 spec_pulse = schedule.add(
                     SoftSquarePulse(
                         duration= spec_pulse_durations[this_qubit],

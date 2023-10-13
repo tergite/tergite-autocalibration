@@ -12,8 +12,12 @@ def configure_dataset(
 
     keys = raw_ds.data_vars.keys()
     sweep_quantities = samplespace.keys() # for example 'ro_frequencies', 'ro_amplitudes' ,...
-    sweep_parameters = list(samplespace.values())[0]
-    qubits = list(sweep_parameters.keys())
+    sweep_parameters = list(samplespace.values())
+    qubits = []
+    for sweep in sweep_parameters:
+        qubits += list(sweep.keys())
+    dublicates = set()
+    qubits = [q for q in qubits if not (q in dublicates or dublicates.add(q))]
     n_qubits = len(qubits)
     if 'ro_opt_frequencies' in list(sweep_quantities):
         qubit_states = [0,1,2]
@@ -25,7 +29,10 @@ def configure_dataset(
         qubit = qubits[key_indx]
         for quantity in sweep_quantities :
             coord_key = quantity+qubit
-            settable_values = samplespace[quantity][qubit]
+            if qubit in samplespace[quantity]:
+                settable_values = samplespace[quantity][qubit]
+            else:
+                continue
             coord_attrs = {'qubit':qubit, 'long_name': f'{coord_key}', 'units': 'NA'}
             #coords_dict[coord_key] = (quantity, settable_values, coord_attrs)
             coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
@@ -52,7 +59,7 @@ def configure_dataset(
         #                )
         #partial_ds[f'y{qubit}_real{qubit_state}'] = real_data_array
 
-        partial_ds[f'y{qubit}_{qubit_state}'] = (tuple(coords_dict.keys()), data_values, attributes)
+        partial_ds[f'y{qubit}{qubit_state}'] = (tuple(coords_dict.keys()), data_values, attributes)
         dataset = xarray.merge([dataset,partial_ds])
     return dataset
 

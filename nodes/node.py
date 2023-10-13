@@ -20,7 +20,7 @@ from analysis.resonator_spectroscopy_analysis import (
 )
 from analysis.qubit_spectroscopy_analysis import QubitSpectroscopyAnalysis
 from analysis.qubit_spectroscopy_multidim import QubitSpectroscopyMultidim
-from analysis.coupler_spectroscopy_multidim import CouplerSpectroscopyAnalysis
+from analysis.coupler_spectroscopy_analysis import CouplerSpectroscopyAnalysis
 from analysis.optimum_ro_frequency_analysis import (
     OptimalROFrequencyAnalysis,
     OptimalRO_012_FrequencyAnalysis
@@ -36,9 +36,12 @@ from analysis.T1_analysis import T1Analysis
 
 graph = nx.DiGraph()
 
-# dependencies: n1 -> n2. For example 'resonator_spectroscopy' depends on 'tof'
+# dependencies: n1 -> n2. For example
+# ('tof','resonator_spectroscopy') 
+# means 'resonator_spectroscopy' depends on 'tof'
 graph_dependencies = [
     ('tof','resonator_spectroscopy'),
+    ('resonator_spectroscopy','coupler_spectroscopy'),
     ('resonator_spectroscopy','qubit_01_spectroscopy_pulsed'),
     ('resonator_spectroscopy','qubit_01_spectroscopy_multidim'),
     ('qubit_01_spectroscopy_pulsed','rabi_oscillations'),

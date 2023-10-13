@@ -9,6 +9,7 @@ from nodes.node import node_definitions
 from workers.post_processing_worker import post_process
 from utilities.status import ClusterStatus
 from qcodes import validators
+import math
 
 from nodes.node import filtered_topological_order
 from utilities.visuals import draw_arrow_chart
@@ -17,6 +18,7 @@ from colorama import init as colorama_init
 from colorama import Fore
 from colorama import Style
 import utilities.user_input as user_input
+import time
 import toml
 import redis
 from qblox_instruments import SpiRack
@@ -30,7 +32,6 @@ parser.add_argument(
     '--d', dest='cluster_status', action='store_const',const=ClusterStatus.dummy,default=ClusterStatus.real
 )
 args = parser.parse_args()
-
 # Settings
 transmon_configuration = toml.load('./config_files/device_config.toml')
 qubits = user_input.qubits
@@ -76,6 +77,7 @@ def inspect_node(node:str):
     logger.info(f'Inspecting node {node}')
     #breakpoint()
     #Reapply the all initials. This is because of two tones messing with mw_duration
+    #TODO: is that necessary?
     initial_parameters = transmon_configuration['initials']
     for qubit in qubits:
         for parameter_key, parameter_value in initial_parameters['all'].items():
@@ -131,36 +133,44 @@ def calibrate_node(node_label:str):
 
     node = node_definitions[node_label]
 
-
     #TODO this is terrible
     compiled_schedules, schedule_durations, partial_samplespaces = precompile(node, qubits, samplespace)
     compilation_zip = list(zip(compiled_schedules, schedule_durations, partial_samplespaces))
     result_dataset = xr.Dataset()
     if node.name == 'coupler_spectroscopy':
-        in_prompt = str(input('Run coupler spectroscopy: Y/N ?'))
-        assert(in_prompt=='Y')
-        spi_mod_number = 4
+        #in_prompt = str(input('Run coupler spectroscopy: Y/N ?'))
+        #assert(in_prompt=='Y')
+        spi_mod_number = 3
         spi_mod_name = f'module{spi_mod_number}'
-        dac_name = 'dac0'
-
-        spi = SpiRack("loki_rack", "COM99") ###
-        spi.add_spi_module(spi_mod_number, "S4g")
-        spi.instrument_modules[spi_mod_name][dac_name].ramp_rate(200e-6)
-        for dac_name, dac in spi.instrument_modules[spi_mod_name].submodules.items():
-            dac.current.vals=validators.Numbers(min_value=-4e-3, max_value=4e-3)
+        dac_name = 'dac3'
 
         def set_current(current_value: float):
-            spi.instrument_modules[spi_mod_name][dac_name].current(current_value)
-	    while spi.module4.dac0.is_ramping():
-	        print('ramping')
-	        time.sleep(1)
-	    print('Finished ramping')
-        dc_currents = samplespace['dc_currents']
+            spi = SpiRack('loki_rack', '/dev/ttyACM0')
+            spi.add_spi_module(spi_mod_number, S4gModule)
+            this_dac = spi.instrument_modules[spi_mod_name].instrument_modules[dac_name]
+            this_dac.ramping_enabled(True)
+            #ramp_rate = math.copysign(200e-6, current_value)
+            #print(f'{ ramp_rate = }')
+            this_dac.ramp_rate(100e-6)
+            this_dac.ramp_max_step(50e-6)
+            print(f'{ current_value = }')
+            print(f'{ this_dac.current() = }')
+            for dac in spi.instrument_modules[spi_mod_name].submodules.values():
+                dac.current.vals = validators.Numbers(min_value=-4e-3, max_value=4e-3)
+            this_dac.current(current_value)
+            while this_dac.is_ramping():
+                print('ramping')
+                time.sleep(1)
+            print('Finished ramping')
+
+        dc_currents = list(samplespace['dc_currents'].values())[0]
         compiled_schedule = compiled_schedules[0]
         schedule_duration = schedule_durations[0]
         logger.info('Starting coupler spectroscopy')
-        for current in dc_currents:
+        samplespace.pop('dc_currents')
+        for indx, current in enumerate(dc_currents):
             set_current(current)
+
             dataset = measure(
                 compiled_schedule,
                 schedule_duration,
@@ -169,8 +179,15 @@ def calibrate_node(node_label:str):
                 #[compilation_indx, len(list(compilation_zip))],
                 cluster_status=args.cluster_status
             )
-            dataset = xr.merge([result_dataset,dataset])
-        spi.instrument_modules[spi_mod_name].set_dacs_zero()
+
+            dataset = dataset.expand_dims(dim='dc_currents')
+            dataset['dc_currents'] = [current]
+
+            if indx == 0:
+                result_dataset = dataset
+            else:
+                result_dataset = xr.concat([result_dataset,dataset], dim='dc_currents')
+        #spi.instrument_modules[spi_mod_name].set_dacs_zero()
     else:
         for compilation_indx, compilation in enumerate(compilation_zip):
             compiled_schedule, schedule_duration, samplespace = compilation

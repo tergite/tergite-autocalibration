@@ -32,4 +32,4 @@ class CouplerSpectroscopyAnalysis():
     def plotter(self,ax):
         datarray = self.dataset[f'y{self.qubit}']
         qubit = self.qubit
-        self.dataset[self.data_var].plot(ax=ax, x=self.frequencies, yscale='log')
+        self.dataset[self.data_var].plot(ax=ax, x=self.frequencies)
