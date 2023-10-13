@@ -31,7 +31,8 @@ def measure(
         schedule_duration: float,
         samplespace: dict,
         node: str,
-        cluster_object,
+        clusterA,
+        lab_ic,
         measurement_index: [int, int] = [0, 0],
         cluster_status: ClusterStatus = ClusterStatus.real
 ) -> xarray.Dataset:
@@ -52,9 +53,9 @@ def measure(
     if node == 'tof':
         result_dataset = measure_time_of_flight(clusterA)
         return result_dataset
-    lab_ic = InstrumentCoordinator('lab_ic')
-    lab_ic.add_component(ClusterComponent(clusterA))
-    lab_ic.timeout(222)
+#    lab_ic = InstrumentCoordinator('lab_ic')
+#    lab_ic.add_component(ClusterComponent(clusterA))
+#    lab_ic.timeout(222)
 
     def run_measurement() -> None:
         lab_ic.prepare(compiled_schedule)
@@ -100,8 +101,8 @@ def measure(
         result_dataset= handle_ro_freq_optimization(result_dataset,states=[0,1])
     elif node=='ro_frequency_optimization_gef':
         result_dataset= handle_ro_freq_optimization(result_dataset,states=[0,1,2])
-
-    lab_ic.stop()
+    #lab_ic.stop()
+    #lab_ic.close()
     logger.info('Finished measurement')
 
     return result_dataset

@@ -65,7 +65,7 @@ def precompile(node, qubits: list[str], samplespace: dict[str,dict[str,np.ndarra
     if node.name == 'tof':
         return None, 1
 
-    Instrument.close_all()
+    #Instrument.close_all()
     device = QuantumDevice('Loki')
     device.hardware_config(hw_config)
     sweep_parameters = list(samplespace.values())

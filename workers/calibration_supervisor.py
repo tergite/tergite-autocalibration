@@ -24,6 +24,8 @@ import toml
 import redis
 from qblox_instruments import SpiRack
 from qblox_instruments.qcodes_drivers.spi_rack_modules import S4gModule
+from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
+from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 
 colorama_init()
 
@@ -42,11 +44,14 @@ qubits = user_input.qubits
 
 if args.cluster_status == ClusterStatus.real:
     Cluster.close_all()
-    # if cluster_status == ClusterStatus.real:
     clusterA = Cluster("clusterA", lokiA_IP)
+    lab_ic = InstrumentCoordinator('lab_ic')
+    lab_ic.add_component(ClusterComponent(clusterA))
+    lab_ic.timeout(222)
 
 
 def calibrate_system():
+    #breakpoint()
     logger.info('Starting System Calibration')
     target_node = user_input.target_node
     topo_order = filtered_topological_order(target_node)
@@ -128,6 +133,7 @@ def inspect_node(node: str):
 
 
 def calibrate_node(node_label: str):
+    # breakpoint()
     logger.info(f'Calibrating node {node_label}')
     dummy = False
     if args.cluster_status == ClusterStatus.dummy:
@@ -159,8 +165,8 @@ def calibrate_node(node_label: str):
         this_dac.ramping_enabled(True)
         # ramp_rate = math.copysign(200e-6, current_value)
         # print(f'{ ramp_rate = }')
-        this_dac.ramp_rate(100e-6)
-        this_dac.ramp_max_step(50e-6)
+        this_dac.ramp_rate( 50e-6)
+        this_dac.ramp_max_step(25e-6)
         for dac in spi.instrument_modules[spi_mod_name].submodules.values():
             dac.current.vals = validators.Numbers(min_value=-4e-3, max_value=4e-3)
 
@@ -187,6 +193,7 @@ def calibrate_node(node_label: str):
                 samplespace,
                 node.name,
                 clusterA,
+                lab_ic,
                 # [compilation_indx, len(list(compilation_zip))],
                 cluster_status=args.cluster_status
             )
@@ -198,7 +205,8 @@ def calibrate_node(node_label: str):
                 result_dataset = dataset
             else:
                 result_dataset = xr.concat([result_dataset, dataset], dim='dc_currents')
-        # spi.instrument_modules[spi_mod_name].set_dacs_zero()
+
+        spi.instrument_modules[spi_mod_name].set_dacs_zero()
     else:
         for compilation_indx, compilation in enumerate(compilation_zip):
             compiled_schedule, schedule_duration, samplespace = compilation
@@ -208,6 +216,7 @@ def calibrate_node(node_label: str):
                 samplespace,
                 node.name,
                 clusterA,
+                lab_ic,
                 # [compilation_indx, len(list(compilation_zip))],
                 cluster_status=args.cluster_status
             )
