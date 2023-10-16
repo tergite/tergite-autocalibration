@@ -1,4 +1,5 @@
 import networkx as nx
+import numpy as np
 from calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
 from calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
 from calibration_schedules.two_tone_multidim import Two_Tones_Multidim
@@ -32,6 +33,10 @@ from analysis.punchout_analysis import PunchoutAnalysis
 from analysis.ramsey_analysis import RamseyAnalysis
 from analysis.tof_analysis import analyze_tof
 from analysis.T1_analysis import T1Analysis
+
+from config_files.VNA_values import (
+    VNA_resonator_frequencies, VNA_qubit_frequencies, VNA_f12_frequencies
+)
 
 
 graph = nx.DiGraph()
@@ -95,144 +100,222 @@ def filtered_topological_order(target_node: str):
     return filtered_order
 
 
+def resonator_samples(qubit: str) -> np.ndarray:
+    res_spec_samples = 55
+    sweep_range = 5.5e6
+    VNA_frequency = VNA_resonator_frequencies[qubit]
+    min_freq = VNA_frequency - sweep_range / 2
+    max_freq = VNA_frequency + sweep_range / 2
+    return np.linspace(min_freq, max_freq, res_spec_samples)
+
+
+def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
+    qub_spec_samples = 45
+    sweep_range = 3.5e6
+    if transition == '01':
+        VNA_frequency = VNA_qubit_frequencies[qubit]
+    elif transition == '12':
+        VNA_frequency = VNA_f12_frequencies[qubit]
+    else:
+        raise ValueError('Invalid transition')
+
+    min_freq = VNA_frequency - sweep_range / 2
+    max_freq = VNA_frequency + sweep_range / 2
+    return np.linspace(min_freq, max_freq, qub_spec_samples)
+
+
 class Node():
-    def __init__(
-        self, name: str, redis_field: str, qubit_state: int, measurement_obj, analysis_obj
-    ):
+    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
         self.name = name
-        self.redis_field = redis_field
-        self.qubit_state = qubit_state  # e.g. qubit_state = 1 for resonator_spectroscopy_1
-        self.measurement_obj = measurement_obj
-        self.analysis_obj = analysis_obj
+        self.all_qubits = all_qubits
+        self.node_dictionary = kwargs
+        self.initialize_node(self.name)
+
+        def initialize_node(name: str):
+            initial_parameters = node_definitions[self.name]
+            self.redis_field = initial_parameters['redis_field']
+            self.qubit_state = initial_parameters['qubit_state']  # e.g. qubit_state = 1 for resonator_spectroscopy_1
+            self.measurement_obj = initial_parameters['measurement_obj']
+            self.analysis_obj = initial_parameters['analysis_obj']
+            self.default_sample_array = initial_parameters['default_sample_array']
+
+        @property
+        def spi_samplespace(self):
+            _spi_samplespace = {self.name: {}}
+            coupled_qubits = self.node_dictionary['coupled_qubits']
+            self.coupler = coupled_qubits[0] + coupled_qubits[1]
+            if self.name in ['coupler_spectroscopy']:
+                _spi_samplespace[self.name] = {
+                    'dc_currents': {self.coupler: np.arange(-3e-3, 3e-3, 100e6)},
+                }
+
+        @property
+        def samplespace(self):
+            _samplespace = {self.name: {}}
+            if self.name in ['coupler_spectroscopy']:
+                if 'coupled_qubits' in self.node_dictionary:
+                    coupled_qubits = self.node_dictionary['coupled_qubits']
+                    self.coupler = coupled_qubits[0] + coupled_qubits[1]
+                    _samplespace[self.name] = {
+                        'spec_frequencies': {
+                            qubit: qubit_samples(qubit) for qubit in coupled_qubits
+                        },
+                    }
+                else:
+                    raise ValueError('User dictionary must contain an "coupled_qubits" field')
+            elif self.name in [
+                    'resonator_spectroscopy',
+                    'resonator_spectroscopy_1',
+                    'resonator_spectroscopy_2',
+            ]:
+                _samplespace[self.name] = {
+                    'ro_frequencies': {
+                        qubit: resonator_samples(qubit) for qubit in self.all_qubits
+                    }
+                }
+            elif self.name == 'qubit_01_spectroscopy_pulsed':
+                _samplespace[self.name] = {
+                    'spec_frequencies': {
+                        qubit: qubit_samples(qubit) for qubit in self.all_qubits
+                    }
+                }
+            elif self.name == 'qubit_12_spectroscopy_pulsed':
+                _samplespace[self.name] = {
+                    'spec_frequencies': {
+                        qubit: qubit_samples(qubit, '12') for qubit in self.all_qubits
+                    }
+                }
+            elif self.name in ['rabi_oscillations', 'rabi_oscillations_12']:
+                _samplespace[self.name] = {
+                    'mw_amplitudes': {
+                        qubit: np.linspace(0.002, 0.200, 31) for qubit in self.all_qubits
+                    }
+                }
+            elif self.name == 'ramsey_correction':
+                _samplespace[self.name] = {
+                    'ramsey_correction': {
+                        'ramsey_delays': {qubit: np.arange(4e-9, 2048e-9, 8 * 8e-9) for qubit in self.all_qubits},
+                        'artificial_detunings': {qubit: np.arange(-2.1, 2.1, 0.8) * 1e6 for qubit in self.all_qubits},
+                    },
+                }
+            elif self.name == 'ramsey_correction_12':
+                _samplespace[self.name] = {
+                    'ramsey_correction': {
+                        'ramsey_delays': {qubit: np.arange(4e-9, 2048e-9, 8 * 8e-9) for qubit in self.all_qubits},
+                        'artificial_detunings': {qubit: np.arange(-2.1, 2.1, 0.8) * 1e6 for qubit in self.all_qubits},
+                    },
+                }
 
 
 node_definitions = {
-    'resonator_spectroscopy': Node(
-        name='resonator_spectroscopy',
-        redis_field='ro_freq',
-        qubit_state=0,
-        measurement_obj=Resonator_Spectroscopy,
-        analysis_obj=ResonatorSpectroscopyAnalysis
-    ),
-    'qubit_01_spectroscopy_pulsed': Node(
-        name='qubit_01_spectroscopy_pulsed',
-        redis_field='freq_01',
-        qubit_state=0,
-        measurement_obj=Two_Tones_Spectroscopy,
-        analysis_obj=QubitSpectroscopyAnalysis
-    ),
-    'rabi_oscillations': Node(
-        name='rabi_oscillations',
-        redis_field='mw_amp180',
-        qubit_state=0,
-        measurement_obj=Rabi_Oscillations,
-        analysis_obj=RabiAnalysis
-    ),
-    'ramsey_correction': Node(
-        name='ramsey_correction',
-        redis_field='freq_01',
-        qubit_state=0,
-        measurement_obj=Ramsey_fringes,
-        analysis_obj=RamseyAnalysis
-    ),
-    'motzoi_parameter': Node(
-        name='motzoi_parameter',
-        redis_field='mw_motzoi',
-        qubit_state=0,
-        measurement_obj=Motzoi_parameter,
-        analysis_obj=MotzoiAnalysis
-    ),
-    'resonator_spectroscopy_1': Node(
-        name='resonator_spectroscopy_1',
-        redis_field='ro_freq_1',
-        qubit_state=1,
-        measurement_obj=Resonator_Spectroscopy,
-        analysis_obj=ResonatorSpectroscopy_1_Analysis
-    ),
-    'T1': Node(
-        name='T1',
-        redis_field='t1_time',
-        qubit_state=0,
-        measurement_obj=T1_BATCHED,
-        analysis_obj=T1Analysis
-    ),
-    'two_tone_multidim': Node(
-        name='two_tone_multidim',
-        redis_field='freq_01',
-        qubit_state=0,
-        measurement_obj=Two_Tones_Multidim,
-        analysis_obj=QubitSpectroscopyMultidim
-    ),
-    'qubit_12_spectroscopy_pulsed': Node(
-        name='qubit_12_spectroscopy_pulsed',
-        redis_field='freq_12',
-        qubit_state=1,
-        measurement_obj=Two_Tones_Spectroscopy,
-        analysis_obj=QubitSpectroscopyAnalysis
-    ),
-    'rabi_oscillations_12': Node(
-        name='rabi_oscillations_12',
-        redis_field='mw_ef_amp180',
-        qubit_state=1,
-        measurement_obj=Rabi_Oscillations,
-        analysis_obj=RabiAnalysis
-    ),
-    'ramsey_correction_12': Node(
-        name ='ramsey_correction_12',
-        redis_field='freq_12',
-        qubit_state=1,
-        measurement_obj=Ramsey_fringes,
-        analysis_obj=RamseyAnalysis
-    ),
-    'resonator_spectroscopy_2': Node(
-        name='resonator_spectroscopy_2',
-        redis_field='ro_freq_2',
-        qubit_state=2,
-        measurement_obj=Resonator_Spectroscopy,
-        analysis_obj=ResonatorSpectroscopy_2_Analysis
-    ),
-    'punchout': Node(
-        name='punchout',
-        redis_field='ro_amp',
-        qubit_state=0,
-        measurement_obj=Punchout,
-        analysis_obj=PunchoutAnalysis
-    ),
-    'ro_frequency_optimization': Node(
-        name='ro_frequency_optimization',
-        redis_field='ro_freq_opt',
-        qubit_state=0, #doesn't matter
-        measurement_obj=RO_frequency_optimization,
-        analysis_obj=OptimalROFrequencyAnalysis
-    ),
-    'ro_frequency_optimization_gef': Node(
-        name='ro_frequency_optimization_gef',
-        redis_field='ro_freq_opt',
-        qubit_state=2,
-        measurement_obj=RO_frequency_optimization,
-        analysis_obj=OptimalROFrequencyAnalysis
-    ),
-    'ro_amplitude_optimization': Node(
-        name='ro_amplitude_optimization',
-        redis_field='ro_pulse_amp_opt',
-        qubit_state=0,  # doesn't matter
-        measurement_obj=RO_amplitude_optimization,
-        analysis_obj=OptimalROAmplitudeAnalysis
-    ),
-    'state_discrimination': Node(
-        name='state_discrimination',
-        redis_field='discriminator',
-        qubit_state=0,  # doesn't matter
-        measurement_obj=Single_Shots_RO,
-        analysis_obj=StateDiscrimination
-    ),
-    'coupler_spectroscopy': Node(
-        name='coupler_spectroscopy',
-        redis_field='',
-        qubit_state=0,
-        measurement_obj=Two_Tones_Spectroscopy,
-        analysis_obj=CouplerSpectroscopyAnalysis
-    ),
+    'resonator_spectroscopy': {
+        'redis_field': 'ro_freq',
+        'qubit_state': 0,
+        'measurement_obj': Resonator_Spectroscopy,
+        'analysis_obj': ResonatorSpectroscopyAnalysis
+    },
+    'qubit_01_spectroscopy_pulsed': {
+        'redis_field': 'freq_01',
+        'qubit_state': 0,
+        'measurement_obj': Two_Tones_Spectroscopy,
+        'analysis_obj': QubitSpectroscopyAnalysis
+    },
+    'rabi_oscillations': {
+        'redis_field': 'mw_amp180',
+        'qubit_state': 0,
+        'measurement_obj': Rabi_Oscillations,
+        'analysis_obj': RabiAnalysis
+    },
+    'ramsey_correction': {
+        'redis_field': 'freq_01',
+        'qubit_state': 0,
+        'measurement_obj': Ramsey_fringes,
+        'analysis_obj': RamseyAnalysis
+    },
+    'motzoi_parameter': {
+        'redis_field': 'mw_motzoi',
+        'qubit_state': 0,
+        'measurement_obj': Motzoi_parameter,
+        'analysis_obj': MotzoiAnalysis
+    },
+    'resonator_spectroscopy_1': {
+        'redis_field': 'ro_freq_1',
+        'qubit_state': 1,
+        'measurement_obj': Resonator_Spectroscopy,
+        'analysis_obj': ResonatorSpectroscopy_1_Analysis
+    },
+    'T1': {
+        'redis_field': 't1_time',
+        'qubit_state': 0,
+        'measurement_obj': T1_BATCHED,
+        'analysis_obj': T1Analysis
+    },
+    'two_tone_multidim': {
+        'redis_field': 'freq_01',
+        'qubit_state': 0,
+        'measurement_obj': Two_Tones_Multidim,
+        'analysis_obj': QubitSpectroscopyMultidim
+    },
+    'qubit_12_spectroscopy_pulsed': {
+        'redis_field': 'freq_12',
+        'qubit_state': 1,
+        'measurement_obj': Two_Tones_Spectroscopy,
+        'analysis_obj': QubitSpectroscopyAnalysis
+    },
+    'rabi_oscillations_12': {
+        'redis_field': 'mw_ef_amp180',
+        'qubit_state': 1,
+        'measurement_obj': Rabi_Oscillations,
+        'analysis_obj': RabiAnalysis
+    },
+    'ramsey_correction_12': {
+        'redis_field': 'freq_12',
+        'qubit_state': 1,
+        'measurement_obj': Ramsey_fringes,
+        'analysis_obj': RamseyAnalysis
+    },
+    'resonator_spectroscopy_2': {
+        'redis_field': 'ro_freq_2',
+        'qubit_state': 2,
+        'measurement_obj': Resonator_Spectroscopy,
+        'analysis_obj': ResonatorSpectroscopy_2_Analysis
+    },
+    'punchout': {
+        'redis_field': 'ro_amp',
+        'qubit_state': 0,
+        'measurement_obj': Punchout,
+        'analysis_obj': PunchoutAnalysis
+    },
+    'ro_frequency_optimization': {
+        'redis_field': 'ro_freq_opt',
+        'qubit_state': 0,  # doesn't matter
+        'measurement_obj': RO_frequency_optimization,
+        'analysis_obj': OptimalROFrequencyAnalysis
+    },
+    'ro_frequency_optimization_gef': {
+        'redis_field': 'ro_freq_opt',
+        'qubit_state': 2,
+        'measurement_obj': RO_frequency_optimization,
+        'analysis_obj': OptimalROFrequencyAnalysis
+    },
+    'ro_amplitude_optimization': {
+        'redis_field': 'ro_pulse_amp_opt',
+        'qubit_state': 0,  # doesn't matter
+        'measurement_obj': RO_amplitude_optimization,
+        'analysis_obj': OptimalROAmplitudeAnalysis
+    },
+    'state_discrimination': {
+        'redis_field': 'discriminator',
+        'qubit_state': 0,  # doesn't matter
+        'measurement_obj': Single_Shots_RO,
+        'analysis_obj': StateDiscrimination
+    },
+    'coupler_spectroscopy': {
+        'redis_field': '',
+        'qubit_state': 0,
+        'measurement_obj': Two_Tones_Spectroscopy,
+        'analysis_obj': CouplerSpectroscopyAnalysis
+    },
 }
 
 
