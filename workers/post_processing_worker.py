@@ -144,6 +144,12 @@ class Multiplexed_Analysis(BaseAnalysis):
 
             node_analysis = analysis_class(ds, **kw_args)
             self.qoi = node_analysis.run_fitting()
+            
+            #if node == 'rabi_oscillations':
+            #    res, stderr = node_analysis.run_fitting()
+            #    self.qoi = res
+            #else:
+            #    self.qoi = node_analysis.run_fitting()
 
             node_analysis.plotter(this_axis)
 

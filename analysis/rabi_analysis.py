@@ -79,12 +79,15 @@ class RabiAnalysis():
         guess = model.guess(self.magnitudes, drive_amp=amplitudes)
         fit_result = model.fit(self.magnitudes, params=guess, drive_amp=amplitudes)
 
+        self.ampl = fit_result.params['amp180'].value
+        self.uncertainty = fit_result.params['amp180'].stderr
+
         self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_amplitudes})
-        return fit_result.params['amp180'].value
+        return self.ampl
 
     def plotter(self,ax):
         # Plots the data and the fitted model of a Rabi experiment
-        ax.plot( self.fit_amplitudes , self.fit_y,'r-',lw=3.0)
+        ax.plot( self.fit_amplitudes , self.fit_y,'r-',lw=3.0, label=f" π_ampl = {self.ampl:.5f} ± {self.uncertainty:.7f} (V)")
         ax.plot( self.independents, self.magnitudes,'bo-',ms=3.0)
         ax.set_title(f'Rabi Oscillations for {self.qubit}')
         ax.set_xlabel('Amplitude (V)')
