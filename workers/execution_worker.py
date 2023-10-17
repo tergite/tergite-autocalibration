@@ -33,10 +33,28 @@ def execute_schedule(
 ) -> xarray.Dataset:
 
     logger.info('Starting measurement')
+    cluster_status = ClusterStatus.real
+    schedule_duration = compiled_schedule.get_schedule_duration()
 
-    lab_ic.prepare(compiled_schedule)
-    lab_ic.start()
-    lab_ic.wait_done(timeout_sec=600)
+    def run_measurement() -> None:
+        lab_ic.prepare(compiled_schedule)
+        lab_ic.start()
+        lab_ic.wait_done(timeout_sec=600)
+
+    def display_progress():
+        steps = int(schedule_duration * 5)
+        if cluster_status == ClusterStatus.dummy:
+            progress_sleep = 0.004
+        elif cluster_status == ClusterStatus.real:
+            progress_sleep = 0.2
+        for _ in tqdm.tqdm(range(steps), desc=compiled_schedule.name, colour='blue'):
+            sleep(progress_sleep)
+    thread_tqdm = threading.Thread(target=display_progress)
+    thread_tqdm.start()
+    thread_lab = threading.Thread(target=run_measurement)
+    thread_lab.start()
+    thread_lab.join()
+    thread_tqdm.join()
 
     raw_dataset: xarray.Dataset = lab_ic.retrieve_acquisition()
     lab_ic.stop()
@@ -81,13 +99,12 @@ def create_dac(node: Node):
 def measure_node(
     node: Node,
     compiled_schedule: CompiledSchedule,
-
-    schedule_duration: float,
     cluster,
     lab_ic
 ):
     samplespace = node.samplespace
 
+    # TODO add a factory here to decide between single or coupled qubits measurement
     if node.name == 'coupler_spectroscopy':
 
         this_dac = create_dac(node)
@@ -121,6 +138,8 @@ def measure_node(
         save_dataset(result_dataset, node)
         # TODO verify this
         this_dac.set_current_instant(0)
+        logger.info('Finished measurement')
+        return result_dataset
 
     raw_dataset = execute_schedule(compiled_schedule, cluster, lab_ic)
     result_dataset = configure_dataset(raw_dataset, samplespace)

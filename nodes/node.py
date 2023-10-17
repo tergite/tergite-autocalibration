@@ -137,7 +137,6 @@ class Node():
             self.qubit_state = initial_parameters['qubit_state']  # e.g. qubit_state = 1 for resonator_spectroscopy_1
             self.measurement_obj = initial_parameters['measurement_obj']
             self.analysis_obj = initial_parameters['analysis_obj']
-            self.default_sample_array = initial_parameters['default_sample_array']
 
         @property
         def spi_samplespace(self):
@@ -317,12 +316,3 @@ node_definitions = {
         'analysis_obj': CouplerSpectroscopyAnalysis
     },
 }
-
-
-if __name__ == "__main__":
-    import matplotlib.pyplot as plt
-    print(f'{ topo_order=}')
-    print(f'{ filtered_order=}')
-
-    # nx.draw_networkx(graph, alpha=0.5, node_color='cyan', node_size=600)
-    # plt.show()

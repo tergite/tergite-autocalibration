@@ -1,16 +1,15 @@
 # This code is part of Tergite
 import argparse
 from utilities.status import DataStatus
-import xarray as xr
 from logger.tac_logger import logger
 from workers.compilation_worker import precompile
-from workers.execution_worker import measure
+from workers.execution_worker import measure_node
 from nodes.node import Node
 from workers.post_processing_worker import post_process
 from utilities.status import ClusterStatus
 from qblox_instruments import Cluster
 
-from nodes.node import filtered_topological_order
+from nodes.graph import filtered_topological_order
 from utilities.visuals import draw_arrow_chart
 from config_files.settings import lokiA_IP
 from workers.dummy_setup import dummy_cluster
@@ -155,92 +154,6 @@ def calibrate_node(node_label: str):
         # [compilation_indx, len(list(compilation_zip))],
         cluster_status=args.cluster_status
     )
-
-    # # TODO this is terrible
-    # compiled_schedules, schedule_durations, partial_samplespaces = precompile(node, qubits, samplespace)
-    # compilation_zip = list(zip(compiled_schedules, schedule_durations, partial_samplespaces))
-    # result_dataset = xr.Dataset()
-    # if node.name == 'coupler_spectroscopy':
-    #     # in_prompt = str(input('Run coupler spectroscopy: Y/N ?'))
-    #     # assert(in_prompt=='Y')
-    #     spi_mod_number = 3
-    #     spi_mod_name = f'module{spi_mod_number}'
-    #     dac_name = 'dac3'
-    #     spi = SpiRack('loki_rack', '/dev/ttyACM0')
-    #     spi.add_spi_module(spi_mod_number, S4gModule)
-    #     this_dac = spi.instrument_modules[spi_mod_name].instrument_modules[dac_name]
-    #     this_dac.ramping_enabled(True)
-    #     # ramp_rate = math.copysign(200e-6, current_value)
-    #     # print(f'{ ramp_rate = }')
-    #     this_dac.ramp_rate(50e-6)
-    #     this_dac.ramp_max_step(25e-6)
-    #     for dac in spi.instrument_modules[spi_mod_name].submodules.values():
-    #         dac.current.vals = validators.Numbers(min_value=-4e-3, max_value=4e-3)
-    #
-    #     def set_current(current_value: float):
-    #         print(f'{ current_value = }')
-    #         print(f'{ this_dac.current() = }')
-    #         this_dac.current(current_value)
-    #         while this_dac.is_ramping():
-    #             print('ramping')
-    #             time.sleep(1)
-    #         print('Finished ramping')
-    #
-    #     dc_currents = list(samplespace['dc_currents'].values())[0]
-    #     compiled_schedule = compiled_schedules[0]
-    #     schedule_duration = schedule_durations[0]
-    #     logger.info('Starting coupler spectroscopy')
-    #     samplespace.pop('dc_currents')
-    #     for indx, current in enumerate(dc_currents):
-    #         set_current(current)
-    #
-    #         dataset = measure(
-    #             compiled_schedule,
-    #             schedule_duration,
-    #             samplespace,
-    #             node.name,
-    #             clusterA,
-    #             lab_ic,
-    #             # [compilation_indx, len(list(compilation_zip))],
-    #             cluster_status=args.cluster_status
-    #         )
-    #
-    #         dataset = dataset.expand_dims(dim='dc_currents')
-    #         dataset['dc_currents'] = [current]
-    #
-    #         if indx == 0:
-    #             result_dataset = dataset
-    #         else:
-    #             result_dataset = xr.concat([result_dataset, dataset], dim='dc_currents')
-    #
-    #     spi.instrument_modules[spi_mod_name].set_dacs_zero()
-    # else:
-    #     for compilation_indx, compilation in enumerate(compilation_zip):
-    #         compiled_schedule, schedule_duration, samplespace = compilation
-    #         dataset = measure(
-    #             compiled_schedule,
-    #             schedule_duration,
-    #             samplespace,
-    #             node.name,
-    #             clusterA,
-    #             lab_ic,
-    #             # [compilation_indx, len(list(compilation_zip))],
-    #             cluster_status=args.cluster_status
-    #         )
-    #         if compilation_indx == 0:
-    #             result_dataset = dataset
-    #         else:
-    #             for var in result_dataset.data_vars:
-    #                 coords = result_dataset[var].coords
-    #                 for coord in coords:
-    #                     if 'qubit_state' not in coord:
-    #                         concat_coord = coord
-    #                         break
-    #
-    #                 darray = xr.concat([result_dataset[var], dataset[var]], dim=concat_coord)
-    #                 result_dataset = result_dataset.drop_vars(var)
-    #                 result_dataset = result_dataset.drop_dims(concat_coord)
-    #                 result_dataset[var] = darray
 
     logger.info('measurement completed')
     post_process(result_dataset, node)
