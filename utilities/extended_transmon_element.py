@@ -158,7 +158,6 @@ class ExtendedTransmon(BasicTransmonElement):
         submodule_data = {
             sub_name: kwargs.pop(sub_name, {}) for sub_name in submodules_to_add.keys()
         }
-        breakpoint()
         super().__init__(name, **kwargs)
 
         for sub_name, sub_class in submodules_to_add.items():

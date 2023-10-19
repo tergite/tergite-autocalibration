@@ -86,6 +86,10 @@ def precompile(node):
 
     compiler = SerialCompiler(name=f'{node.name}_compiler')
     compilation_config = device.generate_compilation_config()
+    
+    # after the compilation_config is acquired, free the transmon resources
+    for extended_transmon in transmons.values():
+        extended_transmon.close()
 
     if 'qubit_states' in samplespace: #this means we have single shots
         shots = 1
