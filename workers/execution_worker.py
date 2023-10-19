@@ -97,6 +97,18 @@ def create_dac(node):
     return this_dac
 
 
+class MeasurementFactory:
+    if node in ['coupler_spectroscopy']:
+        pass
+
+    
+class SingleQubitsMeasurement:
+    pass
+
+
+class CoupledQubitsMeasurement:
+    pass
+
 
 def measure_node(
     node,
