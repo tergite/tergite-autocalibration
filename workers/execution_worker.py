@@ -20,7 +20,6 @@ from uuid import uuid4
 from colorama import init as colorama_init
 from colorama import Fore
 from colorama import Style
-from nodes.node import Node
 colorama_init()
 
 redis_connection = redis.Redis(decode_responses=True)
@@ -76,7 +75,7 @@ def save_dataset(result_dataset, node):
     result_dataset_real.to_netcdf(data_path / 'dataset.hdf5')
 
 
-def create_dac(node: Node):
+def create_dac(node):
     coupler_spi_map = {
         'q21q22': (4, 'dac0'),
         'q20q25': (3, 'dac3'),
@@ -97,10 +96,11 @@ def create_dac(node: Node):
 
 
 def measure_node(
-    node: Node,
+    node,
     compiled_schedule: CompiledSchedule,
     cluster,
-    lab_ic
+    lab_ic,
+    cluster_status = ClusterStatus.real
 ):
     samplespace = node.samplespace
 

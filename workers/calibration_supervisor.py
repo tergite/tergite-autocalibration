@@ -4,7 +4,7 @@ from utilities.status import DataStatus
 from logger.tac_logger import logger
 from workers.compilation_worker import precompile
 from workers.execution_worker import measure_node
-from nodes.node import Node
+from nodes.node import NodeFactory
 from workers.post_processing_worker import post_process
 from utilities.status import ClusterStatus
 from qblox_instruments import Cluster
@@ -142,16 +142,17 @@ def calibrate_node(node_label: str):
     #     lab_ic = InstrumentCoordinator('lab_ic')
     #     lab_ic.add_component(ClusterComponent(clusterA))
 
-    node = Node(node_label, qubits, node_dictionary)
+    # node = Node(node_label, qubits, node_dictionary)
 
-    compiled_schedule, schedule_duration = precompile(node)
+    node_factory = NodeFactory()
+    node = node_factory.create_node(node_label, qubits, **node_dictionary)
+
+    compiled_schedule = precompile(node)
     result_dataset = measure_node(
         node,
         compiled_schedule,
-        schedule_duration,
         clusterA,
         lab_ic,
-        # [compilation_indx, len(list(compilation_zip))],
         cluster_status=args.cluster_status
     )
 

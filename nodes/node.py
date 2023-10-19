@@ -76,29 +76,45 @@ class NodeFactory:
             'coupler_spectroscopy': Coupler_Spectroscopy_Node,
         }
 
-    def create_node(self, node_name: str, all_qubits: list[str], ** kwargs):
-        node_object = self.node_implementations[node_name](node_name, all_qubits, kwargs)
+    def create_node(self, node_name: str, all_qubits: list[str], /, kwargs={}):
+        node_object = self.node_implementations[node_name](node_name, all_qubits, node_dictionary=kwargs)
+        #node_object = self.node_implementations[node_name](node_name, all_qubits, kwargs)
         return node_object
 
+class Base_Node:
+      def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
+          self.name = name
+          self.all_qubits = all_qubits
 
-class Resonator_Spectroscopy_Node:
-    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
+      def __str__(self):
+          return f'Node representation for {self.name} on qubits {self.all_qubits}'
+
+      def __format__(self, message):
+          return f'Node representation for {self.name} on qubits {self.all_qubits}'
+
+      def __repr__(self):
+          return f'Node({self.name}, {self.all_qubits})'
+
+
+class Resonator_Spectroscopy_Node(Base_Node):
+    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
+        super().__init__(name, all_qubits)
         self.name = name
         self.all_qubits = all_qubits
-        self.node_dictionary = kwargs
+        self.node_dictionary = node_dictionary
         self.redis_field = 'ro_freq'
         self.qubit_state = 0
         self.measurement_obj = Resonator_Spectroscopy
         self.analysis_obj = ResonatorSpectroscopyAnalysis
-        self._samplespace: dict = defaultdict()
 
     @property
     def samplespace(self):
-        self._samplespace[self.name] = {
+        cluster_samplespace = {
             'ro_frequencies': {
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             }
         }
+        return cluster_samplespace
 
 
 class Qubit_01_Spectroscopy_Pulsed_Node:
@@ -110,15 +126,15 @@ class Qubit_01_Spectroscopy_Pulsed_Node:
         self.qubit_state = 0
         self.measurement_obj = Two_Tones_Spectroscopy
         self.analysis_obj = QubitSpectroscopyAnalysis
-        self._samplespace = defaultdict()
 
     @property
     def samplespace(self):
-        self._samplespace[self.name] = {
+        cluster_samplespace = {
             'spec_frequencies': {
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
             }
         }
+        return cluster_samplespace
 
 
 class Rabi_Oscillations_Node:
@@ -130,15 +146,15 @@ class Rabi_Oscillations_Node:
         self.qubit_state = 0
         self.measurement_obj = Rabi_Oscillations
         self.analysis_obj = RabiAnalysis
-        self._samplespace = defaultdict()
 
     @property
     def samplespace(self):
-        self._samplespace[self.name] = {
+        cluster_samplespace = {
             'mw_amplitudes': {
                 qubit: np.linspace(0.002, 0.200, 31) for qubit in self.all_qubits
             }
         }
+        return cluster_samplespace
 
 
 class Ramsey_Fringes_Node:
@@ -150,11 +166,10 @@ class Ramsey_Fringes_Node:
         self.qubit_state = 0
         self.measurement_obj = Ramsey_fringes
         self.analysis_obj = RamseyAnalysis
-        self._samplespace = defaultdict()
 
     @property
     def samplespace(self):
-        self._samplespace[self.name] = {
+        cluster_samplespace = {
             'ramsey_correction': {
                 'ramsey_delays': {
                     qubit: np.arange(4e-9, 2048e-9, 8 * 8e-9) for qubit in self.all_qubits
@@ -164,6 +179,7 @@ class Ramsey_Fringes_Node:
                 },
             },
         }
+        return cluster_samplespace
 
 
 class Resonator_Spectroscopy_1_Node:
@@ -175,15 +191,15 @@ class Resonator_Spectroscopy_1_Node:
         self.qubit_state = 1
         self.measurement_obj = Resonator_Spectroscopy
         self.analysis_obj = ResonatorSpectroscopyAnalysis
-        self._samplespace = defaultdict()
 
     @property
     def samplespace(self):
-        self._samplespace[self.name] = {
+        cluster_samplespace = {
             'ro_frequencies': {
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             }
         }
+        return cluster_samplespace
 
 
 class Qubit_12_Spectroscopy_Pulsed_Node:
@@ -195,15 +211,15 @@ class Qubit_12_Spectroscopy_Pulsed_Node:
         self.qubit_state = 0
         self.measurement_obj = Two_Tones_Spectroscopy
         self.analysis_obj = QubitSpectroscopyAnalysis
-        self._samplespace = defaultdict()
 
     @property
     def samplespace(self):
-        self._samplespace[self.name] = {
+        cluster_samplespace = {
             'spec_frequencies': {
                 qubit: qubit_samples(qubit, '12') for qubit in self.all_qubits
             }
         }
+        return cluster_samplespace
 
 
 class Rabi_Oscillations_12_Node:
@@ -215,16 +231,15 @@ class Rabi_Oscillations_12_Node:
         self.qubit_state = 1
         self.measurement_obj = Rabi_Oscillations
         self.analysis_obj = RabiAnalysis
-        self._samplespace = defaultdict()
 
     @property
     def samplespace(self):
-        self._samplespace[self.name] = {
+        cluster_samplespace = {
             'mw_amplitudes': {
                 qubit: np.linspace(0.002, 0.200, 31) for qubit in self.all_qubits
             }
         }
-
+        return cluster_samplespace
 
 class Coupler_Spectroscopy_Node:
     def __init__(self, name: str, all_qubits: list[str], ** kwargs):
@@ -236,16 +251,15 @@ class Coupler_Spectroscopy_Node:
         # perform 2 tones while biasing the current
         self.measurement_obj = Two_Tones_Spectroscopy
         self.analysis_obj = CouplerSpectroscopyAnalysis
-        self._samplespace = defaultdict()
-        self._spi_samplespace = defaultdict()
 
     @property
     def samplespace(self):
-        self._samplespace[self.name] = {
+        cluster_samplespace = {
             'mw_amplitudes': {
                 qubit: np.linspace(0.002, 0.200, 31) for qubit in self.all_qubits
             }
         }
+        return cluster_samplespace
 
     @property
     def spi_samplespace(self):
@@ -253,10 +267,10 @@ class Coupler_Spectroscopy_Node:
             raise ValueError('coupled_qubits not in job dictionary')
         coupled_qubits = self.node_dictionary['coupled_qubits']
         self.coupler = coupled_qubits[0] + coupled_qubits[1]
-        self._spi_samplespace[self.name] = {
+        spi_samplespace = {
             'dc_currents': {self.coupler: np.arange(-3e-3, 3e-3, 100e6)},
         }
-
+        return spi_samplespace
 
 
     # class Node():

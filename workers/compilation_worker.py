@@ -61,12 +61,14 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
     return
 
 
-def precompile(node, qubits: list[str], samplespace: dict[str,dict[str,np.ndarray]]):
+def precompile(node):
     if node.name == 'tof':
         return None, 1
+    samplespace = node.samplespace
+    qubits = node.all_qubits
 
-    #Instrument.close_all()
-    device = QuantumDevice('Loki')
+    # TODO better way to restart the QuantumDevice object
+    device = QuantumDevice(f'Loki_{node.name}')
     device.hardware_config(hw_config)
     sweep_parameters = list(samplespace.values())
 
@@ -153,9 +155,7 @@ def precompile(node, qubits: list[str], samplespace: dict[str,dict[str,np.ndarra
     #              ).to_html()
     #          )
 
-    schedule_duration = compiled_schedule.get_schedule_duration()
-
     logger.info('Finished Compiling')
     # compiled_schedule.plot_pulse_diagram(plot_backend='plotly')
 
-    return [compiled_schedule], [schedule_duration], [samplespace]
+    return compiled_schedule
