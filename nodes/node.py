@@ -12,6 +12,7 @@ from calibration_schedules.ro_amplitude_optimization import RO_amplitude_optimiz
 from calibration_schedules.state_discrimination import Single_Shots_RO
 # from calibration_schedules.drag_amplitude import DRAG_amplitude
 from calibration_schedules.motzoi_parameter import Motzoi_parameter
+
 from analysis.motzoi_analysis import MotzoiAnalysis
 from analysis.resonator_spectroscopy_analysis import (
     ResonatorSpectroscopyAnalysis,
@@ -31,6 +32,7 @@ from analysis.punchout_analysis import PunchoutAnalysis
 from analysis.ramsey_analysis import RamseyAnalysis
 from analysis.tof_analysis import analyze_tof
 from analysis.T1_analysis import T1Analysis
+from analysis.coupler_spectroscopy_analysis import CouplerSpectroscopyAnalysis
 
 from collections import defaultdict
 
@@ -76,10 +78,11 @@ class NodeFactory:
             'coupler_spectroscopy': Coupler_Spectroscopy_Node,
         }
 
-    def create_node(self, node_name: str, all_qubits: list[str], /, kwargs={}):
-        node_object = self.node_implementations[node_name](node_name, all_qubits, node_dictionary=kwargs)
-        #node_object = self.node_implementations[node_name](node_name, all_qubits, kwargs)
+    def create_node(self, node_name: str, all_qubits: list[str], ** kwargs):
+        print(f'{ kwargs = }')
+        node_object = self.node_implementations[node_name](node_name, all_qubits, ** kwargs)
         return node_object
+
 
 class Base_Node:
       def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
@@ -208,7 +211,7 @@ class Qubit_12_Spectroscopy_Pulsed_Node:
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
         self.redis_field = 'freq_12'
-        self.qubit_state = 0
+        self.qubit_state = 1
         self.measurement_obj = Two_Tones_Spectroscopy
         self.analysis_obj = QubitSpectroscopyAnalysis
 
@@ -246,29 +249,41 @@ class Coupler_Spectroscopy_Node:
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
-        self.redis_field = 'mw_ef_amp180'
-        self.qubit_state = 1
+        self.redis_field = 'flux_quantum'
+        self.qubit_state = 0
         # perform 2 tones while biasing the current
         self.measurement_obj = Two_Tones_Spectroscopy
         self.analysis_obj = CouplerSpectroscopyAnalysis
-
+        self.validate()
+    
+    def validate(self):
+        if 'coupled_qubits' not in self.node_dictionary:
+            error_msg = 'coupled_qubits not in job dictionary\n'
+            suggestion = 'job dictionary should look like:\n {"coupled_qubits": ["q1","q2"]}'
+            raise ValueError(error_msg + suggestion)
+        else:
+            coupled_qubits = self.node_dictionary['coupled_qubits']
+            if len(coupled_qubits) != 2:
+                raise ValueError('coupled qubits must be a list with 2 elements')
+            elif not all([q in self.all_qubits for q in coupled_qubits]):
+                raise ValueError('coupled qubits must be a subset of all calibrated qubits')
+            else:
+                self.coupler = coupled_qubits[0] + coupled_qubits[1]
+        
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'mw_amplitudes': {
-                qubit: np.linspace(0.002, 0.200, 31) for qubit in self.all_qubits
+            'spec_frequencies': {
+                qubit: qubit_samples(qubit) for qubit in self.all_qubits
             }
         }
         return cluster_samplespace
 
     @property
     def spi_samplespace(self):
-        if 'coupled_qubits' not in self.node_dictionary:
-            raise ValueError('coupled_qubits not in job dictionary')
         coupled_qubits = self.node_dictionary['coupled_qubits']
-        self.coupler = coupled_qubits[0] + coupled_qubits[1]
         spi_samplespace = {
-            'dc_currents': {self.coupler: np.arange(-3e-3, 3e-3, 100e6)},
+            'dc_currents': {self.coupler: np.arange(-3e-3, 3e-3, 100e-6)},
         }
         return spi_samplespace
 

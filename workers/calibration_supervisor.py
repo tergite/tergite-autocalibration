@@ -37,6 +37,10 @@ args = parser.parse_args()
 # Settings
 transmon_configuration = toml.load('./config_files/device_config.toml')
 
+
+node_factory = NodeFactory()
+
+
 if args.cluster_status == ClusterStatus.real:
     Cluster.close_all()
     clusterA = Cluster("clusterA", lokiA_IP)
@@ -144,7 +148,6 @@ def calibrate_node(node_label: str):
 
     # node = Node(node_label, qubits, node_dictionary)
 
-    node_factory = NodeFactory()
     node = node_factory.create_node(node_label, qubits, **node_dictionary)
 
     compiled_schedule = precompile(node)

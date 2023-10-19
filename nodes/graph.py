@@ -35,13 +35,14 @@ graph.add_node('ramsey_correction_12', type='refine')
 graph.add_node('ro_frequency_optimization', type='refine')
 graph.add_node('ro_amplitude_optimization', type='refine')
 
-# some nodes target exactly the same redis field. Assign a weight to sort them
+# for nodes that perform the same measurement, 
+# assign a weight to the corresponding edge to sort them
 graph['resonator_spectroscopy']['qubit_01_spectroscopy_pulsed']['weight'] = 1
 graph['resonator_spectroscopy']['qubit_01_spectroscopy_multidim']['weight'] = 2
 
 all_nodes = list(nx.topological_sort(graph))
 
-
+# TODO add condition argument and explanation
 def filtered_topological_order(target_node: str):
     if target_node == 'punchout':
         topo_order = ['punchout']

@@ -87,12 +87,15 @@ def create_dac(node):
     spi = SpiRack('loki_rack', '/dev/ttyACM0')
     spi.add_spi_module(spi_mod_number, S4gModule)
     this_dac = spi.instrument_modules[spi_mod_name].instrument_modules[dac_name]
+    #this_dac.span('range_min_bi')
     this_dac.ramping_enabled(True)
-    this_dac.ramp_rate(50e-6)
-    this_dac.ramp_max_step(25e-6)
-    for dac in spi.instrument_modules[spi_mod_name].submodules.values():
-        dac.current.vals = validators.Numbers(min_value=-4e-3, max_value=4e-3)
+    this_dac.ramp_rate(500e-6)
+    this_dac.ramp_max_step(500e-6)
+    this_dac.current.vals = validators.Numbers(min_value=-3e-3, max_value=3e-3)
+    #for dac in spi.instrument_modules[spi_mod_name].submodules.values():
+        #dac.current.vals = validators.Numbers(min_value=-2e-3, max_value=2e-3)
     return this_dac
+
 
 
 def measure_node(
@@ -114,17 +117,18 @@ def measure_node(
             print(f'{ this_dac.current() = }')
             this_dac.current(current_value)
             while this_dac.is_ramping():
-                print('ramping')
+                print(f'ramping {this_dac.current()}')
                 time.sleep(1)
             print('Finished ramping')
 
-        dc_currents = node.spi_samplespace[node.name]['dc_currents']
+        dc_currents = node.spi_samplespace['dc_currents'][node.coupler]
+        print(f'{ dc_currents = }')
         logger.info('Starting coupler spectroscopy')
 
         for indx, current in enumerate(dc_currents):
             set_current(current)
 
-            raw_dataset = execute_schedule(compiled_schedule, node.name, cluster, lab_ic)
+            raw_dataset = execute_schedule(compiled_schedule, cluster, lab_ic)
             dataset = configure_dataset(raw_dataset, samplespace)
 
             dataset = dataset.expand_dims(dim='dc_currents')
