@@ -5,7 +5,6 @@
 
 #user config files
 utilities/user_input.py
-config_files/
 
 #script to scp files
 send_to_lefteris.ps1
