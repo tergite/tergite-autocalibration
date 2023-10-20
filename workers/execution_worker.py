@@ -75,73 +75,76 @@ def save_dataset(result_dataset, node):
     result_dataset_real.to_netcdf(data_path / 'dataset.hdf5')
 
 
-def create_dac(node):
-    coupler_spi_map = {
-        'q21q22': (4, 'dac0'),
-        'q20q25': (3, 'dac3'),
-        'q24q25': (3, 'dac2'),
-    }
-    coupler = node.coupler
-    spi_mod_number, dac_name = coupler_spi_map[coupler]
-    spi_mod_name = f'module{spi_mod_number}'
-    spi = SpiRack('loki_rack', '/dev/ttyACM0')
-    spi.add_spi_module(spi_mod_number, S4gModule)
-    this_dac = spi.instrument_modules[spi_mod_name].instrument_modules[dac_name]
-    #this_dac.span('range_min_bi')
-    this_dac.ramping_enabled(True)
-    this_dac.ramp_rate(500e-6)
-    this_dac.ramp_max_step(500e-6)
-    this_dac.current.vals = validators.Numbers(min_value=-3e-3, max_value=3e-3)
-    #for dac in spi.instrument_modules[spi_mod_name].submodules.values():
-        #dac.current.vals = validators.Numbers(min_value=-2e-3, max_value=2e-3)
-    return this_dac
-
-
 class MeasurementFactory:
-    if node in ['coupler_spectroscopy']:
-        pass
+    def __init__(self, node):
+        self.node = node
+        if node.name in ['coupler_spectroscopy']:
+            return CoupledQubitsMeasurement(node)
+        else:
+            return SingleQubitsMeasurement(node)
 
-    
+
 class SingleQubitsMeasurement:
-    pass
+    def __init__(self, node):
+        self.node = node
+
+    def measure(self, node, compiled_schedule, cluster, ic):
+        samplespace = node.samplespace
+        raw_dataset = execute_schedule(compiled_schedule, cluster, ic)
+        result_dataset = configure_dataset(raw_dataset, samplespace)
+        save_dataset(result_dataset, node)
+        if node.name == 'ro_frequency_optimization':
+            result_dataset = handle_ro_freq_optimization(result_dataset, states=[0, 1])
+        elif node.name == 'ro_frequency_optimization_gef':
+            result_dataset = handle_ro_freq_optimization(result_dataset, states=[0, 1, 2])
+        return result_dataset
 
 
 class CoupledQubitsMeasurement:
-    pass
+    # coupler sweeps need special treatment. For separate them in their own class
 
+    def __init__(self, node):
+        self.node = node
+        self.dac = self.create_dac(self.node)
+        self.dc_currents = self.node.spi_samplespace['dc_currents'][self.node.coupler]
 
-def measure_node(
-    node,
-    compiled_schedule: CompiledSchedule,
-    cluster,
-    lab_ic,
-    cluster_status = ClusterStatus.real
-):
-    samplespace = node.samplespace
+    def create_dac(self, node):
+        coupler_spi_map = {
+            'q21q22': (4, 'dac0'),
+            'q20q25': (3, 'dac3'),
+            'q24q25': (3, 'dac2'),
+        }
+        coupler = node.coupler
+        spi_mod_number, dac_name = coupler_spi_map[coupler]
+        spi_mod_name = f'module{spi_mod_number}'
+        spi = SpiRack('loki_rack', '/dev/ttyACM0')
+        spi.add_spi_module(spi_mod_number, S4gModule)
+        this_dac = spi.instrument_modules[spi_mod_name].instrument_modules[dac_name]
+        this_dac.ramping_enabled(True)
+        this_dac.ramp_rate(500e-6)
+        this_dac.ramp_max_step(500e-6)
+        this_dac.current.vals = validators.Numbers(min_value=-3e-3, max_value=3e-3)
+        # for dac in spi.instrument_modules[spi_mod_name].submodules.values():
+        # dac.current.vals = validators.Numbers(min_value=-2e-3, max_value=2e-3)
+        return this_dac
 
-    # TODO add a factory here to decide between single or coupled qubits measurement
-    if node.name == 'coupler_spectroscopy':
+    def set_current(self, current_value: float):
+        print(f'{ current_value = }')
+        print(f'{ self.dac.current() = }')
+        self.dac.current(current_value)
+        while self.dac.is_ramping():
+            print(f'ramping {self.dac.current()}')
+            time.sleep(1)
+        print('Finished ramping')
 
-        this_dac = create_dac(node)
+    logger.info('Starting coupler spectroscopy')
 
-        def set_current(current_value: float):
-            print(f'{ current_value = }')
-            print(f'{ this_dac.current() = }')
-            this_dac.current(current_value)
-            while this_dac.is_ramping():
-                print(f'ramping {this_dac.current()}')
-                time.sleep(1)
-            print('Finished ramping')
+    def measure(self, node, compiled_schedule, cluster, ic):
+        for indx, current in enumerate(self.dc_currents):
+            self.set_current(current)
 
-        dc_currents = node.spi_samplespace['dc_currents'][node.coupler]
-        print(f'{ dc_currents = }')
-        logger.info('Starting coupler spectroscopy')
-
-        for indx, current in enumerate(dc_currents):
-            set_current(current)
-
-            raw_dataset = execute_schedule(compiled_schedule, cluster, lab_ic)
-            dataset = configure_dataset(raw_dataset, samplespace)
+            raw_dataset = execute_schedule(compiled_schedule, cluster, ic)
+            dataset = configure_dataset(raw_dataset, node.samplespace)
 
             dataset = dataset.expand_dims(dim='dc_currents')
             dataset['dc_currents'] = [current]
@@ -153,18 +156,22 @@ def measure_node(
 
         save_dataset(result_dataset, node)
         # TODO verify this
-        this_dac.set_current_instant(0)
-        logger.info('Finished measurement')
+        self.dac.set_current_instant(0)
         return result_dataset
 
-    raw_dataset = execute_schedule(compiled_schedule, cluster, lab_ic)
-    result_dataset = configure_dataset(raw_dataset, samplespace)
-    save_dataset(result_dataset, node)
 
-    if node.name == 'ro_frequency_optimization':
-        result_dataset = handle_ro_freq_optimization(result_dataset, states=[0, 1])
-    elif node.name == 'ro_frequency_optimization_gef':
-        result_dataset = handle_ro_freq_optimization(result_dataset, states=[0, 1, 2])
+def measure_node(
+    node,
+    compiled_schedule: CompiledSchedule,
+    cluster,
+    lab_ic,
+    cluster_status=ClusterStatus.real
+):
+
+    # the factory determines if the measurement is on single qubits or a coupler is involved
+    measurement = MeasurementFactory(node)
+    result_dataset = measurement.measure(node, compiled_schedule, cluster, lab_ic)
+
     logger.info('Finished measurement')
 
     return result_dataset

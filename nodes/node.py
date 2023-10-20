@@ -85,18 +85,18 @@ class NodeFactory:
 
 
 class Base_Node:
-      def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
-          self.name = name
-          self.all_qubits = all_qubits
+    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
+        self.name = name
+        self.all_qubits = all_qubits
 
-      def __str__(self):
-          return f'Node representation for {self.name} on qubits {self.all_qubits}'
+    def __str__(self):
+        return f'Node representation for {self.name} on qubits {self.all_qubits}'
 
-      def __format__(self, message):
-          return f'Node representation for {self.name} on qubits {self.all_qubits}'
+    def __format__(self, message):
+        return f'Node representation for {self.name} on qubits {self.all_qubits}'
 
-      def __repr__(self):
-          return f'Node({self.name}, {self.all_qubits})'
+    def __repr__(self):
+        return f'Node({self.name}, {self.all_qubits})'
 
 
 class Resonator_Spectroscopy_Node(Base_Node):
@@ -244,6 +244,7 @@ class Rabi_Oscillations_12_Node:
         }
         return cluster_samplespace
 
+
 class Coupler_Spectroscopy_Node:
     def __init__(self, name: str, all_qubits: list[str], ** kwargs):
         self.name = name
@@ -255,7 +256,7 @@ class Coupler_Spectroscopy_Node:
         self.measurement_obj = Two_Tones_Spectroscopy
         self.analysis_obj = CouplerSpectroscopyAnalysis
         self.validate()
-    
+
     def validate(self):
         if 'coupled_qubits' not in self.node_dictionary:
             error_msg = 'coupled_qubits not in job dictionary\n'
@@ -269,7 +270,7 @@ class Coupler_Spectroscopy_Node:
                 raise ValueError('coupled qubits must be a subset of all calibrated qubits')
             else:
                 self.coupler = coupled_qubits[0] + coupled_qubits[1]
-        
+
     @property
     def samplespace(self):
         cluster_samplespace = {
@@ -281,7 +282,6 @@ class Coupler_Spectroscopy_Node:
 
     @property
     def spi_samplespace(self):
-        coupled_qubits = self.node_dictionary['coupled_qubits']
         spi_samplespace = {
             'dc_currents': {self.coupler: np.arange(-3e-3, 3e-3, 100e-6)},
         }
