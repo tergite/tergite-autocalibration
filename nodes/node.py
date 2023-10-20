@@ -283,7 +283,7 @@ class Coupler_Spectroscopy_Node:
     @property
     def spi_samplespace(self):
         spi_samplespace = {
-            'dc_currents': {self.coupler: np.arange(-3e-3, 3e-3, 100e-6)},
+            'dc_currents': {self.coupler: np.arange(-3e-3, 3e-3, 1000e-6)},
         }
         return spi_samplespace
 

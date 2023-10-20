@@ -76,8 +76,10 @@ def save_dataset(result_dataset, node):
 
 
 class MeasurementFactory:
-    def __init__(self, node):
-        self.node = node
+    #def __init__(self, node):
+        #self.node = node
+
+    def select(self, node):
         if node.name in ['coupler_spectroscopy']:
             return CoupledQubitsMeasurement(node)
         else:
@@ -122,7 +124,7 @@ class CoupledQubitsMeasurement:
         this_dac = spi.instrument_modules[spi_mod_name].instrument_modules[dac_name]
         this_dac.ramping_enabled(True)
         this_dac.ramp_rate(500e-6)
-        this_dac.ramp_max_step(500e-6)
+        this_dac.ramp_max_step(250e-6)
         this_dac.current.vals = validators.Numbers(min_value=-3e-3, max_value=3e-3)
         # for dac in spi.instrument_modules[spi_mod_name].submodules.values():
         # dac.current.vals = validators.Numbers(min_value=-2e-3, max_value=2e-3)
@@ -156,7 +158,7 @@ class CoupledQubitsMeasurement:
 
         save_dataset(result_dataset, node)
         # TODO verify this
-        self.dac.set_current_instant(0)
+        self.set_current(0)
         return result_dataset
 
 
@@ -169,7 +171,8 @@ def measure_node(
 ):
 
     # the factory determines if the measurement is on single qubits or a coupler is involved
-    measurement = MeasurementFactory(node)
+    factory = MeasurementFactory()
+    measurement = factory.select(node)
     result_dataset = measurement.measure(node, compiled_schedule, cluster, lab_ic)
 
     logger.info('Finished measurement')
