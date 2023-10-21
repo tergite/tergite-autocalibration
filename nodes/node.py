@@ -76,6 +76,8 @@ class NodeFactory:
             'qubit_12_spectroscopy_pulsed': Qubit_12_Spectroscopy_Pulsed_Node,
             'rabi_oscillations_12': Rabi_Oscillations_12_Node,
             'coupler_spectroscopy': Coupler_Spectroscopy_Node,
+            'coupler_resonator_spectroscopy': Coupler_Resonator_Spectroscopy_Node,
+            'T1': T1_Node,
         }
 
     def create_node(self, node_name: str, all_qubits: list[str], ** kwargs):

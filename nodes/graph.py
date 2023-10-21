@@ -8,6 +8,7 @@ graph = nx.DiGraph()
 graph_dependencies = [
     ('tof', 'resonator_spectroscopy'),
     ('resonator_spectroscopy', 'coupler_spectroscopy'),
+    ('resonator_spectroscopy', 'coupler_resonator_spectroscopy'),
     ('resonator_spectroscopy', 'qubit_01_spectroscopy_pulsed'),
     ('resonator_spectroscopy', 'qubit_01_spectroscopy_multidim'),
     ('qubit_01_spectroscopy_pulsed', 'rabi_oscillations'),

@@ -64,22 +64,6 @@ def configure_dataset(
     return dataset
 
 def to_real_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
-    #dataset_dict = {}
-    #real_ds = xarray.Dataset(coords=iq_dataset.coords)
-    #for var in iq_dataset.data_vars.keys():
-    #    this_qubit = iq_dataset[var].attrs['qubit']
-    #    attributes = {'qubit': this_qubit}
-    #    this_state = ''
-    #    if 'qubit_state' in iq_dataset[var].attrs:
-    #        qubit_state = iq_dataset[var].attrs["qubit_state"]
-    #        this_state = qubit_state
-    #        attributes['qubit_state'] = qubit_state
-
-    #    qubit_coords = iq_dataset[f'y{this_qubit}_{this_state}'].coords
-    #    values = iq_dataset[var].values
-    #    qubit_key = f'y{this_qubit}_{this_state}'
-    #    real_ds[qubit_key+'_real'] = (qubit_coords, values.real, attributes)
-    #    real_ds[qubit_key+'_imag'] = (qubit_coords, values.imag, attributes)
     ds = iq_dataset.expand_dims('ReIm', axis=-1) # Add ReIm axis at the end
     ds = xarray.concat([ds.real, ds.imag], dim='ReIm')
     return ds
@@ -99,4 +83,17 @@ def handle_ro_freq_optimization(complex_dataset: xarray.Dataset, states: list[in
         new_ds[f'y{this_qubit}'] = (('qubit_state',coord), np.vstack(values), attributes)
 
     return new_ds
-    # xarray.concat([result_dataset_complex.yq160, result_dataset_complex.yq161],'ro_opt_frequenciesq16', combine_attrs='drop_conflicts')
+
+
+def save_dataset(result_dataset: xarray.Dataset, node):
+    measurement_date = datetime.now()
+    measurements_today = measurement_date.date().strftime('%Y%m%d')
+    time_id = measurement_date.strftime('%Y%m%d-%H%M%S-%f')[:19]
+    measurement_id = time_id + '-' + str(uuid4())[:6] + f'-{node.name}'
+    data_path = pathlib.Path(data_directory / measurements_today / measurement_id)
+    data_path.mkdir(parents=True, exist_ok=True)
+    result_dataset = result_dataset.assign_attrs({'name': node.name, 'tuid': measurement_id})
+    result_dataset_real = to_real_dataset(result_dataset)
+    # to_netcdf doesn't like complex numbers, convert to real/imag to save:
+    result_dataset_real.to_netcdf(data_path / 'dataset.hdf5')
+
