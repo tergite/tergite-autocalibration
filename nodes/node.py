@@ -3,7 +3,7 @@ from calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
 from calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
 from calibration_schedules.two_tone_multidim import Two_Tones_Multidim
 from calibration_schedules.rabi_oscillations import Rabi_Oscillations
-from calibration_schedules.T1 import T1_BATCHED
+from calibration_schedules.T1 import T1
 from calibration_schedules.XY_crosstalk import XY_cross
 from calibration_schedules.punchout import Punchout
 from calibration_schedules.ramsey_fringes import Ramsey_fringes
@@ -184,6 +184,22 @@ class Ramsey_Fringes_Node:
         }
         return cluster_samplespace
 
+class T1_Node:
+    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
+        self.name = name
+        self.all_qubits = all_qubits
+        self.node_dictionary = kwargs
+        self.redis_field = 'freq_01'
+        self.qubit_state = 0
+        self.measurement_obj = T1
+        self.analysis_obj = T1Analysis
+
+    @property
+    def samplespace(self):
+        cluster_samplespace = {
+            'delays': {qubit : np.arange(16e-9,250e-6,4e-6) for qubit in self.all_qubits}
+        }
+        return cluster_samplespace
 
 class Resonator_Spectroscopy_1_Node:
     def __init__(self, name: str, all_qubits: list[str], ** kwargs):
@@ -287,6 +303,47 @@ class Coupler_Spectroscopy_Node:
         }
         return spi_samplespace
 
+class Coupler_Resonator_Spectroscopy_Node:
+    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
+        self.name = name
+        self.all_qubits = all_qubits
+        self.node_dictionary = kwargs
+        self.redis_field = 'flux_quantum'
+        self.qubit_state = 0
+        # perform 2 tones while biasing the current
+        self.measurement_obj = Resonator_Spectroscopy
+        self.analysis_obj = CouplerSpectroscopyAnalysis
+        self.validate()
+
+    def validate(self):
+        if 'coupled_qubits' not in self.node_dictionary:
+            error_msg = 'coupled_qubits not in job dictionary\n'
+            suggestion = 'job dictionary should look like:\n {"coupled_qubits": ["q1","q2"]}'
+            raise ValueError(error_msg + suggestion)
+        else:
+            coupled_qubits = self.node_dictionary['coupled_qubits']
+            if len(coupled_qubits) != 2:
+                raise ValueError('coupled qubits must be a list with 2 elements')
+            elif not all([q in self.all_qubits for q in coupled_qubits]):
+                raise ValueError('coupled qubits must be a subset of all calibrated qubits')
+            else:
+                self.coupler = coupled_qubits[0] + coupled_qubits[1]
+
+    @property
+    def samplespace(self):
+        cluster_samplespace = {
+            'spec_frequencies': {
+                qubit: resonator_samples(qubit) for qubit in self.all_qubits
+            }
+        }
+        return cluster_samplespace
+
+    @property
+    def spi_samplespace(self):
+        spi_samplespace = {
+            'dc_currents': {self.coupler: np.arange(-3e-3, 3e-3, 1000e-6)},
+        }
+        return spi_samplespace
 
 
     # class Node():
