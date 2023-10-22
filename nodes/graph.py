@@ -22,6 +22,7 @@ graph_dependencies = [
     ('resonator_spectroscopy_1', 'qubit_12_spectroscopy_pulsed'),
     ('qubit_12_spectroscopy_pulsed', 'rabi_oscillations_12'),
     ('rabi_oscillations_12', 'ramsey_correction_12'),
+    ('ramsey_correction_12', 'ro_frequency_optimization_gef'),
 ]
 
 graph.add_edges_from(graph_dependencies)
