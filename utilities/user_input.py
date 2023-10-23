@@ -12,10 +12,12 @@ node reference
   qubit_12_spectroscopy_pulsed
   rabi_oscillations_12
   coupler_spectroscopy
+  coupler_resonator_spectroscopy
+  T1
 '''
 
 user_requested_calibration = {
     'target_node': 'coupler_spectroscopy',
     'all_qubits': qubits,
-    'node_dictionary' : {'coupled_qubits': ['q21','q22']},
+    'node_dictionary' : {'coupled_qubits': ['q24','q25']},
 }

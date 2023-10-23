@@ -22,6 +22,7 @@ T1.t1_time = nan
 XY_crosstalk.selectivity = nan
 punchout.ro_ampl = nan
 coupler_spectroscopy.flux_quantum = nan
+coupler_resonator_spectroscopy.resonator_flux_quantum = nan
 
 [initials.all]
 ro_acq_delay = 200e-9
@@ -57,6 +58,9 @@ q25.ro_pulse_amp = 8.0e-3
 init_duration = 100e-6
 
 [resonator_spectroscopy_1.all]
+init_duration = 100e-6
+
+[coupler_resonator_spectroscopy.all]
 init_duration = 100e-6
 
 [resonator_spectroscopy_2.all]

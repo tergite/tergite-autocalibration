@@ -19,6 +19,7 @@ def execute_schedule(
     logger.info('Starting measurement')
     cluster_status = ClusterStatus.real
     schedule_duration = compiled_schedule.get_schedule_duration()
+    print(f'{ schedule_duration = }')
 
     def run_measurement() -> None:
         lab_ic.prepare(compiled_schedule)
@@ -50,7 +51,7 @@ def execute_schedule(
 class MeasurementFactory:
 
     def select(self, node):
-        if node.name in ['coupler_spectroscopy']:
+        if node.name in ['coupler_spectroscopy', 'coupler_resonator_spectroscopy']:
             return CoupledQubitsMeasurement(node)
         else:
             return SingleQubitsMeasurement(node)
@@ -82,9 +83,9 @@ class CoupledQubitsMeasurement:
 
     def create_dac(self, node):
         coupler_spi_map = {
-            'q21q22': (4, 'dac0'),
-            'q20q25': (3, 'dac3'),
-            'q24q25': (3, 'dac2'),
+            'q21q22': (3, 'dac1'),
+            'q20q25': (3, 'dac0'),
+            'q24q25': (4, 'dac0'),
         }
         coupler = node.coupler
         spi_mod_number, dac_name = coupler_spi_map[coupler]
@@ -94,7 +95,7 @@ class CoupledQubitsMeasurement:
         this_dac = spi.instrument_modules[spi_mod_name].instrument_modules[dac_name]
         this_dac.ramping_enabled(True)
         this_dac.ramp_rate(500e-6)
-        this_dac.ramp_max_step(250e-6)
+        this_dac.ramp_max_step(100e-6)
         this_dac.current.vals = validators.Numbers(min_value=-3e-3, max_value=3e-3)
         # for dac in spi.instrument_modules[spi_mod_name].submodules.values():
         # dac.current.vals = validators.Numbers(min_value=-2e-3, max_value=2e-3)
