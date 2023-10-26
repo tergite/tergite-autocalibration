@@ -129,6 +129,9 @@ class CoupledQubitsMeasurement:
                 result_dataset = dataset
             else:
                 result_dataset = xarray.concat([result_dataset, dataset], dim='dc_currents')
+        # TODO fix the qubit name
+        coord_attrs = {'qubit':'q00', 'long_name': 'dc_currents', 'units': 'NA'}
+        result_dataset.dc_currents.attrs = coord_attrs
 
         save_dataset(result_dataset, node)
         # TODO verify this
