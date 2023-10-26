@@ -46,6 +46,8 @@ all_nodes = list(nx.topological_sort(graph))
 
 # TODO add condition argument and explanation
 def filtered_topological_order(target_node: str):
+    if target_node == 'new_node':
+        topo_order = ['new_node']
     if target_node == 'punchout':
         topo_order = ['punchout']
     else:

@@ -1,5 +1,6 @@
 import numpy as np
 import xarray as xr
+from analysis.qubit_spectroscopy_analysis import LorentzianModel
 
 class CouplerSpectroscopyAnalysis():
     def  __init__(self,dataset: xr.Dataset):
@@ -14,22 +15,20 @@ class CouplerSpectroscopyAnalysis():
         self.dataset = dataset
 
     def run_fitting(self):
-        # magnitudes = self.dataset[f'y{self.qubit}'].values
-        # norm_magnitudes = magnitudes /np.max(magnitudes, axis=0)
-        # self.dataset[f'y{self.qubit}'].values = norm_magnitudes
+        self.dc_currents = self.dataset[f'y{self.qubit}'][self.currents]
+        model = LorentzianModel()
+        frequencies = self.dataset[f'y{self.qubit}'][self.frequencies].values
+        self.qubit_frequencies = []
+        for i, current in enumerate(self.dc_currents.values):
+            magnitudes = self.dataset[f'y{self.qubit}'].isel({self.currents: [i]})[0].values
+            guess = model.guess(magnitudes, x=frequencies)
+            fit_result = model.fit(magnitudes, params=guess, x=frequencies)
 
-        # motzoi_key = 'mw_motzois'+self.qubit
-        # motzois = self.dataset[motzoi_key].size
-        # sums = []
-        # for this_motzoi_index in range(motzois):
-        #     this_sum = sum(np.abs(self.dataset[f'y{self.qubit}'][this_motzoi_index].values))
-        #     sums.append(this_sum)
-        #
-        # index_of_min = np.argmin(np.array(sums))
-        # self.optimal_motzoi = float(self.dataset[motzoi_key][index_of_min].values)
+            self.qubit_frequencies.append(fit_result.params['x0'].value)
         return 0
 
     def plotter(self,ax):
         datarray = self.dataset[f'y{self.qubit}']
         qubit = self.qubit
         self.dataset[self.data_var].plot(ax=ax, x=self.frequencies)
+        ax.scatter(self.qubit_frequencies, self.dc_currents, s=64, c='red' )

@@ -52,9 +52,9 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
     qub_spec_samples = 45
-    sweep_range = 3.5e6
+    sweep_range = 2.5e6
     if transition == '01':
-        VNA_frequency = VNA_qubit_frequencies[qubit]
+        VNA_frequency = VNA_qubit_frequencies[qubit] + 1.5e6
     elif transition == '12':
         VNA_frequency = VNA_f12_frequencies[qubit]
     else:
@@ -317,20 +317,20 @@ class Coupler_Spectroscopy_Node:
             else:
                 self.coupled_qubits = coupled_qubits
                 self.coupler = coupled_qubits[0] + coupled_qubits[1]
+                self.measurement_qubit = coupled_qubits[0]
 
     @property
     def samplespace(self):
+        qubit = self.measurement_qubit
         cluster_samplespace = {
-            'spec_frequencies': {
-                qubit: qubit_samples(qubit) for qubit in self.coupled_qubits
-            }
+            'spec_frequencies': {qubit: qubit_samples(qubit)}
         }
         return cluster_samplespace
 
     @property
     def spi_samplespace(self):
         spi_samplespace = {
-            'dc_currents': {self.coupler: np.arange(-3e-3, 3e-3, 100e-6)},
+            'dc_currents': {self.coupler: np.arange(-7.0e-4, -1e-4, 10e-6)},
         }
         return spi_samplespace
 
@@ -359,20 +359,20 @@ class Coupler_Resonator_Spectroscopy_Node:
             else:
                 self.coupled_qubits = coupled_qubits
                 self.coupler = coupled_qubits[0] + coupled_qubits[1]
+                self.measurement_qubit = coupled_qubits[0]
 
     @property
     def samplespace(self):
+        qubit = self.measurement_qubit
         cluster_samplespace = {
-            'ro_frequencies': {
-                qubit: resonator_samples(qubit) for qubit in self.coupled_qubits
-            }
+            'ro_frequencies': {qubit: resonator_samples(qubit)}
         }
         return cluster_samplespace
 
     @property
     def spi_samplespace(self):
         spi_samplespace = {
-            'dc_currents': {self.coupler: np.arange(-3e-3, 3e-3, 100e-6)},
+            'dc_currents': {self.coupler: np.arange(-1.5e-3, 0e-3, 50e-6)},
         }
         return spi_samplespace
 

@@ -77,7 +77,7 @@ class QubitSpectroscopyAnalysis():
         #Initialize the Lorentzian model
         model = LorentzianModel()
 
-        #Fetch the resulting measurement variables from self
+        #Fetch the resulting measurement variables
         self.magnitudes = np.absolute(self.S21)
         frequencies = self.independents
 

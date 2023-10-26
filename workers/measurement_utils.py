@@ -93,9 +93,12 @@ class CoupledQubitsMeasurement:
         spi = SpiRack('loki_rack', '/dev/ttyACM0')
         spi.add_spi_module(spi_mod_number, S4gModule)
         this_dac = spi.instrument_modules[spi_mod_name].instrument_modules[dac_name]
+        this_dac.ramping_enabled(False)
+        this_dac.span('range_min_bi')
+        this_dac.current(0)
         this_dac.ramping_enabled(True)
         this_dac.ramp_rate(500e-6)
-        this_dac.ramp_max_step(100e-6)
+        this_dac.ramp_max_step( 10e-6)
         this_dac.current.vals = validators.Numbers(min_value=-3e-3, max_value=3e-3)
         # for dac in spi.instrument_modules[spi_mod_name].submodules.values():
         # dac.current.vals = validators.Numbers(min_value=-2e-3, max_value=2e-3)
