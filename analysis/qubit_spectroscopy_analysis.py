@@ -74,6 +74,10 @@ class QubitSpectroscopyAnalysis():
         self.qubit = dataset[data_var].attrs['qubit']
 
     def run_fitting(self):
+
+        if not self.has_peak():
+            return np.nan
+
         #Initialize the Lorentzian model
         model = LorentzianModel()
 
