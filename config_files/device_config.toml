@@ -1,0 +1,81 @@
+[qoi]
+tof.ro_acq_delay = nan
+resonator_spectroscopy.ro_freq = nan
+resonator_spectroscopy_1.ro_freq_1 = nan
+resonator_spectroscopy_2.ro_freq_2 = nan
+ro_frequency_optimization.ro_freq_opt = nan
+ro_frequency_optimization_gef.ro_freq_opt = nan
+ro_amplitude_optimization.ro_ampl_opt = nan
+qubit_01_spectroscopy_pulsed.freq_01 = nan
+two_tone_multidim.freq_01 = nan
+ramsey_correction.freq_01 = nan
+qubit_12_spectroscopy_pulsed.freq_12 = nan
+ramsey_correction_12.freq_12 = nan
+qubit_12_spectroscopy_pulsed.anharmonicity = nan
+rabi_oscillations.mw_amp180 = nan
+DRAG_amplitude.mw_amp180 = nan
+motzoi_parameter.mw_motzoi = nan
+rabi_oscillations_12.mw_ef_amp180 = nan
+randomized_benchmarking.fidelity = nan
+state_discrimination.discriminator = nan
+T1.t1_time = nan
+XY_crosstalk.selectivity = nan
+punchout.ro_ampl = nan
+coupler_spectroscopy.flux_quantum = nan
+
+[initials.all]
+ro_acq_delay = 200e-9
+ro_pulse_delay = 4e-9
+ro_pulse_duration = 2.0e-6
+ro_acq_integration_time = 1.5e-6
+mw_pulse_duration = 52e-9
+init_duration = 300e-6
+min_calibration_point = 0
+max_calibration_point = 0
+spec_pulse_duration = 2e-6
+spec_amp = 2.5e-4
+att = 0
+
+[initials]
+q11.ro_pulse_amp = 6.5e-3
+q12.ro_pulse_amp = 6.8e-3
+q13.ro_pulse_amp = 7.2e-3
+q14.ro_pulse_amp = 8.0e-3
+q15.ro_pulse_amp = 6.5e-3
+q16.ro_pulse_amp = 35.0e-3
+q17.ro_pulse_amp = 50.0e-3
+q18.ro_pulse_amp = 16.0e-3
+q19.ro_pulse_amp = 9.0e-3
+q20.ro_pulse_amp = 26.0e-3
+q21.ro_pulse_amp = 8.0e-3
+q22.ro_pulse_amp = 35.0e-3
+q23.ro_pulse_amp = 36.0e-3
+q24.ro_pulse_amp = 7.0e-3
+q25.ro_pulse_amp = 8.0e-3
+
+[resonator_spectroscopy.all]
+init_duration = 100e-6
+
+[resonator_spectroscopy_1.all]
+init_duration = 100e-6
+
+[resonator_spectroscopy_2.all]
+init_duration = 300e-6
+
+[qubit_01_spectroscopy_pulsed.all]
+spec_pulse_duration = 2e-6
+spec_amp = 3.5e-4
+
+[coupler_spectroscopy.all]
+spec_pulse_duration = 2e-6
+spec_amp = 3.5e-4
+
+[ramsey_correction.all]
+artificial_detuning = 3e6
+
+[ramsey_correction_12.all]
+artificial_detuning = 3e6
+
+[qubit_12_spectroscopy_pulsed.all]
+spec_pulse_duration = 2.0e-6
+spec_amp = 3.5e-4

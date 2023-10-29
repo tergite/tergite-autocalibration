@@ -27,7 +27,6 @@ class Two_Tones_Spectroscopy(Measurement):
             'mw_pulse_ports': self.attributes_dictionary('microwave'),
         }
 
-
     def schedule_function(
         self,
         qubits: list[str],
