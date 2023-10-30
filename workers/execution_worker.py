@@ -108,4 +108,4 @@ def measure(
     lab_ic.stop()
     logger.info('Finished measurement')
 
-    return result_dataset_complex,data_path
+    return result_dataset,data_path

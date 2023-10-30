@@ -9,7 +9,9 @@ class MotzoiAnalysis():
         self.independents = dataset[coord].values
         self.fit_results = {}
         self.qubit = dataset[data_var].attrs['qubit']
-        dataset[f'y{self.qubit}'].values = np.abs(self.S21)
+        # print(data_var)
+        dataset[f'y{self.qubit}_'].values = np.abs(self.S21)
+        # dataset[data_var].values = np.abs(self.S21)
         self.dataset = dataset
 
     def run_fitting(self):
@@ -17,7 +19,7 @@ class MotzoiAnalysis():
         motzois = self.dataset[motzoi_key].size
         sums = []
         for this_motzoi_index in range(motzois):
-            this_sum = sum(np.abs(self.dataset[f'y{self.qubit}'][this_motzoi_index].values))
+            this_sum = sum(np.abs(self.dataset[f'y{self.qubit}_'][this_motzoi_index].values))
             sums.append(this_sum)
 
         index_of_min = np.argmin(np.array(sums))
@@ -26,7 +28,7 @@ class MotzoiAnalysis():
         return self.optimal_motzoi
 
     def plotter(self,axis):
-        datarray = self.dataset[f'y{self.qubit}']
+        datarray = self.dataset[f'y{self.qubit}_']
         qubit = self.qubit
 
 

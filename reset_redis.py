@@ -5,6 +5,8 @@ from utilities import user_input
 
 red = redis.Redis(decode_responses=True)
 qubits = user_input.qubits
+bus_list = [ [qubits[i],qubits[i+1]] for i in range(len(qubits)-1) ]
+couplers = [bus[0]+'_'+bus[1] for bus in bus_list]
 nodes = user_input.nodes
 
 parser = argparse.ArgumentParser()
@@ -25,6 +27,22 @@ for qubit in qubits:
     fields =  red.hgetall(f'transmons:{qubit}').keys()
     key = f'transmons:{qubit}'
     cs_key = f'cs:{qubit}'
+    if remove_node == 'all':
+        for field in fields:
+            red.hset(key, field, 'nan' )
+        for node in nodes:
+            red.hset(cs_key, node, 'not_calibrated' )
+    elif remove_node in nodes:
+        for field in remove_fields:
+            red.hset(key, field, 'nan')
+        red.hset(cs_key, remove_node, 'not_calibrated' )
+    else:
+        raise ValueError('Invalid Field')
+
+for coupler in couplers:
+    fields =  red.hgetall(f'couplers:{coupler}').keys()
+    key = f'couplers:{coupler}'
+    cs_key = f'cs:{coupler}'
     if remove_node == 'all':
         for field in fields:
             red.hset(key, field, 'nan' )

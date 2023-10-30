@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import xarray as xr
 from analysis.motzoi_analysis import MotzoiAnalysis
 from analysis.n_rabi_analysis import NRabiAnalysis
+from analysis.cz_chevron_analysis import CZChevronAnalysis
 from analysis.resonator_spectroscopy_analysis import ResonatorSpectroscopyAnalysis, ResonatorSpectroscopy_1_Analysis, ResonatorSpectroscopy_2_Analysis
 from analysis.qubit_spectroscopy_analysis import QubitSpectroscopyAnalysis
 from analysis.qubit_spectroscopy_multidim import QubitSpectroscopyMultidim
@@ -35,10 +36,13 @@ def post_process(result_dataset: xr.Dataset, node: str, data_path: str):
 
     # figure_manager = plt.get_current_fig_manager()
     # figure_manager.window.showMaximized()
-
     fig = plt.gcf()
     fig.set_tight_layout(True)
-    plt.show()
+    fig.savefig(f'{data_path}/{node}.png', bbox_inches='tight', dpi=600)
+    plt.show(block=False)
+    plt.pause(30)
+    plt.close()
+
     if node != 'tof':
         analysis.node_result.update({'measurement_dataset':result_dataset.to_dict()})
 
@@ -147,6 +151,9 @@ class Multiplexed_Analysis(BaseAnalysis):
             elif node == 'state_discrimination':
                 analysis_class = StateDiscrimination
                 redis_field = 'discrimimator'
+            elif node == 'cz_chevron':
+                analysis_class = CZChevronAnalysis
+                redis_field = 'cz_pulse_frequency'
             else:
                 raise ValueError(f'Invalid node: {node}')
 
@@ -170,7 +177,6 @@ class Multiplexed_Analysis(BaseAnalysis):
             handles.append(patch)
             this_axis.set(title=None)
             this_axis.legend(handles=handles)
-            self.fig.savefig(f'{self.data_path}/{node}.png', bbox_inches='tight', dpi=600)
             # logger.info(f'Analysis for the {node} of {this_qubit} is done, saved at {self.data_path}')
 
 #class Multiplexed_Punchout_Analysis(BaseAnalysis):

@@ -20,12 +20,15 @@ from calibration_schedules.ro_amplitude_optimization import RO_amplitude_optimiz
 from calibration_schedules.state_discrimination import Single_Shots_RO
 from calibration_schedules.n_rabi_oscillations import N_Rabi_Oscillations
 from calibration_schedules.motzoi_parameter import Motzoi_parameter
+from calibration_schedules.cz_chevron import CZ_chevron
 from utilities.extended_transmon_element import ExtendedTransmon
+from utilities.extended_coupler_edge import CompositeSquareEdge
 from quantify_scheduler.backends import SerialCompiler
 from config_files.settings import hw_config_json
 from quantify_core.data.handling import set_datadir
 from quantify_scheduler.json_utils import ScheduleJSONEncoder
 from itertools import tee
+from matplotlib import pyplot as plt
 
 set_datadir('.')
 
@@ -52,6 +55,8 @@ node_map = {
     'ro_frequency_optimization_gef': RO_frequency_optimization,
     'ro_amplitude_optimization': RO_amplitude_optimization,
     'state_discrimination': Single_Shots_RO,
+    'cz_chevron': CZ_chevron,
+
 }
 
 redis_connection = redis.Redis(decode_responses=True)
@@ -95,6 +100,16 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
     transmon.measure_opt.integration_time(float(redis_config['ro_acq_integration_time']))
     return
 
+def load_redis_config_coupler(coupler: CompositeSquareEdge):
+    bus = coupler.name
+    redis_config = redis_connection.hgetall(f"couplers:{bus}")
+    coupler.cz.cz_freq(float(redis_config['cz_pulse_frequency']))
+    coupler.cz.square_amp(float(redis_config['cz_pulse_amplitude']))
+    coupler.cz.square_duration(float(redis_config['cz_pulse_duration']))
+    coupler.cz.cz_width(float(redis_config['cz_pulse_width']))
+    
+    return
+
 
 def precompile(node:str, qubits: list[str], samplespace: dict[str,dict[str,np.ndarray]]):
     if node == 'tof':
@@ -113,19 +128,31 @@ def precompile(node:str, qubits: list[str], samplespace: dict[str,dict[str,np.nd
         device.add_element(transmon)
         transmons[qubit] = transmon
 
+    # Creating coupler edge
+  
+    bus_list = [ [qubits[i],qubits[i+1]] for i in range(len(qubits)-1) ]
+    couplers={}
+    for bus in bus_list:
+        coupler = CompositeSquareEdge(bus[0],bus[1])
+        load_redis_config_coupler(coupler)
+        device.add_edge(coupler)
+        couplers[bus[0]+'_'+bus[1]] = coupler
+
     qubit_state = 0
     if node in ['resonator_spectroscopy_1','qubit_12_spectroscopy_pulsed',
                 'rabi_oscillations_12', 'ramsey_correction_12']:
         qubit_state = 1
     if node in ['resonator_spectroscopy_2', 'ro_frequency_optimization_gef']:
         qubit_state = 2
-
-    node_class = node_map[node](transmons, qubit_state)
+    if node in ['cz_chevron']:
+        node_class = node_map[node](transmons, couplers, qubit_state)
+    else:
+        node_class = node_map[node](transmons, qubit_state)
     schedule_function = node_class.schedule_function
     static_parameters = node_class.static_kwargs
 
     compiler = SerialCompiler(name=f'{node}_compiler')
-    compilation_config = device.generate_compilation_config()
+    
 
     if 'qubit_states' in samplespace: #this means we have single shots
         shots = 1
@@ -173,6 +200,7 @@ def precompile(node:str, qubits: list[str], samplespace: dict[str,dict[str,np.nd
                 schedule = schedule_function(**static_parameters,**partial_samplespace)
                 logger.info(f'Starting Partial {slice_indx+1}/{len(list(slicing))} Compiling')
                 #logger.info(f'Starting Partial Compiling')
+                compilation_config = device.generate_compilation_config()
                 compiled_schedule = compiler.compile(
                     schedule=schedule, config=compilation_config
                 )
@@ -181,9 +209,9 @@ def precompile(node:str, qubits: list[str], samplespace: dict[str,dict[str,np.nd
                 schedule_durations.append(compiled_schedule.get_schedule_duration())
                 samplespaces.append(partial_samplespace)
             return compiled_schedules, schedule_durations, samplespaces
-
+    
     schedule = schedule_function(**static_parameters, **samplespace)
-
+    compilation_config = device.generate_compilation_config()
     logger.info('Starting Compiling')
     compiled_schedule = compiler.compile(schedule=schedule, config=compilation_config)
 
@@ -198,6 +226,5 @@ def precompile(node:str, qubits: list[str], samplespace: dict[str,dict[str,np.nd
     schedule_duration = compiled_schedule.get_schedule_duration()
 
     logger.info('Finished Compiling')
-    # compiled_schedule.plot_pulse_diagram(plot_backend='plotly')
 
     return [compiled_schedule], [schedule_duration], [samplespace]

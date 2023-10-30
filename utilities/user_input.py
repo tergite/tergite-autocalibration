@@ -26,9 +26,12 @@ nodes = [
         #"ro_frequency_optimization",
         #"ro_amplitude_optimization",
         #"state_discrimination",
+        "cz_chevron",
         ]
 
 qubits = [ 'q11','q12','q13','q14','q15']
+# qubits = [ 'q11','q12']
+# couplers = ['c1112','c1213','c1314','c1415']
 #qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
 #qubits = [ 'q16','q17','q19','q21','q22','q23','q25']
 #qubits = [ 'q16','q17', 'q19']
@@ -39,17 +42,20 @@ res_spec_samples = 41
 qub_spec_samples = 201
 
 def resonator_samples(qubit:str, punchout=False) -> np.ndarray:
-    sweep_range = 1e6
+    if qubit == 'q12':
+        sweep_range = 2e6
+    else:
+        sweep_range = 1e6
     punchout_range = 0e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
-    min_freq =  VNA_frequency - sweep_range / 2
+    min_freq =  VNA_frequency - sweep_range/2
     #min_freq =  min_freq if not punchout else min_freq - punchout_range
     #max_freq =  VNA_frequency + sweep_range / 2 - 2e6
     max_freq =  VNA_frequency + sweep_range / 2
     return np.linspace(min_freq, max_freq, res_spec_samples)
 
 def qubit_samples(qubit:str, transition:str = '01') -> np.ndarray:
-    sweep_range = 100e6
+    sweep_range = 20e6
     if transition=='01':
         VNA_frequency = VNA_f01_frequencies[qubit]
     elif transition=='12':
@@ -117,11 +123,11 @@ def experiment_parameters(node:str, qubits:List[str], dummy:bool=False) -> dict:
         },
 
         'rabi_oscillations': {
-            'mw_amplitudes': { qubit : np.linspace(0.002,0.5,31) for qubit in qubits}
+            'mw_amplitudes': { qubit : np.linspace(0.002,0.4,31) for qubit in qubits}
         },
 
         'rabi_oscillations_12': {
-            'mw_amplitudes': { qubit : np.linspace(0.002,0.25,31) for qubit in qubits}
+            'mw_amplitudes': { qubit : np.linspace(0.002,0.5,31) for qubit in qubits}
         },
 
         'ro_amplitude_optimization': {
@@ -138,7 +144,6 @@ def experiment_parameters(node:str, qubits:List[str], dummy:bool=False) -> dict:
             'mw_pulse_durations': { qubit : np.arange(20e-9,300e-9,41) for qubit in qubits },
             'drive_qubit': 'q18'
         },
-
         'ramsey_correction': {
             'ramsey_delays': { qubit : np.arange(4e-9, 2048e-9, 8*8e-9) for qubit in qubits },
             'artificial_detunings': { qubit : np.arange(-2.1, 2.1, 0.8)*1e6 for qubit in qubits },
@@ -154,12 +159,18 @@ def experiment_parameters(node:str, qubits:List[str], dummy:bool=False) -> dict:
             'X_repetitions': {qubit : np.arange(2, 17, 4) for qubit in qubits}
         },
         'n_rabi_oscillations': {
-            'mw_amplitudes_sweep': {qubit: np.linspace(-0.2,0.2,61) for qubit in qubits},
+            'mw_amplitudes_sweep': {qubit: np.linspace(-0.1,0.1,61) for qubit in qubits},
             'X_repetitions': {qubit : np.arange(1, 16, 4) for qubit in qubits}
         },
         'state_discrimination': {
             'qubit_states': {qubit: np.random.randint(0,high=2,size=700) for qubit in qubits},
         },
+        'cz_chevron': {
+            'cz_pulse_frequencies_sweep': {qubit: np.linspace(-50e6,50e6,5) for qubit in qubits},
+            'cz_pulse_amplitudes': {qubit: np.linspace(0.0,0.001,7) for qubit in qubits},
+            # 'cz_pulse_duration': {qubit: 200e-9 for qubit in qubits},
+            # 'cz_pulse_width': {qubit: 4e-9 for qubit in qubits},
+        }
     }
     return sweep_parameters
 

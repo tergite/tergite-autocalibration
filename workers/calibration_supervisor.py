@@ -13,6 +13,7 @@ from colorama import Style
 import utilities.user_input as user_input
 import toml
 import redis
+from matplotlib import pyplot as plt
 
 colorama_init()
 
@@ -23,9 +24,14 @@ parser = argparse.ArgumentParser(
 parser.add_argument('--d', dest='cluster_status', action='store_const',const=ClusterStatus.dummy,default=ClusterStatus.real)
 args = parser.parse_args()
 
+print(args)
+
 # Settings
 transmon_configuration = toml.load('./config_files/device_config.toml')
 qubits = user_input.qubits
+
+bus_list = [ [qubits[i],qubits[i+1]] for i in range(len(qubits)-1) ]
+couplers = [bus[0]+'_'+bus[1]for bus in bus_list]
 
 def calibrate_system():
     logger.info('Starting System Calibration')
@@ -34,7 +40,6 @@ def calibrate_system():
     node_to_be_calibrated = user_input.target_node
     topo_order = nodes[:nodes.index(node_to_be_calibrated) + 1]
     initial_parameters = transmon_configuration['initials']
-
     #Populate the Redis database with the quantities of interest, at Nan value
     #Only if the key does NOT already exist
     quantities_of_interest = transmon_configuration['qoi']
@@ -50,6 +55,17 @@ def calibrate_system():
             # flag for the calibration supervisor
             if not redis_connection.hexists(calibration_supervisor_key, node):
                 redis_connection.hset(f'cs:{qubit}', node, 'not_calibrated' )
+        
+        for coupler in couplers:
+            redis_key = f'couplers:{coupler}'
+            calibration_supervisor_key = f'cs:{coupler}'
+            for field_key, field_value in node_parameters_dictionary.items():
+                # check if field already exists
+                if not redis_connection.hexists(redis_key, field_key):
+                    redis_connection.hset(f'couplers:{coupler}', field_key, field_value)
+            # flag for the calibration supervisor
+            if not redis_connection.hexists(calibration_supervisor_key, node):
+                redis_connection.hset(f'cs:{coupler}', node, 'not_calibrated' )
 
     #Populate the Redis database with the initial 'reasonable' parameter values
     for qubit in qubits:
@@ -58,6 +74,13 @@ def calibrate_system():
 
         for parameter_key, parameter_value in initial_parameters[qubit].items():
             redis_connection.hset(f"transmons:{qubit}", parameter_key, parameter_value)
+
+    for coupler in couplers:
+        for parameter_key, parameter_value in initial_parameters['all'].items():
+            redis_connection.hset(f"couplers:{coupler}", parameter_key, parameter_value)
+
+        # for parameter_key, parameter_value in initial_parameters[coupler].items():
+        #     redis_connection.hset(f"couplers:{coupler}", parameter_key, parameter_value)
 
     for node in topo_order:
         inspect_node(node)
@@ -73,8 +96,13 @@ def inspect_node(node:str):
         for parameter_key, parameter_value in initial_parameters['all'].items():
             redis_connection.hset(f"transmons:{qubit}", parameter_key, parameter_value)
 
+    for coupler in couplers:
+        for parameter_key, parameter_value in initial_parameters['all'].items():
+            redis_connection.hset(f"couplers:{coupler}", parameter_key, parameter_value)
+
     #Populate the Redis database with node specific parameter values
     qubits_statuses = [redis_connection.hget(f"cs:{qubit}", node) == 'calibrated' for qubit in qubits]
+    coupler_statuses = [redis_connection.hget(f"cs:{coupler}", node) == 'calibrated' for coupler in couplers]
     #node is calibrated only when all qubits have the node calibrated:
     is_node_calibrated = all(qubits_statuses)
     if node in transmon_configuration and not is_node_calibrated:
@@ -82,6 +110,9 @@ def inspect_node(node:str):
         for field_key, field_value in node_specific_dict.items():
             for qubit in qubits:
                 redis_connection.hset(f'transmons:{qubit}', field_key, field_value)
+
+            for coupler in couplers:
+                redis_connection.hset(f'couplers:{coupler}', field_key, field_value)
 
     #Check Redis if node is calibrated
     status = DataStatus.undefined
@@ -118,6 +149,9 @@ def calibrate_node(node:str):
     device_config = {}
     for qubit in qubits:
         device_config[qubit] = redis_connection.hgetall(f"transmons:{qubit}")
+    
+    for coupler in couplers:
+        device_config[coupler] = redis_connection.hgetall(f"couplers:{coupler}")
 
     job["device_config"] = device_config
     job_id = job["job_id"]
@@ -130,7 +164,12 @@ def calibrate_node(node:str):
     result_dataset = xr.Dataset()
     for compilation_indx, compilation in enumerate(compilation_zip):
         compiled_schedule, schedule_duration, samplespace = compilation
-        dataset = measure(
+
+        # Plot the pulse diagram
+        # fig = compiled_schedule.plot_pulse_diagram(plot_backend='plotly')
+        # fig.write_image(f"{compiled_schedule.name}.png")
+
+        dataset,data_path = measure(
                 compiled_schedule,
                 schedule_duration,
                 samplespace, 

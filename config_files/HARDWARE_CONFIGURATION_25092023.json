@@ -221,6 +221,67 @@
                   "mixer_phase_error_deg": -12.90709
                }
             ]
+         },
+         "complex_output_1": {
+            "lo_freq": 4400000000.0,
+            "dc_mixer_offset_I": 0,
+            "dc_mixer_offset_Q": 0,
+            "portclock_configs": [
+               {
+                  "port": "q11_q12:fl",
+                  "clock": "q11_q12.cz",
+                  "mixer_amp_ratio": 1,
+                  "mixer_phase_error_deg": 0
+               }
+            ]
+         }
+      },
+      "clusterA_module11": {
+         "instrument_type": "QCM_RF",
+         "complex_output_1": {
+            "lo_freq": 4400000000.0,
+            "dc_mixer_offset_I": 0,
+            "dc_mixer_offset_Q": 0,
+            "portclock_configs": [
+               {
+                  "port": "q12_q13:fl",
+                  "clock": "q12_q13.cz",
+                  "mixer_amp_ratio": 1,
+                  "mixer_phase_error_deg": 0
+               }
+            ]
+         }
+      },
+      "clusterA_module12": {
+         "instrument_type": "QCM_RF",
+         "complex_output_1": {
+            "lo_freq": 4400000000.0,
+            "dc_mixer_offset_I": 0,
+            "dc_mixer_offset_Q": 0,
+            "portclock_configs": [
+               {
+                  "port": "q13_q14:fl",
+                  "clock": "q13_q14.cz",
+                  "mixer_amp_ratio": 1,
+                  "mixer_phase_error_deg": 0
+               }
+            ]
+         }
+      },
+      "clusterA_module13": {
+         "instrument_type": "QCM_RF",
+         "complex_output_1": {
+            "lo_freq": 4400000000.0,
+            "dc_mixer_offset_I": 0,
+            "dc_mixer_offset_Q": 0,
+            "portclock_configs": [
+               {
+                  "port": "q14_q15:fl",
+                  "clock": "q14_q15.cz",
+                  "mixer_amp_ratio": 1,
+                  "mixer_phase_error_deg": 0
+               }
+            ]
          }
       },
       "clusterA_module16": {

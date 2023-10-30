@@ -20,6 +20,13 @@ state_discrimination.discriminator = nan
 T1.t1_time = nan
 XY_crosstalk.selectivity = nan
 punchout.ro_ampl = nan
+cz_chevron.cz_pulse_frequency = nan
+cz_chevron.cz_pulse_amplitude = nan
+cz_chevron.cz_pulse_duration =  200e-9
+cz_chevron.cz_pulse_width = 4e-9
+cz_chevron.dc_flux = nan
+cz_chevron.dc_flux_offset = nan
+cz_chevron.dc_flux_0 = nan
 
 [initials.all]
 ro_acq_delay = 200e-9
