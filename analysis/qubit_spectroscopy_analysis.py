@@ -75,8 +75,8 @@ class QubitSpectroscopyAnalysis():
 
     def run_fitting(self):
 
-        if not self.has_peak():
-            return np.nan
+        #if not self.has_peak():
+            #return np.nan
 
         #Initialize the Lorentzian model
         model = LorentzianModel()
@@ -105,7 +105,7 @@ class QubitSpectroscopyAnalysis():
         # Determines if the data contains one distinct peak or only noise
         x= self.S21
         x_filtered= self.reject_outliers(x, outlier_median)
-        peaks, properties=sp.signal.find_peaks(x, prominence=np.std(x_filtered)*prom_coef, width=wid_coef)
+        peaks, properties=signal.find_peaks(x, prominence=np.std(x_filtered)*prom_coef, width=wid_coef)
         return peaks.size==1
 
     def plotter(self,ax):

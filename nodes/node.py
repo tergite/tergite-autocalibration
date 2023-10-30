@@ -42,7 +42,7 @@ from config_files.VNA_values import (
 
 
 def resonator_samples(qubit: str) -> np.ndarray:
-    res_spec_samples = 55
+    res_spec_samples = 61
     sweep_range = 4.0e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
     min_freq = VNA_frequency - sweep_range / 2
@@ -51,10 +51,10 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 
 def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
-    qub_spec_samples = 45
-    sweep_range = 2.5e6
+    qub_spec_samples = 85
+    sweep_range = 4.5e6
     if transition == '01':
-        VNA_frequency = VNA_qubit_frequencies[qubit] + 1.5e6
+        VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition == '12':
         VNA_frequency = VNA_f12_frequencies[qubit]
     else:
@@ -68,6 +68,7 @@ def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
 class NodeFactory:
     def __init__(self):
         self.node_implementations = {
+            'punchout': Punchout_Node,
             'resonator_spectroscopy': Resonator_Spectroscopy_Node,
             'qubit_01_spectroscopy_pulsed': Qubit_01_Spectroscopy_Pulsed_Node,
             'rabi_oscillations': Rabi_Oscillations_Node,
@@ -123,6 +124,28 @@ class Resonator_Spectroscopy_Node(Base_Node):
         }
         return cluster_samplespace
 
+class Punchout_Node(Base_Node):
+    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
+        super().__init__(name, all_qubits)
+        self.name = name
+        self.all_qubits = all_qubits
+        self.node_dictionary = node_dictionary
+        self.redis_field = 'ro_ampl'
+        self.qubit_state = 0
+        self.measurement_obj = Punchout
+        self.analysis_obj = PunchoutAnalysis
+
+    @property
+    def samplespace(self):
+        cluster_samplespace = {
+            'ro_frequencies': {
+                qubit: resonator_samples(qubit) for qubit in self.all_qubits
+            },
+            'ro_amplitudes': {
+                qubit: np.linspace(0.005, 0.09, 12) for qubit in self.all_qubits
+            },
+        }
+        return cluster_samplespace
 
 class Qubit_01_Spectroscopy_Pulsed_Node:
     def __init__(self, name: str, all_qubits: list[str], ** kwargs):
@@ -382,12 +405,6 @@ class Coupler_Resonator_Spectroscopy_Node:
     #         'qubit_state': 0,
     #         'measurement_obj': Two_Tones_Multidim,
     #         'analysis_obj': QubitSpectroscopyMultidim
-    #     },
-    #     'punchout': {
-    #         'redis_field': 'ro_amp',
-    #         'qubit_state': 0,
-    #         'measurement_obj': Punchout,
-    #         'analysis_obj': PunchoutAnalysis
     #     },
     #     'ro_amplitude_optimization': {
     #         'redis_field': 'ro_pulse_amp_opt',
