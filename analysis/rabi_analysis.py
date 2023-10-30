@@ -87,7 +87,7 @@ class RabiAnalysis():
 
     def plotter(self,ax):
         # Plots the data and the fitted model of a Rabi experiment
-        ax.plot( self.fit_amplitudes , self.fit_y,'r-',lw=3.0, label=f" π_ampl = {self.ampl:.5f} ± {self.uncertainty:.7f} (V)")
+        ax.plot( self.fit_amplitudes , self.fit_y,'r-',lw=3.0, label=f" π_ampl = {self.ampl:.2E} ± {self.uncertainty:.1E} (V)")
         ax.plot( self.independents, self.magnitudes,'bo-',ms=3.0)
         ax.set_title(f'Rabi Oscillations for {self.qubit}')
         ax.set_xlabel('Amplitude (V)')
