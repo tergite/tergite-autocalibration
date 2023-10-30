@@ -70,6 +70,7 @@ class NodeFactory:
         self.node_implementations = {
             'resonator_spectroscopy': Resonator_Spectroscopy_Node,
             'qubit_01_spectroscopy_pulsed': Qubit_01_Spectroscopy_Pulsed_Node,
+            'qubit_01_spectroscopy_multidim': Qubit_01_Spectroscopy_Multidim_Node,
             'rabi_oscillations': Rabi_Oscillations_Node,
             'ramsey_correction': Ramsey_Fringes_Node,
             'resonator_spectroscopy_1': Resonator_Spectroscopy_1_Node,
@@ -139,6 +140,27 @@ class Qubit_01_Spectroscopy_Pulsed_Node:
         }
         return cluster_samplespace
 
+class Qubit_01_Spectroscopy_Multidim_Node:
+    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
+        self.name = name
+        self.all_qubits = all_qubits
+        self.node_dictionary = kwargs
+        self.redis_field = 'freq_01'
+        self.qubit_state = 0
+        self.measurement_obj = Two_Tones_Multidim
+        self.analysis_obj = QubitSpectroscopyMultidim
+
+    @property
+    def samplespace(self):
+        cluster_samplespace = {
+            'spec_frequencies': {
+                qubit: qubit_samples(qubit) for qubit in self.all_qubits
+            },
+            'spec_pulse_amplitudes': {
+                 qubit : np.linspace(1e-4, 4e-3, 5) for qubit in self.all_qubits
+            }
+        }
+        return cluster_samplespace
 
 class Rabi_Oscillations_Node:
     def __init__(self, name: str, all_qubits: list[str], ** kwargs):
