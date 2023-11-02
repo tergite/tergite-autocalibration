@@ -1,4 +1,5 @@
 import networkx as nx
+import matplotlib.pyplot as plt
 
 graph = nx.DiGraph()
 
@@ -37,10 +38,14 @@ graph.add_node('ramsey_correction_12', type='refine')
 graph.add_node('ro_frequency_optimization', type='refine')
 graph.add_node('ro_amplitude_optimization', type='refine')
 
-# for nodes that perform the same measurement, 
+# for nodes that perform the same measurement,
 # assign a weight to the corresponding edge to sort them
 graph['resonator_spectroscopy']['qubit_01_spectroscopy_pulsed']['weight'] = 1
 graph['resonator_spectroscopy']['qubit_01_spectroscopy_multidim']['weight'] = 2
+
+# nx.draw_spring(graph, with_labels=True, k=1)
+nx.draw(graph, pos=nx.spring_layout(graph, k=0.3), with_labels=True)
+plt.show()
 
 all_nodes = list(nx.topological_sort(graph))
 

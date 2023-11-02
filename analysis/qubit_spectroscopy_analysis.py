@@ -65,52 +65,67 @@ class QubitSpectroscopyAnalysis():
     Analysis that fits a Lorentzian function to qubit spectroscopy data.
     The resulting fit can be analyzed to determine if a peak was found or not.
     """
-    def  __init__(self,dataset: xr.Dataset):
+    def __init__(self,dataset: xr.Dataset):
         data_var = list(dataset.data_vars.keys())[0]
-        coord = list(dataset[data_var].coords.keys())[0]
+        for coord in dataset[data_var].coords:
+            if 'frequencies' in coord:
+                self.frequencies = coord
+            elif 'currents' in coord:
+                self.currents = coord
         self.S21 = dataset[data_var].values
-        self.independents = dataset[coord].values
+        self.independents = dataset[self.frequencies].values
         self.fit_results = {}
         self.qubit = dataset[data_var].attrs['qubit']
 
     def run_fitting(self):
 
-        #if not self.has_peak():
-            #return np.nan
-
-        #Initialize the Lorentzian model
-        model = LorentzianModel()
-
-        #Fetch the resulting measurement variables
+        # Fetch the resulting measurement variables
         self.magnitudes = np.absolute(self.S21)
         frequencies = self.independents
 
-        self.fit_freqs = np.linspace( frequencies[0], frequencies[-1], 1000) # x-values for plotting
+        if not self.has_peak():
+            return np.nan
+
+        self.fit_freqs = np.linspace(frequencies[0], frequencies[-1], 1000)  # x-values for plotting
+
+        # Initialize the Lorentzian model
+        model = LorentzianModel()
 
         # Gives an initial guess for the model parameters and then fits the model to the data.
         guess = model.guess(self.magnitudes, x=frequencies)
         fit_result = model.fit(self.magnitudes, params=guess, x=frequencies)
 
         self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_freqs})
-        return fit_result.params['x0'].value
+        self.f01 = fit_result.params['x0'].value
+        return self.f01
 
-    def reject_outliers(self, x, m = 3.):
-        #Filters out datapoints in x that deviate too far from the median
-        d = np.abs(x - np.median(x))
-        mdev = np.median(d)
-        s = d/mdev if mdev else np.zeros(len(d))
-        return x[s<m]
+    def reject_outliers(self, data, m=3.):
+        # Filters out datapoints in data that deviate too far from the median
+        shifted_data = np.abs(data - np.median(data))
+        mdev = np.median(shifted_data)
+        s = shifted_data/mdev if mdev else np.zeros(len(shifted_data))
+        filtered_data = data[s<m]
+        return filtered_data
 
-    def has_peak(self, prom_coef: float = 21, wid_coef: float = 2.4, outlier_median: float = 3.):
+    def has_peak(self, prom_coef: float = 10, wid_coef: float = 2.4, outlier_median: float = 3.):
         # Determines if the data contains one distinct peak or only noise
-        x= self.S21
-        x_filtered= self.reject_outliers(x, outlier_median)
-        peaks, properties=signal.find_peaks(x, prominence=np.std(x_filtered)*prom_coef, width=wid_coef)
-        return peaks.size==1
+        x = self.S21
+        x_filtered = self.reject_outliers(x, outlier_median)
+        self.filtered_std = np.std(x_filtered)
+        peaks, properties = signal.find_peaks(
+            x, prominence = self.filtered_std * prom_coef, width=wid_coef
+        )
+        self.prominence = properties["prominences"][0] if len(properties['prominences']) == 1 else 0
+        self.hasPeak = peaks.size == 1
+        return self.hasPeak
 
     def plotter(self,ax):
         # Plots the data and the fitted model of a qubit spectroscopy experiment
-        ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0)
+        if self.hasPeak:
+            ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0)
+            min = np.min(self.magnitudes)
+            ax.vlines(self.f01, min, self.prominence + min, lw=4, color='teal')
+            ax.vlines(self.f01-1e6, min, self.filtered_std + min, lw=4, color='orange')
         ax.plot( self.independents, self.magnitudes,'bo-',ms=3.0)
         ax.set_title(f'Qubit Spectroscopy for {self.qubit}')
         ax.set_xlabel('frequency (Hz)')

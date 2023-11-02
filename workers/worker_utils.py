@@ -57,7 +57,7 @@ def configure_dataset(
             attributes['qubit_state'] = qubit_state
         #breakpoint()
         #real_data_array = xarray.DataArray(
-        #                     data=data_values.real, 
+        #                     data=data_values.real,
         #                     coords=coords_dict,
         #                     dims='ro_frequencies',
         #                     attrs=attributes
@@ -68,15 +68,17 @@ def configure_dataset(
         dataset = xarray.merge([dataset,partial_ds])
     return dataset
 
+
 def to_real_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
-    ds = iq_dataset.expand_dims('ReIm', axis=-1) # Add ReIm axis at the end
+    ds = iq_dataset.expand_dims('ReIm', axis=-1)  # Add ReIm axis at the end
     ds = xarray.concat([ds.real, ds.imag], dim='ReIm')
     return ds
+
 
 def handle_ro_freq_optimization(complex_dataset: xarray.Dataset, states: list[int]) -> xarray.Dataset:
     new_ds = xarray.Dataset(coords=complex_dataset.coords, attrs=complex_dataset.attrs)
     new_ds = new_ds.expand_dims(dim={'qubit_state': states})
-    #TODO this for every var and every coord. It might cause
+    # TODO this for every var and every coord. It might cause
     # performance issues for larger datasets
     for coord in complex_dataset.coords:
         this_qubit = complex_dataset[coord].attrs['qubit']
@@ -85,7 +87,7 @@ def handle_ro_freq_optimization(complex_dataset: xarray.Dataset, states: list[in
         for var in complex_dataset.data_vars:
             if coord in complex_dataset[var].coords:
                 values.append(complex_dataset[var].values)
-        new_ds[f'y{this_qubit}'] = (('qubit_state',coord), np.vstack(values), attributes)
+        new_ds[f'y{this_qubit}'] = (('qubit_state', coord), np.vstack(values), attributes)
 
     return new_ds
 
@@ -101,4 +103,3 @@ def save_dataset(result_dataset: xarray.Dataset, node):
     result_dataset_real = to_real_dataset(result_dataset)
     # to_netcdf doesn't like complex numbers, convert to real/imag to save:
     result_dataset_real.to_netcdf(data_path / 'dataset.hdf5')
-
