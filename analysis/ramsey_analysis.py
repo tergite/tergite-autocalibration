@@ -88,7 +88,7 @@ class RamseyAnalysis():
         # self.dataset['fit_ramsey_delays'] = self.fit_ramsey_delays
         # self.dataset['fit_y'] = ('fit_ramsey_delays',fit_y)
         self.corrected_qubit_frequency = self.qubit_frequency + self.frequency_correction
-        return self.corrected_qubit_frequency
+        return [self.corrected_qubit_frequency]
 
     def plotter(self,ax):
         ax.plot(self.artificial_detunings , self.fitted_detunings,'bo',ms=5.0)

@@ -23,7 +23,7 @@ class MotzoiAnalysis():
         index_of_min = np.argmin(np.array(sums))
         self.optimal_motzoi = float(self.dataset[motzoi_key][index_of_min].values)
 
-        return self.optimal_motzoi
+        return [self.optimal_motzoi]
 
     def plotter(self,axis):
         datarray = self.dataset[f'y{self.qubit}']

@@ -92,7 +92,7 @@ class QubitSpectroscopyAnalysis():
         self.uncertainty = fit_result.params['x0'].stderr
 
         self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_freqs})
-        return self.qubit_freq
+        return [self.qubit_freq]
 
     def reject_outliers(self, x, m = 3.):
         #Filters out datapoints in x that deviate too far from the median

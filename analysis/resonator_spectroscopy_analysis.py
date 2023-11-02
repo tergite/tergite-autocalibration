@@ -50,7 +50,7 @@ class ResonatorSpectroscopyAnalysis():
                                 + fit_Ql**2 )
                       )
         
-        return self.minimum_freq
+        return [self.minimum_freq]
 
     def plotter(self,ax):
         ax.set_xlabel('Frequency (Hz)')

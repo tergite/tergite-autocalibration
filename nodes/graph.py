@@ -11,7 +11,7 @@ graph_dependencies = [
     ('resonator_spectroscopy', 'qubit_01_spectroscopy_pulsed'),
     ('resonator_spectroscopy', 'qubit_01_spectroscopy_multidim'),
     ('qubit_01_spectroscopy_pulsed', 'rabi_oscillations'),
-    ('qubit_01_spectroscopy_multidim', 'rabi_oscillations'),
+    ('qubit_01_spectroscopy_multidim', 'rabi_oscillations'), #remove this line?
     ('rabi_oscillations', 'ramsey_correction'),
     ('ramsey_correction', 'resonator_spectroscopy_1'),
     ('ramsey_correction', 'ro_frequency_optimization'),

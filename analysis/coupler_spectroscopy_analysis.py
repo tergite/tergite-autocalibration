@@ -27,7 +27,7 @@ class CouplerSpectroscopyAnalysis():
         #
         # index_of_min = np.argmin(np.array(sums))
         # self.optimal_motzoi = float(self.dataset[motzoi_key][index_of_min].values)
-        return 0
+        return [0]
 
     def plotter(self,ax):
         datarray = self.dataset[f'y{self.qubit}']

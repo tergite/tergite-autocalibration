@@ -102,7 +102,8 @@ class QubitSpectroscopyMultidim():
         #fit_result = model.fit(self.magnitudes, params=guess, x=frequencies)
 
         #self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_freqs})
-        return 0
+        return [frequencies[0],
+                amplitudes[0]]
 
     def reject_outliers(self, x, m = 3.):
         #Filters out datapoints in x that deviate too far from the median

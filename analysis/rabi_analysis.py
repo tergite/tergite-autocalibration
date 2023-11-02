@@ -83,7 +83,7 @@ class RabiAnalysis():
         self.uncertainty = fit_result.params['amp180'].stderr
 
         self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_amplitudes})
-        return self.ampl
+        return [self.ampl]
 
     def plotter(self,ax):
         # Plots the data and the fitted model of a Rabi experiment

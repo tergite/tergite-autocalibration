@@ -106,7 +106,7 @@ class Resonator_Spectroscopy_Node(Base_Node):
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = node_dictionary
-        self.redis_field = 'ro_freq'
+        self.redis_field = ['ro_freq']
         self.qubit_state = 0
         self.measurement_obj = Resonator_Spectroscopy
         self.analysis_obj = ResonatorSpectroscopyAnalysis
@@ -126,7 +126,7 @@ class Qubit_01_Spectroscopy_Pulsed_Node:
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
-        self.redis_field = 'freq_01'
+        self.redis_field = ['freq_01']
         self.qubit_state = 0
         self.measurement_obj = Two_Tones_Spectroscopy
         self.analysis_obj = QubitSpectroscopyAnalysis
@@ -145,7 +145,8 @@ class Qubit_01_Spectroscopy_Multidim_Node:
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
-        self.redis_field = 'freq_01'
+        self.redis_field = ['freq_01',
+                            'spec_pulse_amplitude']
         self.qubit_state = 0
         self.measurement_obj = Two_Tones_Multidim
         self.analysis_obj = QubitSpectroscopyMultidim
@@ -167,7 +168,7 @@ class Rabi_Oscillations_Node:
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
-        self.redis_field = 'mw_amp180'
+        self.redis_field = ['mw_amp180']
         self.qubit_state = 0
         self.measurement_obj = Rabi_Oscillations
         self.analysis_obj = RabiAnalysis
@@ -187,7 +188,7 @@ class Ramsey_Fringes_Node:
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
-        self.redis_field = 'freq_01'
+        self.redis_field = ['freq_01']
         self.qubit_state = 0
         self.measurement_obj = Ramsey_fringes
         self.analysis_obj = RamseyAnalysis
@@ -211,7 +212,7 @@ class T1_Node:
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
-        self.redis_field = 'freq_01'
+        self.redis_field = ['freq_01'] # Is this the right redis for T1?
         self.qubit_state = 0
         self.measurement_obj = T1
         self.analysis_obj = T1Analysis
@@ -228,7 +229,7 @@ class Resonator_Spectroscopy_1_Node:
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
-        self.redis_field = 'ro_freq_1'
+        self.redis_field = ['ro_freq_1']
         self.qubit_state = 1
         self.measurement_obj = Resonator_Spectroscopy
         self.analysis_obj = ResonatorSpectroscopyAnalysis
@@ -248,7 +249,7 @@ class Qubit_12_Spectroscopy_Pulsed_Node:
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
-        self.redis_field = 'freq_12'
+        self.redis_field = ['freq_12']
         self.qubit_state = 1
         self.measurement_obj = Two_Tones_Spectroscopy
         self.analysis_obj = QubitSpectroscopyAnalysis
@@ -268,7 +269,7 @@ class Rabi_Oscillations_12_Node:
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
-        self.redis_field = 'mw_ef_amp180'
+        self.redis_field = ['mw_ef_amp180']
         self.qubit_state = 1
         self.measurement_obj = Rabi_Oscillations
         self.analysis_obj = RabiAnalysis
@@ -288,7 +289,7 @@ class Coupler_Spectroscopy_Node:
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
-        self.redis_field = 'flux_quantum'
+        self.redis_field = ['flux_quantum']
         self.qubit_state = 0
         # perform 2 tones while biasing the current
         self.measurement_obj = Two_Tones_Spectroscopy
@@ -330,7 +331,7 @@ class Coupler_Resonator_Spectroscopy_Node:
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
-        self.redis_field = 'flux_quantum'
+        self.redis_field = ['flux_quantum']
         self.qubit_state = 0
         # perform 2 tones while biasing the current
         self.measurement_obj = Resonator_Spectroscopy

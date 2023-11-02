@@ -54,7 +54,7 @@ class StateDiscrimination():
         self.IQ1_positives = [IQ1_tp,IQ1_fp]
         self.IQ2_positives = [IQ2_tp,IQ2_fp]
         
-        return 0
+        return [0]
 
     def plotter(self,ax):
         IQ0_tp, IQ0_fp = self.IQ0_positives
