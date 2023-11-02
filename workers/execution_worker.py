@@ -177,4 +177,4 @@ def measure_node(
 
     logger.info('Finished measurement')
 
-    return result_dataset
+    return result_dataset,data_path

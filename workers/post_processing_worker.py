@@ -2,6 +2,7 @@
 import collections
 import matplotlib.pyplot as plt
 import xarray as xr
+
 from analysis.tof_analysis import analyze_tof
 from quantify_core.data.handling import set_datadir
 # from quantify_core.analysis.calibration import rotate_to_calibrated_axis
@@ -11,29 +12,28 @@ import redis
 import matplotlib
 matplotlib.use('tkagg')
 set_datadir('.')
-
 redis_connection = redis.Redis(decode_responses=True)
 
-
-def post_process(result_dataset: xr.Dataset, node):
-    analysis = Multiplexed_Analysis(result_dataset, node)
+def post_process(result_dataset: xr.Dataset, node: str, data_path: str):
+    analysis = Multiplexed_Analysis(result_dataset, node, data_path)
 
     # figure_manager = plt.get_current_fig_manager()
     # figure_manager.window.showMaximized()
-
     fig = plt.gcf()
     fig.set_tight_layout(True)
-    plt.show()
-    if node.name != 'tof':
-        analysis.node_result.update({'measurement_dataset': result_dataset.to_dict()})
+    fig.savefig(f'{data_path}/{node}.png', bbox_inches='tight', dpi=600)
+    plt.show(block=False)
+    plt.pause(30)
+    plt.close()
+
+    if node != 'tof':
+        analysis.node_result.update({'measurement_dataset':result_dataset.to_dict()})
 
 
 class BaseAnalysis():
-    def __init__(self, result_dataset: xr.Dataset):
+    def __init__(self, result_dataset: xr.Dataset, data_path: str):
         self.result_dataset = result_dataset
-
-        self.n_vars = len(self.result_dataset.data_vars)
-        self.n_coords = len(self.result_dataset.coords)
+        self.data_path = data_path
 
         self.fit_numpoints = 300
         self.column_grid = 3
@@ -41,7 +41,7 @@ class BaseAnalysis():
 
         self.node_result = {}
         self.fig, self.axs = plt.subplots(
-            nrows=self.rows, ncols=np.min((self.n_vars, self.n_coords, self.column_grid)), squeeze=False
+            nrows=self.rows, ncols=np.min((self.n_coords, self.column_grid)), squeeze=False,figsize=(self.column_grid*5,self.rows*5)
         )
         self.qoi = 0  # quantity of interest
 
@@ -52,12 +52,12 @@ class BaseAnalysis():
 
 
 class Multiplexed_Analysis(BaseAnalysis):
-    def __init__(self, result_dataset: xr.Dataset, node):
-        if node.name == 'tof':
+    def __init__(self, result_dataset: xr.Dataset, node: str, data_path: str):
+        if node == 'tof':
             tof = analyze_tof(result_dataset, True)
             return
 
-        super().__init__(result_dataset)
+        super().__init__(result_dataset, data_path)
         data_vars_dict = collections.defaultdict(set)
         for var in result_dataset.data_vars:
             this_qubit = result_dataset[var].attrs['qubit']
@@ -97,3 +97,31 @@ class Multiplexed_Analysis(BaseAnalysis):
             handles.append(patch)
             this_axis.set(title=None)
             this_axis.legend(handles=handles)
+            # logger.info(f'Analysis for the {node} of {this_qubit} is done, saved at {self.data_path}')
+
+#class Multiplexed_Punchout_Analysis(BaseAnalysis):
+#    def __init__(self, result_dataset: xr.Dataset, node: str):
+#        super().__init__(result_dataset)
+#        for indx, var in enumerate(result_dataset.data_vars):
+#            this_qubit = result_dataset[var].attrs['qubit']
+#            ds = result_dataset[var].to_dataset()
+#            #breakpoint()
+#
+#            N_amplitudes = ds.dims[f'ro_amplitudes{this_qubit}']
+#            # print(f'{ N_amplitudes = }')
+#            # norm_factors = np.array([max(ds.y0[ampl].values) for ampl in range(N_amplitudes)])
+#            # ds[f'y{this_qubit}'] = ds.y0 / norm_factors[:,None]
+#            raw_values = np.abs(ds[f'y{this_qubit}'].values)
+#            normalized_values = raw_values / raw_values.max(axis=0)
+#            ds[f'y{this_qubit}'].values = normalized_values
+#
+#            this_axis = self.axs[indx//self.column_grid, indx%self.column_grid]
+#
+#            ds[f'y{this_qubit}'].plot(x=f'ro_frequencies{this_qubit}', ax=this_axis)
+#            # this_axis.set_title(f'{node_name} for {this_qubit}')
+#
+#            handles, labels = this_axis.get_legend_handles_labels()
+#            patch = mpatches.Patch(color='red', label=f'{this_qubit}')
+#            handles.append(patch)
+#            this_axis.set(title=None)
+#            this_axis.legend(handles=handles)

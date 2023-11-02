@@ -3,8 +3,12 @@
 # Learn more about .gitignore:
 #     https://www.atlassian.com/git/tutorials/saving-changes/gitignore
 
+#schedules
+schedules/
+
 #user config files
-utilities/user_input.py
+# utilities/user_input.py
+# config_files/
 
 #script to scp files
 send_to_lefteris.ps1

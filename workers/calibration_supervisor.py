@@ -22,6 +22,7 @@ import toml
 import redis
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
+from matplotlib import pyplot as plt
 
 colorama_init()
 
@@ -49,6 +50,9 @@ if args.cluster_status == ClusterStatus.real:
     lab_ic.timeout(222)
 
 
+bus_list = [ [qubits[i],qubits[i+1]] for i in range(len(qubits)-1) ]
+couplers = [bus[0]+'_'+bus[1]for bus in bus_list]
+
 def calibrate_system():
     logger.info('Starting System Calibration')
     target_node = user_requested_calibration['target_node']
@@ -72,7 +76,18 @@ def calibrate_system():
                     redis_connection.hset(f'transmons:{qubit}', field_key, field_value)
             # flag for the calibration supervisor
             if not redis_connection.hexists(calibration_supervisor_key, node):
-                redis_connection.hset(f'cs:{qubit}', node, 'not_calibrated')
+                redis_connection.hset(f'cs:{qubit}', node, 'not_calibrated' )
+
+        for coupler in couplers:
+            redis_key = f'couplers:{coupler}'
+            calibration_supervisor_key = f'cs:{coupler}'
+            for field_key, field_value in node_parameters_dictionary.items():
+                # check if field already exists
+                if not redis_connection.hexists(redis_key, field_key):
+                    redis_connection.hset(f'couplers:{coupler}', field_key, field_value)
+            # flag for the calibration supervisor
+            if not redis_connection.hexists(calibration_supervisor_key, node):
+                redis_connection.hset(f'cs:{coupler}', node, 'not_calibrated' )
 
     # Populate the Redis database with the initial 'reasonable' parameter values
     for qubit in qubits:
@@ -81,6 +96,13 @@ def calibrate_system():
 
         for parameter_key, parameter_value in initial_parameters[qubit].items():
             redis_connection.hset(f"transmons:{qubit}", parameter_key, parameter_value)
+
+    for coupler in couplers:
+        for parameter_key, parameter_value in initial_parameters['all'].items():
+            redis_connection.hset(f"couplers:{coupler}", parameter_key, parameter_value)
+
+        # for parameter_key, parameter_value in initial_parameters[coupler].items():
+        #     redis_connection.hset(f"couplers:{coupler}", parameter_key, parameter_value)
 
     for node in topo_order:
         inspect_node(node)
@@ -98,9 +120,14 @@ def inspect_node(node: str):
         for parameter_key, parameter_value in initial_parameters['all'].items():
             redis_connection.hset(f"transmons:{qubit}", parameter_key, parameter_value)
 
-    # Populate the Redis database with node specific parameter values
+    for coupler in couplers:
+        for parameter_key, parameter_value in initial_parameters['all'].items():
+            redis_connection.hset(f"couplers:{coupler}", parameter_key, parameter_value)
+
+    #Populate the Redis database with node specific parameter values
     qubits_statuses = [redis_connection.hget(f"cs:{qubit}", node) == 'calibrated' for qubit in qubits]
-    # node is calibrated only when all qubits have the node calibrated:
+    coupler_statuses = [redis_connection.hget(f"cs:{coupler}", node) == 'calibrated' for coupler in couplers]
+    #node is calibrated only when all qubits have the node calibrated:
     is_node_calibrated = all(qubits_statuses)
     if node in transmon_configuration and not is_node_calibrated:
         node_specific_dict = transmon_configuration[node]['all']
@@ -108,7 +135,10 @@ def inspect_node(node: str):
             for qubit in qubits:
                 redis_connection.hset(f'transmons:{qubit}', field_key, field_value)
 
-    # Check Redis if node is calibrated
+            for coupler in couplers:
+                redis_connection.hset(f'couplers:{coupler}', field_key, field_value)
+
+    #Check Redis if node is calibrated
     status = DataStatus.undefined
 
     for qubit in qubits:
@@ -160,7 +190,7 @@ def calibrate_node(node_label: str):
     )
 
     logger.info('measurement completed')
-    post_process(result_dataset, node)
+    post_process(result_dataset, node,data_path)
     logger.info('analysis completed')
 
 
