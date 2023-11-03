@@ -18,9 +18,9 @@ omega_max = 2 * np.pi * 8.49e9
 
 def omega_tunable(phi_ratio):
     # phi_ratio = phi / phi_0
-    return omega_max * np.abs(np.cos(np.pi * phi_ratio))
+    return omega_max * np.abs(np.cos(np.pi * (phi_ratio + 0.0)))
 
-phi_ratios = np.linspace(-1, 1, 400)
+phi_ratios = np.linspace(-1, 1, 50)
 
 def eigenvalues(omega1):
     g12 = 95e6 * 2 * np.pi
@@ -79,11 +79,12 @@ plt.plot(combined_phi_ratios, np.abs(gradient_combined), 'ro-')
 plt.show()
 
 #---
-peaks, properties = signal.find_peaks(np.abs(gradient_combined), prominence=20e6, width=2)
-# plt.plot(combined_phi_ratios, np.abs(gradient_combined), 'ro-')
-# plt.plot(np.array(combined_phi_ratios)[peaks], np.abs(gradient_combined)[peaks], 'x', ms=20)
-# plt.show()
-print(f'{ peaks = }')
+
+peaks, properties = signal.find_peaks(np.abs(gradient_combined), prominence=2e6, width=1)
+plt.plot(combined_phi_ratios, np.abs(gradient_combined), 'ro-')
+plt.plot(np.array(combined_phi_ratios)[peaks], np.abs(gradient_combined)[peaks], 'x', ms=20)
+plt.show()
+# print(f'{ peaks = }')
 
 def pairwise(iterable):
     #TODO after python 3.10 this will be replaced by itertools.pairwise
@@ -93,18 +94,52 @@ def pairwise(iterable):
     next(b, None)
     return zip(a, b)
 
+above = np.array([])
+below = np.array([])
+phis_above = np.array([])
+phis_below = np.array([])
 slicing = list(pairwise(peaks))
 for slice_ in slicing:
     this_slice = slice(*slice_)
     diff = np.mean(data_combined) - np.mean(data_combined[this_slice])
-    print(diff)
+    if diff < 0 :
+        below = np.concatenate((below, data_combined[this_slice]))
+        phis_below = np.concatenate((phis_below, combined_phi_ratios[this_slice]))
+    else:
+        above = np.concatenate((above, data_combined[this_slice]))
+        phis_above = np.concatenate((phis_above, combined_phi_ratios[this_slice]))
 
-## change the coupler maximum value for guess
+# plt.plot( phis_below, below,'bo')
+# plt.plot( phis_above, above,'ro')
+# plt.show()
+#---
 
-def coupler_model(omega_max, omega2, g12):
-    pass
+##################################################
+# lmfit model
+##################################################
+def coupler_model(phi_ratios, omega_max, omega2, g12):
+    def omega_tunable(phi_ratios):
+        # phi_ratio is defined as phi / phi_0
+        return omega_max * np.abs(np.cos(np.pi * phi_ratios))
+    def eigenvalues(omega1):
+        h = hamiltonian(omega1, omega2, g12)
+        evals, _ = h.eigenstates()
+        return evals
+    omegas = omega_tunable(phi_ratios)
+    frequencies = []
+    for omega in omegas:
+        evals = eigenvalues(omega)
+
+        f_ge = (evals[1] - evals[0]) / 2 / np.pi  # frequncy from ground to 1st excited
+        if f_min < f_ge < f_max:
+            frequencies.append(f_ge)
+        else:
+            frequencies.append(3.91e9)
+    return np.array(frequencies)
+
 
 import lmfit
+import datetime
 class CouplerModel(lmfit.model.Model):
     """
     Model for data which follows a coupler function.
@@ -112,54 +147,51 @@ class CouplerModel(lmfit.model.Model):
     def __init__(self, *args, **kwargs):
         super().__init__(coupler_model, *args, **kwargs)
 
-        self.set_param_hint("wmax", vary=True)
-        self.set_param_hint("w2", vary=True)
+        self.set_param_hint("omega_max", vary=True)
+        self.set_param_hint("omega2", vary=True)
         self.set_param_hint("g12", vary=True)
-        self.set_param_hint("m", vary=True)
-        self.set_param_hint("phi_off", vary=True)
+        # self.set_param_hint("m", vary=True)
 
-    def guess(self, data, **kws) -> lmfit.parameter.Parameters | None:
-        x = kws.get("x", None)
+        # self.set_param_hint("phi_off", vary=True)
 
-        if x is None:
+    def guess(self, data, **kws) -> lmfit.parameter.Parameters:
+        phi_ratios = kws.get("phi_ratios", None)
+
+        if phi_ratios is None:
             return None
 
-        # Guess coupler max frequency value
-        omega_max_guess = 6e9* 2 * np.pi
-        self.set_param_hint("omega_max", value=omega_max_guess)
+        omega_max_guess = 8.49e9* 2 * np.pi
+        self.set_param_hint("omega_max", value=omega_max_guess, min=0)
 
         # Guess qubit 2 frequency value
-        omega2_guess = freq_flat_one* 2 * np.pi  # the value near gradient zero
-        self.set_param_hint("omega2", value=omega2_guess)
+        omega2_guess = 4e9 * 2 * np.pi  # the value near gradient zero
+        # omega2_guess = freq_flat_one* 2 * np.pi  # the value near gradient zero
+        self.set_param_hint("omega2", value=omega2_guess, min=0)
 
-        # #guess m_value
-        # bias_max=np.max(DCbias)
-        # bias_min=np.min(DCbias)
-        # size_bias=bias_max-bias_min
-        #
-        # m_guess = size_bias*2/num_avoided_cross
-        # self.set_param_hint("m", value=m_guess)
-
-        # Guess phi_offset
-        #normally phase offset is not large
-        # phi_off_guess = 0
-        # self.set_param_hint("phi_off", value=phi_off_guess)
-
-        ## guessing g12
-        # pair_obj=closest_array_items(arr1, arr2) #arr1 is higher minima arr2 is lower minima
-        # #scaling to phi
-        # angle1=(1/phi_0)*((phi_0/m_guess)*(pair_obj[0]-phi_off_guess))
-        # angle2=(1/phi_0)*((phi_0/m_guess)*(pair_obj[1]-phi_off_guess))
-        # obj1=(wmax_guess/2/pi)*abs(np.cos(angle1))
-        # obj2=(wmax_guess/2/pi)*abs(np.cos(angle2))
-        #
-        # eDistance = math.dist([obj1, freq_flat_one], [obj2, freq_flat_two])
-        #print(eDistance)
-
-        # g12_guess=(eDistance/2)* 2 * pi
-        # self.set_param_hint("g12", value=g12_guess)
-        #self.set_param_hint("g12", value=100e6*2 * pi, min=60e6*2 * pi, max=120e6*2 * pi)
+        self.set_param_hint(
+            "g12", value= 95e6 * 2 * np.pi, min=60e6 * 2 * np.pi, max=120e6 * 2 * np.pi
+        )
 
 
         params = self.make_params()
         return lmfit.models.update_param_vals(params, self.prefix, **kws)
+
+model = CouplerModel()
+# g_to_e_phi_ratios = np.array(g_to_e_phi_ratios)
+guess = model.guess(data_ge, phi_ratios=g_to_e_phi_ratios)
+
+# import cProfile
+# cProfile.run('fit_result = model.fit(data_ge, params=guess, phi_ratios=g_to_e_phi_ratios)')
+#---
+start = datetime.datetime.now()
+fit_result = model.fit(data_ge, params=guess, phi_ratios=g_to_e_phi_ratios)
+finish = datetime.datetime.now()
+print(f'{ finish - start = }')
+#---
+print(f'{ fit_result = }')
+fit_ratios = np.linspace(g_to_e_phi_ratios[0], g_to_e_phi_ratios[-1],400)
+fit_freqs = model.eval(fit_result.params, **{model.independent_vars[0]: fit_ratios})
+#---
+plt.plot(g_to_e_phi_ratios, data_ge, 'bo-')
+plt.plot(fit_ratios, fit_freqs, 'r-')
+plt.show()
