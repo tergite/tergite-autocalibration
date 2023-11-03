@@ -27,7 +27,7 @@ cz_chevron.cz_pulse_width = 4e-9
 cz_chevron.dc_flux = nan
 cz_chevron.dc_flux_offset = nan
 cz_chevron.dc_flux_0 = nan
-cz_chevron.edge_group = 0
+cz_calibration.cz_phase = nan
 
 [initials.all]
 ro_acq_delay = 200e-9

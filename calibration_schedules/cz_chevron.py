@@ -44,7 +44,7 @@ class CZ_chevron(Measurement):
             cz_pulse_amplitudes: dict[str,np.ndarray],
             cz_pulse_duration: dict[str,float],
             cz_pulse_width: dict[str,float], 
-            testing_group: int = 0,
+            testing_group: int = 1,
             repetitions: int = 1024,
         ) -> Schedule:
 
@@ -114,8 +114,8 @@ class CZ_chevron(Measurement):
         cz_pulse_frequencies_sweep_values = cz_pulse_frequencies_sweep[qubits[0]]
         cz_amplitudes_values = cz_pulse_amplitudes[qubits[0]]
         number_of_amplitudes = len(cz_amplitudes_values)
-        cz_duration, cz_width = cz_pulse_duration[qubits[0]], cz_pulse_width[qubits[0]]
-        # cz_duration, cz_width = 200e-9, 4e-9
+        # cz_duration, cz_width = cz_pulse_duration[qubits[0]], cz_pulse_width[qubits[0]]
+        cz_duration, cz_width = 200e-9, 4e-9
 
         # Add the clocks to the schedule
         for this_qubit, mw_f_val in mw_frequencies.items():

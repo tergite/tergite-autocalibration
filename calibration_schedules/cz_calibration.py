@@ -45,10 +45,11 @@ class CZ_calibration(Measurement):
             cz_pulse_amplitude: dict[str,float],
             cz_pulse_duration: dict[str,float],
             cz_pulse_width: dict[str,float], 
-            testing_group: int = 0,
-            ramsey_phases: np.ndarray = np.linspace(0, 2*np.pi, 51),
+            ramsey_phases: dict[str,np.ndarray],
+            control_ons: dict[str,np.ndarray],
+            gate_on: bool = True,
+            testing_group: int = 1,
             number_of_cz: int = 1,
-            gate_on: bool = true,
             repetitions: int = 1024,
         ) -> Schedule:
 
@@ -111,6 +112,10 @@ class CZ_calibration(Measurement):
                 bus_list.append([control,target])
                 couplers_list.append(coupler)
         control, target = np.transpose(bus_list)
+        cz_duration, cz_width = 200e-9, 4e-9
+        # placeholder for the CZ pulse frequency and amplitude
+        cz_pulse_frequency = {coupler: 0 for coupler in couplers_list_all}
+        cz_pulse_amplitude = {coupler: 0 for coupler in couplers_list_all}
 
         # Add the clocks to the schedule
         for this_qubit, mw_f_val in mw_frequencies.items():
@@ -126,31 +131,44 @@ class CZ_calibration(Measurement):
                 ClockResource(name=f'{this_coupler}.cz', freq=
                               cz_pulse_frequency[this_coupler]+4.4e9)
             )
-            self.couplers[this_coupler].cz.square_duration(cz_pulse_duration[this_coupler])
+            self.couplers[this_coupler].cz.square_duration(cz_duration)
             self.couplers[this_coupler].cz.square_amp(cz_pulse_amplitude[this_coupler])
+        
+        ramsey_phases_values = ramsey_phases[this_qubit]
+        number_of_phases = len(ramsey_phases_values)
+        control_on_values = control_ons[this_qubit]
 
-        for ramsey_index, ramsey_phase in enumerate(ramsey_phases): 
-            relaxation = schedule.add(Reset(*qubits), label=f"Reset_{cz_index}_{ramsey_index}")
-            for this_qubit in control:
-                x = schedule.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
+        for cz_index,control_on in enumerate(control_on_values):
+            for ramsey_index, ramsey_phase in enumerate(ramsey_phases_values): 
+                relaxation = schedule.add(Reset(*qubits), label=f"Reset_{cz_index}_{ramsey_index}")
+                if control_on:
+                    for this_qubit in control:
+                        x = schedule.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
+                    
+                for this_qubit in target:
+                    x90 = schedule.add(X90(this_qubit), ref_op=relaxation, ref_pt='end')
                 
-            for this_qubit in target:
-                x90 = schedule.add(X90(this_qubit), ref_op=relaxation, ref_pt='end')
-            
-            for this_bus in bus_list:
-                cz = schedule.add(CZ(this_bus[0],this_bus[1])
-                        ,ref_op=x,ref_pt="end")
-            
-            for this_qubit in control:
-                x_end = schedule.add(X(this_qubit), ref_op=cz, ref_pt='end')
+                if gate_on:
+                    pass
+                else:
+                    for this_coupler in couplers_list:
+                        self.couplers[this_coupler].cz.square_amp(0)
+
+                for this_bus in bus_list:
+                    cz = schedule.add(CZ(this_bus[0],this_bus[1])
+                            ,ref_op=x90,ref_pt="end")
+
+                if control_on:
+                    for this_qubit in control:
+                        x_end = schedule.add(X(this_qubit), ref_op=cz, ref_pt='end')
+                        
+                for this_qubit in target:
+                    x90_end = schedule.add(Rxy(theta=90, phi=ramsey_phase, qubit=this_qubit), ref_op=cz, ref_pt='end')
                 
-            for this_qubit in target:
-                x90_end = schedule.add(X90(this_qubit,phi=ramsey_phase), ref_op=cz, ref_pt='end')
-            
-            for this_qubit in qubits:
-                this_index = cz_index*number_of_amplitudes+ramsey_index
-                schedule.add(Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
-                                ref_op=x_end, ref_pt="end",)
+                for this_qubit in qubits:
+                    this_index = cz_index*number_of_phases+ramsey_index
+                    schedule.add(Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
+                                    ref_op=x90_end, ref_pt="end",)
                 # schedule.add(Reset(this_qubit))
         # Add calibration points
         # relaxation_calib = schedule.add(Reset(*qubits), label=f"Reset_Calib")

@@ -146,7 +146,7 @@ def precompile(node:str, qubits: list[str], samplespace: dict[str,dict[str,np.nd
         qubit_state = 1
     if node in ['resonator_spectroscopy_2', 'ro_frequency_optimization_gef']:
         qubit_state = 2
-    if node in ['cz_chevron']:
+    if node in ['cz_chevron', 'cz_calibration']:
         node_class = node_map[node](transmons, couplers, qubit_state)
     else:
         node_class = node_map[node](transmons, qubit_state)

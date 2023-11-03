@@ -157,7 +157,7 @@ class Multiplexed_Analysis(BaseAnalysis):
                 redis_field = 'cz_pulse_frequency'
             elif node == 'cz_calibration':
                 analysis_class = CZCalibrationAnalysis
-                redis_field = 'cz_pulse_amplitude'
+                redis_field = 'cz_phase'
             else:
                 raise ValueError(f'Invalid node: {node}')
 
