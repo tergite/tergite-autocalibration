@@ -5,6 +5,7 @@ import xarray as xr
 from analysis.motzoi_analysis import MotzoiAnalysis
 from analysis.n_rabi_analysis import NRabiAnalysis
 from analysis.cz_chevron_analysis import CZChevronAnalysis
+from analysis.cz_calibration_analysis import CZCalibrationAnalysis
 from analysis.resonator_spectroscopy_analysis import ResonatorSpectroscopyAnalysis, ResonatorSpectroscopy_1_Analysis, ResonatorSpectroscopy_2_Analysis
 from analysis.qubit_spectroscopy_analysis import QubitSpectroscopyAnalysis
 from analysis.qubit_spectroscopy_multidim import QubitSpectroscopyMultidim
@@ -154,6 +155,9 @@ class Multiplexed_Analysis(BaseAnalysis):
             elif node == 'cz_chevron':
                 analysis_class = CZChevronAnalysis
                 redis_field = 'cz_pulse_frequency'
+            elif node == 'cz_calibration':
+                analysis_class = CZCalibrationAnalysis
+                redis_field = 'cz_pulse_amplitude'
             else:
                 raise ValueError(f'Invalid node: {node}')
 

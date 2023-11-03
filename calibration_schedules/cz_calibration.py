@@ -12,10 +12,9 @@ from utilities.QPU_connections_visualization import edge_group
 from scipy.signal import gaussian
 from scipy import signal
 from matplotlib import pyplot as plt
-
 import numpy as np
 
-class CZ_chevron(Measurement):
+class CZ_calibration(Measurement):
 
     def __init__(self,transmons,couplers,qubit_state:int=0):
         super().__init__(transmons)
@@ -30,6 +29,8 @@ class CZ_chevron(Measurement):
             'mw_frequencies_12': self.attributes_dictionary('f12'),
             'cz_pulse_duration': self.attributes_dictionary('cz_pulse_duration'),
             'cz_pulse_width': self.attributes_dictionary('cz_pulse_width'),
+            'cz_pulse_frequency': self.attributes_dictionary('cz_pulse_frequency'),
+            'cz_pulse_amplitude': self.attributes_dictionary('cz_pulse_amplitude'),
         }
 
     def schedule_function(
@@ -40,11 +41,14 @@ class CZ_chevron(Measurement):
             mw_frequencies_12: dict[str,float],
             mw_pulse_ports: dict[str,str],
             mw_pulse_durations: dict[str,float],
-            cz_pulse_frequencies_sweep: dict[str,np.ndarray],
-            cz_pulse_amplitudes: dict[str,np.ndarray],
+            cz_pulse_frequency: dict[str,float],
+            cz_pulse_amplitude: dict[str,float],
             cz_pulse_duration: dict[str,float],
             cz_pulse_width: dict[str,float], 
             testing_group: int = 0,
+            ramsey_phases: np.ndarray = np.linspace(0, 2*np.pi, 51),
+            number_of_cz: int = 1,
+            gate_on: bool = true,
             repetitions: int = 1024,
         ) -> Schedule:
 
@@ -79,8 +83,12 @@ class CZ_chevron(Measurement):
             The duration of the CZ pulse.
         cz_pulse_width
             The width of the CZ pulse.
+        number_of_cz
+            The number of CZ pulses to be applied.
         testing_group
             The edge group to be tested. 0 means all edges.
+        ramsey_phases
+            the phase of the second pi/2 pulse.
         repetitions
             The amount of times the Schedule will be repeated.
 
@@ -90,7 +98,7 @@ class CZ_chevron(Measurement):
             An experiment schedule.
         """
         schedule = Schedule("CZ_chevron",repetitions)
-        
+
         couplers_list_all = edge_group.keys()
         couplers_list,bus_list = [],[]
         for coupler in couplers_list_all:
@@ -104,19 +112,6 @@ class CZ_chevron(Measurement):
                 couplers_list.append(coupler)
         control, target = np.transpose(bus_list)
 
-        freq_cz = {}
-        for bus_pair in bus_list:
-            f11=mw_frequencies[bus_pair[0]]+mw_frequencies[bus_pair[1]]
-            f20=mw_frequencies_12[bus_pair[0]]+mw_frequencies_12[bus_pair[0]]
-            f02=mw_frequencies_12[bus_pair[1]]+mw_frequencies_12[bus_pair[1]]
-            freq_cz[bus_pair[0]+'_'+bus_pair[1]] = np.min(np.abs(np.array([f20,f02])-f11))
-
-        cz_pulse_frequencies_sweep_values = cz_pulse_frequencies_sweep[qubits[0]]
-        cz_amplitudes_values = cz_pulse_amplitudes[qubits[0]]
-        number_of_amplitudes = len(cz_amplitudes_values)
-        cz_duration, cz_width = cz_pulse_duration[qubits[0]], cz_pulse_width[qubits[0]]
-        # cz_duration, cz_width = 200e-9, 4e-9
-
         # Add the clocks to the schedule
         for this_qubit, mw_f_val in mw_frequencies.items():
             schedule.add_resource(
@@ -129,37 +124,34 @@ class CZ_chevron(Measurement):
         for this_coupler in couplers_list:
             schedule.add_resource(
                 ClockResource(name=f'{this_coupler}.cz', freq=
-                              freq_cz[this_coupler]+cz_pulse_frequencies_sweep[qubits[0]][0]+4.4e9)
+                              cz_pulse_frequency[this_coupler]+4.4e9)
             )
+            self.couplers[this_coupler].cz.square_duration(cz_pulse_duration[this_coupler])
+            self.couplers[this_coupler].cz.square_amp(cz_pulse_amplitude[this_coupler])
 
-        #This is the common reference operation so the qubits can be operated in parallel
-
-        for this_coupler in self.couplers.values():
-            this_coupler.cz.square_duration(cz_duration)
-
-        for cz_index, cz_frequency_sweep in enumerate(cz_pulse_frequencies_sweep_values):
-            for this_coupler in couplers_list:
-                cz_clock = f'{this_coupler}.cz'
-                cz_pulse_ports = f'{this_coupler}:fl'
-                set_frequency = schedule.add(
-                        SetClockFrequency(clock=cz_clock, clock_freq_new=freq_cz[this_coupler]+cz_frequency_sweep+4.4e9),
-                        label=f"set_freq_{this_coupler}_{cz_index}"
-                    )
-            for cz_amplitude_index, cz_amplitude in enumerate(cz_amplitudes_values): 
-                relaxation = schedule.add(Reset(*qubits), label=f"Reset_{cz_index}_{cz_amplitude_index}")
-                for this_qubit in qubits:
-                    x = schedule.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
+        for ramsey_index, ramsey_phase in enumerate(ramsey_phases): 
+            relaxation = schedule.add(Reset(*qubits), label=f"Reset_{cz_index}_{ramsey_index}")
+            for this_qubit in control:
+                x = schedule.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
                 
-                for this_bus in bus_list:
-                    self.couplers[this_bus[0]+'_'+this_bus[1]].cz.square_amp(cz_amplitude)
-                    cz = schedule.add(CZ(this_bus[0],this_bus[1])
-                            ,ref_op=x,ref_pt="end")
+            for this_qubit in target:
+                x90 = schedule.add(X90(this_qubit), ref_op=relaxation, ref_pt='end')
+            
+            for this_bus in bus_list:
+                cz = schedule.add(CZ(this_bus[0],this_bus[1])
+                        ,ref_op=x,ref_pt="end")
+            
+            for this_qubit in control:
+                x_end = schedule.add(X(this_qubit), ref_op=cz, ref_pt='end')
                 
-                for this_qubit in qubits:
-                    this_index = cz_index*number_of_amplitudes+cz_amplitude_index
-                    schedule.add(Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
-                                    ref_op=cz, ref_pt="end",)
-                #     # schedule.add(Reset(this_qubit))
+            for this_qubit in target:
+                x90_end = schedule.add(X90(this_qubit,phi=ramsey_phase), ref_op=cz, ref_pt='end')
+            
+            for this_qubit in qubits:
+                this_index = cz_index*number_of_amplitudes+ramsey_index
+                schedule.add(Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
+                                ref_op=x_end, ref_pt="end",)
+                # schedule.add(Reset(this_qubit))
         # Add calibration points
         # relaxation_calib = schedule.add(Reset(*qubits), label=f"Reset_Calib")
         # for this_qubit in qubits:

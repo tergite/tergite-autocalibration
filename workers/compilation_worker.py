@@ -21,6 +21,7 @@ from calibration_schedules.state_discrimination import Single_Shots_RO
 from calibration_schedules.n_rabi_oscillations import N_Rabi_Oscillations
 from calibration_schedules.motzoi_parameter import Motzoi_parameter
 from calibration_schedules.cz_chevron import CZ_chevron
+from calibration_schedules.cz_calibration import CZ_calibration
 from utilities.extended_transmon_element import ExtendedTransmon
 from utilities.extended_coupler_edge import CompositeSquareEdge
 from quantify_scheduler.backends import SerialCompiler
@@ -56,6 +57,7 @@ node_map = {
     'ro_amplitude_optimization': RO_amplitude_optimization,
     'state_discrimination': Single_Shots_RO,
     'cz_chevron': CZ_chevron,
+    'cz_calibration': CZ_calibration,
 
 }
 

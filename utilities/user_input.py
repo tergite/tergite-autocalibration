@@ -168,8 +168,15 @@ def experiment_parameters(node:str, qubits:List[str], dummy:bool=False) -> dict:
         'cz_chevron': {
             'cz_pulse_frequencies_sweep': {qubit: np.linspace(-50e6,50e6,5) for qubit in qubits},
             'cz_pulse_amplitudes': {qubit: np.linspace(0.0,0.001,7) for qubit in qubits},
-            # 'cz_pulse_duration': {qubit: 200e-9 for qubit in qubits},
-            # 'cz_pulse_width': {qubit: 4e-9 for qubit in qubits},
+            # 'testing_group': 0,
+            # 'cz_pulse_duration': 200e-9,
+            # 'cz_pulse_width': 4e-9,
+        }
+        'CZ_calibration': {
+            'ramsey_phases': {qubit: np.linspace(0, 2*np.pi, 51) for qubit in qubits},
+            # 'testing_group': 0,
+            # 'cz_pulse_duration': 200e-9,
+            # 'cz_pulse_width': 4e-9,
         }
     }
     return sweep_parameters

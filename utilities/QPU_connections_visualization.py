@@ -17,23 +17,37 @@ class QPU_element:
         self.IF: float
 
 QPU = [
-        # QPU_element('q11', 'D6', 1, (0,2)),
-        # QPU_element('q12', 'A1', 2, (1,2)),
-        # QPU_element('q13', 'A5', 3, (2,2)),
-        # QPU_element('q14', 'A9', 4, (3,2)),
-        # QPU_element('q15', 'D4', 5, (4,2)),
-        QPU_element('q16', 'A3', 1, (0,1)),
-        QPU_element('q17', 'D2', 2, (1,1)),
-        QPU_element('q18', 'A2', 3, (2,1)),
-        QPU_element('q19', 'D3', 4, (3,1)),
-        QPU_element('q20', 'A8', 5, (4,1)),
-        QPU_element('q21', 'D5', 6, (0,0)),
-        QPU_element('q22', 'A4', 7, (1,0)),
-        QPU_element('q23', 'A6', 8, (2,0)),
-        QPU_element('q24', 'D7', 9, (3,0)),
-        QPU_element('q25', 'A7', 10,(4,0)),
+        QPU_element('q11', 'D6', 1, (0,2)),
+        QPU_element('q12', 'A1', 2, (1,2)),
+        QPU_element('q13', 'A5', 3, (2,2)),
+        QPU_element('q14', 'A9', 4, (3,2)),
+        QPU_element('q15', 'D4', 5, (4,2)),
+        QPU_element('q16', 'A3', 6, (0,1)),
+        QPU_element('q17', 'D2', 7, (1,1)),
+        QPU_element('q18', 'A2', 8, (2,1)),
+        QPU_element('q19', 'D3', 9, (3,1)),
+        QPU_element('q20', 'A8', 10, (4,1)),
+        QPU_element('q21', 'D5', 11, (0,0)),
+        QPU_element('q22', 'A4', 12, (1,0)),
+        QPU_element('q23', 'A6', 13, (2,0)),
+        QPU_element('q24', 'D7', 14, (3,0)),
+        QPU_element('q25', 'A7', 15,(4,0)),
       ]
 
+# edge = {{'q11_q12':1},{'q12_q13':2},{'q13_q14':1},{'q14_q15':2},
+#         {'q11_q16':3},{'q12_q17':4},{'q13_q18':3},{'q14_q19':4},{'q15_q20':3},
+#         {'q16_q17':5},{'q17_q18':6},{'q18_q19':5},{'q19_q20':6},
+#         {'q16_q21':7},{'q17_q22':8},{'q18_q23':7},{'q19_q24':8},{'q20_q25':7},
+#         {'q21_q22':9},{'q22_q23':10},{'q23_q24':9},{'q24_q25':10},
+#         }
+
+# edge_group = [[1,6,9],[2,5,10],[3,8],[4,7]]
+
+edge_group = {'q11_q12':1,'q12_q13':2,'q13_q14':1,'q14_q15':2,
+        'q11_q16':3,'q12_q17':4,'q13_q18':3,'q14_q19':4,'q15_q20':3,
+        'q16_q17':2,'q17_q18':1,'q18_q19':2,'q19_q20':1,
+        'q16_q21':4,'q17_q22':3,'q18_q23':4,'q19_q24':3,'q20_q25':4,
+        'q21_q22':1,'q22_q23':2,'q23_q24':1,'q24_q25':2}
 
 def distance(element_1, element_2) -> int:
      x_distance = np.abs(element_1.grid_coords[0] - element_2.grid_coords[0])
@@ -86,13 +100,13 @@ def hits_neighbors(qubit:str, lo_freq:float):
             if np.abs(harmonic_freq-neighbour_f12) < collision_tol:
                 print(f'{qubit} harmonic {harmonic} hits neighbour_f12: {neighbour_f12} of {neighbour_qubit} at distance {(neighbour_f12-harmonic_freq)/1e6}MHz')
 
-group_qubits = ['q18', 'q19', 'q20', 'q23', 'q24', 'q25']
+group_qubits = ['q11', 'q12', 'q13', 'q14', 'q15', 'q16', 'q17','q18', 'q19', 'q20', 'q23', 'q24', 'q25']
 [hits_neighbors(q, LO_group) for q in group_qubits]
 
-hits_neighbors('q16', LO_16)
-hits_neighbors('q17', LO_17)
-hits_neighbors('q21', LO_21)
-hits_neighbors('q22', LO_22)
+# hits_neighbors('q16', LO_16)
+# hits_neighbors('q17', LO_17)
+# hits_neighbors('q21', LO_21)
+# hits_neighbors('q22', LO_22)
 
 
 
@@ -105,7 +119,7 @@ for element in QPU:
     y_coord *= 1.6
     ax.add_patch(Rectangle((x_coord,y_coord),1,1.2,color='dodgerblue', alpha=0.5))
     ann_text = f'{element.label}\nmodule{element.module}\n{element.XY_line}\n'
-    ann_text += f'{element.res_freq:.3e}\n{element.qubit_freq:.3e}\nLO:{element.LO/1e9:.3f}\nIF:{element.IF/1e6:.0f}'
+    # ann_text += f'{element.res_freq:.3e}\n{element.qubit_freq:.3e}\nLO:{element.LO/1e9:.3f}\nIF:{element.IF/1e6:.0f}'
     ann_style = {'fontsize': 14, 'fontweight': 'roman'}
     ax.annotate(ann_text, (x_coord,y_coord), **ann_style)
 ax.set_xlim(left = 0, right = 5*1.6 - 0.6)
