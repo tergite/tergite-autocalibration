@@ -80,5 +80,4 @@ artificial_detuning = 3e6
 artificial_detuning = 3e6
 
 [qubit_12_spectroscopy_pulsed.all]
-spec_pulse_duration = 2.0e-6
-spec_amp = 3.5e-4
+spec_pulse_duration = 90.0e-6
