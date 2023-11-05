@@ -18,9 +18,9 @@ omega_max = 2 * np.pi * 8.49e9
 
 def omega_tunable(phi_ratio):
     # phi_ratio = phi / phi_0
-    return omega_max * np.abs(np.cos(np.pi * (phi_ratio + 0.0)))
+    return omega_max * np.abs(np.cos(np.pi * (phi_ratio - 0.2)))
 
-phi_ratios = np.linspace(-1, 1, 50)
+phi_ratios = np.linspace(-1, 1, 60)
 
 def eigenvalues(omega1):
     g12 = 95e6 * 2 * np.pi
@@ -57,13 +57,84 @@ plt.plot(g_to_f_phi_ratios, g_to_f_frequencies, 'go-')
 plt.show()
 
 #---
+from numpy.polynomial.polynomial import Polynomial
+def pairwise(iterable):
+    #TODO after python 3.10 this will be replaced by itertools.pairwise
+    # pairwise('ABCDEFG') --> AB BC CD DE EF FG
+    iterable = [0] + list(iterable) + [len(data_combined)]
+    a, b = tee(iterable)
+    next(b, None)
+    return zip(a, b)
+
 data_ge = np.array(g_to_e_frequencies) + np.random.random(len(g_to_e_frequencies)) * 5e6
 data_gf = np.array(g_to_f_frequencies) + np.random.random(len(g_to_f_frequencies)) * 5e6
 data_combined = np.array(combined_frequencies) + np.random.random(len(combined_frequencies)) * 5e6
 
+diffs = np.abs(np.diff(data_combined))
+min_diff_index = np.argmin(diffs)
+# plt.plot( np.abs(diffs),'bo-')
+peaks, properties = signal.find_peaks(diffs, prominence= 10e6, width=0)
+# plt.plot(
+#     np.array(range(len(diffs)))[peaks], np.abs(diffs)[peaks],'rx'
+# )
+# plt.plot(combined_phi_ratios, data_combined,'bo-')
+plt.axvline(np.array(combined_phi_ratios)[min_diff_index], lw=2, c='green')
+for peak in peaks:
+    plt.axvline(np.array(combined_phi_ratios)[peak], lw=2, c='red')
+# plt.show()
+d1 = np.array(combined_phi_ratios)[2] - np.array(combined_phi_ratios)[0]
+d2 = np.array(combined_phi_ratios)[3] - np.array(combined_phi_ratios)[1]
+above = np.array([])
+below = np.array([])
+phis_above = np.array([])
+phis_below = np.array([])
+slicing = list(pairwise(peaks))
+plt.show()
+for slice_ in slicing:
+    for peak in peaks:
+        plt.axvline(np.array(combined_phi_ratios)[peak], lw=2, c='red')
+    this_slice = slice(*slice_)
+    phis = np.array(combined_phi_ratios[this_slice])
+    phis_space = np.linspace(phis[0], phis[-1], 100)
+    data = np.array(data_combined[this_slice])
+    poly_fit = Polynomial.fit(phis, data, 2)
+    print( poly_fit)
+    print(f'{ poly_fit = }')
+    print(poly_fit(np.array([0,0.2])))
+    print( )
+    plt.plot( phis_space, poly_fit(phis_space),'bo-')
+    plt.plot( phis, data, 'ro')
+    plt.show()
+
+    # diff = np.mean(data_combined) - np.mean(data_combined[this_slice])
+    # if diff < 0 :
+    #     below = np.concatenate((below, data_combined[this_slice]))
+    #     phis_below = np.concatenate((phis_below, combined_phi_ratios[this_slice]))
+    # else:
+    #     above = np.concatenate((above, data_combined[this_slice]))
+    #     phis_above = np.concatenate((phis_above, combined_phi_ratios[this_slice]))
 #---
-plt.plot(g_to_e_phi_ratios, data_ge, 'bo-')
-plt.plot(g_to_f_phi_ratios, data_gf, 'go-')
+from scipy.interpolate import splrep,splprep, splev, BSpline
+from scipy.signal import find_peaks_cwt
+from scipy import signal
+tck = splrep(combined_phi_ratios, data_combined / 1e9,s=0)
+tck50 = splrep(combined_phi_ratios, data_combined / 1e9,s=0., quiet=0)
+fit_ratios = np.linspace(combined_phi_ratios[0], combined_phi_ratios[-1],200)
+yder = splev(fit_ratios, tck50, der=1)
+
+win = signal.windows.boxcar(5)
+# winb = signal.windows.boxcar(20)
+filtered = signal.convolve(np.abs(yder), win, mode='same') / np.sum(win)
+# filteredb = signal.convolve(np.abs(yder), winb, mode='same') / np.sum(win)
+# plt.plot(g_to_e_phi_ratios, data_ge, 'bo')
+# plt.plot(g_to_f_phi_ratios, data_gf, 'go')
+# plt.plot(combined_phi_ratios, data_combined / 1e9, 'go')
+# plt.plot(fit_ratios, BSpline(*tck)(fit_ratios), '-')
+# plt.plot(fit_ratios, BSpline(*tck50)(fit_ratios), '.')
+plt.plot(fit_ratios, np.abs(yder), 'r-')
+plt.plot(fit_ratios, filtered, 'g-')
+# plt.plot(fit_ratios, filteredb, 'b-')
+# plt.plot(fit_ratios[peaks2], np.abs(yder)[peaks2], 'x')
 plt.show()
 
 #---
