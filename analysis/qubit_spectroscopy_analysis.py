@@ -109,7 +109,7 @@ class QubitSpectroscopyAnalysis():
 
     def has_peak(self, prom_coef: float = 10, wid_coef: float = 2.4, outlier_median: float = 3.):
         # Determines if the data contains one distinct peak or only noise
-        x = self.S21
+        x = np.abs(self.S21)
         x_filtered = self.reject_outliers(x, outlier_median)
         self.filtered_std = np.std(x_filtered)
         peaks, properties = signal.find_peaks(

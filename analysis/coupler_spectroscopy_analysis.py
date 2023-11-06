@@ -13,7 +13,7 @@ class CouplerSpectroscopyAnalysis():
                 self.frequencies = coord
             elif 'currents' in coord:
                 self.currents = coord
-        # dataset[f'y{self.qubit}'].values = np.abs(self.S21)
+        dataset[f'y{self.qubit}'].values = np.abs(self.S21)
         self.data_var = data_var
         self.dataset = dataset
 

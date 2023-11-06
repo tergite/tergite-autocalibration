@@ -51,7 +51,7 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 
 def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
-    qub_spec_samples = 85
+    qub_spec_samples = 65
     sweep_range = 4.5e6
     if transition == '01':
         VNA_frequency = VNA_qubit_frequencies[qubit]
@@ -353,7 +353,7 @@ class Coupler_Spectroscopy_Node:
     @property
     def spi_samplespace(self):
         spi_samplespace = {
-            'dc_currents': {self.coupler: np.arange(-7.0e-4, -1e-4, 10e-6)},
+            'dc_currents': {self.coupler: np.arange(-3.0e-3, 3.0e-3, 125e-6)},
         }
         return spi_samplespace
 
