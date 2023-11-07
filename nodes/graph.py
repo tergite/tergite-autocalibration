@@ -1,4 +1,5 @@
 import networkx as nx
+import matplotlib.pyplot as plt
 
 graph = nx.DiGraph()
 
@@ -8,6 +9,7 @@ graph = nx.DiGraph()
 graph_dependencies = [
     ('tof', 'resonator_spectroscopy'),
     ('resonator_spectroscopy', 'coupler_spectroscopy'),
+    ('resonator_spectroscopy', 'coupler_resonator_spectroscopy'),
     ('resonator_spectroscopy', 'qubit_01_spectroscopy_pulsed'),
     ('resonator_spectroscopy', 'qubit_01_spectroscopy_multidim'),
     ('qubit_01_spectroscopy_pulsed', 'rabi_oscillations'),
@@ -21,6 +23,7 @@ graph_dependencies = [
     ('resonator_spectroscopy_1', 'qubit_12_spectroscopy_pulsed'),
     ('qubit_12_spectroscopy_pulsed', 'rabi_oscillations_12'),
     ('rabi_oscillations_12', 'ramsey_correction_12'),
+    ('ramsey_correction_12', 'ro_frequency_optimization_gef'),
 ]
 
 graph.add_edges_from(graph_dependencies)
@@ -35,15 +38,21 @@ graph.add_node('ramsey_correction_12', type='refine')
 graph.add_node('ro_frequency_optimization', type='refine')
 graph.add_node('ro_amplitude_optimization', type='refine')
 
-# for nodes that perform the same measurement, 
+# for nodes that perform the same measurement,
 # assign a weight to the corresponding edge to sort them
 graph['resonator_spectroscopy']['qubit_01_spectroscopy_pulsed']['weight'] = 1
 graph['resonator_spectroscopy']['qubit_01_spectroscopy_multidim']['weight'] = 2
+
+# nx.draw_spring(graph, with_labels=True, k=1)
+nx.draw(graph, pos=nx.spring_layout(graph, k=0.3), with_labels=True)
+plt.show()
 
 all_nodes = list(nx.topological_sort(graph))
 
 # TODO add condition argument and explanation
 def filtered_topological_order(target_node: str):
+    if target_node == 'new_node':
+        topo_order = ['new_node']
     if target_node == 'punchout':
         topo_order = ['punchout']
     else:
