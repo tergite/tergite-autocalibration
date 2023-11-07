@@ -20,6 +20,7 @@ from colorama import Style
 from utilities.user_input import user_requested_calibration
 import toml
 import redis
+from matplotlib import pyplot as plt
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 
@@ -52,6 +53,9 @@ qubits = user_requested_calibration['all_qubits']
 bus_list = [[qubits[i], qubits[i+1]] for i in range(len(qubits) - 1)]
 couplers = [bus[0] + '_' + bus[1] for bus in bus_list]
 
+bus_list = [ [qubits[i],qubits[i+1]] for i in range(len(qubits)-1) ]
+couplers = [bus[0]+'_'+bus[1]for bus in bus_list]
+
 def calibrate_system():
     logger.info('Starting System Calibration')
     target_node = user_requested_calibration['target_node']
@@ -75,6 +79,17 @@ def calibrate_system():
             # flag for the calibration supervisor
             if not redis_connection.hexists(calibration_supervisor_key, node):
                 redis_connection.hset(f'cs:{qubit}', node, 'not_calibrated' )
+        
+        for coupler in couplers:
+            redis_key = f'couplers:{coupler}'
+            calibration_supervisor_key = f'cs:{coupler}'
+            for field_key, field_value in node_parameters_dictionary.items():
+                # check if field already exists
+                if not redis_connection.hexists(redis_key, field_key):
+                    redis_connection.hset(f'couplers:{coupler}', field_key, field_value)
+            # flag for the calibration supervisor
+            if not redis_connection.hexists(calibration_supervisor_key, node):
+                redis_connection.hset(f'cs:{coupler}', node, 'not_calibrated' )
 
         for coupler in couplers:
             redis_key = f'couplers:{coupler}'
@@ -165,14 +180,13 @@ def calibrate_node(node_label: str):
     qubits = user_requested_calibration['all_qubits']
     node_dictionary = user_requested_calibration['node_dictionary']
 
-    # dummy = False
-    # if args.cluster_status == ClusterStatus.dummy:
-    #     dummy = True
-    #
-    # if args.cluster_status == ClusterStatus.dummy:
-    #     clusterA = dummy_cluster(samplespace)
-    #     lab_ic = InstrumentCoordinator('lab_ic')
-    #     lab_ic.add_component(ClusterComponent(clusterA))
+    # Load the latest transmons state onto the job
+    device_config = {}
+    for qubit in qubits:
+        device_config[qubit] = redis_connection.hgetall(f"transmons:{qubit}")
+    
+    for coupler in couplers:
+        device_config[coupler] = redis_connection.hgetall(f"couplers:{coupler}")
 
     # node = Node(node_label, qubits, node_dictionary)
 

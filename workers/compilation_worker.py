@@ -118,7 +118,7 @@ def precompile(node):
         qubit_state = 1
     if node in ['resonator_spectroscopy_2', 'ro_frequency_optimization_gef']:
         qubit_state = 2
-    if node in ['cz_chevron']:
+    if node in ['cz_chevron', 'cz_calibration']:
         node_class = node_map[node](transmons, couplers, qubit_state)
     else:
         node_class = node_map[node](transmons, qubit_state)
@@ -126,7 +126,7 @@ def precompile(node):
     static_parameters = node_class.static_kwargs
 
     compiler = SerialCompiler(name=f'{node}_compiler')
-
+    
 
     if 'qubit_states' in samplespace: #this means we have single shots
         shots = 1
@@ -183,7 +183,7 @@ def precompile(node):
                 schedule_durations.append(compiled_schedule.get_schedule_duration())
                 samplespaces.append(partial_samplespace)
             return compiled_schedules, schedule_durations, samplespaces
-
+    
     schedule = schedule_function(**static_parameters, **samplespace)
     compilation_config = device.generate_compilation_config()
     logger.info('Starting Compiling')

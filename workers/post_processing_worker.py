@@ -2,7 +2,6 @@
 import collections
 import matplotlib.pyplot as plt
 import xarray as xr
-
 from analysis.tof_analysis import analyze_tof
 from quantify_core.data.handling import set_datadir
 # from quantify_core.analysis.calibration import rotate_to_calibrated_axis

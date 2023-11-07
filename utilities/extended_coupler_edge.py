@@ -100,6 +100,15 @@ class CZ(InstrumentChannel):
             unit="A",
             vals=Numbers(min_value=-3e-3, max_value=3e-3, allow_nan=True),
         )
+        
+        self.edge_group = ManualParameter(
+            name="edge_group",
+            instrument=self,
+            label=r"Group assignment for the edge",
+            initial_value=0,
+            unit="",
+            vals=Numbers(min_value=-10, max_value=10, allow_nan=True),
+        )
 
 
 
