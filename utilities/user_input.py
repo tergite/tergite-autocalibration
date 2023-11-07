@@ -27,7 +27,7 @@ nodes = [
         #"ro_amplitude_optimization",
         #"state_discrimination",
         "cz_chevron",
-        "cz_calibration",
+        # "cz_calibration",
         ]
 
 qubits = [ 'q11','q12','q13','q14','q15']
@@ -167,14 +167,14 @@ def experiment_parameters(node:str, qubits:List[str], dummy:bool=False) -> dict:
             'qubit_states': {qubit: np.random.randint(0,high=2,size=700) for qubit in qubits},
         },
         'cz_chevron': {
-            'cz_pulse_frequencies_sweep': {qubit: np.linspace(-50e6,50e6,3) for qubit in qubits},
-            'cz_pulse_amplitudes': {qubit: np.linspace(0.0,0.001,5) for qubit in qubits},
+            'cz_pulse_amplitudes': {qubit: np.linspace(0.0,0.8,21) for qubit in qubits},
+            'cz_pulse_frequencies_sweep': {qubit: np.linspace(-50e6,50e6,5) for qubit in qubits}, # for mock data
             # 'testing_group': 1,
             # 'cz_pulse_duration': 200e-9,
             # 'cz_pulse_width': 4e-9,
         },
         'cz_calibration': {
-            'ramsey_phases': {qubit: np.linspace(0, 2*np.pi, 5) for qubit in qubits},
+            'ramsey_phases': {qubit: np.linspace(0, 3*360, 51) for qubit in qubits},
             'control_ons': {qubit: [False,True] for qubit in qubits},
             # 'testing_group': 1,
             # 'cz_pulse_duration': 200e-9,

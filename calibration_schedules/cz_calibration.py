@@ -150,6 +150,7 @@ class CZ_calibration(Measurement):
                 
                 if gate_on:
                     pass
+                    # add ramsey on control qubit
                 else:
                     for this_coupler in couplers_list:
                         self.couplers[this_coupler].cz.square_amp(0)
