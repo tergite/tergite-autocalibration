@@ -12,6 +12,7 @@ node reference
   resonator_spectroscopy_1
   qubit_12_spectroscopy_pulsed
   rabi_oscillations_12
+  resonator_spectroscopy_2
   coupler_spectroscopy
   coupler_resonator_spectroscopy
   T1

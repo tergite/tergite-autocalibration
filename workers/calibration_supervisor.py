@@ -22,7 +22,6 @@ import toml
 import redis
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
-from matplotlib import pyplot as plt
 
 colorama_init()
 
@@ -49,14 +48,13 @@ if args.cluster_status == ClusterStatus.real:
     lab_ic.add_component(ClusterComponent(clusterA))
     lab_ic.timeout(222)
 
-
-bus_list = [ [qubits[i],qubits[i+1]] for i in range(len(qubits)-1) ]
-couplers = [bus[0]+'_'+bus[1]for bus in bus_list]
+qubits = user_requested_calibration['all_qubits']
+bus_list = [[qubits[i], qubits[i+1]] for i in range(len(qubits) - 1)]
+couplers = [bus[0] + '_' + bus[1] for bus in bus_list]
 
 def calibrate_system():
     logger.info('Starting System Calibration')
     target_node = user_requested_calibration['target_node']
-    qubits = user_requested_calibration['all_qubits']
     topo_order = filtered_topological_order(target_node)
     N_qubits = len(qubits)
     draw_arrow_chart(f'Qubits: {N_qubits}', topo_order)

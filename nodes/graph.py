@@ -24,6 +24,8 @@ graph_dependencies = [
     ('qubit_12_spectroscopy_pulsed', 'rabi_oscillations_12'),
     ('rabi_oscillations_12', 'ramsey_correction_12'),
     ('ramsey_correction_12', 'ro_frequency_optimization_gef'),
+    ('qubit_12_spectroscopy_pulsed', 'cz_chevron'),
+    ('coupler_spectroscopy', 'cz_chevron'),
 ]
 
 graph.add_edges_from(graph_dependencies)

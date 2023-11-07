@@ -12,6 +12,7 @@ from calibration_schedules.ro_amplitude_optimization import RO_amplitude_optimiz
 from calibration_schedules.state_discrimination import Single_Shots_RO
 # from calibration_schedules.drag_amplitude import DRAG_amplitude
 from calibration_schedules.motzoi_parameter import Motzoi_parameter
+from calibration_schedules.cz_chevron import CZ_chevron
 
 from analysis.motzoi_analysis import MotzoiAnalysis
 from analysis.resonator_spectroscopy_analysis import (
@@ -33,8 +34,8 @@ from analysis.ramsey_analysis import RamseyAnalysis
 from analysis.tof_analysis import analyze_tof
 from analysis.T1_analysis import T1Analysis
 from analysis.coupler_spectroscopy_analysis import CouplerSpectroscopyAnalysis
+from analysis.cz_chevron_analysis import CZChevronAnalysis
 
-from collections import defaultdict
 
 from config_files.VNA_values import (
     VNA_resonator_frequencies, VNA_qubit_frequencies, VNA_f12_frequencies
@@ -76,9 +77,11 @@ class NodeFactory:
             'resonator_spectroscopy_1': Resonator_Spectroscopy_1_Node,
             'qubit_12_spectroscopy_pulsed': Qubit_12_Spectroscopy_Pulsed_Node,
             'rabi_oscillations_12': Rabi_Oscillations_12_Node,
+            'resonator_spectroscopy_2': Resonator_Spectroscopy_2_Node,
             'coupler_spectroscopy': Coupler_Spectroscopy_Node,
             'coupler_resonator_spectroscopy': Coupler_Resonator_Spectroscopy_Node,
             'T1': T1_Node,
+            'cz_chevron': CZ_Chevron_Node,
             'ro_frequency_optimization': RO_frequency_optimization_Node,
             #'ro_frequency_optimization_gef': RO_frequency_optimization_gef_Node,
         }
@@ -236,7 +239,27 @@ class Resonator_Spectroscopy_1_Node:
         self.redis_field = 'ro_freq_1'
         self.qubit_state = 1
         self.measurement_obj = Resonator_Spectroscopy
-        self.analysis_obj = ResonatorSpectroscopyAnalysis
+        self.analysis_obj = ResonatorSpectroscopy_1_Analysis
+
+    @property
+    def samplespace(self):
+        cluster_samplespace = {
+            'ro_frequencies': {
+                qubit: resonator_samples(qubit) for qubit in self.all_qubits
+            }
+        }
+        return cluster_samplespace
+
+
+class Resonator_Spectroscopy_2_Node:
+    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
+        self.name = name
+        self.all_qubits = all_qubits
+        self.node_dictionary = kwargs
+        self.redis_field = 'ro_freq_2'
+        self.qubit_state = 2
+        self.measurement_obj = Resonator_Spectroscopy
+        self.analysis_obj = ResonatorSpectroscopy_2_Analysis
 
     @property
     def samplespace(self):
@@ -308,6 +331,24 @@ class RO_frequency_optimization_Node:
         return cluster_samplespace
 
 
+class CZ_Chevron_Node:
+    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
+        self.name = name
+        self.all_qubits = all_qubits
+        self.node_dictionary = kwargs
+        self.redis_field = 'cz_pulse_amplitude'
+        self.qubit_state = 0
+        self.measurement_obj = CZ_chevron
+        self.analysis_obj = CZChevronAnalysis
+
+    @property
+    def samplespace(self):
+        cluster_samplespace = {
+            'ro_opt_frequencies': {
+                qubit: resonator_samples(qubit) for qubit in self.all_qubits
+            }
+        }
+        return cluster_samplespace
     #     'ro_frequency_optimization_gef': {
     #         'redis_field': 'ro_freq_opt',
     #         'qubit_state': 2,
@@ -319,7 +360,7 @@ class Coupler_Spectroscopy_Node:
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
-        self.redis_field = 'flux_quantum'
+        self.redis_field = 'parking_current'
         self.qubit_state = 0
         # perform 2 tones while biasing the current
         self.measurement_obj = Two_Tones_Spectroscopy
@@ -418,10 +459,3 @@ class Coupler_Resonator_Spectroscopy_Node:
     #         'measurement_obj': Single_Shots_RO,
     #         'analysis_obj': StateDiscrimination
     #     },
-    #     'coupler_spectroscopy': {
-    #         'redis_field': '',
-    #         'qubit_state': 0,
-    #         'measurement_obj': Two_Tones_Spectroscopy,
-    #         'analysis_obj': CouplerSpectroscopyAnalysis
-    #     },
-    # }
