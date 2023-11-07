@@ -1,33 +1,18 @@
-'''Given the requested node
-fetch and compile the appropriate schedule'''
-
+'''
+Given the requested node
+fetch and compile the appropriate schedule
+'''
 from logger.tac_logger import logger
 from math import isnan
 import numpy as np
 from quantify_scheduler.device_under_test.quantum_device import Instrument, QuantumDevice
 import redis
 import json
-from calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
-from calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
-from calibration_schedules.two_tone_multidim import Two_Tones_Multidim
-from calibration_schedules.rabi_oscillations import Rabi_Oscillations
-from calibration_schedules.T1 import T1_BATCHED
-from calibration_schedules.XY_crosstalk import XY_cross
-from calibration_schedules.punchout import Punchout
-from calibration_schedules.ramsey_fringes import Ramsey_fringes
-from calibration_schedules.ro_frequency_optimization import RO_frequency_optimization
-from calibration_schedules.ro_amplitude_optimization import RO_amplitude_optimization
-from calibration_schedules.state_discrimination import Single_Shots_RO
-from calibration_schedules.n_rabi_oscillations import N_Rabi_Oscillations
-from calibration_schedules.motzoi_parameter import Motzoi_parameter
-from calibration_schedules.cz_chevron import CZ_chevron
-from calibration_schedules.cz_calibration import CZ_calibration
 from utilities.extended_transmon_element import ExtendedTransmon
 from utilities.extended_coupler_edge import CompositeSquareEdge
 from quantify_scheduler.backends import SerialCompiler
 from config_files.settings import hw_config_json
 from quantify_core.data.handling import set_datadir
-from quantify_scheduler.json_utils import ScheduleJSONEncoder
 from itertools import tee
 from matplotlib import pyplot as plt
 
@@ -35,31 +20,6 @@ set_datadir('.')
 
 with open(hw_config_json) as hw:
     hw_config = json.load(hw)
-
-node_map = {
-    'resonator_spectroscopy': Resonator_Spectroscopy,
-    "two_tone_multidim": Two_Tones_Multidim,
-    'qubit_01_spectroscopy_pulsed': Two_Tones_Spectroscopy,
-    'rabi_oscillations': Rabi_Oscillations,
-    'T1': T1_BATCHED,
-    'XY_crosstalk': XY_cross,
-    'punchout': Punchout,
-    'ramsey_correction': Ramsey_fringes,
-    'motzoi_parameter': Motzoi_parameter,
-    'n_rabi_oscillations': N_Rabi_Oscillations,
-    'resonator_spectroscopy_1': Resonator_Spectroscopy,
-    'qubit_12_spectroscopy_pulsed': Two_Tones_Spectroscopy,
-    'rabi_oscillations_12': Rabi_Oscillations,
-    'ramsey_correction_12': Ramsey_fringes,
-    'resonator_spectroscopy_2': Resonator_Spectroscopy,
-    'ro_frequency_optimization': RO_frequency_optimization,
-    'ro_frequency_optimization_gef': RO_frequency_optimization,
-    'ro_amplitude_optimization': RO_amplitude_optimization,
-    'state_discrimination': Single_Shots_RO,
-    'cz_chevron': CZ_chevron,
-    'cz_calibration': CZ_calibration,
-
-}
 
 redis_connection = redis.Redis(decode_responses=True)
 
@@ -109,16 +69,18 @@ def load_redis_config_coupler(coupler: CompositeSquareEdge):
     coupler.cz.square_amp(float(redis_config['cz_pulse_amplitude']))
     coupler.cz.square_duration(float(redis_config['cz_pulse_duration']))
     coupler.cz.cz_width(float(redis_config['cz_pulse_width']))
-    
+
     return
 
 
-def precompile(node:str, qubits: list[str], samplespace: dict[str,dict[str,np.ndarray]]):
-    if node == 'tof':
+def precompile(node):
+    if node.name == 'tof':
         return None, 1
+    samplespace = node.samplespace
+    qubits = node.all_qubits
 
-    Instrument.close_all()
-    device = QuantumDevice('Loki')
+    # TODO better way to restart the QuantumDevice object
+    device = QuantumDevice(f'Loki_{node.name}')
     device.hardware_config(hw_config)
     sweep_parameters = list(samplespace.values())
 
@@ -130,8 +92,18 @@ def precompile(node:str, qubits: list[str], samplespace: dict[str,dict[str,np.nd
         device.add_element(transmon)
         transmons[qubit] = transmon
 
+    node_class = node.measurement_obj(transmons, node.qubit_state)
+    schedule_function = node_class.schedule_function
+    static_parameters = node_class.static_kwargs
+
+    compiler = SerialCompiler(name=f'{node.name}_compiler')
+    compilation_config = device.generate_compilation_config()
+
+    # after the compilation_config is acquired, free the transmon resources
+    for extended_transmon in transmons.values():
+        extended_transmon.close()
     # Creating coupler edge
-  
+
     bus_list = [ [qubits[i],qubits[i+1]] for i in range(len(qubits)-1) ]
     couplers={}
     for bus in bus_list:
@@ -225,8 +197,6 @@ def precompile(node:str, qubits: list[str], samplespace: dict[str,dict[str,np.nd
     #              ).to_html()
     #          )
 
-    schedule_duration = compiled_schedule.get_schedule_duration()
-
     logger.info('Finished Compiling')
 
-    return [compiled_schedule], [schedule_duration], [samplespace]
+    return compiled_schedule

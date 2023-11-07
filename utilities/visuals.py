@@ -14,6 +14,6 @@ def draw_arrow_chart(header:str, node_list: list[str]):
     print(u"\u2551" + " " + header + " " * (total_length -len(header)-1) + u"\u2551")
     for i, item in enumerate(node_list):
         if i < len(node_list):
-            print(u"\u2551" + " "*length + u"\u2ba1" + " " + item + " " * (total_length-length-len(item) - 2) + u"\u2551")
+            print(u"\u2551" + " "*length + u"\u21aa" + " " + item + " " * (total_length-length-len(item) - 2) + u"\u2551")
             length += len(item) // 2
     print(u"\u255a" + u"\u2550" * total_length + u"\u255d")

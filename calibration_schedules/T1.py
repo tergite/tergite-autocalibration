@@ -7,7 +7,7 @@ from quantify_scheduler.operations.gate_library import Measure, Reset, X
 from calibration_schedules.measurement_base import Measurement
 import numpy as np
 
-class T1_BATCHED(Measurement):
+class T1(Measurement):
 
     def __init__(self,transmons,qubit_state:int=0):
         super().__init__(transmons)
