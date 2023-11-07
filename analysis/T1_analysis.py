@@ -36,7 +36,7 @@ class T1Analysis():
         #self.dataset['fit_delays'] = self.fit_delays
         #self.dataset['fit_y'] = ('fit_delays',fit_y)
         T1_time = fit_result.params['tau'].value
-        return  T1_time
+        return [T1_time]
 
     def plotter(self,ax):
         ax.plot( self.fit_delays , self.fit_y,'r-',lw=3.0)

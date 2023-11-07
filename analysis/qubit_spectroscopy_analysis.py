@@ -5,6 +5,7 @@ from a qubit (two tone) spectroscopy experiment.
 import numpy as np
 import xarray as xr
 from scipy import signal
+from scipy.signal import find_peaks
 import lmfit
 
 # Lorentzian function that is fit to qubit spectroscopy peaks
@@ -95,9 +96,11 @@ class QubitSpectroscopyAnalysis():
         guess = model.guess(self.magnitudes, x=frequencies)
         fit_result = model.fit(self.magnitudes, params=guess, x=frequencies)
 
+        self.qubit_freq = fit_result.params['x0'].value
+        self.uncertainty = fit_result.params['x0'].stderr
+
         self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_freqs})
-        self.f01 = fit_result.params['x0'].value
-        return self.f01
+        return [self.qubit_freq]
 
     def reject_outliers(self, data, m=3.):
         # Filters out datapoints in data that deviate too far from the median
@@ -126,6 +129,8 @@ class QubitSpectroscopyAnalysis():
             min = np.min(self.magnitudes)
             ax.vlines(self.f01, min, self.prominence + min, lw=4, color='teal')
             ax.vlines(self.f01-1e6, min, self.filtered_std + min, lw=4, color='orange')
+        # Plots the data and the fitted model of a qubit spectroscopy experiment
+        ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0, label=f"Qubit Frequency f_01 = {self.qubit_freq:.6E} ± {self.uncertainty:.1E} (Hz)")
         ax.plot( self.independents, self.magnitudes,'bo-',ms=3.0)
         ax.set_title(f'Qubit Spectroscopy for {self.qubit}')
         ax.set_xlabel('frequency (Hz)')

@@ -72,6 +72,7 @@ class NodeFactory:
             'punchout': Punchout_Node,
             'resonator_spectroscopy': Resonator_Spectroscopy_Node,
             'qubit_01_spectroscopy_pulsed': Qubit_01_Spectroscopy_Pulsed_Node,
+            'qubit_01_spectroscopy_multidim': Qubit_01_Spectroscopy_Multidim_Node,
             'rabi_oscillations': Rabi_Oscillations_Node,
             'ramsey_correction': Ramsey_Fringes_Node,
             'resonator_spectroscopy_1': Resonator_Spectroscopy_1_Node,
@@ -113,7 +114,7 @@ class Resonator_Spectroscopy_Node(Base_Node):
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = node_dictionary
-        self.redis_field = 'ro_freq'
+        self.redis_field = ['ro_freq']
         self.qubit_state = 0
         self.measurement_obj = Resonator_Spectroscopy
         self.analysis_obj = ResonatorSpectroscopyAnalysis
@@ -155,7 +156,7 @@ class Qubit_01_Spectroscopy_Pulsed_Node:
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
-        self.redis_field = 'freq_01'
+        self.redis_field = ['freq_01']
         self.qubit_state = 0
         self.measurement_obj = Two_Tones_Spectroscopy
         self.analysis_obj = QubitSpectroscopyAnalysis
@@ -169,13 +170,35 @@ class Qubit_01_Spectroscopy_Pulsed_Node:
         }
         return cluster_samplespace
 
+class Qubit_01_Spectroscopy_Multidim_Node:
+    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
+        self.name = name
+        self.all_qubits = all_qubits
+        self.node_dictionary = kwargs
+        self.redis_field = ['freq_01',
+                            'spec_pulse_amplitude']
+        self.qubit_state = 0
+        self.measurement_obj = Two_Tones_Multidim
+        self.analysis_obj = QubitSpectroscopyMultidim
+
+    @property
+    def samplespace(self):
+        cluster_samplespace = {
+            'spec_frequencies': {
+                qubit: qubit_samples(qubit) for qubit in self.all_qubits
+            },
+            'spec_pulse_amplitudes': {
+                 qubit : np.linspace(2e-5, 8e-4, 5) for qubit in self.all_qubits
+            }
+        }
+        return cluster_samplespace
 
 class Rabi_Oscillations_Node:
     def __init__(self, name: str, all_qubits: list[str], ** kwargs):
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
-        self.redis_field = 'mw_amp180'
+        self.redis_field = ['mw_amp180']
         self.qubit_state = 0
         self.measurement_obj = Rabi_Oscillations
         self.analysis_obj = RabiAnalysis
@@ -195,7 +218,7 @@ class Ramsey_Fringes_Node:
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
-        self.redis_field = 'freq_01'
+        self.redis_field = ['freq_01']
         self.qubit_state = 0
         self.measurement_obj = Ramsey_fringes
         self.analysis_obj = RamseyAnalysis
@@ -219,7 +242,7 @@ class T1_Node:
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
-        self.redis_field = 'freq_01'
+        self.redis_field = ['t1_time'] # Is this the right redis for T1?
         self.qubit_state = 0
         self.measurement_obj = T1
         self.analysis_obj = T1Analysis
@@ -236,7 +259,7 @@ class Resonator_Spectroscopy_1_Node:
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
-        self.redis_field = 'ro_freq_1'
+        self.redis_field = ['ro_freq_1']
         self.qubit_state = 1
         self.measurement_obj = Resonator_Spectroscopy
         self.analysis_obj = ResonatorSpectroscopy_1_Analysis
@@ -276,7 +299,7 @@ class Qubit_12_Spectroscopy_Pulsed_Node:
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
-        self.redis_field = 'freq_12'
+        self.redis_field = ['freq_12']
         self.qubit_state = 1
         self.measurement_obj = Two_Tones_Spectroscopy
         self.analysis_obj = QubitSpectroscopyAnalysis
@@ -296,7 +319,7 @@ class Rabi_Oscillations_12_Node:
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
-        self.redis_field = 'mw_ef_amp180'
+        self.redis_field = ['mw_ef_amp180']
         self.qubit_state = 1
         self.measurement_obj = Rabi_Oscillations
         self.analysis_obj = RabiAnalysis
@@ -403,7 +426,7 @@ class Coupler_Resonator_Spectroscopy_Node:
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
-        self.redis_field = 'resonator_flux_quantum'
+        self.redis_field = ['resonator_flux_quantum']
         self.qubit_state = 0
         self.measurement_obj = Resonator_Spectroscopy
         self.analysis_obj = CouplerSpectroscopyAnalysis

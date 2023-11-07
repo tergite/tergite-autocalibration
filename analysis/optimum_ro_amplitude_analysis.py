@@ -59,7 +59,7 @@ class OptimalROAmplitudeAnalysis():
             self.fidelities.append(assignment)
 
         self.optimal_amplitude = 0
-        return self.optimal_amplitude
+        return [self.optimal_amplitude]
 
     def plotter(self,ax):
         this_qubit = self.dataset.attrs['qubit']

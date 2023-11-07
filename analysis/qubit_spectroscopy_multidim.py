@@ -72,12 +72,13 @@ class QubitSpectroscopyMultidim():
         for coord in dataset[data_var].coords:
             if 'frequencies' in coord: self.frequency_coords = coord
             elif 'amplitudes' in coord: self.amplitude_coords = coord
-        self.frequencies = frequency_coords.values
-        self.amplitudes = amplitude_coords.values
+        self.frequencies = dataset.coords[self.frequency_coords].values
+        self.amplitudes = dataset.coords[self.amplitude_coords].values
+        #dataset[f'y{self.qubit}'].values = np.abs(self.S21)
+        #breakpoint()
 
-        dataset[f'y{self.qubit}'].values = np.abs(self.S21)
-        self.data_var = data_var
         self.fit_results = {}
+        self.data_var = data_var
         self.dataset = dataset
 
     def run_fitting(self):
@@ -89,18 +90,28 @@ class QubitSpectroscopyMultidim():
         frequencies = self.frequencies
         amplitudes = self.amplitudes
 
-        print(np.shape(frequencies))
-        print(np.shape(amplitudes))
-        print(amplitudes[0])
-
         self.fit_freqs = np.linspace( frequencies[0], frequencies[-1], 1000) # x-values for plotting
 
-        # Gives an initial guess for the model parameters and then fits the model to the data.
-        guess = model.guess(self.magnitudes, x=frequencies)
-        fit_result = model.fit(self.magnitudes, params=guess, x=frequencies)
+        qubit_freqs=np.zeros(len(amplitudes))
+        peak_magnitudes=np.zeros(len(amplitudes))
+        self.fit_y=np.zeros((len(self.fit_freqs),len(amplitudes)))
 
-        self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_freqs})
-        return fit_result.params['x0'].value
+        for i,a in enumerate(self.amplitudes):
+            guess = model.guess(self.magnitudes[:,i], x=frequencies)
+            fit_result = model.fit(self.magnitudes[:,i], params=guess, x=frequencies)
+            qubit_freqs[i]=fit_result.params['x0'].value
+            #self.uncertainty = fit_result.params['x0'].stderr
+            self.fit_y[:,i] = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_freqs})
+            peak_magnitudes[i]=max(self.fit_y[:,i])
+        
+        best_ampl_indx=np.where(peak_magnitudes==max(peak_magnitudes))[0][0]
+        self.qubit_ampl = amplitudes[best_ampl_indx]
+        self.qubit_freq = qubit_freqs[best_ampl_indx]
+
+
+        #self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_freqs})
+        return [self.qubit_freq,
+                self.qubit_ampl]
 
     def reject_outliers(self, x, m = 3.):
         #Filters out datapoints in x that deviate too far from the median
@@ -113,14 +124,21 @@ class QubitSpectroscopyMultidim():
         # Determines if the data contains one distinct peak or only noise
         x= self.S21
         x_filtered= self.reject_outliers(x, outlier_median)
-        peaks, properties=sp.signal.find_peaks(x, prominence=np.std(x_filtered)*prom_coef, width=wid_coef)
+        peaks, properties=signal.find_peaks(x, prominence=np.std(x_filtered)*prom_coef, width=wid_coef)
         return peaks.size==1
 
     def plotter(self,ax):
         # Plots the data and the fitted model of a qubit spectroscopy experiment
-        ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0)
-        ax.plot( self.frequencies, self.magnitudes,'bo-',ms=3.0)
-        ax.set_title(f'Qubit Spectroscopy for {self.qubit}')
-        ax.set_xlabel('frequency (Hz)')
-        ax.set_ylabel('|S21| (V)')
-        ax.grid()
+        #ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0)
+        #self.dataset[self.data_var].plot(ax=ax, x=self.frequency_coords, yscale='log')
+        for i,a in enumerate(self.amplitudes):
+            if a==self.qubit_ampl:
+                label=f'Best amplitude:{self.qubit_ampl:.3E}'
+            else:
+                label=None
+            ax.plot(self.fit_freqs, self.fit_y[:,i],'-',lw=3.0, label=label)
+            ax.plot(self.frequencies, self.magnitudes[:,i],'bo-',ms=3.0)
+            ax.set_title(f'Amplitude {a}')
+            ax.set_xlabel('frequency (Hz)')
+            ax.set_ylabel('|S21| (V)')
+            ax.grid()

@@ -45,10 +45,11 @@ class BaseAnalysis():
         )
         self.qoi = 0  # quantity of interest
 
-    def update_redis_trusted_values(self, node: str, this_qubit: str, transmon_parameter: str):
-        redis_connection.hset(f"transmons:{this_qubit}", f"{transmon_parameter}", self.qoi)
-        redis_connection.hset(f"cs:{this_qubit}", node, 'calibrated')
-        self.node_result.update({this_qubit: self.qoi})
+    def update_redis_trusted_values(self, node: str, this_qubit: str, transmon_parameters: list):
+        for i,transmon_parameter in enumerate(transmon_parameters):
+            redis_connection.hset(f"transmons:{this_qubit}", f"{transmon_parameter}", self.qoi[i])
+            redis_connection.hset(f"cs:{this_qubit}", node, 'calibrated')
+            self.node_result.update({this_qubit: self.qoi[i]})
 
 
 class Multiplexed_Analysis(BaseAnalysis):
@@ -79,6 +80,12 @@ class Multiplexed_Analysis(BaseAnalysis):
 
             node_analysis = node.analysis_obj(ds, **kw_args)
             self.qoi = node_analysis.run_fitting()
+            
+            #if node == 'rabi_oscillations':
+            #    res, stderr = node_analysis.run_fitting()
+            #    self.qoi = res
+            #else:
+            #    self.qoi = node_analysis.run_fitting()
 
             node_analysis.plotter(this_axis)
 
@@ -90,7 +97,7 @@ class Multiplexed_Analysis(BaseAnalysis):
             #     patch2 = mpatches.Patch(color='blue', label=f'Peak Found:{hasPeak}')
             #     handles.append(patch2)
             if node.name == 'T1':
-                T1_micros = self.qoi * 1e6
+                T1_micros = self.qoi[0] * 1e6
                 patch2 = mpatches.Patch(color='blue', label=f'T1 = {T1_micros:.2f}')
                 handles.append(patch2)
             patch = mpatches.Patch(color='red', label=f'{this_qubit}')

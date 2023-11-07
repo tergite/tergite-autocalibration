@@ -29,15 +29,16 @@ class ResonatorSpectroscopyAnalysis():
 
         # Gives an initial guess for the model parameters and then fits the model to the data.
         guess = model.guess(S21, f=frequencies)
-        fit_result = model.fit(S21, params=guess, f=frequencies)
         self.fitting_model = model.fit(S21, params=guess, f=frequencies)
+        #self.fitting_model = model.fit(S21, params=guess, f=frequencies)
+        fit_result = self.fitting_model
 
-        fit_result = self.fitting_model.values
+        fit_fr = fit_result.params['fr'].value
+        self.uncertainty = fit_result.params['fr'].stderr
 
-        fitted_resonator_frequency = fit_fr = fit_result['fr']
-        fit_Ql = fit_result['Ql']
-        fit_Qe = fit_result['Qe']
-        fit_ph = fit_result['theta']
+        fit_Ql = fit_result.params['Ql'].value
+        fit_Qe = fit_result.params['Qe'].value
+        fit_ph = fit_result.params['theta'].value
 
         # analytical expression, probably an interpolation of the fit would be better
         self.minimum_freq = fit_fr / (4*fit_Qe*fit_Ql*np.sin(fit_ph)) * (
@@ -48,13 +49,14 @@ class ResonatorSpectroscopyAnalysis():
                                 - 4*fit_Qe*fit_Ql*np.cos(fit_ph)
                                 + fit_Ql**2 )
                       )
-        return self.minimum_freq
+        
+        return [self.minimum_freq]
 
     def plotter(self,ax):
         ax.set_xlabel('Frequency (Hz)')
         ax.set_ylabel('|S21| (V)')
         self.fitting_model.plot_fit(ax,numpoints = 400,xlabel=None, title=None)
-        ax.axvline(self.minimum_freq,c='blue',ls='solid',label='frequency at min')
+        ax.axvline(self.minimum_freq,c='blue',ls='solid',label= f"Resonator frequency = {self.minimum_freq:.6E} ± {self.uncertainty:.1E} (Hz)")
         ax.grid()
 
 class ResonatorSpectroscopy_1_Analysis(ResonatorSpectroscopyAnalysis):

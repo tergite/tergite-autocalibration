@@ -57,8 +57,8 @@ q20.ro_pulse_amp =  50.0e-3
 q21.ro_pulse_amp = 7.0e-3
 q22.ro_pulse_amp = 35.0e-3
 q23.ro_pulse_amp = 36.0e-3
-q24.ro_pulse_amp = 7.0e-3
-q25.ro_pulse_amp = 8.0e-3
+q24.ro_pulse_amp =  7.0e-3
+q25.ro_pulse_amp =  8.0e-3
 
 
 [resonator_spectroscopy.all]
@@ -77,6 +77,9 @@ init_duration = 300e-6
 spec_pulse_duration = 2e-6
 spec_amp = 3.5e-4
 
+[qubit_01_spectroscopy_multidim.all]
+spec_pulse_duration = 2e-6
+
 [coupler_spectroscopy.all]
 spec_pulse_duration = 2e-6
 spec_amp = 3.5e-4
@@ -88,5 +91,4 @@ artificial_detuning = 3e6
 artificial_detuning = 3e6
 
 [qubit_12_spectroscopy_pulsed.all]
-spec_pulse_duration = 2.0e-6
-spec_amp = 3.5e-4
+spec_pulse_duration = 90.0e-6

@@ -191,11 +191,11 @@ def precompile(node):
 
     #TODO
     #ic.retrieve_hardware_logs
-    # with open(f'TIMING_TABLE_{node}.html', 'w') as file:
-    #      file.write(
-    #          compiled_schedule.timing_table.hide(['is_acquisition','wf_idx'],axis="columns"
-    #              ).to_html()
-    #          )
+    #with open(f'TIMING_TABLE_{node}.html', 'w') as file:
+    #    file.write(
+    #        compiled_schedule.timing_table.hide(['is_acquisition','wf_idx'],axis="columns"
+    #            ).to_html()
+    #        )
 
     logger.info('Finished Compiling')
 
