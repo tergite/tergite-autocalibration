@@ -22,6 +22,9 @@ test*py
 #data files
 *.nc
 
+#python packaging
+*egg*
+
 #local develpoment
 local/
 
