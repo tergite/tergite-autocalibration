@@ -112,78 +112,64 @@ def precompile(node):
         device.add_edge(coupler)
         couplers[bus[0]+'_'+bus[1]] = coupler
 
-    qubit_state = 0
-    if node in ['resonator_spectroscopy_1','qubit_12_spectroscopy_pulsed',
-                'rabi_oscillations_12', 'ramsey_correction_12']:
-        qubit_state = 1
-    if node in ['resonator_spectroscopy_2', 'ro_frequency_optimization_gef']:
-        qubit_state = 2
-    if node in ['cz_chevron', 'cz_calibration']:
-        node_class = node_map[node](transmons, couplers, qubit_state)
-    else:
-        node_class = node_map[node](transmons, qubit_state)
-    schedule_function = node_class.schedule_function
-    static_parameters = node_class.static_kwargs
+    # TODO commenting this out because single shots has been fixed by Qblox
+    # if 'qubit_states' in samplespace: #this means we have single shots
+    #     shots = 1
+    #     for subspace in samplespace.values():
+    #         shots *= len( list(subspace.values())[0] )
+    #     INSTRUCTIONS_PER_SHOT = 12
+    #     QRM_instructions = 12200
+    #
+    #     def pairwise(iterable):
+    #         #TODO after python 3.10 this will be replaced by itertools.pairwise
+    #         # pairwise('ABCDEFG') --> AB BC CD DE EF FG
+    #         a, b = tee(iterable)
+    #         next(b, None)
+    #         return zip(a, b)
+    #
+    #     if len(samplespace) == 2:
+    #         compiled_schedules = []
+    #         schedule_durations = []
+    #         samplespaces = []
+    #         for coord, subspace in samplespace.items():
+    #             if coord == 'qubit_states':
+    #                 inner_dimension = len(list(subspace.values())[0])
+    #             if coord != 'qubit_states':
+    #                 outer_coordinate = coord
+    #                 outer_dimension = len(list(subspace.values())[0])
+    #         outer_batch = int(QRM_instructions/inner_dimension /INSTRUCTIONS_PER_SHOT)
+    #         # make a partion like: [0,2,2,2,2]:
+    #         outer_partition = [0] + [outer_batch] * (outer_dimension // outer_batch)
+    #         # add the leftover partition: [0,2,2,2,2,0]:
+    #         outer_partition += [outer_dimension % outer_batch]
+    #         # take the cumulative sum: [0,2,4,6,8,8]
+    #         # and with set() discard duplicates {0,2,4,6,8} then make a list:
+    #         outer_partition = list(set(np.cumsum(outer_partition)))
+    #         inner_samplespace = samplespace['qubit_states']
+    #         slicing = list(pairwise(outer_partition))
+    #         for slice_indx, slice_ in enumerate(slicing):
+    #             partial_samplespace = {}
+    #             partial_samplespace['qubit_states'] = inner_samplespace
+    #             # we need to initialize every time, dict is mutable!!
+    #             partial_samplespace[outer_coordinate] = {}
+    #             for qubit, outer_samples in samplespace[outer_coordinate].items():
+    #                 this_slice = slice(*slice_)
+    #                 partial_samples = np.array(outer_samples)[this_slice]
+    #                 partial_samplespace[outer_coordinate][qubit] = partial_samples
+    #             schedule = schedule_function(**static_parameters,**partial_samplespace)
+    #             logger.info(f'Starting Partial {slice_indx+1}/{len(list(slicing))} Compiling')
+    #             #logger.info(f'Starting Partial Compiling')
+    #             compilation_config = device.generate_compilation_config()
+    #             compiled_schedule = compiler.compile(
+    #                 schedule=schedule, config=compilation_config
+    #             )
+    #             logger.info('Finished Partial Compiling')
+    #             compiled_schedules.append(compiled_schedule)
+    #             schedule_durations.append(compiled_schedule.get_schedule_duration())
+    #             samplespaces.append(partial_samplespace)
+    #         return compiled_schedules, schedule_durations, samplespaces
 
     compiler = SerialCompiler(name=f'{node}_compiler')
-    
-
-    if 'qubit_states' in samplespace: #this means we have single shots
-        shots = 1
-        for subspace in samplespace.values():
-            shots *= len( list(subspace.values())[0] )
-        INSTRUCTIONS_PER_SHOT = 12
-        QRM_instructions = 12200
-
-        def pairwise(iterable):
-            #TODO after python 3.10 this will be replaced by itertools.pairwise
-            # pairwise('ABCDEFG') --> AB BC CD DE EF FG
-            a, b = tee(iterable)
-            next(b, None)
-            return zip(a, b)
-
-        if len(samplespace) == 2:
-            compiled_schedules = []
-            schedule_durations = []
-            samplespaces = []
-            for coord, subspace in samplespace.items():
-                if coord == 'qubit_states':
-                    inner_dimension = len(list(subspace.values())[0])
-                if coord != 'qubit_states':
-                    outer_coordinate = coord
-                    outer_dimension = len(list(subspace.values())[0])
-            outer_batch = int(QRM_instructions/inner_dimension /INSTRUCTIONS_PER_SHOT)
-            # make a partion like: [0,2,2,2,2]:
-            outer_partition = [0] + [outer_batch] * (outer_dimension // outer_batch)
-            # add the leftover partition: [0,2,2,2,2,0]:
-            outer_partition += [outer_dimension % outer_batch]
-            # take the cumulative sum: [0,2,4,6,8,8]
-            # and with set() discard duplicates {0,2,4,6,8} then make a list:
-            outer_partition = list(set(np.cumsum(outer_partition)))
-            inner_samplespace = samplespace['qubit_states']
-            slicing = list(pairwise(outer_partition))
-            for slice_indx, slice_ in enumerate(slicing):
-                partial_samplespace = {}
-                partial_samplespace['qubit_states'] = inner_samplespace
-                # we need to initialize every time, dict is mutable!!
-                partial_samplespace[outer_coordinate] = {}
-                for qubit, outer_samples in samplespace[outer_coordinate].items():
-                    this_slice = slice(*slice_)
-                    partial_samples = np.array(outer_samples)[this_slice]
-                    partial_samplespace[outer_coordinate][qubit] = partial_samples
-                schedule = schedule_function(**static_parameters,**partial_samplespace)
-                logger.info(f'Starting Partial {slice_indx+1}/{len(list(slicing))} Compiling')
-                #logger.info(f'Starting Partial Compiling')
-                compilation_config = device.generate_compilation_config()
-                compiled_schedule = compiler.compile(
-                    schedule=schedule, config=compilation_config
-                )
-                logger.info('Finished Partial Compiling')
-                compiled_schedules.append(compiled_schedule)
-                schedule_durations.append(compiled_schedule.get_schedule_duration())
-                samplespaces.append(partial_samplespace)
-            return compiled_schedules, schedule_durations, samplespaces
-    
     schedule = schedule_function(**static_parameters, **samplespace)
     compilation_config = device.generate_compilation_config()
     logger.info('Starting Compiling')

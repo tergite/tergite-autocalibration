@@ -22,5 +22,4 @@ def measure_node(
     result_dataset = measurement.measure(node, compiled_schedule, cluster, lab_ic)
 
     logger.info('Finished measurement')
-
-    return result_dataset,data_path
+    return result_dataset

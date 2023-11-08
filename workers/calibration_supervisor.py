@@ -1,5 +1,7 @@
 # This code is part of Tergite
 import argparse
+from datetime import datetime
+import pathlib
 from utilities.status import DataStatus
 from logger.tac_logger import logger
 from workers.compilation_worker import precompile
@@ -18,6 +20,7 @@ from colorama import init as colorama_init
 from colorama import Fore
 from colorama import Style
 from utilities.user_input import user_requested_calibration
+from utilities.root_path import data_directory
 import toml
 import redis
 from matplotlib import pyplot as plt
@@ -201,8 +204,14 @@ def calibrate_node(node_label: str):
         cluster_status=args.cluster_status
     )
 
+    measurement_date = datetime.now()
+    plots_today = measurement_date.date().strftime('%Y%m%d')
+    time_id = measurement_date.strftime('%Y%m%d-%H%M%S-%f')[:19]
+    measurement_id = time_id + '-' + f'-{node.name}'
+    data_path = pathlib.Path(data_directory / plots_today / measurement_id)
+    data_path.mkdir(parents=True, exist_ok=True)
     logger.info('measurement completed')
-    post_process(result_dataset, node,data_path)
+    post_process(result_dataset, node, data_path=data_path)
     logger.info('analysis completed')
 
 
