@@ -60,22 +60,23 @@ class CZChevronAnalysis():
         self.independents = dataset[coord].values
         self.fit_results = {}
         self.qubit = dataset[data_var].attrs['qubit']
-        dataset[f'y{self.qubit}_'].values = np.abs(self.S21)
+        dataset[f'y{self.qubit}'].values = np.abs(self.S21)
         self.dataset = dataset
 
     def run_fitting(self):
         # self.testing_group = 0
-        x = self.dataset[f'cz_pulse_frequencies_sweep{self.qubit}'].values
-        y = self.dataset[f'cz_pulse_amplitudes{self.qubit}'].values
-        magnitudes = self.dataset[f'y{self.qubit}_'].values
+        self.freq = self.dataset[f'cz_pulse_frequencies_sweep{self.qubit}'].values/1e6
+        self.amp = self.dataset[f'cz_pulse_amplitudes{self.qubit}'].values
+        magnitudes = self.dataset[f'y{self.qubit}'].values
+        self.magnitudes = (magnitudes - np.min(magnitudes))/(np.max(magnitudes)-np.min(magnitudes))
         # values = [[np.linalg.norm(u) for u in v] for v in self.dataset[f'y{self.qubit}_']]
         fit_results = []
-        for magnitude in np.transpose(magnitudes):
+        for magnitude in self.magnitudes:
             model = ChevronModel()
             # magnitude = np.transpose(values)[15]
-            fit_amplitudes = np.linspace( y[0], y[-1], 400)
-            guess = model.guess(magnitude, drive_amp=y)
-            fit_result = model.fit(magnitude, params=guess, drive_amp=y)
+            fit_amplitudes = np.linspace( self.amp[0], self.amp[-1], 400)
+            guess = model.guess(magnitude, drive_amp=self.amp)
+            fit_result = model.fit(magnitude, params=guess, drive_amp=self.amp)
             fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: fit_amplitudes})
             fit_results.append(fit_result)
             # plt.plot(y,magnitude,'.r')
@@ -83,20 +84,24 @@ class CZChevronAnalysis():
         qois = np.transpose([[fit.result.params[p].value for p in ['amplitude','frequency']] for fit in fit_results])
         qois = np.transpose([(q-np.min(q))/np.max(q) for q in qois])
         opt_id = np.argmax(np.sum(qois,axis=1))
-        self.opt_freq = x[opt_id]
+        self.opt_freq = self.freq[opt_id]
         self.opt_cz = fit_results[opt_id].result.params['cz'].value
         self.opt_swap = fit_results[opt_id].result.params['swap'].value
 
         return self.opt_freq
 
     def plotter(self,axis):
-        datarray = self.dataset[f'y{self.qubit}_']
+        datarray = self.dataset[f'y{self.qubit}']
         qubit = self.qubit
-        datarray.plot(ax=axis, x=f'cz_pulse_frequencies_sweep{qubit}')
-        axis.plot(self.opt_freq,self.opt_cz,'xb', label = 'Optimal CZ',markersize=10)
-        axis.plot(self.opt_freq,self.opt_swap,'xr',label = 'Optimal SWAP',markersize=10)
-        axis.set_title(f'CZ Chevron {self.qubit}')
-        axis.set_xlabel('Detuning (Hz)')
-        axis.set_ylabel('Amplitude (V)')
-        axis.legend()
-        # axis.axvline(self.optimal_motzoi-fetch_redis_params('mw_amp180',self.qubit), c='red', lw=4)
+        #fig = datarray.plot(ax=axis, x=f'cz_pulse_frequencies_sweep{qubit}',cmap='RdBu_r')
+        fig = axis.pcolormesh(self.amp,self.freq,self.magnitudes,shading='nearest',cmap='RdBu_r')
+        axis.scatter(self.opt_cz,self.opt_freq,c='r',label = 'CZ Amplitude= {:.2f} V'.format(self.opt_cz),marker='X',s=200,edgecolors='k', linewidth=2,zorder=10)
+        axis.scatter(self.opt_swap,self.opt_freq,c='b',label = 'SWAP Amplitude= {:.2f} V'.format(self.opt_swap),marker='X',s=200,edgecolors='k', linewidth=2,zorder=10)
+        axis.hlines(self.opt_freq,self.amp[0],self.amp[-1],label = 'Frequency = {:.2f} MHz'.format(self.opt_freq),colors='k',linestyles='--',linewidth=2)
+        axis.legend(loc = 'lower center', bbox_to_anchor=(-0.15, -0.45, 1.4, .102), mode='expand', ncol=2,
+            title = 'Optimal Gate Parameters', columnspacing=200,borderpad=1)
+        #cbar = axis.colorbar(fig)
+        #cbar.set_label('Qubit Population', labelpad=10)
+        axis.set_xlabel('Amplitude (V)')
+        axis.set_ylabel('Frequency (MHz)')
+        #axis.title(f'CZ Chevron {qubit}')

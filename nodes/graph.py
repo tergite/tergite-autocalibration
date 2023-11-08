@@ -25,7 +25,7 @@ graph_dependencies = [
     ('rabi_oscillations_12', 'ramsey_correction_12'),
     ('ramsey_correction_12', 'ro_frequency_optimization_gef'),
     ('qubit_12_spectroscopy_pulsed', 'cz_chevron'),
-    ('coupler_spectroscopy', 'cz_chevron'),
+    #('coupler_spectroscopy', 'cz_chevron'),
 ]
 
 graph.add_edges_from(graph_dependencies)
@@ -46,8 +46,8 @@ graph['resonator_spectroscopy']['qubit_01_spectroscopy_pulsed']['weight'] = 1
 graph['resonator_spectroscopy']['qubit_01_spectroscopy_multidim']['weight'] = 2
 
 # nx.draw_spring(graph, with_labels=True, k=1)
-nx.draw(graph, pos=nx.spring_layout(graph, k=0.3), with_labels=True)
-plt.show()
+# nx.draw(graph, pos=nx.spring_layout(graph, k=0.3), with_labels=True)
+# plt.show()
 
 all_nodes = list(nx.topological_sort(graph))
 

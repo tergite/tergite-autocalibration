@@ -98,7 +98,8 @@ class Punchout(Measurement):
             for ampl_indx, ro_amplitude in enumerate(ro_amplitude_values):
 
                 #The inner for loop iterates over all frequency values in the frequency batch:
-                for acq_index, ro_freq in enumerate(ro_frequencies[this_qubit]):
+                for acq_index, ro_freq in enumerate(frequency_values):
+                #for acq_index, ro_freq in enumerate(ro_frequencies[this_qubit]):
                     this_index = ampl_indx*number_of_freqs + acq_index
 
                     schedule.add(

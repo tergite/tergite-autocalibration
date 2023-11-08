@@ -11,7 +11,6 @@ red = redis.Redis(decode_responses=True)
 qubits = user_input.qubits
 bus_list = [ [qubits[i],qubits[i+1]] for i in range(len(qubits)-1) ]
 couplers = [bus[0]+'_'+bus[1] for bus in bus_list]
-nodes = user_input.nodes
 
 parser = argparse.ArgumentParser()
 parser.add_argument('node', choices=['all']+nodes)

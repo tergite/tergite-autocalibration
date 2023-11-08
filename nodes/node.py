@@ -53,7 +53,9 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
     qub_spec_samples = 65
+    #qub_spec_samples = 165
     sweep_range = 4.5e6
+    #sweep_range = 14.5e6
     if transition == '01':
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition == '12':
@@ -207,7 +209,7 @@ class Rabi_Oscillations_Node:
     def samplespace(self):
         cluster_samplespace = {
             'mw_amplitudes': {
-                qubit: np.linspace(0.002, 0.200, 31) for qubit in self.all_qubits
+                qubit: np.linspace(0.002, 0.350, 51) for qubit in self.all_qubits
             }
         }
         return cluster_samplespace
@@ -363,15 +365,36 @@ class CZ_Chevron_Node:
         self.qubit_state = 0
         self.measurement_obj = CZ_chevron
         self.analysis_obj = CZChevronAnalysis
+        self.validate()
+
+    def validate(self):
+        if 'coupled_qubits' not in self.node_dictionary:
+            error_msg = 'coupled_qubits not in job dictionary\n'
+            suggestion = 'job dictionary should look like:\n {"coupled_qubits": ["q1","q2"]}'
+            raise ValueError(error_msg + suggestion)
+        else:
+            coupled_qubits = self.node_dictionary['coupled_qubits']
+            if len(coupled_qubits) != 2:
+                raise ValueError('coupled qubits must be a list with 2 elements')
+            elif not all([q in self.all_qubits for q in coupled_qubits]):
+                raise ValueError('coupled qubits must be a subset of all calibrated qubits')
+            else:
+                self.coupled_qubits = coupled_qubits
+                self.coupler = coupled_qubits[0] + '_' + coupled_qubits[1]
+                self.all_qubits = coupled_qubits
 
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'ro_opt_frequencies': {
-                qubit: resonator_samples(qubit) for qubit in self.all_qubits
-            }
+            'cz_pulse_frequencies_sweep': {
+                qubit: np.linspace(210e6, 250e6, 5) for qubit in self.coupled_qubits
+            },
+            'cz_pulse_amplitudes': {
+                qubit: np.linspace(0.010, 0.05, 7) for qubit in self.coupled_qubits
+            },
         }
         return cluster_samplespace
+
     #     'ro_frequency_optimization_gef': {
     #         'redis_field': 'ro_freq_opt',
     #         'qubit_state': 2,
@@ -403,7 +426,7 @@ class Coupler_Spectroscopy_Node:
                 raise ValueError('coupled qubits must be a subset of all calibrated qubits')
             else:
                 self.coupled_qubits = coupled_qubits
-                self.coupler = coupled_qubits[0] + coupled_qubits[1]
+                self.coupler = coupled_qubits[0] + '_' + coupled_qubits[1]
                 self.measurement_qubit = coupled_qubits[0]
 
     @property
@@ -445,7 +468,7 @@ class Coupler_Resonator_Spectroscopy_Node:
                 raise ValueError('coupled qubits must be a subset of all calibrated qubits')
             else:
                 self.coupled_qubits = coupled_qubits
-                self.coupler = coupled_qubits[0] + coupled_qubits[1]
+                self.coupler = coupled_qubits[0] + '_' + coupled_qubits[1]
                 self.measurement_qubit = coupled_qubits[0]
 
     @property

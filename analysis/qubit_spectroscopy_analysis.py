@@ -81,13 +81,13 @@ class QubitSpectroscopyAnalysis():
     def run_fitting(self):
 
         # Fetch the resulting measurement variables
-        self.magnitudes = np.absolute(self.S21)
+        self.magnitudes = np.abs(self.S21)
         frequencies = self.independents
 
         if not self.has_peak():
-            return np.nan
+            return [np.nan]
 
-        self.fit_freqs = np.linspace(frequencies[0], frequencies[-1], 1000)  # x-values for plotting
+        self.fit_freqs = np.linspace(frequencies[0], frequencies[-1], 500)  # x-values for plotting
 
         # Initialize the Lorentzian model
         model = LorentzianModel()
@@ -96,11 +96,11 @@ class QubitSpectroscopyAnalysis():
         guess = model.guess(self.magnitudes, x=frequencies)
         fit_result = model.fit(self.magnitudes, params=guess, x=frequencies)
 
-        self.qubit_freq = fit_result.params['x0'].value
+        self.f01 = fit_result.params['x0'].value
         self.uncertainty = fit_result.params['x0'].stderr
 
         self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_freqs})
-        return [self.qubit_freq]
+        return [self.f01]
 
     def reject_outliers(self, data, m=3.):
         # Filters out datapoints in data that deviate too far from the median
@@ -129,8 +129,8 @@ class QubitSpectroscopyAnalysis():
             min = np.min(self.magnitudes)
             ax.vlines(self.f01, min, self.prominence + min, lw=4, color='teal')
             ax.vlines(self.f01-1e6, min, self.filtered_std + min, lw=4, color='orange')
+            ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0, label=f"f01 = {self.f01:.6E} ± {self.uncertainty:.1E} (Hz)")
         # Plots the data and the fitted model of a qubit spectroscopy experiment
-        ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0, label=f"Qubit Frequency f_01 = {self.qubit_freq:.6E} ± {self.uncertainty:.1E} (Hz)")
         ax.plot( self.independents, self.magnitudes,'bo-',ms=3.0)
         ax.set_title(f'Qubit Spectroscopy for {self.qubit}')
         ax.set_xlabel('frequency (Hz)')

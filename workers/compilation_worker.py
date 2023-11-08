@@ -85,25 +85,13 @@ def precompile(node):
     sweep_parameters = list(samplespace.values())
 
     transmons = {}
-
     for channel, qubit in enumerate(qubits):
         transmon = ExtendedTransmon(qubit)
         load_redis_config(transmon,channel)
         device.add_element(transmon)
         transmons[qubit] = transmon
 
-    node_class = node.measurement_obj(transmons, node.qubit_state)
-    schedule_function = node_class.schedule_function
-    static_parameters = node_class.static_kwargs
-
-    compiler = SerialCompiler(name=f'{node.name}_compiler')
-    compilation_config = device.generate_compilation_config()
-
-    # after the compilation_config is acquired, free the transmon resources
-    for extended_transmon in transmons.values():
-        extended_transmon.close()
     # Creating coupler edge
-
     bus_list = [ [qubits[i],qubits[i+1]] for i in range(len(qubits)-1) ]
     couplers={}
     for bus in bus_list:
@@ -111,6 +99,19 @@ def precompile(node):
         load_redis_config_coupler(coupler)
         device.add_edge(coupler)
         couplers[bus[0]+'_'+bus[1]] = coupler
+
+    #breakpoint()
+    node_class = node.measurement_obj(transmons, node.qubit_state)
+    if node.name == 'cz_chevron':
+        node_class = node.measurement_obj(transmons, couplers, node.qubit_state)
+
+    schedule_function = node_class.schedule_function
+    static_parameters = node_class.static_kwargs
+
+    compiler = SerialCompiler(name=f'{node.name}_compiler')
+    compilation_config = device.generate_compilation_config()
+
+
 
     # TODO commenting this out because single shots has been fixed by Qblox
     # if 'qubit_states' in samplespace: #this means we have single shots
@@ -172,6 +173,13 @@ def precompile(node):
     compiler = SerialCompiler(name=f'{node}_compiler')
     schedule = schedule_function(**static_parameters, **samplespace)
     compilation_config = device.generate_compilation_config()
+
+    # after the compilation_config is acquired, free the transmon resources
+    for extended_transmon in transmons.values():
+        extended_transmon.close()
+    for extended_edge in couplers.values():
+        extended_edge.close()
+
     logger.info('Starting Compiling')
     compiled_schedule = compiler.compile(schedule=schedule, config=compilation_config)
 

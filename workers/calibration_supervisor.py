@@ -146,6 +146,7 @@ def inspect_node(node: str):
     #node is calibrated only when all qubits have the node calibrated:
     is_node_calibrated = all(qubits_statuses)
     if node in transmon_configuration and not is_node_calibrated:
+        print(f'{ transmon_configuration[node] = }')
         node_specific_dict = transmon_configuration[node]['all']
         for field_key, field_value in node_specific_dict.items():
             for qubit in qubits:

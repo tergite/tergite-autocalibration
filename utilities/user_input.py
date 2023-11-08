@@ -17,10 +17,11 @@ node reference
   coupler_spectroscopy
   coupler_resonator_spectroscopy
   T1
+  cz_chevron
 '''
 
 user_requested_calibration = {
-    'target_node': 'ramsey_correction',
+    'target_node': 'cz_chevron',
     'all_qubits': qubits,
     'node_dictionary' : {'coupled_qubits': ['q21','q22']},
 }
