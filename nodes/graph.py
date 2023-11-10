@@ -42,8 +42,8 @@ graph.add_node('ro_amplitude_optimization', type='refine')
 
 # for nodes that perform the same measurement,
 # assign a weight to the corresponding edge to sort them
-graph['resonator_spectroscopy']['qubit_01_spectroscopy_pulsed']['weight'] = 1
-graph['resonator_spectroscopy']['qubit_01_spectroscopy_multidim']['weight'] = 2
+graph['resonator_spectroscopy']['qubit_01_spectroscopy_pulsed']['weight'] = 2
+graph['resonator_spectroscopy']['qubit_01_spectroscopy_multidim']['weight'] = 1
 
 # nx.draw_spring(graph, with_labels=True, k=1)
 # nx.draw(graph, pos=nx.spring_layout(graph, k=0.3), with_labels=True)
@@ -53,8 +53,6 @@ all_nodes = list(nx.topological_sort(graph))
 
 # TODO add condition argument and explanation
 def filtered_topological_order(target_node: str):
-    if target_node == 'new_node':
-        topo_order = ['new_node']
     if target_node == 'punchout':
         topo_order = ['punchout']
     else:

@@ -42,7 +42,7 @@ class Two_Tones_Multidim(Measurement):
 
         Schedule sequence
             Reset -> Spectroscopy pulse -> Measure
-        
+
         Parameters
         ----------
         self
@@ -59,7 +59,7 @@ class Two_Tones_Multidim(Measurement):
             The sweeping frequencies of the spectroscopy pulse for each qubit.
         repetitions
             The amount of times the Schedule will be repeated.
-        
+
         Returns
         -------
         :
@@ -68,7 +68,7 @@ class Two_Tones_Multidim(Measurement):
 
         # if port_out is None: port_out = port
         schedule = Schedule("multiplexed_qubit_spec",repetitions)
-        
+
         # Initialize the clock for each qubit
         for this_qubit, spec_array_val in spec_frequencies.items():
 
@@ -83,7 +83,7 @@ class Two_Tones_Multidim(Measurement):
             this_clock = f'{this_qubit}.01'
 
             frequency_values = spec_frequencies[this_qubit]
-       
+
             number_of_freqs = len(frequency_values)
 
             schedule.add(
@@ -104,18 +104,17 @@ class Two_Tones_Multidim(Measurement):
                     #spectroscopy pulse
                     # print(f'{spec_pulse_durations=}')
                     # print(f'{this_clock=}')
-                    
-                    spec_pulse = schedule.add(
-                        long_square_pulse(
-                            duration= spec_pulse_durations[this_qubit],
-                            amp= spec_pulse_amplitude,
-                            port= mw_pulse_ports[this_qubit],
-                            clock=this_clock,
-                        ),
-                        label=f"spec_pulse_multidim_{this_qubit}_{this_index}", ref_op=set_frequency, ref_pt="end",
-                    ) 
-                    
-                    """
+
+                    # spec_pulse = schedule.add(
+                    #     long_square_pulse(
+                    #         duration= spec_pulse_durations[this_qubit],
+                    #         amp= spec_pulse_amplitude,
+                    #         port= mw_pulse_ports[this_qubit],
+                    #         clock=this_clock,
+                    #     ),
+                    #     label=f"spec_pulse_multidim_{this_qubit}_{this_index}", ref_op=set_frequency, ref_pt="end",
+                    # )
+
                     spec_pulse = schedule.add(
                         SoftSquarePulse(
                             duration= spec_pulse_durations[this_qubit],
@@ -125,7 +124,7 @@ class Two_Tones_Multidim(Measurement):
                         ),
                         label=f"spec_pulse_{this_qubit}_{this_index}", ref_op=set_frequency, ref_pt="end",
                     )
-                    """
+
                     if self.qubit_state == 0:
                         measure_function = Measure
                     elif self.qubit_state == 1:

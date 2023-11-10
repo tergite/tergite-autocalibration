@@ -2,6 +2,9 @@
 import argparse
 from datetime import datetime
 import pathlib
+import time
+
+from qcodes import validators
 from utilities.status import DataStatus
 from logger.tac_logger import logger
 from workers.compilation_worker import precompile
@@ -9,7 +12,8 @@ from workers.execution_worker import measure_node
 from nodes.node import NodeFactory
 from workers.post_processing_worker import post_process
 from utilities.status import ClusterStatus
-from qblox_instruments import Cluster
+from qblox_instruments import Cluster, SpiRack
+from qblox_instruments.qcodes_drivers.spi_rack_modules import S4gModule
 
 from nodes.graph import filtered_topological_order
 from utilities.visuals import draw_arrow_chart
@@ -42,6 +46,48 @@ args = parser.parse_args()
 transmon_configuration = toml.load('./config_files/device_config.toml')
 
 
+def set_parking_current(coupler: str) -> None:
+    coupler_spi_map = {
+        'q16_q17': (1, 'dac0'), # slightly heating?
+        'q17_q18': (1, 'dac1'),
+        'q18_q19': (1, 'dac2'),
+        'q19_q20': (1, 'dac3'), # slightly heating
+        'q16_q21': (2, 'dac2'),
+        'q17_q22': (2, 'dac1'),
+        'q18_q23': (2, 'dac0'),
+        'q21_q22': (3, 'dac1'),
+        'q22_q23': (3, 'dac2'), # badly heating?
+        'q23_q24': (3, 'dac3'),
+        'q20_q25': (3, 'dac0'),
+        'q24_q25': (4, 'dac0'),
+    }
+
+    if redis_connection.hexists(f'couplers:{coupler}', 'parking_current'):
+        parking_current = redis_connection.hget(f'couplers:{coupler}', 'parking_current')
+    else:
+        raise ValueError('parking current is not present on redis')
+
+    dc_current_step = 25e-6
+    spi_mod_number, dac_name = coupler_spi_map[coupler]
+    spi_mod_name = f'module{spi_mod_number}'
+    spi = SpiRack('loki_rack', '/dev/ttyACM0')
+    spi.add_spi_module(spi_mod_number, S4gModule)
+    dac = spi.instrument_modules[spi_mod_name].instrument_modules[dac_name]
+    dac.ramping_enabled(False)
+    dac.span('range_min_bi')
+    dac.current(0)
+    dac.ramping_enabled(True)
+    dac.ramp_rate(100e-6)
+    dac.ramp_max_step(dc_current_step)
+    dac.current.vals = validators.Numbers(min_value=-3e-3, max_value=3e-3)
+    dac.current(parking_current)
+    while dac.is_ramping():
+        print(f'ramping {dac.current()}')
+        time.sleep(1)
+    print('Finished ramping')
+    return
+
+
 node_factory = NodeFactory()
 
 
@@ -56,9 +102,6 @@ qubits = user_requested_calibration['all_qubits']
 bus_list = [[qubits[i], qubits[i+1]] for i in range(len(qubits) - 1)]
 couplers = [bus[0] + '_' + bus[1] for bus in bus_list]
 
-bus_list = [ [qubits[i],qubits[i+1]] for i in range(len(qubits)-1) ]
-couplers = [bus[0]+'_'+bus[1]for bus in bus_list]
-
 def calibrate_system():
     logger.info('Starting System Calibration')
     target_node = user_requested_calibration['target_node']
@@ -70,7 +113,7 @@ def calibrate_system():
     # Populate the Redis database with the quantities of interest, at Nan value
     # Only if the key does NOT already exist
     quantities_of_interest = transmon_configuration['qoi']
-    for node, node_parameters_dictionary in quantities_of_interest.items():
+    for node_name, node_parameters_dictionary in quantities_of_interest.items():
         # named field as Redis calls them fields
         for qubit in qubits:
             redis_key = f'transmons:{qubit}'
@@ -80,30 +123,9 @@ def calibrate_system():
                 if not redis_connection.hexists(redis_key, field_key):
                     redis_connection.hset(f'transmons:{qubit}', field_key, field_value)
             # flag for the calibration supervisor
-            if not redis_connection.hexists(calibration_supervisor_key, node):
-                redis_connection.hset(f'cs:{qubit}', node, 'not_calibrated' )
-        
-        for coupler in couplers:
-            redis_key = f'couplers:{coupler}'
-            calibration_supervisor_key = f'cs:{coupler}'
-            for field_key, field_value in node_parameters_dictionary.items():
-                # check if field already exists
-                if not redis_connection.hexists(redis_key, field_key):
-                    redis_connection.hset(f'couplers:{coupler}', field_key, field_value)
-            # flag for the calibration supervisor
-            if not redis_connection.hexists(calibration_supervisor_key, node):
-                redis_connection.hset(f'cs:{coupler}', node, 'not_calibrated' )
+            if not redis_connection.hexists(calibration_supervisor_key, node_name):
+                redis_connection.hset(f'cs:{qubit}', node_name, 'not_calibrated' )
 
-        for coupler in couplers:
-            redis_key = f'couplers:{coupler}'
-            calibration_supervisor_key = f'cs:{coupler}'
-            for field_key, field_value in node_parameters_dictionary.items():
-                # check if field already exists
-                if not redis_connection.hexists(redis_key, field_key):
-                    redis_connection.hset(f'couplers:{coupler}', field_key, field_value)
-            # flag for the calibration supervisor
-            if not redis_connection.hexists(calibration_supervisor_key, node):
-                redis_connection.hset(f'cs:{coupler}', node, 'not_calibrated' )
 
     # Populate the Redis database with the initial 'reasonable' parameter values
     for qubit in qubits:
@@ -117,12 +139,25 @@ def calibrate_system():
         for parameter_key, parameter_value in initial_parameters['all'].items():
             redis_connection.hset(f"couplers:{coupler}", parameter_key, parameter_value)
 
-        # for parameter_key, parameter_value in initial_parameters[coupler].items():
-        #     redis_connection.hset(f"couplers:{coupler}", parameter_key, parameter_value)
+        for parameter_key, parameter_value in initial_parameters[coupler].items():
+            redis_connection.hset(f"couplers:{coupler}", parameter_key, parameter_value)
 
-    for node in topo_order:
-        inspect_node(node)
-        logger.info(f'{node} node is completed')
+
+    if target_node == 'cz_chevron':
+        if 'node_dictionary' in user_requested_calibration:
+            node_dictionary = user_requested_calibration['node_dictionary']
+            if 'coupled_qubits' in node_dictionary:
+                coupled_qubits = node_dictionary['coupled_qubits']
+                coupler = coupled_qubits[0] + '_' + coupled_qubits[1]
+            else:
+                raise ValueError('Misformated user input')
+        else:
+            raise ValueError('Misformated user input')
+        set_parking_current(coupler)
+
+    for calibration_node in topo_order:
+        inspect_node(calibration_node)
+        logger.info(f'{calibration_node} node is completed')
 
 
 def inspect_node(node: str):
@@ -130,19 +165,19 @@ def inspect_node(node: str):
     # breakpoint()
     # Reapply the all initials. This is because of two tones messing with mw_duration
     # TODO: is that necessary?
-    initial_parameters = transmon_configuration['initials']
-    qubits = user_requested_calibration['all_qubits']
-    for qubit in qubits:
-        for parameter_key, parameter_value in initial_parameters['all'].items():
-            redis_connection.hset(f"transmons:{qubit}", parameter_key, parameter_value)
-
-    for coupler in couplers:
-        for parameter_key, parameter_value in initial_parameters['all'].items():
-            redis_connection.hset(f"couplers:{coupler}", parameter_key, parameter_value)
+    # initial_parameters = transmon_configuration['initials']
+    # qubits = user_requested_calibration['all_qubits']
+    # for qubit in qubits:
+    #     for parameter_key, parameter_value in initial_parameters['all'].items():
+    #         redis_connection.hset(f"transmons:{qubit}", parameter_key, parameter_value)
+    #
+    # for coupler in couplers:
+    #     for parameter_key, parameter_value in initial_parameters['all'].items():
+    #         redis_connection.hset(f"couplers:{coupler}", parameter_key, parameter_value)
 
     #Populate the Redis database with node specific parameter values
     qubits_statuses = [redis_connection.hget(f"cs:{qubit}", node) == 'calibrated' for qubit in qubits]
-    coupler_statuses = [redis_connection.hget(f"cs:{coupler}", node) == 'calibrated' for coupler in couplers]
+    # coupler_statuses = [redis_connection.hget(f"cs:{coupler}", node) == 'calibrated' for coupler in couplers]
     #node is calibrated only when all qubits have the node calibrated:
     is_node_calibrated = all(qubits_statuses)
     if node in transmon_configuration and not is_node_calibrated:
@@ -188,13 +223,12 @@ def calibrate_node(node_label: str):
     device_config = {}
     for qubit in qubits:
         device_config[qubit] = redis_connection.hgetall(f"transmons:{qubit}")
-    
+
     for coupler in couplers:
         device_config[coupler] = redis_connection.hgetall(f"couplers:{coupler}")
 
-    # node = Node(node_label, qubits, node_dictionary)
-
     node = node_factory.create_node(node_label, qubits, **node_dictionary)
+
 
     compiled_schedule = precompile(node)
     result_dataset = measure_node(
@@ -208,9 +242,10 @@ def calibrate_node(node_label: str):
     measurement_date = datetime.now()
     plots_today = measurement_date.date().strftime('%Y%m%d')
     time_id = measurement_date.strftime('%Y%m%d-%H%M%S-%f')[:19]
-    measurement_id = time_id + '-' + f'-{node.name}'
+    measurement_id = time_id + '-' + f'{node.name}'
     data_path = pathlib.Path(data_directory / plots_today / measurement_id)
     data_path.mkdir(parents=True, exist_ok=True)
+
     logger.info('measurement completed')
     post_process(result_dataset, node, data_path=data_path)
     logger.info('analysis completed')
