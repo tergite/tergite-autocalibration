@@ -72,6 +72,7 @@ class QubitSpectroscopyMultidim():
         for coord in dataset[data_var].coords:
             if 'frequencies' in coord: self.frequency_coords = coord
             elif 'amplitudes' in coord: self.amplitude_coords = coord
+        dataset[data_var].values = np.abs(self.S21)
         self.frequencies = dataset.coords[self.frequency_coords].values
         self.amplitudes = dataset.coords[self.amplitude_coords].values
         #dataset[f'y{self.qubit}'].values = np.abs(self.S21)

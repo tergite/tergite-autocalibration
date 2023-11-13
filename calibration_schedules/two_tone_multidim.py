@@ -118,8 +118,8 @@ class Two_Tones_Multidim(Measurement):
                     spec_pulse = schedule.add(
                         SoftSquarePulse(
                             duration= spec_pulse_durations[this_qubit],
-                            amp= spec_pulse_amplitude,
-                            port= mw_pulse_ports[this_qubit],
+                            amp = spec_pulse_amplitude,
+                            port = mw_pulse_ports[this_qubit],
                             clock=this_clock,
                         ),
                         label=f"spec_pulse_{this_qubit}_{this_index}", ref_op=set_frequency, ref_pt="end",

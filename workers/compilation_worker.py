@@ -89,13 +89,13 @@ def precompile(node):
         transmons[qubit] = transmon
 
     # Creating coupler edge
-    bus_list = [ [qubits[i],qubits[i+1]] for i in range(len(qubits)-1) ]
-    couplers={}
-    for bus in bus_list:
-        coupler = CompositeSquareEdge(bus[0],bus[1])
-        load_redis_config_coupler(coupler)
-        device.add_edge(coupler)
-        couplers[bus[0]+'_'+bus[1]] = coupler
+    #bus_list = [ [qubits[i],qubits[i+1]] for i in range(len(qubits)-1) ]
+    #couplers={}
+    #for bus in bus_list:
+    #    coupler = CompositeSquareEdge(bus[0],bus[1])
+    #    load_redis_config_coupler(coupler)
+    #    device.add_edge(coupler)
+    #    couplers[bus[0]+'_'+bus[1]] = coupler
 
     #breakpoint()
     node_class = node.measurement_obj(transmons, node.qubit_state)
@@ -174,8 +174,8 @@ def precompile(node):
     # after the compilation_config is acquired, free the transmon resources
     for extended_transmon in transmons.values():
         extended_transmon.close()
-    for extended_edge in couplers.values():
-        extended_edge.close()
+    #for extended_edge in couplers.values():
+    #    extended_edge.close()
 
     logger.info('Starting Compiling')
     compiled_schedule = compiler.compile(schedule=schedule, config=compilation_config)

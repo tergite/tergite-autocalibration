@@ -139,8 +139,9 @@ def calibrate_system():
         for parameter_key, parameter_value in initial_parameters['all'].items():
             redis_connection.hset(f"couplers:{coupler}", parameter_key, parameter_value)
 
-        for parameter_key, parameter_value in initial_parameters[coupler].items():
-            redis_connection.hset(f"couplers:{coupler}", parameter_key, parameter_value)
+        if coupler in initial_parameters:
+            for parameter_key, parameter_value in initial_parameters[coupler].items():
+                redis_connection.hset(f"couplers:{coupler}", parameter_key, parameter_value)
 
 
     if target_node == 'cz_chevron':

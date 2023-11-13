@@ -30,7 +30,7 @@ class ResonatorSpectroscopyAnalysis():
         # Gives an initial guess for the model parameters and then fits the model to the data.
         guess = model.guess(S21, f=frequencies)
         self.fitting_model = model.fit(S21, params=guess, f=frequencies)
-        #self.fitting_model = model.fit(S21, params=guess, f=frequencies)
+
         fit_result = self.fitting_model
 
         fit_fr = fit_result.params['fr'].value

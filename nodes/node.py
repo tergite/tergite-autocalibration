@@ -52,10 +52,8 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 
 def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
-    qub_spec_samples = 65
-    #qub_spec_samples = 165
+    qub_spec_samples = 75
     sweep_range = 4.5e6
-    #sweep_range = 14.5e6
     if transition == '01':
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition == '12':
@@ -190,7 +188,8 @@ class Qubit_01_Spectroscopy_Multidim_Node:
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
             },
             'spec_pulse_amplitudes': {
-                 qubit : np.linspace(2e-5, 8e-4, 5) for qubit in self.all_qubits
+                 qubit: np.linspace(1e-4, 10e-4, 13) for qubit in self.all_qubits
+                 #qubit: np.array([1e-4, 3.5e-4, 8e-4]) for qubit in self.all_qubits
             }
         }
         return cluster_samplespace
@@ -252,7 +251,7 @@ class T1_Node:
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'delays': {qubit : np.arange(16e-9,250e-6,4e-6) for qubit in self.all_qubits}
+            'delays': {qubit : np.arange(52e-9,250e-6,4e-6) for qubit in self.all_qubits}
         }
         return cluster_samplespace
 
@@ -281,7 +280,7 @@ class Resonator_Spectroscopy_2_Node:
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
-        self.redis_field = 'ro_freq_2'
+        self.redis_field = ['ro_freq_2']
         self.qubit_state = 2
         self.measurement_obj = Resonator_Spectroscopy
         self.analysis_obj = ResonatorSpectroscopy_2_Analysis
@@ -330,7 +329,7 @@ class Rabi_Oscillations_12_Node:
     def samplespace(self):
         cluster_samplespace = {
             'mw_amplitudes': {
-                qubit: np.linspace(0.002, 0.200, 31) for qubit in self.all_qubits
+                qubit: np.linspace(0.002, 0.500, 55) for qubit in self.all_qubits
             }
         }
         return cluster_samplespace

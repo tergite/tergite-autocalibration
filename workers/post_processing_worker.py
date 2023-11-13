@@ -14,14 +14,14 @@ matplotlib.use('tkagg')
 set_datadir('.')
 redis_connection = redis.Redis(decode_responses=True)
 
-def post_process(result_dataset: xr.Dataset, node: str, data_path: Path):
+def post_process(result_dataset: xr.Dataset, node, data_path: Path):
     analysis = Multiplexed_Analysis(result_dataset, node, data_path)
 
     # figure_manager = plt.get_current_fig_manager()
     # figure_manager.window.showMaximized()
     fig = plt.gcf()
     fig.set_tight_layout(True)
-    fig.savefig(f'{data_path}/{node}.png', bbox_inches='tight', dpi=600)
+    fig.savefig(f'{data_path}/{node.name}.png', bbox_inches='tight', dpi=600)
     plt.show()
     #plt.show(block=False)
     #plt.pause(30)
@@ -64,7 +64,6 @@ class Multiplexed_Analysis(BaseAnalysis):
         if node == 'tof':
             tof = analyze_tof(result_dataset, True)
             return
-        print(f'{ result_dataset = }')
         super().__init__(result_dataset, data_path)
         data_vars_dict = collections.defaultdict(set)
         for var in result_dataset.data_vars:
@@ -96,8 +95,8 @@ class Multiplexed_Analysis(BaseAnalysis):
 
             node_analysis.plotter(this_axis)
 
-            print( 'WARNING REDIS UPDATE COMMENTED OUT')
-            #self.update_redis_trusted_values(node.name, this_qubit, redis_field)
+            #print( 'WARNING REDIS UPDATE COMMENTED OUT')
+            self.update_redis_trusted_values(node.name, this_qubit, redis_field)
 
             handles, labels = this_axis.get_legend_handles_labels()
             # if node == 'qubit_01_spectroscopy_pulsed':

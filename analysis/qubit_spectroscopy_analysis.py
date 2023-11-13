@@ -85,7 +85,7 @@ class QubitSpectroscopyAnalysis():
         frequencies = self.independents
 
         if not self.has_peak():
-            return [np.nan]
+            return [np.mean(frequencies)]
 
         self.fit_freqs = np.linspace(frequencies[0], frequencies[-1], 500)  # x-values for plotting
 
@@ -96,11 +96,11 @@ class QubitSpectroscopyAnalysis():
         guess = model.guess(self.magnitudes, x=frequencies)
         fit_result = model.fit(self.magnitudes, params=guess, x=frequencies)
 
-        self.f01 = fit_result.params['x0'].value
+        self.freq = fit_result.params['x0'].value
         self.uncertainty = fit_result.params['x0'].stderr
 
         self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_freqs})
-        return [self.f01]
+        return [self.freq]
 
     def reject_outliers(self, data, m=3.):
         # Filters out datapoints in data that deviate too far from the median
@@ -127,9 +127,9 @@ class QubitSpectroscopyAnalysis():
         if self.hasPeak:
             ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0)
             min = np.min(self.magnitudes)
-            ax.vlines(self.f01, min, self.prominence + min, lw=4, color='teal')
-            ax.vlines(self.f01-1e6, min, self.filtered_std + min, lw=4, color='orange')
-            ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0, label=f"f01 = {self.f01:.6E} ± {self.uncertainty:.1E} (Hz)")
+            ax.vlines(self.freq, min, self.prominence + min, lw=4, color='teal')
+            ax.vlines(self.freq-1e6, min, self.filtered_std + min, lw=4, color='orange')
+            ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0, label=f"freq = {self.freq:.6E} ± {self.uncertainty:.1E} (Hz)")
         # Plots the data and the fitted model of a qubit spectroscopy experiment
         ax.plot( self.independents, self.magnitudes,'bo-',ms=3.0)
         ax.set_title(f'Qubit Spectroscopy for {self.qubit}')

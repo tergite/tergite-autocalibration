@@ -16,12 +16,14 @@ graph_dependencies = [
     ('qubit_01_spectroscopy_multidim', 'rabi_oscillations'), #remove this line?
     ('rabi_oscillations', 'ramsey_correction'),
     ('ramsey_correction', 'resonator_spectroscopy_1'),
+    ('resonator_spectroscopy_1', 'T1'),
     ('ramsey_correction', 'ro_frequency_optimization'),
     ('ro_frequency_optimization', 'ro_amplitude_optimization'),
     ('ro_amplitude_optimization', 'state_discrimination'),
-    ('ramsey_correction', 'T1'),
+    #('ramsey_correction', 'T1'),
     ('resonator_spectroscopy_1', 'qubit_12_spectroscopy_pulsed'),
     ('qubit_12_spectroscopy_pulsed', 'rabi_oscillations_12'),
+    ('rabi_oscillations_12', 'resonator_spectroscopy_2'),
     ('rabi_oscillations_12', 'ramsey_correction_12'),
     ('ramsey_correction_12', 'ro_frequency_optimization_gef'),
     ('qubit_12_spectroscopy_pulsed', 'cz_chevron'),
@@ -42,8 +44,8 @@ graph.add_node('ro_amplitude_optimization', type='refine')
 
 # for nodes that perform the same measurement,
 # assign a weight to the corresponding edge to sort them
-graph['resonator_spectroscopy']['qubit_01_spectroscopy_pulsed']['weight'] = 2
-graph['resonator_spectroscopy']['qubit_01_spectroscopy_multidim']['weight'] = 1
+graph['resonator_spectroscopy']['qubit_01_spectroscopy_pulsed']['weight'] = 1
+graph['resonator_spectroscopy']['qubit_01_spectroscopy_multidim']['weight'] = 2
 
 # nx.draw_spring(graph, with_labels=True, k=1)
 # nx.draw(graph, pos=nx.spring_layout(graph, k=0.3), with_labels=True)
