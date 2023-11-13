@@ -47,7 +47,7 @@ class CZ_chevron(Measurement):
             #TODO temporarily comment out as they are hardcoded in the schedule
             #cz_pulse_duration: dict[str,float],
             #cz_pulse_width: dict[str,float], 
-            testing_group: int = 0,
+            testing_group: int = 1,
             repetitions: int = 4096,
             mock_data: bool = False,
             swap: bool = False,
@@ -99,22 +99,22 @@ class CZ_chevron(Measurement):
         # print(f'{ cz_pulse_amplitudes = }')
         print(f'{ qubits = }')
         
-        #couplers_list_all = edge_group.keys()
-        #couplers_list,bus_list = [],[]
-        #for coupler in couplers_list_all:
-        #    control,target = coupler.split('_')[0], coupler.split('_')[1]
-        #    if testing_group != 0:
-        #        check = edge_group[coupler] == testing_group
-        #    else:
-        #        check = True
-        #    if control in qubits and target in qubits and check:
-        #        bus_list.append([control,target])
-        #        couplers_list.append(coupler)
-        #control, target = np.transpose(bus_list)
+        couplers_list_all = edge_group.keys()
+        couplers_list,bus_list = [],[]
+        for coupler in couplers_list_all:
+           control,target = coupler.split('_')[0], coupler.split('_')[1]
+           if testing_group != 0:
+               check = edge_group[coupler] == testing_group
+           else:
+               check = True
+           if control in qubits and target in qubits and check:
+               bus_list.append([control,target])
+               couplers_list.append(coupler)
+        control, target = np.transpose(bus_list)
 
         freq_cz = {}
-        bus_list = [['q21','q22']]
-        this_coupler = 'q21_q22'
+        # bus_list = [['q21','q22']]
+        # this_coupler = 'q21_q22'
         print(f'{mw_frequencies = }')
         print(f'{mw_frequencies_12 = }')
         for bus_pair in bus_list:
@@ -123,7 +123,8 @@ class CZ_chevron(Measurement):
            f02=mw_frequencies[bus_pair[1]]+mw_frequencies_12[bus_pair[1]]
            freq_cz[bus_pair[0]+'_'+bus_pair[1]] = np.min(np.abs(np.array([f20,f02])-f11))
 
-        cz_frequency_values = -freq_cz[this_coupler]-np.array(list(cz_pulse_frequencies_sweep.values())[0])
+        print(freq_cz)
+        cz_frequency_values = np.array(list(cz_pulse_frequencies_sweep.values())[0])
         # cz_amplitude_values = list(cz_pulse_amplitudes.values())[0]
         cz_duration_values = list(cz_pulse_durations.values())[0]
         # number_of_sweeps = len(cz_amplitude_values)
@@ -131,8 +132,6 @@ class CZ_chevron(Measurement):
         # cz_duration, cz_width = 200e-9, 4e-9
 
         # Add the clocks to the schedule
-        # print(mw_frequencies.values())
-        # f01 = -np.abs(np.diff(list(mw_frequencies.values()))[0])
         for this_qubit, mw_f_val in mw_frequencies.items():
             schedule.add_resource(
                 ClockResource( name=f'{this_qubit}.01', freq=mw_f_val)
@@ -141,25 +140,12 @@ class CZ_chevron(Measurement):
             schedule.add_resource(
                 ClockResource(name=f'{this_qubit}.12', freq=mw_f_val)
             )
-
-        #print(f'{ couplers_list = }')
-        #for this_coupler in self.couplers.keys():
-        #    schedule.add_resource(
-        #        ClockResource(name=f'{this_coupler}.cz', freq=4.4e9)
-        #    )
-        print(freq_cz)
-        schedule.add_resource( ClockResource(name=this_coupler+'.cz',freq=-freq_cz[this_coupler]))
-
-
-        #This is the common reference operation so the qubits can be operated in parallel
-        #for this_coupler in self.couplers.values():
-            # this_coupler.cz.square_duration(cz_duration)
+        for this_coupler in couplers_list:
+            schedule.add_resource( ClockResource(name=this_coupler+'.cz',freq=-freq_cz[this_coupler]))
 
 
         # The outer loop, iterates over all couplers
-        this_coupler = 'q21_q22'
-        cz_clock = f'{this_coupler}.cz'
-        cz_pulse_port = f'{this_coupler}:fl'
+        
         #cz_frequency_values = cz_pulse_frequencies_sweep_values[this_coupler]
         number_of_freqs = len(cz_frequency_values)
 
@@ -167,12 +153,8 @@ class CZ_chevron(Measurement):
         for ampl_indx, cz_duration in enumerate(cz_duration_values):
 
             #The inner for loop iterates over all frequency values:
-            for acq_index, cz_freq in enumerate(cz_frequency_values):
+            for acq_index, cz_freq_sweep in enumerate(cz_frequency_values):
                 
-                set_frequency = schedule.add(
-                    SetClockFrequency(clock=cz_clock, clock_freq_new=cz_freq),
-                    label=f"set_freq_{ampl_indx}_{acq_index}"
-                )
 
                 relaxation = schedule.add(Reset(*qubits), label=f"Reset_{acq_index}_{ampl_indx}")
 
@@ -187,15 +169,22 @@ class CZ_chevron(Measurement):
                 # self.couplers[this_coupler].cz.square_amp(0.1)
                 # cz = schedule.add(CZ('q21', 'q22'), ref_op=x, ref_pt='end')
                 cz_amplitude = 0.15
-                cz = schedule.add(
-                        SquarePulse(
-                            duration=cz_duration,
-                            amp = cz_amplitude,
-                            port=cz_pulse_port,
-                            clock=cz_clock,
-                        ),
-                        ref_op=x, ref_pt='end',
+                for this_coupler in couplers_list:
+                   # this_coupler = 'q21_q22'
+                    set_frequency = schedule.add(
+                        SetClockFrequency(clock=cz_clock, clock_freq_new=-freq_cz[this_coupler]-cz_freq_sweep),ref_op=x, ref_pt='end'
                     )
+                    cz_clock = f'{this_coupler}.cz'
+                    cz_pulse_port = f'{this_coupler}:fl'
+                    cz = schedule.add(
+                            SquarePulse(
+                                duration=cz_duration,
+                                amp = cz_amplitude,
+                                port=cz_pulse_port,
+                                clock=cz_clock,
+                            ),
+                            ref_op=set_frequency, ref_pt='end',
+                        )
 
                 for this_qubit in qubits:
                     #this_index = cz_index*number_of_amplitudes+cz_amplitude_index
