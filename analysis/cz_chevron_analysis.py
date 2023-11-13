@@ -66,7 +66,7 @@ class CZChevronAnalysis():
     def run_fitting(self):
         # self.testing_group = 0
         self.freq = self.dataset[f'cz_pulse_frequencies_sweep{self.qubit}'].values/1e6
-        self.amp = self.dataset[f'cz_pulse_amplitudes{self.qubit}'].values
+        self.amp = self.dataset[f'cz_pulse_durations{self.qubit}'].values
         magnitudes = self.dataset[f'y{self.qubit}'].values
         self.magnitudes = (magnitudes - np.min(magnitudes))/(np.max(magnitudes)-np.min(magnitudes))
         # values = [[np.linalg.norm(u) for u in v] for v in self.dataset[f'y{self.qubit}_']]
@@ -88,20 +88,20 @@ class CZChevronAnalysis():
         self.opt_cz = fit_results[opt_id].result.params['cz'].value
         self.opt_swap = fit_results[opt_id].result.params['swap'].value
 
-        return self.opt_freq
+        return [self.opt_freq]
 
     def plotter(self,axis):
         datarray = self.dataset[f'y{self.qubit}']
         qubit = self.qubit
-        #fig = datarray.plot(ax=axis, x=f'cz_pulse_frequencies_sweep{qubit}',cmap='RdBu_r')
-        fig = axis.pcolormesh(self.amp,self.freq,self.magnitudes,shading='nearest',cmap='RdBu_r')
-        axis.scatter(self.opt_cz,self.opt_freq,c='r',label = 'CZ Amplitude= {:.2f} V'.format(self.opt_cz),marker='X',s=200,edgecolors='k', linewidth=2,zorder=10)
-        axis.scatter(self.opt_swap,self.opt_freq,c='b',label = 'SWAP Amplitude= {:.2f} V'.format(self.opt_swap),marker='X',s=200,edgecolors='k', linewidth=2,zorder=10)
-        axis.hlines(self.opt_freq,self.amp[0],self.amp[-1],label = 'Frequency = {:.2f} MHz'.format(self.opt_freq),colors='k',linestyles='--',linewidth=2)
-        axis.legend(loc = 'lower center', bbox_to_anchor=(-0.15, -0.45, 1.4, .102), mode='expand', ncol=2,
-            title = 'Optimal Gate Parameters', columnspacing=200,borderpad=1)
-        #cbar = axis.colorbar(fig)
-        #cbar.set_label('Qubit Population', labelpad=10)
-        axis.set_xlabel('Amplitude (V)')
-        axis.set_ylabel('Frequency (MHz)')
+        fig = datarray.plot(ax=axis, x=f'cz_pulse_frequencies_sweep{qubit}',cmap='RdBu_r')
+        # fig = axis.pcolormesh(self.amp,self.freq,self.magnitudes,shading='nearest',cmap='RdBu_r')
+        # axis.scatter(self.opt_cz,self.opt_freq,c='r',label = 'CZ Amplitude= {:.2f} V'.format(self.opt_cz),marker='X',s=200,edgecolors='k', linewidth=2,zorder=10)
+        # axis.scatter(self.opt_swap,self.opt_freq,c='b',label = 'SWAP Amplitude= {:.2f} V'.format(self.opt_swap),marker='X',s=200,edgecolors='k', linewidth=2,zorder=10)
+        # axis.hlines(self.opt_freq,self.amp[0],self.amp[-1],label = 'Frequency = {:.2f} MHz'.format(self.opt_freq),colors='k',linestyles='--',linewidth=2)
+        # axis.legend(loc = 'lower center', bbox_to_anchor=(-0.15, -0.45, 1.4, .102), mode='expand', ncol=2,
+        #     title = 'Optimal Gate Parameters', columnspacing=200,borderpad=1)
+        # #cbar = axis.colorbar(fig)
+        # #cbar.set_label('Qubit Population', labelpad=10)
+        # axis.set_xlabel('Amplitude (V)')
+        # axis.set_ylabel('Frequency (MHz)')
         #axis.title(f'CZ Chevron {qubit}')

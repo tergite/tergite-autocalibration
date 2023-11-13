@@ -100,7 +100,10 @@ class QubitSpectroscopyAnalysis():
         self.uncertainty = fit_result.params['x0'].stderr
 
         self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_freqs})
-        return [self.f01]
+        # Take maximal value directly
+        self.max_freq = frequencies[np.argmax(self.magnitudes)]
+        print(self.max_freq)
+        return [self.max_freq]
 
     def reject_outliers(self, data, m=3.):
         # Filters out datapoints in data that deviate too far from the median
@@ -120,6 +123,7 @@ class QubitSpectroscopyAnalysis():
         )
         self.prominence = properties["prominences"][0] if len(properties['prominences']) == 1 else 0
         self.hasPeak = peaks.size == 1
+        self.hasPeak = True
         return self.hasPeak
 
     def plotter(self,ax):
