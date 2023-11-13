@@ -53,17 +53,16 @@ class T1(Measurement):
         
         #First loop over every qubit with corresponding tau sweeping lists
         for this_qubit, times_val in delays.items():
-            schedule.add(
-                Reset(*qubits), ref_op=root_relaxation, ref_pt_new='end'
-            )  # To enforce parallelism we refer to the root relaxation
-
+            prev_relax = root_relaxation
             #Second loop over all tau delay values
             for acq_index, tau in enumerate(times_val):
-                schedule.add(X(this_qubit))
+                relaxation=schedule.add(Reset(this_qubit), ref_op=prev_relax, label=f"Reset {this_qubit} {acq_index}")
+                schedule.add(X(this_qubit), label=f"pi {this_qubit} {acq_index}")
                 schedule.add(
                     Measure(this_qubit, acq_index=acq_index, bin_mode=BinMode.AVERAGE),
-                    ref_pt="end",
+                    ref_pt="start",
                     rel_time=tau,
+                    label=f"Measurement {this_qubit} {acq_index}",
                 )
-                schedule.add(Reset(this_qubit))
+                prev_relax=relaxation
         return schedule
