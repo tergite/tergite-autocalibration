@@ -43,8 +43,8 @@ from config_files.VNA_values import (
 
 
 def resonator_samples(qubit: str) -> np.ndarray:
-    res_spec_samples = 61
-    sweep_range = 4.0e6
+    res_spec_samples = 91
+    sweep_range = 7.0e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
     min_freq = VNA_frequency - sweep_range / 2
     max_freq = VNA_frequency + sweep_range / 2
@@ -52,8 +52,8 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 
 def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
-    qub_spec_samples = 75
-    sweep_range = 4.5e6
+    qub_spec_samples = 85
+    sweep_range = 5.0e6
     if transition == '01':
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition == '12':
@@ -114,7 +114,7 @@ class Resonator_Spectroscopy_Node(Base_Node):
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = node_dictionary
-        self.redis_field = ['ro_freq']
+        self.redis_field = ['ro_freq', 'Ql']
         self.qubit_state = 0
         self.measurement_obj = Resonator_Spectroscopy
         self.analysis_obj = ResonatorSpectroscopyAnalysis
