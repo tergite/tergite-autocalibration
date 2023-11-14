@@ -52,7 +52,7 @@ q13.ro_pulse_amp = 7.2e-3
 q14.ro_pulse_amp = 8.0e-3
 q15.ro_pulse_amp = 6.5e-3
 
-q16.ro_pulse_amp = 20.0e-3
+q16.ro_pulse_amp = 25.0e-3
 q17.ro_pulse_amp = 20.0e-3
 q18.ro_pulse_amp =  7.0e-3
 q19.ro_pulse_amp = 8.0e-3
@@ -80,6 +80,7 @@ init_duration = 300e-6
 [qubit_01_spectroscopy_pulsed.all]
 spec_pulse_duration = 2e-6
 spec_amp = 4.5e-4
+#spec_amp = 4.5e-6
 
 [qubit_01_spectroscopy_multidim.all]
 spec_pulse_duration = 2e-6

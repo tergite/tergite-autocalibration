@@ -54,7 +54,7 @@ class T1(Measurement):
         #First loop over every qubit with corresponding tau sweeping lists
         for this_qubit, times_val in delays.items():
             schedule.add(
-                Reset(*qubits), ref_op=root_relaxation, ref_pt_new='end'
+                Reset(*qubits), ref_op=root_relaxation, ref_pt='end'
             )  # To enforce parallelism we refer to the root relaxation
 
             #Second loop over all tau delay values

@@ -96,20 +96,22 @@ class Two_Tones_Spectroscopy(Measurement):
             else:
                 raise ValueError(f'Invalid qubit state: {self.qubit_state}')
 
+            schedule.add(
+                Reset(*qubits), ref_op=root_relaxation, ref_pt='end'
+            )  # To enforce parallelism we refer to the root relaxation
+
             # The second for loop iterates over all frequency values in the frequency batch:
-            relaxation = root_relaxation  # To enforce parallelism we refer to the root relaxation
             for acq_index, spec_pulse_frequency in enumerate(spec_array_val):
                 # reset the clock frequency for the qubit pulse
-                set_frequency = schedule.add(
+                schedule.add(
                     SetClockFrequency(clock=this_clock, clock_freq_new=spec_pulse_frequency),
-                    label=f"set_freq_{this_qubit}_{acq_index}",
-                    ref_op=relaxation, ref_pt='end'
+                    ref_pt='end'
                 )
 
                 if self.qubit_state == 0:
-                    excitation_pulse = set_frequency
+                    pass
                 elif self.qubit_state == 1:
-                    excitation_pulse = schedule.add(X(this_qubit), ref_op=set_frequency, ref_pt='end')
+                    schedule.add(X(this_qubit), ref_pt='end')
                 else:
                     raise ValueError(f'Invalid qubit state: {self.qubit_state}')
 
@@ -133,7 +135,7 @@ class Two_Tones_Spectroscopy(Measurement):
                         port=mw_pulse_ports[this_qubit],
                         clock=this_clock,
                     ),
-                    label=f"spec_pulse_{this_qubit}_{acq_index}", ref_op=excitation_pulse, ref_pt="end",
+                    ref_pt="end", rel_time = 16e-9
                 )
 
                 if self.qubit_state == 0:
@@ -145,12 +147,10 @@ class Two_Tones_Spectroscopy(Measurement):
 
                 schedule.add(
                     measure_function(this_qubit, acq_index=acq_index, bin_mode=BinMode.AVERAGE),
-                    ref_op=spec_pulse,
                     ref_pt='end',
-                    label=f'Measurement_{this_qubit}_{acq_index}'
                 )
 
                 # update the relaxation for the next batch point
-                relaxation = schedule.add(Reset(this_qubit), label=f"Reset_{this_qubit}_{acq_index}")
+                schedule.add(Reset(this_qubit))
 
         return schedule
