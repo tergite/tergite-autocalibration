@@ -12,6 +12,7 @@ from calibration_schedules.ro_amplitude_optimization import RO_amplitude_optimiz
 from calibration_schedules.state_discrimination import Single_Shots_RO
 # from calibration_schedules.drag_amplitude import DRAG_amplitude
 from calibration_schedules.motzoi_parameter import Motzoi_parameter
+from calibration_schedules.n_rabi_oscillations import N_Rabi_Oscillations
 from calibration_schedules.cz_chevron import CZ_chevron
 
 from analysis.motzoi_analysis import MotzoiAnalysis
@@ -35,6 +36,7 @@ from analysis.tof_analysis import analyze_tof
 from analysis.T1_analysis import T1Analysis
 from analysis.coupler_spectroscopy_analysis import CouplerSpectroscopyAnalysis
 from analysis.cz_chevron_analysis import CZChevronAnalysis
+from analysis.n_rabi_analysis import NRabiAnalysis
 
 
 from config_files.VNA_values import (
@@ -43,8 +45,8 @@ from config_files.VNA_values import (
 
 
 def resonator_samples(qubit: str) -> np.ndarray:
-    res_spec_samples = 26
-    sweep_range = 2.5e6
+    res_spec_samples = 51
+    sweep_range = 1.5e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
     min_freq = VNA_frequency - sweep_range / 2
     max_freq = VNA_frequency + sweep_range / 2
@@ -54,7 +56,7 @@ def resonator_samples(qubit: str) -> np.ndarray:
 def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
     qub_spec_samples = 101
     #qub_spec_samples = 165
-    sweep_range = 10e6
+    sweep_range = 20e6
     #sweep_range = 14.5e6
     if transition == '01':
         VNA_frequency = VNA_qubit_frequencies[qubit]
@@ -81,6 +83,8 @@ class NodeFactory:
             'qubit_12_spectroscopy_pulsed': Qubit_12_Spectroscopy_Pulsed_Node,
             'rabi_oscillations_12': Rabi_Oscillations_12_Node,
             'resonator_spectroscopy_2': Resonator_Spectroscopy_2_Node,
+            'motzoi_parameter': Motzoi_Parameter_Node,
+            'n_rabi_oscillations': N_Rabi_Oscillations_Node,
             'coupler_spectroscopy': Coupler_Spectroscopy_Node,
             'coupler_resonator_spectroscopy': Coupler_Resonator_Spectroscopy_Node,
             'T1': T1_Node,
@@ -239,6 +243,42 @@ class Ramsey_Fringes_Node:
         }
         return cluster_samplespace
 
+class Motzoi_Parameter_Node:
+    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
+        self.name = name
+        self.all_qubits = all_qubits
+        self.node_dictionary = kwargs
+        self.redis_field = ['mw_motzoi']
+        self.qubit_state = 0
+        self.measurement_obj = Motzoi_parameter
+        self.analysis_obj = MotzoiAnalysis
+
+    @property
+    def samplespace(self):
+        cluster_samplespace = {
+            'mw_motzois': {qubit: np.linspace(-0.5,0.5,61) for qubit in self.all_qubits},
+            'X_repetitions': {qubit : np.arange(2, 17, 4) for qubit in self.all_qubits}
+        }
+        return cluster_samplespace
+
+class N_Rabi_Oscillations_Node:
+    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
+        self.name = name
+        self.all_qubits = all_qubits
+        self.node_dictionary = kwargs
+        self.redis_field = ['mw_amp180']
+        self.qubit_state = 0
+        self.measurement_obj = N_Rabi_Oscillations
+        self.analysis_obj = NRabiAnalysis
+
+    @property
+    def samplespace(self):
+        cluster_samplespace = {
+            'mw_amplitudes_sweep': {qubit: np.linspace(-0.1,0.1,61) for qubit in self.all_qubits},
+            'X_repetitions': {qubit : np.arange(1, 16, 4) for qubit in self.all_qubits}
+        }
+        return cluster_samplespace
+
 class T1_Node:
     def __init__(self, name: str, all_qubits: list[str], ** kwargs):
         self.name = name
@@ -330,7 +370,7 @@ class Rabi_Oscillations_12_Node:
     def samplespace(self):
         cluster_samplespace = {
             'mw_amplitudes': {
-                qubit: np.linspace(0.002, 0.200, 31) for qubit in self.all_qubits
+                qubit: np.linspace(0.002, 0.400, 31) for qubit in self.all_qubits
             }
         }
         return cluster_samplespace

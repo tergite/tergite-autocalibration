@@ -102,7 +102,7 @@ class QubitSpectroscopyAnalysis():
         self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_freqs})
         # Take maximal value directly
         self.max_freq = frequencies[np.argmax(self.magnitudes)]
-        print(self.max_freq)
+        # print(self.max_freq)
         return [self.max_freq]
 
     def reject_outliers(self, data, m=3.):

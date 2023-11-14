@@ -17,6 +17,8 @@ graph_dependencies = [
     ('rabi_oscillations', 'ramsey_correction'),
     ('ramsey_correction', 'resonator_spectroscopy_1'),
     ('ramsey_correction', 'ro_frequency_optimization'),
+    ('ramsey_correction', 'motzoi_parameter'),
+    ('motzoi_parameter', 'n_rabi_oscillations'),
     ('ro_frequency_optimization', 'ro_amplitude_optimization'),
     ('ro_amplitude_optimization', 'state_discrimination'),
     ('ramsey_correction', 'T1'),

@@ -14,7 +14,7 @@ from qblox_instruments import Cluster
 from nodes.graph import filtered_topological_order
 from utilities.visuals import draw_arrow_chart
 from config_files.settings import lokiA_IP
-from workers.dummy_setup import dummy_cluster
+# from workers.dummy_setup import dummy_cluster
 
 from colorama import init as colorama_init
 from colorama import Fore
