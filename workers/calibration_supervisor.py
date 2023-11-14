@@ -27,7 +27,6 @@ from utilities.user_input import user_requested_calibration
 from utilities.root_path import data_directory
 import toml
 import redis
-from matplotlib import pyplot as plt
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 
@@ -127,11 +126,14 @@ def calibrate_system():
                 redis_connection.hset(f'cs:{qubit}', node_name, 'not_calibrated' )
 
 
-    # Populate the Redis database with the initial 'reasonable' parameter values
+    # Populate the Redis database with the initial 'reasonable'
+    # parameter values from the toml file
     for qubit in qubits:
+        # parameter common to all qubits:
         for parameter_key, parameter_value in initial_parameters['all'].items():
             redis_connection.hset(f"transmons:{qubit}", parameter_key, parameter_value)
 
+        # parameter specific to each qubit:
         for parameter_key, parameter_value in initial_parameters[qubit].items():
             redis_connection.hset(f"transmons:{qubit}", parameter_key, parameter_value)
 
@@ -145,6 +147,7 @@ def calibrate_system():
 
 
     if target_node == 'cz_chevron':
+        # when perform 2qubit gates all calibrations are done with the coupler biased
         if 'node_dictionary' in user_requested_calibration:
             node_dictionary = user_requested_calibration['node_dictionary']
             if 'coupled_qubits' in node_dictionary:
@@ -176,7 +179,7 @@ def inspect_node(node: str):
     #     for parameter_key, parameter_value in initial_parameters['all'].items():
     #         redis_connection.hset(f"couplers:{coupler}", parameter_key, parameter_value)
 
-    #Populate the Redis database with node specific parameter values
+    #Populate the Redis database with node specific parameter values from the toml file
     qubits_statuses = [redis_connection.hget(f"cs:{qubit}", node) == 'calibrated' for qubit in qubits]
     # coupler_statuses = [redis_connection.hget(f"cs:{coupler}", node) == 'calibrated' for coupler in couplers]
     #node is calibrated only when all qubits have the node calibrated:
@@ -207,7 +210,7 @@ def inspect_node(node: str):
             raise ValueError(f'status: {status}')
 
     if status == DataStatus.in_spec:
-        print(u' \u2714 ' + f'{Fore.GREEN}{Style.BRIGHT}Node {node} in spec{Style.RESET_ALL}')
+        print(u'\u2714 ' + f'{Fore.GREEN}{Style.BRIGHT}Node {node} in spec{Style.RESET_ALL}')
         return
 
     if status == DataStatus.out_of_spec:
@@ -221,12 +224,12 @@ def calibrate_node(node_label: str):
     node_dictionary = user_requested_calibration['node_dictionary']
 
     # Load the latest transmons state onto the job
-    device_config = {}
-    for qubit in qubits:
-        device_config[qubit] = redis_connection.hgetall(f"transmons:{qubit}")
-
-    for coupler in couplers:
-        device_config[coupler] = redis_connection.hgetall(f"couplers:{coupler}")
+    # device_config = {}
+    # for qubit in qubits:
+    #     device_config[qubit] = redis_connection.hgetall(f"transmons:{qubit}")
+    #
+    # for coupler in couplers:
+    #     device_config[coupler] = redis_connection.hgetall(f"couplers:{coupler}")
 
     node = node_factory.create_node(node_label, qubits, **node_dictionary)
 
@@ -235,7 +238,6 @@ def calibrate_node(node_label: str):
     result_dataset = measure_node(
         node,
         compiled_schedule,
-        clusterA,
         lab_ic,
         cluster_status=args.cluster_status
     )

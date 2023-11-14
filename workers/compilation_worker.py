@@ -4,7 +4,6 @@ fetch and compile the appropriate schedule
 '''
 from logger.tac_logger import logger
 from math import isnan
-import numpy as np
 from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
 import redis
 import json

@@ -22,6 +22,8 @@ def configure_dataset(
     for sweep in sweep_parameters:
         qubits += list(sweep.keys())
     dublicates = set()
+    # for soem measurements a qubit can appear in multiple keys. Here we filter the dublicates
+    # TODO better explanation
     qubits = [q for q in qubits if not (q in dublicates or dublicates.add(q))]
     n_qubits = len(qubits)
     if 'ro_opt_frequencies' in list(sweep_quantities):
