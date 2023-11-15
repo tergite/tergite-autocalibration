@@ -54,6 +54,8 @@ class BaseAnalysis():
 
     def update_redis_trusted_values(self, node: str, this_qubit: str, transmon_parameters: list):
         for i,transmon_parameter in enumerate(transmon_parameters):
+            #print(f'{ transmon_parameter = }')
+            #print(f'{ self.qoi[i] = }')
             redis_connection.hset(f"transmons:{this_qubit}", f"{transmon_parameter}", self.qoi[i])
             redis_connection.hset(f"cs:{this_qubit}", node, 'calibrated')
             self.node_result.update({this_qubit: self.qoi[i]})

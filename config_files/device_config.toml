@@ -4,6 +4,8 @@ resonator_spectroscopy.ro_freq = nan
 resonator_spectroscopy.Ql = nan
 resonator_spectroscopy.resonator_minimum = nan
 resonator_spectroscopy_1.ro_freq_1 = nan
+resonator_spectroscopy_1.Ql_1 = nan
+resonator_spectroscopy_1.resonator_minimum_1 = nan
 resonator_spectroscopy_2.ro_freq_2 = nan
 ro_frequency_optimization.ro_freq_opt = nan
 ro_frequency_optimization_gef.ro_freq_opt = nan
@@ -60,7 +62,7 @@ q19.ro_pulse_amp = 8.0e-3
 q20.ro_pulse_amp =  50.0e-3
 q21.ro_pulse_amp = 7.0e-3
 q22.ro_pulse_amp = 35.0e-3
-q23.ro_pulse_amp = 36.0e-3
+q23.ro_pulse_amp = 30.0e-3
 q24.ro_pulse_amp =  7.0e-3
 q25.ro_pulse_amp =  8.0e-3
 

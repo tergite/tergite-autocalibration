@@ -22,7 +22,6 @@ redis_connection = redis.Redis(decode_responses=True)
 
 def load_redis_config(transmon: ExtendedTransmon, channel:int):
     qubit = transmon.name
-    print(f'{ qubit = }')
     redis_config = redis_connection.hgetall(f"transmons:{qubit}")
     transmon.reset.duration(float(redis_config['init_duration']))
     transmon.rxy.amp180(float(redis_config['mw_amp180']))
@@ -39,7 +38,6 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
     # transmon.ports.readout(redis_config['ro_port'])
     transmon.clock_freqs.f01(float(redis_config['freq_01']))
     transmon.clock_freqs.f12(float(redis_config['freq_12']))
-    print(float(redis_config['ro_freq']))
     transmon.clock_freqs.readout(float(redis_config['ro_freq']))
     transmon.extended_clock_freqs.readout_1(float(redis_config['ro_freq_1']))
     transmon.extended_clock_freqs.readout_opt(float(redis_config['ro_freq_opt']))

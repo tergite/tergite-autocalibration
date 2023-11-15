@@ -166,18 +166,6 @@ def calibrate_system():
 
 def inspect_node(node: str):
     logger.info(f'Inspecting node {node}')
-    # breakpoint()
-    # Reapply the all initials. This is because of two tones messing with mw_duration
-    # TODO: is that necessary?
-    # initial_parameters = transmon_configuration['initials']
-    # qubits = user_requested_calibration['all_qubits']
-    # for qubit in qubits:
-    #     for parameter_key, parameter_value in initial_parameters['all'].items():
-    #         redis_connection.hset(f"transmons:{qubit}", parameter_key, parameter_value)
-    #
-    # for coupler in couplers:
-    #     for parameter_key, parameter_value in initial_parameters['all'].items():
-    #         redis_connection.hset(f"couplers:{coupler}", parameter_key, parameter_value)
 
     #Populate the Redis database with node specific parameter values from the toml file
     qubits_statuses = [redis_connection.hget(f"cs:{qubit}", node) == 'calibrated' for qubit in qubits]
@@ -223,16 +211,7 @@ def calibrate_node(node_label: str):
     qubits = user_requested_calibration['all_qubits']
     node_dictionary = user_requested_calibration['node_dictionary']
 
-    # Load the latest transmons state onto the job
-    # device_config = {}
-    # for qubit in qubits:
-    #     device_config[qubit] = redis_connection.hgetall(f"transmons:{qubit}")
-    #
-    # for coupler in couplers:
-    #     device_config[coupler] = redis_connection.hgetall(f"couplers:{coupler}")
-
     node = node_factory.create_node(node_label, qubits, **node_dictionary)
-
 
     compiled_schedule = precompile(node)
     result_dataset = measure_node(

@@ -102,6 +102,7 @@ class Two_Tones_Spectroscopy(Measurement):
 
             # The second for loop iterates over all frequency values in the frequency batch:
             for acq_index, spec_pulse_frequency in enumerate(spec_array_val):
+
                 # reset the clock frequency for the qubit pulse
                 schedule.add(
                     SetClockFrequency(clock=this_clock, clock_freq_new=spec_pulse_frequency),

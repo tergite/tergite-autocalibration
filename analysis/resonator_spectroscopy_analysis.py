@@ -50,7 +50,7 @@ class ResonatorSpectroscopyAnalysis():
                                 + fit_Ql**2 )
                       )
 
-        resonator_minimum = fit_result.eval(f=self.minimum_freq)
+        resonator_minimum = np.abs(fit_result.eval(f=self.minimum_freq))
         return [self.minimum_freq, fit_Ql, resonator_minimum]
 
     def plotter(self,ax):
