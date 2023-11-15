@@ -90,7 +90,6 @@ def handle_ro_freq_optimization(complex_dataset: xarray.Dataset, states: list[in
             if coord in complex_dataset[var].coords:
                 values.append(complex_dataset[var].values)
         new_ds[f'y{this_qubit}'] = (('qubit_state', coord), np.vstack(values), attributes)
-
     return new_ds
 
 
