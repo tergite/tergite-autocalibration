@@ -22,7 +22,10 @@ graph_dependencies = [
     ('ro_amplitude_optimization', 'state_discrimination'),
     #('ramsey_correction', 'T1'),
     ('resonator_spectroscopy_1', 'qubit_12_spectroscopy_pulsed'),
+    ('resonator_spectroscopy_1', 'qubit_12_spectroscopy_multidim'),
     ('qubit_12_spectroscopy_pulsed', 'rabi_oscillations_12'),
+    ('qubit_12_spectroscopy_multidim', 'rabi_oscillations_12'),
+
     ('rabi_oscillations_12', 'resonator_spectroscopy_2'),
     ('rabi_oscillations_12', 'ramsey_correction_12'),
     ('ramsey_correction_12', 'ro_frequency_optimization_gef'),

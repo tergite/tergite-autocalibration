@@ -188,8 +188,7 @@ class Qubit_01_Spectroscopy_Multidim_Node:
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
             },
             'spec_pulse_amplitudes': {
-                 qubit: np.linspace(2e-4, 9e-4, 11) for qubit in self.all_qubits
-                 #qubit: np.array([1e-4, 3.5e-4, 8e-4]) for qubit in self.all_qubits
+                 qubit: np.linspace(3e-4, 9e-4, 10) for qubit in self.all_qubits
             }
         }
         return cluster_samplespace
