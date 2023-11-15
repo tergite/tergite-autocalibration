@@ -4,8 +4,7 @@ fetch and compile the appropriate schedule
 '''
 from logger.tac_logger import logger
 from math import isnan
-import numpy as np
-from quantify_scheduler.device_under_test.quantum_device import Instrument, QuantumDevice
+from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
 import redis
 import json
 from utilities.extended_transmon_element import ExtendedTransmon
@@ -13,8 +12,6 @@ from utilities.extended_coupler_edge import CompositeSquareEdge
 from quantify_scheduler.backends import SerialCompiler
 from config_files.settings import hw_config_json
 from quantify_core.data.handling import set_datadir
-from itertools import tee
-from matplotlib import pyplot as plt
 
 set_datadir('.')
 
@@ -69,7 +66,6 @@ def load_redis_config_coupler(coupler: CompositeSquareEdge):
     coupler.cz.square_amp(float(redis_config['cz_pulse_amplitude']))
     coupler.cz.square_duration(float(redis_config['cz_pulse_duration']))
     coupler.cz.cz_width(float(redis_config['cz_pulse_width']))
-
     return
 
 
@@ -92,13 +88,13 @@ def precompile(node):
         transmons[qubit] = transmon
 
     # Creating coupler edge
-    bus_list = [ [qubits[i],qubits[i+1]] for i in range(len(qubits)-1) ]
-    couplers={}
-    for bus in bus_list:
-        coupler = CompositeSquareEdge(bus[0],bus[1])
-        load_redis_config_coupler(coupler)
-        device.add_edge(coupler)
-        couplers[bus[0]+'_'+bus[1]] = coupler
+    #bus_list = [ [qubits[i],qubits[i+1]] for i in range(len(qubits)-1) ]
+    #couplers={}
+    #for bus in bus_list:
+    #    coupler = CompositeSquareEdge(bus[0],bus[1])
+    #    load_redis_config_coupler(coupler)
+    #    device.add_edge(coupler)
+    #    couplers[bus[0]+'_'+bus[1]] = coupler
 
     #breakpoint()
     node_class = node.measurement_obj(transmons, node.qubit_state)
@@ -177,8 +173,8 @@ def precompile(node):
     # after the compilation_config is acquired, free the transmon resources
     for extended_transmon in transmons.values():
         extended_transmon.close()
-    for extended_edge in couplers.values():
-        extended_edge.close()
+    #for extended_edge in couplers.values():
+    #    extended_edge.close()
 
     logger.info('Starting Compiling')
     compiled_schedule = compiler.compile(schedule=schedule, config=compilation_config)

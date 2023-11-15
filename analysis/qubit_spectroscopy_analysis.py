@@ -3,10 +3,13 @@ Module containing classes that model, fit and plot data
 from a qubit (two tone) spectroscopy experiment.
 """
 import numpy as np
+import redis
 import xarray as xr
 from scipy import signal
 from scipy.signal import find_peaks
 import lmfit
+
+redis_connection = redis.Redis(decode_responses=True)
 
 # Lorentzian function that is fit to qubit spectroscopy peaks
 def loretzian_function( x: float, x0: float, width: float, A: float, c: float,) -> float:
@@ -85,7 +88,7 @@ class QubitSpectroscopyAnalysis():
         frequencies = self.independents
 
         if not self.has_peak():
-            return [np.nan]
+            return [np.mean(frequencies)]
 
         self.fit_freqs = np.linspace(frequencies[0], frequencies[-1], 500)  # x-values for plotting
 
@@ -96,14 +99,17 @@ class QubitSpectroscopyAnalysis():
         guess = model.guess(self.magnitudes, x=frequencies)
         fit_result = model.fit(self.magnitudes, params=guess, x=frequencies)
 
-        self.f01 = fit_result.params['x0'].value
+        self.freq = fit_result.params['x0'].value
         self.uncertainty = fit_result.params['x0'].stderr
 
         self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_freqs})
-        # Take maximal value directly
-        self.max_freq = frequencies[np.argmax(self.magnitudes)]
-        # print(self.max_freq)
-        return [self.max_freq]
+
+
+        # # Take maximal value directly
+        # self.max_freq = frequencies[np.argmax(self.magnitudes)]
+        # # print(self.max_freq)
+        # return [self.max_freq]
+        return [self.freq]
 
     def reject_outliers(self, data, m=3.):
         # Filters out datapoints in data that deviate too far from the median
@@ -113,7 +119,7 @@ class QubitSpectroscopyAnalysis():
         filtered_data = data[s<m]
         return filtered_data
 
-    def has_peak(self, prom_coef: float = 10, wid_coef: float = 2.4, outlier_median: float = 3.):
+    def has_peak(self, prom_coef: float = 6, wid_coef: float = 2.4, outlier_median: float = 3.):
         # Determines if the data contains one distinct peak or only noise
         x = np.abs(self.S21)
         x_filtered = self.reject_outliers(x, outlier_median)
@@ -131,10 +137,15 @@ class QubitSpectroscopyAnalysis():
         if self.hasPeak:
             ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0)
             min = np.min(self.magnitudes)
-            ax.vlines(self.f01, min, self.prominence + min, lw=4, color='teal')
-            ax.vlines(self.f01-1e6, min, self.filtered_std + min, lw=4, color='orange')
-            ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0, label=f"f01 = {self.f01:.6E} ± {self.uncertainty:.1E} (Hz)")
+            ax.vlines(self.freq, min, self.prominence + min, lw=4, color='teal')
+            ax.vlines(self.freq-1e6, min, self.filtered_std + min, lw=4, color='orange')
+            ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0, label=f"freq = {self.freq:.6E} ± {self.uncertainty:.1E} (Hz)")
         # Plots the data and the fitted model of a qubit spectroscopy experiment
+        resonator_minimum = float(redis_connection.hget(f'transmons:{self.qubit}', 'resonator_minimum'))
+        resonator_minimum_1 = float(redis_connection.hget(f'transmons:{self.qubit}', 'resonator_minimum_1'))
+        ax.axhline(resonator_minimum, lw=3)
+        if not np.isnan(resonator_minimum_1):
+            ax.axhline(resonator_minimum_1, lw=3, c='red')
         ax.plot( self.independents, self.magnitudes,'bo-',ms=3.0)
         ax.set_title(f'Qubit Spectroscopy for {self.qubit}')
         ax.set_xlabel('frequency (Hz)')

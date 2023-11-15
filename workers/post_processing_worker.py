@@ -14,14 +14,14 @@ matplotlib.use('tkagg')
 set_datadir('.')
 redis_connection = redis.Redis(decode_responses=True)
 
-def post_process(result_dataset: xr.Dataset, node: str, data_path: Path):
+def post_process(result_dataset: xr.Dataset, node, data_path: Path):
     analysis = Multiplexed_Analysis(result_dataset, node, data_path)
 
     # figure_manager = plt.get_current_fig_manager()
     # figure_manager.window.showMaximized()
     fig = plt.gcf()
     fig.set_tight_layout(True)
-    fig.savefig(f'{data_path}/{node}.png', bbox_inches='tight', dpi=600)
+    fig.savefig(f'{data_path}/{node.name}.png', bbox_inches='tight', dpi=600)
     plt.show()
     plt.show(block=False)
     plt.pause(30)
@@ -54,14 +54,16 @@ class BaseAnalysis():
 
     def update_redis_trusted_values(self, node: str, this_qubit: str, transmon_parameters: list):
         for i,transmon_parameter in enumerate(transmon_parameters):
+            #print(f'{ transmon_parameter = }')
+            #print(f'{ self.qoi[i] = }')
             redis_connection.hset(f"transmons:{this_qubit}", f"{transmon_parameter}", self.qoi[i])
             redis_connection.hset(f"cs:{this_qubit}", node, 'calibrated')
             self.node_result.update({this_qubit: self.qoi[i]})
 
 
 class Multiplexed_Analysis(BaseAnalysis):
-    def __init__(self, result_dataset: xr.Dataset, node: str, data_path: Path):
-        if node == 'tof':
+    def __init__(self, result_dataset: xr.Dataset, node, data_path: Path):
+        if node.name == 'tof':
             tof = analyze_tof(result_dataset, True)
             return
         # print(f'{ result_dataset = }')
@@ -98,13 +100,11 @@ class Multiplexed_Analysis(BaseAnalysis):
             # if node.name == 'cz_chevron':
             #     print( 'REDIS UPDATE COMMENTED OUT')
             # else:
+
             self.update_redis_trusted_values(node.name, this_qubit, redis_field)
 
             handles, labels = this_axis.get_legend_handles_labels()
-            # if node == 'qubit_01_spectroscopy_pulsed':
-            #     hasPeak=node_analysis.has_peak()
-            #     patch2 = mpatches.Patch(color='blue', label=f'Peak Found:{hasPeak}')
-            #     handles.append(patch2)
+
             if node.name == 'T1':
                 T1_micros = self.qoi[0] * 1e6
                 patch2 = mpatches.Patch(color='blue', label=f'T1 = {T1_micros:.2f}')

@@ -48,8 +48,8 @@ from config_files.VNA_values import (
 
 
 def resonator_samples(qubit: str) -> np.ndarray:
-    res_spec_samples = 51
-    sweep_range = 2.5e6
+    res_spec_samples = 101
+    sweep_range = 6.0e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
     min_freq = VNA_frequency - sweep_range / 2
     max_freq = VNA_frequency + sweep_range / 2
@@ -57,10 +57,8 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 
 def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
-    qub_spec_samples = 201
-    #qub_spec_samples = 165
-    sweep_range = 30e6
-    #sweep_range = 14.5e6
+    qub_spec_samples = 81
+    sweep_range = 4.5e6
     if transition == '01':
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition == '12':
@@ -124,7 +122,7 @@ class Resonator_Spectroscopy_Node(Base_Node):
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = node_dictionary
-        self.redis_field = ['ro_freq']
+        self.redis_field = ['ro_freq', 'Ql', 'resonator_minimum']
         self.qubit_state = 0
         self.measurement_obj = Resonator_Spectroscopy
         self.analysis_obj = ResonatorSpectroscopyAnalysis
@@ -198,7 +196,7 @@ class Qubit_01_Spectroscopy_Multidim_Node:
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
             },
             'spec_pulse_amplitudes': {
-                 qubit : np.linspace(2e-5, 8e-4, 5) for qubit in self.all_qubits
+                 qubit: np.linspace(3e-4, 9e-4, 10) for qubit in self.all_qubits
             }
         }
         return cluster_samplespace
@@ -296,7 +294,7 @@ class T1_Node:
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'delays': {qubit : np.arange(16e-9,250e-6,4e-6) for qubit in self.all_qubits}
+            'delays': {qubit : np.arange(52e-9,250e-6,4e-6) for qubit in self.all_qubits}
         }
         return cluster_samplespace
 
@@ -305,7 +303,7 @@ class Resonator_Spectroscopy_1_Node:
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
-        self.redis_field = ['ro_freq_1']
+        self.redis_field = ['ro_freq_1', 'Ql_1', 'resonator_minimum_1']
         self.qubit_state = 1
         self.measurement_obj = Resonator_Spectroscopy
         self.analysis_obj = ResonatorSpectroscopy_1_Analysis
@@ -374,7 +372,7 @@ class Rabi_Oscillations_12_Node:
     def samplespace(self):
         cluster_samplespace = {
             'mw_amplitudes': {
-                qubit: np.linspace(0.002, 0.400, 31) for qubit in self.all_qubits
+                qubit: np.linspace(0.002, 0.500, 55) for qubit in self.all_qubits
             }
         }
         return cluster_samplespace
@@ -474,7 +472,7 @@ class CZ_Calibration_Node:
             'control_ons': {qubit: [False,True] for qubit in  self.coupled_qubits},
         }
         return cluster_samplespace
-    
+
 class Coupler_Spectroscopy_Node:
     def __init__(self, name: str, all_qubits: list[str], ** kwargs):
         self.name = name
@@ -560,13 +558,6 @@ class Coupler_Resonator_Spectroscopy_Node:
         }
         return spi_samplespace
 
-
-    #     'two_tone_multidim': {
-    #         'redis_field': 'freq_01',
-    #         'qubit_state': 0,
-    #         'measurement_obj': Two_Tones_Multidim,
-    #         'analysis_obj': QubitSpectroscopyMultidim
-    #     },
     #     'ro_amplitude_optimization': {
     #         'redis_field': 'ro_pulse_amp_opt',
     #         'qubit_state': 0,  # doesn't matter

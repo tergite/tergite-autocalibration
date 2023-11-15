@@ -1,12 +1,18 @@
 [qoi]
 tof.ro_acq_delay = nan
 resonator_spectroscopy.ro_freq = nan
+resonator_spectroscopy.Ql = nan
+resonator_spectroscopy.resonator_minimum = nan
 resonator_spectroscopy_1.ro_freq_1 = nan
+resonator_spectroscopy_1.Ql_1 = nan
+resonator_spectroscopy_1.resonator_minimum_1 = nan
 resonator_spectroscopy_2.ro_freq_2 = nan
 ro_frequency_optimization.ro_freq_opt = nan
 ro_frequency_optimization_gef.ro_freq_opt = nan
 ro_amplitude_optimization.ro_ampl_opt = nan
 qubit_01_spectroscopy_pulsed.freq_01 = nan
+qubit_01_spectroscopy_multidim.freq_01 = nan
+qubit_01_spectroscopy_multidim.spec_pulse_amplitude = nan
 two_tone_multidim.freq_01 = nan
 ramsey_correction.freq_01 = nan
 qubit_12_spectroscopy_pulsed.freq_12 = nan
@@ -74,6 +80,16 @@ q25.ro_pulse_amp =  28.0e-3
 #q23.ro_pulse_amp = 36.0e-3
 #q24.ro_pulse_amp =  7.0e-3
 #q25.ro_pulse_amp =  8.0e-3
+#q16.ro_pulse_amp = 25.0e-3
+#q17.ro_pulse_amp = 20.0e-3
+#q18.ro_pulse_amp =  7.0e-3
+#q19.ro_pulse_amp = 8.0e-3
+#q20.ro_pulse_amp =  50.0e-3
+#q21.ro_pulse_amp = 7.0e-3
+#q22.ro_pulse_amp = 35.0e-3
+#q23.ro_pulse_amp = 30.0e-3
+#q24.ro_pulse_amp =  7.0e-3
+#q25.ro_pulse_amp =  8.0e-3
 
 q21_q22.parking_current = 235e-6
 
@@ -91,7 +107,8 @@ init_duration = 300e-6
 
 [qubit_01_spectroscopy_pulsed.all]
 spec_pulse_duration = 2e-6
-spec_amp = 3.5e-4
+spec_amp = 4.5e-4
+#spec_amp = 4.5e-6
 
 [qubit_01_spectroscopy_multidim.all]
 spec_pulse_duration = 2e-6

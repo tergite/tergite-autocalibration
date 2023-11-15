@@ -22,6 +22,8 @@ def configure_dataset(
     for sweep in sweep_parameters:
         qubits += list(sweep.keys())
     dublicates = set()
+    # for soem measurements a qubit can appear in multiple keys. Here we filter the dublicates
+    # TODO better explanation
     qubits = [q for q in qubits if not (q in dublicates or dublicates.add(q))]
     n_qubits = len(qubits)
     if 'ro_opt_frequencies' in list(sweep_quantities):
@@ -88,7 +90,6 @@ def handle_ro_freq_optimization(complex_dataset: xarray.Dataset, states: list[in
             if coord in complex_dataset[var].coords:
                 values.append(complex_dataset[var].values)
         new_ds[f'y{this_qubit}'] = (('qubit_state', coord), np.vstack(values), attributes)
-
     return new_ds
 
 
@@ -102,4 +103,5 @@ def save_dataset(result_dataset: xarray.Dataset, node):
     result_dataset = result_dataset.assign_attrs({'name': node.name, 'tuid': measurement_id})
     result_dataset_real = to_real_dataset(result_dataset)
     # to_netcdf doesn't like complex numbers, convert to real/imag to save:
+    #if 'multi' in node.name: breakpoint()
     result_dataset_real.to_netcdf(data_path / 'dataset.hdf5')
