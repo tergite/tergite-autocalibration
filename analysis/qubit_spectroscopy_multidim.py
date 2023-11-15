@@ -132,6 +132,7 @@ class QubitSpectroscopyMultidim():
         #ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0)
         #print(f'{ self.dataset[self.data_var].shape = }')
         self.dataset[self.data_var].plot(ax=ax, x=self.frequency_coords)
+        ax.scatter(self.qubit_freq, self.qubit_ampl, s=52, c='red')
         # for i,a in enumerate(self.amplitudes):
         #     if a==self.qubit_ampl:
         #         label=f'Best amplitude:{self.qubit_ampl:.3E}'
