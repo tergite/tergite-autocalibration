@@ -2,6 +2,7 @@
 tof.ro_acq_delay = nan
 resonator_spectroscopy.ro_freq = nan
 resonator_spectroscopy.Ql = nan
+resonator_spectroscopy.resonator_minimum = nan
 resonator_spectroscopy_1.ro_freq_1 = nan
 resonator_spectroscopy_2.ro_freq_2 = nan
 ro_frequency_optimization.ro_freq_opt = nan

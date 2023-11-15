@@ -3,10 +3,13 @@ Module containing classes that model, fit and plot data
 from a qubit (two tone) spectroscopy experiment.
 """
 import numpy as np
+import redis
 import xarray as xr
 from scipy import signal
 from scipy.signal import find_peaks
 import lmfit
+
+redis_connection = redis.Redis(decode_responses=True)
 
 # Lorentzian function that is fit to qubit spectroscopy peaks
 def loretzian_function( x: float, x0: float, width: float, A: float, c: float,) -> float:
@@ -131,6 +134,8 @@ class QubitSpectroscopyAnalysis():
             ax.vlines(self.freq-1e6, min, self.filtered_std + min, lw=4, color='orange')
             ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0, label=f"freq = {self.freq:.6E} ± {self.uncertainty:.1E} (Hz)")
         # Plots the data and the fitted model of a qubit spectroscopy experiment
+        resonator_minimum = float(redis_connection.hget(f'transmons:{this_qubit}', 'resonator_minimum'))
+        ax.axhline(resonator_minimum)
         ax.plot( self.independents, self.magnitudes,'bo-',ms=3.0)
         ax.set_title(f'Qubit Spectroscopy for {self.qubit}')
         ax.set_xlabel('frequency (Hz)')

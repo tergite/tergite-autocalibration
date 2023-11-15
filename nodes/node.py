@@ -114,7 +114,7 @@ class Resonator_Spectroscopy_Node(Base_Node):
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = node_dictionary
-        self.redis_field = ['ro_freq', 'Ql']
+        self.redis_field = ['ro_freq', 'Ql', 'resonator_minimum']
         self.qubit_state = 0
         self.measurement_obj = Resonator_Spectroscopy
         self.analysis_obj = ResonatorSpectroscopyAnalysis

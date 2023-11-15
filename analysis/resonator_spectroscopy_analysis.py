@@ -49,14 +49,15 @@ class ResonatorSpectroscopyAnalysis():
                                 - 4*fit_Qe*fit_Ql*np.cos(fit_ph)
                                 + fit_Ql**2 )
                       )
-        
-        return [self.minimum_freq, fit_Ql]
+
+        resonator_minimum = fit_result.eval(f=self.minimum_freq)
+        return [self.minimum_freq, fit_Ql, resonator_minimum]
 
     def plotter(self,ax):
         ax.set_xlabel('Frequency (Hz)')
         ax.set_ylabel('|S21| (V)')
         self.fitting_model.plot_fit(ax,numpoints = 400,xlabel=None, title=None)
-        ax.axvline(self.minimum_freq,c='blue',ls='solid',label= f"f = {self.minimum_freq:.6E} ± {self.uncertainty:.1E} (Hz)")
+        ax.axvline(self.minimum_freq,c='blue',ls='solid',label=f"f = {self.minimum_freq:.6E} ± {self.uncertainty:.1E} (Hz)")
         ax.grid()
 
 class ResonatorSpectroscopy_1_Analysis(ResonatorSpectroscopyAnalysis):
