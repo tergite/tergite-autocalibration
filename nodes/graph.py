@@ -44,8 +44,8 @@ graph.add_node('ro_amplitude_optimization', type='refine')
 
 # for nodes that perform the same measurement,
 # assign a weight to the corresponding edge to sort them
-graph['resonator_spectroscopy']['qubit_01_spectroscopy_pulsed']['weight'] = 1
-graph['resonator_spectroscopy']['qubit_01_spectroscopy_multidim']['weight'] = 2
+graph['resonator_spectroscopy']['qubit_01_spectroscopy_pulsed']['weight'] = 2
+graph['resonator_spectroscopy']['qubit_01_spectroscopy_multidim']['weight'] = 1
 
 # nx.draw_spring(graph, with_labels=True, k=1)
 # nx.draw(graph, pos=nx.spring_layout(graph, k=0.3), with_labels=True)

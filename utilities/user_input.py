@@ -21,7 +21,7 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'qubit_12_spectroscopy_pulsed',
+    'target_node': 'qubit_01_spectroscopy_multidim',
     'all_qubits': qubits,
     'node_dictionary' : {'coupled_qubits': ['q21','q22']},
 }

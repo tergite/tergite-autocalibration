@@ -52,8 +52,8 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 
 def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
-    qub_spec_samples = 85
-    sweep_range = 5.0e6
+    qub_spec_samples = 81
+    sweep_range = 4.5e6
     if transition == '01':
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition == '12':
@@ -188,7 +188,7 @@ class Qubit_01_Spectroscopy_Multidim_Node:
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
             },
             'spec_pulse_amplitudes': {
-                 qubit: np.linspace(1e-4, 10e-4, 13) for qubit in self.all_qubits
+                 qubit: np.linspace(2e-4, 9e-4, 11) for qubit in self.all_qubits
                  #qubit: np.array([1e-4, 3.5e-4, 8e-4]) for qubit in self.all_qubits
             }
         }
