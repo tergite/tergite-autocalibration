@@ -114,8 +114,8 @@ class CZ_calibration(Measurement):
         control, target = np.transpose(bus_list)
         # cz_duration, cz_width = 200e-9, 4e-9
         # placeholder for the CZ pulse frequency and amplitude
-        cz_pulse_frequency = {coupler: 100000.0 for coupler in couplers_list}
-        cz_pulse_duration = {coupler: 1.2600000000000004e-06 for coupler in couplers_list}
+        cz_pulse_frequency = {coupler: 0.1e6 for coupler in couplers_list}
+        cz_pulse_duration = {coupler: 1.26e-06 for coupler in couplers_list}
         # cz_pulse_amplitude = {coupler: 0 for coupler in couplers_list}
         print(f'{cz_pulse_duration = }')
         print(f'{cz_pulse_frequency = }')
@@ -139,7 +139,7 @@ class CZ_calibration(Measurement):
             )
         for index, this_coupler in enumerate(couplers_list):
             schedule.add_resource(
-                ClockResource(name=f'{this_coupler}.cz', freq=-(cz_pulse_frequency[this_coupler]+freq_cz[this_coupler]))
+                ClockResource(name=f'{this_coupler}.cz', freq=-(freq_cz[this_coupler]+cz_pulse_frequency[this_coupler]))
             )
             # self.couplers[this_coupler].cz.square_duration(cz_pulse_duration[this_coupler])
             # self.couplers[this_coupler].cz.square_amp(0.2)
@@ -157,6 +157,7 @@ class CZ_calibration(Measurement):
                     
                 for this_qubit in target:
                     x90 = schedule.add(X90(this_qubit), ref_op=relaxation, ref_pt='end')
+                
                 
                 if gate_on:
                     cz_amplitude = 0.2

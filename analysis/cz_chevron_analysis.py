@@ -105,6 +105,6 @@ class CZChevronAnalysis():
         # cbar.set_label('|2>-state Population', labelpad=10)
         axis.set_xlim([self.freq[0],self.freq[-1]])
         axis.set_ylim([self.amp[0],self.amp[-1]])
-        axis.set_xlabel('Parametric Drive Durations (ns)')
-        axis.set_ylabel('Frequency Detuning (MHz)')
+        axis.set_ylabel('Parametric Drive Durations (s)')
+        axis.set_xlabel('Frequency Detuning (Hz)')
         

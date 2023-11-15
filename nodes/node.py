@@ -470,7 +470,7 @@ class CZ_Calibration_Node:
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'ramsey_phases': {qubit: np.linspace(0, 3*360, 51) for qubit in  self.coupled_qubits},
+            'ramsey_phases': {qubit: np.linspace(0, 2*360, 21) for qubit in  self.coupled_qubits},
             'control_ons': {qubit: [False,True] for qubit in  self.coupled_qubits},
         }
         return cluster_samplespace
@@ -480,7 +480,7 @@ class Coupler_Spectroscopy_Node:
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
-        self.redis_field = 'parking_current'
+        self.redis_field = ['parking_current']
         self.qubit_state = 0
         # perform 2 tones while biasing the current
         self.measurement_obj = Two_Tones_Spectroscopy

@@ -101,7 +101,7 @@ class CoupledQubitsMeasurement:
         this_dac = spi.instrument_modules[spi_mod_name].instrument_modules[dac_name]
         this_dac.ramping_enabled(False)
         this_dac.span('range_min_bi')
-        this_dac.current(0)
+        # this_dac.current(0)
         this_dac.ramping_enabled(True)
         this_dac.ramp_rate(500e-6)
         this_dac.ramp_max_step(dc_current_step)
@@ -123,7 +123,7 @@ class CoupledQubitsMeasurement:
 
     def measure(self, node, compiled_schedule, cluster, ic):
         for indx, current in enumerate(self.dc_currents):
-            self.set_current(current)
+            # self.set_current(current)
 
             raw_dataset = execute_schedule(compiled_schedule, cluster, ic)
             dataset = configure_dataset(raw_dataset, node.samplespace)
@@ -142,5 +142,5 @@ class CoupledQubitsMeasurement:
 
         save_dataset(result_dataset, node)
         # TODO verify this
-        self.set_current(0)
+        # self.set_current(0)
         return result_dataset
