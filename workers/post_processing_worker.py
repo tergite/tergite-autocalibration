@@ -40,15 +40,15 @@ class BaseAnalysis():
         self.n_coords = len(self.result_dataset.coords)
 
         self.fit_numpoints = 300
-        self.column_grid = 3
-        self.rows = (self.n_vars + 2) // self.column_grid
+        self.column_grid = 5
+        self.rows = int(np.ceil((self.n_vars ) / self.column_grid))
 
         self.node_result = {}
         self.fig, self.axs = plt.subplots(
             nrows=self.rows,
             ncols=np.min((self.n_coords, self.column_grid)),
             squeeze=False,
-            figsize=(self.column_grid*4,self.rows*4)
+            figsize=(self.column_grid*5,self.rows*5)
         )
         self.qoi: list
 
@@ -95,10 +95,10 @@ class Multiplexed_Analysis(BaseAnalysis):
             #    self.qoi = node_analysis.run_fitting()
 
             node_analysis.plotter(this_axis)
-            if node.name == 'cz_chevron':
-                print( 'WARNING REDIS UPDATE COMMENTED OUT')
-            else:
-                self.update_redis_trusted_values(node.name, this_qubit, redis_field)
+            # if node.name == 'cz_chevron':
+            #     print( 'REDIS UPDATE COMMENTED OUT')
+            # else:
+            self.update_redis_trusted_values(node.name, this_qubit, redis_field)
 
             handles, labels = this_axis.get_legend_handles_labels()
             # if node == 'qubit_01_spectroscopy_pulsed':

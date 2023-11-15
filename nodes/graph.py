@@ -17,14 +17,18 @@ graph_dependencies = [
     ('rabi_oscillations', 'ramsey_correction'),
     ('ramsey_correction', 'resonator_spectroscopy_1'),
     ('ramsey_correction', 'ro_frequency_optimization'),
+    ('ramsey_correction', 'motzoi_parameter'),
+    ('motzoi_parameter', 'n_rabi_oscillations'),
     ('ro_frequency_optimization', 'ro_amplitude_optimization'),
     ('ro_amplitude_optimization', 'state_discrimination'),
     ('ramsey_correction', 'T1'),
     ('resonator_spectroscopy_1', 'qubit_12_spectroscopy_pulsed'),
     ('qubit_12_spectroscopy_pulsed', 'rabi_oscillations_12'),
     ('rabi_oscillations_12', 'ramsey_correction_12'),
+    ('ramsey_correction_12', 'resonator_spectroscopy_2'),
     ('ramsey_correction_12', 'ro_frequency_optimization_gef'),
     ('qubit_12_spectroscopy_pulsed', 'cz_chevron'),
+    ('qubit_12_spectroscopy_pulsed', 'cz_calibration'),
     #('coupler_spectroscopy', 'cz_chevron'),
 ]
 
@@ -35,8 +39,8 @@ graph.add_node('tof', type='refine')
 graph.add_node('punchout')
 graph.add_node('qubit_01_spectroscopy_pulsed')
 graph.add_node('qubit_01_spectroscopy_multidim')
-graph.add_node('ramsey_correction', type='refine')
-graph.add_node('ramsey_correction_12', type='refine')
+# graph.add_node('ramsey_correction', type='refine')
+# graph.add_node('ramsey_correction_12', type='refine')
 graph.add_node('ro_frequency_optimization', type='refine')
 graph.add_node('ro_amplitude_optimization', type='refine')
 

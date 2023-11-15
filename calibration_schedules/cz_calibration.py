@@ -4,7 +4,7 @@ Module containing a schedule class for Ramsey calibration. (1D parameter sweep, 
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler import Schedule
 from quantify_scheduler.operations.gate_library import Measure, Reset, X90, Rxy, X, CZ
-from quantify_scheduler.operations.pulse_library import DRAGPulse,SetClockFrequency,NumericalPulse,SoftSquarePulse
+from quantify_scheduler.operations.pulse_library import DRAGPulse,SetClockFrequency,NumericalPulse,SoftSquarePulse,SquarePulse
 from quantify_scheduler.resources import ClockResource
 from calibration_schedules.measurement_base import Measurement
 from utilities.extended_transmon_element import Measure_RO1
@@ -112,10 +112,21 @@ class CZ_calibration(Measurement):
                 bus_list.append([control,target])
                 couplers_list.append(coupler)
         control, target = np.transpose(bus_list)
-        cz_duration, cz_width = 200e-9, 4e-9
+        # cz_duration, cz_width = 200e-9, 4e-9
         # placeholder for the CZ pulse frequency and amplitude
-        cz_pulse_frequency = {coupler: 0 for coupler in couplers_list_all}
-        cz_pulse_amplitude = {coupler: 0 for coupler in couplers_list_all}
+        cz_pulse_frequency = {coupler: 100000.0 for coupler in couplers_list}
+        cz_pulse_duration = {coupler: 1.2600000000000004e-06 for coupler in couplers_list}
+        # cz_pulse_amplitude = {coupler: 0 for coupler in couplers_list}
+        print(f'{cz_pulse_duration = }')
+        print(f'{cz_pulse_frequency = }')
+
+        freq_cz = {}
+        for bus_pair in bus_list:
+           f11=mw_frequencies[bus_pair[0]]+mw_frequencies[bus_pair[1]]
+           f20=mw_frequencies[bus_pair[0]]+mw_frequencies_12[bus_pair[0]]
+           f02=mw_frequencies[bus_pair[1]]+mw_frequencies_12[bus_pair[1]]
+           freq_cz[bus_pair[0]+'_'+bus_pair[1]] = np.min(np.abs(np.array([f20,f02])-f11))
+        print(f'{freq_cz = }')
 
         # Add the clocks to the schedule
         for this_qubit, mw_f_val in mw_frequencies.items():
@@ -126,13 +137,12 @@ class CZ_calibration(Measurement):
             schedule.add_resource(
                 ClockResource(name=f'{this_qubit}.12', freq=mw_f_val)
             )
-        for this_coupler in couplers_list:
+        for index, this_coupler in enumerate(couplers_list):
             schedule.add_resource(
-                ClockResource(name=f'{this_coupler}.cz', freq=
-                              cz_pulse_frequency[this_coupler]+4.4e9)
+                ClockResource(name=f'{this_coupler}.cz', freq=-(cz_pulse_frequency[this_coupler]+freq_cz[this_coupler]))
             )
-            self.couplers[this_coupler].cz.square_duration(cz_duration)
-            self.couplers[this_coupler].cz.square_amp(cz_pulse_amplitude[this_coupler])
+            # self.couplers[this_coupler].cz.square_duration(cz_pulse_duration[this_coupler])
+            # self.couplers[this_coupler].cz.square_amp(0.2)
         
         ramsey_phases_values = ramsey_phases[this_qubit]
         number_of_phases = len(ramsey_phases_values)
@@ -149,15 +159,25 @@ class CZ_calibration(Measurement):
                     x90 = schedule.add(X90(this_qubit), ref_op=relaxation, ref_pt='end')
                 
                 if gate_on:
-                    pass
-                    # add ramsey on control qubit
+                    cz_amplitude = 0.2
                 else:
-                    for this_coupler in couplers_list:
-                        self.couplers[this_coupler].cz.square_amp(0)
+                    # TODO add ramsey on control qubit
+                    cz_amplitude = 0
+                    # for this_coupler in couplers_list:
+                        # self.couplers[this_coupler].cz.square_amp(0)
 
-                for this_bus in bus_list:
-                    cz = schedule.add(CZ(this_bus[0],this_bus[1])
-                            ,ref_op=x90,ref_pt="end")
+                for this_coupler in couplers_list:
+                    cz_clock = f'{this_coupler}.cz'
+                    cz_pulse_port = f'{this_coupler}:fl'
+                    cz = schedule.add(
+                            SquarePulse(
+                                duration=cz_pulse_duration[this_coupler],
+                                amp = cz_amplitude,
+                                port=cz_pulse_port,
+                                clock=cz_clock,
+                            ),
+                            ref_op=x90, ref_pt='end',
+                        )
 
                 if control_on:
                     for this_qubit in control:

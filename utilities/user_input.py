@@ -16,12 +16,15 @@ node reference
   resonator_spectroscopy_2
   coupler_spectroscopy
   coupler_resonator_spectroscopy
+  motzoi_parameter
+  n_rabi_oscillations
   T1
   cz_chevron
+  cz_calibration
 '''
 
 user_requested_calibration = {
-    'target_node': 'cz_chevron',
+    'target_node': 'cz_calibration',
     'all_qubits': qubits,
     'node_dictionary' : {'coupled_qubits': ['q21','q22']},
 }
