@@ -109,5 +109,5 @@ class Multiplexed_Analysis(BaseAnalysis):
             patch = mpatches.Patch(color='red', label=f'{this_qubit}')
             handles.append(patch)
             this_axis.set(title=None)
-            this_axis.legend(handles=handles)
+            this_axis.legend(handles=handles, fontsize='small')
             # logger.info(f'Analysis for the {node} of {this_qubit} is done, saved at {self.data_path}')

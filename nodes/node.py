@@ -1,8 +1,7 @@
 import numpy as np
 from calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
 # from calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
-# from calibration_schedules.two_tone_multidim import Two_Tones_Multidim
-from calibration_schedules.two_tone_multidim_loop_reversed import Two_Tones_Multidim
+from calibration_schedules.two_tone_multidim import Two_Tones_Multidim
 from calibration_schedules.rabi_oscillations import Rabi_Oscillations
 from calibration_schedules.T1 import T1
 from calibration_schedules.XY_crosstalk import XY_cross
