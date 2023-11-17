@@ -1,7 +1,8 @@
 import numpy as np
 from calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
-from calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
-from calibration_schedules.two_tone_multidim import Two_Tones_Multidim
+# from calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
+# from calibration_schedules.two_tone_multidim import Two_Tones_Multidim
+from calibration_schedules.two_tone_multidim_loop_reversed import Two_Tones_Multidim
 from calibration_schedules.rabi_oscillations import Rabi_Oscillations
 from calibration_schedules.T1 import T1
 from calibration_schedules.XY_crosstalk import XY_cross
@@ -52,7 +53,7 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 
 def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
-    qub_spec_samples = 81
+    qub_spec_samples = 41
     sweep_range = 4.5e6
     if transition == '01':
         VNA_frequency = VNA_qubit_frequencies[qubit]
@@ -184,12 +185,12 @@ class Qubit_01_Spectroscopy_Multidim_Node:
     @property
     def samplespace(self):
         cluster_samplespace = {
+            'spec_pulse_amplitudes': {
+                 qubit: np.linspace(3e-4, 9e-4, 10) for qubit in self.all_qubits
+            },
             'spec_frequencies': {
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
             },
-            'spec_pulse_amplitudes': {
-                 qubit: np.linspace(3e-4, 9e-4, 10) for qubit in self.all_qubits
-            }
         }
         return cluster_samplespace
 

@@ -68,15 +68,13 @@ class QubitSpectroscopyMultidim():
     def  __init__(self,dataset: xr.Dataset):
         data_var = list(dataset.data_vars.keys())[0]
         self.qubit = dataset[data_var].attrs['qubit']
-        self.S21 = dataset[data_var].values
+        S21 = dataset[data_var].values
         for coord in dataset[data_var].coords:
             if 'frequencies' in coord: self.frequency_coords = coord
             elif 'amplitudes' in coord: self.amplitude_coords = coord
-        dataset[data_var].values = np.abs(self.S21)
+        dataset[data_var].values = np.abs(S21)
         self.frequencies = dataset.coords[self.frequency_coords].values
         self.amplitudes = dataset.coords[self.amplitude_coords].values
-        #dataset[f'y{self.qubit}'].values = np.abs(self.S21)
-        #breakpoint()
 
         self.fit_results = {}
         self.data_var = data_var
@@ -86,32 +84,31 @@ class QubitSpectroscopyMultidim():
         #Initialize the Lorentzian model
         model = LorentzianModel()
 
-        #Fetch the resulting measurement variables from self
-        self.magnitudes = np.absolute(self.S21)
+        magnitudes = np.abs(self.dataset[self.data_var].values)
+
         frequencies = self.frequencies
-        amplitudes = self.amplitudes
 
         self.fit_freqs = np.linspace( frequencies[0], frequencies[-1], 500) # x-values for plotting
 
-        qubit_freqs = np.zeros(len(amplitudes))
-        peak_magnitudes = np.zeros(len(amplitudes))
-        self.fit_y = np.zeros((len(self.fit_freqs),len(amplitudes)))
-
+        self.spec_ampl = 0
+        self.qubit_ampl = 0
+        self.qubit_freq = 0
         for i,a in enumerate(self.amplitudes):
-            guess = model.guess(self.magnitudes[:,i], x=frequencies)
-            fit_result = model.fit(self.magnitudes[:,i], params=guess, x=frequencies)
-            qubit_freqs[i] = fit_result.params['x0'].value
+            # breakpoint()
+            these_magnitudes = magnitudes[i]
+            if not self.has_peak(these_magnitudes):
+                continue
+            guess = model.guess(these_magnitudes, x=frequencies)
+            fit_result = model.fit(these_magnitudes, params=guess, x=frequencies)
+            qubit_freq = fit_result.params['x0'].value
+            qubit_ampl =fit_result.params['A'].value
             #self.uncertainty = fit_result.params['x0'].stderr
-            self.fit_y[:,i] = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_freqs})
-            peak_magnitudes[i] = max(self.fit_y[:,i])
+            if qubit_ampl > self.qubit_ampl:
+                self.qubit_ampl = qubit_ampl
+                self.qubit_freq = qubit_freq
+                self.spec_ampl = a
 
-        best_ampl_indx=np.where(peak_magnitudes==max(peak_magnitudes))[0][0]
-        self.qubit_ampl = amplitudes[best_ampl_indx]
-        self.qubit_freq = qubit_freqs[best_ampl_indx]
-
-
-        #self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_freqs})
-        return [self.qubit_freq, self.qubit_ampl]
+        return [self.qubit_freq, self.spec_ampl]
 
     def reject_outliers(self, x, m = 3.):
         #Filters out datapoints in x that deviate too far from the median
@@ -120,19 +117,24 @@ class QubitSpectroscopyMultidim():
         s = d/mdev if mdev else np.zeros(len(d))
         return x[s<m]
 
-    def has_peak(self, prom_coef: float = 10, wid_coef: float = 2.4, outlier_median: float = 3.):
+    def has_peak(self, x, prom_coef: float = 10, wid_coef: float = 2.4, outlier_median: float = 3.):
         # Determines if the data contains one distinct peak or only noise
-        x = self.S21
         x_filtered = self.reject_outliers(x, outlier_median)
-        peaks, properties=signal.find_peaks(x, prominence=np.std(x_filtered)*prom_coef, width=wid_coef)
-        return peaks.size==1
+        self.filtered_std = np.std(x_filtered)
+        peaks, properties = signal.find_peaks(
+            x, prominence = self.filtered_std * prom_coef, width=wid_coef
+        )
+        self.prominence = properties["prominences"][0] if len(properties['prominences']) == 1 else 0
+        self.hasPeak = peaks.size == 1
+        return self.hasPeak
 
     def plotter(self,ax):
         # Plots the data and the fitted model of a qubit spectroscopy experiment
+
         #ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0)
         #print(f'{ self.dataset[self.data_var].shape = }')
         self.dataset[self.data_var].plot(ax=ax, x=self.frequency_coords)
-        ax.scatter(self.qubit_freq, self.qubit_ampl, s=52, c='red')
+        ax.scatter(self.qubit_freq, self.spec_ampl, s=52, c='red')
         # for i,a in enumerate(self.amplitudes):
         #     if a==self.qubit_ampl:
         #         label=f'Best amplitude:{self.qubit_ampl:.3E}'
