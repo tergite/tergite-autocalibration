@@ -1,12 +1,12 @@
 Metadata-Version: 2.1
 Name: tergite-auto-calibration-lite
-Version: 0.3.0
+Version: 0.4.0
 Summary: Communication handling for automatic calibration of multi-qubit devices using Qblox instruments. Minimal experimental version
 Home-page: https://bitbucket.org/qtlteam/tergite-autocalibration-lite/src/main/
 Author: Eleftherios Moschandreou
 Author-email: elemos@chalmers.se
 License: Apache 2.0
-Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
 Classifier: Operating System :: OS Independent
 Description-Content-Type: text/markdown
 
