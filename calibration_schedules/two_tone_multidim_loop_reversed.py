@@ -79,27 +79,27 @@ class Two_Tones_Multidim(Measurement):
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
         # The outer loop, iterates over all qubits
-        for acq_cha, (this_qubit, spec_pulse_amplitude_values) in enumerate(spec_pulse_amplitudes.items()):
+        for this_qubit, spec_pulse_frequency_values in spec_frequencies.items():
             this_clock = f'{this_qubit}.01'
 
-            frequency_values = spec_frequencies[this_qubit]
+            amplitude_values = spec_pulse_amplitudes[this_qubit]
 
-            number_of_freqs = len(frequency_values)
+            number_of_ampls = len(amplitude_values)
 
             schedule.add(
                     Reset(*qubits), ref_op=root_relaxation, ref_pt_new='end'
             ) #To enforce parallelism we refer to the root relaxation
 
-            # The intermediate loop, iterates over all spec_amplitudes
-            for ampl_indx, spec_pulse_amplitude in enumerate(spec_pulse_amplitude_values):
+            #The intermediate loop iterates over all frequency values in the frequency batch:
+            for freq_indx, spec_pulse_frequency in enumerate(spec_pulse_frequency_values):
+                #reset the clock frequency for the qubit pulse
+                set_frequency = schedule.add(
+                    SetClockFrequency(clock=this_clock, clock_freq_new=spec_pulse_frequency),
+                )
 
-                #The inner for loop iterates over all frequency values in the frequency batch:
-                for acq_index, spec_freq in enumerate(spec_frequencies[this_qubit]):
-                    this_index = ampl_indx*number_of_freqs + acq_index
-                    #reset the clock frequency for the qubit pulse
-                    set_frequency = schedule.add(
-                        SetClockFrequency(clock=this_clock, clock_freq_new=spec_freq),
-                    )
+                # The inner loop, iterates over all spec_amplitudes
+                for acq_index, spec_pulse_amplitude in enumerate(amplitude_values):
+                    this_index = freq_indx * number_of_ampls + acq_index
 
                     # spec_pulse = schedule.add(
                     #     long_square_pulse(

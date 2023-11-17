@@ -7,10 +7,13 @@ graph = nx.DiGraph()
 # ('tof','resonator_spectroscopy')
 # means 'resonator_spectroscopy' depends on 'tof'
 graph_dependencies = [
+    # _____________________________________
+    # these are edges on  a directed graph
+    # _____________________________________
     ('tof', 'resonator_spectroscopy'),
-    ('resonator_spectroscopy', 'coupler_spectroscopy'),
-    ('resonator_spectroscopy', 'coupler_resonator_spectroscopy'),
+    # ('resonator_spectroscopy', 'coupler_resonator_spectroscopy'),
     ('resonator_spectroscopy', 'qubit_01_spectroscopy_pulsed'),
+    ('qubit_01_spectroscopy_multidim', 'coupler_spectroscopy'),
     ('resonator_spectroscopy', 'qubit_01_spectroscopy_multidim'),
     ('qubit_01_spectroscopy_pulsed', 'rabi_oscillations'),
     ('qubit_01_spectroscopy_multidim', 'rabi_oscillations'), #remove this line?
@@ -28,13 +31,14 @@ graph_dependencies = [
     ('qubit_12_spectroscopy_pulsed', 'rabi_oscillations_12'),
     ('qubit_12_spectroscopy_multidim', 'rabi_oscillations_12'),
 
-    ('rabi_oscillations_12', 'resonator_spectroscopy_2'),
     ('rabi_oscillations_12', 'ramsey_correction_12'),
     ('ramsey_correction_12', 'resonator_spectroscopy_2'),
     ('ramsey_correction_12', 'ro_frequency_optimization_gef'),
+    ('rabi_oscillations_12', 'resonator_spectroscopy_2'),
     ('qubit_12_spectroscopy_pulsed', 'cz_chevron'),
     ('qubit_12_spectroscopy_pulsed', 'cz_calibration'),
-    #('coupler_spectroscopy', 'cz_chevron'),
+    ('coupler_spectroscopy', 'cz_chevron'),
+
 ]
 
 graph.add_edges_from(graph_dependencies)
@@ -51,14 +55,47 @@ graph.add_node('ro_amplitude_optimization', type='refine')
 
 # for nodes that perform the same measurement,
 # assign a weight to the corresponding edge to sort them
-graph['resonator_spectroscopy']['qubit_01_spectroscopy_pulsed']['weight'] = 2
-graph['resonator_spectroscopy']['qubit_01_spectroscopy_multidim']['weight'] = 1
+graph['resonator_spectroscopy']['qubit_01_spectroscopy_pulsed']['weight'] = 1
+graph['resonator_spectroscopy']['qubit_01_spectroscopy_multidim']['weight'] = 2
 
-# nx.draw_spring(graph, with_labels=True, k=1)
+initial_pos = {
+    'tof': (0,1),
+    'resonator_spectroscopy': (0,0.9),
+    'qubit_01_spectroscopy_multidim': ( 0.5,0.8),
+    'qubit_01_spectroscopy_pulsed': (-0.5,0.8),
+    'rabi_oscillations': (0,0.7),
+    'ramsey_correction': (0,0.6),
+    'motzoi_parameter': (0.5,0.6),
+    'n_rabi_oscillations': (-0.5,0.6),
+    'resonator_spectroscopy_1': (0,0.5),
+    'qubit_12_spectroscopy_pulsed': (-0.5,0.4),
+    'qubit_12_spectroscopy_multidim': (0.5,0.4),
+    'rabi_oscillations_12': (0,0.3),
+    'ramsey_correction_12': (0,0.2),
+    'resonator_spectroscopy_2': (0,0.1),
+    'ro_frequency_optimization_gef': (0,0.0),
+    'cz_chevron': (-0.5,0.0),
+    'cz_calibration': (-0.9,0.0),
+    'T1': (0.5,0.5),
+    'ro_frequency_optimization': (0,0.4),
+    'ro_amplitude_optimization': (0.5,0.4),
+    'state_discrimination': (0.5,0.3),
+    'coupler_spectroscopy': (0.5,0.7),
+    'punchout': (0.8,0.8),
+}
+
+# nx.draw_spring(graph, with_labels=True, k=1, pos = initial_pos)
+# pos = nx.spring_layout(graph, k=0.3)
+# print(f'{ pos = }')
+nx.draw(graph, with_labels=True, pos = initial_pos)
 # nx.draw(graph, pos=nx.spring_layout(graph, k=0.3), with_labels=True)
-# plt.show()
+plt.show()
 
-all_nodes = list(nx.topological_sort(graph))
+
+# all_nodes = list(nx.topological_sort(graph))
+# print(f'{ list(graph.predecessors("cz_chevron")) = }')
+# graph.remove_node('coupler_spectroscopy')
+# print(f'{ list(graph.predecessors("cz_chevron")) = }')
 
 # TODO add condition argument and explanation
 def filtered_topological_order(target_node: str):
@@ -77,4 +114,6 @@ def filtered_topological_order(target_node: str):
         return not is_without_type and has_correct_type
 
     filtered_order = [node for node in topo_order if graph_condition(node, 'none')]
+    print(f'{ filtered_order = }')
+    quit()
     return filtered_order
