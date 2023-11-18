@@ -112,6 +112,7 @@ spec_amp = 4.5e-4
 
 [qubit_01_spectroscopy_multidim.all]
 spec_pulse_duration = 2e-6
+init_duration = 200e-6
 
 [coupler_spectroscopy.all]
 spec_pulse_duration = 2e-6
