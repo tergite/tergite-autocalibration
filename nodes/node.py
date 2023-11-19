@@ -1,6 +1,6 @@
 import numpy as np
 from calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
-# from calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
+from calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
 from calibration_schedules.two_tone_multidim import Two_Tones_Multidim
 from calibration_schedules.rabi_oscillations import Rabi_Oscillations
 from calibration_schedules.T1 import T1
@@ -184,7 +184,7 @@ class Qubit_01_Spectroscopy_Multidim_Node:
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
         self.redis_field = ['freq_01',
-                            'spec_pulse_amplitude']
+                            'spec_ampl_optimal']
         self.qubit_state = 0
         self.measurement_obj = Two_Tones_Multidim
         self.analysis_obj = QubitSpectroscopyMultidim
@@ -512,7 +512,7 @@ class Coupler_Spectroscopy_Node:
     @property
     def spi_samplespace(self):
         spi_samplespace = {
-            'dc_currents': {self.coupler: np.arange(-3.0e-3, 3.0e-3, 125e-6)},
+            'dc_currents': {self.coupler: np.arange(-3.0e-3, 3.0e-3, 250e-6)},
         }
         return spi_samplespace
 

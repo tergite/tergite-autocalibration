@@ -36,7 +36,7 @@ graph_dependencies = [
     ('ramsey_correction_12', 'ro_frequency_optimization_gef'),
     ('rabi_oscillations_12', 'resonator_spectroscopy_2'),
     ('qubit_12_spectroscopy_pulsed', 'cz_chevron'),
-    ('qubit_12_spectroscopy_pulsed', 'cz_calibration'),
+    # ('qubit_12_spectroscopy_pulsed', 'cz_calibration'),
     ('coupler_spectroscopy', 'cz_chevron'),
 
 ]
@@ -87,9 +87,9 @@ initial_pos = {
 # nx.draw_spring(graph, with_labels=True, k=1, pos = initial_pos)
 # pos = nx.spring_layout(graph, k=0.3)
 # print(f'{ pos = }')
-nx.draw(graph, with_labels=True, pos = initial_pos)
+# nx.draw(graph, with_labels=True, pos = initial_pos)
 # nx.draw(graph, pos=nx.spring_layout(graph, k=0.3), with_labels=True)
-plt.show()
+# plt.show()
 
 
 # all_nodes = list(nx.topological_sort(graph))

@@ -12,7 +12,7 @@ ro_frequency_optimization_gef.ro_freq_opt = nan
 ro_amplitude_optimization.ro_ampl_opt = nan
 qubit_01_spectroscopy_pulsed.freq_01 = nan
 qubit_01_spectroscopy_multidim.freq_01 = nan
-qubit_01_spectroscopy_multidim.spec_pulse_amplitude = nan
+qubit_01_spectroscopy_multidim.spec_ampl_optimal = nan
 two_tone_multidim.freq_01 = nan
 ramsey_correction.freq_01 = nan
 qubit_12_spectroscopy_pulsed.freq_12 = nan
@@ -48,7 +48,7 @@ init_duration = 300e-6
 min_calibration_point = 0
 max_calibration_point = 0
 spec_pulse_duration = 5e-6
-spec_amp = 3e-4
+spec_ampl_default = 3e-4
 att = 0
 
 [initials]

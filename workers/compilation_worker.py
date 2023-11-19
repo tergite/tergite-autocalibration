@@ -7,6 +7,7 @@ from math import isnan
 from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
 import redis
 import json
+import numpy as np
 from utilities.extended_transmon_element import ExtendedTransmon
 from utilities.extended_coupler_edge import CompositeSquareEdge
 from quantify_scheduler.backends import SerialCompiler
@@ -32,7 +33,13 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
     transmon.rxy.motzoi(motzoi_val)
     transmon.rxy.duration(float(redis_config['mw_pulse_duration']))
 
-    transmon.spec.spec_amp(float(redis_config['spec_amp']))
+    if not np.isnan(float(redis_config['spec_ampl_optimal'])):
+        transmon.spec.spec_amp(float(redis_config['spec_ampl_optimal']))
+        print('setting optimal spec ampl')
+    else:
+        transmon.spec.spec_amp(float(redis_config['spec_ampl_default']))
+        print('setting default spec ampl')
+
     transmon.spec.spec_duration(float(redis_config['spec_pulse_duration']))
     # transmon.ports.microwave(redis_config['mw_port'])
     # transmon.ports.readout(redis_config['ro_port'])
@@ -110,6 +117,7 @@ def precompile(node):
 
 
     # TODO commenting this out because single shots has been fixed by Qblox
+    # _____________________________________________________________________
     # if 'qubit_states' in samplespace: #this means we have single shots
     #     shots = 1
     #     for subspace in samplespace.values():
@@ -166,7 +174,7 @@ def precompile(node):
     #             samplespaces.append(partial_samplespace)
     #         return compiled_schedules, schedule_durations, samplespaces
 
-    compiler = SerialCompiler(name=f'{node}_compiler')
+    compiler = SerialCompiler(name=f'{node.name}_compiler')
     schedule = schedule_function(**static_parameters, **samplespace)
     compilation_config = device.generate_compilation_config()
 

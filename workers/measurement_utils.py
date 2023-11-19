@@ -1,14 +1,11 @@
 from workers.worker_utils import configure_dataset, handle_ro_freq_optimization, to_real_dataset, save_dataset
-import numpy as np
 import time
 import xarray
 from logger.tac_logger import logger
-from qcodes import validators
 import threading
 import tqdm
-from qblox_instruments import SpiRack
-from qblox_instruments.qcodes_drivers.spi_rack_modules import S4gModule
 from utilities.status import ClusterStatus
+from workers.hardware_utils import create_spi_dac
 from quantify_scheduler.instrument_coordinator.instrument_coordinator import CompiledSchedule
 
 def execute_schedule(
@@ -78,36 +75,8 @@ class CoupledQubitsMeasurement:
 
     def __init__(self, node):
         self.node = node
-        self.dac = self.create_dac(self.node)
+        self.dac = create_spi_dac(self.node)
         self.dc_currents = self.node.spi_samplespace['dc_currents'][self.node.coupler]
-
-    def create_dac(self, node):
-        coupler_spi_map = {
-            'q21q22': (3, 'dac1'),
-            'q20q25': (3, 'dac0'),
-            'q24q25': (4, 'dac0'),
-        }
-        coupler = node.coupler
-
-        dc_current_step = np.diff(node.spi_samplespace['dc_currents'][coupler])[0]
-        #ensure step is rounded in microAmpere:
-        dc_current_step = round(dc_current_step / 1e-6) * 1e-6
-        print(f'{ dc_current_step = }')
-        spi_mod_number, dac_name = coupler_spi_map[coupler]
-        spi_mod_name = f'module{spi_mod_number}'
-        spi = SpiRack('loki_rack', '/dev/ttyACM0')
-        spi.add_spi_module(spi_mod_number, S4gModule)
-        this_dac = spi.instrument_modules[spi_mod_name].instrument_modules[dac_name]
-        this_dac.ramping_enabled(False)
-        this_dac.span('range_min_bi')
-        # this_dac.current(0)
-        this_dac.ramping_enabled(True)
-        this_dac.ramp_rate(500e-6)
-        this_dac.ramp_max_step(dc_current_step)
-        this_dac.current.vals = validators.Numbers(min_value=-3e-3, max_value=3e-3)
-        # for dac in spi.instrument_modules[spi_mod_name].submodules.values():
-        # dac.current.vals = validators.Numbers(min_value=-2e-3, max_value=2e-3)
-        return this_dac
 
     def set_current(self, current_value: float):
         print(f'{ current_value = }')
@@ -122,7 +91,7 @@ class CoupledQubitsMeasurement:
 
     def measure(self, node, compiled_schedule, ic):
         for indx, current in enumerate(self.dc_currents):
-            # self.set_current(current)
+            self.set_current(current)
 
             raw_dataset = execute_schedule(compiled_schedule, ic)
             dataset = configure_dataset(raw_dataset, node.samplespace)
@@ -141,5 +110,5 @@ class CoupledQubitsMeasurement:
 
         save_dataset(result_dataset, node)
         # TODO verify this
-        # self.set_current(0)
+        self.set_current(0)
         return result_dataset

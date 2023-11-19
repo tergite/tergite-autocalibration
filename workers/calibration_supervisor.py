@@ -10,6 +10,7 @@ from logger.tac_logger import logger
 from workers.compilation_worker import precompile
 from workers.execution_worker import measure_node
 from nodes.node import NodeFactory
+from workers.hardware_utils import create_spi_dac
 from workers.post_processing_worker import post_process
 from utilities.status import ClusterStatus
 from qblox_instruments import Cluster, SpiRack
@@ -45,40 +46,14 @@ args = parser.parse_args()
 transmon_configuration = toml.load('./config_files/device_config.toml')
 
 
-def set_parking_current(coupler: str) -> None:
-    coupler_spi_map = {
-        'q16_q17': (1, 'dac0'), # slightly heating?
-        'q17_q18': (1, 'dac1'),
-        'q18_q19': (1, 'dac2'),
-        'q19_q20': (1, 'dac3'), # slightly heating
-        'q16_q21': (2, 'dac2'),
-        'q17_q22': (2, 'dac1'),
-        'q18_q23': (2, 'dac0'),
-        'q21_q22': (3, 'dac1'),
-        'q22_q23': (3, 'dac2'), # badly heating?
-        'q23_q24': (3, 'dac3'),
-        'q20_q25': (3, 'dac0'),
-        'q24_q25': (4, 'dac0'),
-    }
+def set_parking_current(node) -> None:
+    coupler = node.coupler
 
     if redis_connection.hexists(f'couplers:{coupler}', 'parking_current'):
         parking_current = redis_connection.hget(f'couplers:{coupler}', 'parking_current')
     else:
         raise ValueError('parking current is not present on redis')
-
-    dc_current_step = 25e-6
-    spi_mod_number, dac_name = coupler_spi_map[coupler]
-    spi_mod_name = f'module{spi_mod_number}'
-    spi = SpiRack('loki_rack', '/dev/ttyACM0')
-    spi.add_spi_module(spi_mod_number, S4gModule)
-    dac = spi.instrument_modules[spi_mod_name].instrument_modules[dac_name]
-    dac.ramping_enabled(False)
-    dac.span('range_min_bi')
-    dac.current(0)
-    dac.ramping_enabled(True)
-    dac.ramp_rate(100e-6)
-    dac.ramp_max_step(dc_current_step)
-    dac.current.vals = validators.Numbers(min_value=-3e-3, max_value=3e-3)
+    dac = create_spi_dac(node)
     dac.current(parking_current)
     while dac.is_ramping():
         print(f'ramping {dac.current()}')
@@ -211,7 +186,7 @@ def inspect_node(node: str):
             raise ValueError(f'status: {status}')
 
     if status == DataStatus.in_spec:
-        print(u'\u2714 ' + f'{Fore.GREEN}{Style.BRIGHT}Node {node} in spec{Style.RESET_ALL}')
+        print(u' \u2714 ' + f'{Fore.GREEN}{Style.BRIGHT}Node {node} in spec{Style.RESET_ALL}')
         return
 
     if status == DataStatus.out_of_spec:

@@ -23,9 +23,9 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
     fig.set_tight_layout(True)
     fig.savefig(f'{data_path}/{node.name}.png', bbox_inches='tight', dpi=600)
     plt.show()
-    plt.show(block=False)
-    plt.pause(30)
-    plt.close()
+    # plt.show(block=False)
+    # plt.pause(30)
+    # plt.close()
 
     if node != 'tof':
         analysis.node_result.update({'measurement_dataset':result_dataset.to_dict()})
@@ -112,5 +112,5 @@ class Multiplexed_Analysis(BaseAnalysis):
             patch = mpatches.Patch(color='red', label=f'{this_qubit}')
             handles.append(patch)
             this_axis.set(title=None)
-            this_axis.legend(handles=handles, fontsize='small')
+            this_axis.legend(handles=handles, fontsize='xx-small')
             # logger.info(f'Analysis for the {node} of {this_qubit} is done, saved at {self.data_path}')
