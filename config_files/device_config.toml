@@ -1,7 +1,11 @@
 [qoi]
 tof.ro_acq_delay = nan
 resonator_spectroscopy.ro_freq = nan
+resonator_spectroscopy.Ql = nan
+resonator_spectroscopy.resonator_minimum = nan
 resonator_spectroscopy_1.ro_freq_1 = nan
+resonator_spectroscopy_1.Ql_1 = nan
+resonator_spectroscopy_1.resonator_minimum_1 = nan
 resonator_spectroscopy_2.ro_freq_2 = nan
 ro_frequency_optimization.ro_freq_opt = nan
 ro_amplitude_optimization.ro_ampl_opt = nan
@@ -39,7 +43,7 @@ init_duration = 300e-6
 min_calibration_point = 0
 max_calibration_point = 0
 spec_pulse_duration = 5e-6
-spec_amp = 3e-4
+spec_ampl_default = 3e-4
 att = 0
 
 [initials]

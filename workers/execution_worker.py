@@ -11,7 +11,6 @@ redis_connection = redis.Redis(decode_responses=True)
 def measure_node(
     node,
     compiled_schedule: CompiledSchedule,
-    cluster,
     lab_ic,
     cluster_status=ClusterStatus.real
 ):
@@ -19,7 +18,7 @@ def measure_node(
     # the factory determines if the measurement is on single qubits or a coupler is involved
     factory = MeasurementFactory()
     measurement = factory.select(node)
-    result_dataset = measurement.measure(node, compiled_schedule, cluster, lab_ic)
+    result_dataset = measurement.measure(node, compiled_schedule, lab_ic)
 
     logger.info('Finished measurement')
     return result_dataset

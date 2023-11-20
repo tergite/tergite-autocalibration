@@ -32,7 +32,7 @@ class CouplerSpectroscopyAnalysis():
         for i, current in enumerate(self.dc_currents.values):
             partial_ds = self.dataset[f'y{self.qubit}'].isel({self.currents: [i]})[0]
             analysis = QubitSpectroscopyAnalysis(partial_ds.to_dataset())
-            qubit_frequency = analysis.run_fitting()
+            qubit_frequency = analysis.run_fitting()[0]
             if not np.isnan(qubit_frequency):
                 self.detected_frequencies.append(qubit_frequency)
                 self.detected_currents.append(current)
@@ -67,4 +67,4 @@ class CouplerSpectroscopyAnalysis():
         ax.scatter(self.root_frequencies, self.roots, s=64, c='black', label=r'$\Phi_0$')
         print(f'{ self.roots = }')
         print(f'{ self.root_frequencies = }')
-        ax.axhline(self.parking_I, lw=5, ls='dashed',  c='orange', label='parking current')
+        ax.axhline(self.parking_I, lw=5, ls='dashed',  c='orange', label=f'parking current = {self.parking_I}')

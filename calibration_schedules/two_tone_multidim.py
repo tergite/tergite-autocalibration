@@ -42,7 +42,7 @@ class Two_Tones_Multidim(Measurement):
 
         Schedule sequence
             Reset -> Spectroscopy pulse -> Measure
-        
+
         Parameters
         ----------
         self
@@ -59,7 +59,7 @@ class Two_Tones_Multidim(Measurement):
             The sweeping frequencies of the spectroscopy pulse for each qubit.
         repetitions
             The amount of times the Schedule will be repeated.
-        
+
         Returns
         -------
         :
@@ -68,7 +68,7 @@ class Two_Tones_Multidim(Measurement):
 
         # if port_out is None: port_out = port
         schedule = Schedule("multiplexed_qubit_spec",repetitions)
-        
+
         # Initialize the clock for each qubit
         for this_qubit, spec_array_val in spec_frequencies.items():
 
@@ -79,53 +79,49 @@ class Two_Tones_Multidim(Measurement):
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
         # The outer loop, iterates over all qubits
-        for acq_cha, (this_qubit, spec_pulse_amplitude_values) in enumerate(spec_pulse_amplitudes.items()):
+        for this_qubit, spec_pulse_frequency_values in spec_frequencies.items():
             this_clock = f'{this_qubit}.01'
 
-            frequency_values = spec_frequencies[this_qubit]
-       
-            number_of_freqs = len(frequency_values)
+            amplitude_values = spec_pulse_amplitudes[this_qubit]
+
+            number_of_ampls = len(amplitude_values)
 
             schedule.add(
                     Reset(*qubits), ref_op=root_relaxation, ref_pt_new='end'
             ) #To enforce parallelism we refer to the root relaxation
 
-            # The intermediate loop, iterates over all spec_amplitudes
-            for ampl_indx, spec_pulse_amplitude in enumerate(spec_pulse_amplitude_values):
+            #The intermediate loop iterates over all frequency values in the frequency batch:
+            for freq_indx, spec_pulse_frequency in enumerate(spec_pulse_frequency_values):
+                #reset the clock frequency for the qubit pulse
+                schedule.add(
+                    SetClockFrequency(clock=this_clock, clock_freq_new=spec_pulse_frequency),
+                    ref_pt='end'
+                )
 
-                #The inner for loop iterates over all frequency values in the frequency batch:
-                for acq_index, spec_freq in enumerate(spec_frequencies[this_qubit]):
-                    this_index = ampl_indx*number_of_freqs + acq_index
-                    #reset the clock frequency for the qubit pulse
-                    set_frequency = schedule.add(
-                        SetClockFrequency(clock=this_clock, clock_freq_new=spec_freq),
-                    )
+                # The inner loop, iterates over all spec_amplitudes
+                for acq_index, spec_pulse_amplitude in enumerate(amplitude_values):
+                    this_index = freq_indx * number_of_ampls + acq_index
 
-                    #spectroscopy pulse
-                    # print(f'{spec_pulse_durations=}')
-                    # print(f'{this_clock=}')
-                    
-                    spec_pulse = schedule.add(
-                        long_square_pulse(
-                            duration= spec_pulse_durations[this_qubit],
-                            amp= spec_pulse_amplitude,
-                            port= mw_pulse_ports[this_qubit],
-                            clock=this_clock,
-                        ),
-                        label=f"spec_pulse_multidim_{this_qubit}_{this_index}", ref_op=set_frequency, ref_pt="end",
-                    ) 
-                    
-                    """
-                    spec_pulse = schedule.add(
+                    # spec_pulse = schedule.add(
+                    #     long_square_pulse(
+                    #         duration= spec_pulse_durations[this_qubit],
+                    #         amp= spec_pulse_amplitude,
+                    #         port= mw_pulse_ports[this_qubit],
+                    #         clock=this_clock,
+                    #     ),
+                    #     label=f"spec_pulse_multidim_{this_qubit}_{this_index}", ref_op=set_frequency, ref_pt="end",
+                    # )
+
+                    schedule.add(
                         SoftSquarePulse(
                             duration= spec_pulse_durations[this_qubit],
-                            amp= spec_pulse_amplitude,
-                            port= mw_pulse_ports[this_qubit],
+                            amp = spec_pulse_amplitude,
+                            port = mw_pulse_ports[this_qubit],
                             clock=this_clock,
                         ),
-                        label=f"spec_pulse_{this_qubit}_{this_index}", ref_op=set_frequency, ref_pt="end",
+                        ref_pt="end",
                     )
-                    """
+
                     if self.qubit_state == 0:
                         measure_function = Measure
                     elif self.qubit_state == 1:
@@ -135,6 +131,7 @@ class Two_Tones_Multidim(Measurement):
 
                     schedule.add(
                         measure_function(this_qubit, acq_index=this_index,bin_mode=BinMode.AVERAGE),
+                        ref_pt="end",
                     )
 
                     # update the relaxation for the next batch point

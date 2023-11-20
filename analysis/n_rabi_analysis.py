@@ -22,9 +22,9 @@ class NRabiAnalysis():
             sums.append(this_sum)
 
         index_of_min = np.argmax(np.array(sums))
-        self.optimal_motzoi = float(self.dataset[motzoi_key][index_of_min].values)+fetch_redis_params('mw_amp180',self.qubit)
+        self.optimal_amp180 = float(self.dataset[motzoi_key][index_of_min].values)+fetch_redis_params('mw_amp180',self.qubit)
 
-        return [self.optimal_motzoi]
+        return [self.optimal_amp180]
 
     def plotter(self,axis):
         datarray = self.dataset[f'y{self.qubit}']
@@ -32,4 +32,4 @@ class NRabiAnalysis():
 
 
         datarray.plot(ax=axis, x=f'mw_amplitudes_sweep{qubit}')
-        axis.axvline(self.optimal_motzoi-fetch_redis_params('mw_amp180',self.qubit), c='red', lw=4)
+        axis.axvline(self.optimal_amp180-fetch_redis_params('mw_amp180',self.qubit), c='red', lw=4)

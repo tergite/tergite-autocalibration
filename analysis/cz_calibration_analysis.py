@@ -1,6 +1,59 @@
 import numpy as np
 import xarray as xr
 from utilities.redis_helper import fetch_redis_params
+import lmfit
+from quantify_core.analysis.fitting_models import fft_freq_phase_guess
+from utilities.QPU_connections_visualization import edge_group
+import matplotlib.pyplot as plt
+
+
+# Cosine function that is fit to Rabi oscillations
+def cos_func(
+    drive_amp: float,
+    frequency: float,
+    amplitude: float,
+    offset: float,
+    phase: float = 0,
+) -> float:
+    return amplitude * np.cos(2 * np.pi * frequency * (drive_amp + phase)) + offset
+
+class CZModel(lmfit.model.Model):
+    """
+    Generate a cosine model that can be fit to Rabi oscillation data.
+    """
+    def __init__(self, *args, **kwargs):
+        # Pass in the defining equation so the user doesn't have to later.
+        super().__init__(cos_func, *args, **kwargs)
+
+        # Enforce oscillation frequency is positive
+        self.set_param_hint("frequency", min=0)
+
+        # Fix the phase at pi so that the ouput is at a minimum when drive_amp=0
+        self.set_param_hint("phase", min = 0, max = 360)
+
+        # Pi-pulse amplitude can be derived from the oscillation frequency
+
+        # self.set_param_hint("swap", expr="1/(2*frequency)-phase", vary=False)
+        self.set_param_hint("cz", expr="2/(2*frequency)-phase", vary=False)
+
+
+    def guess(self, data, **kws) -> lmfit.parameter.Parameters:
+        drive_amp = kws.get("drive_amp", None)
+        if drive_amp is None:
+            return None
+
+        amp_guess = abs(max(data) - min(data)) / 2  # amp is positive by convention
+        offs_guess = np.mean(data)
+
+        # Frequency guess is obtained using a fast fourier transform (FFT).
+        (freq_guess, _) = fft_freq_phase_guess(data, drive_amp)
+
+        self.set_param_hint("frequency", value=freq_guess, min=0)
+        self.set_param_hint("amplitude", value=amp_guess, min=0)
+        self.set_param_hint("offset", value=offs_guess)
+
+        params = self.make_params()
+        return lmfit.models.update_param_vals(params, self.prefix, **kws)
 
 class CZCalibrationAnalysis():
     def  __init__(self,dataset: xr.Dataset):
@@ -10,20 +63,56 @@ class CZCalibrationAnalysis():
         self.independents = dataset[coord].values
         self.fit_results = {}
         self.qubit = dataset[data_var].attrs['qubit']
-        dataset[f'y{self.qubit}_'].values = np.abs(self.S21)
+        dataset[f'y{self.qubit}'].values = np.abs(self.S21)
         self.dataset = dataset
 
     def run_fitting(self):
-        ramsey_phases_key = 'ramsey_phases'+self.qubit
-        ramsey_phases = self.dataset[ramsey_phases_key].size
-        # for this_frequency_index in range(frequencies):
-        #     freqs = self.dataset[f'y{self.qubit}_'][this_frequency_index].values
-        #     amps = self.dataset[amplitude_key].values
+        # self.testing_group = 0
+        self.freq = self.dataset[f'control_ons{self.qubit}'].values
+        self.amp = self.dataset[f'ramsey_phases{self.qubit}'].values
+        magnitudes = self.dataset[f'y{self.qubit}'].values
+        self.magnitudes = np.transpose((magnitudes - np.min(magnitudes))/(np.max(magnitudes)-np.min(magnitudes)))
+        self.fit_amplitudes = np.linspace( self.amp[0], self.amp[-1], 400)
 
-        return 0
+        self.fit_results,self.fit_ys = [],[]
+        for magnitude in self.magnitudes:
+            if int(self.qubit[1:]) % 2 == 0:
+                fit = True
+                model = CZModel()
+                # magnitude = np.transpose(values)[15]
+                guess = model.guess(magnitude, drive_amp=self.amp)
+                fit_result = model.fit(magnitude, params=guess, drive_amp=self.amp)
+                fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_amplitudes})
+                self.fit_results.append(fit_result)
+            else:
+                fit = False
+                fit_y = [np.mean(magnitude)]*400
+            self.fit_ys.append(fit_y)
+        if fit:
+            qois = np.transpose([[fit.result.params[p].value for p in ['cz']] for fit in self.fit_results])
+            self.opt_cz = qois[0]
+            self.cphase = np.abs(np.diff(self.opt_cz))[0]
+        else:
+            self.cphase = 0
+            self.opt_cz = [0]*2
+        return [self.cphase]
 
     def plotter(self,axis):
-        datarray = self.dataset[f'y{self.qubit}_']
-        qubit = self.qubit
-        datarray.plot(ax=axis, x=f'ramsey_phases{qubit}')
-        # axis.axvline(self.optimal_motzoi-fetch_redis_params('mw_amp180',self.qubit), c='red', lw=4)
+        # datarray = self.dataset[f'y{self.qubit}']
+        # qubit = self.qubit
+        label = ['Control Off','Control On']
+        x = range(len(label))
+        colors = plt.get_cmap('RdBu_r')(np.linspace(0.2, 0.8, len(x)))
+
+        for index,magnitude in enumerate(self.magnitudes):
+            axis.plot(self.amp,magnitude,'.',c = colors[index])
+            axis.plot(self.fit_amplitudes,self.fit_ys[index],'-',c = colors[index],label = label[index])
+            axis.vlines(self.opt_cz[index],-10,10,colors='gray',linestyles='--',linewidth=1.5)
+
+        axis.vlines(0,-10,-10,colors='gray',linestyles='--', label = 'C-phase = {:.1f}'.format(self.cphase),zorder=-10)
+        # axis.legend(loc = 'upper right')
+        axis.set_xlim([self.amp[0],self.amp[-1]])
+        axis.set_ylim(np.min(self.magnitudes),np.max(self.magnitudes))
+        axis.set_xlabel('Phase (deg)')
+        axis.set_ylabel('Qubit |1>-state Population')
+        # axis.title(f'CZ Chevron - Target Qubit')

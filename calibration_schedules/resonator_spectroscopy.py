@@ -102,7 +102,7 @@ class Resonator_Spectroscopy(Measurement):
         for acq_cha, (this_qubit, ro_f_values) in enumerate(ro_frequencies.items()):
 
             sched.add(
-                Reset(*qubits), ref_op=root_relaxation, ref_pt_new='end'
+                Reset(*qubits), ref_op=root_relaxation, ref_pt='end'
             ) #To enforce parallelism we refer to the root relaxation
 
             this_ro_clock = f'{this_qubit}.' + ro_str

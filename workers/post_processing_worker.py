@@ -14,18 +14,18 @@ matplotlib.use('tkagg')
 set_datadir('.')
 redis_connection = redis.Redis(decode_responses=True)
 
-def post_process(result_dataset: xr.Dataset, node: str, data_path: Path):
+def post_process(result_dataset: xr.Dataset, node, data_path: Path):
     analysis = Multiplexed_Analysis(result_dataset, node, data_path)
 
     # figure_manager = plt.get_current_fig_manager()
     # figure_manager.window.showMaximized()
     fig = plt.gcf()
     fig.set_tight_layout(True)
-    fig.savefig(f'{data_path}/{node}.png', bbox_inches='tight', dpi=600)
+    fig.savefig(f'{data_path}/{node.name}.png', bbox_inches='tight', dpi=600)
     plt.show()
-    plt.show(block=False)
-    plt.pause(30)
-    plt.close()
+    # plt.show(block=False)
+    # plt.pause(30)
+    # plt.close()
 
     if node != 'tof':
         analysis.node_result.update({'measurement_dataset':result_dataset.to_dict()})
@@ -40,28 +40,30 @@ class BaseAnalysis():
         self.n_coords = len(self.result_dataset.coords)
 
         self.fit_numpoints = 300
-        self.column_grid = 3
-        self.rows = (self.n_vars + 2) // self.column_grid
+        self.column_grid = 5
+        self.rows = int(np.ceil((self.n_vars ) / self.column_grid))
 
         self.node_result = {}
         self.fig, self.axs = plt.subplots(
             nrows=self.rows,
             ncols=np.min((self.n_coords, self.column_grid)),
             squeeze=False,
-            figsize=(self.column_grid*4,self.rows*4)
+            figsize=(self.column_grid*5,self.rows*5)
         )
         self.qoi: list
 
     def update_redis_trusted_values(self, node: str, this_qubit: str, transmon_parameters: list):
         for i,transmon_parameter in enumerate(transmon_parameters):
+            #print(f'{ transmon_parameter = }')
+            #print(f'{ self.qoi[i] = }')
             redis_connection.hset(f"transmons:{this_qubit}", f"{transmon_parameter}", self.qoi[i])
             redis_connection.hset(f"cs:{this_qubit}", node, 'calibrated')
             self.node_result.update({this_qubit: self.qoi[i]})
 
 
 class Multiplexed_Analysis(BaseAnalysis):
-    def __init__(self, result_dataset: xr.Dataset, node: str, data_path: Path):
-        if node == 'tof':
+    def __init__(self, result_dataset: xr.Dataset, node, data_path: Path):
+        if node.name == 'tof':
             tof = analyze_tof(result_dataset, True)
             return
         # print(f'{ result_dataset = }')
@@ -95,16 +97,14 @@ class Multiplexed_Analysis(BaseAnalysis):
             #    self.qoi = node_analysis.run_fitting()
 
             node_analysis.plotter(this_axis)
-            if node.name == 'cz_chevron':
-                print( 'WARNING REDIS UPDATE COMMENTED OUT')
-            else:
-                self.update_redis_trusted_values(node.name, this_qubit, redis_field)
+            # if node.name == 'cz_chevron':
+            #     print( 'REDIS UPDATE COMMENTED OUT')
+            # else:
+
+            self.update_redis_trusted_values(node.name, this_qubit, redis_field)
 
             handles, labels = this_axis.get_legend_handles_labels()
-            # if node == 'qubit_01_spectroscopy_pulsed':
-            #     hasPeak=node_analysis.has_peak()
-            #     patch2 = mpatches.Patch(color='blue', label=f'Peak Found:{hasPeak}')
-            #     handles.append(patch2)
+
             if node.name == 'T1':
                 T1_micros = self.qoi[0] * 1e6
                 patch2 = mpatches.Patch(color='blue', label=f'T1 = {T1_micros:.2f}')
@@ -112,5 +112,5 @@ class Multiplexed_Analysis(BaseAnalysis):
             patch = mpatches.Patch(color='red', label=f'{this_qubit}')
             handles.append(patch)
             this_axis.set(title=None)
-            this_axis.legend(handles=handles)
+            this_axis.legend(handles=handles, fontsize='xx-small')
             # logger.info(f'Analysis for the {node} of {this_qubit} is done, saved at {self.data_path}')

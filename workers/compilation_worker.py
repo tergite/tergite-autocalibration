@@ -4,17 +4,15 @@ fetch and compile the appropriate schedule
 '''
 from logger.tac_logger import logger
 from math import isnan
-import numpy as np
-from quantify_scheduler.device_under_test.quantum_device import Instrument, QuantumDevice
+from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
 import redis
 import json
+import numpy as np
 from utilities.extended_transmon_element import ExtendedTransmon
 from utilities.extended_coupler_edge import CompositeSquareEdge
 from quantify_scheduler.backends import SerialCompiler
 from config_files.settings import hw_config_json
 from quantify_core.data.handling import set_datadir
-from itertools import tee
-from matplotlib import pyplot as plt
 
 set_datadir('.')
 
@@ -35,7 +33,13 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
     transmon.rxy.motzoi(motzoi_val)
     transmon.rxy.duration(float(redis_config['mw_pulse_duration']))
 
-    transmon.spec.spec_amp(float(redis_config['spec_amp']))
+    if not np.isnan(float(redis_config['spec_ampl_optimal'])):
+        transmon.spec.spec_amp(float(redis_config['spec_ampl_optimal']))
+        print('setting optimal spec ampl')
+    else:
+        transmon.spec.spec_amp(float(redis_config['spec_ampl_default']))
+        print('setting default spec ampl')
+
     transmon.spec.spec_duration(float(redis_config['spec_pulse_duration']))
     # transmon.ports.microwave(redis_config['mw_port'])
     # transmon.ports.readout(redis_config['ro_port'])
@@ -69,7 +73,6 @@ def load_redis_config_coupler(coupler: CompositeSquareEdge):
     coupler.cz.square_amp(float(redis_config['cz_pulse_amplitude']))
     coupler.cz.square_duration(float(redis_config['cz_pulse_duration']))
     coupler.cz.cz_width(float(redis_config['cz_pulse_width']))
-
     return
 
 
@@ -92,13 +95,13 @@ def precompile(node):
         transmons[qubit] = transmon
 
     # Creating coupler edge
-    bus_list = [ [qubits[i],qubits[i+1]] for i in range(len(qubits)-1) ]
-    couplers={}
-    for bus in bus_list:
-        coupler = CompositeSquareEdge(bus[0],bus[1])
-        load_redis_config_coupler(coupler)
-        device.add_edge(coupler)
-        couplers[bus[0]+'_'+bus[1]] = coupler
+    #bus_list = [ [qubits[i],qubits[i+1]] for i in range(len(qubits)-1) ]
+    #couplers={}
+    #for bus in bus_list:
+    #    coupler = CompositeSquareEdge(bus[0],bus[1])
+    #    load_redis_config_coupler(coupler)
+    #    device.add_edge(coupler)
+    #    couplers[bus[0]+'_'+bus[1]] = coupler
 
     #breakpoint()
     node_class = node.measurement_obj(transmons, node.qubit_state)
@@ -114,6 +117,7 @@ def precompile(node):
 
 
     # TODO commenting this out because single shots has been fixed by Qblox
+    # _____________________________________________________________________
     # if 'qubit_states' in samplespace: #this means we have single shots
     #     shots = 1
     #     for subspace in samplespace.values():
@@ -170,22 +174,22 @@ def precompile(node):
     #             samplespaces.append(partial_samplespace)
     #         return compiled_schedules, schedule_durations, samplespaces
 
-    compiler = SerialCompiler(name=f'{node}_compiler')
+    compiler = SerialCompiler(name=f'{node.name}_compiler')
     schedule = schedule_function(**static_parameters, **samplespace)
     compilation_config = device.generate_compilation_config()
 
     # after the compilation_config is acquired, free the transmon resources
     for extended_transmon in transmons.values():
         extended_transmon.close()
-    for extended_edge in couplers.values():
-        extended_edge.close()
+    #for extended_edge in couplers.values():
+    #    extended_edge.close()
 
     logger.info('Starting Compiling')
     compiled_schedule = compiler.compile(schedule=schedule, config=compilation_config)
 
     #TODO
     #ic.retrieve_hardware_logs
-    #with open(f'TIMING_TABLE_{node}.html', 'w') as file:
+    # with open(f'TIMING_TABLE_{node}.html', 'w') as file:
     #    file.write(
     #        compiled_schedule.timing_table.hide(['is_acquisition','wf_idx'],axis="columns"
     #            ).to_html()

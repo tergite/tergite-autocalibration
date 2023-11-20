@@ -21,6 +21,7 @@ node reference
   n_rabi_oscillations
   T1
   cz_chevron
+  cz_calibration
 '''
 
 user_requested_calibration = {
