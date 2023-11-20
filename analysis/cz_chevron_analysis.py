@@ -46,7 +46,7 @@ class ChevronModel(lmfit.model.Model):
         (freq_guess, _) = fft_freq_phase_guess(data, drive_amp)
 
         self.set_param_hint("frequency", value=freq_guess, min=0)
-        self.set_param_hint("amplitude", value=amp_guess, min=0)
+        self.set_param_hint("amplitude", value=amp_guess, min=-1.5*amp_guess)
         self.set_param_hint("offset", value=offs_guess)
 
         params = self.make_params()
@@ -81,12 +81,19 @@ class CZChevronAnalysis():
             fit_results.append(fit_result)
             # plt.plot(y,magnitude,'.r')
             # plt.plot(fit_amplitudes,fit_y,'--b')
-        qois = np.transpose([[fit.result.params[p].value for p in ['amplitude','frequency']] for fit in fit_results])
+        qois = np.transpose([[np.abs(fit.result.params[p].value) for p in ['amplitude','frequency']] for fit in fit_results])
         qois = np.transpose([(q-np.min(q))/np.max(q) for q in qois])
-        opt_id = np.argmax(np.sum(qois,axis=1))
+        if int(self.qubit[1:]) % 2 == 0:
+            opt_id = np.argmax(np.sum(qois,axis=1))
+            self.qubit_type = 'Control'
+        else:
+            opt_id = np.argmin(np.diff(qois,axis=1))
+            self.qubit_type = 'Target'
         self.opt_freq = self.freq[opt_id]
         self.opt_cz = fit_results[opt_id].result.params['cz'].value
         self.opt_swap = fit_results[opt_id].result.params['swap'].value
+        print(f'{self.opt_freq = }')
+        print(f'{self.opt_cz = }')
 
         return [self.opt_freq,self.opt_cz]
 
@@ -107,4 +114,5 @@ class CZChevronAnalysis():
         axis.set_ylim([self.amp[0],self.amp[-1]])
         axis.set_ylabel('Parametric Drive Durations (s)')
         axis.set_xlabel('Frequency Detuning (Hz)')
+        axis.set_title(f'CZ Chevron - {self.qubit_type} Qubit {self.qubit[1:]}')
         

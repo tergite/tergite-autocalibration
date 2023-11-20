@@ -37,6 +37,7 @@ from analysis.tof_analysis import analyze_tof
 from analysis.T1_analysis import T1Analysis
 from analysis.coupler_spectroscopy_analysis import CouplerSpectroscopyAnalysis
 from analysis.cz_chevron_analysis import CZChevronAnalysis
+from analysis.cz_calibration_analysis import CZCalibrationAnalysis
 from analysis.n_rabi_analysis import NRabiAnalysis
 
 
@@ -504,7 +505,7 @@ class CZ_Calibration_Node:
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'ramsey_phases': {qubit: np.linspace(0, 2*360, 21) for qubit in  self.coupled_qubits},
+            'ramsey_phases': {qubit: np.linspace(0, 2*360, 51) for qubit in  self.coupled_qubits},
             'control_ons': {qubit: [False,True] for qubit in  self.coupled_qubits},
         }
         return cluster_samplespace

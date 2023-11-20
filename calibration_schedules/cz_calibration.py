@@ -47,7 +47,7 @@ class CZ_calibration(Measurement):
             cz_pulse_width: dict[str,float], 
             ramsey_phases: dict[str,np.ndarray],
             control_ons: dict[str,np.ndarray],
-            gate_on: bool = True,
+            dynamic: bool = True,
             testing_group: int = 1,
             number_of_cz: int = 1,
             repetitions: int = 1024,
@@ -98,7 +98,11 @@ class CZ_calibration(Measurement):
         :
             An experiment schedule.
         """
-        schedule = Schedule("CZ_chevron",repetitions)
+        if dynamic:
+            name = 'Dynamic_phase'
+        else:
+            name = 'CZ_calibration'
+        schedule = Schedule(f"{name}",repetitions)
 
         couplers_list_all = edge_group.keys()
         couplers_list,bus_list = [],[]
@@ -113,12 +117,12 @@ class CZ_calibration(Measurement):
                 couplers_list.append(coupler)
         control, target = np.transpose(bus_list)
         # cz_duration, cz_width = 200e-9, 4e-9
-        # placeholder for the CZ pulse frequency and amplitude
-        cz_pulse_frequency = {coupler: 0.1e6 for coupler in couplers_list}
-        cz_pulse_duration = {coupler: 1.26e-06 for coupler in couplers_list}
+        # placeholder for the CZ pulse frequency and amplitude -0.4 689.9058811833632 for parking current  = -35e-6
+        cz_pulse_frequency = {coupler: -0.4e6 for coupler in couplers_list}
+        cz_pulse_duration = {coupler: 688e-09 for coupler in couplers_list}
         # cz_pulse_amplitude = {coupler: 0 for coupler in couplers_list}
-        print(f'{cz_pulse_duration = }')
-        print(f'{cz_pulse_frequency = }')
+        # print(f'{cz_pulse_duration = }')
+        # print(f'{cz_pulse_frequency = }')
 
         freq_cz = {}
         for bus_pair in bus_list:
@@ -151,21 +155,18 @@ class CZ_calibration(Measurement):
         for cz_index,control_on in enumerate(control_on_values):
             for ramsey_index, ramsey_phase in enumerate(ramsey_phases_values): 
                 relaxation = schedule.add(Reset(*qubits), label=f"Reset_{cz_index}_{ramsey_index}")
-                if control_on:
-                    for this_qubit in control:
-                        x = schedule.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
-                    
+    
+                cz_amplitude = 0.9
+                if dynamic:
+                    if not control_on:
+                        cz_amplitude = 0
+                else:
+                    if control_on:
+                        for this_qubit in control:
+                            x = schedule.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
+                        
                 for this_qubit in target:
                     x90 = schedule.add(X90(this_qubit), ref_op=relaxation, ref_pt='end')
-                
-                
-                if gate_on:
-                    cz_amplitude = 0.2
-                else:
-                    # TODO add ramsey on control qubit
-                    cz_amplitude = 0
-                    # for this_coupler in couplers_list:
-                        # self.couplers[this_coupler].cz.square_amp(0)
 
                 for this_coupler in couplers_list:
                     cz_clock = f'{this_coupler}.cz'
@@ -179,10 +180,10 @@ class CZ_calibration(Measurement):
                             ),
                             ref_op=x90, ref_pt='end',
                         )
-
-                if control_on:
-                    for this_qubit in control:
-                        x_end = schedule.add(X(this_qubit), ref_op=cz, ref_pt='end')
+                if not dynamic:
+                    if control_on:
+                        for this_qubit in control:
+                            x_end = schedule.add(X(this_qubit), ref_op=cz, ref_pt='end')
                         
                 for this_qubit in target:
                     x90_end = schedule.add(Rxy(theta=90, phi=ramsey_phase, qubit=this_qubit), ref_op=cz, ref_pt='end')
