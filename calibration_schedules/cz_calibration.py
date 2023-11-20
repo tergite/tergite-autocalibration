@@ -47,8 +47,7 @@ class CZ_calibration(Measurement):
             cz_pulse_width: dict[str,float], 
             ramsey_phases: dict[str,np.ndarray],
             control_ons: dict[str,np.ndarray],
-            dynamic: bool = True,
-            testing_group: int = 1,
+            # testing_group: int = 1,
             number_of_cz: int = 1,
             repetitions: int = 1024,
         ) -> Schedule:
@@ -98,8 +97,8 @@ class CZ_calibration(Measurement):
         :
             An experiment schedule.
         """
-        if dynamic:
-            name = 'Dynamic_phase'
+        if self.dynamic:
+            name = 'CZ_dynamic_phase'
         else:
             name = 'CZ_calibration'
         schedule = Schedule(f"{name}",repetitions)
@@ -108,8 +107,8 @@ class CZ_calibration(Measurement):
         couplers_list,bus_list = [],[]
         for coupler in couplers_list_all:
             control,target = coupler.split('_')[0], coupler.split('_')[1]
-            if testing_group != 0:
-                check = edge_group[coupler] == testing_group
+            if self.testing_group != 0:
+                check = edge_group[coupler] == self.testing_group
             else:
                 check = True
             if control in qubits and target in qubits and check:
@@ -157,7 +156,7 @@ class CZ_calibration(Measurement):
                 relaxation = schedule.add(Reset(*qubits), label=f"Reset_{cz_index}_{ramsey_index}")
     
                 cz_amplitude = 0.9
-                if dynamic:
+                if self.dynamic:
                     if not control_on:
                         cz_amplitude = 0
                 else:
@@ -180,7 +179,7 @@ class CZ_calibration(Measurement):
                             ),
                             ref_op=x90, ref_pt='end',
                         )
-                if not dynamic:
+                if not self.dynamic:
                     if control_on:
                         for this_qubit in control:
                             x_end = schedule.add(X(this_qubit), ref_op=cz, ref_pt='end')

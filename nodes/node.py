@@ -92,6 +92,7 @@ class NodeFactory:
             'T1': T1_Node,
             'cz_chevron': CZ_Chevron_Node,
             'cz_calibration': CZ_Calibration_Node,
+            'cz_dynamic_phase': CZ_Dynamic_Phase_Node,
             'ro_frequency_optimization': RO_frequency_optimization_Node,
             #'ro_frequency_optimization_gef': RO_frequency_optimization_gef_Node,
         }
@@ -482,6 +483,44 @@ class CZ_Calibration_Node:
         self.node_dictionary = kwargs
         self.redis_field = ['cz_phase']
         self.qubit_state = 0
+        self.testing_group = 0 # The edge group to be tested. 0 means all edges.
+        self.dynamic = False
+        self.measurement_obj = CZ_calibration
+        self.analysis_obj = CZCalibrationAnalysis
+        self.validate()
+
+    def validate(self):
+        if 'coupled_qubits' not in self.node_dictionary:
+            error_msg = 'coupled_qubits not in job dictionary\n'
+            suggestion = 'job dictionary should look like:\n {"coupled_qubits": ["q1","q2"]}'
+            raise ValueError(error_msg + suggestion)
+        else:
+            coupled_qubits = self.node_dictionary['coupled_qubits']
+            if len(coupled_qubits) != 2:
+                raise ValueError('coupled qubits must be a list with 2 elements')
+            elif not all([q in self.all_qubits for q in coupled_qubits]):
+                raise ValueError('coupled qubits must be a subset of all calibrated qubits')
+            else:
+                self.coupled_qubits = coupled_qubits
+                self.coupler = coupled_qubits[0] + '_' + coupled_qubits[1]
+                self.all_qubits = coupled_qubits
+
+    @property
+    def samplespace(self):
+        cluster_samplespace = {
+            'ramsey_phases': {qubit: np.linspace(0, 2*360, 51) for qubit in  self.coupled_qubits},
+            'control_ons': {qubit: [False,True] for qubit in  self.coupled_qubits},
+        }
+        return cluster_samplespace
+
+class CZ_Dynamic_Phase_Node:
+    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
+        self.name = name
+        self.all_qubits = all_qubits
+        self.node_dictionary = kwargs
+        self.redis_field = ['cz_phase']
+        self.dynamic = True
+        self.testing_group = 0 # The edge group to be tested. 0 means all edges.
         self.measurement_obj = CZ_calibration
         self.analysis_obj = CZCalibrationAnalysis
         self.validate()
