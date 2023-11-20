@@ -28,11 +28,11 @@ def create_spi_dac(node):
     spi_mod_number, dac_name = coupler_spi_map[coupler]
     spi_mod_name = f'module{spi_mod_number}'
     spi = SpiRack('loki_rack', '/dev/ttyACM0')
-    spi.add_spi_module(spi_mod_number, S4gModule)
+    spi.add_spi_module(spi_mod_number, S4gModule, reset_currents = False)
     this_dac = spi.instrument_modules[spi_mod_name].instrument_modules[dac_name]
     this_dac.ramping_enabled(False)
     this_dac.span('range_min_bi')
-    this_dac.current(0)
+    # this_dac.current(0)
     this_dac.ramping_enabled(True)
     this_dac.ramp_rate(100e-6)
     this_dac.ramp_max_step(dc_current_step)
