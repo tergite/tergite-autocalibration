@@ -2,8 +2,8 @@ import json
 from utilities.root_path import project_root
 import csv
 
-mixer_file = project_root / 'utilities/231002_mixercorrectionTwoQubitSample.csv'
-json_config_file = project_root / 'config_files/HARDWARE_CONFIGURATION_02102023.json'
+mixer_file = project_root / 'utilities/20231120_LOKIA.csv'
+json_config_file = project_root / 'config_files/HARDWARE_CONFIGURATION_LOKIA_20231120.json'
 HW_CONFIG = {}
 HW_CONFIG['backend'] = "quantify_scheduler.backends.qblox_backend.hardware_compile"
 HW_CONFIG['clusterA'] = {
@@ -45,7 +45,10 @@ def qrm_hw(qubits,cluster='clusterA', module='module16', lo=6e9, off_I=0.0, off_
    }
    return hw
 
-def qcm_hw(cluster='clusterA', module='module1', lo=4e9, off_I=0.0, off_Q=0.0, amp_ratio=1., phase=0.0):
+def qcm_hw(
+        cluster='clusterA', module='module1', sequencer=0, lo=4e9, off_I=0.0, off_Q=0.0,
+        amp_ratio=1., phase=0.0, amp_ratio_2=1., phase_2=0.0,
+    ):
    qubit = module_to_qubit_map[module]
    hw = {
        'instrument_type': 'QCM_RF',
@@ -55,11 +58,12 @@ def qcm_hw(cluster='clusterA', module='module1', lo=4e9, off_I=0.0, off_Q=0.0, a
            'dc_mixer_offset_Q': off_Q*1e-3,
            'portclock_configs': [
                {"port": f"{qubit}:mw", "clock": f"{qubit}.01", 'mixer_amp_ratio': amp_ratio, 'mixer_phase_error_deg': phase},
-               {"port": f"{qubit}:mw", "clock": f"{qubit}.12", 'mixer_amp_ratio': amp_ratio, 'mixer_phase_error_deg': phase},
+               {"port": f"{qubit}:mw", "clock": f"{qubit}.12", 'mixer_amp_ratio': amp_ratio_2, 'mixer_phase_error_deg': phase_2},
            ],
        },
    }
    return hw
+
 
 with open(mixer_file) as csvfile:
     reader = csv.reader(csvfile)
@@ -68,12 +72,14 @@ with open(mixer_file) as csvfile:
     for row in reader:
         if all(row):
             (label, module, cmpl_out, seq_indx, lo_freq, if_freq,
-            off_I, off_Q, amp_ratio, phase_error_deg) = row
+            off_I, off_Q, amp_ratio, phase_error_deg,amp_ratio_2, phase_error_deg_2) = row
             lo_freq = float(lo_freq)
             off_I = float(off_I)
             off_Q = float(off_Q)
             amp_ratio = float(amp_ratio)
             phase_error_deg = float(phase_error_deg)
+            amp_ratio_2 = float(amp_ratio_2)
+            phase_error_deg_2 = float(phase_error_deg_2)
 
             if module == 'module16' or module == 'module17':
                 if module == 'module16': qrm_qubits = module_16_qubits
@@ -86,7 +92,7 @@ with open(mixer_file) as csvfile:
             else:
                 qcm_config = qcm_hw(
                         module=module, lo=lo_freq,
-                        off_I=off_I, off_Q=off_Q, amp_ratio=amp_ratio, phase=phase_error_deg
+                        off_I=off_I, off_Q=off_Q, amp_ratio=amp_ratio, phase=phase_error_deg, amp_ratio_2=amp_ratio_2, phase_2=phase_error_deg_2
                         )
                 HW_CONFIG['clusterA'][f'clusterA_{module}'] = qcm_config
 
