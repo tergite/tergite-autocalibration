@@ -114,6 +114,4 @@ def filtered_topological_order(target_node: str):
         return not is_without_type and has_correct_type
 
     filtered_order = [node for node in topo_order if graph_condition(node, 'none')]
-    print(f'{ filtered_order = }')
-    quit()
     return filtered_order
