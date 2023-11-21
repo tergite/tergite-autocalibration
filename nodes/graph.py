@@ -35,10 +35,9 @@ graph_dependencies = [
     ('ramsey_correction_12', 'resonator_spectroscopy_2'),
     ('ramsey_correction_12', 'ro_frequency_optimization_gef'),
     ('rabi_oscillations_12', 'resonator_spectroscopy_2'),
-    ('qubit_12_spectroscopy_pulsed', 'cz_chevron'),
+    ('resonator_spectroscopy_1', 'cz_chevron'),
     # ('qubit_12_spectroscopy_pulsed', 'cz_calibration'),
     ('coupler_spectroscopy', 'cz_chevron'),
-
 ]
 
 graph.add_edges_from(graph_dependencies)
@@ -48,8 +47,8 @@ graph.add_node('tof', type='refine')
 graph.add_node('punchout')
 graph.add_node('qubit_01_spectroscopy_pulsed')
 graph.add_node('qubit_01_spectroscopy_multidim')
-# graph.add_node('ramsey_correction', type='refine')
-# graph.add_node('ramsey_correction_12', type='refine')
+graph.add_node('ramsey_correction', type='refine')
+graph.add_node('ramsey_correction_12', type='refine')
 graph.add_node('ro_frequency_optimization', type='refine')
 graph.add_node('ro_amplitude_optimization', type='refine')
 
@@ -99,6 +98,14 @@ initial_pos = {
 
 # TODO add condition argument and explanation
 def filtered_topological_order(target_node: str):
+    target_ancestors = nx.ancestors(graph, target_node)
+    if 'coupler_spectroscopy' in target_ancestors:
+        coupler_path = nx.shortest_path(graph, 'resonator_spectroscopy', 'coupler_spectroscopy')
+
+        graph.remove_node('coupler_spectroscopy')
+    else:
+        coupler_path = []
+
     if target_node == 'punchout':
         topo_order = ['punchout']
     else:
@@ -114,4 +121,7 @@ def filtered_topological_order(target_node: str):
         return not is_without_type and has_correct_type
 
     filtered_order = [node for node in topo_order if graph_condition(node, 'none')]
+    filtered_order = coupler_path + filtered_order
+    print(f'{ filtered_order = }')
+    quit()
     return filtered_order

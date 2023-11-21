@@ -87,9 +87,9 @@ class CoupledQubitsMeasurement:
             time.sleep(1)
         print('Finished ramping')
 
-    logger.info('Starting coupler spectroscopy')
 
     def measure(self, node, compiled_schedule, ic):
+        logger.info('Starting coupler spectroscopy')
         for indx, current in enumerate(self.dc_currents):
             self.set_current(current)
 

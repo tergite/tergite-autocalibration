@@ -24,7 +24,7 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'qubit_01_spectroscopy_multidim',
+    'target_node': 'cz_chevron',
     'all_qubits': qubits,
     'node_dictionary' : {'coupled_qubits': ['q21','q22']},
 }
