@@ -14,7 +14,8 @@ from calibration_schedules.state_discrimination import Single_Shots_RO
 from calibration_schedules.motzoi_parameter import Motzoi_parameter
 from calibration_schedules.n_rabi_oscillations import N_Rabi_Oscillations
 
-from calibration_schedules.cz_chevron import CZ_chevron
+# from calibration_schedules.cz_chevron import CZ_chevron
+from calibration_schedules.cz_chevron_reversed import CZ_chevron
 from calibration_schedules.cz_calibration import CZ_calibration
 
 from analysis.motzoi_analysis import MotzoiAnalysis
@@ -428,12 +429,12 @@ class CZ_Chevron_Node:
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'cz_pulse_frequencies_sweep': {
-                qubit: np.linspace(-1e6, 1e6, 21) for qubit in self.coupled_qubits
-                # qubit: np.linspace(-100e6, 300e6, 41) for qubit in self.coupled_qubits # wide sweep
-            },
             'cz_pulse_durations': {
                 qubit: np.linspace(20e-9, 2420e-9, 21) for qubit in self.coupled_qubits
+            },
+            'cz_pulse_frequencies_sweep': {
+                qubit: np.linspace(200e6, 300e6, 21) for qubit in self.coupled_qubits
+                # qubit: np.linspace(-100e6, 300e6, 41) for qubit in self.coupled_qubits # wide sweep
             },
         }
         return cluster_samplespace
@@ -512,7 +513,7 @@ class Coupler_Spectroscopy_Node:
     @property
     def spi_samplespace(self):
         spi_samplespace = {
-            'dc_currents': {self.coupler: np.arange(-3.0e-3, 3.0e-3, 250e-6)},
+            'dc_currents': {self.coupler: np.arange(-3.0e-3, 3.0e-3, 2000e-6)},
         }
         return spi_samplespace
 

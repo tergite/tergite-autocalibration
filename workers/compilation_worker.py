@@ -106,7 +106,8 @@ def precompile(node):
     #breakpoint()
     node_class = node.measurement_obj(transmons, node.qubit_state)
     if node.name == 'cz_chevron':
-        node_class = node.measurement_obj(transmons, couplers, node.qubit_state)
+        coupler = node.coupler
+        node_class = node.measurement_obj(transmons, coupler, node.qubit_state)
 
     schedule_function = node_class.schedule_function
     static_parameters = node_class.static_kwargs

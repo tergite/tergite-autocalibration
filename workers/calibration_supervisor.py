@@ -46,19 +46,20 @@ args = parser.parse_args()
 transmon_configuration = toml.load('./config_files/device_config.toml')
 
 
-def set_parking_current(node) -> None:
-    coupler = node.coupler
+def set_parking_current(coupler) -> None:
 
     if redis_connection.hexists(f'couplers:{coupler}', 'parking_current'):
-        parking_current = redis_connection.hget(f'couplers:{coupler}', 'parking_current')
+        parking_current = float(redis_connection.hget(f'couplers:{coupler}', 'parking_current'))
     else:
         raise ValueError('parking current is not present on redis')
-    dac = create_spi_dac(node)
+    dac = create_spi_dac(coupler)
     dac.current(parking_current)
     while dac.is_ramping():
         print(f'ramping {dac.current()}')
         time.sleep(1)
     print('Finished ramping')
+    print(f'{ parking_current = }')
+    print(f'{ dac.current() = }')
     return
 
 
@@ -112,6 +113,16 @@ def calibrate_system():
             # flag for the calibration supervisor
             if not redis_connection.hexists(calibration_supervisor_key, node_name):
                 redis_connection.hset(f'cs:{qubit}', node_name, 'not_calibrated' )
+        for coupler in couplers:
+            redis_key = f'couplers:{coupler}'
+            calibration_supervisor_key = f'cs:{coupler}'
+            for field_key, field_value in node_parameters_dictionary.items():
+                # check if field already exists
+                if not redis_connection.hexists(redis_key, field_key):
+                    redis_connection.hset(f'couplers:{coupler}', field_key, field_value)
+            # flag for the calibration supervisor
+            if not redis_connection.hexists(calibration_supervisor_key, node_name):
+                redis_connection.hset(f'cs:{coupler}', node_name, 'not_calibrated' )
 
 
     # Populate the Redis database with the initial 'reasonable'
@@ -155,13 +166,24 @@ def calibrate_system():
 def inspect_node(node: str):
     logger.info(f'Inspecting node {node}')
 
+    if node in ['coupler_spectroscopy', 'cz_chevron']:
+        if 'node_dictionary' in user_requested_calibration:
+            node_dictionary = user_requested_calibration['node_dictionary']
+            if 'coupled_qubits' in node_dictionary:
+                coupled_qubits = node_dictionary['coupled_qubits']
+                coupler = coupled_qubits[0] + '_' + coupled_qubits[1]
+            else:
+                raise ValueError('Misformated user input')
+        else:
+            raise ValueError('Misformated user input')
+        is_node_calibrated = redis_connection.hget(f"cs:{coupler}", node) == 'calibrated'
+    else:
+        qubits_statuses = [redis_connection.hget(f"cs:{qubit}", node) == 'calibrated' for qubit in qubits]
+        is_node_calibrated = all(qubits_statuses)
+
     #Populate the Redis database with node specific parameter values from the toml file
-    qubits_statuses = [redis_connection.hget(f"cs:{qubit}", node) == 'calibrated' for qubit in qubits]
-    # coupler_statuses = [redis_connection.hget(f"cs:{coupler}", node) == 'calibrated' for coupler in couplers]
     #node is calibrated only when all qubits have the node calibrated:
-    is_node_calibrated = all(qubits_statuses)
     if node in transmon_configuration and not is_node_calibrated:
-        print(f'{ transmon_configuration[node] = }')
         node_specific_dict = transmon_configuration[node]['all']
         for field_key, field_value in node_specific_dict.items():
             for qubit in qubits:
@@ -180,6 +202,25 @@ def inspect_node(node: str):
         if is_Calibrated == 'not_calibrated':
             status = DataStatus.out_of_spec
             break  # even if a single qubit is not_calibrated mark as out_of_spec
+        elif is_Calibrated == 'calibrated':
+            status = DataStatus.in_spec
+        else:
+            raise ValueError(f'status: {status}')
+
+    if node in ['coupler_spectroscopy', 'cz_chevron']:
+        if 'node_dictionary' in user_requested_calibration:
+            node_dictionary = user_requested_calibration['node_dictionary']
+            if 'coupled_qubits' in node_dictionary:
+                coupled_qubits = node_dictionary['coupled_qubits']
+                coupler = coupled_qubits[0] + '_' + coupled_qubits[1]
+            else:
+                raise ValueError('Misformated user input')
+        else:
+            raise ValueError('Misformated user input')
+
+        is_Calibrated = redis_connection.hget(f"cs:{coupler}", node)
+        if is_Calibrated == 'not_calibrated':
+            status = DataStatus.out_of_spec
         elif is_Calibrated == 'calibrated':
             status = DataStatus.in_spec
         else:
