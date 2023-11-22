@@ -87,7 +87,7 @@ class Two_Tones_Multidim(Measurement):
             number_of_ampls = len(amplitude_values)
 
             schedule.add(
-                    Reset(*qubits), ref_op=root_relaxation, ref_pt_new='end'
+                    Reset(*qubits), ref_op=root_relaxation, ref_pt='end'
             ) #To enforce parallelism we refer to the root relaxation
 
             #The intermediate loop iterates over all frequency values in the frequency batch:
@@ -118,7 +118,6 @@ class Two_Tones_Multidim(Measurement):
                             port = mw_pulse_ports[this_qubit],
                             clock=this_clock,
                         ),
-                        label=f"spec_pulse_{this_qubit}_{this_index}", ref_op=set_frequency, ref_pt="end",
                     )
 
                     if self.qubit_state == 0:

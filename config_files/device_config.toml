@@ -58,17 +58,17 @@ q13.ro_pulse_amp = 7.2e-3
 q14.ro_pulse_amp = 8.0e-3
 q15.ro_pulse_amp = 6.5e-3
 
-# Added 6dB att
-q16.ro_pulse_amp = 200.0e-3
-q17.ro_pulse_amp = 100.0e-3
-q18.ro_pulse_amp =  24.0e-3
-q19.ro_pulse_amp = 20.0e-3
-q20.ro_pulse_amp =  180.0e-3
-q21.ro_pulse_amp = 18.0e-3
-q22.ro_pulse_amp = 140.0e-3
-q23.ro_pulse_amp = 144.0e-3
-q24.ro_pulse_amp =  28.0e-3
-q25.ro_pulse_amp =  20.0e-3
+# # Added 6dB att
+# q16.ro_pulse_amp = 200.0e-3
+# q17.ro_pulse_amp = 100.0e-3
+# q18.ro_pulse_amp =  24.0e-3
+# q19.ro_pulse_amp = 20.0e-3
+# q20.ro_pulse_amp =  180.0e-3
+# q21.ro_pulse_amp = 18.0e-3
+# q22.ro_pulse_amp = 140.0e-3
+# q23.ro_pulse_amp = 144.0e-3
+# q24.ro_pulse_amp =  28.0e-3
+# q25.ro_pulse_amp =  20.0e-3
 
 #q16.ro_pulse_amp = 60.0e-3
 #q17.ro_pulse_amp = 25.0e-3
@@ -80,16 +80,17 @@ q25.ro_pulse_amp =  20.0e-3
 #q23.ro_pulse_amp = 36.0e-3
 #q24.ro_pulse_amp =  7.0e-3
 #q25.ro_pulse_amp =  8.0e-3
-#q16.ro_pulse_amp = 25.0e-3
-#q17.ro_pulse_amp = 20.0e-3
-#q18.ro_pulse_amp =  7.0e-3
-#q19.ro_pulse_amp = 8.0e-3
-#q20.ro_pulse_amp =  50.0e-3
-#q21.ro_pulse_amp = 7.0e-3
-#q22.ro_pulse_amp = 35.0e-3
-#q23.ro_pulse_amp = 30.0e-3
-#q24.ro_pulse_amp =  7.0e-3
-#q25.ro_pulse_amp =  8.0e-3
+
+q16.ro_pulse_amp = 25.0e-3
+q17.ro_pulse_amp = 20.0e-3
+q18.ro_pulse_amp =  7.0e-3
+q19.ro_pulse_amp = 8.0e-3
+q20.ro_pulse_amp =  50.0e-3
+q21.ro_pulse_amp = 7.0e-3
+q22.ro_pulse_amp = 35.0e-3
+q23.ro_pulse_amp = 30.0e-3
+q24.ro_pulse_amp =  7.0e-3
+q25.ro_pulse_amp =  8.0e-3
 
 q21_q22.parking_current = 235e-6
 

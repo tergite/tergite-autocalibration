@@ -54,8 +54,8 @@ graph.add_node('ro_amplitude_optimization', type='refine')
 
 # for nodes that perform the same measurement,
 # assign a weight to the corresponding edge to sort them
-graph['resonator_spectroscopy']['qubit_01_spectroscopy_pulsed']['weight'] = 1
-graph['resonator_spectroscopy']['qubit_01_spectroscopy_multidim']['weight'] = 2
+graph['resonator_spectroscopy']['qubit_01_spectroscopy_pulsed']['weight'] = 2
+graph['resonator_spectroscopy']['qubit_01_spectroscopy_multidim']['weight'] = 1
 
 initial_pos = {
     'tof': (0,1),

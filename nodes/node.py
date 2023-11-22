@@ -1,7 +1,8 @@
 import numpy as np
 from calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
 from calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
-from calibration_schedules.two_tone_multidim import Two_Tones_Multidim
+# from calibration_schedules.two_tone_multidim import Two_Tones_Multidim
+from calibration_schedules.two_tone_multidim_loop_reversed import Two_Tones_Multidim
 from calibration_schedules.rabi_oscillations import Rabi_Oscillations
 from calibration_schedules.T1 import T1
 from calibration_schedules.XY_crosstalk import XY_cross
@@ -49,7 +50,7 @@ from config_files.VNA_values import (
 
 
 def resonator_samples(qubit: str) -> np.ndarray:
-    res_spec_samples = 101
+    res_spec_samples = 151
     sweep_range = 6.0e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
     min_freq = VNA_frequency - sweep_range / 2
@@ -58,7 +59,7 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 
 def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
-    qub_spec_samples = 41
+    qub_spec_samples = 51
     sweep_range = 4.5e6
     if transition == '01':
         VNA_frequency = VNA_qubit_frequencies[qubit]

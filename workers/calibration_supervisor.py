@@ -80,15 +80,15 @@ couplers = [bus[0] + '_' + bus[1] for bus in bus_list]
 bus_list = [ [qubits[i],qubits[i+1]] for i in range(len(qubits)-1) ]
 couplers = [bus[0]+'_'+bus[1]for bus in bus_list]
 
-def set_module_att(cluster):
-    # Flux lines
-    for module in cluster.modules[0:13]:
-        module.out1_att(40)
-    print(module.name + '_att:'+ str(module.out1_att()) + 'dB')
-    # Readout lines
-    for module in cluster.modules[15:17]:
-        module.out0_att(6)
-    print(module.name + '_att:'+ str(module.out0_att()) + 'dB')
+# def set_module_att(cluster):
+#     # Flux lines
+#     for module in cluster.modules[0:13]:
+#         module.out1_att(40)
+#     print(module.name + '_att:'+ str(module.out1_att()) + 'dB')
+#     # Readout lines
+#     for module in cluster.modules[15:17]:
+#         module.out0_att(6)
+#     print(module.name + '_att:'+ str(module.out0_att()) + 'dB')
 
 def calibrate_system():
     logger.info('Starting System Calibration')
@@ -240,7 +240,7 @@ def calibrate_node(node_label: str):
     qubits = user_requested_calibration['all_qubits']
     node_dictionary = user_requested_calibration['node_dictionary']
 
-    set_module_att(clusterA)
+    # set_module_att(clusterA)
 
     node = node_factory.create_node(node_label, qubits, **node_dictionary)
 
