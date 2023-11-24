@@ -20,7 +20,6 @@ class CZ_chevron(Measurement):
         self.qubit_state = qubit_state
         self.coupler = coupler
         self.static_kwargs = {
-            'qubits': self.qubits,
             'coupler': self.coupler,
             # 'mw_frequencies': self.attributes_dictionary('f01'),
             # 'mw_pulse_durations': self.attributes_dictionary('duration'),
@@ -34,7 +33,6 @@ class CZ_chevron(Measurement):
 
     def schedule_function(
             self,
-            qubits: list[str],
             coupler: str,
             cz_pulse_frequencies_sweep: dict[str,np.ndarray],
             cz_pulse_durations: dict[str,np.ndarray],
@@ -83,6 +81,7 @@ class CZ_chevron(Measurement):
             An experiment schedule.
         """
         schedule = Schedule("CZ_chevron",repetitions)
+        qubits = coupler.split(sep='_')
 
         cz_frequency_values = np.array(list(cz_pulse_frequencies_sweep.values())[0])
         cz_duration_values = list(cz_pulse_durations.values())[0]
@@ -104,12 +103,12 @@ class CZ_chevron(Measurement):
             #The inner for loop iterates over cz pulse durations
             for acq_index, cz_duration in enumerate(cz_duration_values):
 
-                relaxation = schedule.add(Reset(*qubits))
+                schedule.add(Reset(*qubits))
 
                 for this_qubit in qubits:
-                    schedule.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
+                    schedule.add(X(this_qubit))
 
-                cz_amplitude = 0.2
+                cz_amplitude = 0.00001
                 cz = schedule.add(
                         SquarePulse(
                             duration=cz_duration,
@@ -124,7 +123,7 @@ class CZ_chevron(Measurement):
                     this_index = freq_index * number_of_durations + acq_index
                     schedule.add(
                         Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
-                        ref_op=cz,rel_time=40e-9, ref_pt="end",
+                        ref_op=cz,rel_time=4e-9, ref_pt="end",
                     )
         return schedule
 

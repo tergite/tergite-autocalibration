@@ -35,7 +35,7 @@ graph_dependencies = [
     ('ramsey_correction_12', 'resonator_spectroscopy_2'),
     ('ramsey_correction_12', 'ro_frequency_optimization_gef'),
     ('rabi_oscillations_12', 'resonator_spectroscopy_2'),
-    ('resonator_spectroscopy_1', 'cz_chevron'),
+    ('qubit_12_spectroscopy_multidim', 'cz_chevron'),
     # ('qubit_12_spectroscopy_pulsed', 'cz_calibration'),
     # ('coupler_spectroscopy', 'cz_chevron'),
 ]
@@ -56,6 +56,8 @@ graph.add_node('ro_amplitude_optimization', type='refine')
 # assign a weight to the corresponding edge to sort them
 graph['resonator_spectroscopy']['qubit_01_spectroscopy_pulsed']['weight'] = 2
 graph['resonator_spectroscopy']['qubit_01_spectroscopy_multidim']['weight'] = 1
+graph['resonator_spectroscopy_1']['qubit_12_spectroscopy_multidim']['weight'] = 2
+graph['resonator_spectroscopy_1']['qubit_12_spectroscopy_multidim']['weight'] = 1
 
 initial_pos = {
     'tof': (0,1),

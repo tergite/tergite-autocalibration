@@ -1,6 +1,7 @@
 qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
 #qubits = ['q16', 'q17', 'q19', 'q21', 'q22', 'q23', 'q25']
 #qubits = [ 'q22','q23', 'q25']
+couplers = ['q21_q22']
 
 '''
 node reference
@@ -8,6 +9,7 @@ node reference
   resonator_spectroscopy
   qubit_01_spectroscopy_multidim
   qubit_01_spectroscopy_pulsed
+  qubit_12_spectroscopy_multidim
   rabi_oscillations
   ramsey_correction
   resonator_spectroscopy_1
@@ -24,7 +26,8 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'rabi_oscillations',
+    'target_node': 'cz_chevron',
     'all_qubits': qubits,
-    'node_dictionary' : {'coupled_qubits': ['q21','q22']},
+    'couplers': couplers,
+    # 'node_dictionary' : {'coupled_qubits': ['q21','q22']},
 }

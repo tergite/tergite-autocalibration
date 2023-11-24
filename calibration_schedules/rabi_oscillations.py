@@ -119,6 +119,6 @@ class Rabi_Oscillations(Measurement):
                     measure_function(this_qubit, acq_index=acq_index, bin_mode=BinMode.AVERAGE),
                 )
 
-                schedule.add(Reset(this_qubit), label=f"Reset_{this_qubit}_{acq_index}")
+                schedule.add(Reset(this_qubit))
 
         return schedule

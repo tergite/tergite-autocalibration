@@ -35,10 +35,8 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
 
     if not np.isnan(float(redis_config['spec_ampl_optimal'])):
         transmon.spec.spec_amp(float(redis_config['spec_ampl_optimal']))
-        print('setting optimal spec ampl')
     else:
         transmon.spec.spec_amp(float(redis_config['spec_ampl_default']))
-        print('setting default spec ampl')
 
     transmon.spec.spec_duration(float(redis_config['spec_pulse_duration']))
     # transmon.ports.microwave(redis_config['mw_port'])
@@ -103,7 +101,6 @@ def precompile(node):
     #    device.add_edge(coupler)
     #    couplers[bus[0]+'_'+bus[1]] = coupler
 
-    #breakpoint()
     node_class = node.measurement_obj(transmons, node.qubit_state)
     if node.name == 'cz_chevron':
         coupler = node.coupler

@@ -1,8 +1,25 @@
 from qblox_instruments import SpiRack
-from qblox_instruments.qcodes_drivers.spi_rack_modules import S4gModule
 from qcodes import validators
-import numpy as np
 import time
+import redis
+
+redis_connection = redis.Redis(decode_responses=True)
+
+def set_parking_current(coupler) -> None:
+
+    if redis_connection.hexists(f'couplers:{coupler}', 'parking_current'):
+        parking_current = float(redis_connection.hget(f'couplers:{coupler}', 'parking_current'))
+    else:
+        raise ValueError('parking current is not present on redis')
+    dac = create_spi_dac(coupler)
+    dac.current(parking_current)
+    while dac.is_ramping():
+        print(f'ramping {dac.current()}')
+        time.sleep(1)
+    print('Finished ramping')
+    print(f'{ parking_current = }')
+    print(f'{ dac.current() = }')
+    return
 
 
 def create_spi_dac(coupler: str):
