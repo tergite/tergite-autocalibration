@@ -103,10 +103,10 @@ class CZ_chevron(Measurement):
             #The inner for loop iterates over cz pulse durations
             for acq_index, cz_duration in enumerate(cz_duration_values):
 
-                schedule.add(Reset(*qubits))
+                relaxation = schedule.add(Reset(*qubits))
 
                 for this_qubit in qubits:
-                    schedule.add(X(this_qubit))
+                    schedule.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
 
                 cz_amplitude = 0.00001
                 cz = schedule.add(
@@ -116,7 +116,6 @@ class CZ_chevron(Measurement):
                             port=cz_pulse_port,
                             clock=cz_clock,
                         ),
-                        ref_pt='end',
                     )
 
                 for this_qubit in qubits:
