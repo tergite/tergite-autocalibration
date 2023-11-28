@@ -5,7 +5,7 @@ from logger.tac_logger import logger
 import threading
 import tqdm
 from utilities.status import ClusterStatus
-from workers.hardware_utils import create_spi_dac
+from workers.hardware_utils import SpiDAC
 from quantify_scheduler.instrument_coordinator.instrument_coordinator import CompiledSchedule
 
 def execute_schedule(
@@ -74,8 +74,9 @@ class CoupledQubitsMeasurement:
     # coupler sweeps need special treatment. For this, separate them in their own class
 
     def __init__(self, node):
+        DAC = SpiDAC()
         self.node = node
-        self.dac = create_spi_dac(self.node)
+        self.dac = DAC.create_spi_dac(self.node.coupler)
         self.dc_currents = self.node.spi_samplespace['dc_currents'][self.node.coupler]
 
     def set_current(self, current_value: float):

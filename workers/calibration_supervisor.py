@@ -11,7 +11,7 @@ from nodes.node import NodeFactory
 from workers.post_processing_worker import post_process
 from utilities.status import ClusterStatus
 from qblox_instruments import Cluster
-from workers.hardware_utils import set_parking_current
+# from workers.hardware_utils import set_parking_current
 
 from nodes.graph import filtered_topological_order
 from utilities.visuals import draw_arrow_chart
@@ -46,9 +46,19 @@ transmon_configuration = toml.load('./config_files/device_config.toml')
 node_factory = NodeFactory()
 
 
+def set_module_att(cluster):
+    # Flux lines
+    for module in cluster.modules[0:13]:
+        module.out1_att(50)
+    # print(module.name + '_att:'+ str(module.out1_att()) + 'dB')
+    # Readout lines
+    # for module in cluster.modules[15:17]:
+    #     module.out0_att(6)
+    # print(module.name + '_att:'+ str(module.out0_att()) + 'dB')
 if args.cluster_status == ClusterStatus.real:
     Cluster.close_all()
     clusterA = Cluster("clusterA", lokiA_IP)
+    set_module_att(clusterA)
     lab_ic = InstrumentCoordinator('lab_ic')
     lab_ic.add_component(ClusterComponent(clusterA))
     lab_ic.timeout(222)
@@ -61,15 +71,6 @@ couplers = user_requested_calibration['couplers']
 # bus_list = [ [qubits[i],qubits[i+1]] for i in range(len(qubits)-1) ]
 # couplers = [bus[0]+'_'+bus[1]for bus in bus_list]
 
-# def set_module_att(cluster):
-#     # Flux lines
-#     for module in cluster.modules[0:13]:
-#         module.out1_att(40)
-#     print(module.name + '_att:'+ str(module.out1_att()) + 'dB')
-#     # Readout lines
-#     for module in cluster.modules[15:17]:
-#         module.out0_att(6)
-#     print(module.name + '_att:'+ str(module.out0_att()) + 'dB')
 
 def calibrate_system():
     logger.info('Starting System Calibration')
@@ -131,9 +132,10 @@ def calibrate_system():
                 redis_connection.hset(f"couplers:{coupler}", parameter_key, parameter_value)
 
 
-    if target_node == 'cz_chevron':
-        for coupler in couplers:
-            set_parking_current(coupler)
+    # if target_node == 'cz_chevron':
+    #     set_module_att(clusterA)
+    #     for coupler in couplers:
+    #         set_parking_current(coupler)
 
     for calibration_node in topo_order:
         inspect_node(calibration_node)
@@ -201,10 +203,9 @@ def inspect_node(node: str):
 
 def calibrate_node(node_label: str):
     logger.info(f'Calibrating node {node_label}')
-    
+
     # node_dictionary = user_requested_calibration['node_dictionary']
 
-    # set_module_att(clusterA)
 
     node = node_factory.create_node(node_label, qubits, couplers=couplers)
 

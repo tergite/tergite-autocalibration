@@ -18,11 +18,14 @@ args = parser.parse_args()
 
 transmon_configuration = toml.load('./config_files/device_config.toml')
 quantities_of_interest = transmon_configuration['qoi']['qubits']
+coupler_quantities_of_interest = transmon_configuration['qoi']['couplers']
 remove_node = args.node
 print(f'{ remove_node = }')
 if not remove_node == 'all':
-    remove_fields = quantities_of_interest[remove_node].keys()
-    #print('remove_fields', remove_fields)
+    if remove_node in quantities_of_interest:
+        remove_fields = quantities_of_interest[remove_node].keys()
+    else:
+        remove_fields = coupler_quantities_of_interest[remove_node].keys()
 
 #TODO Why flush?
 #red.flushdb()

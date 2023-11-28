@@ -62,8 +62,8 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 
 def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
-    qub_spec_samples = 101
-    sweep_range =  6.5e6
+    qub_spec_samples = 51
+    sweep_range =  4.5e6
     if transition == '01':
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition == '12':
@@ -447,8 +447,8 @@ class CZ_Chevron_Node:
         q2_f01 = float(redis_connection.hget(f'transmons:{self.coupled_qubits[1]}', "freq_01"))
         q1_f12 = float(redis_connection.hget(f'transmons:{self.coupled_qubits[0]}', "freq_12"))
         q2_f12 = float(redis_connection.hget(f'transmons:{self.coupled_qubits[1]}', "freq_12"))
-        ac_freq = np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12))
-        # ac_freq = np.abs(q1_f01 + q2_f01 - (q2_f01 + q2_f12))
+        # ac_freq = np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12))
+        ac_freq = np.abs(q1_f01 + q2_f01 - (q2_f01 + q2_f12))
         print(f'{ ac_freq/1e6 = } MHz')
         return ac_freq
 
@@ -456,10 +456,10 @@ class CZ_Chevron_Node:
     def samplespace(self):
         cluster_samplespace = {
             'cz_pulse_durations': {
-                qubit: np.linspace(20e-9, 2420e-9, 16) for qubit in self.coupled_qubits
+                qubit: np.arange(20e-9, 1400e-9, 180e-9) for qubit in self.coupled_qubits
             },
             'cz_pulse_frequencies_sweep': {
-                qubit: np.linspace(-10e6, 10e6, 11) + self.ac_freq for qubit in self.coupled_qubits
+                qubit: np.linspace(- 35e6, 35e6, 111) + self.ac_freq for qubit in self.coupled_qubits
                 # qubit: np.linspace(-100e6, 300e6, 41) for qubit in self.coupled_qubits # wide sweep
             },
         }
@@ -504,13 +504,14 @@ class Coupler_Spectroscopy_Node:
     def __init__(self, name: str, all_qubits: list[str], ** kwargs):
         self.name = name
         self.all_qubits = all_qubits
-        self.node_dictionary = kwargs
+        self.coupler = kwargs['couplers'][0]
         self.redis_field = ['parking_current']
         self.qubit_state = 0
         # perform 2 tones while biasing the current
         self.measurement_obj = Two_Tones_Spectroscopy
         self.analysis_obj = CouplerSpectroscopyAnalysis
-        self.validate()
+        self.coupled_qubits = self.coupler.split(sep='_')
+        # self.validate()
 
     def validate(self):
         if 'coupled_qubits' not in self.node_dictionary:
@@ -530,7 +531,10 @@ class Coupler_Spectroscopy_Node:
 
     @property
     def samplespace(self):
-        qubit = self.measurement_qubit
+        qubit = self.coupled_qubits[0]
+        self.measurement_qubit = qubit
+        print(f'{ self.coupled_qubits = }')
+        print(f'{ qubit = }')
         cluster_samplespace = {
             'spec_frequencies': {qubit: qubit_samples(qubit)}
         }
@@ -539,7 +543,7 @@ class Coupler_Spectroscopy_Node:
     @property
     def spi_samplespace(self):
         spi_samplespace = {
-            'dc_currents': {self.coupler: np.arange(-3.0e-3, 3.0e-3, 2000e-6)},
+            'dc_currents': {self.coupler: np.arange(-3.0e-3, 3.0e-3, 200e-6)},
         }
         return spi_samplespace
 

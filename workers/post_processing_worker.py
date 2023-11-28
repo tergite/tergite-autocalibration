@@ -68,6 +68,7 @@ class Multiplexed_Analysis(BaseAnalysis):
         # print(f'{ result_dataset = }')
         super().__init__(result_dataset, data_path)
         data_vars_dict = collections.defaultdict(set)
+        print(f'{ result_dataset = }')
         for var in result_dataset.data_vars:
             this_qubit = result_dataset[var].attrs['qubit']
             data_vars_dict[this_qubit].add(var)

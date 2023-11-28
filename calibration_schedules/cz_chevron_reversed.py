@@ -87,7 +87,7 @@ class CZ_chevron(Measurement):
         cz_duration_values = list(cz_pulse_durations.values())[0]
 
         schedule.add_resource(
-            ClockResource(name=coupler+'.cz',freq=cz_frequency_values[0] + 4.4e9)
+            ClockResource(name=coupler+'.cz',freq=cz_frequency_values[0] + 4.0e9)
         )
 
         number_of_durations = len(cz_duration_values)
@@ -97,18 +97,23 @@ class CZ_chevron(Measurement):
             cz_clock = f'{coupler}.cz'
             cz_pulse_port = f'{coupler}:fl'
             schedule.add(
-                SetClockFrequency(clock=cz_clock, clock_freq_new=cz_frequency + 4.4e9),
+                SetClockFrequency(clock=cz_clock, clock_freq_new=cz_frequency + 4.0e9),
             )
 
             #The inner for loop iterates over cz pulse durations
             for acq_index, cz_duration in enumerate(cz_duration_values):
+                this_index = freq_index * number_of_durations + acq_index
 
                 relaxation = schedule.add(Reset(*qubits))
 
                 for this_qubit in qubits:
                     schedule.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
+                    # schedule.add(
+                    #     Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
+                    #     ref_op=relaxation, ref_pt="end",
+                    # )
 
-                cz_amplitude = 0.00001
+                cz_amplitude = 0.5
                 cz = schedule.add(
                         SquarePulse(
                             duration=cz_duration,
@@ -119,10 +124,9 @@ class CZ_chevron(Measurement):
                     )
 
                 for this_qubit in qubits:
-                    this_index = freq_index * number_of_durations + acq_index
                     schedule.add(
                         Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
-                        ref_op=cz,rel_time=4e-9, ref_pt="end",
+                        ref_op=cz,rel_time=12e-9, ref_pt="end",
                     )
         return schedule
 
