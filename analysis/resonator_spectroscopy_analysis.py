@@ -49,13 +49,11 @@ class ResonatorSpectroscopyAnalysis():
                                 - 4*fit_Qe*fit_Ql*np.cos(fit_ph)
                                 + fit_Ql**2 )
                       )
-        # # using the min value driectly
+        # using the min value driectly
         # self.min_freq = frequencies[np.argmin(np.abs(S21))]
-        # # print(fit_Ql)
-        # return [self.min_freq]
-
-        resonator_minimum = np.abs(fit_result.eval(f=self.minimum_freq))
-        return [self.minimum_freq, fit_Ql, resonator_minimum]
+        # print(fit_Ql)
+        # print(self.min_freq )
+        return [self.minimum_freq]
 
     def plotter(self,ax):
         ax.set_xlabel('Frequency (Hz)')

@@ -25,7 +25,7 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'n_rabi_oscillations',
+    'target_node': 'resonator_spectroscopy_2',
     'all_qubits': qubits,
     'node_dictionary' : {'coupled_qubits': ['q21','q22']},
 }

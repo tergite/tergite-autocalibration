@@ -236,50 +236,12 @@ class Ramsey_Fringes_Node:
     @property
     def samplespace(self):
         cluster_samplespace = {
-            # 'ramsey_correction': {
-                'ramsey_delays': {
-                    qubit: np.arange(4e-9, 2048e-9, 8 * 8e-9) for qubit in self.all_qubits
-                },
-                'artificial_detunings': {
-                    qubit: np.arange(-2.1, 2.1, 0.8) * 1e6 for qubit in self.all_qubits
-                },
-            # },
-        }
-        return cluster_samplespace
-
-class Motzoi_Parameter_Node:
-    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
-        self.name = name
-        self.all_qubits = all_qubits
-        self.node_dictionary = kwargs
-        self.redis_field = ['mw_motzoi']
-        self.qubit_state = 0
-        self.measurement_obj = Motzoi_parameter
-        self.analysis_obj = MotzoiAnalysis
-
-    @property
-    def samplespace(self):
-        cluster_samplespace = {
-            'mw_motzois': {qubit: np.linspace(-0.5,0.5,61) for qubit in self.all_qubits},
-            'X_repetitions': {qubit : np.arange(2, 17, 4) for qubit in self.all_qubits}
-        }
-        return cluster_samplespace
-
-class N_Rabi_Oscillations_Node:
-    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
-        self.name = name
-        self.all_qubits = all_qubits
-        self.node_dictionary = kwargs
-        self.redis_field = ['mw_amp180']
-        self.qubit_state = 0
-        self.measurement_obj = N_Rabi_Oscillations
-        self.analysis_obj = NRabiAnalysis
-
-    @property
-    def samplespace(self):
-        cluster_samplespace = {
-            'mw_amplitudes_sweep': {qubit: np.linspace(-0.1,0.1,61) for qubit in self.all_qubits},
-            'X_repetitions': {qubit : np.arange(1, 16, 4) for qubit in self.all_qubits}
+            'ramsey_delays': {
+                qubit: np.arange(4e-9, 2048e-9, 8 * 8e-9) for qubit in self.all_qubits
+            },
+            'artificial_detunings': {
+                qubit: np.arange(-2.1, 2.1, 0.8) * 1e6 for qubit in self.all_qubits
+            },
         }
         return cluster_samplespace
 

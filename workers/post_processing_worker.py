@@ -21,11 +21,11 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
     # figure_manager.window.showMaximized()
     fig = plt.gcf()
     fig.set_tight_layout(True)
-    fig.savefig(f'{data_path}/{node.name}.png', bbox_inches='tight', dpi=600)
-    plt.show()
-    # plt.show(block=False)
-    # plt.pause(30)
-    # plt.close()
+    fig.savefig(f'{data_path}/{node}.png', bbox_inches='tight', dpi=600)
+    # plt.show()
+    plt.show(block=False)
+    plt.pause(30)
+    plt.close()
 
     if node != 'tof':
         analysis.node_result.update({'measurement_dataset':result_dataset.to_dict()})
@@ -97,11 +97,11 @@ class Multiplexed_Analysis(BaseAnalysis):
             #    self.qoi = node_analysis.run_fitting()
 
             node_analysis.plotter(this_axis)
-            # if node.name == 'cz_chevron':
-            #     print( 'REDIS UPDATE COMMENTED OUT')
-            # else:
-
-            self.update_redis_trusted_values(node.name, this_qubit, redis_field)
+            if node.name == 'cz_chevron':
+                print( 'WARNING REDIS UPDATE COMMENTED OUT')
+            else:
+                print(this_qubit,self.qoi,redis_field)
+                self.update_redis_trusted_values(node.name, this_qubit, redis_field)
 
             handles, labels = this_axis.get_legend_handles_labels()
 
