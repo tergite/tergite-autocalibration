@@ -13,8 +13,10 @@ class QPU_element:
     def __post_init__(self):
         self.res_freq = VNA_resonator_frequencies[self.label]
         self.qubit_freq = VNA_qubit_frequencies[self.label]
+        self.qubit_f12 = VNA_f12_frequencies[self.label]
         self.LO: float
         self.IF: float
+        self.IF_12: float
 
 QPU = [
 #        QPU_element('q11', 'D6', 1, (0,2)),
@@ -55,81 +57,87 @@ def distance(element_1, element_2) -> int:
      return x_distance + y_distance
 
 
-LO_group = 3.640e9
+LO_group = 3.511e9
 LO_16 = 3.295e9
-LO_17 = 4.048e9
+LO_17 = 4.055e9
+LO_20 = 3.455e9
+LO_25 = 4.124e9
 LO_21 = 3.884e9
-LO_22 = 3.440e9
-collision_tol = 10e6
-#def hits_neighbors(qubit:str, lo_freq:float):
-#    for q in QPU:
-#        if q.label == qubit:
-#            element = q
+LO_22 = 3.445e9
+collision_tol = 6.5e6
+
+def hits_neighbors(qubit:str, lo_freq:float):
+    for q in QPU:
+        if q.label == qubit:
+            element = q
+
+    # Code by Stefan Hill:
+    neighbour_qubits = list(filter(lambda element_: distance(element, element_)==1, QPU))
+
+    # print(f'{ neighbour_qubits = }')
+    f01 = VNA_qubit_frequencies[qubit]
+    f12 = VNA_f12_frequencies[qubit]
+    i_freq = f01 - lo_freq
+    i_freq_12 = f12 - lo_freq
+
+    element.LO = lo_freq
+    element.IF = i_freq
+    element.IF_12 = i_freq_12
+
+    mirror = lo_freq - i_freq
+    harmonics = {
+        'mirror': mirror,
+        'h_harm_2' : lo_freq - 2*i_freq,
+        'h_harm_3' : lo_freq - 3*i_freq,
+        'l_harm_2' : lo_freq + 2*i_freq,
+        'l_harm_3' : lo_freq + 3*i_freq,
+    }
+
+    for harmonic, harmonic_freq in harmonics.items():
+        if np.abs(harmonic_freq-f12) < collision_tol:
+            print(f'{qubit} harmonic {harmonic} hits f12 at distance {np.abs(harmonic_freq-f12)/1e6}MHz')
+
+    for neighbour_element in neighbour_qubits:
+        neighbour_qubit = neighbour_element.label
+        neighbour_f01 = VNA_qubit_frequencies[neighbour_qubit]
+        neighbour_f12 = VNA_f12_frequencies[neighbour_qubit]
+        for harmonic, harmonic_freq in harmonics.items():
+            if np.abs(harmonic_freq-neighbour_f01) < collision_tol:
+                print(f'{qubit} harmonic {harmonic} hits neighbour_f01: {neighbour_f01} of {neighbour_qubit} at distance {(neighbour_f01-harmonic_freq)/1e6}MHz')
+            if np.abs(harmonic_freq-neighbour_f12) < collision_tol:
+                print(f'{qubit} harmonic {harmonic} hits neighbour_f12: {neighbour_f12} of {neighbour_qubit} at distance {(neighbour_f12-harmonic_freq)/1e6}MHz')
+
+# group_qubits = ['q11', 'q12', 'q13', 'q14', 'q15', 'q16', 'q17','q18', 'q19', 'q20', 'q23', 'q24', 'q25']
+group_qubits = ['q18', 'q19', 'q20', 'q23', 'q24', 'q25']
+[hits_neighbors(q, LO_group) for q in group_qubits]
+
+hits_neighbors('q16', LO_16)
+hits_neighbors('q17', LO_17)
+hits_neighbors('q21', LO_21)
+hits_neighbors('q22', LO_22)
+hits_neighbors('q20', LO_20)
+hits_neighbors('q25', LO_25)
+
+
+fig, ax = plt.subplots(1,1, figsize=(10,6))
+for element in QPU:
+    x_coord, y_coord = element.grid_coords
+    x_coord *= 1.6
+    y_coord *= 1.6
+    ax.add_patch(Rectangle((x_coord,y_coord),1,1.2,color='dodgerblue', alpha=0.5))
+    ann_text = f'{element.label}\nmodule{element.module}\n{element.XY_line}\n'
+    ann_text += f'{element.res_freq:.3e}\nLO:{element.LO/1e9:.3f}\n{element.qubit_freq:.3e}  IF:{element.IF/1e6:.0f}\n'
+    ann_text += f'{element.qubit_f12:.3e}  IF:{element.IF_12/1e6:.0f}'
+    ann_style = {'fontsize': 14, 'fontweight': 'roman'}
+    ax.annotate(ann_text, (x_coord,y_coord), **ann_style)
+ax.set_xlim(left = 0, right = 5*1.6 - 0.6)
+ax.set_ylim(bottom = 0, top = 6)
+plt.tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)
+plt.show()
+# fig, ax = plt.subplots(1,1, figsize=(10,4))
+# for qubit, f01 in VNA_qubit_frequencies.items():
+#     f12 = VNA_f12_frequencies[qubit]
+#     ax.axvline(x=f01)
+#     ax.axvline(x=f12)
+# plt.show()
 #
-#    # Code by Stefan Hill:
-#    neighbour_qubits = list(filter(lambda element_: distance(element, element_)==1, QPU))
-#
-#    # print(f'{ neighbour_qubits = }')
-#    f01 = VNA_qubit_frequencies[qubit]
-#    f12 = VNA_f12_frequencies[qubit]
-#    i_freq = f01 - lo_freq
-#
-#    element.LO = lo_freq
-#    element.IF = i_freq
-#
-#    mirror = lo_freq - i_freq
-#    harmonics = {
-#        'mirror': mirror,
-#        'h_harm_2' : lo_freq - 2*i_freq,
-#        'h_harm_3' : lo_freq - 3*i_freq,
-#        'l_harm_2' : lo_freq + 2*i_freq,
-#        'l_harm_3' : lo_freq + 3*i_freq,
-#    }
-#
-#    for harmonic in harmonics.values():
-#        if np.abs(harmonic-f12) < collision_tol:
-#            print(f'harmonic {harmonic} hits f12')
-#
-#    for neighbour_element in neighbour_qubits:
-#        neighbour_qubit = neighbour_element.label
-#        neighbour_f01 = VNA_qubit_frequencies[neighbour_qubit]
-#        neighbour_f12 = VNA_f12_frequencies[neighbour_qubit]
-#        for harmonic, harmonic_freq in harmonics.items():
-#            if np.abs(harmonic_freq-neighbour_f01) < collision_tol:
-#                print(f'{qubit} harmonic {harmonic} hits neighbour_f01: {neighbour_f01} of {neighbour_qubit} at distance {(neighbour_f01-harmonic_freq)/1e6}MHz')
-#            if np.abs(harmonic_freq-neighbour_f12) < collision_tol:
-#                print(f'{qubit} harmonic {harmonic} hits neighbour_f12: {neighbour_f12} of {neighbour_qubit} at distance {(neighbour_f12-harmonic_freq)/1e6}MHz')
-#
-#group_qubits = ['q11', 'q12', 'q13', 'q14', 'q15', 'q16', 'q17','q18', 'q19', 'q20', 'q23', 'q24', 'q25']
-#[hits_neighbors(q, LO_group) for q in group_qubits]
-#
-## hits_neighbors('q16', LO_16)
-## hits_neighbors('q17', LO_17)
-## hits_neighbors('q21', LO_21)
-## hits_neighbors('q22', LO_22)
-#
-#
-#
-#
-#
-#fig, ax = plt.subplots(1,1, figsize=(10,6))
-#for element in QPU:
-#    x_coord, y_coord = element.grid_coords
-#    x_coord *= 1.6
-#    y_coord *= 1.6
-#    ax.add_patch(Rectangle((x_coord,y_coord),1,1.2,color='dodgerblue', alpha=0.5))
-#    ann_text = f'{element.label}\nmodule{element.module}\n{element.XY_line}\n'
-#    # ann_text += f'{element.res_freq:.3e}\n{element.qubit_freq:.3e}\nLO:{element.LO/1e9:.3f}\nIF:{element.IF/1e6:.0f}'
-#    ann_style = {'fontsize': 14, 'fontweight': 'roman'}
-#    ax.annotate(ann_text, (x_coord,y_coord), **ann_style)
-#ax.set_xlim(left = 0, right = 5*1.6 - 0.6)
-#ax.set_ylim(bottom = 0, top = 6)
-#plt.tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)
-#plt.show()
-#fig, ax = plt.subplots(1,1, figsize=(10,4))
-## for qubit, f01 in VNA_qubit_frequencies.items():
-##     f12 = VNA_f12_frequencies[qubit]
-##     ax.axvline(x=f01)
-##     ax.axvline(x=f12)
-## plt.show()
-##
