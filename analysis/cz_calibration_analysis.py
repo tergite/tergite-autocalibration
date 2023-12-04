@@ -68,10 +68,12 @@ class CZCalibrationAnalysis():
 
     def run_fitting(self):
         # self.testing_group = 0
+        self.dynamic = self.dataset['name']  == 'cz_dynamic_phase'
         self.freq = self.dataset[f'control_ons{self.qubit}'].values
         self.amp = self.dataset[f'ramsey_phases{self.qubit}'].values
         magnitudes = self.dataset[f'y{self.qubit}'].values
-        self.magnitudes = np.transpose((magnitudes - np.min(magnitudes))/(np.max(magnitudes)-np.min(magnitudes)))
+        self.magnitudes = np.transpose(magnitudes)
+        # self.magnitudes = np.transpose((magnitudes - np.min(magnitudes))/(np.max(magnitudes)-np.min(magnitudes)))
         self.fit_amplitudes = np.linspace( self.amp[0], self.amp[-1], 400)
 
         self.fit_results,self.fit_ys = [],[]
@@ -84,23 +86,33 @@ class CZCalibrationAnalysis():
                 fit_result = model.fit(magnitude, params=guess, drive_amp=self.amp)
                 fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_amplitudes})
                 self.fit_results.append(fit_result)
+                self.qubit_type = 'Target'
             else:
                 fit = False
                 fit_y = [np.mean(magnitude)]*400
+                self.qubit_type = 'Control'
             self.fit_ys.append(fit_y)
         if fit:
-            qois = np.transpose([[fit.result.params[p].value for p in ['cz']] for fit in self.fit_results])
-            self.opt_cz = qois[0]
-            self.cphase = np.abs(np.diff(self.opt_cz))[0]
+            qois = np.transpose([[[fit.result.params[p].value,fit.result.params[p].stderr] for p in ['cz']] for fit in self.fit_results])
+            opt_cz = qois[0][0]
+            self.cphase = 180-np.abs(np.abs(np.diff(opt_cz))[0]-180)
+            self.err = np.sqrt(np.sum(np.array(qois[1][0])**2))
         else:
             self.cphase = 0
+            self.err = 0
             self.opt_cz = [0]*2
         return [self.cphase]
 
     def plotter(self,axis):
         # datarray = self.dataset[f'y{self.qubit}']
         # qubit = self.qubit
-        label = ['Control Off','Control On']
+
+        if self.dynamic:
+            label = ['Gate Off','Gate On']
+            name = 'Dynamic Phase'
+        else:
+            label = ['Control Off','Control On']
+            name = 'CZ'
         x = range(len(label))
         colors = plt.get_cmap('RdBu_r')(np.linspace(0.2, 0.8, len(x)))
 
@@ -109,10 +121,10 @@ class CZCalibrationAnalysis():
             axis.plot(self.fit_amplitudes,self.fit_ys[index],'-',c = colors[index],label = label[index])
             axis.vlines(self.opt_cz[index],-10,10,colors='gray',linestyles='--',linewidth=1.5)
 
-        axis.vlines(0,-10,-10,colors='gray',linestyles='--', label = 'C-phase = {:.1f}'.format(self.cphase),zorder=-10)
+        axis.vlines(0,-10,-10,colors='gray',linestyles='--', label = '{:} = {:.1f}+/-{:.1f}'.format(name,self.cphase,self.err),zorder=-10)
         # axis.legend(loc = 'upper right')
         axis.set_xlim([self.amp[0],self.amp[-1]])
         axis.set_ylim(np.min(self.magnitudes),np.max(self.magnitudes))
         axis.set_xlabel('Phase (deg)')
-        axis.set_ylabel('Qubit |1>-state Population')
-        # axis.title(f'CZ Chevron - Target Qubit')
+        axis.set_ylabel('Signal (a.u.)')
+        axis.set_title(f'{name} Calibration - {self.qubit_type} Qubit {self.qubit[1:]}')
