@@ -86,8 +86,10 @@ class CZ_chevron(Measurement):
         cz_frequency_values = np.array(list(cz_pulse_frequencies_sweep.values())[0])
         cz_duration_values = list(cz_pulse_durations.values())[0]
 
+        print(f'{ cz_frequency_values[0] = }')
+
         schedule.add_resource(
-            ClockResource(name=coupler+'.cz',freq=cz_frequency_values[0] + 4.0e9)
+            ClockResource(name=coupler+'.cz',freq= - cz_frequency_values[0] + 4.4e9)
         )
 
         number_of_durations = len(cz_duration_values)
@@ -97,7 +99,7 @@ class CZ_chevron(Measurement):
             cz_clock = f'{coupler}.cz'
             cz_pulse_port = f'{coupler}:fl'
             schedule.add(
-                SetClockFrequency(clock=cz_clock, clock_freq_new=cz_frequency + 4.0e9),
+                SetClockFrequency(clock=cz_clock, clock_freq_new= - cz_frequency + 4.4e9),
             )
 
             #The inner for loop iterates over cz pulse durations
@@ -113,7 +115,8 @@ class CZ_chevron(Measurement):
                     #     ref_op=relaxation, ref_pt="end",
                     # )
 
-                cz_amplitude = 0.5
+                cz_amplitude = 0.9
+
                 cz = schedule.add(
                         SquarePulse(
                             duration=cz_duration,

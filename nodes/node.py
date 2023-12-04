@@ -53,8 +53,8 @@ from config_files.VNA_values import (
 
 
 def resonator_samples(qubit: str) -> np.ndarray:
-    res_spec_samples = 141
-    sweep_range = 7.0e6
+    res_spec_samples = 111
+    sweep_range = 5.0e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
     min_freq = VNA_frequency - sweep_range / 2
     max_freq = VNA_frequency + sweep_range / 2
@@ -62,8 +62,8 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 
 def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
-    qub_spec_samples = 51
-    sweep_range =  4.5e6
+    qub_spec_samples = 151
+    sweep_range = 11.5e6
     if transition == '01':
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition == '12':
@@ -148,7 +148,7 @@ class Punchout_Node(Base_Node):
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = node_dictionary
-        self.redis_field = 'ro_ampl'
+        self.redis_field = ['ro_ampl']
         self.qubit_state = 0
         self.measurement_obj = Punchout
         self.analysis_obj = PunchoutAnalysis
@@ -160,7 +160,7 @@ class Punchout_Node(Base_Node):
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             },
             'ro_amplitudes': {
-                qubit: np.linspace(0.005, 0.09, 12) for qubit in self.all_qubits
+                qubit: np.linspace(0.005, 0.04, 12) for qubit in self.all_qubits
             },
         }
         return cluster_samplespace
@@ -199,7 +199,7 @@ class Qubit_01_Spectroscopy_Multidim_Node:
     def samplespace(self):
         cluster_samplespace = {
             'spec_pulse_amplitudes': {
-                 qubit: np.linspace(3e-4, 9e-4, 8) for qubit in self.all_qubits
+                 qubit: np.linspace(3e-4, 9e-4, 6) for qubit in self.all_qubits
             },
             'spec_frequencies': {
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
@@ -427,6 +427,8 @@ class RO_frequency_optimization_Node:
         return cluster_samplespace
 
 redis_connection = redis.Redis(decode_responses=True)
+
+
 class CZ_Chevron_Node:
     def __init__(self, name: str, all_qubits: list[str], couplers: list[str]):
         self.name = name
@@ -449,18 +451,20 @@ class CZ_Chevron_Node:
         q2_f12 = float(redis_connection.hget(f'transmons:{self.coupled_qubits[1]}', "freq_12"))
         # ac_freq = np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12))
         ac_freq = np.abs(q1_f01 + q2_f01 - (q2_f01 + q2_f12))
+        ac_freq = int( ac_freq / 1e4 ) * 1e4
         print(f'{ ac_freq/1e6 = } MHz')
         return ac_freq
 
     @property
     def samplespace(self):
+        print(f'{ np.linspace(- 50e6, 50e6, 2) + self.ac_freq = }')
         cluster_samplespace = {
             'cz_pulse_durations': {
-                qubit: np.arange(20e-9, 1400e-9, 180e-9) for qubit in self.coupled_qubits
+                qubit: np.arange(200e-9, 2600e-9, 100e-9) for qubit in self.coupled_qubits
             },
             'cz_pulse_frequencies_sweep': {
-                qubit: np.linspace(- 35e6, 35e6, 111) + self.ac_freq for qubit in self.coupled_qubits
-                # qubit: np.linspace(-100e6, 300e6, 41) for qubit in self.coupled_qubits # wide sweep
+                # qubit: np.array([692790000.0]) for qubit in self.coupled_qubits
+                qubit: np.linspace(-0.6e6, 0.2e6, 11) + self.ac_freq for qubit in self.coupled_qubits
             },
         }
         return cluster_samplespace

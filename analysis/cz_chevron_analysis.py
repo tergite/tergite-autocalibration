@@ -25,6 +25,7 @@ class ChevronModel(lmfit.model.Model):
 
         # Enforce oscillation frequency is positive
         self.set_param_hint("frequency", min=0)
+        self.set_param_hint("duration", expr="1/frequency", vary=False)
 
         # Fix the phase at pi so that the ouput is at a minimum when drive_amp=0
         self.set_param_hint("phase", min = -0.5, max = 0.5)
@@ -62,48 +63,63 @@ class CZChevronAnalysis():
         self.dataset = dataset
 
     def run_fitting(self):
-        return [0,0]
-        # # self.testing_group = 0
-        # self.freq = self.dataset[f'cz_pulse_frequencies_sweep{self.qubit}'].values
-        # self.amp = self.dataset[f'cz_pulse_durations{self.qubit}'].values
-        # magnitudes = self.dataset[f'y{self.qubit}'].values
-        # self.magnitudes = (magnitudes - np.min(magnitudes))/(np.max(magnitudes)-np.min(magnitudes))
-        # # values = [[np.linalg.norm(u) for u in v] for v in self.dataset[f'y{self.qubit}_']]
-        # fit_results = []
-        # for magnitude in self.magnitudes:
-        #     model = ChevronModel()
-        #     # magnitude = np.transpose(values)[15]
-        #     fit_amplitudes = np.linspace( self.amp[0], self.amp[-1], 400)
-        #     guess = model.guess(magnitude, drive_amp=self.amp)
-        #     fit_result = model.fit(magnitude, params=guess, drive_amp=self.amp)
-        #     fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: fit_amplitudes})
-        #     fit_results.append(fit_result)
-        #     # plt.plot(y,magnitude,'.r')
-        #     # plt.plot(fit_amplitudes,fit_y,'--b')
-        # qois = np.transpose([[fit.result.params[p].value for p in ['amplitude','frequency']] for fit in fit_results])
-        # qois = np.transpose([(q-np.min(q))/np.max(q) for q in qois])
-        # opt_id = np.argmax(np.sum(qois,axis=1))
-        # self.opt_freq = self.freq[opt_id]
-        # self.opt_cz = fit_results[opt_id].result.params['cz'].value
-        # self.opt_swap = fit_results[opt_id].result.params['swap'].value
-        #
-        # return [self.opt_freq,self.opt_cz]
+        # return [0,0]
+        self.testing_group = 0
+        self.freq = self.dataset[f'cz_pulse_frequencies_sweep{self.qubit}'].values
+        self.amp = self.dataset[f'cz_pulse_durations{self.qubit}'].values
+        magnitudes = self.dataset[f'y{self.qubit}'].values
+
+        self.magnitudes = (magnitudes - np.min(magnitudes))/(np.max(magnitudes)-np.min(magnitudes))
+        self.magnitudes = np.transpose(self.magnitudes)
+
+        model = ChevronModel()
+
+        # values = [[np.linalg.norm(u) for u in v] for v in self.dataset[f'y{self.qubit}_']]
+        fit_results = []
+        print(f'{ self.magnitudes.shape = }')
+        for magnitude in self.magnitudes:
+            # magnitude = np.transpose(values)[15]
+
+            fit_amplitudes = np.linspace( self.amp[0], self.amp[-1], 400)
+            guess = model.guess(magnitude, drive_amp=self.amp)
+            fit_result = model.fit(magnitude, params=guess, drive_amp=self.amp)
+            # breakpoint()
+            fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: fit_amplitudes})
+            fit_results.append(fit_result)
+            # plt.plot(y,magnitude,'.r')
+            # plt.plot(fit_amplitudes,fit_y,'--b')
+        qois = np.transpose([[np.abs(fit.result.params[p].value) for p in ['amplitude','duration']] for fit in fit_results])
+        qois = np.transpose([(q-np.min(q))/np.max(q) for q in qois])
+
+        if int(self.qubit[1:]) % 2 == 0:
+            qubit_type = 'target'
+        else:
+            qubit_type = 'control'
+
+        opt_id = np.argmax(np.sum(qois,axis=1))
+
+        self.opt_freq = self.freq[opt_id]
+        print(f'{ self.opt_freq = }')
+        self.opt_cz = fit_results[opt_id].result.params['cz'].value
+        print(f'{ self.opt_cz = }')
+        self.opt_swap = fit_results[opt_id].result.params['swap'].value
+
+        return [self.opt_freq,self.opt_cz]
 
     def plotter(self,axis):
         datarray = self.dataset[f'y{self.qubit}']
         qubit = self.qubit
         datarray.plot(ax=axis, x=f'cz_pulse_durations{qubit}',cmap='RdBu_r')
-        # fig = axis.pcolormesh(amp,freq,magnitudes,shading='nearest',cmap='RdBu_r')
-        # axis.scatter(self.opt_freq,self.opt_cz,c='r',label = 'CZ Duration = {:.1f} ns'.format(self.opt_cz*1e9),marker='X',s=200,edgecolors='k', linewidth=1.5,zorder=10)
+        # # fig = axis.pcolormesh(amp,freq,magnitudes,shading='nearest',cmap='RdBu_r')
+        axis.scatter(self.opt_cz,self.opt_freq,c='r',label = 'CZ Duration = {:.1f} ns'.format(self.opt_cz*1e9),marker='X',s=200,edgecolors='k', linewidth=1.5,zorder=10)
         # plt.scatter(opt_swap,opt_freq,c='b',label = 'SWAP12 Duration= {:.2f} V'.format(opt_swap),marker='X',s=200,edgecolors='k', linewidth=1.5,zorder=10)
-        # axis.vlines(self.opt_freq,self.amp[0],self.amp[-1],label = 'Frequency Detuning = {:.2f} MHz'.format(self.opt_freq/1e6),colors='k',linestyles='--',linewidth=1.5)
-        # axis.hlines(self.opt_cz,self.freq[0],self.freq[-1],colors='k',linestyles='--',linewidth=1.5)
+        axis.hlines(self.opt_freq,self.amp[0],self.amp[-1],label = 'Frequency Detuning = {:.2f} MHz'.format(self.opt_freq/1e6),colors='k',linestyles='--',linewidth=1.5)
+        axis.vlines(self.opt_cz,self.freq[0],self.freq[-1],colors='k',linestyles='--',linewidth=1.5)
         # axis.legend(loc = 'lower center', bbox_to_anchor=(-0.15, -0.36, 1.4, .102), mode='expand', ncol=2,
         #             title = 'Optimal Gate Parameters', columnspacing=200,borderpad=1)
-        # cbar = plt.colorbar(fig)
-        # cbar.set_label('|2>-state Population', labelpad=10)
+        # # cbar = plt.colorbar(fig)
+        # # cbar.set_label('|2>-state Population', labelpad=10)
         # axis.set_xlim([self.freq[0],self.freq[-1]])
         # axis.set_ylim([self.amp[0],self.amp[-1]])
-        # axis.set_ylabel('Parametric Drive Durations (s)')
-        # axis.set_xlabel('Frequency Detuning (Hz)')
-        
+        axis.set_ylabel('Parametric Drive Durations (s)')
+        axis.set_xlabel('Frequency Detuning (Hz)')

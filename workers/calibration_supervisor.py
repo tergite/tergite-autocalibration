@@ -11,7 +11,8 @@ from nodes.node import NodeFactory
 from workers.post_processing_worker import post_process
 from utilities.status import ClusterStatus
 from qblox_instruments import Cluster
-# from workers.hardware_utils import set_parking_current
+from workers.hardware_utils import SpiDAC
+from workers.worker_utils import create_node_data_path
 
 from nodes.graph import filtered_topological_order
 from utilities.visuals import draw_arrow_chart
@@ -49,16 +50,17 @@ node_factory = NodeFactory()
 def set_module_att(cluster):
     # Flux lines
     for module in cluster.modules[0:13]:
-        module.out1_att(50)
+        module.out1_att(42)
     # print(module.name + '_att:'+ str(module.out1_att()) + 'dB')
     # Readout lines
     # for module in cluster.modules[15:17]:
     #     module.out0_att(6)
     # print(module.name + '_att:'+ str(module.out0_att()) + 'dB')
+
 if args.cluster_status == ClusterStatus.real:
     Cluster.close_all()
     clusterA = Cluster("clusterA", lokiA_IP)
-    set_module_att(clusterA)
+    # set_module_att(clusterA)
     lab_ic = InstrumentCoordinator('lab_ic')
     lab_ic.add_component(ClusterComponent(clusterA))
     lab_ic.timeout(222)
@@ -132,10 +134,11 @@ def calibrate_system():
                 redis_connection.hset(f"couplers:{coupler}", parameter_key, parameter_value)
 
 
-    # if target_node == 'cz_chevron':
-    #     set_module_att(clusterA)
-    #     for coupler in couplers:
-    #         set_parking_current(coupler)
+    if target_node == 'cz_chevron':
+        set_module_att(clusterA)
+        for coupler in couplers:
+            spi = SpiDAC()
+            spi.set_parking_current(coupler)
 
     for calibration_node in topo_order:
         inspect_node(calibration_node)
@@ -206,23 +209,17 @@ def calibrate_node(node_label: str):
 
     # node_dictionary = user_requested_calibration['node_dictionary']
 
-
     node = node_factory.create_node(node_label, qubits, couplers=couplers)
+    data_path = create_node_data_path(node)
 
     compiled_schedule = precompile(node)
     result_dataset = measure_node(
         node,
         compiled_schedule,
         lab_ic,
-        cluster_status=args.cluster_status
+        data_path,
+        cluster_status=args.cluster_status,
     )
-
-    measurement_date = datetime.now()
-    plots_today = measurement_date.date().strftime('%Y%m%d')
-    time_id = measurement_date.strftime('%Y%m%d-%H%M%S-%f')[:19]
-    measurement_id = time_id + '-' + f'{node.name}'
-    data_path = pathlib.Path(data_directory / plots_today / measurement_id)
-    data_path.mkdir(parents=True, exist_ok=True)
 
     logger.info('measurement completed')
     post_process(result_dataset, node, data_path=data_path)

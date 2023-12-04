@@ -5,11 +5,9 @@ VNA_resonator_frequencies = {
 
 VNA_qubit_frequencies = {
         'q16': 3.189e9, 'q17': 3.932e9, 'q18': 3.254e9, 'q19': 3.921e9, 'q20': 3.333e9,
-        'q21': 3.7737e9, 'q22': 3.327e9, 'q23': 3.911e9, 'q24': 3.271e9, 'q25': 4.009e9,
+        'q21': 3.770e9, 'q22': 3.325e9, 'q23': 3.911e9, 'q24': 3.271e9, 'q25': 4.009e9,
         }
 
-########################
-# the +100e6 is wrong need to recalibrate mixer
 ########################
 VNA_f12_frequencies= {
         # 'q11': 3.749e9 - 230e6,

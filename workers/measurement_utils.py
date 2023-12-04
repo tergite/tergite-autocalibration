@@ -58,11 +58,11 @@ class SingleQubitsMeasurement:
     def __init__(self, node):
         self.node = node
 
-    def measure(self, node, compiled_schedule, ic):
+    def measure(self, node, compiled_schedule, ic, data_path):
         samplespace = node.samplespace
         raw_dataset = execute_schedule(compiled_schedule, ic)
         result_dataset = configure_dataset(raw_dataset, samplespace)
-        save_dataset(result_dataset, node)
+        save_dataset(result_dataset, node, data_path)
         if node.name == 'ro_frequency_optimization':
             result_dataset = handle_ro_freq_optimization(result_dataset, states=[0, 1])
         elif node.name == 'ro_frequency_optimization_gef':
@@ -89,7 +89,7 @@ class CoupledQubitsMeasurement:
         print('Finished ramping')
 
 
-    def measure(self, node, compiled_schedule, ic):
+    def measure(self, node, compiled_schedule, ic, data_path):
         logger.info('Starting coupler spectroscopy')
         for indx, current in enumerate(self.dc_currents):
             self.set_current(current)
@@ -109,7 +109,7 @@ class CoupledQubitsMeasurement:
         coord_attrs = {'qubit':measure_qubit, 'long_name': 'dc_currents', 'units': 'NA'}
         result_dataset.dc_currents.attrs = coord_attrs
 
-        save_dataset(result_dataset, node)
+        save_dataset(result_dataset, node, data_path)
         # TODO verify this
         self.set_current(0)
         return result_dataset
