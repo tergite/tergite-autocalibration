@@ -52,13 +52,12 @@ class BaseAnalysis():
         )
         self.qoi: list
 
-    def update_redis_trusted_values(self, node: str, this_qubit: str, transmon_parameters: list):
+    def update_redis_trusted_values(self, node: str, this_element: str, transmon_parameters: list):
         for i,transmon_parameter in enumerate(transmon_parameters):
-            #print(f'{ transmon_parameter = }')
-            #print(f'{ self.qoi[i] = }')
-            redis_connection.hset(f"transmons:{this_qubit}", f"{transmon_parameter}", self.qoi[i])
-            redis_connection.hset(f"cs:{this_qubit}", node, 'calibrated')
-            self.node_result.update({this_qubit: self.qoi[i]})
+            # TODO this_qubit -> this_element, (transmons can be both qubits and couplers)
+            redis_connection.hset(f"transmons:{this_element}", f"{transmon_parameter}", self.qoi[i])
+            redis_connection.hset(f"cs:{this_element}", node, 'calibrated')
+            self.node_result.update({this_element: self.qoi[i]})
 
 
 class Multiplexed_Analysis(BaseAnalysis):
@@ -66,12 +65,12 @@ class Multiplexed_Analysis(BaseAnalysis):
         if node.name == 'tof':
             tof = analyze_tof(result_dataset, True)
             return
-        # print(f'{ result_dataset = }')
         super().__init__(result_dataset, data_path)
         data_vars_dict = collections.defaultdict(set)
         for var in result_dataset.data_vars:
             this_qubit = result_dataset[var].attrs['qubit']
             data_vars_dict[this_qubit].add(var)
+
 
         for indx, var in enumerate(result_dataset.data_vars):
             this_qubit = result_dataset[var].attrs['qubit']
@@ -90,18 +89,13 @@ class Multiplexed_Analysis(BaseAnalysis):
             node_analysis = node.analysis_obj(ds, **kw_args)
             self.qoi = node_analysis.run_fitting()
 
-            #if node == 'rabi_oscillations':
-            #    res, stderr = node_analysis.run_fitting()
-            #    self.qoi = res
-            #else:
-            #    self.qoi = node_analysis.run_fitting()
-
             node_analysis.plotter(this_axis)
-            if node.name == 'cz_chevron':
-                print( 'WARNING REDIS UPDATE COMMENTED OUT')
-            else:
-                print(this_qubit,self.qoi,redis_field)
-                self.update_redis_trusted_values(node.name, this_qubit, redis_field)
+
+            # TODO temporary hack:
+            if node.name == 'coupler_spectroscopy':
+                this_qubit = node.coupler
+
+            self.update_redis_trusted_values(node.name, this_qubit, redis_field)
 
             handles, labels = this_axis.get_legend_handles_labels()
 
@@ -112,5 +106,5 @@ class Multiplexed_Analysis(BaseAnalysis):
             patch = mpatches.Patch(color='red', label=f'{this_qubit}')
             handles.append(patch)
             this_axis.set(title=None)
-            this_axis.legend(handles=handles, fontsize='xx-small')
+            this_axis.legend(handles=handles, fontsize='x-small')
             # logger.info(f'Analysis for the {node} of {this_qubit} is done, saved at {self.data_path}')

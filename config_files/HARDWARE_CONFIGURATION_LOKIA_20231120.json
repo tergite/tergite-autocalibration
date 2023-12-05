@@ -221,6 +221,19 @@
                   "mixer_phase_error_deg": -22.73123
                }
             ]
+         },
+          "complex_output_1": {
+            "lo_freq": 3.9e9,
+            "dc_mixer_offset_I": -0.7448e-3,
+            "dc_mixer_offset_Q": -13.2039e-3,
+            "portclock_configs": [
+               {
+                  "port": "q21_q22:fl",
+                  "clock": "q21_q22.cz",
+                  "mixer_amp_ratio": 0.972,
+                  "mixer_phase_error_deg": -19.09491
+               }
+            ]
          }
       },
       "clusterA_module16": {

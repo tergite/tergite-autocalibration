@@ -17,7 +17,7 @@ setuptools.setup(
     license="Apache 2.0",
     install_requires=REQUIREMENTS,
     classifiers=[
-        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.9",
         "Operating System :: OS Independent",
     ],
 )

@@ -70,24 +70,34 @@ class Two_Tones_Multidim(Measurement):
         schedule = Schedule("multiplexed_qubit_spec",repetitions)
 
         # Initialize the clock for each qubit
-        for this_qubit, spec_array_val in spec_frequencies.items():
-
             #Initialize ClockResource with the first frequency value
-            schedule.add_resource( ClockResource(name=f'{this_qubit}.01', freq=spec_array_val[0]) )
+        for this_qubit, spec_array_val in spec_frequencies.items():
+            if self.qubit_state == 0:
+                schedule.add_resource( ClockResource(name=f'{this_qubit}.01', freq=spec_array_val[0]) )
+            elif self.qubit_state == 1:
+                schedule.add_resource( ClockResource(name=f'{this_qubit}.12', freq=spec_array_val[0]) )
+            else:
+                raise ValueError(f'Invalid qubit state: {self.qubit_state}')
+
 
         #This is the common reference operation so the qubits can be operated in parallel
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
         # The outer loop, iterates over all qubits
         for this_qubit, spec_pulse_frequency_values in spec_frequencies.items():
-            this_clock = f'{this_qubit}.01'
+            if self.qubit_state == 0:
+                this_clock = f'{this_qubit}.01'
+            elif self.qubit_state == 1:
+                this_clock = f'{this_qubit}.12'
+            else:
+                raise ValueError(f'Invalid qubit state: {self.qubit_state}')
 
             amplitude_values = spec_pulse_amplitudes[this_qubit]
 
             number_of_ampls = len(amplitude_values)
 
             schedule.add(
-                    Reset(*qubits), ref_op=root_relaxation, ref_pt_new='end'
+                    Reset(*qubits), ref_op=root_relaxation, ref_pt='end'
             ) #To enforce parallelism we refer to the root relaxation
 
             #The intermediate loop iterates over all frequency values in the frequency batch:
@@ -111,6 +121,13 @@ class Two_Tones_Multidim(Measurement):
                     #     label=f"spec_pulse_multidim_{this_qubit}_{this_index}", ref_op=set_frequency, ref_pt="end",
                     # )
 
+                    if self.qubit_state == 0:
+                        pass
+                    elif self.qubit_state == 1:
+                        schedule.add(X(this_qubit))
+                    else:
+                        raise ValueError(f'Invalid qubit state: {self.qubit_state}')
+
                     schedule.add(
                         SoftSquarePulse(
                             duration= spec_pulse_durations[this_qubit],
@@ -118,7 +135,6 @@ class Two_Tones_Multidim(Measurement):
                             port = mw_pulse_ports[this_qubit],
                             clock=this_clock,
                         ),
-                        label=f"spec_pulse_{this_qubit}_{this_index}", ref_op=set_frequency, ref_pt="end",
                     )
 
                     if self.qubit_state == 0:

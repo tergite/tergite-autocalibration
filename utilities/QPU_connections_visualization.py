@@ -119,21 +119,21 @@ hits_neighbors('q20', LO_20)
 hits_neighbors('q25', LO_25)
 
 
-fig, ax = plt.subplots(1,1, figsize=(10,6))
-for element in QPU:
-    x_coord, y_coord = element.grid_coords
-    x_coord *= 1.6
-    y_coord *= 1.6
-    ax.add_patch(Rectangle((x_coord,y_coord),1,1.2,color='dodgerblue', alpha=0.5))
-    ann_text = f'{element.label}\nmodule{element.module}\n{element.XY_line}\n'
-    ann_text += f'{element.res_freq:.3e}\nLO:{element.LO/1e9:.3f}\n{element.qubit_freq:.3e}  IF:{element.IF/1e6:.0f}\n'
-    ann_text += f'{element.qubit_f12:.3e}  IF:{element.IF_12/1e6:.0f}'
-    ann_style = {'fontsize': 14, 'fontweight': 'roman'}
-    ax.annotate(ann_text, (x_coord,y_coord), **ann_style)
-ax.set_xlim(left = 0, right = 5*1.6 - 0.6)
-ax.set_ylim(bottom = 0, top = 6)
-plt.tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)
-plt.show()
+# fig, ax = plt.subplots(1,1, figsize=(10,6))
+# for element in QPU:
+#     x_coord, y_coord = element.grid_coords
+#     x_coord *= 1.6
+#     y_coord *= 1.6
+#     ax.add_patch(Rectangle((x_coord,y_coord),1,1.2,color='dodgerblue', alpha=0.5))
+#     ann_text = f'{element.label}\nmodule{element.module}\n{element.XY_line}\n'
+#     ann_text += f'{element.res_freq:.3e}\nLO:{element.LO/1e9:.3f}\n{element.qubit_freq:.3e}  IF:{element.IF/1e6:.0f}\n'
+#     ann_text += f'{element.qubit_f12:.3e}  IF:{element.IF_12/1e6:.0f}'
+#     ann_style = {'fontsize': 14, 'fontweight': 'roman'}
+#     ax.annotate(ann_text, (x_coord,y_coord), **ann_style)
+# ax.set_xlim(left = 0, right = 5*1.6 - 0.6)
+# ax.set_ylim(bottom = 0, top = 6)
+# plt.tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)
+# plt.show()
 # fig, ax = plt.subplots(1,1, figsize=(10,4))
 # for qubit, f01 in VNA_qubit_frequencies.items():
 #     f12 = VNA_f12_frequencies[qubit]

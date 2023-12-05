@@ -92,14 +92,18 @@ def handle_ro_freq_optimization(complex_dataset: xarray.Dataset, states: list[in
         new_ds[f'y{this_qubit}'] = (('qubit_state', coord), np.vstack(values), attributes)
     return new_ds
 
-
-def save_dataset(result_dataset: xarray.Dataset, node):
+def create_node_data_path(node):
     measurement_date = datetime.now()
     measurements_today = measurement_date.date().strftime('%Y%m%d')
     time_id = measurement_date.strftime('%Y%m%d-%H%M%S-%f')[:19]
     measurement_id = time_id + '-' + str(uuid4())[:6] + f'-{node.name}'
     data_path = pathlib.Path(data_directory / measurements_today / measurement_id)
+    return data_path
+
+
+def save_dataset(result_dataset: xarray.Dataset, node, data_path: pathlib.Path):
     data_path.mkdir(parents=True, exist_ok=True)
+    measurement_id = data_path.stem[0:19]
     result_dataset = result_dataset.assign_attrs({'name': node.name, 'tuid': measurement_id})
     result_dataset_real = to_real_dataset(result_dataset)
     # to_netcdf doesn't like complex numbers, convert to real/imag to save:

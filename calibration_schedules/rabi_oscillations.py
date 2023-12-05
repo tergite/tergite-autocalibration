@@ -97,7 +97,7 @@ class Rabi_Oscillations(Measurement):
                 raise ValueError(f'Invalid qubit state: {self.qubit_state}')
 
             schedule.add(
-                Reset(*qubits), ref_op=root_relaxation, ref_pt_new='end'
+                Reset(*qubits), ref_op=root_relaxation, ref_pt='end'
             )  # To enforce parallelism we refer to the root relaxation
 
             # The second for loop iterates over all amplitude values in the amplitudes batch:
@@ -119,6 +119,6 @@ class Rabi_Oscillations(Measurement):
                     measure_function(this_qubit, acq_index=acq_index, bin_mode=BinMode.AVERAGE),
                 )
 
-                schedule.add(Reset(this_qubit), label=f"Reset_{this_qubit}_{acq_index}")
+                schedule.add(Reset(this_qubit))
 
         return schedule

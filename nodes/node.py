@@ -1,7 +1,10 @@
+from math import prod
 import numpy as np
+import redis
 from calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
 from calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
-from calibration_schedules.two_tone_multidim import Two_Tones_Multidim
+# from calibration_schedules.two_tone_multidim import Two_Tones_Multidim
+from calibration_schedules.two_tone_multidim_loop_reversed import Two_Tones_Multidim
 from calibration_schedules.rabi_oscillations import Rabi_Oscillations
 from calibration_schedules.T1 import T1
 from calibration_schedules.XY_crosstalk import XY_cross
@@ -13,7 +16,10 @@ from calibration_schedules.state_discrimination import Single_Shots_RO
 # from calibration_schedules.drag_amplitude import DRAG_amplitude
 from calibration_schedules.motzoi_parameter import Motzoi_parameter
 from calibration_schedules.n_rabi_oscillations import N_Rabi_Oscillations
-from calibration_schedules.cz_chevron import CZ_chevron
+
+# from calibration_schedules.cz_chevron import CZ_chevron
+
+from calibration_schedules.cz_chevron_reversed import CZ_chevron
 from calibration_schedules.cz_calibration import CZ_calibration
 
 from analysis.motzoi_analysis import MotzoiAnalysis
@@ -47,8 +53,8 @@ from config_files.VNA_values import (
 
 
 def resonator_samples(qubit: str) -> np.ndarray:
-    res_spec_samples = 51
-    sweep_range = 1.2e6
+    res_spec_samples = 101
+    sweep_range = 6.0e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
     min_freq = VNA_frequency - sweep_range / 1.5
     max_freq = VNA_frequency + sweep_range / 2
@@ -56,10 +62,8 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 
 def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
-    qub_spec_samples = 101
-    #qub_spec_samples = 165
-    sweep_range = 20e6
-    #sweep_range = 14.5e6
+    qub_spec_samples = 41
+    sweep_range = 4.5e6
     if transition == '01':
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition == '12':
@@ -83,6 +87,7 @@ class NodeFactory:
             'ramsey_correction': Ramsey_Fringes_Node,
             'resonator_spectroscopy_1': Resonator_Spectroscopy_1_Node,
             'qubit_12_spectroscopy_pulsed': Qubit_12_Spectroscopy_Pulsed_Node,
+            'qubit_12_spectroscopy_multidim': Qubit_12_Spectroscopy_Multidim_Node,
             'rabi_oscillations_12': Rabi_Oscillations_12_Node,
             'ramsey_correction_12': Ramsey_Fringes_12_Node,
             'resonator_spectroscopy_2': Resonator_Spectroscopy_2_Node,
@@ -145,7 +150,7 @@ class Punchout_Node(Base_Node):
         self.name = name
         self.all_qubits = all_qubits
         self.node_dictionary = node_dictionary
-        self.redis_field = 'ro_ampl'
+        self.redis_field = ['ro_ampl']
         self.qubit_state = 0
         self.measurement_obj = Punchout
         self.analysis_obj = PunchoutAnalysis
@@ -157,7 +162,7 @@ class Punchout_Node(Base_Node):
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             },
             'ro_amplitudes': {
-                qubit: np.linspace(0.005, 0.09, 12) for qubit in self.all_qubits
+                qubit: np.linspace(0.005, 0.04, 12) for qubit in self.all_qubits
             },
         }
         return cluster_samplespace
@@ -196,7 +201,7 @@ class Qubit_01_Spectroscopy_Multidim_Node:
     def samplespace(self):
         cluster_samplespace = {
             'spec_pulse_amplitudes': {
-                 qubit: np.linspace(3e-4, 9e-4, 10) for qubit in self.all_qubits
+                 qubit: np.linspace(3e-4, 9e-4, 6) for qubit in self.all_qubits
             },
             'spec_frequencies': {
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
@@ -381,6 +386,29 @@ class Qubit_12_Spectroscopy_Pulsed_Node:
         return cluster_samplespace
 
 
+class Qubit_12_Spectroscopy_Multidim_Node:
+    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
+        self.name = name
+        self.all_qubits = all_qubits
+        self.node_dictionary = kwargs
+        self.redis_field = ['freq_12',
+                            'spec_ampl_12_optimal']
+        self.qubit_state = 1
+        self.measurement_obj = Two_Tones_Multidim
+        self.analysis_obj = QubitSpectroscopyMultidim
+
+    @property
+    def samplespace(self):
+        cluster_samplespace = {
+            'spec_pulse_amplitudes': {
+                 qubit: np.linspace(3e-4, 9e-4, 5) for qubit in self.all_qubits
+            },
+            'spec_frequencies': {
+                qubit: qubit_samples(qubit, transition='12') for qubit in self.all_qubits
+            },
+        }
+        return cluster_samplespace
+
 class Rabi_Oscillations_12_Node:
     def __init__(self, name: str, all_qubits: list[str], ** kwargs):
         self.name = name
@@ -420,43 +448,45 @@ class RO_frequency_optimization_Node:
         }
         return cluster_samplespace
 
+redis_connection = redis.Redis(decode_responses=True)
+
 
 class CZ_Chevron_Node:
-    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
+    def __init__(self, name: str, all_qubits: list[str], couplers: list[str]):
         self.name = name
         self.all_qubits = all_qubits
-        self.node_dictionary = kwargs
+        self.all_couplers = couplers
+        self.coupler = couplers[0]
         self.redis_field = ['cz_pulse_frequency','cz_pulse_duration']
         self.qubit_state = 0
         self.measurement_obj = CZ_chevron
         self.analysis_obj = CZChevronAnalysis
-        self.validate()
+        self.coupled_qubits = couplers[0].split(sep='_')
+        self.ac_freq = self.transition_frequency
+        print(f'{ self.coupled_qubits = }')
 
-    def validate(self):
-        if 'coupled_qubits' not in self.node_dictionary:
-            error_msg = 'coupled_qubits not in job dictionary\n'
-            suggestion = 'job dictionary should look like:\n {"coupled_qubits": ["q1","q2"]}'
-            raise ValueError(error_msg + suggestion)
-        else:
-            coupled_qubits = self.node_dictionary['coupled_qubits']
-            if len(coupled_qubits) != 2:
-                raise ValueError('coupled qubits must be a list with 2 elements')
-            elif not all([q in self.all_qubits for q in coupled_qubits]):
-                raise ValueError('coupled qubits must be a subset of all calibrated qubits')
-            else:
-                self.coupled_qubits = coupled_qubits
-                self.coupler = coupled_qubits[0] + '_' + coupled_qubits[1]
-                self.all_qubits = coupled_qubits
+    @property
+    def transition_frequency(self):
+        q1_f01 = float(redis_connection.hget(f'transmons:{self.coupled_qubits[0]}', "freq_01"))
+        q2_f01 = float(redis_connection.hget(f'transmons:{self.coupled_qubits[1]}', "freq_01"))
+        q1_f12 = float(redis_connection.hget(f'transmons:{self.coupled_qubits[0]}', "freq_12"))
+        q2_f12 = float(redis_connection.hget(f'transmons:{self.coupled_qubits[1]}', "freq_12"))
+        # ac_freq = np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12))
+        ac_freq = np.abs(q1_f01 + q2_f01 - (q2_f01 + q2_f12))
+        ac_freq = int( ac_freq / 1e4 ) * 1e4
+        print(f'{ ac_freq/1e6 = } MHz')
+        return ac_freq
 
     @property
     def samplespace(self):
+        print(f'{ np.linspace(- 50e6, 50e6, 2) + self.ac_freq = }')
         cluster_samplespace = {
-            'cz_pulse_frequencies_sweep': {
-                qubit: np.linspace(-1e6, 1e6, 21) for qubit in self.coupled_qubits
-                # qubit: np.linspace(-100e6, 300e6, 41) for qubit in self.coupled_qubits # wide sweep
-            },
             'cz_pulse_durations': {
-                qubit: np.linspace(20e-9, 2420e-9, 21) for qubit in self.coupled_qubits
+                qubit: np.arange(200e-9, 2600e-9, 100e-9) for qubit in self.coupled_qubits
+            },
+            'cz_pulse_frequencies_sweep': {
+                # qubit: np.array([692790000.0]) for qubit in self.coupled_qubits
+                qubit: np.linspace(-0.6e6, 0.2e6, 11) + self.ac_freq for qubit in self.coupled_qubits
             },
         }
         return cluster_samplespace
@@ -504,8 +534,7 @@ class CZ_Dynamic_Phase_Node:
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
         self.redis_field = ['cz_phase']
-        self.dynamic = True
-        self.testing_group = 0 # The edge group to be tested. 0 means all edges.
+        self.qubit_state = 0
         self.measurement_obj = CZ_calibration
         self.analysis_obj = CZCalibrationAnalysis
         self.validate()
@@ -534,17 +563,23 @@ class CZ_Dynamic_Phase_Node:
         }
         return cluster_samplespace
 
+
+
+
+
+
 class Coupler_Spectroscopy_Node:
     def __init__(self, name: str, all_qubits: list[str], ** kwargs):
         self.name = name
         self.all_qubits = all_qubits
-        self.node_dictionary = kwargs
+        self.coupler = kwargs['couplers'][0]
         self.redis_field = ['parking_current']
         self.qubit_state = 0
         # perform 2 tones while biasing the current
         self.measurement_obj = Two_Tones_Spectroscopy
         self.analysis_obj = CouplerSpectroscopyAnalysis
-        self.validate()
+        self.coupled_qubits = self.coupler.split(sep='_')
+        # self.validate()
 
     def validate(self):
         if 'coupled_qubits' not in self.node_dictionary:
@@ -564,7 +599,10 @@ class Coupler_Spectroscopy_Node:
 
     @property
     def samplespace(self):
-        qubit = self.measurement_qubit
+        qubit = self.coupled_qubits[0]
+        self.measurement_qubit = qubit
+        print(f'{ self.coupled_qubits = }')
+        print(f'{ qubit = }')
         cluster_samplespace = {
             'spec_frequencies': {qubit: qubit_samples(qubit)}
         }
@@ -573,7 +611,7 @@ class Coupler_Spectroscopy_Node:
     @property
     def spi_samplespace(self):
         spi_samplespace = {
-            'dc_currents': {self.coupler: np.arange(-3.0e-3, 3.0e-3, 250e-6)},
+            'dc_currents': {self.coupler: np.arange(-3.0e-3, 3.0e-3, 200e-6)},
         }
         return spi_samplespace
 

@@ -6,7 +6,7 @@ Home-page: https://bitbucket.org/qtlteam/tergite-autocalibration-lite/src/main/
 Author: Eleftherios Moschandreou
 Author-email: elemos@chalmers.se
 License: Apache 2.0
-Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.9
 Classifier: Operating System :: OS Independent
 Description-Content-Type: text/markdown
 

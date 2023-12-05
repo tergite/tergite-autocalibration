@@ -52,6 +52,9 @@ class CouplerSpectroscopyAnalysis():
                 root = np.mean(np.real(coupler_fit.roots()))
                 roots.append(root)
                 root_frequencies.append(coupler_fit(root))
+        if len(roots) == 0:
+            print('No Roots Found, returning zero current')
+            return [0]
         I0 = roots[np.argmin(np.abs(roots))]
         I1 = roots[np.argmax(np.abs(roots))]
         DeltaI = I1 - I0
@@ -64,7 +67,7 @@ class CouplerSpectroscopyAnalysis():
     def plotter(self,ax: plt.Axes):
         self.dataset[self.data_var].plot(ax=ax, x=self.frequencies)
         ax.scatter(self.detected_frequencies, self.detected_currents, s=52, c='red')
-        ax.scatter(self.root_frequencies, self.roots, s=64, c='black', label=r'$\Phi_0$')
-        print(f'{ self.roots = }')
-        print(f'{ self.root_frequencies = }')
-        ax.axhline(self.parking_I, lw=5, ls='dashed',  c='orange', label=f'parking current = {self.parking_I}')
+        if hasattr(self, 'root_frequencies'):
+            ax.scatter(self.root_frequencies, self.roots, s=64, c='black', label=r'$\Phi_0$')
+        if hasattr(self, 'parking_I'):
+            ax.axhline(self.parking_I, lw=5, ls='dashed',  c='orange', label=f'parking current = {self.parking_I}')

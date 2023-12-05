@@ -4,7 +4,7 @@ import argparse
 from utilities import user_input
 #TODO this is a bit slow so better just keep a copy of the nodes here
 #from nodes.node import all_nodes
-nodes = ['cz_calibration','resonator_spectroscopy_2','n_rabi_oscillations','motzoi_parameter','tof', 'resonator_spectroscopy', 'qubit_01_spectroscopy_pulsed', 'qubit_01_spectroscopy_multidim', 'rabi_oscillations', 'ramsey_correction', 'resonator_spectroscopy_1', 'ro_frequency_optimization', 'T1', 'qubit_12_spectroscopy_pulsed', 'ro_amplitude_optimization', 'rabi_oscillations_12', 'state_discrimination', 'ramsey_correction_12','coupler_spectroscopy','coupler_resonator_spectroscopy', 'punchout' ]
+nodes = ['cz_calibration','resonator_spectroscopy_2','n_rabi_oscillations','motzoi_parameter','tof', 'resonator_spectroscopy', 'qubit_01_spectroscopy_pulsed', 'qubit_01_spectroscopy_multidim', 'rabi_oscillations', 'ramsey_correction', 'resonator_spectroscopy_1', 'ro_frequency_optimization', 'T1', 'qubit_12_spectroscopy_pulsed', 'ro_amplitude_optimization', 'qubit_12_spectroscopy_multidim', 'rabi_oscillations_12', 'state_discrimination', 'ramsey_correction_12','coupler_spectroscopy','coupler_resonator_spectroscopy', 'punchout' ]
 
 #nodes = all_nodes
 red = redis.Redis(decode_responses=True)
@@ -17,12 +17,15 @@ parser.add_argument('node', choices=['all']+nodes)
 args = parser.parse_args()
 
 transmon_configuration = toml.load('./config_files/device_config.toml')
-quantities_of_interest = transmon_configuration['qoi']
+quantities_of_interest = transmon_configuration['qoi']['qubits']
+coupler_quantities_of_interest = transmon_configuration['qoi']['couplers']
 remove_node = args.node
 print(f'{ remove_node = }')
 if not remove_node == 'all':
-    remove_fields = quantities_of_interest[remove_node].keys()
-    #print('remove_fields', remove_fields)
+    if remove_node in quantities_of_interest:
+        remove_fields = quantities_of_interest[remove_node].keys()
+    else:
+        remove_fields = coupler_quantities_of_interest[remove_node].keys()
 
 #TODO Why flush?
 #red.flushdb()
