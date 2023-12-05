@@ -15,8 +15,8 @@ set_datadir('.')
 redis_connection = redis.Redis(decode_responses=True)
 
 def post_process(result_dataset: xr.Dataset, node, data_path: Path):
+    print(data_path)
     analysis = Multiplexed_Analysis(result_dataset, node, data_path)
-
     # figure_manager = plt.get_current_fig_manager()
     # figure_manager.window.showMaximized()
     fig = plt.gcf()

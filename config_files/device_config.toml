@@ -43,15 +43,16 @@ init_duration = 300e-6
 min_calibration_point = 0
 max_calibration_point = 0
 spec_pulse_duration = 5e-6
-spec_ampl_default = 3e-4
+spec_ampl_default = 5e-4
+spec_ampl_optimal = 5e-4
 att = 0
 
 [initials]
-q11.ro_pulse_amp = 60e-3
-q12.ro_pulse_amp = 40e-3
-q13.ro_pulse_amp = 40e-3
-q14.ro_pulse_amp = 40e-3
-q15.ro_pulse_amp = 40e-3
+q11.ro_pulse_amp = 30e-3
+q12.ro_pulse_amp = 30e-3
+q13.ro_pulse_amp = 30e-3
+q14.ro_pulse_amp = 30e-3
+q15.ro_pulse_amp = 30e-3
 q16.ro_pulse_amp = 15.0e-3
 q17.ro_pulse_amp = 15.0e-3
 q18.ro_pulse_amp = 6.6e-3

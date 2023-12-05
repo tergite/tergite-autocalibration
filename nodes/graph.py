@@ -33,7 +33,7 @@ graph_dependencies = [
     ('rabi_oscillations_12', 'ramsey_correction_12'),
     ('ramsey_correction_12', 'resonator_spectroscopy_2'),
     ('ramsey_correction_12', 'ro_frequency_optimization_gef'),
-    ('rabi_oscillations_12', 'resonator_spectroscopy_2'),
+    # ('rabi_oscillations_12', 'resonator_spectroscopy_2'),
     ('resonator_spectroscopy_1', 'cz_chevron'),
     # ('qubit_12_spectroscopy_pulsed', 'cz_calibration'),
     ('coupler_spectroscopy', 'cz_chevron'),
@@ -46,10 +46,10 @@ graph.add_node('tof', type='refine')
 graph.add_node('punchout')
 graph.add_node('qubit_01_spectroscopy_pulsed')
 graph.add_node('qubit_01_spectroscopy_multidim')
-graph.add_node('ramsey_correction', type='refine')
-graph.add_node('ramsey_correction_12', type='refine')
-graph.add_node('ro_frequency_optimization', type='refine')
-graph.add_node('ro_amplitude_optimization', type='refine')
+# graph.add_node('ramsey_correction', type='refine')
+# graph.add_node('ramsey_correction_12', type='refine')
+# graph.add_node('ro_frequency_optimization', type='refine')
+# graph.add_node('ro_amplitude_optimization', type='refine')
 
 # for nodes that perform the same measurement,
 # assign a weight to the corresponding edge to sort them
@@ -120,6 +120,6 @@ def filtered_topological_order(target_node: str):
 
     filtered_order = [node for node in topo_order if graph_condition(node, 'none')]
     filtered_order = coupler_path + filtered_order
-    print(f'{ filtered_order = }')
-    quit()
+    # print(f'{ filtered_order = }')
+    # quit()
     return filtered_order

@@ -48,9 +48,9 @@ from config_files.VNA_values import (
 
 def resonator_samples(qubit: str) -> np.ndarray:
     res_spec_samples = 51
-    sweep_range = 1.5e6
+    sweep_range = 1.2e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
-    min_freq = VNA_frequency - sweep_range / 2
+    min_freq = VNA_frequency - sweep_range / 1.5
     max_freq = VNA_frequency + sweep_range / 2
     return np.linspace(min_freq, max_freq, res_spec_samples)
 
@@ -84,6 +84,7 @@ class NodeFactory:
             'resonator_spectroscopy_1': Resonator_Spectroscopy_1_Node,
             'qubit_12_spectroscopy_pulsed': Qubit_12_Spectroscopy_Pulsed_Node,
             'rabi_oscillations_12': Rabi_Oscillations_12_Node,
+            'ramsey_correction_12': Ramsey_Fringes_12_Node,
             'resonator_spectroscopy_2': Resonator_Spectroscopy_2_Node,
             'motzoi_parameter': Motzoi_Parameter_Node,
             'n_rabi_oscillations': N_Rabi_Oscillations_Node,
@@ -230,6 +231,28 @@ class Ramsey_Fringes_Node:
         self.node_dictionary = kwargs
         self.redis_field = ['freq_01']
         self.qubit_state = 0
+        self.measurement_obj = Ramsey_fringes
+        self.analysis_obj = RamseyAnalysis
+
+    @property
+    def samplespace(self):
+        cluster_samplespace = {
+            'ramsey_delays': {
+                qubit: np.arange(4e-9, 2048e-9, 8 * 8e-9) for qubit in self.all_qubits
+            },
+            'artificial_detunings': {
+                qubit: np.arange(-2.1, 2.1, 0.8) * 1e6 for qubit in self.all_qubits
+            },
+        }
+        return cluster_samplespace
+
+class Ramsey_Fringes_12_Node:
+    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
+        self.name = name
+        self.all_qubits = all_qubits
+        self.node_dictionary = kwargs
+        self.redis_field = ['freq_12']
+        self.qubit_state = 1
         self.measurement_obj = Ramsey_fringes
         self.analysis_obj = RamseyAnalysis
 
