@@ -92,7 +92,6 @@ initial_pos = {
 # nx.draw(graph, pos=nx.spring_layout(graph, k=0.3), with_labels=True)
 # plt.show()
 
-
 # all_nodes = list(nx.topological_sort(graph))
 # print(f'{ list(graph.predecessors("cz_chevron")) = }')
 # graph.remove_node('coupler_spectroscopy')

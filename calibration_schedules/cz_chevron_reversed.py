@@ -115,7 +115,7 @@ class CZ_chevron(Measurement):
                     #     ref_op=relaxation, ref_pt="end",
                     # )
 
-                cz_amplitude = 0.9
+                cz_amplitude = 0.5
 
                 cz = schedule.add(
                         SquarePulse(

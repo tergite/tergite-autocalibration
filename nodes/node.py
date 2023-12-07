@@ -54,7 +54,7 @@ from config_files.VNA_values import (
 
 def resonator_samples(qubit: str) -> np.ndarray:
     res_spec_samples = 111
-    sweep_range = 5.0e6
+    sweep_range = 6.0e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
     min_freq = VNA_frequency - sweep_range / 2
     max_freq = VNA_frequency + sweep_range / 2
@@ -62,8 +62,8 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 
 def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
-    qub_spec_samples = 151
-    sweep_range = 11.5e6
+    qub_spec_samples = 101
+    sweep_range = 6.5e6
     if transition == '01':
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition == '12':
@@ -160,7 +160,7 @@ class Punchout_Node(Base_Node):
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             },
             'ro_amplitudes': {
-                qubit: np.linspace(0.005, 0.04, 12) for qubit in self.all_qubits
+                qubit: np.linspace(0.005, 0.02, 10) for qubit in self.all_qubits
             },
         }
         return cluster_samplespace
@@ -221,7 +221,7 @@ class Rabi_Oscillations_Node:
     def samplespace(self):
         cluster_samplespace = {
             'mw_amplitudes': {
-                qubit: np.linspace(0.002, 0.350, 51) for qubit in self.all_qubits
+                qubit: np.linspace(0.002, 0.50, 71) for qubit in self.all_qubits
             }
         }
         return cluster_samplespace
@@ -457,14 +457,12 @@ class CZ_Chevron_Node:
 
     @property
     def samplespace(self):
-        print(f'{ np.linspace(- 50e6, 50e6, 2) + self.ac_freq = }')
         cluster_samplespace = {
             'cz_pulse_durations': {
                 qubit: np.arange(200e-9, 2600e-9, 100e-9) for qubit in self.coupled_qubits
             },
             'cz_pulse_frequencies_sweep': {
-                # qubit: np.array([692790000.0]) for qubit in self.coupled_qubits
-                qubit: np.linspace(-0.6e6, 0.2e6, 11) + self.ac_freq for qubit in self.coupled_qubits
+                qubit: np.linspace(-2.0e6, 2.0e6, 31) + self.ac_freq for qubit in self.coupled_qubits
             },
         }
         return cluster_samplespace

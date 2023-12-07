@@ -50,7 +50,7 @@ node_factory = NodeFactory()
 def set_module_att(cluster):
     # Flux lines
     for module in cluster.modules[0:13]:
-        module.out1_att(42)
+        module.out1_att(36)
     # print(module.name + '_att:'+ str(module.out1_att()) + 'dB')
     # Readout lines
     # for module in cluster.modules[15:17]:
