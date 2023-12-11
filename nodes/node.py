@@ -16,6 +16,7 @@ from calibration_schedules.state_discrimination import Single_Shots_RO
 # from calibration_schedules.drag_amplitude import DRAG_amplitude
 from calibration_schedules.motzoi_parameter import Motzoi_parameter
 from calibration_schedules.n_rabi_oscillations import N_Rabi_Oscillations
+from calibration_schedules.randomized_benchmarking import Randomized_Benchmarking
 
 # from calibration_schedules.cz_chevron import CZ_chevron
 
@@ -45,7 +46,7 @@ from analysis.coupler_spectroscopy_analysis import CouplerSpectroscopyAnalysis
 from analysis.cz_chevron_analysis import CZChevronAnalysis
 from analysis.cz_calibration_analysis import CZCalibrationAnalysis
 from analysis.n_rabi_analysis import NRabiAnalysis
-
+from analysis.randomized_benchmarking_analysis import RandomizedBenchmarkingAnalysis
 
 from config_files.VNA_values import (
     VNA_resonator_frequencies, VNA_qubit_frequencies, VNA_f12_frequencies
@@ -99,6 +100,7 @@ class NodeFactory:
             'cz_calibration': CZ_Calibration_Node,
             'ro_frequency_optimization': RO_frequency_optimization_Node,
             #'ro_frequency_optimization_gef': RO_frequency_optimization_gef_Node,
+            'randomized_benchmarking': Randomized_Benchmarking,
         }
 
     def create_node(self, node_name: str, all_qubits: list[str], ** kwargs):
@@ -303,6 +305,26 @@ class T1_Node:
             'delays': {qubit : np.arange(52e-9,250e-6,4e-6) for qubit in self.all_qubits}
         }
         return cluster_samplespace
+
+class Randomized_Benchmarking_Node:
+    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
+        self.name = name
+        self.all_qubits = all_qubits
+        self.node_dictionary = kwargs
+        self.redis_field = ['t1_time'] #TODO change to something, error?
+        self.qubit_state = 0
+        self.measurement_obj = Randomized_Benchmarking_Node
+        self.analysis_obj = RandomizedBenchmarkingAnalysis
+
+    @property
+    def samplespace(self):
+        cluster_samplespace = {
+            'number_of_cliffords_operations': {
+                qubit: {"rb": 'rb', "max_cliffords": 2048} for qubit in self.all_qubits #TODO this is awful
+            }
+        }
+        return cluster_samplespace
+
 
 class Resonator_Spectroscopy_1_Node:
     def __init__(self, name: str, all_qubits: list[str], ** kwargs):

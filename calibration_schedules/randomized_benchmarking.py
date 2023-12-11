@@ -6,42 +6,25 @@ from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.gate_library import Measure, Reset, Rxy
 from quantify_scheduler.schedules.schedule import Schedule
 
-from measurements_base import Measurement_base
-import randomized_benchmarking.clifford_elements_decomposition as cliffords
+from calibration_schedules.measurement_base import Measurement
+import utilities.clifford_elements_decomposition as cliffords
 
 
-class Randomized_Benchmarking_BATCHED(Measurement_base):
-    def __init__(self,transmons,connections,qubit_state:int=0):
-        super().__init__(transmons,connections)
-        self.experiment_parameters = ['number_of_cliffords']
-        self.gettable_batched = True
+class Randomized_Benchmarking(Measurement):
+    def __init__(self, transmons, qubit_state: int = 0):
+        super().__init__(transmons)
         self.qubit_state = qubit_state
+        self.transmons = transmons
+
         self.static_kwargs = {
             'qubits': self.qubits,
         }
 
-    def settables_dictionary(self):
-        manual_parameter = 'number_of_cliffords'
-        parameters = self.experiment_parameters
-        assert( manual_parameter in self.experiment_parameters )
-        mp_data = {
-            manual_parameter : {
-                'name': manual_parameter,
-                'initial_value': 2,
-                'unit': '-',
-                'batched': True
-            }
-        }
-        return self._settables_dictionary(parameters, isBatched=self.gettable_batched, mp_data=mp_data)
-
-    def setpoints_array(self):
-        return self._setpoints_1d_array()
-
     def schedule_function(
             self, #Note, this is not used in the schedule
             qubits: list[str],
+            number_of_cliffords_operations: dict[str, np.ndarray],
             repetitions: int = 128,
-            **number_of_cliffords_operations,
         ) -> Schedule:
         """
         Generate a schedule for performing a randomized benchmarking test using Clifford gates.

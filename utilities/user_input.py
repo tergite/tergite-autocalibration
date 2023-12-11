@@ -23,12 +23,13 @@ node reference
   motzoi_parameter
   n_rabi_oscillations
   T1
+  randomized_benchmarking
   cz_chevron
   cz_calibration
 '''
 
 user_requested_calibration = {
-    'target_node': 'cz_chevron',
+    'target_node': 'rabi:oscillations',
     'all_qubits': qubits,
     'couplers': couplers,
     # 'node_dictionary' : {'coupled_qubits': ['q21','q22']},
