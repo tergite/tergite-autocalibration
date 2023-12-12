@@ -22,6 +22,14 @@ class ExtendedClocksFrequencies(InstrumentChannel):
             initial_value=kwargs.get("readout_1", math.nan),
             vals=Numbers(min_value=0, max_value=1e12, allow_nan=True),
         )
+        self.readout_2 = ManualParameter(
+            name="readout_2",
+            instrument=self,
+            label="Readout frequency when qubit is at |2>",
+            unit="Hz",
+            initial_value=kwargs.get("readout_2", math.nan),
+            vals=Numbers(min_value=0, max_value=1e12, allow_nan=True),
+        )
         self.readout_opt = ManualParameter(
             name="readout_opt",
             instrument=self,
@@ -108,6 +116,43 @@ class Measure_RO1(Measure):
         )
         self._update()
 
+
+class Measure_RO2(Measure):
+    def __init__(
+        self,
+        *qubits: str,
+        acq_index: int | None = None,
+        # These are the currently supported acquisition protocols.
+        acq_protocol: Optional[
+            Literal[
+                "SSBIntegrationComplex",
+                "Trace",
+                "TriggerCount",
+                "NumericalWeightedIntegrationComplex",
+                "ThresholdedAcquisition",
+            ]
+        ] = None,
+        bin_mode: BinMode | None = None,
+    ):
+        super().__init__(qubits[0], acq_index=acq_index, bin_mode=bin_mode)
+        plot_func = "quantify_scheduler.schedules._visualization.circuit_diagram.meter"
+        self.data.update(
+            {
+                "name": f"Measure_RO2 {', '.join(qubits)}",
+                "gate_info": {
+                    'unitary': None,
+                    'plot_func': plot_func,
+                    'tex': r'$\langle0|$',
+                    'qubits': list(qubits),
+                    'acq_index': acq_index,
+                    'acq_protocol': acq_protocol,
+                    'bin_mode': bin_mode,
+                    'operation_type': 'measure_2',
+                },
+            }
+        )
+        self._update()
+
 class Measure_RO_Opt(Measure):
     def __init__(
         self,
@@ -150,6 +195,7 @@ class ExtendedTransmon(BasicTransmonElement):
 
         submodules_to_add = {
             'measure_1': DispersiveMeasurement,
+            'measure_2': DispersiveMeasurement,
             'measure_opt': DispersiveMeasurement,
             'r12': R12,
             'spec': Spec,
@@ -178,6 +224,7 @@ class ExtendedTransmon(BasicTransmonElement):
                 f'{self.name}.12': self.clock_freqs.f12(),
                 f'{self.name}.ro': self.clock_freqs.readout(),
                 f'{self.name}.ro1': self.extended_clock_freqs.readout_1(),
+                f'{self.name}.ro2': self.extended_clock_freqs.readout_2(),
                 f'{self.name}.ro_opt': self.extended_clock_freqs.readout_opt()
             },
             'edges': {},
@@ -188,6 +235,32 @@ class ExtendedTransmon(BasicTransmonElement):
                         'port': self.ports.readout(),
                         # use different clock: ####
                         'clock': f'{self.name}.ro1',
+                        ############################
+                        'pulse_type': self.measure.pulse_type(),
+                        'pulse_amp': self.measure.pulse_amp(),
+                        'pulse_duration': self.measure.pulse_duration(),
+                        'acq_delay': self.measure.acq_delay(),
+                        'acq_duration': self.measure.integration_time(),
+                        'acq_channel': self.measure.acq_channel(),
+                        'acq_protocol_default': 'SSBIntegrationComplex',
+                        'reset_clock_phase': self.measure.reset_clock_phase(),
+                        'reference_magnitude': pulse_library.ReferenceMagnitude.from_parameter(
+                            self.measure.reference_magnitude
+                        ),
+                        'acq_weights_a': self.measure.acq_weights_a(),
+                        'acq_weights_b': self.measure.acq_weights_b(),
+                        'acq_weights_sampling_rate': self.measure.acq_weights_sampling_rate(),
+                        # 'acq_rotation': self.measure.acq_rotation(),
+                        # 'acq_threshold': self.measure.acq_threshold(),
+                    },
+                    gate_info_factory_kwargs=['acq_index', 'bin_mode', 'acq_protocol'],
+                )
+        cfg_dict['elements'][f'{self.name}']['measure_2'] = OperationCompilationConfig(
+                    factory_func=measurement_factories.dispersive_measurement,
+                    factory_kwargs={
+                        'port': self.ports.readout(),
+                        # use different clock: ####
+                        'clock': f'{self.name}.ro2',
                         ############################
                         'pulse_type': self.measure.pulse_type(),
                         'pulse_amp': self.measure.pulse_amp(),
