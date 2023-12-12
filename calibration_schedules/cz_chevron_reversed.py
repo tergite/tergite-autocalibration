@@ -7,7 +7,7 @@ from quantify_scheduler.operations.gate_library import Measure, Reset, X90, Rxy,
 from quantify_scheduler.operations.pulse_library import DRAGPulse,SetClockFrequency,NumericalPulse,SoftSquarePulse,SquarePulse
 from quantify_scheduler.resources import ClockResource
 from calibration_schedules.measurement_base import Measurement
-from utilities.extended_transmon_element import Measure_RO1
+from utilities.extended_transmon_element import Measure_RO2
 from utilities.QPU_connections_visualization import edge_group
 from matplotlib import pyplot as plt
 
@@ -82,6 +82,8 @@ class CZ_chevron(Measurement):
         """
         schedule = Schedule("CZ_chevron",repetitions)
         qubits = coupler.split(sep='_')
+        control_qubit = qubits[0]
+        target_qubit = qubits[1]
 
         cz_frequency_values = np.array(list(cz_pulse_frequencies_sweep.values())[0])
         cz_duration_values = list(cz_pulse_durations.values())[0]
@@ -110,10 +112,6 @@ class CZ_chevron(Measurement):
 
                 for this_qubit in qubits:
                     schedule.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
-                    # schedule.add(
-                    #     Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
-                    #     ref_op=relaxation, ref_pt="end",
-                    # )
 
                 cz_amplitude = 0.505
 
@@ -126,11 +124,19 @@ class CZ_chevron(Measurement):
                         ),
                     )
 
-                for this_qubit in qubits:
-                    schedule.add(
-                        Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
-                        ref_op=cz,rel_time=12e-9, ref_pt="end",
-                    )
+                schedule.add(
+                    Measure(control_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
+                    ref_op=cz,rel_time=12e-9, ref_pt="end",
+                )
+                schedule.add(
+                    Measure_RO2(target_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
+                    ref_op=cz,rel_time=12e-9, ref_pt="end",
+                )
+                # for this_qubit in qubits:
+                #     schedule.add(
+                #         Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
+                #         ref_op=cz,rel_time=12e-9, ref_pt="end",
+                #     )
         return schedule
 
         # Add calibration points

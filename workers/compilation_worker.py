@@ -45,6 +45,7 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
     transmon.clock_freqs.f12(float(redis_config['freq_12']))
     transmon.clock_freqs.readout(float(redis_config['ro_freq']))
     transmon.extended_clock_freqs.readout_1(float(redis_config['ro_freq_1']))
+    transmon.extended_clock_freqs.readout_2(float(redis_config['ro_freq_2']))
     transmon.extended_clock_freqs.readout_opt(float(redis_config['ro_freq_opt']))
     transmon.measure.pulse_amp(float(redis_config['ro_pulse_amp']))
     transmon.measure.pulse_duration(float(redis_config['ro_pulse_duration']))
