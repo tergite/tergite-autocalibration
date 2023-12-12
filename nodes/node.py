@@ -459,10 +459,10 @@ class CZ_Chevron_Node:
     def samplespace(self):
         cluster_samplespace = {
             'cz_pulse_durations': {
-                qubit: np.arange(200e-9, 2600e-9, 100e-9) for qubit in self.coupled_qubits
+                qubit: np.arange(100e-9, 1000e-9, 48e-9) for qubit in self.coupled_qubits
             },
             'cz_pulse_frequencies_sweep': {
-                qubit: np.linspace(-2.0e6, 2.0e6, 31) + self.ac_freq for qubit in self.coupled_qubits
+                qubit: np.linspace(-4.0e6, 0.0e6, 31) + self.ac_freq for qubit in self.coupled_qubits
             },
         }
         return cluster_samplespace

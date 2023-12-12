@@ -98,7 +98,8 @@ q25.ro_pulse_amp = 9e-3
 [initials.couplers.all]
 
 [initials.couplers]
-q21_q22.parking_current = -700e-6
+q21_q22.parking_current = -720e-6
+
 
 [resonator_spectroscopy.all]
 init_duration =  60e-6
