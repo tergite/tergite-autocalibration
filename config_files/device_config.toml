@@ -85,20 +85,21 @@ q15.ro_pulse_amp = 6.5e-3
 #q25.ro_pulse_amp =  8.0e-3
 
 q16.ro_pulse_amp = 10e-3
-q17.ro_pulse_amp = 14e-3
+
+q17.ro_pulse_amp = 21e-3
 q18.ro_pulse_amp = 9e-3
 q19.ro_pulse_amp = 9e-3
-q20.ro_pulse_amp = 25e-3
-q21.ro_pulse_amp = 9e-3
-q22.ro_pulse_amp = 10e-3
-q23.ro_pulse_amp = 25e-3
-q24.ro_pulse_amp = 15e-3
+q20.ro_pulse_amp = 20e-3
+q21.ro_pulse_amp = 8e-3
+q22.ro_pulse_amp = 15e-3
+q23.ro_pulse_amp = 20e-3
+q24.ro_pulse_amp = 13e-3
 q25.ro_pulse_amp = 9e-3
 
 [initials.couplers.all]
 
 [initials.couplers]
-q21_q22.parking_current = -720e-6
+q21_q22.parking_current =  800e-6
 
 
 [resonator_spectroscopy.all]
@@ -128,6 +129,7 @@ init_duration = 200e-6
 [coupler_spectroscopy.all]
 spec_pulse_duration = 2e-6
 spec_amp = 3.5e-4
+init_duration = 100e-6
 
 [ramsey_correction.all]
 artificial_detuning = 3e6

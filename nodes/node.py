@@ -62,8 +62,8 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 
 def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
-    qub_spec_samples = 101
-    sweep_range = 6.5e6
+    qub_spec_samples = 51
+    sweep_range = 3.5e6
     if transition == '01':
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition == '12':
@@ -199,7 +199,7 @@ class Qubit_01_Spectroscopy_Multidim_Node:
     def samplespace(self):
         cluster_samplespace = {
             'spec_pulse_amplitudes': {
-                 qubit: np.linspace(3e-4, 9e-4, 6) for qubit in self.all_qubits
+                 qubit: np.linspace(3e-4, 9e-4, 9) for qubit in self.all_qubits
             },
             'spec_frequencies': {
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
@@ -461,8 +461,11 @@ class CZ_Chevron_Node:
             'cz_pulse_durations': {
                 qubit: np.arange(100e-9, 1000e-9, 48e-9) for qubit in self.coupled_qubits
             },
+            # 'cz_pulse_amplitudes': {
+            #     qubit: np.linspace(0.5, 0.7, 21) for qubit in self.coupled_qubits
+            # },
             'cz_pulse_frequencies_sweep': {
-                qubit: np.linspace(-4.0e6, 0.0e6, 31) + self.ac_freq for qubit in self.coupled_qubits
+                qubit: np.linspace(-3.0e6, 1.0e6, 35) + self.ac_freq for qubit in self.coupled_qubits
             },
         }
         return cluster_samplespace

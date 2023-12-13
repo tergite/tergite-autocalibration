@@ -67,7 +67,13 @@ class CZChevronAnalysis():
         # return [0,0]
         self.testing_group = 0
         self.freq = self.dataset[f'cz_pulse_frequencies_sweep{self.qubit}'].values
-        self.amp = self.dataset[f'cz_pulse_durations{self.qubit}'].values
+        if f'cz_pulse_amplitudes{self.qubit}' in self.dataset.coords:
+            self.independent_coord = f'cz_pulse_amplitudes{self.qubit}'
+        elif f'cz_pulse_durations{self.qubit}' in self.dataset.coords:
+            self.independent_coord = f'cz_pulse_durations{self.qubit}'
+        else:
+            raise ValueError('Invalid Coord')
+        self.amp = self.dataset[self.independent_coord].values
         magnitudes = self.dataset[f'y{self.qubit}'].values
 
         self.magnitudes = (magnitudes - np.min(magnitudes))/(np.max(magnitudes)-np.min(magnitudes))
@@ -124,7 +130,7 @@ class CZChevronAnalysis():
     def plotter(self,axis):
         datarray = self.dataset[f'y{self.qubit}']
         qubit = self.qubit
-        datarray.plot(ax=axis, x=f'cz_pulse_durations{qubit}',cmap='RdBu_r')
+        datarray.plot(ax=axis, x=self.independent_coord,cmap='RdBu_r')
         # # fig = axis.pcolormesh(amp,freq,magnitudes,shading='nearest',cmap='RdBu_r')
         axis.scatter(
             self.opt_cz,self.opt_freq,
