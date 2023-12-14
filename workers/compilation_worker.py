@@ -68,6 +68,7 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
 def load_redis_config_coupler(coupler: CompositeSquareEdge):
     bus = coupler.name
     redis_config = redis_connection.hgetall(f"couplers:{bus}")
+    coupler.spec.coupler_spec_amp(float(redis_config['coupler_spec_amp']))
     coupler.cz.cz_freq(float(redis_config['cz_pulse_frequency']))
     coupler.cz.square_amp(float(redis_config['cz_pulse_amplitude']))
     coupler.cz.square_duration(float(redis_config['cz_pulse_duration']))
@@ -80,11 +81,9 @@ def precompile(node):
         return None, 1
     samplespace = node.samplespace
     qubits = node.all_qubits
-
     # TODO better way to restart the QuantumDevice object
     device = QuantumDevice(f'Loki_{node.name}')
     device.hardware_config(hw_config)
-    sweep_parameters = list(samplespace.values())
 
     transmons = {}
     for channel, qubit in enumerate(qubits):
@@ -95,17 +94,20 @@ def precompile(node):
 
     # Creating coupler edge
     #bus_list = [ [qubits[i],qubits[i+1]] for i in range(len(qubits)-1) ]
-    #couplers={}
-    #for bus in bus_list:
-    #    coupler = CompositeSquareEdge(bus[0],bus[1])
-    #    load_redis_config_coupler(coupler)
-    #    device.add_edge(coupler)
-    #    couplers[bus[0]+'_'+bus[1]] = coupler
+    if hasattr(node, 'couplers'):
+        couplers = node.couplers
+        edges = {}
+        for bus in couplers:
+           control, target = bus.split(sep='_')
+           coupler = CompositeSquareEdge(control, target)
+           load_redis_config_coupler(coupler)
+           device.add_edge(coupler)
+           edges[bus] = coupler
 
-    node_class = node.measurement_obj(transmons, node.qubit_state)
     if node.name == 'cz_chevron':
-        coupler = node.coupler
-        node_class = node.measurement_obj(transmons, coupler, node.qubit_state)
+        node_class = node.measurement_obj(transmons, edges, node.qubit_state)
+    else:
+        node_class = node.measurement_obj(transmons, node.qubit_state)
 
     schedule_function = node_class.schedule_function
     static_parameters = node_class.static_kwargs

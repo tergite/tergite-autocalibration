@@ -8,24 +8,28 @@ from utilities.root_path import data_directory
 
 def configure_dataset(
         raw_ds: xarray.Dataset,
-        samplespace: dict[str, dict[str,np.ndarray]],
+        node,
         ) -> xarray.Dataset:
     '''The dataset retrieved from the instrument coordinator  is
        too bare-bones. Here we configure the dims, coords and data_vars'''
 
     dataset = xarray.Dataset()
+    breakpoint()
 
     keys = raw_ds.data_vars.keys()
+    measurement_qubits = node.all_qubits
+    samplespace = node.samplespace
     sweep_quantities = samplespace.keys() # for example 'ro_frequencies', 'ro_amplitudes' ,...
-    sweep_parameters = list(samplespace.values())
-    qubits = []
-    for sweep in sweep_parameters:
-        qubits += list(sweep.keys())
-    dublicates = set()
-    # for soem measurements a qubit can appear in multiple keys. Here we filter the dublicates
-    # TODO better explanation
-    qubits = [q for q in qubits if not (q in dublicates or dublicates.add(q))]
-    n_qubits = len(qubits)
+
+    # sweep_parameters = list(samplespace.values())
+    # measurement_qubits = []
+    # for sweep in sweep_parameters:
+    #     measurement_qubits += list(sweep.keys())
+    # dublicates = set()
+    # # for soem measurements a qubit can appear in multiple keys. Here we filter the dublicates
+    # # TODO better explanation
+    # measurement_qubits = [q for q in measurement_qubits if not (q in dublicates or dublicates.add(q))]
+    n_qubits = len(measurement_qubits)
     if 'ro_opt_frequencies' in list(sweep_quantities):
         qubit_states = [0,1,2]
 
@@ -33,10 +37,16 @@ def configure_dataset(
         key_indx = key%n_qubits # this is to handle ro_opt_frequencies node where
         # there are 2 or 3 measurements (i.e 2 or 3 Datarrays) for each qubit
         coords_dict = {}
-        qubit = qubits[key_indx]
+        qubit = measurement_qubits[key_indx]
+
         for quantity in sweep_quantities :
             coord_key = quantity+qubit
-            if qubit in samplespace[quantity]:
+            if hasattr(node, 'couplers'):
+                for bus in node.couplers:
+                    if qubit in bus:
+                        coupler = bus
+                settable_values = samplespace[quantity][coupler]
+            elif qubit in samplespace[quantity]:
                 settable_values = samplespace[quantity][qubit]
             else:
                 continue

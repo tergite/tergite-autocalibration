@@ -62,8 +62,8 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 
 def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
-    qub_spec_samples = 51
-    sweep_range = 3.5e6
+    qub_spec_samples = 101
+    sweep_range = 6.5e6
     if transition == '01':
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition == '12':
@@ -432,40 +432,33 @@ redis_connection = redis.Redis(decode_responses=True)
 class CZ_Chevron_Node:
     def __init__(self, name: str, all_qubits: list[str], couplers: list[str]):
         self.name = name
-        self.all_qubits = all_qubits
-        self.all_couplers = couplers
-        self.coupler = couplers[0]
+        self.couplers = couplers
         self.redis_field = ['cz_pulse_frequency','cz_pulse_duration']
         self.qubit_state = 0
         self.measurement_obj = CZ_chevron
         self.analysis_obj = CZChevronAnalysis
-        self.coupled_qubits = couplers[0].split(sep='_')
-        self.ac_freq = self.transition_frequency
-        print(f'{ self.coupled_qubits = }')
+        self.all_qubits = [q for bus in couplers for q in bus.split('_')]
 
-    @property
-    def transition_frequency(self):
-        q1_f01 = float(redis_connection.hget(f'transmons:{self.coupled_qubits[0]}', "freq_01"))
-        q2_f01 = float(redis_connection.hget(f'transmons:{self.coupled_qubits[1]}', "freq_01"))
-        q1_f12 = float(redis_connection.hget(f'transmons:{self.coupled_qubits[0]}', "freq_12"))
-        q2_f12 = float(redis_connection.hget(f'transmons:{self.coupled_qubits[1]}', "freq_12"))
+    def transition_frequency(self, coupler: str):
+        coupled_qubits = coupler.split(sep='_')
+        q1_f01 = float(redis_connection.hget(f'transmons:{coupled_qubits[0]}', "freq_01"))
+        q2_f01 = float(redis_connection.hget(f'transmons:{coupled_qubits[1]}', "freq_01"))
+        q1_f12 = float(redis_connection.hget(f'transmons:{coupled_qubits[0]}', "freq_12"))
+        q2_f12 = float(redis_connection.hget(f'transmons:{coupled_qubits[1]}', "freq_12"))
         # ac_freq = np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12))
         ac_freq = np.abs(q1_f01 + q2_f01 - (q2_f01 + q2_f12))
         ac_freq = int( ac_freq / 1e4 ) * 1e4
-        print(f'{ ac_freq/1e6 = } MHz')
+        print(f'{ ac_freq/1e6 = } MHz for coupler: {coupler}')
         return ac_freq
 
     @property
     def samplespace(self):
         cluster_samplespace = {
             'cz_pulse_durations': {
-                qubit: np.arange(100e-9, 1000e-9, 48e-9) for qubit in self.coupled_qubits
+                coupler: np.arange(100e-9, 1000e-9, 48e-9) for coupler in self.couplers
             },
-            # 'cz_pulse_amplitudes': {
-            #     qubit: np.linspace(0.5, 0.7, 21) for qubit in self.coupled_qubits
-            # },
-            'cz_pulse_frequencies_sweep': {
-                qubit: np.linspace(-3.0e6, 1.0e6, 35) + self.ac_freq for qubit in self.coupled_qubits
+            'cz_pulse_frequencies': {
+                coupler: np.linspace(-3.0e6, 1.0e6, 5) + self.transition_frequency(coupler) for coupler in self.couplers
             },
         }
         return cluster_samplespace

@@ -66,7 +66,7 @@ class CZChevronAnalysis():
     def run_fitting(self):
         # return [0,0]
         self.testing_group = 0
-        self.freq = self.dataset[f'cz_pulse_frequencies_sweep{self.qubit}'].values
+        self.freq = self.dataset[f'cz_pulse_frequencies{self.qubit}'].values
         if f'cz_pulse_amplitudes{self.qubit}' in self.dataset.coords:
             self.independent_coord = f'cz_pulse_amplitudes{self.qubit}'
         elif f'cz_pulse_durations{self.qubit}' in self.dataset.coords:

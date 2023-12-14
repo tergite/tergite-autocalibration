@@ -1,3 +1,4 @@
+import math
 from typing import Dict, Any
 
 from qcodes.instrument import InstrumentChannel
@@ -5,10 +6,27 @@ from qcodes.instrument.base import InstrumentBase
 from qcodes.instrument.parameter import ManualParameter
 
 from quantify_scheduler.backends.graph_compilation import OperationCompilationConfig
+from quantify_scheduler.device_under_test.transmon_element import pulse_factories
 from quantify_scheduler.helpers.validators import Numbers
 from quantify_scheduler.device_under_test.edge import Edge
 from quantify_scheduler.operations.pulse_factories import composite_square_pulse
 from quantify_scheduler.resources import BasebandClockResource
+
+
+class Spec(InstrumentChannel):
+    """
+    Submodule containing parameters for performing qubit spectroscopy measurements
+    """
+    def __init__(self, parent: InstrumentBase, name: str, **kwargs: Any) -> None:
+        super().__init__(parent=parent, name=name)
+        self.spec_amp = ManualParameter(
+            name="coupler_spec_amp",
+            instrument=self,
+            label=r"amplitude for the coupler spectroscopy pulse",
+            initial_value=kwargs.get("coupler_spec_amp", math.nan),
+            unit="",
+            vals=Numbers(min_value=-10, max_value=10, allow_nan=True),
+        )
 
 
 class CZ(InstrumentChannel):
@@ -100,7 +118,7 @@ class CZ(InstrumentChannel):
             unit="A",
             vals=Numbers(min_value=-3e-3, max_value=3e-3, allow_nan=True),
         )
-        
+
         self.edge_group = ManualParameter(
             name="edge_group",
             instrument=self,
@@ -132,6 +150,7 @@ class CompositeSquareEdge(Edge):
         )
 
         self.add_submodule("cz", CZ(self, "cz"))
+        self.add_submodule("spec", Spec(self, "spec"))
 
     def generate_edge_config(self) -> Dict[str, Dict[str, OperationCompilationConfig]]:
         """
@@ -159,6 +178,13 @@ class CompositeSquareEdge(Edge):
                         "virt_z_child_qubit_clock": f"{self.child_device_element.name}.01",
                     },
                 ),
+                "spec": OperationCompilationConfig(
+                    factory_func=pulse_factories.rxy_drag_pulse,
+                    factory_kwargs={
+                        'coupler_spec_amp': self.spec.coupler_spec_amp(),
+                    },
+                    gate_info_factory_kwargs=['theta', 'phi'],
+                )
             }
         }
 

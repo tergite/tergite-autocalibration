@@ -162,8 +162,9 @@ def inspect_node(node: str):
         for field_key, field_value in node_specific_dict.items():
             for qubit in qubits:
                 redis_connection.hset(f'transmons:{qubit}', field_key, field_value)
+            for coupler in couplers:
+                redis_connection.hset(f'couplers:{coupler}', field_key, field_value)
 
-            # If needed add an all couplers initializer here but with a different key e.g. all_couplers
 
     #Check Redis if node is calibrated
     status = DataStatus.undefined
