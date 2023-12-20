@@ -23,7 +23,7 @@ class Randomized_Benchmarking(Measurement):
     def schedule_function(
             self, #Note, this is not used in the schedule
             qubits: list[str],
-            number_of_cliffords_operations: dict[str, np.ndarray],
+            number_of_cliffords: dict[str, np.ndarray],
             repetitions: int = 128,
         ) -> Schedule:
         """
@@ -52,65 +52,67 @@ class Randomized_Benchmarking(Measurement):
         """
 
         # if port_out is None: port_out = port
-        sched = Schedule("multiplexed_RB",repetitions)
-        # Initialize the clock for each qubit
-        for rb_key in number_of_cliffords_operations.keys():
-            this_qubit = [qubit for qubit in qubits if qubit in rb_key][0]
+        schedule = Schedule("multiplexed_RB",repetitions)
 
 
         #This is the common reference operation so the qubits can be operated in parallel
-        root_relaxation = sched.add(Reset(*qubits), label="Reset")
+        root_relaxation = schedule.add(Reset(*qubits), label="Start")
 
-        # The first for loop iterates over all qubits:
-        for acq_cha, (rb_key, clifford_sequence_lengths) in enumerate(number_of_cliffords_operations.items()):
-            this_qubit = [qubit for qubit in qubits if qubit in rb_key][0]
-            print(f'{ this_qubit = }')
+        # The first for loop iterates over all qubits: 
+        for (this_qubit, clifford_sequence_lengths) in number_of_cliffords.items():
 
-            relaxation = sched.add(
-                Reset(*qubits), label=f'Reset_{acq_cha}', ref_op=root_relaxation, ref_pt_new='end'
-            ) #To enforce parallelism we refer to the root relaxation
+            #print(f'{ this_qubit = }')
+            #print(f'{ clifford_sequence_lengths = }')
+
+            schedule.add(
+                Reset(*qubits), ref_op=root_relaxation, ref_pt='end'
+            )  # To enforce parallelism we refer to the root relaxation
+
+            #relaxation = schedule.add(
+            #    Reset(*qubits), label=f'Reset_{this_qubit}', ref_op=root_relaxation, ref_pt_new='end'
+            #) #To enforce parallelism we refer to the root relaxation
 
             # The second for loop iterates over the random clifford sequence lengths
             for acq_index, number_of_cliffords in enumerate(clifford_sequence_lengths):
-                print( )
-                print(f'{ number_of_cliffords = }')
+                #print( )
+                #rint(f'{ number_of_cliffords = }')
                 seed = 1
                 all_cliffords = len(cliffords.XY_decompositions)
-                # print(f'{ all_cliffords = }')
+                #print(f'{ all_cliffords = }')
                 rng = np.random.default_rng(seed)
                 random_sequence = rng.integers(all_cliffords, size=number_of_cliffords)
 
-                print(f'{ random_sequence = }')
+                #print(f'{ random_sequence = }')
                 for sequence_index in random_sequence:
-                    print(f'{ sequence_index = }')
+                    #print(f'{ sequence_index = }')
                     physical_gates = cliffords.XY_decompositions[sequence_index]
                     for gate_index, gate_angles in physical_gates.items():
                         theta = gate_angles['theta']
                         phi = gate_angles['phi']
-                        clifford_gate = sched.add(
+                        clifford_gate = schedule.add(
                             Rxy(qubit=this_qubit,theta=theta,phi=phi)
                         )
                         # print(f'{ clifford_gate = }')
 
                 recovery_index, recovery_XY_operations = cliffords.reversing_XY_matrix(random_sequence)
-                print(f'{ recovery_XY_operations = }')
+                #print(f'{ recovery_XY_operations = }')
                 for gate_index, gate_angles in recovery_XY_operations.items():
                     theta = gate_angles['theta']
                     phi = gate_angles['phi']
-                    recovery_gate = sched.add(
+                    recovery_gate = schedule.add(
                         Rxy(qubit=this_qubit,theta=theta,phi=phi)
                     )
 
-                sched.add(
-                        Measure(this_qubit, acq_channel=acq_cha, acq_index=acq_index,bin_mode=BinMode.AVERAGE),
+                schedule.add(
+                        Measure(this_qubit, acq_index=acq_index,bin_mode=BinMode.AVERAGE),
                         ref_op=recovery_gate,
                         ref_pt='end',
                         label=f'Measurement_{this_qubit}_{acq_index}'
                     )
 
                 all_indexes = np.append(random_sequence, recovery_index)
-                print(f'{ cliffords.is_sequence_identity(all_indexes) = }')
+                #print(f'{ cliffords.is_sequence_identity(all_indexes) = }')
 
-                sched.add(Reset(this_qubit))
+                schedule.add(Reset(this_qubit))
 
-        return sched
+        return schedule

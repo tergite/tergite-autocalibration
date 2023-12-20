@@ -29,7 +29,7 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'rabi:oscillations',
+    'target_node': 'randomized_benchmarking',
     'all_qubits': qubits,
     'couplers': couplers,
     # 'node_dictionary' : {'coupled_qubits': ['q21','q22']},

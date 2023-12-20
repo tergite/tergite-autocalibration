@@ -100,7 +100,7 @@ class NodeFactory:
             'cz_calibration': CZ_Calibration_Node,
             'ro_frequency_optimization': RO_frequency_optimization_Node,
             #'ro_frequency_optimization_gef': RO_frequency_optimization_gef_Node,
-            'randomized_benchmarking': Randomized_Benchmarking,
+            'randomized_benchmarking': Randomized_Benchmarking_Node,
         }
 
     def create_node(self, node_name: str, all_qubits: list[str], ** kwargs):
@@ -313,14 +313,14 @@ class Randomized_Benchmarking_Node:
         self.node_dictionary = kwargs
         self.redis_field = ['t1_time'] #TODO change to something, error?
         self.qubit_state = 0
-        self.measurement_obj = Randomized_Benchmarking_Node
+        self.measurement_obj = Randomized_Benchmarking
         self.analysis_obj = RandomizedBenchmarkingAnalysis
 
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'number_of_cliffords_operations': {
-                qubit: {"rb": 'rb', "max_cliffords": 2048} for qubit in self.all_qubits #TODO this is awful
+            'number_of_cliffords': {
+                qubit: np.array([2,4,8,16,32,64,128,256,512]) for qubit in self.all_qubits
             }
         }
         return cluster_samplespace
