@@ -320,7 +320,7 @@ class Randomized_Benchmarking_Node:
     def samplespace(self):
         cluster_samplespace = {
             'number_of_cliffords': {
-                qubit: np.array([2,4,8,16,32,64,128,256,512]) for qubit in self.all_qubits
+                qubit: np.array([2,4,8,16,32,64,128,256,512,1024]) for qubit in self.all_qubits
             }
         }
         return cluster_samplespace

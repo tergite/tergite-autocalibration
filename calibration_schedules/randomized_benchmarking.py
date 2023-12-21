@@ -52,7 +52,7 @@ class Randomized_Benchmarking(Measurement):
         """
 
         # if port_out is None: port_out = port
-        schedule = Schedule("multiplexed_RB",repetitions)
+        schedule = Schedule("multiplexed_randomized_benchmarking",repetitions)
 
 
         #This is the common reference operation so the qubits can be operated in parallel
