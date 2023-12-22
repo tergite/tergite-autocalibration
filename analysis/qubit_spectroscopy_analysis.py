@@ -12,7 +12,7 @@ import lmfit
 redis_connection = redis.Redis(decode_responses=True)
 
 # Lorentzian function that is fit to qubit spectroscopy peaks
-def loretzian_function( x: float, x0: float, width: float, A: float, c: float,) -> float:
+def lorentzian_function( x: float, x0: float, width: float, A: float, c: float,) -> float:
     return A * width**2 / ( (x-x0)**2 + width**2 ) + c
 
 
@@ -22,7 +22,7 @@ class LorentzianModel(lmfit.model.Model):
     """
     def __init__(self, *args, **kwargs):
 
-        super().__init__(loretzian_function, *args, **kwargs)
+        super().__init__(lorentzian_function, *args, **kwargs)
 
         self.set_param_hint("x0", vary=True)
         self.set_param_hint("A", vary=True)
