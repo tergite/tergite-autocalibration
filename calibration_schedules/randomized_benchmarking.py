@@ -3,7 +3,7 @@ Module containing a schedule class for randomized benchmarking measurement.
 """
 import numpy as np
 from quantify_scheduler.enums import BinMode
-from quantify_scheduler.operations.gate_library import Measure, Reset, Rxy
+from quantify_scheduler.operations.gate_library import Measure, Reset, Rxy, X
 from quantify_scheduler.schedules.schedule import Schedule
 
 from calibration_schedules.measurement_base import Measurement
@@ -21,7 +21,7 @@ class Randomized_Benchmarking(Measurement):
         }
 
     def schedule_function(
-            self, #Note, this is not used in the schedule
+            self,
             qubits: list[str],
             number_of_cliffords: dict[str, np.ndarray],
             repetitions: int = 128,
@@ -61,21 +61,15 @@ class Randomized_Benchmarking(Measurement):
         # The first for loop iterates over all qubits: 
         for (this_qubit, clifford_sequence_lengths) in number_of_cliffords.items():
 
-            #print(f'{ this_qubit = }')
-            #print(f'{ clifford_sequence_lengths = }')
-
             schedule.add(
                 Reset(*qubits), ref_op=root_relaxation, ref_pt='end'
             )  # To enforce parallelism we refer to the root relaxation
 
-            #relaxation = schedule.add(
-            #    Reset(*qubits), label=f'Reset_{this_qubit}', ref_op=root_relaxation, ref_pt_new='end'
-            #) #To enforce parallelism we refer to the root relaxation
-
             # The second for loop iterates over the random clifford sequence lengths
             for acq_index, number_of_cliffords in enumerate(clifford_sequence_lengths):
-                #print( )
-                #rint(f'{ number_of_cliffords = }')
+                if self.qubit_state == 1:
+                    schedule.add(X(this_qubit))
+
                 seed = 1
                 all_cliffords = len(cliffords.XY_decompositions)
                 #print(f'{ all_cliffords = }')
