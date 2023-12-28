@@ -312,16 +312,17 @@ class Randomized_Benchmarking_Node:
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
         self.redis_field = ['t1_time'] #TODO change to something, error?
-        self.qubit_state = 0
+        self.qubit_state = 1
         self.measurement_obj = Randomized_Benchmarking
         self.analysis_obj = RandomizedBenchmarkingAnalysis
 
     @property
     def samplespace(self):
         cluster_samplespace = {
+            # Always include 0 and 1 to measure |0⟩ and |1⟩ (distinct from number of cliffords)
             'number_of_cliffords': {
-                #qubit: np.array([2,4,8,16,32,64,128,256,512,1024]) for qubit in self.all_qubits
-                qubit: np.array([2,5,10,20,40,60,120,180,240,300,360,400,500,600]) for qubit in self.all_qubits
+                #qubit: np.array([0,1,2,4,8,16,32,64,128,256,512,1024]) for qubit in self.all_qubits
+                qubit: np.array([0,1,2,5,10,20,40,60,120,180,240,300,360,400,500,600]) for qubit in self.all_qubits
             }
         }
         return cluster_samplespace

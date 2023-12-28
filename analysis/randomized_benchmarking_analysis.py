@@ -3,7 +3,6 @@ Module containing classes that model, fit and plot data from a Rabi experiment.
 """
 import numpy as np
 import lmfit
-from quantify_core.analysis.fitting_models import ExpDecayModel
 import xarray as xr
 
 def exponential_decay_function( x: float, amplitude: float, B: float, offset: float) -> float:
@@ -60,23 +59,36 @@ class RandomizedBenchmarkingAnalysis():
         self.magnitudes = np.abs(self.S21)
         n_cliffords = self.independents
 
+        # Normalize data to interval [0,1]
+        self.normalized_magnitudes = (self.magnitudes-self.magnitudes[0])/(self.magnitudes[1]-self.magnitudes[0])
+        
         # Gives an initial guess for the model parameters and then fits the model to the data.
-        guess = model.guess(data=self.magnitudes, x=n_cliffords)
-        #print(f'{ guess= }')
+        guess = model.guess(data=self.magnitudes[2:], x=n_cliffords[2:])
+        #print(len(self.magnitudes))
         fit_result = model.fit(self.magnitudes, params=guess, x=n_cliffords)
         
         self.fit_n_cliffords = np.linspace( n_cliffords[0], n_cliffords[-1], 400)
         self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_n_cliffords})
+        self.normalized_fit_y = (self.fit_y-self.magnitudes[0])/(self.magnitudes[1]-self.magnitudes[0])
         #print(f'{ fit_result.params= }')
-        
+
         return [0]
 
     def plotter(self,ax):
         # Plots the data and the fitted model of a Rabi experiment
-        ax.plot( self.fit_n_cliffords , self.fit_y,'r-',lw=3.0)#, label=f" π_ampl = {self.ampl:.2E} ± {self.uncertainty:.1E} (V)")
-        ax.plot( self.independents, self.magnitudes,'bo-',ms=3.0)
+        
+        """ #Unnormalized plot:
+        ax.plot( self.fit_n_cliffords, self.fit_y,'r-',lw=3.0)
+        ax.plot( self.independents[2:], self.magnitudes[2:],'bo-',ms=3.0)
+        ax.hlines(y=self.magnitudes[0],xmin=self.independents[0],xmax=self.independents[-1],color='g',linestyle='--') # Plots |0⟩
+        ax.hlines(y=self.magnitudes[1],xmin=self.independents[0],xmax=self.independents[-1],color='g',linestyle='--') # Plots |1⟩
+        ax.set_ylabel(f'|S21| (V)')
+        """
+
+        ax.plot( self.fit_n_cliffords, self.normalized_fit_y,'r-',lw=3.0)
+        ax.plot( self.independents[2:], self.normalized_magnitudes[2:],'bo-',ms=3.0)
         ax.set_title(f'Randomized benchmarking for {self.qubit}')
         ax.set_xlabel('Number of clifford operations')
-        ax.set_ylabel('|S21| (V)')
+        ax.set_ylabel(f'Normalized |S21|')
         ax.grid()
 

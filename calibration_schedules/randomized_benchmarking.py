@@ -61,52 +61,59 @@ class Randomized_Benchmarking(Measurement):
         # The first for loop iterates over all qubits: 
         for (this_qubit, clifford_sequence_lengths) in number_of_cliffords.items():
 
-            schedule.add(
-                Reset(*qubits), ref_op=root_relaxation, ref_pt='end'
-            )  # To enforce parallelism we refer to the root relaxation
-
             # The second for loop iterates over the random clifford sequence lengths
             for acq_index, number_of_cliffords in enumerate(clifford_sequence_lengths):
-                if self.qubit_state == 1:
-                    schedule.add(X(this_qubit))
+                if number_of_cliffords>1:
+                    if self.qubit_state == 1:
+                        schedule.add(X(this_qubit))
 
-                seed = 1
-                all_cliffords = len(cliffords.XY_decompositions)
-                #print(f'{ all_cliffords = }')
-                rng = np.random.default_rng(seed)
-                random_sequence = rng.integers(all_cliffords, size=number_of_cliffords)
+                    seed = 42
+                    all_cliffords = len(cliffords.XY_decompositions)
+                    #print(f'{ all_cliffords = }')
+                    rng = np.random.default_rng(seed)
+                    random_sequence = rng.integers(all_cliffords, size=number_of_cliffords)
 
-                #print(f'{ random_sequence = }')
-                for sequence_index in random_sequence:
-                    #print(f'{ sequence_index = }')
-                    physical_gates = cliffords.XY_decompositions[sequence_index]
-                    for gate_index, gate_angles in physical_gates.items():
+                    #print(f'{ random_sequence = }')
+                    for sequence_index in random_sequence:
+                        #print(f'{ sequence_index = }')
+                        physical_gates = cliffords.XY_decompositions[sequence_index]
+                        for gate_index, gate_angles in physical_gates.items():
+                            theta = gate_angles['theta']
+                            phi = gate_angles['phi']
+                            clifford_gate = schedule.add(
+                                Rxy(qubit=this_qubit,theta=theta,phi=phi)
+                            )
+                            # print(f'{ clifford_gate = }')
+
+                    recovery_index, recovery_XY_operations = cliffords.reversing_XY_matrix(random_sequence)
+                    #print(f'{ recovery_XY_operations = }')
+                    for gate_index, gate_angles in recovery_XY_operations.items():
                         theta = gate_angles['theta']
                         phi = gate_angles['phi']
-                        clifford_gate = schedule.add(
+                        recovery_gate = schedule.add(
                             Rxy(qubit=this_qubit,theta=theta,phi=phi)
                         )
-                        # print(f'{ clifford_gate = }')
 
-                recovery_index, recovery_XY_operations = cliffords.reversing_XY_matrix(random_sequence)
-                #print(f'{ recovery_XY_operations = }')
-                for gate_index, gate_angles in recovery_XY_operations.items():
-                    theta = gate_angles['theta']
-                    phi = gate_angles['phi']
-                    recovery_gate = schedule.add(
-                        Rxy(qubit=this_qubit,theta=theta,phi=phi)
-                    )
-
-                schedule.add(
+                    schedule.add(
                         Measure(this_qubit, acq_index=acq_index,bin_mode=BinMode.AVERAGE),
                         ref_op=recovery_gate,
                         ref_pt='end',
                         label=f'Measurement_{this_qubit}_{acq_index}'
                     )
-
-                all_indexes = np.append(random_sequence, recovery_index)
-                #print(f'{ cliffords.is_sequence_identity(all_indexes) = }')
-
+                elif number_of_cliffords == 0:
+                    schedule.add(
+                        Measure(this_qubit, acq_index=acq_index,bin_mode=BinMode.AVERAGE),
+                        ref_op=root_relaxation,
+                        ref_pt='end',
+                        label=f'Measurement_{this_qubit}_{acq_index}'
+                    )
+                elif number_of_cliffords == 1:
+                    schedule.add(X(this_qubit))
+                    schedule.add(
+                        Measure(this_qubit, acq_index=acq_index,bin_mode=BinMode.AVERAGE),
+                        label=f'Measurement_{this_qubit}_{acq_index}'
+                    )
+                
                 schedule.add(Reset(this_qubit))
 
         return schedule
