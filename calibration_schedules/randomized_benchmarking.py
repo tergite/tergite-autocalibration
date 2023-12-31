@@ -24,7 +24,7 @@ class Randomized_Benchmarking(Measurement):
             self,
             qubits: list[str],
             number_of_cliffords: dict[str, np.ndarray],
-            repetitions: int = 128,
+            repetitions: int = 1024,
         ) -> Schedule:
         """
         Generate a schedule for performing a randomized benchmarking test using Clifford gates.
@@ -67,7 +67,7 @@ class Randomized_Benchmarking(Measurement):
                     if self.qubit_state == 1:
                         schedule.add(X(this_qubit))
 
-                    seed = 42
+                    seed = 59
                     all_cliffords = len(cliffords.XY_decompositions)
                     #print(f'{ all_cliffords = }')
                     rng = np.random.default_rng(seed)
@@ -86,7 +86,9 @@ class Randomized_Benchmarking(Measurement):
                             # print(f'{ clifford_gate = }')
 
                     recovery_index, recovery_XY_operations = cliffords.reversing_XY_matrix(random_sequence)
-                    #print(f'{ recovery_XY_operations = }')
+
+                    #print(f'{ cliffords.is_sequence_identity(np.append(random_sequence,recovery_index).tolist()) = }') # this print checks if reversing is working correctly
+
                     for gate_index, gate_angles in recovery_XY_operations.items():
                         theta = gate_angles['theta']
                         phi = gate_angles['phi']

@@ -17,6 +17,9 @@ from calibration_schedules.state_discrimination import Single_Shots_RO
 from calibration_schedules.motzoi_parameter import Motzoi_parameter
 from calibration_schedules.n_rabi_oscillations import N_Rabi_Oscillations
 from calibration_schedules.randomized_benchmarking import Randomized_Benchmarking
+from calibration_schedules.check_cliffords import Check_Cliffords
+
+
 
 # from calibration_schedules.cz_chevron import CZ_chevron
 
@@ -47,6 +50,8 @@ from analysis.cz_chevron_analysis import CZChevronAnalysis
 from analysis.cz_calibration_analysis import CZCalibrationAnalysis
 from analysis.n_rabi_analysis import NRabiAnalysis
 from analysis.randomized_benchmarking_analysis import RandomizedBenchmarkingAnalysis
+from analysis.check_cliffords_analysis import CheckCliffordsAnalysis
+
 
 from config_files.VNA_values import (
     VNA_resonator_frequencies, VNA_qubit_frequencies, VNA_f12_frequencies
@@ -101,6 +106,7 @@ class NodeFactory:
             'ro_frequency_optimization': RO_frequency_optimization_Node,
             #'ro_frequency_optimization_gef': RO_frequency_optimization_gef_Node,
             'randomized_benchmarking': Randomized_Benchmarking_Node,
+            'check_cliffords': Check_Cliffords_Node,
         }
 
     def create_node(self, node_name: str, all_qubits: list[str], ** kwargs):
@@ -312,7 +318,7 @@ class Randomized_Benchmarking_Node:
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
         self.redis_field = ['t1_time'] #TODO change to something, error?
-        self.qubit_state = 1
+        self.qubit_state = 0 #can be 0 or 1
         self.measurement_obj = Randomized_Benchmarking
         self.analysis_obj = RandomizedBenchmarkingAnalysis
 
@@ -321,8 +327,27 @@ class Randomized_Benchmarking_Node:
         cluster_samplespace = {
             # Always include 0 and 1 to measure |0⟩ and |1⟩ (distinct from number of cliffords)
             'number_of_cliffords': {
-                #qubit: np.array([0,1,2,4,8,16,32,64,128,256,512,1024]) for qubit in self.all_qubits
-                qubit: np.array([0,1,2,5,10,20,40,60,120,180,240,300,360,400,500,600]) for qubit in self.all_qubits
+                qubit: np.array([0,1,2,4,8,16,32,64,128,256,512,1024]) for qubit in self.all_qubits
+                #qubit: np.array([0,1,2,5,10,20,40,60,120,180,240,300,360,400,500,600]) for qubit in self.all_qubits
+            }
+        }
+        return cluster_samplespace
+
+class Check_Cliffords_Node:
+    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
+        self.name = name
+        self.all_qubits = all_qubits
+        self.node_dictionary = kwargs
+        self.redis_field = ['t1_time'] #TODO Empty?
+        self.qubit_state = 0
+        self.measurement_obj = Check_Cliffords
+        self.analysis_obj = CheckCliffordsAnalysis
+
+    @property
+    def samplespace(self):
+        cluster_samplespace = {
+            'clifford_indices': {
+                qubit: np.linspace(0,25) for qubit in self.all_qubits
             }
         }
         return cluster_samplespace

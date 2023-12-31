@@ -74,21 +74,22 @@ class RandomizedBenchmarkingAnalysis():
 
         return [0]
 
-    def plotter(self,ax):
-        # Plots the data and the fitted model of a Rabi experiment
-        
-        """ #Unnormalized plot:
+    def plotter(self,ax):        
+        # unnormalized plot:
         ax.plot( self.fit_n_cliffords, self.fit_y,'r-',lw=3.0)
         ax.plot( self.independents[2:], self.magnitudes[2:],'bo-',ms=3.0)
         ax.hlines(y=self.magnitudes[0],xmin=self.independents[0],xmax=self.independents[-1],color='g',linestyle='--') # Plots |0⟩
         ax.hlines(y=self.magnitudes[1],xmin=self.independents[0],xmax=self.independents[-1],color='g',linestyle='--') # Plots |1⟩
         ax.set_ylabel(f'|S21| (V)')
-        """
+        
 
+        """ # normalized plot:
         ax.plot( self.fit_n_cliffords, self.normalized_fit_y,'r-',lw=3.0)
         ax.plot( self.independents[2:], self.normalized_magnitudes[2:],'bo-',ms=3.0)
+        ax.set_ylabel(f'Normalized |S21|')
+        """
         ax.set_title(f'Randomized benchmarking for {self.qubit}')
         ax.set_xlabel('Number of clifford operations')
-        ax.set_ylabel(f'Normalized |S21|')
+        
         ax.grid()
 

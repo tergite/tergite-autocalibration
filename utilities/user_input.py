@@ -24,6 +24,7 @@ node reference
   n_rabi_oscillations
   T1
   randomized_benchmarking
+  check_cliffords
   cz_chevron
   cz_calibration
 '''

@@ -36,6 +36,7 @@ graph_dependencies = [
     ('rabi_oscillations_12', 'resonator_spectroscopy_2'),
     ('qubit_12_spectroscopy_multidim', 'cz_chevron'),
     ('rabi_oscillations', 'randomized_benchmarking'),
+    ('rabi_oscillations', 'check_cliffords'),
     # ('qubit_12_spectroscopy_pulsed', 'cz_calibration'),
     # ('coupler_spectroscopy', 'cz_chevron'),
 ]
