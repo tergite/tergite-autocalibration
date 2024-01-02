@@ -80,6 +80,25 @@ def precompile(node):
     samplespace = node.samplespace
     qubits = node.all_qubits
 
+    # backup old parameter values
+    fields = node.redis_field
+    for field in fields:
+        field_backup = field + "_backup"
+        for qubit in qubits:
+            key = f"transmons:{qubit}"
+            if field in redis_connection.hgetall(key).keys():
+                value = redis_connection.hget(key, field)
+                redis_connection.hset(key, field_backup, value)
+                redis_connection.hset(key, field, 'nan' )
+        if getattr(node, "coupler", None) is not None:
+            couplers = node.coupler
+            for coupler in couplers:
+                key = f"couplers:{coupler}"
+                if field in redis_connection.hgetall().keys():
+                    value = redis_connection.hget(key, field)
+                    redis_connection.hset(key, field_backup, value)
+                    redis_connection.hset(key, field, 'nan')
+
     # TODO better way to restart the QuantumDevice object
     device = QuantumDevice(f'Loki_{node.name}')
     device.hardware_config(hw_config)

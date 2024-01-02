@@ -66,9 +66,17 @@ def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
     qub_spec_samples = 101
     sweep_range = 6.5e6
     if transition == '01':
-        VNA_frequency = float(cxn.hget(f"transmons:{qubit}", "freq_" + transition)) or VNA_qubit_frequencies[qubit]
+        redis_value = float(cxn.hget(f"transmons:{qubit}", "freq_" + transition)) 
+        if redis_value != float('nan'):
+            VNA_frequency = VNA_qubit_frequencies[qubit]
+        else:
+            VNA_frequency = redis_value
     elif transition == '12':
-        VNA_frequency = float(cxn.hget(f"transmons:{qubit}", "freq_" + transition)) or VNA_f12_frequencies[qubit]
+        redis_value = float(cxn.hget(f"transmons:{qubit}", "freq_" + transition)) 
+        if redis_value != float('nan'):
+            VNA_frequency = VNA_f12_frequencies[qubit]
+        else:
+            VNA_frequency = redis_value
     else:
         raise ValueError('Invalid transition')
 
