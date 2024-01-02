@@ -51,6 +51,7 @@ from config_files.VNA_values import (
     VNA_resonator_frequencies, VNA_qubit_frequencies, VNA_f12_frequencies
 )
 
+cxn = redis.Redis(decode_responses=True)
 
 def resonator_samples(qubit: str) -> np.ndarray:
     res_spec_samples = 111
@@ -65,9 +66,9 @@ def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
     qub_spec_samples = 101
     sweep_range = 6.5e6
     if transition == '01':
-        VNA_frequency = VNA_qubit_frequencies[qubit]
+        VNA_frequency = float(cxn.hget(f"transmons:{qubit}", "freq_" + transition)) or VNA_qubit_frequencies[qubit]
     elif transition == '12':
-        VNA_frequency = VNA_f12_frequencies[qubit]
+        VNA_frequency = float(cxn.hget(f"transmons:{qubit}", "freq_" + transition)) or VNA_f12_frequencies[qubit]
     else:
         raise ValueError('Invalid transition')
 

@@ -109,11 +109,6 @@ def precompile(node):
     schedule_function = node_class.schedule_function
     static_parameters = node_class.static_kwargs
 
-    compiler = SerialCompiler(name=f'{node.name}_compiler')
-    compilation_config = device.generate_compilation_config()
-
-
-
     # TODO commenting this out because single shots has been fixed by Qblox
     # _____________________________________________________________________
     # if 'qubit_states' in samplespace: #this means we have single shots
@@ -184,6 +179,7 @@ def precompile(node):
 
     logger.info('Starting Compiling')
     compiled_schedule = compiler.compile(schedule=schedule, config=compilation_config)
+    device.close()
 
     #TODO
     #ic.retrieve_hardware_logs
