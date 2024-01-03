@@ -196,7 +196,7 @@ class CZChevronAnalysis():
         except:
             print("Something wrong with the fitting process.")
             self.opt_freq,self.opt_cz = 0,0
-        fig.show(block=False)
+        fig.show()
         return [self.opt_freq , self.opt_cz ]
 
     def plotter(self, axis):

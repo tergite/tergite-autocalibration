@@ -1,6 +1,7 @@
 from importlib import reload
 import utilities.user_input as ui
 import workers.calibration_supervisor as supervisor
+import nodes
 from nodes import node as calibrate_nodes
 from nodes.graph import graph as cg
 
@@ -38,6 +39,10 @@ class Monitor:
         self.cxn = supervisor.redis_connection
         self.node_park = "resonator_spectroscopy"
 
+    def __repr__(self):
+        return "Calibration Monitor @@\n--------------\n" \
+            + f"Parking node: {self.node_park} \n Qubits: \n\t {self.qubits} \n Couplers: \n\t {self.couplers}"
+
     def node_status(self, node:str=None):
         if node is None: node = self.node_park
         print("Qubits:")
@@ -48,9 +53,12 @@ class Monitor:
         for coupler in self.couplers:
             print(f"    {coupler}: {node}:", self.cxn.hget(f"cs:{coupler}", node))
 
-    def calibrate_node(self, node:str):
-        supervisor.calibrate_node(node)
-        self.node_park = node
+    def calibrate_node(self, node:str=None, **kwargs):
+        if node is None:
+            supervisor.calibrate_node(self.node_park, **kwargs)    
+        else:
+            supervisor.calibrate_node(node, **kwargs)
+            self.node_park = node
 
     def next_node(self, node:str=None):
         if node is None:

@@ -14,9 +14,9 @@ qubit_01_spectroscopy_pulsed.freq_01 = nan
 qubit_01_spectroscopy_multidim.freq_01 = nan
 qubit_01_spectroscopy_multidim.spec_ampl_optimal = nan
 two_tone_multidim.freq_01 = nan
-ramsey_correction.freq_01 = nan
+ramsey_fringes.freq_01 = nan
 qubit_12_spectroscopy_pulsed.freq_12 = nan
-ramsey_correction_12.freq_12 = nan
+ramsey_fringes_12.freq_12 = nan
 qubit_12_spectroscopy_pulsed.anharmonicity = nan
 qubit_12_spectroscopy_multidim.freq_12 = nan
 qubit_12_spectroscopy_multidim.spec_ampl_12_optimal = nan
@@ -128,10 +128,10 @@ init_duration = 200e-6
 spec_pulse_duration = 2e-6
 spec_amp = 3.5e-4
 
-[ramsey_correction.all]
+[ramsey_fringes.all]
 artificial_detuning = 3e6
 
-[ramsey_correction_12.all]
+[ramsey_fringes_12.all]
 artificial_detuning = 3e6
 
 [qubit_12_spectroscopy_pulsed.all]

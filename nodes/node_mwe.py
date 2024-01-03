@@ -8,19 +8,19 @@ graph_dependencies = [
         ('resonator_spectroscopy','qubit_01_spectroscopy_multidim'),
         ('qubit_01_spectroscopy_pulsed','rabi_oscillations'),
         ('qubit_01_spectroscopy_multidim','rabi_oscillations'),
-        ('rabi_oscillations','ramsey_correction'),
-        ('ramsey_correction','resonator_spectroscopy_1'),
+        ('rabi_oscillations','ramsey_fringes'),
+        ('ramsey_fringes','resonator_spectroscopy_1'),
         ('resonator_spectroscopy_1','qubit_12_spectroscopy_pulsed'),
         ('qubit_12_spectroscopy_pulsed','rabi_oscillations_12'),
-        ('rabi_oscillations_12','ramsey_correction_12'),
+        ('rabi_oscillations_12','ramsey_fringes_12'),
     ]
 
 
 graph_1.add_edges_from(graph_dependencies)
 graph_1.add_node('qubit_01_spectroscopy_pulsed', type='fast')
 graph_1.add_node('qubit_01_spectroscopy_multidim', type='accurate')
-graph_1.add_node('ramsey_correction', type='refine')
-graph_1.add_node('ramsey_correction_12', type='refine')
+graph_1.add_node('ramsey_fringes', type='refine')
+graph_1.add_node('ramsey_fringes_12', type='refine')
 topo_order = list(nx.topological_sort(graph_1))
 
 def graph_condition(node, types):
