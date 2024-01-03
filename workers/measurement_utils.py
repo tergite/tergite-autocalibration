@@ -42,6 +42,12 @@ def execute_schedule(
     lab_ic.stop()
     logger.info('Raw dataset acquired')
 
+    # try:
+    #     raw_dataset = raw_dataset.dropna(dim='loop_repetition',how='any')
+    # except:
+    #     pass
+    # print(f'{raw_dataset=}')
+
     return raw_dataset
 
 
@@ -61,7 +67,7 @@ class SingleQubitsMeasurement:
     def measure(self, node, compiled_schedule, ic, data_path):
         samplespace = node.samplespace
         raw_dataset = execute_schedule(compiled_schedule, ic)
-        result_dataset = configure_dataset(raw_dataset, samplespace)
+        result_dataset = configure_dataset(node.name, raw_dataset, samplespace)
         save_dataset(result_dataset, node, data_path)
         if node.name == 'ro_frequency_optimization':
             result_dataset = handle_ro_freq_optimization(result_dataset, states=[0, 1])

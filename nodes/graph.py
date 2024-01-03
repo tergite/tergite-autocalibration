@@ -18,7 +18,7 @@ graph_dependencies = [
     ('qubit_01_spectroscopy_pulsed', 'rabi_oscillations'),
     ('qubit_01_spectroscopy_multidim', 'rabi_oscillations'), #remove this line?
     ('rabi_oscillations', 'ramsey_correction'),
-    ('ramsey_correction', 'ro_frequency_optimization'),
+    # ('ramsey_correction', 'ro_frequency_optimization'),
     ('ramsey_correction', 'motzoi_parameter'),
     ('motzoi_parameter', 'n_rabi_oscillations'),
     ('n_rabi_oscillations', 'resonator_spectroscopy_1'),
@@ -27,16 +27,18 @@ graph_dependencies = [
     #('ramsey_correction', 'T1'),
     ('resonator_spectroscopy_1', 'qubit_12_spectroscopy_pulsed'),
     ('resonator_spectroscopy_1', 'qubit_12_spectroscopy_multidim'),
-    ('qubit_12_spectroscopy_pulsed', 'rabi_oscillations_12'),
+    # ('qubit_12_spectroscopy_pulsed', 'rabi_oscillations_12'),
     ('qubit_12_spectroscopy_multidim', 'rabi_oscillations_12'),
-
     ('rabi_oscillations_12', 'ramsey_correction_12'),
     ('ramsey_correction_12', 'resonator_spectroscopy_2'),
-    ('ramsey_correction_12', 'ro_frequency_optimization_gef'),
-    ('rabi_oscillations_12', 'resonator_spectroscopy_2'),
-    ('qubit_12_spectroscopy_multidim', 'cz_chevron'),
-    # ('qubit_12_spectroscopy_pulsed', 'cz_calibration'),
+    ('resonator_spectroscopy_2', 'ro_frequency_optimization_gef'),
+    ('ro_frequency_optimization_gef', 'ro_amplitude_optimization_gef'),
     # ('coupler_spectroscopy', 'cz_chevron'),
+    ('ro_amplitude_optimization_gef', 'cz_chevron'),
+    ('cz_chevron', 'cz_calibration'),
+    # ('qubit_12_spectroscopy_multidim', 'cz_calibration'),
+    # ('cz_calibration', 'cz_calibration_ssro'),
+    ('cz_calibration', 'cz_calibration_ssro'),
 ]
 
 graph.add_edges_from(graph_dependencies)
@@ -47,9 +49,11 @@ graph.add_node('punchout')
 graph.add_node('qubit_01_spectroscopy_pulsed')
 graph.add_node('qubit_01_spectroscopy_multidim')
 # graph.add_node('ramsey_correction', type='refine')
+# graph.add_node('motzoi_parameter', type='refine')
+# graph.add_node('n_rabi_oscillations', type='refine')
 # graph.add_node('ramsey_correction_12', type='refine')
-# graph.add_node('ro_frequency_optimization', type='refine')
-# graph.add_node('ro_amplitude_optimization', type='refine')
+# graph.add_node('ro_frequency_optimization_gef', type='refine')
+# graph.add_node('ro_amplitude_optimization_gef', type='refine')
 
 # for nodes that perform the same measurement,
 # assign a weight to the corresponding edge to sort them
@@ -74,6 +78,7 @@ initial_pos = {
     'ramsey_correction_12': (0,0.2),
     'resonator_spectroscopy_2': (0,0.1),
     'ro_frequency_optimization_gef': (0,0.0),
+    'ro_amplitude_optimization_gef': (0,0.0),
     'cz_chevron': (-0.5,0.0),
     'cz_calibration': (-0.9,0.0),
     'T1': (0.5,0.5),

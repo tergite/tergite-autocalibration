@@ -50,17 +50,18 @@ node_factory = NodeFactory()
 def set_module_att(cluster):
     # Flux lines
     for module in cluster.modules[0:13]:
-        module.out1_att(42)
-    # print(module.name + '_att:'+ str(module.out1_att()) + 'dB')
+        module.out1_att(40)
+    print(module.name + '_att:'+ str(module.out1_att()) + 'dB')
     # Readout lines
-    # for module in cluster.modules[15:17]:
-    #     module.out0_att(6)
-    # print(module.name + '_att:'+ str(module.out0_att()) + 'dB')
+    for module in cluster.modules[15:17]:
+        module.out0_att(16)
+    print(module.name + '_att:'+ str(module.out0_att()) + 'dB')
 
 if args.cluster_status == ClusterStatus.real:
     Cluster.close_all()
     clusterA = Cluster("clusterA", lokiA_IP)
-    # set_module_att(clusterA)
+    clusterA.reset()
+    set_module_att(clusterA)
     lab_ic = InstrumentCoordinator('lab_ic')
     lab_ic.add_component(ClusterComponent(clusterA))
     lab_ic.timeout(222)
@@ -133,12 +134,10 @@ def calibrate_system():
             for parameter_key, parameter_value in initial_coupler_parameters[coupler].items():
                 redis_connection.hset(f"couplers:{coupler}", parameter_key, parameter_value)
 
-
-    if target_node == 'cz_chevron':
-        set_module_att(clusterA)
-        for coupler in couplers:
-            spi = SpiDAC()
-            spi.set_parking_current(coupler)
+    # if target_node in ['cz_chevron','cz_calibration','cz_calibration_ssro']:
+    #     for coupler in couplers:
+    #         spi = SpiDAC()
+    #         spi.set_parking_current(coupler)
 
     for calibration_node in topo_order:
         inspect_node(calibration_node)
@@ -148,7 +147,7 @@ def calibrate_system():
 def inspect_node(node: str):
     logger.info(f'Inspecting node {node}')
 
-    if node in ['coupler_spectroscopy', 'cz_chevron']:
+    if node in ['coupler_spectroscopy']:
         coupler_statuses = [redis_connection.hget(f"cs:{coupler}", node) == 'calibrated' for coupler in couplers]
         is_node_calibrated = all(coupler_statuses)
     else:
@@ -168,7 +167,7 @@ def inspect_node(node: str):
     #Check Redis if node is calibrated
     status = DataStatus.undefined
 
-    if node in ['coupler_spectroscopy', 'cz_chevron']:
+    if node in ['coupler_spectroscopy']:
         for coupler in couplers:
             # the calibrated, not_calibrated flags may be not necessary,
             # just store the DataStatus on Redis
@@ -228,3 +227,6 @@ def calibrate_node(node_label: str):
 
 # main
 calibrate_system()
+logger.info('calibration completed, closing cluster')
+clusterA.reset()
+clusterA.close()

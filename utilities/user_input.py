@@ -1,9 +1,11 @@
-qubits = ['q11','q12','q13','q14','q15']
+# qubits = ['q12','q13','q14','q15']
+# qubits = ['q13','q14']
+qubits = ['q14','q15']
 # qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
 # qubits = ['q16', 'q17', 'q19', 'q21', 'q22', 'q23', 'q25']
 #qubits = [ 'q22','q23', 'q25']
-qubits = [ 'q21','q22']
-couplers = ['q21_q22']
+# qubits = [ 'q21','q22']
+couplers = ['q14_q15']
 
 '''
 node reference
@@ -19,6 +21,9 @@ node reference
   rabi_oscillations_12
   ramsey_correction_12
   resonator_spectroscopy_2
+  ro_frequency_optimization
+  ro_frequency_optimization_gef
+  ro_amplitude_optimization_gef
   coupler_spectroscopy
   coupler_resonator_spectroscopy
   motzoi_parameter
@@ -26,10 +31,11 @@ node reference
   T1
   cz_chevron
   cz_calibration
+  cz_calibration_ssro
 '''
 
 user_requested_calibration = {
-    'target_node': 'resonator_spectroscopy_2',
+    'target_node': 'cz_calibration_ssro',
     'all_qubits': qubits,
     'couplers': couplers,
     # 'node_dictionary' : {'coupled_qubits': ['q21','q22']},

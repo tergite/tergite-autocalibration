@@ -15,16 +15,15 @@ set_datadir('.')
 redis_connection = redis.Redis(decode_responses=True)
 
 def post_process(result_dataset: xr.Dataset, node, data_path: Path):
-    print(data_path)
     analysis = Multiplexed_Analysis(result_dataset, node, data_path)
     # figure_manager = plt.get_current_fig_manager()
     # figure_manager.window.showMaximized()
     fig = plt.gcf()
     fig.set_tight_layout(True)
-    fig.savefig(f'{data_path}/{node}.png', bbox_inches='tight', dpi=600)
+    fig.savefig(f'{data_path}/{node.name}.png', bbox_inches='tight', dpi=600)
     # plt.show()
     plt.show(block=False)
-    plt.pause(30)
+    plt.pause(10)
     plt.close()
 
     if node != 'tof':
@@ -80,6 +79,7 @@ class Multiplexed_Analysis(BaseAnalysis):
                 ds = xr.merge([ds, result_dataset[var]])
 
             ds.attrs['qubit'] = this_qubit
+            ds.attrs['node'] = node.name
 
             this_axis = self.axs[indx // self.column_grid, indx % self.column_grid]
             kw_args = {}
@@ -92,7 +92,7 @@ class Multiplexed_Analysis(BaseAnalysis):
             node_analysis.plotter(this_axis)
 
             # TODO temporary hack:
-            if node.name == 'coupler_spectroscopy':
+            if node.name == ['coupler_spectroscopy','cz_chevron','cz_calibration']:
                 this_qubit = node.coupler
 
             self.update_redis_trusted_values(node.name, this_qubit, redis_field)

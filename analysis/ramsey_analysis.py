@@ -61,7 +61,7 @@ class RamseyAnalysis():
         self.S21 = dataset[self.data_var].values
         self.fit_results = {}
         # print(dataset)
-        if dataset.name == 'ramsey_correction_12':
+        if dataset.node == 'ramsey_correction_12':
             redis_field = 'freq_12'
         self.qubit_frequency = float(redis_connection.hget(f'{redis_key}',redis_field))
         print(redis_field,self.qubit_frequency)

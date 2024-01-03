@@ -83,23 +83,34 @@ class OptimalRO_012_FrequencyAnalysis(OptimalROFrequencyAnalysis):
 
         fit_values_2 = self.fit_result_2.values
 
-        self.distances_01 = np.abs(self.fit_IQ_1 - self.fit_IQ_0)
-        self.distances_12 = np.abs(self.fit_IQ_2 - self.fit_IQ_1)
-        self.distances_20 = np.abs(self.fit_IQ_0 - self.fit_IQ_2)
-        self.total_distance = self.distances_01 + self.distances_12 + self.distances_20
+        # self.distances_01 = np.abs(self.fit_IQ_1 - self.fit_IQ_0)
+        # self.distances_12 = np.abs(self.fit_IQ_2 - self.fit_IQ_1)
+        # self.distances_20 = np.abs(self.fit_IQ_0 - self.fit_IQ_2)
+        self.distances_01 = np.abs(self.S21_0 - self.S21_1)
+        self.distances_12 = np.abs(self.S21_1 - self.S21_2)
+        self.distances_20 = np.abs(self.S21_2 - self.S21_0)
+        self.total_distance = (self.distances_01 + self.distances_12 + self.distances_20)/3
         self.index_of_max_distance = np.argmax(self.total_distance)
-        self.optimal_frequency = self.fit_frequencies[self.index_of_max_distance]
+        # self.optimal_frequency = self.fit_frequencies[self.index_of_max_distance]
+        self.optimal_frequency = self.frequencies[self.index_of_max_distance]
 
-        return self.optimal_frequency
+        return [self.optimal_frequency]
 
     def plotter(self,ax):
         this_qubit = self.dataset.attrs['qubit']
         ax.set_xlabel('RO frequency')
         ax.set_ylabel('IQ distance')
-        ax.plot(self.fit_frequencies, self.distances_01,label='01')
-        ax.plot(self.fit_frequencies, self.distances_12,label='12')
-        ax.plot(self.fit_frequencies, self.distances_20,label='20')
-        ax.plot(self.fit_frequencies, self.total_distance,label='total')
+        ax.plot(self.frequencies, np.abs(self.S21_0),label='0')
+        ax.plot(self.frequencies, np.abs(self.S21_1),label='1')
+        ax.plot(self.frequencies, np.abs(self.S21_2),label='2')
+        ax.plot(self.frequencies, self.total_distance,'--',label='distance')
+        # ax.plot(self.frequencies, self.distances_01,label='01')
+        # ax.plot(self.frequencies, self.distances_12,label='12')
+        # ax.plot(self.frequencies, self.distances_20,label='20')
+        # ax.plot(self.fit_frequencies, self.distances_01,label='01')
+        # ax.plot(self.fit_frequencies, self.distances_12,label='12')
+        # ax.plot(self.fit_frequencies, self.distances_20,label='20')
+        # ax.plot(self.fit_frequencies, self.total_distance,label='total')
         optimal_distance = self.total_distance[self.index_of_max_distance]
 
         ax.scatter(

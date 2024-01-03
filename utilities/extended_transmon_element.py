@@ -7,8 +7,9 @@ from quantify_scheduler.enums import BinMode
 from quantify_scheduler.device_under_test.transmon_element import BasicTransmonElement, ClocksFrequencies, DispersiveMeasurement, InstrumentBase, measurement_factories, pulse_factories, pulse_library
 from quantify_scheduler.backends.circuit_to_device import OperationCompilationConfig, DeviceCompilationConfig
 from quantify_scheduler.helpers.validators import Numbers
-from quantify_scheduler.operations.gate_library import Measure
+from quantify_scheduler.operations.gate_library import Measure,Rxy
 from typing import Literal, Optional, Any
+
 
 class ExtendedClocksFrequencies(InstrumentChannel):
     def __init__(self, parent: InstrumentBase, name: str, **kwargs: Any) -> None:
@@ -71,6 +72,22 @@ class Spec(InstrumentChannel):
             vals=validators.Numbers(min_value=0, max_value=1),
         )
 
+class Rxy_12(Rxy):
+    """
+    A single qubit rotation on the 12 transition.
+    """
+
+    def __init__(self, qubit: str, theta: float = 180, phi: float = 0):
+        super().__init__(theta=theta, phi=phi, qubit=qubit)
+        self.data["name"] = f"Rxy-12({theta:.8g}, {phi:.8g}, '{qubit}')",
+        self.data['gate_info']["unitary"]= None # this is not a Qubit operation
+        self.data['gate_info']["operation_type"]= "r12" # this key is used in compilation!
+
+        self._update()  # Update the Operation's internals
+
+    def __str__(self) -> str:
+        qubit = self.data["gate_info"]["qubits"][0]
+        return f"{self.__class__.__name__}(qubit='{qubit}')"
 
 class Measure_RO1(Measure):
     def __init__(
@@ -170,8 +187,8 @@ class ExtendedTransmon(BasicTransmonElement):
 
     def generate_device_config(self) -> DeviceCompilationConfig:
         cfg_dict = {
-            'backend': 'quantify_scheduler.backends'
-            '.circuit_to_device.compile_circuit_to_device',
+            # 'backend': 'quantify_scheduler.backends'
+            # '.circuit_to_device.compile_circuit_to_device',
             'elements': self._generate_config(),
             'clocks': {
                 f'{self.name}.01': self.clock_freqs.f01(),
@@ -237,11 +254,11 @@ class ExtendedTransmon(BasicTransmonElement):
         cfg_dict['elements'][f'{self.name}']['r12'] = OperationCompilationConfig(
                     factory_func=pulse_factories.rxy_drag_pulse,
                     factory_kwargs={
-                        'ef_amp180': self.r12.ef_amp180(),
-                        # 'motzoi': self.rxy.motzoi(),
+                        'amp180': self.r12.ef_amp180(),
+                        'motzoi': 0,
                         'port': self.ports.microwave(),
                         'clock': f'{self.name}.12',
-                        # 'duration': self.rxy.duration(),
+                        'duration': self.rxy.duration(),
                     },
                     gate_info_factory_kwargs=['theta', 'phi'],
                 )

@@ -156,6 +156,10 @@ class RO_frequency_optimization(Measurement):
                             phase=0,
                         ),
                     )
+                    
+                    sched.add(
+                        SetClockFrequency(clock=this_ro_clock, clock_freq_new=ro_frequency),
+                    )
 
                     ro_pulse = sched.add(
                         SquarePulse(

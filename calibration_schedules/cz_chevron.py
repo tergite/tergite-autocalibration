@@ -8,7 +8,7 @@ from quantify_scheduler.operations.pulse_library import DRAGPulse,SetClockFreque
 from quantify_scheduler.resources import ClockResource
 from calibration_schedules.measurement_base import Measurement
 from utilities.extended_transmon_element import Measure_RO1
-from utilities.QPU_connections_visualization import edge_group
+from config_files.coupler_config import edge_group
 from scipy.signal import gaussian
 from scipy import signal
 from matplotlib import pyplot as plt

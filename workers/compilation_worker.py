@@ -46,18 +46,20 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
     transmon.clock_freqs.readout(float(redis_config['ro_freq']))
     transmon.extended_clock_freqs.readout_1(float(redis_config['ro_freq_1']))
     transmon.extended_clock_freqs.readout_opt(float(redis_config['ro_freq_opt']))
-    transmon.measure.pulse_amp(float(redis_config['ro_pulse_amp']))
+    ro_amp_opt = float(redis_config['ro_ampl_opt'])
+    if isnan(ro_amp_opt):
+        ro_amp_opt = float(redis_config['ro_pulse_amp'])
+    transmon.measure.pulse_amp(ro_amp_opt)
     transmon.measure.pulse_duration(float(redis_config['ro_pulse_duration']))
     transmon.measure.acq_channel(channel)
     transmon.measure.acq_delay(float(redis_config['ro_acq_delay']))
     transmon.measure.integration_time(float(redis_config['ro_acq_integration_time']))
-    transmon.measure_1.pulse_amp(float(redis_config['ro_pulse_amp']))
+    transmon.measure_1.pulse_amp(float(ro_amp_opt))
     transmon.measure_1.pulse_duration(float(redis_config['ro_pulse_duration']))
     transmon.measure_1.acq_channel(channel)
     transmon.measure_1.acq_delay(float(redis_config['ro_acq_delay']))
     transmon.measure_1.integration_time(float(redis_config['ro_acq_integration_time']))
-
-    transmon.measure_opt.pulse_amp(float(redis_config['ro_pulse_amp']))
+    transmon.measure_opt.pulse_amp(ro_amp_opt)
     transmon.measure_opt.pulse_duration(float(redis_config['ro_pulse_duration']))
     transmon.measure_opt.acq_channel(channel)
     transmon.measure_opt.acq_delay(float(redis_config['ro_acq_delay']))
@@ -102,9 +104,11 @@ def precompile(node):
     #    couplers[bus[0]+'_'+bus[1]] = coupler
 
     node_class = node.measurement_obj(transmons, node.qubit_state)
-    if node.name == 'cz_chevron':
+    if node.name in ['cz_chevron','cz_calibration','cz_calibration_ssro']:
         coupler = node.coupler
         node_class = node.measurement_obj(transmons, coupler, node.qubit_state)
+    if node.name in ['ro_amplitude_optimization_gef','cz_calibration_ssro']:
+        device.cfg_sched_repetitions(1)    # for single-shot readout
 
     schedule_function = node_class.schedule_function
     static_parameters = node_class.static_kwargs
@@ -184,6 +188,15 @@ def precompile(node):
 
     logger.info('Starting Compiling')
     compiled_schedule = compiler.compile(schedule=schedule, config=compilation_config)
+    # if node.name not in ['ro_amplitude_optimization_gef','cz_calibration_ssro']:
+    #     try:
+    #         figs = compiled_schedule.plot_pulse_diagram(plot_backend="plotly")
+    #         figs.write_image(f'pulse_diagrams\{node.name}.png')
+    #     except:
+    #         pass
+    # breakpoint()
+    # figs[0].savefig('ssro')
+    # breakpoint()
 
     #TODO
     #ic.retrieve_hardware_logs
