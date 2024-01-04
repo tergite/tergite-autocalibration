@@ -210,10 +210,11 @@ def calibrate_node(node_label: str, **static_parameters):
     # node_dictionary = user_requested_calibration['node_dictionary']
     if couplers is not None and len(couplers):
         static_parameters["couplers"] = couplers
+    bin_mode = static_parameters.pop("bin_mode", None)
     node = node_factory.create_node(node_label, qubits, **static_parameters)
     data_path = create_node_data_path(node)
 
-    compiled_schedule = precompile(node)
+    compiled_schedule = precompile(node, bin_mode=bin_mode)
     result_dataset = measure_node(
         node,
         compiled_schedule,

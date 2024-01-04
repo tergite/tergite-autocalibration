@@ -71,6 +71,8 @@ class CZChevronAnalysis():
         self.result = OptimalResult( f'cz_pulse_frequencies_sweep', "MHz")
 
     def run_fitting(self):
+        import pdb
+        pdb.set_trace()
         freq = self.dataset[f'cz_pulse_frequencies_sweep{self.qubit}'].values # MHz
         times = self.dataset[f'cz_pulse_durations{self.qubit}'].values # ns
         self.amp = times

@@ -80,6 +80,7 @@ class CZ_chevron(Measurement):
         :
             An experiment schedule.
         """
+        print("bin mode ", self.bin_mode)
         schedule = Schedule("CZ_chevron",repetitions)
         qubits = coupler.split(sep='_')
 
@@ -128,7 +129,7 @@ class CZ_chevron(Measurement):
 
                 for this_qubit in qubits:
                     schedule.add(
-                        Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
+                        Measure(this_qubit, acq_index=this_index, bin_mode=self.bin_mode),
                         ref_op=cz,rel_time=12e-9, ref_pt="end",
                     )
         return schedule

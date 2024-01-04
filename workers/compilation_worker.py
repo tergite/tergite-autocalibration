@@ -74,7 +74,7 @@ def load_redis_config_coupler(coupler: CompositeSquareEdge):
     return
 
 
-def precompile(node):
+def precompile(node, bin_mode:str=None):
     if node.name == 'tof':
         return None, 1
     samplespace = node.samplespace
@@ -125,7 +125,7 @@ def precompile(node):
     if node.name == 'cz_chevron':
         coupler = node.coupler
         node_class = node.measurement_obj(transmons, coupler, node.qubit_state)
-
+    if bin_mode is not None: node_class.set_bin_mode(bin_mode)
     schedule_function = node_class.schedule_function
 
     # Merge with the parameters from node dictionary
