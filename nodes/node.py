@@ -90,6 +90,7 @@ class NodeFactory:
             'qubit_01_spectroscopy_multidim': Qubit_01_Spectroscopy_Multidim_Node,
             'rabi_oscillations': Rabi_Oscillations_Node,
             'ramsey_fringes': Ramsey_Fringes_Node,
+            'ramsey_fringes_12': Ramsey_Fringes_12_Node,
             'resonator_spectroscopy_1': Resonator_Spectroscopy_1_Node,
             'qubit_12_spectroscopy_pulsed': Qubit_12_Spectroscopy_Pulsed_Node,
             'qubit_12_spectroscopy_multidim': Qubit_12_Spectroscopy_Multidim_Node,
@@ -230,6 +231,32 @@ class Ramsey_Fringes_Node(Base_Node):
         self.measurement_obj = Ramsey_fringes
         self.analysis_obj = RamseyAnalysis
         self.backup = False
+        self.analysis_kwargs = {"redis_field":"freq_01"}
+
+    @property
+    def samplespace(self):
+        cluster_samplespace = {
+            # 'ramsey_fringes': {
+                'ramsey_delays': {
+                    qubit: np.arange(4e-9, 2048e-9, 8 * 8e-9) for qubit in self.all_qubits
+                },
+                'artificial_detunings': {
+                    qubit: np.arange(-2.1, 2.1, 0.8) * 1e6 for qubit in self.all_qubits
+                },
+            # },
+        }
+        return cluster_samplespace
+
+
+class Ramsey_Fringes_12_Node(Base_Node):
+    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
+        self.redis_field = ['freq_12']
+        self.qubit_state = 1
+        self.measurement_obj = Ramsey_fringes
+        self.analysis_obj = RamseyAnalysis
+        self.backup = False
+        self.analysis_kwargs = {"redis_field":"freq_12"}
 
     @property
     def samplespace(self):
@@ -388,7 +415,7 @@ class Rabi_Oscillations_12_Node(Base_Node):
 class RO_frequency_optimization_Node(Base_Node):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = 'ro_freq_opt'
+        self.redis_field = ['ro_freq_opt']
         self.qubit_state = 0
         self.measurement_obj = RO_frequency_optimization
         self.analysis_obj = OptimalROFrequencyAnalysis
@@ -437,7 +464,8 @@ class CZ_Chevron_Node(Base_Node):
                 qubit: np.arange(200e-9, 2600e-9, 100e-9) for qubit in self.coupled_qubits
             },
             'cz_pulse_frequencies_sweep': {
-                qubit: np.linspace(-40e6, 40e6, 21) + self.ac_freq for qubit in self.coupled_qubits
+                qubit: np.linspace(-200e6, 200e6, 21) + self.ac_freq for qubit in self.coupled_qubits
+                #qubit: np.linspace(00e6, 200e6, 21) for qubit in self.coupled_qubits
             },
         }
         return cluster_samplespace

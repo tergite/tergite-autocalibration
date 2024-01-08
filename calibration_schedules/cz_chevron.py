@@ -94,8 +94,6 @@ class CZ_chevron(Measurement):
         :
             An experiment schedule.
         """
-        print('----------------')
-        print("BIN_MODE:", self.bin_mode)
         schedule = Schedule("CZ_chevron",repetitions)
 
         couplers_list_all = edge_group.keys()

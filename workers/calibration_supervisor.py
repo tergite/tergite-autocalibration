@@ -50,7 +50,7 @@ node_factory = NodeFactory()
 def set_module_att(cluster):
     # Flux lines
     for module in cluster.modules[0:13]:
-        module.out1_att(36)
+        module.out1_att(40)
     # print(module.name + '_att:'+ str(module.out1_att()) + 'dB')
     # Readout lines
     # for module in cluster.modules[15:17]:
@@ -134,11 +134,11 @@ def calibrate_system():
                 redis_connection.hset(f"couplers:{coupler}", parameter_key, parameter_value)
 
 
-    if target_node == 'cz_chevron':
-        set_module_att(clusterA)
-        for coupler in couplers:
-            spi = SpiDAC()
-            spi.set_parking_current(coupler)
+    # if target_node == 'cz_chevron':
+    #     set_module_att(clusterA)
+    #     for coupler in couplers:
+    #         spi = SpiDAC()
+    #         spi.set_parking_current(coupler)
 
     for calibration_node in topo_order:
         inspect_node(calibration_node)
@@ -211,10 +211,11 @@ def calibrate_node(node_label: str, **static_parameters):
     if couplers is not None and len(couplers):
         static_parameters["couplers"] = couplers
     bin_mode = static_parameters.pop("bin_mode", None)
+    repetitions = static_parameters.pop("repetitions", None)
     node = node_factory.create_node(node_label, qubits, **static_parameters)
     data_path = create_node_data_path(node)
 
-    compiled_schedule = precompile(node, bin_mode=bin_mode)
+    compiled_schedule = precompile(node, bin_mode=bin_mode, repetitions=repetitions)
     result_dataset = measure_node(
         node,
         compiled_schedule,

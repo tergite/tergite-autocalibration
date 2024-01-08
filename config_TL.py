@@ -64,5 +64,5 @@ class Monitor:
         if node is None:
             node = self.node_park
         print(cg[node])
-
+        
 s = Monitor()

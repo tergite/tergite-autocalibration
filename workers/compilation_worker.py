@@ -73,8 +73,7 @@ def load_redis_config_coupler(coupler: CompositeSquareEdge):
     coupler.cz.cz_width(float(redis_config['cz_pulse_width']))
     return
 
-
-def precompile(node, bin_mode:str=None):
+def precompile(node, bin_mode:str=None, repetitions:int=None):
     if node.name == 'tof':
         return None, 1
     samplespace = node.samplespace
@@ -130,6 +129,10 @@ def precompile(node, bin_mode:str=None):
 
     # Merge with the parameters from node dictionary
     static_parameters = node_class.static_kwargs # parameters stored in the redis
+
+    if repetitions is not None:
+        static_parameters["repetitions"] = repetitions
+
     for key, value in node.node_dictionary.items():
         if key in static_parameters:
             if not np.iterable(value):

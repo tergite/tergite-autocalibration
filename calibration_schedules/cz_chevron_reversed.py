@@ -80,7 +80,6 @@ class CZ_chevron(Measurement):
         :
             An experiment schedule.
         """
-        print("bin mode ", self.bin_mode)
         schedule = Schedule("CZ_chevron",repetitions)
         qubits = coupler.split(sep='_')
 
@@ -116,7 +115,7 @@ class CZ_chevron(Measurement):
                     #     ref_op=relaxation, ref_pt="end",
                     # )
 
-                cz_amplitude = 0.5
+                cz_amplitude = 1
 
                 cz = schedule.add(
                         SquarePulse(

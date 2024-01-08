@@ -90,7 +90,7 @@ class OptimalRO_012_FrequencyAnalysis(OptimalROFrequencyAnalysis):
         self.index_of_max_distance = np.argmax(self.total_distance)
         self.optimal_frequency = self.fit_frequencies[self.index_of_max_distance]
 
-        return self.optimal_frequency
+        return [self.optimal_frequency]
 
     def plotter(self,ax):
         this_qubit = self.dataset.attrs['qubit']

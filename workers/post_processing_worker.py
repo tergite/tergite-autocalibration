@@ -82,10 +82,9 @@ class Multiplexed_Analysis(BaseAnalysis):
             ds.attrs['qubit'] = this_qubit
 
             this_axis = self.axs[indx // self.column_grid, indx % self.column_grid]
-            kw_args = {}
             # this_axis.set_title(f'{node_name} for {this_qubit}')
             redis_field = node.redis_field
-
+            kw_args = getattr(node, "analysis_kwargs", dict())
             node_analysis = node.analysis_obj(ds, **kw_args)
             self.qoi = node_analysis.run_fitting()
 
