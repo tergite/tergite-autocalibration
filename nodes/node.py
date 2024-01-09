@@ -539,8 +539,6 @@ class CZ_Dynamic_Phase_Node:
 
 
 
-
-
 class Coupler_Spectroscopy_Node:
     def __init__(self, name: str, all_qubits: list[str], ** kwargs):
         self.name = name

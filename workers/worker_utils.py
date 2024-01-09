@@ -2,33 +2,50 @@ import xarray
 import numpy as np
 from datetime import datetime
 from uuid import uuid4
+from enum import Enum
 import pathlib
 from utilities.root_path import data_directory
+
+
+class SweepType(Enum):
+    ClusterSweepOnQubits = 1 # Sweeps with the cluster.  All the single qubit operations are of these type.
+    ClusterSweepOnCouplers = 2 # Sweeps with the cluster but applied on a coupler. E.g. CZ Chevron measurements.
+    SPI_and_Cluster_Sweep = 3 # Sweeps using the SPI and the cluster. Used on Coupler spectroscopy.
+
 
 
 def configure_dataset(
         raw_ds: xarray.Dataset,
         node,
-        ) -> xarray.Dataset:
-    '''The dataset retrieved from the instrument coordinator  is
-       too bare-bones. Here we configure the dims, coords and data_vars'''
+    ) -> xarray.Dataset:
+    '''
+    The dataset retrieved from the instrument coordinator  is
+    too bare-bones. Here we configure the dims, coords and data_vars
+    '''
+
+    if hasattr(node, 'coupler_samplespace'):
+        sweep_type = SweepType.ClusterSweepOnCouplers
+    elif hasattr(node, 'spi_samplespace'):
+        sweep_type = SweepType.SPI_and_Cluster_Sweep
+        spi_samplespace = node.spi_samplespace
+        spi_sweep_quantities = spi_samplespace.keys() # for example 'dc_currents'
+    elif hasattr(node, 'samplespace') and not hasattr(node, 'spi_samplespace'):
+        sweep_type = SweepType.ClusterSweepOnQubits
 
     dataset = xarray.Dataset()
-    breakpoint()
+
+    def get_coupler_from_qubit(qubit: str):
+        for bus in node.couplers:
+            if qubit in bus:
+                coupler = bus
+        return coupler
+
 
     keys = raw_ds.data_vars.keys()
     measurement_qubits = node.all_qubits
     samplespace = node.samplespace
     sweep_quantities = samplespace.keys() # for example 'ro_frequencies', 'ro_amplitudes' ,...
 
-    # sweep_parameters = list(samplespace.values())
-    # measurement_qubits = []
-    # for sweep in sweep_parameters:
-    #     measurement_qubits += list(sweep.keys())
-    # dublicates = set()
-    # # for soem measurements a qubit can appear in multiple keys. Here we filter the dublicates
-    # # TODO better explanation
-    # measurement_qubits = [q for q in measurement_qubits if not (q in dublicates or dublicates.add(q))]
     n_qubits = len(measurement_qubits)
     if 'ro_opt_frequencies' in list(sweep_quantities):
         qubit_states = [0,1,2]
@@ -40,21 +57,29 @@ def configure_dataset(
         qubit = measurement_qubits[key_indx]
 
         for quantity in sweep_quantities :
-            coord_key = quantity+qubit
-            if hasattr(node, 'couplers'):
-                for bus in node.couplers:
-                    if qubit in bus:
-                        coupler = bus
+            if sweep_type == SweepType.ClusterSweepOnCouplers:
+                coupler = get_coupler_from_qubit(qubit)
+                coord_key = quantity + coupler
                 settable_values = samplespace[quantity][coupler]
-            elif qubit in samplespace[quantity]:
+            elif sweep_type == SweepType.ClusterSweepOnQubits:
+                coord_key = quantity + qubit
                 settable_values = samplespace[quantity][qubit]
             else:
-                continue
+                raise(ValueError)
+
             coord_attrs = {'qubit':qubit, 'long_name': f'{coord_key}', 'units': 'NA'}
-            #coords_dict[coord_key] = (quantity, settable_values, coord_attrs)
             coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
+
+        if sweep_type == SweepType.SPI_and_Cluster_Sweep:
+            for quantity in spi_sweep_quantities:
+                coupler = get_coupler_from_qubit(qubit)
+                coord_key = quantity + coupler
+                settable_values = spi_samplespace[quantity][coupler]
+
+
         partial_ds = xarray.Dataset(coords=coords_dict)
         dimensions = [len(samplespace[quantity][qubit]) for quantity in sweep_quantities]
+
         # TODO this is not safe:
         # This assumes that the inner settable variable is placed
         # at the first position in the samplespace
@@ -117,5 +142,4 @@ def save_dataset(result_dataset: xarray.Dataset, node, data_path: pathlib.Path):
     result_dataset = result_dataset.assign_attrs({'name': node.name, 'tuid': measurement_id})
     result_dataset_real = to_real_dataset(result_dataset)
     # to_netcdf doesn't like complex numbers, convert to real/imag to save:
-    #if 'multi' in node.name: breakpoint()
     result_dataset_real.to_netcdf(data_path / 'dataset.hdf5')
