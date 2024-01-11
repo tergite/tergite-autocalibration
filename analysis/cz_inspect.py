@@ -115,7 +115,6 @@ def inspect(data, q0, q1, savefig=None, fig_suffix="png"):
     axes[2].set_ylabel("Fringe frequency")
     freq = freq[cs > 1e-3]
     cs = cs[cs > 1e-3]
-    cs_df = np.diff(cs)
     if len(cs) < 5:
         axes[2].set_title("No enough available points.")
         print(f"No enough available points for {data.tuid}. Please resweep once again or enlarge sweep range.")
@@ -143,22 +142,33 @@ def inspect(data, q0, q1, savefig=None, fig_suffix="png"):
             freq_fit = np.linspace(freq[0], freq[-1], 1000)
             data_fit = fitfunc(p, freq_fit)
             f_opt = freq_fit[np.argmin(data_fit)]
-
             id_opt = np.argmin(np.abs(freq - f_opt))
-            xs = freq[id_opt - 3: id_opt + 4]
+            id_left = (id_opt - 3) if (id_opt - 3) > 0 else 0
+            id_right = (id_opt + 4) if (id_opt + 4) < len(freq) else len(freq)
+            xs = freq[id_left: id_right]
             p_guess = [p0_guess, freq[id_opt], cs[id_opt]]
             def fitfunc(p, xs):
                 return p[0] * (p[1] - xs)**2 + p[2]
             def errfunc(p):
-                return cs[id_opt - 3: id_opt + 4] - fitfunc(p, xs)
+                return cs[id_left: id_right] - fitfunc(p, xs)
             out = leastsq(errfunc, p_guess)
             p = out[0]
             axes[2].plot(xs, fitfunc(p, xs), 'm--', label="fine-fit")
             freq_fit = np.linspace(xs[0], xs[-1], 100)
             data_fit = fitfunc(p, freq_fit)
-            f_opt = freq_fit[np.argmin(data_fit)]
-            c_opt = fitfunc(p, f_opt)
+            id_min = np.argmin(cs[id_left: id_right])
+            print('np.min(cs):', np.min(cs))
+            print('np.min(data_fit):', np.min(data_fit))
+            if np.min(data_fit) > np.min(cs) and (id_left <= id_min + id_left <= id_right):
+                f_opt = freq[id_min + id_left]
+                c_opt = np.min(cs)
+                print("We use the raw measured data.")
+            else:
+                id_opt = np.argmin(data_fit)
+                c_opt = data_fit[id_opt]
+                f_opt = freq_fit[id_opt]
             gate_time = 1 / c_opt
+            axes[2].scatter(f_opt, c_opt, 15, 'r')
             axes[2].vlines(f_opt, np.min(cs), np.max(cs), 'g', linestyle='--', linewidth=1.5)
             axes[2].set_title(f"Result for {data.tuid}. The optimal frequency is {f_opt}.")
             res.set_result((f_opt, gate_time))

@@ -43,7 +43,7 @@ class SpiDAC():
         this_dac.current.vals = validators.Numbers(min_value=-3.1e-3, max_value=3.1e-3)
 
         this_dac.ramping_enabled(True)
-        this_dac.ramp_rate(10e-6)
+        this_dac.ramp_rate(20e-6)
         this_dac.ramp_max_step(dc_current_step)
 # for dac in spi.instrument_modules[spi_mod_name].submodules.values():
 # dac.current.vals = validators.Numbers(min_value=-2e-3, max_value=2e-3)

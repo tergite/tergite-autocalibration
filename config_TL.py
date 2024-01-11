@@ -1,9 +1,11 @@
 from importlib import reload
 import utilities.user_input as ui
+import numpy as np
 import workers.calibration_supervisor as supervisor
 import nodes
 from nodes import node as calibrate_nodes
 from nodes.graph import graph as cg
+import workers
 
 qubits_10 = [f"q{i}" for i in range(16, 26)]
 

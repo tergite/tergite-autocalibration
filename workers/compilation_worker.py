@@ -143,7 +143,8 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
                 value = {q: value for q in qubits}
             samplespace[key] = value
         elif key != "couplers":
-            print(f"{key} isn't one of the static parameters of {node_class}. \n We will ignore this parameter.")
+            static_parameters[key] = value
+            # print(f"{key} isn't one of the static parameters of {node_class}. \n We will ignore this parameter.")
 
     # TODO commenting this out because single shots has been fixed by Qblox
     # _____________________________________________________________________

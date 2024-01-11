@@ -4,7 +4,7 @@ Module containing a schedule class for Ramsey calibration. (1D parameter sweep, 
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler import Schedule
 from quantify_scheduler.operations.gate_library import Measure, Reset, X90, Rxy, X, CZ
-from quantify_scheduler.operations.pulse_library import DRAGPulse,SetClockFrequency,NumericalPulse,SoftSquarePulse,SquarePulse
+from quantify_scheduler.operations.pulse_library import DRAGPulse,SetClockFrequency,NumericalPulse,SoftSquarePulse,SquarePulse, ResetClockPhase
 from quantify_scheduler.resources import ClockResource
 from calibration_schedules.measurement_base import Measurement
 from utilities.extended_transmon_element import Measure_RO1
@@ -36,6 +36,7 @@ class CZ_chevron(Measurement):
             coupler: str,
             cz_pulse_frequencies_sweep: dict[str,np.ndarray],
             cz_pulse_durations: dict[str,np.ndarray],
+            cz_pulse_amplitude: float = 0.5,
             repetitions: int = 1024,
         ) -> Schedule:
 
@@ -114,13 +115,11 @@ class CZ_chevron(Measurement):
                     #     Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
                     #     ref_op=relaxation, ref_pt="end",
                     # )
-
-                cz_amplitude = 1
-
+                schedule.add(ResetClockPhase(clock=coupler+'.cz'))
                 cz = schedule.add(
                         SquarePulse(
                             duration=cz_duration,
-                            amp = cz_amplitude,
+                            amp=cz_pulse_amplitude,
                             port=cz_pulse_port,
                             clock=cz_clock,
                         ),

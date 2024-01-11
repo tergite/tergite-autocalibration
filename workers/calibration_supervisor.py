@@ -49,8 +49,9 @@ node_factory = NodeFactory()
 
 def set_module_att(cluster):
     # Flux lines
+    print("Set module attr")
     for module in cluster.modules[0:13]:
-        module.out1_att(40)
+        module.out1_att(36)
     # print(module.name + '_att:'+ str(module.out1_att()) + 'dB')
     # Readout lines
     # for module in cluster.modules[15:17]:
@@ -60,7 +61,7 @@ def set_module_att(cluster):
 if args.cluster_status == ClusterStatus.real:
     Cluster.close_all()
     clusterA = Cluster("clusterA", lokiA_IP)
-    # set_module_att(clusterA)
+    set_module_att(clusterA)
     lab_ic = InstrumentCoordinator('lab_ic')
     lab_ic.add_component(ClusterComponent(clusterA))
     lab_ic.timeout(222)
@@ -69,9 +70,6 @@ qubits = user_requested_calibration['all_qubits']
 couplers = user_requested_calibration['couplers']
 # bus_list = [[qubits[i], qubits[i+1]] for i in range(len(qubits) - 1)]
 # couplers = [bus[0] + '_' + bus[1] for bus in bus_list]
-#
-# bus_list = [ [qubits[i],qubits[i+1]] for i in range(len(qubits)-1) ]
-# couplers = [bus[0]+'_'+bus[1]for bus in bus_list]
 
 
 def calibrate_system():
@@ -215,6 +213,7 @@ def calibrate_node(node_label: str, **static_parameters):
     node = node_factory.create_node(node_label, qubits, **static_parameters)
     data_path = create_node_data_path(node)
 
+    #TODO precomiple should support support at least two types of samplespace: coarse and fine. 
     compiled_schedule = precompile(node, bin_mode=bin_mode, repetitions=repetitions)
     result_dataset = measure_node(
         node,

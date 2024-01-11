@@ -1,7 +1,6 @@
 from workers.hardware_utils import SpiDAC
 import redis
 
-spi = SpiDAC()
 redis_connection = redis.Redis(decode_responses=True)
 
 def show_coupler_parameters(couplers):
@@ -28,10 +27,12 @@ def set_coupler_current(coupler, parking_current=None):
     print(f"Parking current of {coupler} is ", parking_current)
 
 def apply_coupler_current(coupler):
-    spi.set_parking_current(coupler)
+    DAC = SpiDAC()
+    DAC.set_parking_current(coupler)
 
 def set_dacs_zero():
-    spi.set_dacs_zero()
+    DAC = SpiDAC()
+    DAC.set_dacs_zero()
 
 # spi.set_dac_current(dac, parking_current)
 
