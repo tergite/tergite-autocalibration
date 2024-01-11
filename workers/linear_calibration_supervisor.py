@@ -65,8 +65,6 @@ if args.cluster_status == ClusterStatus.real:
     lab_ic.add_component(ClusterComponent(clusterA))
     lab_ic.timeout(222)
 
-qubits = user_requested_calibration['all_qubits']
-couplers = user_requested_calibration['couplers']
 # bus_list = [[qubits[i], qubits[i+1]] for i in range(len(qubits) - 1)]
 # couplers = [bus[0] + '_' + bus[1] for bus in bus_list]
 #
@@ -74,10 +72,8 @@ couplers = user_requested_calibration['couplers']
 # couplers = [bus[0]+'_'+bus[1]for bus in bus_list]
 
 
-def calibrate_system():
+def calibrate_topo_sorted_path(topo_order):
     logger.info('Starting System Calibration')
-    target_node = user_requested_calibration['target_node']
-    topo_order = filtered_topological_order(target_node)
     N_qubits = len(qubits)
     draw_arrow_chart(f'Qubits: {N_qubits}', topo_order)
 
@@ -134,11 +130,6 @@ def calibrate_system():
                 redis_connection.hset(f"couplers:{coupler}", parameter_key, parameter_value)
 
 
-    if target_node == 'cz_chevron':
-        set_module_att(clusterA)
-        for coupler in couplers:
-            spi = SpiDAC()
-            spi.set_parking_current(coupler)
 
     for calibration_node in topo_order:
         inspect_node(calibration_node)
@@ -228,4 +219,18 @@ def calibrate_node(node_label: str):
 
 
 # main
-calibrate_system()
+if __name__ == "__main__":
+
+    qubits = user_requested_calibration['all_qubits']
+    couplers = user_requested_calibration['couplers']
+
+    target_node = user_requested_calibration['target_node']
+
+    if target_node == 'cz_chevron':
+        set_module_att(clusterA)
+        for coupler in couplers:
+            spi = SpiDAC()
+            spi.set_parking_current(coupler)
+
+    topo_order = filtered_topological_order(target_node)
+    calibrate_topo_sorted_path(topo_order)
