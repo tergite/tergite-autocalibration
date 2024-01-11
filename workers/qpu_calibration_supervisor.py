@@ -9,6 +9,7 @@ from workers.hardware_utils import SpiDAC, set_module_att
 import numpy as np
 from utilities.user_input import user_requested_calibration
 from workers.linear_calibration_supervisor import calibrate_topo_sorted_path
+from config_files.settings import lokiA_IP
 
 parking_currents = np.linspace(-1e-3, 1e-3, 5)
 
@@ -25,8 +26,10 @@ args = parser.parse_args()
 # Settings
 transmon_configuration = toml.load('./config_files/device_config.toml')
 
+
 qubits = user_requested_calibration['all_qubits']
 couplers = user_requested_calibration['couplers']
+target_node = user_requested_calibration['target_node']
 
 if args.cluster_status == ClusterStatus.real:
     Cluster.close_all()
@@ -38,15 +41,19 @@ if args.cluster_status == ClusterStatus.real:
 
 set_module_att(clusterA)
 
-for current in parking_currents:
-    for coupler in couplers:
-        spi = SpiDAC()
-        spi.set_parking_current(coupler)
+topo_order = filtered_topological_order(target_node)
+calibrate_topo_sorted_path(topo_order)
 
-    target_node = 'cz_chevron'
 
-    nullify_nodes_on_path(target_node)
-
-    topo_order = filtered_topological_order(target_node)
-    calibrate_topo_sorted_path(topo_order)
+# for current in parking_currents:
+#     for coupler in couplers:
+#         spi = SpiDAC()
+#         spi.set_parking_current(coupler)
+#
+#     target_node = 'cz_chevron'
+#
+#     nullify_nodes_on_path(target_node)
+#
+#     topo_order = filtered_topological_order(target_node)
+#     calibrate_topo_sorted_path(topo_order)
 
