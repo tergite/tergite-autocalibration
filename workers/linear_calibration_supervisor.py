@@ -11,7 +11,7 @@ from nodes.node import NodeFactory
 from workers.post_processing_worker import post_process
 from utilities.status import ClusterStatus
 from qblox_instruments import Cluster
-from workers.hardware_utils import SpiDAC
+from workers.hardware_utils import SpiDAC, set_module_att
 from workers.worker_utils import create_node_data_path
 
 from nodes.graph import filtered_topological_order
@@ -32,38 +32,7 @@ from quantify_scheduler.instrument_coordinator.components.qblox import ClusterCo
 colorama_init()
 
 
-redis_connection = redis.Redis(decode_responses=True)
-parser = argparse.ArgumentParser(prog='Tergite Automatic Calibration',)
-parser.add_argument(
-    '--d', dest='cluster_status',
-    action='store_const',
-    const=ClusterStatus.dummy, default=ClusterStatus.real
-)
-args = parser.parse_args()
-# Settings
-transmon_configuration = toml.load('./config_files/device_config.toml')
 
-
-node_factory = NodeFactory()
-
-
-def set_module_att(cluster):
-    # Flux lines
-    for module in cluster.modules[0:13]:
-        module.out1_att(38)
-    # print(module.name + '_att:'+ str(module.out1_att()) + 'dB')
-    # Readout lines
-    # for module in cluster.modules[15:17]:
-    #     module.out0_att(6)
-    # print(module.name + '_att:'+ str(module.out0_att()) + 'dB')
-
-if args.cluster_status == ClusterStatus.real:
-    Cluster.close_all()
-    clusterA = Cluster("clusterA", lokiA_IP)
-    # set_module_att(clusterA)
-    lab_ic = InstrumentCoordinator('lab_ic')
-    lab_ic.add_component(ClusterComponent(clusterA))
-    lab_ic.timeout(222)
 
 # bus_list = [[qubits[i], qubits[i+1]] for i in range(len(qubits) - 1)]
 # couplers = [bus[0] + '_' + bus[1] for bus in bus_list]
@@ -220,6 +189,28 @@ def calibrate_node(node_label: str):
 
 # main
 if __name__ == "__main__":
+
+    node_factory = NodeFactory()
+
+    redis_connection = redis.Redis(decode_responses=True)
+    parser = argparse.ArgumentParser(prog='Tergite Automatic Calibration',)
+    parser.add_argument(
+        '--d', dest='cluster_status',
+        action='store_const',
+        const=ClusterStatus.dummy, default=ClusterStatus.real
+    )
+    args = parser.parse_args()
+# Settings
+    transmon_configuration = toml.load('./config_files/device_config.toml')
+
+
+    if args.cluster_status == ClusterStatus.real:
+        Cluster.close_all()
+        clusterA = Cluster("clusterA", lokiA_IP)
+        # set_module_att(clusterA)
+        lab_ic = InstrumentCoordinator('lab_ic')
+        lab_ic.add_component(ClusterComponent(clusterA))
+        lab_ic.timeout(222)
 
     qubits = user_requested_calibration['all_qubits']
     couplers = user_requested_calibration['couplers']

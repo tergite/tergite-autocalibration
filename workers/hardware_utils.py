@@ -5,6 +5,16 @@ import redis
 
 redis_connection = redis.Redis(decode_responses=True)
 
+def set_module_att(cluster):
+
+    # Flux lines
+    for module in cluster.modules[0:13]:
+        module.out1_att(38)
+    # print(module.name + '_att:'+ str(module.out1_att()) + 'dB')
+    # Readout lines
+    # for module in cluster.modules[15:17]:
+    #     module.out0_att(6)
+    # print(module.name + '_att:'+ str(module.out0_att()) + 'dB')
 
 class SpiDAC():
     def __init__(self) -> None:
@@ -37,6 +47,8 @@ class SpiDAC():
         self.spi.add_spi_module(spi_mod_number, 'S4g')
         this_dac = self.spi.instrument_modules[spi_mod_name].instrument_modules[dac_name]
 # IMPORTANT: First we set the span and then with set the currents to zero
+# otherwise it jumps to theh min value : -20mA causing significant rise in the temperature
+# of the cryostat
         this_dac.span('range_min_bi')
         self.spi.set_dacs_zero()
         this_dac.current.vals = validators.Numbers(min_value=-3.1e-3, max_value=3.1e-3)
