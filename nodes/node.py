@@ -439,6 +439,14 @@ class CZ_Chevron_Node:
         self.analysis_obj = CZChevronAnalysis
         self.all_qubits = [q for bus in couplers for q in bus.split('_')]
 
+    @property
+    def spi_currents(self):
+        currents = {}
+        for coupler in self.couplers:
+            parking_current = float(redis_connection.hget(f'couplers:{coupler}', "parking_current"))
+            currents[coupler] = iter(parking_current + np.linspace(-1e-4, 1e-4, 5))
+        return currents
+
     def transition_frequency(self, coupler: str):
         coupled_qubits = coupler.split(sep='_')
         q1_f01 = float(redis_connection.hget(f'transmons:{coupled_qubits[0]}', "freq_01"))

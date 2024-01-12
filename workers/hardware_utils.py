@@ -60,15 +60,18 @@ class SpiDAC():
 # dac.current.vals = validators.Numbers(min_value=-2e-3, max_value=2e-3)
         return this_dac
 
-    def set_parking_current(self, coupler: str) -> None:
+    def set_parking_current(self, coupler: str, parking_current: float = None) -> None:
 
         dac = self.create_spi_dac(coupler)
 
-        if redis_connection.hexists(f'couplers:{coupler}', 'parking_current'):
-            parking_current = float(redis_connection.hget(f'couplers:{coupler}', 'parking_current'))
-        else:
-            raise ValueError('parking current is not present on redis')
+        if parking_current is None:
+            if redis_connection.hexists(f'couplers:{coupler}', 'parking_current'):
+                parking_current = float(redis_connection.hget(f'couplers:{coupler}', 'parking_current'))
+            else:
+                raise ValueError('parking current is not present on redis')
+
         dac.current(parking_current)
+
         while dac.is_ramping():
             print(f'ramping {dac.current()}')
             time.sleep(1)

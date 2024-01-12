@@ -10,6 +10,8 @@ import numpy as np
 import redis
 import matplotlib
 from pathlib import Path
+
+from utilities.status import DataStatus
 matplotlib.use('tkagg')
 set_datadir('.')
 redis_connection = redis.Redis(decode_responses=True)
@@ -30,6 +32,15 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
     if node != 'tof':
         analysis.node_result.update({'measurement_dataset':result_dataset.to_dict()})
 
+    if all(analysis.node_statuses.values()):
+        analysis.data_status = DataStatus.in_spec
+    else:
+        analysis.data_status = DataStatus.out_of_spec
+
+    return analysis.data_status
+
+
+
 
 class BaseAnalysis():
     def __init__(self, result_dataset: xr.Dataset, data_path: Path):
@@ -43,18 +54,23 @@ class BaseAnalysis():
         self.column_grid = 5
         self.rows = int(np.ceil((self.n_vars ) / self.column_grid))
 
+        # TODO What does this do, when the MSS is not connected?
         self.node_result = {}
+
+        self.node_statuses = {}
+
         self.fig, self.axs = plt.subplots(
             nrows=self.rows,
             ncols=np.min((self.n_coords, self.column_grid)),
             squeeze=False,
             figsize=(self.column_grid*5,self.rows*5)
         )
+
         self.qoi: list
+        self.data_status: DataStatus
 
     def update_redis_trusted_values(self, node: str, this_element: str, transmon_parameters: list):
         for i,transmon_parameter in enumerate(transmon_parameters):
-            # TODO this_qubit -> this_element, (transmons can be both qubits and couplers)
             redis_connection.hset(f"transmons:{this_element}", f"{transmon_parameter}", self.qoi[i])
             redis_connection.hset(f"cs:{this_element}", node, 'calibrated')
             self.node_result.update({this_element: self.qoi[i]})
@@ -89,6 +105,12 @@ class Multiplexed_Analysis(BaseAnalysis):
             node_analysis = node.analysis_obj(ds, **kw_args)
             self.qoi = node_analysis.run_fitting()
 
+            if self.qoi is not None:
+                analysis_success = True
+            else:
+                analysis_success = True
+
+            self.node_statuses.update({ this_qubit: analysis_success} )
             node_analysis.plotter(this_axis)
 
             # TODO temporary hack:
@@ -99,10 +121,10 @@ class Multiplexed_Analysis(BaseAnalysis):
 
             handles, labels = this_axis.get_legend_handles_labels()
 
-            if node.name == 'T1':
-                T1_micros = self.qoi[0] * 1e6
-                patch2 = mpatches.Patch(color='blue', label=f'T1 = {T1_micros:.2f}')
-                handles.append(patch2)
+            # if node.name == 'T1':
+            #     T1_micros = self.qoi[0] * 1e6
+            #     patch2 = mpatches.Patch(color='blue', label=f'T1 = {T1_micros:.2f}')
+            #     handles.append(patch2)
             patch = mpatches.Patch(color='red', label=f'{this_qubit}')
             handles.append(patch)
             this_axis.set(title=None)

@@ -28,7 +28,7 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'rabi_oscillations',
+    'target_node': 'cz_chevron',
     'all_qubits': qubits,
     'couplers': couplers,
     # 'node_dictionary' : {'coupled_qubits': ['q21','q22']},
