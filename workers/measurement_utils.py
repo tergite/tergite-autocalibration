@@ -101,7 +101,9 @@ class CoupledQubitsMeasurement:
             self.set_current(current)
 
             raw_dataset = execute_schedule(compiled_schedule, ic)
-            dataset = configure_dataset(raw_dataset, node.samplespace)
+
+            # breakpoint()
+            dataset = configure_dataset(node.name, raw_dataset, node.samplespace)
 
             dataset = dataset.expand_dims(dim='dc_currents')
             dataset['dc_currents'] = [current]

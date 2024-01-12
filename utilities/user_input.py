@@ -1,10 +1,12 @@
+qubits = ['q11','q12','q13','q14','q15']
 # qubits = ['q12','q13','q14','q15']
-# qubits = ['q13','q14']
-qubits = ['q14','q15']
 # qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
 # qubits = ['q16', 'q17', 'q19', 'q21', 'q22', 'q23', 'q25']
 #qubits = [ 'q22','q23', 'q25']
 # qubits = [ 'q21','q22']
+# qubits = ['q11','q12']
+# couplers = ['q11_q12']
+# qubits = ['q14','q15']
 couplers = ['q14_q15']
 
 '''
@@ -29,13 +31,14 @@ node reference
   motzoi_parameter
   n_rabi_oscillations
   T1
+  T2
   cz_chevron
   cz_calibration
   cz_calibration_ssro
 '''
 
 user_requested_calibration = {
-    'target_node': 'cz_calibration_ssro',
+    'target_node': 'T2',
     'all_qubits': qubits,
     'couplers': couplers,
     # 'node_dictionary' : {'coupled_qubits': ['q21','q22']},
