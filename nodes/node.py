@@ -6,7 +6,7 @@ from calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
 # from calibration_schedules.two_tone_multidim import Two_Tones_Multidim
 from calibration_schedules.two_tone_multidim_loop_reversed import Two_Tones_Multidim
 from calibration_schedules.rabi_oscillations import Rabi_Oscillations
-from calibration_schedules.T1 import T1,T2
+from calibration_schedules.T1 import T1,T2, T2Echo
 from calibration_schedules.XY_crosstalk import XY_cross
 from calibration_schedules.punchout import Punchout
 from calibration_schedules.ramsey_fringes import Ramsey_fringes
@@ -40,7 +40,7 @@ from analysis.rabi_analysis import RabiAnalysis
 from analysis.punchout_analysis import PunchoutAnalysis
 from analysis.ramsey_analysis import RamseyAnalysis
 from analysis.tof_analysis import analyze_tof
-from analysis.T1_analysis import T1Analysis, T2Analysis
+from analysis.T1_analysis import T1Analysis, T2Analysis, T2EchoAnalysis
 from analysis.coupler_spectroscopy_analysis import CouplerSpectroscopyAnalysis
 from analysis.cz_chevron_analysis import CZChevronAnalysis,CZChevronAnalysisReset
 from analysis.cz_calibration_analysis import CZCalibrationAnalysis, CZCalibrationSSROAnalysis
@@ -103,6 +103,7 @@ class NodeFactory:
             'coupler_resonator_spectroscopy': Coupler_Resonator_Spectroscopy_Node,
             'T1': T1_Node,
             'T2': T2_Node,
+            'T2_echo': T2_Echo_Node,
             'reset_chevron': Reset_Chevron_Node,
             'cz_chevron': CZ_Chevron_Node,
             'cz_calibration': CZ_Calibration_Node,
@@ -278,7 +279,7 @@ class Ramsey_Fringes_12_Node:
                 qubit: np.arange(4e-9, 2048e-9, 8 * 8e-9) for qubit in self.all_qubits
             },
             'artificial_detunings': {
-                qubit: np.arange(-2.1, 2.1, 0.8) * 1e6 for qubit in self.all_qubits
+                qubit: np.arange(-1.5, 1.5, 0.6) * 1e6 for qubit in self.all_qubits
             },
         }
         return cluster_samplespace
@@ -332,7 +333,7 @@ class T1_Node:
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'delays': {qubit : np.arange(52e-9,250e-6,4e-6) for qubit in self.all_qubits}
+            'delays': {qubit : 8e-9 +  np.arange(0,300e-6,6e-6) for qubit in self.all_qubits}
         }
         return cluster_samplespace
 
@@ -349,7 +350,24 @@ class T2_Node:
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'delays': {qubit : np.arange(52e-9,250e-6,4e-6) for qubit in self.all_qubits}
+            'delays': {qubit : 8e-9 + np.arange(0,100e-6,1e-6) for qubit in self.all_qubits}
+        }
+        return cluster_samplespace
+
+class T2_Echo_Node:
+    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
+        self.name = name
+        self.all_qubits = all_qubits
+        self.node_dictionary = kwargs
+        self.redis_field = ['t2_time']
+        self.qubit_state = 0
+        self.measurement_obj = T2Echo
+        self.analysis_obj = T2EchoAnalysis
+
+    @property
+    def samplespace(self):
+        cluster_samplespace = {
+            'delays': {qubit : 8e-9 + np.arange(0,300e-6,6e-6) for qubit in self.all_qubits}
         }
         return cluster_samplespace
 

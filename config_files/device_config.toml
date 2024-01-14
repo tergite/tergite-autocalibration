@@ -30,6 +30,7 @@ randomized_benchmarking.fidelity = nan
 state_discrimination.discriminator = nan
 T1.t1_time = nan
 T2.t2_time = nan
+T2_echo.t2_echo_time = nan
 XY_crosstalk.selectivity = nan
 punchout.ro_ampl = nan
 reset_chevron.reset_amplitude_qc = nan

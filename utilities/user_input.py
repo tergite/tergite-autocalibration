@@ -32,13 +32,14 @@ node reference
   n_rabi_oscillations
   T1
   T2
+  T2_echo
   cz_chevron
   cz_calibration
   cz_calibration_ssro
 '''
 
 user_requested_calibration = {
-    'target_node': 'T2',
+    'target_node': 'T2_echo',
     'all_qubits': qubits,
     'couplers': couplers,
     # 'node_dictionary' : {'coupled_qubits': ['q21','q22']},

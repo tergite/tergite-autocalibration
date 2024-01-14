@@ -26,6 +26,7 @@ graph_dependencies = [
     ('ro_amplitude_optimization', 'state_discrimination'),
     ('rabi_oscillations', 'T1'),
     ('T1', 'T2'),
+    ('T2', 'T2_echo'),
     ('resonator_spectroscopy_1', 'qubit_12_spectroscopy_pulsed'),
     ('resonator_spectroscopy_1', 'qubit_12_spectroscopy_multidim'),
     # ('qubit_12_spectroscopy_pulsed', 'rabi_oscillations_12'),
