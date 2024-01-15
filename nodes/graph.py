@@ -35,7 +35,6 @@ graph_dependencies = [
     ('ramsey_correction_12', 'resonator_spectroscopy_2'),
     ('ramsey_correction_12', 'ro_frequency_optimization_gef'),
     ('rabi_oscillations_12', 'resonator_spectroscopy_2'),
-    #('qubit_12_spectroscopy_multidim', 'cz_chevron'),
     ('qubit_12_spectroscopy_multidim', 'cz_chevron'),
     # ('qubit_12_spectroscopy_pulsed', 'cz_calibration'),
     # ('coupler_spectroscopy', 'cz_chevron'),

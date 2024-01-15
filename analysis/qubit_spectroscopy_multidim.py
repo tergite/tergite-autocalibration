@@ -117,7 +117,7 @@ class QubitSpectroscopyMultidim():
         s = d/mdev if mdev else np.zeros(len(d))
         return x[s<m]
 
-    def has_peak(self, x, prom_coef: float = 10, wid_coef: float = 2.4, outlier_median: float = 3.):
+    def has_peak(self, x, prom_coef: float = 7, wid_coef: float = 2.4, outlier_median: float = 3.):
         # Determines if the data contains one distinct peak or only noise
         x_filtered = self.reject_outliers(x, outlier_median)
         self.filtered_std = np.std(x_filtered)

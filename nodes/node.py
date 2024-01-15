@@ -62,8 +62,8 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 
 def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
-    qub_spec_samples = 101
-    sweep_range = 6.5e6
+    qub_spec_samples = 81
+    sweep_range = 5.5e6
     if transition == '01':
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition == '12':
@@ -199,7 +199,7 @@ class Qubit_01_Spectroscopy_Multidim_Node:
     def samplespace(self):
         cluster_samplespace = {
             'spec_pulse_amplitudes': {
-                 qubit: np.linspace(3e-4, 9e-4, 9) for qubit in self.all_qubits
+                 qubit: np.linspace(3e-4, 9e-4, 5) for qubit in self.all_qubits
             },
             'spec_frequencies': {
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
@@ -438,14 +438,8 @@ class CZ_Chevron_Node:
         self.measurement_obj = CZ_chevron
         self.analysis_obj = CZChevronAnalysis
         self.all_qubits = [q for bus in couplers for q in bus.split('_')]
+        self.coupler_samplespace = self.samplespace
 
-    @property
-    def spi_currents(self):
-        currents = {}
-        for coupler in self.couplers:
-            parking_current = float(redis_connection.hget(f'couplers:{coupler}', "parking_current"))
-            currents[coupler] = iter(parking_current + np.linspace(-1e-4, 1e-4, 5))
-        return currents
 
     def transition_frequency(self, coupler: str):
         coupled_qubits = coupler.split(sep='_')
@@ -470,6 +464,7 @@ class CZ_Chevron_Node:
             },
         }
         return cluster_samplespace
+
 
 class CZ_Calibration_Node:
     def __init__(self, name: str, all_qubits: list[str], ** kwargs):

@@ -109,6 +109,7 @@ def precompile(node):
     else:
         node_class = node.measurement_obj(transmons, node.qubit_state)
 
+
     schedule_function = node_class.schedule_function
     static_parameters = node_class.static_kwargs
 

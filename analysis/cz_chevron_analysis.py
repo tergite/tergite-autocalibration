@@ -59,6 +59,7 @@ class CZChevronAnalysis():
         data_var = list(dataset.data_vars.keys())[0]
         self.S21 = dataset[data_var].values
         self.fit_results = {}
+        self.coupler = dataset[data_var].attrs['coupler']
         self.qubit = dataset[data_var].attrs['qubit']
         dataset[f'y{self.qubit}'].values = np.abs(self.S21)
         self.dataset = dataset
@@ -66,11 +67,11 @@ class CZChevronAnalysis():
     def run_fitting(self):
         # return [0,0]
         self.testing_group = 0
-        self.freq = self.dataset[f'cz_pulse_frequencies{self.qubit}'].values
-        if f'cz_pulse_amplitudes{self.qubit}' in self.dataset.coords:
-            self.independent_coord = f'cz_pulse_amplitudes{self.qubit}'
-        elif f'cz_pulse_durations{self.qubit}' in self.dataset.coords:
-            self.independent_coord = f'cz_pulse_durations{self.qubit}'
+        self.freq = self.dataset[f'cz_pulse_frequencies{self.coupler}'].values
+        if f'cz_pulse_amplitudes{self.coupler}' in self.dataset.coords:
+            self.independent_coord = f'cz_pulse_amplitudes{self.coupler}'
+        elif f'cz_pulse_durations{self.coupler}' in self.dataset.coords:
+            self.independent_coord = f'cz_pulse_durations{self.coupler}'
         else:
             raise ValueError('Invalid Coord')
         self.amp = self.dataset[self.independent_coord].values
