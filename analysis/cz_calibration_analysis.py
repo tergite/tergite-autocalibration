@@ -143,7 +143,6 @@ class CZCalibrationAnalysis():
             name = 'CZ'
         x = range(len(label))
         colors = plt.get_cmap('RdBu_r')(np.linspace(0.2, 0.8, len(x)))
-
         for index,magnitude in enumerate(self.magnitudes):
             axis.plot(self.amp,magnitude,'.',c = colors[index])
             axis.plot(self.fit_amplitudes,self.fit_ys[index],'-',c = colors[index],label = label[index])
@@ -201,8 +200,8 @@ class CZCalibrationSSROAnalysis():
             cm_norm = confusion_matrix(y,y_pred,normalize='true')
             cm_inv = inv(cm_norm)
             assignment = np.trace(cm_norm)/len(self.calibs)
-            # print(f'{assignment = }')
-            # print(f'{cm_norm = }')
+            print(f'{assignment = }')
+            print(f'{cm_norm = }')
             # disp = ConfusionMatrixDisplay(confusion_matrix=cm_norm)
             # disp.plot()
             # plt.show()

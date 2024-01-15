@@ -54,7 +54,7 @@ def set_module_att(cluster):
     print(module.name + '_att:'+ str(module.out1_att()) + 'dB')
     # Readout lines
     for module in cluster.modules[15:17]:
-        module.out0_att(16)
+        module.out0_att(6)
     print(module.name + '_att:'+ str(module.out0_att()) + 'dB')
 
 if args.cluster_status == ClusterStatus.real:
@@ -147,7 +147,7 @@ def calibrate_system():
 def inspect_node(node: str):
     logger.info(f'Inspecting node {node}')
 
-    if node in ['coupler_spectroscopy']:
+    if node in ['coupler_spectroscopy','cz_chevron','cz_calibration','cz_calibration_ssro','cz_dynamic_phase']:
         coupler_statuses = [redis_connection.hget(f"cs:{coupler}", node) == 'calibrated' for coupler in couplers]
         is_node_calibrated = all(coupler_statuses)
     else:
@@ -167,7 +167,7 @@ def inspect_node(node: str):
     #Check Redis if node is calibrated
     status = DataStatus.undefined
 
-    if node in ['coupler_spectroscopy']:
+    if node in ['coupler_spectroscopy','cz_chevron','cz_calibration','cz_calibration_ssro','cz_dynamic_phase']:
         for coupler in couplers:
             # the calibrated, not_calibrated flags may be not necessary,
             # just store the DataStatus on Redis

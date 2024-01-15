@@ -31,5 +31,5 @@ class NRabiAnalysis():
         qubit = self.qubit
 
 
-        datarray.plot(ax=axis, x=f'mw_amplitudes_sweep{qubit}')
-        axis.axvline(self.optimal_amp180-fetch_redis_params('mw_amp180',self.qubit), c='red', lw=4)
+        datarray.plot(ax=axis, x=f'mw_amplitudes_sweep{qubit}',cmap='RdBu_r')
+        axis.axvline(self.optimal_amp180-fetch_redis_params('mw_amp180',self.qubit), c='k', lw=4,linestyle ='--')

@@ -144,7 +144,7 @@ class Reset_chevron_dc(Measurement):
                         # schedule.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
                         # schedule.add(Rxy_12(this_qubit))
 
-                buffer = schedule.add(IdlePulse(12e-9))
+                buffer = schedule.add(IdlePulse(4e-9))
                 schedule.add(ResetClockPhase(clock=coupler+'.cz'))
                 # cz = schedule.add(DRAGPulse(
                 #             duration=cz_duration,
@@ -184,7 +184,7 @@ class Reset_chevron_dc(Measurement):
                 # else:
                 #     schedule.add(IdlePulse(20e-9))
 
-                buffer = schedule.add(IdlePulse(12e-9))
+                buffer = schedule.add(IdlePulse(4e-9))
 
                 for this_qubit in qubits:
                     schedule.add(
@@ -422,12 +422,8 @@ class CZ_chevron(Measurement):
         redis_connection = redis.Redis(decode_responses=True)
         cz_pulse_amplitude = {}
         for this_coupler in couplers_list:
-            qubits = this_coupler.split(sep='_')
-            cz_amplitude_values = []
-            for qubit in qubits: 
-                redis_config = redis_connection.hgetall(f"transmons:{qubit}")
-                cz_amplitude_values.append(float(redis_config['cz_pulse_amplitude']))
-            cz_pulse_amplitude[this_coupler] = cz_amplitude_values[0]
+            redis_config = redis_connection.hgetall(f"couplers:{this_coupler}")
+            cz_pulse_amplitude[this_coupler] = float(redis_config['cz_pulse_amplitude'])
         print(f'{cz_pulse_amplitude = }')
 
         schedule.add_resource(
@@ -454,7 +450,9 @@ class CZ_chevron(Measurement):
                     schedule.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
 
                 # cz_amplitude = 0.5
-                buffer = schedule.add(IdlePulse(12e-9))
+                buffer = schedule.add(IdlePulse(4e-9))
+            
+                schedule.add(ResetClockPhase(clock=coupler+'.cz'))
 
                 cz = schedule.add(
                         SoftSquarePulse(
@@ -465,12 +463,12 @@ class CZ_chevron(Measurement):
                         ),
                     )
                 
-                buffer = schedule.add(IdlePulse(12e-9))
+                buffer = schedule.add(IdlePulse(4e-9))
 
                 for this_qubit in qubits:
                     schedule.add(
                         Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
-                        ref_op=cz,rel_time=12e-9, ref_pt="end",
+                        ref_op=buffer,rel_time=4e-9, ref_pt="end",
                     )
         return schedule
 

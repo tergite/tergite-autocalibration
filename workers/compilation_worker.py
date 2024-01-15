@@ -104,7 +104,7 @@ def precompile(node):
     #    couplers[bus[0]+'_'+bus[1]] = coupler
 
     node_class = node.measurement_obj(transmons, node.qubit_state)
-    if node.name in ['cz_chevron','cz_calibration','cz_calibration_ssro']:
+    if node.name in ['cz_chevron','cz_calibration','cz_calibration_ssro','cz_dynamic_phase']:
         coupler = node.coupler
         node_class = node.measurement_obj(transmons, coupler, node.qubit_state)
     if node.name in ['ro_amplitude_optimization_gef','cz_calibration_ssro']:

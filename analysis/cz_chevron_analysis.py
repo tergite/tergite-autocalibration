@@ -430,8 +430,8 @@ class CZChevronAnalysis():
         # cbar.set_label('|2>-state Population', labelpad=10)
         axis.set_xlim([self.freq[0],self.freq[-1]])
         axis.set_ylim([self.amp[0],self.amp[-1]])
-        axis.set_ylabel('Parametric Drive Durations (s)')
-        axis.set_xlabel('Frequency Detuning (Hz)')
+        axis.set_ylabel('Drive Durations (s)')
+        axis.set_xlabel('Drive Frequency (Hz)')
         axis.set_title(f'CZ Chevron - Qubit {self.qubit[1:]}')
 
         # self.fig.show()

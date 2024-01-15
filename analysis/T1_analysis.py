@@ -129,7 +129,7 @@ class T2Analysis():
         return [self.T2_time]
 
     def plotter(self,ax):
-        ax.plot(self.fit_delays , self.fit_y,'r-',lw=3.0,label = 'T2 = %.2f us'% (self.T2_time*1e6))
+        ax.plot(self.fit_delays , self.fit_y,'r-',lw=3.0)
         ax.plot(self.independents, self.magnitudes,'bo-',ms=3.0)
         ax.set_title(f'T2 experiment for {self.qubit}')
         ax.set_xlabel('Delay (s)')
@@ -170,7 +170,7 @@ class T2EchoAnalysis():
         return [self.T2_Echo_time]
 
     def plotter(self,ax):
-        ax.plot( self.fit_delays , self.fit_y,'r-',lw=3.0,label = 'T2 Echo = %.2f us'% (self.T2_Echo_time*1e6))
+        ax.plot( self.fit_delays , self.fit_y,'r-',lw=3.0)
         ax.plot(self.independents, self.magnitudes,'bo-',ms=3.0)
         ax.set_title(f'T2 Echo experiment for {self.qubit}')
         ax.set_xlabel('Delay (s)')

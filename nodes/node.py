@@ -20,7 +20,7 @@ from calibration_schedules.n_rabi_oscillations import N_Rabi_Oscillations
 # from calibration_schedules.cz_chevron import CZ_chevron
 
 from calibration_schedules.cz_chevron_reversed import CZ_chevron, Reset_chevron_dc
-from calibration_schedules.cz_calibration import CZ_calibration, CZ_calibration_SSRO
+from calibration_schedules.cz_calibration import CZ_calibration, CZ_calibration_SSRO,CZ_dynamic_phase
 
 from analysis.motzoi_analysis import MotzoiAnalysis
 from analysis.resonator_spectroscopy_analysis import (
@@ -56,7 +56,7 @@ def resonator_samples(qubit: str) -> np.ndarray:
     res_spec_samples = 51
     sweep_range = 1.2e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
-    min_freq = VNA_frequency - sweep_range / 2
+    min_freq = VNA_frequency - sweep_range / 1.5
     max_freq = VNA_frequency + sweep_range / 2
     return np.linspace(min_freq, max_freq, res_spec_samples)
 
@@ -525,7 +525,7 @@ class RO_amplitude_optimization_gef_Node:
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'ro_amplitudes': {qubit : np.linspace(0.001,0.101,31) for qubit in self.all_qubits}
+            'ro_amplitudes': {qubit : np.linspace(0.001,0.151,31) for qubit in self.all_qubits}
         }
         return cluster_samplespace
 
@@ -617,10 +617,10 @@ class CZ_Chevron_Node:
 
             # For CZ gate
             'cz_pulse_durations': {
-                qubit: 100e-9+np.arange(0e-9, 30*20e-9,20e-9) for qubit in self.coupled_qubits
+                qubit: 4e-9+np.arange(0e-9, 30*16e-9,16e-9) for qubit in self.coupled_qubits
             },
             'cz_pulse_frequencies_sweep': {
-                qubit: np.linspace(-4e6, 4e6, 15) + self.ac_freq for qubit in self.coupled_qubits
+                qubit: np.linspace(-6e6, 6e6, 13) + self.ac_freq for qubit in self.coupled_qubits
             },
         }
         return cluster_samplespace
@@ -697,37 +697,45 @@ class CZ_Calibration_SSRO_Node:
         return cluster_samplespace
 
 class CZ_Dynamic_Phase_Node:
-    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
+    def __init__(self, name: str, all_qubits: list[str], couplers: list[str], ** kwargs):
         self.name = name
         self.all_qubits = all_qubits
+        self.all_couplers = couplers
         self.node_dictionary = kwargs
+        self.coupler = couplers[0]
+        print(couplers)
+        self.coupled_qubits = couplers[0].split(sep='_')
+        print(self.coupled_qubits)
+        # self.node_dictionary = kwargs
         self.redis_field = ['cz_phase']
-        self.qubit_state = 0
-        self.measurement_obj = CZ_calibration
+        self.qubit_state = 2
+        self.testing_group = 0 # The edge group to be tested. 0 means all edges.
+        self.dynamic = True
+        self.measurement_obj = CZ_dynamic_phase
         self.analysis_obj = CZCalibrationAnalysis
-        self.validate()
+    #     self.validate()
 
-    def validate(self):
-        if 'coupled_qubits' not in self.node_dictionary:
-            error_msg = 'coupled_qubits not in job dictionary\n'
-            suggestion = 'job dictionary should look like:\n {"coupled_qubits": ["q1","q2"]}'
-            raise ValueError(error_msg + suggestion)
-        else:
-            coupled_qubits = self.node_dictionary['coupled_qubits']
-            if len(coupled_qubits) != 2:
-                raise ValueError('coupled qubits must be a list with 2 elements')
-            elif not all([q in self.all_qubits for q in coupled_qubits]):
-                raise ValueError('coupled qubits must be a subset of all calibrated qubits')
-            else:
-                self.coupled_qubits = coupled_qubits
-                self.coupler = coupled_qubits[0] + '_' + coupled_qubits[1]
-                self.all_qubits = coupled_qubits
+    # def validate(self):
+    #     if 'coupled_qubits' not in self.node_dictionary:
+    #         error_msg = 'coupled_qubits not in job dictionary\n'
+    #         suggestion = 'job dictionary should look like:\n {"coupled_qubits": ["q1","q2"]}'
+    #         raise ValueError(error_msg + suggestion)
+    #     else:
+    #         coupled_qubits = self.node_dictionary['coupled_qubits']
+    #         if len(coupled_qubits) != 2:
+    #             raise ValueError('coupled qubits must be a list with 2 elements')
+    #         elif not all([q in self.all_qubits for q in coupled_qubits]):
+    #             raise ValueError('coupled qubits must be a subset of all calibrated qubits')
+    #         else:
+    #             self.coupled_qubits = coupled_qubits
+    #             self.coupler = coupled_qubits[0] + '_' + coupled_qubits[1]
+    #             self.all_qubits = coupled_qubits
 
     @property
     def samplespace(self):
         cluster_samplespace = {
+            'ramsey_phases': {qubit: np.linspace(0, 2*360, 31) for qubit in  self.coupled_qubits},
             'control_ons': {qubit: [False,True] for qubit in  self.coupled_qubits},
-            'ramsey_phases': {qubit: np.linspace(0, 2*360, 51) for qubit in  self.coupled_qubits},
         }
         return cluster_samplespace
 

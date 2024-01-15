@@ -17,7 +17,7 @@ graph_dependencies = [
     ('resonator_spectroscopy', 'qubit_01_spectroscopy_multidim'),
     ('qubit_01_spectroscopy_pulsed', 'rabi_oscillations'),
     ('qubit_01_spectroscopy_multidim', 'rabi_oscillations'),
-    ('rabi_oscillations', 'ramsey_correction'),
+    # ('rabi_oscillations', 'ramsey_correction'),
     # ('ramsey_correction', 'ro_frequency_optimization'),
     ('ramsey_correction', 'motzoi_parameter'),
     ('motzoi_parameter', 'n_rabi_oscillations'),
@@ -27,6 +27,7 @@ graph_dependencies = [
     ('rabi_oscillations', 'T1'),
     ('T1', 'T2'),
     ('T2', 'T2_echo'),
+    ('T2_echo', 'ramsey_correction'),
     ('resonator_spectroscopy_1', 'qubit_12_spectroscopy_pulsed'),
     ('resonator_spectroscopy_1', 'qubit_12_spectroscopy_multidim'),
     # ('qubit_12_spectroscopy_pulsed', 'rabi_oscillations_12'),
@@ -42,6 +43,7 @@ graph_dependencies = [
     # ('qubit_12_spectroscopy_multidim', 'cz_calibration'),
     # ('cz_calibration', 'cz_calibration_ssro'),
     ('cz_calibration', 'cz_calibration_ssro'),
+    ('cz_calibration', 'cz_dynamic_phase')
 ]
 
 graph.add_edges_from(graph_dependencies)
@@ -51,12 +53,15 @@ graph.add_node('tof', type='refine')
 graph.add_node('punchout')
 graph.add_node('qubit_01_spectroscopy_pulsed')
 graph.add_node('qubit_01_spectroscopy_multidim')
-# graph.add_node('ramsey_correction', type='refine')
-# graph.add_node('motzoi_parameter', type='refine')
-# graph.add_node('n_rabi_oscillations', type='refine')
-# graph.add_node('ramsey_correction_12', type='refine')
-# graph.add_node('ro_frequency_optimization_gef', type='refine')
-# graph.add_node('ro_amplitude_optimization_gef', type='refine')
+graph.add_node('T1', type='refine')
+graph.add_node('T2', type='refine')
+graph.add_node('T2_echo', type='refine')
+graph.add_node('ramsey_correction', type='refine')
+graph.add_node('motzoi_parameter', type='refine')
+graph.add_node('n_rabi_oscillations', type='refine')
+graph.add_node('ramsey_correction_12', type='refine')
+graph.add_node('ro_frequency_optimization_gef', type='refine')
+graph.add_node('ro_amplitude_optimization_gef', type='refine')
 
 # for nodes that perform the same measurement,
 # assign a weight to the corresponding edge to sort them

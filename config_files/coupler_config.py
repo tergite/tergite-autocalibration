@@ -28,9 +28,9 @@ edge_group = {'q11_q12':1,'q12_q13':2,'q13_q14':1,'q14_q15':2,
 qubit_types = {}
 for qubit in all_qubits:
     if int(qubit[1:]) % 2 == 0:
-        # Odd qubits are target qubits
+        # Even qubits are target qubits
         qubit_type = 'Target'
     else:
-        #Even qubits are control qubits
+        # Odd qubits are control qubits
         qubit_type = 'Control'
     qubit_types[qubit] = qubit_type

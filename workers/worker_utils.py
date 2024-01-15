@@ -34,10 +34,11 @@ def configure_dataset(
         qubit_states = [0,1]
     elif name in ['cz_calibration_ssro']:
         qubit_states = ['c0','c1','c2'] # for calibration points
-
-    for key in keys:
-        key_indx = key%n_qubits # this is to handle ro_opt_frequencies node where
+    key_list = [key for key in raw_ds.data_vars.keys()]
+    for idx,key in enumerate(keys):
+        key_indx = idx%n_qubits # this is to handle ro_opt_frequencies node where
         # there are 2 or 3 measurements (i.e 2 or 3 Datarrays) for each qubit
+        # and also start from 0
         coords_dict = {}
         qubit = qubits[key_indx]
         dimensions = [len(samplespace[quantity][qubit]) for quantity in sweep_quantities]
@@ -50,7 +51,7 @@ def configure_dataset(
             dimensions[1] += len(qubit_states) # for calibration points
             shots = int(len(raw_ds[key].values[0])/(np.product(dimensions)))
             coords_dict['shot'] = ('shot',range(shots),{'qubit':qubit, 'long_name': 'shot', 'units': 'NA'})
-
+ 
         for quantity in sweep_quantities :
             coord_key = quantity+qubit
             if qubit in samplespace[quantity]:
@@ -78,7 +79,6 @@ def configure_dataset(
         elif name in ['cz_calibration_ssro']:
             reshaping = np.array([shots])
             reshaping = np.append(reshaping,dimensions)
-            # breakpoint()
             data_values = raw_ds[key].values.reshape(*reshaping)
         else:
             data_values = raw_ds[key].values.reshape(*reshaping)
@@ -98,6 +98,7 @@ def configure_dataset(
         # breakpoint()
         partial_ds[f'y{qubit}{qubit_state}'] = (tuple(coords_dict.keys()), data_values, attributes)
         dataset = xarray.merge([dataset,partial_ds])
+        # breakpoint()
 
     return dataset
 

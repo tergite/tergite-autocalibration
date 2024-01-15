@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import xarray as xr
 from analysis.tof_analysis import analyze_tof
 from quantify_core.data.handling import set_datadir
+from config_files.coupler_config import qubit_types
 # from quantify_core.analysis.calibration import rotate_to_calibrated_axis
 import matplotlib.patches as mpatches
 import numpy as np
@@ -54,10 +55,13 @@ class BaseAnalysis():
     def update_redis_trusted_values(self, node: str, this_element: str, transmon_parameters: list):
         for i,transmon_parameter in enumerate(transmon_parameters):
             # TODO this_qubit -> this_element, (transmons can be both qubits and couplers)
-            redis_connection.hset(f"transmons:{this_element}", f"{transmon_parameter}", self.qoi[i])
+            if '_' in this_element:
+                name = 'couplers'
+            else:
+                name = 'transmons'
+            redis_connection.hset(f"{name}:{this_element}", f"{transmon_parameter}", self.qoi[i])
             redis_connection.hset(f"cs:{this_element}", node, 'calibrated')
             self.node_result.update({this_element: self.qoi[i]})
-
 
 class Multiplexed_Analysis(BaseAnalysis):
     def __init__(self, result_dataset: xr.Dataset, node, data_path: Path):
@@ -92,16 +96,18 @@ class Multiplexed_Analysis(BaseAnalysis):
             node_analysis.plotter(this_axis)
 
             # TODO temporary hack:
-            if node.name == ['coupler_spectroscopy','cz_chevron','cz_calibration']:
-                this_qubit = node.coupler
-
-            self.update_redis_trusted_values(node.name, this_qubit, redis_field)
+            if node.name in ['cz_chevron','cz_calibration','cz_dynamic_phase'] and qubit_types[this_qubit] == 'Target':
+                self.update_redis_trusted_values(node.name, node.coupler, redis_field)
+            if node.name in ['coupler_spectroscopy']:
+                self.update_redis_trusted_values(node.name, node.coupler, redis_field)
+            else:
+                self.update_redis_trusted_values(node.name, this_qubit, redis_field)
 
             handles, labels = this_axis.get_legend_handles_labels()
 
-            if node.name == 'T1':
+            if node.name in ['T1','T2','T2_echo']:
                 T1_micros = self.qoi[0] * 1e6
-                patch2 = mpatches.Patch(color='blue', label=f'T1 = {T1_micros:.2f}')
+                patch2 = mpatches.Patch(color='blue', label=f'{node.name} = {T1_micros:.2f} us')
                 handles.append(patch2)
             patch = mpatches.Patch(color='red', label=f'{this_qubit}')
             handles.append(patch)

@@ -36,10 +36,11 @@ node reference
   cz_chevron
   cz_calibration
   cz_calibration_ssro
+  cz_dynamic_phase
 '''
 
 user_requested_calibration = {
-    'target_node': 'T2_echo',
+    'target_node': 'cz_dynamic_phase',
     'all_qubits': qubits,
     'couplers': couplers,
     # 'node_dictionary' : {'coupled_qubits': ['q21','q22']},
