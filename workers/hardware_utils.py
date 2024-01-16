@@ -3,6 +3,8 @@ from qcodes import validators
 import time
 import redis
 
+from config_files.settings import spiA_serial_port
+
 redis_connection = redis.Redis(decode_responses=True)
 
 def set_module_att(cluster):
@@ -18,7 +20,7 @@ def set_module_att(cluster):
 
 class SpiDAC():
     def __init__(self) -> None:
-        self.spi = SpiRack('loki_rack', '/dev/ttyACM0')
+        self.spi = SpiRack('loki_rack', spiA_serial_port)
 
     def create_spi_dac(self, coupler: str):
         coupler_spi_map = {

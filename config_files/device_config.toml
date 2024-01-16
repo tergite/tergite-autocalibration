@@ -54,11 +54,11 @@ spec_ampl_default = 3e-4
 att = 0
 
 [initials.qubits]
-q11.ro_pulse_amp = 6.5e-3
-q12.ro_pulse_amp = 6.8e-3
-q13.ro_pulse_amp = 7.2e-3
-q14.ro_pulse_amp = 8.0e-3
-q15.ro_pulse_amp = 6.5e-3
+q11.ro_pulse_amp = 15.0e-3
+q12.ro_pulse_amp = 9.0e-3
+q13.ro_pulse_amp = 10.0e-3
+q14.ro_pulse_amp = 10.0e-3
+q15.ro_pulse_amp = 15.0e-3
 
 # # Added 6dB att
 # q16.ro_pulse_amp = 200.0e-3

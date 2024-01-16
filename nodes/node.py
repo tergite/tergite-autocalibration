@@ -47,16 +47,16 @@ from analysis.cz_calibration_analysis import CZCalibrationAnalysis
 from analysis.n_rabi_analysis import NRabiAnalysis
 
 
-from config_files.VNA_values import (
+from config_files.VNA_LOKIB_values import (
     VNA_resonator_frequencies, VNA_qubit_frequencies, VNA_f12_frequencies
 )
 
 
 def resonator_samples(qubit: str) -> np.ndarray:
     res_spec_samples = 111
-    sweep_range = 6.0e6
+    sweep_range = 2.0e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
-    min_freq = VNA_frequency - sweep_range / 2
+    min_freq = VNA_frequency - sweep_range / 2 + 0.5e6
     max_freq = VNA_frequency + sweep_range / 2
     return np.linspace(min_freq, max_freq, res_spec_samples)
 
@@ -160,7 +160,7 @@ class Punchout_Node(Base_Node):
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             },
             'ro_amplitudes': {
-                qubit: np.linspace(0.005, 0.02, 10) for qubit in self.all_qubits
+                qubit: np.linspace(0.005, 0.022, 10) for qubit in self.all_qubits
             },
         }
         return cluster_samplespace
@@ -457,10 +457,10 @@ class CZ_Chevron_Node:
     def samplespace(self):
         cluster_samplespace = {
             'cz_pulse_durations': {
-                coupler: np.arange(100e-9, 1000e-9, 48e-9) for coupler in self.couplers
+                coupler: np.arange(100e-9, 1000e-9, 32e-9) for coupler in self.couplers
             },
             'cz_pulse_frequencies': {
-                coupler: np.linspace(-3.0e6, 1.0e6, 5) + self.transition_frequency(coupler) for coupler in self.couplers
+                coupler: np.linspace(-2.0e6, 2.0e6, 25) + self.transition_frequency(coupler) for coupler in self.couplers
             },
         }
         return cluster_samplespace

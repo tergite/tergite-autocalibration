@@ -27,6 +27,7 @@ import redis
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 import numpy as np
+from workers.redis_utils import populate_initial_parameters
 
 colorama_init()
 
@@ -86,34 +87,14 @@ class CalibrationSupervisor():
                 self.redis_connection.hset(cs_key, node, 'not_calibrated' )
 
 
-    def populate_initial_parameters(self):
-        initial_device_config = self.transmon_configuration['initials']
-        initial_qubit_parameters = initial_device_config['qubits']
-        initial_coupler_parameters = initial_device_config['couplers']
-
-        # Populate the Redis database with the initial 'reasonable'
-        # parameter values from the toml file
-        for qubit in self.qubits:
-            # parameter common to all qubits:
-            for parameter_key, parameter_value in initial_qubit_parameters['all'].items():
-                self.redis_connection.hset(f"transmons:{qubit}", parameter_key, parameter_value)
-
-            # parameter specific to each qubit:
-            for parameter_key, parameter_value in initial_qubit_parameters[qubit].items():
-                self.redis_connection.hset(f"transmons:{qubit}", parameter_key, parameter_value)
-
-        for coupler in self.couplers:
-            for parameter_key, parameter_value in initial_coupler_parameters['all'].items():
-                self.redis_connection.hset(f"couplers:{coupler}", parameter_key, parameter_value)
-
-            if coupler in initial_coupler_parameters:
-                for parameter_key, parameter_value in initial_coupler_parameters[coupler].items():
-                    self.redis_connection.hset(f"couplers:{coupler}", parameter_key, parameter_value)
-
-
     def calibrate_system(self):
 
-        self.populate_initial_parameters()
+        populate_initial_parameters(
+            self.transmon_configuration,
+            self.qubits,
+            self.couplers,
+            self.redis_connection
+        )
 
         # TODO temporary hack because optimizing CZ chevron requires re-running
         # the whole calibration chain
@@ -136,7 +117,12 @@ class CalibrationSupervisor():
                     print('Finished ramping')
                 self.calibrate_linear_node_sequence()
                 self.reset_all_nodes()
-                self.populate_initial_parameters()
+                populate_initial_parameters(
+                    self.transmon_configuration,
+                    self.qubits,
+                    self.couplers,
+                    self.redis_connection
+                )
         else:
             self.calibrate_linear_node_sequence()
 
@@ -249,7 +235,12 @@ class CalibrationSupervisor():
 
         elif status == DataStatus.out_of_spec:
             print(u'\u2691\u2691\u2691 ' + f'{Fore.RED}{Style.BRIGHT}Calibration required for Node {node_name}{Style.RESET_ALL}')
-            self.calibrate_node(node)
+            node_calibration_status = self.calibrate_node(node)
+
+            #TODO : develop failure strategies ->
+            # if node_calibration_status == DataStatus.out_of_spec:
+            #     node_expand()
+            #     node_calibration_status = self.calibrate_node(node)
 
 
     def calibrate_node(self, node) -> DataStatus:

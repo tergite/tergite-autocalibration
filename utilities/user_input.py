@@ -1,8 +1,6 @@
 # qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
-qubits = [ 'q18','q19','q20','q21','q22','q23','q24','q25']
-#qubits = ['q16', 'q17', 'q19', 'q21', 'q22', 'q23', 'q25']
-# qubits = ['q16', 'q17']
-#qubits = [ 'q21','q22']
+# qubits = [ 'q18','q19','q20','q21','q22','q23','q24','q25']
+qubits = ['q11','q12','q13','q14']
 couplers = ['q21_q22']
 
 '''
@@ -28,8 +26,7 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'cz_chevron',
+    'target_node': 'rabi_oscillations',
     'all_qubits': qubits,
     'couplers': couplers,
-    # 'node_dictionary' : {'coupled_qubits': ['q21','q22']},
 }

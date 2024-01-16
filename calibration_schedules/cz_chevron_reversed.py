@@ -89,6 +89,7 @@ class CZ_chevron(Measurement):
             cz_duration_values = cz_pulse_durations[coupler]
             number_of_durations = len(cz_duration_values)
             cz_amplitude = coupler_pulse_amplitudes[coupler]
+            print(f'{ cz_amplitude = }')
 
             schedule.add(
                 Reset(*qubits), ref_op=root_relaxation, ref_pt='end'

@@ -183,14 +183,17 @@ def precompile(node):
     # after the compilation_config is acquired, free the transmon resources
     for extended_transmon in transmons.values():
         extended_transmon.close()
-    #for extended_edge in couplers.values():
-    #    extended_edge.close()
+    if hasattr(node, 'couplers'):
+        for extended_edge in edges.values():
+           extended_edge.close()
 
     logger.info('Starting Compiling')
     compiled_schedule = compiler.compile(schedule=schedule, config=compilation_config)
+    # if node.name == 'cz_chevron':
+    #     breakpoint()
 
     #TODO
-    #ic.retrieve_hardware_logs
+    # ic.retrieve_hardware_logs
     # with open(f'TIMING_TABLE_{node}.html', 'w') as file:
     #    file.write(
     #        compiled_schedule.timing_table.hide(['is_acquisition','wf_idx'],axis="columns"
