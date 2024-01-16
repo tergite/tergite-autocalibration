@@ -60,7 +60,7 @@ def set_module_att(cluster):
 if args.cluster_status == ClusterStatus.real:
     Cluster.close_all()
     clusterA = Cluster("clusterA", lokiA_IP)
-    clusterA.reset()
+    # clusterA.reset()
     set_module_att(clusterA)
     lab_ic = InstrumentCoordinator('lab_ic')
     lab_ic.add_component(ClusterComponent(clusterA))
@@ -228,5 +228,5 @@ def calibrate_node(node_label: str):
 # main
 calibrate_system()
 logger.info('calibration completed, closing cluster')
-clusterA.reset()
-clusterA.close()
+# clusterA.reset()
+# clusterA.close()

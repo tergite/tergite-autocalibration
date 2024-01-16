@@ -38,7 +38,7 @@ graph_dependencies = [
     ('ro_frequency_optimization_gef', 'ro_amplitude_optimization_gef'),
     # ('coupler_spectroscopy', 'cz_chevron'),
     ('ro_amplitude_optimization_gef', 'cz_chevron'),
-    ('ro_amplitude_optimization_gef', 'reset_chevron'),
+    ('rabi_oscillations', 'reset_chevron'),
     ('cz_chevron', 'cz_calibration'),
     # ('qubit_12_spectroscopy_multidim', 'cz_calibration'),
     # ('cz_calibration', 'cz_calibration_ssro'),
@@ -53,15 +53,15 @@ graph.add_node('tof', type='refine')
 graph.add_node('punchout')
 graph.add_node('qubit_01_spectroscopy_pulsed')
 graph.add_node('qubit_01_spectroscopy_multidim')
-graph.add_node('T1', type='refine')
-graph.add_node('T2', type='refine')
-graph.add_node('T2_echo', type='refine')
-graph.add_node('ramsey_correction', type='refine')
-graph.add_node('motzoi_parameter', type='refine')
-graph.add_node('n_rabi_oscillations', type='refine')
-graph.add_node('ramsey_correction_12', type='refine')
-graph.add_node('ro_frequency_optimization_gef', type='refine')
-graph.add_node('ro_amplitude_optimization_gef', type='refine')
+# graph.add_node('T1', type='refine')
+# graph.add_node('T2', type='refine')
+# graph.add_node('T2_echo', type='refine')
+# graph.add_node('ramsey_correction', type='refine')
+# graph.add_node('motzoi_parameter', type='refine')
+# graph.add_node('n_rabi_oscillations', type='refine')
+# graph.add_node('ramsey_correction_12', type='refine')
+# graph.add_node('ro_frequency_optimization_gef', type='refine')
+# graph.add_node('ro_amplitude_optimization_gef', type='refine')
 
 # for nodes that perform the same measurement,
 # assign a weight to the corresponding edge to sort them

@@ -58,7 +58,7 @@ class CouplerSpectroscopyAnalysis():
         I0 = roots[np.argmin(np.abs(roots))]
         I1 = roots[np.argmax(np.abs(roots))]
         DeltaI = I1 - I0
-        possible_I = np.array([0.3 * DeltaI + I0, 0.3 * DeltaI - I0])
+        possible_I = np.array([0.4 * DeltaI + I0, 0.4 * DeltaI - I0])
         self.parking_I = possible_I[np.argmin(np.abs(possible_I))]
         self.roots = roots
         self.root_frequencies = root_frequencies

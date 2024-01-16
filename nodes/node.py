@@ -53,10 +53,10 @@ from config_files.VNA_values import (
 
 
 def resonator_samples(qubit: str) -> np.ndarray:
-    res_spec_samples = 51
-    sweep_range = 1.2e6
+    res_spec_samples = 101
+    sweep_range = 3e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
-    min_freq = VNA_frequency - sweep_range / 1.5
+    min_freq = VNA_frequency - sweep_range / 2
     max_freq = VNA_frequency + sweep_range / 2
     return np.linspace(min_freq, max_freq, res_spec_samples)
 
@@ -550,7 +550,7 @@ class Reset_Chevron_Node:
         cluster_samplespace = {
             # Pulse test
             'cz_pulse_durations': {
-                qubit: 12e-9+np.linspace(12*12e-9, 12*12e-9, 11)  for qubit in self.coupled_qubits
+                qubit: 4e-9+np.linspace(16e-9, 16e-9, 11)  for qubit in self.coupled_qubits
             },
             'cz_pulse_amplitudes': {
                 qubit: np.linspace(0.4, 0.4, 11) for qubit in self.coupled_qubits

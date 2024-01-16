@@ -4,6 +4,7 @@ import xarray
 from logger.tac_logger import logger
 import threading
 import tqdm
+import numpy as np
 from utilities.status import ClusterStatus
 from workers.hardware_utils import SpiDAC
 from quantify_scheduler.instrument_coordinator.instrument_coordinator import CompiledSchedule

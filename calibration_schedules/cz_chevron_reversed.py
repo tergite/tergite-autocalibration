@@ -145,6 +145,9 @@ class Reset_chevron_dc(Measurement):
                         # schedule.add(Rxy_12(this_qubit))
 
                 buffer = schedule.add(IdlePulse(4e-9))
+                # schedule.add(
+                # SetClockFrequency(clock=cz_clock, clock_freq_new=-1/cz_duration+4.4e9),
+                # ) 
                 schedule.add(ResetClockPhase(clock=coupler+'.cz'))
                 # cz = schedule.add(DRAGPulse(
                 #             duration=cz_duration,
@@ -154,10 +157,10 @@ class Reset_chevron_dc(Measurement):
                 #             clock=cz_clock,
                 #             phase=0,
                 #         ),
-                #     )   
+                #     ) 
 
                 cz = schedule.add(
-                            SoftSquarePulse(
+                            SquarePulse(
                                 duration = cz_duration,
                                 amp = cz_amplitude,
                                 port = cz_pulse_port,

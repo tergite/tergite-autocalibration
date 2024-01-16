@@ -9,7 +9,7 @@ redis_connection = redis.Redis(decode_responses=True)
 
 class SpiDAC():
     def __init__(self) -> None:
-        self.spi = SpiRack('loki_rack', '/dev/ttyACM0')
+        self.spi = SpiRack('loki_rack', '/dev/ttyACM1')
 
     def create_spi_dac(self, coupler: str):
         # coupler_spi_map = {
@@ -52,6 +52,9 @@ class SpiDAC():
     def set_dacs_zero(self) -> None:
         self.spi.set_dacs_zero()
         return
+    
+    def set_currenet_instant(self, dac , current) -> None:
+        self.spi.set_current_instant(dac, current)
 
     def set_parking_current(self, coupler: str) -> None:
 
