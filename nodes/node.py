@@ -53,8 +53,8 @@ from config_files.VNA_values import (
 
 
 def resonator_samples(qubit: str) -> np.ndarray:
-    res_spec_samples = 101
-    sweep_range = 3e6
+    res_spec_samples = 41
+    sweep_range = 4e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
     min_freq = VNA_frequency - sweep_range / 2
     max_freq = VNA_frequency + sweep_range / 2

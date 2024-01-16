@@ -41,7 +41,7 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'cz_calibration_ssro',
+    'target_node': 'ro_frequency_optimization_gef',
     'all_qubits': qubits,
     'couplers': couplers,
     # 'node_dictionary' : {'coupled_qubits': ['q21','q22']},

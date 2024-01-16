@@ -36,9 +36,11 @@ def configure_dataset(
         qubit_states = ['c0','c1','c2'] # for calibration points
     key_list = [key for key in raw_ds.data_vars.keys()]
     for idx,key in enumerate(keys):
-        key_indx = idx%n_qubits # this is to handle ro_opt_frequencies node where
-        # there are 2 or 3 measurements (i.e 2 or 3 Datarrays) for each qubit
-        # and also start from 0
+        if name in ['ro_frequency_optimization_gef',]:
+            key_indx = key%n_qubits # this is to handle ro_opt_frequencies node where
+            # there are 2 or 3 measurements (i.e 2 or 3 Datarrays) for each qubit
+        else:
+            key_indx = idx%n_qubits # and also start from 0
         coords_dict = {}
         qubit = qubits[key_indx]
         dimensions = [len(samplespace[quantity][qubit]) for quantity in sweep_quantities]
