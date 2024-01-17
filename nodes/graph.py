@@ -76,14 +76,14 @@ initial_pos = {
     'qubit_01_spectroscopy_multidim': ( 0.5,0.8),
     'qubit_01_spectroscopy_pulsed': (-0.5,0.8),
     'rabi_oscillations': (0,0.7),
-    'ramsey_correction': (0,0.6),
+    'ramsey_fringes': (0,0.6),
     'motzoi_parameter': (0.5,0.6),
     'n_rabi_oscillations': (-0.5,0.6),
     'resonator_spectroscopy_1': (0,0.5),
     'qubit_12_spectroscopy_pulsed': (-0.5,0.4),
     'qubit_12_spectroscopy_multidim': (0.5,0.4),
     'rabi_oscillations_12': (0,0.3),
-    'ramsey_correction_12': (0,0.2),
+    'ramsey_fringes_12': (0,0.2),
     'resonator_spectroscopy_2': (0,0.1),
     'ro_frequency_optimization_gef': (0,0.0),
     'ro_amplitude_optimization_gef': (0,0.0),
@@ -103,7 +103,6 @@ initial_pos = {
 # nx.draw(graph, with_labels=True, pos = initial_pos)
 # nx.draw(graph, pos=nx.spring_layout(graph, k=0.3), with_labels=True)
 # plt.show()
-
 
 # all_nodes = list(nx.topological_sort(graph))
 # print(f'{ list(graph.predecessors("cz_chevron")) = }')

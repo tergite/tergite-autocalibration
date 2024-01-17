@@ -5,6 +5,7 @@ from quantify_scheduler.enums import BinMode
 from quantify_scheduler import Schedule
 from quantify_scheduler.operations.gate_library import Measure, Reset, X90, Rxy, X, CZ
 from quantify_scheduler.operations.pulse_library import SuddenNetZeroPulse,ResetClockPhase,IdlePulse,DRAGPulse,SetClockFrequency,NumericalPulse,SoftSquarePulse,SquarePulse
+from quantify_scheduler.operations.pulse_library import DRAGPulse,SetClockFrequency,NumericalPulse,SoftSquarePulse,SquarePulse, ResetClockPhase
 from quantify_scheduler.resources import ClockResource
 from calibration_schedules.measurement_base import Measurement
 from utilities.extended_transmon_element import Measure_RO1, Rxy_12
@@ -220,6 +221,7 @@ class CZ_chevron_ac_reset(Measurement):
             coupler: str,
             cz_pulse_frequencies_sweep: dict[str,np.ndarray],
             cz_pulse_durations: dict[str,np.ndarray],
+            cz_pulse_amplitude: float = 0.5,
             repetitions: int = 1024,
         ) -> Schedule:
 
@@ -369,6 +371,7 @@ class CZ_chevron(Measurement):
             coupler: str,
             cz_pulse_frequencies_sweep: dict[str,np.ndarray],
             cz_pulse_durations: dict[str,np.ndarray],
+            cz_pulse_amplitude: float = 0.5,
             repetitions: int = 1024,
         ) -> Schedule:
 
@@ -582,6 +585,9 @@ class CZ_chevron_duration(Measurement):
                     schedule.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
                     # schedule.add(
                     #     Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
+                    #     ref_op=relaxation, ref_pt="end",
+                    # )
+                schedule.add(ResetClockPhase(clock=coupler+'.cz'))
                     #     ref_op=relaxation, ref_pt="end",)
 
                 # cz_amplitude = 0.75
@@ -590,7 +596,7 @@ class CZ_chevron_duration(Measurement):
                 cz = schedule.add(
                         SoftSquarePulse(
                             duration=cz_duration,
-                            amp = cz_amplitude,
+                            amp=cz_pulse_amplitude,
                             port=cz_pulse_port,
                             clock=cz_clock,
                         ),
@@ -598,7 +604,7 @@ class CZ_chevron_duration(Measurement):
 
                 for this_qubit in qubits:
                     schedule.add(
-                        Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
+                        Measure(this_qubit, acq_index=this_index, bin_mode=self.bin_mode),
                         ref_op=cz,rel_time=12e-9, ref_pt="end",
                     )
         return schedule

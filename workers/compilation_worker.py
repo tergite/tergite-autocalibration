@@ -75,12 +75,31 @@ def load_redis_config_coupler(coupler: CompositeSquareEdge):
     coupler.cz.cz_width(float(redis_config['cz_pulse_width']))
     return
 
-
-def precompile(node):
+def precompile(node, bin_mode:str=None, repetitions:int=None):
     if node.name == 'tof':
         return None, 1
     samplespace = node.samplespace
     qubits = node.all_qubits
+
+    # backup old parameter values
+    if node.backup:
+        fields = node.redis_field
+        for field in fields:
+            field_backup = field + "_backup"
+            for qubit in qubits:
+                key = f"transmons:{qubit}"
+                if field in redis_connection.hgetall(key).keys():
+                    value = redis_connection.hget(key, field)
+                    redis_connection.hset(key, field_backup, value)
+                    redis_connection.hset(key, field, 'nan' )
+            if getattr(node, "coupler", None) is not None:
+                couplers = node.coupler
+                for coupler in couplers:
+                    key = f"couplers:{coupler}"
+                    if field in redis_connection.hgetall(key).keys():
+                        value = redis_connection.hget(key, field)
+                        redis_connection.hset(key, field_backup, value)
+                        redis_connection.hset(key, field, 'nan')
 
     # TODO better way to restart the QuantumDevice object
     device = QuantumDevice(f'Loki_{node.name}')
@@ -109,14 +128,27 @@ def precompile(node):
         node_class = node.measurement_obj(transmons, coupler, node.qubit_state)
     if node.name in ['ro_amplitude_optimization_gef','cz_calibration_ssro']:
         device.cfg_sched_repetitions(1)    # for single-shot readout
-
+    if bin_mode is not None: node_class.set_bin_mode(bin_mode)
     schedule_function = node_class.schedule_function
-    static_parameters = node_class.static_kwargs
 
-    compiler = SerialCompiler(name=f'{node.name}_compiler')
-    compilation_config = device.generate_compilation_config()
+    # Merge with the parameters from node dictionary
+    static_parameters = node_class.static_kwargs # parameters stored in the redis
 
+    if repetitions is not None:
+        static_parameters["repetitions"] = repetitions
 
+    for key, value in node.node_dictionary.items():
+        if key in static_parameters:
+            if not np.iterable(value):
+                value = {q: value for q in qubits}
+            static_parameters[key] = value
+        elif key in samplespace:
+            if not isinstance(value, dict):
+                value = {q: value for q in qubits}
+            samplespace[key] = value
+        elif key != "couplers":
+            static_parameters[key] = value
+            # print(f"{key} isn't one of the static parameters of {node_class}. \n We will ignore this parameter.")
 
     # TODO commenting this out because single shots has been fixed by Qblox
     # _____________________________________________________________________
@@ -179,7 +211,7 @@ def precompile(node):
     compiler = SerialCompiler(name=f'{node.name}_compiler')
     schedule = schedule_function(**static_parameters, **samplespace)
     compilation_config = device.generate_compilation_config()
-
+    device.close()
     # after the compilation_config is acquired, free the transmon resources
     for extended_transmon in transmons.values():
         extended_transmon.close()
@@ -205,7 +237,5 @@ def precompile(node):
     #        compiled_schedule.timing_table.hide(['is_acquisition','wf_idx'],axis="columns"
     #            ).to_html()
     #        )
-
-    logger.info('Finished Compiling')
 
     return compiled_schedule

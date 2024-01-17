@@ -11,7 +11,7 @@ import numpy as np
 
 class N_Rabi_Oscillations(Measurement):
 
-    def __init__(self,transmons,qubit_state=0):
+    def __init__(self,transmons, qubit_state=0):
         super().__init__(transmons)
         self.transmons = transmons
         self.static_kwargs = {

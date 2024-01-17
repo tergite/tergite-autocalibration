@@ -51,6 +51,7 @@ from config_files.VNA_values import (
     VNA_resonator_frequencies, VNA_qubit_frequencies, VNA_f12_frequencies
 )
 
+cxn = redis.Redis(decode_responses=True)
 
 def resonator_samples(qubit: str) -> np.ndarray:
     res_spec_samples = 81
@@ -61,22 +62,20 @@ def resonator_samples(qubit: str) -> np.ndarray:
     return np.linspace(min_freq, max_freq, res_spec_samples)
 
 
-def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
-    qub_spec_samples = 151
-    sweep_range = 30e6
-    if transition == '01':
-        VNA_frequency = VNA_qubit_frequencies[qubit]
-    elif transition == '12':
-        VNA_frequency = VNA_f12_frequencies[qubit]
-        qub_spec_samples = 301
-        sweep_range = 60e6
-    elif transition == 'coupler':
-        VNA_frequency = VNA_qubit_frequencies[qubit]
-        qub_spec_samples = 51 
-        sweep_range = 20e6
+def qubit_samples(qubit: str, transition: str = '01', sweep_range = None) -> np.ndarray:
+    qub_spec_samples = 101
+    if sweep_range is None: sweep_range = 6.5e6
+    key_backup = f"transmons:{qubit}", "freq_" + transition + "_backup"
+    key = f"transmons:{qubit}", "freq_" + transition
+    redis_value = cxn.hget(*key)
+    redis_value_backup = cxn.hget(*key_backup)
+    VNA_value = VNA_qubit_frequencies[qubit] if transition == '01' else VNA_f12_frequencies[qubit] if transition == '12' else ValueError(f"Invalid transition {transition}")
+    if redis_value is not None and redis_value != 'nan':
+            VNA_frequency = float(redis_value)
+    elif redis_value_backup is not None and redis_value_backup != 'nan':
+            VNA_frequency = float(redis_value_backup)
     else:
-        raise ValueError('Invalid transition')
-
+        VNA_frequency = VNA_value
     min_freq = VNA_frequency - sweep_range / 2
     max_freq = VNA_frequency + sweep_range / 2
     return np.linspace(min_freq, max_freq, qub_spec_samples)
@@ -90,7 +89,8 @@ class NodeFactory:
             'qubit_01_spectroscopy_pulsed': Qubit_01_Spectroscopy_Pulsed_Node,
             'qubit_01_spectroscopy_multidim': Qubit_01_Spectroscopy_Multidim_Node,
             'rabi_oscillations': Rabi_Oscillations_Node,
-            'ramsey_correction': Ramsey_Fringes_Node,
+            'ramsey_fringes': Ramsey_Fringes_Node,
+            'ramsey_fringes_12': Ramsey_Fringes_12_Node,
             'resonator_spectroscopy_1': Resonator_Spectroscopy_1_Node,
             'qubit_12_spectroscopy_pulsed': Qubit_12_Spectroscopy_Pulsed_Node,
             'qubit_12_spectroscopy_multidim': Qubit_12_Spectroscopy_Multidim_Node,
@@ -124,6 +124,8 @@ class Base_Node:
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         self.name = name
         self.all_qubits = all_qubits
+        self.node_dictionary = node_dictionary
+        self.backup = True
 
     def __str__(self):
         return f'Node representation for {self.name} on qubits {self.all_qubits}'
@@ -137,10 +139,7 @@ class Base_Node:
 
 class Resonator_Spectroscopy_Node(Base_Node):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
-        super().__init__(name, all_qubits)
-        self.name = name
-        self.all_qubits = all_qubits
-        self.node_dictionary = node_dictionary
+        super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['ro_freq', 'Ql', 'resonator_minimum']
         self.qubit_state = 0
         self.measurement_obj = Resonator_Spectroscopy
@@ -157,10 +156,7 @@ class Resonator_Spectroscopy_Node(Base_Node):
 
 class Punchout_Node(Base_Node):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
-        super().__init__(name, all_qubits)
-        self.name = name
-        self.all_qubits = all_qubits
-        self.node_dictionary = node_dictionary
+        super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['ro_ampl']
         self.qubit_state = 0
         self.measurement_obj = Punchout
@@ -173,16 +169,15 @@ class Punchout_Node(Base_Node):
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             },
             'ro_amplitudes': {
-                qubit: np.linspace(0.005, 0.04, 12) for qubit in self.all_qubits
+                qubit: np.linspace(0.005, 0.02, 10) for qubit in self.all_qubits
             },
         }
         return cluster_samplespace
 
-class Qubit_01_Spectroscopy_Pulsed_Node:
-    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
-        self.name = name
-        self.all_qubits = all_qubits
-        self.node_dictionary = kwargs
+class Qubit_01_Spectroscopy_Pulsed_Node(Base_Node):
+    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
+        self.sweep_range = self.node_dictionary.pop("sweep_range", None)
         self.redis_field = ['freq_01']
         self.qubit_state = 0
         self.measurement_obj = Two_Tones_Spectroscopy
@@ -192,16 +187,14 @@ class Qubit_01_Spectroscopy_Pulsed_Node:
     def samplespace(self):
         cluster_samplespace = {
             'spec_frequencies': {
-                qubit: qubit_samples(qubit) for qubit in self.all_qubits
+                qubit: qubit_samples(qubit, sweep_range=self.sweep_range) for qubit in self.all_qubits
             }
         }
         return cluster_samplespace
 
-class Qubit_01_Spectroscopy_Multidim_Node:
-    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
-        self.name = name
-        self.all_qubits = all_qubits
-        self.node_dictionary = kwargs
+class Qubit_01_Spectroscopy_Multidim_Node(Base_Node):
+    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['freq_01',
                             'spec_ampl_optimal']
         self.qubit_state = 0
@@ -220,11 +213,9 @@ class Qubit_01_Spectroscopy_Multidim_Node:
         }
         return cluster_samplespace
 
-class Rabi_Oscillations_Node:
-    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
-        self.name = name
-        self.all_qubits = all_qubits
-        self.node_dictionary = kwargs
+class Rabi_Oscillations_Node(Base_Node):
+    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['mw_amp180']
         self.qubit_state = 0
         self.measurement_obj = Rabi_Oscillations
@@ -234,21 +225,46 @@ class Rabi_Oscillations_Node:
     def samplespace(self):
         cluster_samplespace = {
             'mw_amplitudes': {
-                qubit: np.linspace(0.002, 0.350, 51) for qubit in self.all_qubits
+                qubit: np.linspace(0.002, 0.50, 71) for qubit in self.all_qubits
             }
         }
         return cluster_samplespace
 
 
-class Ramsey_Fringes_Node:
-    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
-        self.name = name
-        self.all_qubits = all_qubits
-        self.node_dictionary = kwargs
+class Ramsey_Fringes_Node(Base_Node):
+    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['freq_01']
         self.qubit_state = 0
         self.measurement_obj = Ramsey_fringes
         self.analysis_obj = RamseyAnalysis
+        self.backup = False
+        self.analysis_kwargs = {"redis_field":"freq_01"}
+
+    @property
+    def samplespace(self):
+        cluster_samplespace = {
+            # 'ramsey_fringes': {
+                'ramsey_delays': {
+                    qubit: np.arange(4e-9, 2048e-9, 8 * 8e-9) for qubit in self.all_qubits
+                },
+                'artificial_detunings': {
+                    qubit: np.arange(-2.1, 2.1, 0.8) * 1e6 for qubit in self.all_qubits
+                },
+            # },
+        }
+        return cluster_samplespace
+
+
+class Ramsey_Fringes_12_Node(Base_Node):
+    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
+        self.redis_field = ['freq_12']
+        self.qubit_state = 1
+        self.measurement_obj = Ramsey_fringes
+        self.analysis_obj = RamseyAnalysis
+        self.backup = False
+        self.analysis_kwargs = {"redis_field":"freq_12"}
 
     @property
     def samplespace(self):
@@ -284,11 +300,9 @@ class Ramsey_Fringes_12_Node:
         }
         return cluster_samplespace
 
-class Motzoi_Parameter_Node:
-    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
-        self.name = name
-        self.all_qubits = all_qubits
-        self.node_dictionary = kwargs
+class Motzoi_Parameter_Node(Base_Node):
+    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['mw_motzoi']
         self.qubit_state = 0
         self.measurement_obj = Motzoi_parameter
@@ -302,11 +316,9 @@ class Motzoi_Parameter_Node:
         }
         return cluster_samplespace
 
-class N_Rabi_Oscillations_Node:
-    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
-        self.name = name
-        self.all_qubits = all_qubits
-        self.node_dictionary = kwargs
+class N_Rabi_Oscillations_Node(Base_Node):
+    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['mw_amp180']
         self.qubit_state = 0
         self.measurement_obj = N_Rabi_Oscillations
@@ -371,11 +383,9 @@ class T2_Echo_Node:
         }
         return cluster_samplespace
 
-class Resonator_Spectroscopy_1_Node:
-    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
-        self.name = name
-        self.all_qubits = all_qubits
-        self.node_dictionary = kwargs
+class Resonator_Spectroscopy_1_Node(Base_Node):
+    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['ro_freq_1', 'Ql_1', 'resonator_minimum_1']
         self.qubit_state = 1
         self.measurement_obj = Resonator_Spectroscopy
@@ -391,11 +401,9 @@ class Resonator_Spectroscopy_1_Node:
         return cluster_samplespace
 
 
-class Resonator_Spectroscopy_2_Node:
-    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
-        self.name = name
-        self.all_qubits = all_qubits
-        self.node_dictionary = kwargs
+class Resonator_Spectroscopy_2_Node(Base_Node):
+    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['ro_freq_2']
         self.qubit_state = 2
         self.measurement_obj = Resonator_Spectroscopy
@@ -411,11 +419,10 @@ class Resonator_Spectroscopy_2_Node:
         return cluster_samplespace
 
 
-class Qubit_12_Spectroscopy_Pulsed_Node:
-    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
-        self.name = name
-        self.all_qubits = all_qubits
-        self.node_dictionary = kwargs
+class Qubit_12_Spectroscopy_Pulsed_Node(Base_Node):
+    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
+        self.sweep_range = self.node_dictionary.pop("sweep_range", None)
         self.redis_field = ['freq_12']
         self.qubit_state = 1
         self.measurement_obj = Two_Tones_Spectroscopy
@@ -425,17 +432,15 @@ class Qubit_12_Spectroscopy_Pulsed_Node:
     def samplespace(self):
         cluster_samplespace = {
             'spec_frequencies': {
-                qubit: qubit_samples(qubit, '12') for qubit in self.all_qubits
+                qubit: qubit_samples(qubit, '12', sweep_range=self.sweep_range) for qubit in self.all_qubits
             }
         }
         return cluster_samplespace
 
 
-class Qubit_12_Spectroscopy_Multidim_Node:
-    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
-        self.name = name
-        self.all_qubits = all_qubits
-        self.node_dictionary = kwargs
+class Qubit_12_Spectroscopy_Multidim_Node(Base_Node):
+    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['freq_12',
                             'spec_ampl_12_optimal']
         self.qubit_state = 1
@@ -454,11 +459,9 @@ class Qubit_12_Spectroscopy_Multidim_Node:
         }
         return cluster_samplespace
 
-class Rabi_Oscillations_12_Node:
-    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
-        self.name = name
-        self.all_qubits = all_qubits
-        self.node_dictionary = kwargs
+class Rabi_Oscillations_12_Node(Base_Node):
+    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['mw_ef_amp180']
         self.qubit_state = 1
         self.measurement_obj = Rabi_Oscillations
@@ -574,18 +577,17 @@ class Reset_Chevron_Node:
         }
         return cluster_samplespace
 
-class CZ_Chevron_Node:
-    def __init__(self, name: str, all_qubits: list[str], couplers: list[str]):
-        self.name = name
-        self.all_qubits = all_qubits
-        self.all_couplers = couplers
-        self.coupler = couplers[0]
+class CZ_Chevron_Node(Base_Node):
+    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
+        self.couplers = node_dictionary.pop('couplers')
+        self.coupler = self.couplers[0]
+        super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['cz_pulse_frequency','cz_pulse_duration']
         # self.redis_field = ['cz_pulse_frequency','cz_pulse_amplitude']
         self.qubit_state = 0
         self.measurement_obj = CZ_chevron
         self.analysis_obj = CZChevronAnalysis
-        self.coupled_qubits = couplers[0].split(sep='_')
+        self.coupled_qubits = self.coupler.split(sep='_')
         self.ac_freq = self.transition_frequency
         print(f'{ self.coupled_qubits = }')
 
@@ -739,17 +741,18 @@ class CZ_Dynamic_Phase_Node:
         }
         return cluster_samplespace
 
-class Coupler_Spectroscopy_Node:
-    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
-        self.name = name
-        self.all_qubits = all_qubits
-        self.coupler = kwargs['couplers'][0]
+class Coupler_Spectroscopy_Node(Base_Node):
+    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
+        self.coupler = node_dictionary.pop('couplers')[0]
+        super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['parking_current']
         self.qubit_state = 0
         # perform 2 tones while biasing the current
         self.measurement_obj = Two_Tones_Spectroscopy
         self.analysis_obj = CouplerSpectroscopyAnalysis
         self.coupled_qubits = self.coupler.split(sep='_')
+        self.sweep_range = self.node_dictionary.pop("sweep_range", None)
+        self.measure_qubit_index = self.node_dictionary.pop("measure_qubit", 0)
         # self.validate()
 
     def validate(self):
@@ -770,13 +773,16 @@ class Coupler_Spectroscopy_Node:
 
     @property
     def samplespace(self):
-        qubit = self.coupled_qubits[0]
+        qubit = self.coupled_qubits[self.measure_qubit_index]
         self.measurement_qubit = qubit
         print(f'{ self.coupled_qubits = }')
         print(f'{ qubit = }')
         cluster_samplespace = {
-            'spec_frequencies': {qubit: qubit_samples(qubit,transition='coupler')}
+            'spec_frequencies': {qubit: qubit_samples(qubit, sweep_range=self.sweep_range)}
         }
+        # cluster_samplespace = {
+        #     'spec_frequencies': {qubit: np.linspace(3.771, 3.971, 0.0005)}
+        # }
         return cluster_samplespace
 
     @property
@@ -786,11 +792,9 @@ class Coupler_Spectroscopy_Node:
         }
         return spi_samplespace
 
-class Coupler_Resonator_Spectroscopy_Node:
-    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
-        self.name = name
-        self.all_qubits = all_qubits
-        self.node_dictionary = kwargs
+class Coupler_Resonator_Spectroscopy_Node(Base_Node):
+    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['resonator_flux_quantum']
         self.qubit_state = 0
         self.measurement_obj = Resonator_Spectroscopy

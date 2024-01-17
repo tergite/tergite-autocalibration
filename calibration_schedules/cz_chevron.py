@@ -192,7 +192,7 @@ class CZ_chevron(Measurement):
                 for this_qubit in qubits:
                     #this_index = cz_index*number_of_amplitudes+cz_amplitude_index
                     this_index = ampl_indx * number_of_freqs + acq_index
-                    schedule.add(Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
+                    schedule.add(Measure(this_qubit, acq_index=this_index, bin_mode=self.bin_mode),
                                     ref_op=cz,rel_time=40e-9, ref_pt="end",
                                     )
         return schedule

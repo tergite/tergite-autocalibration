@@ -16,7 +16,7 @@ node reference
   qubit_01_spectroscopy_multidim
   qubit_01_spectroscopy_pulsed
   rabi_oscillations
-  ramsey_correction
+  ramsey_fringes
   resonator_spectroscopy_1
   qubit_12_spectroscopy_pulsed
   qubit_12_spectroscopy_multidim

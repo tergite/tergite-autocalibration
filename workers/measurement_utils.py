@@ -121,4 +121,5 @@ class CoupledQubitsMeasurement:
         save_dataset(result_dataset, node, data_path)
         # TODO verify this
         self.set_current(0)
+        self.SPI.spi.close()
         return result_dataset

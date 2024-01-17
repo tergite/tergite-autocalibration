@@ -14,7 +14,7 @@ importlib.reload(analysis.cz_chevron_analysis)
 
 analysis_class = analysis.cz_chevron_analysis.CZChevronAnalysis
 
-ds = xr.open_dataset('data_directory/20231204/20231204-103125-215-10c309-cz_chevron/dataset.hdf5')
+ds = xr.open_dataset('data_directory/20231207/20231207-173914-020-f18290-cz_chevron/dataset.hdf5')
 # print(f'{ ds.yq21.attrs = }')
 ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
 
@@ -33,6 +33,7 @@ for qubit in qubits:
     analysis = analysis_class(dataset)
     analysis.run_fitting()
     analysis.plotter(ax)
+    ax.legend()
     plt.show()
 
 # data_var = list(ds.data_vars.keys())[0]

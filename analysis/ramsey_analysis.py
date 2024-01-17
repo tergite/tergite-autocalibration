@@ -48,6 +48,7 @@ class RamseyModel(lmfit.model.Model):
 
 class RamseyAnalysis():
     def  __init__( self,dataset: xr.Dataset, redis_field='freq_01'):
+        self.redis_field = redis_field
         self.qubit = dataset.attrs['qubit']
         redis_key = f'transmons:{self.qubit}'
 
@@ -91,7 +92,9 @@ class RamseyAnalysis():
 
         # self.dataset['fit_ramsey_delays'] = self.fit_ramsey_delays
         # self.dataset['fit_y'] = ('fit_ramsey_delays',fit_y)
+        print("Frequency before correction: ", self.qubit_frequency)
         self.corrected_qubit_frequency = self.qubit_frequency + self.frequency_correction
+        print("Frequency after correction: ", self.corrected_qubit_frequency)
         return [self.corrected_qubit_frequency]
 
     def plotter(self,ax):
