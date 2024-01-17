@@ -1,5 +1,8 @@
 import numpy as np
 import itertools
+import matplotlib
+matplotlib.use('tkagg')
+
 from workers.hardware_utils import SpiDAC
 from qblox_instruments import SpiRack
 
@@ -29,3 +32,10 @@ def overnoon20240111(s, DAC, dac):
         s.calibrate_node('qubit_01_spectroscopy_pulsed', spec_pulse_amplitudes=0.0005)
         for cz_pulse_amplitude in np.arange(0.1, 0.6, 0.03):
             s.calibrate_node("cz_chevron", cz_pulse_amplitude=cz_pulse_amplitude)
+
+def overnoon20240117(s, DAC, dac):
+    """
+    Test 640 MHz.
+    """
+    for cz_pulse_amplitude in np.arange(0.5, 0.9, 0.05):
+        s.calibrate_node("cz_chevron", cz_pulse_amplitude=cz_pulse_amplitude)

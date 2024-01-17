@@ -71,13 +71,7 @@ couplers = user_requested_calibration['couplers']
 # bus_list = [[qubits[i], qubits[i+1]] for i in range(len(qubits) - 1)]
 # couplers = [bus[0] + '_' + bus[1] for bus in bus_list]
 
-
-def calibrate_system():
-    logger.info('Starting System Calibration')
-    target_node = user_requested_calibration['target_node']
-    topo_order = filtered_topological_order(target_node)
-    N_qubits = len(qubits)
-    draw_arrow_chart(f'Qubits: {N_qubits}', topo_order)
+def redis_init_toml():
 
     initial_qubit_parameters = transmon_configuration['initials']['qubits']
     initial_coupler_parameters = transmon_configuration['initials']['couplers']
@@ -131,6 +125,20 @@ def calibrate_system():
             for parameter_key, parameter_value in initial_coupler_parameters[coupler].items():
                 redis_connection.hset(f"couplers:{coupler}", parameter_key, parameter_value)
 
+def write_calibrate_paras(node):
+    node_specific_dict = transmon_configuration[node]['all']
+    for field_key, field_value in node_specific_dict.items():
+        for qubit in qubits:
+            redis_connection.hset(f'transmons:{qubit}', field_key, field_value)
+
+def calibrate_system():
+    logger.info('Starting System Calibration')
+    target_node = user_requested_calibration['target_node']
+    topo_order = filtered_topological_order(target_node)
+    N_qubits = len(qubits)
+    draw_arrow_chart(f'Qubits: {N_qubits}', topo_order)
+
+    redis_init_toml()
 
     # if target_node == 'cz_chevron':
     #     set_module_att(clusterA)
@@ -156,11 +164,7 @@ def inspect_node(node: str):
     #Populate the Redis database with node specific parameter values from the toml file
     #node is calibrated only when all qubits have the node calibrated:
     if node in transmon_configuration and not is_node_calibrated:
-        node_specific_dict = transmon_configuration[node]['all']
-        for field_key, field_value in node_specific_dict.items():
-            for qubit in qubits:
-                redis_connection.hset(f'transmons:{qubit}', field_key, field_value)
-
+        write_calibrate_paras(node)
             # If needed add an all couplers initializer here but with a different key e.g. all_couplers
 
     #Check Redis if node is calibrated
@@ -204,7 +208,9 @@ def inspect_node(node: str):
 
 def calibrate_node(node_label: str, **static_parameters):
     logger.info(f'Calibrating node {node_label}')
-
+    redis_init_toml()
+    if node_label in transmon_configuration:
+        write_calibrate_paras(node_label)
     # node_dictionary = user_requested_calibration['node_dictionary']
     if couplers is not None and len(couplers):
         static_parameters["couplers"] = couplers

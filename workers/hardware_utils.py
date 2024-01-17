@@ -2,14 +2,27 @@ from qblox_instruments import SpiRack
 from qcodes import validators
 import time
 import redis
+from pathlib import Path
 from config_files.coupler_config import coupler_spi_map
 
 redis_connection = redis.Redis(decode_responses=True)
 
+def find_serial_port():
+    path = Path('/dev/')
+    for file in path.iterdir():
+        if file.name.startswith('ttyA'):
+            port = str(file.absolute())
+            break
+    else:
+        print("Couldn't find the serial port. Please check the connection.")
+        port = None
+    return port    
 
 class SpiDAC():
     def __init__(self) -> None:
-        self.spi = SpiRack('loki_rack', '/dev/ttyACM0')
+        port = find_serial_port()
+        if port is not None:
+            self.spi = SpiRack('loki_rack', port)
 
     def create_spi_dac(self, coupler: str):
         coupler_spi_map = {
