@@ -106,7 +106,7 @@ q25.ro_pulse_amp = 9e-3
 #q25.ro_pulse_amp =  8.0e-3
 
 [initials.couplers.all]
-cz_pulse_amplitude = 0.45
+cz_pulse_amplitude = 0.3
 
 [initials.couplers]
 q21_q22.parking_current = 200e-6

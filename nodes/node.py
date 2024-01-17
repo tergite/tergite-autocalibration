@@ -53,7 +53,7 @@ from config_files.VNA_values import (
 
 
 def resonator_samples(qubit: str) -> np.ndarray:
-    res_spec_samples = 41
+    res_spec_samples = 81
     sweep_range = 4e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
     min_freq = VNA_frequency - sweep_range / 2
@@ -525,7 +525,7 @@ class RO_amplitude_optimization_gef_Node:
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'ro_amplitudes': {qubit : np.linspace(0.001,0.151,31) for qubit in self.all_qubits}
+            'ro_amplitudes': {qubit : np.linspace(0.001,0.121,31) for qubit in self.all_qubits}
         }
         return cluster_samplespace
 
@@ -597,7 +597,7 @@ class CZ_Chevron_Node:
         q2_f12 = float(redis_connection.hget(f'transmons:{self.coupled_qubits[1]}', "freq_12"))
         # ac_freq = np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12))
         print([np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12)),np.abs(q1_f01 + q2_f01 - (q2_f01 + q2_f12))])
-        ac_freq = [np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12)),np.abs(q1_f01 + q2_f01 - (q2_f01 + q2_f12))][1]
+        ac_freq = np.min([np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12)),np.abs(q1_f01 + q2_f01 - (q2_f01 + q2_f12))])
         # ac_freq = int( ac_freq / 1e4 ) * 1e4
         print(f'{ ac_freq/1e6 = } MHz')
         # ac_freq = 0
@@ -617,10 +617,10 @@ class CZ_Chevron_Node:
 
             # For CZ gate
             'cz_pulse_durations': {
-                qubit: 4e-9+np.arange(0e-9, 30*16e-9,16e-9) for qubit in self.coupled_qubits
+                qubit: 12e-9+np.arange(0e-9, 40*12e-9,12e-9) for qubit in self.coupled_qubits
             },
             'cz_pulse_frequencies_sweep': {
-                qubit: np.linspace(-6e6, 6e6, 13) + self.ac_freq for qubit in self.coupled_qubits
+                qubit: np.linspace(-5e6, -1e6, 17) + self.ac_freq for qubit in self.coupled_qubits
             },
         }
         return cluster_samplespace

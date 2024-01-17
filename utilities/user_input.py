@@ -7,7 +7,7 @@ qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
 # qubits = ['q11','q12']
 # couplers = ['q11_q12']
 # qubits = ['q14','q15']
-couplers = ['q16_q21']
+couplers = ['q21_q22']
 
 '''
 node reference
@@ -41,7 +41,7 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'ro_frequency_optimization_gef',
+    'target_node': 'cz_calibration',
     'all_qubits': qubits,
     'couplers': couplers,
     # 'node_dictionary' : {'coupled_qubits': ['q21','q22']},
