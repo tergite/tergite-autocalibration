@@ -49,7 +49,7 @@ class MeasurementFactory:
 
     def select(self, node):
         if node.name in ['coupler_spectroscopy', 'coupler_resonator_spectroscopy']:
-            return CoupledQubitsMeasurement(node)
+            return CouplerSpectroscopyMeasurement(node)
         else:
             return SingleQubitsMeasurement(node)
 
@@ -70,7 +70,7 @@ class SingleQubitsMeasurement:
         return result_dataset
 
 
-class CoupledQubitsMeasurement:
+class CouplerSpectroscopyMeasurement:
     # coupler sweeps need special treatment. For this, separate them in their own class
 
     def __init__(self, node):
@@ -91,11 +91,12 @@ class CoupledQubitsMeasurement:
 
     def measure(self, node, compiled_schedule, ic, data_path):
         logger.info('Starting coupler spectroscopy')
+        print(f'{ self.dc_currents = }')
         for indx, current in enumerate(self.dc_currents):
             self.set_current(current)
 
             raw_dataset = execute_schedule(compiled_schedule, ic)
-            dataset = configure_dataset(raw_dataset, node.samplespace)
+            dataset = configure_dataset(raw_dataset, node)
 
             dataset = dataset.expand_dims(dim='dc_currents')
             dataset['dc_currents'] = [current]

@@ -32,9 +32,8 @@ punchout.ro_ampl = nan
 
 [qoi.couplers]
 coupler_spectroscopy.parking_current = nan
-# cz_chevron.cz_pulse_frequency = nan
-# cz_chevron.cz_pulse_duration = nan
-# cz_chevron.cz_pulse_width = 4e-9
+cz_chevron.cz_pulse_frequency = nan
+cz_chevron.cz_pulse_duration = nan
 # cz_chevron.dc_flux = nan
 # cz_chevron.dc_flux_offset = nan
 # cz_chevron.dc_flux_0 = nan
@@ -55,10 +54,10 @@ att = 0
 
 [initials.qubits]
 q11.ro_pulse_amp = 15.0e-3
-q12.ro_pulse_amp = 9.0e-3
-q13.ro_pulse_amp = 10.0e-3
-q14.ro_pulse_amp = 10.0e-3
-q15.ro_pulse_amp = 15.0e-3
+q12.ro_pulse_amp = 3.0e-3  #9.0e-3
+q13.ro_pulse_amp = 3.0e-3 #10.0e-3
+q14.ro_pulse_amp = 3.0e-3 #10.0e-3
+q15.ro_pulse_amp = 3.0e-3 #15.0e-3
 
 # # Added 6dB att
 # q16.ro_pulse_amp = 200.0e-3
@@ -96,9 +95,13 @@ q24.ro_pulse_amp = 13e-3
 q25.ro_pulse_amp = 9e-3
 
 [initials.couplers.all]
+cz_pulse_amplitude = 0.3
+cz_pulse_width = 4e-9
 
 [initials.couplers]
-q21_q22.parking_current =  800e-6
+# q21_q22.parking_current =  800e-6
+q12_q13.parking_current =  0
+q13_q14.parking_current =  0
 
 
 [resonator_spectroscopy.all]

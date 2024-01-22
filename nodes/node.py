@@ -53,10 +53,10 @@ from config_files.VNA_LOKIB_values import (
 
 
 def resonator_samples(qubit: str) -> np.ndarray:
-    res_spec_samples = 111
-    sweep_range = 2.0e6
+    res_spec_samples = 101
+    sweep_range =  2.0e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
-    min_freq = VNA_frequency - sweep_range / 2 + 0.5e6
+    min_freq = VNA_frequency - sweep_range / 2 -0.5e6
     max_freq = VNA_frequency + sweep_range / 2
     return np.linspace(min_freq, max_freq, res_spec_samples)
 
@@ -160,7 +160,7 @@ class Punchout_Node(Base_Node):
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             },
             'ro_amplitudes': {
-                qubit: np.linspace(0.005, 0.022, 10) for qubit in self.all_qubits
+                qubit: np.linspace(0.005, 0.022, 8) for qubit in self.all_qubits
             },
         }
         return cluster_samplespace
@@ -221,7 +221,7 @@ class Rabi_Oscillations_Node:
     def samplespace(self):
         cluster_samplespace = {
             'mw_amplitudes': {
-                qubit: np.linspace(0.002, 0.50, 71) for qubit in self.all_qubits
+                qubit: np.linspace(0.002, 0.80, 151) for qubit in self.all_qubits
             }
         }
         return cluster_samplespace
@@ -273,6 +273,7 @@ class N_Rabi_Oscillations_Node:
     def __init__(self, name: str, all_qubits: list[str], ** kwargs):
         self.name = name
         self.all_qubits = all_qubits
+
         self.node_dictionary = kwargs
         self.redis_field = ['mw_amp180']
         self.qubit_state = 0
@@ -546,30 +547,21 @@ class Coupler_Spectroscopy_Node:
     def __init__(self, name: str, all_qubits: list[str], ** kwargs):
         self.name = name
         self.all_qubits = all_qubits
-        self.coupler = kwargs['couplers'][0]
+        self.couplers = kwargs['couplers']
         self.redis_field = ['parking_current']
         self.qubit_state = 0
         # perform 2 tones while biasing the current
         self.measurement_obj = Two_Tones_Spectroscopy
         self.analysis_obj = CouplerSpectroscopyAnalysis
-        self.coupled_qubits = self.coupler.split(sep='_')
+        self.coupled_qubits = self.get_coupled_qubits()
         # self.validate()
 
-    def validate(self):
-        if 'coupled_qubits' not in self.node_dictionary:
-            error_msg = 'coupled_qubits not in job dictionary\n'
-            suggestion = 'job dictionary should look like:\n {"coupled_qubits": ["q1","q2"]}'
-            raise ValueError(error_msg + suggestion)
-        else:
-            coupled_qubits = self.node_dictionary['coupled_qubits']
-            if len(coupled_qubits) != 2:
-                raise ValueError('coupled qubits must be a list with 2 elements')
-            elif not all([q in self.all_qubits for q in coupled_qubits]):
-                raise ValueError('coupled qubits must be a subset of all calibrated qubits')
-            else:
-                self.coupled_qubits = coupled_qubits
-                self.coupler = coupled_qubits[0] + '_' + coupled_qubits[1]
-                self.measurement_qubit = coupled_qubits[0]
+    def get_coupled_qubits(self) -> list:
+        if len(self.couplers) > 1:
+            print('Multiple couplers, lets work with only one')
+        coupled_qubits = self.couplers[0].split(sep='_')
+        self.coupler = self.couplers[0]
+        return coupled_qubits
 
     @property
     def samplespace(self):
@@ -585,7 +577,7 @@ class Coupler_Spectroscopy_Node:
     @property
     def spi_samplespace(self):
         spi_samplespace = {
-            'dc_currents': {self.coupler: np.arange(-3.0e-3, 3.0e-3, 200e-6)},
+            'dc_currents': {self.couplers[0]: np.arange(-0.0e-3, 3.0e-3, 300e-6)},
         }
         return spi_samplespace
 

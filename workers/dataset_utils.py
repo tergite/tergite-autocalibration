@@ -21,7 +21,6 @@ def configure_dataset(
     The dataset retrieved from the instrument coordinator  is
     too bare-bones. Here we configure the dims, coords and data_vars
     '''
-
     if hasattr(node, 'coupler_samplespace'):
         sweep_type = SweepType.ClusterSweepOnCouplers
     elif hasattr(node, 'spi_samplespace'):
@@ -67,6 +66,10 @@ def configure_dataset(
                 coord_key = quantity + qubit
                 settable_values = samplespace[quantity][qubit]
                 coord_attrs = {'qubit':qubit, 'long_name': f'{coord_key}', 'units': 'NA'}
+            elif sweep_type == SweepType.SPI_and_Cluster_Sweep:
+                coord_key = quantity + qubit
+                settable_values = samplespace[quantity][qubit]
+                coord_attrs = {'qubit':qubit, 'long_name': f'{coord_key}', 'units': 'NA'}
             else:
                 raise(ValueError)
 
@@ -85,6 +88,8 @@ def configure_dataset(
             coupler = get_coupler_from_qubit(qubit)
             dimensions = [len(samplespace[quantity][coupler]) for quantity in sweep_quantities]
         elif sweep_type == SweepType.ClusterSweepOnQubits:
+            dimensions = [len(samplespace[quantity][qubit]) for quantity in sweep_quantities]
+        elif sweep_type == SweepType.SPI_and_Cluster_Sweep:
             dimensions = [len(samplespace[quantity][qubit]) for quantity in sweep_quantities]
 
         # TODO this is not safe:

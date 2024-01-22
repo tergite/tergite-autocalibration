@@ -6,4 +6,4 @@ hw_config_json = project_root / 'config_files/HARDWARE_CONFIGURATION_LOKIB_25092
 
 lokiA_IP = '192.0.2.141'
 
-spiA_serial_port = '/dev/ttyACM1'
+spiA_serial_port = '/dev/ttyACM0'
