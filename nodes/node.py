@@ -440,6 +440,16 @@ class CZ_Chevron_Node:
         self.analysis_obj = CZChevronAnalysis
         self.all_qubits = [q for bus in couplers for q in bus.split('_')]
         self.coupler_samplespace = self.samplespace
+        self.validate()
+
+    def validate(self) -> None:
+        all_coupled_qubits = []
+        for coupler in self.couplers:
+            all_coupled_qubits += coupler.split('_')
+        if len(all_coupled_qubits) > len(set(all_coupled_qubits)):
+            print('Couplers share qubits')
+            raise ValueError('Improper Couplers')
+
 
 
     def transition_frequency(self, coupler: str):
@@ -452,7 +462,9 @@ class CZ_Chevron_Node:
         ac_freq = np.abs(q1_f01 + q2_f01 - (q2_f01 + q2_f12))
         ac_freq = int( ac_freq / 1e4 ) * 1e4
         print(f'{ ac_freq/1e6 = } MHz for coupler: {coupler}')
-        return ac_freq
+        # return ac_freq
+        print( 'WARNING SETTING ACFREQ')
+        return 333e+6
 
     @property
     def samplespace(self):
@@ -577,7 +589,7 @@ class Coupler_Spectroscopy_Node:
     @property
     def spi_samplespace(self):
         spi_samplespace = {
-            'dc_currents': {self.couplers[0]: np.arange(-0.0e-3, 3.0e-3, 300e-6)},
+            'dc_currents': {self.couplers[0]: np.arange(-2.5e-3, 2.5e-3, 250e-6)},
         }
         return spi_samplespace
 

@@ -25,8 +25,9 @@ class SpiDAC():
     def create_spi_dac(self, coupler: str):
         coupler_spi_map = {
             'q11_q12': (1, 'dac0'), # seems dead
-            'q12_q13': (1, 'dac1'), # heating?
+            'q12_q13': (1, 'dac1'), # heating? about 1mK for a coupler spectroscopy
             'q13_q14': (1, 'dac2'),
+            'q14_q15': (1, 'dac3'),
             # 'q16_q17': (1, 'dac0'), # slightly heating?
             # 'q17_q18': (1, 'dac1'),
             # 'q18_q19': (1, 'dac2'),
@@ -41,17 +42,14 @@ class SpiDAC():
             # 'q24_q25': (4, 'dac0'),
         }
 
-        dc_current_step = 20e-6
+        dc_current_step = 2e-6
         spi_mod_number, dac_name = coupler_spi_map[coupler]
-        print(f'{ spi_mod_number = }')
-        print(f'{ dac_name = }')
         spi_mod_name = f'module{spi_mod_number}'
         if spi_mod_name not in self.spi.instrument_modules:
             self.spi.add_spi_module(spi_mod_number, 'S4g')
         this_dac = self.spi.instrument_modules[spi_mod_name].instrument_modules[dac_name]
         this_dac.ramping_enabled(True)
         this_dac.span('range_min_bi')
-        self.spi.set_dacs_zero()
         this_dac.current.vals = validators.Numbers(min_value=-3.1e-3, max_value=3.1e-3)
         this_dac.ramp_rate(20e-6)
         this_dac.ramp_max_step(dc_current_step)

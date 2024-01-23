@@ -27,7 +27,7 @@ import redis
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 import numpy as np
-from workers.redis_utils import populate_initial_parameters
+from workers.redis_utils import populate_initial_parameters, populate_quantities_of_interest
 
 colorama_init()
 
@@ -66,26 +66,6 @@ class CalibrationSupervisor():
             ic.timeout(222)
         return ic
 
-    def reset_all_nodes(self):
-        nodes = self.topo_order
-        for qubit in self.qubits:
-            fields =  self.redis_connection.hgetall(f'transmons:{qubit}').keys()
-            key = f'transmons:{qubit}'
-            cs_key = f'cs:{qubit}'
-            for field in fields:
-                self.redis_connection.hset(key, field, 'nan' )
-            for node in nodes:
-                self.redis_connection.hset(cs_key, node, 'not_calibrated' )
-
-        for coupler in self.couplers:
-            fields =  self.redis_connection.hgetall(f'couplers:{coupler}').keys()
-            key = f'couplers:{coupler}'
-            cs_key = f'cs:{coupler}'
-            for field in fields:
-                self.redis_connection.hset(key, field, 'nan' )
-            for node in nodes:
-                self.redis_connection.hset(cs_key, node, 'not_calibrated' )
-
 
     def calibrate_system(self):
 
@@ -95,36 +75,37 @@ class CalibrationSupervisor():
             self.couplers,
             self.redis_connection
         )
+        self.calibrate_linear_node_sequence()
 
-        # TODO temporary hack because optimizing CZ chevron requires re-running
-        # the whole calibration chain
-        if self.target_node == 'cz_chevron':
-            self.currents = {}
-            self.number_of_test_currents = 5
-            for coupler in self.couplers:
-                parking_current = float(self.redis_connection.hget(f'couplers:{coupler}', "parking_current"))
-                self.currents[coupler] = parking_current + np.linspace(-1e-4, 1e-4, self.number_of_test_currents)
+        # # TODO temporary hack because optimizing CZ chevron requires re-running
+        # # the whole calibration chain
+        # if self.target_node == 'cz_chevron':
+        #     self.currents = {}
+        #     self.number_of_test_currents = 5
+        #     for coupler in self.couplers:
+        #         parking_current = float(self.redis_connection.hget(f'couplers:{coupler}', "parking_current"))
+        #         self.currents[coupler] = parking_current + np.linspace(-1e-4, 1e-4, self.number_of_test_currents)
+        #     for current_index in range(self.number_of_test_currents):
+        #         print(f'{ self.dacs = }')
+        #         for coupler in self.couplers:
+        #             current = self.currents[coupler][current_index]
+        #             print(f'{ current = }')
+        #             self.dacs[coupler].current(current)
+        #             while self.dacs[coupler].is_ramping():
+        #                 print('ramping')
 
-            for current_index in range(self.number_of_test_currents):
-                print(f'{ self.dacs = }')
-                for coupler in self.couplers:
-                    current = self.currents[coupler][current_index]
-                    print(f'{ current = }')
-                    self.dacs[coupler].current(current)
-                    while self.dacs[coupler].is_ramping():
-                        print('ramping')
-                        time.sleep(1)
-                    print('Finished ramping')
-                self.calibrate_linear_node_sequence()
-                self.reset_all_nodes()
-                populate_initial_parameters(
-                    self.transmon_configuration,
-                    self.qubits,
-                    self.couplers,
-                    self.redis_connection
-                )
-        else:
-            self.calibrate_linear_node_sequence()
+        #                 time.sleep(1)
+        #             print('Finished ramping')
+        #         self.calibrate_linear_node_sequence()
+        #         self.reset_all_nodes()
+        #         populate_initial_parameters(
+        #             self.transmon_configuration,
+        #             self.qubits,
+        #             self.couplers,
+        #             self.redis_connection
+        #         )
+        # else:
+        #     self.calibrate_linear_node_sequence()
 
     def calibrate_linear_node_sequence(self):
         logger.info('Starting System Calibration')
@@ -133,39 +114,12 @@ class CalibrationSupervisor():
 
         redis_connection = self.redis_connection
 
-        # Populate the Redis database with the quantities of interest, at Nan value
-        # Only if the key does NOT already exist
-        quantities_of_interest = self.transmon_configuration['qoi']
-        qubit_quantities_of_interest = quantities_of_interest['qubits']
-        coupler_quantities_of_interest = quantities_of_interest['couplers']
-
-        for node_name, node_parameters_dictionary in qubit_quantities_of_interest.items():
-            # named field as Redis calls them fields
-            for qubit in self.qubits:
-                redis_key = f'transmons:{qubit}'
-                calibration_supervisor_key = f'cs:{qubit}'
-                for field_key, field_value in node_parameters_dictionary.items():
-                    # check if field already exists
-                    if not redis_connection.hexists(redis_key, field_key):
-                        redis_connection.hset(f'transmons:{qubit}', field_key, field_value)
-                # flag for the calibration supervisor
-                if not redis_connection.hexists(calibration_supervisor_key, node_name):
-                    redis_connection.hset(f'cs:{qubit}', node_name, 'not_calibrated' )
-
-        for node_name, node_parameters_dictionary in coupler_quantities_of_interest.items():
-            for coupler in self.couplers:
-                redis_key = f'couplers:{coupler}'
-                calibration_supervisor_key = f'cs:{coupler}'
-                for field_key, field_value in node_parameters_dictionary.items():
-                    # check if field already exists
-                    if not redis_connection.hexists(redis_key, field_key):
-                        redis_connection.hset(f'couplers:{coupler}', field_key, field_value)
-                # flag for the calibration supervisor
-                if not redis_connection.hexists(calibration_supervisor_key, node_name):
-                    redis_connection.hset(f'cs:{coupler}', node_name, 'not_calibrated' )
-
-
-
+        populate_quantities_of_interest(
+            self.transmon_configuration,
+            self.qubits,
+            self.couplers,
+            self.redis_connection
+        )
 
         for calibration_node in self.topo_order:
             self.inspect_node(calibration_node)

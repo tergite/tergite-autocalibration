@@ -2,7 +2,7 @@
 # qubits = [ 'q18','q19','q20','q21','q22','q23','q24','q25']
 qubits = ['q12','q13','q14','q15']
 # couplers = ['q12_q13','q13_q14' ]
-couplers = ['q12_q13']
+couplers = ['q12_q13', 'q14_q15']
 
 '''
 node reference
@@ -27,7 +27,7 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'coupler_spectroscopy',
+    'target_node': 'rabi_oscillations',
     'all_qubits': qubits,
     'couplers': couplers,
 }

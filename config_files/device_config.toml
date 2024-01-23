@@ -100,8 +100,10 @@ cz_pulse_width = 4e-9
 
 [initials.couplers]
 # q21_q22.parking_current =  800e-6
+q11_q12.parking_current =  0
 q12_q13.parking_current =  0
 q13_q14.parking_current =  0
+q14_q15.parking_current =  0
 
 
 [resonator_spectroscopy.all]
