@@ -72,8 +72,8 @@ class CZModel(lmfit.model.Model):
         # Frequency guess is obtained using a fast fourier transform (FFT).
         (freq_guess, _) = fft_freq_phase_guess(data, drive_amp)
 
-        self.set_param_hint("frequency", value=freq_guess, min=0)
-        self.set_param_hint("amplitude", value=amp_guess, min=amp_guess/2)
+        self.set_param_hint("frequency", value=freq_guess, min=freq_guess*0.9)
+        self.set_param_hint("amplitude", value=amp_guess, min=amp_guess*0.9)
         self.set_param_hint("offset", value=offs_guess)
 
         params = self.make_params()
@@ -125,11 +125,18 @@ class CZCalibrationAnalysis():
                 self.cphase = 0
                 self.err = 0
                 self.opt_cz = [0]*2
+            if fit:
+                qois = np.transpose([[[fit.result.params[p].value,fit.result.params[p].stderr] for p in ['amplitude']] for fit in self.fit_results])
+                self.pop_loss = np.diff(np.flip(qois[0][0]))[0]
+            else:
+                self.pop_loss = np.mean(np.diff(np.flip(self.fit_ys)))
         except:
             self.cphase = 0
             self.err = 0
             self.opt_cz = [0]*2
-        return [self.cphase]
+            self.pop_loss = 0
+        
+        return [self.cphase,self.pop_loss]
 
     def plotter(self,axis):
         # datarray = self.dataset[f'y{self.qubit}']
@@ -200,8 +207,8 @@ class CZCalibrationSSROAnalysis():
             cm_norm = confusion_matrix(y,y_pred,normalize='true')
             cm_inv = inv(cm_norm)
             assignment = np.trace(cm_norm)/len(self.calibs)
-            print(f'{assignment = }')
-            print(f'{cm_norm = }')
+            # print(f'{assignment = }')
+            # print(f'{cm_norm = }')
             # disp = ConfusionMatrixDisplay(confusion_matrix=cm_norm)
             # disp.plot()
             # plt.show()
@@ -228,7 +235,7 @@ class CZCalibrationSSROAnalysis():
             self.all_magnitudes.append(data_res)
         self.all_magnitudes = np.array(self.all_magnitudes)
         # Fitting the 0 state data
-        self.magnitudes = self.all_magnitudes[:,:-3,0]
+        self.magnitudes = self.all_magnitudes[:,:-3,1]
 
         # self.freq = self.dataset[f'control_ons{self.qubit}'].values
         # self.amp = self.dataset[f'ramsey_phases{self.qubit}'].values
@@ -289,17 +296,17 @@ class CZCalibrationSSROAnalysis():
             label = ['Control Off','Control On']
             name = 'CZ'
         x = range(len(label))
-        marker = ['-','--']
-        # colors = plt.get_cmap('RdBu_r')(np.linspace(0.2, 0.8, len(x)))
-        colors = plt.get_cmap('tab20c')
+        marker = ['.','*','-','--']
+        colors = plt.get_cmap('RdBu_r')(np.linspace(0.2, 0.8, len(x)))
+        # colors = plt.get_cmap('tab20c')
         
         for index,magnitude in enumerate(self.all_magnitudes):
-            axis.plot(self.independents,magnitude[:-3,0],f'{marker[index]}',c = colors(2),label=f'|0> {label[index]}')
-            axis.plot(self.independents,magnitude[:-3,1],f'{marker[index]}',c = colors(2+4),label=f'|1> {label[index]}')
-            axis.plot(self.independents,magnitude[:-3,2],f'{marker[index]}',c = colors(2+4*2),label=f'|2> {label[index]}')
+            axis.plot(self.independents,magnitude[:-3,1],f'{marker[0]}',c = colors[index],label=f'|1> {label[index]}')
+            # axis.plot(self.independents,magnitude[:-3,1],f'{marker[index]}',c = colors(2+4),label=f'|1> {label[index]}')
+            axis.plot(self.independents,magnitude[:-3,2],f'{marker[1]}',c = colors[index],label=f'|2> {label[index]}')
 
         for index,magnitude in enumerate(self.magnitudes):
-            axis.plot(self.fit_independents,self.fit_ys[index],f'{marker[index]}',c = colors(0))
+            axis.plot(self.fit_independents,self.fit_ys[index],'-',c = colors[index])
             axis.vlines(self.opt_cz[index],-10,10,colors='gray',linestyles='--',linewidth=1.5)
         
         axis.vlines(0,-10,-10,colors='gray',linestyles='--', label = '{:} = {:.1f}+/-{:.1f}'.format(name,self.cphase,self.err),zorder=-10)

@@ -65,7 +65,7 @@ class RamseyAnalysis():
         if dataset.node == 'ramsey_correction_12':
             redis_field = 'freq_12'
         self.qubit_frequency = float(redis_connection.hget(f'{redis_key}',redis_field))
-        print(redis_field,self.qubit_frequency)
+        # print(redis_field,self.qubit_frequency)
         self.dataset = dataset
 
     def run_fitting(self):
@@ -92,9 +92,9 @@ class RamseyAnalysis():
 
         # self.dataset['fit_ramsey_delays'] = self.fit_ramsey_delays
         # self.dataset['fit_y'] = ('fit_ramsey_delays',fit_y)
-        print("Frequency before correction: ", self.qubit_frequency)
+        # print("Frequency before correction: ", self.qubit_frequency)
         self.corrected_qubit_frequency = self.qubit_frequency + self.frequency_correction
-        print("Frequency after correction: ", self.corrected_qubit_frequency)
+        # print("Frequency after correction: ", self.corrected_qubit_frequency)
         return [self.corrected_qubit_frequency]
 
     def plotter(self,ax):

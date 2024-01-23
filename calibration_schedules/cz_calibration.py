@@ -55,7 +55,7 @@ class CZ_calibration(Measurement):
             ramsey_phases: dict[str,np.ndarray],
             control_ons: dict[str,np.ndarray],
             number_of_cz: int = 1,
-            repetitions: int = 1024,
+            repetitions: int = 4096,
         ) -> Schedule:
 
         """
@@ -187,32 +187,32 @@ class CZ_calibration(Measurement):
                     if qubit_types[this_qubit] == 'Target':
                         x90 = schedule.add(X90(this_qubit), ref_op=relaxation, ref_pt='end')
 
+                buffer_start = schedule.add(IdlePulse(4e-9), ref_op=x90, ref_pt='end')
                 for this_coupler in all_couplers:
                     cz_clock = f'{this_coupler}.cz'
                     cz_pulse_port = f'{this_coupler}:fl'
-                    buffer = schedule.add(IdlePulse(4e-9), ref_op=x90, ref_pt='end')
-                    reset_phase = schedule.add(ResetClockPhase(clock=cz_clock))
+                    reset_phase = schedule.add(ResetClockPhase(clock=cz_clock),
+                            ref_op=buffer_start, ref_pt='end',)
                     cz = schedule.add(
                             SoftSquarePulse(
                                 duration=cz_pulse_duration[this_coupler],
                                 amp = cz_pulse_amplitude[this_coupler],
                                 port=cz_pulse_port,
                                 clock=cz_clock,
-                            ),
-                            ref_op=reset_phase, ref_pt='end',
+                            )
                         )
                     # cz = schedule.add(IdlePulse(cz_pulse_duration[this_coupler]))
-                    buffer = schedule.add(IdlePulse(4e-9))
+                buffer_end = shot.add(IdlePulse(4e-9),ref_op=buffer_start, ref_pt='end',rel_time = np.ceil( cz_pulse_duration[this_coupler] * 1e9 / 4) * 4e-9)
                 if not dynamic:
                     if control_on:
                         for this_qubit in all_qubits:
                             if qubit_types[this_qubit] == 'Control':
                                 # print(this_qubit, qubit_types[this_qubit])
-                                x_end = schedule.add(X(this_qubit), ref_op=buffer, ref_pt='end')
+                                x_end = schedule.add(X(this_qubit), ref_op=buffer_end, ref_pt='end')
                 
                 for this_qubit in all_qubits:
                     if qubit_types[this_qubit] == 'Target':
-                        x90_end = schedule.add(Rxy(theta=90, phi=ramsey_phase, qubit=this_qubit), ref_op=buffer, ref_pt='end')
+                        x90_end = schedule.add(Rxy(theta=90, phi=ramsey_phase, qubit=this_qubit), ref_op=buffer_end, ref_pt='end')
                 
                 for this_qubit in all_qubits:
                     this_index = cz_index*number_of_phases+ramsey_index
@@ -721,7 +721,10 @@ class CZ_calibration_SSRO(Measurement):
         coupler: str,
         ramsey_phases: dict[str,np.ndarray],
         control_ons: dict[str,np.ndarray],
-        repetitions: int = 1024,
+        repetitions: int = 3000,
+        opt_cz_pulse_frequency: dict[str,float] = None,
+        opt_cz_pulse_duration: dict[str,float] = None,
+        opt_cz_pulse_amplitude: dict[str,float] = None,
         ) -> Schedule:
 
         dynamic = False
@@ -746,8 +749,17 @@ class CZ_calibration_SSRO(Measurement):
             for this_coupler in all_couplers:
                 redis_config = redis_connection.hgetall(f"couplers:{this_coupler}")
                 cz_pulse_frequency[this_coupler] = float(redis_config['cz_pulse_frequency'])
-                cz_pulse_duration[this_coupler] = np.ceil(float(redis_config['cz_pulse_duration'])* 1e9 / 4) * 4e-9
+                cz_pulse_duration[this_coupler] = float(redis_config['cz_pulse_duration'])
                 cz_pulse_amplitude[this_coupler] = float(redis_config['cz_pulse_amplitude'])
+
+        for this_coupler in all_couplers:
+            if opt_cz_pulse_amplitude is not None:
+                cz_pulse_amplitude[this_coupler] += opt_cz_pulse_amplitude[this_coupler]
+            if opt_cz_pulse_duration is not None:
+                cz_pulse_duration[this_coupler] += opt_cz_pulse_duration[this_coupler]
+            if opt_cz_pulse_frequency is not None:
+                cz_pulse_frequency[this_coupler] += opt_cz_pulse_frequency[this_coupler]
+
         print(f'{cz_pulse_frequency = }')
         print(f'{cz_pulse_duration = }')
         print(f'{cz_pulse_amplitude = }')
@@ -793,13 +805,14 @@ class CZ_calibration_SSRO(Measurement):
                     if qubit_types[this_qubit] == 'Target':
                         x90 = shot.add(X90(this_qubit), ref_op=relaxation, ref_pt='end')
                 
-                buffer = shot.add(IdlePulse(4e-9), ref_op=x90, ref_pt='end')
+                buffer_start = shot.add(IdlePulse(4e-9), ref_op=x90, ref_pt='end')
                 for this_coupler in all_couplers:
                     cz_clock = f'{this_coupler}.cz'
                     cz_pulse_port = f'{this_coupler}:fl'
                     # cz_clock = 'q11_q12.cz'
                     # cz_pulse_port = 'q11_q12:fl'
-                    reset_phase = shot.add(ResetClockPhase(clock=cz_clock))
+                    reset_phase = shot.add(ResetClockPhase(clock=cz_clock),
+                            ref_op=buffer_start, ref_pt='end',)
                     cz = shot.add(
                             SoftSquarePulse(
                                 duration = cz_pulse_duration[this_coupler],
@@ -808,22 +821,20 @@ class CZ_calibration_SSRO(Measurement):
                                 clock = cz_clock,
                                 # port = 'q11_q12:fl',
                                 # clock = 'q11_q12.cz',
-                            ),
-                            ref_op=buffer, ref_pt='end',
+                            )
                         )
                     # cz = shot.add(IdlePulse(cz_pulse_duration[this_coupler]))
-                
-                buffer = shot.add(IdlePulse(4e-9))
+                buffer_end = shot.add(IdlePulse(4e-9),ref_op=buffer_start, ref_pt='end',rel_time = np.ceil( cz_pulse_duration[this_coupler] * 1e9 / 4) * 4e-9)
                 if not dynamic:
                     if control_on:
                         for this_qubit in all_qubits:
                             if qubit_types[this_qubit] == 'Control':
-                                x_end = shot.add(X(this_qubit), ref_op=buffer, ref_pt='end')
+                                x_end = shot.add(X(this_qubit), ref_op=buffer_end, ref_pt='end')
                                 # x_end = shot.add(IdlePulse(20e-9))
                         
                 for this_qubit in all_qubits:
                     if qubit_types[this_qubit] == 'Target':
-                        x90_end = shot.add(Rxy(theta=90, phi=ramsey_phase, qubit=this_qubit), ref_op=buffer, ref_pt='end')
+                        x90_end = shot.add(Rxy(theta=90, phi=ramsey_phase, qubit=this_qubit), ref_op=buffer_end, ref_pt='end')
                 
                 for this_qubit in all_qubits:
                     this_index = cz_index*number_of_phases+ramsey_index

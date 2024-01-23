@@ -58,14 +58,18 @@ class Monitor:
 
     def calibrate_node(self, node:str=None, **kwargs):
         if node is None:
-            supervisor.calibrate_node(self.node_park, **kwargs)    
+            self.all_results = supervisor.calibrate_node(self.node_park, **kwargs)    
         else:
-            supervisor.calibrate_node(node, **kwargs)
+            self.all_results = supervisor.calibrate_node(node, **kwargs)
             self.node_park = node
 
     def next_node(self, node:str=None):
         if node is None:
             node = self.node_park
         print(cg[node])
+
+    def get_results(self):
+        return self.all_results
         
-s = Monitor()
+        
+# monitor = Monitor()

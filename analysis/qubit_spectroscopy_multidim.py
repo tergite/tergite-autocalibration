@@ -104,7 +104,7 @@ class QubitSpectroscopyMultidim():
             # qubit_ampl =fit_result.params['A'].value
             qubit_freq = frequencies[these_magnitudes.argmax()]
             qubit_ampl = these_magnitudes.max()
-            print(qubit_ampl,qubit_freq)
+            # print(qubit_ampl,qubit_freq)
             #self.uncertainty = fit_result.params['x0'].stderr
             if qubit_ampl > self.qubit_ampl:
                 self.qubit_ampl = qubit_ampl

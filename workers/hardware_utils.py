@@ -42,7 +42,7 @@ class SpiDAC():
 
 # dc_current_step = np.diff(node.spi_samplespace['dc_currents'][coupler])[0]
 # ensure step is rounded in microAmpere:
-        dc_current_step = 20e-6
+        dc_current_step = 1e-6
         dc_current_step = round(dc_current_step / 1e-6) * 1e-6
         spi_mod_number, dac_name = coupler_spi_map[coupler]
         print(f'{ spi_mod_number = }')
@@ -52,7 +52,6 @@ class SpiDAC():
         this_dac = self.spi.instrument_modules[spi_mod_name].instrument_modules[dac_name]
 # IMPORTANT: First we set the span and then with set the currents to zero
         this_dac.span('range_min_bi')
-        # self.spi.set_dacs_zero()
         this_dac.current.vals = validators.Numbers(min_value=-3.1e-3, max_value=3.1e-3)
 
         this_dac.ramping_enabled(True)

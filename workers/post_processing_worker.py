@@ -24,11 +24,13 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
     fig.savefig(f'{data_path}/{node.name}.png', bbox_inches='tight', dpi=600)
     # plt.show()
     plt.show(block=False)
-    plt.pause(10)
+    plt.pause(4)
     plt.close()
 
     if node != 'tof':
         analysis.node_result.update({'measurement_dataset':result_dataset.to_dict()})
+    
+    return analysis.get_results()
 
 
 class BaseAnalysis():
@@ -73,8 +75,8 @@ class Multiplexed_Analysis(BaseAnalysis):
         for var in result_dataset.data_vars:
             this_qubit = result_dataset[var].attrs['qubit']
             data_vars_dict[this_qubit].add(var)
-
-
+        
+        self.all_results = {}
         for indx, var in enumerate(result_dataset.data_vars):
             this_qubit = result_dataset[var].attrs['qubit']
             # ds = result_dataset[var].to_dataset()
@@ -91,17 +93,24 @@ class Multiplexed_Analysis(BaseAnalysis):
             kw_args = getattr(node, "analysis_kwargs", dict())
             node_analysis = node.analysis_obj(ds, **kw_args)
             self.qoi = node_analysis.run_fitting()
-
+            
             node_analysis.plotter(this_axis)
 
             # TODO temporary hack:
-            if node.name in ['cz_chevron','cz_calibration','cz_dynamic_phase'] and qubit_types[this_qubit] == 'Target':
+            if node.name in ['cz_calibration','cz_dynamic_phase','cz_calibration_ssro'] and qubit_types[this_qubit] == 'Target':
                 self.update_redis_trusted_values(node.name, node.coupler, redis_field)
-            if node.name in ['coupler_spectroscopy']:
+                this_element = node.coupler
+            elif node.name in ['cz_chevron'] and qubit_types[this_qubit] == 'Control':
                 self.update_redis_trusted_values(node.name, node.coupler, redis_field)
+                this_element = node.coupler
+            elif node.name in ['coupler_spectroscopy']:
+                self.update_redis_trusted_values(node.name, node.coupler, redis_field)
+                this_element = node.coupler
             else:
                 self.update_redis_trusted_values(node.name, this_qubit, redis_field)
+                this_element = this_qubit
 
+            self.all_results[this_element] = dict(zip(redis_field,self.qoi))
             handles, labels = this_axis.get_legend_handles_labels()
 
             if node.name in ['T1','T2','T2_echo']:
@@ -113,3 +122,6 @@ class Multiplexed_Analysis(BaseAnalysis):
             this_axis.set(title=None)
             this_axis.legend(handles=handles, fontsize='x-small')
             # logger.info(f'Analysis for the {node} of {this_qubit} is done, saved at {self.data_path}')
+    
+    def get_results(self):
+        return self.all_results
