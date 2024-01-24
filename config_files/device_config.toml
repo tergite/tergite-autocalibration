@@ -10,13 +10,15 @@ resonator_spectroscopy_2.ro_freq_2 = nan
 ro_frequency_optimization.ro_freq_opt = nan
 ro_frequency_optimization_gef.ro_freq_opt = nan
 ro_amplitude_optimization.ro_ampl_opt = nan
+ro_amplitude_optimization_gef.ro_ampl_opt = nan
+ro_amplitude_optimization_gef.inv_cm_opt = nan
 qubit_01_spectroscopy_pulsed.freq_01 = nan
 qubit_01_spectroscopy_multidim.freq_01 = nan
 qubit_01_spectroscopy_multidim.spec_ampl_optimal = nan
 two_tone_multidim.freq_01 = nan
-ramsey_correction.freq_01 = nan
+ramsey_fringes.freq_01 = nan
 qubit_12_spectroscopy_pulsed.freq_12 = nan
-ramsey_correction_12.freq_12 = nan
+ramsey_fringes_12.freq_12 = nan
 qubit_12_spectroscopy_pulsed.anharmonicity = nan
 qubit_12_spectroscopy_multidim.freq_12 = nan
 qubit_12_spectroscopy_multidim.spec_ampl_12_optimal = nan
@@ -27,8 +29,12 @@ rabi_oscillations_12.mw_ef_amp180 = nan
 randomized_benchmarking.fidelity = nan
 state_discrimination.discriminator = nan
 T1.t1_time = nan
+T2.t2_time = nan
+T2_echo.t2_echo_time = nan
 XY_crosstalk.selectivity = nan
 punchout.ro_ampl = nan
+reset_chevron.reset_amplitude_qc = nan
+reset_chevron.reset_duration_qc = nan
 
 [qoi.couplers]
 coupler_spectroscopy.parking_current = nan
@@ -37,15 +43,19 @@ cz_chevron.cz_pulse_duration = nan
 # cz_chevron.dc_flux = nan
 # cz_chevron.dc_flux_offset = nan
 # cz_chevron.dc_flux_0 = nan
-# cz_calibration.cz_phase = nan
+cz_calibration.cz_phase = nan
+cz_calibration_ssro.cz_phase = nan
+cz_calibration_ssro.cz_pop_loss = nan
+cz_calibration_ssro.cz_leakage = nan
+cz_dynamic_phase.coupler_dynamic_phase = nan
 
 [initials.qubits.all]
-ro_acq_delay = 200e-9
+ro_acq_delay = 220e-9
 ro_pulse_delay = 4e-9
-ro_pulse_duration = 3.0e-6
+ro_pulse_duration = 3e-6
 ro_acq_integration_time = 2.5e-6
 mw_pulse_duration = 20e-9
-init_duration = 240e-6
+init_duration = 400e-6
 min_calibration_point = 0
 max_calibration_point = 0
 spec_pulse_duration = 5e-6
@@ -134,10 +144,10 @@ spec_pulse_duration = 2e-6
 spec_amp = 3.5e-4
 init_duration = 100e-6
 
-[ramsey_correction.all]
+[ramsey_fringes.all]
 artificial_detuning = 3e6
 
-[ramsey_correction_12.all]
+[ramsey_fringes_12.all]
 artificial_detuning = 3e6
 
 [qubit_12_spectroscopy_pulsed.all]

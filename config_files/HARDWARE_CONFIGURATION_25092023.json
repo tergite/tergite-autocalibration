@@ -1,7 +1,7 @@
 {
    "backend": "quantify_scheduler.backends.qblox_backend.hardware_compile",
    "clusterA": {
-      "ref": "internal",
+      "ref": "external",
       "instrument_type": "Cluster",
       "clusterA_module1": {
          "instrument_type": "QCM_RF",
@@ -223,14 +223,14 @@
             ]
          },
          "complex_output_1": {
-            "lo_freq": 4400000000.0,
-            "dc_mixer_offset_I": 0,
-            "dc_mixer_offset_Q": 0,
+            "lo_freq": 3900000000.0,
+            "dc_mixer_offset_I": 0.3233e-3,
+            "dc_mixer_offset_Q": -10.3449e-3,
             "portclock_configs": [
                {
                   "port": "q11_q12:fl",
                   "clock": "q11_q12.cz",
-                  "mixer_amp_ratio": 1,
+                  "mixer_amp_ratio": 1	,
                   "mixer_phase_error_deg": 0
                }
             ]
@@ -239,7 +239,7 @@
       "clusterA_module11": {
          "instrument_type": "QCM_RF",
          "complex_output_1": {
-            "lo_freq": 4400000000.0,
+            "lo_freq": 3900000000.0,
             "dc_mixer_offset_I": 0,
             "dc_mixer_offset_Q": 0,
             "portclock_configs": [
@@ -255,7 +255,7 @@
       "clusterA_module12": {
          "instrument_type": "QCM_RF",
          "complex_output_1": {
-            "lo_freq": 4400000000.0,
+            "lo_freq": 3900000000.0,
             "dc_mixer_offset_I": 0,
             "dc_mixer_offset_Q": 0,
             "portclock_configs": [
@@ -271,15 +271,15 @@
       "clusterA_module13": {
          "instrument_type": "QCM_RF",
          "complex_output_1": {
-            "lo_freq": 4400000000.0,
-            "dc_mixer_offset_I": 0,
-            "dc_mixer_offset_Q": 0,
+            "lo_freq": 3900000000.0,
+            "dc_mixer_offset_I": 2.2629e-3,
+            "dc_mixer_offset_Q": -12.7156e-3,
             "portclock_configs": [
                {
                   "port": "q14_q15:fl",
                   "clock": "q14_q15.cz",
-                  "mixer_amp_ratio": 1,
-                  "mixer_phase_error_deg": 0
+                  "mixer_amp_ratio": 0.9485,
+                  "mixer_phase_error_deg": -24.92263
                }
             ]
          }

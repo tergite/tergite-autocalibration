@@ -32,5 +32,5 @@ class MotzoiAnalysis():
         qubit = self.qubit
 
 
-        datarray.plot(ax=axis, x=f'mw_motzois{qubit}')
-        axis.axvline(self.optimal_motzoi, c='red', lw=4)
+        datarray.plot(ax=axis, x=f'mw_motzois{qubit}',cmap='RdBu_r')
+        axis.axvline(self.optimal_motzoi, c='k', lw=4,linestyle ='--')

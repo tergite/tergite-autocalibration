@@ -112,6 +112,14 @@ class Two_Tones_Multidim(Measurement):
                     #     label=f"spec_pulse_multidim_{this_qubit}_{this_index}", ref_op=set_frequency, ref_pt="end",
                     # )
 
+                    if self.qubit_state == 0:
+                        pass
+                    elif self.qubit_state == 1:
+                        schedule.add(X(this_qubit), ref_pt='end')
+                    else:
+                        raise ValueError(f'Invalid qubit state: {self.qubit_state}')
+
+
                     schedule.add(
                         SoftSquarePulse(
                             duration= spec_pulse_durations[this_qubit],
@@ -125,7 +133,8 @@ class Two_Tones_Multidim(Measurement):
                     if self.qubit_state == 0:
                         measure_function = Measure
                     elif self.qubit_state == 1:
-                        measure_function = Measure_RO1
+                        schedule.add(X(this_qubit), ref_pt='end')
+                        measure_function = Measure
                     else:
                         raise ValueError(f'Invalid qubit state: {self.qubit_state}')
 

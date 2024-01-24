@@ -137,15 +137,15 @@ class QubitSpectroscopyAnalysis():
         if self.hasPeak:
             ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0)
             min = np.min(self.magnitudes)
-            ax.vlines(self.freq, min, self.prominence + min, lw=4, color='teal')
-            ax.vlines(self.freq-1e6, min, self.filtered_std + min, lw=4, color='orange')
+            # ax.vlines(self.freq, min, self.prominence + min, lw=4, color='teal')
+            # ax.vlines(self.freq-1e6, min, self.filtered_std + min, lw=4, color='orange')
             ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0, label=f"freq = {self.freq:.6E} ± {self.uncertainty:.1E} (Hz)")
         # Plots the data and the fitted model of a qubit spectroscopy experiment
         resonator_minimum = float(redis_connection.hget(f'transmons:{self.qubit}', 'resonator_minimum'))
         resonator_minimum_1 = float(redis_connection.hget(f'transmons:{self.qubit}', 'resonator_minimum_1'))
-        ax.axhline(resonator_minimum, lw=3)
-        if not np.isnan(resonator_minimum_1):
-            ax.axhline(resonator_minimum_1, lw=3, c='red')
+        # ax.axhline(resonator_minimum, lw=3)
+        # if not np.isnan(resonator_minimum_1):
+        #     ax.axhline(resonator_minimum_1, lw=3, c='red')
         ax.plot( self.independents, self.magnitudes,'bo-',ms=3.0)
         ax.set_title(f'Qubit Spectroscopy for {self.qubit}')
         ax.set_xlabel('frequency (Hz)')

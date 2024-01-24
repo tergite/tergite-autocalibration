@@ -5,6 +5,10 @@ import numpy as np
 import redis
 import xarray as xr
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.metrics import confusion_matrix,ConfusionMatrixDisplay
+import matplotlib.pyplot as plt
+from numpy.linalg import inv
+
 redis_connection = redis.Redis(decode_responses=True)
 
 class OptimalROAmplitudeAnalysis():
@@ -21,50 +25,56 @@ class OptimalROAmplitudeAnalysis():
                 self.amplitude_coord = coord
             elif 'state' in str(coord):
                 self.state_coord = coord
+            elif 'shot' in str(coord):
+                self.shot_coord = coord
         self.independents = dataset[self.state_coord].values
         self.amplitudes = dataset.coords[self.amplitude_coord]
+        self.shots = len(dataset[self.shot_coord].values)
         self.fit_results = {}
 
     def run_fitting(self):
         self.fidelities = []
+        self.cms = []
         for indx, ro_amplitude in enumerate(self.amplitudes):
-            y = self.independents
-            IQ_complex = self.dataset[self.data_var].isel({self.amplitude_coord:[indx]})
-            I = IQ_complex.values.real.flatten()
-            Q = IQ_complex.values.imag.flatten()
+            y = np.repeat(self.independents,self.shots)
+            IQ_complex = np.array([])
+            for state in self.independents:
+                IQ_complex_0 = self.dataset[self.data_var].isel({self.amplitude_coord:[indx],self.state_coord:state})
+                IQ_complex = np.append(IQ_complex,IQ_complex_0)
+            I = IQ_complex.real.flatten()
+            Q = IQ_complex.imag.flatten()
             IQ = np.array([I,Q]).T
             lda = LinearDiscriminantAnalysis(solver = "svd", store_covariance=True)
+            # breakpoint()
             y_pred = lda.fit(IQ,y).predict(IQ)
 
-            tp = y == y_pred # True Positive
-            tp0 = tp[y == 0] # true positive levels when reading 0
-            tp1 = tp[y == 1] # true positive levels when reading 1
-            tp2 = tp[y == 2] # true positive levels when reading 2
-
-            IQ0 = IQ[y == 0] # IQ when reading 0
-            IQ1 = IQ[y == 1] # IQ when reading 1
-            IQ2 = IQ[y == 2] # IQ when reading 2
-
-            IQ0_tp = IQ0[ tp0] # True Positive when sending 0
-            IQ0_fp = IQ0[~tp0]
-            IQ1_tp = IQ1[ tp1] # True Positive when sending 1
-            IQ1_fp = IQ1[~tp1]
-            IQ2_tp = IQ2[ tp2] # True Positive when sending 2
-            IQ2_fp = IQ2[~tp2]
-
-            err_wr_0 = len(IQ0_fp) / (len(IQ0_fp) + len(IQ0_tp))
-            err_wr_1 = len(IQ1_fp) / (len(IQ1_fp) + len(IQ1_tp))
-
-            assignment = 1 - 1/2 * (err_wr_0 + err_wr_1)
+            # cm = confusion_matrix(y,y_pred)
+            # disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+            # disp.plot()
+            # plt.show()
+            cm_norm = confusion_matrix(y,y_pred,normalize='true')
+            assignment = np.trace(cm_norm)/len(self.independents)
+            # print(f'{cm_norm = }')
+            # print(f'{assignment = }')
             self.fidelities.append(assignment)
-
-        self.optimal_amplitude = 0
-        return [self.optimal_amplitude]
+            self.cms.append(cm_norm)
+        
+        for i, f in enumerate(self.fidelities):
+            if i > 1:
+                if f < self.fidelities[i-1] and f < self.fidelities[i-2] and f > np.mean(self.fidelities):
+                    self.optimal_index = i
+        self.optimal_index = np.argmax(self.fidelities)
+        self.optimal_amplitude = self.amplitudes.values[self.optimal_index]
+        self.optimal_inv_cm = inv(self.cms[self.optimal_index])
+        inv_cm_str = ",".join(str(element) for element in list(self.optimal_inv_cm.flatten()))
+        # breakpoint()
+        return [self.optimal_amplitude,inv_cm_str]
 
     def plotter(self,ax):
         this_qubit = self.dataset.attrs['qubit']
         ax.set_xlabel('RO amplitude')
         ax.set_ylabel('assignment fidelity')
         ax.plot(self.amplitudes, self.fidelities)
+        ax.plot(self.optimal_amplitude, self.fidelities[self.optimal_index], '*')
 
         ax.grid()

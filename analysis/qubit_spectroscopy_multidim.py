@@ -100,8 +100,11 @@ class QubitSpectroscopyMultidim():
                 continue
             guess = model.guess(these_magnitudes, x=frequencies)
             fit_result = model.fit(these_magnitudes, params=guess, x=frequencies)
-            qubit_freq = fit_result.params['x0'].value
-            qubit_ampl =fit_result.params['A'].value
+            # qubit_freq = fit_result.params['x0'].value
+            # qubit_ampl =fit_result.params['A'].value
+            qubit_freq = frequencies[these_magnitudes.argmax()]
+            qubit_ampl = these_magnitudes.max()
+            # print(qubit_ampl,qubit_freq)
             #self.uncertainty = fit_result.params['x0'].stderr
             if qubit_ampl > self.qubit_ampl:
                 self.qubit_ampl = qubit_ampl
@@ -125,7 +128,8 @@ class QubitSpectroscopyMultidim():
             x, prominence = self.filtered_std * prom_coef, width=wid_coef
         )
         self.prominence = properties["prominences"][0] if len(properties['prominences']) == 1 else 0
-        self.hasPeak = peaks.size == 1
+        self.hasPeak = peaks.size > 0
+        self.hasPeak = True
         return self.hasPeak
 
     def plotter(self,ax):
@@ -134,7 +138,11 @@ class QubitSpectroscopyMultidim():
         #ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0)
         #print(f'{ self.dataset[self.data_var].shape = }')
         self.dataset[self.data_var].plot(ax=ax, x=self.frequency_coords)
-        ax.scatter(self.qubit_freq, self.spec_ampl, s=52, c='red')
+        if len(self.amplitudes) > 1:
+            ax.scatter(self.qubit_freq, self.spec_ampl, s=52, c='red')
+        else:
+            ax.scatter(self.qubit_freq, self.qubit_ampl, s=52, c='red')
+
         # for i,a in enumerate(self.amplitudes):
         #     if a==self.qubit_ampl:
         #         label=f'Best amplitude:{self.qubit_ampl:.3E}'

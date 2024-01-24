@@ -8,7 +8,7 @@ from quantify_scheduler.operations.pulse_library import DRAGPulse,SetClockFreque
 from quantify_scheduler.resources import ClockResource
 from calibration_schedules.measurement_base import Measurement
 from utilities.extended_transmon_element import Measure_RO1
-from utilities.QPU_connections_visualization import edge_group
+from config_files.coupler_config import edge_group
 from scipy.signal import gaussian
 from scipy import signal
 from matplotlib import pyplot as plt
@@ -192,7 +192,7 @@ class CZ_chevron(Measurement):
                 for this_qubit in qubits:
                     #this_index = cz_index*number_of_amplitudes+cz_amplitude_index
                     this_index = ampl_indx * number_of_freqs + acq_index
-                    schedule.add(Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
+                    schedule.add(Measure(this_qubit, acq_index=this_index, bin_mode=self.bin_mode),
                                     ref_op=cz,rel_time=40e-9, ref_pt="end",
                                     )
         return schedule

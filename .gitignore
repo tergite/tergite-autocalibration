@@ -6,6 +6,9 @@
 #schedules
 schedules/
 
+# notebooks
+notebooks/
+
 #user config files
 # utilities/user_input.py
 # config_files/

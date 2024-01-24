@@ -16,7 +16,7 @@ from workers.dataset_utils import create_node_data_path
 from nodes.graph import filtered_topological_order
 from utilities.visuals import draw_arrow_chart
 from config_files.settings import lokiA_IP
-from workers.dummy_setup import dummy_cluster
+# from workers.dummy_setup import dummy_cluster
 
 from colorama import init as colorama_init
 from colorama import Fore
@@ -34,9 +34,6 @@ colorama_init()
 
 # bus_list = [[qubits[i], qubits[i+1]] for i in range(len(qubits) - 1)]
 # couplers = [bus[0] + '_' + bus[1] for bus in bus_list]
-#
-# bus_list = [ [qubits[i],qubits[i+1]] for i in range(len(qubits)-1) ]
-# couplers = [bus[0]+'_'+bus[1]for bus in bus_list]
 
 class CalibrationSupervisor():
     def __init__(self) -> None:
@@ -124,6 +121,11 @@ class CalibrationSupervisor():
             self.inspect_node(calibration_node)
             logger.info(f'{calibration_node} node is completed')
 
+def write_calibrate_paras(node):
+    node_specific_dict = transmon_configuration[node]['all']
+    for field_key, field_value in node_specific_dict.items():
+        for qubit in qubits:
+            redis_connection.hset(f'transmons:{qubit}', field_key, field_value)
 
     def inspect_node(self, node_name: str):
         logger.info(f'Inspecting node {node_name}')

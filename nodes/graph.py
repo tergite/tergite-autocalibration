@@ -16,28 +16,34 @@ graph_dependencies = [
     ('qubit_01_spectroscopy_multidim', 'coupler_spectroscopy'),
     ('resonator_spectroscopy', 'qubit_01_spectroscopy_multidim'),
     ('qubit_01_spectroscopy_pulsed', 'rabi_oscillations'),
-    ('qubit_01_spectroscopy_multidim', 'rabi_oscillations'), #remove this line?
-    ('rabi_oscillations', 'ramsey_correction'),
-    ('ramsey_correction', 'resonator_spectroscopy_1'),
-    ('resonator_spectroscopy_1', 'T1'),
-    ('ramsey_correction', 'ro_frequency_optimization'),
+    ('qubit_01_spectroscopy_multidim', 'rabi_oscillations'),
+    # ('rabi_oscillations', 'ramsey_correction'),
+    # ('ramsey_correction', 'ro_frequency_optimization'),
     ('ramsey_correction', 'motzoi_parameter'),
     ('motzoi_parameter', 'n_rabi_oscillations'),
+    ('n_rabi_oscillations', 'resonator_spectroscopy_1'),
     ('ro_frequency_optimization', 'ro_amplitude_optimization'),
     ('ro_amplitude_optimization', 'state_discrimination'),
-    #('ramsey_correction', 'T1'),
+    ('rabi_oscillations', 'T1'),
+    ('T1', 'T2'),
+    ('T2', 'T2_echo'),
+    ('T2_echo', 'ramsey_correction'),
     ('resonator_spectroscopy_1', 'qubit_12_spectroscopy_pulsed'),
     ('resonator_spectroscopy_1', 'qubit_12_spectroscopy_multidim'),
-    ('qubit_12_spectroscopy_pulsed', 'rabi_oscillations_12'),
+    # ('qubit_12_spectroscopy_pulsed', 'rabi_oscillations_12'),
     ('qubit_12_spectroscopy_multidim', 'rabi_oscillations_12'),
-
     ('rabi_oscillations_12', 'ramsey_correction_12'),
     ('ramsey_correction_12', 'resonator_spectroscopy_2'),
-    ('ramsey_correction_12', 'ro_frequency_optimization_gef'),
-    ('rabi_oscillations_12', 'resonator_spectroscopy_2'),
-    ('qubit_12_spectroscopy_multidim', 'cz_chevron'),
-    # ('qubit_12_spectroscopy_pulsed', 'cz_calibration'),
+    ('resonator_spectroscopy_2', 'ro_frequency_optimization_gef'),
+    ('ro_frequency_optimization_gef', 'ro_amplitude_optimization_gef'),
     # ('coupler_spectroscopy', 'cz_chevron'),
+    ('ro_amplitude_optimization_gef', 'cz_chevron'),
+    ('rabi_oscillations', 'reset_chevron'),
+    ('cz_chevron', 'cz_calibration'),
+    # ('qubit_12_spectroscopy_multidim', 'cz_calibration'),
+    # ('cz_calibration', 'cz_calibration_ssro'),
+    ('cz_calibration', 'cz_calibration_ssro'),
+    ('cz_calibration', 'cz_dynamic_phase')
 ]
 
 graph.add_edges_from(graph_dependencies)
@@ -47,10 +53,16 @@ graph.add_node('tof', type='refine')
 graph.add_node('punchout')
 graph.add_node('qubit_01_spectroscopy_pulsed')
 graph.add_node('qubit_01_spectroscopy_multidim')
-graph.add_node('ramsey_correction', type='refine')
-graph.add_node('ramsey_correction_12', type='refine')
-graph.add_node('ro_frequency_optimization', type='refine')
-graph.add_node('ro_amplitude_optimization', type='refine')
+# graph.add_node('T1', type='refine')
+# graph.add_node('T2', type='refine')
+# graph.add_node('T2_echo', type='refine')
+# graph.add_node('ramsey_correction', type='refine')
+# graph.add_node('motzoi_parameter', type='refine')
+# graph.add_node('n_rabi_oscillations', type='refine')
+# graph.add_node('ramsey_correction_12', type='refine')
+# graph.add_node('ro_frequency_optimization_gef', type='refine')
+# graph.add_node('ro_amplitude_optimization_gef', type='refine')
+# graph.add_node('resonator_spectroscopy_2', type='refine')
 
 # for nodes that perform the same measurement,
 # assign a weight to the corresponding edge to sort them
@@ -65,16 +77,17 @@ initial_pos = {
     'qubit_01_spectroscopy_multidim': ( 0.5,0.8),
     'qubit_01_spectroscopy_pulsed': (-0.5,0.8),
     'rabi_oscillations': (0,0.7),
-    'ramsey_correction': (0,0.6),
+    'ramsey_fringes': (0,0.6),
     'motzoi_parameter': (0.5,0.6),
     'n_rabi_oscillations': (-0.5,0.6),
     'resonator_spectroscopy_1': (0,0.5),
     'qubit_12_spectroscopy_pulsed': (-0.5,0.4),
     'qubit_12_spectroscopy_multidim': (0.5,0.4),
     'rabi_oscillations_12': (0,0.3),
-    'ramsey_correction_12': (0,0.2),
+    'ramsey_fringes_12': (0,0.2),
     'resonator_spectroscopy_2': (0,0.1),
     'ro_frequency_optimization_gef': (0,0.0),
+    'ro_amplitude_optimization_gef': (0,0.0),
     'cz_chevron': (-0.5,0.0),
     'cz_calibration': (-0.9,0.0),
     'T1': (0.5,0.5),

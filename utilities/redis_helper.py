@@ -1,6 +1,10 @@
 import redis
 
-def fetch_redis_params(param:str, qubit:str):
+def fetch_redis_params(param:str, this_element:str):
     redis_connection = redis.Redis(decode_responses=True)
-    redis_config = redis_connection.hgetall(f"transmons:{qubit}")
+    if '_' in this_element:
+                name = 'couplers'
+    else:
+        name = 'transmons'
+    redis_config = redis_connection.hgetall(f"{name}:{this_element}")
     return float(redis_config[param])

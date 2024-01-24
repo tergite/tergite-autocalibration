@@ -47,6 +47,9 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
     transmon.extended_clock_freqs.readout_1(float(redis_config['ro_freq_1']))
     transmon.extended_clock_freqs.readout_2(float(redis_config['ro_freq_2']))
     transmon.extended_clock_freqs.readout_opt(float(redis_config['ro_freq_opt']))
+    ro_amp_opt = float(redis_config['ro_ampl_opt'])
+    if isnan(ro_amp_opt):
+        ro_amp_opt = float(redis_config['ro_pulse_amp'])
     transmon.measure.pulse_amp(float(redis_config['ro_pulse_amp']))
     transmon.measure.pulse_duration(float(redis_config['ro_pulse_duration']))
     transmon.measure.acq_channel(channel)
@@ -57,8 +60,7 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
     transmon.measure_1.acq_channel(channel)
     transmon.measure_1.acq_delay(float(redis_config['ro_acq_delay']))
     transmon.measure_1.integration_time(float(redis_config['ro_acq_integration_time']))
-
-    transmon.measure_opt.pulse_amp(float(redis_config['ro_pulse_amp']))
+    transmon.measure_opt.pulse_amp(ro_amp_opt)
     transmon.measure_opt.pulse_duration(float(redis_config['ro_pulse_duration']))
     transmon.measure_opt.acq_channel(channel)
     transmon.measure_opt.acq_delay(float(redis_config['ro_acq_delay']))
@@ -75,12 +77,32 @@ def load_redis_config_coupler(coupler: CompositeSquareEdge):
     coupler.cz.cz_width(float(redis_config['cz_pulse_width']))
     return
 
-
-def precompile(node):
+def precompile(node, bin_mode:str=None, repetitions:int=None):
     if node.name == 'tof':
         return None, 1
     samplespace = node.samplespace
     qubits = node.all_qubits
+
+    # backup old parameter values
+    if node.backup:
+        fields = node.redis_field
+        for field in fields:
+            field_backup = field + "_backup"
+            for qubit in qubits:
+                key = f"transmons:{qubit}"
+                if field in redis_connection.hgetall(key).keys():
+                    value = redis_connection.hget(key, field)
+                    redis_connection.hset(key, field_backup, value)
+                    redis_connection.hset(key, field, 'nan' )
+            if getattr(node, "coupler", None) is not None:
+                couplers = node.coupler
+                for coupler in couplers:
+                    key = f"couplers:{coupler}"
+                    if field in redis_connection.hgetall(key).keys():
+                        value = redis_connection.hget(key, field)
+                        redis_connection.hset(key, field_backup, value)
+                        redis_connection.hset(key, field, 'nan')
+
     # TODO better way to restart the QuantumDevice object
     device = QuantumDevice(f'Loki_{node.name}')
     device.hardware_config(hw_config)
@@ -104,23 +126,39 @@ def precompile(node):
            device.add_edge(coupler)
            edges[bus] = coupler
 
-    if node.name == 'cz_chevron':
-        node_class = node.measurement_obj(transmons, edges, node.qubit_state)
-    else:
-        node_class = node.measurement_obj(transmons, node.qubit_state)
-
-
+    node_class = node.measurement_obj(transmons, node.qubit_state)
+    if node.name in ['cz_chevron','cz_calibration','cz_calibration_ssro','cz_dynamic_phase','reset_chevron']:
+        coupler = node.coupler
+        node_class = node.measurement_obj(transmons, coupler, node.qubit_state)
+    if node.name in ['ro_amplitude_optimization_gef','cz_calibration_ssro']:
+        device.cfg_sched_repetitions(1)    # for single-shot readout
+    if bin_mode is not None: node_class.set_bin_mode(bin_mode)
     schedule_function = node_class.schedule_function
-    static_parameters = node_class.static_kwargs
 
-    compiler = SerialCompiler(name=f'{node.name}_compiler')
-    compilation_config = device.generate_compilation_config()
+    # Merge with the parameters from node dictionary
+    static_parameters = node_class.static_kwargs # parameters stored in the redis
+
+    if repetitions is not None:
+        static_parameters["repetitions"] = repetitions
+
+    for key, value in node.node_dictionary.items():
+        if key in static_parameters:
+            if not np.iterable(value):
+                value = {q: value for q in qubits}
+            static_parameters[key] = value
+        elif key in samplespace:
+            if not isinstance(value, dict):
+                value = {q: value for q in qubits}
+            samplespace[key] = value
+        elif key != "couplers":
+            static_parameters[key] = value
+            # print(f"{key} isn't one of the static parameters of {node_class}. \n We will ignore this parameter.")
 
 
     compiler = SerialCompiler(name=f'{node.name}_compiler')
     schedule = schedule_function(**static_parameters, **samplespace)
     compilation_config = device.generate_compilation_config()
-
+    device.close()
     # after the compilation_config is acquired, free the transmon resources
     for extended_transmon in transmons.values():
         extended_transmon.close()
@@ -130,6 +168,15 @@ def precompile(node):
 
     logger.info('Starting Compiling')
     compiled_schedule = compiler.compile(schedule=schedule, config=compilation_config)
+    # if node.name not in ['ro_amplitude_optimization_gef','cz_calibration_ssro']:
+    #     try:
+    #         figs = compiled_schedule.plot_pulse_diagram(plot_backend="plotly")
+    #         figs.write_image(f'pulse_diagrams\{node.name}.png')
+    #     except:
+    #         pass
+    # breakpoint()
+    # figs[0].savefig('ssro')
+    # breakpoint()
 
     #TODO
     # ic.retrieve_hardware_logs
@@ -139,7 +186,5 @@ def precompile(node):
     #        compiled_schedule.timing_table.hide(['is_acquisition','wf_idx'],axis="columns"
     #            ).to_html()
     #        )
-
-    logger.info('Finished Compiling')
 
     return compiled_schedule

@@ -70,7 +70,7 @@ class Multiplexed_Analysis(BaseAnalysis):
             elif node == 'rabi_oscillations':
                 analysis_class = RabiAnalysis
                 redis_field = 'mw_amp180'
-            elif node == 'ramsey_correction':
+            elif node == 'ramsey_fringes':
                 analysis_class = RamseyAnalysis
                 redis_field = 'freq_01'
             elif node == 'motzoi_parameter':

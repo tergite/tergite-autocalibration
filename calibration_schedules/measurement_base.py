@@ -2,6 +2,9 @@
 Module containing a base class that defines the basic principles used in all calibration schedule classes.
 """
 import redis
+from quantify_scheduler.enums import BinMode
+
+np.set_printoptions(precision=3, linewidth=125)
 
 redis_connection = redis.Redis(decode_responses=True)
 
@@ -12,6 +15,7 @@ class Measurement():
         self.couplers = couplers
         self.qubits = list(self.transmons.keys())
         self.device_configuration = {}
+        self.bin_mode = BinMode.AVERAGE
 
     def attributes_dictionary(self, parameter):
         """
@@ -42,3 +46,10 @@ class Measurement():
 
         # print(f'{ attr_dict = }')
         return attr_dict
+
+    def set_bin_mode(self, bin_mode:str):
+        bin_mode = getattr(BinMode, bin_mode, None)
+        if bin_mode is not None:
+            self.bin_mode = bin_mode
+        else:
+            raise ValueError(f"bin mode {bin_mode} isn't defined in Quantify now.")
