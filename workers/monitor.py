@@ -109,7 +109,9 @@ class OptimizeNode:
     def plot_optimization(self):
         return optuna.visualization.plot_optimization_history(self.study)
 
-    def validate_cz(self,best_params = self.best_params):
+    def validate_cz(self,best_params = None):
+        if best_params is None:
+            best_params = self.best_params
         freqs = np.array([best_params['freq']])*1e6
         times = np.array([best_params['time']])*1e-9
         amps = np.array([best_params['amp']])
@@ -119,5 +121,6 @@ class OptimizeNode:
         results = self.monitor.get_results()
         print(results)
         return results
+        
         
 # monitor = Monitor()

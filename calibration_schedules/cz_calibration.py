@@ -202,7 +202,7 @@ class CZ_calibration(Measurement):
                             )
                         )
                     # cz = schedule.add(IdlePulse(cz_pulse_duration[this_coupler]))
-                buffer_end = shot.add(IdlePulse(4e-9),ref_op=buffer_start, ref_pt='end',rel_time = np.ceil( cz_pulse_duration[this_coupler] * 1e9 / 4) * 4e-9)
+                buffer_end = schedule.add(IdlePulse(4e-9),ref_op=buffer_start, ref_pt='end',rel_time = np.ceil( cz_pulse_duration[this_coupler] * 1e9 / 4) * 4e-9)
                 if not dynamic:
                     if control_on:
                         for this_qubit in all_qubits:

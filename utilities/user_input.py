@@ -7,8 +7,8 @@ qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
 # qubits = ['q11','q12']
 # couplers = ['q11_q12']
 # qubits = ['q14','q15']
-couplers = ['q21_q22']
-
+# couplers = ['q21_q22']
+couplers = ['q16_q21']
 '''
 node reference
   punchout

@@ -64,7 +64,7 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 def qubit_samples(qubit: str, transition: str = '01', sweep_range = None) -> np.ndarray:
     qub_spec_samples = 101
-    if sweep_range is None: sweep_range = 40e6
+    if sweep_range is None: sweep_range = 50e6
     key_backup = f"transmons:{qubit}", "freq_" + transition + "_backup"
     key = f"transmons:{qubit}", "freq_" + transition
     redis_value = cxn.hget(*key)
@@ -206,7 +206,7 @@ class Qubit_01_Spectroscopy_Multidim_Node(Base_Node):
     def samplespace(self):
         cluster_samplespace = {
             'spec_pulse_amplitudes': {
-                 qubit: np.linspace(5e-4, 5e-4, 1) for qubit in self.all_qubits
+                 qubit: np.linspace(6e-4, 6e-4, 1) for qubit in self.all_qubits
             },
             'spec_frequencies': {
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
@@ -599,7 +599,7 @@ class CZ_Chevron_Node(Base_Node):
                 qubit: 12e-9+np.arange(0e-9, 40*16e-9,16e-9) for qubit in self.coupled_qubits
             },
             'cz_pulse_frequencies_sweep': {
-                qubit: np.linspace(-4e6, 4e6, 17) + self.ac_freq for qubit in self.coupled_qubits
+                qubit: np.linspace(-12e6, 0e6, 17) + self.ac_freq for qubit in self.coupled_qubits
             },
         }
         return cluster_samplespace
@@ -759,7 +759,7 @@ class Coupler_Spectroscopy_Node(Base_Node):
     @property
     def spi_samplespace(self):
         spi_samplespace = {
-            'dc_currents': {self.coupler: np.arange(-1e-3, 1e-3, 50e-6)},
+            'dc_currents': {self.coupler: np.arange(-3e-3, 3e-3, 100e-6)},
         }
         return spi_samplespace
 
