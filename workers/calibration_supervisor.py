@@ -27,7 +27,7 @@ import redis
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 import numpy as np
-from workers.redis_utils import populate_initial_parameters, populate_quantities_of_interest
+from workers.redis_utils import populate_initial_parameters, populate_node_parameters, populate_quantities_of_interest
 
 colorama_init()
 
@@ -69,12 +69,13 @@ class CalibrationSupervisor():
 
     def calibrate_system(self):
 
-        populate_initial_parameters(
-            self.transmon_configuration,
-            self.qubits,
-            self.couplers,
-            self.redis_connection
-        )
+        # populate_initial_parameters(
+        #     self.transmon_configuration,
+        #     self.qubits,
+        #     self.couplers,
+        #     self.redis_connection
+        # )
+
         self.calibrate_linear_node_sequence()
 
         # # TODO temporary hack because optimizing CZ chevron requires re-running
@@ -112,8 +113,6 @@ class CalibrationSupervisor():
         number_of_qubits = len(self.qubits)
         draw_arrow_chart(f'Qubits: {number_of_qubits}', self.topo_order)
 
-        redis_connection = self.redis_connection
-
         populate_quantities_of_interest(
             self.transmon_configuration,
             self.qubits,
@@ -135,23 +134,30 @@ class CalibrationSupervisor():
 
         redis_connection = self.redis_connection
 
+        populate_initial_parameters(
+            self.transmon_configuration,
+            self.qubits,
+            self.couplers,
+            self.redis_connection
+        )
+
         if node_name in ['coupler_spectroscopy', 'cz_chevron']:
             coupler_statuses = [redis_connection.hget(f"cs:{coupler}", node_name) == 'calibrated' for coupler in self.couplers]
+            #node is calibrated only when all couplers have the node calibrated:
             is_node_calibrated = all(coupler_statuses)
         else:
             qubits_statuses = [redis_connection.hget(f"cs:{qubit}", node_name) == 'calibrated' for qubit in self.qubits]
+            #node is calibrated only when all qubits have the node calibrated:
             is_node_calibrated = all(qubits_statuses)
 
-        #Populate the Redis database with node specific parameter values from the toml file
-        #node is calibrated only when all qubits have the node calibrated:
-        if node_name in self.transmon_configuration and not is_node_calibrated:
-            node_specific_dict = self.transmon_configuration[node_name]['all']
-            for field_key, field_value in node_specific_dict.items():
-                for qubit in self.qubits:
-                    redis_connection.hset(f'transmons:{qubit}', field_key, field_value)
-                for coupler in self.couplers:
-                    redis_connection.hset(f'couplers:{coupler}', field_key, field_value)
-
+        populate_node_parameters(
+            node_name,
+            is_node_calibrated,
+            self.transmon_configuration,
+            self.qubits,
+            self.couplers,
+            self.redis_connection
+        )
 
         #Check Redis if node is calibrated
         status = DataStatus.undefined

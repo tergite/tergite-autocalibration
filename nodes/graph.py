@@ -120,7 +120,7 @@ def filtered_topological_order(target_node: str):
         has_correct_type = graph.nodes[node]['type'] in types
         return not is_without_type and has_correct_type
 
-    filtered_order = [node for node in topo_order if graph_condition(node, 'none')]
+    filtered_order = [node for node in topo_order if graph_condition(node, 'refine')]
     filtered_order = coupler_path + filtered_order
     # print(f'{ filtered_order = }')
     # quit()

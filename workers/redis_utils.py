@@ -30,6 +30,25 @@ def populate_initial_parameters(
                 redis_connection.hset(f"couplers:{coupler}", parameter_key, parameter_value)
 
 
+
+def populate_node_parameters(
+    node_name: str,
+    is_node_calibrated: bool,
+    transmon_configuration: dict,
+    qubits: list,
+    couplers: list,
+    redis_connection
+    ):
+    #Populate the Redis database with node specific parameter values from the toml file
+    if node_name in transmon_configuration and not is_node_calibrated:
+        node_specific_dict = transmon_configuration[node_name]['all']
+        for field_key, field_value in node_specific_dict.items():
+            for qubit in qubits:
+                redis_connection.hset(f'transmons:{qubit}', field_key, field_value)
+            for coupler in couplers:
+                redis_connection.hset(f'couplers:{coupler}', field_key, field_value)
+
+
 def populate_quantities_of_interest(
         transmon_configuration: dict,
         qubits: list,

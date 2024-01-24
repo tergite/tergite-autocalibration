@@ -62,8 +62,8 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 
 def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
-    qub_spec_samples = 81
-    sweep_range = 5.5e6
+    qub_spec_samples = 41
+    sweep_range = 3.0e6
     if transition == '01':
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition == '12':
@@ -102,7 +102,6 @@ class NodeFactory:
         }
 
     def create_node(self, node_name: str, all_qubits: list[str], ** kwargs):
-        print(f'{ kwargs = }')
         node_object = self.node_implementations[node_name](node_name, all_qubits, ** kwargs)
         return node_object
 
@@ -221,7 +220,7 @@ class Rabi_Oscillations_Node:
     def samplespace(self):
         cluster_samplespace = {
             'mw_amplitudes': {
-                qubit: np.linspace(0.002, 0.80, 151) for qubit in self.all_qubits
+                qubit: np.linspace(0.002, 0.80, 101) for qubit in self.all_qubits
             }
         }
         return cluster_samplespace
