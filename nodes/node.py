@@ -14,6 +14,11 @@ from calibration_schedules.ro_amplitude_optimization import RO_amplitude_optimiz
 from calibration_schedules.state_discrimination import Single_Shots_RO
 from calibration_schedules.motzoi_parameter import Motzoi_parameter
 from calibration_schedules.n_rabi_oscillations import N_Rabi_Oscillations
+from calibration_schedules.randomized_benchmarking import Randomized_Benchmarking
+from calibration_schedules.check_cliffords import Check_Cliffords
+from nodes.base_node import Base_Node
+
+
 
 # from calibration_schedules.cz_chevron import CZ_chevron
 # from calibration_schedules.cz_chevron_reversed import CZ_chevron, Reset_chevron_dc
@@ -42,6 +47,8 @@ from analysis.T1_analysis import T1Analysis, T2Analysis, T2EchoAnalysis
 # from analysis.cz_chevron_analysis import CZChevronAnalysis, CZChevronAnalysisReset
 # from analysis.cz_calibration_analysis import CZCalibrationAnalysis, CZCalibrationSSROAnalysis
 from analysis.n_rabi_analysis import NRabiAnalysis
+from analysis.randomized_benchmarking_analysis import RandomizedBenchmarkingAnalysis
+from analysis.check_cliffords_analysis import CheckCliffordsAnalysis
 
 
 from config_files.VNA_LOKIB_values import (
@@ -104,6 +111,9 @@ class NodeFactory:
             'ro_frequency_optimization': RO_frequency_optimization_Node,
             'ro_frequency_optimization_gef': RO_frequency_optimization_gef_Node,
             'ro_amplitude_optimization_gef': RO_amplitude_optimization_gef_Node,
+            #'ro_frequency_optimization_gef': RO_frequency_optimization_gef_Node,
+            'randomized_benchmarking': Randomized_Benchmarking_Node,
+            'check_cliffords': Check_Cliffords_Node,
         }
     def all_nodes(self):
         return list(self.node_implementations.keys())
@@ -113,21 +123,6 @@ class NodeFactory:
         return node_object
 
 
-class Base_Node:
-    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
-        self.name = name
-        self.all_qubits = all_qubits
-        self.node_dictionary = node_dictionary
-        self.backup = True
-
-    def __str__(self):
-        return f'Node representation for {self.name} on qubits {self.all_qubits}'
-
-    def __format__(self, message):
-        return f'Node representation for {self.name} on qubits {self.all_qubits}'
-
-    def __repr__(self):
-        return f'Node({self.name}, {self.all_qubits})'
 
 
 class Resonator_Spectroscopy_Node(Base_Node):
@@ -319,6 +314,48 @@ class T1_Node(Base_Node):
             'delays': {qubit : 8e-9 +  np.arange(0,300e-6,6e-6) for qubit in self.all_qubits}
         }
         return cluster_samplespace
+
+class Randomized_Benchmarking_Node:
+    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
+        self.name = name
+        self.all_qubits = all_qubits
+        self.node_dictionary = kwargs
+        self.backup = False
+        self.redis_field = ['t1_time'] #TODO change to something, error?
+        self.qubit_state = 0 #can be 0 or 1
+        self.measurement_obj = Randomized_Benchmarking
+        self.analysis_obj = RandomizedBenchmarkingAnalysis
+
+    @property
+    def samplespace(self):
+        cluster_samplespace = {
+            # Always include 0 and 1 to measure |0⟩ and |1⟩ (distinct from number of cliffords)
+            'number_of_cliffords': {
+                qubit: np.array([0,1,2,4,8,16,32,64,128,256,512,1024]) for qubit in self.all_qubits
+                #qubit: np.array([0,1,2,5,10,20,40,60,120,180,240,300,360,400,500,600]) for qubit in self.all_qubits
+            }
+        }
+        return cluster_samplespace
+
+class Check_Cliffords_Node:
+    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
+        self.name = name
+        self.all_qubits = all_qubits
+        self.node_dictionary = kwargs
+        self.redis_field = ['t1_time'] #TODO Empty?
+        self.qubit_state = 0
+        self.measurement_obj = Check_Cliffords
+        self.analysis_obj = CheckCliffordsAnalysis
+
+    @property
+    def samplespace(self):
+        cluster_samplespace = {
+            'clifford_indices': {
+                qubit: np.linspace(0,25) for qubit in self.all_qubits
+            }
+        }
+        return cluster_samplespace
+
 
 class T2_Node(Base_Node):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):

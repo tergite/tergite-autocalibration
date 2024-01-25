@@ -25,13 +25,11 @@ class T1Analysis():
         self.magnitudes = np.absolute(self.S21)
         delays = self.independents
 
-        self.fit_delays = np.linspace( delays[0], delays[-1], 400) # x-values for plotting
-
         # Gives an initial guess for the model parameters and then fits the model to the data.
         guess = model.guess(data=self.magnitudes, delay=delays)
         fit_result = model.fit(self.magnitudes, params=guess, t=delays)
 
-        self.fit_delays = np.linspace( delays[0], delays[-1], 400)
+        self.fit_delays = np.linspace( delays[0], delays[-1], 400) # x-values for plotting
         self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_delays})
         #self.dataset['fit_delays'] = self.fit_delays
         #self.dataset['fit_y'] = ('fit_delays',fit_y)

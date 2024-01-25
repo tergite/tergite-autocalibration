@@ -3,7 +3,7 @@ from calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
 from calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
 from analysis.coupler_spectroscopy_analysis import CouplerSpectroscopyAnalysis
 from config_files.VNA_LOKIB_values import VNA_resonator_frequencies, VNA_qubit_frequencies, VNA_f12_frequencies
-from nodes.node import Base_Node
+from nodes.base_node import Base_Node
 
 def resonator_samples(qubit: str) -> np.ndarray:
     res_spec_samples = 101

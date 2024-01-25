@@ -29,6 +29,8 @@ node reference
   T1
   T2
   T2_echo
+  randomized_benchmarking
+  check_cliffords
   cz_chevron
   reset_chevron
   cz_calibration
@@ -37,7 +39,7 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'resonator_spectroscopy_1',
+    'target_node': 'randomized_benchmarking',
     'all_qubits': qubits,
     'couplers': couplers,
 }

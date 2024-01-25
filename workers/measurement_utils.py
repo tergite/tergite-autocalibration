@@ -8,6 +8,10 @@ import numpy as np
 from utilities.status import ClusterStatus
 from workers.hardware_utils import SpiDAC
 from quantify_scheduler.instrument_coordinator.instrument_coordinator import CompiledSchedule
+from colorama import init as colorama_init
+from colorama import Fore
+from colorama import Style
+colorama_init()
 
 def execute_schedule(
         compiled_schedule: CompiledSchedule,
@@ -17,7 +21,7 @@ def execute_schedule(
     logger.info('Starting measurement')
     cluster_status = ClusterStatus.real
     schedule_duration = compiled_schedule.get_schedule_duration()
-    print(f'schedule_duration = {schedule_duration:.2f} sec')
+    print(f'schedule_duration = {Fore.CYAN}{Style.BRIGHT}{schedule_duration:.2f} sec{Style.RESET_ALL}')
 
     def run_measurement() -> None:
         lab_ic.prepare(compiled_schedule)
