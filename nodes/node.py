@@ -328,11 +328,15 @@ class Randomized_Benchmarking_Node:
 
     @property
     def samplespace(self):
+        numbers = 2 ** np.arange(1,10)
+        extra_numbers = [numbers[i] + numbers[i+1] for i in range(len(numbers)-2)]
+        extra_numbers = np.array(extra_numbers)
+        all_numbers = np.sort( np.concatenate((numbers, extra_numbers)) )
+
         cluster_samplespace = {
-            # Always include 0 and 1 to measure |0⟩ and |1⟩ (distinct from number of cliffords)
             'number_of_cliffords': {
-                qubit: np.array([0,1,2,4,8,16,32,64,128,256,512,1024]) for qubit in self.all_qubits
-                #qubit: np.array([0,1,2,5,10,20,40,60,120,180,240,300,360,400,500,600]) for qubit in self.all_qubits
+                qubit: all_numbers for qubit in self.all_qubits
+                # qubit: np.array([2,4,8,16,32,64,128,256,512,768,1024]) for qubit in self.all_qubits
             }
         }
         return cluster_samplespace

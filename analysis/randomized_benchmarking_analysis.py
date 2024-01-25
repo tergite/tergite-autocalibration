@@ -26,7 +26,7 @@ class ExpDecayModel(lmfit.model.Model):
 
         if x is None:
             return None
-        
+
         amplitude_guess= data[0]-data[-1]
         self.set_param_hint("amplitude", value=amplitude_guess)
 
@@ -60,13 +60,12 @@ class RandomizedBenchmarkingAnalysis():
         n_cliffords = self.independents
 
         # Normalize data to interval [0,1]
-        self.normalized_magnitudes = (self.magnitudes-self.magnitudes[0])/(self.magnitudes[1]-self.magnitudes[0])
-        
+        # self.normalized_magnitudes = (self.magnitudes-self.magnitudes[0])/(self.magnitudes[1]-self.magnitudes[0])
+
         # Gives an initial guess for the model parameters and then fits the model to the data.
         guess = model.guess(data=self.magnitudes[2:], x=n_cliffords[2:])
-        #print(len(self.magnitudes))
         fit_result = model.fit(self.magnitudes, params=guess, x=n_cliffords)
-        
+
         self.fit_n_cliffords = np.linspace( n_cliffords[0], n_cliffords[-1], 400)
         self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_n_cliffords})
         self.normalized_fit_y = (self.fit_y-self.magnitudes[0])/(self.magnitudes[1]-self.magnitudes[0])
@@ -74,14 +73,13 @@ class RandomizedBenchmarkingAnalysis():
 
         return [0]
 
-    def plotter(self,ax):        
+    def plotter(self,ax):
         # unnormalized plot:
         ax.plot( self.fit_n_cliffords, self.fit_y,'r-',lw=3.0)
-        ax.plot( self.independents[2:], self.magnitudes[2:],'bo-',ms=3.0)
-        ax.hlines(y=self.magnitudes[0],xmin=self.independents[0],xmax=self.independents[-1],color='g',linestyle='--') # Plots |0⟩
-        ax.hlines(y=self.magnitudes[1],xmin=self.independents[0],xmax=self.independents[-1],color='g',linestyle='--') # Plots |1⟩
+        ax.plot( self.independents, self.magnitudes,'bo-',ms=3.0)
+        # ax.hlines(y=self.magnitudes[0],xmin=self.independents[0],xmax=self.independents[-1],color='g',linestyle='--') # Plots |0⟩
+        # ax.hlines(y=self.magnitudes[1],xmin=self.independents[0],xmax=self.independents[-1],color='g',linestyle='--') # Plots |1⟩
         ax.set_ylabel(f'|S21| (V)')
-        
 
         """ # normalized plot:
         ax.plot( self.fit_n_cliffords, self.normalized_fit_y,'r-',lw=3.0)
@@ -90,6 +88,6 @@ class RandomizedBenchmarkingAnalysis():
         """
         ax.set_title(f'Randomized benchmarking for {self.qubit}')
         ax.set_xlabel('Number of clifford operations')
-        
+
         ax.grid()
 
