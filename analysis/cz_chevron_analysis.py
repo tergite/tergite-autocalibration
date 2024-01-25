@@ -351,15 +351,10 @@ class CZChevronAnalysisReset():
         magnitudes = np.transpose((magnitudes - np.min(magnitudes))/(np.max(magnitudes)-np.min(magnitudes)))
         direct = True
         if direct:
-            stds = []
-            for magnitude in magnitudes:
-                this_std = np.abs(np.max(magnitude)-np.min(magnitude))
-                stds.append(this_std)
-            max_index = np.argmax(stds)
-            print(max_index)
-            max_magnitude = magnitudes[max_index]
-            self.opt_freq = self.freq[max_index]
-            self.opt_cz = self.amp[np.argmax(max_magnitude)]
+            min_index = np.argmin(magnitudes)
+            min_index = np.unravel_index(min_index, magnitudes.shape)
+            self.opt_freq = self.freq[min_index[1]]
+            self.opt_cz = self.amp[min_index[0]]
             print(self.opt_freq, self.opt_cz)
         else:
             # fig, axes = self.fig, self.axes

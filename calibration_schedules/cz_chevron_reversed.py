@@ -5,7 +5,7 @@ from quantify_scheduler.enums import BinMode
 from quantify_scheduler import Schedule
 from quantify_scheduler.operations.gate_library import Measure, Reset, X90, Rxy, X, CZ
 from quantify_scheduler.operations.pulse_library import SuddenNetZeroPulse,ResetClockPhase,IdlePulse,DRAGPulse,SetClockFrequency,NumericalPulse,SoftSquarePulse,SquarePulse
-from quantify_scheduler.operations.pulse_library import DRAGPulse,SetClockFrequency,NumericalPulse,SoftSquarePulse,SquarePulse, ResetClockPhase
+from quantify_scheduler.operations.pulse_library import RampPulse,DRAGPulse,SetClockFrequency,NumericalPulse,SoftSquarePulse,SquarePulse, ResetClockPhase
 from quantify_scheduler.resources import ClockResource
 from calibration_schedules.measurement_base import Measurement
 from utilities.extended_transmon_element import Measure_RO1, Rxy_12
@@ -84,7 +84,7 @@ class Reset_chevron_dc(Measurement):
         :
             An experiment schedule.
         """
-        schedule = Schedule("CZ_chevron",repetitions)
+        schedule = Schedule("reset_chevron",repetitions)
         qubits = coupler.split(sep='_')
 
         # cz_frequency_values = np.array(list(cz_pulse_frequencies_sweep.values())[0])
@@ -94,25 +94,16 @@ class Reset_chevron_dc(Measurement):
         print(f'{ cz_pulse_amplitude_values = }')
         # print(f'{ cz_frequency_values[0] = }')
 
-        # couplers_list = [coupler]
-        # # find cz parameters from redis
-        # redis_connection = redis.Redis(decode_responses=True)
-        # cz_pulse_amplitude = {}
-        # for this_coupler in couplers_list:
-        #     qubits = this_coupler.split(sep='_')
-        #     cz_amplitude_values = []
-        #     for qubit in qubits: 
-        #         redis_config = redis_connection.hgetall(f"transmons:{qubit}")
-        #         cz_amplitude_values.append(float(redis_config['cz_pulse_amplitude']))
-        #     cz_pulse_amplitude[this_coupler] = cz_amplitude_values[0]
-        # print(f'{cz_pulse_amplitude = }')
-
         # schedule.add_resource(
         #     ClockResource(name=coupler+'.cz',freq= - cz_frequency_values[0] + 4.4e9)
         # )
 
+        # schedule.add_resource(
+        #     ClockResource(name=coupler+'.cz',freq= 4.4e9)
+        # )
+
         schedule.add_resource(
-            ClockResource(name=coupler+'.cz',freq= 4.4e9)
+            ClockResource(name=coupler+'.cz',freq= 0e9)
         )
 
         number_of_durations = len(cz_duration_values)
@@ -134,66 +125,37 @@ class Reset_chevron_dc(Measurement):
 
                 relaxation = schedule.add(Reset(*qubits))
 
-                # for this_qubit in qubits:
+                for this_qubit in qubits:
                     # schedule.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
-                    # if this_qubit == 'q15':
+                    if this_qubit == 'q21':
                         # schedule.add(IdlePulse(20e-9))
+                        schedule.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
+                        schedule.add(Rxy_12(this_qubit))
+                    else:
+                        schedule.add(IdlePulse(20e-9), ref_op=relaxation, ref_pt='end')
+                        schedule.add(IdlePulse(20e-9))
                         # schedule.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
-                        # schedule.add(Rxy_12(this_qubit))
-                    # else:
-                        # schedule.add(IdlePulse(20e-9))
-                        # schedule.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
-                        # schedule.add(Rxy_12(this_qubit))
 
-                buffer = schedule.add(IdlePulse(4e-9))
-                # schedule.add(
-                # SetClockFrequency(clock=cz_clock, clock_freq_new=-1/cz_duration+4.4e9),
-                # ) 
+                buffer_start = schedule.add(IdlePulse(4e-9))
+
                 schedule.add(ResetClockPhase(clock=coupler+'.cz'))
-                # cz = schedule.add(DRAGPulse(
-                #             duration=cz_duration,
-                #             G_amp = cz_amplitude,
-                #             D_amp = 0,
-                #             port=cz_pulse_port,
-                #             clock=cz_clock,
-                #             phase=0,
-                #         ),
-                #     ) 
 
-                cz = schedule.add(
-                            SquarePulse(
+                schedule.add(
+                            RampPulse(
                                 duration = cz_duration,
+                                offset = -cz_amplitude,
                                 amp = cz_amplitude,
                                 port = cz_pulse_port,
                                 clock = cz_clock,
                             ),
                         )
-                # schedule.add(ResetClockPhase(clock=coupler+'.cz'))
 
-                # cz = schedule.add(
-                #             SoftSquarePulse(
-                #                 duration = cz_duration,
-                #                 amp = -cz_amplitude,
-                #                 port = cz_pulse_port,
-                #                 clock = cz_clock,
-                #             ),
-                #         )
-                
-
-                # reset test
-                # buffer = schedule.add(IdlePulse(cz_duration_values[-1]-cz_duration))
-                # if this_qubit == 'q15':
-                    # schedule.add(X90(this_qubit), ref_op=buffer, ref_pt='end')
-                    # schedule.add(Rxy_12(this_qubit))
-                # else:
-                #     schedule.add(IdlePulse(20e-9))
-
-                buffer = schedule.add(IdlePulse(4e-9))
+                buffer_end = schedule.add(IdlePulse(4e-9),ref_op=buffer_start, ref_pt='end',rel_time = np.ceil( cz_duration * 1e9 / 4) * 4e-9)
 
                 for this_qubit in qubits:
                     schedule.add(
                         Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
-                        ref_op=buffer,rel_time=12e-9, ref_pt="end",
+                        ref_op=buffer_end,rel_time=4e-9, ref_pt="end",
                     )
         return schedule
 
@@ -430,11 +392,14 @@ class CZ_chevron(Measurement):
         for this_coupler in couplers_list:
             redis_config = redis_connection.hgetall(f"couplers:{this_coupler}")
             cz_pulse_amplitude[this_coupler] = float(redis_config['cz_pulse_amplitude'])
-        print(f'{cz_pulse_amplitude = }')
-
-        schedule.add_resource(
-            ClockResource(name=coupler+'.cz',freq= - cz_frequency_values[0] + 4.4e9)
-        )
+            print(f'{cz_pulse_amplitude = }')
+            if coupler == 'q16_q21':
+                downconvert = 0
+            else:
+                downconvert = 4.4e9
+            schedule.add_resource(
+                ClockResource(name=coupler+'.cz',freq= - cz_frequency_values[this_coupler]+downconvert)
+            )
 
         number_of_durations = len(cz_duration_values)
 
@@ -443,7 +408,7 @@ class CZ_chevron(Measurement):
             cz_clock = f'{coupler}.cz'
             cz_pulse_port = f'{coupler}:fl'
             schedule.add(
-                SetClockFrequency(clock=cz_clock, clock_freq_new= - cz_frequency + 4.4e9),
+                SetClockFrequency(clock=cz_clock, clock_freq_new= - cz_frequency + downconvert),
             )
 
             #The inner for loop iterates over cz pulse durations

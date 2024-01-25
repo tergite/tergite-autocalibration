@@ -528,20 +528,20 @@ class Reset_Chevron_Node(Base_Node):
         # print(f'{ np.linspace(- 50e6, 50e6, 2) + self.ac_freq = }')
         cluster_samplespace = {
             # Pulse test
-            'cz_pulse_durations': {
-                qubit: 4e-9+np.linspace(16e-9, 16e-9, 11)  for qubit in self.coupled_qubits
-            },
-            'cz_pulse_amplitudes': {
-                qubit: np.linspace(0.4, 0.4, 11) for qubit in self.coupled_qubits
-            },
-
-            # For DC reset
             # 'cz_pulse_durations': {
-            #     qubit: 4e-9+np.arange(0e-9, 12*4e-9,4e-9) for qubit in self.coupled_qubits
+            #     qubit: 4e-9+np.linspace(16e-9, 16e-9, 11)  for qubit in self.coupled_qubits
             # },
             # 'cz_pulse_amplitudes': {
-            #     qubit: np.linspace(0.2, 0.8, 61) for qubit in self.coupled_qubits
+            #     qubit: np.linspace(0.4, 0.4, 11) for qubit in self.coupled_qubits
             # },
+
+            # For DC reset
+            'cz_pulse_durations': {
+                qubit: 1e-9+np.arange(0e-9, 200e-9,10e-9) for qubit in self.coupled_qubits
+            },
+            'cz_pulse_amplitudes': {
+                qubit: np.linspace(-0.0, -0.8, 41) for qubit in self.coupled_qubits
+            },
 
             # For AC reset
             # 'cz_pulse_durations': {
@@ -596,11 +596,18 @@ class CZ_Chevron_Node(Base_Node):
 
             # For CZ gate
             'cz_pulse_durations': {
-                qubit: 12e-9+np.arange(0e-9, 40*16e-9,16e-9) for qubit in self.coupled_qubits
+                qubit: 12e-9+np.arange(0e-9, 32*20e-9,16e-9) for qubit in self.coupled_qubits
             },
             'cz_pulse_frequencies_sweep': {
-                qubit: np.linspace(-12e6, 0e6, 17) + self.ac_freq for qubit in self.coupled_qubits
+                qubit: np.linspace(-12e6,-4e6, 17) + self.ac_freq for qubit in self.coupled_qubits
             },
+
+            # 'cz_pulse_durations': {
+            #     qubit: np.linspace(32*20e-9,32*20e-9, 17) for qubit in self.coupled_qubits
+            # },
+            # 'cz_pulse_frequencies_sweep': {
+            #     qubit: np.linspace(0e6,0e6, 17) for qubit in self.coupled_qubits
+            # },
         }
         return cluster_samplespace
 
@@ -639,7 +646,7 @@ class CZ_Calibration_Node(Base_Node):
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'ramsey_phases': {qubit: np.linspace(0, 360, 31) for qubit in  self.coupled_qubits},
+            'ramsey_phases': {qubit: np.linspace(0, 360, 13) for qubit in  self.coupled_qubits},
             'control_ons': {qubit: [False,True] for qubit in  self.coupled_qubits},
         }
         return cluster_samplespace

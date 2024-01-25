@@ -112,23 +112,6 @@ class CZ_calibration(Measurement):
 
         # all_couplers_all = edge_group.keys()
         # all_couplers,bus_list = [],[]
-        # for coupler in all_couplers_all:
-        #     control,target = coupler.split('_')[0], coupler.split('_')[1]
-        #     if self.testing_group != 0:
-        #         check = edge_group[coupler] == self.testing_group
-        #     else:
-        #         check = True
-        #     if control in qubits and target in qubits and check:
-        #         bus_list.append([control,target])
-        #         all_couplers.append(coupler)
-        # control, target = np.transpose(bus_list)
-        # # cz_duration, cz_width = 200e-9, 4e-9
-        # # placeholder for the CZ pulse frequency and amplitude -0.4 689.9058811833632 for parking current  = -35e-6
-        # cz_pulse_frequency = {coupler: -0.4e6 for coupler in all_couplers}
-        # cz_pulse_duration = {coupler: 688e-09 for coupler in all_couplers}
-        # # cz_pulse_amplitude = {coupler: 0 for coupler in all_couplers}
-        # # print(f'{cz_pulse_duration = }')
-        # # print(f'{cz_pulse_frequency = }')
 
         all_couplers = [coupler]
         all_qubits = [coupler.split(sep='_') for coupler in all_couplers]
@@ -150,6 +133,7 @@ class CZ_calibration(Measurement):
         print(f'{cz_pulse_frequency = }')
         print(f'{cz_pulse_duration = }')
         print(f'{cz_pulse_amplitude = }')
+        
 
         # Add the clocks to the schedule
         # for this_qubit, mw_f_val in mw_frequencies.items():
@@ -161,8 +145,12 @@ class CZ_calibration(Measurement):
         #         ClockResource(name=f'{this_qubit}.12', freq=mw_f_val)
         #     )
         for index, this_coupler in enumerate(all_couplers):
+            if coupler == 'q16_q21':
+                downconvert = 0
+            else:
+                downconvert = 4.4e9
             schedule.add_resource(
-                ClockResource(name=f'{this_coupler}.cz', freq=-cz_pulse_frequency[this_coupler]+4.4e9)
+                ClockResource(name=f'{this_coupler}.cz', freq=-cz_pulse_frequency[this_coupler]+downconvert)
             )
         
         ramsey_phases_values = ramsey_phases[all_qubits[0]]

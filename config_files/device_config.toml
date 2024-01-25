@@ -82,9 +82,10 @@ q24.ro_pulse_amp = 15e-3
 q25.ro_pulse_amp = 9e-3
 
 [initials.couplers.all]
-cz_pulse_amplitude = 0.15
 
 [initials.couplers]
+q21_q22.cz_pulse_amplitude = 0.15
+q16_q21.cz_pulse_amplitude = 0.1
 q21_q22.parking_current = -700e-6
 
 [resonator_spectroscopy.all]

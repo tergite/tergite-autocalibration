@@ -243,7 +243,7 @@ def calibrate_node(node_label: str, **static_parameters):
 
 
 # main
-# calibrate_system()
+calibrate_system()
 # logger.info('calibration completed, closing cluster')
 # clusterA.reset()
 # clusterA.close()

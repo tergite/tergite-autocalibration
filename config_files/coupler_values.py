@@ -1,0 +1,1 @@
+cz_values = {'q16_q21': {'cz_pulse_frequency': nan, 'cz_pulse_duration': nan, 'cz_pulse_amplitude': 0.148}, 'q21_q22': {'cz_pulse_frequency': 216643363.6552124, 'cz_pulse_duration': 3.599826644814524e-07, 'cz_pulse_amplitude': 0.14909999999999998}}

@@ -48,7 +48,10 @@ class SpiDAC():
         print(f'{ spi_mod_number = }')
         print(f'{ dac_name = }')
         spi_mod_name = f'module{spi_mod_number}'
-        self.spi.add_spi_module(spi_mod_number, 'S4g')
+        try:
+            self.spi.add_spi_module(spi_mod_number, 'S4g')
+        except:
+            pass
         this_dac = self.spi.instrument_modules[spi_mod_name].instrument_modules[dac_name]
 # IMPORTANT: First we set the span and then with set the currents to zero
         this_dac.span('range_min_bi')
