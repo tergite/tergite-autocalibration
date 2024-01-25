@@ -25,6 +25,7 @@ node reference
   coupler_resonator_spectroscopy
   motzoi_parameter
   n_rabi_oscillations
+  randomized_benchmarking
   T1
   T2
   T2_echo
@@ -36,7 +37,7 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'rabi_oscillations',
+    'target_node': 'resonator_spectroscopy_1',
     'all_qubits': qubits,
     'couplers': couplers,
 }

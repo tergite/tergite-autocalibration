@@ -14,7 +14,6 @@ class SweepType(Enum):
 
 
 def configure_dataset(
-        name: str,
         raw_ds: xarray.Dataset,
         node,
     ) -> xarray.Dataset:
@@ -50,17 +49,10 @@ def configure_dataset(
     n_qubits = len(measurement_qubits)
     if 'ro_opt_frequencies' in list(sweep_quantities):
         qubit_states = [0,1,2]
-    elif name in ['ro_amplitude_optimization', 'ro_frequency_optimization']:
-        qubit_states = [0,1]
-    elif name in ['cz_calibration_ssro']:
-        qubit_states = ['c0','c1','c2'] # for calibration points
-    key_list = [key for key in raw_ds.data_vars.keys()]
-    for idx,key in enumerate(keys):
-        if name in ['ro_frequency_optimization_gef',]:
-            key_indx = key%n_qubits # this is to handle ro_opt_frequencies node where
-            # there are 2 or 3 measurements (i.e 2 or 3 Datarrays) for each qubit
-        else:
-            key_indx = idx%n_qubits # and also start from 0
+
+    for key in keys:
+        key_indx = key%n_qubits # this is to handle ro_opt_frequencies node where
+        # there are 2 or 3 measurements (i.e 2 or 3 Datarrays) for each qubit
         coords_dict = {}
         qubit = measurement_qubits[key_indx]
 
@@ -105,21 +97,13 @@ def configure_dataset(
         # at the first position in the samplespace
 
         reshaping = reversed(dimensions)
-        if name in ['ro_amplitude_optimization_gef']:
-            reshaping = [shots,dimensions[0],len(qubit_states)]
-            data_values = raw_ds[key].values.reshape(*reshaping)
-        elif name in ['cz_calibration_ssro']:
-            reshaping = np.array([shots])
-            reshaping = np.append(reshaping,dimensions)
-            data_values = raw_ds[key].values.reshape(*reshaping)
-        else:
-            data_values = raw_ds[key].values.reshape(*reshaping)
-            data_values = np.transpose(data_values)
+        data_values = raw_ds[key].values.reshape(*reshaping)
+        data_values = np.transpose(data_values)
         attributes = {'qubit': qubit, 'long_name': f'y{qubit}', 'units': 'NA'}
         if sweep_type == SweepType.ClusterSweepOnCouplers:
             attributes['coupler'] = coupler
         qubit_state = ''
-        if name in ['ro_amplitude_optimization_gef', 'ro_frequency_optimization_gef']:
+        if 'ro_opt_frequencies' in list(sweep_quantities):
             qubit_state = qubit_states[key // n_qubits]
             attributes['qubit_state'] = qubit_state
         #real_data_array = xarray.DataArray(
@@ -129,11 +113,9 @@ def configure_dataset(
         #                     attrs=attributes
         #                )
         #partial_ds[f'y{qubit}_real{qubit_state}'] = real_data_array
-        # breakpoint()
+
         partial_ds[f'y{qubit}{qubit_state}'] = (tuple(coords_dict.keys()), data_values, attributes)
         dataset = xarray.merge([dataset,partial_ds])
-        # breakpoint()
-
     return dataset
 
 
@@ -155,8 +137,6 @@ def handle_ro_freq_optimization(complex_dataset: xarray.Dataset, states: list[in
         for var in complex_dataset.data_vars:
             if coord in complex_dataset[var].coords:
                 values.append(complex_dataset[var].values)
-        # print(new_ds)
-        # print(coord,np.vstack(values),attributes)
         new_ds[f'y{this_qubit}'] = (('qubit_state', coord), np.vstack(values), attributes)
     return new_ds
 

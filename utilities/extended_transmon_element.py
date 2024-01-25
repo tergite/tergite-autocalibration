@@ -233,8 +233,8 @@ class ExtendedTransmon(BasicTransmonElement):
 
     def generate_device_config(self) -> DeviceCompilationConfig:
         cfg_dict = {
-            # 'backend': 'quantify_scheduler.backends'
-            # '.circuit_to_device.compile_circuit_to_device',
+            'backend': 'quantify_scheduler.backends'
+            '.circuit_to_device.compile_circuit_to_device',
             'elements': self._generate_config(),
             'clocks': {
                 f'{self.name}.01': self.clock_freqs.f01(),

@@ -159,6 +159,7 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
     schedule = schedule_function(**static_parameters, **samplespace)
     compilation_config = device.generate_compilation_config()
     device.close()
+
     # after the compilation_config is acquired, free the transmon resources
     for extended_transmon in transmons.values():
         extended_transmon.close()

@@ -26,7 +26,7 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
     fig.savefig(f'{data_path}/{node.name}.png', bbox_inches='tight', dpi=600)
     # plt.show()
     plt.show(block=False)
-    plt.pause(4)
+    plt.pause(20)
     plt.close()
 
     if node != 'tof':

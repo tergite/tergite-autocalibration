@@ -17,7 +17,7 @@ def execute_schedule(
     logger.info('Starting measurement')
     cluster_status = ClusterStatus.real
     schedule_duration = compiled_schedule.get_schedule_duration()
-    print(f'{ schedule_duration = }')
+    print(f'schedule_duration = {schedule_duration:.2f} sec')
 
     def run_measurement() -> None:
         lab_ic.prepare(compiled_schedule)

@@ -26,14 +26,10 @@ import toml
 import redis
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
-import numpy as np
 from workers.redis_utils import populate_initial_parameters, populate_node_parameters, populate_quantities_of_interest
 
 colorama_init()
 
-
-# bus_list = [[qubits[i], qubits[i+1]] for i in range(len(qubits) - 1)]
-# couplers = [bus[0] + '_' + bus[1] for bus in bus_list]
 
 class CalibrationSupervisor():
     def __init__(self) -> None:
@@ -65,47 +61,6 @@ class CalibrationSupervisor():
 
 
     def calibrate_system(self):
-
-        # populate_initial_parameters(
-        #     self.transmon_configuration,
-        #     self.qubits,
-        #     self.couplers,
-        #     self.redis_connection
-        # )
-
-        self.calibrate_linear_node_sequence()
-
-        # # TODO temporary hack because optimizing CZ chevron requires re-running
-        # # the whole calibration chain
-        # if self.target_node == 'cz_chevron':
-        #     self.currents = {}
-        #     self.number_of_test_currents = 5
-        #     for coupler in self.couplers:
-        #         parking_current = float(self.redis_connection.hget(f'couplers:{coupler}', "parking_current"))
-        #         self.currents[coupler] = parking_current + np.linspace(-1e-4, 1e-4, self.number_of_test_currents)
-        #     for current_index in range(self.number_of_test_currents):
-        #         print(f'{ self.dacs = }')
-        #         for coupler in self.couplers:
-        #             current = self.currents[coupler][current_index]
-        #             print(f'{ current = }')
-        #             self.dacs[coupler].current(current)
-        #             while self.dacs[coupler].is_ramping():
-        #                 print('ramping')
-
-        #                 time.sleep(1)
-        #             print('Finished ramping')
-        #         self.calibrate_linear_node_sequence()
-        #         self.reset_all_nodes()
-        #         populate_initial_parameters(
-        #             self.transmon_configuration,
-        #             self.qubits,
-        #             self.couplers,
-        #             self.redis_connection
-        #         )
-        # else:
-        #     self.calibrate_linear_node_sequence()
-
-    def calibrate_linear_node_sequence(self):
         logger.info('Starting System Calibration')
         number_of_qubits = len(self.qubits)
         draw_arrow_chart(f'Qubits: {number_of_qubits}', self.topo_order)
@@ -121,11 +76,6 @@ class CalibrationSupervisor():
             self.inspect_node(calibration_node)
             logger.info(f'{calibration_node} node is completed')
 
-def write_calibrate_paras(node):
-    node_specific_dict = transmon_configuration[node]['all']
-    for field_key, field_value in node_specific_dict.items():
-        for qubit in qubits:
-            redis_connection.hset(f'transmons:{qubit}', field_key, field_value)
 
     def inspect_node(self, node_name: str):
         logger.info(f'Inspecting node {node_name}')

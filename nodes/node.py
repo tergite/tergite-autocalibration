@@ -1,4 +1,3 @@
-from math import prod
 import numpy as np
 import redis
 from calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
@@ -13,14 +12,13 @@ from calibration_schedules.ramsey_fringes import Ramsey_fringes
 from calibration_schedules.ro_frequency_optimization import RO_frequency_optimization
 from calibration_schedules.ro_amplitude_optimization import RO_amplitude_optimization
 from calibration_schedules.state_discrimination import Single_Shots_RO
-# from calibration_schedules.drag_amplitude import DRAG_amplitude
 from calibration_schedules.motzoi_parameter import Motzoi_parameter
 from calibration_schedules.n_rabi_oscillations import N_Rabi_Oscillations
 
 # from calibration_schedules.cz_chevron import CZ_chevron
-
-from calibration_schedules.cz_chevron_reversed import CZ_chevron, Reset_chevron_dc
-from calibration_schedules.cz_calibration import CZ_calibration, CZ_calibration_SSRO,CZ_dynamic_phase
+# from calibration_schedules.cz_chevron_reversed import CZ_chevron, Reset_chevron_dc
+from calibration_schedules.cz_chevron_reversed import CZ_chevron
+# from calibration_schedules.cz_calibration import CZ_calibration, CZ_calibration_SSRO,CZ_dynamic_phase
 
 from analysis.motzoi_analysis import MotzoiAnalysis
 from analysis.resonator_spectroscopy_analysis import (
@@ -41,15 +39,15 @@ from analysis.punchout_analysis import PunchoutAnalysis
 from analysis.ramsey_analysis import RamseyAnalysis
 from analysis.tof_analysis import analyze_tof
 from analysis.T1_analysis import T1Analysis, T2Analysis, T2EchoAnalysis
-from analysis.coupler_spectroscopy_analysis import CouplerSpectroscopyAnalysis
-from analysis.cz_chevron_analysis import CZChevronAnalysis,CZChevronAnalysisReset
-from analysis.cz_calibration_analysis import CZCalibrationAnalysis, CZCalibrationSSROAnalysis
+# from analysis.cz_chevron_analysis import CZChevronAnalysis, CZChevronAnalysisReset
+# from analysis.cz_calibration_analysis import CZCalibrationAnalysis, CZCalibrationSSROAnalysis
 from analysis.n_rabi_analysis import NRabiAnalysis
 
 
 from config_files.VNA_LOKIB_values import (
     VNA_resonator_frequencies, VNA_qubit_frequencies, VNA_f12_frequencies
 )
+from nodes.coupler_nodes import Coupler_Resonator_Spectroscopy_Node, Coupler_Spectroscopy_Node
 
 cxn = redis.Redis(decode_responses=True)
 
@@ -623,22 +621,6 @@ class CZ_Calibration_Node(Base_Node):
         self.analysis_obj = CZCalibrationAnalysis
         # self.validate()
 
-    # def validate(self):
-    #     if 'coupled_qubits' not in self.node_dictionary:
-    #         error_msg = 'coupled_qubits not in job dictionary\n'
-    #         suggestion = 'job dictionary should look like:\n {"coupled_qubits": ["q1","q2"]}'
-    #         raise ValueError(error_msg + suggestion)
-    #     else:
-    #         coupled_qubits = self.node_dictionary['coupled_qubits']
-    #         if len(coupled_qubits) != 2:
-    #             raise ValueError('coupled qubits must be a list with 2 elements')
-    #         elif not all([q in self.all_qubits for q in coupled_qubits]):
-    #             raise ValueError('coupled qubits must be a subset of all calibrated qubits')
-    #         else:
-    #             self.coupled_qubits = coupled_qubits
-    #             self.coupler = coupled_qubits[0] + '_' + coupled_qubits[1]
-    #             self.all_qubits = coupled_qubits
-
     @property
     def samplespace(self):
         cluster_samplespace = {
@@ -651,9 +633,7 @@ class CZ_Calibration_SSRO_Node(Base_Node):
     def __init__(self, name: str, all_qubits: list[str], couplers: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.coupler = couplers[0]
-        # print(couplers)
         self.coupled_qubits = couplers[0].split(sep='_')
-        # print(self.coupled_qubits)
         # self.node_dictionary = kwargs
         self.redis_field = ['cz_phase','cz_pop_loss','cz_leakage']
         self.qubit_state = 2
@@ -689,125 +669,3 @@ class CZ_Dynamic_Phase_Node(Base_Node):
         self.dynamic = True
         self.measurement_obj = CZ_dynamic_phase
         self.analysis_obj = CZCalibrationAnalysis
-    #     self.validate()
-
-    # def validate(self):
-    #     if 'coupled_qubits' not in self.node_dictionary:
-    #         error_msg = 'coupled_qubits not in job dictionary\n'
-    #         suggestion = 'job dictionary should look like:\n {"coupled_qubits": ["q1","q2"]}'
-    #         raise ValueError(error_msg + suggestion)
-    #     else:
-    #         coupled_qubits = self.node_dictionary['coupled_qubits']
-    #         if len(coupled_qubits) != 2:
-    #             raise ValueError('coupled qubits must be a list with 2 elements')
-    #         elif not all([q in self.all_qubits for q in coupled_qubits]):
-    #             raise ValueError('coupled qubits must be a subset of all calibrated qubits')
-    #         else:
-    #             self.coupled_qubits = coupled_qubits
-    #             self.coupler = coupled_qubits[0] + '_' + coupled_qubits[1]
-    #             self.all_qubits = coupled_qubits
-
-    @property
-    def samplespace(self):
-        cluster_samplespace = {
-            'ramsey_phases': {qubit: np.linspace(0, 2*360, 31) for qubit in  self.coupled_qubits},
-            'control_ons': {qubit: [False,True] for qubit in  self.coupled_qubits},
-        }
-        return cluster_samplespace
-
-
-
-
-class Coupler_Spectroscopy_Node:
-    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
-        self.name = name
-        self.all_qubits = all_qubits
-        self.couplers = kwargs['couplers']
-        self.redis_field = ['parking_current']
-        self.qubit_state = 0
-        # perform 2 tones while biasing the current
-        self.measurement_obj = Two_Tones_Spectroscopy
-        self.analysis_obj = CouplerSpectroscopyAnalysis
-        self.coupled_qubits = self.get_coupled_qubits()
-        # self.validate()
-
-    def get_coupled_qubits(self) -> list:
-        if len(self.couplers) > 1:
-            print('Multiple couplers, lets work with only one')
-        coupled_qubits = self.couplers[0].split(sep='_')
-        self.coupler = self.couplers[0]
-        return coupled_qubits
-
-    @property
-    def samplespace(self):
-        qubit = self.coupled_qubits[self.measure_qubit_index]
-        self.measurement_qubit = qubit
-        # print(f'{ self.coupled_qubits = }')
-        # print(f'{ qubit = }')
-        cluster_samplespace = {
-            'spec_frequencies': {qubit: qubit_samples(qubit, sweep_range=self.sweep_range)}
-        }
-        # cluster_samplespace = {
-        #     'spec_frequencies': {qubit: np.linspace(3.771, 3.971, 0.0005)}
-        # }
-        return cluster_samplespace
-
-    @property
-    def spi_samplespace(self):
-        spi_samplespace = {
-            'dc_currents': {self.couplers[0]: np.arange(-2.5e-3, 2.5e-3, 250e-6)},
-        }
-        return spi_samplespace
-
-class Coupler_Resonator_Spectroscopy_Node(Base_Node):
-    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['resonator_flux_quantum']
-        self.qubit_state = 0
-        self.measurement_obj = Resonator_Spectroscopy
-        self.analysis_obj = CouplerSpectroscopyAnalysis
-        self.validate()
-
-    def validate(self):
-        if 'coupled_qubits' not in self.node_dictionary:
-            error_msg = 'coupled_qubits not in job dictionary\n'
-            suggestion = 'job dictionary should look like:\n {"coupled_qubits": ["q1","q2"]}'
-            raise ValueError(error_msg + suggestion)
-        else:
-            coupled_qubits = self.node_dictionary['coupled_qubits']
-            if len(coupled_qubits) != 2:
-                raise ValueError('coupled qubits must be a list with 2 elements')
-            elif not all([q in self.all_qubits for q in coupled_qubits]):
-                raise ValueError('coupled qubits must be a subset of all calibrated qubits')
-            else:
-                self.coupled_qubits = coupled_qubits
-                self.coupler = coupled_qubits[0] + '_' + coupled_qubits[1]
-                self.measurement_qubit = coupled_qubits[0]
-
-    @property
-    def samplespace(self):
-        qubit = self.measurement_qubit
-        cluster_samplespace = {
-            'ro_frequencies': {qubit: resonator_samples(qubit)}
-        }
-        return cluster_samplespace
-
-    @property
-    def spi_samplespace(self):
-        spi_samplespace = {
-            'dc_currents': {self.coupler: np.arange(-1.5e-3, 0e-3, 50e-6)},
-        }
-        return spi_samplespace
-
-    #     'ro_amplitude_optimization': {
-    #         'redis_field': 'ro_pulse_amp_opt',
-    #         'qubit_state': 0,  # doesn't matter
-    #         'measurement_obj': RO_amplitude_optimization,
-    #         'analysis_obj': OptimalROAmplitudeAnalysis
-    #     },
-    #     'state_discrimination': {
-    #         'redis_field': 'discriminator',
-    #         'qubit_state': 0,  # doesn't matter
-    #         'measurement_obj': Single_Shots_RO,
-    #         'analysis_obj': StateDiscrimination
-    #     },

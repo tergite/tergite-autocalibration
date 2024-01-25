@@ -27,24 +27,8 @@ class SpiDAC():
             self.spi = SpiRack('loki_rack', port)
 
     def create_spi_dac(self, coupler: str):
-        # coupler_spi_map = {
-        #     'q16_q17': (1, 'dac0'), # slightly heating?
-        #     'q17_q18': (1, 'dac1'),
-        #     'q18_q19': (1, 'dac2'),
-        #     'q19_q20': (1, 'dac3'), # slightly heating? , possibly +0.5mK for a coupler spectroscopy round
-        #     'q16_q21': (2, 'dac2'),
-        #     'q17_q22': (2, 'dac1'),
-        #     'q18_q23': (2, 'dac0'),
-        #     'q21_q22': (3, 'dac1'),
-        #     'q22_q23': (3, 'dac2'), # badly heating?
-        #     'q23_q24': (3, 'dac3'),
-        #     'q20_q25': (3, 'dac0'),
-        #     'q24_q25': (4, 'dac0'),
-        # }
 
-# ensure step is rounded in microAmpere:
         dc_current_step = 1e-6
-        dc_current_step = round(dc_current_step / 1e-6) * 1e-6
         spi_mod_number, dac_name = coupler_spi_map[coupler]
         spi_mod_name = f'module{spi_mod_number}'
         if spi_mod_name not in self.spi.instrument_modules:

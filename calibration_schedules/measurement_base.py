@@ -4,8 +4,6 @@ Module containing a base class that defines the basic principles used in all cal
 import redis
 from quantify_scheduler.enums import BinMode
 
-np.set_printoptions(precision=3, linewidth=125)
-
 redis_connection = redis.Redis(decode_responses=True)
 
 class Measurement():
@@ -23,7 +21,7 @@ class Measurement():
         The values are actual values str or float, not qcodes references.
         """
         attr_dict = {}
-        # breakpoint()
+
         for transmon in self.transmons.values():
             qubit = transmon.name
             if parameter=='readout_port':
@@ -43,8 +41,6 @@ class Measurement():
                     if parameter in submodule.parameters:
                         attr_dict[bus] = submodule.parameters[parameter]()
 
-
-        # print(f'{ attr_dict = }')
         return attr_dict
 
     def set_bin_mode(self, bin_mode:str):
