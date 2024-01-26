@@ -30,6 +30,7 @@ class SpiDAC():
 
         dc_current_step = 1e-6
         spi_mod_number, dac_name = coupler_spi_map[coupler]
+
         spi_mod_name = f'module{spi_mod_number}'
         if spi_mod_name not in self.spi.instrument_modules:
             self.spi.add_spi_module(spi_mod_number, 'S4g')

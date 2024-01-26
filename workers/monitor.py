@@ -20,7 +20,7 @@ class UserInputObject:
 
     def __get__(self, obj, objtype=None):
         return getattr(obj, self.private_name, None)
-    
+
     def __set__(self, obj, value):
         value_old = self.__get__(obj)
         if value_old is None:
@@ -32,7 +32,7 @@ class UserInputObject:
                 if v not in value_old:
                     value_old.append(v)
             value_old.sort()
-            
+
 class Monitor:
 
     qubits = UserInputObject()
@@ -61,7 +61,7 @@ class Monitor:
 
     def calibrate_node(self, node:str=None, **kwargs):
         if node is None:
-            self.all_results = supervisor.calibrate_node(self.node_park, **kwargs)    
+            self.all_results = supervisor.calibrate_node(self.node_park, **kwargs)
         else:
             self.all_results = supervisor.calibrate_node(node, **kwargs)
             self.node_park = node
@@ -89,7 +89,7 @@ class OptimizeNode:
         times = np.array([trial.suggest_float("time", -10, 10,step=0.1)])*1e-9
         amps = np.array([trial.suggest_float("amp", -0.01, 0.01,step=0.001)])
         # self.reset_redis.reset_node(self.node)
-        self.monitor.calibrate_node(self.node, opt_cz_pulse_frequency = dict(zip(couplers,freqs)), 
+        self.monitor.calibrate_node(self.node, opt_cz_pulse_frequency = dict(zip(couplers,freqs)),
                                                         opt_cz_pulse_duration = dict(zip(couplers,times)),
                                                         opt_cz_pulse_amplitude = dict(zip(couplers,amps)))
         results = self.monitor.get_results()
@@ -103,9 +103,10 @@ class OptimizeNode:
         self.best_params = self.study.best_params
         print(f"Validating trail {self.study.best_trial.number} with params {self.best_params}")
         self.validate_cz()
+
         print(f"Optimization finished for {self.node}")
         return self.study
-    
+
     def plot_optimization(self):
         return optuna.visualization.plot_optimization_history(self.study)
 
@@ -113,11 +114,11 @@ class OptimizeNode:
         freqs = np.array([best_params['freq']])*1e6
         times = np.array([best_params['time']])*1e-9
         amps = np.array([best_params['amp']])
-        self.monitor.calibrate_node('cz_calibration_ssro',opt_cz_pulse_frequency = dict(zip(couplers,freqs)), 
+        self.monitor.calibrate_node('cz_calibration_ssro',opt_cz_pulse_frequency = dict(zip(couplers,freqs)),
                                                         opt_cz_pulse_duration = dict(zip(couplers,times)),
                                                         opt_cz_pulse_amplitude = dict(zip(couplers,amps)))
         results = self.monitor.get_results()
         print(results)
         return results
-        
+
 # monitor = Monitor()

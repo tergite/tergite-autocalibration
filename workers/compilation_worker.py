@@ -169,6 +169,7 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
 
     logger.info('Starting Compiling')
     compiled_schedule = compiler.compile(schedule=schedule, config=compilation_config)
+
     # if node.name not in ['ro_amplitude_optimization_gef','cz_calibration_ssro']:
     #     try:
     #         figs = compiled_schedule.plot_pulse_diagram(plot_backend="plotly")

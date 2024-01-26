@@ -4,6 +4,7 @@ class Base_Node:
         self.all_qubits = all_qubits
         self.node_dictionary = node_dictionary
         self.backup = True
+        self.type = 'simple_sweep'
 
     def __str__(self):
         return f'Node representation for {self.name} on qubits {self.all_qubits}'

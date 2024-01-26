@@ -1,13 +1,9 @@
 # This code is part of Tergite
 import argparse
-import time
 
 from utilities.status import DataStatus
 from logger.tac_logger import logger
-from workers.compilation_worker import precompile
-from workers.execution_worker import measure_node
 from nodes.node import NodeFactory
-from workers.post_processing_worker import post_process
 from utilities.status import ClusterStatus
 from qblox_instruments import Cluster
 from workers.hardware_utils import SpiDAC
@@ -26,6 +22,7 @@ import toml
 import redis
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
+from workers.monitor_worker import monitor_node_calibration
 from workers.redis_utils import populate_initial_parameters, populate_node_parameters, populate_quantities_of_interest
 
 colorama_init()
@@ -114,7 +111,7 @@ class CalibrationSupervisor():
         #Check Redis if node is calibrated
         status = DataStatus.undefined
 
-        if node_name in ['coupler_spectroscopy', 'cz_chevron']:
+        if node_name in ['coupler_spectroscopy', 'cz_chevron', 'cz_optimize_chevron']:
             for coupler in self.couplers:
                 # the calibrated, not_calibrated flags may be not necessary,
                 # just store the DataStatus on Redis
@@ -140,7 +137,9 @@ class CalibrationSupervisor():
                     raise ValueError(f'status: {status}')
 
 
+
         if status == DataStatus.in_spec:
+
             print(f' \u2714  {Fore.GREEN}{Style.BRIGHT}Node {node_name} in spec{Style.RESET_ALL}')
             # print(f'{Fore.GREEN}{Style.BRIGHT} + u" \u2714 " + Node {node} in spec{Style.RESET_ALL}')
             return
@@ -160,20 +159,9 @@ class CalibrationSupervisor():
 
         data_path = create_node_data_path(node)
 
-        compiled_schedule = precompile(node)
+        monitor_node_calibration(node, data_path, self.lab_ic)
 
-        result_dataset = measure_node(
-            node,
-            compiled_schedule,
-            self.lab_ic,
-            data_path,
-            cluster_status=args.cluster_status,
-        )
-
-        logger.info('measurement completed')
-        measurement_status = post_process(result_dataset, node, data_path=data_path)
-        logger.info('analysis completed')
-        return measurement_status
+        return
 
 
 # main
@@ -189,8 +177,6 @@ if __name__ == "__main__":
 
     supervisor = CalibrationSupervisor()
     supervisor.calibrate_system()
-
-
 
     # if target_node == 'cz_chevron':
     #     set_module_att(clusterA)

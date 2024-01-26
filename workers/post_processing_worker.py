@@ -38,10 +38,7 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
         analysis.data_status = DataStatus.in_spec
     else:
         analysis.data_status = DataStatus.out_of_spec
-
     return analysis.data_status
-
-
 
 
 class BaseAnalysis():
@@ -95,7 +92,7 @@ class Multiplexed_Analysis(BaseAnalysis):
         self.all_results = {}
         for indx, var in enumerate(result_dataset.data_vars):
             this_qubit = result_dataset[var].attrs['qubit']
-            # ds = result_dataset[var].to_dataset()
+
             ds = xr.Dataset()
             for var in data_vars_dict[this_qubit]:
                 ds = xr.merge([ds, result_dataset[var]])
@@ -110,12 +107,12 @@ class Multiplexed_Analysis(BaseAnalysis):
             node_analysis = node.analysis_obj(ds, **kw_args)
             self.qoi = node_analysis.run_fitting()
 
-            if self.qoi is not None:
-                analysis_success = True
-            else:
-                analysis_success = True
+            # if self.qoi is not None:
+            #     analysis_success = True
+            # else:
+            #     analysis_success = True
+            # self.node_statuses.update({ this_qubit: analysis_success} )
 
-            self.node_statuses.update({ this_qubit: analysis_success} )
             node_analysis.plotter(this_axis)
 
             # TODO temporary hack:
