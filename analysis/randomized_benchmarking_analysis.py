@@ -6,7 +6,7 @@ import lmfit
 import xarray as xr
 
 def exponential_decay_function( x: float, amplitude: float, B: float, offset: float) -> float:
-    return amplitude*np.exp(-x/B) + offset
+    return amplitude * np.exp(-x / B) + offset
 
 
 class ExpDecayModel(lmfit.model.Model):
@@ -49,6 +49,13 @@ class RandomizedBenchmarkingAnalysis():
         data_var = list(dataset.data_vars.keys())[0]
         coord = list(dataset[data_var].coords.keys())[0]
         self.S21 = dataset[data_var].values
+        self.I_quad = self.S21.real
+        self.Q_quad = self.S21.imag
+        self.calibration_point_0 = self.S21[-2]
+        self.calibration_point_1 = self.S21[-1]
+        self.displacement_vector = self.calibration_point_1 - self.calibration_point_0
+        self.rotation_angle = np.angle(self.displacement_vector)
+        self.normalization = np.abs(self.displacement_vector)
         self.independents = dataset[coord].values
         self.fit_results = {}
         self.qubit = dataset[data_var].attrs['qubit']
@@ -56,7 +63,11 @@ class RandomizedBenchmarkingAnalysis():
     def run_fitting(self):
         model = ExpDecayModel()
 
-        self.magnitudes = np.abs(self.S21)
+        translated_to_zero_samples = self.S21 - self.calibration_point_0
+        rotated_samples = translated_to_zero_samples * np.exp(-1j * self.rotation_angle)
+        normalized_rotated_samples = rotated_samples / self.normalization
+
+        self.magnitudes = np.abs(normalized_rotated_samples)
         n_cliffords = self.independents
 
         # Normalize data to interval [0,1]
