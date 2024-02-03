@@ -205,20 +205,7 @@
                   "mixer_phase_error_deg": 4.375489999999999
                }
             ]
-         },
-         "complex_output_1": {
-           "lo_freq": 3.9e9,
-           "dc_mixer_offset_I": 0,
-           "dc_mixer_offset_Q": 0,
-           "portclock_configs": [
-              {
-                 "port": "q17_q22:fl",
-                 "clock": "q17_q22.cz",
-                 "mixer_amp_ratio": 1,
-                 "mixer_phase_error_deg": 0
-              }
-           ]
-        }
+         }
       },
       "clusterA_module7": {
          "instrument_type": "QCM_RF",
@@ -240,20 +227,7 @@
                   "mixer_phase_error_deg": -36.177859999999995
                }
             ]
-         },
-         "complex_output_1": {
-           "lo_freq": 3.9e9,
-           "dc_mixer_offset_I": 0,
-           "dc_mixer_offset_Q": 0,
-           "portclock_configs": [
-              {
-                 "port": "q18_q23:fl",
-                 "clock": "q18_q23.cz",
-                 "mixer_amp_ratio": 1,
-                 "mixer_phase_error_deg": 0
-              }
-           ]
-        }
+         }
       },
       "clusterA_module8": {
          "instrument_type": "QCM_RF",
@@ -275,20 +249,7 @@
                   "mixer_phase_error_deg": -15.79447
                }
             ]
-         },
-         "complex_output_1": {
-           "lo_freq": 3.9e9,
-           "dc_mixer_offset_I": 0,
-           "dc_mixer_offset_Q": 0,
-           "portclock_configs": [
-              {
-                 "port": "q19_q24:fl",
-                 "clock": "q19_q24.cz",
-                 "mixer_amp_ratio": 1,
-                 "mixer_phase_error_deg": 0
-              }
-           ]
-        }
+         }
       },
       "clusterA_module9": {
          "instrument_type": "QCM_RF",
@@ -442,11 +403,35 @@
       },
       "clusterA_module14": {
          "instrument_type": "QCM",
-         "complex_output_0": {
+         "real_output_0": {
             "portclock_configs": [
                {
                   "port": "q16_q21:fl",
                   "clock": "q16_q21.cz"
+               }
+            ]
+         },
+         "real_output_1": {
+            "portclock_configs": [
+               {
+                  "port": "q17_q22:fl",
+                  "clock": "q17_q22.cz"
+               }
+            ]
+         },
+         "real_output_2": {
+            "portclock_configs": [
+               {
+                  "port": "q18_q23:fl",
+                  "clock": "q18_q23.cz"
+               }
+            ]
+         },
+         "real_output_3": {
+            "portclock_configs": [
+               {
+                  "port": "q19_q24:fl",
+                  "clock": "q19_q24.cz"
                }
             ]
          }

@@ -32,7 +32,7 @@ def configure_dataset(
         qubit_states = [0,1,2]
     elif name in ['ro_amplitude_optimization', 'ro_frequency_optimization']:
         qubit_states = [0,1]
-    elif name in ['cz_calibration_ssro']:
+    elif name in ['cz_calibration_ssro','reset_calibration_ssro']:
         qubit_states = ['c0','c1','c2'] # for calibration points
     key_list = [key for key in raw_ds.data_vars.keys()]
     for idx,key in enumerate(keys):
@@ -49,7 +49,7 @@ def configure_dataset(
             # shots = int(len(raw_ds[key].values))
             shots = int(len(raw_ds[key].values[0])/(dimensions[0]*len(qubit_states)))
             coords_dict['shot'] = ('shot',range(shots),{'qubit':qubit, 'long_name': 'shot', 'units': 'NA'})
-        elif name in ['cz_calibration_ssro']:
+        elif name in ['cz_calibration_ssro','reset_calibration_ssro']:
             dimensions[1] += len(qubit_states) # for calibration points
             shots = int(len(raw_ds[key].values[0])/(np.product(dimensions)))
             coords_dict['shot'] = ('shot',range(shots),{'qubit':qubit, 'long_name': 'shot', 'units': 'NA'})
@@ -59,7 +59,7 @@ def configure_dataset(
             if qubit in samplespace[quantity]:
                 settable_values = samplespace[quantity][qubit]
                 # for node with calibration points [g,e,f], only change the ramey_phase samplespace
-                if name in ['cz_calibration_ssro'] and 'ramsey_phases' in quantity:
+                if name in ['cz_calibration_ssro','reset_calibration_ssro'] and 'ramsey_phases' in quantity:
                     settable_values = np.append(np.array([settable_values]),np.array([qubit_states]))
             else:
                 continue
@@ -78,7 +78,7 @@ def configure_dataset(
         if name in ['ro_amplitude_optimization_gef']:
             reshaping = [shots,dimensions[0],len(qubit_states)]
             data_values = raw_ds[key].values.reshape(*reshaping)
-        elif name in ['cz_calibration_ssro']:
+        elif name in ['cz_calibration_ssro','reset_calibration_ssro']:
             reshaping = np.array([shots])
             reshaping = np.append(reshaping,dimensions)
             data_values = raw_ds[key].values.reshape(*reshaping)

@@ -353,8 +353,8 @@ class CZChevronAnalysisReset():
         if direct:
             min_index = np.argmin(magnitudes)
             min_index = np.unravel_index(min_index, magnitudes.shape)
-            self.opt_freq = self.freq[min_index[1]]
-            self.opt_cz = self.amp[min_index[0]]
+            self.opt_freq = self.freq[min_index[0]]
+            self.opt_cz = self.amp[min_index[1]]
             print(self.opt_freq, self.opt_cz)
         else:
             # fig, axes = self.fig, self.axes
@@ -479,7 +479,7 @@ class CZChevronAnalysisReset():
         # fig = axis.pcolormesh(amp,freq,magnitudes,shading='nearest',cmap='RdBu_r')
         axis.scatter(self.opt_freq,self.opt_cz,c='r',label = 'Duration = {:.1f} ns'.format(self.opt_cz*1e9),marker='*',s=200,edgecolors='k', linewidth=0.5,zorder=10)
         # plt.scatter(opt_swap,opt_freq,c='b',label = 'SWAP12 Duration= {:.2f} V'.format(opt_swap),marker='X',s=200,edgecolors='k', linewidth=1.5,zorder=10)
-        axis.vlines(self.opt_freq,self.amp[0],self.amp[-1],label = 'Amplitude = {:.2f} V'.format(self.opt_freq),colors='k',linestyles='--',linewidth=1.5)
+        axis.vlines(self.opt_freq,self.amp[0],self.amp[-1],label = 'Amplitude = {:.5f} V'.format(self.opt_freq),colors='k',linestyles='--',linewidth=1.5)
         axis.hlines(self.opt_cz,self.freq[0],self.freq[-1],colors='k',linestyles='--',linewidth=1.5)
         # axis.legend(loc = 'lower center', bbox_to_anchor=(-0.15, -0.36, 1.4, .102), mode='expand', ncol=2,
         #             title = 'Optimal Gate Parameters', columnspacing=200,borderpad=1)

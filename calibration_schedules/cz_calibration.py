@@ -145,7 +145,7 @@ class CZ_calibration(Measurement):
         #         ClockResource(name=f'{this_qubit}.12', freq=mw_f_val)
         #     )
         for index, this_coupler in enumerate(all_couplers):
-            if coupler == 'q16_q21':
+            if this_coupler == 'q16_q21':
                 downconvert = 0
             else:
                 downconvert = 4.4e9

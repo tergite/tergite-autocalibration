@@ -1,7 +1,9 @@
 # qubits = ['q11','q12','q13','q14','q15']
 qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
 # qubits = ['q16', 'q17', 'q19', 'q21', 'q22', 'q23', 'q25']
-couplers = ['q16_q21']
+couplers = ['q17_q22']
+# couplers = ['q17_q18']
+# couplers = ['q16_q21']
 # couplers = ['q21_q22']
 '''
 node reference
@@ -29,6 +31,7 @@ node reference
   T2_echo
   cz_chevron
   reset_chevron
+  reset_calibration_ssro
   cz_calibration
   cz_calibration_ssro
   cz_dynamic_phase

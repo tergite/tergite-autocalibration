@@ -35,6 +35,8 @@ XY_crosstalk.selectivity = nan
 punchout.ro_ampl = nan
 reset_chevron.reset_amplitude_qc = nan
 reset_chevron.reset_duration_qc = nan
+reset_calibration_ssro.reset_fidelity = nan
+reset_calibration_ssro.reset_leakage = nan
 
 [qoi.couplers]
 coupler_spectroscopy.parking_current = nan

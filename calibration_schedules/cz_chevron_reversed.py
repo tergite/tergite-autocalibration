@@ -4,12 +4,12 @@ Module containing a schedule class for Ramsey calibration. (1D parameter sweep, 
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler import Schedule
 from quantify_scheduler.operations.gate_library import Measure, Reset, X90, Rxy, X, CZ
-from quantify_scheduler.operations.pulse_library import SuddenNetZeroPulse,ResetClockPhase,IdlePulse,DRAGPulse,SetClockFrequency,NumericalPulse,SoftSquarePulse,SquarePulse
+from quantify_scheduler.operations.pulse_library import GaussPulse,SuddenNetZeroPulse,ResetClockPhase,IdlePulse,DRAGPulse,SetClockFrequency,NumericalPulse,SoftSquarePulse,SquarePulse
 from quantify_scheduler.operations.pulse_library import RampPulse,DRAGPulse,SetClockFrequency,NumericalPulse,SoftSquarePulse,SquarePulse, ResetClockPhase
 from quantify_scheduler.resources import ClockResource
 from calibration_schedules.measurement_base import Measurement
 from utilities.extended_transmon_element import Measure_RO1, Rxy_12
-from config_files.coupler_config import edge_group
+from config_files.coupler_config import edge_group, qubit_types
 from matplotlib import pyplot as plt
 
 import numpy as np
@@ -88,10 +88,11 @@ class Reset_chevron_dc(Measurement):
         qubits = coupler.split(sep='_')
 
         # cz_frequency_values = np.array(list(cz_pulse_frequencies_sweep.values())[0])
-        cz_duration_values = list(cz_pulse_durations.values())[0]
-        cz_pulse_amplitude_values = list(cz_pulse_amplitudes.values())[0]
-        print(f'{ cz_duration_values = }')
-        print(f'{ cz_pulse_amplitude_values = }')
+        reset_duration_values = list(cz_pulse_durations.values())[0]
+        reset_pulse_amplitude_values = list(cz_pulse_amplitudes.values())[0]
+        print(f'{ reset_duration_values = }')
+        print(f'{ reset_pulse_amplitude_values = }')
+
         # print(f'{ cz_frequency_values[0] = }')
 
         # schedule.add_resource(
@@ -106,10 +107,10 @@ class Reset_chevron_dc(Measurement):
             ClockResource(name=coupler+'.cz',freq= 0e9)
         )
 
-        number_of_durations = len(cz_duration_values)
+        number_of_durations = len(reset_duration_values)
 
         # The outer loop, iterates over all cz_frequencies
-        for freq_index, cz_amplitude in enumerate(cz_pulse_amplitude_values):
+        for freq_index, reset_amplitude in enumerate(reset_pulse_amplitude_values):
             cz_clock = f'{coupler}.cz'
             cz_pulse_port = f'{coupler}:fl'
             # schedule.add(
@@ -120,38 +121,342 @@ class Reset_chevron_dc(Measurement):
             # )
 
             #The inner for loop iterates over cz pulse durations
-            for acq_index, cz_duration in enumerate(cz_duration_values):
+            for acq_index, reset_duration in enumerate(reset_duration_values):
                 this_index = freq_index * number_of_durations + acq_index
 
                 relaxation = schedule.add(Reset(*qubits))
 
                 for this_qubit in qubits:
                     # schedule.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
-                    if this_qubit == 'q21':
+                    if qubit_types[this_qubit] == 'Target':
+                        # schedule.add(IdlePulse(20e-9), ref_op=relaxation, ref_pt='end')
                         # schedule.add(IdlePulse(20e-9))
                         schedule.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
-                        schedule.add(Rxy_12(this_qubit))
+                        # schedule.add(Rxy_12(this_qubit))
                     else:
-                        schedule.add(IdlePulse(20e-9), ref_op=relaxation, ref_pt='end')
-                        schedule.add(IdlePulse(20e-9))
-                        # schedule.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
+                        schedule.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
+                        schedule.add(Rxy_12(this_qubit))
+                        # schedule.add(IdlePulse(20e-9))
+                        # schedule.add(IdlePulse(20e-9), ref_op=relaxation, ref_pt='end')
 
-                buffer_start = schedule.add(IdlePulse(4e-9))
 
                 schedule.add(ResetClockPhase(clock=coupler+'.cz'))
+                
+                buffer = schedule.add(IdlePulse(4e-9))
 
-                schedule.add(
+                reset_duration_qc = 80e-09
+                reset_amplitude_qc = -0.085
+
+                # reset_duration_cr = 360e-09
+                # reset_amplitude_cr = 0.042
+
+                # reset_duration_cr_gf = 0e-09
+                # reset_amplitude_cr_gf = 0
+
+                # reset_duration_qc_fg = 0e-09
+                # reset_amplitude_qc_fg = 0
+                
+                # step 1 - calibrate ge/f reset qc pulse
+
+                target_duration = 8000e-09
+
+                # qc = schedule.add(
+                #             RampPulse(
+                #                 duration = reset_duration,
+                #                 offset = reset_amplitude,
+                #                 # amp = - reset_amplitude,
+                #                 amp = - reset_amplitude,
+                #                 # amp = 0,
+                #                 port = cz_pulse_port,
+                #                 clock = cz_clock,
+                #             ),
+                #         )
+
+                # buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration * 1e9 / 4) * 4e-9)
+               
+                # step 2 - calibrate ge/f reset cr pulse
+                
+                # qc = schedule.add(
+                #             RampPulse(
+                #                 duration = reset_duration_qc,
+                #                 offset = reset_amplitude_qc,
+                #                 amp = - reset_amplitude_qc,
+                #                 port = cz_pulse_port,
+                #                 clock = cz_clock,
+                #             ),
+                #         )
+
+                # buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration_qc * 1e9 / 4) * 4e-9)
+                # # buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration * 1e9 / 4) * 4e-9)
+            
+                # cr = schedule.add(
+                #             RampPulse(
+                #                 # duration = reset_duration_cr,
+                #                 # offset = reset_amplitude_cr,
+                #                 duration = reset_duration,
+                #                 offset = reset_amplitude,
+                #                 # amp = - reset_amplitude,
+                #                 amp = 0,
+                #                 port = cz_pulse_port,
+                #                 clock = cz_clock,
+                #             ),
+                #         )
+
+                # # buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration_cr * 1e9 / 4) * 4e-9)
+                # buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration * 1e9 / 4) * 4e-9)
+
+                # cr = schedule.add(
+                #             RampPulse(
+                #                 # duration = reset_duration_cr_gf,
+                #                 # offset = reset_amplitude_cr_gf,
+                #                 duration = reset_duration,
+                #                 offset = reset_amplitude,
+                #                 amp = 0,
+                #                 port = cz_pulse_port,
+                #                 clock = cz_clock,
+                #             ),
+                #         )
+
+                # # buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration_cr_gf * 1e9 / 4) * 4e-9)
+                # buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration * 1e9 / 4) * 4e-9)
+            
+                # qc = schedule.add(
+                #             RampPulse(
+                #                 duration = reset_duration_qc,
+                #                 offset = reset_amplitude_qc,
+                #                 amp = - reset_amplitude_qc,
+                #                 port = cz_pulse_port,
+                #                 clock = cz_clock,
+                #             ),
+                #         )
+
+                # buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration_qc * 1e9 / 4) * 4e-9)
+                # # buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration * 1e9 / 4) * 4e-9)
+
+                # # step 3 - calibrate fg reset qc pulse
+
+                qc = schedule.add(
                             RampPulse(
-                                duration = cz_duration,
-                                offset = -cz_amplitude,
-                                amp = cz_amplitude,
+                                duration = reset_duration,
+                                offset = reset_amplitude,
+                                amp = 0,
                                 port = cz_pulse_port,
                                 clock = cz_clock,
                             ),
                         )
 
-                buffer_end = schedule.add(IdlePulse(4e-9),ref_op=buffer_start, ref_pt='end',rel_time = np.ceil( cz_duration * 1e9 / 4) * 4e-9)
+                # buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration_qc * 1e9 / 4) * 4e-9)
+                buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration * 1e9 / 4) * 4e-9)
 
+                # for this_qubit in qubits:
+                #     # schedule.add(X(this_qubit), ref_op=buffer, ref_pt='end')
+                #     if this_qubit == 'q21':
+                #         schedule.add(IdlePulse(20e-9), ref_op=buffer, ref_pt='end')
+                #         # schedule.add(IdlePulse(20e-9))
+                #         # schedule.add(X(this_qubit), ref_op=buffer, ref_pt='end')
+                #         # schedule.add(Rxy_12(this_qubit))
+                #     else:
+                #         schedule.add(X(this_qubit), ref_op=buffer, ref_pt='end')
+                #         # schedule.add(Rxy_12(this_qubit))
+                #         # schedule.add(IdlePulse(20e-9))
+                #         # schedule.add(IdlePulse(20e-9), ref_op=buffer, ref_pt='end')
+
+                # # step 4 - check fg reset cr pulse
+                
+                # qc = schedule.add(
+                #             RampPulse(
+                #                 duration = reset_duration_qc_fg,
+                #                 offset = reset_amplitude_qc_fg,
+                #                 amp = - reset_amplitude_qc_fg,
+                #                 port = cz_pulse_port,
+                #                 clock = cz_clock,
+                #             ),
+                #         )
+
+                # buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration_qc_fg * 1e9 / 4) * 4e-9)
+            
+                # cr = schedule.add(
+                #             RampPulse(
+                #                 duration = reset_duration_cr,
+                #                 offset = reset_amplitude_cr,
+                #                 amp = 0,
+                #                 port = cz_pulse_port,
+                #                 clock = cz_clock,
+                #             ),
+                #         )
+
+                # buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration_cr * 1e9 / 4) * 4e-9)
+
+                # cr = schedule.add(
+                #             RampPulse(
+                #                 duration = reset_duration_cr_gf,
+                #                 offset = reset_amplitude_cr_gf,
+                #                 amp = 0,
+                #                 port = cz_pulse_port,
+                #                 clock = cz_clock,
+                #             ),
+                #         )
+
+                # buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration_cr_gf * 1e9 / 4) * 4e-9)
+            
+                # qc = schedule.add(
+                #             RampPulse(
+                #                 duration = reset_duration_qc_fg,
+                #                 offset = reset_amplitude_qc_fg,
+                #                 amp = - reset_amplitude_qc_fg,
+                #                 port = cz_pulse_port,
+                #                 clock = cz_clock,
+                #             ),
+                #         )
+
+                # buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration_qc_fg * 1e9 / 4) * 4e-9)
+
+                # # step 5 - full reset
+
+                # qc = schedule.add(
+                #             RampPulse(
+                #                 duration = reset_duration_qc_fg,
+                #                 offset = reset_amplitude_qc_fg,
+                #                 amp = - reset_amplitude_qc_fg,
+                #                 port = cz_pulse_port,
+                #                 clock = cz_clock,
+                #             ),
+                #         )
+
+                # buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration_qc_fg * 1e9 / 4) * 4e-9)
+
+                # qc = schedule.add(
+                #             RampPulse(
+                #                 duration = reset_duration_qc,
+                #                 offset = reset_amplitude_qc,
+                #                 amp = - reset_amplitude_qc,
+                #                 port = cz_pulse_port,
+                #                 clock = cz_clock,
+                #             ),
+                #         )
+
+                # buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration_qc * 1e9 / 4) * 4e-9)
+
+                # cr = schedule.add(
+                #             RampPulse(
+                #                 duration = reset_duration_cr,
+                #                 offset = reset_amplitude_cr,
+                #                 amp = 0,
+                #                 port = cz_pulse_port,
+                #                 clock = cz_clock,
+                #             ),
+                #         )
+
+                # buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration_cr * 1e9 / 4) * 4e-9)
+
+                # cr = schedule.add(
+                #             RampPulse(
+                #                 duration = reset_duration_cr_gf,
+                #                 offset = reset_amplitude_cr_gf,
+                #                 amp = 0,
+                #                 port = cz_pulse_port,
+                #                 clock = cz_clock,
+                #             ),
+                #         )
+
+                # buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration_cr_gf * 1e9 / 4) * 4e-9)
+
+
+###################################################################
+
+                # reset_duration_qc = 20e-09
+                # reset_amplitude_qc = -0.025
+
+                # reset_duration_qc_gf = 25e-09
+                # reset_amplitude_qc_gf = -0.044
+
+                # reset_duration_cr = 190e-09
+                # reset_amplitude_cr = 0.055
+
+                # reset_duration_cr_gf = 360e-09
+                # reset_amplitude_cr_gf = 0.061
+
+                # reset_duration_qc_fg = 15e-09
+                # reset_amplitude_qc_fg = -0.076
+
+
+                # qc = schedule.add(
+                #             GaussPulse(
+                #                 # duration = reset_duration,
+                #                 # G_amp = reset_amplitude,
+                #                 duration = reset_duration_qc_gf,
+                #                 G_amp = reset_amplitude_qc_gf,
+                #                 phase = 0,
+                #                 port = cz_pulse_port,
+                #                 clock = cz_clock,
+                #             ),
+                #         )
+
+                # buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration_qc_gf * 1e9 / 4) * 4e-9)
+                # # buffer_qc = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration * 1e9 / 4) * 4e-9)
+
+                # qc = schedule.add(
+                #             RampPulse(
+                #                 duration = reset_duration_qc_fg,
+                #                 offset = reset_amplitude_qc_fg,
+                #                 # amp = - reset_duration / target_duration* reset_amplitude,
+                #                 amp = 0,
+                #                 port = cz_pulse_port,
+                #                 clock = cz_clock,
+                #             ),
+                #         )
+
+                # buffer_qc = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration_qc_fg * 1e9 / 4) * 4e-9)
+                # # buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration * 1e9 / 4) * 4e-9)
+            
+
+                # qc = schedule.add(
+                #             GaussPulse(
+                #                 # duration = reset_duration,
+                #                 # G_amp = reset_amplitude,
+                #                 duration = reset_duration_qc,
+                #                 G_amp = reset_amplitude_qc,
+                #                 phase = 0,
+                #                 port = cz_pulse_port,
+                #                 clock = cz_clock,
+                #             ),
+                #         )
+
+                # buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration_qc * 1e9 / 4) * 4e-9)
+                # # buffer_qc = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration * 1e9 / 4) * 4e-9)
+
+                # cr = schedule.add(
+                #             RampPulse(
+                #                 duration = reset_duration_cr,
+                #                 offset = reset_amplitude_cr,
+                #                 # duration = reset_duration,
+                #                 # offset = reset_amplitude,
+                #                 amp = 0,
+                #                 port = cz_pulse_port,
+                #                 clock = cz_clock,
+                #             ),
+                #         )
+
+                # buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration_cr * 1e9 / 4) * 4e-9)
+                # # buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration * 1e9 / 4) * 4e-9)
+            
+                # cr = schedule.add(
+                #             RampPulse(
+                #                 duration = reset_duration_cr_gf,
+                #                 offset = reset_amplitude_cr_gf,
+                #                 # duration = reset_duration,
+                #                 # offset = reset_amplitude,
+                #                 amp = 0,
+                #                 port = cz_pulse_port,
+                #                 clock = cz_clock,
+                #             ),
+                #         )
+
+                # buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration_cr_gf * 1e9 / 4) * 4e-9)
+                # # buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration * 1e9 / 4) * 4e-9)
+
+                buffer_end = schedule.add(IdlePulse(4e-9))
+                
                 for this_qubit in qubits:
                     schedule.add(
                         Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
@@ -159,7 +464,7 @@ class Reset_chevron_dc(Measurement):
                     )
         return schedule
 
-class CZ_chevron_ac_reset(Measurement):
+class Reset_chevron_ac(Measurement):
     # for testing reset
 
     def __init__(self,transmons,coupler,qubit_state:int=0):
@@ -393,12 +698,12 @@ class CZ_chevron(Measurement):
             redis_config = redis_connection.hgetall(f"couplers:{this_coupler}")
             cz_pulse_amplitude[this_coupler] = float(redis_config['cz_pulse_amplitude'])
             print(f'{cz_pulse_amplitude = }')
-            if coupler == 'q16_q21':
+            if this_coupler == 'q16_q21':
                 downconvert = 0
             else:
                 downconvert = 4.4e9
             schedule.add_resource(
-                ClockResource(name=coupler+'.cz',freq= - cz_frequency_values[this_coupler]+downconvert)
+                ClockResource(name=coupler+'.cz',freq= - cz_frequency_values[0]+downconvert)
             )
 
         number_of_durations = len(cz_duration_values)

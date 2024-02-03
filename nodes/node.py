@@ -21,7 +21,7 @@ from calibration_schedules.n_rabi_oscillations import N_Rabi_Oscillations
 
 from calibration_schedules.cz_chevron_reversed import CZ_chevron, Reset_chevron_dc
 from calibration_schedules.cz_calibration import CZ_calibration, CZ_calibration_SSRO,CZ_dynamic_phase
-
+from calibration_schedules.reset_calibration import Reset_calibration_SSRO
 from analysis.motzoi_analysis import MotzoiAnalysis
 from analysis.resonator_spectroscopy_analysis import (
     ResonatorSpectroscopyAnalysis,
@@ -43,6 +43,7 @@ from analysis.tof_analysis import analyze_tof
 from analysis.T1_analysis import T1Analysis, T2Analysis, T2EchoAnalysis
 from analysis.coupler_spectroscopy_analysis import CouplerSpectroscopyAnalysis
 from analysis.cz_chevron_analysis import CZChevronAnalysis,CZChevronAnalysisReset
+from analysis.reset_calibration_analysis import ResetCalibrationSSROAnalysis
 from analysis.cz_calibration_analysis import CZCalibrationAnalysis, CZCalibrationSSROAnalysis
 from analysis.n_rabi_analysis import NRabiAnalysis
 
@@ -104,6 +105,7 @@ class NodeFactory:
             'T2': T2_Node,
             'T2_echo': T2_Echo_Node,
             'reset_chevron': Reset_Chevron_Node,
+            'reset_calibration_ssro': Reset_Calibration_SSRO_Node,
             'cz_chevron': CZ_Chevron_Node,
             'cz_calibration': CZ_Calibration_Node,
             'cz_calibration_ssro': CZ_Calibration_SSRO_Node,
@@ -206,7 +208,7 @@ class Qubit_01_Spectroscopy_Multidim_Node(Base_Node):
     def samplespace(self):
         cluster_samplespace = {
             'spec_pulse_amplitudes': {
-                 qubit: np.linspace(6e-4, 6e-4, 1) for qubit in self.all_qubits
+                 qubit: np.linspace(8e-4, 8e-4, 1) for qubit in self.all_qubits
             },
             'spec_frequencies': {
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
@@ -428,7 +430,7 @@ class Qubit_12_Spectroscopy_Multidim_Node(Base_Node):
     def samplespace(self):
         cluster_samplespace = {
             'spec_pulse_amplitudes': {
-                 qubit: np.linspace(6e-4, 6e-4, 1) for qubit in self.all_qubits
+                 qubit: np.linspace(8e-4, 8e-4, 1) for qubit in self.all_qubits
             },
             'spec_frequencies': {
                 qubit: qubit_samples(qubit, transition='12') for qubit in self.all_qubits
@@ -527,6 +529,24 @@ class Reset_Chevron_Node(Base_Node):
     def samplespace(self):
         # print(f'{ np.linspace(- 50e6, 50e6, 2) + self.ac_freq = }')
         cluster_samplespace = {
+
+            # For DC reset
+            'cz_pulse_durations': {
+                qubit: 1e-9+np.arange(0e-9, 80e-9,2e-9) for qubit in self.coupled_qubits
+            },
+            'cz_pulse_amplitudes': {
+                qubit: np.linspace(0, 0.1, 21) for qubit in self.coupled_qubits
+            },
+
+            # # For DC reset - ge/gf
+            # 'cz_pulse_durations': {
+            #     qubit: 1e-9+np.arange(0e-9, 200e-9,5e-9) for qubit in self.coupled_qubits
+            # },
+            # 'cz_pulse_amplitudes': {
+            #     qubit: np.linspace(-0.058, -0.064, 21) for qubit in self.coupled_qubits
+            # },
+
+            
             # Pulse test
             # 'cz_pulse_durations': {
             #     qubit: 4e-9+np.linspace(16e-9, 16e-9, 11)  for qubit in self.coupled_qubits
@@ -534,14 +554,6 @@ class Reset_Chevron_Node(Base_Node):
             # 'cz_pulse_amplitudes': {
             #     qubit: np.linspace(0.4, 0.4, 11) for qubit in self.coupled_qubits
             # },
-
-            # For DC reset
-            'cz_pulse_durations': {
-                qubit: 1e-9+np.arange(0e-9, 200e-9,10e-9) for qubit in self.coupled_qubits
-            },
-            'cz_pulse_amplitudes': {
-                qubit: np.linspace(-0.0, -0.8, 41) for qubit in self.coupled_qubits
-            },
 
             # For AC reset
             # 'cz_pulse_durations': {
@@ -599,7 +611,7 @@ class CZ_Chevron_Node(Base_Node):
                 qubit: 12e-9+np.arange(0e-9, 32*20e-9,16e-9) for qubit in self.coupled_qubits
             },
             'cz_pulse_frequencies_sweep': {
-                qubit: np.linspace(-12e6,-4e6, 17) + self.ac_freq for qubit in self.coupled_qubits
+                qubit: np.linspace(-15e6,-5e6, 21) + self.ac_freq for qubit in self.coupled_qubits
             },
 
             # 'cz_pulse_durations': {
@@ -610,6 +622,31 @@ class CZ_Chevron_Node(Base_Node):
             # },
         }
         return cluster_samplespace
+
+class Reset_Calibration_SSRO_Node(Base_Node):
+    def __init__(self, name: str, all_qubits: list[str], couplers: list[str], ** node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
+        self.coupler = couplers[0]
+        # print(couplers)
+        self.coupled_qubits = couplers[0].split(sep='_')
+        # print(self.coupled_qubits)
+        # self.node_dictionary = kwargs
+        self.redis_field = ['reset_fidelity','reset_leakage']
+        self.qubit_state = 2
+        self.testing_group = 0 # The edge group to be tested. 0 means all edges.
+        self.dynamic = False
+        self.measurement_obj = Reset_calibration_SSRO
+        self.analysis_obj = ResetCalibrationSSROAnalysis
+        # self.validate()
+
+    @property
+    def samplespace(self):
+        cluster_samplespace = {
+            'control_ons': {qubit: [False,True] for qubit in  self.coupled_qubits},
+            'ramsey_phases': {qubit: range(9) for qubit in  self.coupled_qubits},
+        }
+        return cluster_samplespace
+
 
 class CZ_Calibration_Node(Base_Node):
     def __init__(self, name: str, all_qubits: list[str], couplers: list[str], ** node_dictionary):
@@ -766,7 +803,7 @@ class Coupler_Spectroscopy_Node(Base_Node):
     @property
     def spi_samplespace(self):
         spi_samplespace = {
-            'dc_currents': {self.coupler: np.arange(-3e-3, 3e-3, 100e-6)},
+            'dc_currents': {self.coupler: np.append(np.arange(0e-3, 3e-3, 100e-6),np.arange(0e-3, -3e-3, -100e-6))},
         }
         return spi_samplespace
 
