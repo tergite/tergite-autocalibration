@@ -156,6 +156,7 @@ class CZ_Chevron_Node(Base_Node):
 class CZ_Optimize_Chevron_Node(Base_Node):
     def __init__(self, name: str, all_qubits: list[str], couplers: list[str]):
         super().__init__(name, all_qubits)
+        self.type = 'optimized_sweep'
         self.couplers = couplers
         self.coupler = self.couplers[0]
         self.redis_field = ['cz_pulse_frequency','cz_pulse_duration']
@@ -201,10 +202,10 @@ class CZ_Optimize_Chevron_Node(Base_Node):
 
             # For CZ gate
             'cz_pulse_durations': {
-                coupler: np.arange(100e-9, 1000e-9, 32e-9) for coupler in self.couplers
+                coupler: np.arange(100e-9, 1000e-9, 320e-9) for coupler in self.couplers
             },
             'cz_pulse_frequencies': {
-                coupler: np.linspace(-2.0e6, 2.0e6, 25) + self.transition_frequency(coupler) for coupler in self.couplers
+                coupler: np.linspace(-2.0e6, 2.0e6, 5) + self.transition_frequency(coupler) for coupler in self.couplers
             },
         }
         return cluster_samplespace

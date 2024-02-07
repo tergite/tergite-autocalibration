@@ -25,9 +25,9 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
     fig.set_tight_layout(True)
     fig.savefig(f'{data_path}/{node.name}.png', bbox_inches='tight', dpi=600)
     # plt.show()
-    plt.show(block=False)
-    plt.pause(20)
-    plt.close()
+    plt.show(block=True)
+    # plt.pause(20)
+    # plt.close()
 
     if node != 'tof':
         analysis.node_result.update({'measurement_dataset':result_dataset.to_dict()})
@@ -84,6 +84,7 @@ class Multiplexed_Analysis(BaseAnalysis):
             tof = analyze_tof(result_dataset, True)
             return
         super().__init__(result_dataset, data_path)
+
         data_vars_dict = collections.defaultdict(set)
         for var in result_dataset.data_vars:
             this_qubit = result_dataset[var].attrs['qubit']
@@ -116,7 +117,7 @@ class Multiplexed_Analysis(BaseAnalysis):
             node_analysis.plotter(this_axis)
 
             # TODO temporary hack:
-            if node.name in ['cz_calibration','cz_dynamic_phase','cz_calibration_ssro'] and qubit_types[this_qubit] == 'Target':
+            if node.name in ['cz_calibration','cz_dynamic_phase','cz_calibration_ssro', 'cz_optimize_chevron'] and qubit_types[this_qubit] == 'Target':
                 self.update_redis_trusted_values(node.name, node.coupler, redis_field)
                 this_element = node.coupler
             elif node.name in ['cz_chevron'] and qubit_types[this_qubit] == 'Control':

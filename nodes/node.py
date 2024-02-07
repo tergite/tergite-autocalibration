@@ -318,11 +318,12 @@ class T1_Node(Base_Node):
         }
         return cluster_samplespace
 
-class Randomized_Benchmarking_Node:
-    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
+class Randomized_Benchmarking_Node(Base_Node):
+    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
         self.name = name
         self.all_qubits = all_qubits
-        self.node_dictionary = kwargs
+        self.node_dictionary = node_dictionary
         self.backup = False
         self.redis_field = ['t1_time'] #TODO change to something, error?
         self.qubit_state = 0 #can be 0 or 1
@@ -331,16 +332,25 @@ class Randomized_Benchmarking_Node:
 
     @property
     def samplespace(self):
-        numbers = 2 ** np.arange(1,10)
+        numbers = 2 ** np.arange(1,12,3)
         extra_numbers = [numbers[i] + numbers[i+1] for i in range(len(numbers)-2)]
         extra_numbers = np.array(extra_numbers)
+        calibration_points = np.array([0,1])
         all_numbers = np.sort( np.concatenate((numbers, extra_numbers)) )
+        # all_numbers = numbers
+
+        all_numbers =  np.concatenate((all_numbers, calibration_points))
+
+        number_of_repetitions = 1
 
         cluster_samplespace = {
             'number_of_cliffords': {
-                qubit: all_numbers for qubit in self.all_qubits
-                # qubit: np.array([2,4,8,16,32,64,128,256,512,768,1024]) for qubit in self.all_qubits
-            }
+                # qubit: all_numbers for qubit in self.all_qubits
+                qubit: np.array([2, 16, 128, 256,512, 768, 1024, 0, 1]) for qubit in self.all_qubits
+            },
+            'sequence_repetitions': {
+                qubit: np.ones(number_of_repetitions) for qubit in self.all_qubits
+            },
         }
         return cluster_samplespace
 
@@ -474,7 +484,7 @@ class Qubit_12_Spectroscopy_Multidim_Node(Base_Node):
 
 class Rabi_Oscillations_12_Node(Base_Node):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
+        super().__init__(name, all_qubits, ** node_dictionary)
         self.redis_field = ['mw_ef_amp180']
         self.qubit_state = 1
         self.measurement_obj = Rabi_Oscillations

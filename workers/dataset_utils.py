@@ -81,7 +81,6 @@ def configure_dataset(
                 coord_key = quantity + coupler
                 settable_values = spi_samplespace[quantity][coupler]
 
-
         partial_ds = xarray.Dataset(coords=coords_dict)
 
         if sweep_type == SweepType.ClusterSweepOnCouplers:
@@ -106,6 +105,7 @@ def configure_dataset(
         if 'ro_opt_frequencies' in list(sweep_quantities):
             qubit_state = qubit_states[key // n_qubits]
             attributes['qubit_state'] = qubit_state
+
         #real_data_array = xarray.DataArray(
         #                     data=data_values.real,
         #                     coords=coords_dict,

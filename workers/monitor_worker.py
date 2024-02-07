@@ -24,7 +24,8 @@ def monitor_node_calibration(node, data_path, lab_ic):
         measurement_result = post_process(result_dataset, node, data_path=data_path)
         logger.info('analysis completed')
 
-    if node.type == 'optimized_sweep':
+    elif node.type == 'optimized_sweep':
+        print('Performing optimized Sweep')
         compiled_schedule = precompile(node)
 
         optimization_element = 'q13_q14'
@@ -60,8 +61,8 @@ def monitor_node_calibration(node, data_path, lab_ic):
             single_sweep,
             optimization_guess,
             method='Nelder-Mead',
-            maxiter=2,
-            bounds=(80e-6, 120e-6)
+            bounds=[(80e-6, 120e-6)],
+            options={'maxiter':2}
         )
 
 

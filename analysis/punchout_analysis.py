@@ -17,7 +17,6 @@ class PunchoutAnalysis():
         magnitudes = self.dataset[f'y{self.qubit}'].values
         norm_magnitudes = magnitudes /np.max(magnitudes, axis=0)
         self.dataset[f'y{self.qubit}'].values = norm_magnitudes
-
         # motzoi_key = 'mw_motzois'+self.qubit
         # motzois = self.dataset[motzoi_key].size
         # sums = []

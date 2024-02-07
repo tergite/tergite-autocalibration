@@ -6,26 +6,36 @@ from scipy.optimize import leastsq
 
 class CZChevronAnalysis():
     def  __init__(self,dataset: xr.Dataset):
-        data_var = list(dataset.data_vars.keys())[0]
-        self.S21 = dataset[data_var].values
+        self.data_var = list(dataset.data_vars.keys())[0]
+        self.S21 = dataset[self.data_var].values
         self.fit_results = {}
-        self.qubit = dataset[data_var].attrs['qubit']
+        self.qubit = dataset[self.data_var].attrs['qubit']
         dataset[f'y{self.qubit}'].values = np.abs(self.S21)
         self.dataset = dataset
 
-    def run_fitting(self):
+    def run_fitting(self) -> list[float, float]:
         # There are two types of fitting with different fitting goals.
         # run_fitting_min_coupling_strength is more robust as it will use all measurment data.
         # I recommend using it initially.
         # You can perform a more refined fitting by using run_fitting_max_swap_amp.
-        return self.run_fitting_min_coupling_strength()
+
+        print('WARNING TESTING CZ ANALYSIS')
+        return [300e-9, 0.1]
+
+        # return self.run_fitting_min_coupling_strength()
 
     def run_fitting_min_coupling_strength(self):
         """
         Find the optimal ac frequency by finding the longest swapping period.
         """
-        freq = self.dataset[f'cz_pulse_frequencies_sweep{self.qubit}'].values # MHz
-        times = self.dataset[f'cz_pulse_durations{self.qubit}'].values # ns
+        breakpoint()
+        for coord in self.dataset[self.data_var].coords:
+            if 'frequencies' in coord:
+                frequencies_coord = coord
+            elif 'durations' in coord:
+                durations_coord = coord
+        freq = self.dataset[frequencies_coord].values # MHz
+        times = self.dataset[durations_coord].values # ns
         self.amp = times
         self.freq = freq
         freq = freq/1e6
@@ -46,7 +56,7 @@ class CZChevronAnalysis():
         coupling_strength = []
         for i, prob in enumerate(magnitudes):
             # p[0]: amp, p[1]: period, p[2]: time_offset, p[4]: decay rate
-            def fitfunc(p): 
+            def fitfunc(p):
                 return p[0] * np.exp(-p[4] * times) * np.cos(2 * np.pi / p[1] * (times - p[2])) + p[3]
             def errfunc(p):
                 return prob - fitfunc(p)
@@ -56,7 +66,7 @@ class CZChevronAnalysis():
         coupling_strength = np.array(coupling_strength)
 
         #----------- Second round fit ------------#
-        # The longest gate times is less than 1000 ns, which means that p[1] must be less than 1e3. 
+        # The longest gate times is less than 1000 ns, which means that p[1] must be less than 1e3.
         # Thus, coupling_strength must be greater than 1e-3.
         freq = freq[coupling_strength > 1e-3]
         coupling_strength = coupling_strength[coupling_strength > 1e-3]
@@ -71,12 +81,12 @@ class CZChevronAnalysis():
             p1_guess = (coupling_strength[-1] - cmin) / (freq[-1] - fmin_guess)**2
             p_guess = np.array([p0_guess, p1_guess, fmin_guess, cmin])
             # Fine-fitting with parabolas in the form of y = a (x - b)^2 + c
-            # Because the data may not be symmetric about the axis. We 
+            # Because the data may not be symmetric about the axis. We
             # p[0]: parameter a of the left one
             # p[1]: parameter a of the right one
             # p[2]: the symmetric axis, b
             # p[3]: the minimal coupling strength, c
-            def fitfunc(p, xs): 
+            def fitfunc(p, xs):
                 return np.heaviside(p[2] - xs, 0) * p[0] * (xs - p[2])**2 + p[3] + np.heaviside(xs - p[2], 0) * p[1] * (xs - p[2])**2
             def errfunc(p):
                 return coupling_strength - fitfunc(p, freq)
@@ -84,7 +94,7 @@ class CZChevronAnalysis():
             paras = out[0]
             # The symmetric axis must lie in the range of freq.
             # Two as must be both less than zero indiciating a minimum.
-            if p[2] > freq[-1] or p[2] < freq[0] or p[0] < 0 or p[1] < 0: 
+            if p[2] > freq[-1] or p[2] < freq[0] or p[0] < 0 or p[1] < 0:
                 # The freq range is too small or the swapping period exceeds 1 us, which is also unacceptable.
                 print("You should probably enlarge your sweep range. The optimial point is not in the current range.")
                 self.opt_freq, self.opt_cz = 0,0
@@ -106,13 +116,13 @@ class CZChevronAnalysis():
                 out = leastsq(errfunc, p_guess)
                 p = out[0]
                 freq_fit = np.linspace(freq_cut[0], freq_cut[-1], 100) # The final fitting frequency
-                data_fit = fitfunc(p, freq_fit) # The final fitting period 
+                data_fit = fitfunc(p, freq_fit) # The final fitting period
                 id_min = np.argmin(coupling_strength[id_left: id_right]) # The experiment data lying the new region
                 print('np.min(coupling_strength):', np.min(coupling_strength))
                 print('np.min(data_fit):', np.min(data_fit))
-                # Compare the experiment data with the fitting data. 
+                # Compare the experiment data with the fitting data.
                 # The minimal experiment data must be valided. It should also lie in the new region.
-                if np.min(data_fit) > np.min(coupling_strength) and (id_left <= id_min + id_left <= id_right): 
+                if np.min(data_fit) > np.min(coupling_strength) and (id_left <= id_min + id_left <= id_right):
                     f_opt = freq[id_min + id_left]
                     c_opt = np.min(coupling_strength)
                     print("We use the raw measured data.")
@@ -161,7 +171,7 @@ class CZChevronAnalysis():
             period_fit.append(p[1])
         period_fit = np.array(period_fit)
         #----------- Second round fit ------------#
-        # We only fit the data in the first fitting period. 
+        # We only fit the data in the first fitting period.
         amps = [] # The swapping amplitudes in the first period.
         for i, prob in enumerate(magnitudes):
             times_cut_index = np.argmin(np.abs(times - period_fit[i]))
@@ -175,7 +185,7 @@ class CZChevronAnalysis():
             amps.append(p[0])
             period_fit[i] = p[1]
         amps = np.array(amps)
-        # The longest gate time should be less than 1000 ns, i.e., p[1] must be less than 1e3. 
+        # The longest gate time should be less than 1000 ns, i.e., p[1] must be less than 1e3.
         # Thus, coupling strength must be greater than 1e-3.
         freq = freq[period_fit < 1000]
         amps = amps[period_fit < 1000]
@@ -193,7 +203,7 @@ class CZChevronAnalysis():
             p_guess = np.array([p0_guess, p1_guess, fmin_guess, amp_max])
             def fitfunc(p, xs):
                 # Fine-fitting with parabolas in the form of y = a (x - b)^2 + c
-                # Because the data may not be symmetric about the axis. We 
+                # Because the data may not be symmetric about the axis. We
                 # p[0]: parameter a of the left one
                 # p[1]: parameter a of the right one
                 # p[2]: the symmetric axis, b
@@ -227,7 +237,7 @@ class CZChevronAnalysis():
                 data_fit = fitfunc(p, freq_fit) # The final fitting amps
                 f_opt = freq_fit[np.argmax(data_fit)] # Find the optimal fitting frequency.
                 id_max = np.argmax(amps) # The index of maximal amplitudes in experiment data.
-                # Compare the experiment data with the fitting data. 
+                # Compare the experiment data with the fitting data.
                 # The maximal experiment data must be valided. It should also lie in the new region.
                 if np.max(data_fit) < np.max(amps) and (id_left <= id_max <= id_right):
                     f_opt = freq[id_max]
@@ -251,18 +261,18 @@ class CZChevronAnalysis():
 
         datarray = self.dataset[f'y{self.qubit}']
         qubit = self.qubit
-        datarray.plot(ax=axis, x=f'cz_pulse_frequencies_sweep{qubit}',cmap='RdBu_r')
-        # fig = axis.pcolormesh(amp,freq,magnitudes,shading='nearest',cmap='RdBu_r')
-        axis.scatter(self.opt_freq,self.opt_cz,c='r',label = 'CZ Duration = {:.1f} ns'.format(self.opt_cz*1e9),marker='X',s=200,edgecolors='k', linewidth=1.5,zorder=10)
-        # plt.scatter(opt_swap,opt_freq,c='b',label = 'SWAP12 Duration= {:.2f} V'.format(opt_swap),marker='X',s=200,edgecolors='k', linewidth=1.5,zorder=10)
-        axis.vlines(self.opt_freq,self.amp[0],self.amp[-1],label = 'Frequency Detuning = {:.2f} MHz'.format(self.opt_freq/1e6),colors='k',linestyles='--',linewidth=1.5)
-        axis.hlines(self.opt_cz,self.freq[0],self.freq[-1],colors='k',linestyles='--',linewidth=1.5)
-        # axis.legend(loc = 'lower center', bbox_to_anchor=(-0.15, -0.36, 1.4, .102), mode='expand', ncol=2,
-        #             title = 'Optimal Gate Parameters', columnspacing=200,borderpad=1)
-        # cbar = plt.colorbar(fig)
-        # cbar.set_label('|2>-state Population', labelpad=10)
-        axis.set_xlim([self.freq[0],self.freq[-1]])
-        axis.set_ylim([self.amp[0],self.amp[-1]])
-        axis.set_ylabel('Parametric Drive Durations (s)')
-        axis.set_xlabel('Frequency Detuning (Hz)')
-        axis.set_title(f'CZ Chevron - Qubit {self.qubit[1:]}')
+        datarray.plot(ax=axis, x=f'cz_pulse_frequencies{"q13_q14"}',cmap='RdBu_r')
+        # # fig = axis.pcolormesh(amp,freq,magnitudes,shading='nearest',cmap='RdBu_r')
+        # axis.scatter(self.opt_freq,self.opt_cz,c='r',label = 'CZ Duration = {:.1f} ns'.format(self.opt_cz*1e9),marker='X',s=200,edgecolors='k', linewidth=1.5,zorder=10)
+        # # plt.scatter(opt_swap,opt_freq,c='b',label = 'SWAP12 Duration= {:.2f} V'.format(opt_swap),marker='X',s=200,edgecolors='k', linewidth=1.5,zorder=10)
+        # axis.vlines(self.opt_freq,self.amp[0],self.amp[-1],label = 'Frequency Detuning = {:.2f} MHz'.format(self.opt_freq/1e6),colors='k',linestyles='--',linewidth=1.5)
+        # axis.hlines(self.opt_cz,self.freq[0],self.freq[-1],colors='k',linestyles='--',linewidth=1.5)
+        # # axis.legend(loc = 'lower center', bbox_to_anchor=(-0.15, -0.36, 1.4, .102), mode='expand', ncol=2,
+        # #             title = 'Optimal Gate Parameters', columnspacing=200,borderpad=1)
+        # # cbar = plt.colorbar(fig)
+        # # cbar.set_label('|2>-state Population', labelpad=10)
+        # axis.set_xlim([self.freq[0],self.freq[-1]])
+        # axis.set_ylim([self.amp[0],self.amp[-1]])
+        # axis.set_ylabel('Parametric Drive Durations (s)')
+        # axis.set_xlabel('Frequency Detuning (Hz)')
+        # axis.set_title(f'CZ Chevron - Qubit {self.qubit[1:]}')

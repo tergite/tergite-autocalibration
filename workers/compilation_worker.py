@@ -126,10 +126,12 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
            device.add_edge(coupler)
            edges[bus] = coupler
 
-    node_class = node.measurement_obj(transmons, node.qubit_state)
-    if node.name in ['cz_chevron','cz_calibration','cz_calibration_ssro','cz_dynamic_phase','reset_chevron']:
+    # if node.name in ['cz_chevron','cz_calibration','cz_calibration_ssro','cz_dynamic_phase','reset_chevron']:
+    if hasattr(node, 'couplers'):
         coupler = node.coupler
-        node_class = node.measurement_obj(transmons, coupler, node.qubit_state)
+        node_class = node.measurement_obj(transmons, edges, node.qubit_state)
+    else:
+        node_class = node.measurement_obj(transmons, node.qubit_state)
     if node.name in ['ro_amplitude_optimization_gef','cz_calibration_ssro']:
         device.cfg_sched_repetitions(1)    # for single-shot readout
     if bin_mode is not None: node_class.set_bin_mode(bin_mode)

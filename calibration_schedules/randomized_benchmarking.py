@@ -21,10 +21,11 @@ class Randomized_Benchmarking(Measurement):
         }
 
     def schedule_function(
-            self,
-            qubits: list[str],
-            number_of_cliffords: dict[str, np.ndarray],
-            repetitions: int = 1024,
+        self,
+        qubits: list[str],
+        number_of_cliffords: dict[str, np.ndarray],
+        sequence_repetitions: dict[str, np.ndarray],
+        repetitions: int = 1024,
         ) -> Schedule:
         """
         Generate a schedule for performing a randomized benchmarking test using Clifford gates.
@@ -57,66 +58,61 @@ class Randomized_Benchmarking(Measurement):
         root_relaxation = schedule.add(Reset(*qubits), label="Start")
 
         # The first for loop iterates over all qubits:
-        for (this_qubit, clifford_sequence_lengths) in number_of_cliffords.items():
+        for this_qubit, clifford_sequence_lengths in number_of_cliffords.items():
+
+            this_clifford_repetitions = sequence_repetitions[this_qubit]
+            number_of_clifford_sequences = len(clifford_sequence_lengths)
+
+            seed = 4
+            all_cliffords = len(cliffords.XY_decompositions)
+            rng = np.random.default_rng(seed)
 
             schedule.add(
                 Reset(*qubits), ref_op=root_relaxation, ref_pt='end'
-            )  # To enforce parallelism we refer to the root relaxation
+            ) # To enforce parallelism we refer to the root relaxation
 
-            # The second for loop iterates over the random clifford sequence lengths
-            for acq_index, this_number_of_cliffords in enumerate(clifford_sequence_lengths):
+            for repetition_index, _ in enumerate(this_clifford_repetitions):
+                # The inner for loop iterates over the random clifford sequence lengths
+                for acq_index, this_number_of_cliffords in enumerate(clifford_sequence_lengths[:-2]):
 
-                schedule.add(X(this_qubit))
+                    this_index = number_of_clifford_sequences * repetition_index + acq_index
+                    schedule.add(X(this_qubit))
+                    random_sequence = rng.integers(all_cliffords, size=this_number_of_cliffords)
 
-                seed = 59
-                all_cliffords = len(cliffords.XY_decompositions)
-                #print(f'{ all_cliffords = }')
-                rng = np.random.default_rng(seed)
-                random_sequence = rng.integers(all_cliffords, size=this_number_of_cliffords)
+                    for sequence_index in random_sequence:
+                        physical_gates = cliffords.XY_decompositions[sequence_index]
+                        for gate_angles in physical_gates.values():
+                            theta = gate_angles['theta']
+                            phi = gate_angles['phi']
+                            schedule.add(
+                                Rxy(qubit=this_qubit,theta=theta,phi=phi)
+                            )
 
-                #print(f'{ random_sequence = }')
-                for sequence_index in random_sequence:
-                    #print(f'{ sequence_index = }')
-                    physical_gates = cliffords.XY_decompositions[sequence_index]
-                    for gate_index, gate_angles in physical_gates.items():
+                    recovery_index, recovery_XY_operations = cliffords.reversing_XY_matrix(random_sequence)
+
+                    for gate_angles in recovery_XY_operations.values():
                         theta = gate_angles['theta']
                         phi = gate_angles['phi']
-                        clifford_gate = schedule.add(
-                            Rxy(qubit=this_qubit,theta=theta,phi=phi)
+                        recovery_gate = schedule.add(
+                            Rxy(qubit=this_qubit, theta=theta, phi=phi)
                         )
-                        # print(f'{ clifford_gate = }')
 
-                recovery_index, recovery_XY_operations = cliffords.reversing_XY_matrix(random_sequence)
-
-                #print(f'{ cliffords.is_sequence_identity(np.append(random_sequence,recovery_index).tolist()) = }') # this print checks if reversing is working correctly
-
-                for gate_index, gate_angles in recovery_XY_operations.items():
-                    theta = gate_angles['theta']
-                    phi = gate_angles['phi']
-                    recovery_gate = schedule.add(
-                        Rxy(qubit=this_qubit,theta=theta,phi=phi)
+                    schedule.add(
+                        Measure(this_qubit, acq_index=this_index,),
+                        ref_op=recovery_gate,
+                        ref_pt='end',
                     )
 
-                schedule.add(
-                    Measure(this_qubit, acq_index=acq_index,bin_mode=BinMode.AVERAGE),
-                    ref_op=recovery_gate,
-                    ref_pt='end',
-                    label=f'Measurement_{this_qubit}_{acq_index}'
-                )
-                # elif number_of_cliffords == 0:
-                #     schedule.add(
-                #         Measure(this_qubit, acq_index=acq_index,bin_mode=BinMode.AVERAGE),
-                #         ref_op=root_relaxation,
-                #         ref_pt='end',
-                #         label=f'Measurement_{this_qubit}_{acq_index}'
-                #     )
-                # elif number_of_cliffords == 1:
-                #     schedule.add(X(this_qubit))
-                #     schedule.add(
-                #         Measure(this_qubit, acq_index=acq_index,bin_mode=BinMode.AVERAGE),
-                #         label=f'Measurement_{this_qubit}_{acq_index}'
-                #     )
+                    schedule.add(Reset(this_qubit))
 
+
+                # 0 calibration point
+                schedule.add(Measure( this_qubit, acq_index=this_index + 1))
+                schedule.add(Reset(this_qubit))
+
+                # 1 calibration point
+                schedule.add(X(this_qubit))
+                schedule.add( Measure( this_qubit, acq_index=this_index + 2))
                 schedule.add(Reset(this_qubit))
 
         return schedule

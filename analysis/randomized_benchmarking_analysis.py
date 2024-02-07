@@ -46,59 +46,64 @@ class RandomizedBenchmarkingAnalysis():
     Analysis that fits an exponential decay function to randomized benchmarking data.
     """
     def  __init__(self,dataset: xr.Dataset):
-        data_var = list(dataset.data_vars.keys())[0]
-        coord = list(dataset[data_var].coords.keys())[0]
-        self.S21 = dataset[data_var].values
-        self.I_quad = self.S21.real
-        self.Q_quad = self.S21.imag
-        self.calibration_point_0 = self.S21[-2]
-        self.calibration_point_1 = self.S21[-1]
-        self.displacement_vector = self.calibration_point_1 - self.calibration_point_0
-        self.rotation_angle = np.angle(self.displacement_vector)
-        self.normalization = np.abs(self.displacement_vector)
-        self.independents = dataset[coord].values
+        self.data_var = list(dataset.data_vars.keys())[0]
+        self.qubit = dataset[self.data_var].attrs['qubit']
+        self.S21 = dataset[self.data_var]
+        for coord in dataset[self.data_var].coords:
+            if 'cliffords' in coord: self.number_cliffords_coord = coord
+            elif 'repetitions' in coord: self.repetitions_coord = coord
+        self.number_of_repetitions = dataset.dims[self.repetitions_coord]
+        self.number_of_cliffords = dataset[self.number_cliffords_coord].values
+        self.normalized_data_dict = {}
+        for repetition_index in range(self.number_of_repetitions):
+            complex_values = self.S21.isel(
+                {self.repetitions_coord: [repetition_index]}
+            )
+            measurements = complex_values.values.flatten()
+            data = measurements[:-2]
+            calibration_0 = measurements[-2]
+            calibration_1 = measurements[-1]
+            displacement_vector = calibration_1 - calibration_0
+            data_translated_to_zero = data - calibration_0
+
+            rotation_angle = np.angle(displacement_vector)
+            rotated_data = data_translated_to_zero * np.exp( -1j * rotation_angle)
+            rotated_0 = calibration_0 * np.exp(-1j * rotation_angle)
+            rotated_1 = calibration_1 * np.exp(-1j * rotation_angle)
+            normalization = (rotated_1 - rotated_0).real
+            real_rotated_data = rotated_data.real
+            self.normalized_data_dict[repetition_index] = real_rotated_data / normalization
+
         self.fit_results = {}
-        self.qubit = dataset[data_var].attrs['qubit']
 
     def run_fitting(self):
-        model = ExpDecayModel()
-
-        translated_to_zero_samples = self.S21 - self.calibration_point_0
-        rotated_samples = translated_to_zero_samples * np.exp(-1j * self.rotation_angle)
-        normalized_rotated_samples = rotated_samples / self.normalization
-
-        self.magnitudes = np.abs(normalized_rotated_samples)
-        n_cliffords = self.independents
-
-        # Normalize data to interval [0,1]
-        # self.normalized_magnitudes = (self.magnitudes-self.magnitudes[0])/(self.magnitudes[1]-self.magnitudes[0])
-
-        # Gives an initial guess for the model parameters and then fits the model to the data.
-        guess = model.guess(data=self.magnitudes[2:], x=n_cliffords[2:])
-        fit_result = model.fit(self.magnitudes, params=guess, x=n_cliffords)
-
-        self.fit_n_cliffords = np.linspace( n_cliffords[0], n_cliffords[-1], 400)
-        self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_n_cliffords})
-        self.normalized_fit_y = (self.fit_y-self.magnitudes[0])/(self.magnitudes[1]-self.magnitudes[0])
-        #print(f'{ fit_result.params= }')
-
+        # model = ExpDecayModel()
+        #
+        # translated_to_zero_samples = self.S21 - self.calibration_point_0
+        # rotated_samples = translated_to_zero_samples * np.exp(-1j * self.rotation_angle)
+        # normalized_rotated_samples = rotated_samples / self.normalization
+        #
+        # self.magnitudes = np.abs(normalized_rotated_samples)
+        # n_cliffords = self.independents
+        #
+        # # Normalize data to interval [0,1]
+        # # self.normalized_magnitudes = (self.magnitudes-self.magnitudes[0])/(self.magnitudes[1]-self.magnitudes[0])
+        #
+        # # Gives an initial guess for the model parameters and then fits the model to the data.
+        # guess = model.guess(data=self.magnitudes[2:], x=n_cliffords[2:])
+        # fit_result = model.fit(self.magnitudes, params=guess, x=n_cliffords)
+        #
+        # self.fit_n_cliffords = np.linspace( n_cliffords[0], n_cliffords[-1], 400)
+        # self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_n_cliffords})
+        # self.normalized_fit_y = (self.fit_y-self.magnitudes[0])/(self.magnitudes[1]-self.magnitudes[0])
+        # #print(f'{ fit_result.params= }')
         return [0]
 
     def plotter(self,ax):
-        # unnormalized plot:
-        ax.plot( self.fit_n_cliffords, self.fit_y,'r-',lw=3.0)
-        ax.plot( self.independents, self.magnitudes,'bo-',ms=3.0)
-        # ax.hlines(y=self.magnitudes[0],xmin=self.independents[0],xmax=self.independents[-1],color='g',linestyle='--') # Plots |0⟩
-        # ax.hlines(y=self.magnitudes[1],xmin=self.independents[0],xmax=self.independents[-1],color='g',linestyle='--') # Plots |1⟩
+        for repetition_index in range(self.number_of_repetitions):
+            real_values = self.normalized_data_dict[repetition_index]
+            ax.plot(self.number_of_cliffords[:-2], real_values)
+            # ax.axhline(magnitudes[-2],c='b')
+            # ax.axhline(magnitudes[-1],c='r')
         ax.set_ylabel(f'|S21| (V)')
-
-        """ # normalized plot:
-        ax.plot( self.fit_n_cliffords, self.normalized_fit_y,'r-',lw=3.0)
-        ax.plot( self.independents[2:], self.normalized_magnitudes[2:],'bo-',ms=3.0)
-        ax.set_ylabel(f'Normalized |S21|')
-        """
-        ax.set_title(f'Randomized benchmarking for {self.qubit}')
-        ax.set_xlabel('Number of clifford operations')
-
         ax.grid()
-
