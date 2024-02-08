@@ -14,7 +14,7 @@ ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
 rb = rnb.RandomizedBenchmarkingAnalysis(ds)
 #---
 complex_values = rb.S21.isel(
-    {rb.repetitions_coord: [0]}
+    {rb.seed_coord: [0]}
 ).values
 
 complex_values = complex_values.flatten()

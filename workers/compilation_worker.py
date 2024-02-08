@@ -157,8 +157,13 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
             # print(f"{key} isn't one of the static parameters of {node_class}. \n We will ignore this parameter.")
 
 
+    if hasattr(node, 'node_externals'):
+        external_parameters = {node.external_parameter_name: node.external_parameter_value}
+    else:
+        external_parameters = {}
+
     compiler = SerialCompiler(name=f'{node.name}_compiler')
-    schedule = schedule_function(**static_parameters, **samplespace)
+    schedule = schedule_function(**static_parameters, **external_parameters, **samplespace)
     compilation_config = device.generate_compilation_config()
     device.close()
 
@@ -167,7 +172,7 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
         extended_transmon.close()
     if hasattr(node, 'couplers'):
         for extended_edge in edges.values():
-           extended_edge.close()
+            extended_edge.close()
 
     logger.info('Starting Compiling')
     compiled_schedule = compiler.compile(schedule=schedule, config=compilation_config)

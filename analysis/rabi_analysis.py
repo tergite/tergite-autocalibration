@@ -12,7 +12,7 @@ def cos_func(
     frequency: float,
     amplitude: float,
     offset: float,
-    phase: float = 0,
+    phase: float,
 ) -> float:
     return amplitude * np.cos(2 * np.pi * frequency * drive_amp + phase) + offset
 
@@ -29,7 +29,7 @@ class RabiModel(lmfit.model.Model):
         self.set_param_hint("frequency", min=0)
 
         # Fix the phase at pi so that the ouput is at a minimum when drive_amp=0
-        self.set_param_hint("phase", expr="3.141592653589793", vary=False)
+        self.set_param_hint("phase", expr="3.141592653589793", vary=True)
 
         # Pi-pulse amplitude can be derived from the oscillation frequency
         self.set_param_hint("amp180", expr="1/(2*frequency)", vary=False)
@@ -82,12 +82,15 @@ class RabiAnalysis():
         self.ampl = fit_result.params['amp180'].value
         self.uncertainty = fit_result.params['amp180'].stderr
 
+        print(f'{ self.ampl = }')
+        print(f'{ self.uncertainty = }')
+
         self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_amplitudes})
         return [self.ampl]
 
     def plotter(self,ax):
         # Plots the data and the fitted model of a Rabi experiment
-        ax.plot( self.fit_amplitudes , self.fit_y,'r-',lw=3.0, label=f" π_ampl = {self.ampl:.2E} ± {self.uncertainty:.1E} (V)")
+        ax.plot( self.fit_amplitudes , self.fit_y,'r-',lw=3.0, label=f" π_ampl = {self.ampl:.2E} (V)")
         ax.plot( self.independents, self.magnitudes,'bo-',ms=3.0)
         ax.set_title(f'Rabi Oscillations for {self.qubit}')
         ax.set_xlabel('Amplitude (V)')

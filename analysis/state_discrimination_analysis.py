@@ -4,9 +4,8 @@ Module containing classes that model, fit and plot data from a Rabi experiment.
 import numpy as np
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 import xarray as xr
-import pickle
 
-class StateDiscrimination():
+class StateDiscriminationAnalysis():
     """
     Analysis that fits a cosine function to Rabi oscillation data.
     """
@@ -19,7 +18,7 @@ class StateDiscrimination():
         self.independents = dataset[coord].values
         self.fit_results = {}
         self.qubit = dataset[data_var].attrs['qubit']
-           
+
     def run_fitting(self):
         y = self.independents
         IQ = np.array([self.I, self.Q]).T
@@ -53,7 +52,7 @@ class StateDiscrimination():
         self.IQ0_positives = [IQ0_tp,IQ0_fp]
         self.IQ1_positives = [IQ1_tp,IQ1_fp]
         self.IQ2_positives = [IQ2_tp,IQ2_fp]
-        
+
         return [0]
 
     def plotter(self,ax):
@@ -79,7 +78,7 @@ class StateDiscrimination():
         ax.scatter(IQ2_fp[:, 0], IQ2_fp[:, 1], marker="x", s=mark_size, color="lime",
                 # label=f'errors when sending |2>: {err_wr_2:.4f}'
                 )
-  
+
 
         ax.set_title(f'State Discrimination for {self.qubit}')
         ax.set_xlabel('I (V)')

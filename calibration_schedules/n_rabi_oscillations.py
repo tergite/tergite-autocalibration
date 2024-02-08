@@ -24,7 +24,7 @@ class N_Rabi_Oscillations(Measurement):
         }
 
     def schedule_function(
-            self, #Note, this is not used in the schedule
+            self,
             qubits: list[str],
             mw_frequencies: dict[str,float],
             mw_amplitudes: dict[str,float],
@@ -113,21 +113,9 @@ class N_Rabi_Oscillations(Measurement):
                                     phase=0,
                                     ),
                                 )
-                        # identical inversion pulse
-                        # schedule.add(
-                        #         DRAGPulse(
-                        #             duration=mw_pulse_durations[this_qubit],
-                        #             G_amp=mw_amplitudes[this_qubit]+mw_amplitude_sweep,
-                        #             D_amp=mw_motzois[this_qubit],
-                        #             port=mw_pulse_ports[this_qubit],
-                        #             clock=this_clock,
-                        #             phase=0,
-                        #             ),
-                        #         )
-
                     schedule.add(
-                            Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
-                            )
+                        Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
+                    )
 
                     schedule.add(Reset(this_qubit))
 

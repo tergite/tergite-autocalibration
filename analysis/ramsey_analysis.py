@@ -83,7 +83,7 @@ class RamseyAnalysis():
             fitted_detuning = fit_result.params['frequency'].value
             fits.append(fitted_detuning)
         fits = np.array(fits)
-        index_of_min = np.argmin(fits)    
+        index_of_min = np.argmin(fits)
         self.fitted_detunings = np.concatenate((fits[:index_of_min]*(-1), fits[index_of_min:]))
 
         m, b = np.polyfit(self.artificial_detunings, self.fitted_detunings, 1)
@@ -103,9 +103,8 @@ class RamseyAnalysis():
         # ax.plot( self.fit_ramsey_delays , self.fit_y,'r-',lw=3.0)
         # ax.plot( self.independents, self.magnitudes,'bo-',ms=3.0)
         # ax.set_title(f'Ramsey Oscillations for {self.qubit}')
-        ax.axvline(self.frequency_correction,color='red',label=f'correction: {int(self.frequency_correction)}Hz')
+        ax.axvline(self.frequency_correction,color='red',label=f'correction: {int(self.frequency_correction)/1e3} kHz')
         ax.plot(self.artificial_detunings, self.poly1d_fn(self.artificial_detunings),'--b',lw=1)
-        ax.axhline(0, color='black', lw=1)
         ax.axvline(0, color='black', lw=1)
         ax.set_xlabel('Artificial detuning (Hz)')
         ax.set_ylabel('Fitted detuning (Hz)')

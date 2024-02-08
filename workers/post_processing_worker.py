@@ -60,7 +60,7 @@ class BaseAnalysis():
 
         self.fig, self.axs = plt.subplots(
             nrows=self.rows,
-            ncols=np.min((self.n_coords, self.column_grid)),
+            ncols=np.min((self.n_vars, self.n_coords, self.column_grid)),
             squeeze=False,
             figsize=(self.column_grid*5,self.rows*5)
         )

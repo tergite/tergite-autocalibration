@@ -75,6 +75,11 @@ def configure_dataset(
 
             coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
 
+        if hasattr(node, 'node_externals'):
+            coord_key = node.external_parameter_name + qubit
+            coord_attrs = {'qubit':qubit, 'long_name': f'{coord_key}', 'units': 'NA'}
+            coords_dict[coord_key] = (coord_key, np.array([node.external_parameter_value]), coord_attrs)
+
         if sweep_type == SweepType.SPI_and_Cluster_Sweep:
             for quantity in spi_sweep_quantities:
                 coupler = get_coupler_from_qubit(qubit)
@@ -90,6 +95,9 @@ def configure_dataset(
             dimensions = [len(samplespace[quantity][qubit]) for quantity in sweep_quantities]
         elif sweep_type == SweepType.SPI_and_Cluster_Sweep:
             dimensions = [len(samplespace[quantity][qubit]) for quantity in sweep_quantities]
+
+        if hasattr(node, 'node_externals'):
+            dimensions += [1]
 
         # TODO this is not safe:
         # This assumes that the inner settable variable is placed

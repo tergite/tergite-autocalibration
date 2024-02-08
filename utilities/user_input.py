@@ -26,6 +26,7 @@ node reference
   motzoi_parameter
   n_rabi_oscillations
   randomized_benchmarking
+  state_discrimination
   T1
   T2
   T2_echo
@@ -40,7 +41,7 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'randomized_benchmarking',
+    'target_node': 'state_discrimination',
     'all_qubits': qubits,
     'couplers': couplers,
 }

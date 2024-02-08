@@ -1,3 +1,4 @@
+import xarray
 from utilities.status import ClusterStatus
 from workers.compilation_worker import precompile
 from workers.execution_worker import measure_node
@@ -7,6 +8,12 @@ from logger.tac_logger import logger
 import scipy.optimize as optimize
 
 
+'''
+sweep types:
+simple_sweep
+optimized_sweep: sweep under an external parameter
+parameterized_sweep: sweep under a schedule parameter e.g. T1 or RB
+'''
 
 def monitor_node_calibration(node, data_path, lab_ic):
     if node.type == 'simple_sweep':
@@ -22,6 +29,28 @@ def monitor_node_calibration(node, data_path, lab_ic):
 
         logger.info('measurement completed')
         measurement_result = post_process(result_dataset, node, data_path=data_path)
+        logger.info('analysis completed')
+
+    elif node.type == 'parameterized_sweep':
+        print('Performing parameterized sweep')
+        ds = xarray.Dataset()
+
+        for node_parameter in node.node_externals:
+            node.external_parameter_value = node_parameter
+            print(f'{ node.external_parameter_value = }')
+            compiled_schedule = precompile(node)
+
+            result_dataset = measure_node(
+                node,
+                compiled_schedule,
+                lab_ic,
+                data_path,
+                cluster_status=ClusterStatus.real,
+            )
+
+            ds = xarray.merge([ds, result_dataset])
+        logger.info('measurement completed')
+        measurement_result = post_process(ds, node, data_path=data_path)
         logger.info('analysis completed')
 
     elif node.type == 'optimized_sweep':
@@ -64,5 +93,3 @@ def monitor_node_calibration(node, data_path, lab_ic):
             bounds=[(80e-6, 120e-6)],
             options={'maxiter':2}
         )
-
-

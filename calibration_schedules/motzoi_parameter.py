@@ -101,30 +101,30 @@ class Motzoi_parameter(Measurement):
                     this_index = x_index*number_of_motzois + motzoi_index
                     for _ in range(this_x):
                         schedule.add(
-                                DRAGPulse(
-                                    duration=mw_pulse_durations[this_qubit],
-                                    G_amp=mw_amplitudes[this_qubit],
-                                    D_amp=mw_motzoi,
-                                    port=mw_pulse_ports[this_qubit],
-                                    clock=this_clock,
-                                    phase=0,
-                                    ),
-                                )
+                            DRAGPulse(
+                                duration=mw_pulse_durations[this_qubit],
+                                G_amp=mw_amplitudes[this_qubit],
+                                D_amp=mw_motzoi,
+                                port=mw_pulse_ports[this_qubit],
+                                clock=this_clock,
+                                phase=0,
+                            ),
+                        )
                         # inversion pulse requires 180 deg phase
                         schedule.add(
-                                DRAGPulse(
-                                    duration=mw_pulse_durations[this_qubit],
-                                    G_amp=mw_amplitudes[this_qubit],
-                                    D_amp=mw_motzoi,
-                                    port=mw_pulse_ports[this_qubit],
-                                    clock=this_clock,
-                                    phase=180,
-                                    ),
-                                )
+                            DRAGPulse(
+                                duration=mw_pulse_durations[this_qubit],
+                                G_amp=mw_amplitudes[this_qubit],
+                                D_amp=mw_motzoi,
+                                port=mw_pulse_ports[this_qubit],
+                                clock=this_clock,
+                                phase=180,
+                            ),
+                        )
 
                     schedule.add(
-                            Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
-                            )
+                        Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
+                    )
 
                     schedule.add(Reset(this_qubit))
 

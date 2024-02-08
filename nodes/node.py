@@ -38,7 +38,7 @@ from analysis.optimum_ro_frequency_analysis import (
     OptimalRO_012_FrequencyAnalysis
 )
 from analysis.optimum_ro_amplitude_analysis import OptimalROAmplitudeAnalysis
-from analysis.state_discrimination_analysis import StateDiscrimination
+from analysis.state_discrimination_analysis import StateDiscriminationAnalysis
 from analysis.rabi_analysis import RabiAnalysis
 from analysis.punchout_analysis import PunchoutAnalysis
 from analysis.ramsey_analysis import RamseyAnalysis
@@ -115,24 +115,38 @@ class NodeFactory:
             'ro_frequency_optimization_gef': RO_frequency_optimization_gef_Node,
             'ro_amplitude_optimization_gef': RO_amplitude_optimization_gef_Node,
             #'ro_frequency_optimization_gef': RO_frequency_optimization_gef_Node,
+            'state_discrimination': State_Discrimination_Node,
             'randomized_benchmarking': Randomized_Benchmarking_Node,
             'check_cliffords': Check_Cliffords_Node,
         }
+
     def all_nodes(self):
-        return list(self.node_implementations.keys())
+        return self.node_implementations.keys()
 
     def create_node(self, node_name: str, all_qubits: list[str], ** kwargs):
         node_object = self.node_implementations[node_name](node_name, all_qubits, ** kwargs)
         return node_object
 
+class State_Discrimination_Node(Base_Node):
+    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
+        self.redis_field = ['discriminator']
+        self.measurement_obj = Single_Shots_RO
+        self.analysis_obj = StateDiscriminationAnalysis
 
-
+    @property
+    def samplespace(self):
+        cluster_samplespace = {
+            'qubit_states': {
+                qubit: np.array([0,0,0,0,1,1,1,1]) for qubit in self.all_qubits
+            }
+        }
+        return cluster_samplespace
 
 class Resonator_Spectroscopy_Node(Base_Node):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['ro_freq', 'Ql', 'resonator_minimum']
-        self.qubit_state = 0
         self.measurement_obj = Resonator_Spectroscopy
         self.analysis_obj = ResonatorSpectroscopyAnalysis
 
@@ -149,7 +163,6 @@ class Punchout_Node(Base_Node):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['ro_ampl']
-        self.qubit_state = 0
         self.measurement_obj = Punchout
         self.analysis_obj = PunchoutAnalysis
 
@@ -170,7 +183,6 @@ class Qubit_01_Spectroscopy_Pulsed_Node(Base_Node):
         super().__init__(name, all_qubits, **node_dictionary)
         self.sweep_range = self.node_dictionary.pop("sweep_range", None)
         self.redis_field = ['freq_01']
-        self.qubit_state = 0
         self.measurement_obj = Two_Tones_Spectroscopy
         self.analysis_obj = QubitSpectroscopyAnalysis
 
@@ -188,7 +200,6 @@ class Qubit_01_Spectroscopy_Multidim_Node(Base_Node):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['freq_01',
                             'spec_ampl_optimal']
-        self.qubit_state = 0
         self.measurement_obj = Two_Tones_Multidim
         self.analysis_obj = QubitSpectroscopyMultidim
 
@@ -208,7 +219,6 @@ class Rabi_Oscillations_Node(Base_Node):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['mw_amp180']
-        self.qubit_state = 0
         self.measurement_obj = Rabi_Oscillations
         self.analysis_obj = RabiAnalysis
 
@@ -226,7 +236,6 @@ class Ramsey_Fringes_Node(Base_Node):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['freq_01']
-        self.qubit_state = 0
         self.measurement_obj = Ramsey_fringes
         self.analysis_obj = RamseyAnalysis
         self.backup = False
@@ -273,7 +282,6 @@ class Motzoi_Parameter_Node(Base_Node):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['mw_motzoi']
-        self.qubit_state = 0
         self.measurement_obj = Motzoi_parameter
         self.analysis_obj = MotzoiAnalysis
         self.backup = False
@@ -290,7 +298,6 @@ class N_Rabi_Oscillations_Node(Base_Node):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['mw_amp180']
-        self.qubit_state = 0
         self.measurement_obj = N_Rabi_Oscillations
         self.analysis_obj = NRabiAnalysis
         self.backup = False
@@ -307,7 +314,6 @@ class T1_Node(Base_Node):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['t1_time']
-        self.qubit_state = 0
         self.measurement_obj = T1
         self.analysis_obj = T1Analysis
 
@@ -322,13 +328,20 @@ class Randomized_Benchmarking_Node(Base_Node):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.name = name
+        self.type = 'parameterized_sweep'
         self.all_qubits = all_qubits
         self.node_dictionary = node_dictionary
         self.backup = False
         self.redis_field = ['t1_time'] #TODO change to something, error?
-        self.qubit_state = 0 #can be 0 or 1
         self.measurement_obj = Randomized_Benchmarking
         self.analysis_obj = RandomizedBenchmarkingAnalysis
+
+        # TODO change it a dictionary like samplespace
+        self.node_externals = 5 * np.arange(2, dtype=np.int32)
+        self.external_parameter_name = 'seed'
+        self.external_parameter_value = 0
+        ####################
+
 
     @property
     def samplespace(self):
@@ -341,15 +354,12 @@ class Randomized_Benchmarking_Node(Base_Node):
 
         all_numbers =  np.concatenate((all_numbers, calibration_points))
 
-        number_of_repetitions = 1
+        # number_of_repetitions = 1
 
         cluster_samplespace = {
             'number_of_cliffords': {
                 # qubit: all_numbers for qubit in self.all_qubits
                 qubit: np.array([2, 16, 128, 256,512, 768, 1024, 0, 1]) for qubit in self.all_qubits
-            },
-            'sequence_repetitions': {
-                qubit: np.ones(number_of_repetitions) for qubit in self.all_qubits
             },
         }
         return cluster_samplespace
@@ -360,7 +370,6 @@ class Check_Cliffords_Node:
         self.all_qubits = all_qubits
         self.node_dictionary = kwargs
         self.redis_field = ['t1_time'] #TODO Empty?
-        self.qubit_state = 0
         self.measurement_obj = Check_Cliffords
         self.analysis_obj = CheckCliffordsAnalysis
 
