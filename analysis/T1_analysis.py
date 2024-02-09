@@ -33,11 +33,11 @@ class T1Analysis():
         self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_delays})
         #self.dataset['fit_delays'] = self.fit_delays
         #self.dataset['fit_y'] = ('fit_delays',fit_y)
-        T1_time = fit_result.params['tau'].value
-        return [T1_time]
+        self.T1_time = fit_result.params['tau'].value
+        return [self.T1_time]
 
     def plotter(self,ax):
-        ax.plot( self.fit_delays , self.fit_y,'r-',lw=3.0)
+        ax.plot( self.fit_delays , self.fit_y,'r-', lw=3.0, label=f'T1 = {self.T1_time * 1e6:.1f} μs')
         ax.plot(self.independents, self.magnitudes,'bo-',ms=3.0)
         ax.set_title(f'T1 experiment for {self.qubit}')
         ax.set_xlabel('Delay (s)')

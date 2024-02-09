@@ -58,11 +58,12 @@ class OptimalROFrequencyAnalysis():
         ro_freq = float(redis_connection.hget(f'transmons:{this_qubit}', 'ro_freq'))
         ro_freq_1 = float(redis_connection.hget(f'transmons:{this_qubit}', 'ro_freq_1'))
 
-        label_text = f'opt_ro: {int(self.optimal_frequency)}\n' 
-        label_text = f'opt_ro: |0>_ro: {int(ro_freq)}\n|1>_ro: {int(ro_freq_1)}' 
+        label_text = f'opt_ro: {int(self.optimal_frequency)}\n'
+        label_text += f'|0>_ro: {int(ro_freq)}\n'
+        label_text += f'|1>_ro: {int(ro_freq_1)}'
 
         ax.scatter(
-            [f0.real, f1.real], [f0.imag, f1.imag], 
+            [f0.real, f1.real], [f0.imag, f1.imag],
             marker='*',c='red', s=64,  label=label_text
         )
         ax.grid()

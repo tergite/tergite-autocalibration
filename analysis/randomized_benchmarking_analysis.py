@@ -4,6 +4,7 @@ Module containing classes that model, fit and plot data from a Rabi experiment.
 import numpy as np
 import lmfit
 import xarray as xr
+from matplotlib.axes import Axes
 
 def exponential_decay_function(m: float, p: float, A: float, B: float) -> float:
     return A * p ** m + B
@@ -93,10 +94,13 @@ class RandomizedBenchmarkingAnalysis():
         self.fidelity = fit_result.params['p'].value
         return [self.fidelity]
 
-    def plotter(self,ax):
+    def plotter(self,ax: Axes):
         for repetition_index in range(self.number_of_repetitions):
             real_values = self.normalized_data_dict[repetition_index]
             ax.plot(self.number_of_cliffords[:-2], real_values, alpha=0.2)
+            ax.annotate(f'{repetition_index}', (self.number_of_cliffords[:-2][-1], real_values[-1]))
+
+
         ax.plot( self.fit_n_cliffords, self.fit_y, 'ro-', lw=2.5, label=f'p = {self.fidelity:.3f}',)
         ax.plot(self.number_of_cliffords[:-2], self.sum, ls='dashed', c='black')
         ax.set_ylabel(f'|S21| (V)')

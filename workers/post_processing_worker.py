@@ -133,14 +133,10 @@ class Multiplexed_Analysis(BaseAnalysis):
             self.all_results[this_element] = dict(zip(redis_field,self.qoi))
             handles, labels = this_axis.get_legend_handles_labels()
 
-            if node.name in ['T1','T2','T2_echo']:
-                T1_micros = self.qoi[0] * 1e6
-                patch2 = mpatches.Patch(color='blue', label=f'{node.name} = {T1_micros:.2f} us')
-                handles.append(patch2)
             patch = mpatches.Patch(color='red', label=f'{this_qubit}')
             handles.append(patch)
             this_axis.set(title=None)
-            this_axis.legend(handles=handles, fontsize='x-small')
+            this_axis.legend(handles=handles, fontsize='small')
             # logger.info(f'Analysis for the {node} of {this_qubit} is done, saved at {self.data_path}')
 
     def get_results(self):

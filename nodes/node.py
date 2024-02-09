@@ -121,7 +121,7 @@ class NodeFactory:
         }
 
     def all_nodes(self):
-        return self.node_implementations.keys()
+        return list(self.node_implementations.keys())
 
     def create_node(self, node_name: str, all_qubits: list[str], ** kwargs):
         node_object = self.node_implementations[node_name](node_name, all_qubits, ** kwargs)
@@ -138,7 +138,7 @@ class State_Discrimination_Node(Base_Node):
     def samplespace(self):
         cluster_samplespace = {
             'qubit_states': {
-                qubit: np.array([0,0,0,0,1,1,1,1]) for qubit in self.all_qubits
+                qubit: np.array(110*[0,0,0,0,1,1,1,1]) for qubit in self.all_qubits
             }
         }
         return cluster_samplespace
@@ -332,12 +332,12 @@ class Randomized_Benchmarking_Node(Base_Node):
         self.all_qubits = all_qubits
         self.node_dictionary = node_dictionary
         self.backup = False
-        self.redis_field = ['t1_time'] #TODO change to something, error?
+        self.redis_field = ['fidelity']
         self.measurement_obj = Randomized_Benchmarking
         self.analysis_obj = RandomizedBenchmarkingAnalysis
 
         # TODO change it a dictionary like samplespace
-        self.node_externals = 5 * np.arange(2, dtype=np.int32)
+        self.node_externals = 3 * np.arange(8, dtype=np.int32)
         self.external_parameter_name = 'seed'
         self.external_parameter_value = 0
         ####################
