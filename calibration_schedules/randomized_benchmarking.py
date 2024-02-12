@@ -72,8 +72,6 @@ class Randomized_Benchmarking(Measurement):
 
                 schedule.add(X(this_qubit))
                 random_sequence = rng.integers(all_cliffords, size=this_number_of_cliffords)
-                if this_number_of_cliffords == 16:
-                    print(f'{ random_sequence = }')
 
                 for sequence_index in random_sequence:
                     physical_gates = cliffords.XY_decompositions[sequence_index]

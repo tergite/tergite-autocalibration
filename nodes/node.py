@@ -117,7 +117,7 @@ class NodeFactory:
             #'ro_frequency_optimization_gef': RO_frequency_optimization_gef_Node,
             'state_discrimination': State_Discrimination_Node,
             'randomized_benchmarking': Randomized_Benchmarking_Node,
-            'check_cliffords': Check_Cliffords_Node,
+            # 'check_cliffords': Check_Cliffords_Node,
         }
 
     def all_nodes(self):
@@ -337,7 +337,7 @@ class Randomized_Benchmarking_Node(Base_Node):
         self.analysis_obj = RandomizedBenchmarkingAnalysis
 
         # TODO change it a dictionary like samplespace
-        self.node_externals = 3 * np.arange(8, dtype=np.int32)
+        self.node_externals = 3 * np.arange(3, dtype=np.int32)
         self.external_parameter_name = 'seed'
         self.external_parameter_value = 0
         ####################
@@ -359,7 +359,8 @@ class Randomized_Benchmarking_Node(Base_Node):
         cluster_samplespace = {
             'number_of_cliffords': {
                 # qubit: all_numbers for qubit in self.all_qubits
-                qubit: np.array([2, 16, 128, 256,512, 768, 1024, 0, 1]) for qubit in self.all_qubits
+                # qubit: np.array([2, 16, 128, 256,512, 768, 1024, 0, 1]) for qubit in self.all_qubits
+                qubit: np.array([2, 16, 128, 256, 0, 1]) for qubit in self.all_qubits
             },
         }
         return cluster_samplespace

@@ -85,6 +85,7 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
 
     # backup old parameter values
     if node.backup:
+        print('BACKUP')
         fields = node.redis_field
         for field in fields:
             field_backup = field + "_backup"
@@ -103,7 +104,6 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
                         redis_connection.hset(key, field_backup, value)
                         redis_connection.hset(key, field, 'nan')
 
-    # TODO better way to restart the QuantumDevice object
     device = QuantumDevice(f'Loki_{node.name}')
     device.hardware_config(hw_config)
 
@@ -162,6 +162,7 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
     else:
         external_parameters = {}
 
+
     compiler = SerialCompiler(name=f'{node.name}_compiler')
     schedule = schedule_function(**static_parameters, **external_parameters, **samplespace)
     compilation_config = device.generate_compilation_config()
@@ -175,6 +176,7 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
             extended_edge.close()
 
     logger.info('Starting Compiling')
+
     compiled_schedule = compiler.compile(schedule=schedule, config=compilation_config)
 
     # if node.name not in ['ro_amplitude_optimization_gef','cz_calibration_ssro']:

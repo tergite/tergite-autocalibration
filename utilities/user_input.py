@@ -41,7 +41,7 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'state_discrimination',
+    'target_node': 'randomized_benchmarking',
     'all_qubits': qubits,
     'couplers': couplers,
 }

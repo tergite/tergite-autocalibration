@@ -17,6 +17,8 @@ qubit_01_spectroscopy_multidim.freq_01 = nan
 qubit_01_spectroscopy_multidim.spec_ampl_optimal = nan
 two_tone_multidim.freq_01 = nan
 ramsey_fringes.freq_01 = nan
+ramsey_correction.freq_01 = nan
+ramsey_correction_12.freq_12 = nan
 qubit_12_spectroscopy_pulsed.freq_12 = nan
 ramsey_fringes_12.freq_12 = nan
 qubit_12_spectroscopy_pulsed.anharmonicity = nan
@@ -38,6 +40,7 @@ reset_chevron.reset_duration_qc = nan
 
 [qoi.couplers]
 coupler_spectroscopy.parking_current = nan
+coupler_resonator_spectroscopy.resonator_vs_flux= nan
 cz_chevron.cz_pulse_frequency = nan
 cz_chevron.cz_pulse_duration = nan
 cz_optimize_chevron.cz_pulse_frequency = nan
@@ -57,7 +60,7 @@ ro_acq_delay = 220e-9
 ro_pulse_delay = 4e-9
 ro_pulse_duration = 3e-6
 ro_acq_integration_time = 2.5e-6
-mw_pulse_duration = 40e-9
+mw_pulse_duration = 28e-9
 init_duration = 400e-6
 min_calibration_point = 0
 max_calibration_point = 0

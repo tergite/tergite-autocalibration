@@ -19,9 +19,6 @@ send_to_lefteris.ps1
 #dataset folders
 202[3456789]*/
 
-#test python files
-test*py
-
 #data files
 *.nc
 
