@@ -5,7 +5,7 @@ class Base_Node:
         self.node_dictionary = node_dictionary
         self.backup = False
         self.type = 'simple_sweep'
-        self.qubit_state = 0 #can be 0 or 1
+        self.qubit_state = 0 # can be 0 or 1 or 2
 
     @property
     def samplespace(self) -> dict:
@@ -42,4 +42,3 @@ class Base_Node:
 
     def __repr__(self):
         return f'Node({self.name}, {self.all_qubits})'
-

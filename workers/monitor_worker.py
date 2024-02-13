@@ -7,12 +7,13 @@ from workers.post_processing_worker import post_process
 from logger.tac_logger import logger
 import scipy.optimize as optimize
 
-
 '''
 sweep types:
 simple_sweep
-optimized_sweep: sweep under an external parameter
-parameterized_sweep: sweep under a schedule parameter e.g. T1 or RB
+optimized_sweep:
+    sweep under an external parameter
+parameterized_sweep:
+    sweep under a schedule parameter e.g. T1 or RB
 '''
 
 def monitor_node_calibration(node, data_path, lab_ic):
@@ -49,6 +50,7 @@ def monitor_node_calibration(node, data_path, lab_ic):
             )
 
             ds = xarray.merge([ds, result_dataset])
+
         logger.info('measurement completed')
         measurement_result = post_process(ds, node, data_path=data_path)
         logger.info('analysis completed')
