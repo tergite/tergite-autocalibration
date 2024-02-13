@@ -21,25 +21,8 @@ def configure_dataset(
     The dataset retrieved from the instrument coordinator  is
     too bare-bones. Here we configure the dims, coords and data_vars
     '''
-    if hasattr(node, 'coupler_samplespace'):
-        sweep_type = SweepType.ClusterSweepOnCouplers
-    elif hasattr(node, 'spi_samplespace'):
-        sweep_type = SweepType.SPI_and_Cluster_Sweep
-        spi_samplespace = node.spi_samplespace
-        spi_sweep_quantities = spi_samplespace.keys() # for example 'dc_currents'
-    elif hasattr(node, 'samplespace') and not hasattr(node, 'spi_samplespace'):
-        sweep_type = SweepType.ClusterSweepOnQubits
-    else:
-        raise(ValueError)
 
     dataset = xarray.Dataset()
-
-    def get_coupler_from_qubit(qubit: str):
-        for bus in node.couplers:
-            if qubit in bus:
-                coupler = bus
-        return coupler
-
 
     keys = raw_ds.data_vars.keys()
     measurement_qubits = node.all_qubits
@@ -54,61 +37,72 @@ def configure_dataset(
         key_indx = key%n_qubits # this is to handle ro_opt_frequencies node where
         # there are 2 or 3 measurements (i.e 2 or 3 Datarrays) for each qubit
         coords_dict = {}
-        qubit = measurement_qubits[key_indx]
+        measured_qubit = measurement_qubits[key_indx]
 
         for quantity in sweep_quantities :
-            if sweep_type == SweepType.ClusterSweepOnCouplers:
-                coupler = get_coupler_from_qubit(qubit)
-                coord_key = quantity + coupler
-                settable_values = samplespace[quantity][coupler]
-                coord_attrs = {'coupler':coupler, 'long_name': f'{coord_key}', 'units': 'NA'}
-            elif sweep_type == SweepType.ClusterSweepOnQubits:
-                coord_key = quantity + qubit
-                settable_values = samplespace[quantity][qubit]
-                coord_attrs = {'qubit':qubit, 'long_name': f'{coord_key}', 'units': 'NA'}
-            elif sweep_type == SweepType.SPI_and_Cluster_Sweep:
-                coord_key = quantity + qubit
-                settable_values = samplespace[quantity][qubit]
-                coord_attrs = {'qubit':qubit, 'long_name': f'{coord_key}', 'units': 'NA'}
+            # eg ['q1','q2',...] or ['q1_q2','q3_q4',...] :
+            settable_elements = samplespace[quantity].keys()
+
+            if measured_qubit in settable_elements:
+                element = measured_qubit
+                element_type = 'qubit'
             else:
-                raise(ValueError)
+                matching = [s for s in settable_elements if measured_qubit in s]
+                if len(matching) == 1 and '_' in matching[0]:
+                    element = matching[0]
+                    element_type = 'coupler'
+                else:
+                    raise(ValueError)
+
+            coord_key = quantity + element
+            settable_values = samplespace[quantity][element]
+            coord_attrs = {element_type: element, 'long_name': f'{coord_key}', 'units': 'NA'}
 
             coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
 
         if hasattr(node, 'node_externals'):
-            coord_key = node.external_parameter_name + qubit
-            coord_attrs = {'qubit':qubit, 'long_name': f'{coord_key}', 'units': 'NA'}
+            coord_key = node.external_parameter_name + measured_qubit
+            coord_attrs = {'qubit':measured_qubit, 'long_name': f'{coord_key}', 'units': 'NA'}
             coords_dict[coord_key] = (coord_key, np.array([node.external_parameter_value]), coord_attrs)
 
-        if sweep_type == SweepType.SPI_and_Cluster_Sweep:
+        # TODO merge spi_samplespace and samplespace
+        if hasattr(node, 'spi_samplespace'):
+            spi_samplespace = node.spi_samplespace
+            spi_sweep_quantities = spi_samplespace.keys() # for example 'dc_currents'
             for quantity in spi_sweep_quantities:
-                coupler = get_coupler_from_qubit(qubit)
-                coord_key = quantity + coupler
-                settable_values = spi_samplespace[quantity][coupler]
+                settable_elements = spi_samplespace[quantity].keys()
+                matching = [s for s in settable_elements if measured_qubit in s]
+                if len(matching) == 1 and '_' in matching[0]:
+                    element = matching[0]
+                    element_type = 'coupler'
+                    coord_key = quantity + element
+                    settable_values = spi_samplespace[quantity][element]
+                    coord_attrs = {element_type: element, 'long_name': f'{coord_key}', 'units': 'NA'}
+                else:
+                    raise(ValueError)
+                coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
 
         partial_ds = xarray.Dataset(coords=coords_dict)
 
-        if sweep_type == SweepType.ClusterSweepOnCouplers:
-            coupler = get_coupler_from_qubit(qubit)
-            dimensions = [len(samplespace[quantity][coupler]) for quantity in sweep_quantities]
-        elif sweep_type == SweepType.ClusterSweepOnQubits:
-            dimensions = [len(samplespace[quantity][qubit]) for quantity in sweep_quantities]
-        elif sweep_type == SweepType.SPI_and_Cluster_Sweep:
-            dimensions = [len(samplespace[quantity][qubit]) for quantity in sweep_quantities]
-
-        if hasattr(node, 'node_externals'):
-            dimensions += [1]
+        # if sweep_type == SweepType.ClusterSweepOnCouplers:
+        #     coupler = get_coupler_from_qubit(measured_qubit)
+        #     dimensions = [len(samplespace[quantity][coupler]) for quantity in sweep_quantities]
+        # elif sweep_type == SweepType.ClusterSweepOnQubits:
+        #     dimensions = [len(samplespace[quantity][measured_qubit]) for quantity in sweep_quantities]
+        # elif sweep_type == SweepType.SPI_and_Cluster_Sweep:
+        #     dimensions = [len(samplespace[quantity][measured_qubit]) for quantity in sweep_quantities]
+        # if hasattr(node, 'node_externals'):
+        #     dimensions += [1]
 
         # TODO this is not safe:
         # This assumes that the inner settable variable is placed
         # at the first position in the samplespace
-
-        reshaping = reversed(dimensions)
+        reshaping = reversed(node.dimensions)
         data_values = raw_ds[key].values.reshape(*reshaping)
         data_values = np.transpose(data_values)
-        attributes = {'qubit': qubit, 'long_name': f'y{qubit}', 'units': 'NA'}
-        if sweep_type == SweepType.ClusterSweepOnCouplers:
-            attributes['coupler'] = coupler
+        attributes = {'qubit': measured_qubit, 'long_name': f'y{measured_qubit}', 'units': 'NA'}
+        # if sweep_type == SweepType.ClusterSweepOnCouplers:
+        #     attributes['coupler'] = coupler
         qubit_state = ''
         if 'ro_opt_frequencies' in list(sweep_quantities):
             qubit_state = qubit_states[key // n_qubits]
@@ -122,7 +116,7 @@ def configure_dataset(
         #                )
         #partial_ds[f'y{qubit}_real{qubit_state}'] = real_data_array
 
-        partial_ds[f'y{qubit}{qubit_state}'] = (tuple(coords_dict.keys()), data_values, attributes)
+        partial_ds[f'y{measured_qubit}{qubit_state}'] = (tuple(coords_dict.keys()), data_values, attributes)
         dataset = xarray.merge([dataset,partial_ds])
     return dataset
 

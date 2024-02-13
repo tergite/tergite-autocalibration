@@ -56,8 +56,6 @@ class Coupler_Spectroscopy_Node:
     def samplespace(self):
         qubit = self.coupled_qubits[self.measure_qubit_index]
         self.measurement_qubit = qubit
-        # print(f'{ self.coupled_qubits = }')
-        # print(f'{ qubit = }')
         cluster_samplespace = {
             'spec_frequencies': {qubit: qubit_samples(qubit, sweep_range=self.sweep_range)}
         }
