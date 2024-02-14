@@ -1,3 +1,4 @@
+import time
 import xarray
 from utilities.status import ClusterStatus
 from workers.compilation_worker import precompile
@@ -9,15 +10,23 @@ import scipy.optimize as optimize
 
 '''
 sweep types:
-simple_sweep
-optimized_sweep:
+cluster_simple_sweep:
+   sweep on a predefined samplespace on cluster-controlled parameters.
+   The schedule is compiled only once.
+   At the moment, most of nodes are of this type.
+spi_and_cluster_simple_sweep:
+   sweep on a predefined samplespace on cluster-controlled parameters,
+   and spi-controlled parameters.
+   The schedule is compiled only once. e.g. coupler spectroscopy
+TODO optimized_sweep:
     sweep under an external parameter
 parameterized_sweep:
-    sweep under a schedule parameter e.g. T1 or RB
+    sweep under a schedule parameter e.g. RB.
+    For every external parameter value, the schedule is recompiled.
 '''
 
 def monitor_node_calibration(node, data_path, lab_ic):
-    if node.type == 'simple_sweep':
+    if node.type == 'cluster_simple_sweep':
         compiled_schedule = precompile(node)
 
         result_dataset = measure_node(
@@ -54,6 +63,44 @@ def monitor_node_calibration(node, data_path, lab_ic):
         logger.info('measurement completed')
         measurement_result = post_process(ds, node, data_path=data_path)
         logger.info('analysis completed')
+
+
+    elif node.type == 'spi_and_cluster_simple_sweep':
+
+        # compilation is needed only once
+        compiled_schedule = precompile(node)
+
+        DAC = SpiDAC()
+        dac = DAC.create_spi_dac(node.coupler)
+        dc_currents = node.spi_samplespace['dc_currents'][node.coupler]
+
+        def set_current(current_value: float):
+            print(f'{ current_value = }')
+            print(f'{ dac.current() = }')
+            dac.current(current_value)
+            while dac.is_ramping():
+                print(f'ramping {dac.current()}')
+                time.sleep(1)
+            print('Finished ramping')
+
+        logger.info('Starting coupler spectroscopy')
+
+        ds = xarray.Dataset()
+        for current in dc_currents:
+            set_current(current)
+
+            result_dataset = measure_node(
+                node,
+                compiled_schedule,
+                lab_ic,
+                data_path,
+                cluster_status=ClusterStatus.real,
+            )
+
+        logger.info('measurement completed')
+        measurement_result = post_process(ds, node, data_path=data_path)
+        logger.info('analysis completed')
+
 
     elif node.type == 'optimized_sweep':
         print('Performing optimized Sweep')

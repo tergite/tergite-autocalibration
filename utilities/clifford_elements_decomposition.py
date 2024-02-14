@@ -2,11 +2,10 @@ import numpy as np
 
 #TODO
 # ******************************************************
-# This not a good implementation. better create a    *****
+# This not a good implementation. better create a  *****
 # Clifford object with the physical decompositions *****
 # and the PTM representation as attributes         *****
 # ******************************************************
-
 
 XY_decompositions = [{}] * 24
 
