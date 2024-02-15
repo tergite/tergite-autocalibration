@@ -19,6 +19,9 @@ class OptimalROAmplitudeAnalysis():
         self.dataset = dataset
         self.qubit = dataset.attrs['qubit']
         self.data_var = list(dataset.data_vars.keys())[0]
+        self.S21 = self.dataset[self.data_var]
+
+        # breakpoint()
 
         for coord in dataset.coords:
             if 'amplitudes' in str(coord):
@@ -29,20 +32,25 @@ class OptimalROAmplitudeAnalysis():
                 self.shot_coord = coord
         self.independents = dataset[self.state_coord].values
         self.amplitudes = dataset.coords[self.amplitude_coord]
-        self.shots = len(dataset[self.shot_coord].values)
+        # self.shots = len(dataset[self.shot_coord].values)
         self.fit_results = {}
 
     def run_fitting(self):
         self.fidelities = []
         self.cms = []
+        y = self.independents
+        # breakpoint()
         for indx, ro_amplitude in enumerate(self.amplitudes):
-            y = np.repeat(self.independents,self.shots)
-            IQ_complex = np.array([])
-            for state in self.independents:
-                IQ_complex_0 = self.dataset[self.data_var].isel({self.amplitude_coord:[indx],self.state_coord:state})
-                IQ_complex = np.append(IQ_complex,IQ_complex_0)
-            I = IQ_complex.real.flatten()
-            Q = IQ_complex.imag.flatten()
+            # y = np.repeat(self.independents,self.shots)
+            # IQ_complex = np.array([])
+            # for state in self.independents:
+            #     IQ_complex_0 = self.dataset[self.data_var].isel({self.amplitude_coord:[indx],self.state_coord:state})
+            #     IQ_complex = np.append(IQ_complex,IQ_complex_0)
+            IQ_complex = self.S21[indx]
+            # breakpoint()
+
+            I = IQ_complex.real.values
+            Q = IQ_complex.imag.values
             IQ = np.array([I,Q]).T
             lda = LinearDiscriminantAnalysis(solver = "svd", store_covariance=True)
             # breakpoint()
@@ -58,7 +66,7 @@ class OptimalROAmplitudeAnalysis():
             # print(f'{assignment = }')
             self.fidelities.append(assignment)
             self.cms.append(cm_norm)
-        
+
         for i, f in enumerate(self.fidelities):
             if i > 1:
                 if f < self.fidelities[i-1] and f < self.fidelities[i-2] and f > np.mean(self.fidelities):

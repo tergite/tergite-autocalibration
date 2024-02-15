@@ -17,7 +17,7 @@ Requires-Dist: numpy==1.25.2
 Requires-Dist: qblox-instruments==0.11.1
 Requires-Dist: qcodes==0.39.1
 Requires-Dist: quantify-core==0.7.3
-Requires-Dist: quantify-scheduler==0.17.1
+Requires-Dist: quantify-scheduler==0.18.0
 Requires-Dist: redis==5.0.0
 Requires-Dist: scikit-learn==1.2.2
 Requires-Dist: toml==0.10.2

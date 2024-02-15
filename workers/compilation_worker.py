@@ -85,7 +85,6 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
 
     # backup old parameter values
     if node.backup:
-        print('BACKUP')
         fields = node.redis_field
         for field in fields:
             field_backup = field + "_backup"

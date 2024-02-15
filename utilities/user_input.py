@@ -41,7 +41,7 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'randomized_benchmarking',
+    'target_node': 'ro_amplitude_optimization_gef',
     'all_qubits': qubits,
     'couplers': couplers,
 }

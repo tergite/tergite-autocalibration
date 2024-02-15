@@ -34,12 +34,6 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
 
     return analysis.get_results()
 
-    if all(analysis.node_statuses.values()):
-        analysis.data_status = DataStatus.in_spec
-    else:
-        analysis.data_status = DataStatus.out_of_spec
-    return analysis.data_status
-
 
 class BaseAnalysis():
     def __init__(self, result_dataset: xr.Dataset, data_path: Path):
@@ -55,8 +49,6 @@ class BaseAnalysis():
 
         # TODO What does this do, when the MSS is not connected?
         self.node_result = {}
-
-        self.node_statuses = {}
 
         self.fig, self.axs = plt.subplots(
             nrows=self.rows,
@@ -107,12 +99,6 @@ class Multiplexed_Analysis(BaseAnalysis):
             kw_args = getattr(node, "analysis_kwargs", dict())
             node_analysis = node.analysis_obj(ds, **kw_args)
             self.qoi = node_analysis.run_fitting()
-
-            # if self.qoi is not None:
-            #     analysis_success = True
-            # else:
-            #     analysis_success = True
-            # self.node_statuses.update({ this_qubit: analysis_success} )
 
             node_analysis.plotter(this_axis)
 

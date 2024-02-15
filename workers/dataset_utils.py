@@ -12,8 +12,8 @@ def configure_dataset(
         node,
     ) -> xarray.Dataset:
     '''
-    The dataset retrieved from the instrument coordinator  is
-    too bare-bones. Here we configure the dims, coords and data_vars
+    The dataset retrieved from the instrument coordinator is
+    too bare-bones. Here the dims, coords and data_vars are configured
     '''
     dataset = xarray.Dataset()
 
@@ -40,10 +40,11 @@ def configure_dataset(
         measured_qubit = measurement_qubits[key_indx]
 
         for quantity in sweep_quantities :
+
             # eg ['q1','q2',...] or ['q1_q2','q3_q4',...] :
             settable_elements = samplespace[quantity].keys()
 
-            # distinguish if your settable is on a quabit or a coupler:
+            # distinguish if the settable is on a quabit or a coupler:
             if measured_qubit in settable_elements:
                 element = measured_qubit
                 element_type = 'qubit'

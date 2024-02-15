@@ -27,7 +27,12 @@ def measure_node(
     cluster_status=ClusterStatus.real
     ):
 
-    raw_dataset = execute_schedule(compiled_schedule, lab_ic)
+    schedule_duration = compiled_schedule.get_schedule_duration()
+    if 'loop_repetitions' in node.node_dictionary:
+        schedule_duration *= node.node_dictionary['loop_repetitions']
+    print(f'schedule_duration = {Fore.CYAN}{Style.BRIGHT}{schedule_duration:.2f} sec{Style.RESET_ALL}')
+
+    raw_dataset = execute_schedule(compiled_schedule, lab_ic, schedule_duration)
 
     result_dataset = configure_dataset(raw_dataset, node)
     save_dataset(result_dataset, node, data_path)
@@ -42,12 +47,11 @@ def measure_node(
 def execute_schedule(
     compiled_schedule: CompiledSchedule,
     lab_ic,
+    schedule_duration: float
     ) -> xarray.Dataset:
 
     logger.info('Starting measurement')
     cluster_status = ClusterStatus.real
-    schedule_duration = compiled_schedule.get_schedule_duration()
-    print(f'schedule_duration = {Fore.CYAN}{Style.BRIGHT}{schedule_duration:.2f} sec{Style.RESET_ALL}')
 
     def run_measurement() -> None:
         lab_ic.prepare(compiled_schedule)

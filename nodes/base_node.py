@@ -4,7 +4,7 @@ class Base_Node:
         self.all_qubits = all_qubits
         self.node_dictionary = node_dictionary
         self.backup = False
-        self.type = 'simple_sweep'
+        self.type = 'cluster_simple_sweep'
         self.qubit_state = 0 # can be 0 or 1 or 2
 
     @property
@@ -15,7 +15,7 @@ class Base_Node:
         return {}
 
     @property
-    def dimensions(self):
+    def dimensions(self) -> list:
         '''
         array of dimensions used for raw dataset reshaping
         in workers/dataset_utils.py. some nodes have peculiar dimensions

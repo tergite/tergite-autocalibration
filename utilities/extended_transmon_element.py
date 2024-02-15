@@ -233,8 +233,6 @@ class ExtendedTransmon(BasicTransmonElement):
 
     def generate_device_config(self) -> DeviceCompilationConfig:
         cfg_dict = {
-            'backend': 'quantify_scheduler.backends'
-            '.circuit_to_device.compile_circuit_to_device',
             'elements': self._generate_config(),
             'clocks': {
                 f'{self.name}.01': self.clock_freqs.f01(),
@@ -259,6 +257,7 @@ class ExtendedTransmon(BasicTransmonElement):
                         'acq_delay': self.measure.acq_delay(),
                         'acq_duration': self.measure.integration_time(),
                         'acq_channel': self.measure.acq_channel(),
+                        'acq_channel_override': None,
                         'acq_protocol_default': 'SSBIntegrationComplex',
                         'reset_clock_phase': self.measure.reset_clock_phase(),
                         'reference_magnitude': pulse_library.ReferenceMagnitude.from_parameter(
@@ -285,6 +284,7 @@ class ExtendedTransmon(BasicTransmonElement):
                         'acq_delay': self.measure.acq_delay(),
                         'acq_duration': self.measure.integration_time(),
                         'acq_channel': self.measure.acq_channel(),
+                        'acq_channel_override': None,
                         'acq_protocol_default': 'SSBIntegrationComplex',
                         'reset_clock_phase': self.measure.reset_clock_phase(),
                         'reference_magnitude': pulse_library.ReferenceMagnitude.from_parameter(
