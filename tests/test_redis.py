@@ -1,7 +1,7 @@
-from nodes.node import NodeFactory
+from tergite_acl.nodes.node import NodeFactory
 import quantify_scheduler.device_under_test.mock_setup as mock
 import numpy as np
-from calibration_schedules.randomized_benchmarking import Randomized_Benchmarking
+from tergite_acl.calibration_schedules.randomized_benchmarking import Randomized_Benchmarking
 import toml
 
 
