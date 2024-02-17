@@ -16,6 +16,7 @@ from tergite_acl.analysis.rabi_analysis import RabiAnalysis
 from tergite_acl.analysis.ramsey_analysis import RamseyAnalysis
 from tergite_acl.analysis.n_rabi_analysis import NRabiAnalysis
 
+from tergite_acl.nodes.node import qubit_samples
 
 from tergite_acl.config_files.VNA_LOKIB_values import VNA_qubit_frequencies, VNA_f12_frequencies
 

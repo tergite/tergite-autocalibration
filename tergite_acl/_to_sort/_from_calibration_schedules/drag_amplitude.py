@@ -7,12 +7,13 @@ from quantify_scheduler.operations.pulse_library import DRAGPulse
 from quantify_scheduler.operations.gate_library import Measure, Reset
 from measurements_base import Measurement_base
 
+
 class DRAG_amplitude(Measurement_base):
 
-    def __init__(self,transmons,connections):
-        super().__init__(transmons,connections)
-        self.experiment_parameters = ['mw_amp180_BATCHED', 'X_repetition'] # The order matters
-        self.parameter_order = ['mw_amp180_BATCHED', 'X_repetition'] # The order matters
+    def __init__(self, transmons, connections):
+        super().__init__(transmons, connections)
+        self.experiment_parameters = ['mw_amp180_BATCHED', 'X_repetition']  # The order matters
+        self.parameter_order = ['mw_amp180_BATCHED', 'X_repetition']  # The order matters
         self.gettable_batched = True
         self.static_kwargs = {
             'qubits': self.qubits,
@@ -26,9 +27,9 @@ class DRAG_amplitude(Measurement_base):
     def settables_dictionary(self):
         parameters = self.experiment_parameters
         manual_parameter = 'mw_amp180_BATCHED'
-        assert( manual_parameter in self.experiment_parameters )
+        assert (manual_parameter in self.experiment_parameters)
         mp_data = {
-            manual_parameter : {
+            manual_parameter: {
                 'name': manual_parameter,
                 'initial_value': 1e-4,
                 'unit': 'V',
@@ -36,8 +37,8 @@ class DRAG_amplitude(Measurement_base):
             }
         }
         manual_parameter = 'X_repetition'
-        assert( manual_parameter in self.experiment_parameters )
-        mp_data.update( {
+        assert (manual_parameter in self.experiment_parameters)
+        mp_data.update({
             manual_parameter: {
                 'name': manual_parameter,
                 'initial_value': 1,
@@ -51,16 +52,16 @@ class DRAG_amplitude(Measurement_base):
         return self._setpoints_Nd_array()
 
     def schedule_function(
-            self, #Note, this is not used in the schedule
+            self,  # Note, this is not used in the schedule
             qubits: list[str],
-            mw_frequencies: dict[str,float],
-            mw_motzois: dict[str,float],
-            mw_pulse_ports: dict[str,str],
-            mw_clocks: dict[str,str],
-            mw_pulse_durations: dict[str,float],
+            mw_frequencies: dict[str, float],
+            mw_motzois: dict[str, float],
+            mw_pulse_ports: dict[str, str],
+            mw_clocks: dict[str, str],
+            mw_pulse_durations: dict[str, float],
             repetitions: int = 1024,
             **mw_amplitudes,
-        ) -> Schedule:
+    ) -> Schedule:
         """
         Generate a schedule for a DRAG pulse calibration measurement that optimizes the amplitude parameter.
 
@@ -96,22 +97,22 @@ class DRAG_amplitude(Measurement_base):
         :
             An experiment schedule.
         """
-        schedule = Schedule("mltplx_motzoi",repetitions)
+        schedule = Schedule("mltplx_motzoi", repetitions)
 
         for mw_f_key, mw_f_val in mw_frequencies.items():
             this_qubit = [q for q in qubits if q in mw_f_key][0]
             schedule.add_resource(
                 ClockResource(name=mw_clocks[this_qubit], freq=mw_f_val)
             )
-        values = {qubit:{} for qubit in qubits}
+        values = {qubit: {} for qubit in qubits}
         for mw_amplitude_key, mw_amplitude_val in mw_amplitudes.items():
             this_qubit = [q for q in qubits if q in mw_amplitude_key][0]
             if 'X_repetition' in mw_amplitude_key:
-               values[this_qubit].update({'X_repetition':mw_amplitude_val})
+                values[this_qubit].update({'X_repetition': mw_amplitude_val})
             if 'mw_amp180' in mw_amplitude_key:
-               values[this_qubit].update({'mw_amp180':mw_amplitude_val})
+                values[this_qubit].update({'mw_amp180': mw_amplitude_val})
 
-        #This is the common reference operation so the qubits can be operated in parallel
+        # This is the common reference operation so the qubits can be operated in parallel
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
         for acq_cha, (values_key, values_val) in enumerate(values.items()):
@@ -124,7 +125,7 @@ class DRAG_amplitude(Measurement_base):
             # The second for loop iterates over all frequency values in the frequency batch:
             relaxation = schedule.add(
                 Reset(*qubits), label=f'Reset_{acq_cha}', ref_op=root_relaxation, ref_pt_new='end'
-            ) #To enforce parallelism we refer to the root relaxation
+            )  # To enforce parallelism we refer to the root relaxation
 
             for acq_index, mw_amp180 in enumerate(mw_amplitudes_values):
                 for x_index in range(X_repetitions):

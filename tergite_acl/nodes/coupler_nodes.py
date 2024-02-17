@@ -27,7 +27,7 @@ def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
     elif transition == '12':
         VNA_frequency = VNA_f12_frequencies[qubit]
     else:
-        VNA_frequency = VNA_value
+        VNA_frequency = VNA_value # TODO: this should have a value
     min_freq = VNA_frequency - sweep_range / 2
     max_freq = VNA_frequency + sweep_range / 2
     return np.linspace(min_freq, max_freq, qub_spec_samples)

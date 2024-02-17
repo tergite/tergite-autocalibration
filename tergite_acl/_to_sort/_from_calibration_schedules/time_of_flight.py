@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
 
-def measure_time_of_flight(cluster):
 
+def measure_time_of_flight(cluster):
     readout_module = cluster.module16
 
     readout_module.out0_att(0)
@@ -17,13 +17,10 @@ def measure_time_of_flight(cluster):
     readout_module.out0_in0_lo_freq(6620000000)
 
     # From Mixer Calibration
-    readout_module.out0_offset_path0(-0.0088298*1000)
-    readout_module.out0_offset_path1( 0.0012304*1000)
-
+    readout_module.out0_offset_path0(-0.0088298 * 1000)
+    readout_module.out0_offset_path1(0.0012304 * 1000)
 
     readout_module.sequencer0.sync_en(True)
-
-
 
     readout_module.arm_sequencer(0)
     readout_module.start_sequencer(0)
@@ -76,7 +73,7 @@ def measure_time_of_flight(cluster):
     readout_module.get_acquisition_state(0, 1)
     readout_module.store_scope_acquisition(0, "single")
     # Print status of sequencer.
-    #print(readout_module.get_sequencer_state(0))
+    # print(readout_module.get_sequencer_state(0))
     p0 = np.array(
         readout_module.get_acquisitions(0)["single"]["acquisition"]["scope"]["path0"]["data"]
     )
@@ -89,21 +86,23 @@ def measure_time_of_flight(cluster):
     return ds
 
     # Analysis
-def analyze_tof(p0,p1):
+
+
+def analyze_tof(p0, p1):
     # Determine when the signal crosses half-max for the first time (in ns)
     t_halfmax = np.where(np.abs(p0) > np.max(p0) / 2)[0][0]
 
     # The time it takes for a sine wave to reach its half-max value is (in ns)
     correction = 1 / readout_module.sequencer0.nco_freq() * 1e9 / 12
 
-    #extracts TOF value
+    # extracts TOF value
     tof_measured = t_halfmax - correction
 
-    #makes sure that the time of flight is set to a multiple of 4 ns
-    tof=tof_measured- (tof_measured % 4) + 4
+    # makes sure that the time of flight is set to a multiple of 4 ns
+    tof = tof_measured - (tof_measured % 4) + 4
     #     return tof*1e-9
 
-    #plotting
+    # plotting
     # if plotting:
     #     r = readout_module.get_acquisitions(0)["single"]["acquisition"]["scope"]
     #     plt.plot(r["path0"]["data"], ".-")
