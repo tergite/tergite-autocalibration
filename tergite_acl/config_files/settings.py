@@ -4,6 +4,8 @@ from tergite_acl.utilities.root_path import project_root
 # hw_config_json = project_root / 'config_files/HARDWARE_CONFIGURATION_LOKIA_COUPLERS.json'
 hw_config_json = project_root / 'config_files/HARDWARE_CONFIGURATION_LOKIB_25092023.json'
 
+device_config_file = project_root / 'config_files/device_config.toml'
+
 lokiA_IP = '192.0.2.141'
 
 spiA_serial_port = '/dev/ttyACM0'

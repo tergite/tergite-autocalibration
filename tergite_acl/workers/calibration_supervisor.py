@@ -11,7 +11,7 @@ from tergite_acl.workers.dataset_utils import create_node_data_path
 
 from tergite_acl.nodes.graph import filtered_topological_order
 from tergite_acl.utilities.visuals import draw_arrow_chart
-from tergite_acl.config_files.settings import lokiA_IP
+from tergite_acl.config_files.settings import lokiA_IP, device_config_file
 # from workers.dummy_setup import dummy_cluster
 
 from colorama import init as colorama_init
