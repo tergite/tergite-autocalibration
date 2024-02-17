@@ -19,7 +19,7 @@ from tergite_acl.analysis.optimum_ro_frequency_analysis import (
 from tergite_acl.analysis.optimum_ro_amplitude_analysis import OptimalRO_Three_state_AmplitudeAnalysis, OptimalRO_Two_state_AmplitudeAnalysis, OptimalROAmplitudeAnalysis
 from tergite_acl.analysis.state_discrimination_analysis import StateDiscriminationAnalysis
 from tergite_acl.analysis.punchout_analysis import PunchoutAnalysis
-from tergite_acl.nodes.node import resonator_samples
+from tergite_acl.nodes.node_utils import resonator_samples
 
 from tergite_acl.config_files.VNA_LOKIB_values import VNA_resonator_frequencies
 

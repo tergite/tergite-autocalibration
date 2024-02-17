@@ -13,9 +13,7 @@ from tergite_acl.calibration_schedules.T1 import T1, T2, T2Echo
 from tergite_acl.calibration_schedules.check_cliffords import Check_Cliffords
 from tergite_acl.calibration_schedules.randomized_benchmarking import Randomized_Benchmarking
 from tergite_acl.calibration_schedules.state_discrimination import Single_Shots_RO
-from tergite_acl.config_files.VNA_LOKIB_values import (
-    VNA_resonator_frequencies, VNA_qubit_frequencies, VNA_f12_frequencies
-)
+
 from tergite_acl.nodes.base_node import Base_Node
 from tergite_acl.nodes.coupler_nodes import (
     CZ_Optimize_Chevron_Node, Coupler_Resonator_Spectroscopy_Node, Coupler_Spectroscopy_Node, CZ_Chevron_Node
