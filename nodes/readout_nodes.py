@@ -23,6 +23,13 @@ from analysis.punchout_analysis import PunchoutAnalysis
 
 from config_files.VNA_LOKIB_values import VNA_resonator_frequencies
 
+def resonator_samples(qubit: str) -> np.ndarray:
+    res_spec_samples = 101
+    sweep_range =  2.0e6
+    VNA_frequency = VNA_resonator_frequencies[qubit]
+    min_freq = VNA_frequency - sweep_range / 2 -0.5e6
+    max_freq = VNA_frequency + sweep_range / 2
+    return np.linspace(min_freq, max_freq, res_spec_samples)
 
 class Resonator_Spectroscopy_Node(Base_Node):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
@@ -139,25 +146,27 @@ class RO_amplitude_optimization_gef_Node(Base_Node):
         self.name = name
         self.all_qubits = all_qubits
         self.redis_field = ['ro_ampl_opt','inv_cm_opt']
-        self.qubit_state = 2
+        self.qubit_state = 1
         self.measurement_obj = RO_amplitude_optimization
         self.analysis_obj = OptimalROAmplitudeAnalysis
         self.node_dictionary = node_dictionary
-        self.node_dictionary['loop_repetitions'] = 128
+        self.node_dictionary['loop_repetitions'] = 1000
 
     @property
     def dimensions(self) -> list:
         '''
         overwriting the dimensions of the Base_Node
         '''
-        # assuming that all qubit  have the same dimensions on their samplespace
+        # assuming that all qubit have the same dimensions on their samplespace
         first_qubit = self.all_qubits[0]
 
         ampls = len(self.samplespace['ro_amplitudes'][first_qubit])
         states = self.qubit_state + 1
         loops = self.node_dictionary['loop_repetitions']
-        dims = states * loops
-        return [ampls, dims]
+        dims_per_loop = states * ampls
+        # the dimensions pattern is different when using Control Flow Loops
+        # than when looping on the schedule
+        return [loops, dims_per_loop]
 
 
     @property
@@ -168,11 +177,14 @@ class RO_amplitude_optimization_gef_Node(Base_Node):
         '''
         loops = self.node_dictionary['loop_repetitions']
         cluster_samplespace = {
-            'ro_amplitudes': {qubit : np.linspace(0.001,0.121,31) for qubit in self.all_qubits},
-
+            # 'ro_amplitudes': {qubit : np.linspace(0.001,0.121,31) for qubit in self.all_qubits},
             'qubit_states': {
-                qubit: np.repeat(np.array([0,1,2], dtype=np.int16), loops)  for qubit in self.all_qubits
-            }
+                qubit: np.tile(np.array([0,1], dtype=np.int16), loops)  for qubit in self.all_qubits
+            },
+
+            # 'ro_amplitudes': {qubit : np.array([0.001, 0.002, 0.003, 0.004, 0.005, 0.006]) for qubit in self.all_qubits}
+            # 'ro_amplitudes': {qubit : np.linspace(0.001, 0.05, 21) for qubit in self.all_qubits},
+            # 'ro_amplitudes': {qubit : np.array([0.003, 0.004,  0.005]) for qubit in self.all_qubits},
+            'ro_amplitudes': {qubit : np.array([0.001, 0.006]) for qubit in self.all_qubits},
         }
         return cluster_samplespace
-

@@ -53,9 +53,10 @@ class RO_amplitude_optimization(Measurement):
         ro_amplitudes: dict[str,np.ndarray],
         loop_repetitions: int,
         qubit_states: dict[str,np.ndarray]
+
         ) -> Schedule:
 
-        schedule = Schedule("ro_amplitude_optimization")
+        schedule = Schedule("ro_amplitude_optimization", repetitions=1)
 
         print(f'{ loop_repetitions = }')
 
@@ -102,11 +103,13 @@ class RO_amplitude_optimization(Measurement):
 
             # The intermediate for-loop iterates over all ro_amplitudes:
             for ampl_indx, ro_amplitude in enumerate(ro_amplitude_values):
+                print(f'{ ro_amplitude = }')
 
                 # The inner for-loop iterates over all qubit levels:
                 for level_index, state_level in enumerate(qubit_levels):
 
                     this_index = ampl_indx * number_of_levels + level_index
+                    print(f'{ this_index = }')
 
                     if state_level == 0:
                         prep = shot.add(IdlePulse(mw_pulse_durations[this_qubit]))
@@ -171,9 +174,9 @@ class RO_amplitude_optimization(Measurement):
 
                     shot.add(Reset(this_qubit))
                     # shot.add(IdlePulse(20e-9))
-        # schedule.add(IdlePulse(20e-9))
+        schedule.add(IdlePulse(20e-9))
         # schedule.add(shot, validate=False)
         schedule.add(shot, control_flow=Loop(loop_repetitions), validate=False)
-        # schedule.add(IdlePulse(20e-9))
+        schedule.add(IdlePulse(20e-9))
 
         return schedule

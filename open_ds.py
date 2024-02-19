@@ -1,77 +1,89 @@
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
 import xarray as xr
 import numpy as np
 import matplotlib.pyplot as plt
 from utilities.user_input import qubits
 import importlib
 import analysis.randomized_benchmarking_analysis as rnb
+import analysis.optimum_ro_amplitude_analysis as roa
 importlib.reload(rnb)
 
 
-ds = xr.open_dataset('data_directory/20240206/20240206-171551-503-b05458-randomized_benchmarking/dataset.hdf5')
+ds = xr.open_dataset('data_directory/20240216/20240216-172026-453-f2388e-ro_amplitude_optimization_gef/dataset.hdf5')
 # print(f'{ ds.yq21.attrs = }')
 ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
 #---
-rb = rnb.RandomizedBenchmarkingAnalysis(ds)
+ro = roa.OptimalROAmplitudeAnalysis
 #---
-complex_values = rb.S21.isel(
-    {rb.seed_coord: [0]}
-).values
+qubit = 'q14'
+yq = ds[f'y{qubit}'].isel({f'ro_amplitudes{qubit}': [3]})
 
-complex_values = complex_values.flatten()
-calib_0 = complex_values[-2]
-calib_1 = complex_values[-1]
-displacement_vector = calib_1 - calib_0
-rotation_angle = np.angle(displacement_vector)
-translated_to_zero_values = complex_values[:-2] - calib_0
-rotated_values = translated_to_zero_values * np.exp(-1j * rotation_angle)
+I = yq.real.values.flatten()
+Q = yq.imag.values.flatten()
 
-I_calib_0 = complex_values[-2].real
-Q_calib_0 = complex_values[-2].imag
-I_calib_1 = complex_values[-1].real
-Q_calib_1 = complex_values[-1].imag
-I_quad = complex_values[:-2].real
-Q_quad = complex_values[:-2].imag
+shots = 1000
 
-I_quad_translated = translated_to_zero_values.real
-Q_quad_translated = translated_to_zero_values.imag
+I0 = yq.real[:shots]
+Q0 = yq.imag[:shots]
+I1 = yq.real[shots:2*shots]
+Q1 = yq.imag[shots:2*shots]
+I2 = yq.real[2*shots:]
+Q2 = yq.imag[2*shots:]
 
-I_quad_rotated = rotated_values.real
-Q_quad_rotated = rotated_values.imag
+# y = ds.qubit_statesq13.values
+y = np.tile(np.array([0,1,2], dtype=np.int16), 1000)
+# y = np.repeat(np.array([0,1,2], dtype=np.int16), 1000)
+# y = np.random.randint(2, size=2000)
+print(f'{ sum(y) = }')
 
-plt.plot( I_quad, Q_quad,'bo-')
-plt.plot( I_calib_0, Q_calib_0,'ko')
-plt.plot( I_calib_1, Q_calib_1,'ro')
+IQ = np.array([I, Q]).T
+lda = LinearDiscriminantAnalysis(solver = "svd", store_covariance=True)
 
-plt.plot( I_quad_translated, Q_quad_translated,'go-')
-plt.plot( I_quad_rotated, Q_quad_rotated,'mo-')
+# run the discrimination, y_classified are the classified levels
+y_classified = lda.fit(IQ,y).predict(IQ)
 
-plt.axvline(0)
-plt.axhline(0)
+tp = y == y_classified # True Positive
+cm_norm = confusion_matrix(y,y_classified,normalize='true')
+assign = np.trace(cm_norm) / 3
+print(f'{ assign = }')
+disp = ConfusionMatrixDisplay(confusion_matrix=cm_norm)
+# disp.plot()
+
+tp0 = tp[y == 0] # true positive levels when sending 0
+tp1 = tp[y == 1] # true positive levels when sending 1
+tp2 = tp[y == 2] # true positive levels when sending 2
+
+IQ0 = IQ[y == 0] # IQ when sending 0
+IQ1 = IQ[y == 1] # IQ when sending 1
+IQ2 = IQ[y == 2] # IQ when sending 2
+
+IQ0_tp = IQ0[ tp0] # True Positive when sending 0
+IQ0_fp = IQ0[~tp0]
+IQ1_tp = IQ1[ tp1] # True Positive when sending 1
+IQ1_fp = IQ1[~tp1]
+IQ2_tp = IQ2[ tp2] # True Positive when sending 2
+IQ2_fp = IQ2[~tp2]
+
+IQ0_positives = [IQ0_tp,IQ0_fp]
+IQ1_positives = [IQ1_tp,IQ1_fp]
+IQ2_positives = [IQ2_tp,IQ2_fp]
+
+print(f'{ len(IQ0_tp) = }')
+print(f'{ len(IQ1_tp) = }')
+print(f'{ len(IQ2_tp) = }')
+
+# I2 = yq12.real[2*shots:]
+# Q2 = yq12.imag[2*shots:]
+mark_size = 40
+plt.scatter(IQ0_tp[:, 0], IQ0_tp[:, 1], marker=".", s=mark_size, color="red", label='send 0 and read 0')
+plt.scatter(IQ0_fp[:, 0], IQ0_fp[:, 1], marker="x", s=mark_size, color="orange",)
+plt.scatter(IQ1_tp[:, 0], IQ1_tp[:, 1], marker=".", s=mark_size, color="blue", label='send 1 and read 1')
+plt.scatter(IQ1_fp[:, 0], IQ1_fp[:, 1], marker="x", s=mark_size, color="dodgerblue",)
+plt.scatter(IQ2_tp[:, 0], IQ2_tp[:, 1], marker=".", s=mark_size, color="green")
+plt.scatter(IQ2_fp[:, 0], IQ2_fp[:, 1], marker="x", s=mark_size, color="lime",)
+
+# plt.plot( I0, Q0,'bo')
+# plt.plot( I1, Q1,'ro')
+# plt.plot( I2, Q2,'ko')
 plt.show()
-#---
-
-plt.plot( rb.I_quad, rb.Q_quad,'bo-')
-plt.show()
-
-#---
-for d_var in ds.data_vars:
-    ds[d_var].attrs = {'qubit': d_var[1:4]}
-
-#---
-qubits = ['q21', 'q22']
-for qubit in qubits:
-    fig, ax = plt.subplots()
-    arr = 'y' + qubit
-    dataset = ds[arr].to_dataset(promote_attrs = True)
-    dataset[arr].values = np.abs(ds[arr].values)
-# print(f'{ d16 = }')
-    analysis = analysis_class(dataset)
-    analysis.run_fitting()
-    analysis.plotter(ax)
-    ax.legend()
-    plt.show()
-
-# data_var = list(ds.data_vars.keys())[0]
-
-# ds[data_var].plot()
-

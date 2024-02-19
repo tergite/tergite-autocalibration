@@ -24,12 +24,6 @@ class StateDiscriminationAnalysis():
         IQ = np.array([self.I, self.Q]).T
         lda = LinearDiscriminantAnalysis(solver = "svd", store_covariance=True)
 
-        # Save the LDA model, datapoints and states
-        # if self.qubit == 'q25':
-        #     with open(f'state-disc-q25.disc', 'wb') as f:
-        #         pickle.dump(lda, f, protocol=pickle.HIGHEST_PROTOCOL)
-        #         f.close()
-
         # run the discrimination, y_classified are the classified levels
         y_classified = lda.fit(IQ,y).predict(IQ)
 

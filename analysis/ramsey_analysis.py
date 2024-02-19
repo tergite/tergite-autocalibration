@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import lmfit
 import xarray as xr
@@ -108,6 +109,16 @@ class RamseyAnalysis():
         ax.axvline(0, color='black', lw=1)
         ax.set_xlabel('Artificial detuning (Hz)')
         ax.set_ylabel('Fitted detuning (Hz)')
+
+        if detailed_plotting == True:
+            ax.remove()
+            grid = ax.get_subplotspec().get_gridspec()
+            fig = plt.gcf()
+            subfig = fig.add_subfigure(grid[0])
+            full_ax = subfig.subplots(2,1)
+            full_ax.plot(self.artificial_detunings , self.fitted_detunings,'bo',ms=5.0)
+            full_ax.plot(self.artificial_detunings, self.poly1d_fn(self.artificial_detunings),'--b',lw=1)
+
         # ax.set_xlabel('Intermediate (s)')
         # ax.set_ylabel('|S21| (V)')
         ax.grid()

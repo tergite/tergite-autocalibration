@@ -26,6 +26,27 @@ from config_files.VNA_LOKIB_values import (
 from nodes.coupler_nodes import (
     CZ_Optimize_Chevron_Node, Coupler_Resonator_Spectroscopy_Node, Coupler_Spectroscopy_Node, CZ_Chevron_Node
 )
+from nodes.qubit_control_nodes import (
+    Motzoi_Parameter_Node,
+    N_Rabi_Oscillations_Node,
+    Qubit_01_Spectroscopy_Multidim_Node,
+    Qubit_01_Spectroscopy_Pulsed_Node,
+    Qubit_12_Spectroscopy_Multidim_Node,
+    Qubit_12_Spectroscopy_Pulsed_Node,
+    Rabi_Oscillations_12_Node,
+    Rabi_Oscillations_Node,
+    Ramsey_Fringes_12_Node,
+    Ramsey_Fringes_Node
+)
+from nodes.readout_nodes import (
+    Punchout_Node,
+    RO_amplitude_optimization_gef_Node,
+    RO_frequency_optimization_Node,
+    RO_frequency_optimization_gef_Node,
+    Resonator_Spectroscopy_1_Node,
+    Resonator_Spectroscopy_2_Node,
+    Resonator_Spectroscopy_Node
+)
 
 redis_connection = redis.Redis(decode_responses=True)
 
@@ -38,18 +59,6 @@ def resonator_samples(qubit: str) -> np.ndarray:
     return np.linspace(min_freq, max_freq, res_spec_samples)
 
 
-def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
-    qub_spec_samples = 41
-    sweep_range = 3.0e6
-    if transition == '01':
-        VNA_frequency = VNA_qubit_frequencies[qubit]
-    elif transition == '12':
-        VNA_frequency = VNA_f12_frequencies[qubit]
-    else:
-        VNA_frequency = VNA_value
-    min_freq = VNA_frequency - sweep_range / 2
-    max_freq = VNA_frequency + sweep_range / 2
-    return np.linspace(min_freq, max_freq, qub_spec_samples)
 
 
 class NodeFactory:
@@ -127,6 +136,7 @@ class T1_Node(Base_Node):
         }
         return cluster_samplespace
 
+
 class Randomized_Benchmarking_Node(Base_Node):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
@@ -167,6 +177,7 @@ class Randomized_Benchmarking_Node(Base_Node):
             },
         }
         return cluster_samplespace
+
 
 class Check_Cliffords_Node:
     def __init__(self, name: str, all_qubits: list[str], ** kwargs):
@@ -218,7 +229,6 @@ class T2_Echo_Node(Base_Node):
             'delays': {qubit : 8e-9 + np.arange(0,300e-6,6e-6) for qubit in self.all_qubits}
         }
         return cluster_samplespace
-
 
 
 class Reset_Chevron_Node(Base_Node):
