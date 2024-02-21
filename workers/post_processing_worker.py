@@ -36,7 +36,7 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
 
 
 class BaseAnalysis():
-    def __init__(self, result_dataset: xr.Dataset, data_path: Path):
+    def __init__(self, result_dataset: xr.Dataset, node,  data_path: Path):
         self.result_dataset = result_dataset
         self.data_path = data_path
 
@@ -46,6 +46,7 @@ class BaseAnalysis():
         self.fit_numpoints = 300
         self.column_grid = 5
         self.rows = int(np.ceil((self.n_vars ) / self.column_grid))
+        self.rows = self.rows * node.plots_per_qubit
 
         # TODO What does this do, when the MSS is not connected?
         self.node_result = {}
@@ -75,7 +76,7 @@ class Multiplexed_Analysis(BaseAnalysis):
         if node.name == 'tof':
             tof = analyze_tof(result_dataset, True)
             return
-        super().__init__(result_dataset, data_path)
+        super().__init__(result_dataset, node, data_path)
 
         data_vars_dict = collections.defaultdict(set)
         for var in result_dataset.data_vars:
@@ -93,14 +94,25 @@ class Multiplexed_Analysis(BaseAnalysis):
             ds.attrs['qubit'] = this_qubit
             ds.attrs['node'] = node.name
 
-            this_axis = self.axs[indx // self.column_grid, indx % self.column_grid]
-            # this_axis.set_title(f'{node_name} for {this_qubit}')
+            primary_plot_row = node.plots_per_qubit * (indx // self.column_grid)
+            primary_axis = self.axs[ primary_plot_row, indx % self.column_grid]
+
+
             redis_field = node.redis_field
             kw_args = getattr(node, "analysis_kwargs", dict())
             node_analysis = node.analysis_obj(ds, **kw_args)
             self.qoi = node_analysis.run_fitting()
 
-            node_analysis.plotter(this_axis)
+            if node.plots_per_qubit > 1:
+                list_of_secondary_axes = []
+                for plot_indx in range(1,node.plots_per_qubit):
+                    secondary_plot_row = primary_plot_row + plot_indx
+                    list_of_secondary_axes.append(
+                        self.axs[secondary_plot_row, indx % self.column_grid]
+                    )
+                node_analysis.plotter(primary_axis, secondary_axes=list_of_secondary_axes)
+            else:
+                node_analysis.plotter(primary_axis)
 
             # TODO temporary hack:
             if node.name in ['cz_calibration','cz_dynamic_phase','cz_calibration_ssro', 'cz_optimize_chevron'] and qubit_types[this_qubit] == 'Target':
@@ -117,12 +129,15 @@ class Multiplexed_Analysis(BaseAnalysis):
                 this_element = this_qubit
 
             self.all_results[this_element] = dict(zip(redis_field,self.qoi))
-            handles, labels = this_axis.get_legend_handles_labels()
+            handles, labels = primary_axis.get_legend_handles_labels()
 
             patch = mpatches.Patch(color='red', label=f'{this_qubit}')
             handles.append(patch)
-            this_axis.set(title=None)
-            this_axis.legend(handles=handles, fontsize='small')
+            primary_axis.legend(handles=handles, fontsize='small')
+            if node.plots_per_qubit > 1:
+                for secondary_ax in list_of_secondary_axes:
+                    secondary_ax.legend()
+
             # logger.info(f'Analysis for the {node} of {this_qubit} is done, saved at {self.data_path}')
 
     def get_results(self):

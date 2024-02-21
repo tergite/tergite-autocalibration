@@ -39,44 +39,66 @@ class OptimalROAmplitudeAnalysis():
         y = self.qubit_states
         n_states = len(np.unique(y))
 
-        for indx, ro_amplitude in enumerate(self.amplitudes):
-            lda = LinearDiscriminantAnalysis(solver = "svd", store_covariance=True)
-            IQ_complex = self.S21.isel({self.amplitude_coord: [indx]})
+        lda = LinearDiscriminantAnalysis(solver = "svd", store_covariance=True)
 
+        def IQ(index: int):
+            IQ_complex = self.S21.isel({self.amplitude_coord: [index]})
             I = IQ_complex.real.values.flatten()
             Q = IQ_complex.imag.values.flatten()
-            IQ = np.array([I,Q]).T
+            IQ_samples = np.array([I,Q]).T
+            return IQ_samples
 
-            y_pred = lda.fit(IQ,y).predict(IQ)
+        for index, ro_amplitude in enumerate(self.amplitudes):
+            iq = IQ(index)
+            y_pred = lda.fit(iq, y).predict(iq)
 
-            # cm = confusion_matrix(y,y_pred)
-            # disp = ConfusionMatrixDisplay(confusion_matrix=cm)
-            # disp.plot()
-            # plt.show()
             cm_norm = confusion_matrix(y,y_pred,normalize='true')
             assignment = np.trace(cm_norm)/n_states
-            # print(f'{cm_norm = }')
-            # print(f'{assignment = }')
             self.fidelities.append(assignment)
             self.cms.append(cm_norm)
-
-        # for i, f in enumerate(self.fidelities):
-        #     if i > 1:
-        #         if f < self.fidelities[i-1] and f < self.fidelities[i-2] and f > np.mean(self.fidelities):
-        #             self.optimal_index = i
 
         self.optimal_index = np.argmax(self.fidelities)
         self.optimal_amplitude = self.amplitudes.values[self.optimal_index]
         self.optimal_inv_cm = inv(self.cms[self.optimal_index])
         inv_cm_str = ",".join(str(element) for element in list(self.optimal_inv_cm.flatten()))
 
+        optimal_IQ = IQ(self.optimal_index)
+        optimal_y = lda.fit(optimal_IQ, y).predict(optimal_IQ)
+        true_positives = y == optimal_y
+        tp0 = true_positives[y==0]
+        tp1 = true_positives[y==1]
+        tp2 = true_positives[y==1]
+        IQ0 = optimal_IQ[y == 0] # IQ when sending 0
+        IQ1 = optimal_IQ[y == 1] # IQ when sending 1
+        IQ2 = optimal_IQ[y == 2] # IQ when sending 2
+
+        self.IQ0_tp = IQ0[ tp0] # True Positive when sending 0
+        self.IQ0_fp = IQ0[~tp0]
+        self.IQ1_tp = IQ1[ tp1] # True Positive when sending 1
+        self.IQ1_fp = IQ1[~tp1]
+        self.IQ2_tp = IQ2[ tp2] # True Positive when sending 2
+        self.IQ2_fp = IQ2[~tp2]
+
         return [self.optimal_amplitude,inv_cm_str]
 
-    def plotter(self,ax):
+    def plotter(self, ax, secondary_axes):
         this_qubit = self.dataset.attrs['qubit']
         ax.set_xlabel('RO amplitude')
         ax.set_ylabel('assignment fidelity')
         ax.plot(self.amplitudes, self.fidelities)
-        ax.plot(self.optimal_amplitude, self.fidelities[self.optimal_index], '*')
-
+        ax.plot(self.optimal_amplitude, self.fidelities[self.optimal_index], '*', ms=14)
         ax.grid()
+
+        iq_axis = secondary_axes[0]
+        mark_size = 40
+        iq_axis.scatter(self.IQ0_tp[:, 0], self.IQ0_tp[:, 1], marker=".", s=mark_size, color="red", label='send 0 and read 0')
+        iq_axis.scatter(self.IQ0_fp[:, 0], self.IQ0_fp[:, 1], marker="x", s=mark_size, color="orange",)
+        iq_axis.scatter(self.IQ1_tp[:, 0], self.IQ1_tp[:, 1], marker=".", s=mark_size, color="blue", label='send 1 and read 1')
+        iq_axis.scatter(self.IQ1_fp[:, 0], self.IQ1_fp[:, 1], marker="x", s=mark_size, color="dodgerblue",)
+        iq_axis.scatter(self.IQ2_tp[:, 0], self.IQ2_tp[:, 1], marker=".", s=mark_size, color="green")
+        iq_axis.scatter(self.IQ2_fp[:, 0], self.IQ2_fp[:, 1], marker="x", s=mark_size, color="lime",)
+
+        cm_axis = secondary_axes[1]
+        optimal_confusion_matrix = self.cms[self.optimal_index]
+        disp = ConfusionMatrixDisplay(confusion_matrix=optimal_confusion_matrix)
+        disp.plot(ax=cm_axis)

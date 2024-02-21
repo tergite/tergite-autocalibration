@@ -151,22 +151,7 @@ class RO_amplitude_optimization_gef_Node(Base_Node):
         self.analysis_obj = OptimalROAmplitudeAnalysis
         self.node_dictionary = node_dictionary
         self.node_dictionary['loop_repetitions'] = 1000
-
-    @property
-    def dimensions(self) -> list:
-        '''
-        overwriting the dimensions of the Base_Node
-        '''
-        # assuming that all qubit have the same dimensions on their samplespace
-        first_qubit = self.all_qubits[0]
-
-        ampls = len(self.samplespace['ro_amplitudes'][first_qubit])
-        states = self.qubit_state + 1
-        loops = self.node_dictionary['loop_repetitions']
-        dims_per_loop = states * ampls
-        # the dimensions pattern is different when using Control Flow Loops
-        # than when looping on the schedule
-        return [loops, dims_per_loop]
+        self.plots_per_qubit = 3 #  fidelity plot, IQ shots, confusion matrix
 
 
     @property
@@ -177,14 +162,10 @@ class RO_amplitude_optimization_gef_Node(Base_Node):
         '''
         loops = self.node_dictionary['loop_repetitions']
         cluster_samplespace = {
-            # 'ro_amplitudes': {qubit : np.linspace(0.001,0.121,31) for qubit in self.all_qubits},
             'qubit_states': {
-                qubit: np.tile(np.array([0,1], dtype=np.int16), loops)  for qubit in self.all_qubits
+                qubit: np.tile(np.array([0,1,2], dtype=np.int16), loops)  for qubit in self.all_qubits
             },
+            'ro_amplitudes': {qubit: np.linspace(0.001, 0.01, 11) for qubit in self.all_qubits},
 
-            # 'ro_amplitudes': {qubit : np.array([0.001, 0.002, 0.003, 0.004, 0.005, 0.006]) for qubit in self.all_qubits}
-            # 'ro_amplitudes': {qubit : np.linspace(0.001, 0.05, 21) for qubit in self.all_qubits},
-            # 'ro_amplitudes': {qubit : np.array([0.003, 0.004,  0.005]) for qubit in self.all_qubits},
-            'ro_amplitudes': {qubit : np.array([0.001, 0.006]) for qubit in self.all_qubits},
         }
         return cluster_samplespace

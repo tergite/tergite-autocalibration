@@ -6,6 +6,7 @@ class Base_Node:
         self.backup = False
         self.type = 'cluster_simple_sweep'
         self.qubit_state = 0 # can be 0 or 1 or 2
+        self.plots_per_qubit = 1 # can be 0 or 1 or 2
 
     @property
     def samplespace(self) -> dict:

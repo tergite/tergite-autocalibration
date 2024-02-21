@@ -10,19 +10,19 @@ import analysis.optimum_ro_amplitude_analysis as roa
 importlib.reload(rnb)
 
 
-ds = xr.open_dataset('data_directory/20240216/20240216-172026-453-f2388e-ro_amplitude_optimization_gef/dataset.hdf5')
+ds = xr.open_dataset('data_directory/20240220/20240220-171349-867-88367b-ro_amplitude_optimization_gef/dataset.hdf5')
 # print(f'{ ds.yq21.attrs = }')
 ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
 #---
 ro = roa.OptimalROAmplitudeAnalysis
 #---
 qubit = 'q14'
-yq = ds[f'y{qubit}'].isel({f'ro_amplitudes{qubit}': [3]})
+yq = ds[f'y{qubit}'].isel({f'ro_amplitudes{qubit}': [0]})
 
 I = yq.real.values.flatten()
 Q = yq.imag.values.flatten()
 
-shots = 1000
+shots = 10
 
 I0 = yq.real[:shots]
 Q0 = yq.imag[:shots]
@@ -32,9 +32,9 @@ I2 = yq.real[2*shots:]
 Q2 = yq.imag[2*shots:]
 
 # y = ds.qubit_statesq13.values
-y = np.tile(np.array([0,1,2], dtype=np.int16), 1000)
+y = np.tile(np.array([0,1], dtype=np.int16), shots)
 # y = np.repeat(np.array([0,1,2], dtype=np.int16), 1000)
-# y = np.random.randint(2, size=2000)
+# y = np.random.randint(2, size=3000)
 print(f'{ sum(y) = }')
 
 IQ = np.array([I, Q]).T

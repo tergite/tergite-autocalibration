@@ -69,11 +69,23 @@ def configure_dataset(
 
         partial_ds = xarray.Dataset(coords=coords_dict)
 
+        data_values = raw_ds[key].values
+
+        if node.name == 'ro_amplitude_optimization_gef':
+            loops = node.node_dictionary['loop_repetitions']
+            for key in coords_dict.keys():
+                if measured_qubit in key and 'ro_amplitudes' in key:
+                    ampls = coords_dict[key][1]
+                elif measured_qubit in key and 'qubit_states' in key:
+                    states = coords_dict[key][1]
+            data_values = reshufle_loop_dataset(data_values, ampls, states, loops)
+
+
         # TODO this is not safe:
         # This assumes that the inner settable variable is placed
         # at the first position in the samplespace
         reshaping = reversed(node.dimensions)
-        data_values = raw_ds[key].values.reshape(*reshaping)
+        data_values = data_values.reshape(*reshaping)
         data_values = np.transpose(data_values)
         attributes = {'qubit': measured_qubit, 'long_name': f'y{measured_qubit}', 'units': 'NA'}
         qubit_state = ''
@@ -92,6 +104,25 @@ def to_real_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
     return ds
 
 
+def reshufle_loop_dataset(
+    initial_array: np.ndarray, ampls, states, loops: int
+    ):
+    initial_shape = initial_array.shape
+    initial_array = initial_array.flatten()
+    states = np.unique(states)
+    reshuffled_array = np.empty_like(initial_array)
+    n_states = len(states)
+    for i, el in enumerate(initial_array):
+        measurements_per_loop = len(ampls) * n_states
+        amplitude_group = (i % measurements_per_loop) // n_states
+        new_index_group = amplitude_group * loops * n_states
+        loop_number = i // measurements_per_loop
+        new_index = new_index_group + loop_number * n_states + i % n_states
+        reshuffled_array[new_index] = el
+    reshuffled_array.reshape(*initial_shape)
+    return reshuffled_array
+
+
 def handle_ro_freq_optimization(complex_dataset: xarray.Dataset, states: list[int]) -> xarray.Dataset:
     new_ds = xarray.Dataset(coords=complex_dataset.coords, attrs=complex_dataset.attrs)
     new_ds = new_ds.expand_dims(dim={'qubit_state': states})
@@ -106,6 +137,7 @@ def handle_ro_freq_optimization(complex_dataset: xarray.Dataset, states: list[in
                 values.append(complex_dataset[var].values)
         new_ds[f'y{this_qubit}'] = (('qubit_state', coord), np.vstack(values), attributes)
     return new_ds
+
 
 def create_node_data_path(node):
     measurement_date = datetime.now()

@@ -58,7 +58,6 @@ class RO_amplitude_optimization(Measurement):
 
         schedule = Schedule("ro_amplitude_optimization", repetitions=1)
 
-        print(f'{ loop_repetitions = }')
 
         #Initialize ClockResource with the first frequency value
         ro_str = 'ro_opt'
@@ -103,13 +102,11 @@ class RO_amplitude_optimization(Measurement):
 
             # The intermediate for-loop iterates over all ro_amplitudes:
             for ampl_indx, ro_amplitude in enumerate(ro_amplitude_values):
-                print(f'{ ro_amplitude = }')
 
                 # The inner for-loop iterates over all qubit levels:
                 for level_index, state_level in enumerate(qubit_levels):
 
                     this_index = ampl_indx * number_of_levels + level_index
-                    print(f'{ this_index = }')
 
                     if state_level == 0:
                         prep = shot.add(IdlePulse(mw_pulse_durations[this_qubit]))
