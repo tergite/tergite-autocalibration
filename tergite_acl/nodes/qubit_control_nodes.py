@@ -18,22 +18,7 @@ from tergite_acl.analysis.n_rabi_analysis import NRabiAnalysis
 
 from tergite_acl.nodes.node_utils import qubit_samples
 
-from tergite_acl.config_files.VNA_LOKIB_values import VNA_qubit_frequencies, VNA_f12_frequencies
-
 redis_connection = redis.Redis(decode_responses=True)
-
-def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
-    qub_spec_samples = 41
-    sweep_range = 3.0e6
-    if transition == '01':
-        VNA_frequency = VNA_qubit_frequencies[qubit]
-    elif transition == '12':
-        VNA_frequency = VNA_f12_frequencies[qubit]
-    else:
-        VNA_frequency = VNA_value
-    min_freq = VNA_frequency - sweep_range / 2
-    max_freq = VNA_frequency + sweep_range / 2
-    return np.linspace(min_freq, max_freq, qub_spec_samples)
 
 
 class Qubit_01_Spectroscopy_Pulsed_Node(Base_Node):
