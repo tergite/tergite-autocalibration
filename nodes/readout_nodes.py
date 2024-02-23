@@ -140,7 +140,42 @@ class RO_frequency_optimization_gef_Node(Base_Node):
         }
         return cluster_samplespace
 
-class RO_amplitude_optimization_gef_Node(Base_Node):
+
+class RO_amplitude_two_state_optimization_Node(Base_Node):
+    '''
+    TODO the two and three state discrimination is quite similar, they should be merged
+    '''
+    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
+        self.name = name
+        self.all_qubits = all_qubits
+        self.redis_field = ['ro_ampl_opt','inv_cm_opt']
+        self.qubit_state = 1
+        self.measurement_obj = RO_amplitude_optimization
+        self.analysis_obj = OptimalROAmplitudeAnalysis
+        self.node_dictionary = node_dictionary
+        self.node_dictionary['loop_repetitions'] = 1000
+        self.plots_per_qubit = 3 #  fidelity plot, IQ shots, confusion matrix
+
+
+    @property
+    def samplespace(self):
+        '''
+        we write down the 'qubit_states' here to make easier the
+        configuration of the raw dataset
+        '''
+        loops = self.node_dictionary['loop_repetitions']
+        cluster_samplespace = {
+            'qubit_states': {
+                qubit: np.tile(np.array([0,1], dtype=np.int16), loops)  for qubit in self.all_qubits
+            },
+            'ro_amplitudes': {qubit: np.linspace(0.001, 0.01, 11) for qubit in self.all_qubits},
+
+        }
+        return cluster_samplespace
+
+
+class RO_amplitude_three_state_optimization_Node(Base_Node):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.name = name

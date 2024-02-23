@@ -15,9 +15,14 @@ cluster_simple_sweep:
    The schedule is compiled only once.
    At the moment, most of nodes are of this type.
 spi_and_cluster_simple_sweep:
-   sweep on a predefined samplespace on cluster-controlled parameters,
-   and spi-controlled parameters.
+   sweep on a predefined samplespace on both
+   cluster-controlled and spi-controlled parameters.
    The schedule is compiled only once. e.g. coupler spectroscopy
+parameterized_simple_sweep:
+   sweep under an external parameter
+   The schedule is compiled only once. e.g. T1
+   In T1 the external parameter is a nothing
+   but still we achieve measurement repetition
 TODO optimized_sweep:
     sweep under an external parameter
 parameterized_sweep:
@@ -40,6 +45,33 @@ def monitor_node_calibration(node, data_path, lab_ic):
         logger.info('measurement completed')
         measurement_result = post_process(result_dataset, node, data_path=data_path)
         logger.info('analysis completed')
+
+    elif node.type == 'parameterized_simple_sweep':
+        compiled_schedule = precompile(node)
+        external_parameter_values = node.node_externals
+        pre_measurement_operation = node.pre_measurement_operation
+        operations_args = node.operations_args
+
+        print('Performing parameterized simple sweep')
+        ds = xarray.Dataset()
+
+        for node_parameter in external_parameter_values:
+            node.external_parameter_value = node_parameter
+            pre_measurement_operation(*operations_args, external=node_parameter)
+            result_dataset = measure_node(
+                node,
+                compiled_schedule,
+                lab_ic,
+                data_path,
+                cluster_status=ClusterStatus.real,
+                measurement=(node_parameter, len(external_parameter_values))
+            )
+            ds = xarray.merge([ds, result_dataset])
+
+        logger.info('measurement completed')
+        measurement_result = post_process(ds, node, data_path=data_path)
+        logger.info('analysis completed')
+
 
     elif node.type == 'parameterized_sweep':
         print('Performing parameterized sweep')

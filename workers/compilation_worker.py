@@ -156,7 +156,7 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
             # print(f"{key} isn't one of the static parameters of {node_class}. \n We will ignore this parameter.")
 
 
-    if hasattr(node, 'node_externals'):
+    if node.type == 'parameterized_sweep':
         external_parameters = {node.external_parameter_name: node.external_parameter_value}
     else:
         external_parameters = {}

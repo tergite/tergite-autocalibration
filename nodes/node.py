@@ -1,3 +1,5 @@
+from datetime import time
+from time import sleep
 import numpy as np
 import redis
 from calibration_schedules.T1 import T1,T2, T2Echo
@@ -40,7 +42,8 @@ from nodes.qubit_control_nodes import (
 )
 from nodes.readout_nodes import (
     Punchout_Node,
-    RO_amplitude_optimization_gef_Node,
+    RO_amplitude_three_state_optimization_Node,
+    RO_amplitude_two_state_optimization_Node,
     RO_frequency_optimization_Node,
     RO_frequency_optimization_gef_Node,
     Resonator_Spectroscopy_1_Node,
@@ -91,7 +94,7 @@ class NodeFactory:
             'cz_dynamic_phase': CZ_Dynamic_Phase_Node,
             'ro_frequency_optimization': RO_frequency_optimization_Node,
             'ro_frequency_optimization_gef': RO_frequency_optimization_gef_Node,
-            'ro_amplitude_optimization_gef': RO_amplitude_optimization_gef_Node,
+            'ro_amplitude_optimization_gef': RO_amplitude_three_state_optimization_Node,
             #'ro_frequency_optimization_gef': RO_frequency_optimization_gef_Node,
             'state_discrimination': State_Discrimination_Node,
             'randomized_benchmarking': Randomized_Benchmarking_Node,
@@ -125,14 +128,33 @@ class State_Discrimination_Node(Base_Node):
 class T1_Node(Base_Node):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
+        self.all_qubits = all_qubits
         self.redis_field = ['t1_time']
         self.measurement_obj = T1
         self.analysis_obj = T1Analysis
+        self.backup = False
+        self.type = 'parameterized_simple_sweep'
+
+        self.node_externals = range(2)
+        self.external_parameter_name = 'repeat'
+        self.external_parameter_value = 0
+
+        self.sleep_time = 3
+        self.operations_args = []
+
+    def pre_measurement_operation(self, external=1):
+        if external > 0:
+            print(f'sleeping for {self.sleep_time} seconds')
+            sleep(self.sleep_time)
+
+    @property
+    def dimensions(self):
+        return (len(self.samplespace['delays'][self.all_qubits[0]]), 1)
 
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'delays': {qubit : 8e-9 +  np.arange(0,300e-6,6e-6) for qubit in self.all_qubits}
+            'delays': {qubit: 8e-9 + np.arange(0, 300e-6, 6e-6) for qubit in self.all_qubits}
         }
         return cluster_samplespace
 
@@ -155,6 +177,9 @@ class Randomized_Benchmarking_Node(Base_Node):
         self.external_parameter_value = 0
         ####################
 
+    @property
+    def dimensions(self):
+        return (len(self.samplespace['number_of_cliffords'][self.all_qubits[0]]), 1)
 
     @property
     def samplespace(self):
@@ -173,7 +198,7 @@ class Randomized_Benchmarking_Node(Base_Node):
             'number_of_cliffords': {
                 # qubit: all_numbers for qubit in self.all_qubits
                 # qubit: np.array([2, 16, 128, 256,512, 768, 1024, 0, 1]) for qubit in self.all_qubits
-                qubit: np.array([2, 16, 128, 256, 0, 1]) for qubit in self.all_qubits
+                qubit: np.array([2, 16, 128, 256, 512, 768, 1024, 0, 1]) for qubit in self.all_qubits
             },
         }
         return cluster_samplespace

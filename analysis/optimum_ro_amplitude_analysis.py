@@ -32,25 +32,27 @@ class OptimalROAmplitudeAnalysis():
         self.amplitudes = dataset.coords[self.amplitude_coord]
         self.fit_results = {}
 
-    def run_fitting(self):
+
+    def IQ(self, index: int):
+        IQ_complex = self.S21.isel({self.amplitude_coord: [index]})
+        I = IQ_complex.real.values.flatten()
+        Q = IQ_complex.imag.values.flatten()
+        IQ_samples = np.array([I,Q]).T
+        return IQ_samples
+
+
+    def run_initial_fitting(self):
         self.fidelities = []
         self.cms = []
 
         y = self.qubit_states
         n_states = len(np.unique(y))
 
-        lda = LinearDiscriminantAnalysis(solver = "svd", store_covariance=True)
-
-        def IQ(index: int):
-            IQ_complex = self.S21.isel({self.amplitude_coord: [index]})
-            I = IQ_complex.real.values.flatten()
-            Q = IQ_complex.imag.values.flatten()
-            IQ_samples = np.array([I,Q]).T
-            return IQ_samples
+        self.lda = LinearDiscriminantAnalysis(solver = "svd", store_covariance=True)
 
         for index, ro_amplitude in enumerate(self.amplitudes):
-            iq = IQ(index)
-            y_pred = lda.fit(iq, y).predict(iq)
+            iq = self.IQ(index)
+            y_pred = self.lda.fit(iq, y).predict(iq)
 
             cm_norm = confusion_matrix(y,y_pred,normalize='true')
             assignment = np.trace(cm_norm)/n_states
@@ -60,10 +62,94 @@ class OptimalROAmplitudeAnalysis():
         self.optimal_index = np.argmax(self.fidelities)
         self.optimal_amplitude = self.amplitudes.values[self.optimal_index]
         self.optimal_inv_cm = inv(self.cms[self.optimal_index])
+
+        return
+
+    def primary_plotter(self, ax):
+        this_qubit = self.dataset.attrs['qubit']
+        ax.set_xlabel('RO amplitude')
+        ax.set_ylabel('assignment fidelity')
+        ax.plot(self.amplitudes, self.fidelities)
+        ax.plot(self.optimal_amplitude, self.fidelities[self.optimal_index], '*', ms=14)
+        ax.grid()
+
+
+
+class OptimalRO_Two_state_AmplitudeAnalysis(OptimalROAmplitudeAnalysis):
+    def __init__(self, dataset: xr.Dataset):
+
+        self.dataset = dataset
+        super().__init__(self.dataset)
+
+    def run_fitting(self):
+        self.run_initial_fitting()
         inv_cm_str = ",".join(str(element) for element in list(self.optimal_inv_cm.flatten()))
 
-        optimal_IQ = IQ(self.optimal_index)
-        optimal_y = lda.fit(optimal_IQ, y).predict(optimal_IQ)
+        y = self.qubit_states
+
+        optimal_IQ = self.IQ(self.optimal_index)
+        optimal_y = self.lda.fit(optimal_IQ, y).predict(optimal_IQ)
+
+        # determining the discriminant line from the canonical form Ax + By + intercept = 0
+        A = self.lda.coef_[0][0]
+        B = self.lda.coef_[0][1]
+        intercept = self.lda.intercept_
+        self.lamda = - A / B
+        theta = np.rad2deg(np.arctan(self.lamda))
+        threshold = np.abs(intercept) / np.sqrt(A**2 + B**2)
+
+        self.y_intecept = + intercept / B
+
+        self.x_space = np.linspace(optimal_IQ[:,0].min(), optimal_IQ[:,0].max(), 100)
+        self.y_limits = (optimal_IQ[:,1].min(), optimal_IQ[:,1].max())
+
+        true_positives = y == optimal_y
+        tp0 = true_positives[y==0]
+        tp1 = true_positives[y==1]
+        IQ0 = optimal_IQ[y == 0] # IQ when sending 0
+        IQ1 = optimal_IQ[y == 1] # IQ when sending 1
+
+        self.IQ0_tp = IQ0[ tp0] # True Positive when sending 0
+        self.IQ0_fp = IQ0[~tp0]
+        self.IQ1_tp = IQ1[ tp1] # True Positive when sending 1
+        self.IQ1_fp = IQ1[~tp1]
+        return [self.optimal_amplitude, inv_cm_str, theta, threshold]
+
+    def plotter(self, ax, secondary_axes):
+
+        self.primary_plotter(ax)
+
+        iq_axis = secondary_axes[0]
+        mark_size = 40
+        iq_axis.plot(self.x_space, self.lamda * self.x_space - self.y_intecept, lw=2)
+        iq_axis.scatter(self.IQ0_tp[:, 0], self.IQ0_tp[:, 1], marker=".", s=mark_size, color="red", label='send 0 and read 0')
+        iq_axis.scatter(self.IQ0_fp[:, 0], self.IQ0_fp[:, 1], marker="x", s=mark_size, color="orange",)
+        iq_axis.scatter(self.IQ1_tp[:, 0], self.IQ1_tp[:, 1], marker=".", s=mark_size, color="blue", label='send 1 and read 1')
+        iq_axis.scatter(self.IQ1_fp[:, 0], self.IQ1_fp[:, 1], marker="x", s=mark_size, color="dodgerblue",)
+        iq_axis.set_ylim(*self.y_limits)
+
+        cm_axis = secondary_axes[1]
+        optimal_confusion_matrix = self.cms[self.optimal_index]
+        disp = ConfusionMatrixDisplay(confusion_matrix=optimal_confusion_matrix)
+        disp.plot(ax=cm_axis)
+
+
+
+class OptimalRO_Three_state_AmplitudeAnalysis(OptimalROAmplitudeAnalysis):
+    def __init__(self, dataset: xr.Dataset):
+
+        self.dataset = dataset
+        super().__init__(self.dataset)
+
+    def run_fitting(self):
+        self.run_initial_fitting()
+        inv_cm_str = ",".join(str(element) for element in list(self.optimal_inv_cm.flatten()))
+
+        y = self.qubit_states
+
+        optimal_IQ = self.IQ(self.optimal_index)
+        optimal_y = self.lda.fit(optimal_IQ, y).predict(optimal_IQ)
+
         true_positives = y == optimal_y
         tp0 = true_positives[y==0]
         tp1 = true_positives[y==1]
@@ -78,16 +164,11 @@ class OptimalROAmplitudeAnalysis():
         self.IQ1_fp = IQ1[~tp1]
         self.IQ2_tp = IQ2[ tp2] # True Positive when sending 2
         self.IQ2_fp = IQ2[~tp2]
-
-        return [self.optimal_amplitude,inv_cm_str]
+        return [self.optimal_amplitude, inv_cm_str]
 
     def plotter(self, ax, secondary_axes):
-        this_qubit = self.dataset.attrs['qubit']
-        ax.set_xlabel('RO amplitude')
-        ax.set_ylabel('assignment fidelity')
-        ax.plot(self.amplitudes, self.fidelities)
-        ax.plot(self.optimal_amplitude, self.fidelities[self.optimal_index], '*', ms=14)
-        ax.grid()
+
+        self.primary_plotter(ax)
 
         iq_axis = secondary_axes[0]
         mark_size = 40

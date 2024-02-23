@@ -88,7 +88,7 @@ class QubitSpectroscopyMultidim():
 
         frequencies = self.frequencies
 
-        self.fit_freqs = np.linspace( frequencies[0], frequencies[-1], 500) # x-values for plotting
+        self.fit_freqs = np.linspace(frequencies[0], frequencies[-1], 500) # x-values for plotting
 
         self.spec_ampl = 0
         self.qubit_ampl = 0

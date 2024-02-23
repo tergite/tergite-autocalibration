@@ -24,13 +24,19 @@ def measure_node(
     compiled_schedule: CompiledSchedule,
     lab_ic,
     data_path: pathlib.Path,
-    cluster_status=ClusterStatus.real
+    cluster_status = ClusterStatus.real,
+    measurement = (1,1)
     ):
 
     schedule_duration = compiled_schedule.get_schedule_duration()
     if 'loop_repetitions' in node.node_dictionary:
         schedule_duration *= node.node_dictionary['loop_repetitions']
-    print(f'schedule_duration = {Fore.CYAN}{Style.BRIGHT}{schedule_duration:.2f} sec{Style.RESET_ALL}')
+
+    measurement_message = ''
+    if measurement[1] > 1:
+        measurement_message = f'. Measurement {measurement[0]+1} of {measurement[1]}'
+    message =  f'{schedule_duration:.2f} sec' + measurement_message
+    print(f'schedule_duration = {Fore.CYAN}{Style.BRIGHT}{message}{Style.RESET_ALL}')
 
     raw_dataset = execute_schedule(compiled_schedule, lab_ic, schedule_duration)
 
