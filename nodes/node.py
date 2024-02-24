@@ -62,8 +62,6 @@ def resonator_samples(qubit: str) -> np.ndarray:
     return np.linspace(min_freq, max_freq, res_spec_samples)
 
 
-
-
 class NodeFactory:
     def __init__(self):
         self.node_implementations = {
@@ -94,7 +92,8 @@ class NodeFactory:
             'cz_dynamic_phase': CZ_Dynamic_Phase_Node,
             'ro_frequency_optimization': RO_frequency_optimization_Node,
             'ro_frequency_optimization_gef': RO_frequency_optimization_gef_Node,
-            'ro_amplitude_optimization_gef': RO_amplitude_three_state_optimization_Node,
+            'RO_amplitude_three_state_optimization_Node': RO_amplitude_three_state_optimization_Node,
+            'RO_amplitude_two_state_optimization_Node': RO_amplitude_two_state_optimization_Node,
             #'ro_frequency_optimization_gef': RO_frequency_optimization_gef_Node,
             'state_discrimination': State_Discrimination_Node,
             'randomized_benchmarking': Randomized_Benchmarking_Node,

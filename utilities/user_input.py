@@ -18,9 +18,10 @@ node reference
   rabi_oscillations_12
   ramsey_correction_12
   resonator_spectroscopy_2
-  ro_frequency_optimization
-  ro_frequency_optimization_gef
-  ro_amplitude_optimization_gef
+  ro_frequency_two_state_optimization
+  ro_frequency_three_state_optimization
+  ro_amplitude_two_state_optimization
+  ro_amplitude_three_state_optimization
   coupler_spectroscopy
   coupler_resonator_spectroscopy
   motzoi_parameter

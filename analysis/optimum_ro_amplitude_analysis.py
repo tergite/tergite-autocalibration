@@ -113,7 +113,7 @@ class OptimalRO_Two_state_AmplitudeAnalysis(OptimalROAmplitudeAnalysis):
         self.IQ0_fp = IQ0[~tp0]
         self.IQ1_tp = IQ1[ tp1] # True Positive when sending 1
         self.IQ1_fp = IQ1[~tp1]
-        return [self.optimal_amplitude, inv_cm_str, theta, threshold]
+        return [self.optimal_amplitude, theta, threshold]
 
     def plotter(self, ax, secondary_axes):
 

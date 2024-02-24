@@ -107,7 +107,7 @@ class Punchout_Node(Base_Node):
 class RO_frequency_optimization_Node(Base_Node):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['ro_freq_opt']
+        self.redis_field = ['ro_freq_2st_opt']
         self.qubit_state = 0
         self.measurement_obj = RO_frequency_optimization
         self.analysis_obj = OptimalROFrequencyAnalysis
@@ -126,7 +126,7 @@ class RO_frequency_optimization_gef_Node(Base_Node):
         super().__init__(name, all_qubits, **node_dictionary)
         self.name = name
         self.all_qubits = all_qubits
-        self.redis_field = ['ro_freq_opt']
+        self.redis_field = ['ro_freq_3st_opt']
         self.qubit_state = 2
         self.measurement_obj = RO_frequency_optimization
         self.analysis_obj = OptimalRO_012_FrequencyAnalysis
@@ -149,7 +149,7 @@ class RO_amplitude_two_state_optimization_Node(Base_Node):
         super().__init__(name, all_qubits, **node_dictionary)
         self.name = name
         self.all_qubits = all_qubits
-        self.redis_field = ['ro_ampl_opt','inv_cm_opt']
+        self.redis_field = ['ro_ampl_2st_opt','rotation','threshold']
         self.qubit_state = 1
         self.measurement_obj = RO_amplitude_optimization
         self.analysis_obj = OptimalROAmplitudeAnalysis
