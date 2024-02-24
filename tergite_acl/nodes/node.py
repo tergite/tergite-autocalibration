@@ -43,6 +43,14 @@ from tergite_acl.nodes.readout_nodes import (
 
 redis_connection = redis.Redis(decode_responses=True)
 
+def resonator_samples(qubit: str) -> np.ndarray:
+    res_spec_samples = 101
+    sweep_range =  2.0e6
+    VNA_frequency = VNA_resonator_frequencies[qubit]
+    min_freq = VNA_frequency - sweep_range / 2 -0.5e6
+    max_freq = VNA_frequency + sweep_range / 2
+    return np.linspace(min_freq, max_freq, res_spec_samples)
+
 
 def resonator_samples(qubit: str) -> np.ndarray:
     res_spec_samples = 101
