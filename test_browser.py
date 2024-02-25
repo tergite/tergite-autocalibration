@@ -1,25 +1,34 @@
 import sys
 from PyQt5.QtCore import QSize
-from PyQt5.QtWidgets import QApplication, QDesktopWidget, QWidget, QVBoxLayout, QHBoxLayout, QListWidget, QLabel
+from PyQt5.QtWidgets import QApplication, QDesktopWidget, QWidget, QVBoxLayout, QHBoxLayout, QListWidget, QLabel, QPushButton
 from PyQt5.QtGui import QImageReader, QPixmap
 import os
 
 
 class ImageBrowser(QWidget):
-    def __init__(self):
+    def __init__(self, folder_path):
         super().__init__()
 
+        self.folder_path = folder_path
         self.initUI()
 
     def initUI(self):
-        # Get the list of sub-folders
-        subfolders = ['f1', 'f2']  # Replace with your actual sub-folders
+        # Get the list of sub-folders sorted by creation time
+        subfolders = self.get_sorted_subfolders()
 
         # Create main layout
         layout = QHBoxLayout(self)
 
+        # Create sub-layout for sub-folders list and refresh button
+        sub_layout = QVBoxLayout()
+
         # Set fixed width as a fraction of the screen width
         screen_width = QDesktopWidget().screenGeometry().width()
+
+        # Create refresh button
+        refresh_button = QPushButton('Refresh')
+        refresh_button.clicked.connect(self.refresh_subfolders)
+        sub_layout.addWidget(refresh_button)
 
         # Create list widget for sub-folders
         self.list_widget = QListWidget()
@@ -28,7 +37,10 @@ class ImageBrowser(QWidget):
 
         list_widget_width = int(screen_width * 0.1)  # Adjust the fraction as needed
         self.list_widget.setFixedWidth(list_widget_width)  # Set fixed width for the list widget
-        layout.addWidget(self.list_widget)
+        sub_layout.addWidget(self.list_widget)
+
+        # Add the sub-layout to the main layout
+        layout.addLayout(sub_layout)
 
         # Create label to display image
         self.image_label = QLabel()
@@ -36,8 +48,22 @@ class ImageBrowser(QWidget):
         image_label_width = int(screen_width * 0.8)  # Adjust the fraction as needed
         self.image_label.setFixedWidth(image_label_width)  # Set fixed width for the image label
 
+
         self.setLayout(layout)
         self.setWindowTitle('Image Browser')
+
+    def refresh_subfolders(self):
+        # Update the list of sub-folders and refresh the list widget
+        self.subfolders = self.get_sorted_subfolders()
+        self.list_widget.clear()
+        self.list_widget.addItems(self.subfolders)
+
+    def get_sorted_subfolders(self):
+        # Get the list of sub-folders sorted by creation time
+        return sorted(
+            [d for d in os.listdir(self.folder_path) if os.path.isdir(os.path.join(self.folder_path, d))],
+            key=lambda f: os.path.getctime(os.path.join(self.folder_path, f))
+        )
 
     def on_folder_selected(self, item):
         # Get the selected sub-folder
@@ -74,7 +100,12 @@ class ImageBrowser(QWidget):
         self.image_label.show()
 
 if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print("Usage: python script.py /path/to/subfolders")
+        sys.exit(1)
+    folder_path = sys.argv[1]
+
     app = QApplication(sys.argv)
-    browser = ImageBrowser()
+    browser = ImageBrowser(folder_path)
     browser.show()
     sys.exit(app.exec_())
