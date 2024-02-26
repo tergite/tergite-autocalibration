@@ -36,7 +36,7 @@ class CalibrationSupervisor():
         self.couplers = user_requested_calibration['couplers']
         self.target_node = user_requested_calibration['target_node']
         # Settings
-        self.transmon_configuration = toml.load('./config_files/device_config.toml')
+        self.transmon_configuration = toml.load('/home/calibration/repos/tergite-autocalibration-lite/config_files/device_config.toml')
         self.cluster_status = ClusterStatus.real
         self.topo_order = filtered_topological_order(self.target_node)
         self.lab_ic = self.create_lab_ic()

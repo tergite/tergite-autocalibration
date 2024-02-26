@@ -7,6 +7,9 @@ import xarray as xr
 from scipy import signal
 import lmfit
 
+from analysis.base import BaseAnalysis
+
+
 # Lorentzian function that is fit to qubit spectroscopy peaks
 def loretzian_function( x: float, x0: float, width: float, A: float, c: float,) -> float:
     return A * width**2 / ( (x-x0)**2 + width**2 ) + c
@@ -60,12 +63,13 @@ class LorentzianModel(lmfit.model.Model):
         params = self.make_params()
         return lmfit.models.update_param_vals(params, self.prefix, **kws)
 
-class QubitSpectroscopyMultidim():
+class QubitSpectroscopyMultidim(BaseAnalysis):
     """
     Analysis that fits a Lorentzian function to qubit spectroscopy data.
     The resulting fit can be analyzed to determine if a peak was found or not.
     """
-    def  __init__(self,dataset: xr.Dataset):
+    def  __init__(self, dataset: xr.Dataset):
+        super().__init__()
         data_var = list(dataset.data_vars.keys())[0]
         self.qubit = dataset[data_var].attrs['qubit']
         S21 = dataset[data_var].values
