@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtWidgets import QApplication, QDesktopWidget, QWidget, QVBoxLayout, QHBoxLayout, QListWidget, QLabel, QPushButton
 from PyQt5.QtGui import QImageReader, QPixmap
 import os
@@ -71,7 +71,7 @@ class ImageBrowser(QWidget):
 
         # Display the image from the selected sub-folder
         # image_path = f'./{selected_folder}/coupler.png'  # Replace with your actual image filename
-        folder_path = os.path.join(os.getcwd(), selected_folder)  # Assuming the sub-folders are in the current working directory
+        folder_path = os.path.join(os.getcwd(), self.folder_path, selected_folder)  # Assuming the sub-folders are in the current working directory
 
         files = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
 
@@ -88,14 +88,33 @@ class ImageBrowser(QWidget):
         self.display_image(image_path)
 
     def display_image(self, image_path):
+
         # Check if the image file exists
         if QImageReader(image_path).size() == QSize(0, 0):
             self.image_label.setText('Image not found')
             return
 
+        # image_reader = QImageReader(image_path)
+
         # Display the image in the label
-        pixmap = QPixmap(image_path)
-        self.image_label.setPixmap(pixmap)
+        image = QPixmap(image_path)
+
+        # Get the dimensions of the image_label
+        label_width = self.image_label.width()
+        label_height = self.image_label.height()
+        # self.image_label.setFixedSize(label_width, label_height)
+        # self.image_label.setFixedSize(image_reader.size().width(), image_reader.size().height())
+
+
+        # Scale the image while preserving aspect ratio
+        scaled_image = image.scaled(
+            label_width, label_height, transformMode=Qt.SmoothTransformation
+            # label_width, label_height, aspectRatioMode=Qt.KeepAspectRatio, transformMode=Qt.SmoothTransformation
+        )
+
+        # Display the scaled image in the label
+        self.image_label.setPixmap(scaled_image)
+
         self.image_label.setScaledContents(True)
         self.image_label.show()
 

@@ -34,9 +34,18 @@ class ExtendedClocksFrequencies(InstrumentChannel):
         self.readout_opt = ManualParameter(
             name="readout_opt",
             instrument=self,
-            label="Optimal Readout frequency for discriminating |0>,|1>, |2>",
+            label="Optimal Readout frequency for discriminating |0>,|1>",
             unit="Hz",
             initial_value=kwargs.get("readout_opt", math.nan),
+            vals=Numbers(min_value=0, max_value=1e12, allow_nan=True),
+        )
+
+        self.readout_3state_opt = ManualParameter(
+            name="readout_3state_opt",
+            instrument=self,
+            label="Optimal Readout frequency for discriminating |0>,|1>, |2>",
+            unit="Hz",
+            initial_value=kwargs.get("readout_3state_opt", math.nan),
             vals=Numbers(min_value=0, max_value=1e12, allow_nan=True),
         )
 
@@ -240,7 +249,8 @@ class ExtendedTransmon(BasicTransmonElement):
                 f'{self.name}.ro': self.clock_freqs.readout(),
                 f'{self.name}.ro1': self.extended_clock_freqs.readout_1(),
                 f'{self.name}.ro2': self.extended_clock_freqs.readout_2(),
-                f'{self.name}.ro_opt': self.extended_clock_freqs.readout_opt()
+                f'{self.name}.ro_2st_opt': self.extended_clock_freqs.readout_opt(),
+                f'{self.name}.ro_3st_opt': self.extended_clock_freqs.readout_3state_opt()
             },
             'edges': {},
         }

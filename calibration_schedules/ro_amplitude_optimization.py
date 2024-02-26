@@ -16,6 +16,11 @@ class RO_amplitude_optimization(Measurement):
 
         self.transmons = transmons
         self.qubit_state = qubit_state
+        if self.qubit_state == 1:
+            ro_config = 'readout_opt'
+        elif self.qubit_state == 2:
+            ro_config = 'readout_3state_opt'
+
         self.static_kwargs = {
             'qubits': self.qubits,
 
@@ -28,7 +33,7 @@ class RO_amplitude_optimization(Measurement):
             'mw_frequencies_12': self.attributes_dictionary('f12'),
             'mw_ef_amp180': self.attributes_dictionary('ef_amp180'),
 
-            'ro_opt_frequency': self.attributes_dictionary('readout_opt'),
+            'ro_opt_frequency': self.attributes_dictionary(ro_config),
             'pulse_durations': self.attributes_dictionary('pulse_duration'),
             'acquisition_delays': self.attributes_dictionary('acq_delay'),
             'integration_times': self.attributes_dictionary('integration_time'),
@@ -60,7 +65,10 @@ class RO_amplitude_optimization(Measurement):
 
 
         #Initialize ClockResource with the first frequency value
-        ro_str = 'ro_opt'
+        # TODO the qubit_state attr needs reworking
+        ro_str = 'ro_2st_opt'
+        if self.qubit_state == 2:
+            ro_str = 'ro_3st_opt'
 
         for this_qubit, ro_array_val in ro_opt_frequency.items():
             this_ro_clock = f'{this_qubit}.' + ro_str
@@ -87,7 +95,7 @@ class RO_amplitude_optimization(Measurement):
 
         for acq_cha, (this_qubit, ro_amplitude_values) in enumerate(ro_amplitudes.items()):
 
-            this_ro_clock = this_qubit + '.ro_opt'
+            this_ro_clock =  f'{this_qubit}.' + ro_str
             this_clock = f'{this_qubit}.01'
             this_12_clock = f'{this_qubit}.12'
 

@@ -97,6 +97,7 @@ class OptimalRO_Two_state_AmplitudeAnalysis(OptimalROAmplitudeAnalysis):
         self.lamda = - A / B
         theta = np.rad2deg(np.arctan(self.lamda))
         threshold = np.abs(intercept) / np.sqrt(A**2 + B**2)
+        threshold = threshold[0]
 
         self.y_intecept = + intercept / B
 
@@ -113,6 +114,7 @@ class OptimalRO_Two_state_AmplitudeAnalysis(OptimalROAmplitudeAnalysis):
         self.IQ0_fp = IQ0[~tp0]
         self.IQ1_tp = IQ1[ tp1] # True Positive when sending 1
         self.IQ1_fp = IQ1[~tp1]
+
         return [self.optimal_amplitude, theta, threshold]
 
     def plotter(self, ax, secondary_axes):

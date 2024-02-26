@@ -16,7 +16,7 @@ from analysis.optimum_ro_frequency_analysis import (
     OptimalROFrequencyAnalysis,
     OptimalRO_012_FrequencyAnalysis
 )
-from analysis.optimum_ro_amplitude_analysis import OptimalROAmplitudeAnalysis
+from analysis.optimum_ro_amplitude_analysis import OptimalRO_Three_state_AmplitudeAnalysis, OptimalRO_Two_state_AmplitudeAnalysis, OptimalROAmplitudeAnalysis
 from analysis.state_discrimination_analysis import StateDiscriminationAnalysis
 from analysis.punchout_analysis import PunchoutAnalysis
 
@@ -152,7 +152,7 @@ class RO_amplitude_two_state_optimization_Node(Base_Node):
         self.redis_field = ['ro_ampl_2st_opt','rotation','threshold']
         self.qubit_state = 1
         self.measurement_obj = RO_amplitude_optimization
-        self.analysis_obj = OptimalROAmplitudeAnalysis
+        self.analysis_obj = OptimalRO_Two_state_AmplitudeAnalysis
         self.node_dictionary = node_dictionary
         self.node_dictionary['loop_repetitions'] = 1000
         self.plots_per_qubit = 3 #  fidelity plot, IQ shots, confusion matrix
@@ -181,9 +181,9 @@ class RO_amplitude_three_state_optimization_Node(Base_Node):
         self.name = name
         self.all_qubits = all_qubits
         self.redis_field = ['ro_ampl_opt','inv_cm_opt']
-        self.qubit_state = 1
+        self.qubit_state = 2
         self.measurement_obj = RO_amplitude_optimization
-        self.analysis_obj = OptimalROAmplitudeAnalysis
+        self.analysis_obj = OptimalRO_Three_state_AmplitudeAnalysis
         self.node_dictionary = node_dictionary
         self.node_dictionary['loop_repetitions'] = 1000
         self.plots_per_qubit = 3 #  fidelity plot, IQ shots, confusion matrix

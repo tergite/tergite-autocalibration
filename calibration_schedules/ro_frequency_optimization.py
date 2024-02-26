@@ -52,7 +52,10 @@ class RO_frequency_optimization(Measurement):
 
         # Initialize the clock for each qubit
 
-        ro_str = 'ro_opt'
+        # TODO the qubit_state attr needs reworking
+        ro_str = 'ro_2st_opt'
+        if self.qubit_state == 2:
+            ro_str = 'ro_3st_opt'
 
         #Initialize ClockResource with the first frequency value
         for this_qubit, ro_array_val in ro_opt_frequencies.items():
@@ -154,11 +157,11 @@ class RO_frequency_optimization(Measurement):
                             phase=0,
                         ),
                     )
-                    
+
                     sched.add(
                         SetClockFrequency(clock=this_ro_clock, clock_freq_new=ro_frequency),
                     )
-                
+
                     ro_pulse = sched.add(
                         SquarePulse(
                             duration=pulse_durations[this_qubit],

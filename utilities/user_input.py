@@ -42,7 +42,7 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'ro_amplitude_optimization_gef',
+    'target_node': 'ro_amplitude_two_state_optimization',
     'all_qubits': qubits,
     'couplers': couplers,
 }

@@ -18,6 +18,7 @@ class OptimalROFrequencyAnalysis():
     def __init__(self, dataset: xr.Dataset):
         self.dataset = dataset
         data_var = list(dataset.data_vars.keys())[0]
+
         self.S21_0 = dataset[data_var][0].values
         self.S21_1 = dataset[data_var][1].values
 

@@ -46,7 +46,8 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
     transmon.clock_freqs.readout(float(redis_config['ro_freq']))
     transmon.extended_clock_freqs.readout_1(float(redis_config['ro_freq_1']))
     transmon.extended_clock_freqs.readout_2(float(redis_config['ro_freq_2']))
-    transmon.extended_clock_freqs.readout_opt(float(redis_config['ro_freq_opt']))
+    transmon.extended_clock_freqs.readout_opt(float(redis_config['ro_freq_2st_opt']))
+    transmon.extended_clock_freqs.readout_3state_opt(float(redis_config['ro_freq_3st_opt']))
     ro_amp_opt = float(redis_config['ro_ampl_opt'])
     if isnan(ro_amp_opt):
         ro_amp_opt = float(redis_config['ro_pulse_amp'])
@@ -131,7 +132,7 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
         node_class = node.measurement_obj(transmons, edges, node.qubit_state)
     else:
         node_class = node.measurement_obj(transmons, node.qubit_state)
-    if node.name in ['ro_amplitude_optimization_gef','cz_calibration_ssro']:
+    if node.name in ['ro_amplitude_three_state_optimization','cz_calibration_ssro']:
         device.cfg_sched_repetitions(1)    # for single-shot readout
     if bin_mode is not None: node_class.set_bin_mode(bin_mode)
     schedule_function = node_class.schedule_function

@@ -30,9 +30,6 @@ def configure_dataset(
 
     n_qubits = len(measurement_qubits)
 
-    if 'ro_opt_frequencies' in list(sweep_quantities):
-        qubit_states = [0,1,2]
-
     for key in keys:
         key_indx = key%n_qubits # this is to handle ro_opt_frequencies node where
         # there are 2 or 3 measurements (i.e 2 or 3 Datarrays) for each qubit
@@ -71,7 +68,8 @@ def configure_dataset(
 
         data_values = raw_ds[key].values
 
-        if node.name == 'ro_amplitude_optimization_gef':
+
+        if node.name == 'ro_amplitude_two_state_optimization' or node.name == 'ro_amplitude_three_state_optimization':
             loops = node.node_dictionary['loop_repetitions']
             for key in coords_dict.keys():
                 if measured_qubit in key and 'ro_amplitudes' in key:
@@ -89,7 +87,14 @@ def configure_dataset(
         data_values = np.transpose(data_values)
         attributes = {'qubit': measured_qubit, 'long_name': f'y{measured_qubit}', 'units': 'NA'}
         qubit_state = ''
-        if 'ro_opt_frequencies' in list(sweep_quantities):
+        # if 'ro_opt_frequencies' in list(sweep_quantities):
+        # if 'ro_opt_frequencies' in list(sweep_quantities):
+        #     qubit_states = [0,1,2]
+
+        # TODO ro_frequency_optimization requires multiple measurements per qubit
+        is_frequency_opt = node.name == 'ro_frequency_two_state_optimization' or node.name == 'ro_frequency_three_state_optimization'
+        if is_frequency_opt:
+            qubit_states = [0,1,2]
             qubit_state = qubit_states[key // n_qubits]
             attributes['qubit_state'] = qubit_state
 
