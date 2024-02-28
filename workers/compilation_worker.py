@@ -127,7 +127,7 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
            edges[bus] = coupler
 
     # if node.name in ['cz_chevron','cz_calibration','cz_calibration_ssro','cz_dynamic_phase','reset_chevron']:
-    if hasattr(node, 'couplers'):
+    if hasattr(node, 'edges'):
         coupler = node.coupler
         node_class = node.measurement_obj(transmons, edges, node.qubit_state)
     else:

@@ -6,8 +6,8 @@ import time
 
 coupler_spi_map = {
     # 'q11_q12': (1, 'dac0'),
-    # 'q12_q13': (1, 'dac1'),
-    'q13_q14': (1, 'dac2'),
+    'q12_q13': (1, 'dac1'),
+    # 'q13_q14': (1, 'dac2'),
     # 'q14_q15': (1, 'dac3'),
     # 'q16_q17': (1, 'dac0'), # slightly heating?
     # 'q17_q18': (1, 'dac1'),
@@ -23,8 +23,8 @@ coupler_spi_map = {
     # 'q24_q25': (4, 'dac0'),
 }
 
-coupler = 'q13_q14'
-dc_current_step =2e-6
+coupler = 'q12_q13'
+dc_current_step =6e-6
 #ensure step is rounded in microAmpere:
 dc_current_step = round(dc_current_step / 1e-6) * 1e-6
 spi_mod_number, dac_name = coupler_spi_map[coupler]
@@ -45,10 +45,18 @@ dac0.ramping_enabled(True)
 dac1.ramping_enabled(True)
 dac2.ramping_enabled(True)
 dac3.ramping_enabled(True)
+dac0.current(0)
+dac1.current(0)
+dac2.current(0)
+dac3.current(0)
 dac0.span('range_min_bi')
 dac1.span('range_min_bi')
 dac2.span('range_min_bi')
 dac3.span('range_min_bi')
+dac0.current(0)
+dac1.current(0)
+dac2.current(0)
+dac3.current(0)
 dac0.ramp_rate(20e-6)
 dac1.ramp_rate(20e-6)
 dac2.ramp_rate(20e-6)
@@ -63,15 +71,20 @@ print(f'{ dac1.current() = }')
 print(f'{ dac2.current() = }')
 print(f'{ dac3.current() = }')
 #---
+print(f'{ dac0.span() = }')
+print(f'{ dac1.span() = }')
+print(f'{ dac2.span() = }')
+print(f'{ dac3.span() = }')
+#---
 
 dac0.current(0)
 dac1.current(0)
 dac2.current(0)
 dac3.current(0)
-while dac2.is_ramping():
-            print(f'ramping {dac2.current()}')
+while dac1.is_ramping():
+            print(f'ramping {dac1.current()}')
             time.sleep(1)
 
-print(f'{ dac2.current() = }')
+print(f'{ dac1.current() = }')
 # this_dac.ramp_max_step(dc_current_step)
 # this_dac.current.vals = validators.Numbers(min_value=-3e-3, max_value=3e-3)

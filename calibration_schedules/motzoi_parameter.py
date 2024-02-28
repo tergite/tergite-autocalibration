@@ -41,9 +41,6 @@ class Motzoi_parameter(Measurement):
             Reset -> DRAG pulse -> Inverse DRAG pulse -> Measure
         Note: Step 2 and 3 are repeated X_repetition amount of times
 
-        For more details on the motzoi parameter and DRAG pulse calibration see the following article:
-        S. Balasiu, “Single-qubit gates calibration in pycqed using superconducting qubits,” ETH, 2017.
-
         Parameters
         ----------
         self

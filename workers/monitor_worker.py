@@ -1,4 +1,3 @@
-import time
 import xarray
 from utilities.status import ClusterStatus
 from workers.compilation_worker import precompile
@@ -98,28 +97,19 @@ def monitor_node_calibration(node, data_path, lab_ic):
 
 
     elif node.type == 'spi_and_cluster_simple_sweep':
-
         # compilation is needed only once
         compiled_schedule = precompile(node)
 
-        DAC = SpiDAC()
-        dac = DAC.create_spi_dac(node.coupler)
-        dc_currents = node.spi_samplespace['dc_currents'][node.coupler]
-
-        def set_current(current_value: float):
-            print(f'{ current_value = }')
-            print(f'{ dac.current() = }')
-            dac.current(current_value)
-            while dac.is_ramping():
-                print(f'ramping {dac.current()}')
-                time.sleep(1)
-            print('Finished ramping')
-
-        logger.info('Starting coupler spectroscopy')
+        external_parameter_values = node.node_externals
+        pre_measurement_operation = node.pre_measurement_operation
+        operations_args = node.operations_args
 
         ds = xarray.Dataset()
-        for current in dc_currents:
-            set_current(current)
+        logger.info('Starting coupler spectroscopy')
+
+        for node_parameter in external_parameter_values:
+            node.external_parameter_value = node_parameter
+            pre_measurement_operation(*operations_args, external=node_parameter)
 
             result_dataset = measure_node(
                 node,
@@ -128,6 +118,8 @@ def monitor_node_calibration(node, data_path, lab_ic):
                 data_path,
                 cluster_status=ClusterStatus.real,
             )
+
+            ds = xarray.merge([ds, result_dataset])
 
         logger.info('measurement completed')
         measurement_result = post_process(ds, node, data_path=data_path)

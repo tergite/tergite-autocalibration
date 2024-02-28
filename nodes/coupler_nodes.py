@@ -1,3 +1,4 @@
+import time
 import numpy as np
 import redis
 from calibration_schedules.cz_chevron_reversed import CZ_chevron
@@ -7,6 +8,7 @@ from analysis.coupler_spectroscopy_analysis import CouplerSpectroscopyAnalysis
 from analysis.cz_chevron_analysis import CZChevronAnalysis
 from config_files.VNA_LOKIB_values import VNA_resonator_frequencies, VNA_qubit_frequencies, VNA_f12_frequencies
 from nodes.base_node import Base_Node
+from workers.hardware_utils import SpiDAC
 
 redis_connection = redis.Redis(decode_responses=True)
 
@@ -32,18 +34,33 @@ def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
     max_freq = VNA_frequency + sweep_range / 2
     return np.linspace(min_freq, max_freq, qub_spec_samples)
 
-class Coupler_Spectroscopy_Node:
-    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
+class Coupler_Spectroscopy_Node(Base_Node):
+    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
         self.name = name
         self.all_qubits = all_qubits
-        self.couplers = kwargs['couplers']
+        self.couplers = node_dictionary['couplers']
         self.redis_field = ['parking_current']
         self.qubit_state = 0
         # perform 2 tones while biasing the current
         self.measurement_obj = Two_Tones_Spectroscopy
         self.analysis_obj = CouplerSpectroscopyAnalysis
         self.coupled_qubits = self.get_coupled_qubits()
-        # self.validate()
+        self.measure_qubit_index = 0
+        self.type = 'spi_and_cluster_simple_sweep'
+
+        self.node_externals = self.spi_samplespace['dc_currents'][self.coupler]
+        self.external_parameter_name = 'dc_currents'
+        self.external_parameter_value = 0
+        self.DAC = SpiDAC()
+        self.dac = self.DAC.create_spi_dac(self.coupler)
+        self.operations_args = []
+
+    @property
+    def dimensions(self) -> list:
+        freq_dim = len(self.samplespace['spec_frequencies'][self.measurement_qubit])
+        currents_dim = len(self.spi_samplespace['dc_currents'][self.coupler])
+        return [freq_dim, 1]
 
     def get_coupled_qubits(self) -> list:
         if len(self.couplers) > 1:
@@ -52,22 +69,30 @@ class Coupler_Spectroscopy_Node:
         self.coupler = self.couplers[0]
         return coupled_qubits
 
+    def pre_measurement_operation(self, external=0):
+        current_value = external
+
+        print(f'{ current_value = }')
+        print(f'{ self.dac.current() = }')
+        self.dac.current(current_value)
+        while self.dac.is_ramping():
+            print(f'ramping {self.dac.current()}')
+            time.sleep(1)
+        print('Finished ramping')
+
     @property
     def samplespace(self):
         qubit = self.coupled_qubits[self.measure_qubit_index]
         self.measurement_qubit = qubit
         cluster_samplespace = {
-            'spec_frequencies': {qubit: qubit_samples(qubit, sweep_range=self.sweep_range)}
+            'spec_frequencies': {qubit: qubit_samples(qubit)}
         }
-        # cluster_samplespace = {
-        #     'spec_frequencies': {qubit: np.linspace(3.771, 3.971, 0.0005)}
-        # }
         return cluster_samplespace
 
     @property
     def spi_samplespace(self):
         spi_samplespace = {
-            'dc_currents': {self.couplers[0]: np.arange(-2.5e-3, 2.5e-3, 250e-6)},
+            'dc_currents': {self.coupler: np.arange(0e-3, 0.5e-3, 200e-6)},
         }
         return spi_samplespace
 

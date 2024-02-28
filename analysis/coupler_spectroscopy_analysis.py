@@ -30,7 +30,7 @@ class CouplerSpectroscopyAnalysis():
         self.detected_frequencies = []
         self.detected_currents = []
         for i, current in enumerate(self.dc_currents.values):
-            partial_ds = self.dataset[f'y{self.qubit}'].isel({self.currents: [i]})[0]
+            partial_ds = self.dataset[f'y{self.qubit}'].isel({self.currents: [i]})[:,0]
             analysis = QubitSpectroscopyAnalysis(partial_ds.to_dataset())
             qubit_frequency = analysis.run_fitting()[0]
             if not np.isnan(qubit_frequency):

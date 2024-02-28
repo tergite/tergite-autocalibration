@@ -69,12 +69,12 @@ class SpiDAC():
         print(f'{ dac.current() = }')
         return
 
-    def set_dac_current(self, dac, parking_current) -> None:
-        dac.current(parking_current)
+    def set_dac_current(self, dac,target_current) -> None:
+        dac.current(target_current)
         while dac.is_ramping():
             print(f'ramping {dac.current()}')
             time.sleep(1)
         print('Finished ramping')
-        print(f'{ parking_current = }')
+        print(f'{ target_current = }')
         print(f'{ dac.current() = }')
         return
