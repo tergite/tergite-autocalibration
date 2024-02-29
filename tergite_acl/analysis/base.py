@@ -4,7 +4,7 @@ import redis
 # TODO: we should have a conditional import depending on a feature flag here
 from matplotlib import pyplot as plt
 
-from utilities.qoi import QOI
+from tergite_acl.utilities.qoi import QOI
 
 # TODO: we should import the redis connection once globally
 redis_connection = redis.Redis(decode_responses=True)

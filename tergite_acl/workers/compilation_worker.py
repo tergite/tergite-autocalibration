@@ -79,11 +79,14 @@ def load_redis_config_coupler(coupler: CompositeSquareEdge):
     return
 
 def precompile(node, bin_mode:str=None, repetitions:int=None):
+    # TODO: This has to be definitely handled by different classes
+    # TODO: As soon as we have a tof class, all these if statements disappear
     if node.name == 'tof':
         return None, 1
     samplespace = node.samplespace
     qubits = node.all_qubits
 
+    # TODO: This could be either a function for each different node class or a
     # backup old parameter values
     if node.backup:
         fields = node.redis_field
@@ -104,6 +107,7 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
                         redis_connection.hset(key, field_backup, value)
                         redis_connection.hset(key, field, 'nan')
 
+    # TODO: This is hardcoded and we should move it to the .env file
     device = QuantumDevice(f'Loki_{node.name}')
     device.hardware_config(hw_config)
 
@@ -116,6 +120,7 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
 
     # Creating coupler edge
     #bus_list = [ [qubits[i],qubits[i+1]] for i in range(len(qubits)-1) ]
+    # TODO: It seems like the coupler node is completely different to all other nodes
     if hasattr(node, 'couplers'):
         couplers = node.couplers
         edges = {}

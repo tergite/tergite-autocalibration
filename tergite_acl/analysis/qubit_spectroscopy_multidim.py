@@ -7,7 +7,7 @@ import xarray as xr
 from scipy import signal
 import lmfit
 
-from analysis.base import BaseAnalysis
+from tergite_acl.analysis.base import BaseAnalysis
 
 
 # Lorentzian function that is fit to qubit spectroscopy peaks

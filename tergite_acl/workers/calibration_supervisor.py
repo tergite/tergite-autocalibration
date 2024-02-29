@@ -30,15 +30,21 @@ colorama_init()
 
 class CalibrationSupervisor():
     def __init__(self) -> None:
+        # Initialize the node factory
         self.node_factory = NodeFactory()
+        # TODO: redis connection could be imported once globally
         self.redis_connection = redis.Redis(decode_responses=True)
+        # TODO: user configuration could be a toml file
         self.qubits = user_requested_calibration['all_qubits']
         self.couplers = user_requested_calibration['couplers']
         self.target_node = user_requested_calibration['target_node']
         # Settings
-        self.transmon_configuration = toml.load('/home/calibration/repos/tergite-autocalibration-lite/config_files/device_config.toml')
+        # TODO: move to .env file
+        self.transmon_configuration = toml.load('/home/calibration/repos/tergite-autocalibration-lite/tergite_acl/config_files/device_config.toml')
+        # TODO: how is the dummy cluster initalized?
         self.cluster_status = ClusterStatus.real
         self.topo_order = filtered_topological_order(self.target_node)
+        # TODO: maybe it makes sense to move that part to some hardware utils
         self.lab_ic = self.create_lab_ic()
         if self.target_node == 'cz_chevron':
             self.dacs = {}
@@ -47,6 +53,8 @@ class CalibrationSupervisor():
                 self.dacs[coupler] = self.spi.create_spi_dac(coupler)
 
     def create_lab_ic(self):
+        # TODO: maybe this could be move to some lab utils
+        # TODO: the args variable is not global
         if args.cluster_status == ClusterStatus.real:
             Cluster.close_all()
             clusterA = Cluster("clusterA", lokiA_IP)
@@ -58,6 +66,7 @@ class CalibrationSupervisor():
 
 
     def calibrate_system(self):
+        # TODO: everything which is not in the inspect or calibrate function should go here
         logger.info('Starting System Calibration')
         number_of_qubits = len(self.qubits)
         draw_arrow_chart(f'Qubits: {number_of_qubits}', self.topo_order)
@@ -75,6 +84,7 @@ class CalibrationSupervisor():
 
 
     def inspect_node(self, node_name: str):
+        # TODO: the inspect node function could be part of the node
         logger.info(f'Inspecting node {node_name}')
 
         node = self.node_factory.create_node(
@@ -156,9 +166,9 @@ class CalibrationSupervisor():
 
     def calibrate_node(self, node) -> DataStatus:
         logger.info(f'Calibrating node {node.name}')
-
+        # TODO: This should be in the node initializer
         data_path = create_node_data_path(node)
-
+        # TODO: This should be the refactored such that the node can be run like node.calibrate()
         monitor_node_calibration(node, data_path, self.lab_ic)
 
         return

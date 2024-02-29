@@ -31,6 +31,8 @@ parameterized_sweep:
 '''
 
 def monitor_node_calibration(node, data_path, lab_ic):
+    # TODO: Instead of the types there should be different node classes
+    # TODO: What all nodes have in common is the precompile step
     if node.type == 'cluster_simple_sweep':
         compiled_schedule = precompile(node)
 
