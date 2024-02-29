@@ -2,16 +2,16 @@
 Given the requested node
 fetch and compile the appropriate schedule
 '''
-from tergite_acl.logger.tac_logger import logger
+from tergite_acl.utils.logger import logger
 from math import isnan
 from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
 import redis
 import json
 import numpy as np
-from tergite_acl.utilities.extended_transmon_element import ExtendedTransmon
-from tergite_acl.utilities.extended_coupler_edge import CompositeSquareEdge
+from tergite_acl.utils.extended_transmon_element import ExtendedTransmon
+from tergite_acl.utils.extended_coupler_edge import CompositeSquareEdge
 from quantify_scheduler.backends import SerialCompiler
-from tergite_acl.config_files.settings import hw_config_json
+from tergite_acl.config.settings import hw_config_json
 from quantify_core.data.handling import set_datadir
 
 set_datadir('.')

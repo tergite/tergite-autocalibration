@@ -3,9 +3,9 @@ from qcodes import validators
 import time
 import redis
 from pathlib import Path
-from tergite_acl.config_files.coupler_config import coupler_spi_map
+from tergite_acl.config.coupler_config import coupler_spi_map
 
-from tergite_acl.config_files.settings import spiA_serial_port
+from tergite_acl.config.settings import spiA_serial_port
 
 redis_connection = redis.Redis(decode_responses=True)
 

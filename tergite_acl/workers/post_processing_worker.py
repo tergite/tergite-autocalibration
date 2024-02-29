@@ -2,9 +2,9 @@
 import collections
 import matplotlib.pyplot as plt
 import xarray as xr
-from tergite_acl.analysis.tof_analysis import analyze_tof
+from tergite_acl.lib.analysis.tof_analysis import analyze_tof
 from quantify_core.data.handling import set_datadir
-from tergite_acl.config_files.coupler_config import qubit_types
+from tergite_acl.config.coupler_config import qubit_types
 # from quantify_core.analysis.calibration import rotate_to_calibrated_axis
 import matplotlib.patches as mpatches
 import numpy as np
@@ -12,7 +12,7 @@ import redis
 import matplotlib
 from pathlib import Path
 
-from tergite_acl.utilities.status import DataStatus
+from tergite_acl.utils.status import DataStatus
 matplotlib.use('tkagg')
 set_datadir('.')
 redis_connection = redis.Redis(decode_responses=True)

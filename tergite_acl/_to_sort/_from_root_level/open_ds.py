@@ -1,10 +1,9 @@
 import xarray as xr
 import numpy as np
 import matplotlib.pyplot as plt
-from tergite_acl.utilities.user_input import qubits
 import importlib
-import tergite_acl.analysis.randomized_benchmarking_analysis as rnb
-import tergite_acl.analysis.optimum_ro_amplitude_analysis as roa
+import tergite_acl.lib.analysis.randomized_benchmarking_analysis as rnb
+import tergite_acl.lib.analysis.optimum_ro_amplitude_analysis as roa
 importlib.reload(rnb)
 
 

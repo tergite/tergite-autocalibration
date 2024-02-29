@@ -1,13 +1,13 @@
-from tergite_acl.nodes.node import NodeFactory
+from tergite_acl.lib.nodes.node import NodeFactory
 import quantify_scheduler.device_under_test.mock_setup as mock
 import numpy as np
-from tergite_acl.calibration_schedules.randomized_benchmarking import Randomized_Benchmarking
+from tergite_acl.lib.schedules import Randomized_Benchmarking
 import toml
 
 
 
 nodes = NodeFactory()
-transmon_configuration = toml.load('./config_files/device_config.toml')
+transmon_configuration = toml.load('./config/device_config.toml')
 qois = transmon_configuration['qoi']
 setup = mock.set_up_mock_transmon_setup()
 mock.set_standard_params_transmon(setup)

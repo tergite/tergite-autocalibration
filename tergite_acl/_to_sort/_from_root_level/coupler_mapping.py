@@ -1,6 +1,6 @@
 import typing
 
-from tergite_acl.utilities.QPU_connections_visualization import QPU, QPU_element
+from tergite_acl.utils.QPU_connections_visualization import QPU, QPU_element
 
 
 def create_coupler_marking(qpu: typing.List[QPU_element]):

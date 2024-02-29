@@ -4,7 +4,7 @@ from datetime import datetime
 from uuid import uuid4
 from enum import Enum
 import pathlib
-from tergite_acl.utilities.root_path import data_directory
+from tergite_acl.utils.root_path import data_directory
 
 
 def configure_dataset(

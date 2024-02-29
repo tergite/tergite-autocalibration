@@ -1,11 +1,11 @@
 import time
 import xarray
-from tergite_acl.utilities.status import ClusterStatus
+from tergite_acl.utils.status import ClusterStatus
 from tergite_acl.workers.compilation_worker import precompile
 from tergite_acl.workers.execution_worker import measure_node
 from tergite_acl.workers.hardware_utils import SpiDAC
 from tergite_acl.workers.post_processing_worker import post_process
-from tergite_acl.logger.tac_logger import logger
+from tergite_acl.utils.logger import logger
 import scipy.optimize as optimize
 
 '''

@@ -10,8 +10,8 @@ schedules/
 notebooks/
 
 #user config files
-# utilities/user_input.py
-# config_files/
+# utils/user_input.py
+# config/
 
 #script to scp files
 send_to_lefteris.ps1

@@ -1,23 +1,23 @@
 # This code is part of Tergite
 import argparse
 
-from tergite_acl.utilities.status import DataStatus
-from tergite_acl.logger.tac_logger import logger
-from tergite_acl.nodes.node import NodeFactory
-from tergite_acl.utilities.status import ClusterStatus
+from tergite_acl.utils.status import DataStatus
+from tergite_acl.utils.logger import logger
+from tergite_acl.lib.nodes.node import NodeFactory
+from tergite_acl.utils.status import ClusterStatus
 from qblox_instruments import Cluster
 from tergite_acl.workers.hardware_utils import SpiDAC
 from tergite_acl.workers.dataset_utils import create_node_data_path
 
-from tergite_acl.nodes.graph import filtered_topological_order
-from tergite_acl.utilities.visuals import draw_arrow_chart
-from tergite_acl.config_files.settings import lokiA_IP, device_config_file
+from tergite_acl.lib.nodes import filtered_topological_order
+from tergite_acl.utils.visuals import draw_arrow_chart
+from tergite_acl.config.settings import lokiA_IP
 # from workers.dummy_setup import dummy_cluster
 
 from colorama import init as colorama_init
 from colorama import Fore
 from colorama import Style
-from tergite_acl.utilities.user_input import user_requested_calibration
+from tergite_acl.utils.user_input import user_requested_calibration
 import toml
 import redis
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
@@ -40,7 +40,7 @@ class CalibrationSupervisor():
         self.target_node = user_requested_calibration['target_node']
         # Settings
         # TODO: move to .env file
-        self.transmon_configuration = toml.load('/home/calibration/repos/tergite-autocalibration-lite/tergite_acl/config_files/device_config.toml')
+        self.transmon_configuration = toml.load('/tergite_acl/config/device_config.toml')
         # TODO: how is the dummy cluster initalized?
         self.cluster_status = ClusterStatus.real
         self.topo_order = filtered_topological_order(self.target_node)

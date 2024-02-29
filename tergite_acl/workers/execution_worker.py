@@ -5,8 +5,8 @@ from quantify_scheduler.json_utils import pathlib
 import tqdm
 import time
 import xarray
-from tergite_acl.logger.tac_logger import logger
-from tergite_acl.utilities.status import ClusterStatus
+from tergite_acl.utils.logger import logger
+from tergite_acl.utils.status import ClusterStatus
 from tergite_acl.workers.dataset_utils import configure_dataset, handle_ro_freq_optimization, save_dataset
 from colorama import init as colorama_init
 from colorama import Fore

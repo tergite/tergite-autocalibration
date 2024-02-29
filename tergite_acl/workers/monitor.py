@@ -1,14 +1,10 @@
-from importlib import reload
-import tergite_acl.utilities.user_input as ui
+import tergite_acl.utils.user_input as ui
 import numpy as np
 import tergite_acl.workers.calibration_supervisor as supervisor
-import nodes
-from tergite_acl.nodes import node as calibrate_nodes
-from tergite_acl.nodes.graph import graph as cg
-import workers
-import overnight
-from tergite_acl.utilities.user_input import qubits,couplers
-from tergite_acl.utilities.reset_redis_node import ResetRedisNode
+from tergite_acl.lib.nodes import node as calibrate_nodes
+from tergite_acl.lib.nodes import graph as cg
+from tergite_acl.utils.user_input import qubits,couplers
+from tergite_acl.utils.reset_redis_node import ResetRedisNode
 import optuna
 
 qubits_10 = [f"q{i}" for i in range(16, 26)]

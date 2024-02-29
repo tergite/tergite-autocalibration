@@ -3,13 +3,13 @@ from qblox_instruments import Cluster
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 import toml
-from tergite_acl.nodes.graph import filtered_topological_order
-from tergite_acl.utilities.status import ClusterStatus
-from tergite_acl.workers.hardware_utils import SpiDAC, set_module_att
+from tergite_acl.lib.nodes import filtered_topological_order
+from tergite_acl.utils.status import ClusterStatus
+from tergite_acl.workers.hardware_utils import set_module_att
 import numpy as np
-from tergite_acl.utilities.user_input import user_requested_calibration
+from tergite_acl.utils.user_input import user_requested_calibration
 from workers.linear_calibration_supervisor import calibrate_topo_sorted_path
-from tergite_acl.config_files.settings import lokiA_IP
+from tergite_acl.config.settings import lokiA_IP
 
 parking_currents = np.linspace(-1e-3, 1e-3, 5)
 
@@ -24,7 +24,7 @@ parser.add_argument(
 )
 args = parser.parse_args()
 # Settings
-transmon_configuration = toml.load('./config_files/device_config.toml')
+transmon_configuration = toml.load('./config/device_config.toml')
 
 
 qubits = user_requested_calibration['all_qubits']

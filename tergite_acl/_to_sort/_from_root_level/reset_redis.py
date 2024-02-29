@@ -1,9 +1,6 @@
-import redis
-import toml
 import argparse
-from tergite_acl.utilities import user_input
-from tergite_acl.utilities.reset_redis_node import ResetRedisNode
-from tergite_acl.nodes.node import NodeFactory
+from tergite_acl.utils.reset_redis_node import ResetRedisNode
+from tergite_acl.lib.nodes.node import NodeFactory
 
 node_factory = NodeFactory()
 nodes = node_factory.all_nodes()
