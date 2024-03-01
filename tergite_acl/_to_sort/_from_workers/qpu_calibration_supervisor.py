@@ -9,7 +9,7 @@ from tergite_acl.workers.hardware_utils import set_module_att
 import numpy as np
 from tergite_acl.utils.user_input import user_requested_calibration
 from workers.linear_calibration_supervisor import calibrate_topo_sorted_path
-from tergite_acl.config.settings import lokiA_IP
+from tergite_acl.config.settings import CLUSTER_IP
 
 parking_currents = np.linspace(-1e-3, 1e-3, 5)
 
@@ -33,7 +33,7 @@ target_node = user_requested_calibration['target_node']
 
 if args.cluster_status == ClusterStatus.real:
     Cluster.close_all()
-    clusterA = Cluster("clusterA", lokiA_IP)
+    clusterA = Cluster("clusterA", CLUSTER_IP)
     # set_module_att(clusterA)
     lab_ic = InstrumentCoordinator('lab_ic')
     lab_ic.add_component(ClusterComponent(clusterA))

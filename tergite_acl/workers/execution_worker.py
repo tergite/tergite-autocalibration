@@ -26,6 +26,7 @@ def measure_node(
     cluster_status = ClusterStatus.real,
     measurement = (1,1)
     ):
+    # TODO: This function should be move to the node
 
     schedule_duration = compiled_schedule.get_schedule_duration()
     if 'loop_repetitions' in node.node_dictionary:
@@ -54,7 +55,8 @@ def execute_schedule(
     lab_ic,
     schedule_duration: float
     ) -> xarray.Dataset:
-
+    # TODO: This should go to the BaseMeasurement
+    # TODO: The instrument coordinator could be an attribute of the node
     logger.info('Starting measurement')
     cluster_status = ClusterStatus.real
 

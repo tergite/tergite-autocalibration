@@ -11,12 +11,12 @@ import numpy as np
 from tergite_acl.utils.extended_transmon_element import ExtendedTransmon
 from tergite_acl.utils.extended_coupler_edge import CompositeSquareEdge
 from quantify_scheduler.backends import SerialCompiler
-from tergite_acl.config.settings import hw_config_json
+from tergite_acl.config.settings import HARDWARE_CONFIG
 from quantify_core.data.handling import set_datadir
 
 set_datadir('.')
 
-with open(hw_config_json) as hw:
+with open(HARDWARE_CONFIG) as hw:
     hw_config = json.load(hw)
 
 redis_connection = redis.Redis(decode_responses=True)

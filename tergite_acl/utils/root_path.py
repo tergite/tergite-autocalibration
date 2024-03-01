@@ -4,7 +4,7 @@ def get_project_root() -> Path:
     return Path(__file__).parent.parent
 
 def get_data_directory() -> Path:
-    return get_project_root() / 'data_directory'
+    return get_project_root() / 'data_dir'
 
 
 data_directory = get_data_directory()

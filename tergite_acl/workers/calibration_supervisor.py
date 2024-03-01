@@ -11,7 +11,7 @@ from tergite_acl.workers.dataset_utils import create_node_data_path
 
 from tergite_acl.lib.nodes import filtered_topological_order
 from tergite_acl.utils.visuals import draw_arrow_chart
-from tergite_acl.config.settings import lokiA_IP
+from tergite_acl.config.settings import CLUSTER_IP
 # from workers.dummy_setup import dummy_cluster
 
 from colorama import init as colorama_init
@@ -57,7 +57,7 @@ class CalibrationSupervisor():
         # TODO: the args variable is not global
         if args.cluster_status == ClusterStatus.real:
             Cluster.close_all()
-            clusterA = Cluster("clusterA", lokiA_IP)
+            clusterA = Cluster("clusterA", CLUSTER_IP)
             # set_module_att(clusterA)
             ic = InstrumentCoordinator('lab_ic')
             ic.add_component(ClusterComponent(clusterA))

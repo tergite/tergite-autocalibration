@@ -7,7 +7,7 @@ import tergite_acl.lib.analysis.optimum_ro_amplitude_analysis as roa
 importlib.reload(rnb)
 
 
-ds = xr.open_dataset('data_directory/20240220/20240220-171349-867-88367b-ro_amplitude_optimization_gef/dataset.hdf5')
+ds = xr.open_dataset('data_dir/20240220/20240220-171349-867-88367b-ro_amplitude_optimization_gef/dataset.hdf5')
 # print(f'{ ds.yq21.attrs = }')
 ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
 #---
