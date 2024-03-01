@@ -32,6 +32,8 @@ def _from_config(key_name_: str,
     """
     if key_name_ in config:
         try:
+            if cast_ is bool:
+                return eval(config[key_name_])
             return cast_(config[key_name_])
         except ValueError:
             raise ValueError(f'Variable with name {key_name_} from .env with value {config[key_name_]} '

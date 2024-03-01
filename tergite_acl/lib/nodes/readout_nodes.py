@@ -1,6 +1,6 @@
 import numpy as np
 from tergite_acl.lib.schedules.resonator_spectroscopy import Resonator_Spectroscopy
-from tergite_acl.lib.schedules import Punchout
+from tergite_acl.lib.schedules.punchout import Punchout
 from tergite_acl.lib.schedules.ro_frequency_optimization import RO_frequency_optimization
 from tergite_acl.lib.schedules.ro_amplitude_optimization import RO_amplitude_optimization
 from tergite_acl.lib.nodes.base_node import Base_Node

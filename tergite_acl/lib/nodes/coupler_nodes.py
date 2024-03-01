@@ -1,6 +1,6 @@
 import numpy as np
 import redis
-from tergite_acl.lib.schedules import CZ_chevron
+from tergite_acl.lib.schedules.cz_chevron import CZ_chevron
 from tergite_acl.lib.schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
 from tergite_acl.lib.schedules.resonator_spectroscopy import Resonator_Spectroscopy
 from tergite_acl.lib.analysis.coupler_spectroscopy_analysis import CouplerSpectroscopyAnalysis

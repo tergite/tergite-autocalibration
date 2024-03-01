@@ -6,12 +6,12 @@ from tergite_acl.lib.analysis.T1_analysis import T1Analysis, T2Analysis, T2EchoA
 from tergite_acl.lib.analysis.check_cliffords_analysis import CheckCliffordsAnalysis
 # from analysis.cz_chevron_analysis import CZChevronAnalysis, CZChevronAnalysisReset
 # from analysis.cz_calibration_analysis import CZCalibrationAnalysis, CZCalibrationSSROAnalysis
-from tergite_acl.lib.analysis import RandomizedBenchmarkingAnalysis
+from tergite_acl.lib.analysis.randomized_benchmarking_analysis import RandomizedBenchmarkingAnalysis
 from tergite_acl.lib.analysis.state_discrimination_analysis import StateDiscriminationAnalysis
-from tergite_acl.lib.schedules import T1, T2, T2Echo
-from tergite_acl.lib.schedules import Check_Cliffords
-from tergite_acl.lib.schedules import Randomized_Benchmarking
-from tergite_acl.lib.schedules import Single_Shots_RO
+from tergite_acl.lib.schedules.T1 import T1, T2, T2Echo
+from tergite_acl.lib.schedules.check_cliffords import Check_Cliffords
+from tergite_acl.lib.schedules.randomized_benchmarking import Randomized_Benchmarking
+from tergite_acl.lib.schedules.state_discrimination import Single_Shots_RO
 from tergite_acl.config.VNA_values import VNA_resonator_frequencies
 
 from tergite_acl.lib.nodes.base_node import Base_Node

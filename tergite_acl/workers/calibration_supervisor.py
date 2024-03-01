@@ -1,29 +1,30 @@
 # This code is part of Tergite
 import argparse
 
-from tergite_acl.utils.status import DataStatus
-from tergite_acl.utils.logger import logger
-from tergite_acl.lib.nodes.node import NodeFactory
-from tergite_acl.utils.status import ClusterStatus
-from qblox_instruments import Cluster
-from tergite_acl.workers.hardware_utils import SpiDAC
-from tergite_acl.workers.dataset_utils import create_node_data_path
-
-from tergite_acl.lib.nodes import filtered_topological_order
-from tergite_acl.utils.visuals import draw_arrow_chart
-from tergite_acl.config.settings import CLUSTER_IP
-# from workers.dummy_setup import dummy_cluster
-
-from colorama import init as colorama_init
+import toml
 from colorama import Fore
 from colorama import Style
-from tergite_acl.utils.user_input import user_requested_calibration
-import toml
-import redis
+from colorama import init as colorama_init
+from qblox_instruments import Cluster
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
+
+from tergite_acl.config import settings
+from tergite_acl.config.settings import CLUSTER_IP, REDIS_CONNECTION
+from tergite_acl.lib.nodes.graph import filtered_topological_order
+from tergite_acl.lib.nodes.node import NodeFactory
+from tergite_acl.utils.logger.tac_logger import logger
+from tergite_acl.utils.status import ClusterStatus
+from tergite_acl.utils.status import DataStatus
+from tergite_acl.utils.user_input import user_requested_calibration
+from tergite_acl.utils.visuals import draw_arrow_chart
+from tergite_acl.workers.dataset_utils import create_node_data_path
+from tergite_acl.workers.hardware_utils import SpiDAC
 from tergite_acl.workers.monitor_worker import monitor_node_calibration
-from tergite_acl.workers.redis_utils import populate_initial_parameters, populate_node_parameters, populate_quantities_of_interest
+from tergite_acl.workers.redis_utils import populate_initial_parameters, populate_node_parameters, \
+    populate_quantities_of_interest
+
+# from workers.dummy_setup import dummy_cluster
 
 colorama_init()
 
@@ -32,15 +33,12 @@ class CalibrationSupervisor():
     def __init__(self) -> None:
         # Initialize the node factory
         self.node_factory = NodeFactory()
-        # TODO: redis connection could be imported once globally
-        self.redis_connection = redis.Redis(decode_responses=True)
         # TODO: user configuration could be a toml file
         self.qubits = user_requested_calibration['all_qubits']
         self.couplers = user_requested_calibration['couplers']
         self.target_node = user_requested_calibration['target_node']
         # Settings
-        # TODO: move to .env file
-        self.transmon_configuration = toml.load('/tergite_acl/config/device_config.toml')
+        self.transmon_configuration = toml.load(settings.DEVICE_CONFIG)
         # TODO: how is the dummy cluster initalized?
         self.cluster_status = ClusterStatus.real
         self.topo_order = filtered_topological_order(self.target_node)
@@ -75,7 +73,7 @@ class CalibrationSupervisor():
             self.transmon_configuration,
             self.qubits,
             self.couplers,
-            self.redis_connection
+            REDIS_CONNECTION
         )
 
         for calibration_node in self.topo_order:
@@ -91,21 +89,19 @@ class CalibrationSupervisor():
             node_name, self.qubits, couplers=self.couplers
         )
 
-        redis_connection = self.redis_connection
-
         populate_initial_parameters(
             self.transmon_configuration,
             self.qubits,
             self.couplers,
-            self.redis_connection
+            REDIS_CONNECTION
         )
 
         if node_name in ['coupler_spectroscopy', 'cz_chevron']:
-            coupler_statuses = [redis_connection.hget(f"cs:{coupler}", node_name) == 'calibrated' for coupler in self.couplers]
+            coupler_statuses = [REDIS_CONNECTION.hget(f"cs:{coupler}", node_name) == 'calibrated' for coupler in self.couplers]
             #node is calibrated only when all couplers have the node calibrated:
             is_node_calibrated = all(coupler_statuses)
         else:
-            qubits_statuses = [redis_connection.hget(f"cs:{qubit}", node_name) == 'calibrated' for qubit in self.qubits]
+            qubits_statuses = [REDIS_CONNECTION.hget(f"cs:{qubit}", node_name) == 'calibrated' for qubit in self.qubits]
             #node is calibrated only when all qubits have the node calibrated:
             is_node_calibrated = all(qubits_statuses)
 
@@ -115,7 +111,7 @@ class CalibrationSupervisor():
             self.transmon_configuration,
             self.qubits,
             self.couplers,
-            self.redis_connection
+            REDIS_CONNECTION
         )
 
         #Check Redis if node is calibrated
@@ -125,7 +121,7 @@ class CalibrationSupervisor():
             for coupler in self.couplers:
                 # the calibrated, not_calibrated flags may be not necessary,
                 # just store the DataStatus on Redis
-                is_Calibrated = redis_connection.hget(f"cs:{coupler}", node_name)
+                is_Calibrated = REDIS_CONNECTION.hget(f"cs:{coupler}", node_name)
                 if is_Calibrated == 'not_calibrated':
                     status = DataStatus.out_of_spec
                     break  # even if a single qubit is not_calibrated mark as out_of_spec
@@ -137,7 +133,7 @@ class CalibrationSupervisor():
             for qubit in self.qubits:
                 # the calibrated, not_calibrated flags may be not necessary,
                 # just store the DataStatus on Redis
-                is_Calibrated = redis_connection.hget(f"cs:{qubit}", node_name)
+                is_Calibrated = REDIS_CONNECTION.hget(f"cs:{qubit}", node_name)
                 if is_Calibrated == 'not_calibrated':
                     status = DataStatus.out_of_spec
                     break  # even if a single qubit is not_calibrated mark as out_of_spec

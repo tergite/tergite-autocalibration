@@ -2,7 +2,7 @@ import numpy as np
 import redis
 from tergite_acl.lib.schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
 # from schedules.two_tone_multidim import Two_Tones_Multidim
-from tergite_acl.lib.schedules import Two_Tones_Multidim
+from tergite_acl.lib.schedules.two_tone_multidim_loop_reversed import Two_Tones_Multidim
 from tergite_acl.lib.schedules.rabi_oscillations import Rabi_Oscillations
 from tergite_acl.lib.schedules.ramsey_fringes import Ramsey_fringes
 from tergite_acl.lib.schedules.motzoi_parameter import Motzoi_parameter

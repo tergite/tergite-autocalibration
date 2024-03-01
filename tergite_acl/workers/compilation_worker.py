@@ -2,7 +2,7 @@
 Given the requested node
 fetch and compile the appropriate schedule
 '''
-from tergite_acl.utils.logger import logger
+from tergite_acl.utils.logger.tac_logger import logger
 from math import isnan
 from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
 import redis
