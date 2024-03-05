@@ -2,26 +2,23 @@
 Module containing classes that model, fit and plot data
 from a qubit (two tone) spectroscopy experiment.
 """
+import lmfit
 import numpy as np
-import redis
 import xarray as xr
 from scipy import signal
-from scipy.signal import find_peaks
-import lmfit
 
-redis_connection = redis.Redis(decode_responses=True)
 
 # Lorentzian function that is fit to qubit spectroscopy peaks
-def lorentzian_function( x: float, x0: float, width: float, A: float, c: float,) -> float:
-    return A * width**2 / ( (x-x0)**2 + width**2 ) + c
+def lorentzian_function(x: float, x0: float, width: float, A: float, c: float, ) -> float:
+    return A * width ** 2 / ((x - x0) ** 2 + width ** 2) + c
 
 
 class LorentzianModel(lmfit.model.Model):
     """
     Generate a Lorentzian model that can be fit to qubit spectroscopy data.
     """
-    def __init__(self, *args, **kwargs):
 
+    def __init__(self, *args, **kwargs):
         super().__init__(lorentzian_function, *args, **kwargs)
 
         self.set_param_hint("x0", vary=True)
@@ -48,7 +45,7 @@ class LorentzianModel(lmfit.model.Model):
         min_delta_x = delta_x[delta_x > 0].min()
         # assume data actually samples the resonance reasonably
         width_min = min_delta_x
-        #TODO this needs to be checked:
+        # TODO this needs to be checked:
         # width_guess = np.sqrt(width_min * width_max)  # geometric mean, why not?
         width_guess = 0.5e6
         self.set_param_hint("width", value=width_guess)
@@ -58,18 +55,20 @@ class LorentzianModel(lmfit.model.Model):
         self.set_param_hint("c", value=c_guess)
 
         # Calculate A_guess from difference between the peak and the backround level
-        A_guess = (np.max(data) - c_guess)/10
+        A_guess = (np.max(data) - c_guess) / 10
         self.set_param_hint("A", value=A_guess)
 
         params = self.make_params()
         return lmfit.models.update_param_vals(params, self.prefix, **kws)
+
 
 class QubitSpectroscopyAnalysis():
     """
     Analysis that fits a Lorentzian function to qubit spectroscopy data.
     The resulting fit can be analyzed to determine if a peak was found or not.
     """
-    def __init__(self,dataset: xr.Dataset):
+
+    def __init__(self, dataset: xr.Dataset):
         data_var = list(dataset.data_vars.keys())[0]
         for coord in dataset[data_var].coords:
             if 'frequencies' in coord:
@@ -104,7 +103,6 @@ class QubitSpectroscopyAnalysis():
 
         self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_freqs})
 
-
         # # Take maximal value directly
         # self.max_freq = frequencies[np.argmax(self.magnitudes)]
         # # print(self.max_freq)
@@ -115,8 +113,8 @@ class QubitSpectroscopyAnalysis():
         # Filters out datapoints in data that deviate too far from the median
         shifted_data = np.abs(data - np.median(data))
         mdev = np.median(shifted_data)
-        s = shifted_data/mdev if mdev else np.zeros(len(shifted_data))
-        filtered_data = data[s<m]
+        s = shifted_data / mdev if mdev else np.zeros(len(shifted_data))
+        filtered_data = data[s < m]
         return filtered_data
 
     def has_peak(self, prom_coef: float = 6, wid_coef: float = 2.4, outlier_median: float = 3.):
@@ -125,22 +123,23 @@ class QubitSpectroscopyAnalysis():
         x_filtered = self.reject_outliers(x, outlier_median)
         self.filtered_std = np.std(x_filtered)
         peaks, properties = signal.find_peaks(
-            x, prominence = self.filtered_std * prom_coef, width=wid_coef
+            x, prominence=self.filtered_std * prom_coef, width=wid_coef
         )
         self.prominence = properties["prominences"][0] if len(properties['prominences']) == 1 else 0
         self.hasPeak = peaks.size == 1
         self.hasPeak = True
         return self.hasPeak
 
-    def plotter(self,ax):
+    def plotter(self, ax):
         # Plots the data and the fitted model of a qubit spectroscopy experiment
         if self.hasPeak:
-            ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0)
+            ax.plot(self.fit_freqs, self.fit_y, 'r-', lw=3.0)
             min = np.min(self.magnitudes)
             # ax.vlines(self.freq, min, self.prominence + min, lw=4, color='teal')
             # ax.vlines(self.freq-1e6, min, self.filtered_std + min, lw=4, color='orange')
-            ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0, label=f"freq = {self.freq:.6E} ± {self.uncertainty:.1E} (Hz)")
-        ax.plot( self.independents, self.magnitudes,'bo-',ms=3.0)
+            ax.plot(self.fit_freqs, self.fit_y, 'r-', lw=3.0,
+                    label=f"freq = {self.freq:.6E} ± {self.uncertainty:.1E} (Hz)")
+        ax.plot(self.independents, self.magnitudes, 'bo-', ms=3.0)
         ax.set_title(f'Qubit Spectroscopy for {self.qubit}')
         ax.set_xlabel('frequency (Hz)')
         ax.set_ylabel('|S21| (V)')

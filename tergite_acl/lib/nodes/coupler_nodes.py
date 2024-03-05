@@ -4,7 +4,7 @@ from tergite_acl.config.settings import REDIS_CONNECTION
 from tergite_acl.lib.analysis.coupler_spectroscopy_analysis import CouplerSpectroscopyAnalysis
 from tergite_acl.lib.analysis.cz_calibration_analysis import CZCalibrationAnalysis, CZCalibrationSSROAnalysis
 from tergite_acl.lib.analysis.cz_chevron_analysis import CZChevronAnalysis
-from tergite_acl.lib.node_base import Base_Node
+from tergite_acl.lib.node_base import BaseNode
 from tergite_acl.lib.nodes.node_utils import qubit_samples, resonator_samples
 from tergite_acl.lib.schedules.cz_chevron import CZ_chevron
 from tergite_acl.lib.schedules.resonator_spectroscopy import Resonator_Spectroscopy
@@ -51,7 +51,7 @@ class Coupler_Spectroscopy_Node:
         return spi_samplespace
 
 
-class Coupler_Resonator_Spectroscopy_Node(Base_Node):
+class Coupler_Resonator_Spectroscopy_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['resonator_flux_quantum']
@@ -75,7 +75,7 @@ class Coupler_Resonator_Spectroscopy_Node(Base_Node):
         return spi_samplespace
 
 
-class CZ_Chevron_Node(Base_Node):
+class CZ_Chevron_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], couplers: list[str]):
         super().__init__(name, all_qubits)
         self.couplers = couplers
@@ -132,7 +132,7 @@ class CZ_Chevron_Node(Base_Node):
         return cluster_samplespace
 
 
-class CZ_Optimize_Chevron_Node(Base_Node):
+class CZ_Optimize_Chevron_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], couplers: list[str]):
         super().__init__(name, all_qubits)
         self.type = 'optimized_sweep'
@@ -190,7 +190,7 @@ class CZ_Optimize_Chevron_Node(Base_Node):
         return cluster_samplespace
 
 
-class Reset_Chevron_Node(Base_Node):
+class Reset_Chevron_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.name = name
@@ -235,7 +235,7 @@ class Reset_Chevron_Node(Base_Node):
         return cluster_samplespace
 
 
-class CZ_Calibration_Node(Base_Node):
+class CZ_Calibration_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.coupler = couplers[0]
@@ -260,7 +260,7 @@ class CZ_Calibration_Node(Base_Node):
         return cluster_samplespace
 
 
-class CZ_Calibration_SSRO_Node(Base_Node):
+class CZ_Calibration_SSRO_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.coupler = couplers[0]
@@ -284,7 +284,7 @@ class CZ_Calibration_SSRO_Node(Base_Node):
         return cluster_samplespace
 
 
-class CZ_Dynamic_Phase_Node(Base_Node):
+class CZ_Dynamic_Phase_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], couplers: list[str], **kwargs):
         self.name = name
         self.all_qubits = all_qubits

@@ -2,14 +2,13 @@
 Module containing a class that fits data from a resonator spectroscopy experiment.
 """
 import numpy as np
-from quantify_core.analysis import fitting_models as fm
-import redis
 import xarray as xr
+from quantify_core.analysis import fitting_models as fm
 
+from tergite_acl.config.settings import REDIS_CONNECTION
 from tergite_acl.lib.analysis_base import BaseAnalysis
 
 model = fm.ResonatorModel()
-redis_connection = redis.Redis(decode_responses=True)
 
 
 class ResonatorSpectroscopyAnalysis(BaseAnalysis):
@@ -77,7 +76,7 @@ class ResonatorSpectroscopy_1_Analysis(ResonatorSpectroscopyAnalysis):
         this_qubit = self.dataset.attrs['qubit']
         ax.set_xlabel('Frequency (Hz)')
         ax.set_ylabel('|S21| (V)')
-        ro_freq = float(redis_connection.hget(f'transmons:{this_qubit}', 'ro_freq'))
+        ro_freq = float(REDIS_CONNECTION.hget(f'transmons:{this_qubit}', 'ro_freq'))
         self.fitting_model.plot_fit(ax, numpoints=400, xlabel=None, title=None)
         ax.axvline(self.minimum_freq, c='green', ls='solid', label='frequency |1> ')
         ax.axvline(ro_freq, c='blue', ls='dashed', label='frequency |0>')
@@ -93,8 +92,8 @@ class ResonatorSpectroscopy_2_Analysis(ResonatorSpectroscopyAnalysis):
         this_qubit = self.dataset.attrs['qubit']
         ax.set_xlabel('Frequency (Hz)')
         ax.set_ylabel('|S21| (V)')
-        ro_freq = float(redis_connection.hget(f'transmons:{this_qubit}', 'ro_freq'))
-        ro_freq_1 = float(redis_connection.hget(f'transmons:{this_qubit}', 'ro_freq_1'))
+        ro_freq = float(REDIS_CONNECTION.hget(f'transmons:{this_qubit}', 'ro_freq'))
+        ro_freq_1 = float(REDIS_CONNECTION.hget(f'transmons:{this_qubit}', 'ro_freq_1'))
         self.fitting_model.plot_fit(ax, numpoints=400, xlabel=None, title=None)
         ax.axvline(self.minimum_freq, c='red', ls='solid', label='frequency |2>')
         ax.axvline(ro_freq_1, c='green', ls='dashed', label='frequency |1>')

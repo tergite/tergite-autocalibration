@@ -1,10 +1,13 @@
 """
 Module containing classes that model, fit and plot data from a Rabi experiment.
 """
-import numpy as np
 import lmfit
+import numpy as np
 import xarray as xr
 from matplotlib.axes import Axes
+
+from tergite_acl.lib.analysis_base import BaseAnalysis
+
 
 def exponential_decay_function(m: float, p: float, A: float, B: float) -> float:
     return A * p ** m + B
@@ -14,8 +17,8 @@ class ExpDecayModel(lmfit.model.Model):
     """
     Generate an exponential decay model that can be fit to randomized benchmarking data.
     """
-    def __init__(self, *args, **kwargs):
 
+    def __init__(self, *args, **kwargs):
         super().__init__(exponential_decay_function, *args, **kwargs)
 
         self.set_param_hint("A", vary=True)
@@ -28,7 +31,7 @@ class ExpDecayModel(lmfit.model.Model):
         if m is None:
             return None
 
-        amplitude_guess = 1/2
+        amplitude_guess = 1 / 2
         self.set_param_hint("A", value=amplitude_guess)
 
         offset_guess = data[-1]
@@ -41,17 +44,21 @@ class ExpDecayModel(lmfit.model.Model):
         return lmfit.models.update_param_vals(params, self.prefix, **kws)
 
 
-class RandomizedBenchmarkingAnalysis():
+class RandomizedBenchmarkingAnalysis(BaseAnalysis):
     """
     Analysis that fits an exponential decay function to randomized benchmarking data.
     """
-    def  __init__(self,dataset: xr.Dataset):
+
+    def __init__(self, dataset: xr.Dataset):
+        super().__init__()
         self.data_var = list(dataset.data_vars.keys())[0]
         self.qubit = dataset[self.data_var].attrs['qubit']
         self.S21 = dataset[self.data_var]
         for coord in dataset[self.data_var].coords:
-            if 'cliffords' in coord: self.number_cliffords_coord = coord
-            elif 'seed' in coord: self.seed_coord = coord
+            if 'cliffords' in coord:
+                self.number_cliffords_coord = coord
+            elif 'seed' in coord:
+                self.seed_coord = coord
         self.number_of_repetitions = dataset.dims[self.seed_coord]
         self.number_of_cliffords = dataset[self.number_cliffords_coord].values
         self.number_of_cliffords_runs = dataset.dims[self.number_cliffords_coord] - 2
@@ -68,7 +75,7 @@ class RandomizedBenchmarkingAnalysis():
             data_translated_to_zero = data - calibration_0
 
             rotation_angle = np.angle(displacement_vector)
-            rotated_data = data_translated_to_zero * np.exp( -1j * rotation_angle)
+            rotated_data = data_translated_to_zero * np.exp(-1j * rotation_angle)
             rotated_0 = calibration_0 * np.exp(-1j * rotation_angle)
             rotated_1 = calibration_1 * np.exp(-1j * rotation_angle)
             normalization = (rotated_1 - rotated_0).real
@@ -89,19 +96,18 @@ class RandomizedBenchmarkingAnalysis():
         guess = model.guess(data=self.sum, m=n_cliffords)
         fit_result = model.fit(self.sum, params=guess, m=n_cliffords)
 
-        self.fit_n_cliffords = np.linspace( n_cliffords[0], n_cliffords[-1], 400)
+        self.fit_n_cliffords = np.linspace(n_cliffords[0], n_cliffords[-1], 400)
         self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_n_cliffords})
         self.fidelity = fit_result.params['p'].value
         return [self.fidelity]
 
-    def plotter(self,ax: Axes):
+    def plotter(self, ax: Axes):
         for repetition_index in range(self.number_of_repetitions):
             real_values = self.normalized_data_dict[repetition_index]
             ax.plot(self.number_of_cliffords[:-2], real_values, alpha=0.2)
             ax.annotate(f'{repetition_index}', (self.number_of_cliffords[:-2][-1], real_values[-1]))
 
-
-        ax.plot( self.fit_n_cliffords, self.fit_y, 'ro-', lw=2.5, label=f'p = {self.fidelity:.3f}',)
+        ax.plot(self.fit_n_cliffords, self.fit_y, 'ro-', lw=2.5, label=f'p = {self.fidelity:.3f}', )
         ax.plot(self.number_of_cliffords[:-2], self.sum, ls='dashed', c='black')
         ax.set_ylabel(f'|S21| (V)')
         ax.grid()

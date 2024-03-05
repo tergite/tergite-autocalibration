@@ -8,9 +8,8 @@ from numpy.linalg import inv
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
+from tergite_acl.config.settings import REDIS_CONNECTION
 from tergite_acl.lib.analysis_base import BaseAnalysis
-
-redis_connection = redis.Redis(decode_responses=True)
 
 
 class OptimalROAmplitudeAnalysis(BaseAnalysis):
@@ -155,9 +154,9 @@ class OptimalRO_Two_state_AmplitudeAnalysis(OptimalROAmplitudeAnalysis):
         intercept_ = str(float(self.lda.intercept_[0]))
 
         # We update the values in redis
-        redis_connection.hset(f"transmons:{this_element}", 'lda_coef_0', coef_0_)
-        redis_connection.hset(f"transmons:{this_element}", 'lda_coef_1', coef_1_)
-        redis_connection.hset(f"transmons:{this_element}", 'lda_intercept', intercept_)
+        REDIS_CONNECTION.hset(f"transmons:{this_element}", 'lda_coef_0', coef_0_)
+        REDIS_CONNECTION.hset(f"transmons:{this_element}", 'lda_coef_1', coef_1_)
+        REDIS_CONNECTION.hset(f"transmons:{this_element}", 'lda_intercept', intercept_)
 
 
 class OptimalRO_Three_state_AmplitudeAnalysis(OptimalROAmplitudeAnalysis):

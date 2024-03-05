@@ -12,7 +12,7 @@ from tergite_acl.lib.analysis.resonator_spectroscopy_analysis import (
     ResonatorSpectroscopy_1_Analysis,
     ResonatorSpectroscopy_2_Analysis
 )
-from tergite_acl.lib.node_base import Base_Node
+from tergite_acl.lib.node_base import BaseNode
 from tergite_acl.lib.nodes.node_utils import resonator_samples
 from tergite_acl.lib.schedules.punchout import Punchout
 from tergite_acl.lib.schedules.resonator_spectroscopy import Resonator_Spectroscopy
@@ -20,7 +20,7 @@ from tergite_acl.lib.schedules.ro_amplitude_optimization import RO_amplitude_opt
 from tergite_acl.lib.schedules.ro_frequency_optimization import RO_frequency_optimization
 
 
-class Resonator_Spectroscopy_Node(Base_Node):
+class Resonator_Spectroscopy_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['ro_freq', 'Ql', 'resonator_minimum']
@@ -37,7 +37,7 @@ class Resonator_Spectroscopy_Node(Base_Node):
         return cluster_samplespace
 
 
-class Resonator_Spectroscopy_1_Node(Base_Node):
+class Resonator_Spectroscopy_1_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['ro_freq_1', 'Ql_1', 'resonator_minimum_1']
@@ -55,7 +55,7 @@ class Resonator_Spectroscopy_1_Node(Base_Node):
         return cluster_samplespace
 
 
-class Resonator_Spectroscopy_2_Node(Base_Node):
+class Resonator_Spectroscopy_2_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['ro_freq_2']
@@ -73,7 +73,7 @@ class Resonator_Spectroscopy_2_Node(Base_Node):
         return cluster_samplespace
 
 
-class Punchout_Node(Base_Node):
+class Punchout_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['ro_ampl']
@@ -93,7 +93,7 @@ class Punchout_Node(Base_Node):
         return cluster_samplespace
 
 
-class RO_frequency_optimization_Node(Base_Node):
+class RO_frequency_optimization_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['ro_freq_2st_opt']
@@ -110,7 +110,7 @@ class RO_frequency_optimization_Node(Base_Node):
         }
         return cluster_samplespace
 
-class RO_frequency_optimization_gef_Node(Base_Node):
+class RO_frequency_optimization_gef_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.name = name
@@ -130,7 +130,7 @@ class RO_frequency_optimization_gef_Node(Base_Node):
         return cluster_samplespace
 
 
-class RO_amplitude_two_state_optimization_Node(Base_Node):
+class RO_amplitude_two_state_optimization_Node(BaseNode):
     '''
     TODO the two and three state discrimination is quite similar, they should be merged
     '''
@@ -164,7 +164,7 @@ class RO_amplitude_two_state_optimization_Node(Base_Node):
         return cluster_samplespace
 
 
-class RO_amplitude_three_state_optimization_Node(Base_Node):
+class RO_amplitude_three_state_optimization_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.name = name

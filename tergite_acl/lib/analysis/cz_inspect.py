@@ -4,6 +4,8 @@ from scipy.optimize import leastsq
 from enum import Enum
 from functools import singledispatchmethod
 
+# TODO: Is this an analysis and if not, where to move it?
+
 class SweepResultStatus(Enum):
     NOT_AVAILABLE = 0
     NOT_FOUND = 1

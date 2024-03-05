@@ -1,4 +1,4 @@
-class Base_Node:
+class BaseNode:
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         self.name = name
         self.all_qubits = all_qubits

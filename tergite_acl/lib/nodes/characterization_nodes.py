@@ -6,13 +6,13 @@ from tergite_acl.lib.analysis.T1_analysis import T1Analysis, T2Analysis, T2EchoA
 from tergite_acl.lib.analysis.check_cliffords_analysis import CheckCliffordsAnalysis
 # from analysis.cz_chevron_analysis import CZChevronAnalysis, CZChevronAnalysisReset
 from tergite_acl.lib.analysis.randomized_benchmarking_analysis import RandomizedBenchmarkingAnalysis
-from tergite_acl.lib.node_base import Base_Node
+from tergite_acl.lib.node_base import BaseNode
 from tergite_acl.lib.schedules.T1 import T1, T2, T2Echo
 from tergite_acl.lib.schedules.check_cliffords import Check_Cliffords
 from tergite_acl.lib.schedules.randomized_benchmarking import Randomized_Benchmarking
 
 
-class T1_Node(Base_Node):
+class T1_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.all_qubits = all_qubits
@@ -46,7 +46,7 @@ class T1_Node(Base_Node):
         return cluster_samplespace
 
 
-class Randomized_Benchmarking_Node(Base_Node):
+class Randomized_Benchmarking_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.name = name
@@ -110,7 +110,7 @@ class Check_Cliffords_Node:
         return cluster_samplespace
 
 
-class T2_Node(Base_Node):
+class T2_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.name = name
@@ -127,7 +127,7 @@ class T2_Node(Base_Node):
         return cluster_samplespace
 
 
-class T2_Echo_Node(Base_Node):
+class T2_Echo_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.name = name

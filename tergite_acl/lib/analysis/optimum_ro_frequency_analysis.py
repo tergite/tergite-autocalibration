@@ -2,22 +2,21 @@
 Module containing a class that fits data from a resonator spectroscopy experiment.
 """
 import numpy as np
-from quantify_core.analysis import fitting_models as fm
-import redis
 import xarray as xr
+from quantify_core.analysis import fitting_models as fm
 
+from tergite_acl.config.settings import REDIS_CONNECTION
 from tergite_acl.lib.analysis_base import BaseAnalysis
 
-redis_connection = redis.Redis(decode_responses=True)
-
 model = fm.ResonatorModel()
-redis_connection = redis.Redis(decode_responses=True)
+
 
 class OptimalROFrequencyAnalysis(BaseAnalysis):
     """
     Analysis that fits the data of resonator spectroscopy experiments
     and extractst the optimal RO frequency.
     """
+
     def __init__(self, dataset: xr.Dataset):
         super().__init__()
         self.dataset = dataset
@@ -51,7 +50,7 @@ class OptimalROFrequencyAnalysis(BaseAnalysis):
 
         return [self.optimal_frequency]
 
-    def plotter(self,ax):
+    def plotter(self, ax):
         this_qubit = self.dataset.attrs['qubit']
         ax.set_xlabel('I quadrature (V)')
         ax.set_ylabel('Q quadrature (V)')
@@ -60,8 +59,8 @@ class OptimalROFrequencyAnalysis(BaseAnalysis):
         f0 = self.fit_IQ_0[self.index_of_max_distance]
         f1 = self.fit_IQ_1[self.index_of_max_distance]
 
-        ro_freq = float(redis_connection.hget(f'transmons:{this_qubit}', 'ro_freq'))
-        ro_freq_1 = float(redis_connection.hget(f'transmons:{this_qubit}', 'ro_freq_1'))
+        ro_freq = float(REDIS_CONNECTION.hget(f'transmons:{this_qubit}', 'ro_freq'))
+        ro_freq_1 = float(REDIS_CONNECTION.hget(f'transmons:{this_qubit}', 'ro_freq_1'))
 
         label_text = f'opt_ro: {int(self.optimal_frequency)}\n'
         label_text += f'|0>_ro: {int(ro_freq)}\n'
@@ -69,9 +68,10 @@ class OptimalROFrequencyAnalysis(BaseAnalysis):
 
         ax.scatter(
             [f0.real, f1.real], [f0.imag, f1.imag],
-            marker='*',c='red', s=64,  label=label_text
+            marker='*', c='red', s=64, label=label_text
         )
         ax.grid()
+
 
 class OptimalRO_012_FrequencyAnalysis(OptimalROFrequencyAnalysis):
     def __init__(self, dataset: xr.Dataset):
@@ -83,7 +83,7 @@ class OptimalRO_012_FrequencyAnalysis(OptimalROFrequencyAnalysis):
 
     def run_fitting(self):
         guess_2 = model.guess(self.S21_2, f=self.frequencies)
-        self.fit_frequencies = np.linspace(self.frequencies[0],self.frequencies[-1],400)
+        self.fit_frequencies = np.linspace(self.frequencies[0], self.frequencies[-1], 400)
         self.fit_result_2 = model.fit(self.S21_2, params=guess_2, f=self.frequencies)
         self.fit_IQ_2 = model.eval(self.fit_result_2.params, f=self.fit_frequencies)
 
@@ -95,21 +95,21 @@ class OptimalRO_012_FrequencyAnalysis(OptimalROFrequencyAnalysis):
         self.distances_01 = np.abs(self.S21_0 - self.S21_1)
         self.distances_12 = np.abs(self.S21_1 - self.S21_2)
         self.distances_20 = np.abs(self.S21_2 - self.S21_0)
-        self.total_distance = (self.distances_01 + self.distances_12 + self.distances_20)/3
+        self.total_distance = (self.distances_01 + self.distances_12 + self.distances_20) / 3
         self.index_of_max_distance = np.argmax(self.total_distance)
         # self.optimal_frequency = self.fit_frequencies[self.index_of_max_distance]
         self.optimal_frequency = self.frequencies[self.index_of_max_distance]
 
         return [self.optimal_frequency]
 
-    def plotter(self,ax):
+    def plotter(self, ax):
         this_qubit = self.dataset.attrs['qubit']
         ax.set_xlabel('RO frequency')
         ax.set_ylabel('IQ distance')
-        ax.plot(self.frequencies, np.abs(self.S21_0),label='0')
-        ax.plot(self.frequencies, np.abs(self.S21_1),label='1')
-        ax.plot(self.frequencies, np.abs(self.S21_2),label='2')
-        ax.plot(self.frequencies, self.total_distance,'--',label='distance')
+        ax.plot(self.frequencies, np.abs(self.S21_0), label='0')
+        ax.plot(self.frequencies, np.abs(self.S21_1), label='1')
+        ax.plot(self.frequencies, np.abs(self.S21_2), label='2')
+        ax.plot(self.frequencies, self.total_distance, '--', label='distance')
         # ax.plot(self.frequencies, self.distances_01,label='01')
         # ax.plot(self.frequencies, self.distances_12,label='12')
         # ax.plot(self.frequencies, self.distances_20,label='20')
@@ -121,6 +121,6 @@ class OptimalRO_012_FrequencyAnalysis(OptimalROFrequencyAnalysis):
 
         ax.scatter(
             self.optimal_frequency, optimal_distance,
-            marker='*',c='red', s=64,
+            marker='*', c='red', s=64,
         )
         ax.grid()

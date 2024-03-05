@@ -5,7 +5,7 @@ from tergite_acl.lib.analysis_base import BaseAnalysis
 
 
 class MotzoiAnalysis(BaseAnalysis):
-    def  __init__(self, dataset: xr.Dataset):
+    def __init__(self, dataset: xr.Dataset):
         super().__init__()
         data_var = list(dataset.data_vars.keys())[0]
         coord = list(dataset[data_var].coords.keys())[0]
@@ -19,7 +19,7 @@ class MotzoiAnalysis(BaseAnalysis):
         self.dataset = dataset
 
     def run_fitting(self):
-        motzoi_key = 'mw_motzois'+self.qubit
+        motzoi_key = 'mw_motzois' + self.qubit
         motzois = self.dataset[motzoi_key].size
         sums = []
         for this_motzoi_index in range(motzois):
@@ -31,10 +31,9 @@ class MotzoiAnalysis(BaseAnalysis):
 
         return [self.optimal_motzoi]
 
-    def plotter(self,axis):
+    def plotter(self, axis):
         datarray = self.dataset[f'y{self.qubit}']
         qubit = self.qubit
 
-
-        datarray.plot(ax=axis, x=f'mw_motzois{qubit}',cmap='RdBu_r')
-        axis.axvline(self.optimal_motzoi, c='k', lw=4,linestyle ='--')
+        datarray.plot(ax=axis, x=f'mw_motzois{qubit}', cmap='RdBu_r')
+        axis.axvline(self.optimal_motzoi, c='k', lw=4, linestyle='--')

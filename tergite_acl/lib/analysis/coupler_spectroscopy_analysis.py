@@ -1,12 +1,15 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from numpy.polynomial.polynomial import Polynomial
 import xarray as xr
+from numpy.polynomial.polynomial import Polynomial
+
 from tergite_acl.lib.analysis.qubit_spectroscopy_analysis import QubitSpectroscopyAnalysis
+from tergite_acl.lib.analysis_base import BaseAnalysis
 
 
-class CouplerSpectroscopyAnalysis():
+class CouplerSpectroscopyAnalysis(BaseAnalysis):
     def __init__(self, dataset: xr.Dataset):
+        super().__init__()
         data_var = list(dataset.data_vars.keys())[0]
         self.qubit = dataset[data_var].attrs['qubit']
         self.S21 = dataset[data_var].values
@@ -19,11 +22,11 @@ class CouplerSpectroscopyAnalysis():
         self.data_var = data_var
         self.dataset = dataset
 
-    def reject_outliers(self, data, m = 4):
+    def reject_outliers(self, data, m=4):
         d = np.abs(data - np.median(data))
         mdev = np.median(d)
-        s = d/mdev if mdev else np.zeros(len(d))
-        return np.array(s>m)
+        s = d / mdev if mdev else np.zeros(len(d))
+        return np.array(s > m)
 
     def run_fitting(self):
         self.dc_currents = self.dataset[f'y{self.qubit}'][self.currents]
@@ -64,10 +67,10 @@ class CouplerSpectroscopyAnalysis():
         self.root_frequencies = root_frequencies
         return [self.parking_I]
 
-    def plotter(self,ax: plt.Axes):
+    def plotter(self, ax: plt.Axes):
         self.dataset[self.data_var].plot(ax=ax, x=self.frequencies)
         ax.scatter(self.detected_frequencies, self.detected_currents, s=52, c='red')
         if hasattr(self, 'root_frequencies'):
             ax.scatter(self.root_frequencies, self.roots, s=64, c='black', label=r'$\Phi_0$')
         if hasattr(self, 'parking_I'):
-            ax.axhline(self.parking_I, lw=5, ls='dashed',  c='orange', label=f'parking current = {self.parking_I}')
+            ax.axhline(self.parking_I, lw=5, ls='dashed', c='orange', label=f'parking current = {self.parking_I}')
