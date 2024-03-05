@@ -1,8 +1,12 @@
 import numpy as np
 import xarray as xr
 
-class MotzoiAnalysis():
-    def  __init__(self,dataset: xr.Dataset):
+from tergite_acl.lib.analysis_base import BaseAnalysis
+
+
+class MotzoiAnalysis(BaseAnalysis):
+    def  __init__(self, dataset: xr.Dataset):
+        super().__init__()
         data_var = list(dataset.data_vars.keys())[0]
         coord = list(dataset[data_var].coords.keys())[0]
         self.S21 = dataset[data_var].values

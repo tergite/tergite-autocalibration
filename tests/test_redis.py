@@ -1,4 +1,4 @@
-from tergite_acl.lib.nodes.node import NodeFactory
+from tergite_acl.lib.node_factory import NodeFactory
 import quantify_scheduler.device_under_test.mock_setup as mock
 import numpy as np
 from tergite_acl.lib.schedules import Randomized_Benchmarking

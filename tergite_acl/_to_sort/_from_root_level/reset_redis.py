@@ -1,6 +1,6 @@
 import argparse
 from tergite_acl.utils.reset_redis_node import ResetRedisNode
-from tergite_acl.lib.nodes.node import NodeFactory
+from tergite_acl.lib.node_factory import NodeFactory
 
 node_factory = NodeFactory()
 nodes = node_factory.all_nodes()

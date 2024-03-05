@@ -12,7 +12,7 @@ from quantify_scheduler.instrument_coordinator.components.qblox import ClusterCo
 from tergite_acl.config import settings
 from tergite_acl.config.settings import CLUSTER_IP, REDIS_CONNECTION
 from tergite_acl.lib.nodes.graph import filtered_topological_order
-from tergite_acl.lib.nodes.node import NodeFactory
+from tergite_acl.lib.node_factory import NodeFactory
 from tergite_acl.utils.logger.tac_logger import logger
 from tergite_acl.utils.status import ClusterStatus
 from tergite_acl.utils.status import DataStatus

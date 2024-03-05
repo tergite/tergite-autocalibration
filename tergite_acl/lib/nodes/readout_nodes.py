@@ -1,32 +1,24 @@
 import numpy as np
-from tergite_acl.lib.schedules.resonator_spectroscopy import Resonator_Spectroscopy
-from tergite_acl.lib.schedules.punchout import Punchout
-from tergite_acl.lib.schedules.ro_frequency_optimization import RO_frequency_optimization
-from tergite_acl.lib.schedules.ro_amplitude_optimization import RO_amplitude_optimization
-from tergite_acl.lib.nodes.base_node import Base_Node
 
+from tergite_acl.lib.analysis.optimum_ro_amplitude_analysis import OptimalRO_Three_state_AmplitudeAnalysis, \
+    OptimalRO_Two_state_AmplitudeAnalysis
+from tergite_acl.lib.analysis.optimum_ro_frequency_analysis import (
+    OptimalROFrequencyAnalysis,
+    OptimalRO_012_FrequencyAnalysis
+)
+from tergite_acl.lib.analysis.punchout_analysis import PunchoutAnalysis
 from tergite_acl.lib.analysis.resonator_spectroscopy_analysis import (
     ResonatorSpectroscopyAnalysis,
     ResonatorSpectroscopy_1_Analysis,
     ResonatorSpectroscopy_2_Analysis
 )
-from tergite_acl.lib.analysis.optimum_ro_frequency_analysis import (
-    OptimalROFrequencyAnalysis,
-    OptimalRO_012_FrequencyAnalysis
-)
-from tergite_acl.lib.analysis.optimum_ro_amplitude_analysis import OptimalRO_Three_state_AmplitudeAnalysis, OptimalRO_Two_state_AmplitudeAnalysis
-from tergite_acl.lib.analysis.punchout_analysis import PunchoutAnalysis
+from tergite_acl.lib.node_base import Base_Node
 from tergite_acl.lib.nodes.node_utils import resonator_samples
+from tergite_acl.lib.schedules.punchout import Punchout
+from tergite_acl.lib.schedules.resonator_spectroscopy import Resonator_Spectroscopy
+from tergite_acl.lib.schedules.ro_amplitude_optimization import RO_amplitude_optimization
+from tergite_acl.lib.schedules.ro_frequency_optimization import RO_frequency_optimization
 
-from tergite_acl.config.VNA_LOKIB_values import VNA_resonator_frequencies
-
-def resonator_samples(qubit: str) -> np.ndarray:
-    res_spec_samples = 101
-    sweep_range =  2.0e6
-    VNA_frequency = VNA_resonator_frequencies[qubit]
-    min_freq = VNA_frequency - sweep_range / 2 -0.5e6
-    max_freq = VNA_frequency + sweep_range / 2
-    return np.linspace(min_freq, max_freq, res_spec_samples)
 
 class Resonator_Spectroscopy_Node(Base_Node):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):

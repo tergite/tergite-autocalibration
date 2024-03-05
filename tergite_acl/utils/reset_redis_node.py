@@ -1,7 +1,8 @@
 import redis
 import toml
 from tergite_acl.utils import user_input
-from tergite_acl.lib.nodes.node import NodeFactory
+from tergite_acl.lib.node_factory import NodeFactory
+
 
 class ResetRedisNode:
     def __init__(self):

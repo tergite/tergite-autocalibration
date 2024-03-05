@@ -5,17 +5,21 @@ import numpy as np
 from quantify_core.analysis import fitting_models as fm
 import redis
 import xarray as xr
+
+from tergite_acl.lib.analysis_base import BaseAnalysis
+
 redis_connection = redis.Redis(decode_responses=True)
 
 model = fm.ResonatorModel()
 redis_connection = redis.Redis(decode_responses=True)
 
-class OptimalROFrequencyAnalysis():
+class OptimalROFrequencyAnalysis(BaseAnalysis):
     """
     Analysis that fits the data of resonator spectroscopy experiments
     and extractst the optimal RO frequency.
     """
     def __init__(self, dataset: xr.Dataset):
+        super().__init__()
         self.dataset = dataset
         data_var = list(dataset.data_vars.keys())[0]
 

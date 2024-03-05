@@ -5,6 +5,8 @@ import xarray as xr
 import redis
 from quantify_core.analysis.fitting_models import exp_damp_osc_func, fft_freq_phase_guess
 
+from tergite_acl.lib.analysis_base import BaseAnalysis
+
 redis_connection = redis.Redis(decode_responses=True)
 
 class RamseyModel(lmfit.model.Model):
@@ -47,8 +49,9 @@ class RamseyModel(lmfit.model.Model):
 
 
 
-class RamseyAnalysis():
-    def  __init__( self,dataset: xr.Dataset, redis_field='freq_01'):
+class RamseyAnalysis(BaseAnalysis):
+    def  __init__(self, dataset: xr.Dataset, redis_field='freq_01'):
+        super().__init__()
         self.redis_field = redis_field
         self.qubit = dataset.attrs['qubit']
         redis_key = f'transmons:{self.qubit}'

@@ -6,6 +6,9 @@ import lmfit
 from quantify_core.analysis.fitting_models import fft_freq_phase_guess
 import xarray as xr
 
+from tergite_acl.lib.analysis_base import BaseAnalysis
+
+
 # Cosine function that is fit to Rabi oscillations
 def cos_func(
     drive_amp: float,
@@ -53,11 +56,12 @@ class RabiModel(lmfit.model.Model):
         params = self.make_params()
         return lmfit.models.update_param_vals(params, self.prefix, **kws)
 
-class RabiAnalysis():
+class RabiAnalysis(BaseAnalysis):
     """
     Analysis that fits a cosine function to Rabi oscillation data.
     """
-    def  __init__(self,dataset: xr.Dataset):
+    def  __init__(self, dataset: xr.Dataset):
+        super().__init__()
         data_var = list(dataset.data_vars.keys())[0]
         coord = list(dataset[data_var].coords.keys())[0]
         self.S21 = dataset[data_var].values

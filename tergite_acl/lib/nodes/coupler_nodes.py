@@ -1,39 +1,18 @@
 import numpy as np
-import redis
-from tergite_acl.lib.schedules.cz_chevron import CZ_chevron
-from tergite_acl.lib.schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
-from tergite_acl.lib.schedules.resonator_spectroscopy import Resonator_Spectroscopy
+
+from tergite_acl.config.settings import REDIS_CONNECTION
 from tergite_acl.lib.analysis.coupler_spectroscopy_analysis import CouplerSpectroscopyAnalysis
+from tergite_acl.lib.analysis.cz_calibration_analysis import CZCalibrationAnalysis, CZCalibrationSSROAnalysis
 from tergite_acl.lib.analysis.cz_chevron_analysis import CZChevronAnalysis
-from tergite_acl.config.VNA_LOKIB_values import VNA_resonator_frequencies, VNA_qubit_frequencies, VNA_f12_frequencies
-from tergite_acl.lib.nodes.base_node import Base_Node
+from tergite_acl.lib.node_base import Base_Node
+from tergite_acl.lib.nodes.node_utils import qubit_samples, resonator_samples
+from tergite_acl.lib.schedules.cz_chevron import CZ_chevron
+from tergite_acl.lib.schedules.resonator_spectroscopy import Resonator_Spectroscopy
+from tergite_acl.lib.schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
 
-redis_connection = redis.Redis(decode_responses=True)
-
-def resonator_samples(qubit: str) -> np.ndarray:
-    res_spec_samples = 101
-    sweep_range =  2.0e6
-    VNA_frequency = VNA_resonator_frequencies[qubit]
-    min_freq = VNA_frequency - sweep_range / 2 -0.5e6
-    max_freq = VNA_frequency + sweep_range / 2
-    return np.linspace(min_freq, max_freq, res_spec_samples)
-
-
-def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
-    qub_spec_samples = 41
-    sweep_range = 3.0e6
-    if transition == '01':
-        VNA_frequency = VNA_qubit_frequencies[qubit]
-    elif transition == '12':
-        VNA_frequency = VNA_f12_frequencies[qubit]
-    else:
-        VNA_frequency = VNA_value # TODO: this should have a value
-    min_freq = VNA_frequency - sweep_range / 2
-    max_freq = VNA_frequency + sweep_range / 2
-    return np.linspace(min_freq, max_freq, qub_spec_samples)
 
 class Coupler_Spectroscopy_Node:
-    def __init__(self, name: str, all_qubits: list[str], ** kwargs):
+    def __init__(self, name: str, all_qubits: list[str], **kwargs):
         self.name = name
         self.all_qubits = all_qubits
         self.couplers = kwargs['couplers']
@@ -71,8 +50,9 @@ class Coupler_Spectroscopy_Node:
         }
         return spi_samplespace
 
+
 class Coupler_Resonator_Spectroscopy_Node(Base_Node):
-    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
+    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['resonator_flux_quantum']
         self.qubit_state = 0
@@ -100,7 +80,7 @@ class CZ_Chevron_Node(Base_Node):
         super().__init__(name, all_qubits)
         self.couplers = couplers
         self.coupler = self.couplers[0]
-        self.redis_field = ['cz_pulse_frequency','cz_pulse_duration']
+        self.redis_field = ['cz_pulse_frequency', 'cz_pulse_duration']
         self.qubit_state = 0
         self.measurement_obj = CZ_chevron
         self.analysis_obj = CZChevronAnalysis
@@ -118,13 +98,13 @@ class CZ_Chevron_Node(Base_Node):
 
     def transition_frequency(self, coupler: str):
         coupled_qubits = coupler.split(sep='_')
-        q1_f01 = float(redis_connection.hget(f'transmons:{coupled_qubits[0]}', "freq_01"))
-        q2_f01 = float(redis_connection.hget(f'transmons:{coupled_qubits[1]}', "freq_01"))
-        q1_f12 = float(redis_connection.hget(f'transmons:{coupled_qubits[0]}', "freq_12"))
-        q2_f12 = float(redis_connection.hget(f'transmons:{coupled_qubits[1]}', "freq_12"))
+        q1_f01 = float(REDIS_CONNECTION.hget(f'transmons:{coupled_qubits[0]}', "freq_01"))
+        q2_f01 = float(REDIS_CONNECTION.hget(f'transmons:{coupled_qubits[1]}', "freq_01"))
+        q1_f12 = float(REDIS_CONNECTION.hget(f'transmons:{coupled_qubits[0]}', "freq_12"))
+        q2_f12 = float(REDIS_CONNECTION.hget(f'transmons:{coupled_qubits[1]}', "freq_12"))
         # ac_freq = np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12))
         ac_freq = np.abs(q1_f01 + q2_f01 - (q2_f01 + q2_f12))
-        ac_freq = int( ac_freq / 1e4 ) * 1e4
+        ac_freq = int(ac_freq / 1e4) * 1e4
         print(f'{ ac_freq/1e6 = } MHz for coupler: {coupler}')
         return ac_freq
 
@@ -145,7 +125,8 @@ class CZ_Chevron_Node(Base_Node):
                 coupler: np.arange(100e-9, 1000e-9, 32e-9) for coupler in self.couplers
             },
             'cz_pulse_frequencies': {
-                coupler: np.linspace(-2.0e6, 2.0e6, 25) + self.transition_frequency(coupler) for coupler in self.couplers
+                coupler: np.linspace(-2.0e6, 2.0e6, 25) + self.transition_frequency(coupler) for coupler in
+                self.couplers
             },
         }
         return cluster_samplespace
@@ -157,7 +138,7 @@ class CZ_Optimize_Chevron_Node(Base_Node):
         self.type = 'optimized_sweep'
         self.couplers = couplers
         self.coupler = self.couplers[0]
-        self.redis_field = ['cz_pulse_frequency','cz_pulse_duration']
+        self.redis_field = ['cz_pulse_frequency', 'cz_pulse_duration']
         self.optimization_field = 'cz_pulse_duration'
         self.qubit_state = 0
         self.measurement_obj = CZ_chevron
@@ -176,13 +157,13 @@ class CZ_Optimize_Chevron_Node(Base_Node):
 
     def transition_frequency(self, coupler: str):
         coupled_qubits = coupler.split(sep='_')
-        q1_f01 = float(redis_connection.hget(f'transmons:{coupled_qubits[0]}', "freq_01"))
-        q2_f01 = float(redis_connection.hget(f'transmons:{coupled_qubits[1]}', "freq_01"))
-        q1_f12 = float(redis_connection.hget(f'transmons:{coupled_qubits[0]}', "freq_12"))
-        q2_f12 = float(redis_connection.hget(f'transmons:{coupled_qubits[1]}', "freq_12"))
+        q1_f01 = float(REDIS_CONNECTION.hget(f'transmons:{coupled_qubits[0]}', "freq_01"))
+        q2_f01 = float(REDIS_CONNECTION.hget(f'transmons:{coupled_qubits[1]}', "freq_01"))
+        q1_f12 = float(REDIS_CONNECTION.hget(f'transmons:{coupled_qubits[0]}', "freq_12"))
+        q2_f12 = float(REDIS_CONNECTION.hget(f'transmons:{coupled_qubits[1]}', "freq_12"))
         # ac_freq = np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12))
         ac_freq = np.abs(q1_f01 + q2_f01 - (q2_f01 + q2_f12))
-        ac_freq = int( ac_freq / 1e4 ) * 1e4
+        ac_freq = int(ac_freq / 1e4) * 1e4
         print(f'{ ac_freq/1e6 = } MHz for coupler: {coupler}')
         return ac_freq
 
@@ -207,3 +188,116 @@ class CZ_Optimize_Chevron_Node(Base_Node):
             },
         }
         return cluster_samplespace
+
+
+class Reset_Chevron_Node(Base_Node):
+    def __init__(self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
+        self.name = name
+        self.all_qubits = all_qubits
+        self.all_couplers = couplers
+        self.coupler = couplers[0]
+        self.redis_field = ['reset_amplitude_qc', 'reset_duration_qc']
+        self.qubit_state = 0
+        self.measurement_obj = Reset_chevron_dc
+        self.analysis_obj = CZChevronAnalysisReset
+        self.coupled_qubits = couplers[0].split(sep='_')
+        # print(f'{ self.coupled_qubits = }')
+
+    @property
+    def samplespace(self):
+        # print(f'{ np.linspace(- 50e6, 50e6, 2) + self.ac_freq = }')
+        cluster_samplespace = {
+            # Pulse test
+            'cz_pulse_durations': {
+                qubit: 4e-9 + np.linspace(16e-9, 16e-9, 11) for qubit in self.coupled_qubits
+            },
+            'cz_pulse_amplitudes': {
+                qubit: np.linspace(0.4, 0.4, 11) for qubit in self.coupled_qubits
+            },
+
+            # For DC reset
+            # 'cz_pulse_durations': {
+            #     qubit: 4e-9+np.arange(0e-9, 12*4e-9,4e-9) for qubit in self.coupled_qubits
+            # },
+            # 'cz_pulse_amplitudes': {
+            #     qubit: np.linspace(0.2, 0.8, 61) for qubit in self.coupled_qubits
+            # },
+
+            # For AC reset
+            # 'cz_pulse_durations': {
+            #     qubit: 4e-9+np.arange(0e-9, 36*100e-9,400e-9) for qubit in self.coupled_qubits
+            # },
+            # 'cz_pulse_frequencies_sweep': {
+            #     qubit: np.linspace(210e6, 500e6, 51) + self.ac_freq for qubit in self.coupled_qubits
+            # },
+        }
+        return cluster_samplespace
+
+
+class CZ_Calibration_Node(Base_Node):
+    def __init__(self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
+        self.coupler = couplers[0]
+        # print(couplers)
+        self.coupled_qubits = couplers[0].split(sep='_')
+        # print(self.coupled_qubits)
+        # self.node_dictionary = kwargs
+        self.redis_field = ['cz_phase', 'cz_pop_loss']
+        self.qubit_state = 2
+        self.testing_group = 0  # The edge group to be tested. 0 means all edges.
+        self.dynamic = False
+        self.measurement_obj = CZ_calibration
+        self.analysis_obj = CZCalibrationAnalysis
+        # self.validate()
+
+    @property
+    def samplespace(self):
+        cluster_samplespace = {
+            'ramsey_phases': {qubit: np.linspace(0, 360, 31) for qubit in self.coupled_qubits},
+            'control_ons': {qubit: [False, True] for qubit in self.coupled_qubits},
+        }
+        return cluster_samplespace
+
+
+class CZ_Calibration_SSRO_Node(Base_Node):
+    def __init__(self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
+        self.coupler = couplers[0]
+        self.coupled_qubits = couplers[0].split(sep='_')
+        # self.node_dictionary = kwargs
+        self.redis_field = ['cz_phase', 'cz_pop_loss', 'cz_leakage']
+        self.qubit_state = 2
+        self.testing_group = 0  # The edge group to be tested. 0 means all edges.
+        self.dynamic = False
+        self.measurement_obj = CZ_calibration_SSRO
+        self.analysis_obj = CZCalibrationSSROAnalysis
+        # self.validate()
+
+    @property
+    def samplespace(self):
+        cluster_samplespace = {
+            'control_ons': {qubit: [False, True] for qubit in self.coupled_qubits},
+            'ramsey_phases': {qubit: np.linspace(0, 360, 13) for qubit in self.coupled_qubits},
+            # 'ramsey_phases': {qubit: np.linspace(0.025, 0.025, 1) for qubit in  self.coupled_qubits},
+        }
+        return cluster_samplespace
+
+
+class CZ_Dynamic_Phase_Node(Base_Node):
+    def __init__(self, name: str, all_qubits: list[str], couplers: list[str], **kwargs):
+        self.name = name
+        self.all_qubits = all_qubits
+        self.all_couplers = couplers
+        self.node_dictionary = kwargs
+        self.coupler = couplers[0]
+        # print(couplers)
+        self.coupled_qubits = couplers[0].split(sep='_')
+        # print(self.coupled_qubits)
+        # self.node_dictionary = kwargs
+        self.redis_field = ['cz_phase']
+        self.qubit_state = 2
+        self.testing_group = 0  # The edge group to be tested. 0 means all edges.
+        self.dynamic = True
+        self.measurement_obj = CZ_dynamic_phase
+        self.analysis_obj = CZCalibrationAnalysis

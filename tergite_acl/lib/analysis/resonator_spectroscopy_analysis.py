@@ -6,7 +6,7 @@ from quantify_core.analysis import fitting_models as fm
 import redis
 import xarray as xr
 
-from tergite_acl.lib.analysis.base import BaseAnalysis
+from tergite_acl.lib.analysis_base import BaseAnalysis
 
 model = fm.ResonatorModel()
 redis_connection = redis.Redis(decode_responses=True)
