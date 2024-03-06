@@ -44,8 +44,8 @@ class NodeFactory:
             'ro_frequency_three_state_optimization': RO_frequency_optimization_gef_Node,
             'ro_amplitude_two_state_optimization': RO_amplitude_two_state_optimization_Node,
             'ro_amplitude_three_state_optimization': RO_amplitude_three_state_optimization_Node,
-            #'ro_frequency_optimization_gef': RO_frequency_optimization_gef_Node,
-            #'state_discrimination': State_Discrimination_Node,
+            # 'ro_frequency_optimization_gef': RO_frequency_optimization_gef_Node,
+            # 'state_discrimination': State_Discrimination_Node,
             'randomized_benchmarking': Randomized_Benchmarking_Node,
             # 'check_cliffords': Check_Cliffords_Node,
         }
