@@ -2,9 +2,8 @@ import xarray
 import numpy as np
 from datetime import datetime
 from uuid import uuid4
-from enum import Enum
 import pathlib
-from tergite_acl.utils.root_path import data_directory
+from tergite_acl.config.settings import DATA_DIR
 
 
 def configure_dataset(
@@ -149,7 +148,7 @@ def create_node_data_path(node):
     measurements_today = measurement_date.date().strftime('%Y%m%d')
     time_id = measurement_date.strftime('%Y%m%d-%H%M%S-%f')[:19]
     measurement_id = time_id + '-' + str(uuid4())[:6] + f'-{node.name}'
-    data_path = pathlib.Path(data_directory / measurements_today / measurement_id)
+    data_path = pathlib.Path(DATA_DIR / measurements_today / measurement_id)
     return data_path
 
 
