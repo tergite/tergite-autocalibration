@@ -61,7 +61,7 @@ def load_redis_config(transmon: ExtendedTransmon, channel: int):
     transmon.measure_1.acq_channel(channel)
     transmon.measure_1.acq_delay(float(redis_config['ro_acq_delay']))
     transmon.measure_1.integration_time(float(redis_config['ro_acq_integration_time']))
-    transmon.measure_opt.pulse_amp(ro_amp_opt)
+    # transmon.measure_opt.pulse_amp(ro_amp_opt)
     transmon.measure_opt.pulse_duration(float(redis_config['ro_pulse_duration']))
     transmon.measure_opt.acq_channel(channel)
     transmon.measure_opt.acq_delay(float(redis_config['ro_acq_delay']))
@@ -134,7 +134,7 @@ def precompile(node, bin_mode: str = None, repetitions: int = None):
             edges[bus] = coupler
 
     # if node.name in ['cz_chevron','cz_calibration','cz_calibration_ssro','cz_dynamic_phase','reset_chevron']:
-    if hasattr(node, 'couplers'):
+    if hasattr(node, 'edges'):
         coupler = node.coupler
         node_class = node.measurement_obj(transmons, edges, node.qubit_state)
     else:

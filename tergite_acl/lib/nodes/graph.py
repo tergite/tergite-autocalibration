@@ -21,7 +21,7 @@ graph_dependencies = [
     ('ramsey_correction', 'motzoi_parameter'),
     ('motzoi_parameter', 'n_rabi_oscillations'),
     ('n_rabi_oscillations', 'resonator_spectroscopy_1'),
-    ('n_rabi_oscillations', 'randomized_benchmarking'),
+    ('T1', 'randomized_benchmarking'),
     ('n_rabi_oscillations', 'resonator_spectroscopy_1'),
     ('n_rabi_oscillations', 'T1'),
     ('resonator_spectroscopy_1', 'ro_frequency_two_state_optimization'),
@@ -29,7 +29,7 @@ graph_dependencies = [
     # ('randomized_benchmarking', 'T1'),
     ('T1', 'T2'),
     ('T2', 'T2_echo'),
-    ('T2_echo', 'ramsey_correction'),
+    # ('T2_echo', 'ramsey_correction'),
     # ('resonator_spectroscopy_1', 'qubit_12_spectroscopy_pulsed'),
     ('resonator_spectroscopy_1', 'qubit_12_spectroscopy_multidim'),
     # ('qubit_12_spectroscopy_pulsed', 'rabi_oscillations_12'),
@@ -40,7 +40,7 @@ graph_dependencies = [
     ('resonator_spectroscopy_2', 'ro_frequency_three_state_optimization'),
     ('ro_frequency_three_state_optimization', 'ro_amplitude_three_state_optimization'),
     # ('coupler_spectroscopy', 'cz_chevron'),
-    # ('ro_amplitude_optimization_gef', 'cz_chevron'),
+    ('ro_amplitude_three_state_optimization', 'cz_chevron'),
     # ('rabi_oscillations', 'reset_chevron'),
     # ('cz_chevron', 'cz_calibration'),
     # ('qubit_12_spectroscopy_multidim', 'cz_calibration'),
@@ -84,25 +84,25 @@ initial_pos = {
     'motzoi_parameter': (0.0,0.7),
     'n_rabi_oscillations': (0.0,0.65),
     'resonator_spectroscopy_1': (0,0.6),
-    'ro_frequency_two_state_optimization': (-0.3,0.45),
-    'ro_amplitude_optimization': (-0.3,0.4),
+    'ro_frequency_two_state_optimization': (-0.2,0.45),
+    'ro_amplitude_two_state_optimization': (-0.2,0.35),
     # 'qubit_12_spectroscopy_pulsed': (-0.5,0.4),
     'qubit_12_spectroscopy_multidim': (0.0,0.55),
     'rabi_oscillations_12': (0,0.5),
 
     'ramsey_correction_12': (0,0.45),
     'resonator_spectroscopy_2': (0,0.4),
-    'ro_frequency_three_state_optimization': (0.3,0.35),
-    'ro_amplitude_three_state_optimization': (0.3,0.3),
-    'cz_chevron': (-0.5,0.0),
+    'ro_frequency_three_state_optimization': (0.15,0.35),
+    'ro_amplitude_three_state_optimization': (0.15,0.25),
+    'cz_chevron': (0.0,0.2),
     'cz_calibration': (-0.9,0.0),
-    'T1': (0.5,0.5),
-    'T2': (0.7,0.5),
-    'T2_echo': (0.7,0.6),
-    'randomized_benchmarking': (0.8,0.5),
+    'T1': (0.25,0.55),
+    'T2': (0.35,0.55),
+    'T2_echo': (0.5,0.55),
+    'randomized_benchmarking': (0.45,0.4),
     'state_discrimination': (0.5,0.3),
-    'coupler_spectroscopy': (0.5,0.7),
-    'punchout': (0.8,0.8),
+    'coupler_spectroscopy': (0.3,0.7),
+    'punchout': (0.3,0.9),
 }
 
 
@@ -144,7 +144,7 @@ def filtered_topological_order(target_node: str):
 if __name__ == "__main__":
     # nx.draw_spring(graph, with_labels=True, k=1, pos = initial_pos)
     # pos = nx.spring_layout(graph, k=0.3)
-    nx.draw(graph, with_labels=True, pos = initial_pos)
+    nx.draw(graph, with_labels=True, pos = initial_pos,node_color='#FDFD96', node_shape='o',node_size=500)
     # nx.draw(graph, pos=nx.spring_layout(graph, k=0.3), with_labels=True)
     plt.show()
 

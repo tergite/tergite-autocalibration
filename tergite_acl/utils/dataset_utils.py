@@ -20,10 +20,10 @@ def configure_dataset(
     measurement_qubits = node.all_qubits
     samplespace = node.samplespace
 
-    if hasattr(node, 'spi_samplespace'):
-        spi_samplespace = node.spi_samplespace
-        # merge the samplespaces: | is the dictionary merging operator
-        samplespace = samplespace | spi_samplespace
+    # if hasattr(node, 'spi_samplespace'):
+    #     spi_samplespace = node.spi_samplespace
+    #     # merge the samplespaces: | is the dictionary merging operator
+    #     samplespace = samplespace | spi_samplespace
 
     sweep_quantities = samplespace.keys()
 
