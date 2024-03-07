@@ -5,7 +5,7 @@ from quantify_scheduler.instrument_coordinator.components.qblox import ClusterCo
 import toml
 from tergite_acl.lib.nodes import filtered_topological_order
 from tergite_acl.utils.status import ClusterStatus
-from tergite_acl.workers.hardware_utils import set_module_att
+from tergite_acl.utils.hardware_utils import set_module_att
 import numpy as np
 from tergite_acl.utils.user_input import user_requested_calibration
 from workers.linear_calibration_supervisor import calibrate_topo_sorted_path

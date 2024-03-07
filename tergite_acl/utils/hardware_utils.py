@@ -1,13 +1,12 @@
+import time
+from pathlib import Path
+
 from qblox_instruments import SpiRack
 from qcodes import validators
-import time
-import redis
-from pathlib import Path
+
 from tergite_acl.config.coupler_config import coupler_spi_map
+from tergite_acl.config.settings import REDIS_CONNECTION
 
-from tergite_acl.config.settings import SPI_SERIAL_PORT
-
-redis_connection = redis.Redis(decode_responses=True)
 
 def find_serial_port():
     path = Path('/dev/')
@@ -19,6 +18,7 @@ def find_serial_port():
         print("Couldn't find the serial port. Please check the connection.")
         port = None
     return port
+
 
 class SpiDAC():
     def __init__(self) -> None:
@@ -48,15 +48,15 @@ class SpiDAC():
         self.spi.set_dacs_zero()
         return
 
-    def set_currenet_instant(self, dac , current) -> None:
+    def set_currenet_instant(self, dac, current) -> None:
         self.spi.set_current_instant(dac, current)
 
     def set_parking_current(self, coupler: str) -> None:
 
         dac = self.create_spi_dac(coupler)
 
-        if redis_connection.hexists(f'transmons:{coupler}', 'parking_current'):
-            parking_current = float(redis_connection.hget(f'transmons:{coupler}', 'parking_current'))
+        if REDIS_CONNECTION.hexists(f'transmons:{coupler}', 'parking_current'):
+            parking_current = float(REDIS_CONNECTION.hget(f'transmons:{coupler}', 'parking_current'))
         else:
             raise ValueError('parking current is not present on redis')
         dac.current(parking_current)

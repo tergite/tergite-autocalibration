@@ -1,31 +1,30 @@
 '''Retrieve the compiled schedule and run it'''
 import threading
-from quantify_scheduler.instrument_coordinator.instrument_coordinator import CompiledSchedule
-from quantify_scheduler.json_utils import pathlib
-import tqdm
 import time
+
+import tqdm
 import xarray
-from tergite_acl.utils.logger.tac_logger import logger
-from tergite_acl.utils.status import ClusterStatus
-from tergite_acl.workers.dataset_utils import configure_dataset, handle_ro_freq_optimization, save_dataset
-from colorama import init as colorama_init
 from colorama import Fore
 from colorama import Style
+from colorama import init as colorama_init
+from quantify_scheduler.instrument_coordinator.instrument_coordinator import CompiledSchedule
+from quantify_scheduler.json_utils import pathlib
+
+from tergite_acl.utils.dataset_utils import configure_dataset, handle_ro_freq_optimization, save_dataset
+from tergite_acl.utils.logger.tac_logger import logger
+from tergite_acl.utils.status import ClusterStatus
+
 colorama_init()
 
 
-import redis
-
-redis_connection = redis.Redis(decode_responses=True)
-
 def measure_node(
-    node,
-    compiled_schedule: CompiledSchedule,
-    lab_ic,
-    data_path: pathlib.Path,
-    cluster_status = ClusterStatus.real,
-    measurement = (1,1)
-    ):
+        node,
+        compiled_schedule: CompiledSchedule,
+        lab_ic,
+        data_path: pathlib.Path,
+        cluster_status=ClusterStatus.real,
+        measurement=(1, 1)
+):
     # TODO: This function should be move to the node
 
     schedule_duration = compiled_schedule.get_schedule_duration()
@@ -34,8 +33,8 @@ def measure_node(
 
     measurement_message = ''
     if measurement[1] > 1:
-        measurement_message = f'. Measurement {measurement[0]+1} of {measurement[1]}'
-    message =  f'{schedule_duration:.2f} sec' + measurement_message
+        measurement_message = f'. Measurement {measurement[0] + 1} of {measurement[1]}'
+    message = f'{schedule_duration:.2f} sec' + measurement_message
     print(f'schedule_duration = {Fore.CYAN}{Style.BRIGHT}{message}{Style.RESET_ALL}')
 
     raw_dataset = execute_schedule(compiled_schedule, lab_ic, schedule_duration)
@@ -50,11 +49,12 @@ def measure_node(
     logger.info('Finished measurement')
     return result_dataset
 
+
 def execute_schedule(
-    compiled_schedule: CompiledSchedule,
-    lab_ic,
-    schedule_duration: float
-    ) -> xarray.Dataset:
+        compiled_schedule: CompiledSchedule,
+        lab_ic,
+        schedule_duration: float
+) -> xarray.Dataset:
     # TODO: This should go to the BaseMeasurement
     # TODO: The instrument coordinator could be an attribute of the node
     logger.info('Starting measurement')
@@ -73,6 +73,7 @@ def execute_schedule(
             progress_sleep = 0.2
         for _ in tqdm.tqdm(range(steps), desc=compiled_schedule.name, colour='blue'):
             time.sleep(progress_sleep)
+
     thread_tqdm = threading.Thread(target=display_progress)
     thread_tqdm.start()
     thread_lab = threading.Thread(target=run_measurement)

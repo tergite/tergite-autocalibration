@@ -2,28 +2,28 @@
 Given the requested node
 fetch and compile the appropriate schedule
 '''
-from tergite_acl.utils.logger.tac_logger import logger
-from math import isnan
-from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
-import redis
 import json
-import numpy as np
-from tergite_acl.utils.extended_transmon_element import ExtendedTransmon
-from tergite_acl.utils.extended_coupler_edge import CompositeSquareEdge
-from quantify_scheduler.backends import SerialCompiler
-from tergite_acl.config.settings import HARDWARE_CONFIG
-from quantify_core.data.handling import set_datadir
+from math import isnan
 
-set_datadir('.')
+import numpy as np
+from quantify_core.data.handling import set_datadir
+from quantify_scheduler.backends import SerialCompiler
+from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
+
+from tergite_acl.config.settings import HARDWARE_CONFIG, REDIS_CONNECTION
+from tergite_acl.utils.extended_coupler_edge import CompositeSquareEdge
+from tergite_acl.utils.extended_transmon_element import ExtendedTransmon
+from tergite_acl.utils.logger.tac_logger import logger
+
+set_datadir('../workers')
 
 with open(HARDWARE_CONFIG) as hw:
     hw_config = json.load(hw)
 
-redis_connection = redis.Redis(decode_responses=True)
 
-def load_redis_config(transmon: ExtendedTransmon, channel:int):
+def load_redis_config(transmon: ExtendedTransmon, channel: int):
     qubit = transmon.name
-    redis_config = redis_connection.hgetall(f"transmons:{qubit}")
+    redis_config = REDIS_CONNECTION.hgetall(f"transmons:{qubit}")
     transmon.reset.duration(float(redis_config['init_duration']))
     transmon.rxy.amp180(float(redis_config['mw_amp180']))
     transmon.r12.ef_amp180(float(redis_config['mw_ef_amp180']))
@@ -69,16 +69,18 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
 
     return
 
+
 def load_redis_config_coupler(coupler: CompositeSquareEdge):
     bus = coupler.name
-    redis_config = redis_connection.hgetall(f"couplers:{bus}")
+    redis_config = REDIS_CONNECTION.hgetall(f"couplers:{bus}")
     coupler.cz.cz_freq(float(redis_config['cz_pulse_frequency']))
     coupler.cz.square_amp(float(redis_config['cz_pulse_amplitude']))
     coupler.cz.square_duration(float(redis_config['cz_pulse_duration']))
     coupler.cz.cz_width(float(redis_config['cz_pulse_width']))
     return
 
-def precompile(node, bin_mode:str=None, repetitions:int=None):
+
+def precompile(node, bin_mode: str = None, repetitions: int = None):
     # TODO: This has to be definitely handled by different classes
     # TODO: As soon as we have a tof class, all these if statements disappear
     if node.name == 'tof':
@@ -94,18 +96,18 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
             field_backup = field + "_backup"
             for qubit in qubits:
                 key = f"transmons:{qubit}"
-                if field in redis_connection.hgetall(key).keys():
-                    value = redis_connection.hget(key, field)
-                    redis_connection.hset(key, field_backup, value)
-                    redis_connection.hset(key, field, 'nan' )
+                if field in REDIS_CONNECTION.hgetall(key).keys():
+                    value = REDIS_CONNECTION.hget(key, field)
+                    REDIS_CONNECTION.hset(key, field_backup, value)
+                    REDIS_CONNECTION.hset(key, field, 'nan')
             if getattr(node, "coupler", None) is not None:
                 couplers = node.coupler
                 for coupler in couplers:
                     key = f"couplers:{coupler}"
-                    if field in redis_connection.hgetall(key).keys():
-                        value = redis_connection.hget(key, field)
-                        redis_connection.hset(key, field_backup, value)
-                        redis_connection.hset(key, field, 'nan')
+                    if field in REDIS_CONNECTION.hgetall(key).keys():
+                        value = REDIS_CONNECTION.hget(key, field)
+                        REDIS_CONNECTION.hset(key, field_backup, value)
+                        REDIS_CONNECTION.hset(key, field, 'nan')
 
     # TODO: This is hardcoded and we should move it to the .env file
     device = QuantumDevice(f'Loki_{node.name}')
@@ -114,22 +116,22 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
     transmons = {}
     for channel, qubit in enumerate(qubits):
         transmon = ExtendedTransmon(qubit)
-        load_redis_config(transmon,channel)
+        load_redis_config(transmon, channel)
         device.add_element(transmon)
         transmons[qubit] = transmon
 
     # Creating coupler edge
-    #bus_list = [ [qubits[i],qubits[i+1]] for i in range(len(qubits)-1) ]
+    # bus_list = [ [qubits[i],qubits[i+1]] for i in range(len(qubits)-1) ]
     # TODO: It seems like the coupler node is completely different to all other nodes
     if hasattr(node, 'couplers'):
         couplers = node.couplers
         edges = {}
         for bus in couplers:
-           control, target = bus.split(sep='_')
-           coupler = CompositeSquareEdge(control, target)
-           load_redis_config_coupler(coupler)
-           device.add_edge(coupler)
-           edges[bus] = coupler
+            control, target = bus.split(sep='_')
+            coupler = CompositeSquareEdge(control, target)
+            load_redis_config_coupler(coupler)
+            device.add_edge(coupler)
+            edges[bus] = coupler
 
     # if node.name in ['cz_chevron','cz_calibration','cz_calibration_ssro','cz_dynamic_phase','reset_chevron']:
     if hasattr(node, 'couplers'):
@@ -137,13 +139,13 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
         node_class = node.measurement_obj(transmons, edges, node.qubit_state)
     else:
         node_class = node.measurement_obj(transmons, node.qubit_state)
-    if node.name in ['ro_amplitude_three_state_optimization','cz_calibration_ssro']:
-        device.cfg_sched_repetitions(1)    # for single-shot readout
+    if node.name in ['ro_amplitude_three_state_optimization', 'cz_calibration_ssro']:
+        device.cfg_sched_repetitions(1)  # for single-shot readout
     if bin_mode is not None: node_class.set_bin_mode(bin_mode)
     schedule_function = node_class.schedule_function
 
     # Merge with the parameters from node dictionary
-    static_parameters = node_class.static_kwargs # parameters stored in the redis
+    static_parameters = node_class.static_kwargs  # parameters stored in the redis
 
     if repetitions is not None:
         static_parameters["repetitions"] = repetitions
@@ -161,12 +163,10 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
             static_parameters[key] = value
             # print(f"{key} isn't one of the static parameters of {node_class}. \n We will ignore this parameter.")
 
-
     if node.type == 'parameterized_sweep':
         external_parameters = {node.external_parameter_name: node.external_parameter_value}
     else:
         external_parameters = {}
-
 
     compiler = SerialCompiler(name=f'{node.name}_compiler')
     schedule = schedule_function(**static_parameters, **external_parameters, **samplespace)
@@ -194,7 +194,7 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
     # figs[0].savefig('ssro')
     # breakpoint()
 
-    #TODO
+    # TODO
     # ic.retrieve_hardware_logs
 
     # with open(f'TIMING_TABLE_{node.name}.html', 'w') as file:

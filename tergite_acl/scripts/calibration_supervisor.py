@@ -18,10 +18,10 @@ from tergite_acl.utils.status import ClusterStatus
 from tergite_acl.utils.status import DataStatus
 from tergite_acl.utils.user_input import user_requested_calibration
 from tergite_acl.utils.visuals import draw_arrow_chart
-from tergite_acl.workers.dataset_utils import create_node_data_path
-from tergite_acl.workers.hardware_utils import SpiDAC
-from tergite_acl.workers.monitor_worker import monitor_node_calibration
-from tergite_acl.workers.redis_utils import populate_initial_parameters, populate_node_parameters, \
+from tergite_acl.utils.dataset_utils import create_node_data_path
+from tergite_acl.utils.hardware_utils import SpiDAC
+from tergite_acl.functions.monitor_worker import monitor_node_calibration
+from tergite_acl.utils.redis_utils import populate_initial_parameters, populate_node_parameters, \
     populate_quantities_of_interest
 
 # from workers.dummy_setup import dummy_cluster

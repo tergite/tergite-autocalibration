@@ -1,23 +1,22 @@
 '''Analyze the measured dataset and extract the qoi (quantity of interest)'''
 import collections
-import matplotlib.pyplot as plt
-import xarray as xr
-
-from tergite_acl.config import settings
-from tergite_acl.lib.analysis.tof_analysis import analyze_tof
-from quantify_core.data.handling import set_datadir
-from tergite_acl.config.coupler_config import qubit_types
-# from quantify_core.analysis.calibration import rotate_to_calibrated_axis
-import matplotlib.patches as mpatches
-import numpy as np
-import redis
-import matplotlib
 from pathlib import Path
 
+import matplotlib
+# from quantify_core.analysis.calibration import rotate_to_calibrated_axis
+import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
+import numpy as np
+import xarray as xr
+from quantify_core.data.handling import set_datadir
+
+from tergite_acl.config import settings
+from tergite_acl.config.coupler_config import qubit_types
+from tergite_acl.lib.analysis.tof_analysis import analyze_tof
 from tergite_acl.utils.status import DataStatus
+
 matplotlib.use(settings.PLOTTING_BACKEND)
-set_datadir('.')
-redis_connection = redis.Redis(decode_responses=True)
+set_datadir('../workers')
 
 
 def post_process(result_dataset: xr.Dataset, node, data_path: Path):
@@ -124,7 +123,6 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
         all_results.update({'measurement_dataset': result_dataset.to_dict()})
 
     return all_results
-
 
 # class BaseAnalysis():
 #     def __init__(self, result_dataset: xr.Dataset, node, data_path: Path):

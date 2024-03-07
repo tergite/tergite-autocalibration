@@ -1,13 +1,10 @@
 import abc
 
-import redis
 # TODO: we should have a conditional import depending on a feature flag here
 from matplotlib import pyplot as plt
 
+from tergite_acl.config.settings import REDIS_CONNECTION
 from tergite_acl.utils.qoi import QOI
-
-# TODO: we should import the redis connection once globally
-redis_connection = redis.Redis(decode_responses=True)
 
 
 class BaseAnalysis(abc.ABC):
@@ -62,5 +59,5 @@ class BaseAnalysis(abc.ABC):
                 name = 'couplers'
             else:
                 name = 'transmons'
-            redis_connection.hset(f"{name}:{this_element}", f"{transmon_parameter}", self._qoi[i])
-            redis_connection.hset(f"cs:{this_element}", node, 'calibrated')
+            REDIS_CONNECTION.hset(f"{name}:{this_element}", f"{transmon_parameter}", self._qoi[i])
+            REDIS_CONNECTION.hset(f"cs:{this_element}", node, 'calibrated')
