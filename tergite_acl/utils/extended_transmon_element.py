@@ -124,7 +124,7 @@ class Measure_RO1(Measure):
         bin_mode: BinMode | None = None,
     ):
         super().__init__(qubits[0], acq_index=acq_index, bin_mode=bin_mode)
-        plot_func = "quantify_scheduler.schedules._visualization.circuit_diagram.meter"
+        plot_func = "quantify_scheduler.calibration_schedules._visualization.circuit_diagram.meter"
         self.data.update(
             {
                 "name": f"Measure_RO1 {', '.join(qubits)}",
@@ -161,7 +161,7 @@ class Measure_RO2(Measure):
         bin_mode: BinMode | None = None,
     ):
         super().__init__(qubits[0], acq_index=acq_index, bin_mode=bin_mode)
-        plot_func = "quantify_scheduler.schedules._visualization.circuit_diagram.meter"
+        plot_func = "quantify_scheduler.calibration_schedules._visualization.circuit_diagram.meter"
         self.data.update(
             {
                 "name": f"Measure_RO2 {', '.join(qubits)}",
@@ -197,7 +197,7 @@ class Measure_RO_Opt(Measure):
         bin_mode: BinMode | None = None,
     ):
         super().__init__(qubits[0], acq_index=acq_index, bin_mode=bin_mode)
-        plot_func = "quantify_scheduler.schedules._visualization.circuit_diagram.meter"
+        plot_func = "quantify_scheduler.calibration_schedules._visualization.circuit_diagram.meter"
         self.data.update(
             {
                 "name": f"Measure_RO_Opt {', '.join(qubits)}",

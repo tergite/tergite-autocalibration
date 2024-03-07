@@ -8,13 +8,13 @@ from tergite_acl.lib.analysis.rabi_analysis import RabiAnalysis
 from tergite_acl.lib.analysis.ramsey_analysis import RamseyAnalysis
 from tergite_acl.lib.node_base import BaseNode
 from tergite_acl.lib.nodes.node_utils import qubit_samples
-from tergite_acl.lib.schedules.motzoi_parameter import Motzoi_parameter
-from tergite_acl.lib.schedules.n_rabi_oscillations import N_Rabi_Oscillations
-from tergite_acl.lib.schedules.rabi_oscillations import Rabi_Oscillations
-from tergite_acl.lib.schedules.ramsey_fringes import Ramsey_fringes
-# from schedules.two_tone_multidim import Two_Tones_Multidim
-from tergite_acl.lib.schedules.two_tone_multidim_loop_reversed import Two_Tones_Multidim
-from tergite_acl.lib.schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
+from tergite_acl.lib.calibration_schedules.motzoi_parameter import Motzoi_parameter
+from tergite_acl.lib.calibration_schedules.n_rabi_oscillations import N_Rabi_Oscillations
+from tergite_acl.lib.calibration_schedules.rabi_oscillations import Rabi_Oscillations
+from tergite_acl.lib.calibration_schedules.ramsey_fringes import Ramsey_fringes
+# from calibration_schedules.two_tone_multidim import Two_Tones_Multidim
+from tergite_acl.lib.calibration_schedules.two_tone_multidim_loop_reversed import Two_Tones_Multidim
+from tergite_acl.lib.calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
 
 
 class Qubit_01_Spectroscopy_Pulsed_Node(BaseNode):

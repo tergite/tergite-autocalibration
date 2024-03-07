@@ -14,10 +14,10 @@ from tergite_acl.lib.analysis.resonator_spectroscopy_analysis import (
 )
 from tergite_acl.lib.node_base import BaseNode
 from tergite_acl.lib.nodes.node_utils import resonator_samples
-from tergite_acl.lib.schedules.punchout import Punchout
-from tergite_acl.lib.schedules.resonator_spectroscopy import Resonator_Spectroscopy
-from tergite_acl.lib.schedules.ro_amplitude_optimization import RO_amplitude_optimization
-from tergite_acl.lib.schedules.ro_frequency_optimization import RO_frequency_optimization
+from tergite_acl.lib.calibration_schedules.punchout import Punchout
+from tergite_acl.lib.calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
+from tergite_acl.lib.calibration_schedules.ro_amplitude_optimization import RO_amplitude_optimization
+from tergite_acl.lib.calibration_schedules.ro_frequency_optimization import RO_frequency_optimization
 
 
 class Resonator_Spectroscopy_Node(BaseNode):

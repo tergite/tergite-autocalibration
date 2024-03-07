@@ -7,9 +7,9 @@ from tergite_acl.lib.analysis.check_cliffords_analysis import CheckCliffordsAnal
 # from analysis.cz_chevron_analysis import CZChevronAnalysis, CZChevronAnalysisReset
 from tergite_acl.lib.analysis.randomized_benchmarking_analysis import RandomizedBenchmarkingAnalysis
 from tergite_acl.lib.node_base import BaseNode
-from tergite_acl.lib.schedules.T1 import T1, T2, T2Echo
-from tergite_acl.lib.schedules.check_cliffords import Check_Cliffords
-from tergite_acl.lib.schedules.randomized_benchmarking import Randomized_Benchmarking
+from tergite_acl.lib.calibration_schedules.T1 import T1, T2, T2Echo
+from tergite_acl.lib.calibration_schedules.check_cliffords import Check_Cliffords
+from tergite_acl.lib.calibration_schedules.randomized_benchmarking import Randomized_Benchmarking
 
 
 class T1_Node(BaseNode):

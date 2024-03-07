@@ -4,7 +4,7 @@ Module containing a schedule class for T1 relaxation time measurement.
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler import Schedule
 from quantify_scheduler.operations.gate_library import Measure, Reset, X
-from tergite_acl.lib.schedules.measurement_base import Measurement
+from tergite_acl.lib.calibration_schedules.measurement_base import Measurement
 import numpy as np
 
 class T1(Measurement):
