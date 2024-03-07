@@ -42,7 +42,7 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'coupler_spectroscopy',
+    'target_node': 'resonator_spectroscopy',
     'all_qubits': qubits,
     'couplers': couplers,
 }

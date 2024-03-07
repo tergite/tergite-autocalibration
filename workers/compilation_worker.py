@@ -48,9 +48,9 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
     transmon.extended_clock_freqs.readout_2(float(redis_config['ro_freq_2']))
     transmon.extended_clock_freqs.readout_opt(float(redis_config['ro_freq_2st_opt']))
     transmon.extended_clock_freqs.readout_3state_opt(float(redis_config['ro_freq_3st_opt']))
-    ro_amp_opt = float(redis_config['ro_ampl_opt'])
-    if isnan(ro_amp_opt):
-        ro_amp_opt = float(redis_config['ro_pulse_amp'])
+    # ro_amp_opt = float(redis_config['ro_ampl_opt'])
+    # if isnan(ro_amp_opt):
+    #     ro_amp_opt = float(redis_config['ro_pulse_amp'])
     transmon.measure.pulse_amp(float(redis_config['ro_pulse_amp']))
     transmon.measure.pulse_duration(float(redis_config['ro_pulse_duration']))
     transmon.measure.acq_channel(channel)
@@ -61,7 +61,7 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
     transmon.measure_1.acq_channel(channel)
     transmon.measure_1.acq_delay(float(redis_config['ro_acq_delay']))
     transmon.measure_1.integration_time(float(redis_config['ro_acq_integration_time']))
-    transmon.measure_opt.pulse_amp(ro_amp_opt)
+    # transmon.measure_opt.pulse_amp(ro_amp_opt)
     transmon.measure_opt.pulse_duration(float(redis_config['ro_pulse_duration']))
     transmon.measure_opt.acq_channel(channel)
     transmon.measure_opt.acq_delay(float(redis_config['ro_acq_delay']))
