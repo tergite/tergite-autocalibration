@@ -2,6 +2,8 @@ from qblox_instruments.ieee488_2 import DummyBinnedAcquisitionData
 from qblox_instruments import Cluster, ClusterType
 
 
+# TODO: move to some place in the library
+
 def dummy_cluster(samplespace: dict):
     dummy = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1, 16)}
     dummy["16"] = ClusterType.CLUSTER_QRM_RF
