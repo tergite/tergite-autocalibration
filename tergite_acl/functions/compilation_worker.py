@@ -142,6 +142,7 @@ def precompile(node, bin_mode: str = None, repetitions: int = None):
     if node.name in ['ro_amplitude_three_state_optimization', 'cz_calibration_ssro']:
         device.cfg_sched_repetitions(1)  # for single-shot readout
     if bin_mode is not None: node_class.set_bin_mode(bin_mode)
+
     schedule_function = node_class.schedule_function
 
     # Merge with the parameters from node dictionary
@@ -149,6 +150,9 @@ def precompile(node, bin_mode: str = None, repetitions: int = None):
 
     if repetitions is not None:
         static_parameters["repetitions"] = repetitions
+    else:
+        repetitions = 2**10
+    node.demod_channels.set_repetitions(repetitions)
 
     for key, value in node.node_dictionary.items():
         if key in static_parameters:
