@@ -33,7 +33,7 @@ pytest = "^7.4.2"
 requests-mock = "^1.11.0"
 
 [tool.poetry.scripts]
-acli = "tergite_acl.tools.cli:acli_delegator"
+acli = "tergite_acl.tools.cli:cli"
 
 [build-system]
 requires = ["poetry-core"]

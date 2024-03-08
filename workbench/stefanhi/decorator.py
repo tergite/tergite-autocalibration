@@ -1,5 +1,6 @@
 import typing
 
+
 # This is our QOI class
 class QOI:
 
