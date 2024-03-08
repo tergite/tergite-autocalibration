@@ -17,30 +17,34 @@ def configure_dataset(
     '''The dataset retrieved from the instrument coordinator  is
        too bare-bones. Here we configure the dims, coords and data_vars'''
     samplespace = node.samplespace
+    # For multiplexed single-qubit readout, parallel_demod_channels 
+    # are union of single DemodChannel. The channel label is the name
+    # of qubit.
     parallel_demod_channels: ParallelDemodChannels = node.demod_channels
 
     dataset = xarray.Dataset()
+    # The union of qubits which will be demodulated.
     total_qubits = parallel_demod_channels.qubits_demod
     n_qubits = len(total_qubits)
 
-    for i, demod_channel in enumerate(parallel_demod_channels.demod_channels):
-        qubits = demod_channel.qubits
-        channel_label = demod_channel.channel_label
+    for demod_channel in parallel_demod_channels.demod_channels:
+        qubits = demod_channel.qubits # The qubits contained in this channel.
+        channel_label = demod_channel.channel_label # The name of the channel
         coords_dict = {}
         for quantity in samplespace:
-            settable_elements = samplespace[quantity].keys()
-            if not isinstance(samplespace[quantity], dict):
-                settable_values = samplespace[quantity]
-            elif channel_label in samplespace[quantity]:
+            # e.g., samplesapce[quantify] = {'q1': np.arange(0, 1, 0.1)}
+            if channel_label in samplespace[quantity]:
                 settable_values = samplespace[quantity][channel_label]
+                settable_elements = samplespace[quantity].keys()
             else:
                 settable_values = None
+
             if settable_values is not None:
-                if channel_label in settable_elements:
+                if channel_label in settable_elements: # change the parameter of a qubit
                     element = channel_label
                     element_type = 'qubit'
                 else:
-                    matching = [s for s in settable_elements if channel_label in s]
+                    matching = [s for s in settable_elements if channel_label in s] # change the parameter of a coupler
                     if len(matching) == 1 and '_' in matching[0]:
                         element = matching[0]
                         element_type = 'coupler'
@@ -60,8 +64,9 @@ def configure_dataset(
         reshaping = list(reversed(dimensions))
         data_values_multiqubit = []
         for qubit in qubits:
-            idx = total_qubits.index(qubit)
-            data_values = raw_ds[idx].values
+            # The index of qubit to be demodulated stored as the key of data_vars in raw_ds
+            qubit_index = total_qubits.index(qubit)
+            data_values = raw_ds[qubit_index].values
 
             if node.name == 'ro_amplitude_two_state_optimization' or node.name == 'ro_amplitude_three_state_optimization':
                 loops = node.node_dictionary['loop_repetitions']
@@ -72,14 +77,17 @@ def configure_dataset(
                         states = coords_dict[key][1]
                 data_values = reshufle_loop_dataset(data_values, ampls, states, loops)
 
-
+            # Reshape the data_values
             data_values_reshape = data_values.reshape(*reshaping)
             data_values_multiqubit.append(data_values_reshape)
         data_values_multiqubit = np.array(data_values_multiqubit)
+        # Adjust the order of dimension
         data_values = tunneling_qubits(data_values_multiqubit)
         if len(qubits) == 1:
+            # Single-qubit demodulation
             attributes = {'qubit': qubits[0], 'long_name': f'y{qubit}', 'units': 'NA', 'channel_label': channel_label, 'repetitions':demod_channel.repetitions}
         else:
+            # Multi-qubit demodulation
             attributes = {'qubits': qubits, 'long_name': '_'.join([f'y{qubit}' for qubit in qubits]), 'units': 'NA', 'channel_label': channel_label, 'repetitions':demod_channel.repetitions}
 
         # TODO ro_frequency_optimization requires multiple measurements per qubit
@@ -153,14 +161,14 @@ def save_dataset(result_dataset: xarray.Dataset, node, data_path: pathlib.Path):
     result_dataset_real.to_netcdf(data_path / 'dataset.hdf5')
 
 def tunneling_qubits(data_values:np.ndarray) -> np.ndarray:
-    """
-    Add a new data_var prob.
-    Convert S21 into probs of states.
-    """
     if data_values.shape[0] == 1:
+        # Single-qubit demodulation
         data_values = data_values[0]
         dims = len(data_values.shape)
+        # Transpose data_values
         return np.moveaxis(data_values, range(dims), range(dims-1, -1, -1))
     else:
         dims = len(data_values.shape)
+        # Transpose data_values.
+        # The first dimension corresponds to the index of qubits.
         return np.moveaxis(data_values, range(1, dims), range(dims-1, 0, -1))
