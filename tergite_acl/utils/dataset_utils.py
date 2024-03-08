@@ -4,6 +4,7 @@ from datetime import datetime
 from uuid import uuid4
 import pathlib
 from tergite_acl.config.settings import DATA_DIR
+from tergite_acl.lib.demod_channels import ParallelDemodChannels
 
 
 def configure_dataset(
@@ -101,6 +102,56 @@ def configure_dataset(
         dataset = xarray.merge([dataset,partial_ds])
     return dataset
 
+def configure_dataset_via_meas_ctrl(
+        raw_ds: xarray.Dataset,
+        samplespace: dict[str, dict[str,np.ndarray]],
+        parallel_demod_channels: ParallelDemodChannels
+        ) -> xarray.Dataset:
+    '''The dataset retrieved from the instrument coordinator  is
+       too bare-bones. Here we configure the dims, coords and data_vars'''
+
+    dataset = xarray.Dataset()
+    total_qubits = parallel_demod_channels.qubits_demod
+    assert len(raw_ds.data_vars) == 2 * len(total_qubits), f"Please check the measure in the schedule function. The qubits to be demodulated are {total_qubits}."
+    for i, demod_channel in enumerate(parallel_demod_channels.demod_channels):
+        qubits = demod_channel.qubits
+        channel_label = demod_channel.channel_label
+        coords_dict = {}
+        for quantity in samplespace:
+            if not isinstance(samplespace[quantity], dict):
+                settable_values = samplespace[quantity]
+            elif channel_label in samplespace[quantity]:
+                settable_values = samplespace[quantity][channel_label]
+            else:
+                settable_values = None
+            if settable_values is not None:
+                coord_key = quantity + channel_label
+                coord_attrs = {'qubit':demod_channel.qubits, 'long_name': f'{coord_key}', 'units': 'NA', 'channel_label': channel_label}
+                coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
+
+        dimensions = [len(samplespace[quantity][channel_label]) if isinstance(samplespace[quantity], dict) else len(samplespace[quantity]) for quantity in samplespace]
+        reshaping = list(reversed(dimensions))
+        data_values_multiqubit = []
+        for qubit in qubits:
+            idx = total_qubits.index(qubit)
+            # TODO: Figure out the name of the data_var stored in the dataset
+            # key0, key1 = f'y{2*idx}', f'y{2*idx+1}'
+            # if raw_ds[key0].attrs['name'] == 'magn':
+            #     data_values = raw_ds[key0].values * np.exp(1j * raw_ds[key1].values / 180 * np.pi)
+            # else:
+            #     data_values = raw_ds[key0].values + 1j * raw_ds[key1].values
+            data_values_reshape = data_values.reshape(*reshaping)
+            data_values_multiqubit.append(data_values_reshape)
+        data_values_multiqubit = np.array(data_values_multiqubit)
+        data_values = np.transpose(data_values_reshape)
+        if len(qubits) == 1:
+            attributes = {'qubit': qubits[0], 'long_name': f'y{qubit}', 'units': 'NA', 'channel_label': channel_label, 'repetitions':demod_channel.repetitions}
+        else:
+            attributes = {'qubits': qubits, 'long_name': '_'.join([f'y{qubit}' for qubit in qubits]), 'units': 'NA', 'channel_label': channel_label, 'repetitions':demod_channel.repetitions}
+        partial_ds = xarray.Dataset(coords=coords_dict)
+        partial_ds[f'y{channel_label}'] = (tuple(coords_dict.keys()), data_values, attributes)
+        dataset = xarray.merge([dataset,partial_ds])
+    return dataset
 
 def to_real_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
     ds = iq_dataset.expand_dims('ReIm', axis=-1)  # Add ReIm axis at the end

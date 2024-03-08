@@ -1,3 +1,6 @@
+from tergite_acl.config.settings import REDIS_CONNECTION
+from tergite_acl.lib.demod_channels import ParallelDemodChannels
+
 class BaseNode:
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         self.name = name
@@ -7,7 +10,7 @@ class BaseNode:
         self.type = 'cluster_simple_sweep'
         self.qubit_state = 0 # can be 0 or 1 or 2
         self.plots_per_qubit = 1 # can be 0 or 1 or 2
-        # TODO: Add demod here
+        self.build_demod_channels()
 
     @property
     def samplespace(self) -> dict:
@@ -35,6 +38,24 @@ class BaseNode:
         for quantity in settable_quantities:
             dimensions.append(len(self.samplespace[quantity][first_element]))
         return dimensions
+    
+    def build_demod_channels(self):
+        """
+        The default demodulation channels are multiplexed single-qubit channels,
+        which means that you only readout one qubit in parallel.
+        It works when you only calibrate single qubits.
+        In many cases, you also need jointly readout multiple qubits such as quantum 
+        state tomography.
+        Rewrite this method in these nodes.
+
+        TODO: Add parameters to the global variables
+        """
+        self.demod_channels = ParallelDemodChannels.build_multiplexed_single_demod_channel(
+            self.all_qubits, 
+            ["0", "1"],
+            'IQ', 
+            REDIS_CONNECTION
+        )
 
     def __str__(self):
         return f'Node representation for {self.name} on qubits {self.all_qubits}'
@@ -44,3 +65,4 @@ class BaseNode:
 
     def __repr__(self):
         return f'Node({self.name}, {self.all_qubits})'
+
