@@ -7,6 +7,7 @@ class BaseNode:
         self.type = 'cluster_simple_sweep'
         self.qubit_state = 0 # can be 0 or 1 or 2
         self.plots_per_qubit = 1 # can be 0 or 1 or 2
+        # TODO: Add demod here
 
     @property
     def samplespace(self) -> dict:
