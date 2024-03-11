@@ -100,6 +100,26 @@ class Resonator_Spectroscopy(Measurement):
 
         # The outer for loop iterates over all qubits:
         for acq_cha, (this_qubit, ro_f_values) in enumerate(ro_frequencies.items()):
+            this_transmon = self.transmons['this_qubit']
+            ro_pulse_amplitude = this_transmon.measure.amplitude()
+            mw_ef_amp180 = this_transmon.r12.amplitude()
+            mw_pulse_duration = this_transmon.rxy.duration()
+            mw_pulse_port = this_transmon.ports.microwave()
+            mw_frequencie_12 = this_transmon.
+            acquisition_delay = this_transmon.measure
+            integration_time = this_transmon.measure
+            ro_port = this_transmon.ports.readout()
+        # pulse_amplitudes: dict[str,float],C
+        # pulse_durations: dict[str,float],
+        # mw_ef_amps180: dict[str,float],
+        # mw_pulse_durations: dict[str,float],
+        # mw_pulse_ports: dict[str,str],
+        # mw_frequencies_12:  dict[str,float],
+        # acquisition_delays: dict[str,float],
+        # integration_times: dict[str,float],
+        # qubits: list[str],
+        # ro_ports: dict[str,str],
+        # ro_frequencies: dict[str,np.ndarray],
 
             sched.add(
                 Reset(*qubits), ref_op=root_relaxation, ref_pt='end'
