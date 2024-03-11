@@ -59,7 +59,7 @@ class Qubit_01_Spectroscopy_Multidim_Node(BaseNode):
 class Rabi_Oscillations_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['mw_amp180']
+        self.redis_field = ['rxy:amp180']
         self.measurement_obj = Rabi_Oscillations
         self.analysis_obj = RabiAnalysis
 

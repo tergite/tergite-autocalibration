@@ -44,10 +44,10 @@ class Resonator_Spectroscopy(Measurement):
         """
 
         sched = Schedule("multiplexed_resonator_spectroscopy",repetitions)
-        # Initialize the clock for each qubit
 
         qubits = self.transmons.keys()
 
+        # Initialize the clock for each qubit
         if self.qubit_state == 0: ro_str = 'ro'
         elif self.qubit_state == 1: ro_str = 'ro1'
         elif self.qubit_state == 2: ro_str = 'ro2'
