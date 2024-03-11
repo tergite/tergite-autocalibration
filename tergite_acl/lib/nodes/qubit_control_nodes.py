@@ -13,7 +13,7 @@ from tergite_acl.lib.calibration_schedules.n_rabi_oscillations import N_Rabi_Osc
 from tergite_acl.lib.calibration_schedules.rabi_oscillations import Rabi_Oscillations
 from tergite_acl.lib.calibration_schedules.ramsey_fringes import Ramsey_fringes
 # from calibration_schedules.two_tone_multidim import Two_Tones_Multidim
-from tergite_acl.lib.calibration_schedules.two_tone_multidim_loop_reversed import Two_Tones_Multidim
+from tergite_acl.lib.calibration_schedules.two_tone_multidim import Two_Tones_Multidim
 from tergite_acl.lib.calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
 
 
@@ -21,7 +21,7 @@ class Qubit_01_Spectroscopy_Pulsed_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.sweep_range = self.node_dictionary.pop("sweep_range", None)
-        self.redis_field = ['freq_01']
+        self.redis_field = ['clocks:f01']
         self.measurement_obj = Two_Tones_Spectroscopy
         self.analysis_obj = QubitSpectroscopyAnalysis
 
@@ -38,8 +38,8 @@ class Qubit_01_Spectroscopy_Pulsed_Node(BaseNode):
 class Qubit_01_Spectroscopy_Multidim_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['freq_01',
-                            'spec_ampl_optimal']
+        self.redis_field = ['clocks:f01',
+                            'spec:spec_ampl_optimal']
         self.measurement_obj = Two_Tones_Multidim
         self.analysis_obj = QubitSpectroscopyMultidim
 

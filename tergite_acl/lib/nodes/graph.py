@@ -13,10 +13,10 @@ graph_dependencies = [
     ('tof', 'resonator_spectroscopy'),
     # ('resonator_spectroscopy', 'coupler_resonator_spectroscopy'),
     # ('resonator_spectroscopy', 'qubit_01_spectroscopy_pulsed'),
-    ('qubit_01_spectroscopy_multidim', 'coupler_spectroscopy'),
-    ('resonator_spectroscopy', 'qubit_01_spectroscopy_multidim'),
+    ('qubit_01_spectroscopy', 'coupler_spectroscopy'),
+    ('resonator_spectroscopy', 'qubit_01_spectroscopy'),
     # ('qubit_01_spectroscopy_pulsed', 'rabi_oscillations'),
-    ('qubit_01_spectroscopy_multidim', 'rabi_oscillations'),
+    ('qubit_01_spectroscopy', 'rabi_oscillations'),
     ('rabi_oscillations', 'ramsey_correction'),
     ('ramsey_correction', 'motzoi_parameter'),
     ('motzoi_parameter', 'n_rabi_oscillations'),
@@ -55,7 +55,7 @@ graph.add_edges_from(graph_dependencies)
 graph.add_node('tof', type='refine')
 graph.add_node('punchout')
 # graph.add_node('qubit_01_spectroscopy_pulsed')
-graph.add_node('qubit_01_spectroscopy_multidim')
+graph.add_node('qubit_01_spectroscopy')
 # graph.add_node('T1', type='refine')
 # graph.add_node('T2', type='refine')
 # graph.add_node('T2_echo', type='refine')
@@ -70,14 +70,14 @@ graph.add_node('qubit_01_spectroscopy_multidim')
 # for nodes that perform the same measurement,
 # assign a weight to the corresponding edge to sort them
 # graph['resonator_spectroscopy']['qubit_01_spectroscopy_pulsed']['weight'] = 2
-# graph['resonator_spectroscopy']['qubit_01_spectroscopy_multidim']['weight'] = 1
+# graph['resonator_spectroscopy']['qubit_01_spectroscopy']['weight'] = 1
 graph['resonator_spectroscopy_1']['qubit_12_spectroscopy_multidim']['weight'] = 2
 graph['resonator_spectroscopy_1']['qubit_12_spectroscopy_multidim']['weight'] = 1
 
 initial_pos = {
     'tof': (0,1),
     'resonator_spectroscopy': (0,0.9),
-    'qubit_01_spectroscopy_multidim': ( 0.0,0.85),
+    'qubit_01_spectroscopy': ( 0.0,0.85),
     # 'qubit_01_spectroscopy_pulsed': (-0.5,0.8),
     'rabi_oscillations': (0,0.8),
     'ramsey_correction': (0,0.75),

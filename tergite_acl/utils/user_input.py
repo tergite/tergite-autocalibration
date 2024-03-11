@@ -8,7 +8,7 @@ couplers = ['q12_q13']
 node reference
   punchout
   resonator_spectroscopy
-  qubit_01_spectroscopy_multidim
+  qubit_01_spectroscopy
   qubit_01_spectroscopy_pulsed
   rabi_oscillations
   ramsey_fringes
@@ -42,7 +42,7 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'resonator_spectroscopy',
+    'target_node': 'qubit_01_spectroscopy',
     'all_qubits': qubits,
     'couplers': couplers,
 }

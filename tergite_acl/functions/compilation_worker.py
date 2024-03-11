@@ -64,6 +64,8 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
         if isinstance(sub_module_content, dict) and submodule in device_redis_dict:
             redis_module_config = device_redis_dict[submodule]
             decoded_transmon['data'][submodule].update(redis_module_config)
+        if 'measure' in submodule:
+            decoded_transmon['data'][submodule].update({'acq_channel': channel})
 
     encoded_transmon = json.dumps(decoded_transmon)
 
