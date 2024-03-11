@@ -123,7 +123,7 @@ class Ramsey_Fringes_12_Node(BaseNode):
 class Motzoi_Parameter_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['mw_motzoi']
+        self.redis_field = ['rxy:motzoi']
         self.measurement_obj = Motzoi_parameter
         self.analysis_obj = MotzoiAnalysis
         self.backup = False
@@ -140,7 +140,7 @@ class Motzoi_Parameter_Node(BaseNode):
 class N_Rabi_Oscillations_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['mw_amp180']
+        self.redis_field = ['rxy:amp180']
         self.measurement_obj = N_Rabi_Oscillations
         self.analysis_obj = NRabiAnalysis
         self.backup = False
@@ -177,7 +177,7 @@ class Qubit_12_Spectroscopy_Multidim_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['clock_freqs:f12',
-                            'spec_ampl_12_optimal']
+                            'spec:spec_ampl_12_optimal']
         self.qubit_state = 1
         self.measurement_obj = Two_Tones_Multidim
         self.analysis_obj = QubitSpectroscopyMultidim
@@ -198,7 +198,7 @@ class Qubit_12_Spectroscopy_Multidim_Node(BaseNode):
 class Rabi_Oscillations_12_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['mw_ef_amp180']
+        self.redis_field = ['r12:ef_amp180']
         self.qubit_state = 1
         self.measurement_obj = Rabi_Oscillations
         self.analysis_obj = RabiAnalysis
