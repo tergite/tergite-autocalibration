@@ -21,7 +21,7 @@ class Qubit_01_Spectroscopy_Pulsed_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.sweep_range = self.node_dictionary.pop("sweep_range", None)
-        self.redis_field = ['clocks:f01']
+        self.redis_field = ['clock_freqs:f01']
         self.measurement_obj = Two_Tones_Spectroscopy
         self.analysis_obj = QubitSpectroscopyAnalysis
 
@@ -38,7 +38,7 @@ class Qubit_01_Spectroscopy_Pulsed_Node(BaseNode):
 class Qubit_01_Spectroscopy_Multidim_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['clocks:f01',
+        self.redis_field = ['clock_freqs:f01',
                             'spec:spec_ampl_optimal']
         self.measurement_obj = Two_Tones_Multidim
         self.analysis_obj = QubitSpectroscopyMultidim
@@ -76,11 +76,11 @@ class Rabi_Oscillations_Node(BaseNode):
 class Ramsey_Fringes_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['freq_01']
+        self.redis_field = ['clock_freqs:f01']
         self.measurement_obj = Ramsey_fringes
         self.analysis_obj = RamseyAnalysis
         self.backup = False
-        self.analysis_kwargs = {"redis_field": "freq_01"}
+        self.analysis_kwargs = {"redis_field": "clock_freqs:f01"}
 
     @property
     def samplespace(self):
@@ -100,12 +100,12 @@ class Ramsey_Fringes_Node(BaseNode):
 class Ramsey_Fringes_12_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['freq_12']
+        self.redis_field = ['clock_freqs:f12']
         self.qubit_state = 1
         self.measurement_obj = Ramsey_fringes
         self.analysis_obj = RamseyAnalysis
         self.backup = False
-        self.analysis_kwargs = {"redis_field": "freq_12"}
+        self.analysis_kwargs = {"redis_field": "clock_freqs:f12"}
 
     @property
     def samplespace(self):
@@ -158,7 +158,7 @@ class Qubit_12_Spectroscopy_Pulsed_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.sweep_range = self.node_dictionary.pop("sweep_range", None)
-        self.redis_field = ['freq_12']
+        self.redis_field = ['clock_freqs:f12']
         self.qubit_state = 1
         self.measurement_obj = Two_Tones_Spectroscopy
         self.analysis_obj = QubitSpectroscopyAnalysis
@@ -176,7 +176,7 @@ class Qubit_12_Spectroscopy_Pulsed_Node(BaseNode):
 class Qubit_12_Spectroscopy_Multidim_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['freq_12',
+        self.redis_field = ['clock_freqs:f12',
                             'spec_ampl_12_optimal']
         self.qubit_state = 1
         self.measurement_obj = Two_Tones_Multidim

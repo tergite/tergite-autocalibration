@@ -11,7 +11,7 @@ node reference
   qubit_01_spectroscopy
   qubit_01_spectroscopy_pulsed
   rabi_oscillations
-  ramsey_fringes
+  ramsey_correction
   resonator_spectroscopy_1
   qubit_12_spectroscopy_pulsed
   qubit_12_spectroscopy_multidim
@@ -42,7 +42,7 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'rabi_oscillations',
+    'target_node': 'ramsey_correction',
     'all_qubits': qubits,
     'couplers': couplers,
 }
