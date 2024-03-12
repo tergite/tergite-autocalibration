@@ -68,7 +68,7 @@ class Reset_calibration_SSRO(Measurement):
         coupler: str,
         ramsey_phases: dict[str,np.ndarray],
         control_ons: dict[str,np.ndarray],
-        repetitions: int = 2048,
+        repetitions: int = 5000,
         opt_reset_duration_qc: dict[str,float] = None,
         opt_reset_amplitude_qc: dict[str,float] = None,
         ) -> Schedule:
@@ -96,7 +96,7 @@ class Reset_calibration_SSRO(Measurement):
         for this_qubit, ef_f_val in mw_frequencies_12.items():
             schedule.add_resource(ClockResource(name=f'{this_qubit}.12', freq=ef_f_val))
         for index, this_coupler in enumerate(all_couplers):
-            if this_coupler == 'q16_q21':
+            if this_coupler in ['q16_q21','q17_q22','q18_q23','q19_q24']:
                 downconvert = 0
             else:
                 downconvert = 4.4e9
@@ -130,7 +130,18 @@ class Reset_calibration_SSRO(Measurement):
                         shot.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
                         shot.add(Rxy_12(this_qubit))
 
-                # cz_amplitude = 0.5
+                reset_duration_wait = 1500e-09
+
+                reset_duration_qc = 460e-09
+                reset_amplitude_qc = 0.04526315789473684
+
+                reset_duration_cr = 350e-09
+                reset_amplitude_cr = -0.13815789473684212
+
+                rep = 1
+                    
+                buffer = shot.add(IdlePulse(4e-9))
+
                 if control_on:
 
                     cz_clock = f'{this_coupler}.cz'
@@ -138,68 +149,45 @@ class Reset_calibration_SSRO(Measurement):
 
                     shot.add(ResetClockPhase(clock=coupler+'.cz'))
                     
-                    buffer = schedule.add(IdlePulse(4e-9))
-
-                    reset_duration_qc = 90e-09
-                    reset_amplitude_qc = -0.063
-
-                    reset_duration_cr = 35e-09
-                    reset_amplitude_cr = -0.58
-
-                    reset_duration_cr_gf = 19e-09
-                    reset_amplitude_cr_gf = -0.935
-
-                    # reset_duration_qc_fg = 0e-09
-                    # reset_amplitude_qc_fg = 0
-
-                    qc = shot.add(
+                    for i in range(rep):
+                        qc = shot.add(
                                 RampPulse(
-                                    duration = reset_duration_qc_fg,
-                                    offset = reset_amplitude_qc_fg,
-                                    amp = - reset_amplitude_qc_fg,
-                                    port = cz_pulse_port,
-                                    clock = cz_clock,
-                                ),
-                            )
-
-                    buffer = shot.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration_qc_fg * 1e9 / 4) * 4e-9)
-
-                    qc = shot.add(
-                                RampPulse(
+                                    # offset = reset_amplitude/1.5,
+                                    # duration = reset_duration,
+                                    # amp = reset_amplitude,
                                     duration = reset_duration_qc,
-                                    offset = reset_amplitude_qc,
-                                    amp = - reset_amplitude_qc,
+                                    offset = reset_amplitude_qc/1.5,
+                                    amp = reset_amplitude_qc,
+                                    # amp = 0,
                                     port = cz_pulse_port,
                                     clock = cz_clock,
                                 ),
                             )
 
-                    buffer = shot.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration_qc * 1e9 / 4) * 4e-9)
+                        buffer = shot.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration_qc * 1e9 / 4) * 4e-9)
+                        # buffer = shot.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration * 1e9 / 4) * 4e-9)
 
-                    cr = shot.add(
-                                RampPulse(
-                                    duration = reset_duration_cr,
-                                    offset = reset_amplitude_cr,
-                                    amp = 0,
-                                    port = cz_pulse_port,
-                                    clock = cz_clock,
-                                ),
-                            )
+                        cr = shot.add(
+                                    RampPulse(
+                                        duration = reset_duration_cr,
+                                        offset = reset_amplitude_cr,
+                                        amp = -reset_amplitude_cr/11,
+                                        # duration = reset_duration,
+                                        # offset = reset_amplitude,
+                                        # amp = -reset_amplitude/11,
+                                        port = cz_pulse_port,
+                                        clock = cz_clock,
+                                    ),
+                                )
 
-                    buffer = shot.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration_cr * 1e9 / 4) * 4e-9)
+                        buffer = shot.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration_cr * 1e9 / 4) * 4e-9)
+                        
+                        if rep > 1 and i < rep-1:
+                            buffer = shot.add(IdlePulse(np.ceil( reset_duration_wait * 1e9 / 4) * 4e-9),ref_op=buffer, ref_pt='end')
 
-                    cr = shot.add(
-                                RampPulse(
-                                    duration = reset_duration_cr_gf,
-                                    offset = reset_amplitude_cr_gf,
-                                    amp = 0,
-                                    port = cz_pulse_port,
-                                    clock = cz_clock,
-                                ),
-                            )
-
-                    buffer = shot.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration_cr_gf * 1e9 / 4) * 4e-9)
-
+                        
+                # else:
+                        # buffer = shot.add(IdlePulse(np.ceil( (reset_duration_qc+reset_duration_cr+reset_duration_wait) * rep * 1e9 / 4) * 4e-9),ref_op=buffer, ref_pt='end')
 
 ################################################################################################
 

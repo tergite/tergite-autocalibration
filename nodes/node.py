@@ -208,7 +208,7 @@ class Qubit_01_Spectroscopy_Multidim_Node(Base_Node):
     def samplespace(self):
         cluster_samplespace = {
             'spec_pulse_amplitudes': {
-                 qubit: np.linspace(8e-4, 8e-4, 1) for qubit in self.all_qubits
+                 qubit: np.linspace(20e-4, 20e-4, 1) for qubit in self.all_qubits
             },
             'spec_frequencies': {
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
@@ -228,7 +228,7 @@ class Rabi_Oscillations_Node(Base_Node):
     def samplespace(self):
         cluster_samplespace = {
             'mw_amplitudes': {
-                qubit: np.linspace(0.002, 0.50, 71) for qubit in self.all_qubits
+                qubit: np.linspace(0.002, 1, 51) for qubit in self.all_qubits
             }
         }
         return cluster_samplespace
@@ -430,7 +430,7 @@ class Qubit_12_Spectroscopy_Multidim_Node(Base_Node):
     def samplespace(self):
         cluster_samplespace = {
             'spec_pulse_amplitudes': {
-                 qubit: np.linspace(8e-4, 8e-4, 1) for qubit in self.all_qubits
+                 qubit: np.linspace(20e-4, 20e-4, 1) for qubit in self.all_qubits
             },
             'spec_frequencies': {
                 qubit: qubit_samples(qubit, transition='12') for qubit in self.all_qubits
@@ -450,7 +450,7 @@ class Rabi_Oscillations_12_Node(Base_Node):
     def samplespace(self):
         cluster_samplespace = {
             'mw_amplitudes': {
-                qubit: np.linspace(0.002, 0.400, 31) for qubit in self.all_qubits
+                qubit: np.linspace(0.002, 1, 51) for qubit in self.all_qubits
             }
         }
         return cluster_samplespace
@@ -505,7 +505,7 @@ class RO_amplitude_optimization_gef_Node(Base_Node):
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'ro_amplitudes': {qubit : np.linspace(0.001,0.121,31) for qubit in self.all_qubits}
+            'ro_amplitudes': {qubit : np.linspace(0.001,0.2,31) for qubit in self.all_qubits}
         }
         return cluster_samplespace
 
@@ -532,10 +532,11 @@ class Reset_Chevron_Node(Base_Node):
 
             # For DC reset
             'cz_pulse_durations': {
-                qubit: 1e-9+np.arange(0e-9, 80e-9,2e-9) for qubit in self.coupled_qubits
+                qubit: 1e-9+np.arange(0e-9, 1600e-9,80e-9) for qubit in self.coupled_qubits
+                # qubit: np.linspace(0.0, -0.25 , 6) for qubit in self.coupled_qubits
             },
             'cz_pulse_amplitudes': {
-                qubit: np.linspace(0, 0.1, 21) for qubit in self.coupled_qubits
+                qubit: np.linspace(0, 0.30 , 20) for qubit in self.coupled_qubits
             },
 
             # # For DC reset - ge/gf

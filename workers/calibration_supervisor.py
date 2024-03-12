@@ -53,15 +53,21 @@ node_factory = NodeFactory()
 
 
 def set_module_att(cluster):
+    # XY lines
+    for idx,module in enumerate(cluster.modules[0:13]):
+        if idx in [2,3,8]:
+            module.out0_att(12)
+        else:
+            module.out0_att(16)
+    print('XY: '+module.name + '_att:'+ str(module.out0_att()) + 'dB')
     # Flux lines
-    # print("Set module attr")
     for module in cluster.modules[0:13]:
         module.out1_att(40)
-    print(module.name + '_att:'+ str(module.out1_att()) + 'dB')
+    print('FL: '+module.name + '_att:'+ str(module.out1_att()) + 'dB')
     # Readout lines
     for module in cluster.modules[15:17]:
-        module.out0_att(6)
-    print(module.name + '_att:'+ str(module.out0_att()) + 'dB')
+        module.out0_att(12)
+    print('RO: '+module.name + '_att:'+ str(module.out0_att()) + 'dB')
 
 if args.cluster_status == ClusterStatus.real:
 # if args.cluster_status == ClusterStatus.real:

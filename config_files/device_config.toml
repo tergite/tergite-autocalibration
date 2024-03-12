@@ -58,7 +58,7 @@ ro_acq_delay = 220e-9
 ro_pulse_delay = 4e-9
 ro_pulse_duration = 3e-6
 ro_acq_integration_time = 2.5e-6
-mw_pulse_duration = 20e-9
+mw_pulse_duration = 32e-9
 init_duration = 400e-6
 min_calibration_point = 0
 max_calibration_point = 0
@@ -72,16 +72,17 @@ q12.ro_pulse_amp = 20e-3
 q13.ro_pulse_amp = 20e-3
 q14.ro_pulse_amp = 20e-3
 q15.ro_pulse_amp = 20e-3
-q16.ro_pulse_amp = 20e-3
-q17.ro_pulse_amp = 25e-3
-q18.ro_pulse_amp = 9e-3
-q19.ro_pulse_amp = 15e-3
-q20.ro_pulse_amp = 25e-3
-q21.ro_pulse_amp = 9e-3
-q22.ro_pulse_amp = 20e-3
-q23.ro_pulse_amp = 30e-3
-q24.ro_pulse_amp = 15e-3
-q25.ro_pulse_amp = 9e-3
+q16.ro_pulse_amp = 120e-3
+q17.ro_pulse_amp = 150e-3
+q18.ro_pulse_amp = 54e-3
+q19.ro_pulse_amp = 54e-3
+q20.ro_pulse_amp = 150e-3
+q21.ro_pulse_amp = 40e-3
+q22.ro_pulse_amp = 120e-3
+q23.ro_pulse_amp = 180e-3
+q24.ro_pulse_amp = 90e-3
+q25.ro_pulse_amp = 54e-3
+
 
 [initials.couplers.all]
 

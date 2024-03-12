@@ -116,23 +116,36 @@ class ResetCalibrationSSROAnalysis():
         for n,magnitude in enumerate(self.magnitudes):
             if qubit_types[self.qubit] == 'Target':
                 if n == 0:
-                    self.fit_ys.append([0,1,0,0,1,0,0,1,0]) # Target - ResetOff
+                    self.fit_ys.append([0,0,0,1,1,1,0,0,0]) # Control - ResetOff
                 else:
                     self.fit_ys.append([0,0,0,0,0,0,0,0,0]) # Target - ResetOn
             else:
                 if n == 0:
-                    self.fit_ys.append([0,0,0,1,1,1,0,0,0]) # Control - ResetOff
+                    self.fit_ys.append([0,1,0,0,1,0,0,1,0]) # Target - ResetOff
                 else:
-                    self.fit_ys.append([0,0,0,1,1,1,1,1,1]) # Control - ResetOn
+                    self.fit_ys.append([0,1,0,0,1,0,0,1,0]) # Target - ResetOn no leakage reduction
+                    # self.fit_ys.append([0,1,1,0,1,1,0,1,1]) # Control - ResetOn
+        
+            # if qubit_types[self.qubit] == 'Target':
+            #     if n == 0:
+            #         self.fit_ys.append([0,1,0,0,1,0,0,1,0]) # Target - ResetOff
+            #     else:
+            #         self.fit_ys.append([0,0,0,0,0,0,0,0,0]) # Target - ResetOn
+            # else:
+            #     if n == 0:
+            #         self.fit_ys.append([0,0,0,1,1,1,0,0,0]) # Control - ResetOff
+            #     else:
+            #         self.fit_ys.append([0,0,0,1,1,1,1,1,1]) # Control - ResetOn
         self.fit_ys = np.array(self.fit_ys)
         self.pop_loss = 1-np.sum(np.abs(self.magnitudes - self.fit_ys))/9
+        print(self.magnitudes)
         self.leakage = np.mean(self.all_magnitudes[:,:-3,2][-1])
         return [self.pop_loss,self.leakage]
 
     def plotter(self,axis):
         # datarray = self.dataset[f'y{self.qubit}']
         # qubit = self.qubit
-        state = ['g','e','f']
+        state = ['0','1','2']
         states =list(itertools.product(state, state))
         states = [state[0]+state[1] for state in states]
 
