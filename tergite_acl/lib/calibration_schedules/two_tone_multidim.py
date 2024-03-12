@@ -128,8 +128,6 @@ class Two_Tones_Multidim(Measurement):
                     else:
                         raise ValueError(f'Invalid qubit state: {self.qubit_state}')
 
-
-
                     schedule.add(
                         measure_function(this_qubit, acq_index=this_index,bin_mode=BinMode.AVERAGE),
                     )

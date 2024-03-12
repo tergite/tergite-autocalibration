@@ -137,6 +137,7 @@ class Measure_RO1(Measure):
                     'acq_protocol': acq_protocol,
                     'bin_mode': bin_mode,
                     'operation_type': 'measure_1',
+                    'acq_channel_override': None,
                 },
             }
         )
@@ -267,7 +268,6 @@ class ExtendedTransmon(BasicTransmonElement):
                         'acq_delay': self.measure.acq_delay(),
                         'acq_duration': self.measure.integration_time(),
                         'acq_channel': self.measure.acq_channel(),
-                        'acq_channel_override': None,
                         'acq_protocol_default': 'SSBIntegrationComplex',
                         'reset_clock_phase': self.measure.reset_clock_phase(),
                         'reference_magnitude': pulse_library.ReferenceMagnitude.from_parameter(
@@ -276,10 +276,10 @@ class ExtendedTransmon(BasicTransmonElement):
                         'acq_weights_a': self.measure.acq_weights_a(),
                         'acq_weights_b': self.measure.acq_weights_b(),
                         'acq_weights_sampling_rate': self.measure.acq_weights_sampling_rate(),
-                        # 'acq_rotation': self.measure.acq_rotation(),
-                        # 'acq_threshold': self.measure.acq_threshold(),
+                        'acq_rotation': self.measure.acq_rotation(),
+                        'acq_threshold': self.measure.acq_threshold(),
                     },
-                    gate_info_factory_kwargs=['acq_index', 'bin_mode', 'acq_protocol'],
+                    gate_info_factory_kwargs=['acq_channel_override', 'acq_index', 'bin_mode', 'acq_protocol'],
                 )
         cfg_dict['elements'][f'{self.name}']['measure_2'] = OperationCompilationConfig(
                     factory_func=measurement_factories.dispersive_measurement,
@@ -294,7 +294,7 @@ class ExtendedTransmon(BasicTransmonElement):
                         'acq_delay': self.measure.acq_delay(),
                         'acq_duration': self.measure.integration_time(),
                         'acq_channel': self.measure.acq_channel(),
-                        'acq_channel_override': None,
+                        # 'acq_channel_override': None,
                         'acq_protocol_default': 'SSBIntegrationComplex',
                         'reset_clock_phase': self.measure.reset_clock_phase(),
                         'reference_magnitude': pulse_library.ReferenceMagnitude.from_parameter(
@@ -306,7 +306,7 @@ class ExtendedTransmon(BasicTransmonElement):
                         # 'acq_rotation': self.measure.acq_rotation(),
                         # 'acq_threshold': self.measure.acq_threshold(),
                     },
-                    gate_info_factory_kwargs=['acq_index', 'bin_mode', 'acq_protocol'],
+                    gate_info_factory_kwargs=['acq_channel_override', 'acq_index', 'bin_mode', 'acq_protocol'],
                 )
         cfg_dict['elements'][f'{self.name}']['measure_opt'] = OperationCompilationConfig(
                     factory_func=measurement_factories.dispersive_measurement,
@@ -321,6 +321,7 @@ class ExtendedTransmon(BasicTransmonElement):
                         'acq_delay': self.measure.acq_delay(),
                         'acq_duration': self.measure.integration_time(),
                         'acq_channel': self.measure.acq_channel(),
+                        'acq_channel_override': None,
                         'acq_protocol_default': 'SSBIntegrationComplex',
                         'reset_clock_phase': self.measure.reset_clock_phase(),
                         'reference_magnitude': pulse_library.ReferenceMagnitude.from_parameter(
@@ -332,7 +333,7 @@ class ExtendedTransmon(BasicTransmonElement):
                         # 'acq_rotation': self.measure.acq_rotation(),
                         # 'acq_threshold': self.measure.acq_threshold(),
                     },
-                    gate_info_factory_kwargs=['acq_index', 'bin_mode', 'acq_protocol'],
+                    gate_info_factory_kwargs=['acq_channel_override', 'acq_index', 'bin_mode', 'acq_protocol'],
                 )
         cfg_dict['elements'][f'{self.name}']['r12'] = OperationCompilationConfig(
                     factory_func=pulse_factories.rxy_drag_pulse,

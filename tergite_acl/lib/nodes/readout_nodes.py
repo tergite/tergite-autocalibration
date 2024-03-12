@@ -40,7 +40,7 @@ class Resonator_Spectroscopy_Node(BaseNode):
 class Resonator_Spectroscopy_1_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['clock_freqs:readout_1', 'Ql_1', 'resonator_minimum_1']
+        self.redis_field = ['extended_clock_freqs:readout_1', 'Ql_1', 'resonator_minimum_1']
         self.qubit_state = 1
         self.measurement_obj = Resonator_Spectroscopy
         self.analysis_obj = ResonatorSpectroscopy_1_Analysis
@@ -58,7 +58,7 @@ class Resonator_Spectroscopy_1_Node(BaseNode):
 class Resonator_Spectroscopy_2_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['clock_freqs:readout_2']
+        self.redis_field = ['extended_clock_freqs:readout_2']
         self.qubit_state = 2
         self.measurement_obj = Resonator_Spectroscopy
         self.analysis_obj = ResonatorSpectroscopy_2_Analysis

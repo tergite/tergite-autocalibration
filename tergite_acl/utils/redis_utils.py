@@ -32,6 +32,8 @@ def populate_initial_parameters(
     for qubit in qubits:
         # parameter common to all qubits:
         for module_key, module_value in initial_qubit_parameters['all'].items():
+            print(f'{ module_key = }')
+            print(f'{ module_value = }')
             if isinstance(module_value, dict):
                 for parameter_key, parameter_value in module_value.items():
                     sub_module_key = module_key + ':' + parameter_key

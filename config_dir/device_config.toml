@@ -67,19 +67,29 @@ cz_dynamic_phase.coupler_dynamic_phase = nan
 
 [initials.qubits.all]
 measure.acq_delay = 220e-9
+measure_1.acq_delay = 220e-9
+measure_2.acq_delay = 220e-9
 measure.pulse_duration = 3e-6
+measure_1.pulse_duration = 3e-6
+measure_2.pulse_duration = 3e-6
 measure.integration_time = 2.5e-6
-rxy.duration = 28e-9
-reset.duration = 400e-6
-spec.spec_duration = 5e-6
-spec_ampl_default = 3e-4
+measure_1.integration_time = 2.5e-6
+measure_2.integration_time = 2.5e-6
 
 [initials.qubits]
 q11.measure.pulse_amp = 15.0e-3
 q12.measure.pulse_amp = 3.0e-3  #9.0e-3
+q12.measure_1.pulse_amp = 3.0e-3  #9.0e-3
+q12.measure_2.pulse_amp = 3.0e-3  #9.0e-3
 q13.measure.pulse_amp = 3.0e-3 #10.0e-3
+q13.measure_1.pulse_amp = 3.0e-3 #10.0e-3
+q13.measure_2.pulse_amp = 3.0e-3 #10.0e-3
 q14.measure.pulse_amp = 3.0e-3 #10.0e-3
+q14.measure_1.pulse_amp = 3.0e-3 #10.0e-3
+q14.measure_2.pulse_amp = 3.0e-3 #10.0e-3
 q15.measure.pulse_amp = 3.0e-3 #15.0e-3
+q15.measure_1.pulse_amp = 3.0e-3 #15.0e-3
+q15.measure_2.pulse_amp = 3.0e-3 #15.0e-3
 
 # # Added 6dB att
 # q16.ro_pulse_amp = 200.0e-3
