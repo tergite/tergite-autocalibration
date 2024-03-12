@@ -532,11 +532,11 @@ class Reset_Chevron_Node(Base_Node):
 
             # For DC reset
             'cz_pulse_durations': {
-                qubit: 1e-9+np.arange(0e-9, 1600e-9,80e-9) for qubit in self.coupled_qubits
+                qubit: 1e-9+np.arange(0e-9, 1600e-9,400e-9) for qubit in self.coupled_qubits
                 # qubit: np.linspace(0.0, -0.25 , 6) for qubit in self.coupled_qubits
             },
             'cz_pulse_amplitudes': {
-                qubit: np.linspace(0, 0.30 , 20) for qubit in self.coupled_qubits
+                qubit: np.linspace(0, 0.30 , 5) for qubit in self.coupled_qubits
             },
 
             # # For DC reset - ge/gf

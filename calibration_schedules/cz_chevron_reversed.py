@@ -282,18 +282,18 @@ class Reset_chevron_dc(Measurement):
                 # buffer = schedule.add(IdlePulse(np.ceil( reset_duration_wait * 1e9 / 4) * 4e-9),ref_op=buffer, ref_pt='end')
 
                 # step 1 - calibrate ge/f reset qc pulse
-                qc = schedule.add(
-                            RampPulse(
-                                offset = reset_amplitude,
-                                duration = reset_duration,
-                                amp = 0,
-                                # amp = 0.,
-                                port = cz_pulse_port,
-                                clock = cz_clock,
-                            ),
-                        )
+                # qc = schedule.add(
+                #             RampPulse(
+                #                 offset = reset_amplitude,
+                #                 duration = reset_duration,
+                #                 amp = 0,
+                #                 # amp = 0.,
+                #                 port = cz_pulse_port,
+                #                 clock = cz_clock,
+                #             ),
+                #         )
 
-                buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration * 1e9 / 4) * 4e-9)
+                # buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration * 1e9 / 4) * 4e-9)
 
                 # step 2 - calibrate ge/f reset cr pulse
 
@@ -518,7 +518,7 @@ class Reset_chevron_dc(Measurement):
                 for this_qubit in qubits:
                     schedule.add(
                         Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
-                        # ref_op=buffer_end,rel_time=100e-9, ref_pt="end",
+                        ref_op=buffer_end,rel_time=20e-9, ref_pt="end",
                     )
         return schedule
 
