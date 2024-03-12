@@ -103,10 +103,15 @@ def populate_quantities_of_interest(
             calibration_supervisor_key = f'cs:{qubit}'
             for field_key, field_value in node_parameters_dictionary.items():
                 if isinstance(field_value, dict):
-                    for sub_field_key, sub_field_value in field_value.items():
-                        sub_field_key = field_key + ':' + sub_field_key
-                        if not redis_connection.hexists(redis_key, field_key):
-                            redis_connection.hset(f'transmons:{qubit}', sub_field_key, sub_field_value)
+                    for parameter_name, parameter_value in field_value.items():
+                        '''
+                        e.g. parameter_name -> 'acq_delay'
+                             field_key -> 'measure'
+                             sub_field_key -> 'measure:acq_delay'
+                        '''
+                        sub_field_key = field_key + ':' + parameter_name
+                        if not redis_connection.hexists(redis_key, sub_field_key):
+                            redis_connection.hset(f'transmons:{qubit}', sub_field_key, parameter_value)
                 # check if field already exists
                 elif not redis_connection.hexists(redis_key, field_key):
                     redis_connection.hset(f'transmons:{qubit}', field_key, field_value)

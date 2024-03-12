@@ -31,13 +31,13 @@ class ResetRedisNode:
             cs_key = f'cs:{qubit}'
             if remove_node == 'all':
                 for field in fields:
-                    self.red.hset(key, field, 'nan' )
+                    self.red.hset(key, field, 'nan')
                 for node in self.nodes:
-                    self.red.hset(cs_key, node, 'not_calibrated' )
+                    self.red.hset(cs_key, node, 'not_calibrated')
             elif remove_node in self.nodes:
                 for field in remove_fields:
                     self.red.hset(key, field, 'nan')
-                self.red.hset(cs_key, remove_node, 'not_calibrated' )
+                self.red.hset(cs_key, remove_node, 'not_calibrated')
             else:
                 raise ValueError('Invalid Field')
 

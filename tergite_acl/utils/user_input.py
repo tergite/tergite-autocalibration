@@ -42,7 +42,7 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'ramsey_correction',
+    'target_node': 'ro_amplitude_three_state_optimization',
     'all_qubits': qubits,
     'couplers': couplers,
 }

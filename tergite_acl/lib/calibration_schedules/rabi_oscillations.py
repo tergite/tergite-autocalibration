@@ -54,13 +54,11 @@ class Rabi_Oscillations(Measurement):
 
         qubits = self.transmons.keys()
 
-        print(f'{ self.qubit_state = }')
 
         # we must first add the clocks
         if self.qubit_state == 0:
             for this_qubit, this_transmon in self.transmons.items():
                 mw_frequency_01 = this_transmon.clock_freqs.f01()
-                print(f'{ mw_frequency_01 = }')
                 this_clock = f'{this_qubit}.01'
                 schedule.add_resource(ClockResource(name=this_clock, freq=mw_frequency_01))
         elif self.qubit_state == 1:

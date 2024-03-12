@@ -27,7 +27,7 @@ class RO_frequency_optimization(Measurement):
         repetitions: int = 1024,
         ) -> Schedule:
 
-        sched = Schedule("multiplexed_ro_frequency_optimization", repetitions)
+        schedule = Schedule("multiplexed_ro_frequency_optimization", repetitions)
 
         qubits = self.transmons.keys()
 
@@ -41,14 +41,14 @@ class RO_frequency_optimization(Measurement):
         #Initialize ClockResource with the first frequency value
         for this_qubit, ro_array_val in ro_opt_frequencies.items():
             this_ro_clock = f'{this_qubit}.' + ro_str
-            sched.add_resource(ClockResource(name=this_ro_clock, freq=ro_array_val[0]))
+            schedule.add_resource(ClockResource(name=this_ro_clock, freq=ro_array_val[0]))
 
         for this_qubit, this_transmon in self.transmons.items():
             mw_frequency_12 = this_transmon.clock_freqs.f12()
             this_clock = f'{this_qubit}.12'
             schedule.add_resource(ClockResource(name=this_clock, freq=mw_frequency_12))
 
-        root_relaxation = sched.add(Reset(*qubits), label="Reset")
+        root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
         # The first for loop iterates over all qubits:
         for acq_cha, (this_qubit, ro_f_values) in enumerate(ro_opt_frequencies.items()):
@@ -59,11 +59,12 @@ class RO_frequency_optimization(Measurement):
             ro_pulse_duration = this_transmon.measure.pulse_duration()
             mw_pulse_duration = this_transmon.rxy.duration()
             mw_pulse_port = this_transmon.ports.microwave()
+            mw_ef_amp180 = this_transmon.r12.ef_amp180()
             acquisition_delay = this_transmon.measure.acq_delay()
             integration_time = this_transmon.measure.integration_time()
             ro_port = this_transmon.ports.readout()
 
-            sched.add(
+            schedule.add(
                 Reset(*qubits), ref_op=root_relaxation, ref_pt_new='end'
             ) #To enforce parallelism we refer to the root relaxation
 
@@ -73,10 +74,10 @@ class RO_frequency_optimization(Measurement):
 
             # The second for loop iterates over all frequency values in the frequency batch:
             for acq_index, ro_frequency in enumerate(ro_f_values):
-                sched.add(
+                schedule.add(
                     SetClockFrequency(clock=this_ro_clock, clock_freq_new=ro_frequency),
                 )
-                ro_pulse = sched.add(
+                ro_pulse = schedule.add(
                     SquarePulse(
                         duration=ro_pulse_duration,
                         amp=ro_pulse_amplitude,
@@ -85,7 +86,7 @@ class RO_frequency_optimization(Measurement):
                     ),
                 )
 
-                sched.add(
+                schedule.add(
                     SSBIntegrationComplex(
                         duration=integration_time,
                         port=ro_port,
@@ -98,18 +99,18 @@ class RO_frequency_optimization(Measurement):
                     rel_time=acquisition_delay,
                 )
 
-                sched.add(Reset(this_qubit))
+                schedule.add(Reset(this_qubit))
 
             #shift the acquisition channel
             acq_cha += len(qubits)
             #repeat for when the qubit is at |1>
             for acq_index, ro_frequency in enumerate(ro_f_values):
 
-                sched.add(X(this_qubit))
-                sched.add(
+                schedule.add(X(this_qubit))
+                schedule.add(
                     SetClockFrequency(clock=this_ro_clock, clock_freq_new=ro_frequency),
                 )
-                ro_pulse = sched.add(
+                ro_pulse = schedule.add(
                     SquarePulse(
                         duration=ro_pulse_duration,
                         amp=ro_pulse_amplitude,
@@ -118,7 +119,7 @@ class RO_frequency_optimization(Measurement):
                     ),
                 )
 
-                sched.add(
+                schedule.add(
                     SSBIntegrationComplex(
                         duration=integration_time,
                         port=ro_port,
@@ -131,18 +132,18 @@ class RO_frequency_optimization(Measurement):
                     rel_time=acquisition_delay,
                 )
 
-                sched.add(Reset(this_qubit))
+                schedule.add(Reset(this_qubit))
 
             if self.qubit_state == 2:
                 #shift the acquisition channel
                 acq_cha += len(qubits)
                 #repeat for when the qubit is at |2>
                 for acq_index, ro_frequency in enumerate(ro_f_values):
-                    sched.add(X(this_qubit))
-                    sched.add(
+                    schedule.add(X(this_qubit))
+                    schedule.add(
                         DRAGPulse(
                             duration=mw_pulse_duration,
-                            G_amp=mw_ef_amps180,
+                            G_amp=mw_ef_amp180,
                             D_amp=0,
                             port=mw_pulse_port,
                             clock=this_mw_clock,
@@ -150,11 +151,11 @@ class RO_frequency_optimization(Measurement):
                         ),
                     )
 
-                    sched.add(
+                    schedule.add(
                         SetClockFrequency(clock=this_ro_clock, clock_freq_new=ro_frequency),
                     )
 
-                    ro_pulse = sched.add(
+                    ro_pulse = schedule.add(
                         SquarePulse(
                             duration=ro_pulse_duration,
                             amp=ro_pulse_amplitude,
@@ -163,7 +164,7 @@ class RO_frequency_optimization(Measurement):
                         ),
                     )
 
-                    sched.add(
+                    schedule.add(
                         SSBIntegrationComplex(
                             duration=integration_time,
                             port=ro_port,
@@ -176,6 +177,6 @@ class RO_frequency_optimization(Measurement):
                         rel_time=acquisition_delay,
                     )
 
-                    sched.add(Reset(this_qubit))
+                    schedule.add(Reset(this_qubit))
 
-        return sched
+        return schedule
