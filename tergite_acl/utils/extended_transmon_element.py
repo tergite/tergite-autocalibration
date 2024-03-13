@@ -31,12 +31,12 @@ class ExtendedClocksFrequencies(InstrumentChannel):
             initial_value=kwargs.get("readout_2", math.nan),
             vals=Numbers(min_value=0, max_value=1e12, allow_nan=True),
         )
-        self.readout_opt = ManualParameter(
-            name="readout_opt",
+        self.readout_2state_opt = ManualParameter(
+            name="readout_2state_opt",
             instrument=self,
             label="Optimal Readout frequency for discriminating |0>,|1>",
             unit="Hz",
-            initial_value=kwargs.get("readout_opt", math.nan),
+            initial_value=kwargs.get("readout_2state_opt", math.nan),
             vals=Numbers(min_value=0, max_value=1e12, allow_nan=True),
         )
 
@@ -78,7 +78,7 @@ class Spec(InstrumentChannel):
             label=r"amplitude for the qubit spectroscopy pulse",
             initial_value=kwargs.get("spec_amp", math.nan),
             unit="",
-            vals=Numbers(min_value=-10, max_value=10, allow_nan=True),
+            vals=Numbers(min_value=-1, max_value=1, allow_nan=True),
         )
 
         self.spec_duration = ManualParameter(
@@ -86,7 +86,7 @@ class Spec(InstrumentChannel):
             instrument=self,
             initial_value=kwargs.get("spec_duration", 20e-9),
             unit="s",
-            vals=validators.Numbers(min_value=0, max_value=1),
+            vals=Numbers(min_value=0, max_value=1e-3, allow_nan=True),
         )
 
 class Rxy_12(Rxy):
@@ -250,7 +250,7 @@ class ExtendedTransmon(BasicTransmonElement):
                 f'{self.name}.ro': self.clock_freqs.readout(),
                 f'{self.name}.ro1': self.extended_clock_freqs.readout_1(),
                 f'{self.name}.ro2': self.extended_clock_freqs.readout_2(),
-                f'{self.name}.ro_2st_opt': self.extended_clock_freqs.readout_opt(),
+                f'{self.name}.ro_2st_opt': self.extended_clock_freqs.readout_2state_opt(),
                 f'{self.name}.ro_3st_opt': self.extended_clock_freqs.readout_3state_opt()
             },
             'edges': {},

@@ -198,22 +198,22 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
     static_parameters = {}
 
     # static_parameters = node_class.static_kwargs # parameters stored in the redis
-    #
-    # if repetitions is not None:
-    #     static_parameters["repetitions"] = repetitions
-    #
-    # for key, value in node.node_dictionary.items():
-    #     if key in static_parameters:
-    #         if not np.iterable(value):
-    #             value = {q: value for q in qubits}
-    #         static_parameters[key] = value
-    #     elif key in samplespace:
-    #         if not isinstance(value, dict):
-    #             value = {q: value for q in qubits}
-    #         samplespace[key] = value
-    #     elif key != "couplers":
-    #         static_parameters[key] = value
-    #         # print(f"{key} isn't one of the static parameters of {node_class}. \n We will ignore this parameter.")
+
+    if repetitions is not None:
+        static_parameters["repetitions"] = repetitions
+
+    for key, value in node.node_dictionary.items():
+        if key in static_parameters:
+            if not np.iterable(value):
+                value = {q: value for q in qubits}
+            static_parameters[key] = value
+        elif key in samplespace:
+            if not isinstance(value, dict):
+                value = {q: value for q in qubits}
+            samplespace[key] = value
+        elif key != "couplers":
+            static_parameters[key] = value
+            # print(f"{key} isn't one of the static parameters of {node_class}. \n We will ignore this parameter.")
 
     if node.type == 'parameterized_sweep':
         external_parameters = {node.external_parameter_name: node.external_parameter_value}

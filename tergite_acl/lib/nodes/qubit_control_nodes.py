@@ -148,7 +148,7 @@ class N_Rabi_Oscillations_Node(BaseNode):
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'mw_amplitudes_sweep': {qubit: np.linspace(-0.1, 0.1, 61) for qubit in self.all_qubits},
+            'mw_amplitudes_sweep': {qubit: np.linspace(-0.15, 0.15, 61) for qubit in self.all_qubits},
             'X_repetitions': {qubit: np.arange(1, 16, 4) for qubit in self.all_qubits}
         }
         return cluster_samplespace

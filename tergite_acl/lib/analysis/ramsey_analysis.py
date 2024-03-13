@@ -46,7 +46,7 @@ class RamseyModel(lmfit.model.Model):
 
 
 class RamseyAnalysis(BaseAnalysis):
-    def __init__(self, dataset: xr.Dataset, redis_field='freq_01'):
+    def __init__(self, dataset: xr.Dataset, redis_field='clock_freqs:f01'):
         super().__init__()
         self.redis_field = redis_field
         self.qubit = dataset.attrs['qubit']
@@ -65,7 +65,7 @@ class RamseyAnalysis(BaseAnalysis):
         self.fit_results = {}
         # print(dataset)
         if dataset.node == 'ramsey_correction_12':
-            redis_field = 'freq_12'
+            redis_field = 'clock_freqs:f12'
         self.qubit_frequency = float(REDIS_CONNECTION.hget(f'{redis_key}', redis_field))
         # print(redis_field,self.qubit_frequency)
         self.dataset = dataset

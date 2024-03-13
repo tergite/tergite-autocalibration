@@ -62,6 +62,7 @@ class N_Rabi_Oscillations(Measurement):
             this_transmon = self.transmons[this_qubit]
             mw_pulse_duration = this_transmon.rxy.duration()
             mw_pulse_port = this_transmon.ports.microwave()
+            mw_amplitude = this_transmon.rxy.amp180()
             mw_motzoi = this_transmon.rxy.motzoi()
 
             this_clock = f'{this_qubit}.01'
@@ -77,13 +78,13 @@ class N_Rabi_Oscillations(Measurement):
             for x_index, this_x in enumerate(X_values):
 
                 # The inner for loop iterates over all frequency values in the frequency batch:
-                for mw_amplitude_index, mw_amplitude in enumerate(mw_amplitudes_values):
+                for mw_amplitude_index, mw_amplitude_correction in enumerate(mw_amplitudes_values):
                     this_index = x_index*number_of_amplitudes + mw_amplitude_index
                     for _ in range(this_x):
                         schedule.add(
                                 DRAGPulse(
                                     duration=mw_pulse_duration,
-                                    G_amp=mw_amplitude,
+                                    G_amp=mw_amplitude + mw_amplitude_correction,
                                     D_amp=mw_motzoi,
                                     port=mw_pulse_port,
                                     clock=this_clock,

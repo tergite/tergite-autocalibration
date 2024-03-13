@@ -2,9 +2,9 @@
 tof.measure.acq_delay = nan
 
 resonator_spectroscopy.clock_freqs.readout = nan
-resonator_spectroscopy.extended_clock_freqs.readout_1 = nan
-resonator_spectroscopy.extended_clock_freqs.readout_2 = nan
-resonator_spectroscopy.extended_clock_freqs.readout_opt = nan
+resonator_spectroscopy_1.extended_clock_freqs.readout_1 = nan
+resonator_spectroscopy_2.extended_clock_freqs.readout_2 = nan
+
 resonator_spectroscopy.Ql = nan
 resonator_spectroscopy.resonator_minimum = nan
 resonator_spectroscopy_1.Ql_1 = nan
