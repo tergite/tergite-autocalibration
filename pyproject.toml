@@ -1,13 +1,18 @@
 [tool.poetry]
 name = "tergite-acl"
-version = "0.1.0"
-description = "Communication handling for automatic calibration of multi-qubit devices using Qblox instruments. Minimal experimental version"
-authors = ["Eleftherios Moschandreou <elemos@chalmers.se>"]
+version = "2023.12.0"
+description = "commandline application to calibrate QAL 9000-Like quantum computers automatically"
+authors = [
+    "Eleftherios Moschandreou <elemos@chalmers.se>",
+    "Liangyu Chen <liangyuc@chalmers.se>",
+    "Tong Liu <liuto@chalmers.se>",
+    "Stefan Hill <stefanhi@chalmers.se>"
+]
 readme = "README.md"
 packages = [{include = "tergite_acl"}]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = ">= 3.9, < 3.10"
 colorama = "0.4.6"
 h5netcdf = "1.0.2"
 h5py = "3.7.0"

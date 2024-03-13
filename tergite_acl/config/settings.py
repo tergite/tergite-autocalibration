@@ -68,7 +68,7 @@ if not os.path.exists(DATA_DIR):
 # Configuration directory to store additional configuration files
 CONFIG_DIR = _from_config('CONFIG_DIR',
                           cast_=Path,
-                          default=ROOT_DIR.joinpath('/config_dir'))
+                          default=ROOT_DIR.joinpath('/configs'))
 
 # ---
 # Section with configuration files

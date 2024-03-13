@@ -1,85 +1,95 @@
-# README #
+# tergite-acl
+
+![CI](https://github.com/tergite/tergite-acl/actions/workflows/ci.yml/badge.svg)
+
+A commandline application to calibrate QAL 9000-Like quantum computers automatically
+
+**THIS CODE IS OPEN SOURCE. ANY CONTRIBUTIONS TO IT IS LICENSED VIA THE APACHE 2.0 LICENSE**
+
 This project contains an orchistration manager, a collection of callibration schedules and a collection of post-processing & analysis routines.  
 It is tailored for the tune-up of the 25 qubits QPU at Chalmers, QTL.  
-This repository utilizes **`redis`** for on memory data storage.  
-As redis operates only on Linux systems, this repo can only work either on Linux distributions or WSL (Windows Subsystem for Linux) environments, installed on a Windows system.  
-To install WSL, it is required **Windows 10** of version at least **1903**.
 
-## Repository installation: ##
-#### After setting up your ssh key, clone the repo:  ####
-```git clone git@bitbucket.org:qtlteam/tergite-autocalibration-lite.git```
+## Dependencies
 
-#### Install Redis: ####
-https://redis.io/docs/getting-started/installation/install-redis-on-linux/  
+- [Python 3.9+](https://www.python.org/)
+- [Redis](https://redis.io/)
 
-#### After installing redis, start the service, type from terminal: ####
-```redis-server```  
+## Quick Start
 
-#### Create your local environment.   ####
-For example, here the environment is named `tac`  
-```conda create --name tac python=3.9```  
-#### Activate your local environment.   ####
-```conda activate tac```
+- Ensure you have [conda](https://docs.anaconda.com/free/miniconda/index.html) installed. 
+ (_You could simply have python +3.8 installed instead._)
+- Ensure you have [redis server](https://redis.io/) running
 
-#### If you are not using conda, activate the environment with:   ####
-```source activate tac```
+```shell
+redis-server
+```
 
-#### Enter the project root directory:  ####
-```cd tergite-autocalibration-lite/```  
-**From now on, it is assumed that all commands are executed from the project root directory.**
+- Clone the repo
 
+```shell
+git clone git@github.com:tergite/tergite-acl.git
+```
 
-#### Install the repository in editable mode so all your changes are applied whithout the need of reinstall ####
-Here `.` is the current directory (i.e. the directory that contains the `setup.py` file)  
-```pip install -e .```
+- Create conda environment
 
-Before operation please copy the variables from the `dot-env-template.txt` to a `.env` file and set the values according to the instructions in the template file:
+```shell
+conda create -n tac -y python=3.9
+conda activate tac
+```
 
-```cp dot-env-template.txt .env```
+- Install the application
 
-You can edit the `.env` file with an editor of your choice such as `vim`, `nano` or any other text editor.
+```shell
+cd tergite-acl
+pip install -e .
+```
 
-## Operation: ##
-The package ships with a command line interface to solve some common tasks that appear quite often.
+- Copy the `dot-env-template.txt` file to `.env` and 
+  update the environment variables there appropriately.
 
-In the following there are a number of useful commands, but if you want to find out all commands use:
-```acli --help```
+```shell
+cp dot-env-template.txt .env
+```
 
-To delete all redis entries:  
-```acli node reset -a``` 
+- Start the automatic calibration
 
-To reset a particular node:  
-```acli node reset -n <nodename>```  
+```shell
+acli calibration start
+```
 
-For example to reset the node `rabi_oscillations`:  
-```acli node reset -n rabi_oscillations```
+- For more help on other commands, type:
 
-**To start a new calibration sequence according to the configuration files:**  
-**```python tergite_acl/scripts/calibration_supervisor.py```**
-or
-**```acli calibration start```**
+```shell
+acli --help
+```
 
-## Configuration files
-The sample-space for each node. Also here the target node is declared:  
-`tergite_acl/utils/user_input.py`
+## Contribution Guidelines
 
-A collection of reasonable initial values for the device:  
-`tergite_acl/config/device_config.toml`
+If you would like to contribute to tergite-webgui, please have a look at our
+[contribution guidelines](./CONTRIBUTING.md)
 
-The technical configuration parameters such as the path to the Qblox Cluster configuration file (including IP address) is documented in the `dot-env-template.txt`.
+## Authors
 
-## Structure ##
-For each calibration node:  
-compilation -> execution -> post-processing -> redis updating
+This project is a work of
+[many contributors](https://github.com/tergite/tergite-acl/graphs/contributors).
 
-## Data browsing ##
-Datasets are stored in `data_directory`  
-Can be browsed with the dataset browser (coming soon)
+Special credit goes to the authors of this project as seen in the [CREDITS](./CREDITS.md) file.
 
-## Development ##
-When submitting  contributions, please prepend your commit messages with:
-`fix:` for bug fixes  
-`feat:` for introducing a new feature (e.g. a new measurement node or a new analysis class)  
-`chore:` for refractoring changes or any change that doesn't affect the functionality of the code  
-`docs:` for changes in the README, docstrings etc  
-`test:` or `dev:` for testing or development changes (e.g. profiling scripts)  
+## ChangeLog
+
+To view the changelog for each version, have a look at
+the [CHANGELOG.md](./CHANGELOG.md) file.
+
+## License
+
+[Apache 2.0 License](./LICENSE.txt)
+
+## Acknowledgements
+
+This project was sponsored by:
+
+-   [Knut and Alice Wallenburg Foundation](https://kaw.wallenberg.org/en) under the [Wallenberg Center for Quantum Technology (WAQCT)](https://www.chalmers.se/en/centres/wacqt/) project at [Chalmers University of Technology](https://www.chalmers.se)
+-   [Nordic e-Infrastructure Collaboration (NeIC)](https://neic.no) and [NordForsk](https://www.nordforsk.org/sv) under the [NordIQuEst](https://neic.no/nordiquest/) project
+-   [European Union's Horizon Europe](https://research-and-innovation.ec.europa.eu/funding/funding-opportunities/funding-programmes-and-open-calls/horizon-europe_en) under the [OpenSuperQ](https://cordis.europa.eu/project/id/820363) project
+-   [European Union's Horizon Europe](https://research-and-innovation.ec.europa.eu/funding/funding-opportunities/funding-programmes-and-open-calls/horizon-europe_en) under the [OpenSuperQPlus](https://opensuperqplus.eu/) project
+ 

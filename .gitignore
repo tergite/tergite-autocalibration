@@ -78,3 +78,18 @@ Thumbs.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
+
+.pytest_cache/
+
+# configs
+configs/
+tergite_acl/config/**
+!tergite_acl/config/__init__.py
+!tergite_acl/config/settings.py
+
+# dev-generated artefacts
+tergite_acl/utils/**.csv
+
+# internal
+external/
+workbench/

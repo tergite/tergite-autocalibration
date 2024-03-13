@@ -15,7 +15,7 @@ ROOT_DIR=<path-to-root-dir> e.g. '/home/user/repos/tac'
 DATA_DIR=<path-to-data-dir> e.g. '/home/user/repos/tac/data_dir'
 
 # CONFIG_DIR defines where the configuration is stored
-CONFIG_DIR=<path-to-config-dir> e.g. '/home/user/repos/tac/config_dir'
+CONFIG_DIR=<path-to-config-dir> e.g. '/home/user/repos/tac/configs'
 
 
 # Configuration settings
