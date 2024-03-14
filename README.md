@@ -29,35 +29,44 @@ For example, here the environment is named `tac`
 **From now on, it is assumed that all commands are executed from the project root directory.**
 
 
-#### Install the required packages from the requirements.txt file ####
-```pip install -r requirements.txt```
-
 #### Install the repository in editable mode so all your changes are applied whithout the need of reinstall ####
 Here `.` is the current directory (i.e. the directory that contains the `setup.py` file)  
 ```pip install -e .```
 
+Before operation please copy the variables from the `dot-env-template.txt` to a `.env` file and set the values according to the instructions in the template file:
+
+```cp dot-env-template.txt .env```
+
+You can edit the `.env` file with an editor of your choice such as `vim`, `nano` or any other text editor.
+
 ## Operation: ##
+The package ships with a command line interface to solve some common tasks that appear quite often.
+
+In the following there are a number of useful commands, but if you want to find out all commands use:
+```acli --help```
+
 To delete all redis entries:  
-```python reset_redis.py all``` 
+```acli node reset -a``` 
 
 To reset a particular node:  
-```python reset_redis.py <nodename>```  
+```acli node reset -n <nodename>```  
 
 For example to reset the node `rabi_oscillations`:  
-```python reset_redis.py rabi_oscillations```
+```acli node reset -n rabi_oscillations```
 
 **To start a new calibration sequence according to the configuration files:**  
-**```python workers/calibration_supervisor.py```**
+**```python tergite_acl/scripts/calibration_supervisor.py```**
+or
+**```acli calibration start```**
 
 ## Configuration files
 The sample-space for each node. Also here the target node is declared:  
-`utilities/user_input.py`  
-
-Qblox Cluster configuration file (including IP address):  
-`config_files/settings.py`  
+`tergite_acl/utils/user_input.py`
 
 A collection of reasonable initial values for the device:  
-`config_files/device_config.toml`  
+`tergite_acl/config/device_config.toml`
+
+The technical configuration parameters such as the path to the Qblox Cluster configuration file (including IP address) is documented in the `dot-env-template.txt`.
 
 ## Structure ##
 For each calibration node:  
