@@ -9,7 +9,7 @@ definitions:
       path: "$HOME/.cache/pypoetry/virtualenvs"
   steps:
     - step: &Install-step
-        name: install
+        name: Smoke test
         caches:
             - pip
             - poetry
