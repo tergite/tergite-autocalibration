@@ -49,4 +49,4 @@ pipelines:
             - git fetch $DOWNSTREAM_REPO main:github/main || echo "main branch does not exist"
             - git checkout refactoring/main
             - git rebase github/main || echo "errors rebasing to branch github/main"
-            - git push $DOWNSTREAM_REPO main
+            - git push $DOWNSTREAM_REPO refactoring/main:main
