@@ -1,6 +1,13 @@
 # Credits
 
-### Eleftherios Moschandreou
-- First version of the tergite-autocalibration-lite
+## Eleftherios Moschandreou
 
-TODO: Add contributions from Liangyu and Tong. This has to be discussed in group, how to mention it.
+The first version of the tergite-autocalibration-lite
+
+## Liangyu Chen
+
+Improvements on the CZ gate automatic tune-up
+
+## Tong Liu
+
+Added demodulation channels

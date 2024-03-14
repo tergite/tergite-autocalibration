@@ -1,8 +1,0 @@
-README.md
-setup.py
-tergite_auto_calibration_lite.egg-info/PKG-INFO
-tergite_auto_calibration_lite.egg-info/SOURCES.txt
-tergite_auto_calibration_lite.egg-info/dependency_links.txt
-tergite_auto_calibration_lite.egg-info/requires.txt
-tergite_auto_calibration_lite.egg-info/top_level.txt
-tests/test_redis.py
