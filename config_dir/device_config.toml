@@ -10,14 +10,14 @@ resonator_spectroscopy.resonator_minimum = nan
 resonator_spectroscopy_1.Ql_1 = nan
 resonator_spectroscopy_1.resonator_minimum_1 = nan
 
-ro_frequency_two_state_optimization.extended_clock_freqs.ro_freq_2st_opt = nan
-ro_frequency_three_state_optimization.extended_clock_freqs.ro_freq_3st_opt = nan
+ro_frequency_two_state_optimization.extended_clock_freqs.readout_2state_opt = nan
+ro_frequency_three_state_optimization.extended_clock_freqs.readout_3state_opt = nan
 
 ro_amplitude_two_state_optimization.measure_2state_opt.ro_ampl_2st_opt = nan
 ro_amplitude_two_state_optimization.measure_2state_opt.acq_rotation = nan
 ro_amplitude_two_state_optimization.measure_2state_opt.acq_threshold = nan
 
-ro_amplitude_three_state_optimization.measure_3state_opt = nan
+ro_amplitude_three_state_optimization.measure_3state_opt.ro_ampl_3st_opt = nan
 ro_amplitude_three_state_optimization.inv_cm_opt = nan
 
 qubit_01_spectroscopy_pulsed.clock_freqs.f01 = nan

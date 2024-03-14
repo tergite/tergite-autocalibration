@@ -96,7 +96,7 @@ class Punchout_Node(BaseNode):
 class RO_frequency_optimization_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['ro_freq_2st_opt']
+        self.redis_field = ['extended_clock_freqs:readout_2state_opt']
         self.qubit_state = 0
         self.measurement_obj = RO_frequency_optimization
         self.analysis_obj = OptimalROFrequencyAnalysis
@@ -115,7 +115,7 @@ class RO_frequency_optimization_gef_Node(BaseNode):
         super().__init__(name, all_qubits, **node_dictionary)
         self.name = name
         self.all_qubits = all_qubits
-        self.redis_field = ['ro_freq_3st_opt']
+        self.redis_field = ['extended_clock_freqs:readout_3state_opt']
         self.qubit_state = 2
         self.measurement_obj = RO_frequency_optimization
         self.analysis_obj = OptimalRO_012_FrequencyAnalysis
@@ -138,7 +138,11 @@ class RO_amplitude_two_state_optimization_Node(BaseNode):
         super().__init__(name, all_qubits, **node_dictionary)
         self.name = name
         self.all_qubits = all_qubits
-        self.redis_field = ['ro_ampl_2st_opt','rotation','threshold']
+        self.redis_field = [
+            'measure_2state_opt:ro_ampl_2st_opt',
+            'measure_2state_opt:rotation',
+            'measure_2state_opt:threshold'
+        ]
         self.qubit_state = 1
         self.measurement_obj = RO_amplitude_optimization
         self.analysis_obj = OptimalRO_Two_state_AmplitudeAnalysis
@@ -169,7 +173,7 @@ class RO_amplitude_three_state_optimization_Node(BaseNode):
         super().__init__(name, all_qubits, **node_dictionary)
         self.name = name
         self.all_qubits = all_qubits
-        self.redis_field = ['ro_ampl_opt','inv_cm_opt']
+        self.redis_field = ['measure_3state_opt:ro_ampl_3st_opt','inv_cm_opt']
         self.qubit_state = 2
         self.measurement_obj = RO_amplitude_optimization
         self.analysis_obj = OptimalRO_Three_state_AmplitudeAnalysis

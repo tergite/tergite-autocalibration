@@ -210,7 +210,7 @@ class Measure_RO_Opt(Measure):
                     'acq_index': acq_index,
                     'acq_protocol': acq_protocol,
                     'bin_mode': bin_mode,
-                    'operation_type': 'measure_opt',
+                    'operation_type': 'measure_3state_opt',
                 },
             }
         )
@@ -223,7 +223,7 @@ class ExtendedTransmon(BasicTransmonElement):
         submodules_to_add = {
             'measure_1': DispersiveMeasurement,
             'measure_2': DispersiveMeasurement,
-            'measure_opt': DispersiveMeasurement,
+            'measure_3state_opt': DispersiveMeasurement,
             'r12': R12,
             'spec': Spec,
             'extended_clock_freqs': ExtendedClocksFrequencies,
@@ -308,12 +308,12 @@ class ExtendedTransmon(BasicTransmonElement):
                     },
                     gate_info_factory_kwargs=['acq_channel_override', 'acq_index', 'bin_mode', 'acq_protocol'],
                 )
-        cfg_dict['elements'][f'{self.name}']['measure_opt'] = OperationCompilationConfig(
+        cfg_dict['elements'][f'{self.name}']['measure_3state_opt'] = OperationCompilationConfig(
                     factory_func=measurement_factories.dispersive_measurement,
                     factory_kwargs={
                         'port': self.ports.readout(),
                         # use different clock: ####
-                        'clock': f'{self.name}.ro_opt',
+                        'clock': f'{self.name}.ro_3st_opt',
                         ############################
                         'pulse_type': self.measure.pulse_type(),
                         'pulse_amp': self.measure.pulse_amp(),

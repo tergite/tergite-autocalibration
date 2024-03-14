@@ -68,6 +68,7 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
             decoded_transmon['data'][submodule].update({'acq_channel': channel})
 
     encoded_transmon = json.dumps(decoded_transmon)
+    breakpoint()
 
     # free the transmon
     transmon.close()
@@ -75,11 +76,7 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
     # create a transmon with the same name but with updated config
     transmon = json.loads(encoded_transmon, cls=SchedulerJSONDecoder, modules=[extended_transmon_element])
 
-
     return transmon
-
-
-
 
 
     # transmon.reset.duration(float(redis_config['init_duration']))

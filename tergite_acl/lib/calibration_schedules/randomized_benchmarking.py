@@ -67,22 +67,25 @@ class Randomized_Benchmarking(Measurement):
                 random_sequence = rng.integers(all_cliffords, size=this_number_of_cliffords)
 
                 for sequence_index in random_sequence:
-                    physical_gates = cliffords.XY_decompositions[sequence_index]
-                    for gate_angles in physical_gates.values():
-                        theta = gate_angles['theta']
-                        phi = gate_angles['phi']
-                        schedule.add(
-                            Rxy(qubit=this_qubit,theta=theta,phi=phi)
-                        )
+                    schedule.add(Rxy(qubit=this_qubit, theta=145,phi=0))
+                    recovery_gate = schedule.add(Rxy(qubit=this_qubit, theta=145, phi=180))
 
-                recovery_index, recovery_XY_operations = cliffords.reversing_XY_matrix(random_sequence)
-
-                for gate_angles in recovery_XY_operations.values():
-                    theta = gate_angles['theta']
-                    phi = gate_angles['phi']
-                    recovery_gate = schedule.add(
-                        Rxy(qubit=this_qubit, theta=theta, phi=phi)
-                    )
+                #     physical_gates = cliffords.XY_decompositions[sequence_index]
+                #     for gate_angles in physical_gates.values():
+                #         theta = gate_angles['theta']
+                #         phi = gate_angles['phi']
+                #         schedule.add(
+                #             Rxy(qubit=this_qubit,theta=theta,phi=phi)
+                #         )
+                #
+                # recovery_index, recovery_XY_operations = cliffords.reversing_XY_matrix(random_sequence)
+                #
+                # for gate_angles in recovery_XY_operations.values():
+                #     theta = gate_angles['theta']
+                #     phi = gate_angles['phi']
+                #     recovery_gate = schedule.add(
+                #         Rxy(qubit=this_qubit, theta=theta, phi=phi)
+                #     )
 
                 schedule.add(
                     Measure(this_qubit, acq_index=acq_index,),
@@ -95,10 +98,12 @@ class Randomized_Benchmarking(Measurement):
 
             # 0 calibration point
             schedule.add(Reset(this_qubit))
+            schedule.add(Reset(this_qubit))
             schedule.add(Measure( this_qubit, acq_index=acq_index + 1))
             schedule.add(Reset(this_qubit))
 
             # 1 calibration point
+            schedule.add(Reset(this_qubit))
             schedule.add(Reset(this_qubit))
             schedule.add(X(this_qubit))
             schedule.add(Measure( this_qubit, acq_index=acq_index + 2))

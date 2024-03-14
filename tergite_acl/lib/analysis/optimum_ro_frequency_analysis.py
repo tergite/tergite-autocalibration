@@ -59,8 +59,8 @@ class OptimalROFrequencyAnalysis(BaseAnalysis):
         f0 = self.fit_IQ_0[self.index_of_max_distance]
         f1 = self.fit_IQ_1[self.index_of_max_distance]
 
-        ro_freq = float(REDIS_CONNECTION.hget(f'transmons:{this_qubit}', 'ro_freq'))
-        ro_freq_1 = float(REDIS_CONNECTION.hget(f'transmons:{this_qubit}', 'ro_freq_1'))
+        ro_freq = float(REDIS_CONNECTION.hget(f'transmons:{this_qubit}', 'clock_freqs:readout'))
+        ro_freq_1 = float(REDIS_CONNECTION.hget(f'transmons:{this_qubit}', 'extended_clock_freqs:readout_1'))
 
         label_text = f'opt_ro: {int(self.optimal_frequency)}\n'
         label_text += f'|0>_ro: {int(ro_freq)}\n'

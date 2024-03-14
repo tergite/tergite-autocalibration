@@ -131,8 +131,8 @@ class Motzoi_Parameter_Node(BaseNode):
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'mw_motzois': {qubit: np.linspace(-0.4, 0.4, 61) for qubit in self.all_qubits},
-            'X_repetitions': {qubit: np.arange(2, 17, 4) for qubit in self.all_qubits}
+            'mw_motzois': {qubit: np.linspace(-0.4, 0.1, 51) for qubit in self.all_qubits},
+            'X_repetitions': {qubit: np.arange(2, 22, 6) for qubit in self.all_qubits}
         }
         return cluster_samplespace
 
@@ -148,8 +148,8 @@ class N_Rabi_Oscillations_Node(BaseNode):
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'mw_amplitudes_sweep': {qubit: np.linspace(-0.15, 0.15, 61) for qubit in self.all_qubits},
-            'X_repetitions': {qubit: np.arange(1, 16, 4) for qubit in self.all_qubits}
+            'mw_amplitudes_sweep': {qubit: np.linspace(-0.01, 0.01, 21) for qubit in self.all_qubits},
+            'X_repetitions': {qubit: np.arange(1, 96, 16) for qubit in self.all_qubits}
         }
         return cluster_samplespace
 
