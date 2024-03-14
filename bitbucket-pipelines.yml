@@ -26,7 +26,7 @@ definitions:
 
 pipelines:
   pull-requests:
-    '**':
+    "refactoring/*":
       - step: *Install-step
 
   tags:
@@ -40,12 +40,13 @@ pipelines:
             - git push $DOWNSTREAM_REPO $BITBUCKET_TAG || echo "tag $BITBUCKET_TAG already exists"
 
   branches:
-    main:
+    "refactoring/main":
       - step: *Install-step
       - step:
           name: Push downstream
           script:
             - if [ "${SHOULD_PUSH_DOWNSTREAM}" != "true" ]; then printf "downstream push not enabled"; exit; fi
-            - git pull -r $DOWNSTREAM_REPO main || echo "main branch does not exist"
+            - git fetch $DOWNSTREAM_REPO main:github/main || echo "main branch does not exist"
+            - git checkout refactoring/main
+            - git rebase github/main || echo "errors rebasing to branch github/main"
             - git push $DOWNSTREAM_REPO main
-

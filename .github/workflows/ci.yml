@@ -105,5 +105,7 @@ jobs:
       - name: Push upstream
         run: |
           git config user.email ${{ secrets.UPSTREAM_USER }}
-          git pull -r ${{ secrets.UPSTREAM_REPO }} ${{ github.ref_name }} || echo "${{ github.ref_name }} does not exist"
-          git push ${{ secrets.UPSTREAM_REPO }} ${{ github.ref_name }} || echo "${{ github.ref_name }} already exists"
+          git fetch ${{ secrets.UPSTREAM_REPO }} ${{ secrets.UPSTREAM_BRANCH }}:${{ secrets.UPSTREAM_BRANCH }} || echo "${{ secrets.UPSTREAM_BRANCH }} does not exist"
+          git checkout ${{ github.ref_name }} || echo "${{ github.ref_name }} does not exist"
+          git rebase ${{ secrets.UPSTREAM_BRANCH }} || echo "errors rebasing to branch: ${{ secrets.UPSTREAM_BRANCH }}"
+          git push ${{ secrets.UPSTREAM_REPO }} ${{ github.ref_name }}:${{ secrets.UPSTREAM_BRANCH }} || echo "${{ secrets.UPSTREAM_BRANCH }} already exists"
