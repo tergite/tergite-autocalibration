@@ -76,7 +76,7 @@ class ResonatorSpectroscopy_1_Analysis(ResonatorSpectroscopyAnalysis):
         this_qubit = self.dataset.attrs['qubit']
         ax.set_xlabel('Frequency (Hz)')
         ax.set_ylabel('|S21| (V)')
-        ro_freq = float(REDIS_CONNECTION.hget(f'transmons:{this_qubit}', 'ro_freq'))
+        ro_freq = float(REDIS_CONNECTION.hget(f'transmons:{this_qubit}', 'clock_freqs:readout'))
         self.fitting_model.plot_fit(ax, numpoints=400, xlabel=None, title=None)
         ax.axvline(self.minimum_freq, c='green', ls='solid', label='frequency |1> ')
         ax.axvline(ro_freq, c='blue', ls='dashed', label='frequency |0>')
@@ -92,8 +92,8 @@ class ResonatorSpectroscopy_2_Analysis(ResonatorSpectroscopyAnalysis):
         this_qubit = self.dataset.attrs['qubit']
         ax.set_xlabel('Frequency (Hz)')
         ax.set_ylabel('|S21| (V)')
-        ro_freq = float(REDIS_CONNECTION.hget(f'transmons:{this_qubit}', 'ro_freq'))
-        ro_freq_1 = float(REDIS_CONNECTION.hget(f'transmons:{this_qubit}', 'ro_freq_1'))
+        ro_freq = float(REDIS_CONNECTION.hget(f'transmons:{this_qubit}', 'clock_freqs:readout'))
+        ro_freq_1 = float(REDIS_CONNECTION.hget(f'transmons:{this_qubit}', 'extended_clock_freqs:readout_1'))
         self.fitting_model.plot_fit(ax, numpoints=400, xlabel=None, title=None)
         ax.axvline(self.minimum_freq, c='red', ls='solid', label='frequency |2>')
         ax.axvline(ro_freq_1, c='green', ls='dashed', label='frequency |1>')

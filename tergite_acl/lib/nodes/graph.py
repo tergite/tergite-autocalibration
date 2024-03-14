@@ -13,17 +13,18 @@ graph_dependencies = [
     ('tof', 'resonator_spectroscopy'),
     # ('resonator_spectroscopy', 'coupler_resonator_spectroscopy'),
     # ('resonator_spectroscopy', 'qubit_01_spectroscopy_pulsed'),
-    ('qubit_01_spectroscopy_multidim', 'coupler_spectroscopy'),
-    ('resonator_spectroscopy', 'qubit_01_spectroscopy_multidim'),
+    ('qubit_01_spectroscopy', 'coupler_spectroscopy'),
+    ('resonator_spectroscopy', 'qubit_01_spectroscopy'),
     # ('qubit_01_spectroscopy_pulsed', 'rabi_oscillations'),
-    ('qubit_01_spectroscopy_multidim', 'rabi_oscillations'),
+    ('qubit_01_spectroscopy', 'rabi_oscillations'),
     ('rabi_oscillations', 'ramsey_correction'),
     ('ramsey_correction', 'motzoi_parameter'),
     ('motzoi_parameter', 'n_rabi_oscillations'),
     ('n_rabi_oscillations', 'resonator_spectroscopy_1'),
-    ('T1', 'randomized_benchmarking'),
+    ('randomized_benchmarking', 'T1'),
     ('n_rabi_oscillations', 'resonator_spectroscopy_1'),
-    ('n_rabi_oscillations', 'T1'),
+    # ('n_rabi_oscillations', 'T1'),
+    ('n_rabi_oscillations', 'randomized_benchmarking'),
     ('resonator_spectroscopy_1', 'ro_frequency_two_state_optimization'),
     ('ro_frequency_two_state_optimization', 'ro_amplitude_two_state_optimization'),
     # ('randomized_benchmarking', 'T1'),
@@ -31,10 +32,10 @@ graph_dependencies = [
     ('T2', 'T2_echo'),
     # ('T2_echo', 'ramsey_correction'),
     # ('resonator_spectroscopy_1', 'qubit_12_spectroscopy_pulsed'),
-    ('resonator_spectroscopy_1', 'qubit_12_spectroscopy_multidim'),
+    ('resonator_spectroscopy_1', 'qubit_12_spectroscopy'),
     # ('qubit_12_spectroscopy_pulsed', 'rabi_oscillations_12'),
     # ('qubit_12_spectroscopy_multidim', 'cz_optimize_chevron'),
-    ('qubit_12_spectroscopy_multidim', 'rabi_oscillations_12'),
+    ('qubit_12_spectroscopy', 'rabi_oscillations_12'),
     ('rabi_oscillations_12', 'ramsey_correction_12'),
     ('ramsey_correction_12', 'resonator_spectroscopy_2'),
     ('resonator_spectroscopy_2', 'ro_frequency_three_state_optimization'),
@@ -55,7 +56,7 @@ graph.add_edges_from(graph_dependencies)
 graph.add_node('tof', type='refine')
 graph.add_node('punchout')
 # graph.add_node('qubit_01_spectroscopy_pulsed')
-graph.add_node('qubit_01_spectroscopy_multidim')
+graph.add_node('qubit_01_spectroscopy')
 # graph.add_node('T1', type='refine')
 # graph.add_node('T2', type='refine')
 # graph.add_node('T2_echo', type='refine')
@@ -70,14 +71,14 @@ graph.add_node('qubit_01_spectroscopy_multidim')
 # for nodes that perform the same measurement,
 # assign a weight to the corresponding edge to sort them
 # graph['resonator_spectroscopy']['qubit_01_spectroscopy_pulsed']['weight'] = 2
-# graph['resonator_spectroscopy']['qubit_01_spectroscopy_multidim']['weight'] = 1
-graph['resonator_spectroscopy_1']['qubit_12_spectroscopy_multidim']['weight'] = 2
-graph['resonator_spectroscopy_1']['qubit_12_spectroscopy_multidim']['weight'] = 1
+# graph['resonator_spectroscopy']['qubit_01_spectroscopy']['weight'] = 1
+graph['resonator_spectroscopy_1']['qubit_12_spectroscopy']['weight'] = 2
+graph['resonator_spectroscopy_1']['qubit_12_spectroscopy']['weight'] = 1
 
 initial_pos = {
     'tof': (0,1),
     'resonator_spectroscopy': (0,0.9),
-    'qubit_01_spectroscopy_multidim': ( 0.0,0.85),
+    'qubit_01_spectroscopy': ( 0.0,0.85),
     # 'qubit_01_spectroscopy_pulsed': (-0.5,0.8),
     'rabi_oscillations': (0,0.8),
     'ramsey_correction': (0,0.75),
@@ -87,7 +88,7 @@ initial_pos = {
     'ro_frequency_two_state_optimization': (-0.2,0.45),
     'ro_amplitude_two_state_optimization': (-0.2,0.35),
     # 'qubit_12_spectroscopy_pulsed': (-0.5,0.4),
-    'qubit_12_spectroscopy_multidim': (0.0,0.55),
+    'qubit_12_spectroscopy': (0.0,0.55),
     'rabi_oscillations_12': (0,0.5),
 
     'ramsey_correction_12': (0,0.45),

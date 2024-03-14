@@ -23,7 +23,7 @@ from tergite_acl.lib.calibration_schedules.ro_frequency_optimization import RO_f
 class Resonator_Spectroscopy_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['ro_freq', 'Ql', 'resonator_minimum']
+        self.redis_field = ['clock_freqs:readout', 'Ql', 'resonator_minimum']
         self.measurement_obj = Resonator_Spectroscopy
         self.analysis_obj = ResonatorSpectroscopyAnalysis
 
@@ -40,7 +40,7 @@ class Resonator_Spectroscopy_Node(BaseNode):
 class Resonator_Spectroscopy_1_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['ro_freq_1', 'Ql_1', 'resonator_minimum_1']
+        self.redis_field = ['extended_clock_freqs:readout_1', 'Ql_1', 'resonator_minimum_1']
         self.qubit_state = 1
         self.measurement_obj = Resonator_Spectroscopy
         self.analysis_obj = ResonatorSpectroscopy_1_Analysis
@@ -58,7 +58,7 @@ class Resonator_Spectroscopy_1_Node(BaseNode):
 class Resonator_Spectroscopy_2_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['ro_freq_2']
+        self.redis_field = ['extended_clock_freqs:readout_2']
         self.qubit_state = 2
         self.measurement_obj = Resonator_Spectroscopy
         self.analysis_obj = ResonatorSpectroscopy_2_Analysis
@@ -76,7 +76,7 @@ class Resonator_Spectroscopy_2_Node(BaseNode):
 class Punchout_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['ro_ampl']
+        self.redis_field = ['measure:pulse_amp']
         self.measurement_obj = Punchout
         self.analysis_obj = PunchoutAnalysis
 
@@ -96,7 +96,7 @@ class Punchout_Node(BaseNode):
 class RO_frequency_optimization_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['ro_freq_2st_opt']
+        self.redis_field = ['extended_clock_freqs:readout_2state_opt']
         self.qubit_state = 0
         self.measurement_obj = RO_frequency_optimization
         self.analysis_obj = OptimalROFrequencyAnalysis
@@ -115,7 +115,7 @@ class RO_frequency_optimization_gef_Node(BaseNode):
         super().__init__(name, all_qubits, **node_dictionary)
         self.name = name
         self.all_qubits = all_qubits
-        self.redis_field = ['ro_freq_3st_opt']
+        self.redis_field = ['extended_clock_freqs:readout_3state_opt']
         self.qubit_state = 2
         self.measurement_obj = RO_frequency_optimization
         self.analysis_obj = OptimalRO_012_FrequencyAnalysis
@@ -138,7 +138,11 @@ class RO_amplitude_two_state_optimization_Node(BaseNode):
         super().__init__(name, all_qubits, **node_dictionary)
         self.name = name
         self.all_qubits = all_qubits
-        self.redis_field = ['ro_ampl_2st_opt','rotation','threshold']
+        self.redis_field = [
+            'measure_2state_opt:ro_ampl_2st_opt',
+            'measure_2state_opt:rotation',
+            'measure_2state_opt:threshold'
+        ]
         self.qubit_state = 1
         self.measurement_obj = RO_amplitude_optimization
         self.analysis_obj = OptimalRO_Two_state_AmplitudeAnalysis
@@ -169,7 +173,7 @@ class RO_amplitude_three_state_optimization_Node(BaseNode):
         super().__init__(name, all_qubits, **node_dictionary)
         self.name = name
         self.all_qubits = all_qubits
-        self.redis_field = ['ro_ampl_opt','inv_cm_opt']
+        self.redis_field = ['measure_3state_opt:ro_ampl_3st_opt','inv_cm_opt']
         self.qubit_state = 2
         self.measurement_obj = RO_amplitude_optimization
         self.analysis_obj = OptimalRO_Three_state_AmplitudeAnalysis

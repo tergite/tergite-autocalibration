@@ -31,12 +31,12 @@ class ExtendedClocksFrequencies(InstrumentChannel):
             initial_value=kwargs.get("readout_2", math.nan),
             vals=Numbers(min_value=0, max_value=1e12, allow_nan=True),
         )
-        self.readout_opt = ManualParameter(
-            name="readout_opt",
+        self.readout_2state_opt = ManualParameter(
+            name="readout_2state_opt",
             instrument=self,
             label="Optimal Readout frequency for discriminating |0>,|1>",
             unit="Hz",
-            initial_value=kwargs.get("readout_opt", math.nan),
+            initial_value=kwargs.get("readout_2state_opt", math.nan),
             vals=Numbers(min_value=0, max_value=1e12, allow_nan=True),
         )
 
@@ -78,7 +78,7 @@ class Spec(InstrumentChannel):
             label=r"amplitude for the qubit spectroscopy pulse",
             initial_value=kwargs.get("spec_amp", math.nan),
             unit="",
-            vals=Numbers(min_value=-10, max_value=10, allow_nan=True),
+            vals=Numbers(min_value=-1, max_value=1, allow_nan=True),
         )
 
         self.spec_duration = ManualParameter(
@@ -86,7 +86,7 @@ class Spec(InstrumentChannel):
             instrument=self,
             initial_value=kwargs.get("spec_duration", 20e-9),
             unit="s",
-            vals=validators.Numbers(min_value=0, max_value=1),
+            vals=Numbers(min_value=0, max_value=1e-3, allow_nan=True),
         )
 
 class Rxy_12(Rxy):
@@ -137,6 +137,7 @@ class Measure_RO1(Measure):
                     'acq_protocol': acq_protocol,
                     'bin_mode': bin_mode,
                     'operation_type': 'measure_1',
+                    'acq_channel_override': None,
                 },
             }
         )
@@ -209,7 +210,7 @@ class Measure_RO_Opt(Measure):
                     'acq_index': acq_index,
                     'acq_protocol': acq_protocol,
                     'bin_mode': bin_mode,
-                    'operation_type': 'measure_opt',
+                    'operation_type': 'measure_3state_opt',
                 },
             }
         )
@@ -222,7 +223,7 @@ class ExtendedTransmon(BasicTransmonElement):
         submodules_to_add = {
             'measure_1': DispersiveMeasurement,
             'measure_2': DispersiveMeasurement,
-            'measure_opt': DispersiveMeasurement,
+            'measure_3state_opt': DispersiveMeasurement,
             'r12': R12,
             'spec': Spec,
             'extended_clock_freqs': ExtendedClocksFrequencies,
@@ -249,7 +250,7 @@ class ExtendedTransmon(BasicTransmonElement):
                 f'{self.name}.ro': self.clock_freqs.readout(),
                 f'{self.name}.ro1': self.extended_clock_freqs.readout_1(),
                 f'{self.name}.ro2': self.extended_clock_freqs.readout_2(),
-                f'{self.name}.ro_2st_opt': self.extended_clock_freqs.readout_opt(),
+                f'{self.name}.ro_2st_opt': self.extended_clock_freqs.readout_2state_opt(),
                 f'{self.name}.ro_3st_opt': self.extended_clock_freqs.readout_3state_opt()
             },
             'edges': {},
@@ -267,7 +268,6 @@ class ExtendedTransmon(BasicTransmonElement):
                         'acq_delay': self.measure.acq_delay(),
                         'acq_duration': self.measure.integration_time(),
                         'acq_channel': self.measure.acq_channel(),
-                        'acq_channel_override': None,
                         'acq_protocol_default': 'SSBIntegrationComplex',
                         'reset_clock_phase': self.measure.reset_clock_phase(),
                         'reference_magnitude': pulse_library.ReferenceMagnitude.from_parameter(
@@ -276,10 +276,10 @@ class ExtendedTransmon(BasicTransmonElement):
                         'acq_weights_a': self.measure.acq_weights_a(),
                         'acq_weights_b': self.measure.acq_weights_b(),
                         'acq_weights_sampling_rate': self.measure.acq_weights_sampling_rate(),
-                        # 'acq_rotation': self.measure.acq_rotation(),
-                        # 'acq_threshold': self.measure.acq_threshold(),
+                        'acq_rotation': self.measure.acq_rotation(),
+                        'acq_threshold': self.measure.acq_threshold(),
                     },
-                    gate_info_factory_kwargs=['acq_index', 'bin_mode', 'acq_protocol'],
+                    gate_info_factory_kwargs=['acq_channel_override', 'acq_index', 'bin_mode', 'acq_protocol'],
                 )
         cfg_dict['elements'][f'{self.name}']['measure_2'] = OperationCompilationConfig(
                     factory_func=measurement_factories.dispersive_measurement,
@@ -294,6 +294,33 @@ class ExtendedTransmon(BasicTransmonElement):
                         'acq_delay': self.measure.acq_delay(),
                         'acq_duration': self.measure.integration_time(),
                         'acq_channel': self.measure.acq_channel(),
+                        # 'acq_channel_override': None,
+                        'acq_protocol_default': 'SSBIntegrationComplex',
+                        'reset_clock_phase': self.measure.reset_clock_phase(),
+                        'reference_magnitude': pulse_library.ReferenceMagnitude.from_parameter(
+                            self.measure.reference_magnitude
+                        ),
+                        'acq_weights_a': self.measure.acq_weights_a(),
+                        'acq_weights_b': self.measure.acq_weights_b(),
+                        'acq_weights_sampling_rate': self.measure.acq_weights_sampling_rate(),
+                        # 'acq_rotation': self.measure.acq_rotation(),
+                        # 'acq_threshold': self.measure.acq_threshold(),
+                    },
+                    gate_info_factory_kwargs=['acq_channel_override', 'acq_index', 'bin_mode', 'acq_protocol'],
+                )
+        cfg_dict['elements'][f'{self.name}']['measure_3state_opt'] = OperationCompilationConfig(
+                    factory_func=measurement_factories.dispersive_measurement,
+                    factory_kwargs={
+                        'port': self.ports.readout(),
+                        # use different clock: ####
+                        'clock': f'{self.name}.ro_3st_opt',
+                        ############################
+                        'pulse_type': self.measure.pulse_type(),
+                        'pulse_amp': self.measure.pulse_amp(),
+                        'pulse_duration': self.measure.pulse_duration(),
+                        'acq_delay': self.measure.acq_delay(),
+                        'acq_duration': self.measure.integration_time(),
+                        'acq_channel': self.measure.acq_channel(),
                         'acq_channel_override': None,
                         'acq_protocol_default': 'SSBIntegrationComplex',
                         'reset_clock_phase': self.measure.reset_clock_phase(),
@@ -306,33 +333,7 @@ class ExtendedTransmon(BasicTransmonElement):
                         # 'acq_rotation': self.measure.acq_rotation(),
                         # 'acq_threshold': self.measure.acq_threshold(),
                     },
-                    gate_info_factory_kwargs=['acq_index', 'bin_mode', 'acq_protocol'],
-                )
-        cfg_dict['elements'][f'{self.name}']['measure_opt'] = OperationCompilationConfig(
-                    factory_func=measurement_factories.dispersive_measurement,
-                    factory_kwargs={
-                        'port': self.ports.readout(),
-                        # use different clock: ####
-                        'clock': f'{self.name}.ro_opt',
-                        ############################
-                        'pulse_type': self.measure.pulse_type(),
-                        'pulse_amp': self.measure.pulse_amp(),
-                        'pulse_duration': self.measure.pulse_duration(),
-                        'acq_delay': self.measure.acq_delay(),
-                        'acq_duration': self.measure.integration_time(),
-                        'acq_channel': self.measure.acq_channel(),
-                        'acq_protocol_default': 'SSBIntegrationComplex',
-                        'reset_clock_phase': self.measure.reset_clock_phase(),
-                        'reference_magnitude': pulse_library.ReferenceMagnitude.from_parameter(
-                            self.measure.reference_magnitude
-                        ),
-                        'acq_weights_a': self.measure.acq_weights_a(),
-                        'acq_weights_b': self.measure.acq_weights_b(),
-                        'acq_weights_sampling_rate': self.measure.acq_weights_sampling_rate(),
-                        # 'acq_rotation': self.measure.acq_rotation(),
-                        # 'acq_threshold': self.measure.acq_threshold(),
-                    },
-                    gate_info_factory_kwargs=['acq_index', 'bin_mode', 'acq_protocol'],
+                    gate_info_factory_kwargs=['acq_channel_override', 'acq_index', 'bin_mode', 'acq_protocol'],
                 )
         cfg_dict['elements'][f'{self.name}']['r12'] = OperationCompilationConfig(
                     factory_func=pulse_factories.rxy_drag_pulse,

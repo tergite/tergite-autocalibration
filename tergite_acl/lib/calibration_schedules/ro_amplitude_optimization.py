@@ -5,64 +5,35 @@ from quantify_scheduler.schedules.schedule import Schedule
 from quantify_scheduler.operations.pulse_library import DRAGPulse
 from quantify_scheduler.resources import ClockResource
 from tergite_acl.lib.measurement_base import Measurement
+from tergite_acl.utils.extended_transmon_element import ExtendedTransmon
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.control_flow_library import Loop
 import numpy as np
 
+
 class RO_amplitude_optimization(Measurement):
 
-    def __init__(self,transmons,qubit_state:int=0):
+    def __init__(self,transmons: dict[str, ExtendedTransmon], qubit_state:int=0):
         super().__init__(transmons)
 
         self.transmons = transmons
         self.qubit_state = qubit_state
         if self.qubit_state == 1:
-            ro_config = 'readout_opt'
+            ro_config = 'readout_2state_opt'
         elif self.qubit_state == 2:
             ro_config = 'readout_3state_opt'
 
-        self.static_kwargs = {
-            'qubits': self.qubits,
-
-            'mw_frequencies': self.attributes_dictionary('f01'),
-            'mw_amplitudes': self.attributes_dictionary('amp180'),
-            'mw_pulse_durations': self.attributes_dictionary('duration'),
-            'mw_pulse_ports': self.attributes_dictionary('microwave'),
-            'mw_motzois': self.attributes_dictionary('motzoi'),
-
-            'mw_frequencies_12': self.attributes_dictionary('f12'),
-            'mw_ef_amp180': self.attributes_dictionary('ef_amp180'),
-
-            'ro_opt_frequency': self.attributes_dictionary(ro_config),
-            'pulse_durations': self.attributes_dictionary('pulse_duration'),
-            'acquisition_delays': self.attributes_dictionary('acq_delay'),
-            'integration_times': self.attributes_dictionary('integration_time'),
-            'ro_ports': self.attributes_dictionary('readout_port'),
-        }
 
     def schedule_function(
         self,
-        qubits : list[str],
-        mw_frequencies: dict[str,float],
-        mw_amplitudes: dict[str,float],
-        mw_motzois: dict[str,float],
-        mw_frequencies_12:  dict[str,float],
-        mw_ef_amp180: dict[str,float],
-        mw_pulse_durations: dict[str,float],
-        mw_pulse_ports: dict[str,str],
-        pulse_durations: dict[str,float],
-        acquisition_delays: dict[str,float],
-        integration_times: dict[str,float],
-        ro_ports: dict[str,str],
-        ro_opt_frequency: dict[str,float],
         ro_amplitudes: dict[str,np.ndarray],
         loop_repetitions: int,
         qubit_states: dict[str,np.ndarray]
-
         ) -> Schedule:
 
         schedule = Schedule("ro_amplitude_optimization", repetitions=1)
 
+        qubits = self.transmons.keys()
 
         #Initialize ClockResource with the first frequency value
         # TODO the qubit_state attr needs reworking
@@ -70,22 +41,30 @@ class RO_amplitude_optimization(Measurement):
         if self.qubit_state == 2:
             ro_str = 'ro_3st_opt'
 
-        for this_qubit, ro_array_val in ro_opt_frequency.items():
+        for this_qubit, this_transmon in self.transmons.items():
             this_ro_clock = f'{this_qubit}.' + ro_str
+            if self.qubit_state == 1:
+                ro_frequency = this_transmon.extended_clock_freqs.readout_2state_opt()
+            if self.qubit_state == 2:
+                ro_frequency = this_transmon.extended_clock_freqs.readout_3state_opt()
+
             schedule.add_resource(
-                ClockResource(name=this_ro_clock, freq=ro_array_val)
+                ClockResource(name=this_ro_clock, freq=ro_frequency)
             )
 
-        for this_qubit, mw_f_val in mw_frequencies.items():
+        for this_qubit, this_transmon in self.transmons.items():
+            mw_frequency_01 = this_transmon.clock_freqs.f01()
             schedule.add_resource(
-                ClockResource(name=f'{this_qubit}.01', freq=mw_f_val)
+                ClockResource(name=f'{this_qubit}.01', freq=mw_frequency_01)
             )
 
-        for this_qubit, ef_f_val in mw_frequencies_12.items():
-            this_clock = f'{this_qubit}.12'
-            schedule.add_resource(
-                ClockResource(name=this_clock, freq=ef_f_val)
-            )
+        if self.qubit_state == 2:
+            for this_qubit, this_transmon in self.transmons.items():
+                this_clock = f'{this_qubit}.12'
+                mw_frequency_12 = this_transmon.clock_freqs.f12()
+                schedule.add_resource(
+                    ClockResource(name=this_clock, freq=mw_frequency_12)
+                )
 
 
         # The outer for-loop iterates over all qubits:
@@ -94,6 +73,17 @@ class RO_amplitude_optimization(Measurement):
         # root_relaxation = shot.add(IdlePulse(20e-9), label="Reset")
 
         for acq_cha, (this_qubit, ro_amplitude_values) in enumerate(ro_amplitudes.items()):
+            # unpack the static parameters:
+            this_transmon = self.transmons[this_qubit]
+            ro_pulse_duration = this_transmon.measure.pulse_duration()
+            mw_amp180 = this_transmon.rxy.amp180()
+            mw_ef_amp180 = this_transmon.r12.ef_amp180()
+            mw_pulse_duration = this_transmon.rxy.duration()
+            mw_pulse_port = this_transmon.ports.microwave()
+            mw_motzoi = this_transmon.rxy.motzoi()
+            acquisition_delay = this_transmon.measure.acq_delay()
+            integration_time = this_transmon.measure.integration_time()
+            ro_port = this_transmon.ports.readout()
 
             this_ro_clock =  f'{this_qubit}.' + ro_str
             this_clock = f'{this_qubit}.01'
@@ -117,34 +107,34 @@ class RO_amplitude_optimization(Measurement):
                     this_index = ampl_indx * number_of_levels + level_index
 
                     if state_level == 0:
-                        prep = shot.add(IdlePulse(mw_pulse_durations[this_qubit]))
+                        prep = shot.add(IdlePulse(mw_pulse_duration))
 
                     elif state_level == 1:
                         prep = shot.add(DRAGPulse(
-                                    duration=mw_pulse_durations[this_qubit],
-                                    G_amp=mw_amplitudes[this_qubit],
-                                    D_amp=mw_motzois[this_qubit],
-                                    port=mw_pulse_ports[this_qubit],
+                                    duration=mw_pulse_duration,
+                                    G_amp=mw_amp180,
+                                    D_amp=mw_motzoi,
+                                    port=mw_pulse_port,
                                     clock=this_clock,
                                     phase=0,
                                     ),
                         )
                     elif state_level == 2:
                         shot.add(DRAGPulse(
-                                    duration=mw_pulse_durations[this_qubit],
-                                    G_amp=mw_amplitudes[this_qubit],
-                                    D_amp=mw_motzois[this_qubit],
-                                    port=mw_pulse_ports[this_qubit],
+                                    duration=mw_pulse_duration,
+                                    G_amp=mw_amp180,
+                                    D_amp=mw_motzoi,
+                                    port=mw_pulse_port,
                                     clock=this_clock,
                                     phase=0,
                                     ),
                         )
                         prep = shot.add(
                             DRAGPulse(
-                                duration=mw_pulse_durations[this_qubit],
-                                G_amp=mw_ef_amp180[this_qubit],
+                                duration=mw_pulse_duration,
+                                G_amp=mw_ef_amp180,
                                 D_amp=0,
-                                port=mw_pulse_ports[this_qubit],
+                                port=mw_pulse_port,
                                 clock=this_12_clock,
                                 phase=0,
                             ),
@@ -154,9 +144,9 @@ class RO_amplitude_optimization(Measurement):
 
                     ro_pulse = shot.add(
                         SquarePulse(
-                            duration=pulse_durations[this_qubit],
+                            duration=ro_pulse_duration,
                             amp=ro_amplitude,
-                            port=ro_ports[this_qubit],
+                            port=ro_port,
                             clock=this_ro_clock,
                         ),
 
@@ -166,15 +156,15 @@ class RO_amplitude_optimization(Measurement):
 
                     shot.add(
                         SSBIntegrationComplex(
-                            duration=integration_times[this_qubit],
-                            port=ro_ports[this_qubit],
+                            duration=integration_time,
+                            port=ro_port,
                             clock=this_ro_clock,
                             acq_index=this_index,
                             acq_channel=acq_cha,
                             bin_mode=BinMode.APPEND
                         ),
                         ref_op=ro_pulse, ref_pt="start",
-                        rel_time=acquisition_delays[this_qubit],
+                        rel_time=acquisition_delay,
                     )
 
                     shot.add(Reset(this_qubit))

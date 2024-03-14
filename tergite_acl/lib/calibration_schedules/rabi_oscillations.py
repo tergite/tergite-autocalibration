@@ -6,33 +6,20 @@ from quantify_scheduler.enums import BinMode
 from quantify_scheduler import Schedule
 from quantify_scheduler.operations.pulse_library import DRAGPulse
 from quantify_scheduler.operations.gate_library import Measure, Reset, X
-from tergite_acl.utils.extended_transmon_element import Measure_RO1
+from tergite_acl.utils.extended_transmon_element import ExtendedTransmon, Measure_RO1
 from tergite_acl.lib.measurement_base import Measurement
 import numpy as np
 
 
 class Rabi_Oscillations(Measurement):
 
-    def __init__(self, transmons, qubit_state: int = 0):
+    def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
         super().__init__(transmons)
         self.qubit_state = qubit_state
         self.transmons = transmons
 
-        self.static_kwargs = {
-            'qubits': self.qubits,
-            'mw_frequencies_01': self.attributes_dictionary('f01'),
-            'mw_frequencies_12': self.attributes_dictionary('f12'),
-            'mw_pulse_durations': self.attributes_dictionary('duration'),
-            'mw_pulse_ports': self.attributes_dictionary('microwave'),
-        }
-
     def schedule_function(
         self,
-        qubits: list[str],
-        mw_frequencies_01: dict[str, float],
-        mw_frequencies_12: dict[str, float],
-        mw_pulse_durations: dict[str, float],
-        mw_pulse_ports: dict[str, str],
         mw_amplitudes: dict[str, np.ndarray],
         repetitions: int = 1024,
     ) -> Schedule:
@@ -44,14 +31,6 @@ class Rabi_Oscillations(Measurement):
         Parameters
 
         ----------
-        self
-            Contains all qubit states.
-        qubits
-            The list of qubits on which to perform the experiment.
-        mw_pulse_durations
-            Duration of the Gaussian shaped Rabi pulse for each qubit.
-        mw_pulse_ports
-            Location on the device where the Rabi pulse is applied for each qubit.
         mw_amplitudes
             Array of the sweeping amplitudes of the Rabi pulse for each qubit.
         repetitions
@@ -73,15 +52,20 @@ class Rabi_Oscillations(Measurement):
 
         schedule = Schedule(schedule_title, repetitions)
 
+        qubits = self.transmons.keys()
+
+
         # we must first add the clocks
         if self.qubit_state == 0:
-            for this_qubit, mw_f_val in mw_frequencies_01.items():
+            for this_qubit, this_transmon in self.transmons.items():
+                mw_frequency_01 = this_transmon.clock_freqs.f01()
                 this_clock = f'{this_qubit}.01'
-                schedule.add_resource(ClockResource(name=this_clock, freq=mw_f_val))
+                schedule.add_resource(ClockResource(name=this_clock, freq=mw_frequency_01))
         elif self.qubit_state == 1:
-            for this_qubit, mw_f_val in mw_frequencies_12.items():
+            for this_qubit, this_transmon in self.transmons.items():
+                mw_frequency_12 = this_transmon.clock_freqs.f12()
                 this_clock = f'{this_qubit}.12'
-                schedule.add_resource(ClockResource(name=this_clock, freq=mw_f_val))
+                schedule.add_resource(ClockResource(name=this_clock, freq=mw_frequency_12))
         else:
             raise ValueError(f'Invalid qubit state: {self.qubit_state}')
 
@@ -89,6 +73,12 @@ class Rabi_Oscillations(Measurement):
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
         for this_qubit, mw_amp_array_val in mw_amplitudes.items():
+
+            # unpack the static parameters
+            this_transmon = self.transmons[this_qubit]
+            mw_pulse_duration = this_transmon.rxy.duration()
+            mw_pulse_port = this_transmon.ports.microwave()
+
             if self.qubit_state == 0:
                 this_clock = f'{this_qubit}.01'
             elif self.qubit_state == 1:
@@ -106,10 +96,10 @@ class Rabi_Oscillations(Measurement):
                     schedule.add(X(this_qubit))
                 schedule.add(
                     DRAGPulse(
-                        duration=mw_pulse_durations[this_qubit],
+                        duration=mw_pulse_duration,
                         G_amp=mw_amplitude,
                         D_amp=0,
-                        port=mw_pulse_ports[this_qubit],
+                        port=mw_pulse_port,
                         clock=this_clock,
                         phase=0,
                     ),

@@ -146,6 +146,8 @@ def is_sequence_identity(rng_sequence: np.ndarray) -> bool:
             phi = operation['phi']
             matrix = np.matmul(RXY(theta, phi), matrix)
     # check if the total operation produces I or -I
+    print(f'{ np.allclose(matrix,  np.identity(2)) = }')
+    print(f'{ np.allclose(matrix, -np.identity(2)) = }')
     return np.allclose(matrix, np.identity(2)) or np.allclose(matrix, -np.identity(2))
 
 def reversing_XY_matrix(rng_sequence):
@@ -169,3 +171,12 @@ def reversing_XY_matrix(rng_sequence):
 
     reversing_decomposition = XY_decompositions[reversing_index]
     return reversing_index, reversing_decomposition
+#---
+if __name__ == "__main__":
+    test_sequence = np.array([3], dtype=np.int32)
+    reversing_index, _ = reversing_XY_matrix(test_sequence)
+    print(f'{ test_sequence = }')
+    print(f'{ reversing_index = }')
+    sequence = np.append(test_sequence, reversing_index)
+
+    is_sequence_identity(sequence)

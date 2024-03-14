@@ -13,7 +13,7 @@ from tergite_acl.lib.calibration_schedules.n_rabi_oscillations import N_Rabi_Osc
 from tergite_acl.lib.calibration_schedules.rabi_oscillations import Rabi_Oscillations
 from tergite_acl.lib.calibration_schedules.ramsey_fringes import Ramsey_fringes
 # from calibration_schedules.two_tone_multidim import Two_Tones_Multidim
-from tergite_acl.lib.calibration_schedules.two_tone_multidim_loop_reversed import Two_Tones_Multidim
+from tergite_acl.lib.calibration_schedules.two_tone_multidim import Two_Tones_Multidim
 from tergite_acl.lib.calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
 
 
@@ -21,7 +21,7 @@ class Qubit_01_Spectroscopy_Pulsed_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.sweep_range = self.node_dictionary.pop("sweep_range", None)
-        self.redis_field = ['freq_01']
+        self.redis_field = ['clock_freqs:f01']
         self.measurement_obj = Two_Tones_Spectroscopy
         self.analysis_obj = QubitSpectroscopyAnalysis
 
@@ -38,8 +38,8 @@ class Qubit_01_Spectroscopy_Pulsed_Node(BaseNode):
 class Qubit_01_Spectroscopy_Multidim_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['freq_01',
-                            'spec_ampl_optimal']
+        self.redis_field = ['clock_freqs:f01',
+                            'spec:spec_ampl_optimal']
         self.measurement_obj = Two_Tones_Multidim
         self.analysis_obj = QubitSpectroscopyMultidim
 
@@ -59,7 +59,7 @@ class Qubit_01_Spectroscopy_Multidim_Node(BaseNode):
 class Rabi_Oscillations_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['mw_amp180']
+        self.redis_field = ['rxy:amp180']
         self.measurement_obj = Rabi_Oscillations
         self.analysis_obj = RabiAnalysis
 
@@ -76,11 +76,11 @@ class Rabi_Oscillations_Node(BaseNode):
 class Ramsey_Fringes_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['freq_01']
+        self.redis_field = ['clock_freqs:f01']
         self.measurement_obj = Ramsey_fringes
         self.analysis_obj = RamseyAnalysis
         self.backup = False
-        self.analysis_kwargs = {"redis_field": "freq_01"}
+        self.analysis_kwargs = {"redis_field": "clock_freqs:f01"}
 
     @property
     def samplespace(self):
@@ -100,12 +100,12 @@ class Ramsey_Fringes_Node(BaseNode):
 class Ramsey_Fringes_12_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['freq_12']
+        self.redis_field = ['clock_freqs:f12']
         self.qubit_state = 1
         self.measurement_obj = Ramsey_fringes
         self.analysis_obj = RamseyAnalysis
         self.backup = False
-        self.analysis_kwargs = {"redis_field": "freq_12"}
+        self.analysis_kwargs = {"redis_field": "clock_freqs:f12"}
 
     @property
     def samplespace(self):
@@ -123,7 +123,7 @@ class Ramsey_Fringes_12_Node(BaseNode):
 class Motzoi_Parameter_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['mw_motzoi']
+        self.redis_field = ['rxy:motzoi']
         self.measurement_obj = Motzoi_parameter
         self.analysis_obj = MotzoiAnalysis
         self.backup = False
@@ -131,8 +131,8 @@ class Motzoi_Parameter_Node(BaseNode):
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'mw_motzois': {qubit: np.linspace(-0.4, 0.4, 61) for qubit in self.all_qubits},
-            'X_repetitions': {qubit: np.arange(2, 17, 4) for qubit in self.all_qubits}
+            'mw_motzois': {qubit: np.linspace(-0.4, 0.1, 51) for qubit in self.all_qubits},
+            'X_repetitions': {qubit: np.arange(2, 22, 6) for qubit in self.all_qubits}
         }
         return cluster_samplespace
 
@@ -140,7 +140,7 @@ class Motzoi_Parameter_Node(BaseNode):
 class N_Rabi_Oscillations_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['mw_amp180']
+        self.redis_field = ['rxy:amp180']
         self.measurement_obj = N_Rabi_Oscillations
         self.analysis_obj = NRabiAnalysis
         self.backup = False
@@ -148,8 +148,8 @@ class N_Rabi_Oscillations_Node(BaseNode):
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'mw_amplitudes_sweep': {qubit: np.linspace(-0.1, 0.1, 61) for qubit in self.all_qubits},
-            'X_repetitions': {qubit: np.arange(1, 16, 4) for qubit in self.all_qubits}
+            'mw_amplitudes_sweep': {qubit: np.linspace(-0.01, 0.01, 21) for qubit in self.all_qubits},
+            'X_repetitions': {qubit: np.arange(1, 96, 16) for qubit in self.all_qubits}
         }
         return cluster_samplespace
 
@@ -158,7 +158,7 @@ class Qubit_12_Spectroscopy_Pulsed_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.sweep_range = self.node_dictionary.pop("sweep_range", None)
-        self.redis_field = ['freq_12']
+        self.redis_field = ['clock_freqs:f12']
         self.qubit_state = 1
         self.measurement_obj = Two_Tones_Spectroscopy
         self.analysis_obj = QubitSpectroscopyAnalysis
@@ -176,8 +176,8 @@ class Qubit_12_Spectroscopy_Pulsed_Node(BaseNode):
 class Qubit_12_Spectroscopy_Multidim_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['freq_12',
-                            'spec_ampl_12_optimal']
+        self.redis_field = ['clock_freqs:f12',
+                            'spec:spec_ampl_12_optimal']
         self.qubit_state = 1
         self.measurement_obj = Two_Tones_Multidim
         self.analysis_obj = QubitSpectroscopyMultidim
@@ -198,7 +198,7 @@ class Qubit_12_Spectroscopy_Multidim_Node(BaseNode):
 class Rabi_Oscillations_12_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['mw_ef_amp180']
+        self.redis_field = ['r12:ef_amp180']
         self.qubit_state = 1
         self.measurement_obj = Rabi_Oscillations
         self.analysis_obj = RabiAnalysis
