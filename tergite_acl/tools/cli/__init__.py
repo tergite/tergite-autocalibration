@@ -16,9 +16,12 @@ def reboot():
     from qblox_instruments import Cluster
     from tergite_acl.config.settings import CLUSTER_IP
 
-    click.echo(f'Reboot cluster with IP:{CLUSTER_IP}')
-    cluster_ = Cluster('cluster', CLUSTER_IP)
-    cluster_.reboot()
+    if click.confirm('Do you really want to reboot the cluster? This operation can interrupt ongoing measurements.'):
+        click.echo(f'Reboot cluster with IP:{CLUSTER_IP}')
+        cluster_ = Cluster('cluster', CLUSTER_IP)
+        cluster_.reboot()
+    else:
+        click.echo('Rebooting cluster aborted by user.')
 
 
 @cli.group(help='Handle operations related to the node.')
@@ -34,7 +37,10 @@ def reset(name, a):
 
     reset_obj_ = ResetRedisNode()
     if a:
-        reset_obj_.reset_node('all')
+        if click.confirm('Do you really want to reset all nodes? It might take some time to recalibrate them.'):
+            reset_obj_.reset_node('all')
+        else:
+            click.echo('Node reset aborted by user.')
     elif name is not None:
         reset_obj_.reset_node(name)
     else:
@@ -78,7 +84,7 @@ def joke():
 
     async def print_joke():
         j = await Jokes()  # Initialise the class
-        joke_ = await j.get_joke(blacklist=['racist', 'religious'])  # Retrieve a random joke
+        joke_ = await j.get_joke(blacklist=['racist', 'religious', 'political', 'nsfw', 'sexist'])  # Retrieve a random joke
         if joke_['type'] == 'single':  # Print the joke
             print(joke_['joke'])
         else:
