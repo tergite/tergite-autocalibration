@@ -4,7 +4,8 @@
 
 A commandline application to calibrate QAL 9000-Like quantum computers automatically
 
-**THIS CODE IS OPEN SOURCE. ANY CONTRIBUTIONS TO IT IS LICENSED VIA THE APACHE 2.0 LICENSE**
+**THIS CODE IS OPEN SOURCE AND PUBLIC. BY CONTRIBUTING TO IT, YOU ACCEPT THAT YOUR CONTRIBUTIONS WILL BE LICENSED 
+VIA THE [APACHE 2.0 LICENSE](./LICENSE.txt)**
 
 This project contains an orchistration manager, a collection of callibration schedules and a collection of post-processing & analysis routines.  
 It is tailored for the tune-up of the 25 qubits QPU at Chalmers, QTL.  
