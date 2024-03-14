@@ -7,21 +7,17 @@ from quantify_scheduler.schedules.schedule import Schedule
 
 from tergite_acl.lib.measurement_base import Measurement
 import tergite_acl.utils.clifford_elements_decomposition as cliffords
+from tergite_acl.utils.extended_transmon_element import ExtendedTransmon
 
 
 class Randomized_Benchmarking(Measurement):
-    def __init__(self, transmons, qubit_state: int = 0):
+    def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
         super().__init__(transmons)
         self.qubit_state = qubit_state
         self.transmons = transmons
 
-        self.static_kwargs = {
-            'qubits': self.qubits,
-        }
-
     def schedule_function(
         self,
-        qubits: list[str],
         seed: int,
         number_of_cliffords: dict[str, np.ndarray],
         repetitions: int = 1024,
@@ -35,10 +31,6 @@ class Randomized_Benchmarking(Measurement):
 
         Parameters
         ----------
-        self
-            Contains all qubit states.
-        qubits
-            The list of qubits on which to perform the experiment.
         repetitions
             The amount of times the Schedule will be repeated.
         **number_of_cliffords_operations
@@ -52,6 +44,8 @@ class Randomized_Benchmarking(Measurement):
         """
 
         schedule = Schedule("multiplexed_randomized_benchmarking",repetitions)
+
+        qubits = self.transmons.keys()
 
         #This is the common reference operation so the qubits can be operated in parallel
         root_relaxation = schedule.add(Reset(*qubits), label="Start")
@@ -73,6 +67,7 @@ class Randomized_Benchmarking(Measurement):
                 random_sequence = rng.integers(all_cliffords, size=this_number_of_cliffords)
 
                 for sequence_index in random_sequence:
+
                     physical_gates = cliffords.XY_decompositions[sequence_index]
                     for gate_angles in physical_gates.values():
                         theta = gate_angles['theta']
@@ -101,10 +96,12 @@ class Randomized_Benchmarking(Measurement):
 
             # 0 calibration point
             schedule.add(Reset(this_qubit))
+            schedule.add(Reset(this_qubit))
             schedule.add(Measure( this_qubit, acq_index=acq_index + 1))
             schedule.add(Reset(this_qubit))
 
             # 1 calibration point
+            schedule.add(Reset(this_qubit))
             schedule.add(Reset(this_qubit))
             schedule.add(X(this_qubit))
             schedule.add(Measure( this_qubit, acq_index=acq_index + 2))

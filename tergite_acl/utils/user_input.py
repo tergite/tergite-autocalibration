@@ -1,6 +1,7 @@
 # qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
 # qubits = [ 'q18','q19','q20','q21','q22','q23','q24','q25']
 qubits = ['q12','q13','q14']
+# qubits = ['q14']
 # couplers = ['q12_q13','q13_q14' ]
 couplers = ['q12_q13']
 
@@ -8,10 +9,10 @@ couplers = ['q12_q13']
 node reference
   punchout
   resonator_spectroscopy
-  qubit_01_spectroscopy_multidim
+  qubit_01_spectroscopy
   qubit_01_spectroscopy_pulsed
   rabi_oscillations
-  ramsey_fringes
+  ramsey_correction
   resonator_spectroscopy_1
   qubit_12_spectroscopy_pulsed
   qubit_12_spectroscopy_multidim
@@ -42,7 +43,7 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'resonator_spectroscopy',
+    'target_node': 'ro_amplitude_three_state_optimization',
     'all_qubits': qubits,
     'couplers': couplers,
 }

@@ -7,31 +7,18 @@ from quantify_scheduler.operations.gate_library import Measure, Reset, X90, Rxy,
 from quantify_scheduler.operations.pulse_library import DRAGPulse
 from quantify_scheduler.resources import ClockResource
 from tergite_acl.lib.measurement_base import Measurement
-from tergite_acl.utils.extended_transmon_element import Measure_RO1
+from tergite_acl.utils.extended_transmon_element import ExtendedTransmon, Measure_RO1
 
 import numpy as np
 
 class Ramsey_fringes(Measurement):
 
-    def __init__(self,transmons,qubit_state:int=0):
+    def __init__(self,transmons: dict[str, ExtendedTransmon],qubit_state:int=0):
         super().__init__(transmons)
         self.qubit_state = qubit_state
 
-        self.static_kwargs = {
-            'qubits': self.qubits,
-            'mw_pulse_durations': self.attributes_dictionary('duration'),
-            'mw_pulse_ports': self.attributes_dictionary('microwave'),
-            'mw_ef_amps180': self.attributes_dictionary('ef_amp180'),
-            'mw_frequencies_12': self.attributes_dictionary('f12'),
-        }
-
     def schedule_function(
             self,
-            qubits: list[str],
-            mw_ef_amps180: dict[str,float],
-            mw_frequencies_12: dict[str,float],
-            mw_pulse_ports: dict[str,str],
-            mw_pulse_durations: dict[str,float],
             artificial_detunings: dict[str,np.ndarray],
             ramsey_delays: dict[str,np.ndarray],
             repetitions: int = 1024,
@@ -46,34 +33,19 @@ class Ramsey_fringes(Measurement):
 
         Parameters
         ----------
-        self
-            Contains all qubit states.
-        qubits
-            The list of qubits on which to perform the experiment.
-        mw_clocks_12
-            Clocks for the 12 transition frequency of the qubits.
-        mw_ef_amps180
-            Amplitudes used for the excitation of the qubits to calibrate for the 12 transition.
-        mw_frequencies_12
-            Frequencies used for the excitation of the qubits to calibrate for the 12 transition.
-        mw_pulse_ports
-            Location on the device where the pulsed used for excitation of the qubits to calibrate for the 12 transition is located.
-        mw_pulse_durations
-            Pulse durations used for the excitation of the qubits to calibrate for the 12 transition.
         artificial_detuning
             The artificial detuning of the qubit frequency, which is implemented by changing
             the phase of the second pi/2 pulse.
+        ramsey_delays
+            The wait times tau between the pi/2 pulses for each qubit
         repetitions
             The amount of times the Schedule will be repeated.
-        **intermediate_delays
-            The wait times tau between the pi/2 pulses for each qubit
 
         Returns
         -------
         :
             An experiment schedule.
         """
-        schedule = Schedule("multiplexed_ramsey",repetitions)
 
         if self.qubit_state == 0:
             schedule_title = "multiplexed_ramsey_01"
@@ -86,16 +58,23 @@ class Ramsey_fringes(Measurement):
 
         schedule = Schedule(schedule_title,repetitions)
 
-        for this_qubit, mw_f_val in mw_frequencies_12.items():
-            schedule.add_resource(
-                ClockResource(name=f'{this_qubit}.12', freq=mw_f_val)
-            )
+        qubits = self.transmons.keys()
+
+        if self.qubit_state == 1:
+            for this_qubit, this_transmon in self.transmons.items():
+                mw_frequency_12 = this_transmon.clock_freqs.f12()
+                this_clock = f'{this_qubit}.12'
+                schedule.add_resource(ClockResource(name=this_clock, freq=mw_frequency_12))
 
         #This is the common reference operation so the qubits can be operated in parallel
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
         # The outer loop, iterates over all qubits
         for this_qubit, artificial_detunings_values in artificial_detunings.items():
+            this_transmon = self.transmons[this_qubit]
+            mw_pulse_duration = this_transmon.rxy.duration()
+            mw_pulse_port = this_transmon.ports.microwave()
+            mw_ef_amp180 = this_transmon.r12.ef_amp180()
 
             if self.qubit_state == 1:
                 this_clock = f'{this_qubit}.12'
@@ -125,13 +104,13 @@ class Ramsey_fringes(Measurement):
 
                     if self.qubit_state == 1:
                         schedule.add(X(this_qubit))
-                        f12_amp = mw_ef_amps180[this_qubit]
+                        f12_amp = mw_ef_amp180
                         schedule.add(
                             DRAGPulse(
-                                duration=mw_pulse_durations[this_qubit],
+                                duration=mw_pulse_duration,
                                 G_amp=f12_amp/2,
                                 D_amp=0,
-                                port=mw_pulse_ports[this_qubit],
+                                port=mw_pulse_port,
                                 clock=this_clock,
                                 phase=0,
                             ),
@@ -139,10 +118,10 @@ class Ramsey_fringes(Measurement):
 
                         schedule.add(
                             DRAGPulse(
-                                duration=mw_pulse_durations[this_qubit],
+                                duration=mw_pulse_duration,
                                 G_amp=f12_amp/2,
                                 D_amp=0,
-                                port=mw_pulse_ports[this_qubit],
+                                port=mw_pulse_port,
                                 clock=this_clock,
 
                                 phase=recovery_phase,
