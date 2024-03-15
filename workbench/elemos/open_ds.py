@@ -4,14 +4,33 @@ import matplotlib.pyplot as plt
 import importlib
 import tergite_acl.lib.analysis.randomized_benchmarking_analysis as rnb
 import tergite_acl.lib.analysis.optimum_ro_amplitude_analysis as roa
+import tergite_acl.lib.analysis.motzoi_analysis as motzoi
 importlib.reload(rnb)
 
 
-ds = xr.open_dataset('data_dir/20240220/20240220-171349-867-88367b-ro_amplitude_optimization_gef/dataset.hdf5')
+ds = xr.open_dataset('data_directory/20240315/20240315-115737-071-2bfe33-motzoi_parameter/dataset.hdf5')
 # print(f'{ ds.yq21.attrs = }')
 ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
+ds = ds.yq12.to_dataset()
+ds.yq12.attrs['qubit'] = 'q12'
 #---
-ro = roa.OptimalROAmplitudeAnalysis
+motz = motzoi.MotzoiAnalysis(ds)
+#---
+fig, ax = plt.subplots()
+motz.run_fitting()
+motz.plotter(ax)
+plt.show()
+#---
+da = ds.isel({'X_repetitionsq12': [0]})
+da.yq12.plot()
+plt.show()
+
+
+
+
+
+
+
 #---
 qubit = 'q14'
 yq = ds[f'y{qubit}'].isel({f'ro_amplitudes{qubit}': [0]})

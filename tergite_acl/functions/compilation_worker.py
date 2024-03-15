@@ -61,6 +61,8 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
 
     for submodule in decoded_transmon['data']:
         sub_module_content = decoded_transmon['data'][submodule]
+        # update the dictionary of each module of the serialized extended transmon
+        # with the corresponding module dictionary from redis
         if isinstance(sub_module_content, dict) and submodule in device_redis_dict:
             redis_module_config = device_redis_dict[submodule]
             decoded_transmon['data'][submodule].update(redis_module_config)
@@ -68,7 +70,6 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
             decoded_transmon['data'][submodule].update({'acq_channel': channel})
 
     encoded_transmon = json.dumps(decoded_transmon)
-    breakpoint()
 
     # free the transmon
     transmon.close()
@@ -79,49 +80,10 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
     return transmon
 
 
-    # transmon.reset.duration(float(redis_config['init_duration']))
-    # transmon.rxy.amp180(float(redis_config['mw_amp180']))
-    # transmon.r12.ef_amp180(float(redis_config['mw_ef_amp180']))
-    #
-    # motzoi_val = float(redis_config['mw_motzoi'])
-    # if isnan(motzoi_val):
-    #     motzoi_val = 0
-    # transmon.rxy.motzoi(motzoi_val)
-    # transmon.rxy.duration(float(redis_config['mw_pulse_duration']))
-    #
     # if not np.isnan(float(redis_config['spec_ampl_optimal'])):
     #     transmon.spec.spec_amp(float(redis_config['spec_ampl_optimal']))
     # else:
     #     transmon.spec.spec_amp(float(redis_config['spec_ampl_default']))
-    #
-    # transmon.spec.spec_duration(float(redis_config['spec_pulse_duration']))
-    # # transmon.ports.microwave(redis_config['mw_port'])
-    # # transmon.ports.readout(redis_config['ro_port'])
-    # transmon.clock_freqs.f01(float(redis_config['freq_01']))
-    # transmon.clock_freqs.f12(float(redis_config['freq_12']))
-    # transmon.clock_freqs.readout(float(redis_config['ro_freq']))
-    # transmon.extended_clock_freqs.readout_1(float(redis_config['ro_freq_1']))
-    # transmon.extended_clock_freqs.readout_2(float(redis_config['ro_freq_2']))
-    # transmon.extended_clock_freqs.readout_opt(float(redis_config['ro_freq_2st_opt']))
-    # transmon.extended_clock_freqs.readout_3state_opt(float(redis_config['ro_freq_3st_opt']))
-    # ro_amp_opt = float(redis_config['ro_ampl_opt'])
-    # if isnan(ro_amp_opt):
-    #     ro_amp_opt = float(redis_config['ro_pulse_amp'])
-    # transmon.measure.pulse_amp(float(redis_config['ro_pulse_amp']))
-    # transmon.measure.pulse_duration(float(redis_config['ro_pulse_duration']))
-    # transmon.measure.acq_channel(channel)
-    # transmon.measure.acq_delay(float(redis_config['ro_acq_delay']))
-    # transmon.measure.integration_time(float(redis_config['ro_acq_integration_time']))
-    # transmon.measure_1.pulse_amp(float(redis_config['ro_pulse_amp']))
-    # transmon.measure_1.pulse_duration(float(redis_config['ro_pulse_duration']))
-    # transmon.measure_1.acq_channel(channel)
-    # transmon.measure_1.acq_delay(float(redis_config['ro_acq_delay']))
-    # transmon.measure_1.integration_time(float(redis_config['ro_acq_integration_time']))
-    # transmon.measure_opt.pulse_amp(ro_amp_opt)
-    # transmon.measure_opt.pulse_duration(float(redis_config['ro_pulse_duration']))
-    # transmon.measure_opt.acq_channel(channel)
-    # transmon.measure_opt.acq_delay(float(redis_config['ro_acq_delay']))
-    # transmon.measure_opt.integration_time(float(redis_config['ro_acq_integration_time']))
 
 def load_redis_config_coupler(coupler: CompositeSquareEdge):
     bus = coupler.name

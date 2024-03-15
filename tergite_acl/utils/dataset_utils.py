@@ -9,86 +9,79 @@ from tergite_acl.config.settings import DATA_DIR
 from tergite_acl.lib.demod_channels import ParallelDemodChannels
 from tergite_acl.lib.node_base import BaseNode
 
-
 def configure_dataset(
         raw_ds: xarray.Dataset,
-        node: 'BaseNode',
-        ) -> xarray.Dataset:
-    '''The dataset retrieved from the instrument coordinator  is
-       too bare-bones. Here we configure the dims, coords and data_vars'''
-    samplespace = node.samplespace
-    # For multiplexed single-qubit readout, parallel_demod_channels 
-    # are union of single DemodChannel. The channel label is the name
-    # of qubit.
-    parallel_demod_channels: ParallelDemodChannels = node.demod_channels
-
+        node: BaseNode,
+    ) -> xarray.Dataset:
+    '''
+    The dataset retrieved from the instrument coordinator is
+    too bare-bones. Here the dims, coords and data_vars are configured
+    '''
     dataset = xarray.Dataset()
-    # The union of qubits which will be demodulated.
-    total_qubits = parallel_demod_channels.qubits_demod
-    n_qubits = len(total_qubits)
 
-    for demod_channel in parallel_demod_channels.demod_channels:
-        qubits = demod_channel.qubits # The qubits contained in this channel.
-        channel_label = demod_channel.channel_label # The name of the channel
+    keys = raw_ds.data_vars.keys()
+    measurement_qubits = node.all_qubits
+    samplespace = node.samplespace
+
+    sweep_quantities = samplespace.keys()
+
+    n_qubits = len(measurement_qubits)
+
+    for key in keys:
+        key_indx = key%n_qubits # this is to handle ro_opt_frequencies node where
+        # there are 2 or 3 measurements (i.e 2 or 3 Datarrays) for each qubit
         coords_dict = {}
-        for quantity in samplespace:
-            # e.g., samplesapce[quantify] = {'q1': np.arange(0, 1, 0.1)}
-            if channel_label in samplespace[quantity]:
-                settable_values = samplespace[quantity][channel_label]
-                settable_elements = samplespace[quantity].keys()
+        measured_qubit = measurement_qubits[key_indx]
+
+        for quantity in sweep_quantities :
+
+            # eg ['q1','q2',...] or ['q1_q2','q3_q4',...] :
+            settable_elements = samplespace[quantity].keys()
+
+            # distinguish if the settable is on a quabit or a coupler:
+            if measured_qubit in settable_elements:
+                element = measured_qubit
+                element_type = 'qubit'
             else:
-                settable_values = None
-
-            if settable_values is not None:
-                if channel_label in settable_elements: # change the parameter of a qubit
-                    element = channel_label
-                    element_type = 'qubit'
+                matching = [s for s in settable_elements if measured_qubit in s]
+                if len(matching) == 1 and '_' in matching[0]:
+                    element = matching[0]
+                    element_type = 'coupler'
                 else:
-                    matching = [s for s in settable_elements if channel_label in s] # change the parameter of a coupler
-                    if len(matching) == 1 and '_' in matching[0]:
-                        element = matching[0]
-                        element_type = 'coupler'
-                    else:
-                        raise (ValueError)
-                coord_key = quantity + element
-                settable_values = samplespace[quantity][element]
-                coord_attrs = {element_type: element, 'long_name': f'{coord_key}', 'units': 'NA'}
-                coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
+                    raise(ValueError)
 
-                if hasattr(node, 'node_externals'):
-                    coord_key = node.external_parameter_name + channel_label
-                    coord_attrs = {'qubit': channel_label, 'long_name': f'{coord_key}', 'units': 'NA'}
-                    coords_dict[coord_key] = (coord_key, np.array([node.external_parameter_value]), coord_attrs)
+            coord_key = quantity + element
+            settable_values = samplespace[quantity][element]
+            coord_attrs = {element_type: element, 'long_name': f'{coord_key}', 'units': 'NA'}
 
-        dimensions = [len(samplespace[quantity][channel_label]) if isinstance(samplespace[quantity], dict) else len(samplespace[quantity]) for quantity in samplespace]
-        reshaping = list(reversed(dimensions))
-        data_values_multiqubit = []
-        for qubit in qubits:
-            # The index of qubit to be demodulated stored as the key of data_vars in raw_ds
-            qubit_index = total_qubits.index(qubit)
-            data_values = raw_ds[qubit_index].values
+            coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
 
-            if node.name == 'ro_amplitude_two_state_optimization' or node.name == 'ro_amplitude_three_state_optimization':
-                loops = node.node_dictionary['loop_repetitions']
-                for key in coords_dict.keys():
-                    if channel_label in key and 'ro_amplitudes' in key:
-                        ampls = coords_dict[key][1]
-                    elif channel_label in key and 'qubit_states' in key:
-                        states = coords_dict[key][1]
-                data_values = reshufle_loop_dataset(data_values, ampls, states, loops)
+        if hasattr(node, 'node_externals'):
+            coord_key = node.external_parameter_name + measured_qubit
+            coord_attrs = {'qubit':measured_qubit, 'long_name': f'{coord_key}', 'units': 'NA'}
+            coords_dict[coord_key] = (coord_key, np.array([node.external_parameter_value]), coord_attrs)
 
-            # Reshape the data_values
-            data_values_reshape = data_values.reshape(*reshaping)
-            data_values_multiqubit.append(data_values_reshape)
-        data_values_multiqubit = np.array(data_values_multiqubit)
-        # Adjust the order of dimension
-        data_values = tunneling_qubits(data_values_multiqubit)
-        if len(qubits) == 1:
-            # Single-qubit demodulation
-            attributes = {'qubit': qubits[0], 'long_name': f'y{qubit}', 'units': 'NA', 'channel_label': channel_label, 'repetitions':demod_channel.repetitions}
-        else:
-            # Multi-qubit demodulation
-            attributes = {'qubits': qubits, 'long_name': '_'.join([f'y{qubit}' for qubit in qubits]), 'units': 'NA', 'channel_label': channel_label, 'repetitions':demod_channel.repetitions}
+        partial_ds = xarray.Dataset(coords=coords_dict)
+
+        data_values = raw_ds[key].values
+
+        if node.name == 'ro_amplitude_two_state_optimization' or node.name == 'ro_amplitude_three_state_optimization':
+            loops = node.node_dictionary['loop_repetitions']
+            for key in coords_dict.keys():
+                if measured_qubit in key and 'ro_amplitudes' in key:
+                    ampls = coords_dict[key][1]
+                elif measured_qubit in key and 'qubit_states' in key:
+                    states = coords_dict[key][1]
+            data_values = reshufle_loop_dataset(data_values, ampls, states, loops)
+
+        # TODO this is not safe:
+        # This assumes that the inner settable variable is placed
+        # at the first position in the samplespace
+        reshaping = reversed(node.dimensions)
+        data_values = data_values.reshape(*reshaping)
+        data_values = np.transpose(data_values)
+        attributes = {'qubit': measured_qubit, 'long_name': f'y{measured_qubit}', 'units': 'NA'}
+        qubit_state = ''
 
         # TODO ro_frequency_optimization requires multiple measurements per qubit
         is_frequency_opt = node.name == 'ro_frequency_two_state_optimization' or node.name == 'ro_frequency_three_state_optimization'
@@ -97,10 +90,103 @@ def configure_dataset(
             qubit_state = qubit_states[key // n_qubits]
             attributes['qubit_state'] = qubit_state
 
-        partial_ds = xarray.Dataset(coords=coords_dict)
-        partial_ds[f'y{channel_label}'] = (tuple(coords_dict.keys()), data_values, attributes)
+        partial_ds[f'y{measured_qubit}{qubit_state}'] = (tuple(coords_dict.keys()), data_values, attributes)
         dataset = xarray.merge([dataset,partial_ds])
     return dataset
+
+
+
+# def configure_dataset(
+#         raw_ds: xarray.Dataset,
+#         node: 'BaseNode',
+#         ) -> xarray.Dataset:
+#     '''The dataset retrieved from the instrument coordinator  is
+#        too bare-bones. Here we configure the dims, coords and data_vars'''
+#     samplespace = node.samplespace
+#     # For multiplexed single-qubit readout, parallel_demod_channels 
+#     # are union of single DemodChannel. The channel label is the name
+#     # of qubit.
+#     parallel_demod_channels: ParallelDemodChannels = node.demod_channels
+#
+#     dataset = xarray.Dataset()
+#     # The union of qubits which will be demodulated.
+#     total_qubits = parallel_demod_channels.qubits_demod
+#     n_qubits = len(total_qubits)
+#
+#     for demod_channel in parallel_demod_channels.demod_channels:
+#         qubits = demod_channel.qubits # The qubits contained in this channel.
+#         channel_label = demod_channel.channel_label # The name of the channel
+#         coords_dict = {}
+#         for quantity in samplespace:
+#             # e.g., samplesapce[quantify] = {'q1': np.arange(0, 1, 0.1)}
+#             if channel_label in samplespace[quantity]:
+#                 settable_values = samplespace[quantity][channel_label]
+#                 settable_elements = samplespace[quantity].keys()
+#             else:
+#                 settable_values = None
+#
+#             if settable_values is not None:
+#                 if channel_label in settable_elements: # change the parameter of a qubit
+#                     element = channel_label
+#                     element_type = 'qubit'
+#                 else:
+#                     matching = [s for s in settable_elements if channel_label in s] # change the parameter of a coupler
+#                     if len(matching) == 1 and '_' in matching[0]:
+#                         element = matching[0]
+#                         element_type = 'coupler'
+#                     else:
+#                         raise (ValueError)
+#                 coord_key = quantity + element
+#                 settable_values = samplespace[quantity][element]
+#                 coord_attrs = {element_type: element, 'long_name': f'{coord_key}', 'units': 'NA'}
+#                 coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
+#
+#                 if hasattr(node, 'node_externals'):
+#                     coord_key = node.external_parameter_name + channel_label
+#                     coord_attrs = {'qubit': channel_label, 'long_name': f'{coord_key}', 'units': 'NA'}
+#                     coords_dict[coord_key] = (coord_key, np.array([node.external_parameter_value]), coord_attrs)
+#
+#         dimensions = [len(samplespace[quantity][channel_label]) if isinstance(samplespace[quantity], dict) else len(samplespace[quantity]) for quantity in samplespace]
+#         reshaping = list(reversed(dimensions))
+#         data_values_multiqubit = []
+#         for qubit in qubits:
+#             # The index of qubit to be demodulated stored as the key of data_vars in raw_ds
+#             qubit_index = total_qubits.index(qubit)
+#             data_values = raw_ds[qubit_index].values
+#
+#             if node.name == 'ro_amplitude_two_state_optimization' or node.name == 'ro_amplitude_three_state_optimization':
+#                 loops = node.node_dictionary['loop_repetitions']
+#                 for key in coords_dict.keys():
+#                     if channel_label in key and 'ro_amplitudes' in key:
+#                         ampls = coords_dict[key][1]
+#                     elif channel_label in key and 'qubit_states' in key:
+#                         states = coords_dict[key][1]
+#                 data_values = reshufle_loop_dataset(data_values, ampls, states, loops)
+#
+#             # Reshape the data_values
+#             data_values_reshape = data_values.reshape(*reshaping)
+#             data_values_multiqubit.append(data_values_reshape)
+#         data_values_multiqubit = np.array(data_values_multiqubit)
+#         # Adjust the order of dimension
+#         data_values = tunneling_qubits(data_values_multiqubit)
+#         if len(qubits) == 1:
+#             # Single-qubit demodulation
+#             attributes = {'qubit': qubits[0], 'long_name': f'y{qubit}', 'units': 'NA', 'channel_label': channel_label, 'repetitions':demod_channel.repetitions}
+#         else:
+#             # Multi-qubit demodulation
+#             attributes = {'qubits': qubits, 'long_name': '_'.join([f'y{qubit}' for qubit in qubits]), 'units': 'NA', 'channel_label': channel_label, 'repetitions':demod_channel.repetitions}
+#
+#         # TODO ro_frequency_optimization requires multiple measurements per qubit
+#         is_frequency_opt = node.name == 'ro_frequency_two_state_optimization' or node.name == 'ro_frequency_three_state_optimization'
+#         if is_frequency_opt:
+#             qubit_states = [0,1,2]
+#             qubit_state = qubit_states[key // n_qubits]
+#             attributes['qubit_state'] = qubit_state
+#
+#         partial_ds = xarray.Dataset(coords=coords_dict)
+#         partial_ds[f'y{channel_label}'] = (tuple(coords_dict.keys()), data_values, attributes)
+#         dataset = xarray.merge([dataset,partial_ds])
+#     return dataset
 
 def to_real_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
     ds = iq_dataset.expand_dims('ReIm', axis=-1)  # Add ReIm axis at the end
