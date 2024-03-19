@@ -34,14 +34,14 @@ class ResetRedisNode:
                 for field in fields:
                     REDIS_CONNECTION.hset(key, field, 'nan')
                     if 'motzoi' in field:
-                        REDIS_CONNECTION.hset(key, field, '0')
+                        self.red.hset(key, field, '0')
                 for node in self.nodes:
                     REDIS_CONNECTION.hset(cs_key, node, 'not_calibrated')
             elif remove_node in self.nodes:
                 for field in remove_fields:
                     REDIS_CONNECTION.hset(key, field, 'nan')
                     if 'motzoi' in field:
-                        REDIS_CONNECTION.hset(key, field, '0')
+                        self.red.hset(key, field, '0')
                 REDIS_CONNECTION.hset(cs_key, remove_node, 'not_calibrated')
             else:
                 raise ValueError('Invalid Field')

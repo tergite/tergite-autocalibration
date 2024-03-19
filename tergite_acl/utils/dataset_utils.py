@@ -11,7 +11,7 @@ from tergite_acl.lib.node_base import BaseNode
 
 def configure_dataset(
         raw_ds: xarray.Dataset,
-        node: BaseNode,
+        node,
     ) -> xarray.Dataset:
     '''
     The dataset retrieved from the instrument coordinator is
@@ -22,6 +22,11 @@ def configure_dataset(
     keys = raw_ds.data_vars.keys()
     measurement_qubits = node.all_qubits
     samplespace = node.samplespace
+
+    # if hasattr(node, 'spi_samplespace'):
+    #     spi_samplespace = node.spi_samplespace
+    #     # merge the samplespaces: | is the dictionary merging operator
+    #     samplespace = samplespace | spi_samplespace
 
     sweep_quantities = samplespace.keys()
 
@@ -65,6 +70,7 @@ def configure_dataset(
 
         data_values = raw_ds[key].values
 
+
         if node.name == 'ro_amplitude_two_state_optimization' or node.name == 'ro_amplitude_three_state_optimization':
             loops = node.node_dictionary['loop_repetitions']
             for key in coords_dict.keys():
@@ -74,6 +80,7 @@ def configure_dataset(
                     states = coords_dict[key][1]
             data_values = reshufle_loop_dataset(data_values, ampls, states, loops)
 
+
         # TODO this is not safe:
         # This assumes that the inner settable variable is placed
         # at the first position in the samplespace
@@ -82,6 +89,9 @@ def configure_dataset(
         data_values = np.transpose(data_values)
         attributes = {'qubit': measured_qubit, 'long_name': f'y{measured_qubit}', 'units': 'NA'}
         qubit_state = ''
+        # if 'ro_opt_frequencies' in list(sweep_quantities):
+        # if 'ro_opt_frequencies' in list(sweep_quantities):
+        #     qubit_states = [0,1,2]
 
         # TODO ro_frequency_optimization requires multiple measurements per qubit
         is_frequency_opt = node.name == 'ro_frequency_two_state_optimization' or node.name == 'ro_frequency_three_state_optimization'
@@ -92,8 +102,8 @@ def configure_dataset(
 
         partial_ds[f'y{measured_qubit}{qubit_state}'] = (tuple(coords_dict.keys()), data_values, attributes)
         dataset = xarray.merge([dataset,partial_ds])
+        breakpoint()
     return dataset
-
 
 
 # def configure_dataset(
@@ -112,7 +122,6 @@ def configure_dataset(
 #     # The union of qubits which will be demodulated.
 #     total_qubits = parallel_demod_channels.qubits_demod
 #     n_qubits = len(total_qubits)
-#
 #     for demod_channel in parallel_demod_channels.demod_channels:
 #         qubits = demod_channel.qubits # The qubits contained in this channel.
 #         channel_label = demod_channel.channel_label # The name of the channel
