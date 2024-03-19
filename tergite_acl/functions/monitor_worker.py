@@ -27,6 +27,9 @@ TODO optimized_sweep:
 parameterized_sweep:
     sweep under a schedule parameter e.g. RB.
     For every external parameter value, the schedule is recompiled.
+adaptive_sweep:
+    modify the samplespace after each sweep and repeat
+    For every external parameter value, the schedule is recompiled.
 '''
 
 def monitor_node_calibration(node, data_path, lab_ic):
@@ -95,6 +98,31 @@ def monitor_node_calibration(node, data_path, lab_ic):
 
         logger.info('measurement completed')
         measurement_result = post_process(ds, node, data_path=data_path)
+        logger.info('analysis completed')
+
+
+    elif node.type == 'adaptive_sweep':
+        print('Performing parameterized sweep')
+        ds = xarray.Dataset()
+
+        for node_parameter in node.node_externals:
+            node.external_parameter_value = node_parameter
+            print(f'{ node.external_parameter_value = }')
+            print(f'{ node.samplespace = }')
+            compiled_schedule = precompile(node)
+
+            result_dataset = measure_node(
+                node,
+                compiled_schedule,
+                lab_ic,
+                data_path,
+                cluster_status=ClusterStatus.real,
+            )
+
+            measurement_result = post_process(result_dataset, node, data_path=data_path)
+            ds = xarray.merge([ds, result_dataset])
+
+        logger.info('measurement completed')
         logger.info('analysis completed')
 
 

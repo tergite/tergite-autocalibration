@@ -18,8 +18,8 @@ graph_dependencies = [
     # ('qubit_01_spectroscopy_pulsed', 'rabi_oscillations'),
     ('qubit_01_spectroscopy', 'rabi_oscillations'),
     ('rabi_oscillations', 'ramsey_correction'),
-    ('ramsey_correction', 'motzoi_parameter'),
-    ('motzoi_parameter', 'n_rabi_oscillations'),
+    ('ramsey_correction', 'adaptive_motzoi_parameter'),
+    ('adaptive_motzoi_parameter', 'n_rabi_oscillations'),
     ('n_rabi_oscillations', 'resonator_spectroscopy_1'),
     ('randomized_benchmarking', 'T1'),
     ('n_rabi_oscillations', 'resonator_spectroscopy_1'),
@@ -61,7 +61,7 @@ graph.add_node('qubit_01_spectroscopy')
 # graph.add_node('T2', type='refine')
 # graph.add_node('T2_echo', type='refine')
 # graph.add_node('ramsey_correction', type='refine')
-# graph.add_node('motzoi_parameter', type='refine')
+# graph.add_node('adaptive_motzoi_parameter', type='refine')
 # graph.add_node('n_rabi_oscillations', type='refine')
 # graph.add_node('ramsey_correction_12', type='refine')
 # graph.add_node('ro_frequency_optimization_gef', type='refine')
@@ -82,7 +82,7 @@ initial_pos = {
     # 'qubit_01_spectroscopy_pulsed': (-0.5,0.8),
     'rabi_oscillations': (0,0.8),
     'ramsey_correction': (0,0.75),
-    'motzoi_parameter': (0.0,0.7),
+    'adaptive_motzoi_parameter': (0.0,0.7),
     'n_rabi_oscillations': (0.0,0.65),
     'resonator_spectroscopy_1': (0,0.6),
     'ro_frequency_two_state_optimization': (-0.2,0.45),

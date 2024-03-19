@@ -1,4 +1,5 @@
 import numpy as np
+from tergite_acl.lib.analysis.adaptive_motzoi_analysis import AdaptiveMotzoiAnalysis
 
 from tergite_acl.lib.analysis.motzoi_analysis import MotzoiAnalysis
 from tergite_acl.lib.analysis.n_rabi_analysis import NRabiAnalysis
@@ -120,19 +121,56 @@ class Ramsey_Fringes_12_Node(BaseNode):
         return cluster_samplespace
 
 
+class Adaptive_Motzoi_Parameter_Node(BaseNode):
+    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
+        self.redis_field = ['rxy:motzoi']
+        self.measurement_obj = Motzoi_parameter
+        self.analysis_obj = AdaptiveMotzoiAnalysis
+        self.type = 'adaptive_sweep'
+        self.adaptive_kwargs = {}
+        self.backup = False
+        self.motzoi_minima = []
+        self.node_externals = np.arange(2, 22, 6)
+        self.external_parameter_name = 'X_repetitions'
+        self.external_parameter_value = 0
+
+    @property
+    def dimensions(self):
+        return (len(self.samplespace['mw_motzois'][self.all_qubits[0]]), 1)
+
+    @property
+    def samplespace(self):
+        cluster_samplespace = {
+            'mw_motzois': {qubit: np.linspace(-0.4, 0.1, 51) for qubit in self.all_qubits},
+            # 'X_repetitions': {qubit: np.arange(2, 22, 6) for qubit in self.all_qubits}
+        }
+        return cluster_samplespace
+
+
 class Motzoi_Parameter_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['rxy:motzoi']
         self.measurement_obj = Motzoi_parameter
         self.analysis_obj = MotzoiAnalysis
+        self.type = 'adaptive_sweep'
+        self.adaptive_kwargs = {}
         self.backup = False
+        self.motzoi_minima = []
+        self.node_externals = np.arange(2, 22, 6)
+        self.external_parameter_name = 'X_repetitions'
+        self.external_parameter_value = 0
+
+    @property
+    def dimensions(self):
+        return (len(self.samplespace['mw_motzois'][self.all_qubits[0]]), 1)
 
     @property
     def samplespace(self):
         cluster_samplespace = {
             'mw_motzois': {qubit: np.linspace(-0.4, 0.1, 51) for qubit in self.all_qubits},
-            'X_repetitions': {qubit: np.arange(2, 22, 6) for qubit in self.all_qubits}
+            # 'X_repetitions': {qubit: np.arange(2, 22, 6) for qubit in self.all_qubits}
         }
         return cluster_samplespace
 

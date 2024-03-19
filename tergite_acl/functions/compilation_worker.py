@@ -75,7 +75,11 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
     transmon.close()
 
     # create a transmon with the same name but with updated config
-    transmon = json.loads(encoded_transmon, cls=SchedulerJSONDecoder, modules=[extended_transmon_element])
+    transmon = json.loads(
+        encoded_transmon,
+        cls=SchedulerJSONDecoder,
+        modules=[extended_transmon_element]
+    )
 
     return transmon
 
@@ -178,7 +182,7 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
             static_parameters[key] = value
             # print(f"{key} isn't one of the static parameters of {node_class}. \n We will ignore this parameter.")
 
-    if node.type == 'parameterized_sweep':
+    if node.type == 'parameterized_sweep' or node.type == 'adaptive_sweep':
         external_parameters = {node.external_parameter_name: node.external_parameter_value}
     else:
         external_parameters = {}

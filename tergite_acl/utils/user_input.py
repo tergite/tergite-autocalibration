@@ -25,7 +25,7 @@ node reference
   ro_amplitude_three_state_optimization
   coupler_spectroscopy
   coupler_resonator_spectroscopy
-  motzoi_parameter
+  adaptive_motzoi_parameter
   n_rabi_oscillations
   randomized_benchmarking
   state_discrimination
@@ -43,7 +43,7 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'ro_amplitude_two_state_optimization',
+    'target_node': 'adaptive_motzoi_parameter',
     'all_qubits': qubits,
     'couplers': couplers,
 }

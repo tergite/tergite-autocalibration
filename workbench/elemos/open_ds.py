@@ -5,7 +5,9 @@ import importlib
 import tergite_acl.lib.analysis.randomized_benchmarking_analysis as rnb
 import tergite_acl.lib.analysis.optimum_ro_amplitude_analysis as roa
 import tergite_acl.lib.analysis.motzoi_analysis as motzoi
-importlib.reload(rnb)
+import tergite_acl.lib.analysis.adaptive_motzoi_analysis as adm 
+import tergite_acl.lib.analysis.rabi_analysis as rabi
+importlib.reload(adm)
 
 
 ds = xr.open_dataset('data_directory/20240315/20240315-115737-071-2bfe33-motzoi_parameter/dataset.hdf5')
@@ -13,12 +15,21 @@ ds = xr.open_dataset('data_directory/20240315/20240315-115737-071-2bfe33-motzoi_
 ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
 ds = ds.yq12.to_dataset()
 ds.yq12.attrs['qubit'] = 'q12'
-#---
-motz = motzoi.MotzoiAnalysis(ds)
+ds12 = ds.yq12.isel({'X_repetitionsq12':[0]}).to_dataset()
+ds12 = ds12.drop_vars('X_repetitionsq12')
+
+ada = adm.AdaptiveMotzoiAnalysis(ds12)
+ada.run_fitting(known_values=[])
+ada.updated_samplespace
+fig, ax = plt.subplots()
+ada.plotter(ax)
+
+
+plt.show()
 #---
 fig, ax = plt.subplots()
-motz.run_fitting()
-motz.plotter(ax)
+rab.run_fitting()
+rab.plotter(ax)
 plt.show()
 #---
 da = ds.isel({'X_repetitionsq12': [0]})

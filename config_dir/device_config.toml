@@ -35,6 +35,7 @@ rabi_oscillations.rxy.amp180 = nan
 n_rabi_oscillations.rxy.amp180 = nan
 
 motzoi_parameter.rxy.motzoi = 0
+adaptive_motzoi_parameter.rxy.motzoi = 0
 
 rabi_oscillations_12.r12.ef_amp180 = nan
 
@@ -75,6 +76,7 @@ measure_2.pulse_duration = 3e-6
 measure.integration_time = 2.5e-6
 measure_1.integration_time = 2.5e-6
 measure_2.integration_time = 2.5e-6
+rxy.duration = 28e-9
 
 [initials.qubits]
 q11.measure.pulse_amp = 15.0e-3

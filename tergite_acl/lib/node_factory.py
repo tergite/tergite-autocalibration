@@ -2,7 +2,7 @@ from tergite_acl.lib.nodes.characterization_nodes import T1_Node, T2_Node, T2_Ec
 from tergite_acl.lib.nodes.coupler_nodes import Coupler_Spectroscopy_Node, Coupler_Resonator_Spectroscopy_Node, \
     CZ_Chevron_Node, CZ_Optimize_Chevron_Node, Reset_Chevron_Node, CZ_Calibration_Node, CZ_Calibration_SSRO_Node, \
     CZ_Dynamic_Phase_Node
-from tergite_acl.lib.nodes.qubit_control_nodes import Qubit_01_Spectroscopy_Pulsed_Node, \
+from tergite_acl.lib.nodes.qubit_control_nodes import Adaptive_Motzoi_Parameter_Node, Qubit_01_Spectroscopy_Pulsed_Node, \
     Qubit_01_Spectroscopy_Multidim_Node, Rabi_Oscillations_Node, Ramsey_Fringes_Node, Qubit_12_Spectroscopy_Pulsed_Node, \
     Qubit_12_Spectroscopy_Multidim_Node, Rabi_Oscillations_12_Node, Ramsey_Fringes_12_Node, Motzoi_Parameter_Node, \
     N_Rabi_Oscillations_Node
@@ -27,7 +27,7 @@ class NodeFactory:
             'rabi_oscillations_12': Rabi_Oscillations_12_Node,
             'ramsey_correction_12': Ramsey_Fringes_12_Node,
             'resonator_spectroscopy_2': Resonator_Spectroscopy_2_Node,
-            'motzoi_parameter': Motzoi_Parameter_Node,
+            'adaptive_motzoi_parameter': Adaptive_Motzoi_Parameter_Node,
             'n_rabi_oscillations': N_Rabi_Oscillations_Node,
             'coupler_spectroscopy': Coupler_Spectroscopy_Node,
             'coupler_resonator_spectroscopy': Coupler_Resonator_Spectroscopy_Node,

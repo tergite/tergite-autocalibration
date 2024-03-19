@@ -83,6 +83,11 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
         else:
             node_analysis.plotter(primary_axis)
 
+        if node.type == 'adaptive_sweep':
+            new_qubit_samplespace = node_analysis.updated_qubit_samplespace()
+            node.adaptive_kwargs = node_analysis.updated_kwargs()
+            node.samplespace.update(new_qubit_samplespace)
+
         # TODO temporary hack:
         if node.name in ['cz_calibration', 'cz_dynamic_phase', 'cz_calibration_ssro', 'cz_optimize_chevron'] and \
                 qubit_types[this_qubit] == 'Target':
