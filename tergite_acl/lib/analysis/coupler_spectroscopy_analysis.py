@@ -20,7 +20,7 @@ class CouplerSpectroscopyAnalysis(BaseAnalysis):
                 self.currents = coord
         dataset[f'y{self.qubit}'].values = np.abs(self.S21)
         self.data_var = data_var
-        self.dataset = dataset
+        self.dataset = dataset.sortby(self.currents)
 
     def reject_outliers(self, data, m=4):
         d = np.abs(data - np.median(data))
