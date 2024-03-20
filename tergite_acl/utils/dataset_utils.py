@@ -102,9 +102,12 @@ def configure_dataset(
 
         partial_ds[f'y{measured_qubit}{qubit_state}'] = (tuple(coords_dict.keys()), data_values, attributes)
         dataset = xarray.merge([dataset,partial_ds])
-        breakpoint()
     return dataset
 
+
+####################################################################
+# TODO let's assign the demodulation channels on a separate step
+####################################################################
 
 # def configure_dataset(
 #         raw_ds: xarray.Dataset,
@@ -113,7 +116,7 @@ def configure_dataset(
 #     '''The dataset retrieved from the instrument coordinator  is
 #        too bare-bones. Here we configure the dims, coords and data_vars'''
 #     samplespace = node.samplespace
-#     # For multiplexed single-qubit readout, parallel_demod_channels 
+#     # For multiplexed single-qubit readout, parallel_demod_channels
 #     # are union of single DemodChannel. The channel label is the name
 #     # of qubit.
 #     parallel_demod_channels: ParallelDemodChannels = node.demod_channels
