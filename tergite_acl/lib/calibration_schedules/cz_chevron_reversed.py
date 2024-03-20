@@ -15,6 +15,12 @@ class CZ_chevron(Measurement):
         super().__init__(transmons, couplers=couplers)
         self.qubit_state = qubit_state
         self.couplers = couplers
+
+        print('#'*60)
+        print('WARNING THE loading of static parameters has changed')
+        print('this possibly will not work. ')
+        print('#'*60)
+
         self.static_kwargs = {
             'couplers': self.couplers,
             'coupler_pulse_amplitudes': self.attributes_dictionary('coupler_spec_amp'),

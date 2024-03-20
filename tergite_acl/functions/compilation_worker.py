@@ -68,7 +68,6 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
             decoded_transmon['data'][submodule].update({'acq_channel': channel})
 
     encoded_transmon = json.dumps(decoded_transmon)
-    breakpoint()
 
     # free the transmon
     transmon.close()
