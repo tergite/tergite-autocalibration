@@ -68,7 +68,7 @@ class Reset_calibration_SSRO(Measurement):
         coupler: str,
         ramsey_phases: dict[str,np.ndarray],
         control_ons: dict[str,np.ndarray],
-        repetitions: int = 5000,
+        repetitions: int = 4096,
         opt_reset_duration_qc: dict[str,float] = None,
         opt_reset_amplitude_qc: dict[str,float] = None,
         ) -> Schedule:
@@ -105,6 +105,24 @@ class Reset_calibration_SSRO(Measurement):
         # print(ramsey_phases,qubits)
         # schedule.add_resource(ClockResource(name='q11_q12.cz', freq=-cz_pulse_frequency[this_coupler]+4.4e9))
         # shot.add_resource(ClockResource(name='q11_q12.cz', freq=-cz_pulse_frequency[this_coupler]+4.4e9))
+        
+        # reset_duration_qc = 704e-09
+        # reset_amplitude_qc = 9.5e-2
+
+        reset_duration_qc = 904e-09
+        reset_amplitude_qc = 9.5e-2+0.013
+
+        reset_duration_cr = 904e-09
+        reset_amplitude_cr = -8.75e-2
+
+        for this_coupler in all_couplers:
+            if opt_reset_amplitude_qc is not None:
+                reset_amplitude_qc += opt_reset_amplitude_qc[this_coupler]
+            if opt_reset_duration_qc is not None:
+                reset_duration_qc += opt_reset_duration_qc[this_coupler]
+
+        print(f'{reset_duration_qc = }')
+        print(f'{reset_amplitude_qc = }')
 
         ramsey_phases_values = ramsey_phases[all_qubits[0]]
         number_of_phases = len(ramsey_phases_values)+3 # +3 for calibration points
@@ -120,10 +138,10 @@ class Reset_calibration_SSRO(Measurement):
                 relaxation = shot.add(Reset(*all_qubits), label=f"Reset_{cz_index}_{ramsey_index}")
 
                 test_state = test_states[int(ramsey_phase)]
-                print(f'{test_state = }')
+                # print(f'{test_state = }')
                 for this_qubit in all_qubits:
                     if test_state[this_qubit] == 'g':
-                        shot.add(IdlePulse(20e-9), ref_op=relaxation, ref_pt='end')
+                        shot.add(IdlePulse(32e-9), ref_op=relaxation, ref_pt='end')
                     elif test_state[this_qubit] == 'e':
                         shot.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
                     elif test_state[this_qubit] == 'f':
@@ -132,11 +150,17 @@ class Reset_calibration_SSRO(Measurement):
 
                 reset_duration_wait = 1500e-09
 
-                reset_duration_qc = 460e-09
-                reset_amplitude_qc = 0.04526315789473684
+                # reset_duration_qc = 460e-09
+                # reset_amplitude_qc = 0.04526315789473684
 
-                reset_duration_cr = 350e-09
-                reset_amplitude_cr = -0.13815789473684212
+                # reset_duration_cr = 350e-09
+                # reset_amplitude_cr = -0.13815789473684212
+
+                # reset_duration_qc = 560e-09
+                # reset_amplitude_qc = 4.842105263157895e-2
+
+                # reset_duration_cr = 400e-09
+                # reset_amplitude_cr = -14.473684210526317e-2
 
                 rep = 1
                     
@@ -147,8 +171,24 @@ class Reset_calibration_SSRO(Measurement):
                     cz_clock = f'{this_coupler}.cz'
                     cz_pulse_port = f'{this_coupler}:fl'
 
-                    shot.add(ResetClockPhase(clock=coupler+'.cz'))
+                    start = shot.add(ResetClockPhase(clock=coupler+'.cz'))
                     
+                    # buffer = shot.add(IdlePulse(20e-9),ref_op=buffer, ref_pt='end')
+                    for this_qubit in qubits:
+                    # schedule.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
+                        if qubit_types[this_qubit] == 'Target':
+                            # shot.add(IdlePulse(32e-9), ref_op=start, ref_pt='end')
+                            # schedule.add(IdlePulse(20e-9))
+                            # schedule.add(X(this_qubit))
+                            shot.add(Rxy_12(this_qubit,theta = 90), ref_op=start, ref_pt='end')
+                        else:
+                            # schedule.add(X(this_qubit), ref_op=start, ref_pt='end')
+                            # schedule.add(Rxy_12(this_qubit))
+                            # schedule.add(IdlePulse(20e-9))
+                            shot.add(IdlePulse(32e-9), ref_op=start, ref_pt='end')
+                    
+                    buffer = shot.add(IdlePulse(4e-9))
+
                     for i in range(rep):
                         qc = shot.add(
                                 RampPulse(
@@ -182,8 +222,38 @@ class Reset_calibration_SSRO(Measurement):
 
                         buffer = shot.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration_cr * 1e9 / 4) * 4e-9)
                         
+                        # qc = shot.add(
+                        #         RampPulse(
+                        #             # offset = reset_amplitude/1.5,
+                        #             # duration = reset_duration,
+                        #             # amp = reset_amplitude,
+                        #             duration = reset_duration_qc,
+                        #             offset = reset_amplitude_qc/1.5,
+                        #             amp = reset_amplitude_qc,
+                        #             # amp = 0,
+                        #             port = cz_pulse_port,
+                        #             clock = cz_clock,
+                        #         ),
+                        #     )
+
+                        # buffer = shot.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration_qc * 1e9 / 4) * 4e-9)
+                        # buffer = shot.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( reset_duration * 1e9 / 4) * 4e-9)
+
                         if rep > 1 and i < rep-1:
                             buffer = shot.add(IdlePulse(np.ceil( reset_duration_wait * 1e9 / 4) * 4e-9),ref_op=buffer, ref_pt='end')
+                    
+                    # for this_qubit in qubits:
+                    # # schedule.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
+                    #     if qubit_types[this_qubit] == 'Target':
+                    #         # schedule.add(IdlePulse(20e-9), ref_op=relaxation, ref_pt='end')
+                    #         # schedule.add(IdlePulse(20e-9))
+                    #         # schedule.add(X(this_qubit))
+                    #         shot.add(Rxy(this_qubit,theta = 10), ref_op=start, ref_pt='end')
+                    #     else:
+                    #         # schedule.add(X(this_qubit), ref_op=start, ref_pt='end')
+                    #         # schedule.add(Rxy_12(this_qubit))
+                    #         # schedule.add(IdlePulse(20e-9))
+                    #         shot.add(IdlePulse(20e-9), ref_op=start, ref_pt='end')
 
                         
                 # else:
@@ -372,7 +442,7 @@ class Reset_calibration_SSRO(Measurement):
                     #         )
                     # buffer_cr = shot.add(IdlePulse(4e-9),ref_op=buffer_qc, ref_pt='end',rel_time = np.ceil( reset_duration_cr * 1e9 / 4) * 4e-9)
 
-                buffer_end = shot.add(IdlePulse(4e-9))
+                buffer_end = shot.add(IdlePulse(20e-9))
 
                 for this_qubit in all_qubits:
                     this_index = cz_index*number_of_phases+ramsey_index

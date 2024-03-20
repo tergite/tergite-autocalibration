@@ -1,6 +1,6 @@
 # qubits = ['q11','q12','q13','q14','q15']
 qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
-# qubits = ['q16', 'q17', 'q19', 'q21', 'q22', 'q23', 'q25']
+# qubits = [ 'q17', 'q22']
 couplers = ['q17_q22']
 # couplers = ['q17_q18']
 # couplers = ['q16_q21']
@@ -38,7 +38,7 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'reset_chevron',
+    'target_node': 'reset_calibration_ssro',
     'all_qubits': qubits,
     'couplers': couplers,
     # 'node_dictionary' : {'coupled_qubits': ['q21','q22']},

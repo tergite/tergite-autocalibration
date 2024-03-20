@@ -67,6 +67,9 @@ class OptimalROAmplitudeAnalysis():
         self.optimal_amplitude = self.amplitudes.values[self.optimal_index]
         self.optimal_inv_cm = inv(self.cms[self.optimal_index])
         inv_cm_str = ",".join(str(element) for element in list(self.optimal_inv_cm.flatten()))
+        cm = self.cms[self.optimal_index]
+        print(f'{self.qubit = }')
+        print(f'{cm = }')
         # breakpoint()
         return [self.optimal_amplitude,inv_cm_str]
 

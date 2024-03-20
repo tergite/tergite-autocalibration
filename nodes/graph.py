@@ -17,7 +17,7 @@ graph_dependencies = [
     ('resonator_spectroscopy', 'qubit_01_spectroscopy_multidim'),
     ('qubit_01_spectroscopy_pulsed', 'rabi_oscillations'),
     ('qubit_01_spectroscopy_multidim', 'rabi_oscillations'),
-    # ('rabi_oscillations', 'ramsey_correction'),
+    ('rabi_oscillations', 'ramsey_correction'),
     # ('ramsey_correction', 'ro_frequency_optimization'),
     ('ramsey_correction', 'motzoi_parameter'),
     ('motzoi_parameter', 'n_rabi_oscillations'),
@@ -37,7 +37,7 @@ graph_dependencies = [
     ('resonator_spectroscopy_2', 'ro_frequency_optimization_gef'),
     ('ro_frequency_optimization_gef', 'ro_amplitude_optimization_gef'),
     # ('coupler_spectroscopy', 'cz_chevron'),
-    ('ro_amplitude_optimization_gef', 'cz_chevron'),
+    ('resonator_spectroscopy_2', 'cz_chevron'),
     ('resonator_spectroscopy_2', 'reset_chevron'),
     ('ro_amplitude_optimization_gef', 'reset_calibration_ssro'),
     ('cz_chevron', 'cz_calibration'),
@@ -54,9 +54,9 @@ graph.add_node('tof', type='refine')
 graph.add_node('punchout')
 graph.add_node('qubit_01_spectroscopy_pulsed')
 graph.add_node('qubit_01_spectroscopy_multidim')
-# graph.add_node('T1', type='refine')
-# graph.add_node('T2', type='refine')
-# graph.add_node('T2_echo', type='refine')
+graph.add_node('T1', type='refine')
+graph.add_node('T2', type='refine')
+graph.add_node('T2_echo', type='refine')
 # graph.add_node('ramsey_correction', type='refine')
 # graph.add_node('motzoi_parameter', type='refine')
 # graph.add_node('n_rabi_oscillations', type='refine')

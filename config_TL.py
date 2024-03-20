@@ -69,7 +69,9 @@ class Monitor:
         print(cg[node])
 
     def get_results(self):
-        return self.all_results
-        
+        return self.all_results[1]
+    
+    def get_node_name(self):
+        return str(self.all_results[0]).split('/')[-1]
         
 # monitor = Monitor()

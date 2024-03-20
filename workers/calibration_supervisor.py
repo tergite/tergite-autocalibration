@@ -59,10 +59,15 @@ def set_module_att(cluster):
             module.out0_att(12)
         else:
             module.out0_att(16)
+        # if idx in [1,6]:
+        #     module.out0_att(16)
+        # else:
+        #     module.out0_att(60)
     print('XY: '+module.name + '_att:'+ str(module.out0_att()) + 'dB')
     # Flux lines
     for module in cluster.modules[0:13]:
         module.out1_att(40)
+        # module.out1_att(60)
     print('FL: '+module.name + '_att:'+ str(module.out1_att()) + 'dB')
     # Readout lines
     for module in cluster.modules[15:17]:
@@ -245,11 +250,11 @@ def calibrate_node(node_label: str, **static_parameters):
     logger.info('measurement completed')
     all_results = post_process(result_dataset, node, data_path=data_path)
     logger.info('analysis completed')
-    return all_results
+    return [data_path,all_results]
 
 
 # main
-calibrate_system()
+# calibrate_system()
 # logger.info('calibration completed, closing cluster')
 # clusterA.reset()
 # clusterA.close()
