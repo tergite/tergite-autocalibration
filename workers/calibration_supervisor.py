@@ -35,16 +35,16 @@ colorama_init()
 redis_connection = redis.Redis(decode_responses=True)
 parser = argparse.ArgumentParser(prog='Tergite Automatic Calibration',)
 # parser.add_argument(
-#     '--d', dest='cluster_status',
+#     '--d', dest='cluster_mode',
 #     action='store_const',
 #     const=ClusterStatus.dummy, default=ClusterStatus.real
 # )
 # args = parser.parse_args()
 class Args:
     def __init__(self):
-        self.cluster_status = ClusterStatus.real
+        self.cluster_mode = ClusterStatus.real
 args = Args()        
-args.cluster_status = ClusterStatus.real
+args.cluster_mode = ClusterStatus.real
 # Settings
 transmon_configuration = toml.load('./config_files/device_config.toml')
 
@@ -74,8 +74,8 @@ def set_module_att(cluster):
         module.out0_att(12)
     print('RO: '+module.name + '_att:'+ str(module.out0_att()) + 'dB')
 
-if args.cluster_status == ClusterStatus.real:
-# if args.cluster_status == ClusterStatus.real:
+if args.cluster_mode == ClusterStatus.real:
+# if args.cluster_mode == ClusterStatus.real:
     Cluster.close_all()
     clusterA = Cluster("clusterA", lokiA_IP)
     # clusterA.reset()
@@ -244,7 +244,7 @@ def calibrate_node(node_label: str, **static_parameters):
         compiled_schedule,
         lab_ic,
         data_path,
-        cluster_status=args.cluster_status,
+        cluster_mode=args.cluster_mode,
     )
 
     logger.info('measurement completed')

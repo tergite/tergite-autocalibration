@@ -1,6 +1,7 @@
 # This code is part of Tergite
 from enum import Enum
 
+
 # Used by check_data to indicate outcome
 class DataStatus(Enum):
     in_spec = 1
@@ -8,7 +9,10 @@ class DataStatus(Enum):
     bad_data = 3
     undefined = 4
 
-# Used to distinguish running on dummy or real clusters
-class ClusterStatus(Enum):
+
+class ClusterMode(Enum):
+    """
+    Used to set the cluster mode e.g. dummy cluster or real cluster
+    """
+    real = 0
     dummy = 1
-    real = 2
