@@ -25,15 +25,20 @@ class Qubit_01_Spectroscopy_Pulsed_Node(BaseNode):
         self.redis_field = ['clock_freqs:f01']
         self.measurement_obj = Two_Tones_Spectroscopy
         self.analysis_obj = QubitSpectroscopyAnalysis
-
-    @property
-    def samplespace(self):
-        cluster_samplespace = {
+        self.samplespace = {
             'spec_frequencies': {
                 qubit: qubit_samples(qubit, sweep_range=self.sweep_range) for qubit in self.all_qubits
             }
         }
-        return cluster_samplespace
+
+    # @property
+    # def samplespace(self):
+    #     cluster_samplespace = {
+    #         'spec_frequencies': {
+    #             qubit: qubit_samples(qubit, sweep_range=self.sweep_range) for qubit in self.all_qubits
+    #         }
+    #     }
+    #     return cluster_samplespace
 
 
 class Qubit_01_Spectroscopy_Multidim_Node(BaseNode):
@@ -43,10 +48,7 @@ class Qubit_01_Spectroscopy_Multidim_Node(BaseNode):
                             'spec:spec_ampl_optimal']
         self.measurement_obj = Two_Tones_Multidim
         self.analysis_obj = QubitSpectroscopyMultidim
-
-    @property
-    def samplespace(self):
-        cluster_samplespace = {
+        self.samplespace = {
             'spec_pulse_amplitudes': {
                 qubit: np.linspace(3e-4, 9e-4, 5) for qubit in self.all_qubits
             },
@@ -54,7 +56,18 @@ class Qubit_01_Spectroscopy_Multidim_Node(BaseNode):
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
             },
         }
-        return cluster_samplespace
+
+    # @property
+    # def samplespace(self):
+    #     cluster_samplespace = {
+    #         'spec_pulse_amplitudes': {
+    #             qubit: np.linspace(3e-4, 9e-4, 5) for qubit in self.all_qubits
+    #         },
+    #         'spec_frequencies': {
+    #             qubit: qubit_samples(qubit) for qubit in self.all_qubits
+    #         },
+    #     }
+    #     return cluster_samplespace
 
 
 class Rabi_Oscillations_Node(BaseNode):
@@ -63,15 +76,20 @@ class Rabi_Oscillations_Node(BaseNode):
         self.redis_field = ['rxy:amp180']
         self.measurement_obj = Rabi_Oscillations
         self.analysis_obj = RabiAnalysis
-
-    @property
-    def samplespace(self):
-        cluster_samplespace = {
+        self.samplespace = {
             'mw_amplitudes': {
                 qubit: np.linspace(0.002, 0.80, 101) for qubit in self.all_qubits
             }
         }
-        return cluster_samplespace
+
+    # @property
+    # def samplespace(self):
+    #     cluster_samplespace = {
+    #         'mw_amplitudes': {
+    #             qubit: np.linspace(0.002, 0.80, 101) for qubit in self.all_qubits
+    #         }
+    #     }
+    #     return cluster_samplespace
 
 
 class Ramsey_Fringes_Node(BaseNode):
@@ -82,20 +100,28 @@ class Ramsey_Fringes_Node(BaseNode):
         self.analysis_obj = RamseyAnalysis
         self.backup = False
         self.analysis_kwargs = {"redis_field": "clock_freqs:f01"}
-
-    @property
-    def samplespace(self):
-        cluster_samplespace = {
-            # 'ramsey_fringes': {
+        self.samplespace = {
             'ramsey_delays': {
                 qubit: np.arange(4e-9, 2048e-9, 8 * 8e-9) for qubit in self.all_qubits
             },
             'artificial_detunings': {
                 qubit: np.arange(-2.1, 2.1, 0.8) * 1e6 for qubit in self.all_qubits
             },
-            # },
         }
-        return cluster_samplespace
+
+    # @property
+    # def samplespace(self):
+    #     cluster_samplespace = {
+    #         # 'ramsey_fringes': {
+    #         'ramsey_delays': {
+    #             qubit: np.arange(4e-9, 2048e-9, 8 * 8e-9) for qubit in self.all_qubits
+    #         },
+    #         'artificial_detunings': {
+    #             qubit: np.arange(-2.1, 2.1, 0.8) * 1e6 for qubit in self.all_qubits
+    #         },
+    #         # },
+    #     }
+    #     return cluster_samplespace
 
 
 class Ramsey_Fringes_12_Node(BaseNode):
@@ -107,10 +133,7 @@ class Ramsey_Fringes_12_Node(BaseNode):
         self.analysis_obj = RamseyAnalysis
         self.backup = False
         self.analysis_kwargs = {"redis_field": "clock_freqs:f12"}
-
-    @property
-    def samplespace(self):
-        cluster_samplespace = {
+        self.samplespace = {
             'ramsey_delays': {
                 qubit: np.arange(4e-9, 2048e-9, 8 * 8e-9) for qubit in self.all_qubits
             },
@@ -118,15 +141,27 @@ class Ramsey_Fringes_12_Node(BaseNode):
                 qubit: np.arange(-2.1, 2.1, 0.8) * 1e6 for qubit in self.all_qubits
             },
         }
-        return cluster_samplespace
+
+    # @property
+    # def samplespace(self):
+    #     cluster_samplespace = {
+    #         'ramsey_delays': {
+    #             qubit: np.arange(4e-9, 2048e-9, 8 * 8e-9) for qubit in self.all_qubits
+    #         },
+    #         'artificial_detunings': {
+    #             qubit: np.arange(-2.1, 2.1, 0.8) * 1e6 for qubit in self.all_qubits
+    #         },
+    #     }
+    #     return cluster_samplespace
 
 
 class Adaptive_Motzoi_Parameter_Node(BaseNode):
+    measurement_obj = Motzoi_parameter
+    analysis_obj = AdaptiveMotzoiAnalysis
+
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['rxy:motzoi']
-        self.measurement_obj = Motzoi_parameter
-        self.analysis_obj = AdaptiveMotzoiAnalysis
         self.type = 'adaptive_sweep'
         self.adaptive_kwargs = {}
         self.backup = False
@@ -134,20 +169,24 @@ class Adaptive_Motzoi_Parameter_Node(BaseNode):
         self.node_externals = np.arange(2, 22, 6)
         self.external_parameter_name = 'X_repetitions'
         self.external_parameter_value = 0
+        self.measurement_is_completed = False
+
+        self.samplespace = {
+            'mw_motzois': {qubit: np.linspace(-0.4, 0.1, 51) for qubit in self.all_qubits},
+        }
 
     @property
     def dimensions(self):
         return (len(self.samplespace['mw_motzois'][self.all_qubits[0]]), 1)
 
-    @property
-    def samplespace(self):
-        cluster_samplespace = {
-            'mw_motzois': {qubit: np.linspace(-0.4, 0.1, 51) for qubit in self.all_qubits},
-            # 'X_repetitions': {qubit: np.arange(2, 22, 6) for qubit in self.all_qubits}
-        }
-        return cluster_samplespace
-
-
+    # @property
+    # def samplespace(self):
+    #     cluster_samplespace = {
+    #         'mw_motzois': {qubit: np.linspace(-0.4, 0.1, 51) for qubit in self.all_qubits},
+    #     }
+    #     return cluster_samplespace
+    
+    
 class Motzoi_Parameter_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
@@ -161,18 +200,22 @@ class Motzoi_Parameter_Node(BaseNode):
         self.node_externals = np.arange(2, 22, 6)
         self.external_parameter_name = 'X_repetitions'
         self.external_parameter_value = 0
+        self.samplespace = {
+            'mw_motzois': {qubit: np.linspace(-0.4, 0.1, 51) for qubit in self.all_qubits},
+            # 'X_repetitions': {qubit: np.arange(2, 22, 6) for qubit in self.all_qubits}
+        }
 
     @property
     def dimensions(self):
         return (len(self.samplespace['mw_motzois'][self.all_qubits[0]]), 1)
 
-    @property
-    def samplespace(self):
-        cluster_samplespace = {
-            'mw_motzois': {qubit: np.linspace(-0.4, 0.1, 51) for qubit in self.all_qubits},
-            # 'X_repetitions': {qubit: np.arange(2, 22, 6) for qubit in self.all_qubits}
-        }
-        return cluster_samplespace
+    # @property
+    # def samplespace(self):
+    #     cluster_samplespace = {
+    #         'mw_motzois': {qubit: np.linspace(-0.4, 0.1, 51) for qubit in self.all_qubits},
+    #         # 'X_repetitions': {qubit: np.arange(2, 22, 6) for qubit in self.all_qubits}
+    #     }
+    #     return cluster_samplespace
 
 
 class N_Rabi_Oscillations_Node(BaseNode):
@@ -183,13 +226,18 @@ class N_Rabi_Oscillations_Node(BaseNode):
         self.analysis_obj = NRabiAnalysis
         self.backup = False
 
-    @property
-    def samplespace(self):
-        cluster_samplespace = {
+        self.samplespace = {
             'mw_amplitudes_sweep': {qubit: np.linspace(-0.01, 0.01, 21) for qubit in self.all_qubits},
             'X_repetitions': {qubit: np.arange(1, 96, 16) for qubit in self.all_qubits}
         }
-        return cluster_samplespace
+
+    # @property
+    # def samplespace(self):
+    #     cluster_samplespace = {
+    #         'mw_amplitudes_sweep': {qubit: np.linspace(-0.01, 0.01, 21) for qubit in self.all_qubits},
+    #         'X_repetitions': {qubit: np.arange(1, 96, 16) for qubit in self.all_qubits}
+    #     }
+    #     return cluster_samplespace
 
 
 class Qubit_12_Spectroscopy_Pulsed_Node(BaseNode):

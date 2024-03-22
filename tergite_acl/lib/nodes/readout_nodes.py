@@ -26,15 +26,20 @@ class Resonator_Spectroscopy_Node(BaseNode):
         self.redis_field = ['clock_freqs:readout', 'Ql', 'resonator_minimum']
         self.measurement_obj = Resonator_Spectroscopy
         self.analysis_obj = ResonatorSpectroscopyAnalysis
-
-    @property
-    def samplespace(self):
-        cluster_samplespace = {
+        self.cluster_samplespace = {
             'ro_frequencies': {
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             }
         }
-        return cluster_samplespace
+
+    # @property
+    # def samplespace(self):
+    #     cluster_samplespace = {
+    #         'ro_frequencies': {
+    #             qubit: resonator_samples(qubit) for qubit in self.all_qubits
+    #         }
+    #     }
+    #     return cluster_samplespace
 
 
 class Resonator_Spectroscopy_1_Node(BaseNode):
@@ -45,14 +50,20 @@ class Resonator_Spectroscopy_1_Node(BaseNode):
         self.measurement_obj = Resonator_Spectroscopy
         self.analysis_obj = ResonatorSpectroscopy_1_Analysis
 
-    @property
-    def samplespace(self):
-        cluster_samplespace = {
+        self.cluster_samplespace = {
             'ro_frequencies': {
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             }
         }
-        return cluster_samplespace
+
+    # @property
+    # def samplespace(self):
+    #     cluster_samplespace = {
+    #         'ro_frequencies': {
+    #             qubit: resonator_samples(qubit) for qubit in self.all_qubits
+    #         }
+    #     }
+    #     return cluster_samplespace
 
 
 class Resonator_Spectroscopy_2_Node(BaseNode):
@@ -63,14 +74,19 @@ class Resonator_Spectroscopy_2_Node(BaseNode):
         self.measurement_obj = Resonator_Spectroscopy
         self.analysis_obj = ResonatorSpectroscopy_2_Analysis
 
-    @property
-    def samplespace(self):
-        cluster_samplespace = {
+        self.cluster_samplespace = {
             'ro_frequencies': {
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             }
         }
-        return cluster_samplespace
+    # @property
+    # def samplespace(self):
+    #     cluster_samplespace = {
+    #         'ro_frequencies': {
+    #             qubit: resonator_samples(qubit) for qubit in self.all_qubits
+    #         }
+    #     }
+    #     return cluster_samplespace
 
 
 class Punchout_Node(BaseNode):
@@ -101,14 +117,20 @@ class RO_frequency_optimization_Node(BaseNode):
         self.measurement_obj = RO_frequency_optimization
         self.analysis_obj = OptimalROFrequencyAnalysis
 
-    @property
-    def samplespace(self):
-        cluster_samplespace = {
-            'ro_opt_frequencies': {
+        self.cluster_samplespace = {
+            'ro_frequencies': {
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             }
         }
-        return cluster_samplespace
+
+    # @property
+    # def samplespace(self):
+    #     cluster_samplespace = {
+    #         'ro_opt_frequencies': {
+    #             qubit: resonator_samples(qubit) for qubit in self.all_qubits
+    #         }
+    #     }
+    #     return cluster_samplespace
 
 class RO_frequency_optimization_gef_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
@@ -120,14 +142,20 @@ class RO_frequency_optimization_gef_Node(BaseNode):
         self.measurement_obj = RO_frequency_optimization
         self.analysis_obj = OptimalRO_012_FrequencyAnalysis
 
-    @property
-    def samplespace(self):
-        cluster_samplespace = {
-            'ro_opt_frequencies': {
+        self.cluster_samplespace = {
+            'ro_frequencies': {
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             }
         }
-        return cluster_samplespace
+
+    # @property
+    # def samplespace(self):
+    #     cluster_samplespace = {
+    #         'ro_opt_frequencies': {
+    #             qubit: resonator_samples(qubit) for qubit in self.all_qubits
+    #         }
+    #     }
+    #     return cluster_samplespace
 
 
 class RO_amplitude_two_state_optimization_Node(BaseNode):

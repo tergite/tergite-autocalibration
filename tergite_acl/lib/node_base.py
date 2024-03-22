@@ -11,13 +11,14 @@ class BaseNode:
         self.qubit_state = 0 # can be 0 or 1 or 2
         self.plots_per_qubit = 1 # can be 0 or 1 or 2
         self.build_demod_channels()
+        self.samplespace = {}
 
-    @property
-    def samplespace(self) -> dict:
-        '''
-        to be implemented by the child nodes
-        '''
-        return {}
+    # @property
+    # def samplespace(self) -> dict:
+    #     '''
+    #     to be implemented by the child nodes
+    #     '''
+    #     return {}
 
     @property
     def dimensions(self) -> list:

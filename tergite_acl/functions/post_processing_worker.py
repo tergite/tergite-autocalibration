@@ -8,40 +8,26 @@ import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
-from quantify_core.data.handling import set_datadir
+# from quantify_core.data.handling import set_datadir
 
 from tergite_acl.config import settings
 from tergite_acl.config.coupler_config import qubit_types
 from tergite_acl.lib.analysis.tof_analysis import analyze_tof
+from tergite_acl.utils.post_processing_utils import manage_plots
 from tergite_acl.utils.status import DataStatus
 
 matplotlib.use(settings.PLOTTING_BACKEND)
-set_datadir('../workers')
-
+# set_datadir('../workers')
 
 def post_process(result_dataset: xr.Dataset, node, data_path: Path):
-    # analysis = Multiplexed_Analysis(result_dataset, node, data_path)
+
     if node.name == 'tof':
         tof = analyze_tof(result_dataset, True)
         return
 
-    n_vars = len(result_dataset.data_vars)
-    n_coords = len(result_dataset.coords)
 
-    fit_numpoints = 300
     column_grid = 5
-    rows = int(np.ceil(n_vars / column_grid))
-    rows = rows * node.plots_per_qubit
-
-    # TODO What does this do, when the MSS is not connected?
-    node_result = {}
-
-    fig, axs = plt.subplots(
-        nrows=rows,
-        ncols=np.min((n_vars, n_coords, column_grid)),
-        squeeze=False,
-        figsize=(column_grid * 5, rows * 5)
-    )
+    fig, axs = manage_plots(result_dataset, column_grid, node.plots_per_qubit)
 
     qoi: list
     data_status: DataStatus
@@ -66,30 +52,24 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
         primary_axis = axs[primary_plot_row, indx % column_grid]
 
         redis_field = node.redis_field
-        kw_args = getattr(node, "analysis_kwargs", dict())
+        kw_args = getattr(node, 'analysis_kwargs', dict())
         node_analysis = node.analysis_obj(ds, **kw_args)
         qoi = node_analysis.run_fitting()
-        # TODO: This step should better happen inside the analysis function
+
         node_analysis.qoi = qoi
 
-        if node.plots_per_qubit > 1:
-            list_of_secondary_axes = []
-            for plot_indx in range(1, node.plots_per_qubit):
-                secondary_plot_row = primary_plot_row + plot_indx
-                list_of_secondary_axes.append(
-                    axs[secondary_plot_row, indx % column_grid]
-                )
-            node_analysis.plotter(primary_axis, secondary_axes=list_of_secondary_axes)
-        else:
-            node_analysis.plotter(primary_axis)
-
-        if node.type == 'adaptive_sweep':
-            new_qubit_samplespace = node_analysis.updated_qubit_samplespace()
-            node.adaptive_kwargs = node_analysis.updated_kwargs()
-            node.samplespace.update(new_qubit_samplespace)
 
         # TODO temporary hack:
-        if node.name in ['cz_calibration', 'cz_dynamic_phase', 'cz_calibration_ssro', 'cz_optimize_chevron'] and \
+        if node.type == 'adaptive_sweep':
+            new_qubit_samplespace = node_analysis.updated_qubit_samplespace
+            node.adaptive_kwargs = node_analysis.updated_kwargs
+            for settable_key in new_qubit_samplespace.keys():
+                node.samplespace[settable_key].update(new_qubit_samplespace[settable_key])
+            if node.measurement_is_completed:
+                node_analysis.update_redis_trusted_values(node.name, this_qubit, redis_field)
+                this_element = this_qubit
+
+        elif node.name in ['cz_calibration', 'cz_dynamic_phase', 'cz_calibration_ssro', 'cz_optimize_chevron'] and \
                 qubit_types[this_qubit] == 'Target':
             node_analysis.update_redis_trusted_values(node.name, node.coupler, redis_field)
             this_element = node.coupler
@@ -103,7 +83,21 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
             node_analysis.update_redis_trusted_values(node.name, this_qubit, redis_field)
             this_element = this_qubit
 
+        if node.type == 'adaptive_sweep':
+            this_element = this_qubit
         all_results[this_element] = dict(zip(redis_field, qoi))
+
+
+        if node.plots_per_qubit > 1:
+            list_of_secondary_axes = []
+            for plot_indx in range(1, node.plots_per_qubit):
+                secondary_plot_row = primary_plot_row + plot_indx
+                list_of_secondary_axes.append(
+                    axs[secondary_plot_row, indx % column_grid]
+                )
+            node_analysis.plotter(primary_axis, secondary_axes=list_of_secondary_axes)
+        else:
+            node_analysis.plotter(primary_axis)
         handles, labels = primary_axis.get_legend_handles_labels()
 
         patch = mpatches.Patch(color='red', label=f'{this_qubit}')
@@ -113,7 +107,6 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
             for secondary_ax in list_of_secondary_axes:
                 secondary_ax.legend()
 
-        # logger.info(f'Analysis for the {node} of {this_qubit} is done, saved at {self.data_path}')
     # figure_manager = plt.get_current_fig_manager()
     # figure_manager.window.showMaximized()
     fig = plt.gcf()

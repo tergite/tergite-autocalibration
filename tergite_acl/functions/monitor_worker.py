@@ -81,7 +81,11 @@ def monitor_node_calibration(node, data_path, lab_ic):
         print('Performing parameterized sweep')
         ds = xarray.Dataset()
 
-        for node_parameter in node.node_externals:
+        iterations = len(node.node_externals)
+
+        for index, node_parameter in enumerate(node.node_externals):
+            if index == iterations:
+                node.measurement_is_completed = True
             node.external_parameter_value = node_parameter
             print(f'{ node.external_parameter_value = }')
             compiled_schedule = precompile(node)

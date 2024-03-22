@@ -3,8 +3,11 @@ Module containing classes that model, fit and plot data from a Rabi experiment.
 """
 import lmfit
 import numpy as np
+import warnings
+from scipy.optimize import root_scalar
 import xarray as xr
 from quantify_core.analysis.fitting_models import fft_freq_phase_guess
+from typing import Callable, Iterable
 
 from tergite_acl.lib.analysis_base import BaseAnalysis
 
@@ -47,7 +50,7 @@ class MotzoiModel(lmfit.model.Model):
         self.set_param_hint("frequency", value=freq_guess, min=0)
         self.set_param_hint("amplitude", value=amp_guess, min=0)
         self.set_param_hint("offset", value=offs_guess)
-        self.set_param_hint("phase", value=0)
+        self.set_param_hint("phase", value=-1.5)
 
         params = self.make_params()
         return lmfit.models.update_param_vals(params, self.prefix, **kws)
@@ -83,16 +86,26 @@ class AdaptiveMotzoiAnalysis(BaseAnalysis):
 
         frequency = self.fit_result.params['frequency'].value
         phase = self.fit_result.params['phase'].value
-        delta_phi = 2 * np.pi * frequency * (motzois[-1] - motzois[0])
-        number_of_minimums = 1 + int(delta_phi // (2*np.pi))
 
-        phi_0 = 2 * np.pi * frequency * motzois[0] + phase
+        delta_phi = 2 * np.pi * frequency * (motzois[-1] - motzois[0])
+        phi_0 = 2 * np.pi * frequency * motzois[0]
+        phi_last = 2 * np.pi * frequency * motzois[-1]
+
+        max_number_of_minimums = 1 + int(delta_phi // (2*np.pi))
+
         self.min_motzois = []
-        for this_min in range(number_of_minimums):
-            pi_index = np.sign(phi_0) * (np.abs(phi_0) // np.pi) + this_min * 2 * np.pi
+        for this_min in range(max_number_of_minimums):
+            first_extreme_multiple_of_pi =  int(np.abs(phi_0) // np.pi)
+            if first_extreme_multiple_of_pi % 2 == 0:
+                first_extreme_multiple_of_pi = np.sign(phi_0) * first_extreme_multiple_of_pi
+                first_extreme_multiple_of_pi += 1
+            else:
+                first_extreme_multiple_of_pi = np.sign(phi_0) * first_extreme_multiple_of_pi
+            pi_index = first_extreme_multiple_of_pi + this_min * 2
             min_phase = pi_index * np.pi
-            min_motzoi = (min_phase - phase) / ( 2 * np.pi * frequency )
-            self.min_motzois.append(min_motzoi)
+            if phi_0 < min_phase < phi_last:
+                min_motzoi = (min_phase - phase) / ( 2 * np.pi * frequency )
+                self.min_motzois.append(min_motzoi)
 
         self.fit_y = model.eval(self.fit_result.params, **{model.independent_vars[0]: self.fit_motzois})
         if len(self.known_values) == 0:
@@ -100,8 +113,8 @@ class AdaptiveMotzoiAnalysis(BaseAnalysis):
             self.best_motzoi = None
         else:
             differences = []
-            for new_motzoi in self.min_motzois:
-                this_differences = np.array(self.min_motzois) - new_motzoi
+            for min_motzoi in self.min_motzois:
+                this_differences = np.abs(np.array(self.known_values) - min_motzoi)
                 this_min_diffence = np.min(this_differences)
                 differences.append(this_min_diffence)
 
@@ -124,19 +137,30 @@ class AdaptiveMotzoiAnalysis(BaseAnalysis):
             first_sample = (phase_of_first_sample - phase) / omega
             last_sample = (phase_of_last_sample - phase) / omega
         else:
-            phase_of_best_motzoi = 2 * np.pi * frequency * self.best_motzoi + phase
-            first_sample = (phase_of_best_motzoi - phase) / omega
-            last_sample = (phase_of_best_motzoi - phase) / omega
+            phase_of_best_motzoi = omega * self.best_motzoi + phase
+            first_sample = (phase_of_best_motzoi - phase - np.pi) / omega
+            last_sample = (phase_of_best_motzoi - phase + np.pi) / omega
+
         qubit_samplespace = {
-            self.qubit: np.linspace(first_sample, last_sample, self.samples)
+            'mw_motzois': {
+                self.qubit: np.linspace(first_sample, last_sample, self.samples)
+            }
         }
+        self.first_sample = first_sample
+        self.last_sample = last_sample
         return qubit_samplespace
+
+    @property
+    def updated_kwargs(self):
+        return {'known_values': self.known_values}
 
 
     def plotter(self, ax):
         # Plots the data and the fitted model of a Rabi experiment
         for min_motzoi in self.min_motzois:
             ax.axvline(min_motzoi)
+        ax.axvline(self.first_sample, c='red')
+        ax.axvline(self.last_sample, c='red')
         ax.plot(self.fit_motzois, self.fit_y, 'r-', lw=3.0)
         ax.plot(self.independents, self.magnitudes, 'bo-', ms=3.0)
         ax.set_title(f'Motzois for {self.qubit}')
