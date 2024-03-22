@@ -82,6 +82,8 @@ DEVICE_CONFIG = CONFIG_DIR.joinpath(_from_config('DEVICE_CONFIG',
 # Section with other configuration variables
 CLUSTER_IP = ip_address(_from_config('CLUSTER_IP',
                                      cast_=str))
+CLUSTER_NAME = _from_config('CLUSTER_NAME',
+                            cast_=str)
 SPI_SERIAL_PORT = _from_config('SPI_SERIAL_PORT',
                                cast_=str)
 

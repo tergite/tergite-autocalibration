@@ -11,7 +11,7 @@ from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 
 from tergite_acl.config import settings
-from tergite_acl.config.settings import CLUSTER_IP, REDIS_CONNECTION
+from tergite_acl.config.settings import CLUSTER_IP, REDIS_CONNECTION, CLUSTER_NAME
 from tergite_acl.functions.monitor_worker import monitor_node_calibration
 from tergite_acl.lib.node_factory import NodeFactory
 from tergite_acl.lib.nodes.graph import filtered_topological_order
@@ -69,14 +69,14 @@ class CalibrationSupervisor:
         cluster_: 'Cluster'
         if self.cluster_mode == ClusterMode.real:
             Cluster.close_all()
-            cluster_ = Cluster("cluster", self.cluster_ip)
+            cluster_ = Cluster(CLUSTER_NAME, str(self.cluster_ip))
             return cluster_
         else:
             raise ClusterNotFoundError(f'Cannot create cluster object from {self.cluster_ip}')
 
     def _create_lab_ic(self, clusters: Union['Cluster', List['Cluster']]):
         ic_ = InstrumentCoordinator('lab_ic')
-        if type(clusters, Cluster):
+        if isinstance(clusters, Cluster):
             clusters = [clusters]
         for cluster in clusters:
             ic_.add_component(ClusterComponent(cluster))
