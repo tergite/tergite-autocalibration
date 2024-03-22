@@ -71,14 +71,14 @@ def calibration():
 
 
 @calibration.command(help='Start the calibration supervisor.')
-@click.option('-c', '--cluster',
+@click.option('-c',
               required=False,
               help='Takes the cluster ip address as argument. If not set, it will try take CLUSTER_IP in the .env file.')
 @click.option('-d',
               required=False,
               is_flag=True,
               help='Use -d if you want to use the dummy cluster (not implemented)')
-def start(cluster_ip, is_dummy):
+def start(c, d):
     from ipaddress import ip_address, IPv4Address
 
     from tergite_acl.config.settings import CLUSTER_IP
@@ -89,16 +89,16 @@ def start(cluster_ip, is_dummy):
 
     # Checks whether to start the cluster in dummy mode
     # TODO: The dummy cluster is currently not implemented
-    if is_dummy:
+    if d:
         click.echo('The option to run on a dummy cluster is currently not implemented. '
                    'Trying to start the calibration supervisor with default cluster configuration')
         cluster_mode = ClusterMode.dummy
 
     # Check whether the ip address of the cluster is set correctly
-    if cluster_ip and not is_dummy:
-        if len(cluster_ip) >= 0:
+    if c and not d:
+        if len(c) >= 0:
             cluster_mode = ClusterMode.real
-            parsed_cluster_ip = ip_address(cluster_ip)
+            parsed_cluster_ip = ip_address(c)
         else:
             click.echo('Cluster argument requires the ip address of the cluster as parameter. '
                        'Trying to start the calibration supervisor with default cluster configuration.')
