@@ -7,9 +7,9 @@ from quantify_scheduler.operations.gate_library import Measure, Reset, X90, Rxy,
 from quantify_scheduler.operations.pulse_library import GaussPulse,SuddenNetZeroPulse,ResetClockPhase,IdlePulse,DRAGPulse,SetClockFrequency,NumericalPulse,SoftSquarePulse,SquarePulse
 from quantify_scheduler.operations.pulse_library import RampPulse,DRAGPulse,SetClockFrequency,NumericalPulse,SoftSquarePulse,SquarePulse, ResetClockPhase
 from quantify_scheduler.resources import ClockResource
-from calibration_schedules.measurement_base import Measurement
-from utilities.extended_transmon_element import Measure_RO1, Rxy_12
-from config_files.coupler_config import edge_group, qubit_types
+from tergite_acl.lib.measurement_base import Measurement
+from tergite_acl.utils.extended_transmon_element import Measure_RO1, Rxy_12
+from tergite_acl.config.coupler_config import edge_group, qubit_types
 from matplotlib import pyplot as plt
 
 import numpy as np
@@ -992,7 +992,7 @@ class CZ_chevron_duration(Measurement):
 
                 # cz_amplitude = 0.75
                 # cz_duration = 200e-9
-
+                # TODO MERGE-CZ-GATE: Where is cz_pulse_amplitude defined?
                 cz = schedule.add(
                         SoftSquarePulse(
                             duration=cz_duration,

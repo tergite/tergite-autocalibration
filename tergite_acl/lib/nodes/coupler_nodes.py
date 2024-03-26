@@ -10,7 +10,7 @@ from tergite_acl.lib.calibration_schedules.cz_chevron_reversed import Reset_chev
 from tergite_acl.lib.calibration_schedules.reset_calibration import Reset_calibration_SSRO
 from tergite_acl.lib.node_base import BaseNode
 from tergite_acl.lib.nodes.node_utils import qubit_samples, resonator_samples
-from _sort.cz_chevron import CZ_chevron
+from tergite_acl.lib.calibration_schedules.cz_chevron_reversed import CZ_chevron
 from tergite_acl.lib.calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
 from tergite_acl.lib.calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
 
