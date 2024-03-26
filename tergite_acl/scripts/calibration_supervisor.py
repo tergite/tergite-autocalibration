@@ -96,8 +96,9 @@ class CalibrationSupervisor:
             #     module.out0_att(60)
         print('XY: ' + module.name + '_att:' + str(module.out0_att()) + 'dB')
         # Flux lines
-        for module in cluster_.modules[0:13]:
-            module.out1_att(40)
+        if CLUSTER_NAME == 'clusterB':
+            for module in cluster_.modules[0:13]:
+                module.out1_att(40)
             # module.out1_att(60)
         print('FL: ' + module.name + '_att:' + str(module.out1_att()) + 'dB')
         # Readout lines
