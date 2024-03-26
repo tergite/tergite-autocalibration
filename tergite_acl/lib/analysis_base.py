@@ -4,6 +4,7 @@ import abc
 from matplotlib import pyplot as plt
 
 from tergite_acl.config.settings import REDIS_CONNECTION
+from tergite_acl.utils.convert import structured_redis_storage
 from tergite_acl.utils.qoi import QOI
 
 
@@ -59,5 +60,8 @@ class BaseAnalysis(abc.ABC):
                 name = 'couplers'
             else:
                 name = 'transmons'
-            REDIS_CONNECTION.hset(f"{name}:{this_element}", f"{transmon_parameter}", self._qoi[i])
+            # Setting the value in the tergite-autocalibration-lite format
+            REDIS_CONNECTION.hset(f"{name}:{this_element}", transmon_parameter, self._qoi[i])
+            # Setting the value in the standard redis storage
+            structured_redis_storage(transmon_parameter, this_element.strip('q'), self._qoi[i])
             REDIS_CONNECTION.hset(f"cs:{this_element}", node, 'calibrated')

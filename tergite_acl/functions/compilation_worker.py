@@ -5,6 +5,7 @@ fetch and compile the appropriate schedule
 
 from quantify_scheduler.json_utils import SchedulerJSONDecoder, SchedulerJSONEncoder
 from tergite_acl.utils import extended_transmon_element
+from tergite_acl.utils.convert import structured_redis_storage
 from tergite_acl.utils.logger.tac_logger import logger
 from math import isnan
 from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
@@ -138,6 +139,7 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
     qubits = node.all_qubits
 
     # backup old parameter values
+    # TODO:
     if node.backup:
         fields = node.redis_field
         for field in fields:
@@ -147,7 +149,9 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
                 if field in redis_connection.hgetall(key).keys():
                     value = redis_connection.hget(key, field)
                     redis_connection.hset(key, field_backup, value)
-                    redis_connection.hset(key, field, 'nan' )
+                    structured_redis_storage(field_backup, qubit.strip('q'), value)
+                    redis_connection.hset(key, field, 'nan')
+                    structured_redis_storage(key, field, None)
             if getattr(node, "coupler", None) is not None:
                 couplers = node.coupler
                 for coupler in couplers:
@@ -155,7 +159,9 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
                     if field in redis_connection.hgetall(key).keys():
                         value = redis_connection.hget(key, field)
                         redis_connection.hset(key, field_backup, value)
+                        structured_redis_storage(field_backup, coupler, value)
                         redis_connection.hset(key, field, 'nan')
+                        structured_redis_storage(key, coupler, value)
 
     device = QuantumDevice(f'Loki_{node.name}')
     device.hardware_config(hw_config)

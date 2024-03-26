@@ -10,6 +10,7 @@ from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 from tergite_acl.config.settings import REDIS_CONNECTION
 from tergite_acl.lib.analysis_base import BaseAnalysis
+from tergite_acl.utils.convert import structured_redis_storage
 
 
 class OptimalROAmplitudeAnalysis(BaseAnalysis):
@@ -157,6 +158,11 @@ class OptimalRO_Two_state_AmplitudeAnalysis(OptimalROAmplitudeAnalysis):
         REDIS_CONNECTION.hset(f"transmons:{this_element}", 'lda_coef_0', coef_0_)
         REDIS_CONNECTION.hset(f"transmons:{this_element}", 'lda_coef_1', coef_1_)
         REDIS_CONNECTION.hset(f"transmons:{this_element}", 'lda_intercept', intercept_)
+
+        # We also update the values in the redis standard storage
+        structured_redis_storage('lda_coef_0', this_element.strip('q'), coef_0_)
+        structured_redis_storage('lda_coef_1', this_element.strip('q'), coef_1_)
+        structured_redis_storage('lda_intercept', this_element.strip('q'), intercept_)
 
 
 class OptimalRO_Three_state_AmplitudeAnalysis(OptimalROAmplitudeAnalysis):
