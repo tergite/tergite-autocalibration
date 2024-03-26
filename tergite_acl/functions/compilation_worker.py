@@ -25,9 +25,9 @@ with open(HARDWARE_CONFIG) as hw:
 redis_connection = redis.Redis(decode_responses=True)
 
 
-def qubit_config_from_redis(qubit: str, channel:int) -> dict:
+def qubit_config_from_redis(qubit: str, channel: int) -> dict:
     redis_config = redis_connection.hgetall(f"transmons:{qubit}")
-    transmon_config = {k:v for k,v in redis_config.items() if ':' in k}
+    transmon_config = {k: v for k, v in redis_config.items() if ':' in k}
     # transmon_submodules = transmon.submodules.keys()
     device_dict = {}
     for redis_entry_key, redis_value in transmon_config.items():
@@ -40,7 +40,8 @@ def qubit_config_from_redis(qubit: str, channel:int) -> dict:
 
     return device_dict
 
-def load_redis_config(transmon: ExtendedTransmon, channel:int):
+
+def load_redis_config(transmon: ExtendedTransmon, channel: int):
     qubit = transmon.name
     redis_config = redis_connection.hgetall(f"transmons:{qubit}")
 
@@ -49,7 +50,7 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
     decoded_transmon = json.loads(serialized_transmon)
 
     # the transmon modules are recognized by the ':' in the redis key
-    transmon_redis_config = {k:v for k,v in redis_config.items() if ':' in k}
+    transmon_redis_config = {k: v for k, v in redis_config.items() if ':' in k}
     device_redis_dict = {}
     for redis_entry_key, redis_value in transmon_redis_config.items():
         redis_value = float(redis_value)
@@ -76,7 +77,6 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
     transmon = json.loads(encoded_transmon, cls=SchedulerJSONDecoder, modules=[extended_transmon_element])
 
     return transmon
-
 
     # transmon.reset.duration(float(redis_config['init_duration']))
     # transmon.rxy.amp180(float(redis_config['mw_amp180']))
@@ -122,6 +122,7 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
     # transmon.measure_opt.acq_delay(float(redis_config['ro_acq_delay']))
     # transmon.measure_opt.integration_time(float(redis_config['ro_acq_integration_time']))
 
+
 def load_redis_config_coupler(coupler: CompositeSquareEdge):
     bus = coupler.name
     redis_config = redis_connection.hgetall(f"couplers:{bus}")
@@ -131,7 +132,8 @@ def load_redis_config_coupler(coupler: CompositeSquareEdge):
     coupler.cz.cz_width(float(redis_config['cz_pulse_width']))
     return
 
-def precompile(node, bin_mode:str=None, repetitions:int=None):
+
+def precompile(node, bin_mode: str = None, repetitions: int = None):
     if node.name == 'tof':
         return None, 1
     samplespace = node.samplespace
@@ -147,7 +149,7 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
                 if field in redis_connection.hgetall(key).keys():
                     value = redis_connection.hget(key, field)
                     redis_connection.hset(key, field_backup, value)
-                    redis_connection.hset(key, field, 'nan' )
+                    redis_connection.hset(key, field, 'nan')
             if getattr(node, "coupler", None) is not None:
                 couplers = node.coupler
                 for coupler in couplers:
@@ -163,30 +165,31 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
     transmons = {}
     for channel, qubit in enumerate(qubits):
         transmon = ExtendedTransmon(qubit)
-        transmon = load_redis_config(transmon,channel)
+        transmon = load_redis_config(transmon, channel)
         device.add_element(transmon)
         transmons[qubit] = transmon
 
     # Creating coupler edge
-    #bus_list = [ [qubits[i],qubits[i+1]] for i in range(len(qubits)-1) ]
+    # bus_list = [ [qubits[i],qubits[i+1]] for i in range(len(qubits)-1) ]
     if hasattr(node, 'edges'):
         couplers = node.edges
         edges = {}
         for bus in couplers:
-           control, target = bus.split(sep='_')
-           coupler = CompositeSquareEdge(control, target)
-           load_redis_config_coupler(coupler)
-           device.add_edge(coupler)
-           edges[bus] = coupler
+            control, target = bus.split(sep='_')
+            coupler = CompositeSquareEdge(control, target)
+            load_redis_config_coupler(coupler)
+            device.add_edge(coupler)
+            edges[bus] = coupler
 
     # if node.name in ['cz_chevron','cz_calibration','cz_calibration_ssro','cz_dynamic_phase','reset_chevron']:
-    if hasattr(node, 'edges'):
+    if hasattr(node, 'edges') or node.name in ['cz_chevron', 'cz_calibration', 'cz_calibration_ssro',
+                                               'cz_dynamic_phase', 'reset_chevron', 'reset_calibration_ssro']:
         coupler = node.coupler
         node_class = node.measurement_obj(transmons, edges, node.qubit_state)
     else:
         node_class = node.measurement_obj(transmons, node.qubit_state)
-    if node.name in ['ro_amplitude_three_state_optimization','cz_calibration_ssro']:
-        device.cfg_sched_repetitions(1)    # for single-shot readout
+    if node.name in ['ro_amplitude_three_state_optimization', 'cz_calibration_ssro', 'reset_calibration_ssro']:
+        device.cfg_sched_repetitions(1)  # for single-shot readout
     if bin_mode is not None: node_class.set_bin_mode(bin_mode)
 
     schedule_function = node_class.schedule_function
@@ -199,7 +202,7 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
     if repetitions is not None:
         static_parameters["repetitions"] = repetitions
     else:
-        repetitions = 2**10
+        repetitions = 2 ** 10
     node.demod_channels.set_repetitions(repetitions)
 
     for key, value in node.node_dictionary.items():
@@ -246,7 +249,7 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
     # figs[0].savefig('ssro')
     # breakpoint()
 
-    #TODO
+    # TODO
     # ic.retrieve_hardware_logs
 
     # with open(f'TIMING_TABLE_{node.name}.html', 'w') as file:

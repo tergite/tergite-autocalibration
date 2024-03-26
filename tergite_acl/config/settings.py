@@ -6,6 +6,7 @@ import logging
 import os
 import typing
 import warnings
+from ipaddress import ip_address
 from pathlib import Path
 
 import redis
@@ -79,8 +80,10 @@ DEVICE_CONFIG = CONFIG_DIR.joinpath(_from_config('DEVICE_CONFIG',
 
 # ---
 # Section with other configuration variables
-CLUSTER_IP = _from_config('CLUSTER_IP',
-                          cast_=str)
+CLUSTER_IP = ip_address(_from_config('CLUSTER_IP',
+                                     cast_=str))
+CLUSTER_NAME = _from_config('CLUSTER_NAME',
+                            cast_=str)
 SPI_SERIAL_PORT = _from_config('SPI_SERIAL_PORT',
                                cast_=str)
 
@@ -91,7 +94,6 @@ REDIS_PORT = _from_config('REDIS_PORT',
                           default=6379)
 REDIS_CONNECTION = redis.Redis(decode_responses=True,
                                port=REDIS_PORT)
-
 
 # ---
 # Section for plotting

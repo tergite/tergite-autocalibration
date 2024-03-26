@@ -7,11 +7,10 @@ from quantify_scheduler.operations.gate_library import Measure, Reset, X90, Rxy,
 from quantify_scheduler.operations.pulse_library import GaussPulse,RampPulse,ResetClockPhase,DRAGPulse,SetClockFrequency,NumericalPulse,SoftSquarePulse,SquarePulse,IdlePulse
 from quantify_scheduler.operations.acquisition_library import SSBIntegrationComplex
 from quantify_scheduler.resources import ClockResource
-from calibration_schedules.measurement_base import Measurement
-from utilities.extended_transmon_element import Measure_RO1, Measure_RO_Opt, Rxy_12
+from tergite_acl.lib.measurement_base import Measurement
+from tergite_acl.utils.extended_transmon_element import Measure_RO1, Measure_RO_Opt, Rxy_12
 from quantify_scheduler.operations.control_flow_library import Loop
-from config_files.coupler_config import edge_group, qubit_types
-from scipy.signal import gaussian
+from tergite_acl.config.coupler_config import edge_group, qubit_types
 from scipy import signal
 from matplotlib import pyplot as plt
 import numpy as np
