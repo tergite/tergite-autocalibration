@@ -55,7 +55,7 @@ def create_backend_snapshot() -> dict:
     for qubit_id in qubit_ids:
         id = str(qubit_id).strip("q")
 
-        for manual_parameter_key, manual_parameter_value in manual_param_map:
+        for manual_parameter_key, manual_parameter_value in manual_param_map.items():
             structured_redis_storage(manual_parameter_key, qubit_id, manual_parameter_value)
 
         qubit = {}

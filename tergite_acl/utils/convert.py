@@ -42,7 +42,7 @@ param_map = {
     "rxy:amp180": ("qubit", "pi_pulse_amplitude", "V", float),
     "rxy:duration": ("qubit", "pi_pulse_duration", "Sec", float),
     "rxy:sigma": ("qubit", "pulse_sigma", "None", float),
-    "rxy:mw_pulse_type": ("qubit", "pulse_type", "None", float),
+    "rxy:mw_pulse_type": ("qubit", "pulse_type", "None", str),
     "rxy:motzoi": ("qubit", "motzoi_parameter", "V", float),
     "t1_time": ("qubit", "t1_decoherence", "Sec", float),
     "clock_freqs:f12": ("qubit", "frequency_12", "Hz", float),
