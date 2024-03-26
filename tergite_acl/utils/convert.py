@@ -63,7 +63,7 @@ param_map = {
     "fidelity": ("qubit", "fidelity", None, None),
 }
 
-default_param_map = {
+manual_param_map = {
     'rxy:mw_pulse_type': 'Gaussian',
     'measure:_type': 'Square',
     'measure:ro_pulse_delay': 4e-9,
@@ -89,19 +89,20 @@ def manual_checks(parameter_name_: str,
     if parsed_parameter_value_ == 'nan':
         parsed_parameter_value_ = None
 
-    if overwrite_default and parameter_name_ in default_param_map.keys():
-        parsed_parameter_value_ = default_param_map[parameter_name_]
+    if overwrite_default and parameter_name_ in manual_param_map.keys():
+        parsed_parameter_value_ = manual_param_map[parameter_name_]
 
     return parsed_parameter_value_
 
 
 def structured_redis_storage(field_key: str, comp_index: str, field_value, **kwarg):
     if field_key in param_map:
+        parsed_value = manual_checks(field_key, field_value, overwrite_default=False)
         store.set_component_property(
             param_map[field_key][0],
             param_map[field_key][1],
             comp_index,
-            value=field_value,
+            value=parsed_value,
             unit=param_map[field_key][2],
             **kwarg
         )

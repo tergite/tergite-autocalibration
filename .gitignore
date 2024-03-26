@@ -86,6 +86,7 @@ configs/
 tergite_acl/config/**
 !tergite_acl/config/__init__.py
 !tergite_acl/config/settings.py
+!tergite_acl/config/backend_config_default.toml
 
 # dev-generated artefacts
 tergite_acl/utils/**.csv

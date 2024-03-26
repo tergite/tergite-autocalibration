@@ -24,6 +24,7 @@ import requests
 import toml
 
 from tergite_acl.config.settings import MSS_MACHINE_ROOT_URL, BACKEND_CONFIG
+from tergite_acl.utils.convert import manual_param_map, structured_redis_storage
 from tergite_acl.utils.storage import get_component_value
 
 mss_url = str(MSS_MACHINE_ROOT_URL)
@@ -53,6 +54,10 @@ def create_backend_snapshot() -> dict:
 
     for qubit_id in qubit_ids:
         id = str(qubit_id).strip("q")
+
+        for manual_parameter_key, manual_parameter_value in manual_param_map:
+            structured_redis_storage(manual_parameter_key, qubit_id, manual_parameter_value)
+
         qubit = {}
         for parameter in qubit_parameters:
             if parameter == "id":
