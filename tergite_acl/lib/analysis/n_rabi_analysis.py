@@ -2,7 +2,8 @@ import numpy as np
 import xarray as xr
 
 from tergite_acl.lib.analysis_base import BaseAnalysis
-from tergite_acl.utils.redis_helper import fetch_redis_params
+from tergite_acl.utils.redis_utils import fetch_redis_params
+
 
 class NRabiAnalysis(BaseAnalysis):
     def  __init__(self, dataset: xr.Dataset):

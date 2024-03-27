@@ -12,7 +12,7 @@ from quantify_scheduler.json_utils import pathlib
 
 from tergite_acl.utils.dataset_utils import configure_dataset, handle_ro_freq_optimization, save_dataset
 from tergite_acl.utils.logger.tac_logger import logger
-from tergite_acl.utils.status import ClusterStatus
+from tergite_acl.utils.enums import ClusterMode
 
 colorama_init()
 
@@ -22,7 +22,7 @@ def measure_node(
         compiled_schedule: CompiledSchedule,
         lab_ic,
         data_path: pathlib.Path,
-        cluster_status=ClusterStatus.real,
+        cluster_mode=ClusterMode.real,
         measurement=(1, 1)
 ):
     # TODO: This function should be move to the node
@@ -58,7 +58,7 @@ def execute_schedule(
     # TODO: This should go to the BaseMeasurement
     # TODO: The instrument coordinator could be an attribute of the node
     logger.info('Starting measurement')
-    cluster_status = ClusterStatus.real
+    cluster_mode = ClusterMode.real
 
     def run_measurement() -> None:
         lab_ic.prepare(compiled_schedule)
@@ -67,9 +67,9 @@ def execute_schedule(
 
     def display_progress():
         steps = int(schedule_duration * 5)
-        if cluster_status == ClusterStatus.dummy:
+        if cluster_mode == ClusterMode.dummy:
             progress_sleep = 0.004
-        elif cluster_status == ClusterStatus.real:
+        elif cluster_mode == ClusterMode.real:
             progress_sleep = 0.2
         for _ in tqdm.tqdm(range(steps), desc=compiled_schedule.name, colour='blue'):
             time.sleep(progress_sleep)

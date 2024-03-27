@@ -1,5 +1,5 @@
 import xarray
-from tergite_acl.utils.status import ClusterStatus
+from tergite_acl.utils.enums import ClusterMode
 from tergite_acl.functions.compilation_worker import precompile
 from tergite_acl.functions.execution_worker import measure_node
 from tergite_acl.utils.hardware_utils import SpiDAC
@@ -32,6 +32,9 @@ parameterized_sweep:
 def monitor_node_calibration(node, data_path, lab_ic):
     # TODO: Instead of the types there should be different node classes
     # TODO: What all nodes have in common is the precompile step
+
+    measurement_result = None
+
     if node.type == 'cluster_simple_sweep':
         compiled_schedule = precompile(node)
 
@@ -40,7 +43,7 @@ def monitor_node_calibration(node, data_path, lab_ic):
             compiled_schedule,
             lab_ic,
             data_path,
-            cluster_status=ClusterStatus.real,
+            cluster_mode=ClusterMode.real,
         )
 
         logger.info('measurement completed')
@@ -64,7 +67,7 @@ def monitor_node_calibration(node, data_path, lab_ic):
                 compiled_schedule,
                 lab_ic,
                 data_path,
-                cluster_status=ClusterStatus.real,
+                cluster_mode=ClusterMode.real,
                 measurement=(node_parameter, len(external_parameter_values))
             )
             ds = xarray.merge([ds, result_dataset])
@@ -88,7 +91,7 @@ def monitor_node_calibration(node, data_path, lab_ic):
                 compiled_schedule,
                 lab_ic,
                 data_path,
-                cluster_status=ClusterStatus.real,
+                cluster_mode=ClusterMode.real,
             )
 
             ds = xarray.merge([ds, result_dataset])
@@ -118,7 +121,7 @@ def monitor_node_calibration(node, data_path, lab_ic):
                 compiled_schedule,
                 lab_ic,
                 data_path,
-                cluster_status=ClusterStatus.real,
+                cluster_mode=ClusterMode.real,
             )
 
             ds = xarray.merge([ds, result_dataset])
@@ -152,12 +155,12 @@ def monitor_node_calibration(node, data_path, lab_ic):
                 compiled_schedule,
                 lab_ic,
                 data_path,
-                cluster_status=ClusterStatus.real,
+                cluster_mode=ClusterMode.real,
             )
 
-            measurement_result = post_process(result_dataset, node, data_path=data_path)
+            measurement_result_ = post_process(result_dataset, node, data_path=data_path)
 
-            optimization_quantity = measurement_result[optimization_element][node.optimization_field]
+            optimization_quantity = measurement_result_[optimization_element][node.optimization_field]
 
             return optimization_quantity
 
@@ -168,3 +171,7 @@ def monitor_node_calibration(node, data_path, lab_ic):
             bounds=[(80e-6, 120e-6)],
             options={'maxiter':2}
         )
+
+        # TODO MERGE-CZ-GATE: I guess this is under active development, so, we do not have a measurement_result?
+
+    return measurement_result

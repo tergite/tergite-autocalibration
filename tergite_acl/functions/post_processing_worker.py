@@ -13,7 +13,7 @@ from quantify_core.data.handling import set_datadir
 from tergite_acl.config import settings
 from tergite_acl.config.coupler_config import qubit_types
 from tergite_acl.lib.analysis.tof_analysis import analyze_tof
-from tergite_acl.utils.status import DataStatus
+from tergite_acl.utils.enums import DataStatus
 
 matplotlib.use(settings.PLOTTING_BACKEND)
 set_datadir('../workers')

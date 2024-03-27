@@ -3,10 +3,14 @@ import numpy as np
 from tergite_acl.config.settings import REDIS_CONNECTION
 from tergite_acl.lib.analysis.coupler_spectroscopy_analysis import CouplerSpectroscopyAnalysis
 from tergite_acl.lib.analysis.cz_calibration_analysis import CZCalibrationAnalysis, CZCalibrationSSROAnalysis
-from tergite_acl.lib.analysis.cz_chevron_analysis import CZChevronAnalysis
+from tergite_acl.lib.analysis.cz_chevron_analysis import CZChevronAnalysis, CZChevronAnalysisReset
+from tergite_acl.lib.analysis.reset_calibration_analysis import ResetCalibrationSSROAnalysis
+from tergite_acl.lib.calibration_schedules.cz_calibration import CZ_calibration, CZ_calibration_SSRO, CZ_dynamic_phase
+from tergite_acl.lib.calibration_schedules.cz_chevron_reversed import Reset_chevron_dc
+from tergite_acl.lib.calibration_schedules.reset_calibration import Reset_calibration_SSRO
 from tergite_acl.lib.node_base import BaseNode
 from tergite_acl.lib.nodes.node_utils import qubit_samples, resonator_samples
-from tergite_acl.lib.calibration_schedules.cz_chevron import CZ_chevron
+from tergite_acl.lib.calibration_schedules.cz_chevron_reversed import CZ_chevron
 from tergite_acl.lib.calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
 from tergite_acl.lib.calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
 
@@ -46,7 +50,7 @@ class Coupler_Spectroscopy_Node:
     @property
     def spi_samplespace(self):
         spi_samplespace = {
-            'dc_currents': {self.couplers[0]: np.arange(-2.5e-3, 2.5e-3, 250e-6)},
+            'dc_currents': {self.couplers[0]: np.append(np.arange(0e-3, 3e-3, 100e-6),np.arange(0e-3, -3e-3, -100e-6))},
         }
         return spi_samplespace
 
@@ -282,6 +286,32 @@ class CZ_Calibration_SSRO_Node(BaseNode):
             # 'ramsey_phases': {qubit: np.linspace(0.025, 0.025, 1) for qubit in  self.coupled_qubits},
         }
         return cluster_samplespace
+
+class Reset_Calibration_SSRO_Node(BaseNode):
+    def __init__(self, name: str, all_qubits: list[str], couplers: list[str], ** node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
+        self.coupler = couplers[0]
+        # print(couplers)
+        self.coupled_qubits = couplers[0].split(sep='_')
+        # print(self.coupled_qubits)
+        # self.node_dictionary = kwargs
+        self.redis_field = ['reset_fidelity','reset_leakage']
+        self.qubit_state = 2
+        self.testing_group = 0 # The edge group to be tested. 0 means all edges.
+        self.dynamic = False
+        self.measurement_obj = Reset_calibration_SSRO
+        self.analysis_obj = ResetCalibrationSSROAnalysis
+        # self.validate()
+
+    @property
+    def samplespace(self):
+        cluster_samplespace = {
+            'control_ons': {qubit: [False,True] for qubit in  self.coupled_qubits},
+            'ramsey_phases': {qubit: range(9) for qubit in  self.coupled_qubits},
+        }
+        return cluster_samplespace
+
+
 
 
 class CZ_Dynamic_Phase_Node(BaseNode):

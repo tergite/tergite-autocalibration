@@ -1,9 +1,8 @@
 import numpy as np
 import xarray as xr
-from utilities.redis_helper import fetch_redis_params
 import lmfit
 from quantify_core.analysis.fitting_models import fft_freq_phase_guess
-from config_files.coupler_config import edge_group, qubit_types
+from tergite_acl.config.coupler_config import edge_group, qubit_types
 import matplotlib.pyplot as plt
 
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
