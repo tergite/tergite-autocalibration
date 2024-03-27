@@ -1,3 +1,4 @@
+from collections import defaultdict
 import numpy as np
 from tergite_acl.lib.analysis.adaptive_motzoi_analysis import AdaptiveMotzoiAnalysis
 
@@ -163,16 +164,18 @@ class Adaptive_Motzoi_Parameter_Node(BaseNode):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['rxy:motzoi']
         self.type = 'adaptive_sweep'
-        self.adaptive_kwargs = {}
+        self.adaptive_kwargs = defaultdict(dict)
         self.backup = False
         self.motzoi_minima = []
         self.node_externals = np.arange(2, 22, 6)
         self.external_parameter_name = 'X_repetitions'
         self.external_parameter_value = 0
         self.measurement_is_completed = False
+        self.node_samples = 41
+        self.analysis_kwargs = {'samples': self.node_samples}
 
         self.samplespace = {
-            'mw_motzois': {qubit: np.linspace(-0.4, 0.1, 51) for qubit in self.all_qubits},
+            'mw_motzois': {qubit: np.linspace(-0.4, 0.1, 41) for qubit in self.all_qubits},
         }
 
     @property
@@ -185,8 +188,8 @@ class Adaptive_Motzoi_Parameter_Node(BaseNode):
     #         'mw_motzois': {qubit: np.linspace(-0.4, 0.1, 51) for qubit in self.all_qubits},
     #     }
     #     return cluster_samplespace
-    
-    
+
+
 class Motzoi_Parameter_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
@@ -194,7 +197,6 @@ class Motzoi_Parameter_Node(BaseNode):
         self.measurement_obj = Motzoi_parameter
         self.analysis_obj = MotzoiAnalysis
         self.type = 'adaptive_sweep'
-        self.adaptive_kwargs = {}
         self.backup = False
         self.motzoi_minima = []
         self.node_externals = np.arange(2, 22, 6)

@@ -59,13 +59,16 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
         node_analysis.qoi = qoi
 
 
+
         # TODO temporary hack:
         if node.type == 'adaptive_sweep':
-            new_qubit_samplespace = node_analysis.updated_qubit_samplespace
-            node.adaptive_kwargs = node_analysis.updated_kwargs
+            qubit_adaptive_kwargs = node.adaptive_kwargs[this_qubit]
+            new_qubit_samplespace = node_analysis.updated_qubit_samplespace(**qubit_adaptive_kwargs)
+            node.adaptive_kwargs[this_qubit] = node_analysis.updated_kwargs
             for settable_key in new_qubit_samplespace.keys():
                 node.samplespace[settable_key].update(new_qubit_samplespace[settable_key])
             if node.measurement_is_completed:
+                print(f'{ node.measurement_is_completed = }')
                 node_analysis.update_redis_trusted_values(node.name, this_qubit, redis_field)
                 this_element = this_qubit
 

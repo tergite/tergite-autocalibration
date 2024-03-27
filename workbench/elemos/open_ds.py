@@ -10,7 +10,7 @@ import tergite_acl.lib.analysis.rabi_analysis as rabi
 importlib.reload(adm)
 
 
-ds = xr.open_dataset('data_directory/20240322/20240322-160117-672-36bc85-adaptive_motzoi_parameter/dataset.hdf5')
+ds = xr.open_dataset('data_directory/20240327/20240327-161604-043-a7be12-adaptive_motzoi_parameter/dataset.hdf5')
 # print(f'{ ds.yq21.attrs = }')
 ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
 d12 = ds.yq12.to_dataset()
@@ -29,10 +29,9 @@ d14.yq14.attrs['qubit'] = 'q14'
 ds14 = d14.yq14.isel({'X_repetitionsq14':[0]}).to_dataset()
 ds14 = ds14.drop_vars('X_repetitionsq14')
 #
-
-ada = adm.AdaptiveMotzoiAnalysis(ds14)
-ada.run_fitting(known_values=[])
-ada.updated_qubit_samplespace
+ada = adm.AdaptiveMotzoiAnalysis(ds14, samples=41)
+ada.run_fitting()
+ada.updated_qubit_samplespace(known_values=[])
 fig, ax = plt.subplots()
 ada.plotter(ax)
 
