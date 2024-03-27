@@ -32,9 +32,9 @@ def configure_dataset(
     sweep_quantities = samplespace.keys()
 
     n_qubits = len(measurement_qubits)
-    if node.name in ['ro_amplitude_optimization_gef', 'ro_frequency_optimization_gef']:
+    if node.name in ['ro_amplitude_three_state_optimization', 'ro_frequency_three_state_optimization']:
         qubit_states = [0, 1, 2]
-    elif node.name in ['ro_amplitude_optimization', 'ro_frequency_optimization']:
+    elif node.name in ['ro_amplitude_two_state_optimization', 'ro_frequency_two_state_optimization']:
         qubit_states = [0, 1]
     elif node.name in ['cz_calibration_ssro', 'reset_calibration_ssro']:
         qubit_states = ['c0', 'c1', 'c2']  # for calibration points
@@ -46,7 +46,7 @@ def configure_dataset(
         measured_qubit = measurement_qubits[key_indx]
         dimensions = node.dimensions
 
-        if node.name in ['ro_amplitude_optimization_gef']:
+        if node.name in ['ro_amplitude_three_state_optimization']:
             # shots = 1
             # shots = int(len(raw_ds[key].values))
             shots = int(len(raw_ds[key].values[0]) / (dimensions[0] * len(qubit_states)))
@@ -88,7 +88,7 @@ def configure_dataset(
             coord_attrs = {'qubit': measured_qubit, 'long_name': f'{coord_key}', 'units': 'NA'}
             coords_dict[coord_key] = (coord_key, np.array([node.external_parameter_value]), coord_attrs)
 
-        if node.name in ['ro_amplitude_optimization_gef']:
+        if node.name in ['ro_amplitude_three_state_optimization']:
             coords_dict['state'] = (
             'state', qubit_states, {'qubit': measured_qubit, 'long_name': 'state', 'units': 'NA'})
 
