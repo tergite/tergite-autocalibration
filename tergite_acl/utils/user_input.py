@@ -1,9 +1,11 @@
-qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
+#qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
 # qubits = [ 'q18','q19','q20','q21','q22','q23','q24','q25']
-# qubits = ['q12','q13','q14']
+qubits = ['q12','q13','q14']
 # qubits = ['q14']
 # couplers = ['q12_q13','q13_q14' ]
-couplers = ['q16_q21']
+#couplers = ['q16_q21']
+couplers = ['q12_q14']
+
 
 '''
 node reference

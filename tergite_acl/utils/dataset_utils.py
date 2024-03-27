@@ -111,13 +111,13 @@ def configure_dataset(
         reshaping = reversed(node.dimensions)
         if node.name in ['ro_amplitude_optimization_gef']:
             reshaping = [shots, dimensions[0], len(qubit_states)]
-            data_values = raw_ds[key].values.reshape(*reshaping)
+            data_values = data_values.reshape(*reshaping)
         elif node.name in ['cz_calibration_ssro', 'reset_calibration_ssro']:
             reshaping = np.array([shots])
             reshaping = np.append(reshaping, dimensions)
-            data_values = raw_ds[key].values.reshape(*reshaping)
+            data_values = data_values.reshape(*reshaping)
         else:
-            data_values = raw_ds[key].values.reshape(*reshaping)
+            data_values = data_values.reshape(*reshaping)
             data_values = np.transpose(data_values)
         attributes = {'qubit': measured_qubit, 'long_name': f'y{measured_qubit}', 'units': 'NA'}
         qubit_state = ''
