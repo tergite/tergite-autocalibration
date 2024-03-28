@@ -6,6 +6,10 @@
 # Default: cal
 DEFAULT_PREFIX=<str> e.g. 'username'
 
+# Connectivity settings
+# MSS_MACHINE_ROOT_URL defines the URL to which the backend definition should be pushed after calibration
+MSS_MACHINE_ROOT_URL = http://host:port
+
 # Directory settings
 # ROOT_DIR defines the top-level folder of the tergite-autocalibration-lite folder
 # Default: two levels up from the config

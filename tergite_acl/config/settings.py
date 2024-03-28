@@ -49,6 +49,12 @@ def _from_config(key_name_: str,
 
 
 # ---
+# Section with connectivity definitions
+MSS_MACHINE_ROOT_URL = _from_config('MSS_MACHINE_ROOT_URL',
+                                    cast_=str,
+                                    default='http://localhost:8002')
+
+# ---
 # Section with directory configurations
 
 # Root directory of the project
@@ -77,6 +83,7 @@ HARDWARE_CONFIG = CONFIG_DIR.joinpath(_from_config('HARDWARE_CONFIG',
                                                    cast_=Path))
 DEVICE_CONFIG = CONFIG_DIR.joinpath(_from_config('DEVICE_CONFIG',
                                                  cast_=Path))
+BACKEND_CONFIG = Path(__file__).parent / 'backend_config_default.toml'
 
 # ---
 # Section with other configuration variables

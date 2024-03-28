@@ -3,30 +3,29 @@ Given the requested node
 fetch and compile the appropriate schedule
 '''
 
-from quantify_scheduler.json_utils import SchedulerJSONDecoder, SchedulerJSONEncoder
-from tergite_acl.utils import extended_transmon_element
-from tergite_acl.utils.logger.tac_logger import logger
-from math import isnan
-from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
-import redis
 import json
-import numpy as np
-from tergite_acl.utils.extended_transmon_element import ExtendedTransmon
-from tergite_acl.utils.extended_coupler_edge import CompositeSquareEdge
-from quantify_scheduler.backends import SerialCompiler
-from tergite_acl.config.settings import HARDWARE_CONFIG, REDIS_CONNECTION
-from quantify_core.data.handling import set_datadir
 
-set_datadir('.')
+import numpy as np
+from quantify_core.data.handling import set_datadir
+from quantify_scheduler.backends import SerialCompiler
+from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
+from quantify_scheduler.json_utils import SchedulerJSONDecoder, SchedulerJSONEncoder
+
+from tergite_acl.config.settings import HARDWARE_CONFIG, DATA_DIR, REDIS_CONNECTION
+from tergite_acl.utils import extended_transmon_element
+from tergite_acl.utils.convert import structured_redis_storage
+from tergite_acl.utils.extended_coupler_edge import CompositeSquareEdge
+from tergite_acl.utils.extended_transmon_element import ExtendedTransmon
+from tergite_acl.utils.logger.tac_logger import logger
+
+set_datadir(DATA_DIR)
 
 with open(HARDWARE_CONFIG) as hw:
     hw_config = json.load(hw)
 
-redis_connection = redis.Redis(decode_responses=True)
-
 
 def qubit_config_from_redis(qubit: str, channel: int) -> dict:
-    redis_config = redis_connection.hgetall(f"transmons:{qubit}")
+    redis_config = REDIS_CONNECTION.hgetall(f"transmons:{qubit}")
     transmon_config = {k: v for k, v in redis_config.items() if ':' in k}
     # transmon_submodules = transmon.submodules.keys()
     device_dict = {}
@@ -43,7 +42,7 @@ def qubit_config_from_redis(qubit: str, channel: int) -> dict:
 
 def load_redis_config(transmon: ExtendedTransmon, channel: int):
     qubit = transmon.name
-    redis_config = redis_connection.hgetall(f"transmons:{qubit}")
+    redis_config = REDIS_CONNECTION.hgetall(f"transmons:{qubit}")
 
     # get the transmon template in dictionary form
     serialized_transmon = json.dumps(transmon, cls=SchedulerJSONEncoder)
@@ -125,7 +124,7 @@ def load_redis_config(transmon: ExtendedTransmon, channel: int):
 
 def load_redis_config_coupler(coupler: CompositeSquareEdge):
     bus = coupler.name
-    redis_config = redis_connection.hgetall(f"couplers:{bus}")
+    redis_config = REDIS_CONNECTION.hgetall(f"couplers:{bus}")
     coupler.cz.cz_freq(float(redis_config['cz_pulse_frequency']))
     coupler.cz.square_amp(float(redis_config['cz_pulse_amplitude']))
     coupler.cz.square_duration(float(redis_config['cz_pulse_duration']))
@@ -140,24 +139,30 @@ def precompile(node, bin_mode: str = None, repetitions: int = None):
     qubits = node.all_qubits
 
     # backup old parameter values
+    # TODO:
     if node.backup:
         fields = node.redis_field
         for field in fields:
             field_backup = field + "_backup"
             for qubit in qubits:
                 key = f"transmons:{qubit}"
-                if field in redis_connection.hgetall(key).keys():
-                    value = redis_connection.hget(key, field)
-                    redis_connection.hset(key, field_backup, value)
-                    redis_connection.hset(key, field, 'nan')
+                if field in REDIS_CONNECTION.hgetall(key).keys():
+                    value = REDIS_CONNECTION.hget(key, field)
+                    REDIS_CONNECTION.hset(key, field_backup, value)
+                    REDIS_CONNECTION.hset(key, field, 'nan')
+                    structured_redis_storage(field_backup, qubit.strip('q'), value)
+                    REDIS_CONNECTION.hset(key, field, 'nan')
+                    structured_redis_storage(field, qubit.strip('q'), None)
             if getattr(node, "coupler", None) is not None:
                 couplers = node.coupler
                 for coupler in couplers:
                     key = f"couplers:{coupler}"
-                    if field in redis_connection.hgetall(key).keys():
-                        value = redis_connection.hget(key, field)
-                        redis_connection.hset(key, field_backup, value)
-                        redis_connection.hset(key, field, 'nan')
+                    if field in REDIS_CONNECTION.hgetall(key).keys():
+                        value = REDIS_CONNECTION.hget(key, field)
+                        REDIS_CONNECTION.hset(key, field_backup, value)
+                        structured_redis_storage(field_backup, coupler, value)
+                        REDIS_CONNECTION.hset(key, field, 'nan')
+                        structured_redis_storage(key, coupler, value)
 
     device = QuantumDevice(f'Loki_{node.name}')
     device.hardware_config(hw_config)
