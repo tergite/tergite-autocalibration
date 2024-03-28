@@ -7,6 +7,20 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 
 ## [Unreleased]
 
+This is part of the tergite release v2024.03 that updates the full pipeline for state discrimination hardware calibration
+
+
+### Added
+- All research-related features regarding the calibration of a CZ gate
+- Updater to push calibration values as a backend to MSS/database
+
+### Changed
+- Improved command line interface
+
+### Fixed
+
+### Contributors
+
 ## [2024.02.0] - 2024-03-19
 
 This is part of the tergite release v2024.02 which introduces authentication, authorization and accounting to the
