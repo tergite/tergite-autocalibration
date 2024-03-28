@@ -78,11 +78,16 @@ def calibration():
               required=False,
               is_flag=True,
               help='Use -d if you want to use the dummy cluster (not implemented)')
-def start(c, d):
+@click.option('--push',
+              required=False,
+              is_flag=True,
+              help='If --push the a backend will pushed to an MSS specified in MSS_MACHINE_ROOT_URL in the .env file.')
+def start(c, d, push):
     from ipaddress import ip_address, IPv4Address
 
     from tergite_acl.config.settings import CLUSTER_IP
     from tergite_acl.scripts.calibration_supervisor import CalibrationSupervisor
+    from tergite_acl.scripts.db_backend_update import update_mss
 
     cluster_mode: 'ClusterMode' = ClusterMode.real
     parsed_cluster_ip: 'IPv4Address' = CLUSTER_IP
@@ -106,6 +111,8 @@ def start(c, d):
     supervisor = CalibrationSupervisor(cluster_mode=cluster_mode,
                                        cluster_ip=parsed_cluster_ip)
     supervisor.calibrate_system()
+    if push:
+        update_mss()
 
 
 @cli.command(help='Handle operations related to the well-being of the user.')

@@ -73,6 +73,17 @@ manual_param_map = {
 }
 
 
+def store_manual_parameters(qubit_id):
+    """
+    This function can be used to load static default values into redis
+
+    Returns:
+
+    """
+    for manual_parameter_key, manual_parameter_value in manual_param_map.items():
+        structured_redis_storage(manual_parameter_key, qubit_id.strip('q'), manual_parameter_value)
+
+
 def manual_checks(parameter_name_: str,
                   parameter_value_: Any,
                   overwrite_default: bool = False) -> Any:
@@ -108,7 +119,8 @@ def structured_redis_storage(field_key: str, comp_index: str, field_value, **kwa
         )
     else:
         warnings.warn(
-            f"'{field_key}' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter atributes in the map"
+            f"'{field_key}' is not in mapped parameter list in utilities/standard_redis_storage.py. "
+            f"Please add appropriate parameter atributes in the map"
         )
 
 
