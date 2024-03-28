@@ -9,10 +9,11 @@ from tergite_acl.config.settings import DATA_DIR
 from tergite_acl.lib.demod_channels import ParallelDemodChannels
 from tergite_acl.lib.node_base import BaseNode
 
+
 def configure_dataset(
         raw_ds: xarray.Dataset,
         node,
-    ) -> xarray.Dataset:
+) -> xarray.Dataset:
     '''
     The dataset retrieved from the instrument coordinator is
     too bare-bones. Here the dims, coords and data_vars are configured
@@ -31,14 +32,32 @@ def configure_dataset(
     sweep_quantities = samplespace.keys()
 
     n_qubits = len(measurement_qubits)
+    if node.name in ['ro_amplitude_three_state_optimization', 'ro_frequency_three_state_optimization']:
+        qubit_states = [0, 1, 2]
+    elif node.name in ['ro_amplitude_two_state_optimization', 'ro_frequency_two_state_optimization']:
+        qubit_states = [0, 1]
+    elif node.name in ['cz_calibration_ssro', 'reset_calibration_ssro']:
+        qubit_states = ['c0', 'c1', 'c2']  # for calibration points
 
     for key in keys:
-        key_indx = key%n_qubits # this is to handle ro_opt_frequencies node where
+        key_indx = key % n_qubits  # this is to handle ro_opt_frequencies node where
         # there are 2 or 3 measurements (i.e 2 or 3 Datarrays) for each qubit
         coords_dict = {}
         measured_qubit = measurement_qubits[key_indx]
+        dimensions = node.dimensions
 
-        for quantity in sweep_quantities :
+        if node.name in ['ro_amplitude_three_state_optimization']:
+            # shots = 1
+            # shots = int(len(raw_ds[key].values))
+            shots = int(len(raw_ds[key].values[0]) / (dimensions[0] * len(qubit_states)))
+            coords_dict['shot'] = ('shot', range(shots), {'qubit': measured_qubit, 'long_name': 'shot', 'units': 'NA'})
+        elif node.name in ['cz_calibration_ssro', 'reset_calibration_ssro']:
+            # TODO: We are not sure about this one
+            dimensions[1] += len(qubit_states)  # for calibration points
+            shots = int(len(raw_ds[key].values[0]) / (np.product(dimensions)))
+            coords_dict['shot'] = ('shot', range(shots), {'qubit': measured_qubit, 'long_name': 'shot', 'units': 'NA'})
+
+        for quantity in sweep_quantities:
 
             # eg ['q1','q2',...] or ['q1_q2','q3_q4',...] :
             settable_elements = samplespace[quantity].keys()
@@ -53,23 +72,29 @@ def configure_dataset(
                     element = matching[0]
                     element_type = 'coupler'
                 else:
-                    raise(ValueError)
+                    raise (ValueError)
 
             coord_key = quantity + element
+
             settable_values = samplespace[quantity][element]
+            if node.name in ['cz_calibration_ssro', 'reset_calibration_ssro'] and 'ramsey_phases' in quantity:
+                settable_values = np.append(np.array([settable_values]), np.array([qubit_states]))
             coord_attrs = {element_type: element, 'long_name': f'{coord_key}', 'units': 'NA'}
 
             coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
 
         if hasattr(node, 'node_externals'):
             coord_key = node.external_parameter_name + measured_qubit
-            coord_attrs = {'qubit':measured_qubit, 'long_name': f'{coord_key}', 'units': 'NA'}
+            coord_attrs = {'qubit': measured_qubit, 'long_name': f'{coord_key}', 'units': 'NA'}
             coords_dict[coord_key] = (coord_key, np.array([node.external_parameter_value]), coord_attrs)
+
+        if node.name in ['ro_amplitude_three_state_optimization']:
+            coords_dict['state'] = (
+            'state', qubit_states, {'qubit': measured_qubit, 'long_name': 'state', 'units': 'NA'})
 
         partial_ds = xarray.Dataset(coords=coords_dict)
 
         data_values = raw_ds[key].values
-
 
         if node.name == 'ro_amplitude_two_state_optimization' or node.name == 'ro_amplitude_three_state_optimization':
             loops = node.node_dictionary['loop_repetitions']
@@ -80,13 +105,20 @@ def configure_dataset(
                     states = coords_dict[key][1]
             data_values = reshufle_loop_dataset(data_values, ampls, states, loops)
 
-
         # TODO this is not safe:
         # This assumes that the inner settable variable is placed
         # at the first position in the samplespace
         reshaping = reversed(node.dimensions)
-        data_values = data_values.reshape(*reshaping)
-        data_values = np.transpose(data_values)
+        if node.name in ['ro_amplitude_optimization_gef']:
+            reshaping = [shots, dimensions[0], len(qubit_states)]
+            data_values = data_values.reshape(*reshaping)
+        elif node.name in ['cz_calibration_ssro', 'reset_calibration_ssro']:
+            reshaping = np.array([shots])
+            reshaping = np.append(reshaping, dimensions)
+            data_values = data_values.reshape(*reshaping)
+        else:
+            data_values = data_values.reshape(*reshaping)
+            data_values = np.transpose(data_values)
         attributes = {'qubit': measured_qubit, 'long_name': f'y{measured_qubit}', 'units': 'NA'}
         qubit_state = ''
         # if 'ro_opt_frequencies' in list(sweep_quantities):
@@ -94,14 +126,14 @@ def configure_dataset(
         #     qubit_states = [0,1,2]
 
         # TODO ro_frequency_optimization requires multiple measurements per qubit
-        is_frequency_opt = node.name == 'ro_frequency_two_state_optimization' or node.name == 'ro_frequency_three_state_optimization'
-        if is_frequency_opt:
-            qubit_states = [0,1,2]
+        if node.name in ['ro_frequency_two_state_optimization', 'ro_frequency_three_state_optimization',
+                         'ro_amplitude_optimization_gef', 'ro_frequency_optimization_gef']:
+            qubit_states = [0, 1, 2]
             qubit_state = qubit_states[key // n_qubits]
             attributes['qubit_state'] = qubit_state
 
         partial_ds[f'y{measured_qubit}{qubit_state}'] = (tuple(coords_dict.keys()), data_values, attributes)
-        dataset = xarray.merge([dataset,partial_ds])
+        dataset = xarray.merge([dataset, partial_ds])
     return dataset
 
 
@@ -207,8 +239,8 @@ def to_real_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
 
 
 def reshufle_loop_dataset(
-    initial_array: np.ndarray, ampls, states, loops: int
-    ):
+        initial_array: np.ndarray, ampls, states, loops: int
+):
     initial_shape = initial_array.shape
     initial_array = initial_array.flatten()
     states = np.unique(states)
@@ -258,15 +290,16 @@ def save_dataset(result_dataset: xarray.Dataset, node, data_path: pathlib.Path):
     # to_netcdf doesn't like complex numbers, convert to real/imag to save:
     result_dataset_real.to_netcdf(data_path / 'dataset.hdf5')
 
-def tunneling_qubits(data_values:np.ndarray) -> np.ndarray:
+
+def tunneling_qubits(data_values: np.ndarray) -> np.ndarray:
     if data_values.shape[0] == 1:
         # Single-qubit demodulation
         data_values = data_values[0]
         dims = len(data_values.shape)
         # Transpose data_values
-        return np.moveaxis(data_values, range(dims), range(dims-1, -1, -1))
+        return np.moveaxis(data_values, range(dims), range(dims - 1, -1, -1))
     else:
         dims = len(data_values.shape)
         # Transpose data_values.
         # The first dimension corresponds to the index of qubits.
-        return np.moveaxis(data_values, range(1, dims), range(dims-1, 0, -1))
+        return np.moveaxis(data_values, range(1, dims), range(dims - 1, 0, -1))

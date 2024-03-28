@@ -1,7 +1,7 @@
 import numpy as np
 
 from tergite_acl.lib.analysis.optimum_ro_amplitude_analysis import OptimalRO_Three_state_AmplitudeAnalysis, \
-    OptimalRO_Two_state_AmplitudeAnalysis
+    OptimalRO_Two_state_AmplitudeAnalysis, OptimalROAmplitudeAnalysis
 from tergite_acl.lib.analysis.optimum_ro_frequency_analysis import (
     OptimalROFrequencyAnalysis,
     OptimalRO_012_FrequencyAnalysis
@@ -93,7 +93,7 @@ class Punchout_Node(BaseNode):
         return cluster_samplespace
 
 
-class RO_frequency_optimization_Node(BaseNode):
+class RO_frequency_two_state_optimization_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['extended_clock_freqs:readout_2state_opt']
@@ -110,7 +110,7 @@ class RO_frequency_optimization_Node(BaseNode):
         }
         return cluster_samplespace
 
-class RO_frequency_optimization_gef_Node(BaseNode):
+class RO_frequency_three_state_optimization_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.name = name

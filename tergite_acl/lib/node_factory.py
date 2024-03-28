@@ -7,8 +7,8 @@ from tergite_acl.lib.nodes.qubit_control_nodes import Qubit_01_Spectroscopy_Puls
     Qubit_12_Spectroscopy_Multidim_Node, Rabi_Oscillations_12_Node, Ramsey_Fringes_12_Node, Motzoi_Parameter_Node, \
     N_Rabi_Oscillations_Node
 from tergite_acl.lib.nodes.readout_nodes import Punchout_Node, Resonator_Spectroscopy_Node, \
-    Resonator_Spectroscopy_1_Node, Resonator_Spectroscopy_2_Node, RO_frequency_optimization_Node, \
-    RO_frequency_optimization_gef_Node, RO_amplitude_two_state_optimization_Node, \
+    Resonator_Spectroscopy_1_Node, Resonator_Spectroscopy_2_Node, RO_frequency_two_state_optimization_Node, \
+    RO_frequency_three_state_optimization_Node, RO_amplitude_two_state_optimization_Node, \
     RO_amplitude_three_state_optimization_Node
 
 
@@ -40,8 +40,8 @@ class NodeFactory:
             'cz_calibration': CZ_Calibration_Node,
             'cz_calibration_ssro': CZ_Calibration_SSRO_Node,
             'cz_dynamic_phase': CZ_Dynamic_Phase_Node,
-            'ro_frequency_two_state_optimization': RO_frequency_optimization_Node,
-            'ro_frequency_three_state_optimization': RO_frequency_optimization_gef_Node,
+            'ro_frequency_two_state_optimization': RO_frequency_two_state_optimization_Node,
+            'ro_frequency_three_state_optimization': RO_frequency_three_state_optimization_Node,
             'ro_amplitude_two_state_optimization': RO_amplitude_two_state_optimization_Node,
             'ro_amplitude_three_state_optimization': RO_amplitude_three_state_optimization_Node,
             # 'ro_frequency_optimization_gef': RO_frequency_optimization_gef_Node,
