@@ -110,24 +110,26 @@ class RO_amplitude_optimization(Measurement):
                         prep = shot.add(IdlePulse(mw_pulse_duration))
 
                     elif state_level == 1:
-                        prep = shot.add(DRAGPulse(
-                                    duration=mw_pulse_duration,
-                                    G_amp=mw_amp180,
-                                    D_amp=mw_motzoi,
-                                    port=mw_pulse_port,
-                                    clock=this_clock,
-                                    phase=0,
-                                    ),
+                        prep = shot.add(
+                            DRAGPulse(
+                                duration=mw_pulse_duration,
+                                G_amp=mw_amp180,
+                                D_amp=mw_motzoi,
+                                port=mw_pulse_port,
+                                clock=this_clock,
+                                phase=0,
+                            ),
                         )
                     elif state_level == 2:
-                        shot.add(DRAGPulse(
-                                    duration=mw_pulse_duration,
-                                    G_amp=mw_amp180,
-                                    D_amp=mw_motzoi,
-                                    port=mw_pulse_port,
-                                    clock=this_clock,
-                                    phase=0,
-                                    ),
+                        shot.add(
+                            DRAGPulse(
+                                duration=mw_pulse_duration,
+                                G_amp=mw_amp180,
+                                D_amp=mw_motzoi,
+                                port=mw_pulse_port,
+                                clock=this_clock,
+                                phase=0,
+                            ),
                         )
                         prep = shot.add(
                             DRAGPulse(

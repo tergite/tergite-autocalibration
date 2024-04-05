@@ -29,7 +29,7 @@ d14.yq14.attrs['qubit'] = 'q14'
 ds14 = d14.yq14.isel({'X_repetitionsq14':[0]}).to_dataset()
 ds14 = ds14.drop_vars('X_repetitionsq14')
 #
-ada = adm.AdaptiveMotzoiAnalysis(ds14, samples=41)
+ada = adm.AdaptiveMotzoiAnalysis(ds13, samples=41)
 ada.run_fitting()
 ada.updated_qubit_samplespace(known_values=[])
 fig, ax = plt.subplots()

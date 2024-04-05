@@ -106,13 +106,14 @@ def monitor_node_calibration(node, data_path, lab_ic):
 
 
     elif node.type == 'adaptive_sweep':
-        print('Performing parameterized sweep')
+        print('Performing Adaptive sweep')
         ds = xarray.Dataset()
 
-        for node_parameter in node.node_externals:
+        iterations = len(node.node_externals)
+
+        for index, node_parameter in enumerate(node.node_externals):
             node.external_parameter_value = node_parameter
             print(f'{ node.external_parameter_value = }')
-            print(f'{ node.samplespace = }')
             compiled_schedule = precompile(node)
 
             result_dataset = measure_node(
@@ -122,6 +123,9 @@ def monitor_node_calibration(node, data_path, lab_ic):
                 data_path,
                 cluster_status=ClusterStatus.real,
             )
+            # flag the last measurement so the postprocessing stores the extracted value
+            if index == iterations - 1:
+                node.measurement_is_completed = True
 
             measurement_result = post_process(result_dataset, node, data_path=data_path)
             ds = xarray.merge([ds, result_dataset])

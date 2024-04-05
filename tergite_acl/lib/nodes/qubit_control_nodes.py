@@ -11,6 +11,7 @@ from tergite_acl.lib.analysis.ramsey_analysis import RamseyAnalysis
 from tergite_acl.lib.node_base import BaseNode
 from tergite_acl.lib.nodes.node_utils import qubit_samples
 from tergite_acl.lib.calibration_schedules.motzoi_parameter import Motzoi_parameter
+from tergite_acl.lib.calibration_schedules.adaptive_motzoi_parameter import Adaptive_Motzoi_parameter
 from tergite_acl.lib.calibration_schedules.n_rabi_oscillations import N_Rabi_Oscillations
 from tergite_acl.lib.calibration_schedules.rabi_oscillations import Rabi_Oscillations
 from tergite_acl.lib.calibration_schedules.ramsey_fringes import Ramsey_fringes
@@ -167,15 +168,18 @@ class Adaptive_Motzoi_Parameter_Node(BaseNode):
         self.adaptive_kwargs = defaultdict(dict)
         self.backup = False
         self.motzoi_minima = []
-        self.node_externals = np.arange(2, 22, 6)
+        # self.node_externals = np.arange(2, 52, 8)
         self.external_parameter_name = 'X_repetitions'
         self.external_parameter_value = 0
         self.measurement_is_completed = False
         self.node_samples = 41
         self.analysis_kwargs = {'samples': self.node_samples}
 
+        repeats = [2,2+6,2+4*6,2+8*6,2+12*6,2+16*6]
+        self.node_externals = np.array(repeats)
+
         self.samplespace = {
-            'mw_motzois': {qubit: np.linspace(-0.4, 0.1, 41) for qubit in self.all_qubits},
+            'mw_motzois': {qubit: np.linspace(-0.4, 0.1, self.node_samples) for qubit in self.all_qubits},
         }
 
     @property

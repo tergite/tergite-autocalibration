@@ -47,8 +47,14 @@ class MotzoiModel(lmfit.model.Model):
         guess_motzoi_index = np.argmin(np.abs(drive_motzoi))
 
         phase_guess = kws.get("phase_guess", None)
+
         if phase_guess is None:
-            phase_guess = np.arccos((data[guess_motzoi_index] - offs_guess) / amp_guess) - 2 * np.pi * freq_guess * drive_motzoi[guess_motzoi_index]
+
+            # It may happen that the arc-cosine argument is outside of [-1,1]
+            guess_argument = (data[guess_motzoi_index] - offs_guess) / amp_guess
+            guess_argument = np.min((-1, guess_argument))
+            guess_argument = np.max(( 1, guess_argument))
+            phase_guess = np.arccos(guess_argument) - 2 * np.pi * freq_guess * drive_motzoi[guess_motzoi_index]
 
         self.set_param_hint("frequency", value=freq_guess, min=0)
         self.set_param_hint("amplitude", value=amp_guess, min=0)
