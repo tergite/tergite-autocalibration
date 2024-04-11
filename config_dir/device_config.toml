@@ -24,6 +24,7 @@ qubit_01_spectroscopy_pulsed.clock_freqs.f01 = nan
 qubit_01_spectroscopy.clock_freqs.f01 = nan
 qubit_01_spectroscopy.spec_ampl_optimal = nan
 ramsey_correction.clock_freqs.f01 = nan
+adaptive_ramsey_correction.clock_freqs.f01 = nan
 
 qubit_12_spectroscopy_pulsed.clock_freqs.f12 = nan
 qubit_12_spectroscopy_pulsed.anharmonicity = nan

@@ -11,7 +11,8 @@ class BaseNode:
         self.qubit_state = 0 # can be 0 or 1 or 2
         self.plots_per_qubit = 1 # can be 0 or 1 or 2
         self.build_demod_channels()
-        self.samplespace = {}
+        # self.samplespace = {}
+        self.external_parameters = {}
 
     # @property
     # def samplespace(self) -> dict:
@@ -39,22 +40,22 @@ class BaseNode:
         for quantity in settable_quantities:
             dimensions.append(len(self.samplespace[quantity][first_element]))
         return dimensions
-    
+
     def build_demod_channels(self):
         """
         The default demodulation channels are multiplexed single-qubit channels,
         which means that you only readout one qubit in parallel.
         It works when you only calibrate single qubits.
-        In many cases, you also need jointly readout multiple qubits such as quantum 
+        In many cases, you also need jointly readout multiple qubits such as quantum
         state tomography.
         Rewrite this method in these nodes.
 
         TODO: Add parameters to the global variables
         """
         self.demod_channels = ParallelDemodChannels.build_multiplexed_single_demod_channel(
-            self.all_qubits, 
+            self.all_qubits,
             ["0", "1"],
-            'IQ', 
+            'IQ',
             REDIS_CONNECTION
         )
 

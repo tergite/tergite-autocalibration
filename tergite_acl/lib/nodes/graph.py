@@ -17,8 +17,12 @@ graph_dependencies = [
     ('resonator_spectroscopy', 'qubit_01_spectroscopy'),
     # ('qubit_01_spectroscopy_pulsed', 'rabi_oscillations'),
     ('qubit_01_spectroscopy', 'rabi_oscillations'),
-    ('rabi_oscillations', 'ramsey_correction'),
-    ('ramsey_correction', 'adaptive_motzoi_parameter'),
+
+    # ('rabi_oscillations', 'ramsey_correction'),
+    # ('ramsey_correction', 'adaptive_motzoi_parameter'),
+    ('rabi_oscillations', 'adaptive_ramsey_correction'),
+    ('adaptive_ramsey_correction', 'adaptive_motzoi_parameter'),
+
     ('adaptive_motzoi_parameter', 'n_rabi_oscillations'),
     ('n_rabi_oscillations', 'resonator_spectroscopy_1'),
     ('randomized_benchmarking', 'T1'),

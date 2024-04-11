@@ -77,17 +77,22 @@ def monitor_node_calibration(node, data_path, lab_ic):
         logger.info('analysis completed')
 
 
+
     elif node.type == 'parameterized_sweep':
         print('Performing parameterized sweep')
         ds = xarray.Dataset()
 
         iterations = len(node.node_externals)
 
-        for index, node_parameter in enumerate(node.node_externals):
-            if index == iterations:
+        for iteration_index in range(node.external_iterations):
+            if iteration_index == node.external_iterations:
                 node.measurement_is_completed = True
+            node_parameter = node.node_externals[iteration_index]
             node.external_parameter_value = node_parameter
-            print(f'{ node.external_parameter_value = }')
+            node.external_parameters = {
+                node.external_parameter_name: node_parameter
+            }
+            # reduce the external samplespace
             compiled_schedule = precompile(node)
 
             result_dataset = measure_node(
@@ -98,10 +103,13 @@ def monitor_node_calibration(node, data_path, lab_ic):
                 cluster_status=ClusterStatus.real,
             )
 
+            if node.post_process_each_iteration:
+                measurement_result = post_process(result_dataset, node, data_path=data_path)
             ds = xarray.merge([ds, result_dataset])
 
         logger.info('measurement completed')
-        measurement_result = post_process(ds, node, data_path=data_path)
+        if not node.post_process_each_iteration:
+            measurement_result = post_process(ds, node, data_path=data_path)
         logger.info('analysis completed')
 
 
@@ -162,45 +170,3 @@ def monitor_node_calibration(node, data_path, lab_ic):
         logger.info('measurement completed')
         measurement_result = post_process(ds, node, data_path=data_path)
         logger.info('analysis completed')
-
-
-    elif node.type == 'optimized_sweep':
-        print('Performing optimized Sweep')
-        compiled_schedule = precompile(node)
-
-        optimization_element = 'q13_q14'
-
-        optimization_guess = 100e-6
-
-        spi = SpiDAC()
-        dac = spi.create_spi_dac(optimization_element)
-
-        def set_optimizing_parameter(optimizing_parameter):
-            if node.name == 'cz_chevron_optimize':
-                spi.set_dac_current(dac, optimizing_parameter)
-
-
-        def single_sweep(optimizing_parameter) -> float:
-            set_optimizing_parameter(optimizing_parameter)
-
-            result_dataset = measure_node(
-                node,
-                compiled_schedule,
-                lab_ic,
-                data_path,
-                cluster_status=ClusterStatus.real,
-            )
-
-            measurement_result = post_process(result_dataset, node, data_path=data_path)
-
-            optimization_quantity = measurement_result[optimization_element][node.optimization_field]
-
-            return optimization_quantity
-
-        optimize.minimize(
-            single_sweep,
-            optimization_guess,
-            method='Nelder-Mead',
-            bounds=[(80e-6, 120e-6)],
-            options={'maxiter':2}
-        )

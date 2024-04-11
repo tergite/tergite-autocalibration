@@ -21,25 +21,17 @@ from tergite_acl.lib.calibration_schedules.ro_frequency_optimization import RO_f
 
 
 class Resonator_Spectroscopy_Node(BaseNode):
+    measurement_obj = Resonator_Spectroscopy
+    analysis_obj = ResonatorSpectroscopyAnalysis
+
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['clock_freqs:readout', 'Ql', 'resonator_minimum']
-        self.measurement_obj = Resonator_Spectroscopy
-        self.analysis_obj = ResonatorSpectroscopyAnalysis
-        self.cluster_samplespace = {
+        self.samplespace = {
             'ro_frequencies': {
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             }
         }
-
-    # @property
-    # def samplespace(self):
-    #     cluster_samplespace = {
-    #         'ro_frequencies': {
-    #             qubit: resonator_samples(qubit) for qubit in self.all_qubits
-    #         }
-    #     }
-    #     return cluster_samplespace
 
 
 class Resonator_Spectroscopy_1_Node(BaseNode):

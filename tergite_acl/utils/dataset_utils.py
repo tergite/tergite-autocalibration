@@ -38,7 +38,7 @@ def configure_dataset(
             # eg ['q1','q2',...] or ['q1_q2','q3_q4',...] :
             settable_elements = samplespace[quantity].keys()
 
-            # distinguish if the settable is on a quabit or a coupler:
+            # distinguish if the settable is on a qubit or a coupler:
             if measured_qubit in settable_elements:
                 element = measured_qubit
                 element_type = 'qubit'
@@ -52,7 +52,12 @@ def configure_dataset(
 
             coord_key = quantity + element
             settable_values = samplespace[quantity][element]
-            coord_attrs = {element_type: element, 'long_name': f'{coord_key}', 'units': 'NA'}
+            coord_attrs = {
+                'element_type': element_type, # 'element_type' is ether 'qubit' or 'coupler' 
+                element_type: element, 
+                'long_name': f'{coord_key}', 
+                'units': 'NA'
+            }
 
             coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
 
@@ -92,6 +97,7 @@ def configure_dataset(
 
         partial_ds[f'y{measured_qubit}{qubit_state}'] = (tuple(coords_dict.keys()), data_values, attributes)
         dataset = xarray.merge([dataset,partial_ds])
+
     return dataset
 
 
@@ -103,7 +109,7 @@ def configure_dataset(
 #     '''The dataset retrieved from the instrument coordinator  is
 #        too bare-bones. Here we configure the dims, coords and data_vars'''
 #     samplespace = node.samplespace
-#     # For multiplexed single-qubit readout, parallel_demod_channels 
+#     # For multiplexed single-qubit readout, parallel_demod_channels
 #     # are union of single DemodChannel. The channel label is the name
 #     # of qubit.
 #     parallel_demod_channels: ParallelDemodChannels = node.demod_channels
