@@ -1,5 +1,5 @@
 project:
   render:
-    - tac_docs.qmd
+    - new_node_creation.qmd
   type: website
   output-dir: docs

@@ -1,3 +1,4 @@
 # To create a new node:
 
-1. in the file ``
+1. in the file `tergite_acl/lib/node_factory.py` expand the dictionary `self.node_implementations`  with a new entry:
+The key should be a string of the node name and the value should be the object that contains the implementation details
