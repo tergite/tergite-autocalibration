@@ -1,0 +1,5 @@
+project:
+  render:
+    - tac_docs.qmd
+  type: website
+  output-dir: docs
