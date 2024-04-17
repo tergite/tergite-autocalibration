@@ -1,4 +1,4 @@
-from tergite_acl.lib.nodes.characterization_nodes import T1_Node, T2_Node, T2_Echo_Node, Randomized_Benchmarking_Node
+from tergite_acl.lib.nodes.characterization_nodes import T1_Node, T2_Node, T2_Echo_Node, Randomized_Benchmarking_Node, All_XY_Node
 from tergite_acl.lib.nodes.coupler_nodes import Coupler_Spectroscopy_Node, Coupler_Resonator_Spectroscopy_Node, \
     CZ_Chevron_Node, CZ_Optimize_Chevron_Node, Reset_Chevron_Node, CZ_Calibration_Node, CZ_Calibration_SSRO_Node, \
     CZ_Dynamic_Phase_Node
@@ -35,6 +35,7 @@ class NodeFactory:
             'T1': T1_Node,
             'T2': T2_Node,
             'T2_echo': T2_Echo_Node,
+            'all_XY': All_XY_Node,
             'reset_chevron': Reset_Chevron_Node,
             'cz_chevron': CZ_Chevron_Node,
             'cz_optimize_chevron': CZ_Optimize_Chevron_Node,

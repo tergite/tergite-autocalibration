@@ -27,6 +27,7 @@ graph_dependencies = [
     ('n_rabi_oscillations', 'resonator_spectroscopy_1'),
     ('randomized_benchmarking', 'T1'),
     ('n_rabi_oscillations', 'resonator_spectroscopy_1'),
+    ('n_rabi_oscillations', 'all_XY'),
     # ('n_rabi_oscillations', 'T1'),
     ('n_rabi_oscillations', 'randomized_benchmarking'),
     ('resonator_spectroscopy_1', 'ro_frequency_two_state_optimization'),

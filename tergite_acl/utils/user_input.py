@@ -33,6 +33,7 @@ node reference
   T2
   T2_echo
   randomized_benchmarking
+  all_XY
   check_cliffords
   cz_chevron
   cz_optimize_chevron

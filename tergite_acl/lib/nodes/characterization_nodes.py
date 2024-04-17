@@ -4,12 +4,38 @@ import numpy as np
 
 from tergite_acl.lib.analysis.T1_analysis import T1Analysis, T2Analysis, T2EchoAnalysis
 from tergite_acl.lib.analysis.check_cliffords_analysis import CheckCliffordsAnalysis
+from tergite_acl.lib.analysis.all_XY_analysis import All_XY_Analysis
 # from analysis.cz_chevron_analysis import CZChevronAnalysis, CZChevronAnalysisReset
 from tergite_acl.lib.analysis.randomized_benchmarking_analysis import RandomizedBenchmarkingAnalysis
 from tergite_acl.lib.node_base import BaseNode
 from tergite_acl.lib.calibration_schedules.T1 import T1, T2, T2Echo
 from tergite_acl.lib.calibration_schedules.check_cliffords import Check_Cliffords
 from tergite_acl.lib.calibration_schedules.randomized_benchmarking import Randomized_Benchmarking
+from tergite_acl.lib.calibration_schedules.all_XY import All_XY
+
+
+class All_XY_Node(BaseNode):
+    measurement_obj = All_XY
+    analysis_obj = All_XY_Analysis
+
+    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
+        self.all_qubits = all_qubits
+        self.redis_field = ['error_syndromes']
+        self.backup = False
+
+    @property
+    def dimensions(self):
+        return (len(self.samplespace['delays'][self.all_qubits[0]]), 1)
+
+    @property
+    def samplespace(self):
+        cluster_samplespace = {
+            'delays': {qubit: 8e-9 + np.arange(0, 300e-6, 6e-6) for qubit in self.all_qubits}
+        }
+        return cluster_samplespace
+
+
 
 
 class T1_Node(BaseNode):

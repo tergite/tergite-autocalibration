@@ -33,7 +33,7 @@ ramsey_correction_12.clock_freqs.f12 = nan
 
 rabi_oscillations.rxy.amp180 = nan
 n_rabi_oscillations.rxy.amp180 = nan
-
+all_XY.error_syndromes = nan
 motzoi_parameter.rxy.motzoi = nan
 
 rabi_oscillations_12.r12.ef_amp180 = nan
