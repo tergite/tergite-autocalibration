@@ -1,4 +1,5 @@
 import xarray
+from tergite_acl.utils.dataset_utils import retrieve_dummy_dataset
 from tergite_acl.utils.status import ClusterStatus
 from tergite_acl.functions.compilation_worker import precompile
 from tergite_acl.functions.execution_worker import measure_node
@@ -32,9 +33,10 @@ adaptive_sweep:
     For every external parameter value, the schedule is recompiled.
 '''
 
-def monitor_node_calibration(node, data_path, lab_ic):
+def monitor_node_calibration(node, data_path, lab_ic, cluster_status):
     # TODO: Instead of the types there should be different node classes
     # TODO: What all nodes have in common is the precompile step
+    print(f'{ node.type = }')
     if node.type == 'cluster_simple_sweep':
         compiled_schedule = precompile(node)
 
@@ -43,8 +45,11 @@ def monitor_node_calibration(node, data_path, lab_ic):
             compiled_schedule,
             lab_ic,
             data_path,
-            cluster_status=ClusterStatus.real,
+            cluster_status,
         )
+
+        if cluster_status==ClusterStatus.dummy:
+            result_dataset = retrieve_dummy_dataset(result_dataset, node)
 
         logger.info('measurement completed')
         measurement_result = post_process(result_dataset, node, data_path=data_path)
@@ -67,7 +72,7 @@ def monitor_node_calibration(node, data_path, lab_ic):
                 compiled_schedule,
                 lab_ic,
                 data_path,
-                cluster_status=ClusterStatus.real,
+                cluster_status,
                 measurement=(node_parameter, len(external_parameter_values))
             )
             ds = xarray.merge([ds, result_dataset])
@@ -100,8 +105,11 @@ def monitor_node_calibration(node, data_path, lab_ic):
                 compiled_schedule,
                 lab_ic,
                 data_path,
-                cluster_status=ClusterStatus.real,
+                cluster_status,
             )
+            if cluster_status == ClusterStatus.dummy:
+                result_dataset = retrieve_dummy_dataset(result_dataset, node)
+                continue
 
             if node.post_process_each_iteration:
                 measurement_result = post_process(result_dataset, node, data_path=data_path)
@@ -129,7 +137,7 @@ def monitor_node_calibration(node, data_path, lab_ic):
                 compiled_schedule,
                 lab_ic,
                 data_path,
-                cluster_status=ClusterStatus.real,
+                cluster_status,
             )
             # flag the last measurement so the postprocessing stores the extracted value
             if index == iterations - 1:
@@ -162,7 +170,7 @@ def monitor_node_calibration(node, data_path, lab_ic):
                 compiled_schedule,
                 lab_ic,
                 data_path,
-                cluster_status=ClusterStatus.real,
+                cluster_status,
             )
 
             ds = xarray.merge([ds, result_dataset])

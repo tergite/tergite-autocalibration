@@ -44,7 +44,7 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'adaptive_motzoi_parameter',
+    'target_node': 'all_XY',
     'all_qubits': qubits,
     'couplers': couplers,
 }

@@ -53,9 +53,9 @@ def configure_dataset(
             coord_key = quantity + element
             settable_values = samplespace[quantity][element]
             coord_attrs = {
-                'element_type': element_type, # 'element_type' is ether 'qubit' or 'coupler' 
-                element_type: element, 
-                'long_name': f'{coord_key}', 
+                'element_type': element_type, # 'element_type' is ether 'qubit' or 'coupler'
+                element_type: element,
+                'long_name': f'{coord_key}',
                 'units': 'NA'
             }
 
@@ -242,6 +242,33 @@ def create_node_data_path(node):
     measurement_id = time_id + '-' + str(uuid4())[:6] + f'-{node.name}'
     data_path = pathlib.Path(DATA_DIR / measurements_today / measurement_id)
     return data_path
+
+
+def retrieve_dummy_dataset(result_dataset: xarray.Dataset, node) -> xarray.Dataset:
+    if node.name == 'resonator_spectroscopy':
+        ds_path = 'tergite_acl/utils/dummy_datasets/20240312-092341-245-0c45cb-resonator_spectroscopy/dataset.hdf5'
+    elif node.name == 'qubit_01_spectroscopy':
+        ds_path = 'tergite_acl/utils/dummy_datasets/20240312-092355-781-934808-qubit_01_spectroscopy/dataset.hdf5'
+    elif node.name == 'rabi_oscillations':
+        ds_path = 'tergite_acl/utils/dummy_datasets/20240312-092445-965-2c64c2-rabi_oscillations/dataset.hdf5'
+    elif node.name == 'ramsey_correction':
+        ds_path = 'tergite_acl/utils/dummy_datasets/20240312-092539-970-23d58e-ramsey_correction/dataset.hdf5'
+    elif node.name == 'adaptive_ramsey_correction':
+        ds_path = 'tergite_acl/utils/dummy_datasets/20240312-092539-970-23d58e-ramsey_correction/dataset.hdf5'
+    else:
+        raise ValueError('Node does not have a stored dummy dataset')
+
+    real_dataset = xarray.open_dataset(ds_path)
+    dummy_ds = real_dataset.isel(ReIm=0) + 1j * real_dataset.isel(ReIm=1)
+
+    #TODO probably this is not needed for newer datasets
+    for data_var in dummy_ds.data_vars:
+        dummy_ds[data_var].attrs.update({'qubit': data_var[1:]})
+    for coord in dummy_ds.coords:
+        dummy_ds[coord].attrs.update({'element_type': 'qubit'})
+
+    return dummy_ds
+
 
 
 def save_dataset(result_dataset: xarray.Dataset, node, data_path: pathlib.Path):

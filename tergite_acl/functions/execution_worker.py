@@ -22,7 +22,7 @@ def measure_node(
         compiled_schedule: CompiledSchedule,
         lab_ic,
         data_path: pathlib.Path,
-        cluster_status=ClusterStatus.real,
+        cluster_status,
         measurement=(1, 1)
 ):
     # TODO: This function should be move to the node
@@ -37,7 +37,7 @@ def measure_node(
     message = f'{schedule_duration:.2f} sec' + measurement_message
     print(f'schedule_duration = {Fore.CYAN}{Style.BRIGHT}{message}{Style.RESET_ALL}')
 
-    raw_dataset = execute_schedule(compiled_schedule, lab_ic, schedule_duration)
+    raw_dataset = execute_schedule(compiled_schedule, lab_ic, schedule_duration, cluster_status)
 
     result_dataset = configure_dataset(raw_dataset, node)
     save_dataset(result_dataset, node, data_path)
@@ -53,12 +53,12 @@ def measure_node(
 def execute_schedule(
         compiled_schedule: CompiledSchedule,
         lab_ic,
-        schedule_duration: float
-) -> xarray.Dataset:
-    # TODO: This should go to the BaseMeasurement
-    # TODO: The instrument coordinator could be an attribute of the node
+        schedule_duration: float,
+        cluster_status
+    ) -> xarray.Dataset:
+
     logger.info('Starting measurement')
-    cluster_status = ClusterStatus.real
+    # cluster_status = ClusterStatus.real
 
     def run_measurement() -> None:
         lab_ic.prepare(compiled_schedule)
