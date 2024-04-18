@@ -188,6 +188,7 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
         external_parameters = {}
 
     compiler = SerialCompiler(name=f'{node.name}_compiler')
+
     schedule = schedule_function(**static_parameters, **external_parameters, **samplespace)
     compilation_config = device.generate_compilation_config()
     device.close()
