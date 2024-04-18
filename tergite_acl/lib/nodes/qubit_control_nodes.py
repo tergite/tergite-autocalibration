@@ -8,6 +8,7 @@ from tergite_acl.lib.analysis.qubit_spectroscopy_analysis import QubitSpectrosco
 from tergite_acl.lib.analysis.qubit_spectroscopy_multidim import QubitSpectroscopyMultidim
 from tergite_acl.lib.analysis.rabi_analysis import RabiAnalysis
 from tergite_acl.lib.analysis.ramsey_analysis import RamseyAnalysis
+from tergite_acl.lib.analysis.ramsey_analysis import RamseyDetuningsAnalysis
 from tergite_acl.lib.node_base import BaseNode
 from tergite_acl.lib.nodes.node_utils import qubit_samples
 from tergite_acl.lib.calibration_schedules.motzoi_parameter import Motzoi_parameter
@@ -15,6 +16,7 @@ from tergite_acl.lib.calibration_schedules.adaptive_motzoi_parameter import Adap
 from tergite_acl.lib.calibration_schedules.n_rabi_oscillations import N_Rabi_Oscillations
 from tergite_acl.lib.calibration_schedules.rabi_oscillations import Rabi_Oscillations
 from tergite_acl.lib.calibration_schedules.ramsey_fringes import Ramsey_fringes
+from tergite_acl.lib.calibration_schedules.ramsey_detunings import Ramsey_detunings
 # from calibration_schedules.two_tone_multidim import Two_Tones_Multidim
 from tergite_acl.lib.calibration_schedules.two_tone_multidim import Two_Tones_Multidim
 from tergite_acl.lib.calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
@@ -34,7 +36,6 @@ class Qubit_01_Spectroscopy_Pulsed_Node(BaseNode):
         }
 
 
-
 class Qubit_01_Spectroscopy_Multidim_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
@@ -52,7 +53,6 @@ class Qubit_01_Spectroscopy_Multidim_Node(BaseNode):
         }
 
 
-
 class Rabi_Oscillations_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
@@ -66,13 +66,12 @@ class Rabi_Oscillations_Node(BaseNode):
         }
 
 
-
 class Ramsey_Fringes_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['clock_freqs:f01']
-        self.measurement_obj = Ramsey_fringes
-        self.analysis_obj = RamseyAnalysis
+        self.measurement_obj = Ramsey_detunings
+        self.analysis_obj = RamseyDetuningsAnalysis
         self.backup = False
         self.analysis_kwargs = {"redis_field": "clock_freqs:f01"}
         self.samplespace = {
