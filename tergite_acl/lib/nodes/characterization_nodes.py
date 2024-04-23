@@ -23,20 +23,9 @@ class All_XY_Node(BaseNode):
         self.all_qubits = all_qubits
         self.redis_field = ['error_syndromes']
         self.backup = False
-        self.samplespace = {}
-
-    # @property
-    # def dimensions(self):
-    #     return (len(self.samplespace['delays'][self.all_qubits[0]]), 1)
-
-    # @property
-    # def samplespace(self):
-    #     cluster_samplespace = {
-    #         'delays': {qubit: 8e-9 + np.arange(0, 300e-6, 6e-6) for qubit in self.all_qubits}
-    #     }
-    #     return cluster_samplespace
-
-
+        self.samplespace = {
+            'XY_index': {qubit: np.array(range(1,22)) for qubit in self.all_qubits}
+        }
 
 
 class T1_Node(BaseNode):

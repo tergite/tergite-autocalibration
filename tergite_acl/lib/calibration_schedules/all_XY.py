@@ -38,7 +38,11 @@ class All_XY(Measurement):
         self.qubit_state = qubit_state
         self.transmons = transmons
 
-    def schedule_function(self, repetitions: int = 1024,) -> Schedule:
+    def schedule_function(
+            self,
+            XY_index: dict[str, np.ndarray],
+            repetitions: int = 1024,
+        ) -> Schedule:
         """
 
         Returns
@@ -51,7 +55,14 @@ class All_XY(Measurement):
 
         qubits = self.transmons.keys()
 
+        # This is the common reference operation so the qubits can be operated in parallel
+        root_relaxation = schedule.add(Reset(*qubits), label="Reset")
+
         for this_qubit in qubits:
+
+            schedule.add(
+                Reset(*qubits), ref_op=root_relaxation, ref_pt='end'
+            ) # To enforce parallelism we refer to the root relaxation
 
             for index, pulses in all_XY_angles.items():
                 first_theta = pulses[0]['theta']
