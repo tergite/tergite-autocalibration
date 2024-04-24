@@ -63,6 +63,9 @@ class T1_Node(BaseNode):
 
 
 class Randomized_Benchmarking_Node(BaseNode):
+    measurement_obj = Randomized_Benchmarking
+    analysis_obj = RandomizedBenchmarkingAnalysis
+
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.name = name
@@ -71,8 +74,6 @@ class Randomized_Benchmarking_Node(BaseNode):
         self.node_dictionary = node_dictionary
         self.backup = False
         self.redis_field = ['fidelity']
-        self.measurement_obj = Randomized_Benchmarking
-        self.analysis_obj = RandomizedBenchmarkingAnalysis
 
         # TODO change it a dictionary like samplespace
         self.node_externals = 6 * np.arange(5, dtype=np.int32)
