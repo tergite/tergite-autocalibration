@@ -20,40 +20,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -127,11 +93,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Getting started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./available_nodes.html"> 
+    <a class="nav-link active" href="./available_nodes.html" aria-current="page"> 
 <span class="menu-text">Available Nodes</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./new_node_creation.html" aria-current="page"> 
+    <a class="nav-link" href="./new_node_creation.html"> 
 <span class="menu-text">Creating New Nodes</span></a>
   </li>  
   <li class="nav-item">
@@ -154,14 +120,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#to-create-a-new-node" id="toc-to-create-a-new-node" class="nav-link active" data-scroll-target="#to-create-a-new-node">To create a new node:</a>
+  <li><a href="#available-nodes" id="toc-available-nodes" class="nav-link active" data-scroll-target="#available-nodes">Available Nodes</a>
   <ul class="collapse">
-  <li><a href="#node-implementation-object" id="toc-node-implementation-object" class="nav-link" data-scroll-target="#node-implementation-object">Node implementation object</a>
-  <ul class="collapse">
-  <li><a href="#creating-a-measurement_obj" id="toc-creating-a-measurement_obj" class="nav-link" data-scroll-target="#creating-a-measurement_obj">Creating a <code>measurement_obj</code></a></li>
-  <li><a href="#creating-an-analysis_obj" id="toc-creating-an-analysis_obj" class="nav-link" data-scroll-target="#creating-an-analysis_obj">Creating an <code>analysis_obj</code></a></li>
-  <li><a href="#node-types" id="toc-node-types" class="nav-link" data-scroll-target="#node-types">Node types</a></li>
-  </ul></li>
+  <li><a href="#readout-nodes" id="toc-readout-nodes" class="nav-link" data-scroll-target="#readout-nodes">Readout Nodes</a></li>
+  <li><a href="#qubit-control-nodes" id="toc-qubit-control-nodes" class="nav-link" data-scroll-target="#qubit-control-nodes">Qubit Control Nodes</a></li>
+  <li><a href="#coupler-nodes" id="toc-coupler-nodes" class="nav-link" data-scroll-target="#coupler-nodes">Coupler Nodes</a></li>
+  <li><a href="#characterization-nodes" id="toc-characterization-nodes" class="nav-link" data-scroll-target="#characterization-nodes">Characterization Nodes</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -172,50 +136,55 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="to-create-a-new-node" class="level1">
-<h1>To create a new node:</h1>
-<ol type="1">
-<li><p>in the file <code>tergite_acl/lib/node_factory.py</code> expand the dictionary <code>self.node_implementations</code> with a new entry: The key should be a string of the node name and the value should be the object that contains the implementation details. This object should be imported from either <code>tergite_acl/lib/nodes/qubit_control_nodes.py</code>, <code>tergite_acl/lib/nodes/coupler_nodes.py</code>, <code>tergite_acl/lib/nodes/readout_nodes.py</code> or <code>tergite_acl/lib/nodes/characterization_nodes.py</code></p></li>
-<li><p>In the file <code>tergite_acl/lib/nodes/graph.py</code> in the list <code>graph_dependencies</code> insert the edges that describe the position of the new node in the Directed Acyclic Graph. There are two entries required (or one entry if the new node is the last on its path):</p></li>
-</ol>
+<section id="available-nodes" class="level1">
+<h1>Available Nodes</h1>
+<section id="readout-nodes" class="level2">
+<h2 class="anchored" data-anchor-id="readout-nodes">Readout Nodes</h2>
 <ul>
-<li><code>('previous_node','new_node')</code></li>
-<li><code>('new_node', 'next_node')</code></li>
+<li>punchout</li>
+<li>resonator_spectroscopy</li>
+<li>resonator_spectroscopy_1</li>
+<li>resonator_spectroscopy_2</li>
+<li>ro_frequency_two_state_optimization</li>
+<li>ro_frequency_three_state_optimization</li>
+<li>ro_amplitude_two_state_optimization</li>
+<li>ro_amplitude_three_state_optimization</li>
 </ul>
-<ol start="3" type="1">
-<li>In the <code>tergite_acl/config/device_config.toml</code> set the quantity of interest at <code>nan</code> value</li>
-</ol>
-<section id="node-implementation-object" class="level2">
-<h2 class="anchored" data-anchor-id="node-implementation-object">Node implementation object</h2>
-<p>Each node implementation object should contain a reference to the measurement object, the analysis object, the list of redis fields that the analysis updates and the samplespace of the measurement. For example on the Rabi Rabi Oscillations Node:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Rabi_Oscillations_Node(BaseNode):</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, name: <span class="bu">str</span>, all_qubits: <span class="bu">list</span>[<span class="bu">str</span>], <span class="op">**</span>node_dictionary):</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>(name, all_qubits, <span class="op">**</span>node_dictionary)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.redis_field <span class="op">=</span> [<span class="st">'rxy:amp180'</span>]</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.measurement_obj <span class="op">=</span> Rabi_Oscillations</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.analysis_obj <span class="op">=</span> RabiAnalysis</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.samplespace <span class="op">=</span> {</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">'mw_amplitudes'</span>: {</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                qubit: np.linspace(<span class="fl">0.002</span>, <span class="fl">0.80</span>, <span class="dv">101</span>) <span class="cf">for</span> qubit <span class="kw">in</span> <span class="va">self</span>.all_qubits</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>            }</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<section id="creating-a-measurement_obj" class="level3">
-<h3 class="anchored" data-anchor-id="creating-a-measurement_obj">Creating a <code>measurement_obj</code></h3>
-<p>The <code>measurement_obj</code> is imported from <code>tergite_acl/lib/calibration_schedules/</code> and contains the class that generates the appropriate measurement schedule. To initialize we require a dicttionary of the extended transmons:</p>
-<p><code>transmons: dict[str, ExtendedTransmon]</code></p>
-<p>It must contain a method called <code>schedule_function</code> that expects the <code>node.samplespace</code> as input and returns the complete schedule.</p>
 </section>
-<section id="creating-an-analysis_obj" class="level3">
-<h3 class="anchored" data-anchor-id="creating-an-analysis_obj">Creating an <code>analysis_obj</code></h3>
-<p>The <code>analysis_obj</code> is imported from <code>tergite_acl/lib/analysis/</code> and contains the class that perform the analysis for a single qubit. It must contain a <code>run_fitting</code> method and a <code>plotter</code> method</p>
+<section id="qubit-control-nodes" class="level2">
+<h2 class="anchored" data-anchor-id="qubit-control-nodes">Qubit Control Nodes</h2>
+<ul>
+<li>qubit_01_spectroscopy</li>
+<li>qubit_01_spectroscopy_pulsed</li>
+<li>rabi_oscillations</li>
+<li>ramsey_correction</li>
+<li>qubit_12_spectroscopy_pulsed</li>
+<li>qubit_12_spectroscopy_multidim</li>
+<li>rabi_oscillations_12</li>
+<li>ramsey_correction_12</li>
+<li>adaptive_motzoi_parameter</li>
+<li>n_rabi_oscillations</li>
+<li>state_discrimination</li>
+</ul>
 </section>
-<section id="node-types" class="level3">
-<h3 class="anchored" data-anchor-id="node-types">Node types</h3>
-<p>Nodes are divided in two distict categories: - <code>simple_sweep</code>: where the Quantify Schedule is compiled only once - <code>parameterized_sweep</code>: where the node requires multiple iterations and each iteration requires a new recompilation.</p>
-<p><a href="./node_types.html">Details on the implementation on the Node types section</a>.</p>
+<section id="coupler-nodes" class="level2">
+<h2 class="anchored" data-anchor-id="coupler-nodes">Coupler Nodes</h2>
+<ul>
+<li>coupler_spectroscopy</li>
+<li>coupler_resonator_spectroscopy</li>
+</ul>
+</section>
+<section id="characterization-nodes" class="level2">
+<h2 class="anchored" data-anchor-id="characterization-nodes">Characterization Nodes</h2>
+<ul>
+<li>T1</li>
+<li>T2</li>
+<li>T2_echo</li>
+<li>randomized_benchmarking</li>
+<li>all_XY</li>
+</ul>
 
 
-</section>
 </section>
 </section>
 

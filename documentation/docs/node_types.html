@@ -131,11 +131,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Available Nodes</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./new_node_creation.html" aria-current="page"> 
+    <a class="nav-link" href="./new_node_creation.html"> 
 <span class="menu-text">Creating New Nodes</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./node_types.html"> 
+    <a class="nav-link active" href="./node_types.html" aria-current="page"> 
 <span class="menu-text">Node types</span></a>
   </li>  
 </ul>
@@ -154,15 +154,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#to-create-a-new-node" id="toc-to-create-a-new-node" class="nav-link active" data-scroll-target="#to-create-a-new-node">To create a new node:</a>
-  <ul class="collapse">
-  <li><a href="#node-implementation-object" id="toc-node-implementation-object" class="nav-link" data-scroll-target="#node-implementation-object">Node implementation object</a>
-  <ul class="collapse">
-  <li><a href="#creating-a-measurement_obj" id="toc-creating-a-measurement_obj" class="nav-link" data-scroll-target="#creating-a-measurement_obj">Creating a <code>measurement_obj</code></a></li>
-  <li><a href="#creating-an-analysis_obj" id="toc-creating-an-analysis_obj" class="nav-link" data-scroll-target="#creating-an-analysis_obj">Creating an <code>analysis_obj</code></a></li>
-  <li><a href="#node-types" id="toc-node-types" class="nav-link" data-scroll-target="#node-types">Node types</a></li>
-  </ul></li>
-  </ul></li>
+  <li><a href="#node-types" id="toc-node-types" class="nav-link active" data-scroll-target="#node-types">Node types</a></li>
   </ul>
 </nav>
     </div>
@@ -172,51 +164,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="to-create-a-new-node" class="level1">
-<h1>To create a new node:</h1>
-<ol type="1">
-<li><p>in the file <code>tergite_acl/lib/node_factory.py</code> expand the dictionary <code>self.node_implementations</code> with a new entry: The key should be a string of the node name and the value should be the object that contains the implementation details. This object should be imported from either <code>tergite_acl/lib/nodes/qubit_control_nodes.py</code>, <code>tergite_acl/lib/nodes/coupler_nodes.py</code>, <code>tergite_acl/lib/nodes/readout_nodes.py</code> or <code>tergite_acl/lib/nodes/characterization_nodes.py</code></p></li>
-<li><p>In the file <code>tergite_acl/lib/nodes/graph.py</code> in the list <code>graph_dependencies</code> insert the edges that describe the position of the new node in the Directed Acyclic Graph. There are two entries required (or one entry if the new node is the last on its path):</p></li>
-</ol>
-<ul>
-<li><code>('previous_node','new_node')</code></li>
-<li><code>('new_node', 'next_node')</code></li>
-</ul>
-<ol start="3" type="1">
-<li>In the <code>tergite_acl/config/device_config.toml</code> set the quantity of interest at <code>nan</code> value</li>
-</ol>
-<section id="node-implementation-object" class="level2">
-<h2 class="anchored" data-anchor-id="node-implementation-object">Node implementation object</h2>
-<p>Each node implementation object should contain a reference to the measurement object, the analysis object, the list of redis fields that the analysis updates and the samplespace of the measurement. For example on the Rabi Rabi Oscillations Node:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Rabi_Oscillations_Node(BaseNode):</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, name: <span class="bu">str</span>, all_qubits: <span class="bu">list</span>[<span class="bu">str</span>], <span class="op">**</span>node_dictionary):</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>(name, all_qubits, <span class="op">**</span>node_dictionary)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.redis_field <span class="op">=</span> [<span class="st">'rxy:amp180'</span>]</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.measurement_obj <span class="op">=</span> Rabi_Oscillations</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.analysis_obj <span class="op">=</span> RabiAnalysis</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.samplespace <span class="op">=</span> {</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">'mw_amplitudes'</span>: {</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                qubit: np.linspace(<span class="fl">0.002</span>, <span class="fl">0.80</span>, <span class="dv">101</span>) <span class="cf">for</span> qubit <span class="kw">in</span> <span class="va">self</span>.all_qubits</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>            }</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<section id="creating-a-measurement_obj" class="level3">
-<h3 class="anchored" data-anchor-id="creating-a-measurement_obj">Creating a <code>measurement_obj</code></h3>
-<p>The <code>measurement_obj</code> is imported from <code>tergite_acl/lib/calibration_schedules/</code> and contains the class that generates the appropriate measurement schedule. To initialize we require a dicttionary of the extended transmons:</p>
-<p><code>transmons: dict[str, ExtendedTransmon]</code></p>
-<p>It must contain a method called <code>schedule_function</code> that expects the <code>node.samplespace</code> as input and returns the complete schedule.</p>
-</section>
-<section id="creating-an-analysis_obj" class="level3">
-<h3 class="anchored" data-anchor-id="creating-an-analysis_obj">Creating an <code>analysis_obj</code></h3>
-<p>The <code>analysis_obj</code> is imported from <code>tergite_acl/lib/analysis/</code> and contains the class that perform the analysis for a single qubit. It must contain a <code>run_fitting</code> method and a <code>plotter</code> method</p>
-</section>
-<section id="node-types" class="level3">
-<h3 class="anchored" data-anchor-id="node-types">Node types</h3>
-<p>Nodes are divided in two distict categories: - <code>simple_sweep</code>: where the Quantify Schedule is compiled only once - <code>parameterized_sweep</code>: where the node requires multiple iterations and each iteration requires a new recompilation.</p>
-<p><a href="./node_types.html">Details on the implementation on the Node types section</a>.</p>
+<section id="node-types" class="level1">
+<h1>Node types</h1>
+<p>There are two distinct type of nodes. This is what the <code>node_supervisor.py</code> looks for to handle the measurement for each node: - simple_sweep: The schedule to be executed on the cluster is compiled only ONCE - parameterized_sweep: The node consists of multiple iterations. For each iteration the schedule needs to be recompiled. For example the Randomized_Benchmarking_Node is of type <code>parameterized_sweep</code> i.e.&nbsp;every iterations (every different seed of the Randomized Benchmarking) reuires a new schedule compilation</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Randomized_Benchmarking_Node(BaseNode):</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    measurement_obj <span class="op">=</span> Randomized_Benchmarking</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    analysis_obj <span class="op">=</span> RandomizedBenchmarkingAnalysis</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, name: <span class="bu">str</span>, all_qubits: <span class="bu">list</span>[<span class="bu">str</span>], <span class="op">**</span>node_dictionary):</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>(name, all_qubits, <span class="op">**</span>node_dictionary)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.name <span class="op">=</span> name</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.<span class="bu">type</span> <span class="op">=</span> <span class="st">'parameterized_sweep'</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.all_qubits <span class="op">=</span> all_qubits</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.node_dictionary <span class="op">=</span> node_dictionary</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.backup <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.redis_field <span class="op">=</span> [<span class="st">'fidelity'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
-</section>
-</section>
 </section>
 
 </main> <!-- /main -->
