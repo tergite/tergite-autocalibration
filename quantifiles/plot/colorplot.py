@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+from typing import List, Sequence
 from PyQt5 import QtCore
 import pyqtgraph
 
@@ -13,9 +16,8 @@ class ColorPlot(BasePlot):
     def __init__(
         self,
         dataset: xr.Dataset,
-        x: str,
-        y: str,
-        z: str,
+        x_keys: Sequence[str] | str,
+        y_keys: Sequence[str] | str,
         colormap: str = "viridis",
         parent=None,
     ):
@@ -38,45 +40,46 @@ class ColorPlot(BasePlot):
             The parent widget of this widget. By default, `None`.
         """
         super().__init__(dataset, parent=parent)
-        self.header.set_additional_info(
-            f"{dataset[z].long_name} ({dataset[z].attrs['units']})"
-        )
 
-        self.x = x
-        self.y = y
-        self.z = z
+        # self.header.set_additional_info(
+        #     f"{dataset[z].long_name} ({dataset[z].attrs['units']})"
+        # )
+
+        self.y_keys = [y_keys] if isinstance(y_keys, str) else y_keys
+        self.x_keys = x_keys
+        # self.z = z
 
         self.img = pyqtgraph.ImageItem()
         self.img.setColorMap(pyqtgraph.colormap.get(colormap))
 
         self.colorbar = pyqtgraph.ColorBarItem(width=16, cmap=colormap)
-        self.colorbar.setLabels(
-            right=f"{dataset[z].long_name} ({dataset[z].attrs['units']})"
-        )
+        # self.colorbar.setLabels(
+        #     right=f"{dataset[z].long_name} ({dataset[z].attrs['units']})"
+        # )
 
         self.plot.addItem(self.img)
 
         # Check that necessary attributes are present in the dataset
-        assert "long_name" in dataset[x].attrs, f"{x} attribute 'long_name' not found"
-        assert "units" in dataset[x].attrs, f"{x} attribute 'units' not found"
-        assert "long_name" in dataset[y].attrs, f"{y} attribute 'long_name' not found"
-        assert "units" in dataset[y].attrs, f"{y} attribute 'units' not found"
+        # assert "long_name" in dataset[x].attrs, f"{x} attribute 'long_name' not found"
+        # assert "units" in dataset[x].attrs, f"{x} attribute 'units' not found"
+        # assert "long_name" in dataset[y].attrs, f"{y} attribute 'long_name' not found"
+        # assert "units" in dataset[y].attrs, f"{y} attribute 'units' not found"
 
         x_unit, self.x_scaling = units.get_si_unit_and_scaling(
-            dataset[x].attrs["units"]
+            dataset[x_keys[0]].attrs["units"]
         )
         y_unit, self.y_scaling = units.get_si_unit_and_scaling(
-            dataset[y].attrs["units"]
+            dataset[x_keys[1]].attrs["units"]
         )
 
         # Set the data
         self.set_data(dataset)
 
         set_label(
-            self.plot, "bottom", dataset[x].long_name, x_unit, dataset[x].attrs["units"]
+            self.plot, "bottom", dataset[x_keys[0]].long_name, x_unit, dataset[x_keys[0]].attrs["units"]
         )
         set_label(
-            self.plot, "left", dataset[y].long_name, y_unit, dataset[y].attrs["units"]
+            self.plot, "left", dataset[x_keys[1]].long_name, y_unit, dataset[x_keys[1]].attrs["units"]
         )
 
     def set_data(self, dataset: xr.Dataset) -> None:
@@ -93,16 +96,22 @@ class ColorPlot(BasePlot):
         None
         """
 
-        is_uniformly_spaced = dataset and dataset.attrs.get(
-            "grid_2d_uniformly_spaced", dataset.attrs.get("2D-grid", False)
-        )
+        # is_uniformly_spaced = dataset and dataset.attrs.get(
+        #     "grid_2d_uniformly_spaced", dataset.attrs.get("2D-grid", False)
+        # )
+
+        is_uniformly_spaced = True
         if is_uniformly_spaced:
-            x_data = self.x_scaling * dataset[self.x].values[: dataset.attrs["xlen"]]
-            y_data = self.y_scaling * dataset[self.y].values[:: dataset.attrs["xlen"]]
-            z_data = np.reshape(
-                dataset[self.z].values, (len(x_data), len(y_data)), order="F"
-            )
-            self.set_image(x_data, y_data, z_data)
+            x_data = self.x_scaling * dataset[self.x_keys[0]].values
+            y_data = self.y_scaling * dataset[self.x_keys[1]].values
+
+            real_values = dataset[self.y_keys[0]].values[:,:,0]
+            imag_values = dataset[self.y_keys[0]].values[:,:,1]
+            data_values = np.transpose(np.sqrt(real_values**2 + imag_values**2))
+            # z_data = np.reshape(
+            #     dataset[self.z].values, (len(x_data), len(y_data)), order="F"
+            # )
+            self.set_image(x_data, y_data, data_values)
         else:
             raise NotImplementedError(
                 "Plotting of non-uniformly spaced 2D data is not yet implemented."
@@ -158,21 +167,21 @@ class ColorPlot(BasePlot):
         str
             The text to display.
         """
-        index_pos = self.img.getViewBox().mapFromViewToItem(
-            self.img, QtCore.QPointF(x, y)
-        )
-        try:
-            x_idx, y_idx = int(round(index_pos.x())), int(round(index_pos.y()))
-            x_idx = max(0, min(x_idx, self.img.image.shape[0] - 1))
-            y_idx = max(0, min(y_idx, self.img.image.shape[1] - 1))
-            z_value = self.img.image[x_idx, y_idx]
-        except IndexError:
-            z_value = np.nan
-
-        x_unit = self.dataset[self.x].attrs["units"]
-        y_unit = self.dataset[self.y].attrs["units"]
-        z_unit = self.dataset[self.z].attrs["units"]
-
-        return (
-            f"\nx = {x:.2e} {x_unit}\ny = {y:.2e} {y_unit}\nz = {z_value:.2e} {z_unit}"
-        )
+        # index_pos = self.img.getViewBox().mapFromViewToItem(
+        #     self.img, QtCore.QPointF(x, y)
+        # )
+        # try:
+        #     x_idx, y_idx = int(round(index_pos.x())), int(round(index_pos.y()))
+        #     x_idx = max(0, min(x_idx, self.img.image.shape[0] - 1))
+        #     y_idx = max(0, min(y_idx, self.img.image.shape[1] - 1))
+        #     z_value = self.img.image[x_idx, y_idx]
+        # except IndexError:
+        #     z_value = np.nan
+        #
+        # x_unit = self.dataset[self.x].attrs["units"]
+        # y_unit = self.dataset[self.y].attrs["units"]
+        # z_unit = self.dataset[self.z].attrs["units"]
+        #
+        # return (
+        #     f"\nx = {x:.2e} {x_unit}\ny = {y:.2e} {y_unit}\nz = {z_value:.2e} {z_unit}"
+        # )

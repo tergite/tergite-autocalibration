@@ -22,11 +22,16 @@ def autoplot(dataset: xr.Dataset) -> QtWidgets.QMainWindow:
 
         if len(settables) == 1:
             settable = cast(str, settables[0])
+            plot_widget = LinePlot(
+                dataset, x_key=settable, y_keys=gettable, parent=plot_window
+            )
+        elif len(settables) == 2:
+            settables = [cast(str, settable) for settable in settables]
+            plot_widget = ColorPlot(
+                dataset, x_keys=settables, y_keys=gettable, parent=plot_window
+            )
         else:
-            raise ValueError('Cant plot 2d datasets :(')
-        plot_widget = LinePlot(
-            dataset, x_key=settable, y_keys=gettable, parent=plot_window
-        )
+            raise ValueError('Cant plot datasets with more than 2 settables :(')
         plot_window.add_plot(qubit, plot_widget)
 
     return plot_window
