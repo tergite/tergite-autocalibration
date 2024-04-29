@@ -47,7 +47,7 @@ class Qubit_01_Spectroscopy_Multidim_Node(BaseNode):
     def samplespace(self):
         cluster_samplespace = {
             'spec_pulse_amplitudes': {
-                qubit: np.linspace(3e-4, 9e-4, 5) for qubit in self.all_qubits
+                qubit: np.linspace(10e-3, 40e-3, 1) for qubit in self.all_qubits
             },
             'spec_frequencies': {
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
@@ -90,7 +90,7 @@ class Ramsey_Fringes_Node(BaseNode):
                 qubit: np.arange(4e-9, 2048e-9, 8 * 8e-9) for qubit in self.all_qubits
             },
             'artificial_detunings': {
-                qubit: np.arange(-2.1, 2.1, 0.8) * 1e6 for qubit in self.all_qubits
+                qubit: np.arange(-0.5, 0.5, 0.2) * 1e6 for qubit in self.all_qubits
             },
             # },
         }
@@ -186,7 +186,7 @@ class Qubit_12_Spectroscopy_Multidim_Node(BaseNode):
     def samplespace(self):
         cluster_samplespace = {
             'spec_pulse_amplitudes': {
-                qubit: np.linspace(5e-4, 9e-4, 5) for qubit in self.all_qubits
+                qubit: np.linspace(20e-4, 40e-4, 4) for qubit in self.all_qubits
             },
             'spec_frequencies': {
                 qubit: qubit_samples(qubit, transition='12') for qubit in self.all_qubits

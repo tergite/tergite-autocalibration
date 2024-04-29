@@ -106,6 +106,6 @@ REDIS_CONNECTION = redis.Redis(decode_responses=True,
 # Section for plotting
 PLOTTING = _from_config('PLOTTING',
                         cast_=bool,
-                        default=True)
+                        default=False)
 # This will be set in matplotlib
 PLOTTING_BACKEND = 'tkagg' if PLOTTING else 'agg'
