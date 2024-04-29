@@ -23,7 +23,7 @@ from tergite_acl.utils.hardware_utils import SpiDAC
 from tergite_acl.utils.logger.tac_logger import logger
 from tergite_acl.utils.redis_utils import populate_initial_parameters, populate_node_parameters, \
     populate_quantities_of_interest
-from tergite_acl.utils.user_input import user_requested_calibration
+from tergite_acl.utils.user_input import user_requested_calibration, attenuation_setting
 from tergite_acl.utils.visuals import draw_arrow_chart
 
 
@@ -79,33 +79,16 @@ class CalibrationSupervisor:
         if isinstance(clusters, Cluster):
             clusters = [clusters]
         for cluster in clusters:
+            # Set the attenuation values for the modules
+            # for module in cluster.modules:
+                # if module.is_qcm_type:
+                #     module.out0_att(attenuation_setting['qubit']) # Control lines
+                #     module.out1_att(attenuation_setting['coupler']) # Flux lines
+                # elif module.is_qrm_type:
+                #     module.out0_att(attenuation_setting['readout']) # Readout lines
             ic_.add_component(ClusterComponent(cluster))
             ic_.timeout(self.cluster_timeout)
         return ic_
-
-    def _set_module_att(self, cluster_: 'Cluster') -> bool:
-        # TODO MERGE-CZ-GATE: Looks like this depends heavily hardware and some coupler/device configuration
-        for idx, module in enumerate(cluster_.modules[0:13]):
-            if idx in [2, 3, 8]:
-                module.out0_att(12)
-            else:
-                module.out0_att(16)
-            # if idx in [1,6]:
-            #     module.out0_att(16)
-            # else:
-            #     module.out0_att(60)
-        print('XY: ' + module.name + '_att:' + str(module.out0_att()) + 'dB')
-        # Flux lines
-        if CLUSTER_NAME == 'clusterB':
-            for module in cluster_.modules[0:13]:
-                module.out1_att(40)
-            # module.out1_att(60)
-        print('FL: ' + module.name + '_att:' + str(module.out1_att()) + 'dB')
-        # Readout lines
-        for module in cluster_.modules[15:17]:
-            module.out0_att(12)
-        print('RO: ' + module.name + '_att:' + str(module.out0_att()) + 'dB')
-        return True
 
     def calibrate_system(self):
         # TODO: everything which is not in the inspect or calibrate function should go here

@@ -13,20 +13,42 @@ from tergite_acl.lib.nodes.node_utils import qubit_samples, resonator_samples
 from tergite_acl.lib.calibration_schedules.cz_chevron_reversed import CZ_chevron
 from tergite_acl.lib.calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
 from tergite_acl.lib.calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
+from tergite_acl.utils.hardware_utils import SpiRack
+from tergite_acl.utils.hardware_utils import SpiDAC
+from tergite_acl.config.coupler_config import coupler_spi_map
 
 
-class Coupler_Spectroscopy_Node:
-    def __init__(self, name: str, all_qubits: list[str], **kwargs):
+
+class Coupler_Spectroscopy_Node(BaseNode):
+    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
         self.name = name
         self.all_qubits = all_qubits
-        self.couplers = kwargs['couplers']
+        self.couplers = node_dictionary['couplers']
         self.redis_field = ['parking_current']
         self.qubit_state = 0
+        self.type = 'spi_and_cluster_simple_sweep'
         # perform 2 tones while biasing the current
         self.measurement_obj = Two_Tones_Spectroscopy
         self.analysis_obj = CouplerSpectroscopyAnalysis
         self.coupled_qubits = self.get_coupled_qubits()
+        self.sweep_range = self.node_dictionary.pop("sweep_range", None)
+        self.external_parameter_name = 'currents'
+
         # self.validate()
+        self.node_externals = np.append(np.arange(0e-3, 3e-3, 100e-6),np.arange(-0.1e-3, -3e-3, -100e-6))
+        self.operations_args = []
+        self.measure_qubit_index = 0
+
+        try:
+            self.spi = SpiDAC()
+        except:
+            pass
+        couplers = list(coupler_spi_map.keys())
+        dacs = [self.spi.create_spi_dac(coupler) for coupler in couplers]
+        self.coupler_dac = dict(zip(couplers,dacs))
+        self.coupler = self.couplers[0] # we will generalize for multiple couplers later
+        self.dac = self.coupler_dac[self.coupler]
 
     def get_coupled_qubits(self) -> list:
         if len(self.couplers) > 1:
@@ -36,21 +58,26 @@ class Coupler_Spectroscopy_Node:
         return coupled_qubits
 
     @property
+    def dimensions(self):
+        return (len(self.samplespace['spec_frequencies'][self.all_qubits[0]]), 1)
+
+    def pre_measurement_operation(self, external: float = 0): #external is the current
+        print(f'Current: {external} for coupler: {self.coupler}')
+        self.spi.set_dac_current(self.dac, external)
+        
+    @property
     def samplespace(self):
         qubit = self.coupled_qubits[self.measure_qubit_index]
         self.measurement_qubit = qubit
         cluster_samplespace = {
-            'spec_frequencies': {qubit: qubit_samples(qubit, sweep_range=self.sweep_range)}
+            'spec_frequencies': {qubit: qubit_samples(qubit)}
         }
-        # cluster_samplespace = {
-        #     'spec_frequencies': {qubit: np.linspace(3.771, 3.971, 0.0005)}
-        # }
         return cluster_samplespace
 
     @property
     def spi_samplespace(self):
         spi_samplespace = {
-            'dc_currents': {self.couplers[0]: np.append(np.arange(0e-3, 3e-3, 100e-6),np.arange(0e-3, -3e-3, -100e-6))},
+            'dc_currents': {self.couplers[0]: np.append(np.arange(0e-3, 3e-3, 100e-6),np.arange(-100e-3, -3e-3, -100e-6))},
         }
         return spi_samplespace
 
@@ -111,6 +138,9 @@ class CZ_Chevron_Node(BaseNode):
         ac_freq = int(ac_freq / 1e4) * 1e4
         print(f'{ ac_freq/1e6 = } MHz for coupler: {coupler}')
         return ac_freq
+
+
+
 
     @property
     def samplespace(self):

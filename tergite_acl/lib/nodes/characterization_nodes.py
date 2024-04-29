@@ -11,6 +11,7 @@ from tergite_acl.lib.calibration_schedules.T1 import T1, T2, T2Echo
 from tergite_acl.lib.calibration_schedules.check_cliffords import Check_Cliffords
 from tergite_acl.lib.calibration_schedules.randomized_benchmarking import Randomized_Benchmarking
 
+coherence_repeat = 100
 
 class T1_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
@@ -22,7 +23,7 @@ class T1_Node(BaseNode):
         self.backup = False
         self.type = 'parameterized_simple_sweep'
 
-        self.node_externals = range(2)
+        self.node_externals = range(coherence_repeat)
         self.external_parameter_name = 'repeat'
         self.external_parameter_value = 0
 
@@ -109,15 +110,31 @@ class Check_Cliffords_Node:
         }
         return cluster_samplespace
 
-
 class T2_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.name = name
+        self.all_qubits = all_qubits
         self.redis_field = ['t2_time']
-        self.qubit_state = 0
         self.measurement_obj = T2
         self.analysis_obj = T2Analysis
+        self.backup = False
+        self.type = 'parameterized_simple_sweep'
+
+        self.node_externals = range(coherence_repeat)
+        self.external_parameter_name = 'repeat'
+        self.external_parameter_value = 0
+
+        self.sleep_time = 3
+        self.operations_args = []
+
+    def pre_measurement_operation(self, external=1):
+        if external > 0:
+            print(f'sleeping for {self.sleep_time} seconds')
+            sleep(self.sleep_time)
+
+    @property
+    def dimensions(self):
+        return (len(self.samplespace['delays'][self.all_qubits[0]]), 1)
 
     @property
     def samplespace(self):
@@ -126,15 +143,31 @@ class T2_Node(BaseNode):
         }
         return cluster_samplespace
 
-
 class T2_Echo_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.name = name
-        self.redis_field = ['t2_time']
-        self.qubit_state = 0
+        self.all_qubits = all_qubits
+        self.redis_field = ['t2_echo_time']
         self.measurement_obj = T2Echo
         self.analysis_obj = T2EchoAnalysis
+        self.backup = False
+        self.type = 'parameterized_simple_sweep'
+
+        self.node_externals = range(coherence_repeat)
+        self.external_parameter_name = 'repeat'
+        self.external_parameter_value = 0
+
+        self.sleep_time = 3
+        self.operations_args = []
+
+    def pre_measurement_operation(self, external=1):
+        if external > 0:
+            print(f'sleeping for {self.sleep_time} seconds')
+            sleep(self.sleep_time)
+
+    @property
+    def dimensions(self):
+        return (len(self.samplespace['delays'][self.all_qubits[0]]), 1)
 
     @property
     def samplespace(self):
