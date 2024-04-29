@@ -6,6 +6,7 @@ qubits = ['q12','q13','q14']
 #couplers = ['q16_q21']
 couplers = ['q12_q14']
 
+attenuation_setting = {'qubit':16, 'coupler':40, 'readout':12}
 
 '''
 node reference
