@@ -23,7 +23,7 @@ from tergite_acl.utils.hardware_utils import SpiDAC
 from tergite_acl.utils.logger.tac_logger import logger
 from tergite_acl.utils.redis_utils import populate_initial_parameters, populate_node_parameters, \
     populate_quantities_of_interest
-from tergite_acl.utils.user_input import user_requested_calibration,attenuation_setting
+from tergite_acl.utils.user_input import user_requested_calibration, attenuation_setting
 from tergite_acl.utils.visuals import draw_arrow_chart
 
 colorama_init()
@@ -81,12 +81,12 @@ class CalibrationSupervisor:
             clusters = [clusters]
         for cluster in clusters:
             # Set the attenuation values for the modules
-            for module in cluster.modules:
-                if module.is_qcm_type:
-                    module.out0_att(attenuation_setting['qubit']) # Control lines
-                    module.out1_att(attenuation_setting['coupler']) # Flux lines
-                elif module.is_qrm_type:
-                    module.out0_att(attenuation_setting['readout']) # Readout lines
+            # for module in cluster.modules:
+                # if module.is_qcm_type:
+                #     module.out0_att(attenuation_setting['qubit']) # Control lines
+                #     module.out1_att(attenuation_setting['coupler']) # Flux lines
+                # elif module.is_qrm_type:
+                #     module.out0_att(attenuation_setting['readout']) # Readout lines
             ic_.add_component(ClusterComponent(cluster))
             ic_.timeout(self.cluster_timeout)
         return ic_

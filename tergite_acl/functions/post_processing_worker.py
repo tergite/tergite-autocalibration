@@ -112,10 +112,10 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
     fig = plt.gcf()
     fig.set_tight_layout(True)
     fig.savefig(f'{data_path}/{node.name}.png', bbox_inches='tight', dpi=600)
-    # plt.show()
-    plt.show(block=True)
-    # plt.pause(20)
-    # plt.close()
+    # plt.show(block=True)
+    plt.show(block=False)
+    plt.pause(20)
+    plt.close()
 
     if node != 'tof':
         all_results.update({'measurement_dataset': result_dataset.to_dict()})

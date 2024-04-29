@@ -65,18 +65,13 @@ class T1(Measurement):
 
 class T2(Measurement):
 
-    def __init__(self,transmons,qubit_state:int=0):
+    def __init__(self,transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
         super().__init__(transmons)
         self.qubit_state = qubit_state
         self.transmons = transmons
 
-        self.static_kwargs = {
-            'qubits': self.qubits,
-        }
-
     def schedule_function(
         self,
-        qubits: list[str],
         delays: dict[str, np.ndarray],
         repetitions: int = 1024,
     ) -> Schedule:
@@ -104,6 +99,8 @@ class T2(Measurement):
         """
         schedule = Schedule("multiplexed_T2",repetitions)
 
+        qubits = self.transmons.keys()
+
         #This is the common reference operation so the qubits can be operated in parallel
         root_relaxation = schedule.add(Reset(*qubits), label="Start")
 
@@ -127,18 +124,13 @@ class T2(Measurement):
 
 class T2Echo(Measurement):
 
-    def __init__(self,transmons,qubit_state:int=0):
+    def __init__(self,transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
         super().__init__(transmons)
         self.qubit_state = qubit_state
         self.transmons = transmons
 
-        self.static_kwargs = {
-            'qubits': self.qubits,
-        }
-
     def schedule_function(
         self,
-        qubits: list[str],
         delays: dict[str, np.ndarray],
         repetitions: int = 1024,
     ) -> Schedule:
@@ -165,6 +157,8 @@ class T2Echo(Measurement):
             An experiment schedule.
         """
         schedule = Schedule("multiplexed_T2_Echo",repetitions)
+
+        qubits = self.transmons.keys()
 
         #This is the common reference operation so the qubits can be operated in parallel
         root_relaxation = schedule.add(Reset(*qubits), label="Start")

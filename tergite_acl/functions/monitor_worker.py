@@ -113,7 +113,7 @@ def monitor_node_calibration(node, data_path, lab_ic):
         logger.info('Starting coupler spectroscopy')
 
         for node_parameter in external_parameter_values:
-            node.external_parameter_value = node_parameter
+            node.external_parameter_value = node_parameter # probably not needed, will refactor
             pre_measurement_operation(*operations_args, external=node_parameter)
 
             result_dataset = measure_node(
