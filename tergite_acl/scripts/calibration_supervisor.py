@@ -26,7 +26,6 @@ from tergite_acl.utils.redis_utils import populate_initial_parameters, populate_
 from tergite_acl.utils.user_input import user_requested_calibration, attenuation_setting
 from tergite_acl.utils.visuals import draw_arrow_chart
 
-
 colorama_init()
 
 
@@ -74,7 +73,9 @@ class CalibrationSupervisor:
         else:
             raise ClusterNotFoundError(f'Cannot create cluster object from {self.cluster_ip}')
 
+    
     def _create_lab_ic(self, clusters: Union['Cluster', List['Cluster']]):
+
         ic_ = InstrumentCoordinator('lab_ic')
         if isinstance(clusters, Cluster):
             clusters = [clusters]
