@@ -63,7 +63,8 @@ class ExperimentList(QtWidgets.QTreeWidget):
     """A widget that displays a list of experiments for the selected dates."""
 
     # Define the columns to display in the tree view
-    cols = ["TUID", "Name", "Date", "Time", "Keywords"]
+    # cols = ["TUID", "Name", "Date", "Time", "Keywords"]
+    cols = ["TUID", "Name", "Date", "Time"]
 
     # Define signals emitted by this widget
     experiment_selected = QtCore.pyqtSignal(str)
@@ -78,6 +79,7 @@ class ExperimentList(QtWidgets.QTreeWidget):
 
         # Connect signals to corresponding slots
         self.itemSelectionChanged.connect(self.select_experiment)
+        # itemActivated means double clicking or pressing Enter
         self.itemActivated.connect(self.activate_experiment)
 
         # Set up context menu
@@ -304,6 +306,29 @@ class TopBar(QtWidgets.QWidget):
         """
         self.liveplotting_changed.emit(state == QtCore.Qt.Checked)
 
+class ExperimentPreview(QtWidgets.QLabel):
+    def __init__(self, datadir: str, parent: QtWidgets.QWidget | None = None):
+        super().__init__(parent)
+        self.datadir = datadir
+
+        self.setWordWrap(True)
+        self.setSizePolicy(
+            QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
+        )
+
+        font = QtGui.QFont()
+        font.setPointSize(24)
+        self.setFont(font)
+
+    @QtCore.pyqtSlot(str)
+    def display_datadir_path(self, tuid: str) -> None:
+    # def update_datadir(self, datadir: str) -> None:
+        sub_folders = [d for d in os.listdir(self.datadir) if os.path.isdir(os.path.join(self.datadir, d))]
+        if tuid is None:
+            self.setText("No data directory selected")
+        else:
+            self.setText(f"Data directory: {tuid}")
+
 
 class DataDirInspector(QtWidgets.QMainWindow):
     """
@@ -336,12 +361,19 @@ class DataDirInspector(QtWidgets.QMainWindow):
         # create widgets
         self.experiment_list = ExperimentList()
         self.date_list = DateList()
+        self.experiment_preview = ExperimentPreview(datadir)
+
+        sub_splitter = QtWidgets.QSplitter()
+        sub_splitter.addWidget(self.experiment_list)
+        sub_splitter.addWidget(self.experiment_preview)
+        sub_splitter.setSizes([350, 650])
 
         # create splitter for widgets
         splitter = QtWidgets.QSplitter()
         splitter.addWidget(self.date_list)
-        splitter.addWidget(self.experiment_list)
-        splitter.setSizes([80, 920])
+        # splitter.addWidget(self.experiment_list)
+        splitter.addWidget(sub_splitter)
+        splitter.setSizes([85, 915])
 
         # create data directory label and toolbar
         self.top_bar = TopBar(datadir, liveplotting=auto_open_plots, parent=self)
@@ -380,12 +412,13 @@ class DataDirInspector(QtWidgets.QMainWindow):
 
         # set window size
         screen = QDesktopWidget().screenGeometry()
-        self.resize(int(screen.width() * 0.6), int(screen.height() * 0.6))
+        self.resize(int(screen.width() * 0.8), int(screen.height() * 0.8))
 
         # connect signals and slots
         self.experiment_list.experiment_activated.connect(self.open_plots)
         self.date_list.dates_selected.connect(self.set_date_selection)
         self.new_datadir_selected.connect(self.update_datadir)
+        self.experiment_list.experiment_selected.connect(self.experiment_preview.display_datadir_path)
         self._today_folder_monitor.new_measurement_found.connect(
             self._on_new_measurement
         )
