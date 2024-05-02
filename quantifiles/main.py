@@ -10,6 +10,8 @@ from typing import Sequence, Mapping
 
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QDesktopWidget, QMessageBox
+from PyQt5.QtGui import QImageReader, QPixmap
+from PyQt5.QtCore import QSize, Qt
 from quantify_core.data.handling import set_datadir
 from quantify_core.data.types import TUID
 
@@ -68,6 +70,7 @@ class ExperimentList(QtWidgets.QTreeWidget):
 
     # Define signals emitted by this widget
     experiment_selected = QtCore.pyqtSignal(str)
+    new_experiment_selected = QtCore.pyqtSignal(str)
     experiment_activated = QtCore.pyqtSignal(str)
 
     def __init__(self, parent: QtWidgets.QWidget | None = None):
@@ -79,6 +82,7 @@ class ExperimentList(QtWidgets.QTreeWidget):
 
         # Connect signals to corresponding slots
         self.itemSelectionChanged.connect(self.select_experiment)
+        self.itemSelectionChanged.connect(self.select_new_experiment)
         # itemActivated means double clicking or pressing Enter
         self.itemActivated.connect(self.activate_experiment)
 
@@ -172,6 +176,19 @@ class ExperimentList(QtWidgets.QTreeWidget):
 
         tuid = selection[0].text(0)
         self.experiment_selected.emit(tuid)
+
+    @QtCore.pyqtSlot()
+    def select_new_experiment(self) -> None:
+        selection = self.selectedItems()
+        if len(selection) == 0:
+            return
+
+        tuid = selection[0].text(0)
+        name = selection[0].text(1)
+        date = selection[0].text(2).replace('-','')
+        subpath = tuid + '-' + name
+        path = f'{date}/{subpath}'
+        self.new_experiment_selected.emit(path)
 
     @QtCore.pyqtSlot(QtWidgets.QTreeWidgetItem, int)
     def activate_experiment(self, item: QtWidgets.QTreeWidgetItem, _: int) -> None:
@@ -307,27 +324,84 @@ class TopBar(QtWidgets.QWidget):
         self.liveplotting_changed.emit(state == QtCore.Qt.Checked)
 
 class ExperimentPreview(QtWidgets.QLabel):
-    def __init__(self, datadir: str, parent: QtWidgets.QWidget | None = None):
+    def __init__(
+            self,
+            datadir: str,
+            parent: QtWidgets.QWidget | None = None
+        ):
         super().__init__(parent)
         self.datadir = datadir
+
+        # Create label to display image
+        # self.image_label = QtWidgets.QLabel()
+
+        # image_label_width = int(screen_width * 0.8)  # Adjust the fraction as needed
+        # self.image_label.setFixedWidth(image_label_width)  # Set fixed width for the image label
 
         self.setWordWrap(True)
         self.setSizePolicy(
             QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
         )
 
-        font = QtGui.QFont()
-        font.setPointSize(24)
-        self.setFont(font)
+        # font = QtGui.QFont()
+        # font.setPointSize(24)
+        # self.setFont(font)
+
+    def display_image(self, image_path):
+
+        # Check if the image file exists
+        if QImageReader(image_path).size() == QSize(0, 0):
+            self.setText('Image not found')
+            return
+
+        # image_reader = QImageReader(image_path)
+
+        # Display the image in the label
+        image = QPixmap(image_path)
+
+        # Get the dimensions of the image_label
+        label_width = self.width()
+        label_height = self.height()
+        # self.setFixedSize(label_width, label_height)
+        # self.image_label.setFixedSize(image_reader.size().width(), image_reader.size().height())
+        # Scale the image while preserving aspect ratio
+        scaled_image = image.scaled(
+            label_width, label_height, transformMode=Qt.SmoothTransformation
+            # label_width, label_height, aspectRatioMode=Qt.KeepAspectRatio
+        )
+
+        # Display the scaled image in the label
+        self.setPixmap(scaled_image)
+
+        self.setScaledContents(True)
+        self.adjustSize()
+        self.setGeometry(100, 100, label_width, label_height)
+        # self.setGeometry(5, 5, image.width(), image.height())
+        self.show()
 
     @QtCore.pyqtSlot(str)
-    def display_datadir_path(self, tuid: str) -> None:
+    def display_datadir_path(self, date: str) -> None:
     # def update_datadir(self, datadir: str) -> None:
-        sub_folders = [d for d in os.listdir(self.datadir) if os.path.isdir(os.path.join(self.datadir, d))]
-        if tuid is None:
-            self.setText("No data directory selected")
-        else:
-            self.setText(f"Data directory: {tuid}")
+        folder_path = self.datadir + date
+
+        # if folder_content is None:
+        #     self.setText("No data directory selected")
+        # else:
+        #     self.setText(f"Data directory: {folder_content}")
+
+        files = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
+
+        # Filter for PNG files
+        png_files = [f for f in files if f.lower().endswith('.png')]
+
+        if not png_files:
+            self.image_label.setText('No PNG image found in the selected folder')
+            return
+
+        # Assuming one png per file, let's use the first PNG file found in the folder
+        image_path = os.path.join(folder_path, png_files[0])
+
+        self.display_image(image_path)
 
 
 class DataDirInspector(QtWidgets.QMainWindow):
@@ -418,7 +492,8 @@ class DataDirInspector(QtWidgets.QMainWindow):
         self.experiment_list.experiment_activated.connect(self.open_plots)
         self.date_list.dates_selected.connect(self.set_date_selection)
         self.new_datadir_selected.connect(self.update_datadir)
-        self.experiment_list.experiment_selected.connect(self.experiment_preview.display_datadir_path)
+        # self.experiment_list.experiment_selected.connect(self.experiment_preview.display_datadir_path)
+        self.experiment_list.new_experiment_selected.connect(self.experiment_preview.display_datadir_path)
         self._today_folder_monitor.new_measurement_found.connect(
             self._on_new_measurement
         )
