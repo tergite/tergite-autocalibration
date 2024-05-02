@@ -173,7 +173,7 @@ def reversing_XY_matrix(rng_sequence):
     return reversing_index, reversing_decomposition
 #---
 if __name__ == "__main__":
-    test_sequence = np.array([3], dtype=np.int32)
+    test_sequence = np.array(np.random.randint(0, 24, 10), dtype=np.int32)
     reversing_index, _ = reversing_XY_matrix(test_sequence)
     print(f'{ test_sequence = }')
     print(f'{ reversing_index = }')
