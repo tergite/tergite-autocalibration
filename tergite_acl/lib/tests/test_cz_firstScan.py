@@ -1,3 +1,4 @@
+import matplotlib
 import pytest
 from pathlib import Path
 import xarray as xr
@@ -138,3 +139,23 @@ def test_canGetBestFrequencyFromBadChevronQ22(setup_bad_data):
     assert bestFreq == freq[3]
     assert (max(result.pvalues) < 0.8) or (max(p[0] for p in result.fittedParams)) < 0.2
     assert result.status == FitResultStatus.FOUND
+
+def test_plotsAreCreated(setup_good_data):
+    matplotlib.use('Agg')
+    d17, d22  = setup_good_data
+    first_scan = CZFirstScan(d17)
+    result  = first_scan.run_fitting()
+    folder_path = Path(__file__).parent / 'results'
+    first_scan.plotter(folder_path)
+
+    figure_path = folder_path / 'AllFits_q17.png'
+    assert figure_path.exists(), "The PNG file should exist"
+    from PIL import Image
+    with Image.open(figure_path) as img:
+        assert img.format == "PNG", "File should be a PNG image"
+
+    figure_path = folder_path / 'SummaryScan_q17.png'
+    assert figure_path.exists(), "The PNG file should exist"
+    from PIL import Image
+    with Image.open(figure_path) as img:
+        assert img.format == "PNG", "File should be a PNG image"
