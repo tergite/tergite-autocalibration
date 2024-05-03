@@ -86,7 +86,8 @@ class AttrDict(dict):
         try:
             keys.insert(0, self._key)
             self._former_instance.fresh(keys, value)
-        except AttributeError:
+        except AttributeError as e:
+            print(e.args)
             self._fresh(keys, value)
             
     def clear(self):
@@ -113,10 +114,12 @@ class SRegistry(AttrDict):
         super().__init__(dct)
 
     def fresh(self, keys, value):
+        print('SRegistry starts freshing...')
         for i, key in enumerate(keys):
             if key in self.device_dict:
                 keys[i] = self.device_dict[key]
         keys.append(value)
+        keys = [keys[0], ":".join(keys[1:-1]), str(keys[-1])]
         self.cxn.hset(*keys)
         print('Sent to redis...')
 
