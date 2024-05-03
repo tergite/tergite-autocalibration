@@ -1,4 +1,5 @@
 import pytest
+from pathlib import Path
 import xarray as xr
 import numpy as np
 from tergite_acl.lib.analysis.cz_firstScan import CZFirstScan
@@ -6,7 +7,9 @@ from tergite_acl.lib.analysis.cz_firstScanResult import FitResultStatus
 
 @pytest.fixture(autouse=True)
 def setup_good_data():
-    ds = xr.open_dataset('C:/Users/faucci/Documents/Autocalibration/cz_20240324-26/20240324/20240324-161704-095-ab9244-cz_chevron/dataset.hdf5') #super good
+    dataset_path = Path(__file__).parent / 'data' / 'dataset_goodQuality.hdf5'
+    print(dataset_path)
+    ds = xr.open_dataset(dataset_path) 
     ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
     d17 = ds.yq17.to_dataset()
     d22 = ds.yq22.to_dataset()
@@ -48,7 +51,8 @@ def test_canGetBestFrequencyFromGoodChevronQ22(setup_good_data):
 
 @pytest.fixture(autouse=True)
 def setup_medium_data():
-    ds = xr.open_dataset('C:/Users/faucci/Documents/Autocalibration/cz_20240324-26/20240324/20240324-163035-272-36df40-cz_chevron/dataset.hdf5')
+    dataset_path = Path(__file__).parent / 'data' / 'dataset_mediumQuality.hdf5'
+    ds = xr.open_dataset(dataset_path) 
     ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
     d17 = ds.yq17.to_dataset()
     d22 = ds.yq22.to_dataset()
@@ -78,7 +82,8 @@ def test_canGetBestFrequencyFromMediumChevronQ22(setup_medium_data):
 
 @pytest.fixture(autouse=True)
 def setup_poor_data():
-    ds = xr.open_dataset('C:/Users/faucci/Documents/Autocalibration/cz_20240324-26/20240324/20240324-174712-413-685424-cz_chevron/dataset.hdf5')
+    dataset_path = Path(__file__).parent / 'data' / 'dataset_poorQuality.hdf5'
+    ds = xr.open_dataset(dataset_path) 
     ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
     d17 = ds.yq17.to_dataset()
     d22 = ds.yq22.to_dataset()
@@ -104,7 +109,9 @@ def test_canGetBestFrequencyFromPoorChevronQ22(setup_poor_data):
 
 @pytest.fixture(autouse=True)
 def setup_bad_data():
-    ds = xr.open_dataset('C:/Users/faucci/Documents/Autocalibration/cz_20240324-26/20240324/20240324-165738-206-71adb0-cz_chevron/dataset.hdf5')
+    dataset_path = Path(__file__).parent / 'data' / 'dataset_badQuality.hdf5'
+    print(dataset_path)
+    ds = xr.open_dataset(dataset_path) 
     ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
     d17 = ds.yq17.to_dataset()
     d22 = ds.yq22.to_dataset()
