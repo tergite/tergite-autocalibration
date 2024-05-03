@@ -3,17 +3,17 @@ import xarray as xr
 import numpy as np
 from scipy.optimize import curve_fit
 from scipy.stats import chi2 as chi2dist
-from tergite_acl.lib.analysis.cz_firstScanResult import CZFirstScanResult,FitResultStatus
+from tergite_acl.lib.analysis.cz_singleGateSimpleFitResult import CZSingleGateSimpleFitResult,FitResultStatus
 import matplotlib.pyplot as plt
 
-class CZFirstScan(BaseAnalysis):
+class CZSimpleFit(BaseAnalysis):
         
     def __init__(self, dataset: xr.Dataset):
         super().__init__()
         self.dataset = dataset
         self.data_var = list(dataset.data_vars.keys())[0]
         self.qubit = dataset[self.data_var].attrs['qubit']
-        self.result = CZFirstScanResult()
+        self.result = CZSingleGateSimpleFitResult()
         self.fittefTimes = []
         self.freq = self.dataset[f'cz_pulse_frequencies_sweep{self.qubit}'].values / 1e6 # MHz
         self.times = self.dataset[f'cz_pulse_durations{self.qubit}'].values  * 1e9 # ns
@@ -26,7 +26,7 @@ class CZFirstScan(BaseAnalysis):
         
         return p[0] * np.cos(2 * np.pi / p[1] * (x - p[2])) + p[3]    
     
-    def run_fitting(self) -> CZFirstScanResult:
+    def run_fitting(self) -> CZSingleGateSimpleFitResult:
         magnitudes = np.array([[np.linalg.norm(u) for u in v] for v in self.dataset[f'y{self.qubit}']])
         self.magnitudes = np.transpose((magnitudes - np.min(magnitudes)) / (np.max(magnitudes) - np.min(magnitudes)))
 
@@ -45,7 +45,7 @@ class CZFirstScan(BaseAnalysis):
                 popt = curve_fit(self.fitfunc, self.times, prob, sigma=errors, bounds=bounds, p0=initial_parameters)
             except RuntimeError as e:
                 print("An error occurred during curve fitting:", e)
-                self.result = CZFirstScanResult(pvalues, paras_fit, FitResultStatus.NOT_FOUND)    
+                self.result = CZSingleGateSimpleFitResult(pvalues, paras_fit, FitResultStatus.NOT_FOUND)    
                 return self.result
             
             params = popt[0]
@@ -81,7 +81,7 @@ class CZFirstScan(BaseAnalysis):
                 except RuntimeError as e:
                     print("An error occurred during curve fitting:", e)
                     self.status = FitResultStatus.NOT_FOUND
-                    r = CZFirstScanResult(pvalues, paras_fit, self.status)    
+                    r = CZSingleGateSimpleFitResult(pvalues, paras_fit, self.status)    
                     return r
                 
                 params = popt[0]
@@ -103,7 +103,7 @@ class CZFirstScan(BaseAnalysis):
             else:
                 print("Not enough points, using first step")
         
-        self.result = CZFirstScanResult(pvalues, paras_fit, FitResultStatus.FOUND)
+        self.result = CZSingleGateSimpleFitResult(pvalues, paras_fit, FitResultStatus.FOUND)
         return self.result
 
     def plotter(self, outputFolder):

@@ -93,3 +93,5 @@ tergite_acl/utils/**.csv
 # internal
 external/
 workbench/
+tergite_acl/lib/tests/results/AllFits_q17.png
+tergite_acl/lib/tests/results/SummaryScan_q17.png
