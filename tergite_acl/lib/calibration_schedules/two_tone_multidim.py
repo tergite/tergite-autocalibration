@@ -95,16 +95,6 @@ class Two_Tones_Multidim(Measurement):
                 for acq_index, spec_pulse_amplitude in enumerate(amplitude_values):
                     this_index = freq_indx * number_of_ampls + acq_index
 
-                    # spec_pulse = schedule.add(
-                    #     long_square_pulse(
-                    #         duration= spec_pulse_durations[this_qubit],
-                    #         amp= spec_pulse_amplitude,
-                    #         port= mw_pulse_ports[this_qubit],
-                    #         clock=this_clock,
-                    #     ),
-                    #     label=f"spec_pulse_multidim_{this_qubit}_{this_index}", ref_op=set_frequency, ref_pt="end",
-                    # )
-
                     if self.qubit_state == 0:
                         pass
                     elif self.qubit_state == 1:
@@ -112,8 +102,14 @@ class Two_Tones_Multidim(Measurement):
                     else:
                         raise ValueError(f'Invalid qubit state: {self.qubit_state}')
 
+                    # long pulses require more efficient memory managment
+                    if spec_pulse_duration > 6.5e-6:
+                        SpectroscopyPulse = long_square_pulse
+                    else:
+                        SpectroscopyPulse = SoftSquarePulse
+
                     schedule.add(
-                        SoftSquarePulse(
+                        SpectroscopyPulse(
                             duration=spec_pulse_duration,
                             amp=spec_pulse_amplitude,
                             port=mw_pulse_port,
