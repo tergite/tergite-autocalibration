@@ -1,8 +1,10 @@
-#----Standard packages------
 import copy
-from collections import abc, UserList
+from collections import abc, UserList, defaultdict
 from functools import singledispatchmethod
-from config.settings import REDIS_CONNECTION, REDIS_PORT
+from tergite_acl.config.settings import REDIS_CONNECTION, REDIS_PORT
+
+def nested_dd():
+    return defaultdict(nested_dd)
 
 class AttrDict(dict):
     """A dict accessed by attribute recursivly.
@@ -117,15 +119,27 @@ class SRegistry(AttrDict):
         keys.append(value)
         self.cxn.hset(*keys)
         print('Sent to redis...')
+
+    @staticmethod
+    def _set_recr_dd(dd, key, value):
+        keys_split = key.split(":")
+        for key in keys_split[:-1]:
+            dd = dd[key]
+        try:
+            dd[keys_split[-1]] = value
+        except TypeError:
+            dd = nested_dd()
+            dd[keys_split[-1]] = value
             
     def readin(self):
-        dct = dict()
+        dct = nested_dd()
         for key in self.cxn.keys():
-            value_dict = self.cxn.hgetall(key)
             if 'transmons' in key or 'couplers' in key:
+                value_dict = self.cxn.hgetall(key)
                 device = key.split(":")[-1]
                 self.device_dict[device] = key
-                dct[device] = value_dict
+                for key, value in value_dict.items():
+                    self._set_recr_dd(dct[device], key, value)
         return dct
             
     def __repr__(self):
