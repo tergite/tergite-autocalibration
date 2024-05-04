@@ -62,9 +62,10 @@ def configure_dataset(
             coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
 
         if hasattr(node, 'node_externals'):
-            coord_key = node.external_parameter_name + measured_qubit
-            coord_attrs = {'qubit':measured_qubit, 'long_name': f'{coord_key}', 'units': 'NA'}
-            coords_dict[coord_key] = (coord_key, np.array([node.external_parameter_value]), coord_attrs)
+            print('WARNING for node_externals dataset attrs')
+            # coord_key = node.external_parameter_name + measured_qubit
+            # coord_attrs = {'qubit':measured_qubit, 'long_name': f'{coord_key}', 'units': 'NA'}
+            # coords_dict[coord_key] = (coord_key, np.array([node.external_parameter_value]), coord_attrs)
 
         partial_ds = xarray.Dataset(coords=coords_dict)
 

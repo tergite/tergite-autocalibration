@@ -40,7 +40,9 @@ def measure_node(
     raw_dataset = execute_schedule(compiled_schedule, lab_ic, schedule_duration, cluster_status)
 
     result_dataset = configure_dataset(raw_dataset, node)
+
     save_dataset(result_dataset, node, data_path)
+
     if node.name == 'ro_frequency_two_state_optimization':
         result_dataset = handle_ro_freq_optimization(result_dataset, states=[0, 1])
     elif node.name == 'ro_frequency_three_state_optimization':

@@ -1,3 +1,4 @@
+from logging import raiseExceptions
 import xarray
 from tergite_acl.utils.dataset_utils import retrieve_dummy_dataset
 from tergite_acl.utils.status import ClusterStatus
@@ -103,3 +104,5 @@ def monitor_node_calibration(node, data_path, lab_ic, cluster_status):
         if not node.post_process_each_iteration:
             measurement_result = post_process(ds, node, data_path=data_path)
         logger.info('analysis completed')
+    else:
+        raise ValueError(f'{node.type} is node a valid node type' )
