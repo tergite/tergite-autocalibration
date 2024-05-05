@@ -15,6 +15,7 @@ from tergite_acl.lib.calibration_schedules.motzoi_parameter import Motzoi_parame
 from tergite_acl.lib.calibration_schedules.adaptive_motzoi_parameter import Adaptive_Motzoi_parameter
 from tergite_acl.lib.calibration_schedules.n_rabi_oscillations import N_Rabi_Oscillations
 from tergite_acl.lib.calibration_schedules.rabi_oscillations import Rabi_Oscillations
+from tergite_acl.lib.calibration_schedules.cw_two_nones_spectroscopy import CW_Two_Tones_Spectroscopy
 from tergite_acl.lib.calibration_schedules.ramsey_fringes import Ramsey_fringes
 from tergite_acl.lib.calibration_schedules.ramsey_detunings import Ramsey_detunings
 # from calibration_schedules.two_tone_multidim import Two_Tones_Multidim
@@ -23,12 +24,13 @@ from tergite_acl.lib.calibration_schedules.two_tones_spectroscopy import Two_Ton
 
 
 class Qubit_01_Spectroscopy_Pulsed_Node(BaseNode):
+    measurement_obj = Two_Tones_Spectroscopy
+    analysis_obj = QubitSpectroscopyAnalysis
+
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.sweep_range = self.node_dictionary.pop("sweep_range", None)
         self.redis_field = ['clock_freqs:f01']
-        self.measurement_obj = Two_Tones_Spectroscopy
-        self.analysis_obj = QubitSpectroscopyAnalysis
         self.samplespace = {
             'spec_frequencies': {
                 qubit: qubit_samples(qubit, sweep_range=self.sweep_range) for qubit in self.all_qubits
@@ -36,13 +38,36 @@ class Qubit_01_Spectroscopy_Pulsed_Node(BaseNode):
         }
 
 
+class Qubit_01_Spectroscopy_CW_Node(BaseNode):
+    measurement_obj = CW_Two_Tones_Spectroscopy
+    analysis_obj = QubitSpectroscopyAnalysis
+
+    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
+        self.sweep_range = self.node_dictionary.pop("sweep_range", None)
+        self.redis_field = ['clock_freqs:f01']
+        self.type = 'parameterized_simple_sweep'
+
+        self.operations_args = []
+
+        self.external_samplespace = {
+            'cw_frequenies': {
+                qubit: qubit_samples(qubit, sweep_range=self.sweep_range) for qubit in self.all_qubits
+            }
+        }
+
+    def pre_measurement_operation(self, external=1):
+        pass
+
+
 class Qubit_01_Spectroscopy_Multidim_Node(BaseNode):
+    measurement_obj = Two_Tones_Multidim
+    analysis_obj = QubitSpectroscopyMultidim
+
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['clock_freqs:f01',
                             'spec:spec_ampl_optimal']
-        self.measurement_obj = Two_Tones_Multidim
-        self.analysis_obj = QubitSpectroscopyMultidim
         self.samplespace = {
             'spec_pulse_amplitudes': {
                 qubit: np.linspace(3e-4, 9e-4, 5) for qubit in self.all_qubits

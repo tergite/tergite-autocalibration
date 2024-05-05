@@ -19,6 +19,7 @@ class NodeFactory:
             'resonator_spectroscopy': Resonator_Spectroscopy_Node,
             'qubit_01_spectroscopy_pulsed': Qubit_01_Spectroscopy_Pulsed_Node,
             'qubit_01_spectroscopy': Qubit_01_Spectroscopy_Multidim_Node,
+            'qubit_01_cw_spectroscopy': Qubit_01_Spectroscopy_CW_Node,
             'rabi_oscillations': Rabi_Oscillations_Node,
             'ramsey_correction': Ramsey_Fringes_Node,
             'adaptive_ramsey_correction': Adaptive_Ramsey_Fringes_Node,

@@ -36,8 +36,6 @@ class All_XY_Node(BaseNode):
         return cluster_samplespace
 
 
-
-
 class T1_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
@@ -46,8 +44,8 @@ class T1_Node(BaseNode):
         self.measurement_obj = T1
         self.analysis_obj = T1Analysis
         self.backup = False
-        self.type = 'parameterized_simple_sweep'
 
+        self.type = 'parameterized_simple_sweep'
         self.node_externals = range(2)
         self.external_parameter_name = 'repeat'
         self.external_parameter_value = 0

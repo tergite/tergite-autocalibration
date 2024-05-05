@@ -11,6 +11,7 @@ node reference
   resonator_spectroscopy
   qubit_01_spectroscopy
   qubit_01_spectroscopy_pulsed
+  qubit_01_cw_spectroscopy
   rabi_oscillations
   ramsey_correction
   resonator_spectroscopy_1
@@ -44,7 +45,7 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'adaptive_motzoi_parameter',
+    'target_node': '',
     'all_qubits': qubits,
     'couplers': couplers,
 }
