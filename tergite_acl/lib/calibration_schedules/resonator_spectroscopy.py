@@ -43,7 +43,7 @@ class Resonator_Spectroscopy(Measurement):
             An experiment schedule.
         """
 
-        sched = Schedule("multiplexed_resonator_spectroscopy",repetitions)
+        schedule = Schedule("multiplexed_resonator_spectroscopy",repetitions)
 
         qubits = self.transmons.keys()
 
@@ -57,15 +57,15 @@ class Resonator_Spectroscopy(Measurement):
         #Initialize ClockResource with the first frequency value
         for this_qubit, ro_array_val in ro_frequencies.items():
             this_ro_clock = f'{this_qubit}.' + ro_str
-            sched.add_resource( ClockResource(name=this_ro_clock, freq=ro_array_val[0]) )
+            schedule.add_resource( ClockResource(name=this_ro_clock, freq=ro_array_val[0]) )
 
         if self.qubit_state == 2:
             for this_qubit, this_transmon in self.transmons.items():
                 this_clock = f'{this_qubit}.12'
                 mw_frequency_12 = this_transmon.clock_freqs.f12()
-                sched.add_resource(ClockResource(name=this_clock, freq=mw_frequency_12))
+                schedule.add_resource(ClockResource(name=this_clock, freq=mw_frequency_12))
 
-        root_relaxation = sched.add(Reset(*qubits), label="Reset")
+        root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
         # The outer for loop iterates over all qubits:
         for acq_cha, (this_qubit, ro_f_values) in enumerate(ro_frequencies.items()):
@@ -81,7 +81,7 @@ class Resonator_Spectroscopy(Measurement):
             integration_time = this_transmon.measure.integration_time()
             ro_port = this_transmon.ports.readout()
 
-            sched.add(
+            schedule.add(
                 Reset(*qubits), ref_op=root_relaxation, ref_pt='end'
             ) #To enforce parallelism we refer to the root relaxation
 
@@ -90,17 +90,17 @@ class Resonator_Spectroscopy(Measurement):
 
             # The second for loop iterates over all frequency values in the frequency batch:
             for acq_index, ro_frequency in enumerate(ro_f_values):
-                sched.add(
+                schedule.add(
                     SetClockFrequency(clock=this_ro_clock, clock_freq_new=ro_frequency),
                 )
 
                 if self.qubit_state == 0:
                     pass
                 elif self.qubit_state == 1:
-                    sched.add(X(this_qubit))
+                    schedule.add(X(this_qubit))
                 elif self.qubit_state == 2:
-                    sched.add(X(this_qubit))
-                    sched.add(
+                    schedule.add(X(this_qubit))
+                    schedule.add(
                         DRAGPulse(
                             duration=mw_pulse_duration,
                             G_amp=mw_ef_amp180,
@@ -111,7 +111,7 @@ class Resonator_Spectroscopy(Measurement):
                         ),
                     )
 
-                ro_pulse = sched.add(
+                ro_pulse = schedule.add(
                     SquarePulse(
                         duration=ro_pulse_duration,
                         amp=ro_pulse_amplitude,
@@ -120,7 +120,7 @@ class Resonator_Spectroscopy(Measurement):
                     ),
                 )
 
-                sched.add(
+                schedule.add(
                     SSBIntegrationComplex(
                         duration=integration_time,
                         port=ro_port,
@@ -133,6 +133,6 @@ class Resonator_Spectroscopy(Measurement):
                     rel_time=acquisition_delay,
                 )
 
-                sched.add(Reset(this_qubit))
+                schedule.add(Reset(this_qubit))
 
-        return sched
+        return schedule

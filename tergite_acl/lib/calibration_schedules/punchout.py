@@ -18,22 +18,8 @@ class Punchout(Measurement):
         self.qubit_state = qubit_state
         self.transmons = transmons
 
-        self.static_kwargs = {
-            'qubits': self.qubits,
-            'pulse_durations': self.attributes_dictionary('pulse_duration'),
-            'acquisition_delays': self.attributes_dictionary('acq_delay'),
-            'integration_times': self.attributes_dictionary('integration_time'),
-            'ports': self.attributes_dictionary('readout_port'),
-        }
-
-
     def schedule_function(
             self, #Note, this is not used in the schedule
-            qubits: list[str],
-            pulse_durations: dict[str,float],
-            acquisition_delays: dict[str,float],
-            integration_times: dict[str,float],
-            ports: dict[str,str],
             ro_frequencies: dict[str,np.ndarray],
             ro_amplitudes: dict[str,np.ndarray],
             repetitions: int = 1024,
@@ -74,9 +60,10 @@ class Punchout(Measurement):
 
         schedule = Schedule("mltplx_punchout",repetitions)
 
+        qubits = self.transmons.keys()
+
         # Initialize the clock for each qubit
         for this_qubit, ro_array_val in ro_frequencies.items():
-
             #Initialize ClockResource with the first frequency value
             schedule.add_resource( ClockResource(name=f'{this_qubit}.ro', freq=ro_array_val[0]) )
 
@@ -86,6 +73,13 @@ class Punchout(Measurement):
         # The outer loop, iterates over all qubits
         for acq_cha, (this_qubit, ro_amplitude_values) in enumerate(ro_amplitudes.items()):
             this_clock = f'{this_qubit}.ro'
+
+            # unpack the static parameters
+            this_transmon = self.transmons[this_qubit]
+            pulse_duration = this_transmon.measure.pulse_duration()
+            acquisition_delay = this_transmon.measure.acq_delay()
+            integration_time = this_transmon.measure.integration_time()
+            ro_port = this_transmon.ports.readout()
 
             frequency_values = ro_frequencies[this_qubit]
             number_of_freqs = len(frequency_values)
@@ -108,9 +102,9 @@ class Punchout(Measurement):
 
                     schedule.add(
                         SquarePulse(
-                            duration=pulse_durations[this_qubit],
+                            duration=pulse_duration,
                             amp=ro_amplitude,
-                            port=ports[this_qubit],
+                            port=ro_port,
                             clock=this_clock,
                         ),
                         ref_pt="end",
@@ -118,16 +112,15 @@ class Punchout(Measurement):
 
                     schedule.add(
                         SSBIntegrationComplex(
-                            duration=integration_times[this_qubit],
-                            port=ports[this_qubit],
+                            duration=integration_time,
+                            port=ro_port,
                             clock=this_clock,
                             acq_index=this_index,
                             acq_channel=acq_cha,
                             bin_mode=BinMode.AVERAGE
                         ),
                         ref_pt="start",
-                        rel_time=acquisition_delays[this_qubit],
-                        label=f"acquisition_{this_qubit}_{this_index}",
+                        rel_time=acquisition_delay,
                     )
 
                     schedule.add(Reset(this_qubit))

@@ -45,7 +45,7 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'punchout',
+    'target_node': 'qubit_01_spectroscopy',
     'all_qubits': qubits,
     'couplers': couplers,
 }

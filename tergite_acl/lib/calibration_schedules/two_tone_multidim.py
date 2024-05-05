@@ -22,7 +22,7 @@ class Two_Tones_Multidim(Measurement):
     def schedule_function(
         self,
         spec_frequencies: dict[str,np.ndarray],
-        spec_pulse_amplitudes: dict[str,np.ndarray],
+        spec_pulse_amplitudes: dict[str,np.ndarray] = None,
 
         repetitions: int = 1024,
         ) -> Schedule:

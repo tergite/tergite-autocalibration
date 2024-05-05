@@ -82,11 +82,12 @@ class Resonator_Spectroscopy_2_Node(BaseNode):
 
 
 class Punchout_Node(BaseNode):
+    measurement_obj = Punchout
+    analysis_obj = PunchoutAnalysis
+
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['measure:pulse_amp']
-        self.measurement_obj = Punchout
-        self.analysis_obj = PunchoutAnalysis
 
     @property
     def samplespace(self):
@@ -95,7 +96,7 @@ class Punchout_Node(BaseNode):
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             },
             'ro_amplitudes': {
-                qubit: np.linspace(0.005, 0.022, 8) for qubit in self.all_qubits
+                qubit: np.linspace(0.008, 0.1, 11) for qubit in self.all_qubits
             },
         }
         return cluster_samplespace
