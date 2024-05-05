@@ -22,14 +22,14 @@ ro_amplitude_three_state_optimization.inv_cm_opt = nan
 
 qubit_01_spectroscopy_pulsed.clock_freqs.f01 = nan
 qubit_01_spectroscopy.clock_freqs.f01 = nan
-qubit_01_spectroscopy.spec_ampl_optimal = nan
+qubit_01_spectroscopy.spec.spec_ampl_optimal = nan
 ramsey_correction.clock_freqs.f01 = nan
 adaptive_ramsey_correction.clock_freqs.f01 = nan
 
 qubit_12_spectroscopy_pulsed.clock_freqs.f12 = nan
 qubit_12_spectroscopy_pulsed.anharmonicity = nan
 qubit_12_spectroscopy.clock_freqs.f12 = nan
-qubit_12_spectroscopy.spec_ampl_12_optimal = nan
+qubit_12_spectroscopy.spec.spec_ampl_12_optimal = nan
 ramsey_correction_12.clock_freqs.f12 = nan
 
 rabi_oscillations.rxy.amp180 = nan
@@ -135,10 +135,6 @@ reset.duration = 100e-6
 
 [resonator_spectroscopy_2.all]
 reset.duration = 240e-6
-
-[qubit_01_spectroscopy_pulsed.all]
-spec.spec_duration = 2e-6
-spec.spec_amp = 4.5e-4
 
 [qubit_01_spectroscopy.all]
 spec.spec_duration = 2e-6
