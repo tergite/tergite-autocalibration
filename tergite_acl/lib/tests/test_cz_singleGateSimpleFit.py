@@ -3,7 +3,7 @@ import pytest
 from pathlib import Path
 import xarray as xr
 import numpy as np
-from tergite_acl.lib.analysis.cz_simpleFit import CZSimpleFit
+from tergite_acl.lib.analysis.cz_singleGateSimpleFit import CZSingleGateSimpleFit
 from tergite_acl.lib.analysis.cz_singleGateSimpleFitResult import FitResultStatus
 
 @pytest.fixture(autouse=True)
@@ -20,19 +20,19 @@ def setup_good_data():
 
 def test_canCreate(setup_good_data):
     d17, d22 = setup_good_data
-    CZSimpleFit(d17)
+    CZSingleGateSimpleFit(d17)
     pass
     
 def test_datasetHasQubitDefined(setup_good_data):
     d17, d22 = setup_good_data
-    r = CZSimpleFit(d17)
+    r = CZSingleGateSimpleFit(d17)
     assert r.qubit == 'q17'
-    r = CZSimpleFit(d22)
+    r = CZSingleGateSimpleFit(d22)
     assert r.qubit == 'q22'
 
 def test_canGetBestFrequencyFromGoodChevronQ17(setup_good_data):
     d17, d22  = setup_good_data
-    first_scan = CZSimpleFit(d17)
+    first_scan = CZSingleGateSimpleFit(d17)
     result = first_scan.run_fitting()
     freq = d17[f'cz_pulse_frequencies_sweepq17'].values  # MHz
     bestFreq = freq[np.argmax(result.pvalues)]
@@ -42,7 +42,7 @@ def test_canGetBestFrequencyFromGoodChevronQ17(setup_good_data):
 
 def test_canGetBestFrequencyFromGoodChevronQ22(setup_good_data):
     d17, d22  = setup_good_data
-    first_scan = CZSimpleFit(d22)
+    first_scan = CZSingleGateSimpleFit(d22)
     result = first_scan.run_fitting()
     freq = d22[f'cz_pulse_frequencies_sweepq22'].values  # MHz
     bestFreq = freq[np.argmax(result.pvalues)]
@@ -63,7 +63,7 @@ def setup_medium_data():
 
 def test_canGetBestFrequencyFromMediumChevronQ17(setup_medium_data):
     d17, d22  = setup_medium_data
-    first_scan = CZSimpleFit(d17)
+    first_scan = CZSingleGateSimpleFit(d17)
     result  = first_scan.run_fitting()
     freq = d17[f'cz_pulse_frequencies_sweepq17'].values  # MHz
     bestFreq = freq[np.argmax(result.pvalues)]
@@ -73,7 +73,7 @@ def test_canGetBestFrequencyFromMediumChevronQ17(setup_medium_data):
 
 def test_canGetBestFrequencyFromMediumChevronQ22(setup_medium_data):
     d17, d22  = setup_medium_data
-    first_scan = CZSimpleFit(d22)
+    first_scan = CZSingleGateSimpleFit(d22)
     result = first_scan.run_fitting()
     freq = d22[f'cz_pulse_frequencies_sweepq22'].values  # MHz
     bestFreq = freq[np.argmax(result.pvalues)]
@@ -94,13 +94,13 @@ def setup_poor_data():
 
 def test_CatchBadFitFromPoorChevronQ17(setup_poor_data):
     d17, d22  = setup_poor_data
-    first_scan = CZSimpleFit(d17)
+    first_scan = CZSingleGateSimpleFit(d17)
     result  = first_scan.run_fitting()
     assert result.status == FitResultStatus.NOT_FOUND
 
 def test_canGetBestFrequencyFromPoorChevronQ22(setup_poor_data):
     d17, d22  = setup_poor_data
-    first_scan = CZSimpleFit(d22)
+    first_scan = CZSingleGateSimpleFit(d22)
     result = first_scan.run_fitting()
     freq = d22[f'cz_pulse_frequencies_sweepq22'].values  # MHz
     bestFreq = freq[np.argmax(result.pvalues)]
@@ -122,7 +122,7 @@ def setup_bad_data():
 
 def test_canGetBestFrequencyFromBadChevronQ17(setup_bad_data):
     d17, d22  = setup_bad_data
-    first_scan = CZSimpleFit(d17)
+    first_scan = CZSingleGateSimpleFit(d17)
     result  = first_scan.run_fitting()
     freq = d17[f'cz_pulse_frequencies_sweepq17'].values  # MHz
     bestFreq = freq[np.argmax(result.pvalues)]
@@ -132,7 +132,7 @@ def test_canGetBestFrequencyFromBadChevronQ17(setup_bad_data):
 
 def test_canGetBestFrequencyFromBadChevronQ22(setup_bad_data):
     d17, d22  = setup_bad_data
-    first_scan = CZSimpleFit(d22)
+    first_scan = CZSingleGateSimpleFit(d22)
     result = first_scan.run_fitting()
     freq = d22[f'cz_pulse_frequencies_sweepq22'].values  # MHz
     bestFreq = freq[np.argmax(result.pvalues)]
@@ -143,7 +143,7 @@ def test_canGetBestFrequencyFromBadChevronQ22(setup_bad_data):
 def test_plotsAreCreated(setup_good_data):
     matplotlib.use('Agg')
     d17, d22  = setup_good_data
-    first_scan = CZSimpleFit(d17)
+    first_scan = CZSingleGateSimpleFit(d17)
     result  = first_scan.run_fitting()
     folder_path = Path(__file__).parent / 'results'
     first_scan.plotter(folder_path)

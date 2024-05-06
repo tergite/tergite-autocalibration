@@ -6,12 +6,14 @@ from scipy.stats import chi2 as chi2dist
 from tergite_acl.lib.analysis.cz_singleGateSimpleFitResult import CZSingleGateSimpleFitResult,FitResultStatus
 import matplotlib.pyplot as plt
 
-class CZSimpleFit(BaseAnalysis):
+class CZSingleGateSimpleFit(BaseAnalysis):
         
     def __init__(self, dataset: xr.Dataset):
         super().__init__()
         self.dataset = dataset
+        #print(dataset)
         self.data_var = list(dataset.data_vars.keys())[0]
+        #print(self.data_var)
         self.qubit = dataset[self.data_var].attrs['qubit']
         self.result = CZSingleGateSimpleFitResult()
         self.fittefTimes = []
@@ -30,13 +32,13 @@ class CZSimpleFit(BaseAnalysis):
         magnitudes = np.array([[np.linalg.norm(u) for u in v] for v in self.dataset[f'y{self.qubit}']])
         self.magnitudes = np.transpose((magnitudes - np.min(magnitudes)) / (np.max(magnitudes) - np.min(magnitudes)))
 
-        print("First fit")
+        #print("First fit")
         # Here we could reintroduce the fft for better estumate of inital period        
         paras_fit = []
         chi2 = []
         pvalues = []
         for i, prob in enumerate(self.magnitudes):
-            print(i)
+            #print(i)
             errors = np.full(len(prob), 0.05)
             initial_parameters = [0.4, 100, self.times[np.argmax(prob)], 0.5]
             bounds = ([0.01, 20, min(self.times), -1], [0.6, 400, max(self.times), 1])
@@ -94,7 +96,7 @@ class CZSimpleFit(BaseAnalysis):
                 # Calculate the p-value
                 p_value = 1 - chi2dist.cdf(chi_sq, len(prob_cut) - len(params))
 
-                print("pvalue: " + str(p_value))
+                #print("pvalue: " + str(p_value))
 
                 paras_fit[i] = params
                 chi2[i] = chi_sq
