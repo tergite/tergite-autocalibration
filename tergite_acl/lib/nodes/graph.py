@@ -41,7 +41,7 @@ graph_dependencies = [
     ('resonator_spectroscopy_2', 'ro_frequency_three_state_optimization'),
     ('ro_frequency_three_state_optimization', 'ro_amplitude_three_state_optimization'),
     # ('coupler_spectroscopy', 'cz_chevron'),
-    ('ro_amplitude_three_state_optimization', 'cz_chevron'),
+    ('resonator_spectroscopy_2', 'cz_chevron'),
     # ('rabi_oscillations', 'reset_chevron'),
     # ('cz_chevron', 'cz_calibration'),
     # ('qubit_12_spectroscopy_multidim', 'cz_calibration'),

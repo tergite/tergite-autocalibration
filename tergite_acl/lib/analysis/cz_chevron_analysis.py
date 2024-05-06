@@ -344,7 +344,7 @@ class CZChevronAnalysis(BaseAnalysis):
 
         datarray = self.dataset[f'y{self.qubit}']
         qubit = self.qubit
-        datarray.plot(ax=axis, x=f'cz_pulse_frequencies{"q13_q14"}', cmap='RdBu_r')
+        datarray.plot(ax=axis, cmap='RdBu_r')
         # # fig = axis.pcolormesh(amp,freq,magnitudes,shading='nearest',cmap='RdBu_r')
         # axis.scatter(self.opt_freq,self.opt_cz,c='r',label = 'CZ Duration = {:.1f} ns'.format(self.opt_cz*1e9),marker='X',s=200,edgecolors='k', linewidth=1.5,zorder=10)
         # # plt.scatter(opt_swap,opt_freq,c='b',label = 'SWAP12 Duration= {:.2f} V'.format(opt_swap),marker='X',s=200,edgecolors='k', linewidth=1.5,zorder=10)

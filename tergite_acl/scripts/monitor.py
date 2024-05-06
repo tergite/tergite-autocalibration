@@ -1,10 +1,16 @@
 import tergite_acl.utils.user_input as ui
 import numpy as np
-import tergite_acl.scripts.calibration_supervisor as supervisor
+from tergite_acl.scripts.calibration_supervisor import CalibrationSupervisor
 from tergite_acl.lib.nodes import graph as cg, characterization_nodes as calibrate_nodes
 from tergite_acl.utils.user_input import qubits,couplers
 from tergite_acl.utils.reset_redis_node import ResetRedisNode
 import optuna
+from ipaddress import ip_address, IPv4Address
+from tergite_acl.config.settings import CLUSTER_IP
+from tergite_acl.scripts.calibration_supervisor import CalibrationSupervisor
+from tergite_acl.scripts.db_backend_update import update_mss
+from tergite_acl.utils.enums import ClusterMode
+from tergite_acl.config.settings import CLUSTER_IP, REDIS_CONNECTION, CLUSTER_NAME
 
 qubits_10 = [f"q{i}" for i in range(16, 26)]
 
@@ -37,7 +43,11 @@ class Monitor:
         self.qubits = ui.qubits
         self.couplers = ui.couplers
         self.nodes = [(f.split("_Node")[0]).lower() for f in dir(calibrate_nodes) if f.endswith("_Node")]
-        self.cxn = supervisor.redis_connection
+        cluster_mode: 'ClusterMode' = ClusterMode.real
+        parsed_cluster_ip: 'IPv4Address' = CLUSTER_IP
+        self.supervisor = CalibrationSupervisor(cluster_mode=cluster_mode,
+                                    cluster_ip=parsed_cluster_ip)
+        self.cxn = REDIS_CONNECTION
         self.node_park = "resonator_spectroscopy"
 
     def __repr__(self):
@@ -55,10 +65,11 @@ class Monitor:
             print(f"    {coupler}: {node}:", self.cxn.hget(f"cs:{coupler}", node))
 
     def calibrate_node(self, node:str=None, **kwargs):
+        self.node = node
         if node is None:
-            self.all_results = supervisor.calibrate_node(self.node_park, **kwargs)
+            self.all_results = self.supervisor.calibrate_node(self.node_park, **kwargs)
         else:
-            self.all_results = supervisor.calibrate_node(node, **kwargs)
+            self.all_results = self.supervisor.calibrate_node(node, **kwargs)
             self.node_park = node
 
     def next_node(self, node:str=None):
@@ -66,8 +77,11 @@ class Monitor:
             node = self.node_park
         print(cg[node])
 
+    def get_name(self):
+        return self.all_results[0].split('/')[-1]
+
     def get_results(self):
-        return self.all_results
+        return self.all_results[1]
 
 class OptimizeNode:
     def __init__(self, node):
@@ -105,15 +119,15 @@ class OptimizeNode:
     def plot_optimization(self):
         return optuna.visualization.plot_optimization_history(self.study)
 
-    def validate_cz(self,best_params = self.best_params):
-        freqs = np.array([best_params['freq']])*1e6
-        times = np.array([best_params['time']])*1e-9
-        amps = np.array([best_params['amp']])
-        self.monitor.calibrate_node('cz_calibration_ssro',opt_cz_pulse_frequency = dict(zip(couplers,freqs)),
-                                                        opt_cz_pulse_duration = dict(zip(couplers,times)),
-                                                        opt_cz_pulse_amplitude = dict(zip(couplers,amps)))
-        results = self.monitor.get_results()
-        print(results)
-        return results
+    # def validate_cz(self,best_params = self.best_params):
+    #     freqs = np.array([best_params['freq']])*1e6
+    #     times = np.array([best_params['time']])*1e-9
+    #     amps = np.array([best_params['amp']])
+    #     self.monitor.calibrate_node('cz_calibration_ssro',opt_cz_pulse_frequency = dict(zip(couplers,freqs)),
+    #                                                     opt_cz_pulse_duration = dict(zip(couplers,times)),
+    #                                                     opt_cz_pulse_amplitude = dict(zip(couplers,amps)))
+    #     results = self.monitor.get_results()
+    #     print(results)
+    #     return results
 
 # monitor = Monitor()

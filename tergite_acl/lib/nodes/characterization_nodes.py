@@ -60,7 +60,7 @@ class Randomized_Benchmarking_Node(BaseNode):
         self.analysis_obj = RandomizedBenchmarkingAnalysis
 
         # TODO change it a dictionary like samplespace
-        self.node_externals = 6 * np.arange(5, dtype=np.int32)
+        self.node_externals = 6 * np.arange(150, dtype=np.int32)
         self.external_parameter_name = 'seed'
         self.external_parameter_value = 0
         ####################

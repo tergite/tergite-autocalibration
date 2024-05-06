@@ -125,10 +125,13 @@ def load_redis_config(transmon: ExtendedTransmon, channel: int):
 def load_redis_config_coupler(coupler: CompositeSquareEdge):
     bus = coupler.name
     redis_config = REDIS_CONNECTION.hgetall(f"couplers:{bus}")
-    coupler.cz.cz_freq(float(redis_config['cz_pulse_frequency']))
-    coupler.cz.square_amp(float(redis_config['cz_pulse_amplitude']))
-    coupler.cz.square_duration(float(redis_config['cz_pulse_duration']))
-    coupler.cz.cz_width(float(redis_config['cz_pulse_width']))
+    try:
+        coupler.cz.cz_freq(float(redis_config['cz_pulse_frequency']))
+        coupler.cz.square_amp(float(redis_config['cz_pulse_amplitude']))
+        coupler.cz.square_duration(float(redis_config['cz_pulse_duration']))
+        coupler.cz.cz_width(float(redis_config['cz_pulse_width']))
+    except:
+        pass
     return
 
 
@@ -191,6 +194,7 @@ def precompile(node, bin_mode: str = None, repetitions: int = None):
                                                'cz_dynamic_phase', 'reset_chevron', 'reset_calibration_ssro']:
         coupler = node.coupler
         node_class = node.measurement_obj(transmons, edges, node.qubit_state)
+        print(edges)
     else:
         node_class = node.measurement_obj(transmons, node.qubit_state)
     if node.name in ['ro_amplitude_three_state_optimization', 'cz_calibration_ssro', 'reset_calibration_ssro']:
