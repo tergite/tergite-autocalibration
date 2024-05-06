@@ -1,0 +1,167 @@
+[qoi.qubits]
+tof.measure.acq_delay = nan
+
+resonator_spectroscopy.clock_freqs.readout = nan
+resonator_spectroscopy_1.extended_clock_freqs.readout_1 = nan
+resonator_spectroscopy_2.extended_clock_freqs.readout_2 = nan
+
+resonator_spectroscopy.Ql = nan
+resonator_spectroscopy.resonator_minimum = nan
+resonator_spectroscopy_1.Ql_1 = nan
+resonator_spectroscopy_1.resonator_minimum_1 = nan
+
+ro_frequency_two_state_optimization.extended_clock_freqs.readout_2state_opt = nan
+ro_frequency_three_state_optimization.extended_clock_freqs.readout_3state_opt = nan
+
+ro_amplitude_two_state_optimization.measure_2state_opt.ro_ampl_2st_opt = nan
+ro_amplitude_two_state_optimization.measure_2state_opt.acq_rotation = nan
+ro_amplitude_two_state_optimization.measure_2state_opt.acq_threshold = nan
+
+ro_amplitude_three_state_optimization.measure_3state_opt.ro_ampl_3st_opt = nan
+ro_amplitude_three_state_optimization.inv_cm_opt = nan
+
+qubit_01_spectroscopy_pulsed.clock_freqs.f01 = nan
+qubit_01_spectroscopy.clock_freqs.f01 = nan
+qubit_01_spectroscopy.spec_ampl_optimal = nan
+ramsey_correction.clock_freqs.f01 = nan
+
+qubit_12_spectroscopy_pulsed.clock_freqs.f12 = nan
+qubit_12_spectroscopy_pulsed.anharmonicity = nan
+qubit_12_spectroscopy.clock_freqs.f12 = nan
+qubit_12_spectroscopy.spec_ampl_12_optimal = nan
+ramsey_correction_12.clock_freqs.f12 = nan
+
+rabi_oscillations.rxy.amp180 = nan
+n_rabi_oscillations.rxy.amp180 = nan
+
+motzoi_parameter.rxy.motzoi = 0
+adaptive_motzoi_parameter.rxy.motzoi = 0
+
+rabi_oscillations_12.r12.ef_amp180 = nan
+
+randomized_benchmarking.fidelity = nan
+T1.t1_time = nan
+T2.t2_time = nan
+T2_echo.t2_echo_time = nan
+XY_crosstalk.selectivity = nan
+punchout.measure.pulse_amp = nan
+
+reset_chevron.reset_amplitude_qc = nan
+reset_chevron.reset_duration_qc = nan
+
+[qoi.couplers]
+coupler_spectroscopy.parking_current = nan
+coupler_resonator_spectroscopy.resonator_vs_flux= nan
+cz_chevron.cz_pulse_frequency = nan
+cz_chevron.cz_pulse_duration = nan
+cz_optimize_chevron.cz_pulse_frequency = nan
+cz_optimize_chevron.cz_pulse_duration = nan
+cz_optimize_chevron.parking_current = nan
+# cz_chevron.dc_flux = nan
+# cz_chevron.dc_flux_offset = nan
+# cz_chevron.dc_flux_0 = nan
+cz_calibration.cz_phase = nan
+cz_calibration_ssro.cz_phase = nan
+cz_calibration_ssro.cz_pop_loss = nan
+cz_calibration_ssro.cz_leakage = nan
+cz_dynamic_phase.coupler_dynamic_phase = nan
+
+[initials.qubits.all]
+measure.acq_delay = 220e-9
+measure_1.acq_delay = 220e-9
+measure_2.acq_delay = 220e-9
+measure.pulse_duration = 3e-6
+measure_1.pulse_duration = 3e-6
+measure_2.pulse_duration = 3e-6
+measure.integration_time = 2.5e-6
+measure_1.integration_time = 2.5e-6
+measure_2.integration_time = 2.5e-6
+rxy.duration = 40e-9
+reset.duration =  600e-6
+
+[initials.qubits]
+q11.measure.pulse_amp = 15.0e-3
+q12.measure.pulse_amp = 3.0e-3  #9.0e-3
+q12.measure_1.pulse_amp = 3.0e-3  #9.0e-3
+q12.measure_2.pulse_amp = 3.0e-3  #9.0e-3
+q13.measure.pulse_amp = 3.0e-3 #10.0e-3
+q13.measure_1.pulse_amp = 3.0e-3 #10.0e-3
+q13.measure_2.pulse_amp = 3.0e-3 #10.0e-3
+q14.measure.pulse_amp = 3.0e-3 #10.0e-3
+q14.measure_1.pulse_amp = 3.0e-3 #10.0e-3
+q14.measure_2.pulse_amp = 3.0e-3 #10.0e-3
+q15.measure.pulse_amp = 3.0e-3 #15.0e-3
+q15.measure_1.pulse_amp = 3.0e-3 #15.0e-3
+q15.measure_2.pulse_amp = 3.0e-3 #15.0e-3
+
+# q16.measure.pulse_amp = 16e-3
+# q17.measure.pulse_amp = 16e-3
+# q18.measure.pulse_amp = 10e-3
+# q19.measure.pulse_amp = 16e-3
+# q20.measure.pulse_amp = 16e-3
+# q21.measure.pulse_amp = 16e-3
+# q22.measure.pulse_amp = 8e-3
+# q23.measure.pulse_amp = 16e-3
+# q24.measure.pulse_amp = 16e-3
+# q25.measure.pulse_amp = 16e-3
+
+q16.measure.pulse_amp = 64e-3
+q17.measure.pulse_amp = 64e-3
+q18.measure.pulse_amp = 40e-3
+q19.measure.pulse_amp = 64e-3
+q20.measure.pulse_amp = 64e-3
+q21.measure.pulse_amp = 64e-3
+q22.measure.pulse_amp = 32e-3
+q23.measure.pulse_amp = 64e-3
+q24.measure.pulse_amp = 64e-3
+q25.measure.pulse_amp = 64e-3
+
+[initials.couplers.all]
+cz_pulse_amplitude = 0.2
+cz_pulse_width = 4e-9
+
+[initials.couplers]
+q21_q22.parking_current =  0
+q11_q12.parking_current = 0
+q12_q13.parking_current = 0
+q13_q14.parking_current = 0
+q14_q15.parking_current = 0
+
+q19_q20.parking_current = -825e-6
+q19_q21.cz_pulse_amplitude = 0.25
+
+[resonator_spectroscopy.all]
+reset.duration =  60e-6
+
+[punchout.all]
+reset.duration =  60e-6
+
+[resonator_spectroscopy_1.all]
+reset.duration = 240e-6
+
+[coupler_resonator_spectroscopy.all]
+reset.duration = 100e-6
+
+[resonator_spectroscopy_2.all]
+reset.duration = 240e-6
+
+[qubit_01_spectroscopy_pulsed.all]
+spec.spec_duration = 2e-6
+spec.spec_amp = 4.5e-4
+
+[qubit_01_spectroscopy.all]
+spec.spec_duration = 2e-6
+reset.duration = 200e-6
+
+[coupler_spectroscopy.all]
+spec.spec_duration = 2e-6
+spec.spec_amp = 3.5e-4
+reset.duration = 100e-6
+
+[qubit_12_spectroscopy_pulsed.all]
+spec.spec_duration = 2.0e-6
+spec.spec_amp = 6e-4
+
+[cz_chevron.all]
+# cz_pulse_duration = 200e-9
+coupler_spec_amp = 0.3

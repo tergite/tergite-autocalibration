@@ -46,6 +46,7 @@ couplers = ['q06_q11']
 
 
 attenuation_setting = {'qubit':12, 'coupler':40, 'readout':12}
+attenuation_setting = {'qubit':12, 'coupler':40, 'readout':12}
 
 '''punchout
   resonator_spectroscopy

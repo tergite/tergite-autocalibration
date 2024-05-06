@@ -11,6 +11,8 @@ from tergite_acl.lib.measurement_base import Measurement
 from tergite_acl.utils.extended_transmon_element import Measure_RO1, Rxy_12
 from tergite_acl.config.coupler_config import edge_group, qubit_types
 from matplotlib import pyplot as plt
+from tergite_acl.utils.extended_coupler_edge import CompositeSquareEdge
+from tergite_acl.utils.extended_transmon_element import ExtendedTransmon
 
 import numpy as np
 import redis
@@ -741,26 +743,15 @@ class Reset_chevron_ac(Measurement):
 
 class CZ_chevron(Measurement):
 
-    def __init__(self,transmons,coupler,qubit_state:int=0):
+    def __init__(self, transmons: dict[str, ExtendedTransmon],couplers: dict[str, CompositeSquareEdge], qubit_state: int = 0):
         super().__init__(transmons)
+        self.transmons = transmons
         self.qubit_state = qubit_state
-        self.coupler = coupler
-        self.static_kwargs = {
-            'coupler': self.coupler,
-            # 'mw_frequencies': self.attributes_dictionary('f01'),
-            # 'mw_pulse_durations': self.attributes_dictionary('duration'),
-            # 'mw_pulse_ports': self.attributes_dictionary('microwave'),
-            # 'mw_ef_amps180': self.attributes_dictionary('ef_amp180'),
-            # 'mw_frequencies_12': self.attributes_dictionary('f12'),
-            #TODO temporarily comment out as they are hardcoded in the schedule
-            #'cz_pulse_duration': self.attributes_dictionary('cz_pulse_duration'),
-            #'cz_pulse_width': self.attributes_dictionary('cz_pulse_width'),
-        }
+        self.couplers = couplers
 
     def schedule_function(
             self,
-            coupler: str,
-            cz_pulse_frequencies_sweep: dict[str,np.ndarray],
+            cz_pulse_frequencies: dict[str,np.ndarray],
             cz_pulse_durations: dict[str,np.ndarray],
             cz_pulse_amplitude: float = 0.15,
             opt_cz_pulse_amplitude: dict[str,float] = None,
@@ -809,9 +800,10 @@ class CZ_chevron(Measurement):
             An experiment schedule.
         """
         schedule = Schedule("CZ_chevron",repetitions)
+        coupler = list(self.couplers.keys())[0]
         qubits = coupler.split(sep='_')
 
-        cz_frequency_values = np.array(list(cz_pulse_frequencies_sweep.values())[0])
+        cz_frequency_values = np.array(list(cz_pulse_frequencies.values())[0])
         cz_duration_values = list(cz_pulse_durations.values())[0]
 
         # print(f'{ cz_frequency_values[0] = }')
@@ -823,14 +815,14 @@ class CZ_chevron(Measurement):
             redis_config = redis_connection.hgetall(f"couplers:{this_coupler}")
             cz_pulse_amplitude[this_coupler] = float(redis_config['cz_pulse_amplitude'])
             
-            if this_coupler in ['q16_q21','q17_q22']:
+            if this_coupler in ['q14_q19','q17_q22']:
                 downconvert = 0
             else:
                 downconvert = 4.4e9
             schedule.add_resource(
                 ClockResource(name=coupler+'.cz',freq= - cz_frequency_values[0]+downconvert)
             )
-
+        print(f'{opt_cz_pulse_amplitude = }')
         for this_coupler in all_couplers:
             if opt_cz_pulse_amplitude is not None:
                 cz_pulse_amplitude[this_coupler] += opt_cz_pulse_amplitude[this_coupler]
