@@ -7,12 +7,17 @@ class BaseNode:
         self.all_qubits = all_qubits
         self.node_dictionary = node_dictionary
         self.backup = False
-        self.type = 'cluster_simple_sweep'
+        self.type = 'simple_sweep' # TODO better as Enum type
         self.qubit_state = 0 # can be 0 or 1 or 2
         self.plots_per_qubit = 1 # can be 0 or 1 or 2
         self.build_demod_channels()
-        # self.samplespace = {}
-        self.external_parameters = {}
+        self.schedule_samplespace = {}
+        self.external_samplespace = {}
+
+        self.samplespace = self.schedule_samplespace | self.external_samplespace
+
+        # self.external_parameters = {}
+        # self.node_externals = []
 
     # @property
     # def samplespace(self) -> dict:

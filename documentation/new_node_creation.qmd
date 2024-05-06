@@ -44,3 +44,11 @@ It must contain a method called `schedule_function` that expects the `node.sampl
 
 The `analysis_obj` is imported from `tergite_acl/lib/analysis/` and contains the class that perform the analysis for a single qubit.
 It must contain a `run_fitting` method and a `plotter` method
+
+### Node types
+
+Nodes are divided in two distict categories:
+- `simple_sweep`: where the Quantify Schedule is compiled only once
+- `parameterized_sweep`: where the node requires multiple iterations and each iteration requires a new recompilation.
+
+[Details on the implementation on the Node types section](node_types.qmd).

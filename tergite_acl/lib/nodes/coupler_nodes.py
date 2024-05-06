@@ -8,19 +8,18 @@ from tergite_acl.lib.node_base import BaseNode
 from tergite_acl.lib.nodes.node_utils import qubit_samples, resonator_samples
 from tergite_acl.lib.calibration_schedules.cz_chevron import CZ_chevron
 from tergite_acl.lib.calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
-from tergite_acl.lib.calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
+from tergite_acl.lib.calibration_schedules.two_tone_multidim import Two_Tones_Multidim
 
 
 class Coupler_Spectroscopy_Node:
+    measurement_obj = Two_Tones_Multidim
+    analysis_obj = CouplerSpectroscopyAnalysis
     def __init__(self, name: str, all_qubits: list[str], **kwargs):
         self.name = name
         self.all_qubits = all_qubits
         self.couplers = kwargs['couplers']
         self.redis_field = ['parking_current']
         self.qubit_state = 0
-        # perform 2 tones while biasing the current
-        self.measurement_obj = Two_Tones_Spectroscopy
-        self.analysis_obj = CouplerSpectroscopyAnalysis
         self.coupled_qubits = self.get_coupled_qubits()
         # self.validate()
 
@@ -38,9 +37,6 @@ class Coupler_Spectroscopy_Node:
         cluster_samplespace = {
             'spec_frequencies': {qubit: qubit_samples(qubit, sweep_range=self.sweep_range)}
         }
-        # cluster_samplespace = {
-        #     'spec_frequencies': {qubit: np.linspace(3.771, 3.971, 0.0005)}
-        # }
         return cluster_samplespace
 
     @property

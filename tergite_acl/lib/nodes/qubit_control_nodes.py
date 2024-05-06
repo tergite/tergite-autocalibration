@@ -12,7 +12,7 @@ from tergite_acl.lib.analysis.ramsey_analysis import RamseyDetuningsAnalysis
 from tergite_acl.lib.node_base import BaseNode
 from tergite_acl.lib.nodes.node_utils import qubit_samples
 from tergite_acl.lib.calibration_schedules.motzoi_parameter import Motzoi_parameter
-from tergite_acl.lib.calibration_schedules.adaptive_motzoi_parameter import Adaptive_Motzoi_parameter
+# from tergite_acl.lib.calibration_schedules.adaptive_motzoi_parameter import Adaptive_Motzoi_parameter
 from tergite_acl.lib.calibration_schedules.n_rabi_oscillations import N_Rabi_Oscillations
 from tergite_acl.lib.calibration_schedules.rabi_oscillations import Rabi_Oscillations
 from tergite_acl.lib.calibration_schedules.cw_two_nones_spectroscopy import CW_Two_Tones_Spectroscopy

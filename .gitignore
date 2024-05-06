@@ -17,7 +17,8 @@ notebooks/
 send_to_lefteris.ps1
 
 #dataset folders
-202[3456789]*/
+data_directory/
+!dummy_datasets/*
 
 #data files
 *.nc

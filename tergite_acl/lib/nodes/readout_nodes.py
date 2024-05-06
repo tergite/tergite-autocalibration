@@ -27,7 +27,7 @@ class Resonator_Spectroscopy_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['clock_freqs:readout', 'Ql', 'resonator_minimum']
-        self.samplespace = {
+        self.schedule_samplespace = {
             'ro_frequencies': {
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             }
@@ -35,79 +35,57 @@ class Resonator_Spectroscopy_Node(BaseNode):
 
 
 class Resonator_Spectroscopy_1_Node(BaseNode):
+    measurement_obj = Resonator_Spectroscopy
+    analysis_obj = ResonatorSpectroscopy_1_Analysis
+
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['extended_clock_freqs:readout_1', 'Ql_1', 'resonator_minimum_1']
         self.qubit_state = 1
-        self.measurement_obj = Resonator_Spectroscopy
-        self.analysis_obj = ResonatorSpectroscopy_1_Analysis
 
-        self.cluster_samplespace = {
+        self.schedule_samplespace = {
             'ro_frequencies': {
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             }
         }
 
-    # @property
-    # def samplespace(self):
-    #     cluster_samplespace = {
-    #         'ro_frequencies': {
-    #             qubit: resonator_samples(qubit) for qubit in self.all_qubits
-    #         }
-    #     }
-    #     return cluster_samplespace
-
 
 class Resonator_Spectroscopy_2_Node(BaseNode):
+    measurement_obj = Resonator_Spectroscopy
+    analysis_obj = ResonatorSpectroscopy_2_Analysis
+
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['extended_clock_freqs:readout_2']
         self.qubit_state = 2
-        self.measurement_obj = Resonator_Spectroscopy
-        self.analysis_obj = ResonatorSpectroscopy_2_Analysis
-
-        self.cluster_samplespace = {
-            'ro_frequencies': {
-                qubit: resonator_samples(qubit) for qubit in self.all_qubits
-            }
-        }
-    # @property
-    # def samplespace(self):
-    #     cluster_samplespace = {
-    #         'ro_frequencies': {
-    #             qubit: resonator_samples(qubit) for qubit in self.all_qubits
-    #         }
-    #     }
-    #     return cluster_samplespace
 
 
 class Punchout_Node(BaseNode):
+    measurement_obj = Punchout
+    analysis_obj = PunchoutAnalysis
+
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['measure:pulse_amp']
-        self.measurement_obj = Punchout
-        self.analysis_obj = PunchoutAnalysis
 
-    @property
-    def samplespace(self):
-        cluster_samplespace = {
+        self.schedule_samplespace = {
             'ro_frequencies': {
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             },
             'ro_amplitudes': {
-                qubit: np.linspace(0.005, 0.022, 8) for qubit in self.all_qubits
+                qubit: np.linspace(0.008, 0.1, 11) for qubit in self.all_qubits
             },
         }
-        return cluster_samplespace
 
 
 class RO_frequency_optimization_Node(BaseNode):
+    measurement_obj = RO_frequency_optimization
+    analysis_obj = OptimalROFrequencyAnalysis
+
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['extended_clock_freqs:readout_2state_opt']
         self.qubit_state = 0
-        self.measurement_obj = RO_frequency_optimization
-        self.analysis_obj = OptimalROFrequencyAnalysis
 
         self.cluster_samplespace = {
             'ro_frequencies': {
@@ -115,24 +93,17 @@ class RO_frequency_optimization_Node(BaseNode):
             }
         }
 
-    # @property
-    # def samplespace(self):
-    #     cluster_samplespace = {
-    #         'ro_opt_frequencies': {
-    #             qubit: resonator_samples(qubit) for qubit in self.all_qubits
-    #         }
-    #     }
-    #     return cluster_samplespace
 
 class RO_frequency_optimization_gef_Node(BaseNode):
+    measurement_obj = RO_frequency_optimization
+    analysis_obj = OptimalRO_012_FrequencyAnalysis
+
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.name = name
         self.all_qubits = all_qubits
         self.redis_field = ['extended_clock_freqs:readout_3state_opt']
         self.qubit_state = 2
-        self.measurement_obj = RO_frequency_optimization
-        self.analysis_obj = OptimalRO_012_FrequencyAnalysis
 
         self.cluster_samplespace = {
             'ro_frequencies': {
@@ -140,20 +111,14 @@ class RO_frequency_optimization_gef_Node(BaseNode):
             }
         }
 
-    # @property
-    # def samplespace(self):
-    #     cluster_samplespace = {
-    #         'ro_opt_frequencies': {
-    #             qubit: resonator_samples(qubit) for qubit in self.all_qubits
-    #         }
-    #     }
-    #     return cluster_samplespace
-
 
 class RO_amplitude_two_state_optimization_Node(BaseNode):
     '''
     TODO the two and three state discrimination is quite similar, they should be merged
     '''
+    measurement_obj = RO_amplitude_optimization
+    analysis_obj = OptimalRO_Two_state_AmplitudeAnalysis
+
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.name = name
@@ -164,56 +129,46 @@ class RO_amplitude_two_state_optimization_Node(BaseNode):
             'measure_2state_opt:threshold'
         ]
         self.qubit_state = 1
-        self.measurement_obj = RO_amplitude_optimization
-        self.analysis_obj = OptimalRO_Two_state_AmplitudeAnalysis
         self.node_dictionary = node_dictionary
         self.node_dictionary['loop_repetitions'] = 1000
         self.plots_per_qubit = 3 #  fidelity plot, IQ shots, confusion matrix
 
+        self.loops = self.node_dictionary['loop_repetitions']
 
-    @property
-    def samplespace(self):
-        '''
-        we write down the 'qubit_states' here to make easier the
-        configuration of the raw dataset
-        '''
-        loops = self.node_dictionary['loop_repetitions']
-        cluster_samplespace = {
+        self.schedule_samplespace = {
             'qubit_states': {
-                qubit: np.tile(np.array([0,1], dtype=np.int16), loops)  for qubit in self.all_qubits
+                qubit: np.tile(
+                    np.array([0,1], dtype=np.int16), loops
+                )  for qubit in self.all_qubits
             },
-            'ro_amplitudes': {qubit: np.linspace(0.001, 0.01, 11) for qubit in self.all_qubits},
-
+            'ro_amplitudes': {
+                qubit: np.linspace(0.001, 0.01, 11) for qubit in self.all_qubits
+            },
         }
-        return cluster_samplespace
 
 
 class RO_amplitude_three_state_optimization_Node(BaseNode):
+    measurement_obj = RO_amplitude_optimization
+    analysis_obj = OptimalRO_Three_state_AmplitudeAnalysis
+
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.name = name
         self.all_qubits = all_qubits
         self.redis_field = ['measure_3state_opt:ro_ampl_3st_opt','inv_cm_opt']
         self.qubit_state = 2
-        self.measurement_obj = RO_amplitude_optimization
-        self.analysis_obj = OptimalRO_Three_state_AmplitudeAnalysis
         self.node_dictionary = node_dictionary
         self.node_dictionary['loop_repetitions'] = 1000
         self.plots_per_qubit = 3 #  fidelity plot, IQ shots, confusion matrix
+        self.loops = self.node_dictionary['loop_repetitions']
 
-
-    @property
-    def samplespace(self):
-        '''
-        we write down the 'qubit_states' here to make easier the
-        configuration of the raw dataset
-        '''
-        loops = self.node_dictionary['loop_repetitions']
-        cluster_samplespace = {
+        self.schedule_samplespace = {
             'qubit_states': {
-                qubit: np.tile(np.array([0,1,2], dtype=np.int16), loops)  for qubit in self.all_qubits
+                qubit: np.tile(
+                    np.array([0,1,2], dtype=np.int16), self.loops
+                )  for qubit in self.all_qubits
             },
-            'ro_amplitudes': {qubit: np.linspace(0.001, 0.01, 11) for qubit in self.all_qubits},
-
+            'ro_amplitudes': {
+                qubit: np.linspace(0.001, 0.01, 11) for qubit in self.all_qubits
+            },
         }
-        return cluster_samplespace

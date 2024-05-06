@@ -81,6 +81,24 @@ class Spec(InstrumentChannel):
             vals=Numbers(min_value=-1, max_value=1, allow_nan=True),
         )
 
+        self.spec_ampl_optimal = ManualParameter(
+            name="spec_ampl_optimal",
+            instrument=self,
+            label=r"optimal spectroscopy amplitude to be used in coupler anticrossing",
+            initial_value=kwargs.get("spec_amp", math.nan),
+            unit="",
+            vals=Numbers(min_value=-1, max_value=1, allow_nan=True),
+        )
+
+        self.spec_ampl_12_optimal = ManualParameter(
+            name="spec_ampl_12_optimal",
+            instrument=self,
+            label=r"optimal spectroscopy amplitude to be used in coupler anticrossing",
+            initial_value=kwargs.get("spec_amp", math.nan),
+            unit="",
+            vals=Numbers(min_value=-1, max_value=1, allow_nan=True),
+        )
+
         self.spec_duration = ManualParameter(
             name="spec_duration",
             instrument=self,

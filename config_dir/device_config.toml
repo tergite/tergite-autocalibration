@@ -22,14 +22,14 @@ ro_amplitude_three_state_optimization.inv_cm_opt = nan
 
 qubit_01_spectroscopy_pulsed.clock_freqs.f01 = nan
 qubit_01_spectroscopy.clock_freqs.f01 = nan
-qubit_01_spectroscopy.spec_ampl_optimal = nan
+qubit_01_spectroscopy.spec.spec_ampl_optimal = nan
 ramsey_correction.clock_freqs.f01 = nan
 adaptive_ramsey_correction.clock_freqs.f01 = nan
 
 qubit_12_spectroscopy_pulsed.clock_freqs.f12 = nan
 qubit_12_spectroscopy_pulsed.anharmonicity = nan
 qubit_12_spectroscopy.clock_freqs.f12 = nan
-qubit_12_spectroscopy.spec_ampl_12_optimal = nan
+qubit_12_spectroscopy.spec.spec_ampl_12_optimal = nan
 ramsey_correction_12.clock_freqs.f12 = nan
 
 rabi_oscillations.rxy.amp180 = nan
@@ -80,42 +80,22 @@ measure_2.integration_time = 2.5e-6
 rxy.duration = 28e-9
 
 [initials.qubits]
-q11.measure.pulse_amp = 15.0e-3
-q12.measure.pulse_amp = 3.0e-3  #9.0e-3
-q12.measure_1.pulse_amp = 3.0e-3  #9.0e-3
-q12.measure_2.pulse_amp = 3.0e-3  #9.0e-3
-q13.measure.pulse_amp = 3.0e-3 #10.0e-3
-q13.measure_1.pulse_amp = 3.0e-3 #10.0e-3
-q13.measure_2.pulse_amp = 3.0e-3 #10.0e-3
-q14.measure.pulse_amp = 3.0e-3 #10.0e-3
-q14.measure_1.pulse_amp = 3.0e-3 #10.0e-3
-q14.measure_2.pulse_amp = 3.0e-3 #10.0e-3
-q15.measure.pulse_amp = 3.0e-3 #15.0e-3
-q15.measure_1.pulse_amp = 3.0e-3 #15.0e-3
-q15.measure_2.pulse_amp = 3.0e-3 #15.0e-3
+q06.measure.pulse_amp = 15.0e-3
+q06.measure_1.pulse_amp = 3.0e-3  #9.0e-3
+q06.measure_2.pulse_amp = 3.0e-3  #9.0e-3
+q07.measure.pulse_amp = 3.0e-3  #9.0e-3
+q07.measure_1.pulse_amp = 3.0e-3  #9.0e-3
+q07.measure_2.pulse_amp = 3.0e-3  #9.0e-3
+q08.measure.pulse_amp = 5.0e-3 #10.0e-3
+q08.measure_1.pulse_amp = 5.0e-3 #10.0e-3
+q08.measure_2.pulse_amp = 5.0e-3 #10.0e-3
+q09.measure.pulse_amp = 3.0e-3 #10.0e-3
+q09.measure_1.pulse_amp = 3.0e-3 #10.0e-3
+q09.measure_2.pulse_amp = 3.0e-3 #10.0e-3
+q10.measure.pulse_amp = 3.0e-3 #15.0e-3
+q10.measure_1.pulse_amp = 3.0e-3 #15.0e-3
+q10.measure_2.pulse_amp = 3.0e-3 #15.0e-3
 
-# # Added 6dB att
-# q16.ro_pulse_amp = 200.0e-3
-# q17.ro_pulse_amp = 100.0e-3
-# q18.ro_pulse_amp =  24.0e-3
-# q19.ro_pulse_amp = 20.0e-3
-# q20.ro_pulse_amp =  180.0e-3
-# q21.ro_pulse_amp = 18.0e-3
-# q22.ro_pulse_amp = 140.0e-3
-# q23.ro_pulse_amp = 144.0e-3
-# q24.ro_pulse_amp =  28.0e-3
-# q25.ro_pulse_amp =  20.0e-3
-
-#q16.ro_pulse_amp = 60.0e-3
-#q17.ro_pulse_amp = 25.0e-3
-#q18.ro_pulse_amp =  7.0e-3
-#q19.ro_pulse_amp = 8.0e-3
-#q20.ro_pulse_amp =  50.0e-3
-#q21.ro_pulse_amp = 7.0e-3
-#q22.ro_pulse_amp = 35.0e-3
-#q23.ro_pulse_amp = 36.0e-3
-#q24.ro_pulse_amp =  7.0e-3
-#q25.ro_pulse_amp =  8.0e-3
 
 q16.measure.pulse_amp = 10e-3
 
@@ -155,10 +135,6 @@ reset.duration = 100e-6
 
 [resonator_spectroscopy_2.all]
 reset.duration = 240e-6
-
-[qubit_01_spectroscopy_pulsed.all]
-spec.spec_duration = 2e-6
-spec.spec_amp = 4.5e-4
 
 [qubit_01_spectroscopy.all]
 spec.spec_duration = 2e-6

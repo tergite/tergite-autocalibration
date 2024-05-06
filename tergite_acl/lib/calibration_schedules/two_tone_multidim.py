@@ -4,6 +4,7 @@ Module containing a schedule class for two-tone (qubit) spectroscopy calibration
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.gate_library import Measure, Reset, X
 from quantify_scheduler.operations.pulse_library import SetClockFrequency, SoftSquarePulse
+from quantify_scheduler.operations.pulse_factories import long_square_pulse
 from quantify_scheduler.resources import ClockResource
 from quantify_scheduler.schedules.schedule import Schedule
 from tergite_acl.utils.extended_transmon_element import ExtendedTransmon, Measure_RO1
@@ -22,7 +23,7 @@ class Two_Tones_Multidim(Measurement):
     def schedule_function(
         self,
         spec_frequencies: dict[str,np.ndarray],
-        spec_pulse_amplitudes: dict[str,np.ndarray],
+        spec_pulse_amplitudes: dict[str,np.ndarray] = None,
 
         repetitions: int = 1024,
         ) -> Schedule:
@@ -58,6 +59,14 @@ class Two_Tones_Multidim(Measurement):
 
         #This is the common reference operation so the qubits can be operated in parallel
         qubits = self.transmons.keys()
+
+        if self.qubit_state == 0:
+            measure_function = Measure
+        elif self.qubit_state == 1:
+            measure_function = Measure_RO1
+        else:
+            raise ValueError(f'Invalid qubit state: {self.qubit_state}')
+
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
         # The outer loop, iterates over all qubits
@@ -67,6 +76,18 @@ class Two_Tones_Multidim(Measurement):
             this_transmon = self.transmons[this_qubit]
             spec_pulse_duration = this_transmon.spec.spec_duration()
             mw_pulse_port = this_transmon.ports.microwave()
+
+            if spec_pulse_amplitudes is None:
+                spec_amplitude = this_transmon.spec.spec_ampl_optimal()
+                print(f'setting optimal spec spec_amplitude for {this_qubit} {spec_amplitude}')
+                amplitude_values = [spec_amplitude]
+
+            # assign qubit spectroscopy pulse based on duration so long pulses can fit in memory
+            if spec_pulse_duration > 6e-6:
+                SpectroscopyPulse = long_square_pulse
+            else:
+                SpectroscopyPulse = SoftSquarePulse
+
 
             if self.qubit_state == 0:
                 this_clock = f'{this_qubit}.01'
@@ -116,13 +137,6 @@ class Two_Tones_Multidim(Measurement):
                             clock=this_clock,
                         ),
                     )
-
-                    if self.qubit_state == 0:
-                        measure_function = Measure
-                    elif self.qubit_state == 1:
-                        measure_function = Measure_RO1
-                    else:
-                        raise ValueError(f'Invalid qubit state: {self.qubit_state}')
 
                     schedule.add(
                         measure_function(this_qubit, acq_index=this_index,bin_mode=BinMode.AVERAGE),

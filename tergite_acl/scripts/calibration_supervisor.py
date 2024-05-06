@@ -20,17 +20,17 @@ from tergite_acl.utils.user_input import user_requested_calibration
 from tergite_acl.utils.visuals import draw_arrow_chart
 from tergite_acl.utils.dataset_utils import create_node_data_path
 from tergite_acl.utils.hardware_utils import SpiDAC
-from tergite_acl.functions.monitor_worker import monitor_node_calibration
+from tergite_acl.functions.node_supervisor import monitor_node_calibration
 from tergite_acl.utils.redis_utils import populate_initial_parameters, populate_node_parameters, \
     populate_quantities_of_interest
 
-# from workers.dummy_setup import dummy_cluster
+from tergite_acl.utils.dummy_setup import dummy_cluster, dummy_setup
 
 colorama_init()
 
 
 class CalibrationSupervisor():
-    def __init__(self) -> None:
+    def __init__(self, cluster_status) -> None:
         # Initialize the node factory
         self.node_factory = NodeFactory()
         # TODO: user configuration could be a toml file
@@ -40,7 +40,7 @@ class CalibrationSupervisor():
         # Settings
         self.transmon_configuration = toml.load(settings.DEVICE_CONFIG)
         # TODO: how is the dummy cluster initalized?
-        self.cluster_status = ClusterStatus.real
+        self.cluster_status = cluster_status
         self.topo_order = filtered_topological_order(self.target_node)
         # TODO: maybe it makes sense to move that part to some hardware utils
         self.lab_ic = self.create_lab_ic()
@@ -51,15 +51,18 @@ class CalibrationSupervisor():
                 self.dacs[coupler] = self.spi.create_spi_dac(coupler)
 
     def create_lab_ic(self):
-        # TODO: maybe this could be move to some lab utils
-        # TODO: the args variable is not global
-        if args.cluster_status == ClusterStatus.real:
+        if self.cluster_status == ClusterStatus.real:
             Cluster.close_all()
             clusterA = Cluster("clusterA", CLUSTER_IP)
-            # set_module_att(clusterA)
-            ic = InstrumentCoordinator('lab_ic')
-            ic.add_component(ClusterComponent(clusterA))
-            ic.timeout(222)
+        elif self.cluster_status == ClusterStatus.dummy:
+            Cluster.close_all()
+            clusterA = Cluster("clusterA", dummy_cfg=dummy_setup)
+        else:
+            raise ValueError('Undefined Cluster Status')
+        # set_module_att(clusterA)
+        ic = InstrumentCoordinator('lab_ic')
+        ic.add_component(ClusterComponent(clusterA))
+        ic.timeout(222)
         return ic
 
 
@@ -165,7 +168,7 @@ class CalibrationSupervisor():
         # TODO: This should be in the node initializer
         data_path = create_node_data_path(node)
         # TODO: This should be the refactored such that the node can be run like node.calibrate()
-        monitor_node_calibration(node, data_path, self.lab_ic)
+        monitor_node_calibration(node, data_path, self.lab_ic, self.cluster_status)
 
         return
 
@@ -181,7 +184,8 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    supervisor = CalibrationSupervisor()
+
+    supervisor = CalibrationSupervisor(args.cluster_status)
     supervisor.calibrate_system()
 
     # if target_node == 'cz_chevron':
