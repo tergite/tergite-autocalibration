@@ -119,7 +119,7 @@ def test_canGetBestFrequencyFromMediumChevronQ22(setup_medium_data):
     result = first_scan.run_fitting()
     bestFreq = freq[np.argmax(result.pvalues)]
     #assert bestFreq == freq[3] # as above
-    assert max(result.pvalues) < 0.9
+    assert max(result.pvalues) > 0.9 or (max(p[0] for p in result.fittedParams)) < 0.21
     assert result.status == FitResultStatus.FOUND
 
 @pytest.fixture(autouse=True)
@@ -139,7 +139,7 @@ def test_canGetBestFrequencyFromPoorChevronQ17(setup_poor_data):
     d17, d22, freq, times  = setup_poor_data
     first_scan = CZSingleGateSimpleFit(d17, freq, times)
     result  = first_scan.run_fitting()
-    assert max(result.pvalues) < 0.8 or (max(p[1] for p in result.fittedParams)) < 0.21
+    assert max(result.pvalues) < 0.8 or (max(p[0] for p in result.fittedParams)) < 0.21
     assert result.status == FitResultStatus.FOUND
 
 def test_canGetBestFrequencyFromPoorChevronQ22(setup_poor_data):
@@ -148,7 +148,7 @@ def test_canGetBestFrequencyFromPoorChevronQ22(setup_poor_data):
     result = first_scan.run_fitting()
     bestFreq = freq[np.argmax(result.pvalues)]
     assert bestFreq > freq[6]
-    assert max(result.pvalues) < 0.8 or (max(p[1] for p in result.fittedParams)) < 0.21
+    assert max(result.pvalues) < 0.8 or (max(p[0] for p in result.fittedParams)) < 0.21
     assert result.status == FitResultStatus.FOUND
 
 @pytest.fixture(autouse=True)

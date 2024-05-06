@@ -50,7 +50,7 @@ class CZSingleGateSimpleFit(BaseAnalysis):
             indexMax = np.argmax(prob)
             indexMin = np.argmin(prob)
             startPeriod = abs(self.times[indexMax]-self.times[indexMin]) * 2
-            if startPeriod < 30 or startPeriod > 300:
+            if startPeriod < 30 or startPeriod > 500:
                 #print(f'Per: {startPeriod}')
                 startPeriod = 100
             start_periods.append(startPeriod)
