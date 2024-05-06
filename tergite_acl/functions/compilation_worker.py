@@ -4,6 +4,7 @@ fetch and compile the appropriate schedule
 '''
 
 from quantify_scheduler.json_utils import SchedulerJSONDecoder, SchedulerJSONEncoder
+from tergite_acl.lib.node_base import BaseNode
 from tergite_acl.utils import extended_transmon_element
 from tergite_acl.utils.logger.tac_logger import logger
 from math import isnan
@@ -25,20 +26,19 @@ with open(HARDWARE_CONFIG) as hw:
 redis_connection = redis.Redis(decode_responses=True)
 
 
-def qubit_config_from_redis(qubit: str, channel:int) -> dict:
-    redis_config = redis_connection.hgetall(f"transmons:{qubit}")
-    transmon_config = {k:v for k,v in redis_config.items() if ':' in k}
-    # transmon_submodules = transmon.submodules.keys()
-    device_dict = {}
-    for redis_entry_key, redis_value in transmon_config.items():
-        submodule, field = redis_entry_key.split(':')
-        device_dict[submodule] = device_dict.get(submodule, {}) | {field: redis_value}
-    device_dict['name'] = qubit
-    for submodule in device_dict:
-        if 'measure' in submodule:
-            device_dict[submodule]['acq_channel'] = channel
-
-    return device_dict
+# def qubit_config_from_redis(qubit: str, channel:int) -> dict:
+#     redis_config = redis_connection.hgetall(f"transmons:{qubit}")
+#     transmon_config = {k:v for k,v in redis_config.items() if ':' in k}
+#     # transmon_submodules = transmon.submodules.keys()
+#     device_dict = {}
+#     for redis_entry_key, redis_value in transmon_config.items():
+#         submodule, field = redis_entry_key.split(':')
+#         device_dict[submodule] = device_dict.get(submodule, {}) | {field: redis_value}
+#     device_dict['name'] = qubit
+#     for submodule in device_dict:
+#         if 'measure' in submodule:
+#             device_dict[submodule]['acq_channel'] = channel
+#     return device_dict
 
 def load_redis_config(transmon: ExtendedTransmon, channel:int):
     qubit = transmon.name
@@ -98,7 +98,7 @@ def load_redis_config_coupler(coupler: CompositeSquareEdge):
     coupler.cz.cz_width(float(redis_config['cz_pulse_width']))
     return
 
-def precompile(node, bin_mode:str=None, repetitions:int=None):
+def precompile(node: BaseNode, bin_mode:str=None, repetitions:int=None):
     if node.name == 'tof':
         return None, 1
     samplespace = node.samplespace
@@ -158,38 +158,38 @@ def precompile(node, bin_mode:str=None, repetitions:int=None):
 
     schedule_function = node_class.schedule_function
 
-    # Merge with the parameters from node dictionary
-    static_parameters = {}
-
-    # static_parameters = node_class.static_kwargs # parameters stored in the redis
-
     if repetitions is not None:
         static_parameters["repetitions"] = repetitions
     else:
         repetitions = 2**10
     node.demod_channels.set_repetitions(repetitions)
 
-    for key, value in node.node_dictionary.items():
-        if key in static_parameters:
-            if not np.iterable(value):
-                value = {q: value for q in qubits}
-            static_parameters[key] = value
-        elif key in samplespace:
-            if not isinstance(value, dict):
-                value = {q: value for q in qubits}
-            samplespace[key] = value
-        elif key != "couplers":
-            static_parameters[key] = value
-            # print(f"{key} isn't one of the static parameters of {node_class}. \n We will ignore this parameter.")
+    # for key, value in node.node_dictionary.items():
+    #     if key in static_parameters:
+    #         if not np.iterable(value):
+    #             value = {q: value for q in qubits}
+    #         static_parameters[key] = value
+    #     elif key in samplespace:
+    #         if not isinstance(value, dict):
+    #             value = {q: value for q in qubits}
+    #         samplespace[key] = value
+    #     elif key != "couplers":
+    #         static_parameters[key] = value
+    #         # print(f"{key} isn't one of the static parameters of {node_class}. \n We will ignore this parameter.")
 
-    if node.type == 'parameterized_sweep' or node.type == 'adaptive_sweep':
-        external_parameters = {node.external_parameter_name: node.external_parameter_value}
-    else:
-        external_parameters = {}
+    # if node.type == 'parameterized_sweep' or node.type == 'adaptive_sweep':
+    #     external_parameters = {node.external_parameter_name: node.external_parameter_value}
+    # else:
+    #     external_parameters = {}
 
     compiler = SerialCompiler(name=f'{node.name}_compiler')
 
-    schedule = schedule_function(**static_parameters, **external_parameters, **samplespace)
+    schedule_samplespace = node.schedule_samplespace
+    external_samplespace = node.external_samplespace
+
+    samplespace = schedule_samplespace | external_samplespace
+
+    schedule = schedule_function( **samplespace )
     compilation_config = device.generate_compilation_config()
     device.close()
 

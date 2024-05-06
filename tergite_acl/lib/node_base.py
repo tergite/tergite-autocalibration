@@ -33,17 +33,19 @@ class BaseNode:
         in workers/dataset_utils.py. some nodes have peculiar dimensions
         e.g. randomized benchmarking and need dimension definition in their class
         '''
-        settable_quantities = self.samplespace.keys()
+        schedule_settable_quantities = self.schedule_samplespace.keys()
 
         # keeping the first element, ASSUMING that all settable elements
         # have the same dimensions on their samplespace
-        first_settable = list(settable_quantities)[0]
-        measured_elements = self.samplespace[first_settable].keys()
+        first_settable = list(schedule_settable_quantities)[0]
+        measured_elements = self.schedule_samplespace[first_settable].keys()
         first_element = list(measured_elements)[0]
 
         dimensions = []
-        for quantity in settable_quantities:
-            dimensions.append(len(self.samplespace[quantity][first_element]))
+        for quantity in schedule_settable_quantities:
+            dimensions.append(
+                len(self.schedule_samplespace[quantity][first_element])
+            )
         return dimensions
 
     def build_demod_channels(self):

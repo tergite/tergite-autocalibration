@@ -1,5 +1,6 @@
 from logging import raiseExceptions
 import xarray
+from tergite_acl.lib.node_base import BaseNode
 from tergite_acl.utils.dataset_utils import retrieve_dummy_dataset
 from tergite_acl.utils.status import ClusterStatus
 from tergite_acl.functions.compilation_worker import precompile
@@ -30,11 +31,11 @@ adaptive_sweep:
     For every external parameter value, the schedule is recompiled.
 '''
 
-def monitor_node_calibration(node, data_path, lab_ic, cluster_status):
+def monitor_node_calibration(node: BaseNode, data_path, lab_ic, cluster_status):
     if node.type == 'simple_sweep':
         compiled_schedule = precompile(node)
 
-        if len(node.node_externals) == 0:
+        if node.external_samplespace == {}:
             '''
             This correspond to simple cluster schedules
             '''

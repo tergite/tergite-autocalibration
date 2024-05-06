@@ -40,10 +40,10 @@ class T1_Node(BaseNode):
         self.redis_field = ['t1_time']
         self.backup = False
 
-        self.type = 'parameterized_simple_sweep'
-        self.node_externals = range(2)
-        self.external_parameter_name = 'repeat'
-        self.external_parameter_value = 0
+        self.type = 'simple_sweep'
+
+        self.external_parameter_value = 0 # TODO is this needed?
+        self.number_or_repeated_T1 = 3
 
         self.sleep_time = 3
         self.operations_args = []
