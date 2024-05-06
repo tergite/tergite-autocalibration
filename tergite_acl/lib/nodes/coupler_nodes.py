@@ -140,20 +140,21 @@ class CZ_Chevron_Node(BaseNode):
     def samplespace(self):
         # print(f'{ np.linspace(- 50e6, 50e6, 2) + self.ac_freq = }')
         cluster_samplespace = {
-            # For Wide sweep
+            # For biase point sweep
             # 'cz_pulse_durations': {
-            #     qubit: 4e-9+np.arange(0e-9, 36*100e-9,400e-9) for qubit in self.coupled_qubits
+            #     coupler: np.arange(0e-9, 601e-9, 40e-9)+20e-9 for coupler in self.couplers
             # },
-            # 'cz_pulse_frequencies_sweep': {
-            #     qubit: np.linspace(210e6, 500e6, 51) + self.ac_freq for qubit in self.coupled_qubits
+            # 'cz_pulse_frequencies': {
+            #     coupler: np.linspace(-20e6, 20e6, 41) + self.transition_frequency(coupler) for coupler in
+            #     self.couplers
             # },
 
-            # For CZ gate
+            # For CZ gate calibration
             'cz_pulse_durations': {
-                coupler: np.arange(0e-9, 601e-9, 40e-9)+20e-9 for coupler in self.couplers
+                coupler: np.arange(0e-9, 401e-9, 10e-9)+20e-9 for coupler in self.couplers
             },
             'cz_pulse_frequencies': {
-                coupler: np.linspace(-20e6, 20e6, 41) + self.transition_frequency(coupler) for coupler in
+                coupler: np.linspace(-10e6, 0e6, 21) + self.transition_frequency(coupler) for coupler in
                 self.couplers
             },
         }
@@ -267,10 +268,7 @@ class CZ_Calibration_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.coupler = couplers[0]
-        # print(couplers)
         self.coupled_qubits = couplers[0].split(sep='_')
-        # print(self.coupled_qubits)
-        # self.node_dictionary = kwargs
         self.redis_field = ['cz_phase', 'cz_pop_loss']
         self.qubit_state = 2
         self.testing_group = 0  # The edge group to be tested. 0 means all edges.

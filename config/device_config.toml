@@ -121,12 +121,14 @@ cz_pulse_amplitude = 0.2
 cz_pulse_width = 4e-9
 
 [initials.couplers]
-# q21_q22.parking_current =  800e-6
+q21_q22.parking_current =  0
 q11_q12.parking_current = 0
 q12_q13.parking_current = 0
-q13_q14.parking_current = -200e-6
+q13_q14.parking_current = 0
 q14_q15.parking_current = 0
 
+q19_q20.parking_current = -825e-6
+q19_q21.cz_pulse_amplitude = 0.25
 
 [resonator_spectroscopy.all]
 reset.duration =  60e-6

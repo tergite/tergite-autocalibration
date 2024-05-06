@@ -815,7 +815,7 @@ class CZ_chevron(Measurement):
             redis_config = redis_connection.hgetall(f"couplers:{this_coupler}")
             cz_pulse_amplitude[this_coupler] = float(redis_config['cz_pulse_amplitude'])
             
-            if this_coupler in ['q16_q21','q17_q22']:
+            if this_coupler in ['q14_q19','q17_q22']:
                 downconvert = 0
             else:
                 downconvert = 4.4e9

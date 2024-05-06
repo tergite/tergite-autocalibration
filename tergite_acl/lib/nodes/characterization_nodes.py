@@ -11,7 +11,7 @@ from tergite_acl.lib.calibration_schedules.T1 import T1, T2, T2Echo
 from tergite_acl.lib.calibration_schedules.check_cliffords import Check_Cliffords
 from tergite_acl.lib.calibration_schedules.randomized_benchmarking import Randomized_Benchmarking
 
-coherence_repeat = 100
+coherence_repeat = 10
 
 class T1_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
@@ -60,7 +60,7 @@ class Randomized_Benchmarking_Node(BaseNode):
         self.analysis_obj = RandomizedBenchmarkingAnalysis
 
         # TODO change it a dictionary like samplespace
-        self.node_externals = 6 * np.arange(150, dtype=np.int32)
+        self.node_externals = 6 * np.arange(50, dtype=np.int32)
         self.external_parameter_name = 'seed'
         self.external_parameter_value = 0
         ####################

@@ -77,9 +77,9 @@ class CZChevronAnalysis(BaseAnalysis):
         # You can perform a more refined fitting by using run_fitting_max_swap_amp.
 
         print('WARNING TESTING CZ ANALYSIS')
-        return [300e-9, 0.1]
+        # return [300e-9, 0.1]
 
-        # return self.run_fitting_min_coupling_strength()
+        return self.run_fitting_min_coupling_strength()
 
     def run_fitting_min_coupling_strength(self):
         """
