@@ -23,18 +23,21 @@ class All_XY_Node(BaseNode):
         self.all_qubits = all_qubits
         self.redis_field = ['error_syndromes']
         self.backup = False
-        self.samplespace = {
-            'XY_index': {qubit: np.array(range(1,22)) for qubit in self.all_qubits}
+        self.schedule_samplespace = {
+            'XY_index': {
+                qubit: np.array(range(1,22)) for qubit in self.all_qubits
+            }
         }
 
 
 class T1_Node(BaseNode):
+    measurement_obj = T1
+    analysis_obj = T1Analysis
+
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.all_qubits = all_qubits
         self.redis_field = ['t1_time']
-        self.measurement_obj = T1
-        self.analysis_obj = T1Analysis
         self.backup = False
 
         self.type = 'parameterized_simple_sweep'
@@ -45,6 +48,15 @@ class T1_Node(BaseNode):
         self.sleep_time = 3
         self.operations_args = []
 
+        self.schedule_samplespace = {
+            'delays': {
+                qubit: 8e-9 + np.arange(0, 300e-6, 6e-6) for qubit in self.all_qubits
+            }
+        }
+        self.external_samplespace = {
+            'repeat': range(self.number_or_repeated_T1)
+        }
+
     def pre_measurement_operation(self, external=1):
         if external > 0:
             print(f'sleeping for {self.sleep_time} seconds')
@@ -54,12 +66,6 @@ class T1_Node(BaseNode):
     def dimensions(self):
         return (len(self.samplespace['delays'][self.all_qubits[0]]), 1)
 
-    @property
-    def samplespace(self):
-        cluster_samplespace = {
-            'delays': {qubit: 8e-9 + np.arange(0, 300e-6, 6e-6) for qubit in self.all_qubits}
-        }
-        return cluster_samplespace
 
 
 class Randomized_Benchmarking_Node(BaseNode):
@@ -75,87 +81,74 @@ class Randomized_Benchmarking_Node(BaseNode):
         self.backup = False
         self.redis_field = ['fidelity']
 
-        # TODO change it a dictionary like samplespace
-        self.node_externals = 6 * np.arange(5, dtype=np.int32)
-        self.external_parameter_name = 'seed'
-        self.external_parameter_value = 0
-        ####################
+        self.external_parameter_value = 0 # TODO is this necessary?
+
+        self.schedule_samplespace = {
+            'number_of_cliffords': {
+                qubit: np.array(
+                    [2, 16, 128, 256, 512, 768, 1024, 0, 1]
+                ) for qubit in self.all_qubits
+            },
+        }
+
+        self.external_samplespace = {
+            'seed': np.arange(5, dtype=np.int32)
+        }
 
     @property
     def dimensions(self):
         return (len(self.samplespace['number_of_cliffords'][self.all_qubits[0]]), 1)
 
-    @property
-    def samplespace(self):
-        numbers = 2 ** np.arange(1, 12, 3)
-        extra_numbers = [numbers[i] + numbers[i + 1] for i in range(len(numbers) - 2)]
-        extra_numbers = np.array(extra_numbers)
-        calibration_points = np.array([0, 1])
-        all_numbers = np.sort(np.concatenate((numbers, extra_numbers)))
-        # all_numbers = numbers
 
-        all_numbers = np.concatenate((all_numbers, calibration_points))
-
-        # number_of_repetitions = 1
-
-        cluster_samplespace = {
-            'number_of_cliffords': {
-                # qubit: all_numbers for qubit in self.all_qubits
-                # qubit: np.array([2, 16, 128, 256,512, 768, 1024, 0, 1]) for qubit in self.all_qubits
-                qubit: np.array([2, 16, 128, 256, 512, 768, 1024, 0, 1]) for qubit in self.all_qubits
-            },
-        }
-        return cluster_samplespace
-
-
-class Check_Cliffords_Node:
-    def __init__(self, name: str, all_qubits: list[str], **kwargs):
-        self.name = name
-        self.all_qubits = all_qubits
-        self.node_dictionary = kwargs
-        self.redis_field = ['t1_time']  # TODO Empty?
-        self.measurement_obj = Check_Cliffords
-        self.analysis_obj = CheckCliffordsAnalysis
-
-    @property
-    def samplespace(self):
-        cluster_samplespace = {
-            'clifford_indices': {
-                qubit: np.linspace(0, 25) for qubit in self.all_qubits
-            }
-        }
-        return cluster_samplespace
+# TODO this needs to be reviwed
+# class Check_Cliffords_Node:
+#     def __init__(self, name: str, all_qubits: list[str], **kwargs):
+#         self.name = name
+#         self.all_qubits = all_qubits
+#         self.node_dictionary = kwargs
+#         self.redis_field = ['t1_time']  # TODO Empty?
+#         self.measurement_obj = Check_Cliffords
+#         self.analysis_obj = CheckCliffordsAnalysis
+#
+#     @property
+#     def samplespace(self):
+#         cluster_samplespace = {
+#             'clifford_indices': {
+#                 qubit: np.linspace(0, 25) for qubit in self.all_qubits
+#             }
+#         }
+#         return cluster_samplespace
 
 
 class T2_Node(BaseNode):
+    measurement_obj = T2
+    analysis_obj = T2Analysis
+
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.name = name
         self.redis_field = ['t2_time']
         self.qubit_state = 0
-        self.measurement_obj = T2
-        self.analysis_obj = T2Analysis
 
-    @property
-    def samplespace(self):
-        cluster_samplespace = {
-            'delays': {qubit: 8e-9 + np.arange(0, 100e-6, 1e-6) for qubit in self.all_qubits}
+        self.schedule_samplespace = {
+            'delays': {
+                qubit: 8e-9 + np.arange(0, 100e-6, 1e-6) for qubit in self.all_qubits
+            }
         }
-        return cluster_samplespace
 
 
 class T2_Echo_Node(BaseNode):
+    measurement_obj = T2Echo
+    analysis_obj = T2EchoAnalysis
+
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.name = name
         self.redis_field = ['t2_time']
         self.qubit_state = 0
-        self.measurement_obj = T2Echo
-        self.analysis_obj = T2EchoAnalysis
 
-    @property
-    def samplespace(self):
-        cluster_samplespace = {
-            'delays': {qubit: 8e-9 + np.arange(0, 300e-6, 6e-6) for qubit in self.all_qubits}
+        self.schedule_samplespace = {
+            'delays': {
+                qubit: 8e-9 + np.arange(0, 300e-6, 6e-6) for qubit in self.all_qubits
+            }
         }
-        return cluster_samplespace
