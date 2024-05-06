@@ -65,7 +65,7 @@ ROOT_DIR = _from_config('ROOT_DIR',
 # Data directory to store plots and datasets
 DATA_DIR = _from_config('DATA_DIR',
                         cast_=Path,
-                        default=ROOT_DIR.joinpath('/data_dir'))
+                        default=ROOT_DIR.joinpath('data_dir'))
 
 # If the data directory does not exist, it will be created automatically
 if not os.path.exists(DATA_DIR):

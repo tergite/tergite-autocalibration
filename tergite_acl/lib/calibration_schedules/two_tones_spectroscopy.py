@@ -6,7 +6,7 @@ from quantify_scheduler.operations.gate_library import Measure, Reset, X
 from quantify_scheduler.operations.pulse_library import SetClockFrequency, SoftSquarePulse
 from quantify_scheduler.resources import ClockResource
 from quantify_scheduler.schedules.schedule import Schedule
-from tergite_acl.utils.extended_transmon_element import Measure_RO1
+from tergite_acl.utils.extended_transmon_element import ExtendedTransmon, Measure_RO1
 import numpy as np
 
 from tergite_acl.lib.measurement_base import Measurement
@@ -14,25 +14,18 @@ from tergite_acl.lib.measurement_base import Measurement
 
 class Two_Tones_Spectroscopy(Measurement):
 
-    def __init__(self, transmons, qubit_state: int = 0):
+    def __init__(self,transmons: dict[str, ExtendedTransmon], qubit_state:int=0):
         super().__init__(transmons)
 
         self.qubit_state = qubit_state
         self.transmons = transmons
 
-        self.static_kwargs = {
-            'qubits': self.qubits,
-            'spec_pulse_durations': self.attributes_dictionary('spec_duration'),
-            'spec_pulse_amplitudes': self.attributes_dictionary('spec_amp'),
-            'mw_pulse_ports': self.attributes_dictionary('microwave'),
-        }
-
     def schedule_function(
         self,
-        qubits: list[str],
-        spec_pulse_durations: dict[str, float],
-        spec_pulse_amplitudes: dict[str, float],
-        mw_pulse_ports: dict[str, str],
+        #qubits: list[str],
+       # spec_pulse_durations: dict[str, float],
+       # spec_pulse_amplitudes: dict[str, float],
+       # mw_pulse_ports: dict[str, str],
         spec_frequencies: dict[str, np.ndarray],
 
         repetitions: int = 1024,
@@ -83,11 +76,19 @@ class Two_Tones_Spectroscopy(Measurement):
                 ClockResource(name=this_clock, freq=spec_array_val[0]),
             )
 
+        qubits = self.transmons.keys()
         # This is the common reference operation so the qubits can be operated in parallel
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
         # The first for loop iterates over all qubits:
         for this_qubit, spec_array_val in spec_frequencies.items():
+
+            # unpack the static parameters
+            this_transmon = self.transmons[this_qubit]
+            spec_pulse_duration = this_transmon.spec.spec_duration()
+            spec_pulse_amplitude = this_transmon.spec.spec_amp()
+            mw_pulse_port = this_transmon.ports.microwave()
+
             if self.qubit_state == 0:
                 this_clock = f'{this_qubit}.01'
             elif self.qubit_state == 1:
@@ -130,9 +131,9 @@ class Two_Tones_Spectroscopy(Measurement):
 
                 spec_pulse = schedule.add(
                     SoftSquarePulse(
-                        duration=spec_pulse_durations[this_qubit],
-                        amp=spec_pulse_amplitudes[this_qubit],
-                        port=mw_pulse_ports[this_qubit],
+                        duration=spec_pulse_duration,
+                        amp=spec_pulse_amplitude,
+                        port=mw_pulse_port,
                         clock=this_clock,
                     ),
                     ref_pt="end", rel_time = 16e-9
