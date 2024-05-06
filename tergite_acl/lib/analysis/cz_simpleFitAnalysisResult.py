@@ -8,3 +8,11 @@ class CZSimpleFitAnalysisResult():
         self.fittedParam_2 = par2
         self.indexBestFrequency = None
         self.status = s
+
+    def Print(self):
+        print(f'Best freq idx: {self.indexBestFrequency}')       
+        print(f'p-value_1: {self.pvalue_1}')
+        print(f'p-value_2: {self.pvalue_2}')
+        print(f'par1: {self.fittedParam_1}')
+        print(f'par2: {self.fittedParam_2}')        
+        print(f'')        

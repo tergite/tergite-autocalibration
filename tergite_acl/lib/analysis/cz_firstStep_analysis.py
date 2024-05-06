@@ -1,4 +1,5 @@
 import glob
+import h5py
 from pathlib import Path
 import xarray as xr
 from typing import Type
@@ -8,8 +9,9 @@ from tergite_acl.lib.analysis.cz_singleGateSimpleFit import CZSingleGateSimpleFi
 from tergite_acl.lib.analysis_base import BaseAnalysis
 
 class CZFirtStepAnalysis(BaseAnalysis):
-    def __init__(self, baseFolder: Type[Path], dataFolder: Type[Path], qubit1, qubit2):
+    def __init__(self, baseFolder: Type[Path], date,  dataFolder: Type[Path], qubit1, qubit2):
         self.baseFolder = baseFolder
+        self.date = date
         self.dataFolder = dataFolder
         self.q1 = qubit1
         self.q2 = qubit2
@@ -26,17 +28,19 @@ class CZFirtStepAnalysis(BaseAnalysis):
         d2.attrs['qubit'] = f"q{self.q2}"
         d1 = d1.to_dataset(name=f"yq{self.q1}")
         d2 = d2.to_dataset(name=f"yq{self.q2}")
-        g1 = CZSingleGateSimpleFit(d1)
-        g2 = CZSingleGateSimpleFit(d2)
+        self.freq = ds[f'cz_pulse_frequenciesq{self.q1}_q{self.q2}'].values / 1e6 # MHz
+        self.times = ds[f'cz_pulse_durationsq{self.q1}_q{self.q2}'].values * 1e9 # ns
+        g1 = CZSingleGateSimpleFit(d1, self.freq, self.times)
+        g2 = CZSingleGateSimpleFit(d2, self.freq, self.times)
         r1 = g1.run_fitting()
         r2 = g2.run_fitting()
-        self.freq = d1[f'cz_pulse_frequencies_sweepq{self.q1}'].values
-        comb = CZFirstStepCombination(r1, r2)
+        #print("here")
+        comb = CZFirstStepCombination(r1, r2, self.freq)
         return comb.Analyze()
     
     def run_fitting(self) -> list[float, float, float, float, float]:
-        prefix = "q" + str(self.q1) + "_q" + str(self.q2) + "_" + self.dataFolder
-        suffix = "cz_chevron_all_results.py"
+        prefix = "q" + str(self.q1) + "_q" + str(self.q2) + "_" + self.date
+        suffix = "all_results.py"
 
         # Use glob to find the file
         file_pattern = f"{self.baseFolder}/{prefix}*{suffix}"
@@ -66,13 +70,15 @@ class CZFirtStepAnalysis(BaseAnalysis):
             # Loop through each folder
             for element in all_results:
                 folder = element["name"]
+                print(folder)
 
                 r = self.AnalyseGridPoint(folder)
                 if r.status == FitResultStatus.FOUND: 
+                    r.Print()
                     if  r.pvalue_1 + r.pvalue_2 > 1.8:
                         print(r.pvalue_1 + r.pvalue_2)
                         print(folder)
-                    if r.pvalue_1 + r.pvalue_2 > current_pv:
+                    if r.pvalue_1 + r.pvalue_2 > current_pv and r.fittedParam_1[0] > 0.2 and r.fittedParam_2[0] > 0.2 :
                         current_pv = r.pvalue_1 + r.pvalue_2
                         bestPoint = r
                         best_current = element["parking_current"]
@@ -80,11 +86,12 @@ class CZFirtStepAnalysis(BaseAnalysis):
                         best_folderName = folder
 
             print(best_folderName)
+            print(current_pv)
             print(best_current)
             print(best_amplitude)
             print(self.freq[bestPoint.indexBestFrequency])
             print(bestPoint.fittedParam_1[1])
-            print(bestPoint.fittedParam_2[2])
+            print(bestPoint.fittedParam_2[1])
             return best_current, best_amplitude, self.freq[bestPoint.indexBestFrequency], bestPoint.fittedParam_1[1], bestPoint.fittedParam_2[2]
 
         elif len(files) > 1:

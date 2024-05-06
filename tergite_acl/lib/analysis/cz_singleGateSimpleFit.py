@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 class CZSingleGateSimpleFit(BaseAnalysis):
         
-    def __init__(self, dataset: xr.Dataset):
+    def __init__(self, dataset: xr.Dataset, frequencies, durations):
         super().__init__()
         self.dataset = dataset
         #print(dataset)
@@ -17,9 +17,15 @@ class CZSingleGateSimpleFit(BaseAnalysis):
         self.qubit = dataset[self.data_var].attrs['qubit']
         self.result = CZSingleGateSimpleFitResult()
         self.fittefTimes = []
-        self.freq = self.dataset[f'cz_pulse_frequencies_sweep{self.qubit}'].values / 1e6 # MHz
-        self.times = self.dataset[f'cz_pulse_durations{self.qubit}'].values  * 1e9 # ns
+        self.freq = frequencies
+        self.times = durations
         self.magnitudes = []
+
+    def get_dataarray_by_partial_name(self, dataset_path, partial_name):
+        with xr.open_dataset(dataset_path) as ds:
+            for var_name in ds.data_vars:
+                if partial_name in var_name:
+                    return ds[var_name]
 
     def fitfunc(self, x, *p):
         if len(p) < 4:
@@ -32,16 +38,32 @@ class CZSingleGateSimpleFit(BaseAnalysis):
         magnitudes = np.array([[np.linalg.norm(u) for u in v] for v in self.dataset[f'y{self.qubit}']])
         self.magnitudes = np.transpose((magnitudes - np.min(magnitudes)) / (np.max(magnitudes) - np.min(magnitudes)))
 
-        #print("First fit")
         # Here we could reintroduce the fft for better estumate of inital period        
         paras_fit = []
         chi2 = []
         pvalues = []
+        start_Amps = []
+        start_periods = []
+        errors = []
         for i, prob in enumerate(self.magnitudes):
-            #print(i)
-            errors = np.full(len(prob), 0.05)
-            initial_parameters = [0.4, 100, self.times[np.argmax(prob)], 0.5]
-            bounds = ([0.01, 20, min(self.times), -1], [0.6, 400, max(self.times), 1])
+            #print(f'freqIndex: {i}')
+            indexMax = np.argmax(prob)
+            indexMin = np.argmin(prob)
+            startPeriod = abs(self.times[indexMax]-self.times[indexMin]) * 2
+            if startPeriod < 30 or startPeriod > 300:
+                #print(f'Per: {startPeriod}')
+                startPeriod = 100
+            start_periods.append(startPeriod)
+            startAmp = (max(prob) - min(prob)) / 2
+            start_Amps.append(startAmp)
+            #print(f'Amp: {startAmp}')
+            error=max(prob) / 20 #0.05
+            errors = np.full(len(prob), error)
+
+        #print("First fit")
+        for i, prob in enumerate(self.magnitudes):
+            initial_parameters = [start_Amps[i], start_periods[i], self.times[np.argmax(prob)], 0.5]
+            bounds = ([0.01, 20, min(self.times), -1], [0.6, 800, max(self.times)*2, 1])
 
             try:
                 popt = curve_fit(self.fitfunc, self.times, prob, sigma=errors, bounds=bounds, p0=initial_parameters)
@@ -67,19 +89,31 @@ class CZSingleGateSimpleFit(BaseAnalysis):
 
         # Second fit in limited range
         for i, prob in enumerate(self.magnitudes):
+            #print(i)
             period_fit = paras_fit[i][1]
-            times_cut_index = np.argmin(np.abs(self.times - 3 * period_fit))
+            times_cut_index = np.argmin(np.abs(self.times - 4 * period_fit))
             times_cut = self.times[:times_cut_index]
             prob_cut = prob[:times_cut_index]
             #print(times_cut)
             if len(times_cut) > 5: 
+                errors_cut = errors[:times_cut_index]
+                amp_step2_init = paras_fit[i][0]
+                if amp_step2_init < 0.2:
+                    amp_step2_init = 0.25
+                if amp_step2_init > 0.6:
+                    amp_step2_init = 0.55
                 
-                errors = np.full(len(prob_cut), 0.05)
-                initial_parameters = [0.4, 100, self.times[np.argmax(prob_cut)], 0.5]
-                bounds = ([0.2, 20, min(times_cut), -1], [0.6, 400, max(times_cut), 1])
+                period_step2_init = paras_fit[i][1]
+                if period_step2_init < 20:
+                    period_step2_init = 250
+                if period_step2_init > 600:
+                    period_step2_init = 250
+                    
+                initial_parameters = [amp_step2_init, period_step2_init, self.times[np.argmax(times_cut)], 0.5]
+                bounds = ([0.2, 20, min(times_cut), -1], [0.6, 600, max(times_cut)*2, 1])
                 
                 try:
-                    popt = curve_fit(self.fitfunc, times_cut, prob_cut, sigma=errors, bounds=bounds, p0=initial_parameters)
+                    popt = curve_fit(self.fitfunc, times_cut, prob_cut, sigma=errors_cut, bounds=bounds, p0=initial_parameters)
                 except RuntimeError as e:
                     print("An error occurred during curve fitting:", e)
                     self.status = FitResultStatus.NOT_FOUND
@@ -152,7 +186,7 @@ class CZSingleGateSimpleFit(BaseAnalysis):
             row = i // 3  # Calculate the row index
             col = i % 3   # Calculate the column index
             
-            axesAll[row, col].plot(self.times, prob, 'o', markersize=5, label=f'P-val: {self.result.pvalues[i]:.4g}')
+            axesAll[row, col].plot(self.times, prob, 'o', markersize=5, label=f'P-val: {self.result.pvalues[i]:.4g} \n p[0] = {self.result.fittedParams[i][0]:.4g} p[1] = {self.result.fittedParams[i][1]:.4g}\n p[2] = {self.result.fittedParams[i][2]:.4g} p[3] = {self.result.fittedParams[i][3]:.4g}')
 
             x_high_res = np.linspace(self.fittefTimes[i][0], self.fittefTimes[i][-1], 100)
             axesAll[row, col].plot(x_high_res, fitfunc(self.result.fittedParams[i], x_high_res), '-.', linewidth=1)
