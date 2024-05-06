@@ -81,12 +81,15 @@ class CalibrationSupervisor:
             clusters = [clusters]
         for cluster in clusters:
             # Set the attenuation values for the modules
-            # for module in cluster.modules:
-                # if module.is_qcm_type:
-                #     module.out0_att(attenuation_setting['qubit']) # Control lines
-                #     module.out1_att(attenuation_setting['coupler']) # Flux lines
-                # elif module.is_qrm_type:
-                #     module.out0_att(attenuation_setting['readout']) # Readout lines
+            for module in cluster.modules:
+                try:
+                    if module.is_qcm_type:
+                        module.out0_att(attenuation_setting['qubit']) # Control lines
+                        module.out1_att(attenuation_setting['coupler']) # Flux lines
+                    elif module.is_qrm_type:
+                        module.out0_att(attenuation_setting['readout']) # Readout lines
+                except:
+                    pass
             ic_.add_component(ClusterComponent(cluster))
             ic_.timeout(self.cluster_timeout)
         return ic_

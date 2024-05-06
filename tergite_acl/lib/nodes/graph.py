@@ -21,7 +21,7 @@ graph_dependencies = [
     ('ramsey_correction', 'motzoi_parameter'),
     ('motzoi_parameter', 'n_rabi_oscillations'),
     ('n_rabi_oscillations', 'resonator_spectroscopy_1'),
-    #('randomized_benchmarking', 'T1'),
+    ('randomized_benchmarking', 'T1'),
     ('n_rabi_oscillations', 'resonator_spectroscopy_1'),
     ('n_rabi_oscillations', 'T1'),
     ('n_rabi_oscillations', 'randomized_benchmarking'),

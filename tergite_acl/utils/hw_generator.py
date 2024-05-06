@@ -13,19 +13,19 @@ HW_CONFIG['clusterA'] = {
 }
 
 module_to_qubit_map = {
-    'module1': 'q16',
-    'module2': 'q17',
-    'module3': 'q18',
-    'module4': 'q19',
-    'module5': 'q20',
-    'module6': 'q21',
-    'module7': 'q22',
-    'module8': 'q23',
-    'module9': 'q24',
-    'module10': 'q25',
+    'module1': 'q06',
+    'module2': 'q07',
+    'module3': 'q08',
+    'module4': 'q09',
+    'module5': 'q10',
+    'module6': 'q11',
+    'module7': 'q12',
+    'module8': 'q13',
+    'module9': 'q14',
+    'module10':'q15',
 }
-module_16_qubits = ['q16', 'q17', 'q18', 'q19', 'q20']
-module_17_qubits = ['q21', 'q22', 'q23', 'q24', 'q25']
+module_16_qubits = ['q06', 'q07', 'q08', 'q09', 'q10']
+module_17_qubits = ['q11', 'q12', 'q13', 'q14', 'q15']
 qubits = module_to_qubit_map.values()
 
 

@@ -36,9 +36,12 @@ class Coupler_Spectroscopy_Node(BaseNode):
         self.external_parameter_name = 'currents'
 
         # self.validate()
-        self.node_externals = np.append(np.arange(0e-3, 3e-3, 100e-6),np.arange(-0.1e-3, -3e-3, -100e-6))
+        self.node_externals = np.round(np.append(np.arange(0.1, 3.1, 0.1),np.arange(-3, 0.1, 0.1)),1)*1e-3
+        #self.node_externals = np.round(np.append([-0.1, -0.2] ,[0.1, 0]),1)*1e-3
+
         self.operations_args = []
         self.measure_qubit_index = 0
+        self.measurement_qubit = self.coupled_qubits[self.measure_qubit_index]
 
         try:
             self.spi = SpiDAC()
@@ -59,7 +62,7 @@ class Coupler_Spectroscopy_Node(BaseNode):
 
     @property
     def dimensions(self):
-        return (len(self.samplespace['spec_frequencies'][self.all_qubits[0]]), 1)
+        return (len(self.samplespace['spec_frequencies'][self.measurement_qubit]), 1)
 
     def pre_measurement_operation(self, external: float = 0): #external is the current
         print(f'Current: {external} for coupler: {self.coupler}')
@@ -67,10 +70,8 @@ class Coupler_Spectroscopy_Node(BaseNode):
         
     @property
     def samplespace(self):
-        qubit = self.coupled_qubits[self.measure_qubit_index]
-        self.measurement_qubit = qubit
         cluster_samplespace = {
-            'spec_frequencies': {qubit: qubit_samples(qubit)}
+            'spec_frequencies': {self.measurement_qubit: qubit_samples(self.measurement_qubit)}
         }
         return cluster_samplespace
 
@@ -80,7 +81,7 @@ class Coupler_Spectroscopy_Node(BaseNode):
             'dc_currents': {self.couplers[0]: np.append(np.arange(0e-3, 3e-3, 100e-6),np.arange(-100e-3, -3e-3, -100e-6))},
         }
         return spi_samplespace
-
+    
 
 class Coupler_Resonator_Spectroscopy_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):

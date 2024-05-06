@@ -63,7 +63,7 @@ class Randomized_Benchmarking(Measurement):
             # The inner for loop iterates over the random clifford sequence lengths
             for acq_index, this_number_of_cliffords in enumerate(clifford_sequence_lengths[:-2]):
 
-                schedule.add(X(this_qubit))
+                #schedule.add(X(this_qubit))
                 random_sequence = rng.integers(all_cliffords, size=this_number_of_cliffords)
 
                 for sequence_index in random_sequence:
