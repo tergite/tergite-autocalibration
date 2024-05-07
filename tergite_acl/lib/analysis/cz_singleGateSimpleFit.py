@@ -20,6 +20,12 @@ class CZSingleGateSimpleFit(BaseAnalysis):
         self.freq = frequencies
         self.times = durations
         self.magnitudes = []
+        self.paras_fit = []
+        self.chi2 = []
+        self.pvalues = []
+        self.start_Amps = []
+        self.start_periods = []
+        self.errors = []
 
     def get_dataarray_by_partial_name(self, dataset_path, partial_name):
         with xr.open_dataset(dataset_path) as ds:
@@ -39,12 +45,19 @@ class CZSingleGateSimpleFit(BaseAnalysis):
         self.magnitudes = np.transpose((magnitudes - np.min(magnitudes)) / (np.max(magnitudes) - np.min(magnitudes)))
 
         # Here we could reintroduce the fft for better estumate of inital period        
-        paras_fit = []
-        chi2 = []
-        pvalues = []
-        start_Amps = []
-        start_periods = []
-        errors = []
+        self.errors = self.SetInitialValues()
+
+        #print("First fit")
+        status = self.FirstFit()
+
+        # Second fit in limited range
+        if status != FitResultStatus.NOT_FOUND:
+            status = self.SecondFit()
+        
+        self.result = CZSingleGateSimpleFitResult(self.pvalues, self.paras_fit, status)
+        return self.result
+
+    def SetInitialValues(self):
         for i, prob in enumerate(self.magnitudes):
             #print(f'freqIndex: {i}')
             indexMax = np.argmax(prob)
@@ -53,57 +66,61 @@ class CZSingleGateSimpleFit(BaseAnalysis):
             if startPeriod < 30 or startPeriod > 500:
                 #print(f'Per: {startPeriod}')
                 startPeriod = 100
-            start_periods.append(startPeriod)
+            self.start_periods.append(startPeriod)
             startAmp = (max(prob) - min(prob)) / 2
-            start_Amps.append(startAmp)
+            self.start_Amps.append(startAmp)
             #print(f'Amp: {startAmp}')
             error=max(prob) / 20 #0.05
             errors = np.full(len(prob), error)
-
-        #print("First fit")
+        return errors
+    
+    def FirstFit(self):
         for i, prob in enumerate(self.magnitudes):
-            initial_parameters = [start_Amps[i], start_periods[i], self.times[np.argmax(prob)], 0.5]
+            initial_parameters = [self.start_Amps[i], self.start_periods[i], self.times[np.argmax(prob)], 0.5]
             bounds = ([0.01, 20, min(self.times), -1], [0.6, 800, max(self.times)*2, 1])
 
             try:
-                popt = curve_fit(self.fitfunc, self.times, prob, sigma=errors, bounds=bounds, p0=initial_parameters)
+                popt = curve_fit(self.fitfunc, self.times, prob, sigma=self.errors, bounds=bounds, p0=initial_parameters)
             except RuntimeError as e:
                 print("An error occurred during curve fitting:", e)
-                self.result = CZSingleGateSimpleFitResult(pvalues, paras_fit, FitResultStatus.NOT_FOUND)    
-                return self.result
+                return FitResultStatus.NOT_FOUND 
             
             params = popt[0]
             # Calculate the residuals
             residuals = prob - self.fitfunc(self.times, *params)
 
             # Calculate the reduced chi-square statistic
-            chi_sq = np.sum((residuals/errors) ** 2) / (len(prob) - len(params))
+            chi_sq = np.sum((residuals/self.errors) ** 2) / (len(prob) - len(params))
 
             # Calculate the p-value
             p_value = 1 - chi2dist.cdf(chi_sq, len(prob) - len(params))
 
-            paras_fit.append(params)
-            chi2.append(chi_sq)
-            pvalues.append(p_value)
+            self.paras_fit.append(params)
+            self.chi2.append(chi_sq)
+            self.pvalues.append(p_value)
             self.fittefTimes.append(self.times)
 
-        # Second fit in limited range
+        return FitResultStatus.FOUND
+
+    def SecondFit(self):
         for i, prob in enumerate(self.magnitudes):
             #print(i)
-            period_fit = paras_fit[i][1]
+            period_fit = self.paras_fit[i][1]
             times_cut_index = np.argmin(np.abs(self.times - 4 * period_fit))
             times_cut = self.times[:times_cut_index]
             prob_cut = prob[:times_cut_index]
             #print(times_cut)
-            if len(times_cut) > 5: 
-                errors_cut = errors[:times_cut_index]
-                amp_step2_init = paras_fit[i][0]
+            if len(times_cut) < 6:
+                print("Not enough points, using first step")   
+            else:
+                errors_cut = self.errors[:times_cut_index]
+                amp_step2_init = self.paras_fit[i][0]
                 if amp_step2_init < 0.2:
                     amp_step2_init = 0.25
                 if amp_step2_init > 0.6:
                     amp_step2_init = 0.55
                 
-                period_step2_init = paras_fit[i][1]
+                period_step2_init = self.paras_fit[i][1]
                 if period_step2_init < 20:
                     period_step2_init = 250
                 if period_step2_init > 600:
@@ -116,31 +133,25 @@ class CZSingleGateSimpleFit(BaseAnalysis):
                     popt = curve_fit(self.fitfunc, times_cut, prob_cut, sigma=errors_cut, bounds=bounds, p0=initial_parameters)
                 except RuntimeError as e:
                     print("An error occurred during curve fitting:", e)
-                    self.status = FitResultStatus.NOT_FOUND
-                    r = CZSingleGateSimpleFitResult(pvalues, paras_fit, self.status)    
-                    return r
+                    return FitResultStatus.NOT_FOUND
                 
                 params = popt[0]
                 # Calculate the residuals
                 residuals = prob_cut - self.fitfunc(times_cut, *params)
 
                 # Calculate the reduced chi-square statistic
-                chi_sq = np.sum((residuals/errors[:times_cut_index]) ** 2) / (len(prob_cut) - len(params))
+                chi_sq = np.sum((residuals/self.errors[:times_cut_index]) ** 2) / (len(prob_cut) - len(params))
 
                 # Calculate the p-value
                 p_value = 1 - chi2dist.cdf(chi_sq, len(prob_cut) - len(params))
-
                 #print("pvalue: " + str(p_value))
 
-                paras_fit[i] = params
-                chi2[i] = chi_sq
-                pvalues[i] = p_value
+                self.paras_fit[i] = params
+                self.chi2[i] = chi_sq
+                self.pvalues[i] = p_value
                 self.fittefTimes[i] = times_cut
-            else:
-                print("Not enough points, using first step")
-        
-        self.result = CZSingleGateSimpleFitResult(pvalues, paras_fit, FitResultStatus.FOUND)
-        return self.result
+
+        return FitResultStatus.FOUND
 
     def plotter(self, outputFolder):
         fig, axes = plt.subplots(1, 3, figsize=(15,7), num=1)

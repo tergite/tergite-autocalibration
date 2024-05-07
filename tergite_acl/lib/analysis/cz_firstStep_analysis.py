@@ -75,9 +75,6 @@ class CZFirtStepAnalysis(BaseAnalysis):
                 r = self.AnalyseGridPoint(folder)
                 if r.status == FitResultStatus.FOUND: 
                     r.Print()
-                    if  r.pvalue_1 + r.pvalue_2 > 1.8:
-                        print(r.pvalue_1 + r.pvalue_2)
-                        print(folder)
                     if r.pvalue_1 + r.pvalue_2 > current_pv and r.fittedParam_1[0] > 0.21 and r.fittedParam_2[0] > 0.21 :
                         current_pv = r.pvalue_1 + r.pvalue_2
                         bestPoint = r
