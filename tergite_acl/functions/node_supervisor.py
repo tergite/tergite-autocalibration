@@ -26,12 +26,10 @@ simple_sweep:
 parameterized_sweep:
     sweep under a schedule parameter e.g. RB.
     For every external parameter value, the schedule is recompiled.
-adaptive_sweep:
-    modify the samplespace after each sweep and repeat
-    For every external parameter value, the schedule is recompiled.
 '''
 
 def monitor_node_calibration(node: BaseNode, data_path, lab_ic, cluster_status):
+    breakpoint()
     if node.type == 'simple_sweep':
         compiled_schedule = precompile(node)
 
@@ -48,14 +46,23 @@ def monitor_node_calibration(node: BaseNode, data_path, lab_ic, cluster_status):
             )
         else:
             pre_measurement_operation = node.pre_measurement_operation
-            operations_args = node.operations_args
 
             # node.external_dimensions is defined in the node_base
             iterations = node.external_dimensions
 
             result_dataset = xarray.Dataset()
 
-            external_settable = list(node.external_samplespace.values())[0]
+            # example of external_samplespace:
+            # external_samplespace = {
+            #       'cw_frequencies': {
+            #          'q1': np.array(4.0e9, 4.1e9, 4.2e9),
+            #          'q2': np.array(4.5e9, 4.6e9, 4.7e9),
+            #        }
+            # }
+
+            # e.g. 'cw_frequencies':
+            external_settable = list(node.external_samplespace.keys())[0]
+
 
             for current_iteration in range(iterations):
                 reduced_external_samplespace = {}
@@ -64,18 +71,26 @@ def monitor_node_calibration(node: BaseNode, data_path, lab_ic, cluster_status):
                     external_value = qubit_specific_values[current_iteration]
                     reduced_external_samplespace[qubit] = external_value
 
-                breakpoint()
+                    # example of reduced_external_samplespace:
+                    # reduced_external_samplespace = {
+                    #     'cw_frequencies': {
+                    #          'q1': np.array(4.2e9),
+                    #          'q2': np.array(4.7e9),
+                    #     }
+                    # }
+
                 pre_measurement_operation(
-                    *operations_args, 
-                    external=reduced_external_samplespace
+                    external=reduced_external_samplespace,
+                    instrument_coordinator=lab_ic
                 )
+
                 ds = measure_node(
                     node,
                     compiled_schedule,
                     lab_ic,
                     data_path,
                     cluster_status,
-                    measurement=(node_parameter, len(external_parameter_values))
+                    measurement=(current_iteration, iterations)
                 )
                 result_dataset = xarray.merge([result_dataset, ds])
 
