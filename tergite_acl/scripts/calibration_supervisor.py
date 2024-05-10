@@ -128,13 +128,16 @@ class CalibrationSupervisor:
             self.couplers,
             REDIS_CONNECTION
         )
-
+        # print(f'{node_name = }')
+        # print(f'{self.couplers = }')
         if node_name in ['coupler_spectroscopy', 'cz_chevron', 'cz_calibration', 'cz_calibration_ssro',
-                         'cz_dynamic_phase']:
+                         'cz_dynamic_phase','cz_dynamic_phase_swap','tqg_randomized_benchmarking']:
             coupler_statuses = [REDIS_CONNECTION.hget(f"cs:{coupler}", node_name) == 'calibrated' for coupler in
                                 self.couplers]
+            # print(f'{coupler_statuses=}')
             # node is calibrated only when all couplers have the node calibrated:
             is_node_calibrated = all(coupler_statuses)
+            # print(f'{is_node_calibrated=}')
         else:
             qubits_statuses = [REDIS_CONNECTION.hget(f"cs:{qubit}", node_name) == 'calibrated' for qubit in self.qubits]
             # node is calibrated only when all qubits have the node calibrated:
@@ -152,7 +155,8 @@ class CalibrationSupervisor:
         # Check Redis if node is calibrated
         status = DataStatus.undefined
 
-        if node_name in ['coupler_spectroscopy', 'cz_calibration', 'cz_calibration_ssro', 'cz_dynamic_phase']:
+        if node_name in ['coupler_spectroscopy', 'cz_chevron', 'cz_calibration', 'cz_calibration_ssro',
+                         'cz_dynamic_phase','cz_dynamic_phase_swap','tqg_randomized_benchmarking']:
             for coupler in self.couplers:
                 # the calibrated, not_calibrated flags may be not necessary,
                 # just store the DataStatus on Redis

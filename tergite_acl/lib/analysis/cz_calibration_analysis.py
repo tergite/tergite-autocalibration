@@ -57,7 +57,7 @@ class CZModel(lmfit.model.Model):
         self.set_param_hint("frequency", min=0)
 
         # Fix the phase at pi so that the ouput is at a minimum when drive_amp=0
-        self.set_param_hint("phase", min=0, max=360)
+        self.set_param_hint("phase", min=-360, max=360)
 
         # Pi-pulse amplitude can be derived from the oscillation frequency
 
@@ -99,7 +99,12 @@ class CZCalibrationAnalysis(BaseAnalysis):
 
     def run_fitting(self):
         # self.testing_group = 0
-        self.dynamic = self.dataset.attrs['node'] == 'cz_dynamic_phase'
+        self.dynamic = self.dataset.attrs['node'][:16] == 'cz_dynamic_phase'
+        self.swap = self.dataset.attrs['node'][-4:] == 'swap'
+        qubit_type_list = ['Control','Target']
+        if self.swap:
+            qubit_type_list.reverse() 
+
         self.freq = self.dataset[f'control_ons{self.qubit}'].values
         self.amp = self.dataset[f'ramsey_phases{self.qubit}'].values
         magnitudes = self.dataset[f'y{self.qubit}'].values
@@ -108,9 +113,10 @@ class CZCalibrationAnalysis(BaseAnalysis):
         self.fit_amplitudes = np.linspace(self.amp[0], self.amp[-1], 400)
 
         self.fit_results, self.fit_ys = [], []
+
         try:
             for magnitude in self.magnitudes:
-                if qubit_types[self.qubit] == 'Target':
+                if qubit_types[self.qubit] == qubit_type_list[1]:
                     fit = True
                     model = CZModel()
                     # magnitude = np.transpose(values)[15]

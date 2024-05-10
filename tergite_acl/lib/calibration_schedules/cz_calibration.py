@@ -5,7 +5,7 @@ import numpy as np
 from quantify_scheduler import Schedule
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.control_flow_library import Loop
-from quantify_scheduler.operations.gate_library import Measure, Reset, X90, Rxy, X
+from quantify_scheduler.operations.gate_library import Measure, Reset, X90, Rxy, X, CZ
 from quantify_scheduler.operations.pulse_library import ResetClockPhase, SoftSquarePulse, IdlePulse
 from quantify_scheduler.resources import ClockResource
 
@@ -13,46 +13,28 @@ from tergite_acl.config.coupler_config import qubit_types
 from tergite_acl.config.settings import REDIS_CONNECTION
 from tergite_acl.lib.measurement_base import Measurement
 from tergite_acl.utils.extended_transmon_element import Measure_RO_Opt, Rxy_12
+from tergite_acl.utils.extended_coupler_edge import CompositeSquareEdge
+from tergite_acl.utils.extended_transmon_element import ExtendedTransmon
 
 
 class CZ_calibration(Measurement):
 
-    def __init__(self, transmons, coupler, qubit_state: int = 0):
+    def __init__(self, transmons: dict[str, ExtendedTransmon],couplers: dict[str, CompositeSquareEdge], qubit_state: int = 0):
         super().__init__(transmons)
+        self.transmons = transmons
         self.qubit_state = qubit_state
-        self.coupler = coupler
-        self.static_kwargs = {
-            'qubits': self.qubits,
-            # 'mw_frequencies': self.attributes_dictionary('f01'),
-            # 'mw_pulse_durations': self.attributes_dictionary('duration'),
-            # 'mw_pulse_ports': self.attributes_dictionary('microwave'),
-            # 'mw_ef_amps180': self.attributes_dictionary('ef_amp180'),
-            # 'mw_frequencies_12': self.attributes_dictionary('f12'),
-            # 'cz_pulse_width': self.attributes_dictionary('cz_pulse_width'),
-            # 'cz_pulse_amplitude': self.attributes_dictionary('cz_pulse_amplitude'),
-            'coupler': self.coupler,
-            # 'cz_pulse_duration': self.attributes_dictionary('cz_pulse_duration'),
-            # 'cz_pulse_frequency': self.attributes_dictionary('cz_pulse_frequency'),
-        }
+        self.couplers = couplers
 
     def schedule_function(
-            self,
-            qubits: list[str],
-            # mw_ef_amps180: dict[str,float],
-            # mw_frequencies: dict[str,float],
-            # mw_frequencies_12: dict[str,float],
-            # mw_pulse_ports: dict[str,str],
-            # mw_pulse_durations: dict[str,float],
-            # cz_pulse_amplitude: dict[str,float],
-            # cz_pulse_width: dict[str,float], 
-            # testing_group: int = 1,
-            coupler: str,
-            # cz_pulse_frequency: dict[str,float],
-            # cz_pulse_duration: dict[str,float],
-            ramsey_phases: dict[str, np.ndarray],
-            control_ons: dict[str, np.ndarray],
-            number_of_cz: int = 1,
-            repetitions: int = 4096,
+        self,
+        ramsey_phases: dict[str, np.ndarray],
+        control_ons: dict[str, np.ndarray],
+        dynamic: bool,
+        swap_type: bool,
+        use_edge:bool = False,
+        number_of_cz: int = 1,
+        repetitions: int = 4096,
+        opt_cz_pulse_amplitude: dict[str,float] = None,
     ) -> Schedule:
 
         """
@@ -100,39 +82,23 @@ class CZ_calibration(Measurement):
         :
             An experiment schedule.
         """
-        dynamic = False
         if dynamic:
             name = 'CZ_dynamic_phase'
         else:
             name = 'CZ_calibration'
+
+        qubit_type_list = ['Control','Target']
+        if swap_type:
+            qubit_type_list.reverse()   
+            name += '_swap'
         schedule = Schedule(f"{name}", repetitions)
 
-        # all_couplers_all = edge_group.keys()
-        # all_couplers,bus_list = [],[]
-        # for coupler in all_couplers_all:
-        #     control,target = coupler.split('_')[0], coupler.split('_')[1]
-        #     if self.testing_group != 0:
-        #         check = edge_group[coupler] == self.testing_group
-        #     else:
-        #         check = True
-        #     if control in qubits and target in qubits and check:
-        #         bus_list.append([control,target])
-        #         all_couplers.append(coupler)
-        # control, target = np.transpose(bus_list)
-        # # cz_duration, cz_width = 200e-9, 4e-9
-        # # placeholder for the CZ pulse frequency and amplitude -0.4 689.9058811833632 for parking current  = -35e-6
-        # cz_pulse_frequency = {coupler: -0.4e6 for coupler in all_couplers}
-        # cz_pulse_duration = {coupler: 688e-09 for coupler in all_couplers}
-        # # cz_pulse_amplitude = {coupler: 0 for coupler in all_couplers}
-        # # print(f'{cz_pulse_duration = }')
-        # # print(f'{cz_pulse_frequency = }')
-
-        all_couplers = [coupler]
+        all_couplers = self.couplers
         all_qubits = [coupler.split(sep='_') for coupler in all_couplers]
         all_qubits = sum(all_qubits, [])
         # target,control = np.transpose(qubits)[0],np.transpose(qubits)[1]
 
-        print(f'{all_qubits = }')
+        # print(f'{all_qubits = }')
 
         # find cz parameters from redis
 
@@ -148,15 +114,7 @@ class CZ_calibration(Measurement):
         print(f'{cz_pulse_duration = }')
         print(f'{cz_pulse_amplitude = }')
 
-        # Add the clocks to the schedule
-        # for this_qubit, mw_f_val in mw_frequencies.items():
-        #     schedule.add_resource(
-        #         ClockResource( name=f'{this_qubit}.01', freq=mw_f_val)
-        #     )
-        # for this_qubit, mw_f_val in mw_frequencies_12.items():
-        #     schedule.add_resource(
-        #         ClockResource(name=f'{this_qubit}.12', freq=mw_f_val)
-        #     )
+
         for index, this_coupler in enumerate(all_couplers):
             schedule.add_resource(
                 ClockResource(name=f'{this_coupler}.cz', freq=-cz_pulse_frequency[this_coupler] + 4.4e9)
@@ -169,19 +127,20 @@ class CZ_calibration(Measurement):
         for cz_index, control_on in enumerate(control_on_values):
             for ramsey_index, ramsey_phase in enumerate(ramsey_phases_values):
                 relaxation = schedule.add(Reset(*all_qubits), label=f"Reset_{cz_index}_{ramsey_index}")
-
-                # cz_amplitude = 0.5
+                
+                gate_amp = 1
                 if dynamic:
                     if not control_on:
-                        for this_coupler in all_couplers:
-                            cz_pulse_amplitude[this_coupler] = 0
+                        gate_amp = 0
+                    else:
+                        gate_amp = 1
                 else:
                     if control_on:
                         for this_qubit in all_qubits:
-                            if qubit_types[this_qubit] == 'Control':
+                            if qubit_types[this_qubit] == qubit_type_list[0]:
                                 x = schedule.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
                 for this_qubit in all_qubits:
-                    if qubit_types[this_qubit] == 'Target':
+                    if qubit_types[this_qubit] == qubit_type_list[1]:
                         x90 = schedule.add(X90(this_qubit), ref_op=relaxation, ref_pt='end')
 
                 buffer_start = schedule.add(IdlePulse(4e-9), ref_op=x90, ref_pt='end')
@@ -190,232 +149,33 @@ class CZ_calibration(Measurement):
                     cz_pulse_port = f'{this_coupler}:fl'
                     reset_phase = schedule.add(ResetClockPhase(clock=cz_clock),
                                                ref_op=buffer_start, ref_pt='end', )
-                    cz = schedule.add(
-                        SoftSquarePulse(
-                            duration=cz_pulse_duration[this_coupler],
-                            amp=cz_pulse_amplitude[this_coupler],
-                            port=cz_pulse_port,
-                            clock=cz_clock,
+
+                    if use_edge:
+                        # print(qubits[0],qubits[1])
+                        cz = schedule.add(CZ(qubits[0],qubits[1]))
+                    else:
+                        cz = schedule.add(
+                            SoftSquarePulse(
+                                duration=cz_pulse_duration[this_coupler],
+                                amp=cz_pulse_amplitude[this_coupler]*gate_amp,
+                                port=cz_pulse_port,
+                                clock=cz_clock,
+                            )
                         )
-                    )
+
                     # cz = schedule.add(IdlePulse(cz_pulse_duration[this_coupler]))
                 buffer_end = schedule.add(IdlePulse(4e-9), ref_op=buffer_start, ref_pt='end',
                                       rel_time=np.ceil(cz_pulse_duration[this_coupler] * 1e9 / 4) * 4e-9)
                 if not dynamic:
                     if control_on:
                         for this_qubit in all_qubits:
-                            if qubit_types[this_qubit] == 'Control':
+                            if qubit_types[this_qubit] == qubit_type_list[0]:
                                 # print(this_qubit, qubit_types[this_qubit])
                                 x_end = schedule.add(X(this_qubit), ref_op=buffer_end, ref_pt='end')
 
                 for this_qubit in all_qubits:
-                    if qubit_types[this_qubit] == 'Target':
+                    if qubit_types[this_qubit] == qubit_type_list[1]:
                         x90_end = schedule.add(Rxy(theta=90, phi=ramsey_phase, qubit=this_qubit), ref_op=buffer_end,
-                                               ref_pt='end')
-
-                for this_qubit in all_qubits:
-                    this_index = cz_index * number_of_phases + ramsey_index
-                    schedule.add(Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
-                                 ref_op=x90_end, ref_pt="end", )
-        return schedule
-
-
-class CZ_dynamic_phase(Measurement):
-
-    def __init__(self, transmons, coupler, qubit_state: int = 0):
-        super().__init__(transmons)
-        self.qubit_state = qubit_state
-        self.coupler = coupler
-        self.static_kwargs = {
-            'qubits': self.qubits,
-            # 'mw_frequencies': self.attributes_dictionary('f01'),
-            # 'mw_pulse_durations': self.attributes_dictionary('duration'),
-            # 'mw_pulse_ports': self.attributes_dictionary('microwave'),
-            # 'mw_ef_amps180': self.attributes_dictionary('ef_amp180'),
-            # 'mw_frequencies_12': self.attributes_dictionary('f12'),
-            # 'cz_pulse_width': self.attributes_dictionary('cz_pulse_width'),
-            # 'cz_pulse_amplitude': self.attributes_dictionary('cz_pulse_amplitude'),
-            'coupler': self.coupler,
-            # 'cz_pulse_duration': self.attributes_dictionary('cz_pulse_duration'),
-            # 'cz_pulse_frequency': self.attributes_dictionary('cz_pulse_frequency'),
-        }
-
-    def schedule_function(
-            self,
-            qubits: list[str],
-            # mw_ef_amps180: dict[str,float],
-            # mw_frequencies: dict[str,float],
-            # mw_frequencies_12: dict[str,float],
-            # mw_pulse_ports: dict[str,str],
-            # mw_pulse_durations: dict[str,float],
-            # cz_pulse_amplitude: dict[str,float],
-            # cz_pulse_width: dict[str,float], 
-            # testing_group: int = 1,
-            coupler: str,
-            # cz_pulse_frequency: dict[str,float],
-            # cz_pulse_duration: dict[str,float],
-            ramsey_phases: dict[str, np.ndarray],
-            control_ons: dict[str, np.ndarray],
-            number_of_cz: int = 1,
-            repetitions: int = 1024,
-    ) -> Schedule:
-
-        """
-        Generate a schedule for performing a Ramsey fringe measurement on multiple qubits.
-        Can be used both to finetune the qubit frequency and to measure the qubit dephasing time T_2. (1D parameter sweep)
-
-        Schedule sequence
-            Reset -> pi/2-pulse -> Idle(tau) -> pi/2-pulse -> Measure
-
-        Parameters
-        ----------
-        self
-            Contains all qubit states.
-        qubits
-            A list of two qubits to perform the experiment on. i.e. [['q1','q2'],['q3','q4'],...]
-        mw_clocks_12
-            Clocks for the 12 transition frequency of the qubits.
-        mw_ef_amps180
-            Amplitudes used for the excitation of the qubits to calibrate for the 12 transition.
-        mw_frequencies_12
-            Frequencies used for the excitation of the qubits to calibrate for the 12 transition.
-        mw_pulse_ports
-            Location on the device where the pulsed used for excitation of the qubits to calibrate for the 12 transition is located.
-        mw_pulse_durations
-            Pulse durations used for the excitation of the qubits to calibrate for the 12 transition.
-        cz_pulse_frequency
-            The frequency of the CZ pulse.
-        cz_pulse_amplitude
-            The amplitude of the CZ pulse.
-        cz_pulse_duration
-            The duration of the CZ pulse.
-        cz_pulse_width
-            The width of the CZ pulse.
-        number_of_cz
-            The number of CZ pulses to be applied.
-        testing_group
-            The edge group to be tested. 0 means all edges.
-        ramsey_phases
-            the phase of the second pi/2 pulse.
-        repetitions
-            The amount of times the Schedule will be repeated.
-
-        Returns
-        -------
-        :
-            An experiment schedule.
-        """
-        dynamic = True
-        if dynamic:
-            name = 'CZ_dynamic_phase'
-        else:
-            name = 'CZ_calibration'
-        schedule = Schedule(f"{name}", repetitions)
-
-        # all_couplers_all = edge_group.keys()
-        # all_couplers,bus_list = [],[]
-        # for coupler in all_couplers_all:
-        #     control,target = coupler.split('_')[0], coupler.split('_')[1]
-        #     if self.testing_group != 0:
-        #         check = edge_group[coupler] == self.testing_group
-        #     else:
-        #         check = True
-        #     if control in qubits and target in qubits and check:
-        #         bus_list.append([control,target])
-        #         all_couplers.append(coupler)
-        # control, target = np.transpose(bus_list)
-        # # cz_duration, cz_width = 200e-9, 4e-9
-        # # placeholder for the CZ pulse frequency and amplitude -0.4 689.9058811833632 for parking current  = -35e-6
-        # cz_pulse_frequency = {coupler: -0.4e6 for coupler in all_couplers}
-        # cz_pulse_duration = {coupler: 688e-09 for coupler in all_couplers}
-        # # cz_pulse_amplitude = {coupler: 0 for coupler in all_couplers}
-        # # print(f'{cz_pulse_duration = }')
-        # # print(f'{cz_pulse_frequency = }')
-        all_couplers = [coupler]
-        all_qubits = [coupler.split(sep='_') for coupler in all_couplers]
-        all_qubits = sum(all_qubits, [])
-        # target,control = np.transpose(qubits)[0],np.transpose(qubits)[1]
-
-        print(f'{all_qubits = }')
-
-        # find cz parameters from redis
-
-        cz_pulse_frequency, cz_pulse_duration, cz_pulse_amplitude = {}, {}, {}
-        for coupler in all_couplers:
-            qubits = coupler.split(sep='_')
-            for this_coupler in all_couplers:
-                redis_config = REDIS_CONNECTION.hgetall(f"couplers:{this_coupler}")
-                cz_pulse_frequency[this_coupler] = float(redis_config['cz_pulse_frequency'])
-                cz_pulse_duration[this_coupler] = np.ceil(float(redis_config['cz_pulse_duration']) * 1e9 / 4) * 4e-9
-                cz_pulse_amplitude[this_coupler] = float(redis_config['cz_pulse_amplitude'])
-        print(f'{cz_pulse_frequency = }')
-        print(f'{cz_pulse_duration = }')
-        print(f'{cz_pulse_amplitude = }')
-
-        # Add the clocks to the schedule
-        # for this_qubit, mw_f_val in mw_frequencies.items():
-        #     schedule.add_resource(
-        #         ClockResource( name=f'{this_qubit}.01', freq=mw_f_val)
-        #     )
-        # for this_qubit, mw_f_val in mw_frequencies_12.items():
-        #     schedule.add_resource(
-        #         ClockResource(name=f'{this_qubit}.12', freq=mw_f_val)
-        #     )
-        for index, this_coupler in enumerate(all_couplers):
-            schedule.add_resource(
-                ClockResource(name=f'{this_coupler}.cz', freq=-cz_pulse_frequency[this_coupler] + 4.4e9)
-            )
-
-        ramsey_phases_values = ramsey_phases[all_qubits[0]]
-        number_of_phases = len(ramsey_phases_values)
-        control_on_values = control_ons[all_qubits[0]]
-
-        for cz_index, control_on in enumerate(control_on_values):
-            for ramsey_index, ramsey_phase in enumerate(ramsey_phases_values):
-                relaxation = schedule.add(Reset(*all_qubits), label=f"Reset_{cz_index}_{ramsey_index}")
-
-                # cz_amplitude = 0.5
-                if dynamic:
-                    if not control_on:
-                        for this_coupler in all_couplers:
-                            cz_amplitude = 0
-                    else:
-                        cz_amplitude = 1
-                else:
-                    if control_on:
-                        for this_qubit in all_qubits:
-                            if qubit_types[this_qubit] == 'Control':
-                                x = schedule.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
-                for this_qubit in all_qubits:
-                    if qubit_types[this_qubit] == 'Target':
-                        x90 = schedule.add(X90(this_qubit), ref_op=relaxation, ref_pt='end')
-
-                for this_coupler in all_couplers:
-                    cz_clock = f'{this_coupler}.cz'
-                    cz_pulse_port = f'{this_coupler}:fl'
-                    buffer = schedule.add(IdlePulse(4e-9), ref_op=x90, ref_pt='end')
-                    reset_phase = schedule.add(ResetClockPhase(clock=cz_clock))
-                    cz = schedule.add(
-                        SoftSquarePulse(
-                            duration=cz_pulse_duration[this_coupler],
-                            amp=cz_pulse_amplitude[this_coupler] * cz_amplitude,
-                            port=cz_pulse_port,
-                            clock=cz_clock,
-                        ),
-                        ref_op=reset_phase, ref_pt='end',
-                    )
-                    # cz = schedule.add(IdlePulse(cz_pulse_duration[this_coupler]))
-                    buffer = schedule.add(IdlePulse(4e-9))
-                if not dynamic:
-                    if control_on:
-                        for this_qubit in all_qubits:
-                            if qubit_types[this_qubit] == 'Control':
-                                # print(this_qubit, qubit_types[this_qubit])
-                                x_end = schedule.add(X(this_qubit), ref_op=buffer, ref_pt='end')
-
-                for this_qubit in all_qubits:
-                    if qubit_types[this_qubit] == 'Target':
-                        x90_end = schedule.add(Rxy(theta=90, phi=ramsey_phase, qubit=this_qubit), ref_op=buffer,
                                                ref_pt='end')
 
                 for this_qubit in all_qubits:
