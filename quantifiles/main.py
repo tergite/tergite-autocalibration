@@ -382,7 +382,7 @@ class ExperimentPreview(QtWidgets.QLabel):
     @QtCore.pyqtSlot(str)
     def display_datadir_path(self, date: str) -> None:
     # def update_datadir(self, datadir: str) -> None:
-        folder_path = self.datadir + date
+        folder_path = Path(self.datadir) / date
 
         # if folder_content is None:
         #     self.setText("No data directory selected")
@@ -441,6 +441,7 @@ class DataDirInspector(QtWidgets.QMainWindow):
         sub_splitter.addWidget(self.experiment_list)
         sub_splitter.addWidget(self.experiment_preview)
         sub_splitter.setSizes([350, 650])
+        sub_splitter.setOrientation(Qt.Vertical)
 
         # create splitter for widgets
         splitter = QtWidgets.QSplitter()
