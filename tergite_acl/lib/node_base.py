@@ -26,6 +26,12 @@ class BaseNode:
     #     '''
     #     return {}
 
+    def pre_measurement_operation(self):
+        '''
+        To be implemented by the child measurement nodes
+        '''
+        pass
+
     @property
     def dimensions(self) -> list:
         '''
@@ -47,6 +53,31 @@ class BaseNode:
                 len(self.schedule_samplespace[quantity][first_element])
             )
         return dimensions
+
+    @property
+    def external_dimensions(self) -> list:
+        '''
+        array of dimensions used for raw dataset reshaping
+        in workers/dataset_utils.py. some nodes have peculiar dimensions
+        e.g. randomized benchmarking and need dimension definition in their class
+        '''
+        external_settable_quantities = self.external_samplespace.keys()
+
+        # keeping the first element, ASSUMING that all settable elements
+        # have the same dimensions on their samplespace
+        # i.e. all qubits have the same number of ro frequency samples in readout spectroscopy
+        first_settable = list(external_settable_quantities)[0]
+        measured_elements = self.schedule_samplespace[first_settable].keys()
+        first_element = list(measured_elements)[0]
+
+        dimensions = []
+        for quantity in external_settable_quantities:
+            dimensions.append(
+                len(self.schedule_samplespace[quantity][first_element])
+            )
+        return dimensions
+
+
 
     def build_demod_channels(self):
         """

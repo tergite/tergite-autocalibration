@@ -19,12 +19,12 @@ from tergite_acl.utils.status import DataStatus
 from tergite_acl.utils.user_input import user_requested_calibration
 from tergite_acl.utils.visuals import draw_arrow_chart
 from tergite_acl.utils.dataset_utils import create_node_data_path
-from tergite_acl.utils.hardware_utils import SpiDAC
+from tergite_acl.utils.hardware_utils import SpiDAC, set_qubit_attenuation
 from tergite_acl.functions.node_supervisor import monitor_node_calibration
 from tergite_acl.utils.redis_utils import populate_initial_parameters, populate_node_parameters, \
     populate_quantities_of_interest
 
-from tergite_acl.utils.dummy_setup import dummy_cluster, dummy_setup
+from tergite_acl.utils.dummy_setup import dummy_setup
 
 colorama_init()
 
@@ -54,11 +54,23 @@ class CalibrationSupervisor():
         if self.cluster_status == ClusterStatus.real:
             Cluster.close_all()
             clusterA = Cluster("clusterA", CLUSTER_IP)
+            logger.info('Reseting Cluster')
+            clusterA.reset()
         elif self.cluster_status == ClusterStatus.dummy:
             Cluster.close_all()
             clusterA = Cluster("clusterA", dummy_cfg=dummy_setup)
         else:
             raise ValueError('Undefined Cluster Status')
+
+        ###############
+        ### set attenuation
+        ###############
+        print('WARNING SETTING ATTENUATION')
+        for qubit in self.qubits:
+            att_in_db = 30
+            set_qubit_attenuation(clusterA, qubit, att_in_db)
+
+
         # set_module_att(clusterA)
         ic = InstrumentCoordinator('lab_ic')
         ic.add_component(ClusterComponent(clusterA))

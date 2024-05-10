@@ -129,6 +129,8 @@ class Two_Tones_Multidim(Measurement):
                     else:
                         SpectroscopyPulse = SoftSquarePulse
 
+                    print(f'{ SpectroscopyPulse = }')
+                    print(f'{ spec_pulse_duration = }')
                     schedule.add(
                         SpectroscopyPulse(
                             duration=spec_pulse_duration,

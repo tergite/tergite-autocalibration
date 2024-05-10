@@ -21,9 +21,9 @@ def configure_dataset(
 
     keys = raw_ds.data_vars.keys()
     measurement_qubits = node.all_qubits
-    samplespace = node.samplespace
+    schedule_samplespace = node.schedule_samplespace
 
-    sweep_quantities = samplespace.keys()
+    sweep_quantities = schedule_samplespace.keys()
 
     n_qubits = len(measurement_qubits)
 
@@ -36,7 +36,7 @@ def configure_dataset(
         for quantity in sweep_quantities :
 
             # eg ['q1','q2',...] or ['q1_q2','q3_q4',...] :
-            settable_elements = samplespace[quantity].keys()
+            settable_elements = schedule_samplespace[quantity].keys()
 
             # distinguish if the settable is on a qubit or a coupler:
             if measured_qubit in settable_elements:
@@ -51,7 +51,7 @@ def configure_dataset(
                     raise(ValueError)
 
             coord_key = quantity + element
-            settable_values = samplespace[quantity][element]
+            settable_values = schedule_samplespace[quantity][element]
             coord_attrs = {
                 'element_type': element_type, # 'element_type' is ether 'qubit' or 'coupler'
                 element_type: element,

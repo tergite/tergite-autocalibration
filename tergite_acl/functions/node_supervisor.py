@@ -40,22 +40,35 @@ def monitor_node_calibration(node: BaseNode, data_path, lab_ic, cluster_status):
             This correspond to simple cluster schedules
             '''
             result_dataset = measure_node(
-            node,
-            compiled_schedule,
-            lab_ic,
-            data_path,
-            cluster_status=cluster_status,
-        )
+                node,
+                compiled_schedule,
+                lab_ic,
+                data_path,
+                cluster_status=cluster_status,
+            )
         else:
-            external_parameter_values = node.node_externals
             pre_measurement_operation = node.pre_measurement_operation
             operations_args = node.operations_args
 
+            # node.external_dimensions is defined in the node_base
+            iterations = node.external_dimensions
+
             result_dataset = xarray.Dataset()
 
-            for node_parameter in external_parameter_values:
-                node.external_parameter_value = node_parameter
-                pre_measurement_operation(*operations_args, external=node_parameter)
+            external_settable = list(node.external_samplespace.values())[0]
+
+            for current_iteration in range(iterations):
+                reduced_external_samplespace = {}
+                for qubit in node.all_qubits:
+                    qubit_specific_values = node.external_samplespace[external_settable][qubit]
+                    external_value = qubit_specific_values[current_iteration]
+                    reduced_external_samplespace[qubit] = external_value
+
+                breakpoint()
+                pre_measurement_operation(
+                    *operations_args, 
+                    external=reduced_external_samplespace
+                )
                 ds = measure_node(
                     node,
                     compiled_schedule,

@@ -20,6 +20,7 @@ from tergite_acl.lib.calibration_schedules.ramsey_fringes import Ramsey_fringes
 from tergite_acl.lib.calibration_schedules.ramsey_detunings import Ramsey_detunings
 # from calibration_schedules.two_tone_multidim import Two_Tones_Multidim
 from tergite_acl.lib.calibration_schedules.two_tone_multidim import Two_Tones_Multidim
+from tergite_acl.utils.hardware_utils import set_qubit_LO
 
 
 # class Qubit_01_Spectroscopy_Pulsed_Node(BaseNode):
@@ -45,7 +46,7 @@ class Qubit_01_Spectroscopy_CW_Node(BaseNode):
         super().__init__(name, all_qubits, **node_dictionary)
         self.sweep_range = self.node_dictionary.pop("sweep_range", None)
         self.redis_field = ['clock_freqs:f01']
-        self.type = 'parameterized_sweep'
+        self.all_qubits = all_qubits
 
         self.operations_args = []
 
@@ -55,8 +56,9 @@ class Qubit_01_Spectroscopy_CW_Node(BaseNode):
             }
         }
 
-    def pre_measurement_operation(self, external=1):
-        pass
+    def pre_measurement_operation(self, cluster, qubit, external_value):
+        for qubit in self.all_qubits:
+            set_qubit_LO(cluster, qubit=qubit, lo_frequency=external_value)
 
 
 class Qubit_01_Spectroscopy_Multidim_Node(BaseNode):
@@ -71,7 +73,7 @@ class Qubit_01_Spectroscopy_Multidim_Node(BaseNode):
 
         self.schedule_samplespace = {
             'spec_pulse_amplitudes': {
-                qubit: np.linspace(3e-4, 9e-4, 5) for qubit in self.all_qubits
+                qubit: np.linspace(6e-4, 12e-4, 2) for qubit in self.all_qubits
             },
             'spec_frequencies': {
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
