@@ -10,7 +10,7 @@ from colorama import init as colorama_init
 from quantify_scheduler.instrument_coordinator.instrument_coordinator import CompiledSchedule
 from quantify_scheduler.json_utils import pathlib
 
-from tergite_acl.utils.dataset_utils import configure_dataset, handle_ro_freq_optimization, save_dataset
+from tergite_acl.utils.dataset_utils import configure_dataset, handle_ro_freq_optimization, retrieve_dummy_dataset, save_dataset
 from tergite_acl.utils.logger.tac_logger import logger
 from tergite_acl.utils.status import ClusterStatus
 
@@ -39,9 +39,12 @@ def measure_node(
 
     raw_dataset = execute_schedule(compiled_schedule, lab_ic, schedule_duration, cluster_status)
 
-    result_dataset = configure_dataset(raw_dataset, node)
 
-    save_dataset(result_dataset, node, data_path)
+    if cluster_status == ClusterStatus.real:
+        result_dataset = configure_dataset(raw_dataset, node)
+        save_dataset(result_dataset, node, data_path)
+    else:
+        result_dataset = retrieve_dummy_dataset(node)
 
     if node.name == 'ro_frequency_two_state_optimization':
         result_dataset = handle_ro_freq_optimization(result_dataset, states=[0, 1])
@@ -60,7 +63,6 @@ def execute_schedule(
     ) -> xarray.Dataset:
 
     logger.info('Starting measurement')
-    # cluster_status = ClusterStatus.real
 
     def run_measurement() -> None:
         lab_ic.prepare(compiled_schedule)

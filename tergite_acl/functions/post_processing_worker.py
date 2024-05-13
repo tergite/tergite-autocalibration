@@ -6,6 +6,7 @@ import matplotlib
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import xarray as xr
+import warnings
 
 from tergite_acl.config import settings
 from tergite_acl.config.coupler_config import qubit_types
@@ -111,7 +112,11 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
     # figure_manager.window.showMaximized()
     fig = plt.gcf()
     fig.set_tight_layout(True)
-    fig.savefig(f'{data_path}/{node.name}.png', bbox_inches='tight', dpi=600)
+    try:
+        fig.savefig(f'{data_path}/{node.name}.png', bbox_inches='tight', dpi=600)
+    except FileNotFoundError:
+        warnings.warn('File Not existing')
+        pass
     # plt.show()
     plt.show(block=True)
     # plt.pause(20)

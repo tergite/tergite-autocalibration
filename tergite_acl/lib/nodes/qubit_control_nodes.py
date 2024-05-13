@@ -22,6 +22,8 @@ from tergite_acl.lib.calibration_schedules.ramsey_detunings import Ramsey_detuni
 from tergite_acl.lib.calibration_schedules.two_tone_multidim import Two_Tones_Multidim
 from tergite_acl.utils.hardware_utils import set_qubit_LO
 
+from qblox_instruments.qcodes_drivers.cluster import Cluster
+
 
 # class Qubit_01_Spectroscopy_Pulsed_Node(BaseNode):
 #     measurement_obj = Two_Tones_Spectroscopy
@@ -57,9 +59,13 @@ class Qubit_01_Spectroscopy_CW_Node(BaseNode):
         }
 
     def pre_measurement_operation(self, reduced_ext_space):
-        breakpoint()
+        for instrument in self.lab_instr_coordinator.values():
+            if type(instrument) == Cluster:
+                cluster = instrument
         for qubit in self.all_qubits:
-            pass
+            lo_frequency = reduced_ext_space[qubit]
+            set_qubit_LO(cluster, qubit, lo_frequency)
+            
 
             # lo_frec = reduced_ext_space[qubit]
             # set_qubit_LO(cluster, qubit=qubit, lo_frequency=external_value)

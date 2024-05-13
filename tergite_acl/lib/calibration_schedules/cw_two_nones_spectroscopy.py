@@ -18,6 +18,7 @@ class CW_Two_Tones_Spectroscopy(Measurement):
     def schedule_function(
         self,
         repetitions: int = 1024,
+        **kwargs
     ) -> Schedule:
         """
         ***************************************************
@@ -42,7 +43,7 @@ class CW_Two_Tones_Spectroscopy(Measurement):
         # This is the common reference operation so the qubits can be operated in parallel
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
-        for this_qubit in qubits():
+        for this_qubit in qubits:
 
             schedule.add(
                 Reset(this_qubit), ref_op=root_relaxation, ref_pt='end'

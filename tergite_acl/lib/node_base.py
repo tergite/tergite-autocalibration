@@ -39,7 +39,7 @@ class BaseNode:
     def dimensions(self) -> list:
         '''
         array of dimensions used for raw dataset reshaping
-        in workers/dataset_utils.py. some nodes have peculiar dimensions
+        in utills/dataset_utils.py. some nodes have peculiar dimensions
         e.g. randomized benchmarking and need dimension definition in their class
         '''
         schedule_settable_quantities = self.schedule_samplespace.keys()
@@ -61,7 +61,7 @@ class BaseNode:
     def external_dimensions(self) -> list:
         '''
         array of dimensions used for raw dataset reshaping
-        in workers/dataset_utils.py. some nodes have peculiar dimensions
+        in utills/dataset_utils.py. some nodes have peculiar dimensions
         e.g. randomized benchmarking and need dimension definition in their class
         '''
         external_settable_quantities = self.external_samplespace.keys()
@@ -70,16 +70,17 @@ class BaseNode:
         # have the same dimensions on their samplespace
         # i.e. all qubits have the same number of ro frequency samples in readout spectroscopy
         first_settable = list(external_settable_quantities)[0]
-        measured_elements = self.schedule_samplespace[first_settable].keys()
+        measured_elements = self.external_samplespace[first_settable].keys()
         first_element = list(measured_elements)[0]
 
         dimensions = []
+        if len(dimensions) > 1:
+            raise NotImplementedError('Multidimensional External Samplespace')
         for quantity in external_settable_quantities:
             dimensions.append(
-                len(self.schedule_samplespace[quantity][first_element])
+                len(self.external_samplespace[quantity][first_element])
             )
         return dimensions
-
 
 
     def build_demod_channels(self):

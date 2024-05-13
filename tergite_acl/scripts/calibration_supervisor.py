@@ -42,25 +42,30 @@ class CalibrationSupervisor():
         # TODO: how is the dummy cluster initalized?
         self.cluster_status = cluster_status
         self.topo_order = filtered_topological_order(self.target_node)
+        self.available_clusters = ['clusterA']
         # TODO: maybe it makes sense to move that part to some hardware utils
+        self.available_clusters_dict: dict[str, Cluster] = {}
         self.lab_ic = self.create_lab_ic()
         if self.target_node == 'cz_chevron':
             self.dacs = {}
             self.spi = SpiDAC()
             for coupler in self.couplers:
                 self.dacs[coupler] = self.spi.create_spi_dac(coupler)
+        logger.info('Initialized Calibration Supervisor')
 
     def create_lab_ic(self):
-        if self.cluster_status == ClusterStatus.real:
-            Cluster.close_all()
-            clusterA = Cluster("clusterA", CLUSTER_IP)
-            logger.info('Reseting Cluster')
-            clusterA.reset()
-        elif self.cluster_status == ClusterStatus.dummy:
-            Cluster.close_all()
-            clusterA = Cluster("clusterA", dummy_cfg=dummy_setup)
-        else:
-            raise ValueError('Undefined Cluster Status')
+        Cluster.close_all()
+        for cluster_name in self.available_clusters:
+            if self.cluster_status == ClusterStatus.real:
+                cluster = Cluster(cluster_name, CLUSTER_IP)
+                logger.info('Reseting Cluster')
+                cluster.reset()
+            elif self.cluster_status == ClusterStatus.dummy:
+                cluster = Cluster(cluster_name, dummy_cfg=dummy_setup)
+            else:
+                raise ValueError('Undefined Cluster Status')
+
+            self.available_clusters_dict[cluster_name] = cluster
 
         ###############
         ### set attenuation
@@ -68,12 +73,13 @@ class CalibrationSupervisor():
         print('WARNING SETTING ATTENUATION')
         for qubit in self.qubits:
             att_in_db = 30
-            set_qubit_attenuation(clusterA, qubit, att_in_db)
-
+            cluster = self.available_clusters_dict['clusterA']
+            set_qubit_attenuation(cluster, qubit, att_in_db)
 
         # set_module_att(clusterA)
         ic = InstrumentCoordinator('lab_ic')
-        ic.add_component(ClusterComponent(clusterA))
+        for cluster in self.available_clusters_dict.values():
+            ic.add_component(ClusterComponent(cluster))
         ic.timeout(222)
         return ic
 
@@ -103,7 +109,7 @@ class CalibrationSupervisor():
         node = self.node_factory.create_node(node_name, self.qubits, couplers=self.couplers)
 
         # some nodes e.g. cw spectroscopy needs access to the instruments
-        node.lab_instr_coordinator = self.lab_ic
+        node.lab_instr_coordinator = self.available_clusters_dict
 
         populate_initial_parameters(
             self.transmon_configuration,

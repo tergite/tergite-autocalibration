@@ -5,7 +5,6 @@ from tergite_acl.utils.dataset_utils import retrieve_dummy_dataset
 from tergite_acl.utils.status import ClusterStatus
 from tergite_acl.functions.compilation_worker import precompile
 from tergite_acl.functions.execution_worker import measure_node
-from tergite_acl.utils.hardware_utils import SpiDAC
 from tergite_acl.functions.post_processing_worker import post_process
 from tergite_acl.utils.logger.tac_logger import logger
 import scipy.optimize as optimize
@@ -47,7 +46,7 @@ def monitor_node_calibration(node: BaseNode, data_path, lab_ic, cluster_status):
             pre_measurement_operation = node.pre_measurement_operation
 
             # node.external_dimensions is defined in the node_base
-            iterations = node.external_dimensions
+            iterations = node.external_dimensions[0]
 
             result_dataset = xarray.Dataset()
 
@@ -89,6 +88,7 @@ def monitor_node_calibration(node: BaseNode, data_path, lab_ic, cluster_status):
                     measurement=(current_iteration, iterations)
                 )
                 result_dataset = xarray.merge([result_dataset, ds])
+
 
         logger.info('measurement completed')
         measurement_result = post_process(result_dataset, node, data_path=data_path)
