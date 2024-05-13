@@ -11,6 +11,9 @@ class BaseNode:
         self.qubit_state = 0 # can be 0 or 1 or 2
         self.plots_per_qubit = 1 # can be 0 or 1 or 2
         self.build_demod_channels()
+
+        self.lab_instr_coordinator = None
+
         self.schedule_samplespace = {}
         self.external_samplespace = {}
 

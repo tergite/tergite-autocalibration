@@ -26,20 +26,6 @@ with open(HARDWARE_CONFIG) as hw:
 redis_connection = redis.Redis(decode_responses=True)
 
 
-# def qubit_config_from_redis(qubit: str, channel:int) -> dict:
-#     redis_config = redis_connection.hgetall(f"transmons:{qubit}")
-#     transmon_config = {k:v for k,v in redis_config.items() if ':' in k}
-#     # transmon_submodules = transmon.submodules.keys()
-#     device_dict = {}
-#     for redis_entry_key, redis_value in transmon_config.items():
-#         submodule, field = redis_entry_key.split(':')
-#         device_dict[submodule] = device_dict.get(submodule, {}) | {field: redis_value}
-#     device_dict['name'] = qubit
-#     for submodule in device_dict:
-#         if 'measure' in submodule:
-#             device_dict[submodule]['acq_channel'] = channel
-#     return device_dict
-
 def load_redis_config(transmon: ExtendedTransmon, channel:int):
     qubit = transmon.name
     redis_config = redis_connection.hgetall(f"transmons:{qubit}")
@@ -83,11 +69,6 @@ def load_redis_config(transmon: ExtendedTransmon, channel:int):
 
     return transmon
 
-
-    # if not np.isnan(float(redis_config['spec_ampl_optimal'])):
-    #     transmon.spec.spec_amp(float(redis_config['spec_ampl_optimal']))
-    # else:
-    #     transmon.spec.spec_amp(float(redis_config['spec_ampl_default']))
 
 def load_redis_config_coupler(coupler: CompositeSquareEdge):
     bus = coupler.name

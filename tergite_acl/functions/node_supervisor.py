@@ -29,7 +29,6 @@ parameterized_sweep:
 '''
 
 def monitor_node_calibration(node: BaseNode, data_path, lab_ic, cluster_status):
-    breakpoint()
     if node.type == 'simple_sweep':
         compiled_schedule = precompile(node)
 
@@ -79,10 +78,7 @@ def monitor_node_calibration(node: BaseNode, data_path, lab_ic, cluster_status):
                     #     }
                     # }
 
-                pre_measurement_operation(
-                    external=reduced_external_samplespace,
-                    instrument_coordinator=lab_ic
-                )
+                pre_measurement_operation(reduced_ext_space=reduced_external_samplespace)
 
                 ds = measure_node(
                     node,

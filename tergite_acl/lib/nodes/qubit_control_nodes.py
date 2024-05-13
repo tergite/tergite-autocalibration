@@ -52,13 +52,17 @@ class Qubit_01_Spectroscopy_CW_Node(BaseNode):
 
         self.external_samplespace = {
             'cw_frequenies': {
-                qubit: qubit_samples(qubit, sweep_range=self.sweep_range) for qubit in self.all_qubits
+                qubit: qubit_samples(qubit) for qubit in self.all_qubits
             }
         }
 
-    def pre_measurement_operation(self, cluster, qubit, external_value):
+    def pre_measurement_operation(self, reduced_ext_space):
+        breakpoint()
         for qubit in self.all_qubits:
-            set_qubit_LO(cluster, qubit=qubit, lo_frequency=external_value)
+            pass
+
+            # lo_frec = reduced_ext_space[qubit]
+            # set_qubit_LO(cluster, qubit=qubit, lo_frequency=external_value)
 
 
 class Qubit_01_Spectroscopy_Multidim_Node(BaseNode):

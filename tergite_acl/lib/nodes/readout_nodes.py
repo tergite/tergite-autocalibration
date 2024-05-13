@@ -26,6 +26,7 @@ class Resonator_Spectroscopy_Node(BaseNode):
 
     def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
+
         self.redis_field = ['clock_freqs:readout', 'Ql', 'resonator_minimum']
         self.schedule_samplespace = {
             'ro_frequencies': {

@@ -3,12 +3,9 @@ import collections
 from pathlib import Path
 
 import matplotlib
-# from quantify_core.analysis.calibration import rotate_to_calibrated_axis
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
-import numpy as np
 import xarray as xr
-# from quantify_core.data.handling import set_datadir
 
 from tergite_acl.config import settings
 from tergite_acl.config.coupler_config import qubit_types
@@ -17,14 +14,12 @@ from tergite_acl.utils.post_processing_utils import manage_plots
 from tergite_acl.utils.status import DataStatus
 
 matplotlib.use(settings.PLOTTING_BACKEND)
-# set_datadir('../workers')
 
 def post_process(result_dataset: xr.Dataset, node, data_path: Path):
 
     if node.name == 'tof':
         tof = analyze_tof(result_dataset, True)
         return
-
 
     column_grid = 5
     fig, axs = manage_plots(result_dataset, column_grid, node.plots_per_qubit)

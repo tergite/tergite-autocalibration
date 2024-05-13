@@ -100,9 +100,10 @@ class CalibrationSupervisor():
         # TODO: the inspect node function could be part of the node
         logger.info(f'Inspecting node {node_name}')
 
-        node = self.node_factory.create_node(
-            node_name, self.qubits, couplers=self.couplers
-        )
+        node = self.node_factory.create_node(node_name, self.qubits, couplers=self.couplers)
+
+        # some nodes e.g. cw spectroscopy needs access to the instruments
+        node.lab_instr_coordinator = self.lab_ic
 
         populate_initial_parameters(
             self.transmon_configuration,
