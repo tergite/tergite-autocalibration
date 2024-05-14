@@ -184,10 +184,10 @@ class CZ_Characterisation_Chevron_Node(BaseNode):
                 qubit: np.linspace(0, 0.2, 3) for qubit in self.coupled_qubits
             },
             'cz_pulse_durations': {
-                qubit: 4e-9+np.arange(0e-9, 36*100e-9,400e-9) for qubit in self.coupled_qubits
+                qubit: 80e-9+np.arange(0e-9, 400e-9,20e-9) for qubit in self.coupled_qubits
             },
             'cz_pulse_frequencies_sweep': {
-                qubit: np.linspace(210e6, 500e6, 51) + self.ac_freq for qubit in self.coupled_qubits
+                qubit: np.linspace(-20e6, 20e6, 21) + self.ac_freq for qubit in self.coupled_qubits
             },
         }
         return cluster_samplespace
