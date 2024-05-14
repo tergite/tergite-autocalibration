@@ -6,7 +6,7 @@ qubits = ['q19','q20']
 couplers = ['q19_q20']
 # couplers = ['q19_q24']
 
-attenuation_setting = {'qubit':12, 'coupler':40, 'readout':12}
+attenuation_setting = {'qubit':12, 'coupler':30, 'readout':12}
 
 '''
 node reference
@@ -45,10 +45,11 @@ node reference
   cz_dynamic_phase
   cz_dynamic_phase_swap
   tqg_randomized_benchmarking
+  tqg_randomized_benchmarking_interleaved
 '''
 
 user_requested_calibration = {
-    'target_node': 'tqg_randomized_benchmarking',
+    'target_node': 'tqg_randomized_benchmarking_interleaved',
     'all_qubits': qubits,
     'couplers': couplers,
 }

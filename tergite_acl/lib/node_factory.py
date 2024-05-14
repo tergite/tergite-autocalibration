@@ -1,7 +1,7 @@
 from tergite_acl.lib.nodes.characterization_nodes import T1_Node, T2_Node, T2_Echo_Node, Randomized_Benchmarking_Node
 from tergite_acl.lib.nodes.coupler_nodes import Coupler_Spectroscopy_Node, Coupler_Resonator_Spectroscopy_Node, \
     CZ_Chevron_Node, CZ_Optimize_Chevron_Node, Reset_Chevron_Node, CZ_Calibration_Node, CZ_Calibration_SSRO_Node, \
-    CZ_Dynamic_Phase_Node, CZ_Dynamic_Phase_Swap_Node,TQG_Randomized_Benchmarking_Node
+    CZ_Dynamic_Phase_Node, CZ_Dynamic_Phase_Swap_Node,TQG_Randomized_Benchmarking_Node,TQG_Randomized_Benchmarking_Interleaved_Node
 from tergite_acl.lib.nodes.qubit_control_nodes import Qubit_01_Spectroscopy_Pulsed_Node, \
     Qubit_01_Spectroscopy_Multidim_Node, Rabi_Oscillations_Node, Ramsey_Fringes_Node, Qubit_12_Spectroscopy_Pulsed_Node, \
     Qubit_12_Spectroscopy_Multidim_Node, Rabi_Oscillations_12_Node, Ramsey_Fringes_12_Node, Motzoi_Parameter_Node, \
@@ -49,6 +49,7 @@ class NodeFactory:
             # 'state_discrimination': State_Discrimination_Node,
             'randomized_benchmarking': Randomized_Benchmarking_Node,
             'tqg_randomized_benchmarking': TQG_Randomized_Benchmarking_Node,
+            'tqg_randomized_benchmarking_interleaved': TQG_Randomized_Benchmarking_Interleaved_Node,
             # 'check_cliffords': Check_Cliffords_Node,
         }
 

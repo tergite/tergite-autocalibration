@@ -131,15 +131,15 @@
             ]
          },
          "complex_output_1": {
-           "lo_freq": 3.9e9,
-           "dc_mixer_offset_I": 0,
-           "dc_mixer_offset_Q": 0,
+           "lo_freq": 3500000000.0,
+           "dc_mixer_offset_I": 0.001903600000000001,
+           "dc_mixer_offset_Q": -0.006296399999999999,
            "portclock_configs": [
               {
                  "port": "q19_q20:fl",
                  "clock": "q19_q20.cz",
-                 "mixer_amp_ratio": 1,
-                 "mixer_phase_error_deg": 0
+                 "mixer_amp_ratio": 1.0975000000000001,
+                 "mixer_phase_error_deg": -35.318200000000004
               }
            ]
         }

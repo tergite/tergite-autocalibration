@@ -67,19 +67,20 @@ def composite_soft_square_pulse(  # pylint: disable=too-many-arguments
     :
         SquarePulse operation.
     """
+    # composite_pulse = pulse_library.ResetClockPhase(clock=square_clock,t0=t0)
 
     # Start the flux pulse
+    # square_amp = 0
+    # composite_pulse.add_pulse(pulse_library.SoftSquarePulse(
     composite_pulse = pulse_library.SoftSquarePulse(
         amp=square_amp,
-        reference_magnitude=reference_magnitude,
         duration=square_duration,
         port=square_port,
         clock=square_clock,
         t0=t0,
     )
-
-    print(virt_z_parent_qubit_phase, virt_z_child_qubit_phase)
-
+    # )
+    
     if virt_z_parent_qubit_phase is float('nan'):
         virt_z_parent_qubit_phase = 0
 
@@ -101,15 +102,6 @@ def composite_soft_square_pulse(  # pylint: disable=too-many-arguments
             t0=t0,
         )
     )
-
-    # composite_pulse = pulse_library.SoftSquarePulse(
-    #     amp=0,
-    #     reference_magnitude=reference_magnitude,
-    #     duration=4e-9,
-    #     port=square_port,
-    #     clock=square_clock,
-    #     t0=np.ceil( square_duration * 1e9 / 4) * 4e-9,
-    # )
 
     return composite_pulse
 

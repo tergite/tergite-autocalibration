@@ -2,7 +2,7 @@
 Module containing a schedule class for randomized benchmarking measurement.
 """
 import numpy as np
-from quantify_scheduler.operations.gate_library import Measure, Reset, Rxy, X, CZ
+from quantify_scheduler.operations.gate_library import Measure, Reset, X90, Rxy, X, CZ
 from quantify_scheduler.operations.pulse_library import ResetClockPhase, SoftSquarePulse, IdlePulse
 
 from quantify_scheduler.schedules.schedule import Schedule
@@ -153,8 +153,11 @@ class TQG_Randomized_Benchmarking(Measurement):
         :
             An experiment schedule.
         """
-
-        schedule = Schedule("tqg_randomized_benchmarking",repetitions)
+        if interleaving_clifford_id is None:
+            name = "tqg_randomized_benchmarking"
+        else:
+            name = "tqg_randomized_benchmarking_interleaved"
+        schedule = Schedule(name,repetitions)
 
         qubits = list(self.transmons.keys())
         coupler_names = self.couplers.keys()
@@ -165,6 +168,7 @@ class TQG_Randomized_Benchmarking(Measurement):
                 ClockResource(name=f'{this_coupler}.cz', freq=4.4e9-self.couplers[this_coupler].clock_freqs.cz_freq())
             )
 
+        print(self.couplers[this_coupler].clock_freqs.cz_freq())
         #This is the common reference operation so the qubits can be operated in parallel
         root_relaxation = schedule.add(Reset(*qubits), label="Start")
 
@@ -174,6 +178,7 @@ class TQG_Randomized_Benchmarking(Measurement):
 
         # all_cliffords = len(cliffords.XY_decompositions)
         # rng = np.random.default_rng(seed)
+
 
         # The inner for loop iterates over the random clifford sequence lengths
         for acq_index, this_number_of_cliffords in enumerate(clifford_sequence_lengths[:-2]):
@@ -197,47 +202,18 @@ class TQG_Randomized_Benchmarking(Measurement):
                 seed=seed,
                 interleaving_clifford_id=interleaving_clifford_id,
                 apply_inverse_gate=apply_inverse_gate,
-                number_of_qubits=len(qubits),
+                number_of_qubits=2,
             )
             physical_gates = decompose_clifford_seq(clifford_seq, qubits)
 
-            separation_time=200e-9
+            separation_time = 300e-9
             # schedule = Schedule('rb_sequence_generation')
             reset = schedule.add(Reset(*qubits))
+
             add_two_qubit_gates_to_schedule(
                             schedule, physical_gates, ref_op=reset, separation_time=separation_time
                         )
 
-                # for this_qubit in qubits:
-                #     physical_gates = cliffords.XY_decompositions[sequence_index]
-                #     for gate_index, gate_angles in enumerate(physical_gates.values()):
-                #             theta = gate_angles['theta']
-                #             phi = gate_angles['phi']
-                #             if gate_index == 0:
-                #                 last_gate = schedule.add(
-                #                     Rxy(qubit=this_qubit,theta=theta,phi=phi),
-                #                     ref_op=start,ref_pt='end')
-                #             else:
-                #                 last_gate = schedule.add(
-                #                     Rxy(qubit=this_qubit,theta=theta,phi=phi)
-                #             )
-                # if clifford_index < this_number_of_cliffords:
-                #     for this_coupler in coupled_qubits:
-                #         start = schedule.add(CZ(this_coupler[0],this_coupler[1]), ref_op=last_gate, ref_pt='end')
-
-            # recovery_index, recovery_XY_operations = cliffords.reversing_XY_matrix(random_sequence)
-            # for this_qubit in qubits:
-            #     for gate_index, gate_angles in enumerate(recovery_XY_operations.values()):
-            #         theta = gate_angles['theta']
-            #         phi = gate_angles['phi']
-            #         if gate_index == 0:
-            #             last_gate = schedule.add(
-            #                 Rxy(qubit=this_qubit,theta=theta,phi=phi),
-            #                 ref_op=start,ref_pt='end')
-            #         else:
-            #             last_gate = schedule.add(
-            #                 Rxy(qubit=this_qubit,theta=theta,phi=phi)
-            #         )  
             buffer = schedule.add(IdlePulse(4e-9))                                                          
             for this_qubit in qubits:
                 schedule.add(
@@ -256,6 +232,7 @@ class TQG_Randomized_Benchmarking(Measurement):
             schedule.add(Reset(this_qubit))
             schedule.add(X(this_qubit))
             schedule.add(Measure( this_qubit, acq_index=acq_index + 2))
+            schedule.add(Reset(this_qubit))
 
         return schedule
 

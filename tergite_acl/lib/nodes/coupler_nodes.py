@@ -134,7 +134,9 @@ class CZ_Chevron_Node(BaseNode):
         # ac_freq = np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12))
         ac_freq = np.min([np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12)),np.abs(q1_f01 + q2_f01 - (q2_f01 + q2_f12))])
         ac_freq = int(ac_freq / 1e4) * 1e4
+        # lo = 4.4e9 - (ac_freq - 450e6) 
         # print(f'{ ac_freq/1e6 = } MHz for coupler: {coupler}')
+        # print(f'{ lo/1e9 = } GHz for coupler: {coupler}')
         return ac_freq
 
     @property
@@ -143,19 +145,18 @@ class CZ_Chevron_Node(BaseNode):
         cluster_samplespace = {
             # For biase point sweep
             # 'cz_pulse_durations': {
-            #     coupler: np.arange(0e-9, 601e-9, 40e-9)+20e-9 for coupler in self.couplers
+            #     coupler: np.arange(0e-9, 401e-9, 20e-9)+40e-9 for coupler in self.couplers
             # },
             # 'cz_pulse_frequencies': {
-            #     coupler: np.linspace(-20e6, 20e6, 41) + self.transition_frequency(coupler) for coupler in
+            #     coupler: np.linspace(-12e6, 12e6, 21) + self.transition_frequency(coupler) for coupler in
             #     self.couplers
             # },
-
             # For CZ gate calibration
             'cz_pulse_durations': {
-                coupler: np.arange(0e-9, 321e-9, 8e-9)+100e-9 for coupler in self.couplers
+                coupler: np.arange(0e-9, 401e-9, 10e-9)+80e-9 for coupler in self.couplers
             },
             'cz_pulse_frequencies': {
-                coupler: np.linspace(-10e6, -2e6, 21) + self.transition_frequency(coupler) for coupler in
+                coupler: np.linspace(-11e6, -4e6, 21) + self.transition_frequency(coupler) for coupler in
                 self.couplers
             },
         }
@@ -287,7 +288,7 @@ class CZ_Calibration_Node(BaseNode):
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'ramsey_phases': {qubit: np.linspace(0, 360, 16) for qubit in self.coupled_qubits},
+            'ramsey_phases': {qubit: np.append(np.linspace(0, 720, 51),[0,1]) for qubit in self.coupled_qubits},
             'control_ons': {qubit: [False, True] for qubit in self.coupled_qubits},
         }
         return cluster_samplespace
@@ -357,11 +358,12 @@ class CZ_Dynamic_Phase_Node(BaseNode):
         self.analysis_obj = CZCalibrationAnalysis
         self.node_dictionary['dynamic'] = True
         self.node_dictionary['swap_type'] = False
+        self.node_dictionary['use_edge'] = False
     
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'ramsey_phases': {qubit: np.linspace(0, 360, 16) for qubit in self.coupled_qubits},
+            'ramsey_phases': {qubit: np.append(np.linspace(0, 720, 51),[0,1]) for qubit in self.coupled_qubits},
             'control_ons': {qubit: [False, True] for qubit in self.coupled_qubits},
         }
         return cluster_samplespace
@@ -382,11 +384,13 @@ class CZ_Dynamic_Phase_Swap_Node(BaseNode):
         self.analysis_obj = CZCalibrationAnalysis
         self.node_dictionary['dynamic'] = True
         self.node_dictionary['swap_type'] = True
+        self.node_dictionary['use_edge'] = False
+
     
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'ramsey_phases': {qubit: np.linspace(0, 360, 16) for qubit in self.coupled_qubits},
+            'ramsey_phases': {qubit: np.append(np.linspace(0, 720, 51),[0,1]) for qubit in self.coupled_qubits},
             'control_ons': {qubit: [False, True] for qubit in self.coupled_qubits},
         }
         return cluster_samplespace
@@ -408,7 +412,56 @@ class TQG_Randomized_Benchmarking_Node(BaseNode):
         self.analysis_obj = RandomizedBenchmarkingAnalysis
 
         # TODO change it a dictionary like samplespace
-        self.node_externals = 6 * np.arange(100, dtype=np.int32)
+        self.node_externals = 42 * np.arange(100, dtype=np.int32)
+        self.external_parameter_name = 'seed'
+        self.external_parameter_value = 0
+        ####################
+
+    @property
+    def dimensions(self):
+        return (len(self.samplespace['number_of_cliffords'][self.all_qubits[0]]), 1)
+
+    @property
+    def samplespace(self):
+        numbers = 2 ** np.arange(1, 12, 3)
+        extra_numbers = [numbers[i] + numbers[i + 1] for i in range(len(numbers) - 2)]
+        extra_numbers = np.array(extra_numbers)
+        calibration_points = np.array([0, 1])
+        all_numbers = np.sort(np.concatenate((numbers, extra_numbers)))
+        # all_numbers = numbers
+
+        all_numbers = np.concatenate((all_numbers, calibration_points))
+
+        # number_of_repetitions = 1
+
+        cluster_samplespace = {
+            'number_of_cliffords': {
+                # qubit: all_numbers for qubit in self.all_qubits
+                qubit: np.array([1, 2, 3, 4, 8, 16, 32, 64, 128, 0, 1]) for qubit in self.all_qubits
+                # qubit: np.array([1, 2,3,4,0, 1]) for qubit in self.all_qubits
+
+            },
+        }
+        return cluster_samplespace
+
+class TQG_Randomized_Benchmarking_Interleaved_Node(BaseNode):
+    def __init__(self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
+        self.name = name
+        self.type = 'parameterized_sweep'
+        self.all_qubits = all_qubits
+        self.couplers = couplers
+        self.edges = couplers
+        self.coupler = self.couplers[0]
+        self.coupled_qubits = couplers[0].split(sep='_')
+        self.node_dictionary = node_dictionary
+        self.backup = False
+        self.redis_field = ['tqg_fidelity_interleaved']
+        self.measurement_obj = TQG_Randomized_Benchmarking
+        self.analysis_obj = RandomizedBenchmarkingAnalysis
+        self.node_dictionary['interleaving_clifford_id'] = 4386
+        # TODO change it a dictionary like samplespace
+        self.node_externals = 42 * np.arange(100, dtype=np.int32)
         self.external_parameter_name = 'seed'
         self.external_parameter_value = 0
         ####################

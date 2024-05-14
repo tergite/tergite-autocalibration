@@ -33,7 +33,9 @@ class CZ_calibration(Measurement):
         swap_type: bool,
         use_edge:bool = False,
         number_of_cz: int = 1,
-        repetitions: int = 4096,
+        repetitions: int = 2048,
+        opt_cz_pulse_frequency: dict[str,float] = None,
+        opt_cz_pulse_duration: dict[str,float] = None,
         opt_cz_pulse_amplitude: dict[str,float] = None,
     ) -> Schedule:
 
@@ -103,13 +105,22 @@ class CZ_calibration(Measurement):
         # find cz parameters from redis
 
         cz_pulse_frequency, cz_pulse_duration, cz_pulse_amplitude = {}, {}, {}
+        print(f'{opt_cz_pulse_amplitude = }')
+        print(f'{opt_cz_pulse_frequency = }')
+        print(f'{opt_cz_pulse_duration = }')
         for coupler in all_couplers:
             qubits = coupler.split(sep='_')
             for this_coupler in all_couplers:
                 redis_config = REDIS_CONNECTION.hgetall(f"couplers:{this_coupler}")
                 cz_pulse_frequency[this_coupler] = float(redis_config['cz_pulse_frequency'])
-                cz_pulse_duration[this_coupler] = np.ceil(float(redis_config['cz_pulse_duration']) * 1e9 / 4) * 4e-9
+                cz_pulse_duration[this_coupler] = float(redis_config['cz_pulse_duration'])
                 cz_pulse_amplitude[this_coupler] = float(redis_config['cz_pulse_amplitude'])
+                if opt_cz_pulse_amplitude is not None:
+                    cz_pulse_amplitude[this_coupler] += opt_cz_pulse_amplitude[this_coupler]
+                if opt_cz_pulse_frequency is not None:
+                    cz_pulse_frequency[this_coupler] += opt_cz_pulse_frequency[this_coupler]
+                if opt_cz_pulse_duration is not None:
+                    cz_pulse_duration[this_coupler] += opt_cz_pulse_duration[this_coupler]        
         print(f'{cz_pulse_frequency = }')
         print(f'{cz_pulse_duration = }')
         print(f'{cz_pulse_amplitude = }')
@@ -125,7 +136,7 @@ class CZ_calibration(Measurement):
         control_on_values = control_ons[all_qubits[0]]
 
         for cz_index, control_on in enumerate(control_on_values):
-            for ramsey_index, ramsey_phase in enumerate(ramsey_phases_values):
+            for ramsey_index, ramsey_phase in enumerate(ramsey_phases_values[:-2]):
                 relaxation = schedule.add(Reset(*all_qubits), label=f"Reset_{cz_index}_{ramsey_index}")
                 
                 gate_amp = 1
@@ -162,7 +173,6 @@ class CZ_calibration(Measurement):
                                 clock=cz_clock,
                             )
                         )
-
                     # cz = schedule.add(IdlePulse(cz_pulse_duration[this_coupler]))
                 buffer_end = schedule.add(IdlePulse(4e-9), ref_op=buffer_start, ref_pt='end',
                                       rel_time=np.ceil(cz_pulse_duration[this_coupler] * 1e9 / 4) * 4e-9)
@@ -182,6 +192,17 @@ class CZ_calibration(Measurement):
                     this_index = cz_index * number_of_phases + ramsey_index
                     schedule.add(Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
                                  ref_op=x90_end, ref_pt="end", )
+
+                    # 0 calibration point
+            for this_qubit in all_qubits:
+                schedule.add(Reset(this_qubit))
+                schedule.add(Measure(this_qubit, acq_index=this_index+1, bin_mode=BinMode.AVERAGE))
+
+                # 1 calibration point
+                schedule.add(Reset(this_qubit))
+                schedule.add(X(this_qubit))
+                schedule.add(Measure(this_qubit, acq_index=this_index+2, bin_mode=BinMode.AVERAGE))
+                schedule.add(Reset(this_qubit))
         return schedule
 
 

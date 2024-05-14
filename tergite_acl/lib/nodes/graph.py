@@ -49,7 +49,8 @@ graph_dependencies = [
     # ('cz_calibration', 'cz_calibration_ssro'),
     ('cz_calibration', 'cz_dynamic_phase'),
     ('cz_dynamic_phase', 'cz_dynamic_phase_swap'),
-    ('cz_dynamic_phase_swap', 'tqg_randomized_benchmarking')
+    ('cz_dynamic_phase_swap', 'tqg_randomized_benchmarking'),
+    ('tqg_randomized_benchmarking', 'tqg_randomized_benchmarking_interleaved')
 ]
 
 graph.add_edges_from(graph_dependencies)
