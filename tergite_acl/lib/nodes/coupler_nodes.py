@@ -167,7 +167,7 @@ class CZ_Characterisation_Chevron_Node(BaseNode):
         q1_f12 = float(REDIS_CONNECTION.hget(f'transmons:{coupled_qubits[0]}', "freq_12"))
         q2_f12 = float(REDIS_CONNECTION.hget(f'transmons:{coupled_qubits[1]}', "freq_12"))
         # ac_freq = np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12))
-        ac_freq = np.abs(q1_f01 + q2_f01 - (q2_f01 + q2_f12))
+        ac_freq = np.min([np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12)),np.abs(q1_f01 + q2_f01 - (q2_f01 + q2_f12))])
         ac_freq = int(ac_freq / 1e4) * 1e4
         print(f'{ ac_freq/1e6 = } MHz for coupler: {coupler}')
         return ac_freq
