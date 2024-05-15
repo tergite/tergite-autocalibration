@@ -85,7 +85,7 @@ class CZChevronAnalysis(BaseAnalysis):
         """
         Find the optimal ac frequency by finding the longest swapping period.
         """
-        breakpoint()
+        #breakpoint()
         for coord in self.dataset[self.data_var].coords:
             if 'frequencies' in coord:
                 frequencies_coord = coord

@@ -154,10 +154,10 @@ class CZ_Chevron_Node(BaseNode):
 
             # For CZ gate calibration
             'cz_pulse_durations': {
-                coupler: np.arange(0e-9, 401e-9, 10e-9)+20e-9 for coupler in self.couplers
+                coupler: np.arange(0e-9, 401e-9, 12e-9)+20e-9 for coupler in self.couplers
             },
             'cz_pulse_frequencies': {
-                coupler: np.linspace(-10e6, 0e6, 21) + self.transition_frequency(coupler) for coupler in
+                coupler: np.linspace(-10e6, 10e6, 21) + self.transition_frequency(coupler) for coupler in
                 self.couplers
             },
         }

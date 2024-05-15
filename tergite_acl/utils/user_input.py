@@ -1,6 +1,6 @@
 #qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
 #qubits = ['q10','q13','q15']
-#qubits = [ 'q06']
+#qubits = [ 'q14']
 qubits = [ 'q06','q07', 'q08', 'q09', 'q10','q11','q12','q13', 'q14', 'q15']
 
 # qubits = [ 'q18','q19','q20','q21','q22','q23','q24','q25']
@@ -29,7 +29,7 @@ qubits = [ 'q06','q07', 'q08', 'q09', 'q10','q11','q12','q13', 'q14', 'q15']
 
 # }
 #couplers = ['q11_q12'] # not tuning
-#couplers = ['q12_q13'] #done
+couplers = ['q14_q15'] #done
 #couplers = ['q13_q14']
 #couplers = ['q14_q15']
 #couplers = ['q08_q09']
@@ -42,11 +42,10 @@ qubits = [ 'q06','q07', 'q08', 'q09', 'q10','q11','q12','q13', 'q14', 'q15']
 #couplers = ['q11_q16']
 #couplers = ['q07_q08']
 #couplers = ['q10_q15']
-couplers = ['q06_q11']
+#couplers = ['q06_q11']
 
 
-attenuation_setting = {'qubit':12, 'coupler':40, 'readout':12}
-attenuation_setting = {'qubit':12, 'coupler':40, 'readout':12}
+attenuation_setting = {'qubit':10, 'coupler':38, 'readout':12}
 
 '''punchout
   resonator_spectroscopy
@@ -84,7 +83,7 @@ attenuation_setting = {'qubit':12, 'coupler':40, 'readout':12}
 '''
 
 user_requested_calibration = {
-    'target_node': 'randomized_benchmarking',
+    'target_node': 'cz_chevron',
     'all_qubits': qubits,
     'couplers': couplers,
 }

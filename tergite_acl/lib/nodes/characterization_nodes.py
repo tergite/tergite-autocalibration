@@ -11,7 +11,7 @@ from tergite_acl.lib.calibration_schedules.T1 import T1, T2, T2Echo
 from tergite_acl.lib.calibration_schedules.check_cliffords import Check_Cliffords
 from tergite_acl.lib.calibration_schedules.randomized_benchmarking import Randomized_Benchmarking
 
-coherence_repeat = 10
+coherence_repeat = 15
 
 class T1_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
@@ -42,7 +42,7 @@ class T1_Node(BaseNode):
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'delays': {qubit: 8e-9 + np.arange(0, 400e-6, 6e-6) for qubit in self.all_qubits}
+            'delays': {qubit: 8e-9 + np.array([0, 5, 10, 15, 20, 25, 30, 35, 40, 50, 60, 70, 80, 100, 120, 140, 160, 200, 240, 280, 320, 360, 400])*1e-6 for qubit in self.all_qubits}
         }
         return cluster_samplespace
 
@@ -139,7 +139,7 @@ class T2_Node(BaseNode):
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'delays': {qubit: 8e-9 + np.arange(0, 80e-6, 1e-6) for qubit in self.all_qubits}
+            'delays': {qubit: 8e-9 + np.arange(0, 70e-6, 1e-6) for qubit in self.all_qubits}
         }
         return cluster_samplespace
 
@@ -172,6 +172,6 @@ class T2_Echo_Node(BaseNode):
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'delays': {qubit: 8e-9 + np.arange(0, 300e-6, 6e-6) for qubit in self.all_qubits}
+            'delays': {qubit: 8e-9 + np.array([0, 5, 10, 15, 20, 25, 30, 35, 40, 50, 60, 70, 80, 100, 120, 140, 160, 200, 240, 280, 320])*1e-6 for qubit in self.all_qubits}
         }
         return cluster_samplespace

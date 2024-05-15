@@ -47,7 +47,7 @@ class Qubit_01_Spectroscopy_Multidim_Node(BaseNode):
     def samplespace(self):
         cluster_samplespace = {
             'spec_pulse_amplitudes': {
-                qubit: np.linspace(50e-4, 50e-4, 1) for qubit in self.all_qubits
+                qubit: np.linspace(70e-4, 80e-4, 1) for qubit in self.all_qubits
             },
             'spec_frequencies': {
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
