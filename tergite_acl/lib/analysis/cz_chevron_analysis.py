@@ -85,7 +85,6 @@ class CZChevronAnalysis(BaseAnalysis):
         """
         Find the optimal ac frequency by finding the longest swapping period.
         """
-        #breakpoint()
         for coord in self.dataset[self.data_var].coords:
             if 'frequencies' in coord:
                 frequencies_coord = coord
@@ -207,8 +206,9 @@ class CZChevronAnalysis(BaseAnalysis):
         """
         Find the optimal ac frequency by finding the largest swapping amplitudes in the first period.
         """
-        freq = self.dataset[f'cz_pulse_frequencies_sweep{self.qubit}'].values  # MHz
-        times = self.dataset[f'cz_pulse_durations{self.qubit}'].values  # ns
+        coords = list(self.dataset.coords)
+        freq = self.dataset[coords[1]].values  # MHz
+        times = self.dataset[coords[0]].values  # ns
         self.amp = times
         self.freq = freq
         freq = freq / 1e6
@@ -345,20 +345,20 @@ class CZChevronAnalysis(BaseAnalysis):
         datarray = self.dataset[f'y{self.qubit}']
         qubit = self.qubit
         datarray.plot(ax=axis, cmap='RdBu_r')
-        # # fig = axis.pcolormesh(amp,freq,magnitudes,shading='nearest',cmap='RdBu_r')
-        # axis.scatter(self.opt_freq,self.opt_cz,c='r',label = 'CZ Duration = {:.1f} ns'.format(self.opt_cz*1e9),marker='X',s=200,edgecolors='k', linewidth=1.5,zorder=10)
-        # # plt.scatter(opt_swap,opt_freq,c='b',label = 'SWAP12 Duration= {:.2f} V'.format(opt_swap),marker='X',s=200,edgecolors='k', linewidth=1.5,zorder=10)
-        # axis.vlines(self.opt_freq,self.amp[0],self.amp[-1],label = 'Frequency Detuning = {:.2f} MHz'.format(self.opt_freq/1e6),colors='k',linestyles='--',linewidth=1.5)
-        # axis.hlines(self.opt_cz,self.freq[0],self.freq[-1],colors='k',linestyles='--',linewidth=1.5)
-        # # axis.legend(loc = 'lower center', bbox_to_anchor=(-0.15, -0.36, 1.4, .102), mode='expand', ncol=2,
-        # #             title = 'Optimal Gate Parameters', columnspacing=200,borderpad=1)
-        # # cbar = plt.colorbar(fig)
-        # # cbar.set_label('|2>-state Population', labelpad=10)
-        # axis.set_xlim([self.freq[0],self.freq[-1]])
-        # axis.set_ylim([self.amp[0],self.amp[-1]])
-        # axis.set_ylabel('Parametric Drive Durations (s)')
-        # axis.set_xlabel('Frequency Detuning (Hz)')
-        # axis.set_title(f'CZ Chevron - Qubit {self.qubit[1:]}')
+        # fig = axis.pcolormesh(amp,freq,magnitudes,shading='nearest',cmap='RdBu_r')
+        axis.scatter(self.opt_freq,self.opt_cz,c='r',label = 'CZ Duration = {:.1f} ns'.format(self.opt_cz*1e9),marker='X',s=200,edgecolors='k', linewidth=1.5,zorder=10)
+        # plt.scatter(opt_swap,opt_freq,c='b',label = 'SWAP12 Duration= {:.2f} V'.format(opt_swap),marker='X',s=200,edgecolors='k', linewidth=1.5,zorder=10)
+        axis.vlines(self.opt_freq,self.amp[0],self.amp[-1],label = 'Frequency Detuning = {:.2f} MHz'.format(self.opt_freq/1e6),colors='k',linestyles='--',linewidth=1.5)
+        axis.hlines(self.opt_cz,self.freq[0],self.freq[-1],colors='k',linestyles='--',linewidth=1.5)
+        # axis.legend(loc = 'lower center', bbox_to_anchor=(-0.15, -0.36, 1.4, .102), mode='expand', ncol=2,
+        #             title = 'Optimal Gate Parameters', columnspacing=200,borderpad=1)
+        # cbar = plt.colorbar(fig)
+        # cbar.set_label('|2>-state Population', labelpad=10)
+        axis.set_xlim([self.freq[0],self.freq[-1]])
+        axis.set_ylim([self.amp[0],self.amp[-1]])
+        axis.set_ylabel('Parametric Drive Durations (s)')
+        axis.set_xlabel('Frequency Detuning (Hz)')
+        axis.set_title(f'CZ Chevron - Qubit {self.qubit[1:]}')
 
 
 class CZChevronAnalysisReset():

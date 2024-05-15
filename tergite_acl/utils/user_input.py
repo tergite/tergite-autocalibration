@@ -80,10 +80,13 @@ attenuation_setting = {'qubit':10, 'coupler':38, 'readout':12}
   cz_calibration
   cz_calibration_ssro
   cz_dynamic_phase
+  cz_dynamic_phase_swap
+  tqg_randomized_benchmarking
+  tqg_randomized_benchmarking_interleaved
 '''
 
 user_requested_calibration = {
-    'target_node': 'cz_chevron',
+    'target_node': 'tqg_randomized_benchmarking_interleaved',
     'all_qubits': qubits,
     'couplers': couplers,
 }

@@ -82,14 +82,14 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
             node_analysis.plotter(primary_axis)
 
         # TODO temporary hack:
-        if node.name in ['cz_calibration', 'cz_dynamic_phase', 'cz_calibration_ssro', 'cz_optimize_chevron'] and \
+        if node.name in ['cz_calibration', 'cz_dynamic_phase',  'cz_dynamic_phase','cz_calibration_ssro', 'cz_optimize_chevron'] and \
                 qubit_types[this_qubit] == 'Target':
             node_analysis.update_redis_trusted_values(node.name, node.coupler, redis_field)
             this_element = node.coupler
-        elif node.name in ['cz_chevron'] and qubit_types[this_qubit] == 'Control':
+        elif node.name in ['cz_chevron','cz_calibration_swap', 'cz_dynamic_phase_swap'] and qubit_types[this_qubit] == 'Control':
             node_analysis.update_redis_trusted_values(node.name, node.coupler, redis_field)
             this_element = node.coupler
-        elif node.name in ['coupler_spectroscopy']:
+        elif node.name in ['coupler_spectroscopy','tqg_randomized_benchmarking']:
             node_analysis.update_redis_trusted_values(node.name, node.coupler, redis_field)
             this_element = node.coupler
         else:

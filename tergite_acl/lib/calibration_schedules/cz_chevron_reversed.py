@@ -753,7 +753,6 @@ class CZ_chevron(Measurement):
             self,
             cz_pulse_frequencies: dict[str,np.ndarray],
             cz_pulse_durations: dict[str,np.ndarray],
-            cz_pulse_amplitude: float = 0.15,
             opt_cz_pulse_amplitude: dict[str,float] = None,
             repetitions: int = 1024,
         ) -> Schedule:
@@ -860,8 +859,8 @@ class CZ_chevron(Measurement):
                             clock=cz_clock,
                         ),
                     )
-                
-                buffer = schedule.add(IdlePulse(4e-9))
+
+                buffer = schedule.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( cz_duration * 1e9 / 4) * 4e-9)
 
                 for this_qubit in qubits:
                     schedule.add(

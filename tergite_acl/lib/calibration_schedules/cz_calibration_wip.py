@@ -13,42 +13,24 @@ from tergite_acl.config.coupler_config import qubit_types
 from tergite_acl.config.settings import REDIS_CONNECTION
 from tergite_acl.lib.measurement_base import Measurement
 from tergite_acl.utils.extended_transmon_element import Measure_RO_Opt, Rxy_12
+from tergite_acl.utils.extended_coupler_edge import CompositeSquareEdge
+from tergite_acl.utils.extended_transmon_element import ExtendedTransmon
 
 
 class CZ_calibration(Measurement):
 
-    def __init__(self, transmons, coupler, qubit_state: int = 0):
+    def __init__(self, transmons: dict[str, ExtendedTransmon],couplers: dict[str, CompositeSquareEdge], qubit_state: int = 0):
         super().__init__(transmons)
+        self.transmons = transmons
         self.qubit_state = qubit_state
-        self.coupler = coupler
-        self.static_kwargs = {
-            'qubits': self.qubits,
-            # 'mw_frequencies': self.attributes_dictionary('f01'),
-            # 'mw_pulse_durations': self.attributes_dictionary('duration'),
-            # 'mw_pulse_ports': self.attributes_dictionary('microwave'),
-            # 'mw_ef_amps180': self.attributes_dictionary('ef_amp180'),
-            # 'mw_frequencies_12': self.attributes_dictionary('f12'),
-            # 'cz_pulse_width': self.attributes_dictionary('cz_pulse_width'),
-            # 'cz_pulse_amplitude': self.attributes_dictionary('cz_pulse_amplitude'),
-            'coupler': self.coupler,
-            # 'cz_pulse_duration': self.attributes_dictionary('cz_pulse_duration'),
-            # 'cz_pulse_frequency': self.attributes_dictionary('cz_pulse_frequency'),
-        }
+        self.couplers = couplers
 
     def schedule_function(
             self,
-            qubits: list[str],
-            # mw_ef_amps180: dict[str,float],
-            # mw_frequencies: dict[str,float],
-            # mw_frequencies_12: dict[str,float],
-            # mw_pulse_ports: dict[str,str],
-            # mw_pulse_durations: dict[str,float],
-            # cz_pulse_amplitude: dict[str,float],
-            # cz_pulse_width: dict[str,float], 
-            # testing_group: int = 1,
-            coupler: str,
-            # cz_pulse_frequency: dict[str,float],
-            # cz_pulse_duration: dict[str,float],
+            cz_pulse_frequencies: dict[str,np.ndarray],
+            cz_pulse_durations: dict[str,np.ndarray],
+            cz_pulse_amplitude: float = 0.15,
+            opt_cz_pulse_amplitude: dict[str,float] = None,
             ramsey_phases: dict[str, np.ndarray],
             control_ons: dict[str, np.ndarray],
             number_of_cz: int = 1,
@@ -222,42 +204,22 @@ class CZ_calibration(Measurement):
 
 class CZ_dynamic_phase(Measurement):
 
-    def __init__(self, transmons, coupler, qubit_state: int = 0):
+    def __init__(self, transmons: dict[str, ExtendedTransmon],couplers: dict[str, CompositeSquareEdge], qubit_state: int = 0):
         super().__init__(transmons)
+        self.transmons = transmons
         self.qubit_state = qubit_state
-        self.coupler = coupler
-        self.static_kwargs = {
-            'qubits': self.qubits,
-            # 'mw_frequencies': self.attributes_dictionary('f01'),
-            # 'mw_pulse_durations': self.attributes_dictionary('duration'),
-            # 'mw_pulse_ports': self.attributes_dictionary('microwave'),
-            # 'mw_ef_amps180': self.attributes_dictionary('ef_amp180'),
-            # 'mw_frequencies_12': self.attributes_dictionary('f12'),
-            # 'cz_pulse_width': self.attributes_dictionary('cz_pulse_width'),
-            # 'cz_pulse_amplitude': self.attributes_dictionary('cz_pulse_amplitude'),
-            'coupler': self.coupler,
-            # 'cz_pulse_duration': self.attributes_dictionary('cz_pulse_duration'),
-            # 'cz_pulse_frequency': self.attributes_dictionary('cz_pulse_frequency'),
-        }
+        self.couplers = couplers
 
     def schedule_function(
             self,
-            qubits: list[str],
-            # mw_ef_amps180: dict[str,float],
-            # mw_frequencies: dict[str,float],
-            # mw_frequencies_12: dict[str,float],
-            # mw_pulse_ports: dict[str,str],
-            # mw_pulse_durations: dict[str,float],
-            # cz_pulse_amplitude: dict[str,float],
-            # cz_pulse_width: dict[str,float], 
-            # testing_group: int = 1,
-            coupler: str,
-            # cz_pulse_frequency: dict[str,float],
-            # cz_pulse_duration: dict[str,float],
+            cz_pulse_frequencies: dict[str,np.ndarray],
+            cz_pulse_durations: dict[str,np.ndarray],
+            cz_pulse_amplitude: float = 0.15,
+            opt_cz_pulse_amplitude: dict[str,float] = None,
             ramsey_phases: dict[str, np.ndarray],
             control_ons: dict[str, np.ndarray],
             number_of_cz: int = 1,
-            repetitions: int = 1024,
+            repetitions: int = 4096,
     ) -> Schedule:
 
         """

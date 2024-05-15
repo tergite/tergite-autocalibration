@@ -60,7 +60,7 @@ class Randomized_Benchmarking_Node(BaseNode):
         self.analysis_obj = RandomizedBenchmarkingAnalysis
 
         # TODO change it a dictionary like samplespace
-        self.node_externals = 6 * np.arange(50, dtype=np.int32)
+        self.node_externals = 6 * np.arange(3, dtype=np.int32)
         self.external_parameter_name = 'seed'
         self.external_parameter_value = 0
         ####################
@@ -86,7 +86,7 @@ class Randomized_Benchmarking_Node(BaseNode):
             'number_of_cliffords': {
                 # qubit: all_numbers for qubit in self.all_qubits
                 # qubit: np.array([2, 16, 128, 256,512, 768, 1024, 0, 1]) for qubit in self.all_qubits
-                qubit: np.array([2, 16, 128, 256, 512, 768, 1024, 0, 1]) for qubit in self.all_qubits
+                qubit: np.array([1, 2, 3, 4, 8, 16, 128, 256, 512, 1024, 0, 1]) for qubit in self.all_qubits
             },
         }
         return cluster_samplespace
