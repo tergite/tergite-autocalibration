@@ -89,7 +89,7 @@ class CZFirtStepAnalysis(BaseAnalysis):
             print(self.freq[bestPoint.indexBestFrequency])
             print(bestPoint.fittedParam_1[1])
             print(bestPoint.fittedParam_2[1])
-            return best_current, best_amplitude, self.freq[bestPoint.indexBestFrequency], bestPoint.fittedParam_1[1], bestPoint.fittedParam_2[2]
+            return best_current, best_amplitude, self.freq[bestPoint.indexBestFrequency], (bestPoint.fittedParam_1[1] + bestPoint.fittedParam_2[1]) / 2
 
         elif len(files) > 1:
             print("Error: More than one file matched the pattern.")
