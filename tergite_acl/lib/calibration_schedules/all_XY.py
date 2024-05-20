@@ -1,7 +1,7 @@
 from quantify_scheduler.resources import ClockResource
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler import Schedule
-from quantify_scheduler.operations.gate_library import Measure, Reset, Rxy
+from quantify_scheduler.operations.gate_library import X, Measure, Reset, Rxy
 from tergite_acl.utils.extended_transmon_element import ExtendedTransmon
 from tergite_acl.lib.measurement_base import Measurement
 import numpy as np
@@ -64,7 +64,7 @@ class All_XY(Measurement):
                 Reset(*qubits), ref_op=root_relaxation, ref_pt='end'
             ) # To enforce parallelism we refer to the root relaxation
 
-            for index, pulses in all_XY_angles.items():
+            for acq_index, pulses in all_XY_angles.items():
                 first_theta = pulses[0]['theta']
                 first_phi = pulses[0]['phi']
                 schedule.add(
@@ -75,7 +75,20 @@ class All_XY(Measurement):
                 schedule.add(
                     Rxy(qubit=this_qubit,theta=second_theta,phi=second_phi)
                 )
-                schedule.add(Measure(this_qubit, acq_index=index))
+                schedule.add(Measure(this_qubit, acq_index=acq_index))
                 schedule.add(Reset(this_qubit))
+
+            # 0 calibration point
+            schedule.add(Reset(this_qubit))
+            schedule.add(Reset(this_qubit))
+            schedule.add(Measure( this_qubit, acq_index=acq_index + 1))
+            schedule.add(Reset(this_qubit))
+
+            # 1 calibration point
+            schedule.add(Reset(this_qubit))
+            schedule.add(Reset(this_qubit))
+            schedule.add(X(this_qubit))
+            schedule.add(Measure( this_qubit, acq_index=acq_index + 2))
+            schedule.add(Reset(this_qubit))
 
         return schedule

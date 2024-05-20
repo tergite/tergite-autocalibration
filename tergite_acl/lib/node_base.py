@@ -16,18 +16,9 @@ class BaseNode:
 
         self.schedule_samplespace = {}
         self.external_samplespace = {}
+        self.reduced_external_samplespace = {}
 
         self.samplespace = self.schedule_samplespace | self.external_samplespace
-
-        # self.external_parameters = {}
-        # self.node_externals = []
-
-    # @property
-    # def samplespace(self) -> dict:
-    #     '''
-    #     to be implemented by the child nodes
-    #     '''
-    #     return {}
 
     def pre_measurement_operation(self):
         '''
@@ -44,8 +35,13 @@ class BaseNode:
         '''
         schedule_settable_quantities = self.schedule_samplespace.keys()
 
+        # no schedule_samplespace applies on to sc_qubit_spectroscopy
+        if len(list(schedule_settable_quantities)) == 0:
+            return [1]
+
         # keeping the first element, ASSUMING that all settable elements
         # have the same dimensions on their samplespace
+
         first_settable = list(schedule_settable_quantities)[0]
         measured_elements = self.schedule_samplespace[first_settable].keys()
         first_element = list(measured_elements)[0]

@@ -1,4 +1,5 @@
 import lmfit
+from matplotlib.pyplot import plot
 import numpy as np
 import xarray as xr
 from quantify_core.analysis.fitting_models import fft_freq_phase_guess
@@ -7,9 +8,6 @@ from tergite_acl.lib.analysis_base import BaseAnalysis
 
 
 class All_XY_Analysis(BaseAnalysis):
-    """
-    Analysis that fits a cosine function to Rabi oscillation data.
-    """
 
     def __init__(self, dataset: xr.Dataset):
         super().__init__()
@@ -17,17 +15,20 @@ class All_XY_Analysis(BaseAnalysis):
         coord = list(dataset[data_var].coords.keys())[0]
         self.S21 = dataset[data_var].values
         self.independents = dataset[coord].values
+        self.calibration_0 = self.S21[-2]
+        self.calibration_1 = self.S21[-1]
+        self.magnitudes = np.absolute(self.S21[:-2])
         self.fit_results = {}
         self.qubit = dataset[data_var].attrs['qubit']
 
     def run_fitting(self):
-        # Initialize the Rabi model
+        self.rotated_data = self.rotate_to_probability_axis(self.S21)
 
-        return []
+        return [0]
 
     def plotter(self, ax):
-        # Plots the data and the fitted model of a Rabi experiment
-        # ax.set_title(f'Rabi Oscillations for {self.qubit}')
-        # ax.set_xlabel('Amplitude (V)')
-        # ax.set_ylabel('|S21| (V)')
+        ax.set_title(f'All-XY analysis_base for {self.qubit}')
+        ax.scatter(self.independents[:-2], self.rotated_data, marker='o', s=48)
+        ax.set_xlabel('Gate')
+        ax.set_ylabel('|S21| (V)')
         ax.grid()

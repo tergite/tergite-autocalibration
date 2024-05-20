@@ -20,6 +20,8 @@ ro_amplitude_two_state_optimization.measure_2state_opt.acq_threshold = nan
 ro_amplitude_three_state_optimization.measure_3state_opt.ro_ampl_3st_opt = nan
 ro_amplitude_three_state_optimization.inv_cm_opt = nan
 
+all_XY.step_fidelity = nan
+
 qubit_01_spectroscopy_pulsed.clock_freqs.f01 = nan
 qubit_01_spectroscopy.clock_freqs.f01 = nan
 qubit_01_spectroscopy.spec.spec_ampl_optimal = nan
@@ -86,13 +88,13 @@ q06.measure_2.pulse_amp = 3.0e-3  #9.0e-3
 q07.measure.pulse_amp = 20.0e-3  #9.0e-3
 q07.measure_1.pulse_amp = 3.0e-3  #9.0e-3
 q07.measure_2.pulse_amp = 3.0e-3  #9.0e-3
-q08.measure.pulse_amp = 35.0e-3 #10.0e-3
+q08.measure.pulse_amp = 25.0e-3 #10.0e-3
 q08.measure_1.pulse_amp = 5.0e-3 #10.0e-3
 q08.measure_2.pulse_amp = 5.0e-3 #10.0e-3
 q09.measure.pulse_amp = 28.0e-3 #10.0e-3
 q09.measure_1.pulse_amp = 3.0e-3 #10.0e-3
 q09.measure_2.pulse_amp = 3.0e-3 #10.0e-3
-q10.measure.pulse_amp = 13.0e-3 #15.0e-3
+q10.measure.pulse_amp = 10.0e-3 #15.0e-3
 q10.measure_1.pulse_amp = 3.0e-3 #15.0e-3
 q10.measure_2.pulse_amp = 3.0e-3 #15.0e-3
 
@@ -137,7 +139,7 @@ reset.duration = 100e-6
 reset.duration = 240e-6
 
 [qubit_01_spectroscopy.all]
-spec.spec_duration = 90e-6
+spec.spec_duration = 20e-6
 reset.duration = 200e-6
 
 [coupler_spectroscopy.all]

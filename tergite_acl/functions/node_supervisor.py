@@ -64,19 +64,21 @@ def monitor_node_calibration(node: BaseNode, data_path, lab_ic, cluster_status):
 
             for current_iteration in range(iterations):
                 reduced_external_samplespace = {}
+                qubit_values = {}
                 for qubit in node.all_qubits:
                     qubit_specific_values = node.external_samplespace[external_settable][qubit]
                     external_value = qubit_specific_values[current_iteration]
-                    reduced_external_samplespace[qubit] = external_value
+                    qubit_values[qubit] = external_value
 
-                    # example of reduced_external_samplespace:
-                    # reduced_external_samplespace = {
-                    #     'cw_frequencies': {
-                    #          'q1': np.array(4.2e9),
-                    #          'q2': np.array(4.7e9),
-                    #     }
-                    # }
-
+                # example of reduced_external_samplespace:
+                # reduced_external_samplespace = {
+                #     'cw_frequencies': {
+                #          'q1': np.array(4.2e9),
+                #          'q2': np.array(4.7e9),
+                #     }
+                # }
+                reduced_external_samplespace[external_settable] = qubit_values
+                node.reduced_external_samplespace = reduced_external_samplespace
                 pre_measurement_operation(reduced_ext_space=reduced_external_samplespace)
 
                 ds = measure_node(
@@ -88,7 +90,6 @@ def monitor_node_calibration(node: BaseNode, data_path, lab_ic, cluster_status):
                     measurement=(current_iteration, iterations)
                 )
                 result_dataset = xarray.merge([result_dataset, ds])
-
 
         logger.info('measurement completed')
         measurement_result = post_process(result_dataset, node, data_path=data_path)

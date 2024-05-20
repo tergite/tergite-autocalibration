@@ -42,7 +42,7 @@ from qblox_instruments.qcodes_drivers.cluster import Cluster
 
 class Qubit_01_Spectroscopy_CW_Node(BaseNode):
     measurement_obj = CW_Two_Tones_Spectroscopy
-    analysis_obj = QubitSpectroscopyAnalysis
+    analysis_obj = QubitSpectroscopyMultidim
 
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
@@ -53,22 +53,19 @@ class Qubit_01_Spectroscopy_CW_Node(BaseNode):
         self.operations_args = []
 
         self.external_samplespace = {
-            'cw_frequenies': {
+            'cw_frequencies': {
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
             }
         }
 
     def pre_measurement_operation(self, reduced_ext_space):
+        settable = list(reduced_ext_space.keys())[0]
         for instrument in self.lab_instr_coordinator.values():
             if type(instrument) == Cluster:
                 cluster = instrument
         for qubit in self.all_qubits:
-            lo_frequency = reduced_ext_space[qubit]
+            lo_frequency = reduced_ext_space[settable][qubit]
             set_qubit_LO(cluster, qubit, lo_frequency)
-            
-
-            # lo_frec = reduced_ext_space[qubit]
-            # set_qubit_LO(cluster, qubit=qubit, lo_frequency=external_value)
 
 
 class Qubit_01_Spectroscopy_Multidim_Node(BaseNode):
@@ -83,7 +80,7 @@ class Qubit_01_Spectroscopy_Multidim_Node(BaseNode):
 
         self.schedule_samplespace = {
             'spec_pulse_amplitudes': {
-                qubit: np.linspace(6e-4, 12e-4, 2) for qubit in self.all_qubits
+                qubit: np.linspace(5e-4, 1e-2, 3) for qubit in self.all_qubits
             },
             'spec_frequencies': {
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits

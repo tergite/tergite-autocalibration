@@ -93,18 +93,17 @@ class Randomized_Benchmarking(Measurement):
 
                 schedule.add(Reset(this_qubit))
 
-
             # 0 calibration point
             schedule.add(Reset(this_qubit))
             schedule.add(Reset(this_qubit))
-            schedule.add(Measure( this_qubit, acq_index=acq_index + 1))
+            schedule.add(Measure(this_qubit, acq_index=acq_index + 1))
             schedule.add(Reset(this_qubit))
 
             # 1 calibration point
             schedule.add(Reset(this_qubit))
             schedule.add(Reset(this_qubit))
             schedule.add(X(this_qubit))
-            schedule.add(Measure( this_qubit, acq_index=acq_index + 2))
+            schedule.add(Measure(this_qubit, acq_index=acq_index + 2))
             schedule.add(Reset(this_qubit))
 
         return schedule

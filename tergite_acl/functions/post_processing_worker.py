@@ -108,12 +108,11 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
             for secondary_ax in list_of_secondary_axes:
                 secondary_ax.legend()
 
-    # figure_manager = plt.get_current_fig_manager()
-    # figure_manager.window.showMaximized()
     fig = plt.gcf()
     fig.set_tight_layout(True)
     try:
-        fig.savefig(f'{data_path}/{node.name}.png', bbox_inches='tight', dpi=600)
+        fig.savefig(f'{data_path}/{node.name}.png', bbox_inches='tight', dpi=400)
+        fig.savefig(f'{data_path}/{node.name}_preview.png', bbox_inches='tight', dpi=100)
     except FileNotFoundError:
         warnings.warn('File Not existing')
         pass

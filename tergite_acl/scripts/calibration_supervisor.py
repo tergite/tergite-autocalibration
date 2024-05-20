@@ -72,7 +72,7 @@ class CalibrationSupervisor():
         ###############
         print('WARNING SETTING ATTENUATION')
         for qubit in self.qubits:
-            att_in_db = 30
+            att_in_db = 8
             cluster = self.available_clusters_dict['clusterA']
             set_qubit_attenuation(cluster, qubit, att_in_db)
 
