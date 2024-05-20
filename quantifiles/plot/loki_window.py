@@ -134,8 +134,8 @@ class QubitSelectBox(QtWidgets.QFrame):
         layout.addWidget(all_qubits_box)
 
         # Add a GettableSelector widget for each data variable in the dataset
-        for coord in dataset.coords:
-            qubit_name = dataset[coord].attrs['qubit']
+        qubits = set([dataset[coord].attrs['qubit'] for coord in dataset.coords])
+        for qubit_name in qubits:
             qubit_box = QubitSelector(
                 qubit_name=qubit_name, dataset=dataset
             )
