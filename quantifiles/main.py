@@ -358,6 +358,8 @@ class ExperimentPreview(QtWidgets.QLabel):
 
         # Display the image in the label
         image = QPixmap(image_path)
+        # image_reader = QImageReader(image_path)
+        # image = image_reader.read()
 
         # Get the dimensions of the image_label
         label_width = self.width()
@@ -365,6 +367,9 @@ class ExperimentPreview(QtWidgets.QLabel):
         # self.setFixedSize(label_width, label_height)
         # self.image_label.setFixedSize(image_reader.size().width(), image_reader.size().height())
         # Scale the image while preserving aspect ratio
+
+        # scaled_image = QPixmap.fromImage(image).scaled(label_width, label_height, transformMode=Qt.SmoothTransformation)
+
         scaled_image = image.scaled(
             label_width, label_height, transformMode=Qt.SmoothTransformation
             # label_width, label_height, aspectRatioMode=Qt.KeepAspectRatio
@@ -372,6 +377,7 @@ class ExperimentPreview(QtWidgets.QLabel):
 
         # Display the scaled image in the label
         self.setPixmap(scaled_image)
+        # self.setPixmap(pixmap)
 
         self.setScaledContents(True)
         self.adjustSize()

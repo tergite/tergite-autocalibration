@@ -167,21 +167,21 @@ class ColorPlot(BasePlot):
         str
             The text to display.
         """
-        # index_pos = self.img.getViewBox().mapFromViewToItem(
-        #     self.img, QtCore.QPointF(x, y)
-        # )
-        # try:
-        #     x_idx, y_idx = int(round(index_pos.x())), int(round(index_pos.y()))
-        #     x_idx = max(0, min(x_idx, self.img.image.shape[0] - 1))
-        #     y_idx = max(0, min(y_idx, self.img.image.shape[1] - 1))
-        #     z_value = self.img.image[x_idx, y_idx]
-        # except IndexError:
-        #     z_value = np.nan
-        #
+        index_pos = self.img.getViewBox().mapFromViewToItem(
+            self.img, QtCore.QPointF(x, y)
+        )
+        try:
+            x_idx, y_idx = int(round(index_pos.x())), int(round(index_pos.y()))
+            x_idx = max(0, min(x_idx, self.img.image.shape[0] - 1))
+            y_idx = max(0, min(y_idx, self.img.image.shape[1] - 1))
+            z_value = self.img.image[x_idx, y_idx]
+        except IndexError:
+            z_value = np.nan
+
         # x_unit = self.dataset[self.x].attrs["units"]
         # y_unit = self.dataset[self.y].attrs["units"]
         # z_unit = self.dataset[self.z].attrs["units"]
-        #
-        # return (
-        #     f"\nx = {x:.2e} {x_unit}\ny = {y:.2e} {y_unit}\nz = {z_value:.2e} {z_unit}"
-        # )
+
+        return (
+            f"\nx = {x:.2e} \ny = {y:.2e} \nz = {z_value:.2e} "
+        )
