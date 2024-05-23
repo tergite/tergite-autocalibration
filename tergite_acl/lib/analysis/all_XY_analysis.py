@@ -5,6 +5,7 @@ import xarray as xr
 from quantify_core.analysis.fitting_models import fft_freq_phase_guess
 
 from tergite_acl.lib.analysis_base import BaseAnalysis
+from tergite_acl.lib.calibration_schedules.all_XY import all_XY_angles
 
 
 class All_XY_Analysis(BaseAnalysis):
@@ -21,8 +22,31 @@ class All_XY_Analysis(BaseAnalysis):
         self.fit_results = {}
         self.qubit = dataset[data_var].attrs['qubit']
 
+    def string_representation(self, operation: dict):
+        if operation['phi'] == 0:
+            if operation['theta'] == 0:
+                str_label = 'I'
+            elif operation['theta'] == 90:
+                str_label = 'X90'
+            elif operation['theta'] == 180:
+                str_label = 'X'
+        elif operation['phi'] == 90:
+            if operation['theta'] == 90:
+                str_label = 'Y90'
+            elif operation['theta'] == 180:
+                str_label = 'Y'
+        return str_label
+
+
     def run_fitting(self):
         self.rotated_data = self.rotate_to_probability_axis(self.S21)
+        labels = []
+        for index in self.independents[:-2]:
+            operation1, operation2 = all_XY_angles[index]
+            label = self.string_representation(operation1) + self.string_representation(operation2)
+            labels.append(label)
+
+        self.x_labels = labels
 
         return [0]
 
@@ -30,5 +54,7 @@ class All_XY_Analysis(BaseAnalysis):
         ax.set_title(f'All-XY analysis_base for {self.qubit}')
         ax.scatter(self.independents[:-2], self.rotated_data, marker='o', s=48)
         ax.set_xlabel('Gate')
+        ax.set_xticks(self.independents[:-2])
+        ax.set_xticklabels(self.x_labels, rotation=90)
         ax.set_ylabel('|S21| (V)')
         ax.grid()

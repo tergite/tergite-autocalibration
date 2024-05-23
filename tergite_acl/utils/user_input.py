@@ -1,11 +1,3 @@
-# qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
-# qubits = [ 'q18','q19','q20','q21','q22','q23','q24','q25']
-# qubits = [ 'q06','q07','q08','q09','q10','q11','q12','q13','q14','q15']
-qubits = [ 'q06','q07','q08','q09','q10']
-# qubits = ['q14']
-# couplers = ['q12_q13','q13_q14' ]
-couplers = ['q12_q13']
-
 '''
 node reference
   punchout
@@ -27,7 +19,7 @@ node reference
   ro_amplitude_three_state_optimization
   coupler_spectroscopy
   coupler_resonator_spectroscopy
-  adaptive_motzoi_parameter
+  motzoi_parameter
   n_rabi_oscillations
   randomized_benchmarking
   state_discrimination
@@ -45,8 +37,36 @@ node reference
   cz_dynamic_phase
 '''
 
+qubits = [ 'q06','q07','q08','q09','q10']
+couplers = ['q12_q13']
+
+'''
+user_samplespace schema:
+user_samplespace = {
+    node1_name : {
+            "settable_of_node1_1": np.ndarray,
+            "settable_of_node1_2": np.ndarray,
+            ...
+        },
+    node2_name : {
+            "settable_of_node2_1": np.ndarray,
+            "settable_of_node2_2": np.ndarray,
+            ...
+        }
+}
+'''
+
+user_samplespace = {
+
+}
+
+'''
+The dictionary user_requested_calibration
+is what we pass to the calibration supervisor
+'''
 user_requested_calibration = {
     'target_node': 'all_XY',
     'all_qubits': qubits,
     'couplers': couplers,
+    'user_samplespace': user_samplespace
 }

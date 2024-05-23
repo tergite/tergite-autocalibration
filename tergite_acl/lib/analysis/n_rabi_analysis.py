@@ -7,17 +7,22 @@ from tergite_acl.utils.redis_helper import fetch_redis_params
 class NRabiAnalysis(BaseAnalysis):
     def  __init__(self, dataset: xr.Dataset):
         super().__init__()
-        data_var = list(dataset.data_vars.keys())[0]
-        coord = list(dataset[data_var].coords.keys())[0]
-        self.S21 = dataset[data_var].values
+        self.data_var = list(dataset.data_vars.keys())[0]
+        for coord in dataset[self.data_var].coords:
+            if 'amplitudes' in coord:
+                self.mw_amplitudes_coord = coord
+            elif 'repetitions' in coord:
+                self.X_repetitions = coord
+        self.S21 = dataset[self.data_var].values
         self.independents = dataset[coord].values
         self.fit_results = {}
-        self.qubit = dataset[data_var].attrs['qubit']
+        self.qubit = dataset[self.data_var].attrs['qubit']
         dataset[f'y{self.qubit}'].values = np.abs(self.S21)
         self.dataset = dataset
 
     def run_fitting(self):
-        mw_amplitude_key = 'mw_amplitudes_sweep' + self.qubit
+        mw_amplitude_key = self.mw_amplitudes_coord
+        # mw_amplitude_key = 'mw_amplitudes_sweep' + self.qubit
         mw_amplitudes = self.dataset[mw_amplitude_key].size
         sums = []
         for this_amplitude_index in range(mw_amplitudes):
@@ -36,4 +41,9 @@ class NRabiAnalysis(BaseAnalysis):
 
         datarray.plot(ax=axis, x=f'mw_amplitudes_sweep{qubit}',cmap='RdBu_r')
         axis.set_xlabel('mw amplitude correction')
-        axis.axvline(self.optimal_amp180-fetch_redis_params('rxy:amp180',self.qubit), c='k', lw=4,linestyle ='--')
+        axis.axvline(
+            self.optimal_amp180 - fetch_redis_params('rxy:amp180',self.qubit),
+            c='k',
+            lw=4,
+            linestyle ='--'
+        )

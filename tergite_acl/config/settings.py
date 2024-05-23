@@ -6,6 +6,7 @@ import logging
 import os
 import typing
 import warnings
+from ipaddress import ip_address
 from pathlib import Path
 
 import redis
@@ -48,6 +49,12 @@ def _from_config(key_name_: str,
 
 
 # ---
+# Section with connectivity definitions
+MSS_MACHINE_ROOT_URL = _from_config('MSS_MACHINE_ROOT_URL',
+                                    cast_=str,
+                                    default='http://localhost:8002')
+
+# ---
 # Section with directory configurations
 
 # Root directory of the project
@@ -68,7 +75,7 @@ if not os.path.exists(DATA_DIR):
 # Configuration directory to store additional configuration files
 CONFIG_DIR = _from_config('CONFIG_DIR',
                           cast_=Path,
-                          default=ROOT_DIR.joinpath('/config_dir'))
+                          default=ROOT_DIR.joinpath('/configs'))
 
 # ---
 # Section with configuration files
@@ -76,11 +83,14 @@ HARDWARE_CONFIG = CONFIG_DIR.joinpath(_from_config('HARDWARE_CONFIG',
                                                    cast_=Path))
 DEVICE_CONFIG = CONFIG_DIR.joinpath(_from_config('DEVICE_CONFIG',
                                                  cast_=Path))
+BACKEND_CONFIG = Path(__file__).parent / 'backend_config_default.toml'
 
 # ---
 # Section with other configuration variables
-CLUSTER_IP = _from_config('CLUSTER_IP',
-                          cast_=str)
+CLUSTER_IP = ip_address(_from_config('CLUSTER_IP',
+                                     cast_=str))
+CLUSTER_NAME = _from_config('CLUSTER_NAME',
+                            cast_=str)
 SPI_SERIAL_PORT = _from_config('SPI_SERIAL_PORT',
                                cast_=str)
 
@@ -91,7 +101,6 @@ REDIS_PORT = _from_config('REDIS_PORT',
                           default=6379)
 REDIS_CONNECTION = redis.Redis(decode_responses=True,
                                port=REDIS_PORT)
-
 
 # ---
 # Section for plotting

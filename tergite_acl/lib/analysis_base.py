@@ -70,7 +70,7 @@ class BaseAnalysis(abc.ABC):
         !!! It Assumes that complex_measurement_data[-2] corresponds to the |0>
                         and complex_measurement_data[-1] corresponds to the |1>
         '''
-        measurements = complex_measurement_data.values.flatten()
+        measurements = complex_measurement_data.flatten()
         data = measurements[:-2]
         calibration_0 = measurements[-2]
         calibration_1 = measurements[-1]

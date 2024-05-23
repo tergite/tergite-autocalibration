@@ -23,9 +23,10 @@ class All_XY_Node(BaseNode):
         self.all_qubits = all_qubits
         self.redis_field = ['error_syndromes']
         self.backup = False
+        # TODO properly set the dimensions
         self.schedule_samplespace = {
             'XY_index': {
-                qubit: np.array(range(1,22)) for qubit in self.all_qubits
+                qubit: np.array(range(23)) for qubit in self.all_qubits
             }
         }
 

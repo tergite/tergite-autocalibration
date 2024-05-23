@@ -11,6 +11,7 @@ from quantify_scheduler.instrument_coordinator.components.qblox import ClusterCo
 
 from tergite_acl.config import settings
 from tergite_acl.config.settings import CLUSTER_IP, REDIS_CONNECTION
+from tergite_acl.lib.node_base import BaseNode
 from tergite_acl.lib.nodes.graph import filtered_topological_order
 from tergite_acl.lib.node_factory import NodeFactory
 from tergite_acl.utils.logger.tac_logger import logger
@@ -57,7 +58,7 @@ class CalibrationSupervisor():
         Cluster.close_all()
         for cluster_name in self.available_clusters:
             if self.cluster_status == ClusterStatus.real:
-                cluster = Cluster(cluster_name, CLUSTER_IP)
+                cluster = Cluster(cluster_name, str(CLUSTER_IP))
                 logger.info('Reseting Cluster')
                 cluster.reset()
             elif self.cluster_status == ClusterStatus.dummy:
@@ -72,7 +73,7 @@ class CalibrationSupervisor():
         ###############
         print('WARNING SETTING ATTENUATION')
         for qubit in self.qubits:
-            att_in_db = 8
+            att_in_db = 2
             cluster = self.available_clusters_dict['clusterA']
             set_qubit_attenuation(cluster, qubit, att_in_db)
 
@@ -106,7 +107,7 @@ class CalibrationSupervisor():
         # TODO: the inspect node function could be part of the node
         logger.info(f'Inspecting node {node_name}')
 
-        node = self.node_factory.create_node(node_name, self.qubits, couplers=self.couplers)
+        node: BaseNode = self.node_factory.create_node(node_name, self.qubits, couplers=self.couplers)
 
         # some nodes e.g. cw spectroscopy needs access to the instruments
         node.lab_instr_coordinator = self.available_clusters_dict

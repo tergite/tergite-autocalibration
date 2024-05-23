@@ -1,6 +1,7 @@
 """
 Module containing a schedule class for DRAG pulse motzoi parameter calibration.
 """
+from __future__ import annotations
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.resources import ClockResource
 from quantify_scheduler import Schedule
@@ -19,7 +20,7 @@ class Motzoi_parameter(Measurement):
     def schedule_function(
             self,
             mw_motzois: dict[str,np.ndarray],
-            X_repetitions: int,
+            X_repetitions: int | dict[str, np.ndarray],
             repetitions: int = 1024,
         ) -> Schedule:
         """
@@ -59,7 +60,7 @@ class Motzoi_parameter(Measurement):
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
         # The outer loop, iterates over all qubits
-        for this_qubit, motzoi_parameter_values in mw_motzois.items():
+        for this_qubit, X_values in X_repetitions.items():
 
             this_transmon = self.transmons[this_qubit]
             mw_amplitude = this_transmon.rxy.amp180()
@@ -68,45 +69,49 @@ class Motzoi_parameter(Measurement):
 
             this_clock = f'{this_qubit}.01'
 
+            motzoi_parameter_values = mw_motzois[this_qubit]
             number_of_motzois = len(motzoi_parameter_values)
 
             schedule.add(
                 Reset(*qubits), ref_op=root_relaxation, ref_pt_new='end'
             ) #To enforce parallelism we refer to the root relaxation
 
+            # The intermediate loop iterates over all numbers of X pulses
+            for x_index, this_x in enumerate(X_values):
 
-            # The inner for loop iterates over all motzoi values
-            for motzoi_index, mw_motzoi in enumerate(motzoi_parameter_values):
-                # this_index = x_index*number_of_motzois + motzoi_index
-                for _ in range(X_repetitions):
+                # The inner for loop iterates over all motzoi values
+                for motzoi_index, mw_motzoi in enumerate(motzoi_parameter_values):
+                    this_index = x_index*number_of_motzois + motzoi_index
+                    for _ in range(this_x):
+                        schedule.add(
+                            DRAGPulse(
+                                duration=mw_pulse_duration,
+                                G_amp=mw_amplitude,
+                                D_amp=mw_motzoi,
+                                port=mw_pulse_port,
+                                clock=this_clock,
+
+                                phase=0,
+                            ),
+                        )
+                        # inversion pulse requires 180 deg phase
+                        schedule.add(
+                            DRAGPulse(
+                                duration=mw_pulse_duration,
+                                G_amp=mw_amplitude,
+
+                                D_amp=mw_motzoi,
+                                port=mw_pulse_port,
+                                clock=this_clock,
+                                phase=180,
+                            ),
+                        )
+
                     schedule.add(
-                        DRAGPulse(
-                            duration=mw_pulse_duration,
-                            G_amp=mw_amplitude,
-                            D_amp=mw_motzoi,
-                            port=mw_pulse_port,
-                            clock=this_clock,
-
-                            phase=0,
-                        ),
-                    )
-                    # inversion pulse requires 180 deg phase
-                    schedule.add(
-                        DRAGPulse(
-                            duration=mw_pulse_duration,
-                            G_amp=mw_amplitude,
-
-                            D_amp=mw_motzoi,
-                            port=mw_pulse_port,
-                            clock=this_clock,
-                            phase=180,
-                        ),
+                        Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
                     )
 
-                schedule.add(
-                    Measure(this_qubit, acq_index=motzoi_index, bin_mode=BinMode.AVERAGE),
-                )
+                    schedule.add(Reset(this_qubit))
 
-                schedule.add(Reset(this_qubit))
 
         return schedule

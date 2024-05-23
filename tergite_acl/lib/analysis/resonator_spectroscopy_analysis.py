@@ -62,7 +62,7 @@ class ResonatorSpectroscopyAnalysis(BaseAnalysis):
         ax.set_xlabel('Frequency (Hz)')
         ax.set_ylabel('|S21| (V)')
         self.fitting_model.plot_fit(ax, numpoints=400, xlabel=None, title=None)
-        # ax.axvline(self.minimum_freq,c='blue',ls='solid',label=f"f = {self.minimum_freq:.6E} ± {self.uncertainty:.1E} (Hz)")
+        ax.axvline(self.minimum_freq,c='blue',ls='solid',label=f"f = {self.minimum_freq:.6E} ± {self.uncertainty:.1E} (Hz)")
         ax.grid()
 
 

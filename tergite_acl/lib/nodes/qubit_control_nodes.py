@@ -80,7 +80,7 @@ class Qubit_01_Spectroscopy_Multidim_Node(BaseNode):
 
         self.schedule_samplespace = {
             'spec_pulse_amplitudes': {
-                qubit: np.linspace(5e-4, 1e-2, 3) for qubit in self.all_qubits
+                qubit: np.linspace(4e-4, 4e-3, 3) for qubit in self.all_qubits
             },
             'spec_frequencies': {
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
@@ -175,33 +175,33 @@ class Ramsey_Fringes_12_Node(BaseNode):
 
 
 class Adaptive_Motzoi_Parameter_Node(BaseNode):
-    measurement_obj = Motzoi_parameter
-    analysis_obj = AdaptiveMotzoiAnalysis
-
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['rxy:motzoi']
-        self.type = 'adaptive_sweep'
-        self.adaptive_kwargs = defaultdict(dict)
-        self.backup = False
-        self.motzoi_minima = []
-        # self.node_externals = np.arange(2, 52, 8)
-        self.external_parameter_name = 'X_repetitions'
-        self.external_parameter_value = 0
-        self.measurement_is_completed = False
-        self.node_samples = 41
-        self.analysis_kwargs = {'samples': self.node_samples}
+        pass
 
-        repeats = [2,2+6,2+4*6,2+8*6,2+12*6,2+16*6]
-        self.node_externals = np.array(repeats)
 
-        self.samplespace = {
-            'mw_motzois': {qubit: np.linspace(-0.4, 0.1, self.node_samples) for qubit in self.all_qubits},
-        }
-
-    @property
-    def dimensions(self):
-        return (len(self.samplespace['mw_motzois'][self.all_qubits[0]]), 1)
+    # measurement_obj = Motzoi_parameter
+    # analysis_obj = AdaptiveMotzoiAnalysis
+    # def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
+    #     super().__init__(name, all_qubits, **node_dictionary)
+    #     self.redis_field = ['rxy:motzoi']
+    #     self.type = 'adaptive_sweep'
+    #     self.adaptive_kwargs = defaultdict(dict)
+    #     self.backup = False
+    #     self.motzoi_minima = []
+    #     # self.node_externals = np.arange(2, 52, 8)
+    #     self.external_parameter_name = 'X_repetitions'
+    #     self.external_parameter_value = 0
+    #     self.measurement_is_completed = False
+    #     self.node_samples = 41
+    #     self.analysis_kwargs = {'samples': self.node_samples}
+    #     repeats = [2,2+6,2+4*6,2+8*6,2+12*6,2+16*6]
+    #     self.node_externals = np.array(repeats)
+    #     self.samplespace = {
+    #         'mw_motzois': {qubit: np.linspace(-0.4, 0.1, self.node_samples) for qubit in self.all_qubits},
+    #     }
+    # @property
+    # def dimensions(self):
+    #     return (len(self.samplespace['mw_motzois'][self.all_qubits[0]]), 1)
 
 
 
@@ -212,21 +212,20 @@ class Motzoi_Parameter_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ['rxy:motzoi']
-        self.type = 'adaptive_sweep'
         self.backup = False
         self.motzoi_minima = []
-        self.node_externals = np.arange(2, 22, 6)
-        self.external_parameter_name = 'X_repetitions'
-        self.external_parameter_value = 0
-        self.samplespace = {
-            'mw_motzois': {qubit: np.linspace(-0.4, 0.1, 51) for qubit in self.all_qubits},
-            # 'X_repetitions': {qubit: np.arange(2, 22, 6) for qubit in self.all_qubits}
+        self.schedule_samplespace = {
+            'mw_motzois': {
+                qubit: np.linspace(-0.4, 0.1, 51) for qubit in self.all_qubits
+            },
+            'X_repetitions': {
+                qubit: np.arange(2, 22, 6) for qubit in self.all_qubits
+            }
         }
 
-    @property
-    def dimensions(self):
-        return (len(self.samplespace['mw_motzois'][self.all_qubits[0]]), 1)
-
+    # @property
+    # def dimensions(self):
+    #     return (len(self.schedule_samplespace['mw_motzois'][self.all_qubits[0]]), 1)
 
 
 class N_Rabi_Oscillations_Node(BaseNode):
@@ -238,12 +237,12 @@ class N_Rabi_Oscillations_Node(BaseNode):
         self.redis_field = ['rxy:amp180']
         self.backup = False
 
-        self.samplespace = {
+        self.schedule_samplespace = {
             'mw_amplitudes_sweep': {
-                qubit: np.linspace(-0.01, 0.01, 21) for qubit in self.all_qubits
+                qubit: np.linspace(-0.015, 0.015, 31) for qubit in self.all_qubits
             },
             'X_repetitions': {
-                qubit: np.arange(1, 96, 16) for qubit in self.all_qubits
+                qubit: np.arange(1, 49, 12) for qubit in self.all_qubits
             }
         }
 
