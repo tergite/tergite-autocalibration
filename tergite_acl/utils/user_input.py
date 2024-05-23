@@ -37,29 +37,55 @@ node reference
   cz_dynamic_phase
 '''
 
-qubits = [ 'q06','q07','q08','q09','q10']
-couplers = ['q12_q13']
+import numpy as np
+
+from tergite_acl.config.VNA_values import VNA_resonator_frequencies, VNA_f12_frequencies, VNA_qubit_frequencies
+def resonator_samples(qubit: str) -> np.ndarray:
+    res_spec_samples = 101
+    sweep_range = 4.0e6
+    VNA_frequency = VNA_resonator_frequencies[qubit]
+    min_freq = VNA_frequency - sweep_range / 2 - 0.5e6
+    max_freq = VNA_frequency + sweep_range / 2
+    return np.linspace(min_freq, max_freq, res_spec_samples)
+
+def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
+    qub_spec_samples = 151
+    sweep_range =  8.0e6
+    if transition == '01':
+        VNA_frequency = VNA_qubit_frequencies[qubit]
+    elif transition == '12':
+        VNA_frequency = VNA_f12_frequencies[qubit]
+    min_freq = VNA_frequency - sweep_range / 2
+    max_freq = VNA_frequency + sweep_range / 2
+    return np.linspace(min_freq, max_freq, qub_spec_samples)
+
+
 
 '''
 user_samplespace schema:
 user_samplespace = {
     node1_name : {
-            "settable_of_node1_1": np.ndarray,
-            "settable_of_node1_2": np.ndarray,
+            "settable_of_node1_1": { 'q1': np.ndarray, 'q2': np.ndarray },
+            "settable_of_node1_2": { 'q1': np.ndarray, 'q2': np.ndarray },
             ...
         },
     node2_name : {
-            "settable_of_node2_1": np.ndarray,
-            "settable_of_node2_2": np.ndarray,
+            "settable_of_node2_1": { 'q1': np.ndarray, 'q2': np.ndarray },
+            "settable_of_node2_2": { 'q1': np.ndarray, 'q2': np.ndarray },
             ...
         }
 }
 '''
 
+qubits = [ 'q06','q07','q08','q09','q10']
+couplers = ['q12_q13']
 user_samplespace = {
-
+    'resonator_spectroscopy': {
+        'ro_frequencies': {
+            qubit: resonator_samples(qubit) + 5e9 for qubit in qubits
+        }
+    }
 }
-
 '''
 The dictionary user_requested_calibration
 is what we pass to the calibration supervisor

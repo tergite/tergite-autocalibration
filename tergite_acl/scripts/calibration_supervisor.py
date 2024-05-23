@@ -29,6 +29,16 @@ from tergite_acl.utils.dummy_setup import dummy_setup
 
 colorama_init()
 
+def update_to_user_samplespace(node: BaseNode, user_samplespace: dict):
+    node_user_samplespace = user_samplespace[node.name]
+    for settable, element_samplespace in node_user_samplespace.items():
+        if settable in node.schedule_samplespace:
+            node.schedule_samplespace[settable] = element_samplespace 
+        elif settable in node.external_samplespace:
+            node.external_samplespace[settable] = element_samplespace 
+        else:
+            raise KeyError(f'{settable} not in any samplespace')
+    return
 
 class CalibrationSupervisor():
     def __init__(self, cluster_status) -> None:
@@ -38,6 +48,7 @@ class CalibrationSupervisor():
         self.qubits = user_requested_calibration['all_qubits']
         self.couplers = user_requested_calibration['couplers']
         self.target_node = user_requested_calibration['target_node']
+        self.user_samplespace = user_requested_calibration['user_samplespace']
         # Settings
         self.transmon_configuration = toml.load(settings.DEVICE_CONFIG)
         # TODO: how is the dummy cluster initalized?
@@ -107,7 +118,12 @@ class CalibrationSupervisor():
         # TODO: the inspect node function could be part of the node
         logger.info(f'Inspecting node {node_name}')
 
-        node: BaseNode = self.node_factory.create_node(node_name, self.qubits, couplers=self.couplers)
+        node: BaseNode = self.node_factory.create_node(
+            node_name, self.qubits, couplers=self.couplers
+        )
+
+        if node.name in self.user_samplespace:
+            update_to_user_samplespace(node, self.user_samplespace)
 
         # some nodes e.g. cw spectroscopy needs access to the instruments
         node.lab_instr_coordinator = self.available_clusters_dict

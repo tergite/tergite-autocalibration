@@ -139,30 +139,6 @@ def precompile(node: BaseNode, bin_mode:str=None, repetitions:int=None):
 
     schedule_function = node_class.schedule_function
 
-    if repetitions is not None:
-        static_parameters["repetitions"] = repetitions
-    else:
-        repetitions = 2**10
-    node.demod_channels.set_repetitions(repetitions)
-
-    # for key, value in node.node_dictionary.items():
-    #     if key in static_parameters:
-    #         if not np.iterable(value):
-    #             value = {q: value for q in qubits}
-    #         static_parameters[key] = value
-    #     elif key in samplespace:
-    #         if not isinstance(value, dict):
-    #             value = {q: value for q in qubits}
-    #         samplespace[key] = value
-    #     elif key != "couplers":
-    #         static_parameters[key] = value
-    #         # print(f"{key} isn't one of the static parameters of {node_class}. \n We will ignore this parameter.")
-
-    # if node.type == 'parameterized_sweep' or node.type == 'adaptive_sweep':
-    #     external_parameters = {node.external_parameter_name: node.external_parameter_value}
-    # else:
-    #     external_parameters = {}
-
     compiler = SerialCompiler(name=f'{node.name}_compiler')
 
     schedule_samplespace = node.schedule_samplespace
@@ -184,16 +160,6 @@ def precompile(node: BaseNode, bin_mode:str=None, repetitions:int=None):
     logger.info('Starting Compiling')
 
     compiled_schedule = compiler.compile(schedule=schedule, config=compilation_config)
-
-    # if node.name not in ['ro_amplitude_optimization_gef','cz_calibration_ssro']:
-    #     try:
-    #         figs = compiled_schedule.plot_pulse_diagram(plot_backend="plotly")
-    #         figs.write_image(f'pulse_diagrams\{node.name}.png')
-    #     except:
-    #         pass
-    # breakpoint()
-    # figs[0].savefig('ssro')
-    # breakpoint()
 
     #TODO
     # ic.retrieve_hardware_logs
