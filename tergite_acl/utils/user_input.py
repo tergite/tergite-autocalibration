@@ -1,10 +1,11 @@
 # qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
 # qubits = [ 'q16','q18','q19','q20','q21','q22','q23','q24','q25']
-qubits = ['q19','q20']
+# qubits = ['q18','q19']
+qubits = ['q22','q23','q24']
 # couplers = ['q12_q13','q13_q14' ]
-#couplers = ['q16_q21']
-couplers = ['q19_q20']
-# couplers = ['q19_q24']
+couplers = ['q23_q24']
+# couplers = ['q19_q20']
+# couplers = ['q18_q19']
 
 attenuation_setting = {'qubit':12, 'coupler':30, 'readout':12}
 
@@ -38,6 +39,7 @@ node reference
   randomized_benchmarking
   check_cliffords
   cz_chevron
+  cz_chevron_amplitude
   cz_optimize_chevron
   reset_chevron
   cz_calibration
@@ -49,7 +51,7 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'tqg_randomized_benchmarking_interleaved',
+    'target_node': 'T2_echo',
     'all_qubits': qubits,
     'couplers': couplers,
 }

@@ -127,16 +127,20 @@ def load_redis_config_coupler(coupler: CompositeSquareEdge):
     bus = coupler.name
     bus_qubits = bus.split('_')
     redis_config = REDIS_CONNECTION.hgetall(f"couplers:{bus}")
-    coupler.clock_freqs.cz_freq(float(redis_config['cz_pulse_frequency']))
-    coupler.cz.square_amp(float(redis_config['cz_pulse_amplitude']))
-    coupler.cz.square_duration(float(redis_config['cz_pulse_duration']))
-    coupler.cz.cz_width(float(redis_config['cz_pulse_width']))
-    if qubit_types[bus_qubits[0]] == 'Target':
-        coupler.cz.parent_phase_correction(float(redis_config['cz_dynamic_target']))
-        coupler.cz.child_phase_correction(float(redis_config['cz_dynamic_control']))
-    else:
-        coupler.cz.parent_phase_correction(float(redis_config['cz_dynamic_control']))
-        coupler.cz.child_phase_correction(float(redis_config['cz_dynamic_target']))
+    try:
+        coupler.clock_freqs.cz_freq(float(redis_config['cz_pulse_frequency']))
+        coupler.cz.square_amp(float(redis_config['cz_pulse_amplitude']))
+        coupler.cz.square_duration(float(redis_config['cz_pulse_duration']))
+        coupler.cz.cz_width(float(redis_config['cz_pulse_width']))
+        if qubit_types[bus_qubits[0]] == 'Target':
+            coupler.cz.parent_phase_correction(float(redis_config['cz_dynamic_target']))
+            coupler.cz.child_phase_correction(float(redis_config['cz_dynamic_control']))
+        else:
+            coupler.cz.parent_phase_correction(float(redis_config['cz_dynamic_control']))
+            coupler.cz.child_phase_correction(float(redis_config['cz_dynamic_target']))
+    except:
+        print(f"No coupler configuration found for {bus}")
+        pass
     return
 
 

@@ -49,11 +49,14 @@ punchout.measure.pulse_amp = nan
 reset_chevron.reset_amplitude_qc = nan
 reset_chevron.reset_duration_qc = nan
 
+
 [qoi.couplers]
 coupler_spectroscopy.parking_current = nan
 coupler_resonator_spectroscopy.resonator_vs_flux= nan
 cz_chevron.cz_pulse_frequency = nan
 cz_chevron.cz_pulse_duration = nan
+cz_chevron_amplitude.cz_pulse_frequency = nan
+cz_chevron_amplitude.cz_pulse_amplitude = nan
 cz_optimize_chevron.cz_pulse_frequency = nan
 cz_optimize_chevron.cz_pulse_duration = nan
 cz_optimize_chevron.parking_current = nan
@@ -115,7 +118,7 @@ q19.measure.pulse_amp = 64e-3
 q20.measure.pulse_amp = 64e-3
 q21.measure.pulse_amp = 64e-3
 q22.measure.pulse_amp = 32e-3
-q23.measure.pulse_amp = 64e-3
+q23.measure.pulse_amp = 32e-3
 q24.measure.pulse_amp = 64e-3
 q25.measure.pulse_amp = 64e-3
 
