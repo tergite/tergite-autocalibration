@@ -2,29 +2,27 @@
 Given the requested node
 fetch and compile the appropriate schedule
 '''
-
+from pathlib import Path
+from pydantic_core.core_schema import decimal_schema
 from quantify_scheduler.json_utils import SchedulerJSONDecoder, SchedulerJSONEncoder
 from tergite_acl.lib.node_base import BaseNode
 from tergite_acl.utils import extended_transmon_element
 from tergite_acl.utils.logger.tac_logger import logger
-from math import isnan
 from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
 import redis
 import json
-import numpy as np
 from tergite_acl.utils.extended_transmon_element import ExtendedTransmon
 from tergite_acl.utils.extended_coupler_edge import CompositeSquareEdge
 from quantify_scheduler.backends import SerialCompiler
 from tergite_acl.config.settings import HARDWARE_CONFIG, REDIS_CONNECTION
 from quantify_core.data.handling import set_datadir
 
-set_datadir('.')
+# set_datadir('.')
 
 with open(HARDWARE_CONFIG) as hw:
     hw_config = json.load(hw)
 
 redis_connection = redis.Redis(decode_responses=True)
-
 
 def load_redis_config(transmon: ExtendedTransmon, channel:int):
     qubit = transmon.name
@@ -79,7 +77,7 @@ def load_redis_config_coupler(coupler: CompositeSquareEdge):
     coupler.cz.cz_width(float(redis_config['cz_pulse_width']))
     return
 
-def precompile(node: BaseNode, bin_mode:str=None, repetitions:int=None):
+def precompile(node: BaseNode, data_path: Path, bin_mode:str=None, repetitions:int=None):
     if node.name == 'tof':
         return None, 1
     samplespace = node.samplespace
@@ -143,11 +141,28 @@ def precompile(node: BaseNode, bin_mode:str=None, repetitions:int=None):
 
     schedule_samplespace = node.schedule_samplespace
     external_samplespace = node.external_samplespace
+    schedule_keywords = node.schedule_keywords
 
     samplespace = schedule_samplespace | external_samplespace
 
-    schedule = schedule_function( **samplespace )
+    schedule = schedule_function( **samplespace, **schedule_keywords )
     compilation_config = device.generate_compilation_config()
+
+    # save_serial_device(device, data_path)
+
+    # create a transmon with the same name but with updated config
+    # get the transmon template in dictionary form
+    serialized_device = json.dumps(device, cls=SchedulerJSONEncoder)
+    decoded_device = json.loads(serialized_device)
+    serial_device = {}
+    for element, element_config in decoded_device['data']['elements'].items():
+        serial_config = json.loads(element_config)
+        serial_device[element] = serial_config
+
+    data_path.mkdir(parents=True, exist_ok=True)
+    with open(f'{data_path}/{node.name}.json', 'w') as f:
+        json.dump(serial_device, f, indent=4)
+
     device.close()
 
     # after the compilation_config is acquired, free the transmon resources

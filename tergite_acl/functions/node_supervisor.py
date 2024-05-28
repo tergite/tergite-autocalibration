@@ -1,8 +1,9 @@
 from logging import raiseExceptions
+from pathlib import Path
 import xarray
 from tergite_acl.lib.node_base import BaseNode
 from tergite_acl.utils.dataset_utils import retrieve_dummy_dataset
-from tergite_acl.utils.status import ClusterStatus
+from tergite_acl.utils.status import MeasurementMode
 from tergite_acl.functions.compilation_worker import precompile
 from tergite_acl.functions.execution_worker import measure_node
 from tergite_acl.functions.post_processing_worker import post_process
@@ -27,9 +28,9 @@ parameterized_sweep:
     For every external parameter value, the schedule is recompiled.
 '''
 
-def monitor_node_calibration(node: BaseNode, data_path, lab_ic, cluster_status):
+def monitor_node_calibration(node: BaseNode, data_path: Path, lab_ic, cluster_status):
     if node.type == 'simple_sweep':
-        compiled_schedule = precompile(node)
+        compiled_schedule = precompile(node, data_path)
 
         if node.external_samplespace == {}:
             '''

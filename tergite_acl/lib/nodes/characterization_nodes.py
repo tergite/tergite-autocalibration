@@ -41,9 +41,8 @@ class T1_Node(BaseNode):
         self.redis_field = ['t1_time']
         self.backup = False
 
-        self.type = 'simple_sweep'
+        self.schedule_keywords = {'multiplexing': 'one_by_one'}
 
-        self.external_parameter_value = 0 # TODO is this needed?
         self.number_or_repeated_T1 = 3
 
         self.sleep_time = 3

@@ -48,7 +48,7 @@ class Qubit_01_Spectroscopy_CW_Node(BaseNode):
         super().__init__(name, all_qubits, **node_dictionary)
         self.sweep_range = self.node_dictionary.pop("sweep_range", None)
         self.redis_field = ['clock_freqs:f01']
-        self.all_qubits = all_qubits
+        # self.all_qubits = all_qubits #BaseNode attr, delete here
 
         self.operations_args = []
 
@@ -239,10 +239,10 @@ class N_Rabi_Oscillations_Node(BaseNode):
 
         self.schedule_samplespace = {
             'mw_amplitudes_sweep': {
-                qubit: np.linspace(-0.015, 0.015, 31) for qubit in self.all_qubits
+                qubit: np.linspace(-0.020, 0.020, 51) for qubit in self.all_qubits
             },
             'X_repetitions': {
-                qubit: np.arange(1, 49, 12) for qubit in self.all_qubits
+                qubit: np.arange(1, 29, 4) for qubit in self.all_qubits
             }
         }
 

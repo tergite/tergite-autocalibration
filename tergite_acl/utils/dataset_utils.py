@@ -149,7 +149,7 @@ def handle_ro_freq_optimization(complex_dataset: xarray.Dataset, states: list[in
     return new_ds
 
 
-def create_node_data_path(node):
+def create_node_data_path(node) -> pathlib.Path:
     measurement_date = datetime.now()
     measurements_today = measurement_date.date().strftime('%Y%m%d')
     time_id = measurement_date.strftime('%Y%m%d-%H%M%S-%f')[:19]

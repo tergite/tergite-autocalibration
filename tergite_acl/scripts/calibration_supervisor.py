@@ -15,7 +15,7 @@ from tergite_acl.lib.node_base import BaseNode
 from tergite_acl.lib.nodes.graph import filtered_topological_order
 from tergite_acl.lib.node_factory import NodeFactory
 from tergite_acl.utils.logger.tac_logger import logger
-from tergite_acl.utils.status import ClusterStatus
+from tergite_acl.utils.status import MeasurementMode
 from tergite_acl.utils.status import DataStatus
 from tergite_acl.utils.user_input import user_requested_calibration
 from tergite_acl.utils.visuals import draw_arrow_chart
@@ -33,15 +33,15 @@ def update_to_user_samplespace(node: BaseNode, user_samplespace: dict):
     node_user_samplespace = user_samplespace[node.name]
     for settable, element_samplespace in node_user_samplespace.items():
         if settable in node.schedule_samplespace:
-            node.schedule_samplespace[settable] = element_samplespace 
+            node.schedule_samplespace[settable] = element_samplespace
         elif settable in node.external_samplespace:
-            node.external_samplespace[settable] = element_samplespace 
+            node.external_samplespace[settable] = element_samplespace
         else:
             raise KeyError(f'{settable} not in any samplespace')
     return
 
 class CalibrationSupervisor():
-    def __init__(self, cluster_status) -> None:
+    def __init__(self, measurement_mode) -> None:
         # Initialize the node factory
         self.node_factory = NodeFactory()
         # TODO: user configuration could be a toml file
@@ -52,7 +52,7 @@ class CalibrationSupervisor():
         # Settings
         self.transmon_configuration = toml.load(settings.DEVICE_CONFIG)
         # TODO: how is the dummy cluster initalized?
-        self.cluster_status = cluster_status
+        self.measurement_mode = measurement_mode
         self.topo_order = filtered_topological_order(self.target_node)
         self.available_clusters = ['clusterA']
         # TODO: maybe it makes sense to move that part to some hardware utils
@@ -68,11 +68,11 @@ class CalibrationSupervisor():
     def create_lab_ic(self):
         Cluster.close_all()
         for cluster_name in self.available_clusters:
-            if self.cluster_status == ClusterStatus.real:
+            if self.measurement_mode == MeasurementMode.real:
                 cluster = Cluster(cluster_name, str(CLUSTER_IP))
                 logger.info('Reseting Cluster')
                 cluster.reset()
-            elif self.cluster_status == ClusterStatus.dummy:
+            elif self.measurement_mode == MeasurementMode.dummy:
                 cluster = Cluster(cluster_name, dummy_cfg=dummy_setup)
             else:
                 raise ValueError('Undefined Cluster Status')
@@ -84,7 +84,7 @@ class CalibrationSupervisor():
         ###############
         print('WARNING SETTING ATTENUATION')
         for qubit in self.qubits:
-            att_in_db = 2
+            att_in_db = 8
             cluster = self.available_clusters_dict['clusterA']
             set_qubit_attenuation(cluster, qubit, att_in_db)
 
@@ -204,7 +204,7 @@ class CalibrationSupervisor():
         # TODO: This should be in the node initializer
         data_path = create_node_data_path(node)
         # TODO: This should be the refactored such that the node can be run like node.calibrate()
-        monitor_node_calibration(node, data_path, self.lab_ic, self.cluster_status)
+        monitor_node_calibration(node, data_path, self.lab_ic, self.measurement_mode)
 
         return
 
@@ -214,14 +214,14 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(prog='Tergite Automatic Calibration',)
     parser.add_argument(
-        '--d', dest='cluster_status',
+        '--d', dest='measurement_mode',
         action='store_const',
-        const=ClusterStatus.dummy, default=ClusterStatus.real
+        const=MeasurementMode.dummy, default=MeasurementMode.real
     )
     args = parser.parse_args()
 
 
-    supervisor = CalibrationSupervisor(args.cluster_status)
+    supervisor = CalibrationSupervisor(args.measurement_mode)
     supervisor.calibrate_system()
 
     # if target_node == 'cz_chevron':

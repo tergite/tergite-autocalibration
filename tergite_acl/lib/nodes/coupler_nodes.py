@@ -11,16 +11,28 @@ from tergite_acl.lib.calibration_schedules.resonator_spectroscopy import Resonat
 from tergite_acl.lib.calibration_schedules.two_tone_multidim import Two_Tones_Multidim
 
 
-class Coupler_Spectroscopy_Node:
+class Coupler_Spectroscopy_Node(BaseNode):
     measurement_obj = Two_Tones_Multidim
     analysis_obj = CouplerSpectroscopyAnalysis
-    def __init__(self, name: str, all_qubits: list[str], **kwargs):
-        self.name = name
-        self.all_qubits = all_qubits
-        self.couplers = kwargs['couplers']
+
+    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
+        # self.name = name
+        # self.all_qubits = all_qubits # this is a Base attr, delete it here
+        self.couplers = node_dictionary['couplers']
         self.redis_field = ['parking_current']
         self.qubit_state = 0
         self.coupled_qubits = self.get_coupled_qubits()
+
+        self.schedule_samplespace = {
+            'spec_frequencies': {
+                qubit: qubit_samples(qubit) for qubit in self.all_qubits
+            }
+        }
+
+        self.external_samplespace = {
+            'dc_currents': {self.couplers[0]: np.arange(-2.5e-3, 2.5e-3, 250e-6)},
+        }
         # self.validate()
 
     def get_coupled_qubits(self) -> list:
@@ -30,21 +42,6 @@ class Coupler_Spectroscopy_Node:
         self.coupler = self.couplers[0]
         return coupled_qubits
 
-    @property
-    def samplespace(self):
-        qubit = self.coupled_qubits[self.measure_qubit_index]
-        self.measurement_qubit = qubit
-        cluster_samplespace = {
-            'spec_frequencies': {qubit: qubit_samples(qubit, sweep_range=self.sweep_range)}
-        }
-        return cluster_samplespace
-
-    @property
-    def spi_samplespace(self):
-        spi_samplespace = {
-            'dc_currents': {self.couplers[0]: np.arange(-2.5e-3, 2.5e-3, 250e-6)},
-        }
-        return spi_samplespace
 
 
 class Coupler_Resonator_Spectroscopy_Node(BaseNode):

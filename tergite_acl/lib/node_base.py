@@ -16,6 +16,7 @@ class BaseNode:
 
         self.schedule_samplespace = {}
         self.external_samplespace = {}
+        self.schedule_keywords = {}
         self.reduced_external_samplespace = {}
 
         self.samplespace = self.schedule_samplespace | self.external_samplespace

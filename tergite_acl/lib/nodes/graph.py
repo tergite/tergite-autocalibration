@@ -21,7 +21,7 @@ graph_dependencies = [
     ('rabi_oscillations', 'ramsey_correction'),
     ('rabi_oscillations', 'T1'),
     ('ramsey_correction', 'motzoi_parameter'),
-    ('ramsey_correction', 'all_XY'),
+    # ('ramsey_correction', 'all_XY'),
     # ('rabi_oscillations', 'adaptive_ramsey_correction'),
     ('adaptive_ramsey_correction', 'adaptive_motzoi_parameter'),
 

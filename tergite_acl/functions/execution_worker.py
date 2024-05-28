@@ -12,7 +12,7 @@ from quantify_scheduler.json_utils import pathlib
 
 from tergite_acl.utils.dataset_utils import configure_dataset, handle_ro_freq_optimization, retrieve_dummy_dataset, save_dataset
 from tergite_acl.utils.logger.tac_logger import logger
-from tergite_acl.utils.status import ClusterStatus
+from tergite_acl.utils.status import MeasurementMode
 
 colorama_init()
 
@@ -40,7 +40,7 @@ def measure_node(
     raw_dataset = execute_schedule(compiled_schedule, lab_ic, schedule_duration, cluster_status)
 
 
-    if cluster_status == ClusterStatus.real:
+    if cluster_status == MeasurementMode.real:
         result_dataset = configure_dataset(raw_dataset, node)
         save_dataset(result_dataset, node, data_path)
     else:
@@ -71,9 +71,9 @@ def execute_schedule(
 
     def display_progress():
         steps = int(schedule_duration * 5)
-        if cluster_status == ClusterStatus.dummy:
+        if cluster_status == MeasurementMode.dummy:
             progress_sleep = 0.004
-        elif cluster_status == ClusterStatus.real:
+        elif cluster_status == MeasurementMode.real:
             progress_sleep = 0.2
         for _ in tqdm.tqdm(range(steps), desc=compiled_schedule.name, colour='blue'):
             time.sleep(progress_sleep)

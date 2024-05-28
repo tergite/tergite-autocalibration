@@ -9,6 +9,6 @@ class DataStatus(Enum):
     undefined = 4
 
 # Used to distinguish running on dummy or real clusters
-class ClusterStatus(Enum):
+class MeasurementMode(Enum):
     dummy = 1
     real = 2

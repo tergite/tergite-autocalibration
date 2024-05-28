@@ -39,7 +39,12 @@ node reference
 
 import numpy as np
 
-from tergite_acl.config.VNA_values import VNA_resonator_frequencies, VNA_f12_frequencies, VNA_qubit_frequencies
+from tergite_acl.config.VNA_values import (
+    VNA_f12_frequencies,
+    VNA_qubit_frequencies,
+    VNA_resonator_frequencies,
+)
+
 def resonator_samples(qubit: str) -> np.ndarray:
     res_spec_samples = 101
     sweep_range = 4.0e6
@@ -60,7 +65,6 @@ def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
     return np.linspace(min_freq, max_freq, qub_spec_samples)
 
 
-
 '''
 user_samplespace schema:
 user_samplespace = {
@@ -76,22 +80,25 @@ user_samplespace = {
         }
 }
 '''
-
+####################################################################
+target_node = 'T1'
 qubits = [ 'q06','q07','q08','q09','q10']
-couplers = ['q12_q13']
+couplers = ['q06_q07']
 user_samplespace = {
     'resonator_spectroscopy': {
         'ro_frequencies': {
-            qubit: resonator_samples(qubit) + 5e9 for qubit in qubits
+            qubit: resonator_samples(qubit) for qubit in qubits
         }
     }
 }
+####################################################################
+
 '''
 The dictionary user_requested_calibration
 is what we pass to the calibration supervisor
 '''
 user_requested_calibration = {
-    'target_node': 'all_XY',
+    'target_node': target_node,
     'all_qubits': qubits,
     'couplers': couplers,
     'user_samplespace': user_samplespace

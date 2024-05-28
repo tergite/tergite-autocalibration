@@ -8,6 +8,8 @@ from qcodes import validators
 
 from tergite_acl.config.coupler_config import coupler_spi_map
 from tergite_acl.config.settings import REDIS_CONNECTION, HARDWARE_CONFIG
+from tergite_acl.functions.execution_worker import measure_node
+from tergite_acl.utils.status import MeasurementMode
 
 
 def extract_cluster_port_mapping(qubit: str) -> Dict[str, str]:
@@ -94,10 +96,12 @@ def find_serial_port():
 
 
 class SpiDAC():
-    def __init__(self) -> None:
+    def __init__(self, measurement_mode: MeasurementMode) -> None:
         port = find_serial_port()
+        is_dummy = measurement_mode == MeasurementMode.dummy
+        breakpoint()
         if port is not None:
-            self.spi = SpiRack('loki_rack', port)
+            self.spi = SpiRack('loki_rack', port, is_dummy=is_dummy)
 
     def create_spi_dac(self, coupler: str):
 
