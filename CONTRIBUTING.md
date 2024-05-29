@@ -70,13 +70,13 @@ contributor license agreement (CLA). By signing a CLA, you're attesting
 that you are the author of the contribution, and that you're freely
 contributing it under the terms of the Apache-2.0 license.
 
-"The [individual CLA](https://tergite.github.io/contributing/icla.pdf) document is available for review as a PDF.
+The [individual CLA](https://tergite.github.io/contributing/icla.pdf) document is available for review as a PDF.
 
 Please note that if your contribution is part of your employment or 
 your contribution is the property of your employer, 
 you will also most likely need to sign a [corporate CLA](https://tergite.github.io/contributing/ccla.pdf).
 
-All signed CLAs are emails to us at <quantum.nextlabs@chalmers.se>."
+All signed CLAs are emails to us at <quantum.nextlabs@chalmers.se>.
 
 ## How to Use
 
