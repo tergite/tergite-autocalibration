@@ -1,27 +1,30 @@
-# Contributing to tergite-calibration
+# Contributing to tergite-autocalibration
 
 **This project is currently not accepting pull requests from the general public yet.**
 
 **It is currently being developed by the core developers only.**
 
-We love your input! We want to make contributing to this project as easy and transparent as possible, whether it's:
+## Government Model
 
--   Reporting a bug
--   Discussing the current state of the code
--   Submitting a fix
--   Proposing new features
--   Becoming a maintainer
+[Chalmers Next Labs AB (CNL)](https://chalmersnextlabs.se) manages and maintains this project on behalf of all contributors.
+
+## Version Control
+
+Tergite is developed on a separate version control system and mirrored on Github.
+If you are reading this on GitHub, then you are looking at a mirror. 
 
 ## Versioning
 
 When versioning we follow the format `{year}.{month}.{patch_number}` e.g. `2023.12.0`.
 
-## We Develop with Github
+## Contacting the Tergite Developers
 
-We use Github to host code, to track issues and feature requests, as well as accept pull requests.
+Since the Github repositories are only mirrors, no Github pull requests or Github issue/bug reports 
+are looked at. Please get in touch via email <quantum.nextlabs@chalmers.se> instead. 
 
-But We Use [Github Flow](https://docs.github.com/en/get-started/quickstart/github-flow),
-So All Code Changes Happen Through Pull Requests
+Take note that the maintainers may not answer every email.
+
+## But We Use [Github Flow](https://docs.github.com/en/get-started/quickstart/github-flow), So All Code Changes Happen Through Pull Requests
 
 Pull requests are the best way to propose changes to the codebase (we
 use [Github Flow](https://docs.github.com/en/get-started/quickstart/github-flow)). We actively welcome your pull
@@ -38,11 +41,6 @@ requests:
 
 In short, when you submit code changes, your submissions are understood to be under the
 same [Apache 2.0 License](./LICENSE.txt) that covers the project. Feel free to contact the maintainers if that's a concern.
-
-## Report bugs using Github's [issues](https://github.com/tergite/tergite-calibration/issues)
-
-We use Github issues to track bugs. Report a bug
-by [opening a new issue](https://github.com/tergite/tergite-calibration/issues); it's that easy!
 
 ## Write bug reports with detail, background, and sample code
 
@@ -65,14 +63,29 @@ People _love_ thorough bug reports. I'm not even kidding.
 
 By contributing, you agree that your contributions will be licensed under its Apache 2.0 License.
 
+## Contributor Licensing Agreement
+
+Before you can submit any code, all contributors must sign a
+contributor license agreement (CLA). By signing a CLA, you're attesting
+that you are the author of the contribution, and that you're freely
+contributing it under the terms of the Apache-2.0 license.
+
+"The [individual CLA](https://tergite.github.io/contributing/icla.pdf) document is available for review as a PDF.
+
+Please note that if your contribution is part of your employment or 
+your contribution is the property of your employer, 
+you will also most likely need to sign a [corporate CLA](https://tergite.github.io/contributing/ccla.pdf).
+
+All signed CLAs are emails to us at <quantum.nextlabs@chalmers.se>."
+
 ## How to Use
 
 -   Make sure you have [conda](https://docs.anaconda.com/free/miniconda/index.html) installed.
 -   Clone the repo and enter its root folder
 
 ```shell
-git clone git@github.com:tergite/tergite-calibration.git
-cd tergite-calibration
+git clone git@github.com:tergite/tergite-autocalibration.git
+cd tergite-autocalibration
 ```
 
 - Create the conda environment
@@ -96,15 +109,15 @@ acli --help
 
 ## Configuration
 
-A number of configurations can be added to the tergite-calibration.
+A number of configurations can be added to the tergite-autocalibration.
 These include:
 
-### - [`tergite_calibration/utils/user_input.py`](tergite_calibration/utils/user_input.py)
+### - [`tergite_autocalibration/utils/user_input.py`](tergite_autocalibration/utils/user_input.py)
 
 The sample-space for each node. 
 The target node is also declared here.
 
-### - [`tergite_calibration/config/device_config.toml`](tergite_calibration/config/device_config.toml)
+### - [`tergite_autocalibration/config/device_config.toml`](tergite_autocalibration/config/device_config.toml)
 
 A collection of reasonable initial values for the given device
 
