@@ -1,15 +1,18 @@
 [tool.poetry]
-name = "tergite-acl"
-version = "2024.02.0"
-description = "commandline application to calibrate QAL 9000-Like quantum computers automatically"
+name = "tergite-calibration"
+version = "2024.04.1"
+description = "commandline application to calibrate the Swedish quantum computer quantum computers automatically"
 authors = [
     "Eleftherios Moschandreou <elemos@chalmers.se>",
     "Liangyu Chen <liangyuc@chalmers.se>",
     "Tong Liu <liuto@chalmers.se>",
     "Stefan Hill <stefanhi@chalmers.se>"
 ]
+maintainers = [
+    "Chalmers Next Labs AB <quantum.nextlabs@chalmers.se>",
+]
 readme = "README.md"
-packages = [{include = "tergite_acl"}]
+packages = [{include = "tergite_calibration"}]
 
 [tool.poetry.dependencies]
 python = ">= 3.9, < 3.10"
@@ -44,7 +47,7 @@ pytest = "^7.4.2"
 requests-mock = "^1.11.0"
 
 [tool.poetry.scripts]
-acli = "tergite_acl.tools.cli:cli"
+acli = "tergite_calibration.tools.cli:cli"
 
 [build-system]
 requires = ["poetry-core"]

@@ -83,12 +83,12 @@ __pycache__/
 
 # configs
 configs/
-tergite_acl/config/**
-!tergite_acl/config/__init__.py
-!tergite_acl/config/settings.py
+tergite_calibration/config/**
+!tergite_calibration/config/__init__.py
+!tergite_calibration/config/settings.py
 
 # dev-generated artefacts
-tergite_acl/utils/**.csv
+tergite_calibration/utils/**.csv
 
 # internal
 external/
