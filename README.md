@@ -1,6 +1,6 @@
-# tergite-acl
+# tergite-calibration
 
-![CI](https://github.com/tergite/tergite-acl/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/tergite/tergite-calibration/actions/workflows/ci.yml/badge.svg)
 
 A commandline application to calibrate QAL 9000-Like quantum computers automatically
 
@@ -28,7 +28,7 @@ redis-server
 - Clone the repo
 
 ```shell
-git clone git@github.com:tergite/tergite-acl.git
+git clone git@github.com:tergite/tergite-calibration.git
 ```
 
 - Create conda environment
@@ -41,7 +41,7 @@ conda activate tac
 - Install the application
 
 ```shell
-cd tergite-acl
+cd tergite-calibration
 pip install -e .
 ```
 
@@ -72,7 +72,7 @@ If you would like to contribute to tergite-webgui, please have a look at our
 ## Authors
 
 This project is a work of
-[many contributors](https://github.com/tergite/tergite-acl/graphs/contributors).
+[many contributors](https://github.com/tergite/tergite-calibration/graphs/contributors).
 
 Special credit goes to the authors of this project as seen in the [CREDITS](./CREDITS.md) file.
 

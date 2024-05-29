@@ -1,4 +1,4 @@
-# Contributing to tergite-acl
+# Contributing to tergite-calibration
 
 **This project is currently not accepting pull requests from the general public yet.**
 
@@ -39,10 +39,10 @@ requests:
 In short, when you submit code changes, your submissions are understood to be under the
 same [Apache 2.0 License](./LICENSE.txt) that covers the project. Feel free to contact the maintainers if that's a concern.
 
-## Report bugs using Github's [issues](https://github.com/tergite/tergite-acl/issues)
+## Report bugs using Github's [issues](https://github.com/tergite/tergite-calibration/issues)
 
 We use Github issues to track bugs. Report a bug
-by [opening a new issue](https://github.com/tergite/tergite-acl/issues); it's that easy!
+by [opening a new issue](https://github.com/tergite/tergite-calibration/issues); it's that easy!
 
 ## Write bug reports with detail, background, and sample code
 
@@ -71,8 +71,8 @@ By contributing, you agree that your contributions will be licensed under its Ap
 -   Clone the repo and enter its root folder
 
 ```shell
-git clone git@github.com:tergite/tergite-acl.git
-cd tergite-acl
+git clone git@github.com:tergite/tergite-calibration.git
+cd tergite-calibration
 ```
 
 - Create the conda environment
@@ -96,15 +96,15 @@ acli --help
 
 ## Configuration
 
-A number of configurations can be added to the tergite-acl.
+A number of configurations can be added to the tergite-calibration.
 These include:
 
-### - [`tergite_acl/utils/user_input.py`](tergite_acl/utils/user_input.py)
+### - [`tergite_calibration/utils/user_input.py`](tergite_calibration/utils/user_input.py)
 
 The sample-space for each node. 
 The target node is also declared here.
 
-### - [`tergite_acl/config/device_config.toml`](tergite_acl/config/device_config.toml)
+### - [`tergite_calibration/config/device_config.toml`](tergite_calibration/config/device_config.toml)
 
 A collection of reasonable initial values for the given device
 
