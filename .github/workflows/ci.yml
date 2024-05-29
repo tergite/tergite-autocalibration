@@ -41,7 +41,7 @@ jobs:
         if: ${{ vars.SHOULD_LINT == 'true' }}
         run: |
           source .venv/bin/activate
-          black tergite_acl --check
+          black tergite_autocalibration --check
       - name: Smoke test
         run: |
           source .venv/bin/activate
