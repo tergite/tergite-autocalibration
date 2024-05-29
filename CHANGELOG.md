@@ -7,8 +7,9 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 
 ## [Unreleased]
 
-This is part of the tergite release v2024.03 that updates the full pipeline for state discrimination hardware calibration
+## [2024.04.0] - 2024-05-29
 
+This is part of the tergite release v2024.04 that updates the full pipeline for state discrimination hardware calibration
 
 ### Added
 - All research-related features regarding the calibration of a CZ gate
@@ -16,10 +17,10 @@ This is part of the tergite release v2024.03 that updates the full pipeline for 
 
 ### Changed
 - Improved command line interface
+- Renamed from tergite-acl to tergite-autocalibration
+- Updated the contribution guidelines and government model statements
 
 ### Fixed
-
-### Contributors
 
 ## [2024.02.0] - 2024-03-19
 
@@ -33,8 +34,6 @@ No major change except for the versions.
 ### Changed
 
 ### Fixed
-
-### Contributors
 
 ## [2023.12.0] - 2024-03-14
 

@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "tergite-calibration"
-version = "2024.04.1"
+name = "tergite-autocalibration"
+version = "2024.04.0"
 description = "commandline application to calibrate the Swedish quantum computer quantum computers automatically"
 authors = [
     "Eleftherios Moschandreou <elemos@chalmers.se>",
@@ -12,7 +12,7 @@ maintainers = [
     "Chalmers Next Labs AB <quantum.nextlabs@chalmers.se>",
 ]
 readme = "README.md"
-packages = [{include = "tergite_calibration"}]
+packages = [{include = "tergite_autocalibration"}]
 
 [tool.poetry.dependencies]
 python = ">= 3.9, < 3.10"
@@ -47,7 +47,7 @@ pytest = "^7.4.2"
 requests-mock = "^1.11.0"
 
 [tool.poetry.scripts]
-acli = "tergite_calibration.tools.cli:cli"
+acli = "tergite_autocalibration.tools.cli:cli"
 
 [build-system]
 requires = ["poetry-core"]

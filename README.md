@@ -1,14 +1,20 @@
-# tergite-calibration
+# tergite-autocalibration
 
-![CI](https://github.com/tergite/tergite-calibration/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/tergite/tergite-autocalibration/actions/workflows/ci.yml/badge.svg)
 
-A commandline application to calibrate QAL 9000-Like quantum computers automatically
+A commandline application to calibrate the Swedish quantum computers automatically.  
 
-**THIS CODE IS OPEN SOURCE AND PUBLIC. BY CONTRIBUTING TO IT, YOU ACCEPT THAT YOUR CONTRIBUTIONS WILL BE LICENSED 
-VIA THE [APACHE 2.0 LICENSE](./LICENSE.txt)**
+This project contains an orchestration manager, a collection of calibration schedules and a collection of post-processing & analysis routines.  
+It was developed and tested on WACQT quantum computer at Chalmers university of Technology.
 
-This project contains an orchistration manager, a collection of callibration schedules and a collection of post-processing & analysis routines.  
-It is tailored for the tune-up of the 25 qubits QPU at Chalmers, QTL.  
+**This project is developed by a core group of collaborators.**    
+**Chalmers Next Labs AB (CNL) takes on the role of managing and maintaining this project.**
+
+## Version Control
+
+The tergite stack is developed on a separate version control system and mirrored on Github.
+If you are reading this on GitHub, then you are looking at a mirror. 
+
 
 ## Dependencies
 
@@ -28,7 +34,7 @@ redis-server
 - Clone the repo
 
 ```shell
-git clone git@github.com:tergite/tergite-calibration.git
+git clone git@github.com:tergite/tergite-autocalibration.git
 ```
 
 - Create conda environment
@@ -41,7 +47,7 @@ conda activate tac
 - Install the application
 
 ```shell
-cd tergite-calibration
+cd tergite-autocalibration
 pip install -e .
 ```
 
@@ -72,7 +78,7 @@ If you would like to contribute to tergite-webgui, please have a look at our
 ## Authors
 
 This project is a work of
-[many contributors](https://github.com/tergite/tergite-calibration/graphs/contributors).
+[many contributors](https://github.com/tergite/tergite-autocalibration/graphs/contributors).
 
 Special credit goes to the authors of this project as seen in the [CREDITS](./CREDITS.md) file.
 
