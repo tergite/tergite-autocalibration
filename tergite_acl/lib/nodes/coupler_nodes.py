@@ -3,14 +3,14 @@ import numpy as np
 from tergite_acl.config.settings import REDIS_CONNECTION
 from tergite_acl.lib.analysis.coupler_spectroscopy_analysis import CouplerSpectroscopyAnalysis
 from tergite_acl.lib.analysis.cz_calibration_analysis import CZCalibrationAnalysis, CZCalibrationSSROAnalysis
-from tergite_acl.lib.analysis.cz_chevron_analysis import CZChevronAnalysis, CZChevronAnalysisReset
+from tergite_acl.lib.analysis.cz_chevron_analysis import CZChevronAnalysis, CZChevronAnalysisReset, CZChevronAmplitudeAnalysis
 from tergite_acl.lib.analysis.reset_calibration_analysis import ResetCalibrationSSROAnalysis
 from tergite_acl.lib.calibration_schedules.cz_calibration import CZ_calibration, CZ_calibration_SSRO
 from tergite_acl.lib.calibration_schedules.cz_chevron_reversed import Reset_chevron_dc
 from tergite_acl.lib.calibration_schedules.reset_calibration import Reset_calibration_SSRO
 from tergite_acl.lib.node_base import BaseNode
 from tergite_acl.lib.nodes.node_utils import qubit_samples, resonator_samples
-from tergite_acl.lib.calibration_schedules.cz_chevron_reversed import CZ_chevron
+from tergite_acl.lib.calibration_schedules.cz_chevron_reversed import CZ_chevron,CZ_chevron_amplitude
 from tergite_acl.lib.calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
 from tergite_acl.lib.calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
 from tergite_acl.utils.hardware_utils import SpiRack
@@ -117,6 +117,16 @@ class CZ_Chevron_Node(BaseNode):
         self.analysis_obj = CZChevronAnalysis
         self.all_qubits = [q for bus in couplers for q in bus.split('_')]
         self.coupler_samplespace = self.samplespace
+        try:
+            print(f'{self.node_dictionary["cz_pulse_amplitude"] = }')
+        except:
+            amplitude = float(REDIS_CONNECTION.hget(f'couplers:{self.coupler}', "cz_pulse_amplitude"))
+            print(f'Amplitude found for coupler {self.coupler} : {amplitude}')
+            if np.isnan(amplitude):
+                amplitude = 0.15
+                print(f'No amplitude found for coupler {self.coupler}. Using default value: {amplitude}')
+            self.node_dictionary['cz_pulse_amplitude'] = amplitude
+            
         self.validate()
 
     def validate(self) -> None:
@@ -147,20 +157,129 @@ class CZ_Chevron_Node(BaseNode):
         cluster_samplespace = {
             # For biase point sweep
             # 'cz_pulse_durations': {
-            #     coupler: np.arange(0e-9, 401e-9, 20e-9)+40e-9 for coupler in self.couplers
+            #     coupler: np.arange(0e-9, 401e-9, 20e-9)+100e-9 for coupler in self.couplers
             # },
             # 'cz_pulse_frequencies': {
-            #     coupler: np.linspace(-12e6, 12e6, 21) + self.transition_frequency(coupler) for coupler in
+            #     coupler: np.linspace(-20e6, 20e6, 21) + self.transition_frequency(coupler) for coupler in
             #     self.couplers
             # },
             # For CZ gate calibration
+            #23-24
             'cz_pulse_durations': {
-                coupler: np.arange(0e-9, 401e-9, 24e-9)+20e-9 for coupler in self.couplers
+                coupler: np.arange(0e-9, 401e-9, 20e-9)+100e-9 for coupler in self.couplers
             },
             'cz_pulse_frequencies': {
-                coupler: np.linspace(-10e6, 2e6, 25) + self.transition_frequency(coupler) for coupler in
+                coupler: np.linspace(-10e6, 5e6, 21) + self.transition_frequency(coupler) for coupler in
                 self.couplers
             },
+            #19-20
+            # 'cz_pulse_durations': {
+            #     coupler: np.arange(0e-9, 301e-9, 20e-9)+100e-9 for coupler in self.couplers
+            # },
+            # 'cz_pulse_frequencies': {
+            #     coupler: np.linspace(-12e6, -4e6, 11) + self.transition_frequency(coupler) for coupler in
+            #     self.couplers
+            # },
+            #18-19
+            # 'cz_pulse_durations': {
+            #     coupler: np.arange(0e-9, 401e-9, 10e-9)+100e-9 for coupler in self.couplers
+            # },
+            # 'cz_pulse_frequencies': {
+            #     coupler: np.linspace(10e6, 20e6, 21) + self.transition_frequency(coupler) for coupler in
+            #     self.couplers
+            # }
+        }
+        return cluster_samplespace
+
+class CZ_Chevron_Amplitude_Node(BaseNode):
+
+    def __init__(self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary):
+        super().__init__(name, all_qubits,**node_dictionary)
+        self.name = name
+        self.all_qubits = all_qubits
+        self.couplers = couplers
+        self.edges = couplers
+        self.coupler = self.couplers[0]
+        self.redis_field = ['cz_pulse_frequency', 'cz_pulse_amplitude']
+        self.qubit_state = 0
+        self.measurement_obj = CZ_chevron_amplitude
+        self.analysis_obj = CZChevronAmplitudeAnalysis
+        self.all_qubits = [q for bus in couplers for q in bus.split('_')]
+        self.coupler_samplespace = self.samplespace
+        self.node_dictionary["cz_pulse_duration"] = 128e-9
+            
+        self.validate()
+
+    def validate(self) -> None:
+        all_coupled_qubits = []
+        for coupler in self.couplers:
+            all_coupled_qubits += coupler.split('_')
+        if len(all_coupled_qubits) > len(set(all_coupled_qubits)):
+            print('Couplers share qubits')
+            raise ValueError('Improper Couplers')
+
+    def transition_frequency(self, coupler: str):
+        coupled_qubits = coupler.split(sep='_')
+        q1_f01 = float(REDIS_CONNECTION.hget(f'transmons:{coupled_qubits[0]}', "clock_freqs:f01"))
+        q2_f01 = float(REDIS_CONNECTION.hget(f'transmons:{coupled_qubits[1]}', "clock_freqs:f01"))
+        q1_f12 = float(REDIS_CONNECTION.hget(f'transmons:{coupled_qubits[0]}', "clock_freqs:f12"))
+        q2_f12 = float(REDIS_CONNECTION.hget(f'transmons:{coupled_qubits[1]}', "clock_freqs:f12"))
+        # ac_freq = np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12))
+        ac_freq = np.min([np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12)),np.abs(q1_f01 + q2_f01 - (q2_f01 + q2_f12))])
+        ac_freq = int(ac_freq / 1e4) * 1e4
+        # lo = 4.4e9 - (ac_freq - 450e6) 
+        # print(f'{ ac_freq/1e6 = } MHz for coupler: {coupler}')
+        # print(f'{ lo/1e9 = } GHz for coupler: {coupler}')
+        return ac_freq
+
+    @property
+    def samplespace(self):
+        # print(f'{ np.linspace(- 50e6, 50e6, 2) + self.ac_freq = }')
+        cluster_samplespace = {
+            # For biase point sweep
+            # 'cz_pulse_amplitudes': {
+            #     coupler: np.linspace(0.0, 0.4, 41) for coupler in self.couplers
+            # },
+            # 'cz_pulse_frequencies': {
+            #     coupler: np.linspace(-20e6, 20e6, 21) + self.transition_frequency(coupler) for coupler in
+            #     self.couplers
+            # },
+
+            #18-19
+            # 'cz_pulse_amplitudes': {
+            #     coupler: np.linspace(0.0, 0.2, 41) for coupler in self.couplers
+            # },
+            # 'cz_pulse_frequencies': {
+            #     coupler: np.linspace(-2e6, 6e6, 21) + self.transition_frequency(coupler) for coupler in
+            #     self.couplers
+            # },
+
+            #23-24
+            'cz_pulse_amplitudes': {
+                coupler: np.linspace(0.2, 0.5, 41) for coupler in self.couplers
+            },
+            'cz_pulse_frequencies': {
+                coupler: np.linspace(-11e6, -4e6, 21) + self.transition_frequency(coupler) for coupler in
+                self.couplers
+            },
+
+            # For CZ gate calibration
+            #19-20
+            # 'cz_pulse_amplitudes': {
+            #     coupler: np.linspace(0, 0.3, 41) +0.05 for coupler in self.couplers
+            # },
+            # 'cz_pulse_frequencies': {
+            #     coupler: np.linspace(-20e6, -10e6, 21) + self.transition_frequency(coupler) for coupler in
+            #     self.couplers
+            # },
+            #18-19
+            # 'cz_pulse_amplitudes': {
+            #     coupler: np.linspace(0, 0.3, 41) for coupler in self.couplers
+            # },
+            # 'cz_pulse_frequencies': {
+            #     coupler: np.linspace(10e6, 20e6, 21) + self.transition_frequency(coupler) for coupler in
+            #     self.couplers
+            # },
         }
         return cluster_samplespace
 

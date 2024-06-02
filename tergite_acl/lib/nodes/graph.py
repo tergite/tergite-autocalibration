@@ -46,7 +46,7 @@ graph_dependencies = [
     ('resonator_spectroscopy_2', 'cz_chevron'),
     #('randomized_benchmarking', 'cz_chevron'),
     # ('rabi_oscillations', 'reset_chevron'),
-    ('cz_chevron', 'cz_calibration'),
+    ('cz_chevron_amplitude', 'cz_calibration'),
     # ('qubit_12_spectroscopy_multidim', 'cz_calibration'),
     # ('cz_calibration', 'cz_calibration_ssro'),
     # ('cz_calibration', 'cz_calibration_ssro'),

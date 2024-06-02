@@ -128,7 +128,6 @@ class CZCalibrationAnalysis(BaseAnalysis):
 
         self.fit_results, self.fit_ys = [], []
 
-        # try:
         for magnitude in self.magnitudes:
             if qubit_types[self.qubit] == qubit_type_list[1]:
                 fit = True
@@ -169,11 +168,6 @@ class CZCalibrationAnalysis(BaseAnalysis):
             self.pop_loss = np.diff(np.flip(qois[0][0]),axis=0)[0]
         else:
             self.pop_loss = np.diff(np.mean(self.fit_ys,axis=1))[0]
-        # except:
-        #     self.cphase = 0
-        #     self.err = 0
-        #     self.opt_cz = [0] * 2
-        #     self.pop_loss = np.mean(np.diff(np.flip(self.fit_ys)))
 
         return [self.cphase, self.pop_loss]
 

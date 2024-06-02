@@ -77,6 +77,7 @@ attenuation_setting = {'qubit':10, 'coupler':30, 'readout':12}
   randomized_benchmarking
   check_cliffords
   cz_chevron
+  cz_chevron_amplitude
   cz_optimize_chevron
   reset_chevron
   cz_calibration

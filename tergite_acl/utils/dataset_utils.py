@@ -289,10 +289,10 @@ def save_dataset(result_dataset: xarray.Dataset, node, data_path: pathlib.Path):
     result_dataset_real = to_real_dataset(result_dataset)
     # to_netcdf doesn't like complex numbers, convert to real/imag to save:
     count = 0
-    dataset_name = 'dataset'+str(count)+'.hdf5'
+    dataset_name = 'dataset_'+str(count)+'.hdf5'
     while (data_path / dataset_name).is_file():
         count += 1
-        dataset_name = 'dataset'+str(count)+'.hdf5'
+        dataset_name = 'dataset_'+str(count)+'.hdf5'
     result_dataset_real.to_netcdf(data_path / dataset_name)
 
 
