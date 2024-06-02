@@ -405,7 +405,7 @@ class CZ_calibration_duration(Measurement):
                 for this_qubit in qubits:
                     this_index = cz_index * number_of_phases + ramsey_index
                     schedule.add(Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
-                                 ref_op=x90_end, ref_pt="end", )
+                                 ref_op=x90_end, ref_pt="end" )
                 # schedule.add(Reset(this_qubit))
         # Add calibration points
         # relaxation_calib = schedule.add(Reset(*qubits), label=f"Reset_Calib")

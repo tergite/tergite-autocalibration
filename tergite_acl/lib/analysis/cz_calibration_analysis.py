@@ -143,14 +143,21 @@ class CZCalibrationAnalysis(BaseAnalysis):
                 fit_y = [np.mean(magnitude)] * 400
             self.fit_ys.append(fit_y)
         if fit:
-            qois = np.transpose(
-                [[[fit.result.params[p].value, fit.result.params[p].stderr] for p in ['cz']] for fit in
-                    self.fit_results])
-            self.opt_cz = qois[0][0]
-            self.cphase = 180 - np.abs(np.abs(np.diff(self.opt_cz))[0] - 180)
-            # self.cphase = np.abs(np.diff(self.opt_cz))[0]
-            print(qois)
-            self.err = np.sqrt(np.sum(np.array(qois[1][0]) ** 2))
+            try:
+                qois = np.transpose(
+                    [[[fit.result.params[p].value, fit.result.params[p].stderr] for p in ['cz']] for fit in
+                        self.fit_results])
+                self.opt_cz = qois[0][0]
+                self.cphase = 180 - np.abs(np.abs(np.diff(self.opt_cz))[0] - 180)
+                # self.cphase = np.abs(np.diff(self.opt_cz))[0]
+                print(qois)
+                self.err = np.sqrt(np.sum(np.array(qois[1][0]) ** 2))
+            except:
+                print('fitting failed ....')
+                self.cphase = 0
+                self.err = 0
+                self.opt_cz = [0] * 2
+
         else:
             self.cphase = 0
             self.err = 0

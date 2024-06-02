@@ -93,11 +93,12 @@ class OptimizeNode:
         sampler = optuna.samplers.CmaEsSampler(with_margin=True)
         self.study = optuna.create_study(sampler=sampler)
         self.trails = trails
+        self.best_params = None
 
     def objective_cz(self,trial):
-        freqs = np.array([trial.suggest_float("cz_pulse_frequency", -2, 2,step=0.001)])*1e6
-        times = np.array([trial.suggest_float("cz_pulse_duration", -20, 20,step=0.01)])*1e-9
-        amps = np.array([trial.suggest_float("cz_pulse_amplitude", -0.02, 0.02,step=0.00001)])
+        freqs = np.array([trial.suggest_float("cz_pulse_frequency", -1, 1,step=0.001)])*1e6
+        times = np.array([trial.suggest_float("cz_pulse_duration", -10, 10,step=0.1)])*1e-9
+        amps = np.array([trial.suggest_float("cz_pulse_amplitude", -0.02, 0.02,step=0.0001)])
         # self.reset_redis.reset_node(self.node)
         self.monitor.calibrate_node(self.node, opt_cz_pulse_frequency = dict(zip(couplers,freqs)),
                                                         opt_cz_pulse_duration = dict(zip(couplers,times)),

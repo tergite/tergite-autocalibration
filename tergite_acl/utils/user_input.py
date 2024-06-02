@@ -1,7 +1,9 @@
 #qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
 #qubits = ['q10','q13','q15']
-#qubits = [ 'q14']
-qubits = [ 'q06','q07', 'q08', 'q09', 'q10','q11','q12','q13', 'q14', 'q15']
+#qubits = [ 'q09']
+#qubits = [ 'q06','q07', 'q08', 'q09', 'q10','q11','q12','q13', 'q14', 'q15']
+qubits = [  'q14', 'q15']
+
 
 # qubits = [ 'q18','q19','q20','q21','q22','q23','q24','q25']
 #qubits = ['q12','q13','q14']
@@ -45,7 +47,7 @@ couplers = ['q14_q15'] #done
 #couplers = ['q06_q11']
 
 
-attenuation_setting = {'qubit':10, 'coupler':38, 'readout':12}
+attenuation_setting = {'qubit':10, 'coupler':30, 'readout':12}
 
 '''punchout
   resonator_spectroscopy
@@ -86,7 +88,7 @@ attenuation_setting = {'qubit':10, 'coupler':38, 'readout':12}
 '''
 
 user_requested_calibration = {
-    'target_node': 'tqg_randomized_benchmarking_interleaved',
+    'target_node': 'T2_echo',
     'all_qubits': qubits,
     'couplers': couplers,
 }

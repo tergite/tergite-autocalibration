@@ -42,7 +42,7 @@ class Coupler_Spectroscopy_Node(BaseNode):
         #self.node_externals = np.round(np.append([-0.1, -0.2] ,[0.1, 0]),1)*1e-3
 
         self.operations_args = []
-        self.measure_qubit_index = 0
+        self.measure_qubit_index = 1
         self.measurement_qubit = self.coupled_qubits[self.measure_qubit_index]
 
         try:
@@ -64,7 +64,6 @@ class Coupler_Spectroscopy_Node(BaseNode):
 
     @property
     def dimensions(self):
-        return (len(self.samplespace['spec_frequencies'][self.measurement_qubit]), 1)
         return (len(self.samplespace['spec_frequencies'][self.measurement_qubit]), 1)
 
     def pre_measurement_operation(self, external: float = 0): #external is the current
@@ -156,10 +155,10 @@ class CZ_Chevron_Node(BaseNode):
             # },
             # For CZ gate calibration
             'cz_pulse_durations': {
-                coupler: np.arange(0e-9, 401e-9, 12e-9)+20e-9 for coupler in self.couplers
+                coupler: np.arange(0e-9, 401e-9, 24e-9)+20e-9 for coupler in self.couplers
             },
             'cz_pulse_frequencies': {
-                coupler: np.linspace(-10e6, 10e6, 21) + self.transition_frequency(coupler) for coupler in
+                coupler: np.linspace(-10e6, 2e6, 25) + self.transition_frequency(coupler) for coupler in
                 self.couplers
             },
         }
@@ -415,7 +414,7 @@ class TQG_Randomized_Benchmarking_Node(BaseNode):
         self.analysis_obj = RandomizedBenchmarkingAnalysis
 
         # TODO change it a dictionary like samplespace
-        self.node_externals = 42 * np.arange(100, dtype=np.int32)
+        self.node_externals = 42 * np.arange(10, dtype=np.int32)
         self.external_parameter_name = 'seed'
         self.external_parameter_value = 0
         ####################
@@ -464,7 +463,7 @@ class TQG_Randomized_Benchmarking_Interleaved_Node(BaseNode):
         self.analysis_obj = RandomizedBenchmarkingAnalysis
         self.node_dictionary['interleaving_clifford_id'] = 4386
         # TODO change it a dictionary like samplespace
-        self.node_externals = 42 * np.arange(100, dtype=np.int32)
+        self.node_externals = 42 * np.arange(5, dtype=np.int32)
         self.external_parameter_name = 'seed'
         self.external_parameter_value = 0
         ####################
@@ -489,8 +488,8 @@ class TQG_Randomized_Benchmarking_Interleaved_Node(BaseNode):
         cluster_samplespace = {
             'number_of_cliffords': {
                 # qubit: all_numbers for qubit in self.all_qubits
-                qubit: np.array([1, 2, 3, 4, 8, 16, 32, 64, 128, 0, 1]) for qubit in self.all_qubits
-                # qubit: np.array([2, 0, 1]) for qubit in self.all_qubits
+                # qubit: np.array([1, 2, 3, 4, 8, 16, 32, 64, 128, 0, 1]) for qubit in self.all_qubits
+                qubit: np.array([1, 0, 1]) for qubit in self.all_qubits
 
             },
         }

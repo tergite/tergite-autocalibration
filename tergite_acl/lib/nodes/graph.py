@@ -11,7 +11,7 @@ graph_dependencies = [
     # these are edges on  a directed graph
     # _____________________________________
     ('tof', 'resonator_spectroscopy'),
-    # ('resonator_spectroscopy', 'coupler_resonator_spectroscopy'),
+    ('resonator_spectroscopy', 'coupler_resonator_spectroscopy'),
     # ('resonator_spectroscopy', 'qubit_01_spectroscopy_pulsed'),
     ('qubit_01_spectroscopy', 'coupler_spectroscopy'),
     ('resonator_spectroscopy', 'qubit_01_spectroscopy'),
@@ -42,8 +42,9 @@ graph_dependencies = [
     ('ramsey_correction_12', 'resonator_spectroscopy_2'),
     ('resonator_spectroscopy_2', 'ro_frequency_three_state_optimization'),
     ('ro_frequency_three_state_optimization', 'ro_amplitude_three_state_optimization'),
-    # ('coupler_spectroscopy', 'cz_chevron'),
-    ('randomized_benchmarking', 'cz_chevron'),
+    #('coupler_spectroscopy', 'cz_chevron'),
+    ('resonator_spectroscopy_2', 'cz_chevron'),
+    #('randomized_benchmarking', 'cz_chevron'),
     # ('rabi_oscillations', 'reset_chevron'),
     ('cz_chevron', 'cz_calibration'),
     # ('qubit_12_spectroscopy_multidim', 'cz_calibration'),

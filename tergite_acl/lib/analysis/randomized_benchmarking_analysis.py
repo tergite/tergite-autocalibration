@@ -71,6 +71,8 @@ class RandomizedBenchmarkingAnalysis(BaseAnalysis):
             data = measurements[:-2]
             calibration_0 = measurements[-2]
             calibration_1 = measurements[-1]
+            #print('these are the zero and one points respectively: ', calibration_0, calibration_1)
+            #print('these are the unrotated data points: ', data)
             displacement_vector = calibration_1 - calibration_0
             data_translated_to_zero = data - calibration_0
 

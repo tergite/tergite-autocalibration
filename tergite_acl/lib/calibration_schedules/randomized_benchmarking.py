@@ -6,6 +6,7 @@ from quantify_scheduler.operations.gate_library import Measure, Reset, X90, Rxy,
 from quantify_scheduler.operations.pulse_library import ResetClockPhase, SoftSquarePulse, IdlePulse
 
 from quantify_scheduler.schedules.schedule import Schedule
+from quantify_scheduler.enums import BinMode
 
 from tergite_acl.lib.measurement_base import Measurement
 import tergite_acl.utils.clifford_elements_decomposition as cliffords
@@ -207,7 +208,7 @@ class TQG_Randomized_Benchmarking(Measurement):
             )
             physical_gates = decompose_clifford_seq(clifford_seq, qubits)
 
-            separation_time = 300e-9
+            separation_time = 400e-9
             # schedule = Schedule('rb_sequence_generation')
             reset = schedule.add(Reset(*qubits))
 
