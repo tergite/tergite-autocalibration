@@ -81,17 +81,19 @@ jobs:
         run: |
           source .venv/bin/activate
           mkdocs gh-deploy --force
+      - name: Build
+        run: poetry build
       - name: Publish to Test pypi
         if: ${{ vars.SHOULD_PUBLISH_TO_STAGING == 'true' }}
         run: |
           poetry config repositories.test-pypi https://test.pypi.org/legacy/
           poetry config pypi-token.test-pypi ${{ secrets.TEST_PYPI_API_TOKEN }}
-          poetry publish --build -r test-pypi
+          poetry publish -r test-pypi
       - name: Publish to pypi
         if: ${{ vars.SHOULD_PUBLISH_TO_PROD == 'true' }}
         run: |
           poetry config pypi-token.pypi ${{ secrets.PYPI_API_TOKEN }}
-          poetry publish --build
+          poetry publish
 
   upstream:
     name: Update upstream
