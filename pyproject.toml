@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "tergite-autocalibration"
 version = "2024.04.0"
-description = "commandline application to calibrate the Swedish quantum computer quantum computers automatically"
+description = "commandline application to calibrate the WACQT quantum computers automatically"
 authors = [
     "Eleftherios Moschandreou <elemos@chalmers.se>",
     "Liangyu Chen <liangyuc@chalmers.se>",
