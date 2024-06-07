@@ -2,7 +2,7 @@
 
 ![CI](https://github.com/tergite/tergite-autocalibration/actions/workflows/ci.yml/badge.svg)
 
-A commandline application to calibrate the Swedish quantum computers automatically.  
+A commandline application to calibrate the WACQT quantum computers automatically.  
 
 This project contains an orchestration manager, a collection of calibration schedules and a collection of post-processing & analysis routines.  
 It was developed and tested on WACQT quantum computer at Chalmers university of Technology.
