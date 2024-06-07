@@ -98,7 +98,7 @@ jobs:
   upstream:
     name: Update upstream
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' }} && ${{ vars.SHOULD_PUSH_UPSTREAM == 'true' }}
+    if: ${{ github.event_name == 'push' && vars.SHOULD_PUSH_UPSTREAM == 'true' }}
     needs: tests
     steps:
       - name: Checkout the commit
@@ -106,6 +106,7 @@ jobs:
 
       - name: Push upstream
         run: |
+          if [ "${{ github.event_name }}" != "push" ] || [ "${{ vars.SHOULD_PUSH_UPSTREAM }}" != 'true' ]; then printf "upstream not enabled"; exit; fi
           git config user.email ${{ secrets.UPSTREAM_USER }}
           git fetch ${{ secrets.UPSTREAM_REPO }} ${{ secrets.UPSTREAM_BRANCH }}:${{ secrets.UPSTREAM_BRANCH }} || echo "${{ secrets.UPSTREAM_BRANCH }} does not exist"
           git checkout ${{ github.ref_name }} || echo "${{ github.ref_name }} does not exist"
