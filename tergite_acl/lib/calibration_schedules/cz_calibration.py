@@ -178,23 +178,23 @@ class CZ_calibration(Measurement):
                     cz_pulse_port = f'{this_coupler}:fl'
                     reset_phase = schedule.add(ResetClockPhase(clock=cz_clock),
                                                ref_op=buffer_start, ref_pt='end', )
-
-                    if use_edge:
-                        # print(qubits[0],qubits[1])
-                        cz = schedule.add(CZ(qubits[0],qubits[1]))
-                    else:
-                        # print(this_coupler,cz_pulse_port,cz_clock)
-                        cz = schedule.add(
-                            SoftSquarePulse(
-                                duration=cz_pulse_duration[this_coupler],
-                                amp=cz_pulse_amplitude[this_coupler]*gate_amp,
-                                port=cz_pulse_port,
-                                clock=cz_clock,
+                    for i in range(number_of_cz):
+                        if use_edge:
+                            # print(qubits[0],qubits[1])
+                            cz = schedule.add(CZ(qubits[0],qubits[1]))
+                        else:
+                            # print(this_coupler,cz_pulse_port,cz_clock)
+                            cz = schedule.add(
+                                SoftSquarePulse(
+                                    duration=cz_pulse_duration[this_coupler],
+                                    amp=cz_pulse_amplitude[this_coupler]*gate_amp,
+                                    port=cz_pulse_port,
+                                    clock=cz_clock,
+                                )
                             )
-                        )
+                        # buffer_end = schedule.add(IdlePulse(100e-9))
 
-                buffer_end = schedule.add(IdlePulse(4e-9), ref_op=buffer_start, ref_pt='end',
-                                      rel_time=np.ceil(cz_pulse_duration[this_coupler] * 1e9 / 4) * 4e-9)
+                buffer_end = schedule.add(IdlePulse(4e-9))
 
                 # cz_pulse_port='q19_q20:fl'
                 # cz_clock = 'q19_q20.cz'

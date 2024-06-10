@@ -11,7 +11,8 @@ from tergite_acl.lib.calibration_schedules.T1 import T1, T2, T2Echo
 from tergite_acl.lib.calibration_schedules.check_cliffords import Check_Cliffords
 from tergite_acl.lib.calibration_schedules.randomized_benchmarking import Randomized_Benchmarking
 
-coherence_repeat = 3
+COHERENCE_REPEATS = 3
+RB_REPEATS = 10
 
 class T1_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
@@ -23,7 +24,7 @@ class T1_Node(BaseNode):
         self.backup = False
         self.type = 'parameterized_simple_sweep'
 
-        self.node_externals = range(coherence_repeat)
+        self.node_externals = range(COHERENCE_REPEATS)
         self.external_parameter_name = 'repeat'
         self.external_parameter_value = 0
 
@@ -60,7 +61,7 @@ class Randomized_Benchmarking_Node(BaseNode):
         self.analysis_obj = RandomizedBenchmarkingAnalysis
 
         # TODO change it a dictionary like samplespace
-        self.node_externals = 6 * np.arange(3, dtype=np.int32)
+        self.node_externals = 6 * np.arange(RB_REPEATS, dtype=np.int32)
         self.external_parameter_name = 'seed'
         self.external_parameter_value = 0
         ####################
@@ -120,7 +121,7 @@ class T2_Node(BaseNode):
         self.backup = False
         self.type = 'parameterized_simple_sweep'
 
-        self.node_externals = range(coherence_repeat)
+        self.node_externals = range(COHERENCE_REPEATS)
         self.external_parameter_name = 'repeat'
         self.external_parameter_value = 0
 
@@ -153,7 +154,7 @@ class T2_Echo_Node(BaseNode):
         self.backup = False
         self.type = 'parameterized_simple_sweep'
 
-        self.node_externals = range(coherence_repeat)
+        self.node_externals = range(COHERENCE_REPEATS)
         self.external_parameter_name = 'repeat'
         self.external_parameter_value = 0
 

@@ -6,7 +6,7 @@ from tergite_acl.lib.analysis.cz_calibration_analysis import CZCalibrationAnalys
 from tergite_acl.lib.analysis.cz_chevron_analysis import CZChevronAnalysis, CZChevronAnalysisReset, CZChevronAmplitudeAnalysis
 from tergite_acl.lib.analysis.reset_calibration_analysis import ResetCalibrationSSROAnalysis
 from tergite_acl.lib.calibration_schedules.cz_calibration import CZ_calibration, CZ_calibration_SSRO
-from tergite_acl.lib.calibration_schedules.cz_chevron_reversed import Reset_chevron_dc
+from tergite_acl.lib.calibration_schedules.reset_chevron import Reset_chevron_dc
 from tergite_acl.lib.calibration_schedules.reset_calibration import Reset_calibration_SSRO
 from tergite_acl.lib.node_base import BaseNode
 from tergite_acl.lib.nodes.node_utils import qubit_samples, resonator_samples
@@ -19,7 +19,7 @@ from tergite_acl.config.coupler_config import coupler_spi_map
 from tergite_acl.lib.calibration_schedules.randomized_benchmarking import Randomized_Benchmarking, TQG_Randomized_Benchmarking
 from tergite_acl.lib.analysis.randomized_benchmarking_analysis import RandomizedBenchmarkingAnalysis
 
-
+RB_REPEATS = 10
 
 class Coupler_Spectroscopy_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
@@ -121,7 +121,7 @@ class CZ_Chevron_Node(BaseNode):
             amplitude = float(REDIS_CONNECTION.hget(f'couplers:{self.coupler}', "cz_pulse_amplitude"))
             print(f'Amplitude found for coupler {self.coupler} : {amplitude}')
             if np.isnan(amplitude):
-                amplitude = 0.15
+                amplitude = 0.375
                 print(f'No amplitude found for coupler {self.coupler}. Using default value: {amplitude}')
             self.node_dictionary['cz_pulse_amplitude'] = amplitude
             
@@ -205,7 +205,7 @@ class CZ_Chevron_Amplitude_Node(BaseNode):
         self.all_qubits = [q for bus in couplers for q in bus.split('_')]
         self.coupler_samplespace = self.samplespace
         self.node_dictionary["cz_pulse_duration"] = 128e-9
-            
+        REDIS_CONNECTION.hset(f"couplers:{self.coupler}", 'cz_pulse_duration',self.node_dictionary["cz_pulse_duration"]*2)
         self.validate()
 
     def validate(self) -> None:
@@ -341,17 +341,20 @@ class CZ_Optimize_Chevron_Node(BaseNode):
 
 
 class Reset_Chevron_Node(BaseNode):
+
     def __init__(self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.name = name
         self.all_qubits = all_qubits
-        self.all_couplers = couplers
-        self.coupler = couplers[0]
+        self.couplers = couplers
+        self.edges = couplers
+        self.coupler = self.couplers[0]
         self.redis_field = ['reset_amplitude_qc', 'reset_duration_qc']
         self.qubit_state = 0
         self.measurement_obj = Reset_chevron_dc
         self.analysis_obj = CZChevronAnalysisReset
-        self.coupled_qubits = couplers[0].split(sep='_')
+        self.coupled_qubits = self.couplers[0].split(sep='_')
+        # self.node_dictionary['duration_offset'] = 0
         # print(f'{ self.coupled_qubits = }')
 
     @property
@@ -359,19 +362,115 @@ class Reset_Chevron_Node(BaseNode):
         # print(f'{ np.linspace(- 50e6, 50e6, 2) + self.ac_freq = }')
         cluster_samplespace = {
             # Pulse test
-            'cz_pulse_durations': {
-                qubit: 4e-9 + np.linspace(16e-9, 16e-9, 11) for qubit in self.coupled_qubits
-            },
-            'cz_pulse_amplitudes': {
-                qubit: np.linspace(0.4, 0.4, 11) for qubit in self.coupled_qubits
-            },
-
-            # For DC reset
             # 'cz_pulse_durations': {
-            #     qubit: 4e-9+np.arange(0e-9, 12*4e-9,4e-9) for qubit in self.coupled_qubits
+            #     qubit: 4e-9 + np.linspace(16e-9, 16e-9, 21) for qubit in self.coupled_qubits
             # },
             # 'cz_pulse_amplitudes': {
-            #     qubit: np.linspace(0.2, 0.8, 61) for qubit in self.coupled_qubits
+            #     qubit: np.linspace(0.4, 0.4, 21) for qubit in self.coupled_qubits
+            # },
+
+            # For DC reset
+            # q22_q23
+            # 'cz_pulse_durations': {
+            #     qubit: 2e-9+np.linspace(0, 20, 21)*1e-9 for qubit in self.coupled_qubits
+            # },
+            # 'cz_pulse_amplitudes': {
+            #     qubit: np.linspace(-0.07, -0.1, 21) for qubit in self.coupled_qubits
+            # },
+            # q23_q24
+            # 'cz_pulse_durations': {
+            #     qubit: 2e-9+np.linspace(0, 40, 41)*1e-9 for qubit in self.coupled_qubits
+            # },
+            # 'cz_pulse_amplitudes': {
+            #     qubit: np.linspace(-0.095, -0.13, 21) for qubit in self.coupled_qubits
+            # },
+            
+            #cr g, f0 sweep
+            # 'cz_pulse_durations': { # g
+            #     qubit: np.linspace(0.075,0.175, 41)for qubit in self.coupled_qubits
+            # },
+            # 'cz_pulse_amplitudes': { # f0
+            #     qubit: np.linspace(1.2, 1.7, 21) for qubit in self.coupled_qubits
+            # },
+
+            #cr ft, t sweep
+            # 'cz_pulse_durations': {
+            #     qubit: 2e-9+np.linspace(0, 20, 21)*1e-9 for qubit in self.coupled_qubits
+            # },
+            # 'cz_pulse_amplitudes': {
+            #     qubit: np.linspace(0.9, 1.4, 41) for qubit in self.coupled_qubits
+            # },
+
+            #cr square sweep
+            # 'cz_pulse_durations': {
+            #     qubit: 4e-9+np.linspace(0, 200, 4)*1e-9 for qubit in self.coupled_qubits
+            # },
+            # 'cz_pulse_amplitudes': {
+            #     qubit: np.linspace(0.0, 0.2, 4) for qubit in self.coupled_qubits
+            # },
+
+             #qc sweep ft. f0
+            # 'cz_pulse_durations': { # ft
+            #     qubit: np.linspace(-0.1,-0.5, 16)for qubit in self.coupled_qubits
+            # },
+            # 'cz_pulse_amplitudes': { # f0
+            #     qubit: np.linspace(0.96, 0.99, 16) for qubit in self.coupled_qubits
+            # },
+
+            #qc sweep g,ft
+            # q23_q24
+            # 'cz_pulse_durations': { # g
+            #     qubit: np.linspace(0.01,0.5, 21)for qubit in self.coupled_qubits
+            # },
+            # 'cz_pulse_amplitudes': { # ft
+            #     qubit: np.linspace(-0.01, -0.5, 21) for qubit in self.coupled_qubits
+            # },
+            # q22_q23
+            'cz_pulse_durations': { # g
+                qubit: np.linspace(0.001,0.1, 26)for qubit in self.coupled_qubits
+            },
+            'cz_pulse_amplitudes': { # ft
+                qubit: np.linspace(0, -0.4, 26) for qubit in self.coupled_qubits
+            },
+            
+            #qc sweep f0,t
+            # 'cz_pulse_durations': {
+            #     qubit: self.node_dictionary['duration_offset']*1e-9+np.linspace(0, 4, 5)*1e-9 for qubit in self.coupled_qubits
+            # },
+            # 'cz_pulse_amplitudes': {
+            #     qubit: np.linspace(0.8, 1.1, 41) for qubit in self.coupled_qubits
+            # },
+
+            #qc sweep g,t
+            # q23_q24
+            # 'cz_pulse_durations': {
+            #     qubit: self.node_dictionary['duration_offset']*1e-9+np.linspace(0, 4, 5)*1e-9 for qubit in self.coupled_qubits
+            # },
+            # 'cz_pulse_amplitudes': {
+            #     qubit: np.linspace(0.0, 0.1, 21) for qubit in self.coupled_qubits
+            # },
+            # q22_q23
+            # 'cz_pulse_durations': {
+            #     qubit: self.node_dictionary['duration_offset']*1e-9+np.linspace(0, 4, 5)*1e-9 for qubit in self.coupled_qubits
+            # },
+            # 'cz_pulse_amplitudes': {
+            #     qubit: np.linspace(0.0, 0.1, 21) for qubit in self.coupled_qubits
+            # },
+
+            #qc sweep f0,t
+            # q23_q24
+            # 'cz_pulse_durations': {
+            #     qubit: self.node_dictionary['duration_offset']*1e-9+np.linspace(0, 4, 5)*1e-9 for qubit in self.coupled_qubits
+            # },
+            # 'cz_pulse_amplitudes': {
+            #     qubit: np.linspace(0.8, 1.1, 21) for qubit in self.coupled_qubits
+            # },
+            # q22_q23
+            # 'cz_pulse_durations': {
+            #     qubit: self.node_dictionary['duration_offset']*1e-9+np.linspace(0, 4, 5)*1e-9 for qubit in self.coupled_qubits
+            # },
+            # 'cz_pulse_amplitudes': {
+            #     qubit: np.linspace(0.5, 0.8, 21) for qubit in self.coupled_qubits
             # },
 
             # For AC reset
@@ -402,6 +501,7 @@ class CZ_Calibration_Node(BaseNode):
         self.node_dictionary['dynamic'] = False
         self.node_dictionary['swap_type'] = False
         self.node_dictionary['use_edge'] = False
+        self.node_dictionary['number_of_cz'] = 1
         # self.validate()
 
     @property
@@ -439,12 +539,16 @@ class CZ_Calibration_SSRO_Node(BaseNode):
 class Reset_Calibration_SSRO_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], couplers: list[str], ** node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
+        self.name = name
+        self.all_qubits = all_qubits
+        self.couplers = couplers
+        self.edges = couplers
         self.coupler = couplers[0]
         # print(couplers)
         self.coupled_qubits = couplers[0].split(sep='_')
         # print(self.coupled_qubits)
         # self.node_dictionary = kwargs
-        self.redis_field = ['reset_fidelity','reset_leakage']
+        self.redis_field = ['reset_fidelity','reset_leakage','all_fidelity','all_fidelity_f']
         self.qubit_state = 2
         self.testing_group = 0 # The edge group to be tested. 0 means all edges.
         self.dynamic = False
@@ -531,7 +635,7 @@ class TQG_Randomized_Benchmarking_Node(BaseNode):
         self.analysis_obj = RandomizedBenchmarkingAnalysis
 
         # TODO change it a dictionary like samplespace
-        self.node_externals = 42 * np.arange(100, dtype=np.int32)
+        self.node_externals = 42 * np.arange(RB_REPEATS, dtype=np.int32)
         self.external_parameter_name = 'seed'
         self.external_parameter_value = 0
         ####################
@@ -556,7 +660,7 @@ class TQG_Randomized_Benchmarking_Node(BaseNode):
         cluster_samplespace = {
             'number_of_cliffords': {
                 # qubit: all_numbers for qubit in self.all_qubits
-                qubit: np.array([1, 2, 3, 4, 8, 16, 32, 64, 128, 0, 1]) for qubit in self.all_qubits
+                qubit: np.array([0, 1, 2, 3, 4, 8, 16, 32, 64, 128, 0, 1]) for qubit in self.all_qubits
                 # qubit: np.array([1, 2,3,4,0, 1]) for qubit in self.all_qubits
 
             },
@@ -580,7 +684,7 @@ class TQG_Randomized_Benchmarking_Interleaved_Node(BaseNode):
         self.analysis_obj = RandomizedBenchmarkingAnalysis
         self.node_dictionary['interleaving_clifford_id'] = 4386
         # TODO change it a dictionary like samplespace
-        self.node_externals = 42 * np.arange(100, dtype=np.int32)
+        self.node_externals = 42 * np.arange(RB_REPEATS, dtype=np.int32)
         self.external_parameter_name = 'seed'
         self.external_parameter_value = 0
         ####################
@@ -605,8 +709,8 @@ class TQG_Randomized_Benchmarking_Interleaved_Node(BaseNode):
         cluster_samplespace = {
             'number_of_cliffords': {
                 # qubit: all_numbers for qubit in self.all_qubits
-                # qubit: np.array([1, 2, 3, 4, 8, 16, 32, 64, 128, 0, 1]) for qubit in self.all_qubits
-                qubit: np.array([1, 0, 1]) for qubit in self.all_qubits
+                qubit: np.array([0, 1, 2, 3, 4, 8, 16, 32, 64, 128, 0, 1]) for qubit in self.all_qubits
+                # qubit: np.array([1, 0, 1]) for qubit in self.all_qubits
 
             },
         }

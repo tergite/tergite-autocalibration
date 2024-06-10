@@ -4,7 +4,7 @@ from tergite_acl.config.VNA_LOKIB_values import (
 import numpy as np
 
 def resonator_samples(qubit: str) -> np.ndarray:
-    res_spec_samples = 81
+    res_spec_samples = 161
     sweep_range = 4.0e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
     min_freq = VNA_frequency - sweep_range / 2

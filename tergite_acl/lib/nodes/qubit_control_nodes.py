@@ -67,7 +67,7 @@ class Rabi_Oscillations_Node(BaseNode):
     def samplespace(self):
         cluster_samplespace = {
             'mw_amplitudes': {
-                qubit: np.linspace(0.002, 0.90, 41) for qubit in self.all_qubits
+                qubit: np.linspace(0.002, 0.90, 61) for qubit in self.all_qubits
             }
         }
         return cluster_samplespace

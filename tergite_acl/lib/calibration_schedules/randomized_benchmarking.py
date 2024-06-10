@@ -164,9 +164,14 @@ class TQG_Randomized_Benchmarking(Measurement):
         coupled_qubits = [coupler.split('_') for coupler in coupler_names]
 
         for index, this_coupler in enumerate(coupler_names):
-            schedule.add_resource(
-                ClockResource(name=f'{this_coupler}.cz', freq=4.4e9-self.couplers[this_coupler].clock_freqs.cz_freq())
-            )
+            for index, this_coupler in enumerate(coupler_names):
+                if this_coupler in ['q21_q22','q22_q23','q23_q24','q24_q25']:
+                    downconvert = 0
+                else:
+                    downconvert = 4.4e9
+                schedule.add_resource(
+                    ClockResource(name=f'{this_coupler}.cz', freq=downconvert-self.couplers[this_coupler].clock_freqs.cz_freq())
+                )
 
         print(self.couplers[this_coupler].clock_freqs.cz_freq())
         #This is the common reference operation so the qubits can be operated in parallel
@@ -204,9 +209,9 @@ class TQG_Randomized_Benchmarking(Measurement):
                 apply_inverse_gate=apply_inverse_gate,
                 number_of_qubits=2,
             )
-            physical_gates = decompose_clifford_seq(clifford_seq, qubits)
+            physical_gates = decompose_clifford_seq(clifford_seq, ['q23','q24'])
 
-            separation_time = 300e-9
+            separation_time = 260e-9
             # schedule = Schedule('rb_sequence_generation')
             reset = schedule.add(Reset(*qubits))
 

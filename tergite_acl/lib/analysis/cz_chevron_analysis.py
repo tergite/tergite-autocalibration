@@ -682,9 +682,9 @@ class CZChevronAmplitudeAnalysis(BaseAnalysis):
         axis.set_title(f'CZ Chevron - Qubit {self.qubit[1:]}')
 
 
-
-class CZChevronAnalysisReset():
+class CZChevronAnalysisReset(BaseAnalysis):
     def __init__(self, dataset: xr.Dataset):
+        super().__init__()
         data_var = list(dataset.data_vars.keys())[0]
         self.S21 = dataset[data_var].values
         self.fit_results = {}

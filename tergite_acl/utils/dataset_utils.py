@@ -46,12 +46,12 @@ def configure_dataset(
         measured_qubit = measurement_qubits[key_indx]
         dimensions = node.dimensions
 
-        if node.name in ['ro_amplitude_three_state_optimization']:
+        # if node.name in ['ro_amplitude_three_state_optimization']:
             # shots = 1
             # shots = int(len(raw_ds[key].values))
-            shots = int(len(raw_ds[key].values[0]) / (dimensions[0] * len(qubit_states)))
-            coords_dict['shot'] = ('shot', range(shots), {'qubit': measured_qubit, 'long_name': 'shot', 'units': 'NA'})
-        elif node.name in ['cz_calibration_ssro', 'reset_calibration_ssro']:
+            # shots = int(len(raw_ds[key].values[0]) / (dimensions[1] * len(qubit_states)))
+            # coords_dict['shot'] = ('shot', range(shots), {'qubit': measured_qubit, 'long_name': 'shot', 'units': 'NA'})
+        if node.name in ['cz_calibration_ssro', 'reset_calibration_ssro']:
             # TODO: We are not sure about this one
             dimensions[1] += len(qubit_states)  # for calibration points
             shots = int(len(raw_ds[key].values[0]) / (np.product(dimensions)))
@@ -88,9 +88,8 @@ def configure_dataset(
             coord_attrs = {'qubit': measured_qubit, 'long_name': f'{coord_key}', 'units': 'NA'}
             coords_dict[coord_key] = (coord_key, np.array([node.external_parameter_value]), coord_attrs)
 
-        if node.name in ['ro_amplitude_three_state_optimization']:
-            coords_dict['state'] = (
-            'state', qubit_states, {'qubit': measured_qubit, 'long_name': 'state', 'units': 'NA'})
+        # if node.name in ['ro_amplitude_three_state_optimization']:
+            # coords_dict['state'] = ('state', qubit_states, {'qubit': measured_qubit, 'long_name': 'state', 'units': 'NA'})
 
         partial_ds = xarray.Dataset(coords=coords_dict)
 

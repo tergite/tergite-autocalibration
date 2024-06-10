@@ -1,13 +1,14 @@
-# qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
-# qubits = [ 'q16','q18','q19','q20','q21','q22','q23','q24','q25']
+qubits = [ 'q16','q18','q19','q20','q21','q22','q23','q24','q25']
+# qubits = ['q21','q22','q23','q24','q25']
 # qubits = ['q18','q19']
-qubits = ['q22','q23','q24']
+# qubits = ['q23','q24']
 # couplers = ['q12_q13','q13_q14' ]
-couplers = ['q23_q24']
+couplers = ['q22_q23']
+# couplers = ['q23_q24']
 # couplers = ['q19_q20']
 # couplers = ['q18_q19']
 
-attenuation_setting = {'qubit':12, 'coupler':30, 'readout':12}
+attenuation_setting = {'qubit':12, 'coupler':30, 'readout':6}
 
 '''
 node reference
@@ -42,6 +43,7 @@ node reference
   cz_chevron_amplitude
   cz_optimize_chevron
   reset_chevron
+  reset_calibration_ssro
   cz_calibration
   cz_calibration_ssro
   cz_dynamic_phase
@@ -51,7 +53,7 @@ node reference
 '''
 
 user_requested_calibration = {
-    'target_node': 'T2_echo',
+    'target_node': 'reset_calibration_ssro',
     'all_qubits': qubits,
     'couplers': couplers,
 }

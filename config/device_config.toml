@@ -48,7 +48,9 @@ punchout.measure.pulse_amp = nan
 
 reset_chevron.reset_amplitude_qc = nan
 reset_chevron.reset_duration_qc = nan
-
+reset_calibration_reset.reset_fidelity = nan
+reset_calibration_reset.reset_leakage = nan
+reset_calibration_reset.all_fidelity = nan
 
 [qoi.couplers]
 coupler_spectroscopy.parking_current = nan

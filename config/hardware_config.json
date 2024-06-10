@@ -171,14 +171,14 @@
            "dc_mixer_offset_Q": -10.2790e-3,
            "portclock_configs": [
               {
-                 "port": "q16_q21:fl",
-                 "clock": "q16_q21.cz",
+                 "port": "q16_q21_rf:fl_",
+                 "clock": "q16_q21_rf.cz",
                  "mixer_amp_ratio": 0.9652,
                  "mixer_phase_error_deg": -13.72245
               },
               {
-               "port": "q16_q21:fl",
-               "clock": "q16_q21.reset",
+               "port": "q16_q21_rf:fl",
+               "clock": "q16_q21_rf.reset",
                "mixer_amp_ratio": 0.9652,
                "mixer_phase_error_deg": -13.72245
             }
