@@ -1,15 +1,16 @@
 """
 Module containing a schedule class for Ramsey calibration. (1D parameter sweep, for 2D see ramsey_detunings.py)
 """
-from quantify_scheduler.enums import BinMode
+import numpy as np
 from quantify_scheduler import Schedule
-from quantify_scheduler.operations.gate_library import Measure, Reset, X90, Rxy, X
+from quantify_scheduler.enums import BinMode
+from quantify_scheduler.operations.gate_library import Measure, Reset, Rxy, X, X90
 from quantify_scheduler.operations.pulse_library import DRAGPulse
 from quantify_scheduler.resources import ClockResource
-from tergite_acl.lib.measurement_base import Measurement
-from tergite_acl.utils.extended_transmon_element import ExtendedTransmon, Measure_RO1
 
-import numpy as np
+from tergite_acl.lib.measurement_base import Measurement
+from tergite_acl.utils.extended_gates import Measure_RO1
+from tergite_acl.utils.extended_transmon_element import ExtendedTransmon
 
 class Ramsey_fringes(Measurement):
 

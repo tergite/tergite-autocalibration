@@ -52,6 +52,9 @@ class BaseNode:
             dimensions.append(
                 len(self.schedule_samplespace[quantity][first_element])
             )
+
+        if self.external_samplespace != {}:
+            dimensions = dimensions + [1]
         return dimensions
 
     @property

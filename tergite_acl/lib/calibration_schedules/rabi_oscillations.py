@@ -6,7 +6,9 @@ from quantify_scheduler.enums import BinMode
 from quantify_scheduler import Schedule
 from quantify_scheduler.operations.pulse_library import DRAGPulse
 from quantify_scheduler.operations.gate_library import Measure, Reset, X
-from tergite_acl.utils.extended_transmon_element import ExtendedTransmon, Measure_RO1
+from tergite_acl.utils.extended_transmon_element import ExtendedTransmon
+from tergite_acl.utils.extended_gates import Measure_RO1
+
 from tergite_acl.lib.measurement_base import Measurement
 import numpy as np
 

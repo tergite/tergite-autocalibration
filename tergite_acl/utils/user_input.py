@@ -81,13 +81,18 @@ user_samplespace = {
 }
 '''
 ####################################################################
-target_node = 'T1'
+target_node = 'coupler_spectroscopy'
 qubits = [ 'q06','q07','q08','q09','q10']
 couplers = ['q06_q07']
 user_samplespace = {
     'resonator_spectroscopy': {
         'ro_frequencies': {
             qubit: resonator_samples(qubit) for qubit in qubits
+        }
+    },
+    'rabi_oscillations': {
+        'mw_amplitudes': {
+            qubit: np.linspace(0.002, 0.5, 101) for qubit in qubits
         }
     }
 }

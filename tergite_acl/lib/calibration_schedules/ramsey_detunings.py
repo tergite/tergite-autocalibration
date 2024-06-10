@@ -4,7 +4,8 @@ from quantify_scheduler.operations.gate_library import Measure, Reset, X90, Rxy,
 from quantify_scheduler.operations.pulse_library import DRAGPulse
 from quantify_scheduler.resources import ClockResource
 from tergite_acl.lib.measurement_base import Measurement
-from tergite_acl.utils.extended_transmon_element import ExtendedTransmon, Measure_RO1
+from tergite_acl.utils.extended_gates import Measure_RO1
+from tergite_acl.utils.extended_transmon_element import ExtendedTransmon
 
 import numpy as np
 

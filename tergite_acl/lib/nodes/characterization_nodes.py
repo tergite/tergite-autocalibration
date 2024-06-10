@@ -41,12 +41,11 @@ class T1_Node(BaseNode):
         self.redis_field = ['t1_time']
         self.backup = False
 
-        self.schedule_keywords = {'multiplexing': 'one_by_one'}
-
-        self.number_or_repeated_T1 = 3
+        self.schedule_keywords = {'multiplexing': 'parallel'} # 'one_by_one' | 'parallel'
+        self.number_or_repeated_T1s = 3
 
         self.sleep_time = 3
-        self.operations_args = []
+        # self.operations_args = []
 
         self.schedule_samplespace = {
             'delays': {
@@ -54,17 +53,19 @@ class T1_Node(BaseNode):
             }
         }
         self.external_samplespace = {
-            'repeat': range(self.number_or_repeated_T1)
+            'repeat': {
+                qubit: range(self.number_or_repeated_T1s) for qubit in self.all_qubits
+            }
         }
 
-    def pre_measurement_operation(self, external=1):
-        if external > 0:
+    def pre_measurement_operation(self, reduced_ext_space):
+        iteration_dict = reduced_ext_space['repeat']
+        # there is some redundancy tha all qubits have the same
+        # iteration index, that's why we keep the first value->
+        this_iteration = list(iteration_dict.values())[0]
+        if this_iteration > 0:
             print(f'sleeping for {self.sleep_time} seconds')
             sleep(self.sleep_time)
-
-    @property
-    def dimensions(self):
-        return (len(self.samplespace['delays'][self.all_qubits[0]]), 1)
 
 
 

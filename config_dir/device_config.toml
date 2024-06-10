@@ -144,7 +144,7 @@ reset.duration = 200e-6
 
 [coupler_spectroscopy.all]
 spec.spec_duration = 2e-6
-spec.spec_amp = 3.5e-4
+# spec.spec_amp = 3.5e-4
 reset.duration = 100e-6
 
 [qubit_12_spectroscopy_pulsed.all]

@@ -7,7 +7,9 @@ from quantify_scheduler.operations.pulse_library import SetClockFrequency, SoftS
 from quantify_scheduler.operations.pulse_factories import long_square_pulse
 from quantify_scheduler.resources import ClockResource
 from quantify_scheduler.schedules.schedule import Schedule
-from tergite_acl.utils.extended_transmon_element import ExtendedTransmon, Measure_RO1
+from tergite_acl.utils.extended_transmon_element import ExtendedTransmon
+from tergite_acl.utils.extended_gates import Measure_RO1
+
 import numpy as np
 
 from tergite_acl.lib.measurement_base import Measurement
@@ -25,7 +27,6 @@ class Two_Tones_Multidim(Measurement):
         spec_frequencies: dict[str,np.ndarray],
         spec_pulse_amplitudes: dict[str,np.ndarray] = None,
         repetitions: int = 1024,
-        **kw_args
         ) -> Schedule:
         """
         Generate a schedule for performing two-tone (qubit) spectroscopy to locate the qubits resonance frequency for multiple qubits.
@@ -79,7 +80,7 @@ class Two_Tones_Multidim(Measurement):
 
             if spec_pulse_amplitudes is None:
                 spec_amplitude = this_transmon.spec.spec_ampl_optimal()
-                print(f'setting optimal spec spec_amplitude for {this_qubit} {spec_amplitude}')
+                print(f'setting optimal spec_amplitude for {this_qubit} {spec_amplitude}')
                 amplitude_values = [spec_amplitude]
             else:
                 amplitude_values = spec_pulse_amplitudes[this_qubit]

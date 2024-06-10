@@ -2,22 +2,21 @@
 Given the requested node
 fetch and compile the appropriate schedule
 '''
+import json
 from pathlib import Path
-from pydantic_core.core_schema import decimal_schema
+
+# from pydantic_core.core_schema import decimal_schema
+from quantify_scheduler.backends import SerialCompiler
+from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
 from quantify_scheduler.json_utils import SchedulerJSONDecoder, SchedulerJSONEncoder
+import redis
+
+from tergite_acl.config.settings import HARDWARE_CONFIG, REDIS_CONNECTION
 from tergite_acl.lib.node_base import BaseNode
 from tergite_acl.utils import extended_transmon_element
-from tergite_acl.utils.logger.tac_logger import logger
-from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
-import redis
-import json
-from tergite_acl.utils.extended_transmon_element import ExtendedTransmon
 from tergite_acl.utils.extended_coupler_edge import CompositeSquareEdge
-from quantify_scheduler.backends import SerialCompiler
-from tergite_acl.config.settings import HARDWARE_CONFIG, REDIS_CONNECTION
-from quantify_core.data.handling import set_datadir
-
-# set_datadir('.')
+from tergite_acl.utils.extended_transmon_element import ExtendedTransmon
+from tergite_acl.utils.logger.tac_logger import logger
 
 with open(HARDWARE_CONFIG) as hw:
     hw_config = json.load(hw)
@@ -145,7 +144,7 @@ def precompile(node: BaseNode, data_path: Path, bin_mode:str=None, repetitions:i
 
     samplespace = schedule_samplespace | external_samplespace
 
-    schedule = schedule_function( **samplespace, **schedule_keywords )
+    schedule = schedule_function( **schedule_samplespace, **schedule_keywords )
     compilation_config = device.generate_compilation_config()
 
     # save_serial_device(device, data_path)

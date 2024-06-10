@@ -9,6 +9,8 @@ from tergite_acl.lib.nodes.node_utils import qubit_samples, resonator_samples
 from tergite_acl.lib.calibration_schedules.cz_chevron import CZ_chevron
 from tergite_acl.lib.calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
 from tergite_acl.lib.calibration_schedules.two_tone_multidim import Two_Tones_Multidim
+from tergite_acl.utils.hardware_utils import SpiDAC
+from tergite_acl.utils.status import MeasurementMode
 
 
 class Coupler_Spectroscopy_Node(BaseNode):
@@ -23,6 +25,11 @@ class Coupler_Spectroscopy_Node(BaseNode):
         self.redis_field = ['parking_current']
         self.qubit_state = 0
         self.coupled_qubits = self.get_coupled_qubits()
+        self.coupler = self.couplers[0]
+        mode = MeasurementMode.dummy
+        self.spi_dac = SpiDAC(mode)
+        self.dac = 1
+        # self.dac = self.spi_dac.create_spi_dac(self.coupler)
 
         self.schedule_samplespace = {
             'spec_frequencies': {
@@ -31,7 +38,9 @@ class Coupler_Spectroscopy_Node(BaseNode):
         }
 
         self.external_samplespace = {
-            'dc_currents': {self.couplers[0]: np.arange(-2.5e-3, 2.5e-3, 250e-6)},
+            'dc_currents': {
+                self.coupler: np.arange(-2.5e-3, 2.5e-3, 250e-6)
+            },
         }
         # self.validate()
 
@@ -41,6 +50,15 @@ class Coupler_Spectroscopy_Node(BaseNode):
         coupled_qubits = self.couplers[0].split(sep='_')
         self.coupler = self.couplers[0]
         return coupled_qubits
+
+    def pre_measurement_operation(self, reduced_ext_space):
+        iteration_dict = reduced_ext_space['dc_currents']
+        # there is some redundancy tha all qubits have the same
+        # iteration index, that's why we keep the first value->
+
+        this_iteration_value = list(iteration_dict.values())[0]
+        print(f'{ this_iteration_value = }')
+        # self.spi_dac.set_dac_current(self.dac, this_iteration_value)
 
 
 

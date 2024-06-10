@@ -66,10 +66,12 @@ def monitor_node_calibration(node: BaseNode, data_path: Path, lab_ic, cluster_st
             for current_iteration in range(iterations):
                 reduced_external_samplespace = {}
                 qubit_values = {}
-                for qubit in node.all_qubits:
-                    qubit_specific_values = node.external_samplespace[external_settable][qubit]
+                #elements may refer to qubits or couplers
+                elements = node.external_samplespace[external_settable].keys()
+                for element in elements:
+                    qubit_specific_values = node.external_samplespace[external_settable][element]
                     external_value = qubit_specific_values[current_iteration]
-                    qubit_values[qubit] = external_value
+                    qubit_values[element] = external_value
 
                 # example of reduced_external_samplespace:
                 # reduced_external_samplespace = {
