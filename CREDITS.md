@@ -1,8 +1,16 @@
 # Credits
 
+## Gustav Grännsjö
+
+The first version of the tergite-autocalibration
+
+## Johan Blomberg
+
+The first version of the tergite-autocalibration
+
 ## Eleftherios Moschandreou
 
-The first version of the tergite-autocalibration-lite
+The revised second version of the tergite-autocalibration
 
 ## Liangyu Chen
 
