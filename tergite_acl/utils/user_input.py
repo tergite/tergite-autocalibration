@@ -47,7 +47,7 @@ couplers = ['q14_q15'] #done
 #couplers = ['q06_q11']
 
 
-attenuation_setting = {'qubit':10, 'coupler':30, 'readout':12}
+attenuation_setting = {'qubit':4, 'coupler':34, 'readout':12}
 
 '''punchout
   resonator_spectroscopy
@@ -89,7 +89,7 @@ attenuation_setting = {'qubit':10, 'coupler':30, 'readout':12}
 '''
 
 user_requested_calibration = {
-    'target_node': 'T2_echo',
+    'target_node': 'tqg_randomized_benchmarking',
     'all_qubits': qubits,
     'couplers': couplers,
 }

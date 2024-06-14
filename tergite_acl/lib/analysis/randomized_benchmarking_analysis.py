@@ -61,16 +61,17 @@ class RandomizedBenchmarkingAnalysis(BaseAnalysis):
                 self.seed_coord = coord
         self.number_of_repetitions = dataset.dims[self.seed_coord]
         self.number_of_cliffords = dataset[self.number_cliffords_coord].values
-        self.number_of_cliffords_runs = dataset.dims[self.number_cliffords_coord] - 2
+        self.number_of_cliffords_runs = dataset.dims[self.number_cliffords_coord] - 3
         self.normalized_data_dict = {}
         for repetition_index in range(self.number_of_repetitions):
             complex_values = self.S21.isel(
                 {self.seed_coord: [repetition_index]}
             )
             measurements = complex_values.values.flatten()
-            data = measurements[:-2]
-            calibration_0 = measurements[-2]
-            calibration_1 = measurements[-1]
+            data = measurements[:-3]
+            calibration_0 = measurements[-3]
+            calibration_1 = measurements[-2]
+            calibration_2 = measurements[-1]
             #print('these are the zero and one points respectively: ', calibration_0, calibration_1)
             #print('these are the unrotated data points: ', data)
             displacement_vector = calibration_1 - calibration_0
@@ -80,6 +81,7 @@ class RandomizedBenchmarkingAnalysis(BaseAnalysis):
             rotated_data = data_translated_to_zero * np.exp(-1j * rotation_angle)
             rotated_0 = calibration_0 * np.exp(-1j * rotation_angle)
             rotated_1 = calibration_1 * np.exp(-1j * rotation_angle)
+            rotated_2 = calibration_2 * np.exp(-1j * rotation_angle)
             normalization = (rotated_1 - rotated_0).real
             real_rotated_data = rotated_data.real
             self.normalized_data_dict[repetition_index] = real_rotated_data / normalization
@@ -92,7 +94,7 @@ class RandomizedBenchmarkingAnalysis(BaseAnalysis):
 
         model = ExpDecayModel()
 
-        n_cliffords = self.number_of_cliffords[:-2]
+        n_cliffords = self.number_of_cliffords[:-3]
 
         # Gives an initial guess for the model parameters and then fits the model to the data.
         guess = model.guess(data=self.sum, m=n_cliffords)
@@ -106,10 +108,10 @@ class RandomizedBenchmarkingAnalysis(BaseAnalysis):
     def plotter(self, ax: Axes):
         for repetition_index in range(self.number_of_repetitions):
             real_values = self.normalized_data_dict[repetition_index]
-            ax.plot(self.number_of_cliffords[:-2], real_values, alpha=0.2)
-            ax.annotate(f'{repetition_index}', (self.number_of_cliffords[:-2][-1], real_values[-1]))
+            ax.plot(self.number_of_cliffords[:-3], real_values, alpha=0.2)
+            ax.annotate(f'{repetition_index}', (self.number_of_cliffords[:-3][-1], real_values[-1]))
 
         ax.plot(self.fit_n_cliffords, self.fit_y, 'ro-', lw=2.5, label=f'p = {self.fidelity:.3f}', )
-        ax.plot(self.number_of_cliffords[:-2], self.sum, ls='dashed', c='black')
+        ax.plot(self.number_of_cliffords[:-3], self.sum, ls='dashed', c='black')
         ax.set_ylabel(f'|S21| (V)')
         ax.grid()

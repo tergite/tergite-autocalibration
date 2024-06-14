@@ -86,7 +86,7 @@ class Randomized_Benchmarking_Node(BaseNode):
             'number_of_cliffords': {
                 # qubit: all_numbers for qubit in self.all_qubits
                 # qubit: np.array([2, 16, 128, 256,512, 768, 1024, 0, 1]) for qubit in self.all_qubits
-                qubit: np.array([1, 2, 3, 4, 8, 16, 128, 256, 512, 1024, 0, 1]) for qubit in self.all_qubits
+                qubit: np.array([0, 2, 4, 8, 16, 128, 256, 512, 1024, 0, 1, 2]) for qubit in self.all_qubits
             },
         }
         return cluster_samplespace

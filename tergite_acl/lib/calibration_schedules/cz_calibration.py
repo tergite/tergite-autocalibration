@@ -91,10 +91,11 @@ class CZ_calibration(Measurement):
 
         qubit_type_list = ['Control','Target']
         if swap_type:
-            qubit_type_list.reverse()   
+            qubit_type_list.reverse()
+            print('swapping')   
             name += '_swap'
+        
         schedule = Schedule(f"{name}", repetitions)
-
         all_couplers = self.couplers
         all_qubits = [coupler.split(sep='_') for coupler in all_couplers]
         all_qubits = sum(all_qubits, [])
@@ -178,23 +179,25 @@ class CZ_calibration(Measurement):
                     cz_pulse_port = f'{this_coupler}:fl'
                     reset_phase = schedule.add(ResetClockPhase(clock=cz_clock),
                                                ref_op=buffer_start, ref_pt='end', )
-
-                    if use_edge:
-                        # print(qubits[0],qubits[1])
-                        cz = schedule.add(CZ(qubits[0],qubits[1]))
-                    else:
-                        # print(this_coupler,cz_pulse_port,cz_clock)
-                        cz = schedule.add(
-                            SoftSquarePulse(
-                                duration=cz_pulse_duration[this_coupler],
-                                amp=cz_pulse_amplitude[this_coupler]*gate_amp,
-                                port=cz_pulse_port,
-                                clock=cz_clock,
+                    for i in range(number_of_cz):
+                        if use_edge:
+                            # print(qubits[0],qubits[1])
+                            print('using edge for CZ')
+                            cz = schedule.add(CZ(qubits[0],qubits[1]))
+                        else:
+                            print('using soft pulse for CZ')
+                            # print(this_coupler,cz_pulse_port,cz_clock)
+                            cz = schedule.add(
+                                SoftSquarePulse(
+                                    duration=cz_pulse_duration[this_coupler],
+                                    amp=cz_pulse_amplitude[this_coupler]*gate_amp,
+                                    port=cz_pulse_port,
+                                    clock=cz_clock,
+                                )
                             )
-                        )
+                        # buffer_end = schedule.add(IdlePulse(100e-9))
 
-                buffer_end = schedule.add(IdlePulse(4e-9), ref_op=buffer_start, ref_pt='end',
-                                      rel_time=np.ceil(cz_pulse_duration[this_coupler] * 1e9 / 4) * 4e-9)
+                buffer_end = schedule.add(IdlePulse(4e-9))
 
                 # cz_pulse_port='q19_q20:fl'
                 # cz_clock = 'q19_q20.cz'
@@ -457,7 +460,7 @@ class CZ_calibration_duration(Measurement):
                 for this_qubit in qubits:
                     this_index = cz_index * number_of_phases + ramsey_index
                     schedule.add(Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
-                                 ref_op=x90_end, ref_pt="end" )
+                                 ref_op=x90_end, ref_pt="end", )
                 # schedule.add(Reset(this_qubit))
         # Add calibration points
         # relaxation_calib = schedule.add(Reset(*qubits), label=f"Reset_Calib")

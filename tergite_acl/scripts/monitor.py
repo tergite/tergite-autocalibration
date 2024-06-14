@@ -84,7 +84,7 @@ class Monitor:
         return self.all_results[1]
 
 class OptimizeNode:
-    def __init__(self, node, trails = 50):
+    def __init__(self, node, trails = 50, optimize_swap = False):
         self.monitor = Monitor()
         self.reset_redis = ResetRedisNode()
         self.node = node
@@ -94,21 +94,49 @@ class OptimizeNode:
         self.study = optuna.create_study(sampler=sampler)
         self.trails = trails
         self.best_params = None
+        self.optimize_swap = optimize_swap
 
     def objective_cz(self,trial):
         freqs = np.array([trial.suggest_float("cz_pulse_frequency", -1, 1,step=0.001)])*1e6
-        times = np.array([trial.suggest_float("cz_pulse_duration", -10, 10,step=0.1)])*1e-9
-        amps = np.array([trial.suggest_float("cz_pulse_amplitude", -0.02, 0.02,step=0.0001)])
+        times = np.array([trial.suggest_float("cz_pulse_duration", -20, 20,step=0.01)])*1e-9
+        amps = np.array([trial.suggest_float("cz_pulse_amplitude", -0.004, 0.004,step=0.00001)])
         # self.reset_redis.reset_node(self.node)
-        self.monitor.calibrate_node(self.node, opt_cz_pulse_frequency = dict(zip(couplers,freqs)),
-                                                        opt_cz_pulse_duration = dict(zip(couplers,times)),
-                                                        opt_cz_pulse_amplitude = dict(zip(couplers,amps)))
-        results = self.monitor.get_results()
-        all_results = [results[coupler] for coupler in results.keys()][:len(results.keys())-1]
+        # self.monitor.calibrate_node('cz_calibration', opt_cz_pulse_frequency = dict(zip(couplers,freqs)),
+        #                                                 opt_cz_pulse_duration = dict(zip(couplers,times)),
+        #                                                 opt_cz_pulse_amplitude = dict(zip(couplers,amps)))
+        # self.monitor.calibrate_node('cz_calibration', opt_cz_pulse_frequency = dict(zip(couplers,freqs)),
+        #                                             opt_cz_pulse_amplitude = dict(zip(couplers,amps)))
+        self.monitor.calibrate_node('cz_calibration', opt_cz_pulse_frequency = dict(zip(couplers,freqs)),
+                                            opt_cz_pulse_duration = dict(zip(couplers,times)))
+        results1 = self.monitor.get_results()
+        all_results1 = [results1[coupler] for coupler in results1.keys()][:len(results1.keys())-1]
+
+        # self.monitor.calibrate_node('cz_calibration_swap', opt_cz_pulse_frequency = dict(zip(couplers,freqs)),
+        #                                                 opt_cz_pulse_duration = dict(zip(couplers,times)),
+        #                                                 opt_cz_pulse_amplitude = dict(zip(couplers,amps)))
+        if self.optimize_swap:
+            # self.monitor.calibrate_node('cz_calibration_swap', opt_cz_pulse_frequency = dict(zip(couplers,freqs)),
+            #                                                 opt_cz_pulse_amplitude = dict(zip(couplers,amps)))
+            self.monitor.calibrate_node('cz_calibration_swap', opt_cz_pulse_frequency = dict(zip(couplers,freqs)),
+                                                            opt_cz_pulse_duration = dict(zip(couplers,times)))                
+            results2 = self.monitor.get_results()
+            all_results2 = [results2[coupler] for coupler in results2.keys()][:len(results2.keys())-1]
+
         if self.node[-4:] == 'ssro':
-            all_costs = [ np.sqrt(((res['cz_phase']-180)/180)**2 + res['cz_pop_loss']**2+res['cz_leakage']**2) for res in all_results]
+            all_costs1 = [ np.sqrt(((res['cz_phase']-180)/180)**2 + res['cz_pop_loss']**2+res['cz_leakage']**2) for res in all_results1]
+            if self.optimize_swap:
+                all_costs2 = [ np.sqrt(((res['cz_phase']-180)/180)**2 + res['cz_pop_loss']**2+res['cz_leakage']**2) for res in all_results2] 
+                all_costs = all_costs1+all_costs2
+            else:
+                all_costs = all_costs1
         else:
-            all_costs = [ np.sqrt(((res['cz_phase']-180)/180)**2 + res['cz_pop_loss']**2) for res in all_results]
+            all_costs1 = [ np.sqrt(((res['cz_phase']-180)/180)**2 + res['cz_pop_loss']**2) for res in all_results1]
+            if self.optimize_swap:
+                all_costs2 = [ np.sqrt(((res['cz_phase']-180)/180)**2 + (2*res['cz_pop_loss'])**2) for res in all_results2] 
+                all_costs = all_costs1+all_costs2
+            else:
+                all_costs = all_costs1
+
         return sum(all_costs)
 
     def optimize_node(self):
@@ -131,7 +159,6 @@ class OptimizeNode:
         times = np.array([best_params['cz_pulse_duration']])*1e-9
         amps = np.array([best_params['cz_pulse_amplitude']])
         self.monitor.calibrate_node(self.node,opt_cz_pulse_frequency = dict(zip(couplers,freqs)),
-                                                        opt_cz_pulse_duration = dict(zip(couplers,times)),
                                                         opt_cz_pulse_amplitude = dict(zip(couplers,amps)))
         results = self.monitor.get_results()
         print(results)
