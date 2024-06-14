@@ -182,10 +182,8 @@ class CZ_calibration(Measurement):
                     for i in range(number_of_cz):
                         if use_edge:
                             # print(qubits[0],qubits[1])
-                            print('using edge for CZ')
                             cz = schedule.add(CZ(qubits[0],qubits[1]))
                         else:
-                            print('using soft pulse for CZ')
                             # print(this_coupler,cz_pulse_port,cz_clock)
                             cz = schedule.add(
                                 SoftSquarePulse(

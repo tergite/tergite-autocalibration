@@ -35,6 +35,7 @@ class NodeFactory:
             'T2': T2_Node,
             'T2_echo': T2_Echo_Node,
             'reset_chevron': Reset_Chevron_Node,
+            'reset_calibration_ssro': Reset_Calibration_SSRO_Node,
             'cz_chevron': CZ_Chevron_Node,
             'cz_chevron_amplitude': CZ_Chevron_Amplitude_Node,
             'cz_optimize_chevron': CZ_Optimize_Chevron_Node,

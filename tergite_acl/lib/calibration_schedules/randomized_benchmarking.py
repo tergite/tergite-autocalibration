@@ -218,9 +218,9 @@ class TQG_Randomized_Benchmarking(Measurement):
                 apply_inverse_gate=apply_inverse_gate,
                 number_of_qubits=2,
             )
-            physical_gates = decompose_clifford_seq(clifford_seq, qubits)
+            physical_gates = decompose_clifford_seq(clifford_seq, ['q23','q24'])
 
-            separation_time = 200e-9
+            separation_time = 260e-9
             # schedule = Schedule('rb_sequence_generation')
             reset = schedule.add(Reset(*qubits))
 

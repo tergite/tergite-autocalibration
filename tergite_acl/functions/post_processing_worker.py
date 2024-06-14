@@ -89,7 +89,7 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
         elif node.name in ['cz_chevron','cz_chevron_amplitude','cz_calibration_swap', 'cz_dynamic_phase_swap'] and qubit_types[this_qubit] == 'Control':
             node_analysis.update_redis_trusted_values(node.name, node.coupler, redis_field)
             this_element = node.coupler
-        elif node.name in ['coupler_spectroscopy','tqg_randomized_benchmarking','tqg_randomized_benchmarking_inteleaved']:
+        elif node.name in ['coupler_spectroscopy','tqg_randomized_benchmarking','tqg_randomized_benchmarking_interleaved']:
             node_analysis.update_redis_trusted_values(node.name, node.coupler, redis_field)
             this_element = node.coupler
         else:

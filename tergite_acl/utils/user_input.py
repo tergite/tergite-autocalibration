@@ -80,6 +80,7 @@ attenuation_setting = {'qubit':4, 'coupler':34, 'readout':12}
   cz_chevron_amplitude
   cz_optimize_chevron
   reset_chevron
+  reset_calibration_ssro
   cz_calibration
   cz_calibration_ssro
   cz_dynamic_phase

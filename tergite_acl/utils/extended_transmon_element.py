@@ -175,6 +175,7 @@ class Measure_RO2(Measure):
                     'acq_protocol': acq_protocol,
                     'bin_mode': bin_mode,
                     'operation_type': 'measure_2',
+                    'acq_channel_override': None,
                 },
             }
         )
@@ -211,6 +212,7 @@ class Measure_RO_Opt(Measure):
                     'acq_protocol': acq_protocol,
                     'bin_mode': bin_mode,
                     'operation_type': 'measure_3state_opt',
+                    'acq_channel_override': None,
                 },
             }
         )
@@ -321,7 +323,7 @@ class ExtendedTransmon(BasicTransmonElement):
                         'acq_delay': self.measure.acq_delay(),
                         'acq_duration': self.measure.integration_time(),
                         'acq_channel': self.measure.acq_channel(),
-                        'acq_channel_override': None,
+                        # 'acq_channel_override': None,
                         'acq_protocol_default': 'SSBIntegrationComplex',
                         'reset_clock_phase': self.measure.reset_clock_phase(),
                         'reference_magnitude': pulse_library.ReferenceMagnitude.from_parameter(

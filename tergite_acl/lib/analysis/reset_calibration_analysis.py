@@ -11,10 +11,16 @@ from scipy.linalg import norm
 from scipy.optimize import minimize
 from numpy.linalg import inv
 import itertools
+from tergite_acl.lib.analysis_base import BaseAnalysis
 
 
 def mitigate(v,cm_inv):
-    u = np.dot(v,cm_inv)
+    try:
+        u = np.dot(v,cm_inv)
+    except:
+        print('Mitigation failed.')
+        print(f'{v = }')
+        return v
     # print(u,np.sum(u))
     def m(t):
         return norm(u-np.array(t))
@@ -29,8 +35,9 @@ def mitigate(v,cm_inv):
     # print(w)
     return w
 
-class ResetCalibrationSSROAnalysis():
+class ResetCalibrationSSROAnalysis(BaseAnalysis):
     def  __init__(self,dataset: xr.Dataset):
+        super().__init__()
         self.data_var = list(dataset.data_vars.keys())[0]
         self.qubit = dataset[self.data_var].attrs['qubit']
         for coord in dataset.coords:
@@ -94,6 +101,9 @@ class ResetCalibrationSSROAnalysis():
             data_res = np.array([])
             for sweep in data_y_pred:
                 uniques, counts = np.unique(sweep, return_counts=True)
+                raw_prob = [0]*len(self.calibs)
+                for state_id,state in enumerate(uniques):
+                    raw_prob[int(state[1])] = counts[state_id]
                 raw_prob = counts/len(sweep)
                 mitigate_prob = mitigate(raw_prob,cm_inv)
                 data_res = np.append(data_res,mitigate_prob)
@@ -102,7 +112,8 @@ class ResetCalibrationSSROAnalysis():
         self.all_magnitudes = np.array(self.all_magnitudes)
         # Fitting the 1 state data
         self.magnitudes = self.all_magnitudes[:,:-3,1]
-
+        self.f_magnitudes = self.all_magnitudes[:,:-3,2]
+        
         # self.freq = self.dataset[f'control_ons{self.qubit}'].values
         # self.amp = self.dataset[f'ramsey_phases{self.qubit}'].values
         # magnitudes = self.dataset[f'y{self.qubit}'].values
@@ -137,9 +148,10 @@ class ResetCalibrationSSROAnalysis():
             #         self.fit_ys.append([0,0,0,1,1,1,1,1,1]) # Control - ResetOn
         self.fit_ys = np.array(self.fit_ys)
         self.pop_loss = 1-np.sum(np.abs(self.magnitudes - self.fit_ys))/9
-        print(self.magnitudes)
-        self.leakage = np.mean(self.all_magnitudes[:,:-3,2][-1])
-        return [self.pop_loss,self.leakage]
+        self.leakage = np.mean(self.f_magnitudes[-1])
+        magnitudes_str = ",".join(str(element) for element in list(self.magnitudes.flatten()))
+        f_magnitudes_str = ",".join(str(element) for element in list(self.f_magnitudes.flatten()))
+        return [self.pop_loss,self.leakage,magnitudes_str,f_magnitudes_str]
 
     def plotter(self,axis):
         # datarray = self.dataset[f'y{self.qubit}']

@@ -84,7 +84,7 @@ class Monitor:
         return self.all_results[1]
 
 class OptimizeNode:
-    def __init__(self, node, trails = 50, optimize_swap = False):
+    def __init__(self, node, trails = 50, params = ['cz_pulse_frequency','cz_pulse_duration','cz_pulse_amplitude']):
         self.monitor = Monitor()
         self.reset_redis = ResetRedisNode()
         self.node = node
@@ -93,35 +93,27 @@ class OptimizeNode:
         sampler = optuna.samplers.CmaEsSampler(with_margin=True)
         self.study = optuna.create_study(sampler=sampler)
         self.trails = trails
-        self.best_params = None
-        self.optimize_swap = optimize_swap
+        self.params = params
 
     def objective_cz(self,trial):
-        freqs = np.array([trial.suggest_float("cz_pulse_frequency", -1, 1,step=0.001)])*1e6
-        times = np.array([trial.suggest_float("cz_pulse_duration", -20, 20,step=0.01)])*1e-9
-        amps = np.array([trial.suggest_float("cz_pulse_amplitude", -0.004, 0.004,step=0.00001)])
-        # self.reset_redis.reset_node(self.node)
-        # self.monitor.calibrate_node('cz_calibration', opt_cz_pulse_frequency = dict(zip(couplers,freqs)),
-        #                                                 opt_cz_pulse_duration = dict(zip(couplers,times)),
-        #                                                 opt_cz_pulse_amplitude = dict(zip(couplers,amps)))
-        # self.monitor.calibrate_node('cz_calibration', opt_cz_pulse_frequency = dict(zip(couplers,freqs)),
-        #                                             opt_cz_pulse_amplitude = dict(zip(couplers,amps)))
-        self.monitor.calibrate_node('cz_calibration', opt_cz_pulse_frequency = dict(zip(couplers,freqs)),
-                                            opt_cz_pulse_duration = dict(zip(couplers,times)))
-        results1 = self.monitor.get_results()
-        all_results1 = [results1[coupler] for coupler in results1.keys()][:len(results1.keys())-1]
-
-        # self.monitor.calibrate_node('cz_calibration_swap', opt_cz_pulse_frequency = dict(zip(couplers,freqs)),
-        #                                                 opt_cz_pulse_duration = dict(zip(couplers,times)),
-        #                                                 opt_cz_pulse_amplitude = dict(zip(couplers,amps)))
-        if self.optimize_swap:
-            # self.monitor.calibrate_node('cz_calibration_swap', opt_cz_pulse_frequency = dict(zip(couplers,freqs)),
-            #                                                 opt_cz_pulse_amplitude = dict(zip(couplers,amps)))
-            self.monitor.calibrate_node('cz_calibration_swap', opt_cz_pulse_frequency = dict(zip(couplers,freqs)),
-                                                            opt_cz_pulse_duration = dict(zip(couplers,times)))                
-            results2 = self.monitor.get_results()
-            all_results2 = [results2[coupler] for coupler in results2.keys()][:len(results2.keys())-1]
-
+        
+        freqs_dict, times_dict, amps_dict = None, None, None
+        for param in self.params:
+            if param == 'cz_pulse_frequency':
+                freqs = np.array([trial.suggest_float("cz_pulse_frequency", -2, 2,step=0.001)])*1e6
+                freqs_dict = dict(zip(couplers,freqs))
+            elif param == 'cz_pulse_duration':
+                times = np.array([trial.suggest_float("cz_pulse_duration", -20, 20,step=0.01)])*1e-9
+                times_dict = dict(zip(couplers,times))
+            elif param == 'cz_pulse_amplitude':
+                amps = np.array([trial.suggest_float("cz_pulse_amplitude", -0.02, 0.02,step=0.00001)])
+                amps_dict = dict(zip(couplers,amps))
+        print(f"Optimizing {self.node} with {freqs_dict}, {times_dict}, {amps_dict}")
+        self.monitor.calibrate_node(self.node, opt_cz_pulse_frequency = freqs_dict,
+                                                        opt_cz_pulse_duration = times_dict,
+                                                        opt_cz_pulse_amplitude = amps_dict)
+        results = self.monitor.get_results()
+        all_results = [results[coupler] for coupler in results.keys()][:len(results.keys())-1]
         if self.node[-4:] == 'ssro':
             all_costs1 = [ np.sqrt(((res['cz_phase']-180)/180)**2 + res['cz_pop_loss']**2+res['cz_leakage']**2) for res in all_results1]
             if self.optimize_swap:
@@ -155,11 +147,25 @@ class OptimizeNode:
     def validate_cz(self, best_params = None):
         if best_params is None:
             best_params = self.best_params
-        freqs = np.array([best_params['cz_pulse_frequency']])*1e6
-        times = np.array([best_params['cz_pulse_duration']])*1e-9
-        amps = np.array([best_params['cz_pulse_amplitude']])
-        self.monitor.calibrate_node(self.node,opt_cz_pulse_frequency = dict(zip(couplers,freqs)),
-                                                        opt_cz_pulse_amplitude = dict(zip(couplers,amps)))
+        # freqs = np.array([best_params['cz_pulse_frequency']])*1e6
+        # times = np.array([best_params['cz_pulse_duration']])*1e-9
+        # amps = np.array([best_params['cz_pulse_amplitude']])
+
+        freqs_dict, times_dict, amps_dict = None, None, None
+        for param in self.params:
+            if param == 'cz_pulse_frequency':
+                freqs = np.array([best_params['cz_pulse_frequency']])*1e6
+                freqs_dict = dict(zip(couplers,freqs))
+            elif param == 'cz_pulse_duration':
+                times = np.array([best_params['cz_pulse_duration']])*1e-9
+                times_dict = dict(zip(couplers,times))
+            elif param == 'cz_pulse_amplitude':
+                amps = np.array([best_params['cz_pulse_amplitude']])
+                amps_dict = dict(zip(couplers,amps))
+
+        self.monitor.calibrate_node(self.node, opt_cz_pulse_frequency = freqs_dict,
+                                                        opt_cz_pulse_duration = times_dict,
+                                                        opt_cz_pulse_amplitude = amps_dict)
         results = self.monitor.get_results()
         print(results)
         return results

@@ -178,7 +178,7 @@ class RO_amplitude_three_state_optimization_Node(BaseNode):
         self.measurement_obj = RO_amplitude_optimization
         self.analysis_obj = OptimalRO_Three_state_AmplitudeAnalysis
         self.node_dictionary = node_dictionary
-        self.node_dictionary['loop_repetitions'] = 1000
+        self.node_dictionary['loop_repetitions'] = 256
         self.plots_per_qubit = 3 #  fidelity plot, IQ shots, confusion matrix
 
 
@@ -193,7 +193,7 @@ class RO_amplitude_three_state_optimization_Node(BaseNode):
             'qubit_states': {
                 qubit: np.tile(np.array([0,1,2], dtype=np.int16), loops)  for qubit in self.all_qubits
             },
-            'ro_amplitudes': {qubit: np.linspace(0.001, 0.01, 11) for qubit in self.all_qubits},
+            'ro_amplitudes': {qubit: np.append(np.linspace(0.001, 0.025, 41),np.linspace(0.026, 0.2, 41)) for qubit in self.all_qubits},
 
         }
         return cluster_samplespace
