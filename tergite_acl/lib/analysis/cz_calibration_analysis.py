@@ -211,19 +211,24 @@ class CZCalibrationSSROAnalysis(BaseAnalysis):
                 self.state_coord = coord
             elif 'shot' in str(coord):
                 self.shot_coord = coord
-        # self.S21 = dataset[data_var].values
+
         self.independents = np.array([float(val) for val in dataset[self.state_coord].values[:-3]])
         self.calibs = dataset[self.state_coord].values[-3:]
         self.sweeps = dataset.coords[self.sweep_coord]
         self.shots = len(dataset[self.shot_coord].values)
         self.fit_results = {}
-        # dataset[f'y{self.qubit}'].values = np.abs(self.S21)
+
         self.dataset = dataset
 
     def run_fitting(self):
         # self.testing_group = 0
         self.dynamic = self.dataset.attrs['node'] == 'cz_dynamic_phase'
+        self.swap = self.dataset.attrs['node'][15:19] == 'swap'
+        qubit_type_list = ['Control','Target']
+        if self.swap:
+            qubit_type_list.reverse() 
         self.all_magnitudes = []
+        print('These are the sweeps', self.sweeps)
         for indx, _ in enumerate(self.sweeps):
             # Calculate confusion matrix from calibration shots
             y = np.repeat(self.calibs, self.shots)
@@ -274,17 +279,11 @@ class CZCalibrationSSROAnalysis(BaseAnalysis):
         # Fitting the 0 state data
         self.magnitudes = self.all_magnitudes[:, :-3, 1]
 
-        # self.freq = self.dataset[f'control_ons{self.qubit}'].values
-        # self.amp = self.dataset[f'ramsey_phases{self.qubit}'].values
-        # magnitudes = self.dataset[f'y{self.qubit}'].values
-        # self.magnitudes = np.transpose(magnitudes)
-        # self.magnitudes = np.transpose((magnitudes - np.min(magnitudes))/(np.max(magnitudes)-np.min(magnitudes)))
-        # breakpoint()
         self.fit_independents = np.linspace(self.independents[0], self.independents[-1], 400)
         self.fit_results, self.fit_ys = [], []
         try:
             for magnitude in self.magnitudes:
-                if qubit_types[self.qubit] == 'Target':
+                if qubit_types[self.qubit] == qubit_type_list[1]:
                     # Odd qubits are target qubits
                     fit = True
                     model = CZModel()
@@ -322,8 +321,9 @@ class CZCalibrationSSROAnalysis(BaseAnalysis):
                  self.fit_results])
             self.pop_loss = np.diff(np.flip(qois[0][0]))[0]
         else:
-            self.pop_loss = np.mean(np.diff(np.flip(self.fit_ys)))
+            self.pop_loss = np.diff(np.mean(self.fit_ys,axis=1))[0]
         self.leakage = np.diff(np.flip(np.mean(self.all_magnitudes[:, :-3, 2], axis=1)))[0]
+        print('population loss is: ', self.pop_loss)
         return [self.cphase, self.pop_loss, self.leakage]
 
     def plotter(self, axis):
@@ -337,7 +337,7 @@ class CZCalibrationSSROAnalysis(BaseAnalysis):
             label = ['Control Off', 'Control On']
             name = 'CZ'
         x = range(len(label))
-        marker = ['.', '*', '-', '--']
+        marker = ['.', '*', '1', '--']
         colors = plt.get_cmap('RdBu_r')(np.linspace(0.2, 0.8, len(x)))
         # colors = plt.get_cmap('tab20c')
 
@@ -347,13 +347,15 @@ class CZCalibrationSSROAnalysis(BaseAnalysis):
             # axis.plot(self.independents,magnitude[:-3,1],f'{marker[index]}',c = colors(2+4),label=f'|1> {label[index]}')
             axis.plot(self.independents, magnitude[:-3, 2], f'{marker[1]}', c=colors[index],
                       label=f'|2> {label[index]}')
+            axis.plot(self.independents, magnitude[:-3, 0], f'{marker[2]}', c=colors[index],
+                    label=f'0> {label[index]}')           
 
         for index, magnitude in enumerate(self.magnitudes):
             axis.plot(self.fit_independents, self.fit_ys[index], '-', c=colors[index])
             axis.vlines(self.opt_cz[index], -10, 10, colors='gray', linestyles='--', linewidth=1.5)
 
         axis.vlines(0, -10, -10, colors='gray', linestyles='--',
-                    label='{:} = {:.1f}+/-{:.1f}'.format(name, self.cphase, self.err), zorder=-10)
+                    label='{:} = {:.1f}+/-{:.1f} \n pop_loss = {:.2f}'.format(name, self.cphase, self.err,self.pop_loss), zorder=-10)
         axis.set_xlim([self.independents[0], self.independents[-1]])
         axis.legend(loc='upper right')
         axis.set_ylim(-0.01, 1.01)

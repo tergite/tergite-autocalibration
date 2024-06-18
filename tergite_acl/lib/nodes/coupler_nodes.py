@@ -363,125 +363,14 @@ class Reset_Chevron_Node(BaseNode):
     def samplespace(self):
         # print(f'{ np.linspace(- 50e6, 50e6, 2) + self.ac_freq = }')
         cluster_samplespace = {
-            # Pulse test
-            # 'cz_pulse_durations': {
-            #     qubit: 4e-9 + np.linspace(16e-9, 16e-9, 21) for qubit in self.coupled_qubits
-            # },
-            # 'cz_pulse_amplitudes': {
-            #     qubit: np.linspace(0.4, 0.4, 21) for qubit in self.coupled_qubits
-            # },
 
-            # For DC reset
-            # q22_q23
-            # 'cz_pulse_durations': {
-            #     qubit: 2e-9+np.linspace(0, 20, 21)*1e-9 for qubit in self.coupled_qubits
-            # },
-            # 'cz_pulse_amplitudes': {
-            #     qubit: np.linspace(-0.07, -0.1, 21) for qubit in self.coupled_qubits
-            # },
-            # q23_q24
-            # 'cz_pulse_durations': {
-            #     qubit: 2e-9+np.linspace(0, 40, 41)*1e-9 for qubit in self.coupled_qubits
-            # },
-            # 'cz_pulse_amplitudes': {
-            #     qubit: np.linspace(-0.095, -0.13, 21) for qubit in self.coupled_qubits
-            # },
-            
-            #cr g, f0 sweep
-            # 'cz_pulse_durations': { # g
-            #     qubit: np.linspace(0.075,0.175, 41)for qubit in self.coupled_qubits
-            # },
-            # 'cz_pulse_amplitudes': { # f0
-            #     qubit: np.linspace(1.2, 1.7, 21) for qubit in self.coupled_qubits
-            # },
-
-            #cr ft, t sweep
-            # 'cz_pulse_durations': {
-            #     qubit: 2e-9+np.linspace(0, 20, 21)*1e-9 for qubit in self.coupled_qubits
-            # },
-            # 'cz_pulse_amplitudes': {
-            #     qubit: np.linspace(0.9, 1.4, 41) for qubit in self.coupled_qubits
-            # },
-
-            #cr square sweep
-            # 'cz_pulse_durations': {
-            #     qubit: 4e-9+np.linspace(0, 200, 4)*1e-9 for qubit in self.coupled_qubits
-            # },
-            # 'cz_pulse_amplitudes': {
-            #     qubit: np.linspace(0.0, 0.2, 4) for qubit in self.coupled_qubits
-            # },
-
-             #qc sweep ft. f0
-            # 'cz_pulse_durations': { # ft
-            #     qubit: np.linspace(-0.1,-0.5, 16)for qubit in self.coupled_qubits
-            # },
-            # 'cz_pulse_amplitudes': { # f0
-            #     qubit: np.linspace(0.96, 0.99, 16) for qubit in self.coupled_qubits
-            # },
-
-            #qc sweep g,ft
-            # q23_q24
-            # 'cz_pulse_durations': { # g
-            #     qubit: np.linspace(0.01,0.5, 21)for qubit in self.coupled_qubits
-            # },
-            # 'cz_pulse_amplitudes': { # ft
-            #     qubit: np.linspace(-0.01, -0.5, 21) for qubit in self.coupled_qubits
-            # },
-            # q22_q23
             'cz_pulse_durations': { # g
                 qubit: np.linspace(0.001,0.1, 26)for qubit in self.coupled_qubits
             },
             'cz_pulse_amplitudes': { # ft
                 qubit: np.linspace(0, -0.4, 26) for qubit in self.coupled_qubits
             },
-            
-            #qc sweep f0,t
-            # 'cz_pulse_durations': {
-            #     qubit: self.node_dictionary['duration_offset']*1e-9+np.linspace(0, 4, 5)*1e-9 for qubit in self.coupled_qubits
-            # },
-            # 'cz_pulse_amplitudes': {
-            #     qubit: np.linspace(0.8, 1.1, 41) for qubit in self.coupled_qubits
-            # },
-
-            #qc sweep g,t
-            # q23_q24
-            # 'cz_pulse_durations': {
-            #     qubit: self.node_dictionary['duration_offset']*1e-9+np.linspace(0, 4, 5)*1e-9 for qubit in self.coupled_qubits
-            # },
-            # 'cz_pulse_amplitudes': {
-            #     qubit: np.linspace(0.0, 0.1, 21) for qubit in self.coupled_qubits
-            # },
-            # q22_q23
-            # 'cz_pulse_durations': {
-            #     qubit: self.node_dictionary['duration_offset']*1e-9+np.linspace(0, 4, 5)*1e-9 for qubit in self.coupled_qubits
-            # },
-            # 'cz_pulse_amplitudes': {
-            #     qubit: np.linspace(0.0, 0.1, 21) for qubit in self.coupled_qubits
-            # },
-
-            #qc sweep f0,t
-            # q23_q24
-            # 'cz_pulse_durations': {
-            #     qubit: self.node_dictionary['duration_offset']*1e-9+np.linspace(0, 4, 5)*1e-9 for qubit in self.coupled_qubits
-            # },
-            # 'cz_pulse_amplitudes': {
-            #     qubit: np.linspace(0.8, 1.1, 21) for qubit in self.coupled_qubits
-            # },
-            # q22_q23
-            # 'cz_pulse_durations': {
-            #     qubit: self.node_dictionary['duration_offset']*1e-9+np.linspace(0, 4, 5)*1e-9 for qubit in self.coupled_qubits
-            # },
-            # 'cz_pulse_amplitudes': {
-            #     qubit: np.linspace(0.5, 0.8, 21) for qubit in self.coupled_qubits
-            # },
-
-            # For AC reset
-            # 'cz_pulse_durations': {
-            #     qubit: 4e-9+np.arange(0e-9, 36*100e-9,400e-9) for qubit in self.coupled_qubits
-            # },
-            # 'cz_pulse_frequencies_sweep': {
-            #     qubit: np.linspace(210e6, 500e6, 51) + self.ac_freq for qubit in self.coupled_qubits
-            # },
+  
         }
         return cluster_samplespace
 
@@ -514,6 +403,35 @@ class CZ_Calibration_Node(BaseNode):
         }
         return cluster_samplespace
 
+
+class CZ_Calibration_SSRO_Node(BaseNode):
+    def __init__(self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
+        self.name = name
+        self.all_qubits = all_qubits
+        self.couplers = couplers
+        self.coupler = couplers[0]
+        self.coupled_qubits = couplers[0].split(sep='_')
+        # self.node_dictionary = kwargs
+        self.edges = couplers
+        self.redis_field = ['cz_phase', 'cz_pop_loss', 'cz_leakage']
+        self.qubit_state = 2
+        self.testing_group = 0  # The edge group to be tested. 0 means all edges.
+        self.node_dictionary['dynamic'] = False
+        self.node_dictionary['swap_type'] = False
+        self.measurement_obj = CZ_calibration_SSRO
+        self.analysis_obj = CZCalibrationSSROAnalysis
+        # self.validate()
+
+    @property
+    def samplespace(self):
+        cluster_samplespace = {
+            'control_ons': {qubit: [False, True] for qubit in self.coupled_qubits},
+            'ramsey_phases': {qubit: np.linspace(0, 360, 25) for qubit in self.coupled_qubits},
+            # 'ramsey_phases': {qubit: np.linspace(0.025, 0.025, 1) for qubit in  self.coupled_qubits},
+        }
+        return cluster_samplespace
+    
 class CZ_Calibration_Swap_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
@@ -542,17 +460,21 @@ class CZ_Calibration_Swap_Node(BaseNode):
         }
         return cluster_samplespace
 
-
-class CZ_Calibration_SSRO_Node(BaseNode):
+class CZ_Calibration_Swap_SSRO_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
+        self.name = name
+        self.all_qubits = all_qubits
+        self.couplers = couplers
         self.coupler = couplers[0]
         self.coupled_qubits = couplers[0].split(sep='_')
         # self.node_dictionary = kwargs
+        self.edges = couplers
         self.redis_field = ['cz_phase', 'cz_pop_loss', 'cz_leakage']
         self.qubit_state = 2
         self.testing_group = 0  # The edge group to be tested. 0 means all edges.
-        self.dynamic = False
+        self.node_dictionary['dynamic'] = False
+        self.node_dictionary['swap_type'] = True
         self.measurement_obj = CZ_calibration_SSRO
         self.analysis_obj = CZCalibrationSSROAnalysis
         # self.validate()
@@ -561,7 +483,7 @@ class CZ_Calibration_SSRO_Node(BaseNode):
     def samplespace(self):
         cluster_samplespace = {
             'control_ons': {qubit: [False, True] for qubit in self.coupled_qubits},
-            'ramsey_phases': {qubit: np.linspace(0, 360, 13) for qubit in self.coupled_qubits},
+            'ramsey_phases': {qubit: np.linspace(0, 360, 25) for qubit in self.coupled_qubits},
             # 'ramsey_phases': {qubit: np.linspace(0.025, 0.025, 1) for qubit in  self.coupled_qubits},
         }
         return cluster_samplespace
@@ -582,6 +504,7 @@ class Reset_Calibration_SSRO_Node(BaseNode):
         self.qubit_state = 2
         self.testing_group = 0 # The edge group to be tested. 0 means all edges.
         self.dynamic = False
+        self.node_dictionary['swap_type'] = True
         self.measurement_obj = Reset_calibration_SSRO
         self.analysis_obj = ResetCalibrationSSROAnalysis
         # self.validate()
@@ -593,6 +516,7 @@ class Reset_Calibration_SSRO_Node(BaseNode):
             'ramsey_phases': {qubit: range(9) for qubit in  self.coupled_qubits},
         }
         return cluster_samplespace
+
 
 
 class CZ_Dynamic_Phase_Node(BaseNode):
