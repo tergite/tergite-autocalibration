@@ -427,7 +427,7 @@ class CZ_Calibration_SSRO_Node(BaseNode):
     def samplespace(self):
         cluster_samplespace = {
             'control_ons': {qubit: [False, True] for qubit in self.coupled_qubits},
-            'ramsey_phases': {qubit: np.linspace(0, 360, 25) for qubit in self.coupled_qubits},
+            'ramsey_phases':  {qubit: np.linspace(0, 360, 25) for qubit in self.coupled_qubits},
             # 'ramsey_phases': {qubit: np.linspace(0.025, 0.025, 1) for qubit in  self.coupled_qubits},
         }
         return cluster_samplespace
@@ -483,7 +483,7 @@ class CZ_Calibration_Swap_SSRO_Node(BaseNode):
     def samplespace(self):
         cluster_samplespace = {
             'control_ons': {qubit: [False, True] for qubit in self.coupled_qubits},
-            'ramsey_phases': {qubit: np.linspace(0, 360, 25) for qubit in self.coupled_qubits},
+            'ramsey_phases':  {qubit: np.linspace(0, 360, 25) for qubit in self.coupled_qubits},
             # 'ramsey_phases': {qubit: np.linspace(0.025, 0.025, 1) for qubit in  self.coupled_qubits},
         }
         return cluster_samplespace

@@ -148,26 +148,6 @@ class Reset_calibration_SSRO(Measurement):
                         fq = 4.50  # qubit frequncy in GHz
                         dt = 1.0  # AWG sampling rate in nanosecond 
                         
-                        #q23_q24
-                        # shot.add(ResetClockPhase(clock=this_coupler+'.cz'))
-                        # f0 = 4.50+0.933 # Initial coupler frequency in GHz
-                        # ft = fq-0.233# Final coupler frequency in GJ+Hz
-                        # g = 0.05  # = coupling strength
-                        # duration = 9  # Pulse duration in nanosecond
-                        # samples = generate_local_adiabatic_fc(g=g, duration=duration, f0=f0, ft=ft, fq=fq, dt=dt)
-                        # times = np.linspace(0, duration, int(np.ceil(duration / dt)))
-                        # samples[-2] = samples[-1]
-                        # qc = shot.add(
-                        #     NumericalPulse(
-                        #         samples=samples,  # Numerical pulses can be complex as well.
-                        #         t_samples=times*1e-9,
-                        #         port = cz_pulse_port,
-                        #         clock = cz_clock,
-                        #     )
-                        # )
-                        # buffer = shot.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( duration / 4) * 4e-9)
-
-                        #q22_q23
                         this_coupler = 'q22_q23'
                         cz_clock = f'{this_coupler}.cz'
                         cz_pulse_port = f'{this_coupler}:fl'
@@ -188,50 +168,6 @@ class Reset_calibration_SSRO(Measurement):
                             )
                         )
                         buffer = shot.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( duration / 4) * 4e-9)
-                        
-
-                        # fq = 4.50  # qubit frequncy in GHz
-                        # f0 = 4.50+0.93 # Initial coupler frequency in GHz
-                        # ft = fq-0.195# Final coupler frequency in GJ+Hz
-                        # g = 0.0415  # = coupling strength
-                        # duration = 9  # Pulse duration in nanosecond
-                        # dt = 1.0  # AWG sampling rate in nanosecond 
-
-                        # samples = generate_local_adiabatic_fc(g=g, duration=duration, f0=f0, ft=ft, fq=fq, dt=dt)
-                        # times = np.linspace(0, duration, int(np.ceil(duration / dt)))
-                        # samples[-2] = samples[-1]
-                        
-                        # shot.add(ResetClockPhase(clock=cz_clock))
-                        # qc = shot.add(
-                        #     NumericalPulse(
-                        #         samples=samples,  # Numerical pulses can be complex as well.
-                        #         t_samples=times*1e-9,
-                        #         port = cz_pulse_port,
-                        #         clock = cz_clock,
-                        #     )
-                        # )
-                        # buffer = shot.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( duration / 4) * 4e-9)
-                        
-                        # fq = 6.5 # qubit frequncy in GHz
-                        # f0 = fq + 1.45 # Initial coupler frequency in GHz
-                        # ft = fq - 1.0 # Final coupler frequency in GJ+Hz
-                        # g = 0.120  # = coupling strength
-                        # duration = 7  # Pulse duration in nanosecond
-                        # dt = 1.0  # AWG sampling rate in nanosecond 
-
-                        # samples = generate_local_adiabatic_fc(g=g, duration=duration, f0=f0, ft=ft, fq=fq, dt=dt)
-                        # times = np.linspace(0, duration, int(np.ceil(duration / dt)))
-                        # samples[-2] = samples[-1]
-                        # samples = samples + max(abs(samples))
-                        # cr = shot.add(
-                        #     NumericalPulse(
-                        #         samples=samples,  # Numerical pulses can be complex as well.
-                        #         t_samples=times*1e-9,
-                        #         port = cz_pulse_port,
-                        #         clock = cz_clock,
-                        #     )
-                        # )
-                        # buffer = shot.add(IdlePulse(4e-9),ref_op=buffer, ref_pt='end',rel_time = np.ceil( duration / 4) * 4e-9)
                         
                 buffer_end = shot.add(IdlePulse(4e-9))
 

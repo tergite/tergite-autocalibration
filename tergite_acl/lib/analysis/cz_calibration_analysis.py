@@ -228,7 +228,6 @@ class CZCalibrationSSROAnalysis(BaseAnalysis):
         if self.swap:
             qubit_type_list.reverse() 
         self.all_magnitudes = []
-        print('These are the sweeps', self.sweeps)
         for indx, _ in enumerate(self.sweeps):
             # Calculate confusion matrix from calibration shots
             y = np.repeat(self.calibs, self.shots)
@@ -270,6 +269,16 @@ class CZCalibrationSSROAnalysis(BaseAnalysis):
             data_res = np.array([])
             for sweep in data_y_pred:
                 uniques, counts = np.unique(sweep, return_counts=True)
+                #print('unique elements are: ', uniques)
+                if len(counts) == 1:
+                    counts = np.append(counts, 0)
+                elif len(counts) == 2 and uniques[1] == 'c2':
+                    pop2 = counts[1]
+                    counts[1] = 0
+                    counts = np.append(counts, pop2)
+                elif len(counts) == 2:
+                    counts = np.append(counts, 0)
+
                 raw_prob = counts / len(sweep)
                 mitigate_prob = mitigate(raw_prob, cm_inv)
                 data_res = np.append(data_res, mitigate_prob)
@@ -322,8 +331,8 @@ class CZCalibrationSSROAnalysis(BaseAnalysis):
             self.pop_loss = np.diff(np.flip(qois[0][0]))[0]
         else:
             self.pop_loss = np.diff(np.mean(self.fit_ys,axis=1))[0]
+            #self.pop_loss = np.mean(np.diff(np.flip(self.fit_ys)))
         self.leakage = np.diff(np.flip(np.mean(self.all_magnitudes[:, :-3, 2], axis=1)))[0]
-        print('population loss is: ', self.pop_loss)
         return [self.cphase, self.pop_loss, self.leakage]
 
     def plotter(self, axis):

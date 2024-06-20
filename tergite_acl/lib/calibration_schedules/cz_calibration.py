@@ -234,6 +234,9 @@ class CZ_calibration_SSRO(Measurement):
         dynamic: bool,
         control_ons: dict[str,np.ndarray],
         repetitions: int = 1024,
+        opt_cz_pulse_frequency: dict[str,float] = None,
+        opt_cz_pulse_duration: dict[str,float] = None,
+        opt_cz_pulse_amplitude: dict[str,float] = None,
 
     ) -> Schedule:
 
@@ -296,7 +299,12 @@ class CZ_calibration_SSRO(Measurement):
                 cz_pulse_frequency[this_coupler] = float(redis_config['cz_pulse_frequency'])
                 cz_pulse_duration[this_coupler] = float(redis_config['cz_pulse_duration'])
                 cz_pulse_amplitude[this_coupler] = float(redis_config['cz_pulse_amplitude'])
-
+                if opt_cz_pulse_amplitude is not None:
+                    cz_pulse_amplitude[this_coupler] += opt_cz_pulse_amplitude[this_coupler]
+                if opt_cz_pulse_frequency is not None:
+                    cz_pulse_frequency[this_coupler] += opt_cz_pulse_frequency[this_coupler]
+                if opt_cz_pulse_duration is not None:
+                    cz_pulse_duration[this_coupler] += opt_cz_pulse_duration[this_coupler]
 
         print(f'{cz_pulse_frequency = }')
         print(f'{cz_pulse_duration = }')
@@ -307,9 +315,6 @@ class CZ_calibration_SSRO(Measurement):
                 ClockResource(name=f'{this_coupler}.cz', freq=-cz_pulse_frequency[this_coupler] + 4.4e9))
             shot.add_resource(ClockResource(name=f'{this_coupler}.cz', freq=-cz_pulse_frequency[this_coupler] + 4.4e9))
         # print(ramsey_phases,qubits)
-        # schedule.add_resource(ClockResource(name='q11_q12.cz', freq=-cz_pulse_frequency[this_coupler]+4.4e9))
-        # shot.add_resource(ClockResource(name='q11_q12.cz', freq=-cz_pulse_frequency[this_coupler]+4.4e9))
-        print('these are ramsey phases', ramsey_phases, all_qubits)
 
         ramsey_phases_values = ramsey_phases[all_qubits[0]]
         number_of_phases = len(ramsey_phases_values) + 3  # +3 for calibration points
@@ -331,20 +336,24 @@ class CZ_calibration_SSRO(Measurement):
                     if control_on:
                         for this_qubit in all_qubits:
                             if qubit_types[this_qubit] == qubit_type_list[0]:
+                                #pass
                                 x = shot.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
 
                 for this_qubit in all_qubits:
                     if qubit_types[this_qubit] == qubit_type_list[1]:
+                        #x = shot.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
+                        #pass
                         x90 = shot.add(X90(this_qubit), ref_op=relaxation, ref_pt='end')
 
-                buffer_start = shot.add(IdlePulse(4e-9), ref_op=x90, ref_pt='end')
+                #buffer_start = shot.add(IdlePulse(8e-9), ref_op=x90, ref_pt='end')
+                buffer_start = shot.add(IdlePulse(12e-9), ref_op=x90, ref_pt='end')
+
                 for this_coupler in all_couplers:
                     cz_clock = f'{this_coupler}.cz'
                     cz_pulse_port = f'{this_coupler}:fl'
-                    # cz_clock = 'q11_q12.cz'
-                    # cz_pulse_port = 'q11_q12:fl'
+
                     reset_phase = shot.add(ResetClockPhase(clock=cz_clock),
-                                           ref_op=buffer_start, ref_pt='end', )
+                                          ref_op=buffer_start, ref_pt='end', )
                     cz = shot.add(
                         SoftSquarePulse(
                             duration=cz_pulse_duration[this_coupler],
@@ -355,24 +364,25 @@ class CZ_calibration_SSRO(Measurement):
                             # clock = 'q11_q12.cz',
                         )
                     )
-                    #cz =  shot.add(IdlePulse(20e-9))
-                    # cz = shot.add(IdlePulse(cz_pulse_duration[this_coupler]))
-                buffer_end = shot.add(IdlePulse(4e-9), ref_op=buffer_start, ref_pt='end',
+                    # cz =  shot.add(IdlePulse(212e-9))
+                buffer_end = shot.add(IdlePulse(8e-9), ref_op=buffer_start, ref_pt='end',
                                       rel_time=np.ceil(cz_pulse_duration[this_coupler] * 1e9 / 4) * 4e-9)
                 if not dynamic:
                     if control_on:
                         for this_qubit in all_qubits:
                             if qubit_types[this_qubit] == qubit_type_list[0]:
-                                #print('skipped pi pulse')
+                                #pass
                                 x_end = shot.add(X(this_qubit), ref_op=buffer_end, ref_pt='end')
-                                # x_end = shot.add(IdlePulse(20e-9))
+  
 
                 for this_qubit in all_qubits:
                     if qubit_types[this_qubit] == qubit_type_list[1]:
+                        #x_end = shot.add(X(this_qubit), ref_op=buffer_end, ref_pt='end')
+                        #pass
                         x90_end = shot.add(Rxy(theta=90, phi=ramsey_phase, qubit=this_qubit), ref_op=buffer_end,
                                            ref_pt='end')
 
-                shot.add(IdlePulse(40e-9))
+                shot.add(IdlePulse(12e-9))
                 for this_qubit in all_qubits:
                     this_index = cz_index * number_of_phases + ramsey_index
 
@@ -394,7 +404,6 @@ class CZ_calibration_SSRO(Measurement):
                 # The inner for-loop iterates over all qubit levels:
                 for level_index, state_level in enumerate(qubit_levels):
                     calib_index = this_index + level_index + 1
-                    print('level index is: ', level_index, ' and state_level is: ', state_level)
                     # print(f'{calib_index = }')
                     if state_level == 0:
                         prep = shot.add(IdlePulse(40e-9))
@@ -413,7 +422,6 @@ class CZ_calibration_SSRO(Measurement):
         schedule.add(IdlePulse(16e-9))
         print(schedule.add(shot, control_flow=Loop(repetitions), validate=False))
         schedule.add(IdlePulse(16e-9))
-        print('added all pulses to the schedule', repetitions)
         return schedule
     
 

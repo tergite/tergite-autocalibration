@@ -47,7 +47,7 @@ couplers = ['q14_q15'] #done
 #couplers = ['q06_q11']
 
 
-attenuation_setting = {'qubit':12, 'coupler':34, 'readout':12}
+attenuation_setting = {'qubit':10, 'coupler':34, 'readout':12}
 
 '''punchout
   resonator_spectroscopy
@@ -90,7 +90,7 @@ attenuation_setting = {'qubit':12, 'coupler':34, 'readout':12}
 '''
 
 user_requested_calibration = {
-    'target_node': 'cz_calibration',
+    'target_node': 'cz_calibration_ssro',
     'all_qubits': qubits,
     'couplers': couplers,
 }
