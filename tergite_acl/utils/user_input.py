@@ -1,15 +1,55 @@
 #qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
+#qubits = ['q10','q13','q15']
+#qubits = [ 'q09']
+#qubits = [ 'q06','q07', 'q08', 'q09', 'q10','q11','q12','q13', 'q14', 'q15']
+qubits = [  'q14', 'q15']
+
+
 # qubits = [ 'q18','q19','q20','q21','q22','q23','q24','q25']
-qubits = ['q12','q13','q14']
+#qubits = ['q12','q13','q14']
 # qubits = ['q14']
 # couplers = ['q12_q13','q13_q14' ]
 #couplers = ['q16_q21']
-couplers = ['q12_q14']
+
+# coupler_spi_map = {
+#     # SPI A
+#     'q11_q12': (1, 'dac0'),
+#     'q12_q13': (1, 'dac1'),
+#     'q13_q14': (1, 'dac2'),
+#     'q14_q15': (1, 'dac3'),
+#     'q08_q09': (2, 'dac0'),
+#     'q12_q17': (2, 'dac1'),
+#     'q07_q12': (2, 'dac2'),
+#     'q08_q13': (2, 'dac3'),
+#     'q09_q14': (3, 'dac0'),
+#     'q06_q07': (3, 'dac1'),
+#     'q09_q10': (3, 'dac2'),
+#     'q11_q16': (3, 'dac3'),
+#     'q07_q08': (4, 'dac0'),
+#     'q10_q15': (4, 'dac1'),
+#     'q06_q11': (4, 'dac2'),
+
+# }
+#couplers = ['q11_q12'] # not tuning
+couplers = ['q14_q15'] #done
+#couplers = ['q13_q14']
+#couplers = ['q14_q15']
+#couplers = ['q08_q09']
+#couplers = ['q12_q17']
+#couplers = ['q07_q12']
+#couplers = ['q08_q13']
+#couplers = ['q09_q14']
+##couplers = ['q06_q07']
+#couplers = ['q09_q10']
+#couplers = ['q11_q16']
+#couplers = ['q07_q08']
+#couplers = ['q10_q15']
+#couplers = ['q06_q11']
 
 
-'''
-node reference
-  punchout
+attenuation_setting = {'qubit':10, 'coupler':34, 'readout':12}
+
+'''punchout
   resonator_spectroscopy
   qubit_01_spectroscopy
   qubit_01_spectroscopy_pulsed
@@ -37,15 +77,20 @@ node reference
   randomized_benchmarking
   check_cliffords
   cz_chevron
+  cz_chevron_amplitude
   cz_optimize_chevron
   reset_chevron
+  reset_calibration_ssro
   cz_calibration
   cz_calibration_ssro
   cz_dynamic_phase
+  cz_dynamic_phase_swap
+  tqg_randomized_benchmarking
+  tqg_randomized_benchmarking_interleaved
 '''
 
 user_requested_calibration = {
-    'target_node': 'ro_amplitude_two_state_optimization',
+    'target_node': 'cz_calibration_ssro',
     'all_qubits': qubits,
     'couplers': couplers,
 }

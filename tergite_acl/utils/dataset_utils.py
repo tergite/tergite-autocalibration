@@ -36,22 +36,18 @@ def configure_dataset(
         qubit_states = [0, 1, 2]
     elif node.name in ['ro_amplitude_two_state_optimization', 'ro_frequency_two_state_optimization']:
         qubit_states = [0, 1]
-    elif node.name in ['cz_calibration_ssro', 'reset_calibration_ssro']:
+    elif node.name in ['cz_calibration_ssro','cz_calibration_swap_ssro','reset_calibration_ssro']:
         qubit_states = ['c0', 'c1', 'c2']  # for calibration points
 
     for key in keys:
         key_indx = key % n_qubits  # this is to handle ro_opt_frequencies node where
-        # there are 2 or 3 measurements (i.e 2 or 3 Datarrays) for each qubit
+
         coords_dict = {}
         measured_qubit = measurement_qubits[key_indx]
         dimensions = node.dimensions
+        print('node dimenstions are: ', dimensions)
 
-        if node.name in ['ro_amplitude_three_state_optimization']:
-            # shots = 1
-            # shots = int(len(raw_ds[key].values))
-            shots = int(len(raw_ds[key].values[0]) / (dimensions[0] * len(qubit_states)))
-            coords_dict['shot'] = ('shot', range(shots), {'qubit': measured_qubit, 'long_name': 'shot', 'units': 'NA'})
-        elif node.name in ['cz_calibration_ssro', 'reset_calibration_ssro']:
+        if node.name in ['cz_calibration_ssro','cz_calibration_swap_ssro', 'reset_calibration_ssro']:
             # TODO: We are not sure about this one
             dimensions[1] += len(qubit_states)  # for calibration points
             shots = int(len(raw_ds[key].values[0]) / (np.product(dimensions)))
@@ -77,7 +73,7 @@ def configure_dataset(
             coord_key = quantity + element
 
             settable_values = samplespace[quantity][element]
-            if node.name in ['cz_calibration_ssro', 'reset_calibration_ssro'] and 'ramsey_phases' in quantity:
+            if node.name in ['cz_calibration_ssro','cz_calibration_swap_ssro', 'reset_calibration_ssro'] and 'ramsey_phases' in quantity:
                 settable_values = np.append(np.array([settable_values]), np.array([qubit_states]))
             coord_attrs = {element_type: element, 'long_name': f'{coord_key}', 'units': 'NA'}
 
@@ -88,9 +84,8 @@ def configure_dataset(
             coord_attrs = {'qubit': measured_qubit, 'long_name': f'{coord_key}', 'units': 'NA'}
             coords_dict[coord_key] = (coord_key, np.array([node.external_parameter_value]), coord_attrs)
 
-        if node.name in ['ro_amplitude_three_state_optimization']:
-            coords_dict['state'] = (
-            'state', qubit_states, {'qubit': measured_qubit, 'long_name': 'state', 'units': 'NA'})
+        # if node.name in ['ro_amplitude_three_state_optimization']:
+            # coords_dict['state'] = ('state', qubit_states, {'qubit': measured_qubit, 'long_name': 'state', 'units': 'NA'})
 
         partial_ds = xarray.Dataset(coords=coords_dict)
 
@@ -112,7 +107,7 @@ def configure_dataset(
         if node.name in ['ro_amplitude_optimization_gef']:
             reshaping = [shots, dimensions[0], len(qubit_states)]
             data_values = data_values.reshape(*reshaping)
-        elif node.name in ['cz_calibration_ssro', 'reset_calibration_ssro']:
+        elif node.name in ['cz_calibration_ssro','cz_calibration_swap_ssro', 'reset_calibration_ssro']:
             reshaping = np.array([shots])
             reshaping = np.append(reshaping, dimensions)
             data_values = data_values.reshape(*reshaping)
@@ -288,7 +283,12 @@ def save_dataset(result_dataset: xarray.Dataset, node, data_path: pathlib.Path):
     result_dataset = result_dataset.assign_attrs({'name': node.name, 'tuid': measurement_id})
     result_dataset_real = to_real_dataset(result_dataset)
     # to_netcdf doesn't like complex numbers, convert to real/imag to save:
-    result_dataset_real.to_netcdf(data_path / 'dataset.hdf5')
+    count = 0
+    dataset_name = 'dataset_'+str(count)+'.hdf5'
+    while (data_path / dataset_name).is_file():
+        count += 1
+        dataset_name = 'dataset_'+str(count)+'.hdf5'
+    result_dataset_real.to_netcdf(data_path / dataset_name)
 
 
 def tunneling_qubits(data_values: np.ndarray) -> np.ndarray:

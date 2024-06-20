@@ -23,9 +23,8 @@ from tergite_acl.utils.hardware_utils import SpiDAC
 from tergite_acl.utils.logger.tac_logger import logger
 from tergite_acl.utils.redis_utils import populate_initial_parameters, populate_node_parameters, \
     populate_quantities_of_interest
-from tergite_acl.utils.user_input import user_requested_calibration
+from tergite_acl.utils.user_input import user_requested_calibration, attenuation_setting
 from tergite_acl.utils.visuals import draw_arrow_chart
-
 
 colorama_init()
 
@@ -59,11 +58,11 @@ class CalibrationSupervisor:
         self.topo_order = filtered_topological_order(self.target_node)
 
         # TODO MERGE-CZ-GATE: Here, we could have a more general check or .env variable whether to use the spi rack
-        if self.target_node == 'cz_chevron':
-            self.dacs = {}
-            self.spi = SpiDAC()
-            for coupler in self.couplers:
-                self.dacs[coupler] = self.spi.create_spi_dac(coupler)
+        # if self.target_node == 'cz_chevron':
+        #     self.dacs = {}
+        #     self.spi = SpiDAC()
+        #     for coupler in self.couplers:
+        #         self.dacs[coupler] = self.spi.create_spi_dac(coupler)
 
     def _create_cluster(self) -> 'Cluster':
         cluster_: 'Cluster'
@@ -74,38 +73,29 @@ class CalibrationSupervisor:
         else:
             raise ClusterNotFoundError(f'Cannot create cluster object from {self.cluster_ip}')
 
+    
     def _create_lab_ic(self, clusters: Union['Cluster', List['Cluster']]):
+
         ic_ = InstrumentCoordinator('lab_ic')
         if isinstance(clusters, Cluster):
             clusters = [clusters]
         for cluster in clusters:
+            # Set the attenuation values for the modules
+            for module in cluster.modules:
+                try:
+                    if module.is_qcm_type and module.is_rf_type:
+                        module.out0_att(attenuation_setting['qubit']) # Control lines
+                        # print(f'Attenuation setting for {module.name} is {attenuation_setting["qubit"]}')
+                        module.out1_att(attenuation_setting['coupler']) # Flux lines
+                        # print(f'Attenuation setting for {module.name} is {attenuation_setting["coupler"]}')
+                    elif module.is_qrm_type and module.is_rf_type:
+                        module.out0_att(attenuation_setting['readout']) # Readout lines
+                        # print(f'Attenuation setting for {module.name} is {attenuation_setting["readout"]}')
+                except:
+                    pass
             ic_.add_component(ClusterComponent(cluster))
             ic_.timeout(self.cluster_timeout)
         return ic_
-
-    def _set_module_att(self, cluster_: 'Cluster') -> bool:
-        # TODO MERGE-CZ-GATE: Looks like this depends heavily hardware and some coupler/device configuration
-        for idx, module in enumerate(cluster_.modules[0:13]):
-            if idx in [2, 3, 8]:
-                module.out0_att(12)
-            else:
-                module.out0_att(16)
-            # if idx in [1,6]:
-            #     module.out0_att(16)
-            # else:
-            #     module.out0_att(60)
-        print('XY: ' + module.name + '_att:' + str(module.out0_att()) + 'dB')
-        # Flux lines
-        if CLUSTER_NAME == 'clusterB':
-            for module in cluster_.modules[0:13]:
-                module.out1_att(40)
-            # module.out1_att(60)
-        print('FL: ' + module.name + '_att:' + str(module.out1_att()) + 'dB')
-        # Readout lines
-        for module in cluster_.modules[15:17]:
-            module.out0_att(12)
-        print('RO: ' + module.name + '_att:' + str(module.out0_att()) + 'dB')
-        return True
 
     def calibrate_system(self):
         # TODO: everything which is not in the inspect or calibrate function should go here
@@ -138,13 +128,17 @@ class CalibrationSupervisor:
             self.couplers,
             REDIS_CONNECTION
         )
-
-        if node_name in ['coupler_spectroscopy', 'cz_chevron', 'cz_calibration', 'cz_calibration_ssro',
-                         'cz_dynamic_phase']:
+        # print(f'{node_name = }')
+        # print(f'{self.couplers = }')
+        if node_name in ['coupler_spectroscopy', 'cz_chevron', 'cz_chevron_amplitude','cz_calibration', 'cz_calibration_ssro','cz_calibration_swap_ssro',
+                         'cz_dynamic_phase','cz_dynamic_phase_swap',
+                         'tqg_randomized_benchmarking','tqg_randomized_benchmarking_interleaved']:
             coupler_statuses = [REDIS_CONNECTION.hget(f"cs:{coupler}", node_name) == 'calibrated' for coupler in
                                 self.couplers]
+            # print(f'{coupler_statuses=}')
             # node is calibrated only when all couplers have the node calibrated:
             is_node_calibrated = all(coupler_statuses)
+            # print(f'{is_node_calibrated=}')
         else:
             qubits_statuses = [REDIS_CONNECTION.hget(f"cs:{qubit}", node_name) == 'calibrated' for qubit in self.qubits]
             # node is calibrated only when all qubits have the node calibrated:
@@ -162,7 +156,8 @@ class CalibrationSupervisor:
         # Check Redis if node is calibrated
         status = DataStatus.undefined
 
-        if node_name in ['coupler_spectroscopy', 'cz_calibration', 'cz_calibration_ssro', 'cz_dynamic_phase']:
+        if node_name in ['coupler_spectroscopy', 'cz_chevron', 'cz_chevron_amplitude','cz_calibration', 'cz_calibration_ssro', 'cz_calibration_swap_ssro',
+                         'cz_dynamic_phase','cz_dynamic_phase_swap','tqg_randomized_benchmarking','tqg_randomized_benchmarking_interleaved']:
             for coupler in self.couplers:
                 # the calibrated, not_calibrated flags may be not necessary,
                 # just store the DataStatus on Redis
@@ -202,6 +197,11 @@ class CalibrationSupervisor:
             #     node_calibration_status = self.calibrate_node(node)
 
     def calibrate_node(self, node, **static_parameters) -> DataStatus:
+        if type(node) == str:
+            node = self.node_factory.create_node(
+                node, self.qubits, couplers=self.couplers,**static_parameters
+            )
+
         logger.info(f'Calibrating node {node.name}')
 
         # TODO MERGE-CZ-GATE: We should discuss the information flow here - what values are set and for which component?
@@ -222,4 +222,4 @@ class CalibrationSupervisor:
         measurement_result = monitor_node_calibration(node, data_path, self.lab_ic)
 
         # TODO MERGE-CZ-GATE: We should discuss the information flow here and see where these return args are used
-        return [data_path, measurement_result]
+        return [str(data_path), measurement_result]

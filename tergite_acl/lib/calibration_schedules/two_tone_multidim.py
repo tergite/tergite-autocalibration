@@ -124,7 +124,8 @@ class Two_Tones_Multidim(Measurement):
                     if self.qubit_state == 0:
                         measure_function = Measure
                     elif self.qubit_state == 1:
-                        measure_function = Measure_RO1
+                        schedule.add(X(this_qubit))
+                        measure_function = Measure
                     else:
                         raise ValueError(f'Invalid qubit state: {self.qubit_state}')
 

@@ -5,16 +5,16 @@ import numpy as np
 
 def resonator_samples(qubit: str) -> np.ndarray:
     res_spec_samples = 101
-    sweep_range = 2.0e6
+    sweep_range = 3.5e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
-    min_freq = VNA_frequency - sweep_range / 2 - 0.5e6
+    min_freq = VNA_frequency - sweep_range / 2
     max_freq = VNA_frequency + sweep_range / 2
     return np.linspace(min_freq, max_freq, res_spec_samples)
 
 
 def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
-    qub_spec_samples = 41
-    sweep_range = 3.0e6
+    qub_spec_samples = 101
+    sweep_range = 30.0e6
     if transition == '01':
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition == '12':

@@ -11,7 +11,7 @@ graph_dependencies = [
     # these are edges on  a directed graph
     # _____________________________________
     ('tof', 'resonator_spectroscopy'),
-    # ('resonator_spectroscopy', 'coupler_resonator_spectroscopy'),
+    ('resonator_spectroscopy', 'coupler_resonator_spectroscopy'),
     # ('resonator_spectroscopy', 'qubit_01_spectroscopy_pulsed'),
     ('qubit_01_spectroscopy', 'coupler_spectroscopy'),
     ('resonator_spectroscopy', 'qubit_01_spectroscopy'),
@@ -21,13 +21,15 @@ graph_dependencies = [
     ('ramsey_correction', 'motzoi_parameter'),
     ('motzoi_parameter', 'n_rabi_oscillations'),
     ('n_rabi_oscillations', 'resonator_spectroscopy_1'),
-    ('randomized_benchmarking', 'T1'),
-    ('n_rabi_oscillations', 'resonator_spectroscopy_1'),
-    # ('n_rabi_oscillations', 'T1'),
+    # ('randomized_benchmarking', 'T1'),
+    ('T2_echo', 'resonator_spectroscopy_1'),
+    ('ramsey_correction', 'T1'),
+    ('T2_echo', 'randomized_benchmarking'),
+    #('n_rabi_oscillations', 'T1'),
     ('n_rabi_oscillations', 'randomized_benchmarking'),
     ('resonator_spectroscopy_1', 'ro_frequency_two_state_optimization'),
     ('ro_frequency_two_state_optimization', 'ro_amplitude_two_state_optimization'),
-    # ('randomized_benchmarking', 'T1'),
+    ('randomized_benchmarking', 'T1'),
     ('T1', 'T2'),
     ('T2', 'T2_echo'),
     # ('T2_echo', 'ramsey_correction'),
@@ -41,13 +43,19 @@ graph_dependencies = [
     ('resonator_spectroscopy_2', 'ro_frequency_three_state_optimization'),
     ('ro_frequency_three_state_optimization', 'ro_amplitude_three_state_optimization'),
     # ('coupler_spectroscopy', 'cz_chevron'),
-    ('ro_amplitude_three_state_optimization', 'cz_chevron'),
-    # ('rabi_oscillations', 'reset_chevron'),
-    # ('cz_chevron', 'cz_calibration'),
+    ('resonator_spectroscopy_2', 'cz_chevron'),
+    ('cz_chevron', 'cz_chevron_amplitude'),
+    ('resonator_spectroscopy_2', 'reset_chevron'),
+    ('ro_amplitude_three_state_optimization', 'reset_calibration_ssro'),
+    ('resonator_spectroscopy_2', 'cz_calibration'),
     # ('qubit_12_spectroscopy_multidim', 'cz_calibration'),
+    ('ro_amplitude_three_state_optimization', 'cz_calibration_ssro'),
+    ('ro_amplitude_three_state_optimization', 'cz_calibration_swap_ssro'),
     # ('cz_calibration', 'cz_calibration_ssro'),
-    # ('cz_calibration', 'cz_calibration_ssro'),
-    # ('cz_calibration', 'cz_dynamic_phase')
+    ('cz_calibration', 'cz_dynamic_phase'),
+    ('cz_dynamic_phase', 'cz_dynamic_phase_swap'),
+    ('cz_dynamic_phase_swap', 'tqg_randomized_benchmarking'),
+    ('tqg_randomized_benchmarking', 'tqg_randomized_benchmarking_interleaved')
 ]
 
 graph.add_edges_from(graph_dependencies)

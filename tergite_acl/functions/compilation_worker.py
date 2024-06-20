@@ -17,6 +17,7 @@ from tergite_acl.utils.convert import structured_redis_storage
 from tergite_acl.utils.extended_coupler_edge import CompositeSquareEdge
 from tergite_acl.utils.extended_transmon_element import ExtendedTransmon
 from tergite_acl.utils.logger.tac_logger import logger
+from tergite_acl.config.coupler_config import qubit_types
 
 set_datadir(DATA_DIR)
 
@@ -124,11 +125,22 @@ def load_redis_config(transmon: ExtendedTransmon, channel: int):
 
 def load_redis_config_coupler(coupler: CompositeSquareEdge):
     bus = coupler.name
+    bus_qubits = bus.split('_')
     redis_config = REDIS_CONNECTION.hgetall(f"couplers:{bus}")
-    coupler.cz.cz_freq(float(redis_config['cz_pulse_frequency']))
-    coupler.cz.square_amp(float(redis_config['cz_pulse_amplitude']))
-    coupler.cz.square_duration(float(redis_config['cz_pulse_duration']))
-    coupler.cz.cz_width(float(redis_config['cz_pulse_width']))
+    try:
+        coupler.clock_freqs.cz_freq(float(redis_config['cz_pulse_frequency']))
+        coupler.cz.square_amp(float(redis_config['cz_pulse_amplitude']))
+        coupler.cz.square_duration(float(redis_config['cz_pulse_duration']))
+        coupler.cz.cz_width(float(redis_config['cz_pulse_width']))
+        if qubit_types[bus_qubits[0]] == 'Target':
+            coupler.cz.parent_phase_correction(float(redis_config['cz_dynamic_target']))
+            coupler.cz.child_phase_correction(float(redis_config['cz_dynamic_control']))
+        else:
+            coupler.cz.parent_phase_correction(float(redis_config['cz_dynamic_control']))
+            coupler.cz.child_phase_correction(float(redis_config['cz_dynamic_target']))
+    except:
+        print(f"No coupler configuration found for {bus}")
+        pass
     return
 
 
@@ -187,13 +199,14 @@ def precompile(node, bin_mode: str = None, repetitions: int = None):
             edges[bus] = coupler
 
     # if node.name in ['cz_chevron','cz_calibration','cz_calibration_ssro','cz_dynamic_phase','reset_chevron']:
-    if hasattr(node, 'edges') or node.name in ['cz_chevron', 'cz_calibration', 'cz_calibration_ssro',
-                                               'cz_dynamic_phase', 'reset_chevron', 'reset_calibration_ssro']:
+    if hasattr(node, 'edges') or node.name in ['cz_chevron', 'cz_calibration', 'cz_calibration_ssro','cz_calibration_swap_ssro', 'cz_dynamic_phase',
+                                                'cz_dynamic_phase_swap', 'reset_chevron', 'reset_calibration_ssro',
+                                                'tqg_randomized_benchmarking','tqg_randomized_benchmarking_interleaved']:
         coupler = node.coupler
         node_class = node.measurement_obj(transmons, edges, node.qubit_state)
     else:
         node_class = node.measurement_obj(transmons, node.qubit_state)
-    if node.name in ['ro_amplitude_three_state_optimization', 'cz_calibration_ssro', 'reset_calibration_ssro']:
+    if node.name in ['ro_amplitude_three_state_optimization', 'cz_calibration_ssro','cz_calibration_swap_ssro', 'reset_calibration_ssro']:
         device.cfg_sched_repetitions(1)  # for single-shot readout
     if bin_mode is not None: node_class.set_bin_mode(bin_mode)
 
@@ -229,7 +242,7 @@ def precompile(node, bin_mode: str = None, repetitions: int = None):
         external_parameters = {}
 
     compiler = SerialCompiler(name=f'{node.name}_compiler')
-    schedule = schedule_function(**static_parameters, **external_parameters, **samplespace)
+    schedule = schedule_function(**static_parameters, **external_parameters, **samplespace )
     compilation_config = device.generate_compilation_config()
     device.close()
 

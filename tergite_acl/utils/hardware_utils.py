@@ -40,7 +40,7 @@ class SpiDAC():
         this_dac.current.vals = validators.Numbers(min_value=-3.1e-3, max_value=3.1e-3)
 
         this_dac.ramping_enabled(True)
-        this_dac.ramp_rate(20e-6)
+        this_dac.ramp_rate(40e-6)
         this_dac.ramp_max_step(dc_current_step)
         return this_dac
 

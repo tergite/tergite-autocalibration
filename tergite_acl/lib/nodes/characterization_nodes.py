@@ -11,6 +11,8 @@ from tergite_acl.lib.calibration_schedules.T1 import T1, T2, T2Echo
 from tergite_acl.lib.calibration_schedules.check_cliffords import Check_Cliffords
 from tergite_acl.lib.calibration_schedules.randomized_benchmarking import Randomized_Benchmarking
 
+COHERENCE_REPEATS = 3
+RB_REPEATS = 10
 
 class T1_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
@@ -22,7 +24,7 @@ class T1_Node(BaseNode):
         self.backup = False
         self.type = 'parameterized_simple_sweep'
 
-        self.node_externals = range(2)
+        self.node_externals = range(COHERENCE_REPEATS)
         self.external_parameter_name = 'repeat'
         self.external_parameter_value = 0
 
@@ -41,7 +43,7 @@ class T1_Node(BaseNode):
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'delays': {qubit: 8e-9 + np.arange(0, 300e-6, 6e-6) for qubit in self.all_qubits}
+            'delays': {qubit: 8e-9 + np.array([0, 5, 10, 15, 20, 25, 30, 35, 40, 50, 60, 70, 80, 100, 120, 140, 160, 200, 240, 280, 320, 360, 400])*1e-6 for qubit in self.all_qubits}
         }
         return cluster_samplespace
 
@@ -59,7 +61,7 @@ class Randomized_Benchmarking_Node(BaseNode):
         self.analysis_obj = RandomizedBenchmarkingAnalysis
 
         # TODO change it a dictionary like samplespace
-        self.node_externals = 6 * np.arange(5, dtype=np.int32)
+        self.node_externals = 6 * np.arange(RB_REPEATS, dtype=np.int32)
         self.external_parameter_name = 'seed'
         self.external_parameter_value = 0
         ####################
@@ -85,7 +87,7 @@ class Randomized_Benchmarking_Node(BaseNode):
             'number_of_cliffords': {
                 # qubit: all_numbers for qubit in self.all_qubits
                 # qubit: np.array([2, 16, 128, 256,512, 768, 1024, 0, 1]) for qubit in self.all_qubits
-                qubit: np.array([2, 16, 128, 256, 512, 768, 1024, 0, 1]) for qubit in self.all_qubits
+                qubit: np.array([0, 2, 4, 8, 16, 128, 256, 512, 1024, 0, 1, 2]) for qubit in self.all_qubits
             },
         }
         return cluster_samplespace
@@ -109,36 +111,68 @@ class Check_Cliffords_Node:
         }
         return cluster_samplespace
 
-
 class T2_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.name = name
+        self.all_qubits = all_qubits
         self.redis_field = ['t2_time']
-        self.qubit_state = 0
         self.measurement_obj = T2
         self.analysis_obj = T2Analysis
+        self.backup = False
+        self.type = 'parameterized_simple_sweep'
+
+        self.node_externals = range(COHERENCE_REPEATS)
+        self.external_parameter_name = 'repeat'
+        self.external_parameter_value = 0
+
+        self.sleep_time = 3
+        self.operations_args = []
+
+    def pre_measurement_operation(self, external=1):
+        if external > 0:
+            print(f'sleeping for {self.sleep_time} seconds')
+            sleep(self.sleep_time)
+
+    @property
+    def dimensions(self):
+        return (len(self.samplespace['delays'][self.all_qubits[0]]), 1)
 
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'delays': {qubit: 8e-9 + np.arange(0, 100e-6, 1e-6) for qubit in self.all_qubits}
+            'delays': {qubit: 8e-9 + np.arange(0, 70e-6, 1e-6) for qubit in self.all_qubits}
         }
         return cluster_samplespace
-
 
 class T2_Echo_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.name = name
-        self.redis_field = ['t2_time']
-        self.qubit_state = 0
+        self.all_qubits = all_qubits
+        self.redis_field = ['t2_echo_time']
         self.measurement_obj = T2Echo
         self.analysis_obj = T2EchoAnalysis
+        self.backup = False
+        self.type = 'parameterized_simple_sweep'
+
+        self.node_externals = range(COHERENCE_REPEATS)
+        self.external_parameter_name = 'repeat'
+        self.external_parameter_value = 0
+
+        self.sleep_time = 3
+        self.operations_args = []
+
+    def pre_measurement_operation(self, external=1):
+        if external > 0:
+            print(f'sleeping for {self.sleep_time} seconds')
+            sleep(self.sleep_time)
+
+    @property
+    def dimensions(self):
+        return (len(self.samplespace['delays'][self.all_qubits[0]]), 1)
 
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'delays': {qubit: 8e-9 + np.arange(0, 300e-6, 6e-6) for qubit in self.all_qubits}
+            'delays': {qubit: 8e-9 + np.array([0, 5, 10, 15, 20, 25, 30, 35, 40, 50, 60, 70, 80, 100, 120, 140, 160, 200, 240, 280, 320])*1e-6 for qubit in self.all_qubits}
         }
         return cluster_samplespace

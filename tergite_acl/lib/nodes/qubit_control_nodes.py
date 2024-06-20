@@ -47,7 +47,7 @@ class Qubit_01_Spectroscopy_Multidim_Node(BaseNode):
     def samplespace(self):
         cluster_samplespace = {
             'spec_pulse_amplitudes': {
-                qubit: np.linspace(3e-4, 9e-4, 5) for qubit in self.all_qubits
+                qubit: np.linspace(70e-4, 80e-4, 1) for qubit in self.all_qubits
             },
             'spec_frequencies': {
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
@@ -67,7 +67,7 @@ class Rabi_Oscillations_Node(BaseNode):
     def samplespace(self):
         cluster_samplespace = {
             'mw_amplitudes': {
-                qubit: np.linspace(0.002, 0.80, 101) for qubit in self.all_qubits
+                qubit: np.linspace(0.002, 0.90, 61) for qubit in self.all_qubits
             }
         }
         return cluster_samplespace
@@ -90,7 +90,7 @@ class Ramsey_Fringes_Node(BaseNode):
                 qubit: np.arange(4e-9, 2048e-9, 8 * 8e-9) for qubit in self.all_qubits
             },
             'artificial_detunings': {
-                qubit: np.arange(-2.1, 2.1, 0.8) * 1e6 for qubit in self.all_qubits
+                qubit: np.arange(-0.5, 0.5, 0.2) * 1e6 for qubit in self.all_qubits
             },
             # },
         }
@@ -148,8 +148,8 @@ class N_Rabi_Oscillations_Node(BaseNode):
     @property
     def samplespace(self):
         cluster_samplespace = {
-            'mw_amplitudes_sweep': {qubit: np.linspace(-0.01, 0.01, 21) for qubit in self.all_qubits},
-            'X_repetitions': {qubit: np.arange(1, 96, 16) for qubit in self.all_qubits}
+            'mw_amplitudes_sweep': {qubit: np.linspace(-0.03, 0.03, 51) for qubit in self.all_qubits},
+            'X_repetitions': {qubit: np.arange(1, 21, 6) for qubit in self.all_qubits}
         }
         return cluster_samplespace
 
@@ -186,7 +186,7 @@ class Qubit_12_Spectroscopy_Multidim_Node(BaseNode):
     def samplespace(self):
         cluster_samplespace = {
             'spec_pulse_amplitudes': {
-                qubit: np.linspace(5e-4, 9e-4, 5) for qubit in self.all_qubits
+                qubit: np.linspace(50e-4, 50e-4, 1) for qubit in self.all_qubits
             },
             'spec_frequencies': {
                 qubit: qubit_samples(qubit, transition='12') for qubit in self.all_qubits
@@ -207,7 +207,7 @@ class Rabi_Oscillations_12_Node(BaseNode):
     def samplespace(self):
         cluster_samplespace = {
             'mw_amplitudes': {
-                qubit: np.linspace(0.002, 0.400, 31) for qubit in self.all_qubits
+                qubit: np.linspace(0.002, 0.98, 41) for qubit in self.all_qubits
             }
         }
         return cluster_samplespace

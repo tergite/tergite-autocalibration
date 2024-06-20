@@ -63,7 +63,7 @@ def execute_schedule(
     def run_measurement() -> None:
         lab_ic.prepare(compiled_schedule)
         lab_ic.start()
-        lab_ic.wait_done(timeout_sec=600)
+        lab_ic.wait_done(timeout_sec=3600)
 
     def display_progress():
         steps = int(schedule_duration * 5)
