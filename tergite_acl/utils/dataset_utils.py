@@ -1,10 +1,11 @@
-import pathlib
 from datetime import datetime
+import pathlib
 from uuid import uuid4
 
 import numpy as np
 import xarray
 
+from collections.abc import Iterable
 from tergite_acl.config.settings import DATA_DIR
 from tergite_acl.lib.demod_channels import ParallelDemodChannels
 from tergite_acl.lib.node_base import BaseNode
@@ -62,16 +63,11 @@ def configure_dataset(
                 'units': 'NA'
             }
 
-            if isinstance(settable_values, (int, float, complex)):
+            if not isinstance(settable_values, Iterable):
                 settable_values = np.array([settable_values])
 
             coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
 
-        # if hasattr(node, 'node_externals'):
-        #     print('WARNING for node_externals dataset attrs')
-        #     # coord_key = node.external_parameter_name + measured_qubit
-        #     # coord_attrs = {'qubit':measured_qubit, 'long_name': f'{coord_key}', 'units': 'NA'}
-        #     # coords_dict[coord_key] = (coord_key, np.array([node.external_parameter_value]), coord_attrs)
 
         partial_ds = xarray.Dataset(coords=coords_dict)
 
@@ -93,16 +89,17 @@ def configure_dataset(
         data_values = data_values.reshape(*reshaping)
         data_values = np.transpose(data_values)
         attributes = {'qubit': measured_qubit, 'long_name': f'y{measured_qubit}', 'units': 'NA'}
-        qubit_state = ''
+        # qubit_state = ''
 
         # TODO ro_frequency_optimization requires multiple measurements per qubit
-        is_frequency_opt = node.name == 'ro_frequency_two_state_optimization' or node.name == 'ro_frequency_three_state_optimization'
-        if is_frequency_opt:
-            qubit_states = [0,1,2]
-            qubit_state = qubit_states[key // n_qubits]
-            attributes['qubit_state'] = qubit_state
+        # is_frequency_opt = node.name == 'ro_frequency_two_state_optimization' or node.name == 'ro_frequency_three_state_optimization'
+        # if is_frequency_opt:
+        #     qubit_states = [0,1,2]
+        #     qubit_state = qubit_states[key // n_qubits]
+        #     attributes['qubit_state'] = qubit_state
 
-        partial_ds[f'y{measured_qubit}{qubit_state}'] = (tuple(coords_dict.keys()), data_values, attributes)
+        # partial_ds[f'y{measured_qubit}{qubit_state}'] = (tuple(coords_dict.keys()), data_values, attributes)
+        partial_ds[f'y{measured_qubit}'] = (tuple(coords_dict.keys()), data_values, attributes)
         dataset = xarray.merge([dataset,partial_ds])
 
     return dataset
@@ -133,20 +130,22 @@ def reshufle_loop_dataset(
     return reshuffled_array
 
 
-def handle_ro_freq_optimization(complex_dataset: xarray.Dataset, states: list[int]) -> xarray.Dataset:
-    new_ds = xarray.Dataset(coords=complex_dataset.coords, attrs=complex_dataset.attrs)
-    new_ds = new_ds.expand_dims(dim={'qubit_state': states})
-    # TODO this for every var and every coord. It might cause
-    # performance issues for larger datasets
-    for coord in complex_dataset.coords:
-        this_qubit = complex_dataset[coord].attrs['qubit']
-        attributes = {'qubit': this_qubit}
-        values = []
-        for var in complex_dataset.data_vars:
-            if coord in complex_dataset[var].coords:
-                values.append(complex_dataset[var].values)
-        new_ds[f'y{this_qubit}'] = (('qubit_state', coord), np.vstack(values), attributes)
-    return new_ds
+# def handle_ro_freq_optimization(complex_dataset: xarray.Dataset, states: list[int]) -> xarray.Dataset:
+#     breakpoint()
+#     # TODO probably this is not necessary, just set the qubit states at the samplespace, the dataset ends up the same anyway
+#     new_ds = xarray.Dataset(coords=complex_dataset.coords, attrs=complex_dataset.attrs)
+#     new_ds = new_ds.expand_dims(dim={'qubit_state': states})
+#     # TODO this for every var and every coord. It might cause
+#     # performance issues for larger datasets
+#     for coord in complex_dataset.coords:
+#         this_qubit = complex_dataset[coord].attrs['qubit']
+#         attributes = {'qubit': this_qubit, 'element_type': 'qubit'}
+#         values = []
+#         for var in complex_dataset.data_vars:
+#             if coord in complex_dataset[var].coords:
+#                 values.append(complex_dataset[var].values)
+#         new_ds[f'y{this_qubit}'] = (('qubit_state', coord), np.vstack(values), attributes)
+#     return new_ds
 
 
 def create_node_data_path(node) -> pathlib.Path:

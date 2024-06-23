@@ -18,7 +18,7 @@ class Randomized_Benchmarking(Measurement):
 
     def schedule_function(
         self,
-        seed: int,
+        seeds: dict[str, int],
         number_of_cliffords: dict[str, np.ndarray],
         repetitions: int = 1024,
         ) -> Schedule:
@@ -54,6 +54,8 @@ class Randomized_Benchmarking(Measurement):
         for this_qubit, clifford_sequence_lengths in number_of_cliffords.items():
 
             all_cliffords = len(cliffords.XY_decompositions)
+            seed = seeds[this_qubit]
+
             rng = np.random.default_rng(seed)
 
             schedule.add(

@@ -10,7 +10,7 @@ from colorama import init as colorama_init
 from quantify_scheduler.instrument_coordinator.instrument_coordinator import CompiledSchedule
 from quantify_scheduler.json_utils import pathlib
 
-from tergite_acl.utils.dataset_utils import configure_dataset, handle_ro_freq_optimization, retrieve_dummy_dataset, save_dataset
+from tergite_acl.utils.dataset_utils import configure_dataset, retrieve_dummy_dataset, save_dataset
 from tergite_acl.utils.logger.tac_logger import logger
 from tergite_acl.utils.status import MeasurementMode
 
@@ -46,10 +46,10 @@ def measure_node(
     else:
         result_dataset = retrieve_dummy_dataset(node)
 
-    if node.name == 'ro_frequency_two_state_optimization':
-        result_dataset = handle_ro_freq_optimization(result_dataset, states=[0, 1])
-    elif node.name == 'ro_frequency_three_state_optimization':
-        result_dataset = handle_ro_freq_optimization(result_dataset, states=[0, 1, 2])
+    # if node.name == 'ro_frequency_two_state_optimization':
+    #     result_dataset = handle_ro_freq_optimization(result_dataset, states=[0, 1])
+    # elif node.name == 'ro_frequency_three_state_optimization':
+    #     result_dataset = handle_ro_freq_optimization(result_dataset, states=[0, 1, 2])
 
     logger.info('Finished measurement')
     return result_dataset

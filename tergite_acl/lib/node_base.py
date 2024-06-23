@@ -1,3 +1,7 @@
+from collections.abc import Iterable
+
+import numpy as np
+
 from tergite_acl.config.settings import REDIS_CONNECTION
 from tergite_acl.lib.demod_channels import ParallelDemodChannels
 
@@ -16,6 +20,7 @@ class BaseNode:
 
         self.schedule_samplespace = {}
         self.external_samplespace = {}
+        self.initial_schedule_samplespace = {}
         self.schedule_keywords = {}
         self.reduced_external_samplespace = {}
 
@@ -48,12 +53,14 @@ class BaseNode:
         first_element = list(measured_elements)[0]
 
         dimensions = []
-        for quantity in schedule_settable_quantities:
-            dimensions.append(
-                len(self.schedule_samplespace[quantity][first_element])
-            )
 
-        if self.external_samplespace != {}:
+        for quantity in schedule_settable_quantities:
+            settable_values = self.schedule_samplespace[quantity][first_element]
+            if not isinstance(settable_values, Iterable):
+                settable_values = np.array([settable_values])
+            dimensions.append(len(settable_values))
+
+        if self.external_samplespace != {} and self.initial_schedule_samplespace == {}:
             dimensions = dimensions + [1]
         return dimensions
 

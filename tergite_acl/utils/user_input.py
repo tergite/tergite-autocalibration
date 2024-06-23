@@ -81,7 +81,7 @@ user_samplespace = {
 }
 '''
 ####################################################################
-target_node = 'coupler_spectroscopy'
+target_node = 'ro_amplitude_three_state_optimization'
 qubits = [ 'q06','q07','q08','q09','q10']
 couplers = ['q06_q07']
 user_samplespace = {
@@ -90,11 +90,6 @@ user_samplespace = {
             qubit: resonator_samples(qubit) for qubit in qubits
         }
     },
-    'rabi_oscillations': {
-        'mw_amplitudes': {
-            qubit: np.linspace(0.002, 0.5, 101) for qubit in qubits
-        }
-    }
 }
 ####################################################################
 

@@ -101,23 +101,32 @@ def monitor_node_calibration(node: BaseNode, data_path: Path, lab_ic, cluster_st
 
     elif node.type == 'parameterized_sweep':
         print('Performing parameterized sweep')
-        ds = xarray.Dataset()
 
-        iterations = len(node.node_externals)
+        pre_measurement_operation = node.pre_measurement_operation
 
-        for iteration_index in range(node.external_iterations):
-            if iteration_index == node.external_iterations:
-                # TODO remove this, such attributes are not a responsibility of the node
-                node.measurement_is_completed = True
-            node_parameter = node.node_externals[iteration_index]
-            node.external_parameter_value = node_parameter
-            node.external_parameters = {
-                node.external_parameter_name: node_parameter
-            }
-            # reduce the external samplespace
-            compiled_schedule = precompile(node)
+        # node.external_dimensions is defined in the node_base
+        iterations = node.external_dimensions[0]
 
-            result_dataset = measure_node(
+        result_dataset = xarray.Dataset()
+
+        for current_iteration in range(iterations):
+            reduced_external_samplespace = {}
+            qubit_values = {}
+            external_settable = list(node.external_samplespace.keys())[0]
+            #elements may refer to qubits or couplers
+            elements = node.external_samplespace[external_settable].keys()
+            for element in elements:
+                qubit_specific_values = node.external_samplespace[external_settable][element]
+                external_value = qubit_specific_values[current_iteration]
+                qubit_values[element] = external_value
+
+            reduced_external_samplespace[external_settable] = qubit_values
+            node.reduced_external_samplespace = reduced_external_samplespace
+            pre_measurement_operation(reduced_ext_space=reduced_external_samplespace)
+
+            compiled_schedule = precompile(node, data_path)
+
+            ds = measure_node(
                 node,
                 compiled_schedule,
                 lab_ic,
@@ -125,13 +134,15 @@ def monitor_node_calibration(node: BaseNode, data_path: Path, lab_ic, cluster_st
                 cluster_status,
             )
 
-            if node.post_process_each_iteration:
-                measurement_result = post_process(result_dataset, node, data_path=data_path)
-            ds = xarray.merge([ds, result_dataset])
+            # if node.post_process_each_iteration:
+            #     measurement_result = post_process(result_dataset, node, data_path=data_path)
+
+            result_dataset = xarray.merge([result_dataset, ds])
 
         logger.info('measurement completed')
-        if not node.post_process_each_iteration:
-            measurement_result = post_process(ds, node, data_path=data_path)
+        measurement_result = post_process(result_dataset, node, data_path=data_path)
+        # if not node.post_process_each_iteration:
+        #     measurement_result = post_process(ds, node, data_path=data_path)
         logger.info('analysis completed')
     else:
         raise ValueError(f'{node.type} is node a valid node type' )

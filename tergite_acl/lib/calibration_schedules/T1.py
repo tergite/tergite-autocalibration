@@ -15,7 +15,7 @@ class T1(Measurement):
         self.qubit_state = qubit_state
         self.transmons = transmons
 
-    def single_qubit_T1(self, schedule: Schedule, qubit: 'str', acq_index: 'int', tau: float):
+    def single_qubit_T1(self, schedule: Schedule, qubit: str, acq_index: int, tau: float):
         schedule.add(X(qubit))
         schedule.add(
             Measure(qubit, acq_index=acq_index, bin_mode=BinMode.AVERAGE),

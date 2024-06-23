@@ -24,20 +24,7 @@ from tergite_acl.utils.hardware_utils import set_qubit_LO
 
 from qblox_instruments.qcodes_drivers.cluster import Cluster
 
-
-# class Qubit_01_Spectroscopy_Pulsed_Node(BaseNode):
-#     measurement_obj = Two_Tones_Spectroscopy
-#     analysis_obj = QubitSpectroscopyAnalysis
-#
-#     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
-#         super().__init__(name, all_qubits, **node_dictionary)
-#         self.sweep_range = self.node_dictionary.pop("sweep_range", None)
-#         self.redis_field = ['clock_freqs:f01']
-#         self.samplespace = {
-#             'spec_frequencies': {
-#                 qubit: qubit_samples(qubit, sweep_range=self.sweep_range) for qubit in self.all_qubits
-#             }
-#         }
+from tergite_acl.utils.redis_helper import fetch_redis_params
 
 
 class Qubit_01_Spectroscopy_CW_Node(BaseNode):
@@ -120,6 +107,28 @@ class Ramsey_Fringes_Node(BaseNode):
             },
         }
 
+
+class Ramsey_Fringes_12_Node(BaseNode):
+    measurement_obj = Ramsey_detunings
+    analysis_obj = RamseyDetuningsAnalysis
+
+    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
+        self.redis_field = ['clock_freqs:f12']
+        self.qubit_state = 1
+        self.backup = False
+        self.analysis_kwargs = {"redis_field": "clock_freqs:f12"}
+        self.schedule_samplespace = {
+            'ramsey_delays': {
+                qubit: np.arange(4e-9, 2048e-9, 8 * 8e-9) for qubit in self.all_qubits
+            },
+            'artificial_detunings': {
+                qubit: np.arange(-2.1, 2.1, 0.8) * 1e6 for qubit in self.all_qubits
+            },
+        }
+
+
+
 class Adaptive_Ramsey_Fringes_Node(BaseNode):
     measurement_obj = Ramsey_fringes
     analysis_obj = RamseyAnalysis
@@ -154,24 +163,6 @@ class Adaptive_Ramsey_Fringes_Node(BaseNode):
         return (len(self.samplespace['ramsey_delays'][self.all_qubits[0]]), 1)
 
 
-class Ramsey_Fringes_12_Node(BaseNode):
-    measurement_obj = Ramsey_fringes
-    analysis_obj = RamseyAnalysis
-
-    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ['clock_freqs:f12']
-        self.qubit_state = 1
-        self.backup = False
-        self.analysis_kwargs = {"redis_field": "clock_freqs:f12"}
-        self.schedule_samplespace = {
-            'ramsey_delays': {
-                qubit: np.arange(4e-9, 2048e-9, 8 * 8e-9) for qubit in self.all_qubits
-            },
-            'artificial_detunings': {
-                qubit: np.arange(-2.1, 2.1, 0.8) * 1e6 for qubit in self.all_qubits
-            },
-        }
 
 
 class Adaptive_Motzoi_Parameter_Node(BaseNode):
@@ -223,10 +214,6 @@ class Motzoi_Parameter_Node(BaseNode):
             }
         }
 
-    # @property
-    # def dimensions(self):
-    #     return (len(self.schedule_samplespace['mw_motzois'][self.all_qubits[0]]), 1)
-
 
 class N_Rabi_Oscillations_Node(BaseNode):
     measurement_obj = N_Rabi_Oscillations
@@ -239,10 +226,10 @@ class N_Rabi_Oscillations_Node(BaseNode):
 
         self.schedule_samplespace = {
             'mw_amplitudes_sweep': {
-                qubit: np.linspace(-0.020, 0.020, 51) for qubit in self.all_qubits
+                qubit: np.linspace(-0.045, 0.045, 40) for qubit in self.all_qubits
             },
             'X_repetitions': {
-                qubit: np.arange(1, 29, 4) for qubit in self.all_qubits
+                qubit: np.arange(1, 40, 8) for qubit in self.all_qubits
             }
         }
 
@@ -277,7 +264,7 @@ class Qubit_12_Spectroscopy_Multidim_Node(BaseNode):
 
         self.schedule_samplespace = {
             'spec_pulse_amplitudes': {
-                qubit: np.linspace(5e-4, 9e-4, 5) for qubit in self.all_qubits
+                qubit: np.linspace(6e-3, 3e-2, 3) for qubit in self.all_qubits
             },
             'spec_frequencies': {
                 qubit: qubit_samples(qubit, transition='12') for qubit in self.all_qubits
@@ -296,6 +283,6 @@ class Rabi_Oscillations_12_Node(BaseNode):
 
         self.schedule_samplespace = {
             'mw_amplitudes': {
-                qubit: np.linspace(0.002, 0.400, 31) for qubit in self.all_qubits
+                qubit: np.linspace(0.002, 0.800, 61) for qubit in self.all_qubits
             }
         }

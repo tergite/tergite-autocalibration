@@ -82,9 +82,7 @@ class Randomized_Benchmarking_Node(BaseNode):
         self.backup = False
         self.redis_field = ['fidelity']
 
-        self.external_parameter_value = 0 # TODO is this necessary?
-
-        self.schedule_samplespace = {
+        self.initial_schedule_samplespace = {
             'number_of_cliffords': {
                 qubit: np.array(
                     [2, 16, 128, 256, 512, 768, 1024, 0, 1]
@@ -93,12 +91,13 @@ class Randomized_Benchmarking_Node(BaseNode):
         }
 
         self.external_samplespace = {
-            'seed': np.arange(5, dtype=np.int32)
+            'seeds': {
+                qubit: np.arange(5, dtype=np.int32) for qubit in self.all_qubits
+            }
         }
 
-    @property
-    def dimensions(self):
-        return (len(self.samplespace['number_of_cliffords'][self.all_qubits[0]]), 1)
+    def pre_measurement_operation(self, reduced_ext_space: dict):
+        self.schedule_samplespace = self.initial_schedule_samplespace | reduced_ext_space
 
 
 # TODO this needs to be reviwed

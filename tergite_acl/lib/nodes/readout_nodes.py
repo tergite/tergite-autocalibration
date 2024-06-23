@@ -1,23 +1,32 @@
 import numpy as np
 
-from tergite_acl.lib.analysis.optimum_ro_amplitude_analysis import OptimalRO_Three_state_AmplitudeAnalysis, \
-    OptimalRO_Two_state_AmplitudeAnalysis
+from tergite_acl.lib.analysis.optimum_ro_amplitude_analysis import (
+    OptimalRO_Three_state_AmplitudeAnalysis,
+    OptimalRO_Two_state_AmplitudeAnalysis,
+)
 from tergite_acl.lib.analysis.optimum_ro_frequency_analysis import (
     OptimalROFrequencyAnalysis,
-    OptimalRO_012_FrequencyAnalysis
+    OptimalRO_012_FrequencyAnalysis,
 )
 from tergite_acl.lib.analysis.punchout_analysis import PunchoutAnalysis
 from tergite_acl.lib.analysis.resonator_spectroscopy_analysis import (
     ResonatorSpectroscopyAnalysis,
     ResonatorSpectroscopy_1_Analysis,
-    ResonatorSpectroscopy_2_Analysis
+    ResonatorSpectroscopy_2_Analysis,
 )
+from tergite_acl.lib.calibration_schedules.punchout import Punchout
+from tergite_acl.lib.calibration_schedules.resonator_spectroscopy import (
+    Resonator_Spectroscopy,
+)
+from tergite_acl.lib.calibration_schedules.ro_amplitude_optimization import (
+    RO_amplitude_optimization,
+)
+# from tergite_acl.lib.calibration_schedules.ro_frequency_optimization import (
+#     RO_frequency_optimization,
+# )
+from tergite_acl.lib.calibration_schedules.ro_frequency_optimization_refactored import RO_frequency_optimization
 from tergite_acl.lib.node_base import BaseNode
 from tergite_acl.lib.nodes.node_utils import resonator_samples
-from tergite_acl.lib.calibration_schedules.punchout import Punchout
-from tergite_acl.lib.calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
-from tergite_acl.lib.calibration_schedules.ro_amplitude_optimization import RO_amplitude_optimization
-from tergite_acl.lib.calibration_schedules.ro_frequency_optimization import RO_frequency_optimization
 
 
 class Resonator_Spectroscopy_Node(BaseNode):
@@ -60,6 +69,12 @@ class Resonator_Spectroscopy_2_Node(BaseNode):
         self.redis_field = ['extended_clock_freqs:readout_2']
         self.qubit_state = 2
 
+        self.schedule_samplespace = {
+            'ro_frequencies': {
+                qubit: resonator_samples(qubit) for qubit in self.all_qubits
+            }
+        }
+
 
 class Punchout_Node(BaseNode):
     measurement_obj = Punchout
@@ -88,9 +103,12 @@ class RO_frequency_optimization_Node(BaseNode):
         self.redis_field = ['extended_clock_freqs:readout_2state_opt']
         self.qubit_state = 0
 
-        self.cluster_samplespace = {
-            'ro_frequencies': {
+        self.schedule_samplespace = {
+            'ro_opt_frequencies': {
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
+            },
+            'qubit_states': {
+                qubit: [0,1] for qubit in self.all_qubits
             }
         }
 
@@ -106,9 +124,12 @@ class RO_frequency_optimization_gef_Node(BaseNode):
         self.redis_field = ['extended_clock_freqs:readout_3state_opt']
         self.qubit_state = 2
 
-        self.cluster_samplespace = {
-            'ro_frequencies': {
+        self.schedule_samplespace = {
+            'ro_opt_frequencies': {
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
+            },
+            'qubit_states': {
+                qubit: [0,1,2] for qubit in self.all_qubits
             }
         }
 

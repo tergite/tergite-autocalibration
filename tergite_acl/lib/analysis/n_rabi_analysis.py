@@ -32,6 +32,7 @@ class NRabiAnalysis(BaseAnalysis):
         index_of_max = np.argmax(np.array(sums))
         self.previous_amplitude = fetch_redis_params('rxy:amp180',self.qubit)
         self.optimal_amp180 = self.dataset[mw_amplitude_key][index_of_max].values + self.previous_amplitude
+        self.index_of_max = index_of_max
 
         return [self.optimal_amp180]
 
@@ -42,6 +43,7 @@ class NRabiAnalysis(BaseAnalysis):
         datarray.plot(ax=axis, x=f'mw_amplitudes_sweep{qubit}',cmap='RdBu_r')
         axis.set_xlabel('mw amplitude correction')
         axis.axvline(
+            # self.dataset[self.mw_amplitudes_coord][self.index_of_max].values,
             self.optimal_amp180 - fetch_redis_params('rxy:amp180',self.qubit),
             c='k',
             lw=4,
