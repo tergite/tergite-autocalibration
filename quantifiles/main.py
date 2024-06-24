@@ -4,6 +4,7 @@ import dataclasses
 import logging
 import os
 import sys
+import json
 from datetime import datetime
 from pathlib import Path
 from typing import Sequence, Mapping
@@ -14,6 +15,7 @@ from PyQt5.QtGui import QImageReader, QPixmap
 from PyQt5.QtCore import QSize, Qt
 from quantify_core.data.handling import set_datadir
 from quantify_core.data.types import TUID
+
 
 from quantifiles.path import load_icon
 from quantifiles.data import (
@@ -71,7 +73,7 @@ class ExperimentList(QtWidgets.QTreeWidget):
     # Define signals emitted by this widget
     experiment_selected = QtCore.pyqtSignal(str)
     new_experiment_selected = QtCore.pyqtSignal(str)
-    experiment_activated = QtCore.pyqtSignal(str)
+    experiment_activated = QtCore.pyqtSignal(str, str)
 
     def __init__(self, parent: QtWidgets.QWidget | None = None):
         super().__init__(parent)
@@ -193,7 +195,8 @@ class ExperimentList(QtWidgets.QTreeWidget):
     @QtCore.pyqtSlot(QtWidgets.QTreeWidgetItem, int)
     def activate_experiment(self, item: QtWidgets.QTreeWidgetItem, _: int) -> None:
         tuid = item.text(0)
-        self.experiment_activated.emit(tuid)
+        measurement_name = item.text(1)
+        self.experiment_activated.emit(tuid, measurement_name)
 
 
 class DataDirLabel(QtWidgets.QLabel):
@@ -404,8 +407,16 @@ class ExperimentPreview(QtWidgets.QLabel):
             self.image_label.setText('No PNG image found in the selected folder')
             return
 
+        for png in png_files:
+            if '_preview' in png:
+                png_file = png
+                break
+            else:
+                png_file = png
+
+
         # Assuming one png per file, let's use the first PNG file found in the folder
-        image_path = os.path.join(folder_path, png_files[0])
+        image_path = os.path.join(folder_path, png_file)
 
         self.display_image(image_path)
 
@@ -524,11 +535,29 @@ class DataDirInspector(QtWidgets.QMainWindow):
     def _liveplotting_changed(self, liveplotting: bool) -> None:
         self._auto_open_plots = liveplotting
 
-    @QtCore.pyqtSlot(str)
-    def open_plots(self, tuid: str) -> None:
+    @QtCore.pyqtSlot(str, str)
+    def open_plots(self, tuid: str, measurement_name:str) -> None:
+
+        # tuid = SplitTuid(tuid)
+        # lockfile = os.path.join(
+        #     _DATASET_LOCKS_DIR, tuid.tuid + "-" + DATASET_NAME + ".lock"
+        # )
+        # with FileLock(lockfile, 5):
+        #     logger.info(f"Loading dataset {tuid.full_tuid}.")
+        #     ds = load_dataset(TUID(tuid.tuid))
+
         # Load the dataset and create a plot
+
+        # device_config = load_device_config(tuid)
+        device_config_path = f'{self.datadir}{tuid[:8]}/{tuid}-{measurement_name}/{measurement_name}.json'
+        with open(device_config_path) as js:
+            device_config = json.load(js)
+
+        for element in device_config:
+            device_config[element] = device_config[element]['data']
+
         ds = safe_load_dataset(tuid)
-        p = autoplot(ds)
+        p = autoplot(ds, device_config)
 
         # Add the plot to the list of plots and show it
         self.plots.append(p)

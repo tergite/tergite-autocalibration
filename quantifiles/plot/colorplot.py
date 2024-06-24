@@ -1,10 +1,9 @@
 from __future__ import annotations
-
 from typing import List, Sequence
-from PyQt5 import QtCore
-import pyqtgraph
 
+from PyQt5 import QtCore
 import numpy as np
+import pyqtgraph
 import xarray as xr
 
 from quantifiles import units
@@ -52,7 +51,7 @@ class ColorPlot(BasePlot):
         self.img = pyqtgraph.ImageItem()
         self.img.setColorMap(pyqtgraph.colormap.get(colormap))
 
-        self.colorbar = pyqtgraph.ColorBarItem(width=16, cmap=colormap)
+        # self.colorbar = pyqtgraph.ColorBarItem(width=16, cmap=colormap)
         # self.colorbar.setLabels(
         #     right=f"{dataset[z].long_name} ({dataset[z].attrs['units']})"
         # )
@@ -145,11 +144,11 @@ class ColorPlot(BasePlot):
                 np.max(y_data) - np.min(y_data),
             )
         )
-        self.colorbar.setImageItem(self.img, insert_in=self.plot.plotItem)
+        # self.colorbar.setImageItem(self.img, insert_in=self.plot.plotItem)
 
-        limits = (np.nanmin(z_data), np.nanmax(z_data))
-        if limits[0] is not np.nan and limits[1] is not np.nan:
-            self.colorbar.setLevels(limits)
+        # limits = (np.nanmin(z_data), np.nanmax(z_data))
+        # if limits[0] is not np.nan and limits[1] is not np.nan:
+        #     self.colorbar.setLevels(limits)
 
     def get_mouse_position_text(self, x: float, y: float) -> str:
         """
@@ -183,5 +182,5 @@ class ColorPlot(BasePlot):
         # z_unit = self.dataset[self.z].attrs["units"]
 
         return (
-            f"\nx = {x:.2e} \ny = {y:.2e} \nz = {z_value:.2e} "
+            f"\nx = {x:.4e} \ny = {y:.3e} \nz = {z_value:.3e} "
         )

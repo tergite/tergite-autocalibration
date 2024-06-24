@@ -1,19 +1,21 @@
 from typing import cast
 
-import xarray as xr
 from PyQt5 import QtWidgets
 from quantify_core.data.handling import set_datadir
+import xarray as xr
 
 from quantifiles.data import safe_load_dataset
 from quantifiles.plot.colorplot import ColorPlot
 from quantifiles.plot.lineplot import LinePlot
-# from quantifiles.plot.window import PlotWindow
 from quantifiles.plot.loki_window import PlotWindow
+from quantifiles.plot.multiple_line_plot import MultipleLinePlot
+
 
 
 #rename it to initial_plot
-def autoplot(dataset: xr.Dataset) -> QtWidgets.QMainWindow:
-    plot_window = PlotWindow(dataset)
+def autoplot(dataset: xr.Dataset, device_config: dict) -> QtWidgets.QMainWindow:
+
+    plot_window = PlotWindow(dataset, device_config)
 
     for var in dataset.data_vars:
         qubit = dataset[var].attrs['qubit']
@@ -30,9 +32,14 @@ def autoplot(dataset: xr.Dataset) -> QtWidgets.QMainWindow:
             plot_widget = ColorPlot(
                 dataset, x_keys=settables, y_keys=gettable, parent=plot_window
             )
+            secondary_plot_widget = MultipleLinePlot(
+                dataset, x_keys=settables, y_keys=gettable, parent=plot_window
+            )
         else:
             raise ValueError('Cant plot datasets with more than 2 settables :(')
         plot_window.add_plot(qubit, plot_widget)
+        if len(settables) == 2:
+            plot_window.add_secondary_plot(qubit, secondary_plot_widget)
 
     return plot_window
 

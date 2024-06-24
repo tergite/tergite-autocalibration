@@ -139,14 +139,14 @@ class LinePlot(BasePlot):
 
         # self.set_data(self.dataset)
 
-    def set_data(self, dataset: xr.Dataset):
-        self.dataset = dataset
-        for curve in self.curves:
-            for yvar in self.y_keys:
-                curve.setData(
-                    self.x_scaling * self.dataset[self.x_key].values,
-                    self.y_scaling * self.dataset[yvar].values,
-                )
+    # def set_data(self, dataset: xr.Dataset):
+    #     self.dataset = dataset
+    #     for curve in self.curves:
+    #         for yvar in self.y_keys:
+    #             curve.setData(
+    #                 self.x_scaling * self.dataset[self.x_key].values,
+    #                 self.y_scaling * self.dataset[yvar].values,
+    #             )
 
     def create_curves(self, x_scaling: float = 1, y_scaling: float = 1):
         options_generator = cycle(_OPTIONS)
