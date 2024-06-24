@@ -1,13 +1,11 @@
 from __future__ import annotations
-
-import logging
 from functools import partial
-from typing import cast
+import logging
+from typing import Any, cast
 
-import xarray as xr
-
-from PyQt5 import QtGui, QtWidgets, QtCore
+from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QSignalMapper
+import xarray as xr
 
 from quantifiles.data import get_snapshot_as_dict
 from quantifiles.plot.baseplot import BasePlot
@@ -248,9 +246,9 @@ class PlotTab(QtWidgets.QWidget):
         self.name_and_tuid_box = NameAndTuidBox(name=dataset.name, tuid=dataset.tuid)
 
         splitter = QtWidgets.QSplitter(QtCore.Qt.Horizontal)
-        # splitter.setSizePolicy(
-        #     QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
-        # )
+        splitter.setSizePolicy(
+            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
+        )
 
         left_column_layout = QtWidgets.QVBoxLayout(self)
         left_column_layout.addWidget(self.name_and_tuid_box)
@@ -269,10 +267,10 @@ class PlotTab(QtWidgets.QWidget):
             QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
         )
 
-        splitter.addWidget(column_container)
-        splitter.addWidget(plot_container)
+        # splitter.addWidget(column_container)
+        # splitter.addWidget(self.plot_container)
+        # splitter.addWidget(secondary_plot_container)
         # splitter.setSizes([5, 295])
-
 
         layout = QtWidgets.QHBoxLayout(self)
         layout.addWidget(column_container)
@@ -285,6 +283,80 @@ class PlotTab(QtWidgets.QWidget):
         plot.setSizePolicy(
             QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred
         )
+        # plot.setFixedSize(200,200)
+
+
+class DeviceTab(QtWidgets.QWidget):
+
+    def __init__(self, device_config: dict[str, any]):
+        """
+        Initializes a new instance of the SnapshotTab class with the given snapshot dictionary.
+
+        Parameters
+        ----------
+        snapshot : dict[str, any]
+            The dictionary to display in the snapshot tab.
+        """
+        super().__init__()
+        self.device_config = device_config
+
+        # Set up the layout
+        layout = QtWidgets.QVBoxLayout(self)
+
+        # Add search bar
+        self.search_bar = QtWidgets.QLineEdit()
+        self.search_bar.setPlaceholderText("Search...")
+        # self.search_bar.textChanged.connect(self.search_snapshot_tree)
+        layout.addWidget(self.search_bar)
+
+        # Set up the snapshot tree widget
+        self.snapshot_tree = QtWidgets.QTreeWidget()
+        self.snapshot_tree.setHeaderLabels(["Name", "Value"])
+        self.snapshot_tree.setColumnWidth(0, 256)
+        self.snapshot_tree.setSortingEnabled(True)
+        self.snapshot_tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        # self.snapshot_tree.customContextMenuRequested.connect(
+        #     self.show_copy_context_menu
+        # )
+
+        # Add the snapshot dictionary to the tree
+        self.add_snapshot_to_tree(self.snapshot_tree, self.device_config)
+
+        # Add the snapshot tree widget to the layout
+        layout.addWidget(self.snapshot_tree)
+        self.setLayout(layout)
+
+    def add_snapshot_to_tree(
+        self,
+        tree: QtWidgets.QTreeWidget,
+        snapshot: dict[str, any],
+        parent_key: str = "",
+    ):
+        """
+        Recursively adds the given snapshot dictionary to the given tree widget.
+
+        Parameters
+        ----------
+        tree : QtWidgets.QTreeWidget
+            The tree widget to add th        containerWidget = QWidget()e snapshot to.
+        snapshot : dict[str, any]
+            The snapshot dictionary to add to the tree.
+        parent_key : str, optional
+            The parent key to use when constructing the item keys, by default "".
+        """
+        for key, value in snapshot.items():
+            if isinstance(value, dict):
+                # If the value is another dictionary, add it as a child item
+                item = QtWidgets.QTreeWidgetItem(tree)
+                item.setText(0, key)
+                self.add_snapshot_to_tree(item, value, key)
+            else:
+                # If the value is a non-dict type, add it as a leaf item
+                item = QtWidgets.QTreeWidgetItem(tree)
+                item.setText(0, f"{parent_key}.{key}" if parent_key else key)
+                item.setText(1, str(value))
+
+
 
 
 class PlotWindowContent(QtWidgets.QWidget):
@@ -292,7 +364,7 @@ class PlotWindowContent(QtWidgets.QWidget):
         self,
         parent: QtWidgets.QWidget | None = None,
         dataset: xr.Dataset | None = None,
-        snapshot: dict[str, any] | None = None,
+        device_config: dict[str, Any] | None = None,
     ):
         super().__init__(parent)
 
@@ -307,11 +379,14 @@ class PlotWindowContent(QtWidgets.QWidget):
             QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred
         )
 
+        self.device_tab = DeviceTab(device_config)
+
         # Add the tabs
         tab_widget.addTab(self.plot_tab, "Plots")
-        if snapshot is not None:
-            # logger.debug("Adding snapshot tab")
-            tab_widget.addTab(SnapshotTab(snapshot=snapshot), "Snapshot")
+        tab_widget.addTab(self.device_tab, 'Device')
+        # if device_config is not None:
+        #     # logger.debug("Adding snapshot tab")
+        #     tab_widget.addTab(SnapshotTab(snapshot=device_config), "Snapshot")
 
         # Set the layout
         layout = QtWidgets.QVBoxLayout(self)
@@ -329,23 +404,29 @@ class PlotWindow(QtWidgets.QMainWindow):
     _WINDOW_HEIGHT: int = 600
     _WINDOW_WIDTH: int = 300
 
-    def __init__(self, dataset: xr.Dataset, parent: QtWidgets.QWidget | None = None):
+    def __init__(
+            self,
+            dataset: xr.Dataset,
+            device_config: dict[str, Any] | None = None,
+            parent: QtWidgets.QWidget | None = None
+        ):
         super().__init__(parent)
         self.dataset = dataset
+        self.device_config = device_config
 
         self.N_gettables = len(list(dataset.data_vars.keys()))
         self.plots = {}
 
         tuid = self.dataset.tuid if hasattr(self.dataset, "tuid") else "no tuid"
         name = self.dataset.name if hasattr(self.dataset, "name") else "no name"
-        self.snapshot = get_snapshot_as_dict(tuid)
+        # self.snapshot = get_snapshot_as_dict(tuid)
 
         self.setWindowTitle(f"{self._WINDOW_TITLE} | {name} | {tuid}")
         # logger.debug(
         #     f"Initialized {self.__class__.__name__} with title: {self.windowTitle()}"
         # )
 
-        canvas = PlotWindowContent(self, dataset=dataset, snapshot=self.snapshot)
+        canvas = PlotWindowContent(self, dataset=dataset, device_config=self.device_config)
         self.canvas = canvas
         self.setCentralWidget(canvas)
 
@@ -364,6 +445,18 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.activateWindow()
 
     def add_plot(self, name: str, plot: BasePlot):
+        self.canvas.add_plot(plot)
+        self.plots[name] = plot
+        plot.mouse_text_changed.connect(
+            self.canvas.plot_tab.gettable_select_box.on_new_mouse_pos_text
+        )
+
+        self.resize(
+            self._WINDOW_WIDTH + self._WINDOW_HEIGHT * len(self.plots),
+            self._WINDOW_HEIGHT,
+        )
+
+    def add_secondary_plot(self, name: str, plot: BasePlot):
         self.canvas.add_plot(plot)
         self.plots[name] = plot
         plot.mouse_text_changed.connect(
