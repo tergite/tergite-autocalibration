@@ -142,8 +142,6 @@ def precompile(node: BaseNode, data_path: Path, bin_mode:str=None, repetitions:i
     external_samplespace = node.external_samplespace
     schedule_keywords = node.schedule_keywords
 
-    samplespace = schedule_samplespace | external_samplespace
-
     schedule = schedule_function( **schedule_samplespace, **schedule_keywords )
     compilation_config = device.generate_compilation_config()
 

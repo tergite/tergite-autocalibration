@@ -21,10 +21,9 @@ from tergite_acl.lib.calibration_schedules.resonator_spectroscopy import (
 from tergite_acl.lib.calibration_schedules.ro_amplitude_optimization import (
     RO_amplitude_optimization,
 )
-# from tergite_acl.lib.calibration_schedules.ro_frequency_optimization import (
-#     RO_frequency_optimization,
-# )
-from tergite_acl.lib.calibration_schedules.ro_frequency_optimization_refactored import RO_frequency_optimization
+from tergite_acl.lib.calibration_schedules.ro_frequency_optimization_refactored import (
+    RO_frequency_optimization,
+)
 from tergite_acl.lib.node_base import BaseNode
 from tergite_acl.lib.nodes.node_utils import resonator_samples
 
@@ -33,8 +32,8 @@ class Resonator_Spectroscopy_Node(BaseNode):
     measurement_obj = Resonator_Spectroscopy
     analysis_obj = ResonatorSpectroscopyAnalysis
 
-    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
+    def __init__(self, name: str, all_qubits: list[str], ** schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
 
         self.redis_field = ['clock_freqs:readout', 'Ql', 'resonator_minimum']
         self.schedule_samplespace = {
@@ -48,8 +47,8 @@ class Resonator_Spectroscopy_1_Node(BaseNode):
     measurement_obj = Resonator_Spectroscopy
     analysis_obj = ResonatorSpectroscopy_1_Analysis
 
-    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
+    def __init__(self, name: str, all_qubits: list[str], ** schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
         self.redis_field = ['extended_clock_freqs:readout_1', 'Ql_1', 'resonator_minimum_1']
         self.qubit_state = 1
 
@@ -64,8 +63,8 @@ class Resonator_Spectroscopy_2_Node(BaseNode):
     measurement_obj = Resonator_Spectroscopy
     analysis_obj = ResonatorSpectroscopy_2_Analysis
 
-    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
+    def __init__(self, name: str, all_qubits: list[str], ** schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
         self.redis_field = ['extended_clock_freqs:readout_2']
         self.qubit_state = 2
 
@@ -80,16 +79,16 @@ class Punchout_Node(BaseNode):
     measurement_obj = Punchout
     analysis_obj = PunchoutAnalysis
 
-    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
+    def __init__(self, name: str, all_qubits: list[str], ** schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
         self.redis_field = ['measure:pulse_amp']
 
         self.schedule_samplespace = {
-            'ro_frequencies': {
-                qubit: resonator_samples(qubit) for qubit in self.all_qubits
-            },
             'ro_amplitudes': {
                 qubit: np.linspace(0.008, 0.06, 11) for qubit in self.all_qubits
+            },
+            'ro_frequencies': {
+                qubit: resonator_samples(qubit) for qubit in self.all_qubits
             },
         }
 
@@ -98,18 +97,18 @@ class RO_frequency_optimization_Node(BaseNode):
     measurement_obj = RO_frequency_optimization
     analysis_obj = OptimalROFrequencyAnalysis
 
-    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
+    def __init__(self, name: str, all_qubits: list[str], ** schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
         self.redis_field = ['extended_clock_freqs:readout_2state_opt']
         self.qubit_state = 0
 
         self.schedule_samplespace = {
+            'qubit_states': {
+                qubit: [0,1] for qubit in self.all_qubits
+            },
             'ro_opt_frequencies': {
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             },
-            'qubit_states': {
-                qubit: [0,1] for qubit in self.all_qubits
-            }
         }
 
 
@@ -117,20 +116,20 @@ class RO_frequency_optimization_gef_Node(BaseNode):
     measurement_obj = RO_frequency_optimization
     analysis_obj = OptimalRO_012_FrequencyAnalysis
 
-    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
+    def __init__(self, name: str, all_qubits: list[str], ** schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
         self.name = name
         self.all_qubits = all_qubits
         self.redis_field = ['extended_clock_freqs:readout_3state_opt']
         self.qubit_state = 2
 
         self.schedule_samplespace = {
+            'qubit_states': {
+                qubit: [0,1,2] for qubit in self.all_qubits
+            },
             'ro_opt_frequencies': {
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             },
-            'qubit_states': {
-                qubit: [0,1,2] for qubit in self.all_qubits
-            }
         }
 
 
@@ -141,8 +140,8 @@ class RO_amplitude_two_state_optimization_Node(BaseNode):
     measurement_obj = RO_amplitude_optimization
     analysis_obj = OptimalRO_Two_state_AmplitudeAnalysis
 
-    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
+    def __init__(self, name: str, all_qubits: list[str], ** schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
         self.name = name
         self.all_qubits = all_qubits
         self.redis_field = [
@@ -151,11 +150,11 @@ class RO_amplitude_two_state_optimization_Node(BaseNode):
             'measure_2state_opt:threshold'
         ]
         self.qubit_state = 1
-        self.node_dictionary = node_dictionary
-        self.node_dictionary['loop_repetitions'] = 1000
+        self.schedule_keywords = schedule_keywords
+        self.schedule_keywords['loop_repetitions'] = 1000
         self.plots_per_qubit = 3 #  fidelity plot, IQ shots, confusion matrix
 
-        self.loops = self.node_dictionary['loop_repetitions']
+        self.loops = self.schedule_keywords['loop_repetitions']
 
         self.schedule_samplespace = {
             'qubit_states': {
@@ -173,16 +172,16 @@ class RO_amplitude_three_state_optimization_Node(BaseNode):
     measurement_obj = RO_amplitude_optimization
     analysis_obj = OptimalRO_Three_state_AmplitudeAnalysis
 
-    def __init__(self, name: str, all_qubits: list[str], ** node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
+    def __init__(self, name: str, all_qubits: list[str], ** schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
         self.name = name
         self.all_qubits = all_qubits
         self.redis_field = ['measure_3state_opt:ro_ampl_3st_opt','inv_cm_opt']
         self.qubit_state = 2
-        self.node_dictionary = node_dictionary
-        self.node_dictionary['loop_repetitions'] = 1000
+        self.schedule_keywords = schedule_keywords
+        self.schedule_keywords['loop_repetitions'] = 1000
         self.plots_per_qubit = 3 #  fidelity plot, IQ shots, confusion matrix
-        self.loops = self.node_dictionary['loop_repetitions']
+        self.loops = self.schedule_keywords['loop_repetitions']
 
         self.schedule_samplespace = {
             'qubit_states': {

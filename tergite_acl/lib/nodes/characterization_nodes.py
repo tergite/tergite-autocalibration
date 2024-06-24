@@ -18,8 +18,8 @@ class All_XY_Node(BaseNode):
     measurement_obj = All_XY
     analysis_obj = All_XY_Analysis
 
-    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
+    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
         self.all_qubits = all_qubits
         self.redis_field = ['error_syndromes']
         self.backup = False
@@ -35,8 +35,8 @@ class T1_Node(BaseNode):
     measurement_obj = T1
     analysis_obj = T1Analysis
 
-    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
+    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
         self.all_qubits = all_qubits
         self.redis_field = ['t1_time']
         self.backup = False
@@ -73,12 +73,12 @@ class Randomized_Benchmarking_Node(BaseNode):
     measurement_obj = Randomized_Benchmarking
     analysis_obj = RandomizedBenchmarkingAnalysis
 
-    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
+    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
         self.name = name
         self.type = 'parameterized_sweep'
         self.all_qubits = all_qubits
-        self.node_dictionary = node_dictionary
+        self.schedule_keywords = schedule_keywords
         self.backup = False
         self.redis_field = ['fidelity']
 
@@ -105,7 +105,7 @@ class Randomized_Benchmarking_Node(BaseNode):
 #     def __init__(self, name: str, all_qubits: list[str], **kwargs):
 #         self.name = name
 #         self.all_qubits = all_qubits
-#         self.node_dictionary = kwargs
+#         self.schedule_keywords = kwargs
 #         self.redis_field = ['t1_time']  # TODO Empty?
 #         self.measurement_obj = Check_Cliffords
 #         self.analysis_obj = CheckCliffordsAnalysis
@@ -124,8 +124,8 @@ class T2_Node(BaseNode):
     measurement_obj = T2
     analysis_obj = T2Analysis
 
-    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
+    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
         self.name = name
         self.redis_field = ['t2_time']
         self.qubit_state = 0
@@ -141,8 +141,8 @@ class T2_Echo_Node(BaseNode):
     measurement_obj = T2Echo
     analysis_obj = T2EchoAnalysis
 
-    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
+    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
         self.name = name
         self.redis_field = ['t2_time']
         self.qubit_state = 0
