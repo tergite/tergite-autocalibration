@@ -94,3 +94,4 @@ tergite_autocalibration/utils/**.csv
 # internal
 external/
 workbench/
+tergite_acl/utils/clifford_module/**
