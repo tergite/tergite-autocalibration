@@ -89,6 +89,7 @@ tergite_acl/config/**
 
 # dev-generated artefacts
 tergite_acl/utils/**.csv
+sequence.json
 
 # internal
 external/
