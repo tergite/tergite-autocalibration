@@ -11,8 +11,8 @@ from tergite_autocalibration.lib.measurement_base import Measurement
 from tergite_autocalibration.utils.extended_transmon_element import Measure_RO1, Rxy_12
 from tergite_autocalibration.config.coupler_config import edge_group, qubit_types
 from matplotlib import pyplot as plt
-from tergite_acl.utils.extended_coupler_edge import CompositeSquareEdge
-from tergite_acl.utils.extended_transmon_element import ExtendedTransmon
+from tergite_autocalibration.utils.extended_coupler_edge import CompositeSquareEdge
+from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 
 import numpy as np
 import redis

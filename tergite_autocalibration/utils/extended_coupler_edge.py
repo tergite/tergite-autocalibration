@@ -11,7 +11,7 @@ from quantify_scheduler.helpers.validators import Numbers
 from quantify_scheduler.device_under_test.edge import Edge
 # from quantify_scheduler.operations.pulse_factories import composite_square_pulse
 from quantify_scheduler.resources import BasebandClockResource
-from tergite_acl.utils.extended_pulse_factories import composite_soft_square_pulse
+from tergite_autocalibration.utils.extended_pulse_factories import composite_soft_square_pulse
 
 
 class Spec(InstrumentChannel):

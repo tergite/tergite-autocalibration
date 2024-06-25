@@ -15,8 +15,8 @@ from scipy import signal
 from matplotlib import pyplot as plt
 import numpy as np
 import itertools
-from tergite_acl.utils.extended_coupler_edge import CompositeSquareEdge
-from tergite_acl.utils.extended_transmon_element import ExtendedTransmon
+from tergite_autocalibration.utils.extended_coupler_edge import CompositeSquareEdge
+from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 
 import redis
 

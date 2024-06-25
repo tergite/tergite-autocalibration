@@ -3,7 +3,7 @@ Module containing a schedule class for randomized benchmarking measurement.
 """
 import numpy as np
 from quantify_scheduler.operations.gate_library import Measure, Reset, X90, Rxy, X, CZ
-from tergite_acl.utils.extended_transmon_element import Measure_RO1, Measure_RO_Opt, Rxy_12
+from tergite_autocalibration.utils.extended_transmon_element import Measure_RO1, Measure_RO_Opt, Rxy_12
 from quantify_scheduler.operations.pulse_library import ResetClockPhase, SoftSquarePulse, IdlePulse
 
 from quantify_scheduler.schedules.schedule import Schedule
@@ -11,7 +11,7 @@ from quantify_scheduler.schedules.schedule import Schedule
 from tergite_autocalibration.lib.measurement_base import Measurement
 import tergite_autocalibration.utils.clifford_elements_decomposition as cliffords
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
-from tergite_acl.utils.extended_coupler_edge import CompositeSquareEdge
+from tergite_autocalibration.utils.extended_coupler_edge import CompositeSquareEdge
 from quantify_scheduler.resources import ClockResource
 
 

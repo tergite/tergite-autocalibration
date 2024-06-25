@@ -11,7 +11,7 @@ from scipy.linalg import norm
 from scipy.optimize import minimize
 from numpy.linalg import inv
 import itertools
-from tergite_acl.lib.analysis_base import BaseAnalysis
+from tergite_autocalibration.lib.analysis_base import BaseAnalysis
 
 
 def mitigate(v,cm_inv):

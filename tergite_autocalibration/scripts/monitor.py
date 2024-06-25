@@ -6,11 +6,11 @@ from tergite_autocalibration.utils.user_input import qubits,couplers
 from tergite_autocalibration.utils.reset_redis_node import ResetRedisNode
 import optuna
 from ipaddress import ip_address, IPv4Address
-from tergite_acl.config.settings import CLUSTER_IP
-from tergite_acl.scripts.calibration_supervisor import CalibrationSupervisor
-from tergite_acl.scripts.db_backend_update import update_mss
-from tergite_acl.utils.enums import ClusterMode
-from tergite_acl.config.settings import CLUSTER_IP, REDIS_CONNECTION, CLUSTER_NAME
+from tergite_autocalibration.config.settings import CLUSTER_IP
+from tergite_autocalibration.scripts.calibration_supervisor import CalibrationSupervisor
+from tergite_autocalibration.scripts.db_backend_update import update_mss
+from tergite_autocalibration.utils.enums import ClusterMode
+from tergite_autocalibration.config.settings import CLUSTER_IP, REDIS_CONNECTION, CLUSTER_NAME
 
 qubits_10 = [f"q{i}" for i in range(16, 26)]
 
