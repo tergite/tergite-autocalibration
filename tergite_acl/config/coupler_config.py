@@ -1,22 +1,10 @@
-all_qubits = ['q11', 'q12', 'q13', 'q14', 'q15', 'q16', 'q17', 'q18', 'q19', 'q20','q21','q22','q23','q24','q25']
+all_qubits = ['q06','q07','q08','q09','q10']
 
 coupler_spi_map = {
-    # 'q11_q12': (1, 'dac0'),
-    'q06_q07': (1, 'dac1'),
-    # 'q13_q14': (1, 'dac2'),
-    # 'q14_q15': (1, 'dac3'),
-    # 'q16_q17': (1, 'dac0'), # slightly heating?
-    # 'q17_q18': (1, 'dac1'),
-    # 'q18_q19': (1, 'dac2'),
-    # 'q19_q20': (1, 'dac3'), # slightly heating? , possibly +0.5mK for a coupler spectroscopy round
-    # 'q16_q21': (2, 'dac2'),
-    # 'q17_q22': (2, 'dac1'),
-    # 'q18_q23': (2, 'dac0'),
-    # 'q21_q22': (3, 'dac1'),
-    # 'q22_q23': (3, 'dac2'), # badly heating?
-    # 'q23_q24': (3, 'dac3'),
-    # 'q20_q25': (3, 'dac0'),
-    # 'q24_q25': (4, 'dac0'),
+    'q06_q07': (3, 'dac1'),
+    'q07_q08': (4, 'dac0'),
+    'q08_q09': (2, 'dac0'),
+    'q09_q10': (3, 'dac2'),
 }
 
 edge_group = {'q11_q12':1,'q12_q13':2,'q13_q14':1,'q14_q15':2,
