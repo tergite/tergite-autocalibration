@@ -1,14 +1,15 @@
-from quantify_scheduler.operations.gate_library import Reset
-from quantify_scheduler.operations.pulse_library import SquarePulse, IdlePulse
+import numpy as np
+from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.acquisition_library import SSBIntegrationComplex
-from quantify_scheduler.schedules.schedule import Schedule
+from quantify_scheduler.operations.control_flow_library import Loop
+from quantify_scheduler.operations.gate_library import Reset
+from quantify_scheduler.operations.pulse_library import IdlePulse, SquarePulse
 from quantify_scheduler.operations.pulse_library import DRAGPulse
 from quantify_scheduler.resources import ClockResource
+from quantify_scheduler.schedules.schedule import Schedule
+
 from tergite_acl.lib.measurement_base import Measurement
 from tergite_acl.utils.extended_transmon_element import ExtendedTransmon
-from quantify_scheduler.enums import BinMode
-from quantify_scheduler.operations.control_flow_library import Loop
-import numpy as np
 
 
 class RO_amplitude_optimization(Measurement):
@@ -18,10 +19,6 @@ class RO_amplitude_optimization(Measurement):
 
         self.transmons = transmons
         self.qubit_state = qubit_state
-        if self.qubit_state == 1:
-            ro_config = 'readout_2state_opt'
-        elif self.qubit_state == 2:
-            ro_config = 'readout_3state_opt'
 
 
     def schedule_function(

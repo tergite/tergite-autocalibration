@@ -2,15 +2,22 @@
 import threading
 import time
 
-import tqdm
-import xarray
 from colorama import Fore
 from colorama import Style
 from colorama import init as colorama_init
-from quantify_scheduler.instrument_coordinator.instrument_coordinator import CompiledSchedule
+from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
+    CompiledSchedule,
+)
 from quantify_scheduler.json_utils import pathlib
+import tqdm
+import xarray
 
-from tergite_acl.utils.dataset_utils import configure_dataset, retrieve_dummy_dataset, save_dataset
+from tergite_acl.lib.node_base import BaseNode
+from tergite_acl.utils.dataset_utils import (
+    configure_dataset,
+    retrieve_dummy_dataset,
+    save_dataset,
+)
 from tergite_acl.utils.logger.tac_logger import logger
 from tergite_acl.utils.status import MeasurementMode
 
@@ -18,18 +25,17 @@ colorama_init()
 
 
 def measure_node(
-        node,
-        compiled_schedule: CompiledSchedule,
-        lab_ic,
-        data_path: pathlib.Path,
-        cluster_status,
-        measurement=(1, 1)
-):
+    node: BaseNode,
+    compiled_schedule: CompiledSchedule,
+    lab_ic,
+    data_path: pathlib.Path,
+    cluster_status,
+    measurement=(1, 1)
+    ):
     # TODO: This function should be move to the node
-
     schedule_duration = compiled_schedule.get_schedule_duration()
-    if 'loop_repetitions' in node.node_dictionary:
-        schedule_duration *= node.node_dictionary['loop_repetitions']
+    if 'loop_repetitions' in node.schedule_keywords:
+        schedule_duration *= node.schedule_keywords['loop_repetitions']
 
     measurement_message = ''
     if measurement[1] > 1:
@@ -39,17 +45,11 @@ def measure_node(
 
     raw_dataset = execute_schedule(compiled_schedule, lab_ic, schedule_duration, cluster_status)
 
-
     if cluster_status == MeasurementMode.real:
         result_dataset = configure_dataset(raw_dataset, node)
         save_dataset(result_dataset, node, data_path)
     else:
         result_dataset = retrieve_dummy_dataset(node)
-
-    # if node.name == 'ro_frequency_two_state_optimization':
-    #     result_dataset = handle_ro_freq_optimization(result_dataset, states=[0, 1])
-    # elif node.name == 'ro_frequency_three_state_optimization':
-    #     result_dataset = handle_ro_freq_optimization(result_dataset, states=[0, 1, 2])
 
     logger.info('Finished measurement')
     return result_dataset

@@ -68,13 +68,12 @@ def configure_dataset(
 
             coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
 
-
         partial_ds = xarray.Dataset(coords=coords_dict)
 
         data_values = raw_ds[key].values
 
         if node.name == 'ro_amplitude_two_state_optimization' or node.name == 'ro_amplitude_three_state_optimization':
-            loops = node.node_dictionary['loop_repetitions']
+            loops = node.schedule_keywords['loop_repetitions']
             for key in coords_dict.keys():
                 if measured_qubit in key and 'ro_amplitudes' in key:
                     ampls = coords_dict[key][1]
@@ -82,23 +81,10 @@ def configure_dataset(
                     states = coords_dict[key][1]
             data_values = reshufle_loop_dataset(data_values, ampls, states, loops)
 
-        # TODO this is not safe:
-        # This assumes that the inner settable variable is placed
-        # at the first position in the samplespace
         reshaping = reversed(node.dimensions)
         data_values = data_values.reshape(*reshaping)
         data_values = np.transpose(data_values)
         attributes = {'qubit': measured_qubit, 'long_name': f'y{measured_qubit}', 'units': 'NA'}
-        # qubit_state = ''
-
-        # TODO ro_frequency_optimization requires multiple measurements per qubit
-        # is_frequency_opt = node.name == 'ro_frequency_two_state_optimization' or node.name == 'ro_frequency_three_state_optimization'
-        # if is_frequency_opt:
-        #     qubit_states = [0,1,2]
-        #     qubit_state = qubit_states[key // n_qubits]
-        #     attributes['qubit_state'] = qubit_state
-
-        # partial_ds[f'y{measured_qubit}{qubit_state}'] = (tuple(coords_dict.keys()), data_values, attributes)
         partial_ds[f'y{measured_qubit}'] = (tuple(coords_dict.keys()), data_values, attributes)
         dataset = xarray.merge([dataset,partial_ds])
 
@@ -128,24 +114,6 @@ def reshufle_loop_dataset(
         reshuffled_array[new_index] = el
     reshuffled_array.reshape(*initial_shape)
     return reshuffled_array
-
-
-# def handle_ro_freq_optimization(complex_dataset: xarray.Dataset, states: list[int]) -> xarray.Dataset:
-#     breakpoint()
-#     # TODO probably this is not necessary, just set the qubit states at the samplespace, the dataset ends up the same anyway
-#     new_ds = xarray.Dataset(coords=complex_dataset.coords, attrs=complex_dataset.attrs)
-#     new_ds = new_ds.expand_dims(dim={'qubit_state': states})
-#     # TODO this for every var and every coord. It might cause
-#     # performance issues for larger datasets
-#     for coord in complex_dataset.coords:
-#         this_qubit = complex_dataset[coord].attrs['qubit']
-#         attributes = {'qubit': this_qubit, 'element_type': 'qubit'}
-#         values = []
-#         for var in complex_dataset.data_vars:
-#             if coord in complex_dataset[var].coords:
-#                 values.append(complex_dataset[var].values)
-#         new_ds[f'y{this_qubit}'] = (('qubit_state', coord), np.vstack(values), attributes)
-#     return new_ds
 
 
 def create_node_data_path(node) -> pathlib.Path:
@@ -185,13 +153,12 @@ def retrieve_dummy_dataset(node) -> xarray.Dataset:
     return dummy_ds
 
 
-
 def save_dataset(result_dataset: xarray.Dataset, node, data_path: pathlib.Path):
     data_path.mkdir(parents=True, exist_ok=True)
     measurement_id = data_path.stem[0:19]
     result_dataset = result_dataset.assign_attrs({'name': node.name, 'tuid': measurement_id})
     result_dataset_real = to_real_dataset(result_dataset)
-    # to_netcdf doesn't like complex numbers, convert to real/imag to save:
+    # to_netcdf() doesn't like complex numbers, convert to real/imag to save:
     result_dataset_real.to_netcdf(data_path / 'dataset.hdf5')
 
 def tunneling_qubits(data_values:np.ndarray) -> np.ndarray:

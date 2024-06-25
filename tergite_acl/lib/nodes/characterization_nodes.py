@@ -3,15 +3,18 @@ from time import sleep
 import numpy as np
 
 from tergite_acl.lib.analysis.T1_analysis import T1Analysis, T2Analysis, T2EchoAnalysis
-from tergite_acl.lib.analysis.check_cliffords_analysis import CheckCliffordsAnalysis
 from tergite_acl.lib.analysis.all_XY_analysis import All_XY_Analysis
-# from analysis.cz_chevron_analysis import CZChevronAnalysis, CZChevronAnalysisReset
-from tergite_acl.lib.analysis.randomized_benchmarking_analysis import RandomizedBenchmarkingAnalysis
-from tergite_acl.lib.node_base import BaseNode
+from tergite_acl.lib.analysis.check_cliffords_analysis import CheckCliffordsAnalysis
+from tergite_acl.lib.analysis.randomized_benchmarking_analysis import (
+    RandomizedBenchmarkingAnalysis,
+)
 from tergite_acl.lib.calibration_schedules.T1 import T1, T2, T2Echo
-from tergite_acl.lib.calibration_schedules.check_cliffords import Check_Cliffords
-from tergite_acl.lib.calibration_schedules.randomized_benchmarking import Randomized_Benchmarking
 from tergite_acl.lib.calibration_schedules.all_XY import All_XY
+from tergite_acl.lib.calibration_schedules.check_cliffords import Check_Cliffords
+from tergite_acl.lib.calibration_schedules.randomized_benchmarking import (
+    Randomized_Benchmarking,
+)
+from tergite_acl.lib.node_base import BaseNode
 
 
 class All_XY_Node(BaseNode):
@@ -60,7 +63,7 @@ class T1_Node(BaseNode):
 
     def pre_measurement_operation(self, reduced_ext_space):
         iteration_dict = reduced_ext_space['repeat']
-        # there is some redundancy tha all qubits have the same
+        # there is some redundancy that all qubits have the same
         # iteration index, that's why we keep the first value->
         this_iteration = list(iteration_dict.values())[0]
         if this_iteration > 0:

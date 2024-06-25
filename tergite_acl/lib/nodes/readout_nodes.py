@@ -150,7 +150,7 @@ class RO_amplitude_two_state_optimization_Node(BaseNode):
             'measure_2state_opt:threshold'
         ]
         self.qubit_state = 1
-        self.schedule_keywords = schedule_keywords
+        self.schedule_keywords = {}
         self.schedule_keywords['loop_repetitions'] = 1000
         self.plots_per_qubit = 3 #  fidelity plot, IQ shots, confusion matrix
 
@@ -178,7 +178,7 @@ class RO_amplitude_three_state_optimization_Node(BaseNode):
         self.all_qubits = all_qubits
         self.redis_field = ['measure_3state_opt:ro_ampl_3st_opt','inv_cm_opt']
         self.qubit_state = 2
-        self.schedule_keywords = schedule_keywords
+        self.schedule_keywords = {}
         self.schedule_keywords['loop_repetitions'] = 1000
         self.plots_per_qubit = 3 #  fidelity plot, IQ shots, confusion matrix
         self.loops = self.schedule_keywords['loop_repetitions']
