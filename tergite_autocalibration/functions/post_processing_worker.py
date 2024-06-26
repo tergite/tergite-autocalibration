@@ -8,38 +8,25 @@ import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
+import warnings
 
 from tergite_autocalibration.config import settings
 from tergite_autocalibration.config.coupler_config import qubit_types
 from tergite_autocalibration.lib.analysis.tof_analysis import analyze_tof
+from tergite_autocalibration.utils.post_processing_utils import manage_plots
 from tergite_autocalibration.utils.enums import DataStatus
 
 matplotlib.use(settings.PLOTTING_BACKEND)
 
 
 def post_process(result_dataset: xr.Dataset, node, data_path: Path):
-    # analysis = Multiplexed_Analysis(result_dataset, node, data_path)
+
     if node.name == 'tof':
         tof = analyze_tof(result_dataset, True)
         return
 
-    n_vars = len(result_dataset.data_vars)
-    n_coords = len(result_dataset.coords)
-
-    fit_numpoints = 300
     column_grid = 5
-    rows = int(np.ceil(n_vars / column_grid))
-    rows = rows * node.plots_per_qubit
-
-    # TODO What does this do, when the MSS is not connected?
-    node_result = {}
-
-    fig, axs = plt.subplots(
-        nrows=rows,
-        ncols=np.min((n_vars, n_coords, column_grid)),
-        squeeze=False,
-        figsize=(column_grid * 5, rows * 5)
-    )
+    fig, axs = manage_plots(result_dataset, column_grid, node.plots_per_qubit)
 
     qoi: list
     data_status: DataStatus
@@ -51,7 +38,10 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
 
     all_results = {}
     for indx, var in enumerate(result_dataset.data_vars):
+        # this refers to the qubit whose resonator was used for the measurement
+        # not necessarily the element where the settable was applied
         this_qubit = result_dataset[var].attrs['qubit']
+        this_element = this_qubit
 
         ds = xr.Dataset()
         for var in data_vars_dict[this_qubit]:
@@ -60,15 +50,47 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
         ds.attrs['qubit'] = this_qubit
         ds.attrs['node'] = node.name
 
+        # detect the element_type on which the settables act
+        for settable in ds.coords:
+            if ds[settable].attrs['element_type'] == 'coupler':
+                this_element = 'coupler'
+
         primary_plot_row = node.plots_per_qubit * (indx // column_grid)
         primary_axis = axs[primary_plot_row, indx % column_grid]
 
         redis_field = node.redis_field
-        kw_args = getattr(node, "analysis_kwargs", dict())
-        node_analysis = node.analysis_obj(ds, **kw_args)
+        analysis_kwargs = getattr(node, 'analysis_kwargs', dict())
+        node_analysis = node.analysis_obj(ds, **analysis_kwargs)
         qoi = node_analysis.run_fitting()
-        # TODO: This step should better happen inside the analysis function
+
         node_analysis.qoi = qoi
+
+        if node.type == 'adaptive_sweep':
+            # fetch relative kwargs, e.g. known minima in motzoi calibration
+            qubit_adaptive_kwargs = node.adaptive_kwargs[this_qubit]
+            # every adaptive iteration should update the samplespace ...
+            new_qubit_samplespace = node_analysis.updated_qubit_samplespace(**qubit_adaptive_kwargs)
+            for settable_key in new_qubit_samplespace.keys():
+                node.samplespace[settable_key].update(new_qubit_samplespace[settable_key])
+            # every adaptive iteration should also update the relevant kwargs
+            node.adaptive_kwargs[this_qubit] = node_analysis.updated_kwargs
+            if node.measurement_is_completed:
+                node_analysis.update_redis_trusted_values(node.name, this_qubit, redis_field)
+
+        # elif node.name in ['cz_calibration', 'cz_dynamic_phase', 'cz_calibration_ssro', 'cz_optimize_chevron'] and \
+        #         qubit_types[this_qubit] == 'Target':
+        #     node_analysis.update_redis_trusted_values(node.name, this_element, redis_field)
+        # elif node.name in ['cz_chevron'] and qubit_types[this_qubit] == 'Control':
+        #     node_analysis.update_redis_trusted_values(node.name, this_element, redis_field)
+        # elif node.name in ['coupler_spectroscopy']:
+        #     node_analysis.update_redis_trusted_values(node.name, this_element, redis_field)
+        #     this_element = node.coupler
+        # else:
+        #     node_analysis.update_redis_trusted_values(node.name, this_elementredis_field)
+        #     this_element = this_qubit
+
+        node_analysis.update_redis_trusted_values(node.name, this_element, redis_field)
+        all_results[this_element] = dict(zip(redis_field, qoi))
 
         if node.plots_per_qubit > 1:
             list_of_secondary_axes = []
@@ -80,23 +102,6 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
             node_analysis.plotter(primary_axis, secondary_axes=list_of_secondary_axes)
         else:
             node_analysis.plotter(primary_axis)
-
-        # TODO temporary hack:
-        if node.name in ['cz_calibration', 'cz_dynamic_phase',  'cz_dynamic_phase','cz_calibration_ssro','cz_calibration_swap_ssro', 'cz_optimize_chevron'] and \
-                qubit_types[this_qubit] == 'Target':
-            node_analysis.update_redis_trusted_values(node.name, node.coupler, redis_field)
-            this_element = node.coupler
-        elif node.name in ['cz_chevron','cz_chevron_amplitude','cz_calibration_swap', 'cz_dynamic_phase_swap'] and qubit_types[this_qubit] == 'Control':
-            node_analysis.update_redis_trusted_values(node.name, node.coupler, redis_field)
-            this_element = node.coupler
-        elif node.name in ['coupler_spectroscopy','tqg_randomized_benchmarking','tqg_randomized_benchmarking_interleaved']:
-            node_analysis.update_redis_trusted_values(node.name, node.coupler, redis_field)
-            this_element = node.coupler
-        else:
-            node_analysis.update_redis_trusted_values(node.name, this_qubit, redis_field)
-            this_element = this_qubit
-
-        all_results[this_element] = dict(zip(redis_field, qoi))
         handles, labels = primary_axis.get_legend_handles_labels()
 
         patch = mpatches.Patch(color='red', label=f'{this_qubit}')
@@ -111,11 +116,16 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
     # figure_manager.window.showMaximized()
     fig = plt.gcf()
     fig.set_tight_layout(True)
-    fig.savefig(f'{data_path}/{node.name}.png', bbox_inches='tight', dpi=600)
-    # plt.show(block=True)
-    plt.show(block=False)
-    plt.pause(5)
-    plt.close()
+    try:
+        fig.savefig(f'{data_path}/{node.name}.png', bbox_inches='tight', dpi=400)
+        fig.savefig(f'{data_path}/{node.name}_preview.png', bbox_inches='tight', dpi=100)
+    except FileNotFoundError:
+        warnings.warn('File Not existing')
+        pass
+    # plt.show()
+    plt.show(block=True)
+    # plt.pause(20)
+    # plt.close()
 
     if node != 'tof':
         all_results.update({'measurement_dataset': result_dataset.to_dict()})

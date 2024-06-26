@@ -10,6 +10,7 @@ from qblox_instruments import Cluster
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 
+from tergite_acl.scripts.calibration_supervisor import update_to_user_samplespace
 from tergite_autocalibration.config import settings
 from tergite_autocalibration.config.settings import CLUSTER_IP, REDIS_CONNECTION, CLUSTER_NAME
 from tergite_autocalibration.functions.monitor_worker import monitor_node_calibration
@@ -25,9 +26,36 @@ from tergite_autocalibration.utils.redis_utils import populate_initial_parameter
     populate_quantities_of_interest
 from tergite_autocalibration.utils.user_input import user_requested_calibration, attenuation_setting
 from tergite_autocalibration.utils.visuals import draw_arrow_chart
+from tergite_autocalibration.config import settings
+from tergite_autocalibration.config.settings import CLUSTER_IP, REDIS_CONNECTION
+from tergite_autocalibration.lib.node_base import BaseNode
+from tergite_autocalibration.lib.nodes.graph import filtered_topological_order
+from tergite_autocalibration.lib.node_factory import NodeFactory
+from tergite_autocalibration.utils.logger.tac_logger import logger
+from tergite_autocalibration.utils.enums import MeasurementMode
+from tergite_autocalibration.utils.enums import DataStatus
+from tergite_autocalibration.utils.user_input import user_requested_calibration
+from tergite_autocalibration.utils.visuals import draw_arrow_chart
+from tergite_autocalibration.utils.dataset_utils import create_node_data_path
+from tergite_autocalibration.utils.hardware_utils import SpiDAC, set_qubit_attenuation
+from tergite_autocalibration.functions.node_supervisor import monitor_node_calibration
+from tergite_autocalibration.utils.redis_utils import populate_initial_parameters, populate_node_parameters, \
+    populate_quantities_of_interest
+
+from tergite_autocalibration.utils.dummy_setup import dummy_setup
 
 colorama_init()
 
+def update_to_user_samplespace(node: BaseNode, user_samplespace: dict):
+    node_user_samplespace = user_samplespace[node.name]
+    for settable, element_samplespace in node_user_samplespace.items():
+        if settable in node.schedule_samplespace:
+            node.schedule_samplespace[settable] = element_samplespace
+        elif settable in node.external_samplespace:
+            node.external_samplespace[settable] = element_samplespace
+        else:
+            raise KeyError(f'{settable} not in any samplespace')
+    return
 
 class CalibrationSupervisor:
     def __init__(self,
@@ -49,6 +77,8 @@ class CalibrationSupervisor:
         self.qubits = user_requested_calibration['all_qubits']
         self.couplers = user_requested_calibration['couplers']
         self.target_node = user_requested_calibration['target_node']
+        self.user_samplespace = user_requested_calibration['user_samplespace']
+        self.measurement_mode = self.cluster_mode
 
         # Read the device configuration
         self.transmon_configuration = toml.load(settings.DEVICE_CONFIG)
@@ -118,9 +148,15 @@ class CalibrationSupervisor:
         # TODO: the inspect node function could be part of the node
         logger.info(f'Inspecting node {node_name}')
 
-        node = self.node_factory.create_node(
+        node: BaseNode = self.node_factory.create_node(
             node_name, self.qubits, couplers=self.couplers
         )
+
+        if node.name in self.user_samplespace:
+            update_to_user_samplespace(node, self.user_samplespace)
+
+        # some nodes e.g. cw spectroscopy needs access to the instruments
+        node.lab_instr_coordinator = self.available_clusters_dict
 
         populate_initial_parameters(
             self.transmon_configuration,
@@ -138,7 +174,6 @@ class CalibrationSupervisor:
             # print(f'{coupler_statuses=}')
             # node is calibrated only when all couplers have the node calibrated:
             is_node_calibrated = all(coupler_statuses)
-            # print(f'{is_node_calibrated=}')
         else:
             qubits_statuses = [REDIS_CONNECTION.hget(f"cs:{qubit}", node_name) == 'calibrated' for qubit in self.qubits]
             # node is calibrated only when all qubits have the node calibrated:
@@ -156,7 +191,7 @@ class CalibrationSupervisor:
         # Check Redis if node is calibrated
         status = DataStatus.undefined
 
-        if node_name in ['coupler_spectroscopy', 'cz_chevron', 'cz_chevron_amplitude','cz_calibration', 'cz_calibration_ssro', 'cz_calibration_swap_ssro',
+        if node_name in ['coupler_spectroscopy', 'cz_chevron', 'cz_optimize_chevron', 'cz_chevron_amplitude','cz_calibration', 'cz_calibration_ssro', 'cz_calibration_swap_ssro',
                          'cz_dynamic_phase','cz_dynamic_phase_swap','tqg_randomized_benchmarking','tqg_randomized_benchmarking_interleaved']:
             for coupler in self.couplers:
                 # the calibrated, not_calibrated flags may be not necessary,
@@ -201,7 +236,6 @@ class CalibrationSupervisor:
             node = self.node_factory.create_node(
                 node, self.qubits, couplers=self.couplers,**static_parameters
             )
-
         logger.info(f'Calibrating node {node.name}')
 
         # TODO MERGE-CZ-GATE: We should discuss the information flow here - what values are set and for which component?
@@ -219,7 +253,7 @@ class CalibrationSupervisor:
         # TODO: This should be in the node initializer
         data_path = create_node_data_path(node)
         # TODO: This should be the refactored such that the node can be run like node.calibrate()
-        measurement_result = monitor_node_calibration(node, data_path, self.lab_ic)
+        measurement_result = monitor_node_calibration(node, data_path, self.lab_ic, self.measurement_mode)
 
         # TODO MERGE-CZ-GATE: We should discuss the information flow here and see where these return args are used
         return [str(data_path), measurement_result]

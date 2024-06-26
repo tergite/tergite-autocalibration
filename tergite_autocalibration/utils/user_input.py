@@ -1,58 +1,10 @@
-#qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
-#qubits = ['q10','q13','q15']
-#qubits = [ 'q09']
-#qubits = [ 'q06','q07', 'q08', 'q09', 'q10','q11','q12','q13', 'q14', 'q15']
-qubits = [  'q14', 'q15']
-
-
-# qubits = [ 'q18','q19','q20','q21','q22','q23','q24','q25']
-#qubits = ['q12','q13','q14']
-# qubits = ['q14']
-# couplers = ['q12_q13','q13_q14' ]
-#couplers = ['q16_q21']
-
-# coupler_spi_map = {
-#     # SPI A
-#     'q11_q12': (1, 'dac0'),
-#     'q12_q13': (1, 'dac1'),
-#     'q13_q14': (1, 'dac2'),
-#     'q14_q15': (1, 'dac3'),
-#     'q08_q09': (2, 'dac0'),
-#     'q12_q17': (2, 'dac1'),
-#     'q07_q12': (2, 'dac2'),
-#     'q08_q13': (2, 'dac3'),
-#     'q09_q14': (3, 'dac0'),
-#     'q06_q07': (3, 'dac1'),
-#     'q09_q10': (3, 'dac2'),
-#     'q11_q16': (3, 'dac3'),
-#     'q07_q08': (4, 'dac0'),
-#     'q10_q15': (4, 'dac1'),
-#     'q06_q11': (4, 'dac2'),
-
-# }
-#couplers = ['q11_q12'] # not tuning
-couplers = ['q14_q15'] #done
-#couplers = ['q13_q14']
-#couplers = ['q14_q15']
-#couplers = ['q08_q09']
-#couplers = ['q12_q17']
-#couplers = ['q07_q12']
-#couplers = ['q08_q13']
-#couplers = ['q09_q14']
-##couplers = ['q06_q07']
-#couplers = ['q09_q10']
-#couplers = ['q11_q16']
-#couplers = ['q07_q08']
-#couplers = ['q10_q15']
-#couplers = ['q06_q11']
-
-
-attenuation_setting = {'qubit':10, 'coupler':34, 'readout':12}
-
-'''punchout
+'''
+node reference
+  punchout
   resonator_spectroscopy
   qubit_01_spectroscopy
   qubit_01_spectroscopy_pulsed
+  qubit_01_cw_spectroscopy
   rabi_oscillations
   ramsey_correction
   resonator_spectroscopy_1
@@ -75,6 +27,7 @@ attenuation_setting = {'qubit':10, 'coupler':34, 'readout':12}
   T2
   T2_echo
   randomized_benchmarking
+  all_XY
   check_cliffords
   cz_chevron
   cz_chevron_amplitude
@@ -89,8 +42,71 @@ attenuation_setting = {'qubit':10, 'coupler':34, 'readout':12}
   tqg_randomized_benchmarking_interleaved
 '''
 
+import numpy as np
+
+from tergite_autocalibration.config.VNA_values import (
+    VNA_f12_frequencies,
+    VNA_qubit_frequencies,
+    VNA_resonator_frequencies,
+)
+
+def resonator_samples(qubit: str) -> np.ndarray:
+    res_spec_samples = 101
+    sweep_range = 4.0e6
+    VNA_frequency = VNA_resonator_frequencies[qubit]
+    min_freq = VNA_frequency - sweep_range / 2 - 0.5e6
+    max_freq = VNA_frequency + sweep_range / 2
+    return np.linspace(min_freq, max_freq, res_spec_samples)
+
+def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
+    qub_spec_samples = 151
+    sweep_range =  8.0e6
+    if transition == '01':
+        VNA_frequency = VNA_qubit_frequencies[qubit]
+    elif transition == '12':
+        VNA_frequency = VNA_f12_frequencies[qubit]
+    min_freq = VNA_frequency - sweep_range / 2
+    max_freq = VNA_frequency + sweep_range / 2
+    return np.linspace(min_freq, max_freq, qub_spec_samples)
+
+
+'''
+user_samplespace schema:
+user_samplespace = {
+    node1_name : {
+            "settable_of_node1_1": { 'q1': np.ndarray, 'q2': np.ndarray },
+            "settable_of_node1_2": { 'q1': np.ndarray, 'q2': np.ndarray },
+            ...
+        },
+    node2_name : {
+            "settable_of_node2_1": { 'q1': np.ndarray, 'q2': np.ndarray },
+            "settable_of_node2_2": { 'q1': np.ndarray, 'q2': np.ndarray },
+            ...
+        }
+}
+'''
+####################################################################
+target_node = 'ro_amplitude_three_state_optimization'
+qubits = [ 'q06','q07','q08','q09','q10']
+couplers = ['q06_q07']
+user_samplespace = {
+    'resonator_spectroscopy': {
+        'ro_frequencies': {
+            qubit: resonator_samples(qubit) for qubit in qubits
+        }
+    },
+}
+attenuation_setting = {'qubit':10, 'coupler':34, 'readout':12}
+
+####################################################################
+
+'''
+The dictionary user_requested_calibration
+is what we pass to the calibration supervisor
+'''
 user_requested_calibration = {
-    'target_node': 'cz_calibration_ssro',
+    'target_node': target_node,
     'all_qubits': qubits,
     'couplers': couplers,
+    'user_samplespace': user_samplespace
 }
