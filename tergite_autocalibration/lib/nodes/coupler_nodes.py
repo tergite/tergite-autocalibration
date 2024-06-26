@@ -1,37 +1,26 @@
 import numpy as np
-
-from tergite_autocalibration.config.settings import REDIS_CONNECTION
-from tergite_autocalibration.lib.analysis.coupler_spectroscopy_analysis import CouplerSpectroscopyAnalysis
-from tergite_autocalibration.lib.analysis.cz_calibration_analysis import CZCalibrationAnalysis, \
-    CZCalibrationSSROAnalysis
-from tergite_autocalibration.lib.analysis.cz_chevron_analysis import CZChevronAnalysis, CZChevronAnalysisReset, \
-    CZChevronAmplitudeAnalysis
-from tergite_autocalibration.lib.analysis.reset_calibration_analysis import ResetCalibrationSSROAnalysis
-from tergite_autocalibration.lib.calibration_schedules.cz_calibration import CZ_calibration, CZ_calibration_SSRO
-from tergite_autocalibration.lib.calibration_schedules.reset_chevron import Reset_chevron_dc
+from tergite_autocalibration.lib.calibration_schedules.cz_chevron_reversed import CZ_chevron
 from tergite_autocalibration.lib.calibration_schedules.reset_calibration import Reset_calibration_SSRO
-from tergite_autocalibration.lib.node_base import BaseNode
-from tergite_autocalibration.lib.nodes.node_utils import qubit_samples, resonator_samples
-from tergite_autocalibration.lib.calibration_schedules.cz_chevron_reversed import CZ_chevron, CZ_chevron_amplitude
-from tergite_autocalibration.lib.calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
-from tergite_autocalibration.lib.calibration_schedules.two_tones_spectroscopy import Two_Tones_Spectroscopy
-from tergite_autocalibration.utils.hardware_utils import SpiRack, SpiDAC
+
 from tergite_autocalibration.config.coupler_config import coupler_spi_map
-from tergite_autocalibration.lib.calibration_schedules.randomized_benchmarking import Randomized_Benchmarking, \
-    TQG_Randomized_Benchmarking
-from tergite_autocalibration.lib.analysis.randomized_benchmarking_analysis import RandomizedBenchmarkingAnalysis
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
 from tergite_autocalibration.lib.analysis.coupler_spectroscopy_analysis import CouplerSpectroscopyAnalysis
 from tergite_autocalibration.lib.analysis.cz_calibration_analysis import CZCalibrationAnalysis, \
     CZCalibrationSSROAnalysis
 from tergite_autocalibration.lib.analysis.cz_chevron_analysis import CZChevronAnalysis
-from tergite_autocalibration.lib.node_base import BaseNode
-from tergite_autocalibration.lib.nodes.node_utils import qubit_samples, resonator_samples
-from tergite_autocalibration.lib.calibration_schedules.cz_chevron import CZ_chevron
+from tergite_autocalibration.lib.analysis.cz_chevron_analysis import CZChevronAnalysisReset, \
+    CZChevronAmplitudeAnalysis
+from tergite_autocalibration.lib.analysis.randomized_benchmarking_analysis import RandomizedBenchmarkingAnalysis
+from tergite_autocalibration.lib.analysis.reset_calibration_analysis import ResetCalibrationSSROAnalysis
+from tergite_autocalibration.lib.calibration_schedules.cz_calibration import CZ_calibration, CZ_calibration_SSRO
+from tergite_autocalibration.lib.calibration_schedules.cz_chevron_reversed import CZ_chevron_amplitude
+from tergite_autocalibration.lib.calibration_schedules.randomized_benchmarking import TQG_Randomized_Benchmarking
+from tergite_autocalibration.lib.calibration_schedules.reset_calibration import Reset_calibration_SSRO
 from tergite_autocalibration.lib.calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
 from tergite_autocalibration.lib.calibration_schedules.two_tone_multidim import Two_Tones_Multidim
+from tergite_autocalibration.lib.node_base import BaseNode
+from tergite_autocalibration.lib.nodes.node_utils import qubit_samples, resonator_samples
 from tergite_autocalibration.utils.hardware_utils import SpiDAC
-from tergite_autocalibration.utils.enums import MeasurementMode
 
 RB_REPEATS = 10
 
@@ -288,7 +277,8 @@ class CZ_Optimize_Chevron_Node(BaseNode):
 
 
 class Reset_Chevron_Node(BaseNode):
-    measurement_obj = Reset_chevron_dc
+    #TODO: Replaced Reset_CZ_Chevron with Reset_calibration_SSRO, is that correct?
+    measurement_obj = Reset_calibration_SSRO
     analysis_obj = CZChevronAnalysisReset
 
     def __init__(self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary):

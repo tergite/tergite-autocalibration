@@ -10,7 +10,6 @@ from qblox_instruments import Cluster
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 
-from tergite_acl.scripts.calibration_supervisor import update_to_user_samplespace
 from tergite_autocalibration.config import settings
 from tergite_autocalibration.config.settings import CLUSTER_IP, REDIS_CONNECTION, CLUSTER_NAME
 from tergite_autocalibration.functions.monitor_worker import monitor_node_calibration
@@ -156,7 +155,7 @@ class CalibrationSupervisor:
             update_to_user_samplespace(node, self.user_samplespace)
 
         # some nodes e.g. cw spectroscopy needs access to the instruments
-        node.lab_instr_coordinator = self.available_clusters_dict
+        node.lab_instr_coordinator = self.cluster_ip
 
         populate_initial_parameters(
             self.transmon_configuration,

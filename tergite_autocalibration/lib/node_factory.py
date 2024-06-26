@@ -13,7 +13,8 @@ from tergite_autocalibration.lib.nodes.coupler_nodes import (
     CZ_Optimize_Chevron_Node,
     Coupler_Resonator_Spectroscopy_Node,
     Coupler_Spectroscopy_Node,
-    Reset_Chevron_Node,
+    Reset_Chevron_Node, Reset_Calibration_SSRO_Node, CZ_Chevron_Amplitude_Node, CZ_Calibration_Swap_Node,
+    CZ_Calibration_Swap_SSRO_Node, CZ_Dynamic_Phase_Swap_Node,
 )
 from tergite_autocalibration.lib.nodes.qubit_control_nodes import (
     Adaptive_Motzoi_Parameter_Node,
@@ -33,8 +34,8 @@ from tergite_autocalibration.lib.nodes.readout_nodes import (
     Punchout_Node,
     RO_amplitude_three_state_optimization_Node,
     RO_amplitude_two_state_optimization_Node,
-    RO_frequency_optimization_Node,
-    RO_frequency_optimization_gef_Node,
+    RO_frequency_two_state_optimization_Node,
+    RO_frequency_three_state_optimization_Node,
     Resonator_Spectroscopy_1_Node,
     Resonator_Spectroscopy_2_Node,
     Resonator_Spectroscopy_Node,

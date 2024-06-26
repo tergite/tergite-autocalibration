@@ -6,7 +6,8 @@ from quantify_scheduler.operations.gate_library import Measure, Reset, X
 from quantify_scheduler.operations.pulse_library import SetClockFrequency, SoftSquarePulse
 from quantify_scheduler.resources import ClockResource
 from quantify_scheduler.schedules.schedule import Schedule
-from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon, Measure_RO1
+from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
+from tergite_autocalibration.utils.extended_gates import Measure_RO1
 import numpy as np
 
 from tergite_autocalibration.lib.measurement_base import Measurement

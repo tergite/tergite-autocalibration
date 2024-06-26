@@ -8,7 +8,7 @@ from quantify_scheduler.operations.pulse_library import GaussPulse,SuddenNetZero
 from quantify_scheduler.operations.pulse_library import RampPulse,DRAGPulse,SetClockFrequency,NumericalPulse,SoftSquarePulse,SquarePulse, ResetClockPhase
 from quantify_scheduler.resources import ClockResource
 from tergite_autocalibration.lib.measurement_base import Measurement
-from tergite_autocalibration.utils.extended_transmon_element import Measure_RO1, Rxy_12
+from tergite_autocalibration.utils.extended_gates import Measure_RO1, Rxy_12
 from tergite_autocalibration.config.coupler_config import edge_group, qubit_types
 from matplotlib import pyplot as plt
 from tergite_autocalibration.utils.extended_coupler_edge import CompositeSquareEdge

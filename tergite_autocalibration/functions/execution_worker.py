@@ -10,7 +10,7 @@ from colorama import init as colorama_init
 from quantify_scheduler.instrument_coordinator.instrument_coordinator import CompiledSchedule
 from quantify_scheduler.json_utils import pathlib
 
-from tergite_autocalibration.utils.dataset_utils import configure_dataset, handle_ro_freq_optimization, retrieve_dummy_dataset, save_dataset
+from tergite_autocalibration.utils.dataset_utils import configure_dataset, retrieve_dummy_dataset, save_dataset #, handle_ro_freq_optimization
 from tergite_autocalibration.utils.logger.tac_logger import logger
 from tergite_autocalibration.utils.enums import MeasurementMode
 

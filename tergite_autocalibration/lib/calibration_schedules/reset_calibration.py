@@ -8,7 +8,7 @@ from quantify_scheduler.operations.pulse_library import GaussPulse,RampPulse,Res
 from quantify_scheduler.operations.acquisition_library import SSBIntegrationComplex
 from quantify_scheduler.resources import ClockResource
 from tergite_autocalibration.lib.measurement_base import Measurement
-from tergite_autocalibration.utils.extended_transmon_element import Measure_RO1, Measure_RO_Opt, Rxy_12
+from tergite_autocalibration.utils.extended_gates import Measure_RO1, Measure_RO_Opt, Rxy_12
 from quantify_scheduler.operations.control_flow_library import Loop
 from tergite_autocalibration.config.coupler_config import edge_group, qubit_types
 from scipy import signal

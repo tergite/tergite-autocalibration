@@ -21,9 +21,7 @@ from tergite_autocalibration.lib.calibration_schedules.resonator_spectroscopy im
 from tergite_autocalibration.lib.calibration_schedules.ro_amplitude_optimization import (
     RO_amplitude_optimization,
 )
-from tergite_autocalibration.lib.calibration_schedules.ro_frequency_optimization_refactored import (
-    RO_frequency_optimization,
-)
+from tergite_autocalibration.lib.calibration_schedules.ro_frequency_optimization import RO_frequency_optimization
 from tergite_autocalibration.lib.node_base import BaseNode
 from tergite_autocalibration.lib.nodes.node_utils import resonator_samples
 

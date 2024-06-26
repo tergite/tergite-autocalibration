@@ -175,15 +175,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="to-create-a-new-node" class="level1">
 <h1>To create a new node:</h1>
 <ol type="1">
-<li><p>in the file <code>tergite_autocalibration/lib/node_factory.py</code> expand the dictionary <code>self.node_implementations</code> with a new entry: The key should be a string of the node name and the value should be the object that contains the implementation details. This object should be imported from either <code>tergite_autocalibration/lib/nodes/qubit_control_nodes.py</code>, <code>tergite_autocalibration/lib/nodes/coupler_nodes.py</code>, <code>tergite_acl/lib/nodes/readout_nodes.py</code> or <code>tergite_acl/lib/nodes/characterization_nodes.py</code></p></li>
-<li><p>In the file <code>tergite_acl/lib/nodes/graph.py</code> in the list <code>graph_dependencies</code> insert the edges that describe the position of the new node in the Directed Acyclic Graph. There are two entries required (or one entry if the new node is the last on its path):</p></li>
+<li><p>in the file <code>tergite_autocalibration/lib/node_factory.py</code> expand the dictionary <code>self.node_implementations</code> with a new entry: The key should be a string of the node name and the value should be the object that contains the implementation details. This object should be imported from either <code>tergite_autocalibration/lib/nodes/qubit_control_nodes.py</code>, <code>tergite_autocalibration/lib/nodes/coupler_nodes.py</code>, <code>tergite_autocalibration/lib/nodes/readout_nodes.py</code> or <code>tergite_autocalibration/lib/nodes/characterization_nodes.py</code></p></li>
+<li><p>In the file <code>tergite_autocalibration/lib/nodes/graph.py</code> in the list <code>graph_dependencies</code> insert the edges that describe the position of the new node in the Directed Acyclic Graph. There are two entries required (or one entry if the new node is the last on its path):</p></li>
 </ol>
 <ul>
 <li><code>('previous_node','new_node')</code></li>
 <li><code>('new_node', 'next_node')</code></li>
 </ul>
 <ol start="3" type="1">
-<li>In the <code>tergite_acl/config/device_config.toml</code> set the quantity of interest at <code>nan</code> value</li>
+<li>In the <code>tergite_autocalibration/config/device_config.toml</code> set the quantity of interest at <code>nan</code> value</li>
 </ol>
 <section id="node-implementation-object" class="level2">
 <h2 class="anchored" data-anchor-id="node-implementation-object">Node implementation object</h2>
@@ -201,13 +201,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <section id="creating-a-measurement_obj" class="level3">
 <h3 class="anchored" data-anchor-id="creating-a-measurement_obj">Creating a <code>measurement_obj</code></h3>
-<p>The <code>measurement_obj</code> is imported from <code>tergite_acl/lib/calibration_schedules/</code> and contains the class that generates the appropriate measurement schedule. To initialize we require a dicttionary of the extended transmons:</p>
+<p>The <code>measurement_obj</code> is imported from <code>tergite_autocalibration/lib/calibration_schedules/</code> and contains the class that generates the appropriate measurement schedule. To initialize we require a dicttionary of the extended transmons:</p>
 <p><code>transmons: dict[str, ExtendedTransmon]</code></p>
 <p>It must contain a method called <code>schedule_function</code> that expects the <code>node.samplespace</code> as input and returns the complete schedule.</p>
 </section>
 <section id="creating-an-analysis_obj" class="level3">
 <h3 class="anchored" data-anchor-id="creating-an-analysis_obj">Creating an <code>analysis_obj</code></h3>
-<p>The <code>analysis_obj</code> is imported from <code>tergite_acl/lib/analysis/</code> and contains the class that perform the analysis for a single qubit. It must contain a <code>run_fitting</code> method and a <code>plotter</code> method</p>
+<p>The <code>analysis_obj</code> is imported from <code>tergite_autocalibration/lib/analysis/</code> and contains the class that perform the analysis for a single qubit. It must contain a <code>run_fitting</code> method and a <code>plotter</code> method</p>
 </section>
 <section id="node-types" class="level3">
 <h3 class="anchored" data-anchor-id="node-types">Node types</h3>

@@ -193,17 +193,17 @@ def create_node_data_path(node) -> pathlib.Path:
 
 def retrieve_dummy_dataset(node) -> xarray.Dataset:
     if node.name == 'resonator_spectroscopy':
-        ds_path = 'tergite_acl/utils/dummy_datasets/20240510-131804-430-b5461c-resonator_spectroscopy/dataset.hdf5'
+        ds_path = 'tergite_autocalibration/utils/dummy_datasets/20240510-131804-430-b5461c-resonator_spectroscopy/dataset.hdf5'
     elif node.name == 'qubit_01_cw_spectroscopy':
-        ds_path = 'tergite_acl/utils/dummy_datasets/20240510-131804-430-b5461c-resonator_spectroscopy/dataset.hdf5'
+        ds_path = 'tergite_autocalibration/utils/dummy_datasets/20240510-131804-430-b5461c-resonator_spectroscopy/dataset.hdf5'
     elif node.name == 'qubit_01_spectroscopy':
-        ds_path = 'tergite_acl/utils/dummy_datasets/20240524-122934-019-3b1942-qubit_01_spectroscopy/dataset.hdf5'
+        ds_path = 'tergite_autocalibration/utils/dummy_datasets/20240524-122934-019-3b1942-qubit_01_spectroscopy/dataset.hdf5'
     elif node.name == 'rabi_oscillations':
-        ds_path = 'tergite_acl/utils/dummy_datasets/20240524-123137-122-974556-rabi_oscillations/dataset.hdf5'
+        ds_path = 'tergite_autocalibration/utils/dummy_datasets/20240524-123137-122-974556-rabi_oscillations/dataset.hdf5'
     elif node.name == 'ramsey_correction':
-        ds_path = 'tergite_acl/utils/dummy_datasets/20240312-092539-970-23d58e-ramsey_correction/dataset.hdf5'
+        ds_path = 'tergite_autocalibration/utils/dummy_datasets/20240312-092539-970-23d58e-ramsey_correction/dataset.hdf5'
     elif node.name == 'adaptive_ramsey_correction':
-        ds_path = 'tergite_acl/utils/dummy_datasets/20240312-092539-970-23d58e-ramsey_correction/dataset.hdf5'
+        ds_path = 'tergite_autocalibration/utils/dummy_datasets/20240312-092539-970-23d58e-ramsey_correction/dataset.hdf5'
     else:
         raise ValueError('Node does not have a stored dummy dataset')
 
