@@ -1,6 +1,8 @@
 project:
   render:
     - getting_started.qmd
+    - operation.qmd
+    - configuration_files.qmd
     - available_nodes.qmd
     - new_node_creation.qmd
     - node_types.qmd
@@ -14,6 +16,8 @@ website:
       logo-href: getting_started.qmd
       left:
         - href: getting_started.qmd
+        - href: operation.qmd
+        - href: configuration_files.qmd
         - href: available_nodes.qmd
         - href: new_node_creation.qmd
           text: Creating New Nodes
