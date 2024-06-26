@@ -86,7 +86,6 @@ __pycache__/
 
 # configs
 configs/
-tergite_autocalibration/config/**
 !tergite_autocalibration/config/__init__.py
 !tergite_autocalibration/config/settings.py
 
