@@ -6,7 +6,7 @@ import time
 
 
 dc_current_step = 5e-6
-spi_mod_number = 1
+spi_mod_number = 3
 spi_mod_name = f'module{spi_mod_number}'
 spi = SpiRack('loki_rack', '/dev/ttyACM0')
 spi.add_spi_module(spi_mod_number, S4gModule)

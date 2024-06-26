@@ -71,7 +71,6 @@ class T1_Node(BaseNode):
             sleep(self.sleep_time)
 
 
-
 class Randomized_Benchmarking_Node(BaseNode):
     measurement_obj = Randomized_Benchmarking
     analysis_obj = RandomizedBenchmarkingAnalysis

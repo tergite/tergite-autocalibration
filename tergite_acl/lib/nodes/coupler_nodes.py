@@ -1,14 +1,21 @@
 import numpy as np
 
 from tergite_acl.config.settings import REDIS_CONNECTION
-from tergite_acl.lib.analysis.coupler_spectroscopy_analysis import CouplerSpectroscopyAnalysis
-from tergite_acl.lib.analysis.cz_calibration_analysis import CZCalibrationAnalysis, CZCalibrationSSROAnalysis
+from tergite_acl.lib.analysis.coupler_spectroscopy_analysis import (
+    CouplerSpectroscopyAnalysis,
+)
+from tergite_acl.lib.analysis.cz_calibration_analysis import (
+    CZCalibrationAnalysis,
+    CZCalibrationSSROAnalysis,
+)
 from tergite_acl.lib.analysis.cz_chevron_analysis import CZChevronAnalysis
+from tergite_acl.lib.calibration_schedules.cz_chevron import CZ_chevron
+from tergite_acl.lib.calibration_schedules.resonator_spectroscopy import (
+    Resonator_Spectroscopy,
+)
+from tergite_acl.lib.calibration_schedules.two_tone_multidim import Two_Tones_Multidim
 from tergite_acl.lib.node_base import BaseNode
 from tergite_acl.lib.nodes.node_utils import qubit_samples, resonator_samples
-from tergite_acl.lib.calibration_schedules.cz_chevron import CZ_chevron
-from tergite_acl.lib.calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
-from tergite_acl.lib.calibration_schedules.two_tone_multidim import Two_Tones_Multidim
 from tergite_acl.utils.hardware_utils import SpiDAC
 from tergite_acl.utils.status import MeasurementMode
 
@@ -17,19 +24,20 @@ class Coupler_Spectroscopy_Node(BaseNode):
     measurement_obj = Two_Tones_Multidim
     analysis_obj = CouplerSpectroscopyAnalysis
 
-    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
+    def __init__(self, name: str, all_qubits: list[str], couplers, **schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
         # self.name = name
         # self.all_qubits = all_qubits # this is a Base attr, delete it here
-        self.couplers = node_dictionary['couplers']
+        self.couplers = couplers
         self.redis_field = ['parking_current']
         self.qubit_state = 0
         self.coupled_qubits = self.get_coupled_qubits()
         self.coupler = self.couplers[0]
-        mode = MeasurementMode.dummy
+        mode = MeasurementMode.real
         self.spi_dac = SpiDAC(mode)
-        self.dac = 1
-        # self.dac = self.spi_dac.create_spi_dac(self.coupler)
+        self.dac = self.spi_dac.create_spi_dac(self.coupler)
+
+        self.all_qubits = self.coupled_qubits
 
         self.schedule_samplespace = {
             'spec_frequencies': {
@@ -39,7 +47,7 @@ class Coupler_Spectroscopy_Node(BaseNode):
 
         self.external_samplespace = {
             'dc_currents': {
-                self.coupler: np.arange(-2.5e-3, 2.5e-3, 250e-6)
+                self.coupler: np.arange(-2.5e-3, 2.5e-3, 500e-6)
             },
         }
         # self.validate()
@@ -58,13 +66,12 @@ class Coupler_Spectroscopy_Node(BaseNode):
 
         this_iteration_value = list(iteration_dict.values())[0]
         print(f'{ this_iteration_value = }')
-        # self.spi_dac.set_dac_current(self.dac, this_iteration_value)
-
+        self.spi_dac.set_dac_current(self.dac, this_iteration_value)
 
 
 class Coupler_Resonator_Spectroscopy_Node(BaseNode):
-    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
+    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
         self.redis_field = ['resonator_flux_quantum']
         self.qubit_state = 0
         self.measurement_obj = Resonator_Spectroscopy
@@ -202,8 +209,8 @@ class CZ_Optimize_Chevron_Node(BaseNode):
 
 
 class Reset_Chevron_Node(BaseNode):
-    def __init__(self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
+    def __init__(self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
         self.name = name
         self.all_qubits = all_qubits
         self.all_couplers = couplers
@@ -247,13 +254,13 @@ class Reset_Chevron_Node(BaseNode):
 
 
 class CZ_Calibration_Node(BaseNode):
-    def __init__(self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
+    def __init__(self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
         self.coupler = couplers[0]
         # print(couplers)
         self.coupled_qubits = couplers[0].split(sep='_')
         # print(self.coupled_qubits)
-        # self.node_dictionary = kwargs
+        # self.schedule_keywords = kwargs
         self.redis_field = ['cz_phase', 'cz_pop_loss']
         self.qubit_state = 2
         self.testing_group = 0  # The edge group to be tested. 0 means all edges.
@@ -272,11 +279,11 @@ class CZ_Calibration_Node(BaseNode):
 
 
 class CZ_Calibration_SSRO_Node(BaseNode):
-    def __init__(self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
+    def __init__(self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
         self.coupler = couplers[0]
         self.coupled_qubits = couplers[0].split(sep='_')
-        # self.node_dictionary = kwargs
+        # self.schedule_keywords = kwargs
         self.redis_field = ['cz_phase', 'cz_pop_loss', 'cz_leakage']
         self.qubit_state = 2
         self.testing_group = 0  # The edge group to be tested. 0 means all edges.
@@ -300,12 +307,12 @@ class CZ_Dynamic_Phase_Node(BaseNode):
         self.name = name
         self.all_qubits = all_qubits
         self.all_couplers = couplers
-        self.node_dictionary = kwargs
+        self.schedule_keywords = kwargs
         self.coupler = couplers[0]
         # print(couplers)
         self.coupled_qubits = couplers[0].split(sep='_')
         # print(self.coupled_qubits)
-        # self.node_dictionary = kwargs
+        # self.schedule_keywords = kwargs
         self.redis_field = ['cz_phase']
         self.qubit_state = 2
         self.testing_group = 0  # The edge group to be tested. 0 means all edges.
