@@ -17,7 +17,8 @@ notebooks/0
 send_to_lefteris.ps1
 
 #dataset folders
-202[3456789]*/
+data_directory/
+!dummy_datasets/*
 
 #data files
 *.nc
@@ -78,6 +79,8 @@ Thumbs.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
+/.quarto/
+
 
 .pytest_cache/
 

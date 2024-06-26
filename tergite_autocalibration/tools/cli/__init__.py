@@ -1,6 +1,6 @@
 import click
 
-from tergite_autocalibration.utils.enums import ClusterMode
+from tergite_autocalibration.utils.enums import MeasurementMode
 
 
 @click.group()
@@ -89,7 +89,7 @@ def start(c, d, push):
     from tergite_autocalibration.scripts.calibration_supervisor import CalibrationSupervisor
     from tergite_autocalibration.scripts.db_backend_update import update_mss
 
-    cluster_mode: 'ClusterMode' = ClusterMode.real
+    cluster_mode: 'MeasurementMode' = MeasurementMode.real
     parsed_cluster_ip: 'IPv4Address' = CLUSTER_IP
 
     # Checks whether to start the cluster in dummy mode
@@ -97,12 +97,12 @@ def start(c, d, push):
     if d:
         click.echo('The option to run on a dummy cluster is currently not implemented. '
                    'Trying to start the calibration supervisor with default cluster configuration')
-        cluster_mode = ClusterMode.dummy
+        cluster_mode = MeasurementMode.dummy
 
     # Check whether the ip address of the cluster is set correctly
     if c and not d:
         if len(c) >= 0:
-            cluster_mode = ClusterMode.real
+            cluster_mode = MeasurementMode.real
             parsed_cluster_ip = ip_address(c)
         else:
             click.echo('Cluster argument requires the ip address of the cluster as parameter. '

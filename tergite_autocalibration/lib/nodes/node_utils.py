@@ -1,4 +1,4 @@
-from tergite_autocalibration.config.VNA_LOKIB_values import (
+from tergite_autocalibration.config.VNA_values import (
     VNA_resonator_frequencies, VNA_qubit_frequencies, VNA_f12_frequencies
 )
 import numpy as np

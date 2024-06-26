@@ -4,6 +4,11 @@ from qblox_instruments import Cluster, ClusterType
 
 # TODO: move to some place in the library
 
+dummy_setup = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1, 16)}
+dummy_setup["16"] = ClusterType.CLUSTER_QRM_RF
+dummy_setup["17"] = ClusterType.CLUSTER_QRM_RF
+
+
 def dummy_cluster(samplespace: dict):
     dummy = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1, 16)}
     dummy["16"] = ClusterType.CLUSTER_QRM_RF

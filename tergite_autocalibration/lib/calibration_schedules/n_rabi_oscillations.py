@@ -23,11 +23,9 @@ class N_Rabi_Oscillations(Measurement):
             repetitions: int = 1024,
         ) -> Schedule:
         """
-        Generate a schedule for a DRAG pulse calibration measurement that gives the optimized motzoi parameter.
-        This calibrates the drive pulse as to account for errors caused by higher order excitations of the qubits.
 
         Schedule sequence
-            Reset -> DRAG pulse -> Inverse DRAG pulse -> Measure
+            Reset -> DRAG pulse x N times-> Measure
         Step 2 and 3 are repeated X_repetition amount of times
 
         Parameters

@@ -10,9 +10,9 @@ from colorama import init as colorama_init
 from quantify_scheduler.instrument_coordinator.instrument_coordinator import CompiledSchedule
 from quantify_scheduler.json_utils import pathlib
 
-from tergite_autocalibration.utils.dataset_utils import configure_dataset, handle_ro_freq_optimization, save_dataset
+from tergite_autocalibration.utils.dataset_utils import configure_dataset, handle_ro_freq_optimization, retrieve_dummy_dataset, save_dataset
 from tergite_autocalibration.utils.logger.tac_logger import logger
-from tergite_autocalibration.utils.enums import ClusterMode
+from tergite_autocalibration.utils.enums import MeasurementMode
 
 colorama_init()
 
@@ -22,7 +22,7 @@ def measure_node(
         compiled_schedule: CompiledSchedule,
         lab_ic,
         data_path: pathlib.Path,
-        cluster_mode=ClusterMode.real,
+        cluster_status=MeasurementMode.real,
         measurement=(1, 1)
 ):
     # TODO: This function should be move to the node
@@ -37,14 +37,19 @@ def measure_node(
     message = f'{schedule_duration:.2f} sec' + measurement_message
     print(f'schedule_duration = {Fore.CYAN}{Style.BRIGHT}{message}{Style.RESET_ALL}')
 
-    raw_dataset = execute_schedule(compiled_schedule, lab_ic, schedule_duration)
+    raw_dataset = execute_schedule(compiled_schedule, lab_ic, schedule_duration, cluster_status)
 
-    result_dataset = configure_dataset(raw_dataset, node)
-    save_dataset(result_dataset, node, data_path)
-    if node.name == 'ro_frequency_two_state_optimization':
-        result_dataset = handle_ro_freq_optimization(result_dataset, states=[0, 1])
-    elif node.name == 'ro_frequency_three_state_optimization':
-        result_dataset = handle_ro_freq_optimization(result_dataset, states=[0, 1, 2])
+
+    if cluster_status == MeasurementMode.real:
+        result_dataset = configure_dataset(raw_dataset, node)
+        save_dataset(result_dataset, node, data_path)
+    else:
+        result_dataset = retrieve_dummy_dataset(node)
+
+    # if node.name == 'ro_frequency_two_state_optimization':
+    #     result_dataset = handle_ro_freq_optimization(result_dataset, states=[0, 1])
+    # elif node.name == 'ro_frequency_three_state_optimization':
+    #     result_dataset = handle_ro_freq_optimization(result_dataset, states=[0, 1, 2])
 
     logger.info('Finished measurement')
     return result_dataset
@@ -53,12 +58,11 @@ def measure_node(
 def execute_schedule(
         compiled_schedule: CompiledSchedule,
         lab_ic,
-        schedule_duration: float
-) -> xarray.Dataset:
-    # TODO: This should go to the BaseMeasurement
-    # TODO: The instrument coordinator could be an attribute of the node
+        schedule_duration: float,
+        cluster_status
+    ) -> xarray.Dataset:
+
     logger.info('Starting measurement')
-    cluster_mode = ClusterMode.real
 
     def run_measurement() -> None:
         lab_ic.prepare(compiled_schedule)
@@ -67,9 +71,9 @@ def execute_schedule(
 
     def display_progress():
         steps = int(schedule_duration * 5)
-        if cluster_mode == ClusterMode.dummy:
+        if cluster_status == MeasurementMode.dummy:
             progress_sleep = 0.004
-        elif cluster_mode == ClusterMode.real:
+        elif cluster_status == MeasurementMode.real:
             progress_sleep = 0.2
         for _ in tqdm.tqdm(range(steps), desc=compiled_schedule.name, colour='blue'):
             time.sleep(progress_sleep)

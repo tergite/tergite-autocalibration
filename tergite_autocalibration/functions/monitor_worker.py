@@ -1,5 +1,5 @@
 import xarray
-from tergite_autocalibration.utils.enums import ClusterMode
+from tergite_autocalibration.utils.enums import MeasurementMode
 from tergite_autocalibration.functions.compilation_worker import precompile
 from tergite_autocalibration.functions.execution_worker import measure_node
 from tergite_autocalibration.utils.hardware_utils import SpiDAC
@@ -43,7 +43,7 @@ def monitor_node_calibration(node, data_path, lab_ic):
             compiled_schedule,
             lab_ic,
             data_path,
-            cluster_mode=ClusterMode.real,
+            cluster_mode=MeasurementMode.real,
         )
 
         logger.info('measurement completed')
@@ -68,7 +68,7 @@ def monitor_node_calibration(node, data_path, lab_ic):
                 compiled_schedule,
                 lab_ic,
                 data_path,
-                cluster_mode=ClusterMode.real,
+                cluster_mode=MeasurementMode.real,
                 measurement=(node_parameter, len(external_parameter_values))
             )
             ds = xarray.merge([ds, result_dataset])
@@ -92,7 +92,7 @@ def monitor_node_calibration(node, data_path, lab_ic):
                 compiled_schedule,
                 lab_ic,
                 data_path,
-                cluster_mode=ClusterMode.real,
+                cluster_mode=MeasurementMode.real,
             )
 
             ds = xarray.merge([ds, result_dataset])
@@ -122,7 +122,7 @@ def monitor_node_calibration(node, data_path, lab_ic):
                 compiled_schedule,
                 lab_ic,
                 data_path,
-                cluster_mode=ClusterMode.real,
+                cluster_mode=MeasurementMode.real,
             )
 
             ds = xarray.merge([ds, result_dataset])
@@ -156,7 +156,7 @@ def monitor_node_calibration(node, data_path, lab_ic):
                 compiled_schedule,
                 lab_ic,
                 data_path,
-                cluster_mode=ClusterMode.real,
+                cluster_mode=MeasurementMode.real,
             )
 
             measurement_result_ = post_process(result_dataset, node, data_path=data_path)

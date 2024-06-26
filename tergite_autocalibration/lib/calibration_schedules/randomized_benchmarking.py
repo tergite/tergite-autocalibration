@@ -23,7 +23,7 @@ class Randomized_Benchmarking(Measurement):
 
     def schedule_function(
         self,
-        seed: int,
+        seeds: dict[str, int],
         number_of_cliffords: dict[str, np.ndarray],
         repetitions: int = 1024,
         ) -> Schedule:
@@ -59,6 +59,8 @@ class Randomized_Benchmarking(Measurement):
         for this_qubit, clifford_sequence_lengths in number_of_cliffords.items():
 
             all_cliffords = len(cliffords.XY_decompositions)
+            seed = seeds[this_qubit]
+
             rng = np.random.default_rng(seed)
 
             schedule.add(
@@ -98,18 +100,17 @@ class Randomized_Benchmarking(Measurement):
 
                 schedule.add(Reset(this_qubit))
 
-
             # 0 calibration point
             schedule.add(Reset(this_qubit))
             schedule.add(Reset(this_qubit))
-            schedule.add(Measure( this_qubit, acq_index=acq_index + 1))
+            schedule.add(Measure(this_qubit, acq_index=acq_index + 1))
             schedule.add(Reset(this_qubit))
 
             # 1 calibration point
             schedule.add(Reset(this_qubit))
             schedule.add(Reset(this_qubit))
             schedule.add(X(this_qubit))
-            schedule.add(Measure( this_qubit, acq_index=acq_index + 2))
+            schedule.add(Measure(this_qubit, acq_index=acq_index + 2))
             schedule.add(Reset(this_qubit))
 
             # 2 calibration point

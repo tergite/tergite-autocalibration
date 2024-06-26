@@ -23,6 +23,8 @@ class ResetRedisNode:
                 remove_fields = self.quantities_of_interest[remove_node].keys()
             elif remove_node in self.coupler_quantities_of_interest:
                 remove_fields = self.coupler_quantities_of_interest[remove_node].keys()
+            else:
+                raise ValueError(f'{remove_node} is not present in the list of qois')
 
         # TODO Why flush?
         # red.flushdb()

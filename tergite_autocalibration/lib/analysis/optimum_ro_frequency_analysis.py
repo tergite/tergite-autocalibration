@@ -22,14 +22,17 @@ class OptimalROFrequencyAnalysis(BaseAnalysis):
         self.dataset = dataset
         data_var = list(dataset.data_vars.keys())[0]
 
-        self.S21_0 = dataset[data_var][0].values
-        self.S21_1 = dataset[data_var][1].values
-
         for coord in dataset.coords:
             if 'frequencies' in str(coord):
                 self.frequencies = dataset[coord].values
+                self.frequency_coord = coord
+            elif 'qubit_states' in str(coord):
+                self.qubit_states = dataset[coord].values
+                self.qubit_state_coord = coord
 
-        self.fit_results = {}
+        self.S21_0 = dataset[data_var].isel({self.qubit_state_coord: [0]}).values.flatten() # S21 when qubit at |0>
+        self.S21_1 = dataset[data_var].isel({self.qubit_state_coord: [1]}).values.flatten() # S21 when qubit at |1>
+
 
     def run_fitting(self):
         # Gives an initial guess for the model parameters and then fits the model to the data.
@@ -77,9 +80,10 @@ class OptimalRO_012_FrequencyAnalysis(OptimalROFrequencyAnalysis):
     def __init__(self, dataset: xr.Dataset):
         self.dataset = dataset
         data_var = list(dataset.data_vars.keys())[0]
-        self.S21_2 = dataset[data_var][2].values
         super().__init__(self.dataset)
-        super().run_fitting()
+        # super().run_fitting()
+
+        self.S21_2 = dataset[data_var].isel({self.qubit_state_coord: [2]}).values.flatten() # S21 when qubit at |2>
 
     def run_fitting(self):
         guess_2 = model.guess(self.S21_2, f=self.frequencies)

@@ -1,0 +1,27 @@
+
+# Node types
+
+There are two distinct type of nodes.
+This is what the `node_supervisor.py` looks for to handle the measurement for each node:
+- simple_sweep:
+    The schedule to be executed on the cluster is compiled only ONCE
+- parameterized_sweep:
+    The node consists of multiple iterations. For each iteration the schedule needs
+    to be recompiled. For example the Randomized_Benchmarking_Node is of type `parameterized_sweep`
+    i.e. every iterations (every different seed of the Randomized Benchmarking) reuires a new schedule
+    compilation
+
+```python
+class Randomized_Benchmarking_Node(BaseNode):
+    measurement_obj = Randomized_Benchmarking
+    analysis_obj = RandomizedBenchmarkingAnalysis
+
+    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
+        self.name = name
+        self.type = 'parameterized_sweep'
+        self.all_qubits = all_qubits
+        self.node_dictionary = node_dictionary
+        self.backup = False
+        self.redis_field = ['fidelity']
+```

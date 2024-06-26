@@ -1,3 +1,7 @@
+from collections.abc import Iterable
+
+import numpy as np
+
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
 from tergite_autocalibration.lib.demod_channels import ParallelDemodChannels
 
@@ -7,53 +11,100 @@ class BaseNode:
         self.all_qubits = all_qubits
         self.node_dictionary = node_dictionary
         self.backup = False
-        self.type = 'cluster_simple_sweep'
+        self.type = 'simple_sweep' # TODO better as Enum type
         self.qubit_state = 0 # can be 0 or 1 or 2
         self.plots_per_qubit = 1 # can be 0 or 1 or 2
         self.build_demod_channels()
 
-    @property
-    def samplespace(self) -> dict:
+        self.lab_instr_coordinator = None
+
+        self.schedule_samplespace = {}
+        self.external_samplespace = {}
+        self.initial_schedule_samplespace = {}
+        self.schedule_keywords = {}
+        self.reduced_external_samplespace = {}
+
+        self.samplespace = self.schedule_samplespace | self.external_samplespace
+
+    def pre_measurement_operation(self):
         '''
-        to be implemented by the child nodes
+        To be implemented by the child measurement nodes
         '''
-        return {}
+        pass
 
     @property
     def dimensions(self) -> list:
         '''
         array of dimensions used for raw dataset reshaping
-        in workers/dataset_utils.py. some nodes have peculiar dimensions
+        in utills/dataset_utils.py. some nodes have peculiar dimensions
         e.g. randomized benchmarking and need dimension definition in their class
         '''
-        settable_quantities = self.samplespace.keys()
+        schedule_settable_quantities = self.schedule_samplespace.keys()
+
+        # no schedule_samplespace applies on to sc_qubit_spectroscopy
+        if len(list(schedule_settable_quantities)) == 0:
+            return [1]
 
         # keeping the first element, ASSUMING that all settable elements
         # have the same dimensions on their samplespace
-        first_settable = list(settable_quantities)[0]
-        measured_elements = self.samplespace[first_settable].keys()
+
+        first_settable = list(schedule_settable_quantities)[0]
+        measured_elements = self.schedule_samplespace[first_settable].keys()
         first_element = list(measured_elements)[0]
 
         dimensions = []
-        for quantity in settable_quantities:
-            dimensions.append(len(self.samplespace[quantity][first_element]))
+
+        for quantity in schedule_settable_quantities:
+            settable_values = self.schedule_samplespace[quantity][first_element]
+            if not isinstance(settable_values, Iterable):
+                settable_values = np.array([settable_values])
+            dimensions.append(len(settable_values))
+
+        if self.external_samplespace != {} and self.initial_schedule_samplespace == {}:
+            dimensions = dimensions + [1]
         return dimensions
-    
+
+    @property
+    def external_dimensions(self) -> list:
+        '''
+        array of dimensions used for raw dataset reshaping
+        in utills/dataset_utils.py. some nodes have peculiar dimensions
+        e.g. randomized benchmarking and need dimension definition in their class
+        '''
+        external_settable_quantities = self.external_samplespace.keys()
+
+        # keeping the first element, ASSUMING that all settable elements
+        # have the same dimensions on their samplespace
+        # i.e. all qubits have the same number of ro frequency samples in readout spectroscopy
+        first_settable = list(external_settable_quantities)[0]
+        measured_elements = self.external_samplespace[first_settable].keys()
+        first_element = list(measured_elements)[0]
+
+        dimensions = []
+        if len(dimensions) > 1:
+            raise NotImplementedError('Multidimensional External Samplespace')
+        for quantity in external_settable_quantities:
+            dimensions.append(
+                len(self.external_samplespace[quantity][first_element])
+            )
+        return dimensions
+
+
     def build_demod_channels(self):
         """
         The default demodulation channels are multiplexed single-qubit channels,
         which means that you only readout one qubit in parallel.
         It works when you only calibrate single qubits.
-        In many cases, you also need jointly readout multiple qubits such as quantum 
+        In many cases, you also need jointly readout multiple qubits such as quantum
         state tomography.
         Rewrite this method in these nodes.
 
         TODO: Add parameters to the global variables
         """
         self.demod_channels = ParallelDemodChannels.build_multiplexed_single_demod_channel(
-            self.all_qubits, 
+            self.all_qubits,
             ["0", "1"],
-            'IQ', 
+            'IQ',
             REDIS_CONNECTION
         )
 

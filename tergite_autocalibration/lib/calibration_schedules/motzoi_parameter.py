@@ -1,6 +1,7 @@
 """
 Module containing a schedule class for DRAG pulse motzoi parameter calibration.
 """
+from __future__ import annotations
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.resources import ClockResource
 from quantify_scheduler import Schedule
@@ -19,7 +20,7 @@ class Motzoi_parameter(Measurement):
     def schedule_function(
             self,
             mw_motzois: dict[str,np.ndarray],
-            X_repetitions: dict[str,np.ndarray],
+            X_repetitions: int | dict[str, np.ndarray],
             repetitions: int = 1024,
         ) -> Schedule:
         """

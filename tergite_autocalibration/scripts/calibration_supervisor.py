@@ -16,7 +16,7 @@ from tergite_autocalibration.functions.monitor_worker import monitor_node_calibr
 from tergite_autocalibration.lib.node_factory import NodeFactory
 from tergite_autocalibration.lib.nodes.graph import filtered_topological_order
 from tergite_autocalibration.utils.dataset_utils import create_node_data_path
-from tergite_autocalibration.utils.enums import ClusterMode
+from tergite_autocalibration.utils.enums import MeasurementMode
 from tergite_autocalibration.utils.enums import DataStatus
 from tergite_autocalibration.utils.errors import ClusterNotFoundError
 from tergite_autocalibration.utils.hardware_utils import SpiDAC
@@ -31,12 +31,12 @@ colorama_init()
 
 class CalibrationSupervisor:
     def __init__(self,
-                 cluster_mode: 'ClusterMode' = ClusterMode.real,
+                 cluster_mode: 'MeasurementMode' = MeasurementMode.real,
                  cluster_ip: Union[str, 'IPv4Address'] = CLUSTER_IP,
                  cluster_timeout: int = 222) -> None:
 
         # Read hardware related configuration steps
-        self.cluster_mode: 'ClusterMode' = cluster_mode
+        self.cluster_mode: 'MeasurementMode' = cluster_mode
         self.cluster_ip: Union[str, 'IPv4Address'] = cluster_ip
         self.cluster_timeout: int = cluster_timeout
 
@@ -66,7 +66,7 @@ class CalibrationSupervisor:
 
     def _create_cluster(self) -> 'Cluster':
         cluster_: 'Cluster'
-        if self.cluster_mode == ClusterMode.real:
+        if self.cluster_mode == MeasurementMode.real:
             Cluster.close_all()
             cluster_ = Cluster(CLUSTER_NAME, str(self.cluster_ip))
             return cluster_

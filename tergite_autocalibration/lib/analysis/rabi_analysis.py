@@ -88,9 +88,6 @@ class RabiAnalysis(BaseAnalysis):
         self.ampl = fit_result.params['amp180'].value
         self.uncertainty = fit_result.params['amp180'].stderr
 
-        print(f'{ self.ampl = }')
-        print(f'{ self.uncertainty = }')
-
         self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_amplitudes})
         return [self.ampl]
 

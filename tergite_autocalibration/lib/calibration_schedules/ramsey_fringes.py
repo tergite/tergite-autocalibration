@@ -1,15 +1,16 @@
 """
 Module containing a schedule class for Ramsey calibration. (1D parameter sweep, for 2D see ramsey_detunings.py)
 """
-from quantify_scheduler.enums import BinMode
+import numpy as np
 from quantify_scheduler import Schedule
-from quantify_scheduler.operations.gate_library import Measure, Reset, X90, Rxy, X
+from quantify_scheduler.enums import BinMode
+from quantify_scheduler.operations.gate_library import Measure, Reset, Rxy, X, X90
 from quantify_scheduler.operations.pulse_library import DRAGPulse
 from quantify_scheduler.resources import ClockResource
-from tergite_autocalibration.lib.measurement_base import Measurement
-from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon, Measure_RO1
 
-import numpy as np
+from tergite_autocalibration.lib.measurement_base import Measurement
+from tergite_autocalibration.utils.extended_gates import Measure_RO1
+from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 
 class Ramsey_fringes(Measurement):
 
@@ -19,7 +20,7 @@ class Ramsey_fringes(Measurement):
 
     def schedule_function(
             self,
-            artificial_detunings: dict[str,np.ndarray],
+            artificial_detuning: float,
             ramsey_delays: dict[str,np.ndarray],
             repetitions: int = 1024,
         ) -> Schedule:
@@ -70,7 +71,7 @@ class Ramsey_fringes(Measurement):
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
         # The outer loop, iterates over all qubits
-        for this_qubit, artificial_detunings_values in artificial_detunings.items():
+        for this_qubit in qubits:
             this_transmon = self.transmons[this_qubit]
             mw_pulse_duration = this_transmon.rxy.duration()
             mw_pulse_port = this_transmon.ports.microwave()
@@ -92,55 +93,52 @@ class Ramsey_fringes(Measurement):
             ramsey_delays_values = ramsey_delays[this_qubit]
             number_of_delays = len(ramsey_delays_values)
 
-            # The intermediate loop, iterates over all detunings
-            for detuning_index, detuning in enumerate(artificial_detunings_values):
+            # The inner for loop iterates over all delays
+            for acq_index, ramsey_delay in enumerate(ramsey_delays_values):
 
-                # The inner for loop iterates over all delays
-                for acq_index, ramsey_delay in enumerate(ramsey_delays_values):
+                this_index = acq_index
 
-                    this_index = detuning_index*number_of_delays + acq_index
+                recovery_phase = np.rad2deg(2 * np.pi * artificial_detuning * ramsey_delay)
 
-                    recovery_phase = np.rad2deg(2 * np.pi * detuning * ramsey_delay)
-
-                    if self.qubit_state == 1:
-                        schedule.add(X(this_qubit))
-                        f12_amp = mw_ef_amp180
-                        schedule.add(
-                            DRAGPulse(
-                                duration=mw_pulse_duration,
-                                G_amp=f12_amp/2,
-                                D_amp=0,
-                                port=mw_pulse_port,
-                                clock=this_clock,
-                                phase=0,
-                            ),
-                        )
-
-                        schedule.add(
-                            DRAGPulse(
-                                duration=mw_pulse_duration,
-                                G_amp=f12_amp/2,
-                                D_amp=0,
-                                port=mw_pulse_port,
-                                clock=this_clock,
-
-                                phase=recovery_phase,
-                            ),
-                            rel_time=ramsey_delay
-                        )
-
-                    if self.qubit_state == 0:
-
-                        schedule.add(X90(this_qubit))
-
-                        schedule.add(
-                            Rxy(theta=90, phi=recovery_phase, qubit=this_qubit),
-                            rel_time=ramsey_delay
-                        )
-
+                if self.qubit_state == 1:
+                    schedule.add(X(this_qubit))
+                    f12_amp = mw_ef_amp180
                     schedule.add(
-                        measure_function(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
+                        DRAGPulse(
+                            duration=mw_pulse_duration,
+                            G_amp=f12_amp/2,
+                            D_amp=0,
+                            port=mw_pulse_port,
+                            clock=this_clock,
+                            phase=0,
+                        ),
                     )
 
-                    schedule.add(Reset(this_qubit))
+                    schedule.add(
+                        DRAGPulse(
+                            duration=mw_pulse_duration,
+                            G_amp=f12_amp/2,
+                            D_amp=0,
+                            port=mw_pulse_port,
+                            clock=this_clock,
+
+                            phase=recovery_phase,
+                        ),
+                        rel_time=ramsey_delay
+                    )
+
+                if self.qubit_state == 0:
+
+                    schedule.add(X90(this_qubit))
+
+                    schedule.add(
+                        Rxy(theta=90, phi=recovery_phase, qubit=this_qubit),
+                        rel_time=ramsey_delay
+                    )
+
+                schedule.add(
+                    measure_function(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
+                )
+
+                schedule.add(Reset(this_qubit))
         return schedule

@@ -9,10 +9,10 @@ class DataStatus(Enum):
     bad_data = 3
     undefined = 4
 
-
-class ClusterMode(Enum):
+# Used to distinguish running on dummy or real clusters
+class MeasurementMode(Enum):
     """
-    Used to set the cluster mode e.g. dummy cluster or real cluster
-    """
+        Used to set the cluster mode e.g. dummy cluster or real cluster
+        """
     real = 0
     dummy = 1
