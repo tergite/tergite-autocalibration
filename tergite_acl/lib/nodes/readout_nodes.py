@@ -84,11 +84,11 @@ class Punchout_Node(BaseNode):
         self.redis_field = ['measure:pulse_amp']
 
         self.schedule_samplespace = {
-            'ro_amplitudes': {
-                qubit: np.linspace(0.008, 0.06, 11) for qubit in self.all_qubits
-            },
             'ro_frequencies': {
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
+            },
+            'ro_amplitudes': {
+                qubit: np.linspace(0.008, 0.06, 5) for qubit in self.all_qubits
             },
         }
 
