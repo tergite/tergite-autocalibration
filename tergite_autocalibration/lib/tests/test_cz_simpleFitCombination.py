@@ -1,8 +1,12 @@
+from tergite_autocalibration.tests.utils.env import setup_test_env
+
+setup_test_env()
+
 import pytest
-from tergite_acl.lib.analysis.cz_FitResultStatus import FitResultStatus
-from tergite_acl.lib.analysis.cz_singleGateSimpleFitResult import CZSingleGateSimpleFitResult
-from tergite_acl.lib.analysis.cz_firstStepCombination import CZFirstStepCombination 
-from tergite_acl.lib.analysis.cz_simpleFitAnalysisResult import CZSimpleFitAnalysisResult
+from tergite_autocalibration.lib.analysis.cz_FitResultStatus import FitResultStatus
+from tergite_autocalibration.lib.analysis.cz_singleGateSimpleFitResult import CZSingleGateSimpleFitResult
+from tergite_autocalibration.lib.analysis.cz_firstStepCombination import CZFirstStepCombination
+from tergite_autocalibration.lib.analysis.cz_simpleFitAnalysisResult import CZSimpleFitAnalysisResult
 
 def test_goodResultReturnCorrectFrequency():
     r1 = CZSingleGateSimpleFitResult([0.2, 0.995, 0.7], [None, [0.4, 100, 50, 0.6], [0.2, 200, 12, 0]], FitResultStatus.FOUND)

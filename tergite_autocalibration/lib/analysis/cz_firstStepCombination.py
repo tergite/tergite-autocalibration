@@ -1,8 +1,8 @@
 from typing import Type
 import numpy as np
-from tergite_acl.lib.analysis.cz_FitResultStatus import FitResultStatus
-from tergite_acl.lib.analysis.cz_simpleFitAnalysisResult import CZSimpleFitAnalysisResult
-from tergite_acl.lib.analysis.cz_singleGateSimpleFitResult import CZSingleGateSimpleFitResult
+from tergite_autocalibration.lib.analysis.cz_FitResultStatus import FitResultStatus
+from tergite_autocalibration.lib.analysis.cz_simpleFitAnalysisResult import CZSimpleFitAnalysisResult
+from tergite_autocalibration.lib.analysis.cz_singleGateSimpleFitResult import CZSingleGateSimpleFitResult
 
 class CZFirstStepCombination():
     def __init__(self, r1: Type[CZSingleGateSimpleFitResult], r2: Type[CZSingleGateSimpleFitResult], freq):

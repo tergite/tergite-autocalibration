@@ -1,4 +1,4 @@
-from tergite_acl.lib.analysis.cz_FitResultStatus import FitResultStatus
+from tergite_autocalibration.lib.analysis.cz_FitResultStatus import FitResultStatus
     
 class CZSimpleFitAnalysisResult():
     def __init__(self, pv1=None , pv2=None, par1=None , par2=None, s=FitResultStatus.NOT_AVAILABLE) -> None:

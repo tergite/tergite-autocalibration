@@ -1,10 +1,16 @@
+import os.path
+
+from tergite_autocalibration.tests.utils.env import setup_test_env
+
+setup_test_env()
+
 import matplotlib
 import pytest
 from pathlib import Path
 import xarray as xr
 import numpy as np
-from tergite_acl.lib.analysis.cz_singleGateSimpleFit import CZSingleGateSimpleFit
-from tergite_acl.lib.analysis.cz_singleGateSimpleFitResult import FitResultStatus
+from tergite_autocalibration.lib.analysis.cz_singleGateSimpleFit import CZSingleGateSimpleFit
+from tergite_autocalibration.lib.analysis.cz_singleGateSimpleFitResult import FitResultStatus
 
 @pytest.fixture(autouse=True)
 def setup_good_data():
@@ -191,6 +197,7 @@ def test_plotsAreCreated(setup_good_data):
     first_scan = CZSingleGateSimpleFit(d17, freq, times)
     result  = first_scan.run_fitting()
     folder_path = Path(__file__).parent / 'results'
+    os.makedirs(folder_path, exist_ok=True)
     first_scan.plotter(folder_path)
 
     figure_path = folder_path / 'AllFits_q17.png'

@@ -86,8 +86,6 @@ __pycache__/
 .pytest_cache/
 
 # configs
-configs/
-tergite_acl/config/**
 !tergite_acl/config/__init__.py
 !tergite_acl/config/settings.py
 !tergite_autocalibration/config/__init__.py
@@ -101,7 +99,7 @@ tergite_autocalibration/utils/**.csv
 # internal
 external/
 workbench/
-tergite_acl/lib/tests/results/AllFits_q17.png
-tergite_acl/lib/tests/results/SummaryScan_q17.png
+tergite_autocalibration/lib/tests/results/AllFits_q17.png
+tergite_autocalibration/lib/tests/results/SummaryScan_q17.png
 
 tergite_acl/utils/clifford_module/**

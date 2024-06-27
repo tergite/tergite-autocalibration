@@ -31,7 +31,16 @@ def _from_config(key_name_: str,
         Type-checked-and-casted variable from .env
 
     """
-    if key_name_ in config:
+
+    if os.environ.get(key_name_) is not None:
+        try:
+            if cast_ is bool:
+                return eval(os.environ.get(key_name_))
+            return cast_(os.environ.get(key_name_))
+        except ValueError:
+            raise ValueError(f'Variable with name {key_name_} from system environmental variables with value '
+                             f'{os.environ.get(key_name_)} cannot be casted to type {cast_}')
+    elif key_name_ in config:
         try:
             if cast_ is bool:
                 return eval(config[key_name_])
@@ -65,7 +74,7 @@ ROOT_DIR = _from_config('ROOT_DIR',
 # Data directory to store plots and datasets
 DATA_DIR = _from_config('DATA_DIR',
                         cast_=Path,
-                        default=ROOT_DIR.joinpath('data_dir'))
+                        default=ROOT_DIR.joinpath('data'))
 
 # If the data directory does not exist, it will be created automatically
 if not os.path.exists(DATA_DIR):

@@ -1,9 +1,9 @@
-from tergite_acl.lib.analysis_base import BaseAnalysis
+from tergite_autocalibration.lib.analysis_base import BaseAnalysis
 import xarray as xr
 import numpy as np
 from scipy.optimize import curve_fit
 from scipy.stats import chi2 as chi2dist
-from tergite_acl.lib.analysis.cz_singleGateSimpleFitResult import CZSingleGateSimpleFitResult,FitResultStatus
+from tergite_autocalibration.lib.analysis.cz_singleGateSimpleFitResult import CZSingleGateSimpleFitResult,FitResultStatus
 import matplotlib.pyplot as plt
 
 class CZSingleGateSimpleFit(BaseAnalysis):
