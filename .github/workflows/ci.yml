@@ -41,7 +41,7 @@ jobs:
         if: ${{ vars.SHOULD_LINT == 'true' }}
         run: |
           source .venv/bin/activate
-          black tergite_acl --check
+          black tergite_autocalibration --check
       - name: Smoke test
         run: |
           source .venv/bin/activate
@@ -81,22 +81,24 @@ jobs:
         run: |
           source .venv/bin/activate
           mkdocs gh-deploy --force
+      - name: Build
+        run: poetry build
       - name: Publish to Test pypi
         if: ${{ vars.SHOULD_PUBLISH_TO_STAGING == 'true' }}
         run: |
           poetry config repositories.test-pypi https://test.pypi.org/legacy/
           poetry config pypi-token.test-pypi ${{ secrets.TEST_PYPI_API_TOKEN }}
-          poetry publish --build -r test-pypi
+          poetry publish -r test-pypi
       - name: Publish to pypi
         if: ${{ vars.SHOULD_PUBLISH_TO_PROD == 'true' }}
         run: |
           poetry config pypi-token.pypi ${{ secrets.PYPI_API_TOKEN }}
-          poetry publish --build
+          poetry publish
 
   upstream:
     name: Update upstream
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' }} && ${{ vars.SHOULD_PUSH_UPSTREAM == 'true' }}
+    if: ${{ github.event_name == 'push' && vars.SHOULD_PUSH_UPSTREAM == 'true' }}
     needs: tests
     steps:
       - name: Checkout the commit
@@ -104,6 +106,7 @@ jobs:
 
       - name: Push upstream
         run: |
+          if [ "${{ github.event_name }}" != "push" ] || [ "${{ vars.SHOULD_PUSH_UPSTREAM }}" != 'true' ]; then printf "upstream not enabled"; exit; fi
           git config user.email ${{ secrets.UPSTREAM_USER }}
           git fetch ${{ secrets.UPSTREAM_REPO }} ${{ secrets.UPSTREAM_BRANCH }}:${{ secrets.UPSTREAM_BRANCH }} || echo "${{ secrets.UPSTREAM_BRANCH }} does not exist"
           git checkout ${{ github.ref_name }} || echo "${{ github.ref_name }} does not exist"

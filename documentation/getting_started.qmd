@@ -1,0 +1,23 @@
+# Getting started
+
+Before operating the automatic calibration measurements, a number of configuration files must be set up.
+
+## The .env file
+
+First we need to create a file `.env` at the `tergite-acl` directory.
+The easiest is to rename the `dot-env-template.txt` to `.env` and modify the entries according to your setup.
+Here is an example of a completed `.env` file.
+
+```bash
+DEFAULT_PREFIX=calibration
+ROOT_DIR='/home/lab_user/github/tergite-acl/'
+DATA_DIR='/home/lab_user/github/tergite-acl/data_directory/'
+CONFIG_DIR='/home/lab_user/github/tergite-acl/config_dir/'
+HARDWARE_CONFIG='HARDWARE_CONFIGURATION_LOKIB.json'
+DEVICE_CONFIG='device_config.toml'
+CLUSTER_IP='172.0.0.0'
+SPI_SERIAL_PORT='/dev/ttyACM0'
+RUN_MODE=development
+REDIS_PORT=6379
+PLOTTING=True
+```

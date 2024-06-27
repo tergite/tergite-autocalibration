@@ -1,0 +1,72 @@
+[
+  {
+    "objectID": "new_node_creation.html",
+    "href": "new_node_creation.html",
+    "title": "To create a new node:",
+    "section": "",
+    "text": "in the file tergite_autocalibration/lib/node_factory.py expand the dictionary self.node_implementations with a new entry: The key should be a string of the node name and the value should be the object that contains the implementation details. This object should be imported from either tergite_autocalibration/lib/nodes/qubit_control_nodes.py, tergite_autocalibration/lib/nodes/coupler_nodes.py, tergite_autocalibration/lib/nodes/readout_nodes.py or tergite_autocalibration/lib/nodes/characterization_nodes.py\nIn the file tergite_autocalibration/lib/nodes/graph.py in the list graph_dependencies insert the edges that describe the position of the new node in the Directed Acyclic Graph. There are two entries required (or one entry if the new node is the last on its path):\n\n\n('previous_node','new_node')\n('new_node', 'next_node')\n\n\nIn the tergite_autocalibration/config/device_config.toml set the quantity of interest at nan value\n\n\n\nEach node implementation object should contain a reference to the measurement object, the analysis object, the list of redis fields that the analysis updates and the samplespace of the measurement. For example on the Rabi Rabi Oscillations Node:\nclass Rabi_Oscillations_Node(BaseNode):\n    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):\n        super().__init__(name, all_qubits, **node_dictionary)\n        self.redis_field = ['rxy:amp180']\n        self.measurement_obj = Rabi_Oscillations\n        self.analysis_obj = RabiAnalysis\n        self.samplespace = {\n            'mw_amplitudes': {\n                qubit: np.linspace(0.002, 0.80, 101) for qubit in self.all_qubits\n            }\n        }\n\n\nThe measurement_obj is imported from tergite_autocalibration/lib/calibration_schedules/ and contains the class that generates the appropriate measurement schedule. To initialize we require a dicttionary of the extended transmons:\ntransmons: dict[str, ExtendedTransmon]\nIt must contain a method called schedule_function that expects the node.samplespace as input and returns the complete schedule.\n\n\n\nThe analysis_obj is imported from tergite_autocalibration/lib/analysis/ and contains the class that perform the analysis for a single qubit. It must contain a run_fitting method and a plotter method\n\n\n\nNodes are divided in two distict categories: - simple_sweep: where the Quantify Schedule is compiled only once - parameterized_sweep: where the node requires multiple iterations and each iteration requires a new recompilation.\nDetails on the implementation on the Node types section."
+  },
+  {
+    "objectID": "new_node_creation.html#node-implementation-object",
+    "href": "new_node_creation.html#node-implementation-object",
+    "title": "To create a new node:",
+    "section": "",
+    "text": "Each node implementation object should contain a reference to the measurement object, the analysis object, the list of redis fields that the analysis updates and the samplespace of the measurement. For example on the Rabi Rabi Oscillations Node:\nclass Rabi_Oscillations_Node(BaseNode):\n    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):\n        super().__init__(name, all_qubits, **node_dictionary)\n        self.redis_field = ['rxy:amp180']\n        self.measurement_obj = Rabi_Oscillations\n        self.analysis_obj = RabiAnalysis\n        self.samplespace = {\n            'mw_amplitudes': {\n                qubit: np.linspace(0.002, 0.80, 101) for qubit in self.all_qubits\n            }\n        }\n\n\nThe measurement_obj is imported from tergite_autocalibration/lib/calibration_schedules/ and contains the class that generates the appropriate measurement schedule. To initialize we require a dicttionary of the extended transmons:\ntransmons: dict[str, ExtendedTransmon]\nIt must contain a method called schedule_function that expects the node.samplespace as input and returns the complete schedule.\n\n\n\nThe analysis_obj is imported from tergite_autocalibration/lib/analysis/ and contains the class that perform the analysis for a single qubit. It must contain a run_fitting method and a plotter method\n\n\n\nNodes are divided in two distict categories: - simple_sweep: where the Quantify Schedule is compiled only once - parameterized_sweep: where the node requires multiple iterations and each iteration requires a new recompilation.\nDetails on the implementation on the Node types section."
+  },
+  {
+    "objectID": "node_types.html",
+    "href": "node_types.html",
+    "title": "Node types",
+    "section": "",
+    "text": "Node types\nThere are two distinct type of nodes. This is what the node_supervisor.py looks for to handle the measurement for each node: - simple_sweep: The schedule to be executed on the cluster is compiled only ONCE - parameterized_sweep: The node consists of multiple iterations. For each iteration the schedule needs to be recompiled. For example the Randomized_Benchmarking_Node is of type parameterized_sweep i.e. every iterations (every different seed of the Randomized Benchmarking) reuires a new schedule compilation\nclass Randomized_Benchmarking_Node(BaseNode):\n    measurement_obj = Randomized_Benchmarking\n    analysis_obj = RandomizedBenchmarkingAnalysis\n\n    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):\n        super().__init__(name, all_qubits, **node_dictionary)\n        self.name = name\n        self.type = 'parameterized_sweep'\n        self.all_qubits = all_qubits\n        self.node_dictionary = node_dictionary\n        self.backup = False\n        self.redis_field = ['fidelity']"
+  },
+  {
+    "objectID": "getting_started.html",
+    "href": "getting_started.html",
+    "title": "Getting started",
+    "section": "",
+    "text": "Before operating the automatic calibration measurements, a number of configuration files must be set up.\n\n\nFirst we need to create a file .env at the tergite-acl directory. The easiest is to rename the dot-env-template.txt to .env and modify the entries according to your setup. Here is an example of a completed .env file.\nDEFAULT_PREFIX=calibration\nROOT_DIR='/home/lab_user/github/tergite-acl/'\nDATA_DIR='/home/lab_user/github/tergite-acl/data_directory/'\nCONFIG_DIR='/home/lab_user/github/tergite-acl/config_dir/'\nHARDWARE_CONFIG='HARDWARE_CONFIGURATION_LOKIB.json'\nDEVICE_CONFIG='device_config.toml'\nCLUSTER_IP='172.0.0.0'\nSPI_SERIAL_PORT='/dev/ttyACM0'\nRUN_MODE=development\nREDIS_PORT=6379\nPLOTTING=True"
+  },
+  {
+    "objectID": "getting_started.html#the-.env-file",
+    "href": "getting_started.html#the-.env-file",
+    "title": "Getting started",
+    "section": "",
+    "text": "First we need to create a file .env at the tergite-acl directory. The easiest is to rename the dot-env-template.txt to .env and modify the entries according to your setup. Here is an example of a completed .env file.\nDEFAULT_PREFIX=calibration\nROOT_DIR='/home/lab_user/github/tergite-acl/'\nDATA_DIR='/home/lab_user/github/tergite-acl/data_directory/'\nCONFIG_DIR='/home/lab_user/github/tergite-acl/config_dir/'\nHARDWARE_CONFIG='HARDWARE_CONFIGURATION_LOKIB.json'\nDEVICE_CONFIG='device_config.toml'\nCLUSTER_IP='172.0.0.0'\nSPI_SERIAL_PORT='/dev/ttyACM0'\nRUN_MODE=development\nREDIS_PORT=6379\nPLOTTING=True"
+  },
+  {
+    "objectID": "available_nodes.html",
+    "href": "available_nodes.html",
+    "title": "Available Nodes",
+    "section": "",
+    "text": "punchout\nresonator_spectroscopy\nresonator_spectroscopy_1\nresonator_spectroscopy_2\nro_frequency_two_state_optimization\nro_frequency_three_state_optimization\nro_amplitude_two_state_optimization\nro_amplitude_three_state_optimization\n\n\n\n\n\nqubit_01_spectroscopy\nqubit_01_spectroscopy_pulsed\nrabi_oscillations\nramsey_correction\nqubit_12_spectroscopy_pulsed\nqubit_12_spectroscopy_multidim\nrabi_oscillations_12\nramsey_correction_12\nadaptive_motzoi_parameter\nn_rabi_oscillations\nstate_discrimination\n\n\n\n\n\ncoupler_spectroscopy\ncoupler_resonator_spectroscopy\n\n\n\n\n\nT1\nT2\nT2_echo\nrandomized_benchmarking\nall_XY"
+  },
+  {
+    "objectID": "available_nodes.html#readout-nodes",
+    "href": "available_nodes.html#readout-nodes",
+    "title": "Available Nodes",
+    "section": "",
+    "text": "punchout\nresonator_spectroscopy\nresonator_spectroscopy_1\nresonator_spectroscopy_2\nro_frequency_two_state_optimization\nro_frequency_three_state_optimization\nro_amplitude_two_state_optimization\nro_amplitude_three_state_optimization"
+  },
+  {
+    "objectID": "available_nodes.html#qubit-control-nodes",
+    "href": "available_nodes.html#qubit-control-nodes",
+    "title": "Available Nodes",
+    "section": "",
+    "text": "qubit_01_spectroscopy\nqubit_01_spectroscopy_pulsed\nrabi_oscillations\nramsey_correction\nqubit_12_spectroscopy_pulsed\nqubit_12_spectroscopy_multidim\nrabi_oscillations_12\nramsey_correction_12\nadaptive_motzoi_parameter\nn_rabi_oscillations\nstate_discrimination"
+  },
+  {
+    "objectID": "available_nodes.html#characterization-nodes",
+    "href": "available_nodes.html#characterization-nodes",
+    "title": "Available Nodes",
+    "section": "",
+    "text": "T1\nT2\nT2_echo\nrandomized_benchmarking\nall_XY"
+  },
+  {
+    "objectID": "available_nodes.html#coupler-nodes",
+    "href": "available_nodes.html#coupler-nodes",
+    "title": "Available Nodes",
+    "section": "",
+    "text": "coupler_spectroscopy\ncoupler_resonator_spectroscopy"
+  }
+]
