@@ -21,7 +21,7 @@ from tergite_acl.lib.calibration_schedules.resonator_spectroscopy import (
 from tergite_acl.lib.calibration_schedules.ro_amplitude_optimization import (
     RO_amplitude_optimization,
 )
-from tergite_acl.lib.calibration_schedules.ro_frequency_optimization_refactored import (
+from tergite_acl.lib.calibration_schedules.ro_frequency_optimization import (
     RO_frequency_optimization,
 )
 from tergite_acl.lib.node_base import BaseNode
@@ -103,11 +103,11 @@ class RO_frequency_optimization_Node(BaseNode):
         self.qubit_state = 0
 
         self.schedule_samplespace = {
-            'qubit_states': {
-                qubit: [0,1] for qubit in self.all_qubits
-            },
             'ro_opt_frequencies': {
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
+            },
+            'qubit_states': {
+                qubit: [0,1] for qubit in self.all_qubits
             },
         }
 
@@ -124,11 +124,11 @@ class RO_frequency_optimization_gef_Node(BaseNode):
         self.qubit_state = 2
 
         self.schedule_samplespace = {
-            'qubit_states': {
-                qubit: [0,1,2] for qubit in self.all_qubits
-            },
             'ro_opt_frequencies': {
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
+            },
+            'qubit_states': {
+                qubit: [0,1,2] for qubit in self.all_qubits
             },
         }
 
@@ -159,7 +159,7 @@ class RO_amplitude_two_state_optimization_Node(BaseNode):
         self.schedule_samplespace = {
             'qubit_states': {
                 qubit: np.tile(
-                    np.array([0,1], dtype=np.int16), loops
+                    np.array([0,1], dtype=np.int16), self.loops
                 )  for qubit in self.all_qubits
             },
             'ro_amplitudes': {

@@ -82,7 +82,7 @@ user_samplespace = {
 '''
 
 ####################################################################
-target_node = 'coupler_spectroscopy'
+target_node = 'randomized_benchmarking'
 qubits = ['q06','q07','q08','q09','q10']
 couplers = ['q06_q07']
 user_samplespace = {

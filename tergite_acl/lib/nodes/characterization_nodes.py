@@ -83,6 +83,7 @@ class Randomized_Benchmarking_Node(BaseNode):
         self.schedule_keywords = schedule_keywords
         self.backup = False
         self.redis_field = ['fidelity']
+        self.schedule_keywords = {}
 
         self.initial_schedule_samplespace = {
             'number_of_cliffords': {
