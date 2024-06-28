@@ -1,29 +1,112 @@
-"""
-Module containing a schedule class for resonator spectroscopy calibration.
-"""
-
+import numpy as np
 from quantify_scheduler.enums import BinMode
-from quantify_scheduler.schedules.schedule import Schedule
-from quantify_scheduler.operations.pulse_library import  SquarePulse, SetClockFrequency, DRAGPulse
 from quantify_scheduler.operations.acquisition_library import SSBIntegrationComplex
 from quantify_scheduler.operations.gate_library import Reset, X
+from quantify_scheduler.operations.pulse_library import (
+    DRAGPulse,
+    SetClockFrequency,
+    SquarePulse,
+)
 from quantify_scheduler.resources import ClockResource
+from quantify_scheduler.schedules.schedule import Schedule
 
 from tergite_autocalibration.lib.measurement_base import Measurement
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
-import numpy as np
 
 class RO_frequency_optimization(Measurement):
 
-    def __init__(self,transmons: dict[str, ExtendedTransmon], qubit_state:int=0):
+    def __init__(self,transmons: dict[str, ExtendedTransmon], qubits_state):
         super().__init__(transmons)
-        self.qubit_state = qubit_state
         self.transmons = transmons
+
+
+    def measure(
+        self, schedule: Schedule, this_qubit: str, acq_index: int, acq_cha: int,
+        this_ro_clock: str, ro_frequency: float, ro_pulse_duration: float,
+        integration_time:float, acquisition_delay: float, ro_pulse_amplitude: float, ro_port: str
+        ):
+        ro_pulse = schedule.add(
+            SquarePulse(
+                duration=ro_pulse_duration,
+                amp=ro_pulse_amplitude,
+                port=ro_port,
+                clock=this_ro_clock,
+            ),
+        )
+        schedule.add(
+            SSBIntegrationComplex(
+                duration=integration_time,
+                port=ro_port,
+                clock=this_ro_clock,
+                acq_index=acq_index,
+                acq_channel=acq_cha,
+                bin_mode=BinMode.AVERAGE
+            ),
+            ref_op=ro_pulse, ref_pt="start",
+            rel_time=acquisition_delay,
+        )
+
+        schedule.add(Reset(this_qubit))
+
+    def measure_first_excited(
+        self, schedule: Schedule, this_qubit: str, acq_index: int, acq_cha: int,
+        this_ro_clock: str, ro_frequency: float, ro_pulse_duration: float,
+        integration_time:float, acquisition_delay: float, ro_pulse_amplitude: float, ro_port: str
+        ):
+        schedule.add(X(this_qubit))
+        self.measure(
+            schedule, this_qubit, acq_index, acq_cha, this_ro_clock, ro_frequency,
+            ro_pulse_duration,integration_time,acquisition_delay,ro_pulse_amplitude,ro_port
+        )
+
+    def measure_second_excited(
+        self, schedule: Schedule, this_qubit: str, acq_index: int, acq_cha: int,
+        this_ro_clock: str, ro_frequency: float, ro_pulse_duration: float,
+        integration_time:float, acquisition_delay: float, ro_pulse_amplitude: float, ro_port: str,
+        mw_pulse_duration: float, mw_ef_amp180: float, mw_pulse_port: str, this_mw_clock: str
+        ):
+        #repeat for when the qubit is at |2>
+        schedule.add(X(this_qubit))
+        schedule.add(
+            DRAGPulse(
+                duration=mw_pulse_duration,
+                G_amp=mw_ef_amp180,
+                D_amp=0,
+                port=mw_pulse_port,
+                clock=this_mw_clock,
+                phase=0,
+            ),
+        )
+
+        ro_pulse = schedule.add(
+            SquarePulse(
+                duration=ro_pulse_duration,
+                amp=ro_pulse_amplitude,
+                port=ro_port,
+                clock=this_ro_clock,
+            ),
+        )
+
+        schedule.add(
+            SSBIntegrationComplex(
+                duration=integration_time,
+                port=ro_port,
+                clock=this_ro_clock,
+                acq_index=acq_index,
+                acq_channel=acq_cha,
+                bin_mode=BinMode.AVERAGE
+            ),
+            ref_op=ro_pulse, ref_pt="start",
+            rel_time=acquisition_delay,
+        )
+
+        schedule.add(Reset(this_qubit))
 
 
     def schedule_function(
         self,
         ro_opt_frequencies: dict[str,np.ndarray],
+        qubit_states: dict[str, list[int]],
         repetitions: int = 1024,
         ) -> Schedule:
 
@@ -32,11 +115,12 @@ class RO_frequency_optimization(Measurement):
         qubits = self.transmons.keys()
 
         # Initialize the clock for each qubit
-
-        # TODO the qubit_state attr needs reworking
-        ro_str = 'ro_2st_opt'
-        if self.qubit_state == 2:
+        if len(qubit_states[list(qubits)[0]]) == 2:
+            ro_str = 'ro_2st_opt'
+        elif len(qubit_states[list(qubits)[0]]) == 3:
             ro_str = 'ro_3st_opt'
+        else:
+            raise ValueError('invalid number of states')
 
         #Initialize ClockResource with the first frequency value
         for this_qubit, ro_array_val in ro_opt_frequencies.items():
@@ -72,111 +156,37 @@ class RO_frequency_optimization(Measurement):
 
             this_mw_clock = f'{this_qubit}.12'
 
-            # The second for loop iterates over all frequency values in the frequency batch:
+            this_qubit_states = qubit_states[this_qubit]
+
+            number_of_frequencies = len(ro_f_values)
+
             for acq_index, ro_frequency in enumerate(ro_f_values):
                 schedule.add(
                     SetClockFrequency(clock=this_ro_clock, clock_freq_new=ro_frequency),
                 )
-                ro_pulse = schedule.add(
-                    SquarePulse(
-                        duration=ro_pulse_duration,
-                        amp=ro_pulse_amplitude,
-                        port=ro_port,
-                        clock=this_ro_clock,
-                    ),
-                )
 
-                schedule.add(
-                    SSBIntegrationComplex(
-                        duration=integration_time,
-                        port=ro_port,
-                        clock=this_ro_clock,
-                        acq_index=acq_index,
-                        acq_channel=acq_cha,
-                        bin_mode=BinMode.AVERAGE
-                    ),
-                    ref_op=ro_pulse, ref_pt="start",
-                    rel_time=acquisition_delay,
-                )
-
-                schedule.add(Reset(this_qubit))
-
-            #shift the acquisition channel
-            acq_cha += len(qubits)
-            #repeat for when the qubit is at |1>
-            for acq_index, ro_frequency in enumerate(ro_f_values):
-
-                schedule.add(X(this_qubit))
-                schedule.add(
-                    SetClockFrequency(clock=this_ro_clock, clock_freq_new=ro_frequency),
-                )
-                ro_pulse = schedule.add(
-                    SquarePulse(
-                        duration=ro_pulse_duration,
-                        amp=ro_pulse_amplitude,
-                        port=ro_port,
-                        clock=this_ro_clock,
-                    ),
-                )
-
-                schedule.add(
-                    SSBIntegrationComplex(
-                        duration=integration_time,
-                        port=ro_port,
-                        clock=this_ro_clock,
-                        acq_index=acq_index,
-                        acq_channel=acq_cha,
-                        bin_mode=BinMode.AVERAGE
-                    ),
-                    ref_op=ro_pulse, ref_pt="start",
-                    rel_time=acquisition_delay,
-                )
-
-                schedule.add(Reset(this_qubit))
-
-            if self.qubit_state == 2:
-                #shift the acquisition channel
-                acq_cha += len(qubits)
+                # The third for loop iterates over all qubit states
+                for qubit_state in this_qubit_states:
+                    if qubit_state == 0:
+                        this_index = acq_index
+                        self.measure(
+                            schedule, this_qubit, this_index, acq_cha, this_ro_clock, ro_frequency,
+                            ro_pulse_duration,integration_time,acquisition_delay,ro_pulse_amplitude,ro_port
+                        )
+                #repeat for when the qubit is at |1>
+                    elif qubit_state == 1:
+                        this_index = acq_index + number_of_frequencies
+                        self.measure_first_excited(
+                            schedule, this_qubit, this_index, acq_cha, this_ro_clock, ro_frequency,
+                            ro_pulse_duration,integration_time,acquisition_delay,ro_pulse_amplitude,ro_port
+                        )
                 #repeat for when the qubit is at |2>
-                for acq_index, ro_frequency in enumerate(ro_f_values):
-                    schedule.add(X(this_qubit))
-                    schedule.add(
-                        DRAGPulse(
-                            duration=mw_pulse_duration,
-                            G_amp=mw_ef_amp180,
-                            D_amp=0,
-                            port=mw_pulse_port,
-                            clock=this_mw_clock,
-                            phase=0,
-                        ),
-                    )
-
-                    schedule.add(
-                        SetClockFrequency(clock=this_ro_clock, clock_freq_new=ro_frequency),
-                    )
-
-                    ro_pulse = schedule.add(
-                        SquarePulse(
-                            duration=ro_pulse_duration,
-                            amp=ro_pulse_amplitude,
-                            port=ro_port,
-                            clock=this_ro_clock,
-                        ),
-                    )
-
-                    schedule.add(
-                        SSBIntegrationComplex(
-                            duration=integration_time,
-                            port=ro_port,
-                            clock=this_ro_clock,
-                            acq_index=acq_index,
-                            acq_channel=acq_cha,
-                            bin_mode=BinMode.AVERAGE
-                        ),
-                        ref_op=ro_pulse, ref_pt="start",
-                        rel_time=acquisition_delay,
-                    )
-
-                    schedule.add(Reset(this_qubit))
+                    elif qubit_state == 2:
+                        this_index = acq_index + 2 * number_of_frequencies
+                        self.measure_second_excited(
+                            schedule, this_qubit, this_index, acq_cha, this_ro_clock, ro_frequency,
+                            ro_pulse_duration,integration_time,acquisition_delay,ro_pulse_amplitude,ro_port,
+                            mw_pulse_duration, mw_ef_amp180, mw_pulse_port, this_mw_clock
+                        )
 
         return schedule

@@ -97,7 +97,7 @@ def configure_dataset(
         data_values = raw_ds[key].values
 
         if node.name == 'ro_amplitude_two_state_optimization' or node.name == 'ro_amplitude_three_state_optimization':
-            loops = node.node_dictionary['loop_repetitions']
+            loops = node.schedule_keywords['loop_repetitions']
             for key in coords_dict.keys():
                 if measured_qubit in key and 'ro_amplitudes' in key:
                     ampls = coords_dict[key][1]

@@ -101,12 +101,12 @@ class RO_frequency_two_state_optimization_Node(BaseNode):
         self.qubit_state = 0
 
         self.schedule_samplespace = {
-            'qubit_states': {
-                qubit: [0,1] for qubit in self.all_qubits
-            },
             'ro_opt_frequencies': {
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             },
+            'qubit_states': {
+                qubit: [0,1] for qubit in self.all_qubits
+            }
         }
 
 
@@ -148,7 +148,8 @@ class RO_amplitude_two_state_optimization_Node(BaseNode):
             'measure_2state_opt:threshold'
         ]
         self.qubit_state = 1
-        self.schedule_keywords = schedule_keywords
+        # FIXME: This is a sort of hack to ignore the couplers
+        self.schedule_keywords = {}
         self.schedule_keywords['loop_repetitions'] = 1000
         self.plots_per_qubit = 3 #  fidelity plot, IQ shots, confusion matrix
 
@@ -157,8 +158,8 @@ class RO_amplitude_two_state_optimization_Node(BaseNode):
         self.schedule_samplespace = {
             'qubit_states': {
                 qubit: np.tile(
-                    np.array([0,1], dtype=np.int16), loops
-                )  for qubit in self.all_qubits
+                    np.array([0, 1], dtype=np.int16), self.loops
+                ) for qubit in self.all_qubits
             },
             'ro_amplitudes': {
                 qubit: np.linspace(0.001, 0.01, 11) for qubit in self.all_qubits
@@ -178,7 +179,7 @@ class RO_amplitude_three_state_optimization_Node(BaseNode):
         self.qubit_state = 2
         self.measurement_obj = RO_amplitude_optimization
         self.analysis_obj = OptimalRO_Three_state_AmplitudeAnalysis
-        self.schedule_keywords = schedule_keywords
+        self.schedule_keywords = {}
         self.schedule_keywords['loop_repetitions'] = 256
         self.plots_per_qubit = 3 #  fidelity plot, IQ shots, confusion matrix
         self.loops = self.schedule_keywords['loop_repetitions']
