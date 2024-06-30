@@ -1,7 +1,10 @@
 from tergite_acl.config.VNA_values import (
-    VNA_resonator_frequencies, VNA_qubit_frequencies, VNA_f12_frequencies
+    VNA_resonator_frequencies,
+    VNA_qubit_frequencies,
+    VNA_f12_frequencies,
 )
 import numpy as np
+
 
 def resonator_samples(qubit: str) -> np.ndarray:
     res_spec_samples = 151
@@ -12,12 +15,12 @@ def resonator_samples(qubit: str) -> np.ndarray:
     return np.linspace(min_freq, max_freq, res_spec_samples)
 
 
-def qubit_samples(qubit: str, transition: str = '01') -> np.ndarray:
-    qub_spec_samples = 121
-    sweep_range =  40.0e6
-    if transition == '01':
+def qubit_samples(qubit: str, transition: str = "01") -> np.ndarray:
+    qub_spec_samples = 61
+    sweep_range = 5.0e6
+    if transition == "01":
         VNA_frequency = VNA_qubit_frequencies[qubit]
-    elif transition == '12':
+    elif transition == "12":
         VNA_frequency = VNA_f12_frequencies[qubit]
     else:
         VNA_frequency = VNA_value  # TODO: this should have a value
