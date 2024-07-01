@@ -11,13 +11,13 @@ from quantify_scheduler.resources import ClockResource
 
 from tergite_autocalibration.config.coupler_config import qubit_types
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
-from tergite_autocalibration.lib.measurement_base import Measurement
+from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.utils.extended_gates import Measure_RO_Opt, Rxy_12
 from tergite_autocalibration.utils.extended_coupler_edge import CompositeSquareEdge
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 import itertools
 
-class CZ_calibration(Measurement):
+class CZ_calibration(BaseMeasurement):
 
     def __init__(self, transmons: dict[str, ExtendedTransmon],couplers: dict[str, CompositeSquareEdge], qubit_state: int = 0):
         super().__init__(transmons)
@@ -218,7 +218,7 @@ class CZ_calibration(Measurement):
 
 
 
-class CZ_calibration_SSRO(Measurement):
+class CZ_calibration_SSRO(BaseMeasurement):
 
     def __init__(self, transmons: dict[str, ExtendedTransmon],couplers: dict[str, CompositeSquareEdge], qubit_state: int = 0):
         super().__init__(transmons)
@@ -426,7 +426,7 @@ class CZ_calibration_SSRO(Measurement):
 
 
 
-class CZ_calibration_duration(Measurement):
+class CZ_calibration_duration(BaseMeasurement):
 
     def __init__(self, transmons, coupler, qubit_state: int = 0):
         super().__init__(transmons)

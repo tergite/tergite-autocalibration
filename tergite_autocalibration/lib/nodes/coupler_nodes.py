@@ -1,8 +1,7 @@
-import numpy as np
+from pathlib import Path
 
-from tergite_autocalibration.lib.analysis.cz_firstStep_analysis import CZFirtStepAnalysis
-from tergite_autocalibration.lib.calibration_schedules.cz_chevron_reversed import CZ_chevron
-from tergite_autocalibration.lib.calibration_schedules.reset_calibration import Reset_calibration_SSRO
+import numpy as np
+import scipy.optimize as optimize
 
 from tergite_autocalibration.config.coupler_config import coupler_spi_map
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
@@ -12,16 +11,20 @@ from tergite_autocalibration.lib.analysis.cz_calibration_analysis import CZCalib
 from tergite_autocalibration.lib.analysis.cz_chevron_analysis import CZChevronAnalysis
 from tergite_autocalibration.lib.analysis.cz_chevron_analysis import CZChevronAnalysisReset, \
     CZChevronAmplitudeAnalysis
+from tergite_autocalibration.lib.analysis.cz_firstStep_analysis import CZFirtStepAnalysis
 from tergite_autocalibration.lib.analysis.randomized_benchmarking_analysis import RandomizedBenchmarkingAnalysis
 from tergite_autocalibration.lib.analysis.reset_calibration_analysis import ResetCalibrationSSROAnalysis
+from tergite_autocalibration.lib.base.node import BaseNode
+from tergite_autocalibration.lib.base.node_subclasses import ParametrizedSweepNode
 from tergite_autocalibration.lib.calibration_schedules.cz_calibration import CZ_calibration, CZ_calibration_SSRO
+from tergite_autocalibration.lib.calibration_schedules.cz_chevron_reversed import CZ_chevron
 from tergite_autocalibration.lib.calibration_schedules.cz_chevron_reversed import CZ_chevron_amplitude
 from tergite_autocalibration.lib.calibration_schedules.randomized_benchmarking import TQG_Randomized_Benchmarking
 from tergite_autocalibration.lib.calibration_schedules.reset_calibration import Reset_calibration_SSRO
 from tergite_autocalibration.lib.calibration_schedules.resonator_spectroscopy import Resonator_Spectroscopy
 from tergite_autocalibration.lib.calibration_schedules.two_tone_multidim import Two_Tones_Multidim
-from tergite_autocalibration.lib.node_base import BaseNode
 from tergite_autocalibration.lib.nodes.node_utils import qubit_samples, resonator_samples
+from tergite_autocalibration.utils.enums import MeasurementMode
 from tergite_autocalibration.utils.hardware_utils import SpiDAC
 
 RB_REPEATS = 10
@@ -93,6 +96,49 @@ class Coupler_Spectroscopy_Node(BaseNode):
             'spec_frequencies': {self.measurement_qubit: qubit_samples(self.measurement_qubit)}
         }
         return cluster_samplespace
+
+    def calibrate(self, data_path: Path, lab_ic, cluster_status):
+        print('Performing optimized Sweep')
+        compiled_schedule = self.precompile(data_path)
+
+        optimization_element = 'q13_q14'
+
+        optimization_guess = 100e-6
+
+        spi = SpiDAC()
+        dac = spi.create_spi_dac(optimization_element)
+
+        def set_optimizing_parameter(optimizing_parameter):
+            if self.name == 'cz_chevron_optimize':
+                spi.set_dac_current(dac, optimizing_parameter)
+
+
+        def single_sweep(optimizing_parameter) -> float:
+            set_optimizing_parameter(optimizing_parameter)
+
+            result_dataset = self.measure_node(
+                compiled_schedule,
+                lab_ic,
+                data_path,
+                cluster_mode=MeasurementMode.real,
+            )
+
+            measurement_result_ = self.post_process(result_dataset, data_path=data_path)
+
+            optimization_quantity = measurement_result_[optimization_element][self.optimization_field]
+
+            return optimization_quantity
+
+        optimize.minimize(
+            single_sweep,
+            optimization_guess,
+            method='Nelder-Mead',
+            bounds=[(80e-6, 120e-6)],
+            options={'maxiter':2}
+        )
+
+        # TODO MERGE-CZ-GATE: I guess this is under active development, so, we do not have a measurement_result?
+        return None
 
 
 class Coupler_Resonator_Spectroscopy_Node(BaseNode):
@@ -539,7 +585,7 @@ class CZ_Dynamic_Phase_Swap_Node(BaseNode):
         }
 
 
-class TQG_Randomized_Benchmarking_Node(BaseNode):
+class TQG_Randomized_Benchmarking_Node(ParametrizedSweepNode):
     measurement_obj = TQG_Randomized_Benchmarking
     analysis_obj = RandomizedBenchmarkingAnalysis
 
@@ -600,7 +646,7 @@ class TQG_Randomized_Benchmarking_Node(BaseNode):
         return cluster_samplespace
 
 
-class TQG_Randomized_Benchmarking_Interleaved_Node(BaseNode):
+class TQG_Randomized_Benchmarking_Interleaved_Node(ParametrizedSweepNode):
     measurement_obj = TQG_Randomized_Benchmarking
     analysis_obj = RandomizedBenchmarkingAnalysis
 

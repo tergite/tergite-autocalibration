@@ -4,14 +4,14 @@ from quantify_scheduler.operations.acquisition_library import SSBIntegrationComp
 from quantify_scheduler.schedules.schedule import Schedule
 from quantify_scheduler.operations.pulse_library import DRAGPulse
 from quantify_scheduler.resources import ClockResource
-from tergite_autocalibration.lib.measurement_base import Measurement
+from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.control_flow_library import Loop
 import numpy as np
 
 
-class RO_amplitude_optimization(Measurement):
+class RO_amplitude_optimization(BaseMeasurement):
 
     def __init__(self,transmons: dict[str, ExtendedTransmon], qubit_state:int=0):
         super().__init__(transmons)

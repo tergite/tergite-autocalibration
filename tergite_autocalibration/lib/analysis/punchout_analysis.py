@@ -1,7 +1,7 @@
 import numpy as np
 import xarray as xr
 
-from tergite_autocalibration.lib.analysis_base import BaseAnalysis
+from tergite_autocalibration.lib.base.analysis import BaseAnalysis
 
 
 class PunchoutAnalysis(BaseAnalysis):

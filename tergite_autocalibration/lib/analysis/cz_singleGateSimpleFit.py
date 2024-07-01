@@ -1,4 +1,4 @@
-from tergite_autocalibration.lib.analysis_base import BaseAnalysis
+from tergite_autocalibration.lib.base.analysis import BaseAnalysis
 import xarray as xr
 import numpy as np
 from scipy.optimize import curve_fit

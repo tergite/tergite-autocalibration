@@ -5,11 +5,11 @@ import numpy as np
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.gate_library import Measure, Reset, Rxy, X
 from quantify_scheduler.schedules.schedule import Schedule
-from tergite_autocalibration.lib.measurement_base import Measurement
+from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 import tergite_autocalibration.utils.clifford_elements_decomposition as cliffords
 
 
-class Check_Cliffords(Measurement):
+class Check_Cliffords(BaseMeasurement):
     def __init__(self, transmons, qubit_state: int = 0):
         super().__init__(transmons)
         self.qubit_state = qubit_state

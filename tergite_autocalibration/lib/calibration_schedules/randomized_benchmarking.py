@@ -2,13 +2,13 @@
 Module containing a schedule class for randomized benchmarking measurement.
 """
 import numpy as np
-from quantify_scheduler.operations.gate_library import Measure, Reset, X90, Rxy, X, CZ
-from tergite_autocalibration.utils.extended_gates import Measure_RO1, Measure_RO_Opt, Rxy_12
-from quantify_scheduler.operations.pulse_library import ResetClockPhase, SoftSquarePulse, IdlePulse
+from quantify_scheduler.operations.gate_library import Measure, Reset, Rxy, X, CZ
+from tergite_autocalibration.utils.extended_gates import Rxy_12
+from quantify_scheduler.operations.pulse_library import IdlePulse
 
 from quantify_scheduler.schedules.schedule import Schedule
 
-from tergite_autocalibration.lib.measurement_base import Measurement
+from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 import tergite_autocalibration.utils.clifford_elements_decomposition as cliffords
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 from tergite_autocalibration.utils.extended_coupler_edge import CompositeSquareEdge
@@ -18,7 +18,7 @@ from quantify_scheduler.resources import ClockResource
 # from superconduction_qubit_tools.clifford_module.cliffords_decomposition import (decompose_clifford_seq,)
 # from superconduction_qubit_tools.utils.clifford_module.from_list import (add_single_qubit_gates_to_schedule,add_two_qubit_gates_to_schedule,)
 
-class Randomized_Benchmarking(Measurement):
+class Randomized_Benchmarking(BaseMeasurement):
     def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
         super().__init__(transmons)
         self.qubit_state = qubit_state
@@ -126,7 +126,7 @@ class Randomized_Benchmarking(Measurement):
 
         return schedule
 
-class TQG_Randomized_Benchmarking(Measurement):
+class TQG_Randomized_Benchmarking(BaseMeasurement):
     def __init__(self, transmons: dict[str, ExtendedTransmon], couplers: dict[str, CompositeSquareEdge],
                  qubit_state: int = 0):
         super().__init__(transmons)
@@ -257,7 +257,7 @@ class TQG_Randomized_Benchmarking(Measurement):
             schedule.add(Reset(this_qubit))
         return schedule
 
-class Cross_Entropy_Randomized_Benchmarking_Backup(Measurement):
+class Cross_Entropy_Randomized_Benchmarking_Backup(BaseMeasurement):
     def __init__(self, transmons: dict[str, ExtendedTransmon], couplers: dict[str, CompositeSquareEdge],
                  qubit_state: int = 0):
         super().__init__(transmons)

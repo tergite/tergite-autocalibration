@@ -1,7 +1,7 @@
 import toml
 
 from tergite_autocalibration.config.settings import DEVICE_CONFIG, REDIS_CONNECTION
-from tergite_autocalibration.lib.node_factory import NodeFactory
+from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.utils import user_input
 from tergite_autocalibration.utils.convert import structured_redis_storage
 

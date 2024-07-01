@@ -6,7 +6,7 @@ import numpy as np
 import xarray as xr
 from quantify_core.analysis.fitting_models import ExpDecayModel, fft_freq_phase_guess
 
-from tergite_autocalibration.lib.analysis_base import BaseAnalysis
+from tergite_autocalibration.lib.base.analysis import BaseAnalysis
 
 
 class T1Analysis(BaseAnalysis):

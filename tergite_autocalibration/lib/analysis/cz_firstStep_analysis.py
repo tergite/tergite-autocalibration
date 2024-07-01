@@ -1,12 +1,11 @@
 import glob
-import h5py
 from pathlib import Path
 import xarray as xr
 from typing import Type
 from tergite_autocalibration.lib.analysis.cz_FitResultStatus import FitResultStatus
 from tergite_autocalibration.lib.analysis.cz_firstStepCombination import CZFirstStepCombination, CZSimpleFitAnalysisResult
 from tergite_autocalibration.lib.analysis.cz_singleGateSimpleFit import CZSingleGateSimpleFit
-from tergite_autocalibration.lib.analysis_base import BaseAnalysis
+from tergite_autocalibration.lib.base.analysis import BaseAnalysis
 
 class CZFirtStepAnalysis(BaseAnalysis):
     def __init__(self, baseFolder: Type[Path], date,  dataFolder: Type[Path], qubit1, qubit2):

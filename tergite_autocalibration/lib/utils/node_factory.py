@@ -19,7 +19,6 @@ from tergite_autocalibration.lib.nodes.coupler_nodes import (
     CZ_Characterisation_Chevron_Node
 )
 from tergite_autocalibration.lib.nodes.qubit_control_nodes import (
-    Adaptive_Motzoi_Parameter_Node,
     Adaptive_Ramsey_Fringes_Node,
     Motzoi_Parameter_Node,
     N_Rabi_Oscillations_Node,

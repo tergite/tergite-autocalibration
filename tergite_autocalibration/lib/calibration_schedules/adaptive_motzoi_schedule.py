@@ -6,11 +6,11 @@ from quantify_scheduler.resources import ClockResource
 from quantify_scheduler import Schedule
 from quantify_scheduler.operations.pulse_library import DRAGPulse
 from quantify_scheduler.operations.gate_library import Measure, Reset
-from tergite_autocalibration.lib.measurement_base import Measurement
+from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 import numpy as np
 
-class Motzoi_parameter(Measurement):
+class Motzoi_parameter(BaseMeasurement):
 
     def __init__(self,transmons: dict[str, ExtendedTransmon], qubit_state=0):
         super().__init__(transmons)

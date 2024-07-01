@@ -5,11 +5,11 @@ from quantify_scheduler.resources import ClockResource
 from quantify_scheduler import Schedule
 from quantify_scheduler.operations.pulse_library import DRAGPulse
 from quantify_scheduler.operations.gate_library import Measure, Reset
-from tergite_autocalibration.lib.measurement_base import Measurement
+from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 
 import numpy as np
 
-class XY_cross(Measurement):
+class XY_cross(BaseMeasurement):
 
     def __init__(self,transmons):
         super().__init__(transmons)

@@ -7,7 +7,7 @@ import numpy as np
 import xarray as xr
 from scipy import signal
 
-from tergite_autocalibration.lib.analysis_base import BaseAnalysis
+from tergite_autocalibration.lib.base.analysis import BaseAnalysis
 
 
 # Lorentzian function that is fit to qubit spectroscopy peaks

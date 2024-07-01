@@ -6,7 +6,7 @@ import numpy as np
 import xarray as xr
 from matplotlib.axes import Axes
 
-from tergite_autocalibration.lib.analysis_base import BaseAnalysis
+from tergite_autocalibration.lib.base.analysis import BaseAnalysis
 
 
 def exponential_decay_function(m: float, p: float, A: float, B: float) -> float:

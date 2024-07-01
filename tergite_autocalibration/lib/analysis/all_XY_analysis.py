@@ -1,10 +1,7 @@
-import lmfit
-from matplotlib.pyplot import plot
 import numpy as np
 import xarray as xr
-from quantify_core.analysis.fitting_models import fft_freq_phase_guess
 
-from tergite_autocalibration.lib.analysis_base import BaseAnalysis
+from tergite_autocalibration.lib.base.analysis import BaseAnalysis
 from tergite_autocalibration.lib.calibration_schedules.all_XY import all_XY_angles
 
 

@@ -11,9 +11,9 @@ from tergite_autocalibration.utils.extended_transmon_element import ExtendedTran
 from tergite_autocalibration.utils.extended_gates import Measure_RO1
 import numpy as np
 
-from tergite_autocalibration.lib.measurement_base import Measurement
+from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 
-class Two_Tones_Multidim(Measurement):
+class Two_Tones_Multidim(BaseMeasurement):
 
     def __init__(self,transmons: dict[str, ExtendedTransmon], qubit_state:int=0):
         super().__init__(transmons)

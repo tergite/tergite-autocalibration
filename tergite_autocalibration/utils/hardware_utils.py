@@ -8,7 +8,6 @@ from qcodes import validators
 
 from tergite_autocalibration.config.coupler_config import coupler_spi_map
 from tergite_autocalibration.config.settings import REDIS_CONNECTION, HARDWARE_CONFIG
-from tergite_autocalibration.functions.execution_worker import measure_node
 from tergite_autocalibration.utils.enums import MeasurementMode
 
 

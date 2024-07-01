@@ -4,7 +4,7 @@ import xarray as xr
 from numpy.polynomial.polynomial import Polynomial
 
 from tergite_autocalibration.lib.analysis.qubit_spectroscopy_analysis import QubitSpectroscopyAnalysis
-from tergite_autocalibration.lib.analysis_base import BaseAnalysis
+from tergite_autocalibration.lib.base.analysis import BaseAnalysis
 
 
 class CouplerSpectroscopyAnalysis(BaseAnalysis):

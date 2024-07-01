@@ -2,14 +2,13 @@
 Module containing a class that fits data from a resonator spectroscopy experiment.
 """
 import numpy as np
-import redis
 import xarray as xr
 from numpy.linalg import inv
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
-from tergite_autocalibration.lib.analysis_base import BaseAnalysis
+from tergite_autocalibration.lib.base.analysis import BaseAnalysis
 from tergite_autocalibration.utils.convert import structured_redis_storage
 
 

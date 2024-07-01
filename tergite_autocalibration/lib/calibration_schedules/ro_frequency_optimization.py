@@ -10,10 +10,10 @@ from quantify_scheduler.operations.pulse_library import (
 from quantify_scheduler.resources import ClockResource
 from quantify_scheduler.schedules.schedule import Schedule
 
-from tergite_autocalibration.lib.measurement_base import Measurement
+from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 
-class RO_frequency_optimization(Measurement):
+class RO_frequency_optimization(BaseMeasurement):
 
     def __init__(self,transmons: dict[str, ExtendedTransmon], qubits_state):
         super().__init__(transmons)

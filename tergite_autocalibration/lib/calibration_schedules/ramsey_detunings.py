@@ -3,13 +3,13 @@ from quantify_scheduler import Schedule
 from quantify_scheduler.operations.gate_library import Measure, Reset, X90, Rxy, X
 from quantify_scheduler.operations.pulse_library import DRAGPulse
 from quantify_scheduler.resources import ClockResource
-from tergite_autocalibration.lib.measurement_base import Measurement
+from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.utils.extended_gates import Measure_RO1
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 
 import numpy as np
 
-class Ramsey_detunings(Measurement):
+class Ramsey_detunings(BaseMeasurement):
 
     def __init__(self,transmons: dict[str, ExtendedTransmon],qubit_state:int=0):
         super().__init__(transmons)

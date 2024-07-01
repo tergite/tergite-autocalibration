@@ -3,13 +3,12 @@ from time import sleep
 import numpy as np
 
 from tergite_autocalibration.lib.analysis.T1_analysis import T1Analysis, T2Analysis, T2EchoAnalysis
-from tergite_autocalibration.lib.analysis.check_cliffords_analysis import CheckCliffordsAnalysis
 from tergite_autocalibration.lib.analysis.all_XY_analysis import All_XY_Analysis
 # from analysis.cz_chevron_analysis import CZChevronAnalysis, CZChevronAnalysisReset
 from tergite_autocalibration.lib.analysis.randomized_benchmarking_analysis import RandomizedBenchmarkingAnalysis
-from tergite_autocalibration.lib.node_base import BaseNode
+from tergite_autocalibration.lib.base.node import BaseNode
+from tergite_autocalibration.lib.base.node_subclasses import ParametrizedSweepNode
 from tergite_autocalibration.lib.calibration_schedules.T1 import T1, T2, T2Echo
-from tergite_autocalibration.lib.calibration_schedules.check_cliffords import Check_Cliffords
 from tergite_autocalibration.lib.calibration_schedules.randomized_benchmarking import Randomized_Benchmarking
 from tergite_autocalibration.lib.calibration_schedules.all_XY import All_XY
 
@@ -72,7 +71,7 @@ class T1_Node(BaseNode):
             sleep(self.sleep_time)
 
 
-class Randomized_Benchmarking_Node(BaseNode):
+class Randomized_Benchmarking_Node(ParametrizedSweepNode):
     measurement_obj = Randomized_Benchmarking
     analysis_obj = RandomizedBenchmarkingAnalysis
 

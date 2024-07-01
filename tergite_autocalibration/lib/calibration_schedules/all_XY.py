@@ -1,9 +1,7 @@
-from quantify_scheduler.resources import ClockResource
-from quantify_scheduler.enums import BinMode
 from quantify_scheduler import Schedule
 from quantify_scheduler.operations.gate_library import X, Measure, Reset, Rxy
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
-from tergite_autocalibration.lib.measurement_base import Measurement
+from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 import numpy as np
 
 all_XY_angles = {
@@ -31,7 +29,7 @@ all_XY_angles = {
 }
 
 
-class All_XY(Measurement):
+class All_XY(BaseMeasurement):
 
     def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
         super().__init__(transmons)

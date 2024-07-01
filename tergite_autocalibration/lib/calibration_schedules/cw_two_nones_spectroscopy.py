@@ -1,14 +1,13 @@
 """
 Module containing a schedule class for Rabi calibration.
 """
-from quantify_scheduler.resources import ClockResource
 from quantify_scheduler import Schedule
 from quantify_scheduler.operations.gate_library import Measure, Reset
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
-from tergite_autocalibration.lib.measurement_base import Measurement
+from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 
 
-class CW_Two_Tones_Spectroscopy(Measurement):
+class CW_Two_Tones_Spectroscopy(BaseMeasurement):
 
     def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
         super().__init__(transmons)

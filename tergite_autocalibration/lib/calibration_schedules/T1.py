@@ -4,11 +4,11 @@ Module containing a schedule class for T1 and T2 coherence time measurement.
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler import Schedule
 from quantify_scheduler.operations.gate_library import Measure, Reset, X, X90
-from tergite_autocalibration.lib.measurement_base import Measurement
+from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 import numpy as np
 
-class T1(Measurement):
+class T1(BaseMeasurement):
 
     def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
         super().__init__(transmons)
@@ -71,7 +71,7 @@ class T1(Measurement):
 
         return schedule
 
-class T2(Measurement):
+class T2(BaseMeasurement):
 
     def __init__(self,transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
         super().__init__(transmons)
@@ -130,7 +130,7 @@ class T2(Measurement):
                 schedule.add(Reset(this_qubit))
         return schedule
 
-class T2Echo(Measurement):
+class T2Echo(BaseMeasurement):
 
     def __init__(self,transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
         super().__init__(transmons)

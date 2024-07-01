@@ -3,21 +3,18 @@ Module containing a schedule class for Ramsey calibration. (1D parameter sweep, 
 """
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler import Schedule
-from quantify_scheduler.operations.gate_library import Measure, Reset, X90, Rxy, X, CZ
-from quantify_scheduler.operations.pulse_library import GaussPulse,SuddenNetZeroPulse,ResetClockPhase,IdlePulse,DRAGPulse,SetClockFrequency,NumericalPulse,SoftSquarePulse,SquarePulse
-from quantify_scheduler.operations.pulse_library import RampPulse,DRAGPulse,SetClockFrequency,NumericalPulse,SoftSquarePulse,SquarePulse, ResetClockPhase
+from quantify_scheduler.operations.gate_library import Measure, Reset, X
+from quantify_scheduler.operations.pulse_library import IdlePulse
+from quantify_scheduler.operations.pulse_library import SetClockFrequency, SoftSquarePulse, ResetClockPhase
 from quantify_scheduler.resources import ClockResource
-from tergite_autocalibration.lib.measurement_base import Measurement
-from tergite_autocalibration.utils.extended_gates import Measure_RO1, Rxy_12
-from tergite_autocalibration.config.coupler_config import edge_group, qubit_types
-from matplotlib import pyplot as plt
+from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.utils.extended_coupler_edge import CompositeSquareEdge
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 
 import numpy as np
-import redis
 
-class CZ_chevron(Measurement):
+
+class CZ_chevron(BaseMeasurement):
 
     def __init__(self, transmons: dict[str, ExtendedTransmon],couplers: dict[str, CompositeSquareEdge], qubit_state: int = 0):
         super().__init__(transmons)
@@ -135,7 +132,7 @@ class CZ_chevron(Measurement):
                     )
         return schedule
 
-class CZ_chevron_amplitude(Measurement):
+class CZ_chevron_amplitude(BaseMeasurement):
 
     def __init__(self, transmons: dict[str, ExtendedTransmon],couplers: dict[str, CompositeSquareEdge], qubit_state: int = 0):
         super().__init__(transmons)

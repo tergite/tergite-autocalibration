@@ -7,8 +7,7 @@ import xarray
 
 from collections.abc import Iterable
 from tergite_autocalibration.config.settings import DATA_DIR
-from tergite_autocalibration.lib.demod_channels import ParallelDemodChannels
-from tergite_autocalibration.lib.node_base import BaseNode
+
 
 def configure_dataset(
         raw_ds: xarray.Dataset,
@@ -220,10 +219,10 @@ def retrieve_dummy_dataset(node) -> xarray.Dataset:
 
 
 
-def save_dataset(result_dataset: xarray.Dataset, node, data_path: pathlib.Path):
+def save_dataset(result_dataset: xarray.Dataset, node_name: str, data_path: pathlib.Path):
     data_path.mkdir(parents=True, exist_ok=True)
     measurement_id = data_path.stem[0:19]
-    result_dataset = result_dataset.assign_attrs({'name': node.name, 'tuid': measurement_id})
+    result_dataset = result_dataset.assign_attrs({'name': node_name, 'tuid': measurement_id})
     result_dataset_real = to_real_dataset(result_dataset)
     # to_netcdf doesn't like complex numbers, convert to real/imag to save:
     count = 0

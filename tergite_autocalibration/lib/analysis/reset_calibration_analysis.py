@@ -1,17 +1,15 @@
 import numpy as np
 import xarray as xr
-import lmfit
-from quantify_core.analysis.fitting_models import fft_freq_phase_guess
-from tergite_autocalibration.config.coupler_config import edge_group, qubit_types
+from tergite_autocalibration.config.coupler_config import qubit_types
 import matplotlib.pyplot as plt
 
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from sklearn.metrics import confusion_matrix,ConfusionMatrixDisplay
+from sklearn.metrics import confusion_matrix
 from scipy.linalg import norm
 from scipy.optimize import minimize
 from numpy.linalg import inv
 import itertools
-from tergite_autocalibration.lib.analysis_base import BaseAnalysis
+from tergite_autocalibration.lib.base.analysis import BaseAnalysis
 
 
 def mitigate(v,cm_inv):
