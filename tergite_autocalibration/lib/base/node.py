@@ -1,3 +1,17 @@
+# This code is part of Tergite
+#
+# (C) Copyright Eleftherios Moschandreou 2023, 2024
+# (C) Copyright Liangyu Chen 2023, 2024
+# (C) Copyright Stefan Hill 2024
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+
 import abc
 import collections
 import json
@@ -401,6 +415,7 @@ class BaseNode(abc.ABC):
         schedule_duration: float,
         cluster_status,
     ) -> xarray.Dataset:
+        # TODO: Could move to helper function, because is static
 
         logger.info("Starting measurement")
 
@@ -480,6 +495,7 @@ class BaseNode(abc.ABC):
             node_analysis.qoi = qoi
 
             if self.type == "adaptive_sweep":
+                # TODO: Is there even an adaptive sweep anywere?
                 # fetch relative kwargs, e.g. known minima in motzoi calibration
                 qubit_adaptive_kwargs = self.adaptive_kwargs[this_qubit]
                 # every adaptive iteration should update the samplespace ...

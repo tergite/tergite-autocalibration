@@ -1,6 +1,17 @@
-"""
-Module containing a base class that defines the basic principles used in all calibration schedule classes.
-"""
+# This code is part of Tergite
+#
+# (C) Copyright Eleftherios Moschandreou 2023, 2024
+# (C) Copyright Liangyu Chen 2023, 2024
+# (C) Copyright Stefan Hill 2024
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+
 from quantify_scheduler.enums import BinMode
 
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
@@ -24,11 +35,13 @@ class BaseMeasurement:
 
         for transmon in self.transmons.values():
             qubit = transmon.name
-            if parameter == 'readout_port':
+            if parameter == "readout_port":
                 attr_dict[qubit] = transmon.ports.readout()
-            elif parameter == 'artificial_detuning':
-                redis_key = f'transmons:{qubit}'
-                attr_dict[qubit] = float(REDIS_CONNECTION.hget(f"{redis_key}", parameter))
+            elif parameter == "artificial_detuning":
+                redis_key = f"transmons:{qubit}"
+                attr_dict[qubit] = float(
+                    REDIS_CONNECTION.hget(f"{redis_key}", parameter)
+                )
             else:
                 for submodule in transmon.submodules.values():
                     if parameter in submodule.parameters:
