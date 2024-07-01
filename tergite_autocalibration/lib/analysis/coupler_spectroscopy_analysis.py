@@ -3,7 +3,9 @@ import numpy as np
 import xarray as xr
 from numpy.polynomial.polynomial import Polynomial
 
-from tergite_autocalibration.lib.analysis.qubit_spectroscopy_analysis import QubitSpectroscopyAnalysis
+from tergite_autocalibration.lib.analysis.qubit_spectroscopy_analysis import (
+    QubitSpectroscopyAnalysis,
+)
 from tergite_autocalibration.lib.base.analysis import BaseAnalysis
 
 
@@ -11,14 +13,14 @@ class CouplerSpectroscopyAnalysis(BaseAnalysis):
     def __init__(self, dataset: xr.Dataset):
         super().__init__()
         data_var = list(dataset.data_vars.keys())[0]
-        self.qubit = dataset[data_var].attrs['qubit']
+        self.qubit = dataset[data_var].attrs["qubit"]
         self.S21 = dataset[data_var].values
         for coord in dataset[data_var].coords:
-            if 'frequencies' in coord:
+            if "frequencies" in coord:
                 self.frequencies = coord
-            elif 'currents' in coord:
+            elif "currents" in coord:
                 self.currents = coord
-        dataset[f'y{self.qubit}'].values = np.abs(self.S21)
+        dataset[f"y{self.qubit}"].values = np.abs(self.S21)
         self.data_var = data_var
         self.dataset = dataset.sortby(self.currents)
 
@@ -29,11 +31,11 @@ class CouplerSpectroscopyAnalysis(BaseAnalysis):
         return np.array(s > m)
 
     def run_fitting(self):
-        self.dc_currents = self.dataset[f'y{self.qubit}'][self.currents]
+        self.dc_currents = self.dataset[f"y{self.qubit}"][self.currents]
         self.detected_frequencies = []
         self.detected_currents = []
         for i, current in enumerate(self.dc_currents.values):
-            partial_ds = self.dataset[f'y{self.qubit}'].isel({self.currents: [i]})[:,0]
+            partial_ds = self.dataset[f"y{self.qubit}"].isel({self.currents: [i]})[:, 0]
             analysis = QubitSpectroscopyAnalysis(partial_ds.to_dataset())
             qubit_frequency = analysis.run_fitting()[0]
             if not np.isnan(qubit_frequency):
@@ -56,7 +58,7 @@ class CouplerSpectroscopyAnalysis(BaseAnalysis):
                 roots.append(root)
                 root_frequencies.append(coupler_fit(root))
         if len(roots) == 0:
-            print('No Roots Found, returning zero current')
+            print("No Roots Found, returning zero current")
             return [0]
         I0 = roots[np.argmin(np.abs(roots))]
         I1 = roots[np.argmax(np.abs(roots))]
@@ -69,8 +71,16 @@ class CouplerSpectroscopyAnalysis(BaseAnalysis):
 
     def plotter(self, ax: plt.Axes):
         self.dataset[self.data_var].plot(ax=ax, x=self.frequencies)
-        ax.scatter(self.detected_frequencies, self.detected_currents, s=52, c='red')
-        if hasattr(self, 'root_frequencies'):
-            ax.scatter(self.root_frequencies, self.roots, s=64, c='black', label=r'$\Phi_0$')
-        if hasattr(self, 'parking_I'):
-            ax.axhline(self.parking_I, lw=5, ls='dashed', c='orange', label=f'parking current = {self.parking_I}')
+        ax.scatter(self.detected_frequencies, self.detected_currents, s=52, c="red")
+        if hasattr(self, "root_frequencies"):
+            ax.scatter(
+                self.root_frequencies, self.roots, s=64, c="black", label=r"$\Phi_0$"
+            )
+        if hasattr(self, "parking_I"):
+            ax.axhline(
+                self.parking_I,
+                lw=5,
+                ls="dashed",
+                c="orange",
+                label=f"parking current = {self.parking_I}",
+            )

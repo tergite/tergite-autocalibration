@@ -73,7 +73,6 @@ matplotlib.use(settings.PLOTTING_BACKEND)
 
 
 class BaseNode(abc.ABC):
-
     measurement_obj: "BaseMeasurement"
     analysis_obj: "BaseAnalysis"
 
@@ -449,7 +448,6 @@ class BaseNode(abc.ABC):
         return raw_dataset
 
     def post_process(self, result_dataset: xr.Dataset, data_path: Path):
-
         if self.name == "tof":
             tof = analyze_tof(result_dataset, True)
             return

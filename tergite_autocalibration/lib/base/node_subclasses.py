@@ -19,7 +19,6 @@ from tergite_autocalibration.utils.logger.tac_logger import logger
 
 
 class ParametrizedSweepNode(BaseNode):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

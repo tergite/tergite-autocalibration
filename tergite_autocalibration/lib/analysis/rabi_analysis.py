@@ -11,11 +11,11 @@ from tergite_autocalibration.lib.base.analysis import BaseAnalysis
 
 # Cosine function that is fit to Rabi oscillations
 def cos_func(
-        drive_amp: float,
-        frequency: float,
-        amplitude: float,
-        offset: float,
-        phase: float,
+    drive_amp: float,
+    frequency: float,
+    amplitude: float,
+    offset: float,
+    phase: float,
 ) -> float:
     return amplitude * np.cos(2 * np.pi * frequency * drive_amp + phase) + offset
 
@@ -69,7 +69,7 @@ class RabiAnalysis(BaseAnalysis):
         self.S21 = dataset[data_var].values
         self.independents = dataset[coord].values
         self.fit_results = {}
-        self.qubit = dataset[data_var].attrs['qubit']
+        self.qubit = dataset[data_var].attrs["qubit"]
 
     def run_fitting(self):
         # Initialize the Rabi model
@@ -79,23 +79,33 @@ class RabiAnalysis(BaseAnalysis):
         self.magnitudes = np.absolute(self.S21)
         amplitudes = self.independents
 
-        self.fit_amplitudes = np.linspace(amplitudes[0], amplitudes[-1], 400)  # x-values for plotting
+        self.fit_amplitudes = np.linspace(
+            amplitudes[0], amplitudes[-1], 400
+        )  # x-values for plotting
 
         # Gives an initial guess for the model parameters and then fits the model to the data.
         guess = model.guess(self.magnitudes, drive_amp=amplitudes)
         fit_result = model.fit(self.magnitudes, params=guess, drive_amp=amplitudes)
 
-        self.ampl = fit_result.params['amp180'].value
-        self.uncertainty = fit_result.params['amp180'].stderr
+        self.ampl = fit_result.params["amp180"].value
+        self.uncertainty = fit_result.params["amp180"].stderr
 
-        self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_amplitudes})
+        self.fit_y = model.eval(
+            fit_result.params, **{model.independent_vars[0]: self.fit_amplitudes}
+        )
         return [self.ampl]
 
     def plotter(self, ax):
         # Plots the data and the fitted model of a Rabi experiment
-        ax.plot(self.fit_amplitudes, self.fit_y, 'r-', lw=3.0, label=f" π_ampl = {self.ampl:.2E} (V)")
-        ax.plot(self.independents, self.magnitudes, 'bo-', ms=3.0)
-        ax.set_title(f'Rabi Oscillations for {self.qubit}')
-        ax.set_xlabel('Amplitude (V)')
-        ax.set_ylabel('|S21| (V)')
+        ax.plot(
+            self.fit_amplitudes,
+            self.fit_y,
+            "r-",
+            lw=3.0,
+            label=f" π_ampl = {self.ampl:.2E} (V)",
+        )
+        ax.plot(self.independents, self.magnitudes, "bo-", ms=3.0)
+        ax.set_title(f"Rabi Oscillations for {self.qubit}")
+        ax.set_xlabel("Amplitude (V)")
+        ax.set_ylabel("|S21| (V)")
         ax.grid()

@@ -5,8 +5,8 @@ import numpy as np
 # Analysis
 def analyze_tof(ds, plotting):
     # Determine when the signal crosses half-max for the first time (in ns)
-    p0 = ds['p0']
-    p1 = ds['p1']
+    p0 = ds["p0"]
+    p1 = ds["p1"]
     t_halfmax = np.where(np.abs(p0) > np.max(p0) / 2)[0][0]
 
     # The time it takes for a sine wave to reach its half-max value is (in ns)
@@ -34,8 +34,8 @@ def analyze_tof(ds, plotting):
             tof_measured + 70 / 50e6 * 1e9,
             # tof_measured + 70 / readout_module.sequencer0.nco_freq() * 1e9,
         )
-        plt.ylabel('Amplitude (V)')
-        plt.xlabel('Time (ns)')
+        plt.ylabel("Amplitude (V)")
+        plt.xlabel("Time (ns)")
         plt.show()
 
         # plt.plot(r["path0"]["data"], ".-")

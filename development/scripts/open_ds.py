@@ -7,27 +7,30 @@ import tergite_autocalibration.lib.analysis.optimum_ro_amplitude_analysis as roa
 import tergite_autocalibration.lib.analysis.motzoi_analysis as motzoi
 import tergite_autocalibration.lib.analysis.adaptive_motzoi_analysis as adm
 import tergite_autocalibration.lib.analysis.rabi_analysis as rabi
+
 importlib.reload(adm)
 
 
-ds = xr.open_dataset('data_directory/20240327/20240327-161604-043-a7be12-adaptive_motzoi_parameter/dataset.hdf5')
+ds = xr.open_dataset(
+    "data_directory/20240327/20240327-161604-043-a7be12-adaptive_motzoi_parameter/dataset.hdf5"
+)
 # print(f'{ ds.yq21.attrs = }')
 ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
 d12 = ds.yq12.to_dataset()
 d13 = ds.yq13.to_dataset()
 d14 = ds.yq14.to_dataset()
 
-d12.yq12.attrs['qubit'] = 'q12'
-ds12 = d12.yq12.isel({'X_repetitionsq12':[0]}).to_dataset()
-ds12 = ds12.drop_vars('X_repetitionsq12')
+d12.yq12.attrs["qubit"] = "q12"
+ds12 = d12.yq12.isel({"X_repetitionsq12": [0]}).to_dataset()
+ds12 = ds12.drop_vars("X_repetitionsq12")
 
-d13.yq13.attrs['qubit'] = 'q13'
-ds13 = d13.yq13.isel({'X_repetitionsq13':[0]}).to_dataset()
-ds13 = ds13.drop_vars('X_repetitionsq13')
+d13.yq13.attrs["qubit"] = "q13"
+ds13 = d13.yq13.isel({"X_repetitionsq13": [0]}).to_dataset()
+ds13 = ds13.drop_vars("X_repetitionsq13")
 
-d14.yq14.attrs['qubit'] = 'q14'
-ds14 = d14.yq14.isel({'X_repetitionsq14':[0]}).to_dataset()
-ds14 = ds14.drop_vars('X_repetitionsq14')
+d14.yq14.attrs["qubit"] = "q14"
+ds14 = d14.yq14.isel({"X_repetitionsq14": [0]}).to_dataset()
+ds14 = ds14.drop_vars("X_repetitionsq14")
 #
 ada = adm.AdaptiveMotzoiAnalysis(ds13, samples=41)
 ada.run_fitting()
@@ -37,7 +40,7 @@ ada.plotter(ax)
 
 
 plt.show()
-#---
+# ---
 #
 # fig, ax = plt.subplots()
 # rab.run_fitting()

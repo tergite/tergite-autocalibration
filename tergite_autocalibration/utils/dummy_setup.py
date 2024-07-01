@@ -17,12 +17,24 @@ def dummy_cluster(samplespace: dict):
     for subspace in samplespace.values():
         dimension *= len(list(subspace.values())[0])
 
-    dummy_data = [ DummyBinnedAcquisitionData(data=(1,6),thres=1,avg_cnt=1) for _ in range(dimension) ]
-    dummy_data_1 = [ DummyBinnedAcquisitionData(data=(1,3),thres=1,avg_cnt=1) for _ in range(dimension) ]
+    dummy_data = [
+        DummyBinnedAcquisitionData(data=(1, 6), thres=1, avg_cnt=1)
+        for _ in range(dimension)
+    ]
+    dummy_data_1 = [
+        DummyBinnedAcquisitionData(data=(1, 3), thres=1, avg_cnt=1)
+        for _ in range(dimension)
+    ]
     clusterA = Cluster("clusterA", dummy_cfg=dummy)
-    clusterA.set_dummy_binned_acquisition_data(16, sequencer=0, acq_index_name="0", data=dummy_data)
-    clusterA.set_dummy_binned_acquisition_data(16, sequencer=1, acq_index_name="1", data=dummy_data)
-    clusterA.set_dummy_binned_acquisition_data(16, sequencer=2, acq_index_name="2", data=dummy_data)
+    clusterA.set_dummy_binned_acquisition_data(
+        16, sequencer=0, acq_index_name="0", data=dummy_data
+    )
+    clusterA.set_dummy_binned_acquisition_data(
+        16, sequencer=1, acq_index_name="1", data=dummy_data
+    )
+    clusterA.set_dummy_binned_acquisition_data(
+        16, sequencer=2, acq_index_name="2", data=dummy_data
+    )
 
     # if node == 'ro_frequency_optimization':
     #     clusterA.set_dummy_binned_acquisition_data(16,sequencer=0,acq_index_name="3",data=dummy_data_1)

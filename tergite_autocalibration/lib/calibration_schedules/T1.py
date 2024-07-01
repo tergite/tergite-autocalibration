@@ -8,14 +8,16 @@ from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 import numpy as np
 
-class T1(BaseMeasurement):
 
+class T1(BaseMeasurement):
     def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
         super().__init__(transmons)
         self.qubit_state = qubit_state
         self.transmons = transmons
 
-    def single_qubit_T1(self, schedule: Schedule, qubit: str, acq_index: int, tau: float):
+    def single_qubit_T1(
+        self, schedule: Schedule, qubit: str, acq_index: int, tau: float
+    ):
         schedule.add(X(qubit))
         schedule.add(
             Measure(qubit, acq_index=acq_index, bin_mode=BinMode.AVERAGE),
@@ -27,7 +29,7 @@ class T1(BaseMeasurement):
     def schedule_function(
         self,
         delays: dict[str, np.ndarray],
-        multiplexing: str = 'parallel',
+        multiplexing: str = "parallel",
         repetitions: int = 1024,
     ) -> Schedule:
         """
@@ -52,28 +54,27 @@ class T1(BaseMeasurement):
 
         qubits = self.transmons.keys()
 
-        #This is the common reference operation so the qubits can be operated in parallel
+        # This is the common reference operation so the qubits can be operated in parallel
         root_relaxation = schedule.add(Reset(*qubits), label="Start")
 
-        #First loop over every qubit
+        # First loop over every qubit
         for this_qubit, times_val in delays.items():
-
-            if multiplexing == 'parallel':
+            if multiplexing == "parallel":
                 schedule.add(
-                    Reset(this_qubit), ref_op=root_relaxation, ref_pt='end'
+                    Reset(this_qubit), ref_op=root_relaxation, ref_pt="end"
                 )  # To enforce parallelism we refer to the root relaxation
-            elif multiplexing == 'one_by_one':
+            elif multiplexing == "one_by_one":
                 pass
 
-            #Second loop over all tau delay values
+            # Second loop over all tau delay values
             for acq_index, tau in enumerate(times_val):
                 self.single_qubit_T1(schedule, this_qubit, acq_index, tau)
 
         return schedule
 
-class T2(BaseMeasurement):
 
-    def __init__(self,transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
+class T2(BaseMeasurement):
+    def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
         super().__init__(transmons)
         self.qubit_state = qubit_state
         self.transmons = transmons
@@ -105,34 +106,36 @@ class T2(BaseMeasurement):
         :
             An experiment schedule.
         """
-        schedule = Schedule("multiplexed_T2",repetitions)
+        schedule = Schedule("multiplexed_T2", repetitions)
 
         qubits = self.transmons.keys()
 
-        #This is the common reference operation so the qubits can be operated in parallel
+        # This is the common reference operation so the qubits can be operated in parallel
         root_relaxation = schedule.add(Reset(*qubits), label="Start")
 
-        #First loop over every qubit with corresponding tau sweeping lists
+        # First loop over every qubit with corresponding tau sweeping lists
         for this_qubit, times_val in delays.items():
             schedule.add(
-                Reset(*qubits), ref_op=root_relaxation, ref_pt='end'
+                Reset(*qubits), ref_op=root_relaxation, ref_pt="end"
             )  # To enforce parallelism we refer to the root relaxation
 
-            #Second loop over all tau delay values
+            # Second loop over all tau delay values
             for acq_index, tau in enumerate(times_val):
                 schedule.add(X90(this_qubit))
-                schedule.add(X90(this_qubit),
+                schedule.add(
+                    X90(this_qubit),
                     ref_pt="end",
-                    rel_time=tau,)
+                    rel_time=tau,
+                )
                 schedule.add(
                     Measure(this_qubit, acq_index=acq_index, bin_mode=BinMode.AVERAGE)
                 )
                 schedule.add(Reset(this_qubit))
         return schedule
 
-class T2Echo(BaseMeasurement):
 
-    def __init__(self,transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
+class T2Echo(BaseMeasurement):
+    def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
         super().__init__(transmons)
         self.qubit_state = qubit_state
         self.transmons = transmons
@@ -164,27 +167,32 @@ class T2Echo(BaseMeasurement):
         :
             An experiment schedule.
         """
-        schedule = Schedule("multiplexed_T2_Echo",repetitions)
+        schedule = Schedule("multiplexed_T2_Echo", repetitions)
 
         qubits = self.transmons.keys()
 
-        #This is the common reference operation so the qubits can be operated in parallel
+        # This is the common reference operation so the qubits can be operated in parallel
         root_relaxation = schedule.add(Reset(*qubits), label="Start")
 
-        #First loop over every qubit with corresponding tau sweeping lists
+        # First loop over every qubit with corresponding tau sweeping lists
         for this_qubit, times_val in delays.items():
             schedule.add(
-                Reset(*qubits), ref_op=root_relaxation, ref_pt='end'
+                Reset(*qubits), ref_op=root_relaxation, ref_pt="end"
             )  # To enforce parallelism we refer to the root relaxation
 
-            #Second loop over all tau delay values
+            # Second loop over all tau delay values
             for acq_index, tau in enumerate(times_val):
                 schedule.add(X90(this_qubit))
-                schedule.add(X(this_qubit),ref_pt="end",
-                    rel_time=tau/2,)
-                schedule.add(X90(this_qubit),
+                schedule.add(
+                    X(this_qubit),
                     ref_pt="end",
-                    rel_time=tau/2,)
+                    rel_time=tau / 2,
+                )
+                schedule.add(
+                    X90(this_qubit),
+                    ref_pt="end",
+                    rel_time=tau / 2,
+                )
                 schedule.add(
                     Measure(this_qubit, acq_index=acq_index, bin_mode=BinMode.AVERAGE)
                 )

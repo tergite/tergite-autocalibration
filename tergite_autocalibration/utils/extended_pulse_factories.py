@@ -19,6 +19,7 @@ from quantify_scheduler.resources import ClockResource
 import numpy as np
 import math
 
+
 def composite_soft_square_pulse(  # pylint: disable=too-many-arguments
     square_amp: float,
     square_duration: float,
@@ -80,11 +81,11 @@ def composite_soft_square_pulse(  # pylint: disable=too-many-arguments
         t0=t0,
     )
     # )
-    
-    if virt_z_parent_qubit_phase is float('nan'):
+
+    if virt_z_parent_qubit_phase is float("nan"):
         virt_z_parent_qubit_phase = 0
 
-    if virt_z_child_qubit_phase is float('nan'):
+    if virt_z_child_qubit_phase is float("nan"):
         virt_z_child_qubit_phase = 0
 
     # And at the same time apply clock phase corrections
@@ -104,6 +105,7 @@ def composite_soft_square_pulse(  # pylint: disable=too-many-arguments
     )
 
     return composite_pulse
+
 
 @deprecated("0.20.0", qblox_pulse_factories.long_square_pulse)
 def long_square_pulse() -> StitchedPulse:

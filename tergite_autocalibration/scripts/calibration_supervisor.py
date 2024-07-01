@@ -69,7 +69,6 @@ class CalibrationSupervisor:
         cluster_ip: Union[str, "IPv4Address"] = CLUSTER_IP,
         cluster_timeout: int = 222,
     ) -> None:
-
         # Read hardware related configuration steps
         self.cluster_mode: "MeasurementMode" = cluster_mode
         self.cluster_ip: Union[str, "IPv4Address"] = cluster_ip
@@ -94,7 +93,6 @@ class CalibrationSupervisor:
         self.node_factory = NodeFactory()
         self.topo_order = filtered_topological_order(self.target_node)
 
-
     def _create_cluster(self) -> "Cluster":
         cluster_: "Cluster"
         if self.cluster_mode == MeasurementMode.real:
@@ -107,7 +105,6 @@ class CalibrationSupervisor:
             )
 
     def _create_lab_ic(self, clusters: Union["Cluster", List["Cluster"]]):
-
         ic_ = InstrumentCoordinator("lab_ic")
         if isinstance(clusters, Cluster):
             clusters = [clusters]

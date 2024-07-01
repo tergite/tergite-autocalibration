@@ -12,41 +12,49 @@ import itertools
 from tergite_autocalibration.lib.base.analysis import BaseAnalysis
 
 
-def mitigate(v,cm_inv):
+def mitigate(v, cm_inv):
     try:
-        u = np.dot(v,cm_inv)
+        u = np.dot(v, cm_inv)
     except:
-        print('Mitigation failed.')
-        print(f'{v = }')
+        print("Mitigation failed.")
+        print(f"{v = }")
         return v
+
     # print(u,np.sum(u))
     def m(t):
-        return norm(u-np.array(t))
+        return norm(u - np.array(t))
+
     def con(t):
-        return t[0]+t[1]+t[2]-1
-    cons = ({'type': 'eq', 'fun': con},
-            {'type': 'ineq', 'fun': lambda t: t[0]},
-            {'type': 'ineq', 'fun': lambda t: t[1]},
-            {'type': 'ineq', 'fun': lambda t: t[2]})
-    result = minimize(m, v, method='SLSQP', constraints=cons)
-    w = np.abs(np.round(result.x,10))
+        return t[0] + t[1] + t[2] - 1
+
+    cons = (
+        {"type": "eq", "fun": con},
+        {"type": "ineq", "fun": lambda t: t[0]},
+        {"type": "ineq", "fun": lambda t: t[1]},
+        {"type": "ineq", "fun": lambda t: t[2]},
+    )
+    result = minimize(m, v, method="SLSQP", constraints=cons)
+    w = np.abs(np.round(result.x, 10))
     # print(w)
     return w
 
+
 class ResetCalibrationSSROAnalysis(BaseAnalysis):
-    def  __init__(self,dataset: xr.Dataset):
+    def __init__(self, dataset: xr.Dataset):
         super().__init__()
         self.data_var = list(dataset.data_vars.keys())[0]
-        self.qubit = dataset[self.data_var].attrs['qubit']
+        self.qubit = dataset[self.data_var].attrs["qubit"]
         for coord in dataset.coords:
-            if f'control_ons{self.qubit}' in str(coord):
+            if f"control_ons{self.qubit}" in str(coord):
                 self.sweep_coord = coord
-            elif f'ramsey_phases{self.qubit}' in str(coord):
+            elif f"ramsey_phases{self.qubit}" in str(coord):
                 self.state_coord = coord
-            elif 'shot' in str(coord):
+            elif "shot" in str(coord):
                 self.shot_coord = coord
         # self.S21 = dataset[data_var].values
-        self.independents = np.array([float(val) for val in dataset[self.state_coord].values[:-3]])
+        self.independents = np.array(
+            [float(val) for val in dataset[self.state_coord].values[:-3]]
+        )
         self.calibs = dataset[self.state_coord].values[-3:]
         self.sweeps = dataset.coords[self.sweep_coord]
         self.shots = len(dataset[self.shot_coord].values)
@@ -56,28 +64,30 @@ class ResetCalibrationSSROAnalysis(BaseAnalysis):
 
     def run_fitting(self):
         # self.testing_group = 0
-        self.dynamic = self.dataset.attrs['node']  == 'cz_dynamic_phase'
+        self.dynamic = self.dataset.attrs["node"] == "cz_dynamic_phase"
         self.all_magnitudes = []
         for indx, _ in enumerate(self.sweeps):
             # Calculate confusion matrix from calibration shots
-            y = np.repeat(self.calibs,self.shots)
+            y = np.repeat(self.calibs, self.shots)
             IQ_complex = np.array([])
             for state, _ in enumerate(self.calibs):
-                IQ_complex_0 = self.dataset[self.data_var].isel({self.sweep_coord:indx,self.state_coord:-3+state})
-                IQ_complex = np.append(IQ_complex,IQ_complex_0)
+                IQ_complex_0 = self.dataset[self.data_var].isel(
+                    {self.sweep_coord: indx, self.state_coord: -3 + state}
+                )
+                IQ_complex = np.append(IQ_complex, IQ_complex_0)
             I = IQ_complex.real.flatten()
             Q = IQ_complex.imag.flatten()
-            IQ = np.array([I,Q]).T
+            IQ = np.array([I, Q]).T
             # IQ = IQ_complex.reshape(-1,2)
             # breakpoint()
-            lda = LinearDiscriminantAnalysis(solver = "svd", store_covariance=True)
-            cla = lda.fit(IQ,y)
+            lda = LinearDiscriminantAnalysis(solver="svd", store_covariance=True)
+            cla = lda.fit(IQ, y)
             y_pred = cla.predict(IQ)
 
-            cm = confusion_matrix(y,y_pred)
-            cm_norm = confusion_matrix(y,y_pred,normalize='true')
+            cm = confusion_matrix(y, y_pred)
+            cm_norm = confusion_matrix(y, y_pred, normalize="true")
             cm_inv = inv(cm_norm)
-            assignment = np.trace(cm_norm)/len(self.calibs)
+            assignment = np.trace(cm_norm) / len(self.calibs)
             # print(f'{assignment = }')
             # print(f'{cm_norm = }')
             # disp = ConfusionMatrixDisplay(confusion_matrix=cm_norm)
@@ -85,12 +95,12 @@ class ResetCalibrationSSROAnalysis(BaseAnalysis):
             # plt.show()
 
             # Classify data shots
-            raw_data = self.dataset[self.data_var].isel({self.sweep_coord:indx}).values
+            raw_data = self.dataset[self.data_var].isel({self.sweep_coord: indx}).values
             raw_shape = raw_data.shape
             I = raw_data.real.flatten()
             Q = raw_data.imag.flatten()
-            IQ = np.array([I,Q]).T
-            data_y_pred = cla.predict(IQ.reshape(-1,2))
+            IQ = np.array([I, Q]).T
+            data_y_pred = cla.predict(IQ.reshape(-1, 2))
             # breakpoint()
             data_y_pred = np.transpose(data_y_pred.reshape(raw_shape))
             data_res_shape = list(data_y_pred.shape[:-1])
@@ -99,19 +109,19 @@ class ResetCalibrationSSROAnalysis(BaseAnalysis):
             data_res = np.array([])
             for sweep in data_y_pred:
                 uniques, counts = np.unique(sweep, return_counts=True)
-                raw_prob = [0]*len(self.calibs)
-                for state_id,state in enumerate(uniques):
+                raw_prob = [0] * len(self.calibs)
+                for state_id, state in enumerate(uniques):
                     raw_prob[int(state[1])] = counts[state_id]
-                raw_prob = counts/len(sweep)
-                mitigate_prob = mitigate(raw_prob,cm_inv)
-                data_res = np.append(data_res,mitigate_prob)
+                raw_prob = counts / len(sweep)
+                mitigate_prob = mitigate(raw_prob, cm_inv)
+                data_res = np.append(data_res, mitigate_prob)
             data_res = data_res.reshape(data_res_shape)
             self.all_magnitudes.append(data_res)
         self.all_magnitudes = np.array(self.all_magnitudes)
         # Fitting the 1 state data
-        self.magnitudes = self.all_magnitudes[:,:-3,1]
-        self.f_magnitudes = self.all_magnitudes[:,:-3,2]
-        
+        self.magnitudes = self.all_magnitudes[:, :-3, 1]
+        self.f_magnitudes = self.all_magnitudes[:, :-3, 2]
+
         # self.freq = self.dataset[f'control_ons{self.qubit}'].values
         # self.amp = self.dataset[f'ramsey_phases{self.qubit}'].values
         # magnitudes = self.dataset[f'y{self.qubit}'].values
@@ -121,19 +131,23 @@ class ResetCalibrationSSROAnalysis(BaseAnalysis):
         self.fit_independents = self.independents
         self.fit_ys = []
 
-        for n,magnitude in enumerate(self.magnitudes):
-            if qubit_types[self.qubit] == 'Target':
+        for n, magnitude in enumerate(self.magnitudes):
+            if qubit_types[self.qubit] == "Target":
                 if n == 0:
-                    self.fit_ys.append([0,0,0,1,1,1,0,0,0]) # Control - ResetOff
+                    self.fit_ys.append(
+                        [0, 0, 0, 1, 1, 1, 0, 0, 0]
+                    )  # Control - ResetOff
                 else:
-                    self.fit_ys.append([0,0,0,0,0,0,0,0,0]) # Target - ResetOn
+                    self.fit_ys.append([0, 0, 0, 0, 0, 0, 0, 0, 0])  # Target - ResetOn
             else:
                 if n == 0:
-                    self.fit_ys.append([0,1,0,0,1,0,0,1,0]) # Target - ResetOff
+                    self.fit_ys.append([0, 1, 0, 0, 1, 0, 0, 1, 0])  # Target - ResetOff
                 else:
-                    self.fit_ys.append([0,1,0,0,1,0,0,1,0]) # Target - ResetOn no leakage reduction
+                    self.fit_ys.append(
+                        [0, 1, 0, 0, 1, 0, 0, 1, 0]
+                    )  # Target - ResetOn no leakage reduction
                     # self.fit_ys.append([0,1,1,0,1,1,0,1,1]) # Control - ResetOn
-        
+
             # if qubit_types[self.qubit] == 'Target':
             #     if n == 0:
             #         self.fit_ys.append([0,1,0,0,1,0,0,1,0]) # Target - ResetOff
@@ -145,42 +159,68 @@ class ResetCalibrationSSROAnalysis(BaseAnalysis):
             #     else:
             #         self.fit_ys.append([0,0,0,1,1,1,1,1,1]) # Control - ResetOn
         self.fit_ys = np.array(self.fit_ys)
-        self.pop_loss = 1-np.sum(np.abs(self.magnitudes - self.fit_ys))/9
+        self.pop_loss = 1 - np.sum(np.abs(self.magnitudes - self.fit_ys)) / 9
         self.leakage = np.mean(self.f_magnitudes[-1])
-        magnitudes_str = ",".join(str(element) for element in list(self.magnitudes.flatten()))
-        f_magnitudes_str = ",".join(str(element) for element in list(self.f_magnitudes.flatten()))
-        return [self.pop_loss,self.leakage,magnitudes_str,f_magnitudes_str]
+        magnitudes_str = ",".join(
+            str(element) for element in list(self.magnitudes.flatten())
+        )
+        f_magnitudes_str = ",".join(
+            str(element) for element in list(self.f_magnitudes.flatten())
+        )
+        return [self.pop_loss, self.leakage, magnitudes_str, f_magnitudes_str]
 
-    def plotter(self,axis):
+    def plotter(self, axis):
         # datarray = self.dataset[f'y{self.qubit}']
         # qubit = self.qubit
-        state = ['0','1','2']
-        states =list(itertools.product(state, state))
-        states = [state[0]+state[1] for state in states]
+        state = ["0", "1", "2"]
+        states = list(itertools.product(state, state))
+        states = [state[0] + state[1] for state in states]
 
-        label = ['Reset Off','Reset On']
-        name = 'Reset'
+        label = ["Reset Off", "Reset On"]
+        name = "Reset"
         x = range(len(label))
-        marker = ['.','*','-','--']
-        colors = plt.get_cmap('RdBu_r')(np.linspace(0.2, 0.8, len(x)))
+        marker = [".", "*", "-", "--"]
+        colors = plt.get_cmap("RdBu_r")(np.linspace(0.2, 0.8, len(x)))
         # colors = plt.get_cmap('tab20c')
-        
-        for index,magnitude in enumerate(self.all_magnitudes):
-            axis.plot(self.independents,magnitude[:-3,1],f'{marker[0]}',c = colors[index],label=f'|1> {label[index]}')
-            # axis.plot(self.independents,magnitude[:-3,1],f'{marker[index]}',c = colors(2+4),label=f'|1> {label[index]}')
-            axis.plot(self.independents,magnitude[:-3,2],f'{marker[1]}',c = colors[index],label=f'|2> {label[index]}')
 
-        for index,magnitude in enumerate(self.magnitudes):
+        for index, magnitude in enumerate(self.all_magnitudes):
+            axis.plot(
+                self.independents,
+                magnitude[:-3, 1],
+                f"{marker[0]}",
+                c=colors[index],
+                label=f"|1> {label[index]}",
+            )
+            # axis.plot(self.independents,magnitude[:-3,1],f'{marker[index]}',c = colors(2+4),label=f'|1> {label[index]}')
+            axis.plot(
+                self.independents,
+                magnitude[:-3, 2],
+                f"{marker[1]}",
+                c=colors[index],
+                label=f"|2> {label[index]}",
+            )
+
+        for index, magnitude in enumerate(self.magnitudes):
             # breakpoint()
-            axis.plot(self.fit_independents,self.fit_ys[index],'-',c = colors[index])
+            axis.plot(self.fit_independents, self.fit_ys[index], "-", c=colors[index])
             # axis.vlines(self.opt_cz[index],-10,10,colors='gray',linestyles='--',linewidth=1.5)
 
-        axis.plot([],[],alpha = 0, label = 'Reset Fidelity = {:.3f}'.format(self.pop_loss),zorder=-10)
-        axis.plot([],[],alpha = 0, label = 'Leakage = {:.3f}'.format(self.leakage),zorder=-10)
-        axis.set_xlim([self.independents[0],self.independents[-1]])
-        axis.legend(loc = 'upper right')
-        axis.set_ylim(-0.01,1.01)
-        axis.set_xlabel('State')
-        axis.set_ylabel('Population')
+        axis.plot(
+            [],
+            [],
+            alpha=0,
+            label="Reset Fidelity = {:.3f}".format(self.pop_loss),
+            zorder=-10,
+        )
+        axis.plot(
+            [], [], alpha=0, label="Leakage = {:.3f}".format(self.leakage), zorder=-10
+        )
+        axis.set_xlim([self.independents[0], self.independents[-1]])
+        axis.legend(loc="upper right")
+        axis.set_ylim(-0.01, 1.01)
+        axis.set_xlabel("State")
+        axis.set_ylabel("Population")
         axis.set_xticklabels(states)
-        axis.set_title(f'{name} Calibration - {qubit_types[self.qubit]} Qubit {self.qubit[1:]}')
+        axis.set_title(
+            f"{name} Calibration - {qubit_types[self.qubit]} Qubit {self.qubit[1:]}"
+        )

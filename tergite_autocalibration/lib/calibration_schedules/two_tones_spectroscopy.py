@@ -3,7 +3,10 @@ Module containing a schedule class for two-tone (qubit) spectroscopy calibration
 """
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.gate_library import Measure, Reset, X
-from quantify_scheduler.operations.pulse_library import SetClockFrequency, SoftSquarePulse
+from quantify_scheduler.operations.pulse_library import (
+    SetClockFrequency,
+    SoftSquarePulse,
+)
 from quantify_scheduler.resources import ClockResource
 from quantify_scheduler.schedules.schedule import Schedule
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
@@ -14,8 +17,7 @@ from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 
 
 class Two_Tones_Spectroscopy(BaseMeasurement):
-
-    def __init__(self,transmons: dict[str, ExtendedTransmon], qubit_state:int=0):
+    def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
         super().__init__(transmons)
 
         self.qubit_state = qubit_state
@@ -23,12 +25,11 @@ class Two_Tones_Spectroscopy(BaseMeasurement):
 
     def schedule_function(
         self,
-        #qubits: list[str],
-       # spec_pulse_durations: dict[str, float],
-       # spec_pulse_amplitudes: dict[str, float],
-       # mw_pulse_ports: dict[str, str],
+        # qubits: list[str],
+        # spec_pulse_durations: dict[str, float],
+        # spec_pulse_amplitudes: dict[str, float],
+        # mw_pulse_ports: dict[str, str],
         spec_frequencies: dict[str, np.ndarray],
-
         repetitions: int = 1024,
     ) -> Schedule:
         """
@@ -66,11 +67,11 @@ class Two_Tones_Spectroscopy(BaseMeasurement):
         # Initialize the clock for each qubit
         for this_qubit, spec_array_val in spec_frequencies.items():
             if self.qubit_state == 0:
-                this_clock = f'{this_qubit}.01'
+                this_clock = f"{this_qubit}.01"
             elif self.qubit_state == 1:
-                this_clock = f'{this_qubit}.12'
+                this_clock = f"{this_qubit}.12"
             else:
-                raise ValueError(f'Invalid qubit state: {self.qubit_state}')
+                raise ValueError(f"Invalid qubit state: {self.qubit_state}")
             # print(f'{this_clock = }')
             # print(f'{spec_array_val[0] = }')
             schedule.add_resource(
@@ -83,7 +84,6 @@ class Two_Tones_Spectroscopy(BaseMeasurement):
 
         # The first for loop iterates over all qubits:
         for this_qubit, spec_array_val in spec_frequencies.items():
-
             # unpack the static parameters
             this_transmon = self.transmons[this_qubit]
             spec_pulse_duration = this_transmon.spec.spec_duration()
@@ -91,31 +91,32 @@ class Two_Tones_Spectroscopy(BaseMeasurement):
             mw_pulse_port = this_transmon.ports.microwave()
 
             if self.qubit_state == 0:
-                this_clock = f'{this_qubit}.01'
+                this_clock = f"{this_qubit}.01"
             elif self.qubit_state == 1:
-                this_clock = f'{this_qubit}.12'
+                this_clock = f"{this_qubit}.12"
             else:
-                raise ValueError(f'Invalid qubit state: {self.qubit_state}')
+                raise ValueError(f"Invalid qubit state: {self.qubit_state}")
 
             schedule.add(
-                Reset(*qubits), ref_op=root_relaxation, ref_pt='end'
+                Reset(*qubits), ref_op=root_relaxation, ref_pt="end"
             )  # To enforce parallelism we refer to the root relaxation
 
             # The second for loop iterates over all frequency values in the frequency batch:
             for acq_index, spec_pulse_frequency in enumerate(spec_array_val):
-
                 # reset the clock frequency for the qubit pulse
                 schedule.add(
-                    SetClockFrequency(clock=this_clock, clock_freq_new=spec_pulse_frequency),
-                    ref_pt='end'
+                    SetClockFrequency(
+                        clock=this_clock, clock_freq_new=spec_pulse_frequency
+                    ),
+                    ref_pt="end",
                 )
 
                 if self.qubit_state == 0:
                     pass
                 elif self.qubit_state == 1:
-                    schedule.add(X(this_qubit), ref_pt='end')
+                    schedule.add(X(this_qubit), ref_pt="end")
                 else:
-                    raise ValueError(f'Invalid qubit state: {self.qubit_state}')
+                    raise ValueError(f"Invalid qubit state: {self.qubit_state}")
 
                 # spectroscopy pulse
                 # print(f'{spec_pulse_durations=}')
@@ -128,7 +129,7 @@ class Two_Tones_Spectroscopy(BaseMeasurement):
                 #        clock=this_clock,
                 #    ),
                 #    label=f"spec_pulse_{this_qubit}_{acq_index}", ref_op=excitation_pulse, ref_pt="end",
-                #)
+                # )
 
                 spec_pulse = schedule.add(
                     SoftSquarePulse(
@@ -137,7 +138,8 @@ class Two_Tones_Spectroscopy(BaseMeasurement):
                         port=mw_pulse_port,
                         clock=this_clock,
                     ),
-                    ref_pt="end", rel_time = 16e-9
+                    ref_pt="end",
+                    rel_time=16e-9,
                 )
 
                 if self.qubit_state == 0:
@@ -145,11 +147,13 @@ class Two_Tones_Spectroscopy(BaseMeasurement):
                 elif self.qubit_state == 1:
                     measure_function = Measure_RO1
                 else:
-                    raise ValueError(f'Invalid qubit state: {self.qubit_state}')
+                    raise ValueError(f"Invalid qubit state: {self.qubit_state}")
 
                 schedule.add(
-                    measure_function(this_qubit, acq_index=acq_index, bin_mode=BinMode.AVERAGE),
-                    ref_pt='end',
+                    measure_function(
+                        this_qubit, acq_index=acq_index, bin_mode=BinMode.AVERAGE
+                    ),
+                    ref_pt="end",
                 )
 
                 # update the relaxation for the next batch point

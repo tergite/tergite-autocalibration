@@ -54,7 +54,6 @@ class UserInputObject:
 
 
 class Monitor:
-
     qubits = UserInputObject()
     couplers = UserInputObject()
 
@@ -133,7 +132,6 @@ class OptimizeNode:
         self.optimize_swap = optimize_swap
 
     def objective_cz(self, trial):
-
         freqs_dict, times_dict, amps_dict = None, None, None
         for param in self.params:
             if param == "cz_pulse_frequency":

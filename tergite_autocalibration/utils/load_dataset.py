@@ -7,7 +7,7 @@ from tergite_autocalibration.config.settings import DATA_DIR
 
 def extract_ds_date(filename: str) -> int:
     # TODO use datetime module for proper datetime handling
-    ym, day, time, node, tuid = filename.split('-', 4)
+    ym, day, time, node, tuid = filename.split("-", 4)
     date = int(ym + day + time)
     return date
 

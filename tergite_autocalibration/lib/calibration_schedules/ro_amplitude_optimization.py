@@ -12,67 +12,63 @@ import numpy as np
 
 
 class RO_amplitude_optimization(BaseMeasurement):
-
-    def __init__(self,transmons: dict[str, ExtendedTransmon], qubit_state:int=0):
+    def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
         super().__init__(transmons)
 
         self.transmons = transmons
         self.qubit_state = qubit_state
         if self.qubit_state == 1:
-            ro_config = 'readout_2state_opt'
+            ro_config = "readout_2state_opt"
         elif self.qubit_state == 2:
-            ro_config = 'readout_3state_opt'
-
+            ro_config = "readout_3state_opt"
 
     def schedule_function(
         self,
-        ro_amplitudes: dict[str,np.ndarray],
+        ro_amplitudes: dict[str, np.ndarray],
         loop_repetitions: int,
-        qubit_states: dict[str,np.ndarray]
-        ) -> Schedule:
-
+        qubit_states: dict[str, np.ndarray],
+    ) -> Schedule:
         schedule = Schedule("ro_amplitude_optimization", repetitions=1)
 
         qubits = self.transmons.keys()
 
-        #Initialize ClockResource with the first frequency value
+        # Initialize ClockResource with the first frequency value
         # TODO the qubit_state attr needs reworking
-        ro_str = 'ro_2st_opt'
+        ro_str = "ro_2st_opt"
         if self.qubit_state == 2:
-            ro_str = 'ro_3st_opt'
+            ro_str = "ro_3st_opt"
 
         for this_qubit, this_transmon in self.transmons.items():
-            this_ro_clock = f'{this_qubit}.' + ro_str
+            this_ro_clock = f"{this_qubit}." + ro_str
             if self.qubit_state == 1:
                 ro_frequency = this_transmon.extended_clock_freqs.readout_2state_opt()
             if self.qubit_state == 2:
                 ro_frequency = this_transmon.extended_clock_freqs.readout_3state_opt()
 
-            schedule.add_resource(
-                ClockResource(name=this_ro_clock, freq=ro_frequency)
-            )
+            schedule.add_resource(ClockResource(name=this_ro_clock, freq=ro_frequency))
 
         for this_qubit, this_transmon in self.transmons.items():
             mw_frequency_01 = this_transmon.clock_freqs.f01()
             schedule.add_resource(
-                ClockResource(name=f'{this_qubit}.01', freq=mw_frequency_01)
+                ClockResource(name=f"{this_qubit}.01", freq=mw_frequency_01)
             )
 
         if self.qubit_state == 2:
             for this_qubit, this_transmon in self.transmons.items():
-                this_clock = f'{this_qubit}.12'
+                this_clock = f"{this_qubit}.12"
                 mw_frequency_12 = this_transmon.clock_freqs.f12()
                 schedule.add_resource(
                     ClockResource(name=this_clock, freq=mw_frequency_12)
                 )
-
 
         # The outer for-loop iterates over all qubits:
         shot = Schedule(f"shot")
         root_relaxation = shot.add(Reset(*qubits), label="Reset")
         # root_relaxation = shot.add(IdlePulse(20e-9), label="Reset")
 
-        for acq_cha, (this_qubit, ro_amplitude_values) in enumerate(ro_amplitudes.items()):
+        for acq_cha, (this_qubit, ro_amplitude_values) in enumerate(
+            ro_amplitudes.items()
+        ):
             # unpack the static parameters:
             this_transmon = self.transmons[this_qubit]
             ro_pulse_duration = this_transmon.measure.pulse_duration()
@@ -85,9 +81,9 @@ class RO_amplitude_optimization(BaseMeasurement):
             integration_time = this_transmon.measure.integration_time()
             ro_port = this_transmon.ports.readout()
 
-            this_ro_clock =  f'{this_qubit}.' + ro_str
-            this_clock = f'{this_qubit}.01'
-            this_12_clock = f'{this_qubit}.12'
+            this_ro_clock = f"{this_qubit}." + ro_str
+            this_clock = f"{this_qubit}.01"
+            this_12_clock = f"{this_qubit}.12"
 
             # qubit_levels = range(self.qubit_state + 1)
             # this is to simplify the configuration of the raw dataset
@@ -96,14 +92,12 @@ class RO_amplitude_optimization(BaseMeasurement):
             number_of_levels = len(qubit_levels)
 
             # To enforce parallelism we refer to the root relaxation
-            shot.add(Reset(*qubits), ref_op=root_relaxation, ref_pt_new='end')
+            shot.add(Reset(*qubits), ref_op=root_relaxation, ref_pt_new="end")
 
             # The intermediate for-loop iterates over all ro_amplitudes:
             for ampl_indx, ro_amplitude in enumerate(ro_amplitude_values):
-
                 # The inner for-loop iterates over all qubit levels:
                 for level_index, state_level in enumerate(qubit_levels):
-
                     this_index = ampl_indx * number_of_levels + level_index
 
                     if state_level == 0:
@@ -142,7 +136,7 @@ class RO_amplitude_optimization(BaseMeasurement):
                             ),
                         )
                     else:
-                        raise ValueError('State Input Error')
+                        raise ValueError("State Input Error")
 
                     ro_pulse = shot.add(
                         SquarePulse(
@@ -151,8 +145,8 @@ class RO_amplitude_optimization(BaseMeasurement):
                             port=ro_port,
                             clock=this_ro_clock,
                         ),
-
-                        ref_op=prep, ref_pt="end",
+                        ref_op=prep,
+                        ref_pt="end",
                         # rel_time=100e-9,
                     )
 
@@ -163,9 +157,10 @@ class RO_amplitude_optimization(BaseMeasurement):
                             clock=this_ro_clock,
                             acq_index=this_index,
                             acq_channel=acq_cha,
-                            bin_mode=BinMode.APPEND
+                            bin_mode=BinMode.APPEND,
                         ),
-                        ref_op=ro_pulse, ref_pt="start",
+                        ref_op=ro_pulse,
+                        ref_pt="start",
                         rel_time=acquisition_delay,
                     )
 

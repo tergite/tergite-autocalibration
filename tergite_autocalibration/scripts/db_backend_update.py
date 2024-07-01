@@ -42,7 +42,9 @@ def create_backend_snapshot() -> dict:
         qubit_ids = config["device_config"]["qubit_ids"]
         qubit_parameters = config["device_config"]["qubit_parameters"]
         resonator_parameters = config["device_config"]["resonator_parameters"]
-        discriminator_parameters = config["device_config"]["discriminator_parameters"]["lda_parameters"]
+        discriminator_parameters = config["device_config"]["discriminator_parameters"][
+            "lda_parameters"
+        ]
         coupling_map = config["device_config"]["coupling_map"]
         meas_map = config["device_config"]["meas_map"]
         gate_configs = config["gates"]
@@ -80,7 +82,8 @@ def create_backend_snapshot() -> dict:
         # Here, we are doing it only for lda
         lda_discriminators[qubit_id] = {
             parameter: get_component_value("discriminator", parameter, id)
-            for parameter in discriminator_parameters}
+            for parameter in discriminator_parameters
+        }
 
     # more components, like couplers etc. can be added in similar manner and added
     # to the device_properties dict ....
@@ -92,9 +95,7 @@ def create_backend_snapshot() -> dict:
         **general_config,
         **{"qubit_ids": qubit_ids},
         **device_properties,
-        **{"discriminators": {
-            "lda": lda_discriminators
-        }},
+        **{"discriminators": {"lda": lda_discriminators}},
         **{"coupling_map": coupling_map},
         **{"meas_map": meas_map},
         **{"gates": gate_configs},
@@ -122,6 +123,6 @@ def update_mss(collection: str = None):
         )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # convert_all_redis_values()
     update_mss()

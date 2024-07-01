@@ -8,17 +8,12 @@ from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 
 
 class CW_Two_Tones_Spectroscopy(BaseMeasurement):
-
     def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
         super().__init__(transmons)
         self.qubit_state = qubit_state
         self.transmons = transmons
 
-    def schedule_function(
-        self,
-        repetitions: int = 1024,
-        **kwargs
-    ) -> Schedule:
+    def schedule_function(self, repetitions: int = 1024, **kwargs) -> Schedule:
         """
         ***************************************************
         This is just a measurement operation.
@@ -35,7 +30,7 @@ class CW_Two_Tones_Spectroscopy(BaseMeasurement):
 
         """
 
-        schedule = Schedule('cw_qubit_spectroscopy', repetitions)
+        schedule = Schedule("cw_qubit_spectroscopy", repetitions)
 
         qubits = self.transmons.keys()
 
@@ -43,9 +38,8 @@ class CW_Two_Tones_Spectroscopy(BaseMeasurement):
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
         for this_qubit in qubits:
-
             schedule.add(
-                Reset(this_qubit), ref_op=root_relaxation, ref_pt='end'
+                Reset(this_qubit), ref_op=root_relaxation, ref_pt="end"
             )  # To enforce parallelism we refer to the root relaxation
 
             schedule.add(

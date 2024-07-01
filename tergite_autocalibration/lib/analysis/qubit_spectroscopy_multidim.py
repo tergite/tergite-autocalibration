@@ -11,8 +11,14 @@ from tergite_autocalibration.lib.base.analysis import BaseAnalysis
 
 
 # Lorentzian function that is fit to qubit spectroscopy peaks
-def loretzian_function(x: float, x0: float, width: float, A: float, c: float, ) -> float:
-    return A * width ** 2 / ((x - x0) ** 2 + width ** 2) + c
+def loretzian_function(
+    x: float,
+    x0: float,
+    width: float,
+    A: float,
+    c: float,
+) -> float:
+    return A * width**2 / ((x - x0) ** 2 + width**2) + c
 
 
 class LorentzianModel(lmfit.model.Model):
@@ -57,7 +63,7 @@ class LorentzianModel(lmfit.model.Model):
         self.set_param_hint("c", value=c_guess)
 
         # Calculate A_guess from difference between the peak and the backround level
-        A_guess = (np.max(data) - c_guess)
+        A_guess = np.max(data) - c_guess
         self.set_param_hint("A", value=A_guess)
 
         params = self.make_params()
@@ -73,13 +79,13 @@ class QubitSpectroscopyMultidim(BaseAnalysis):
     def __init__(self, dataset: xr.Dataset):
         super().__init__()
         data_var = list(dataset.data_vars.keys())[0]
-        self.qubit = dataset[data_var].attrs['qubit']
+        self.qubit = dataset[data_var].attrs["qubit"]
         S21 = dataset[data_var].values
         for coord in dataset[data_var].coords:
-            if 'frequencies' in coord:
+            if "frequencies" in coord:
                 self.frequency_coords = coord
                 self.frequencies = dataset.coords[coord].values
-            elif 'amplitudes' in coord:
+            elif "amplitudes" in coord:
                 self.amplitude_coords = coord
                 self.amplitudes = dataset.coords[coord].values
 
@@ -102,7 +108,7 @@ class QubitSpectroscopyMultidim(BaseAnalysis):
         self.spec_ampl = 0
         self.qubit_ampl = 0
         self.qubit_freq = 0
-        if hasattr(self, 'amplitudes'):
+        if hasattr(self, "amplitudes"):
             for i, a in enumerate(self.amplitudes):
                 these_magnitudes = magnitudes[i]
                 if not self.has_peak(these_magnitudes):
@@ -125,21 +131,29 @@ class QubitSpectroscopyMultidim(BaseAnalysis):
 
         return [self.qubit_freq, self.spec_ampl]
 
-    def reject_outliers(self, x, m=3.):
+    def reject_outliers(self, x, m=3.0):
         # Filters out datapoints in x that deviate too far from the median
         d = np.abs(x - np.median(x))
         mdev = np.median(d)
         s = d / mdev if mdev else np.zeros(len(d))
         return x[s < m]
 
-    def has_peak(self, x, prom_coef: float = 7, wid_coef: float = 2.4, outlier_median: float = 3.):
+    def has_peak(
+        self,
+        x,
+        prom_coef: float = 7,
+        wid_coef: float = 2.4,
+        outlier_median: float = 3.0,
+    ):
         # Determines if the data contains one distinct peak or only noise
         x_filtered = self.reject_outliers(x, outlier_median)
         self.filtered_std = np.std(x_filtered)
         peaks, properties = signal.find_peaks(
             x, prominence=self.filtered_std * prom_coef, width=wid_coef
         )
-        self.prominence = properties["prominences"][0] if len(properties['prominences']) == 1 else 0
+        self.prominence = (
+            properties["prominences"][0] if len(properties["prominences"]) == 1 else 0
+        )
         self.hasPeak = peaks.size > 0
         self.hasPeak = True
         return self.hasPeak
@@ -147,7 +161,7 @@ class QubitSpectroscopyMultidim(BaseAnalysis):
     def plotter(self, ax):
         # ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0)
         self.dataset[self.data_var].plot(ax=ax, x=self.frequency_coords)
-        ax.scatter(self.qubit_freq, self.spec_ampl, s=52, c='red')
+        ax.scatter(self.qubit_freq, self.spec_ampl, s=52, c="red")
 
         # for i,a in enumerate(self.amplitudes):
         #     if a==self.qubit_ampl:

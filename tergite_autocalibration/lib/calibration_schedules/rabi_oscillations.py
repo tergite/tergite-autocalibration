@@ -14,7 +14,6 @@ import numpy as np
 
 
 class Rabi_Oscillations(BaseMeasurement):
-
     def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
         super().__init__(transmons)
         self.qubit_state = qubit_state
@@ -50,46 +49,48 @@ class Rabi_Oscillations(BaseMeasurement):
             schedule_title = "multiplexed_rabi_12"
             measure_function = Measure_RO1
         else:
-            raise ValueError(f'Invalid qubit state: {self.qubit_state}')
+            raise ValueError(f"Invalid qubit state: {self.qubit_state}")
 
         schedule = Schedule(schedule_title, repetitions)
 
         qubits = self.transmons.keys()
 
-
         # we must first add the clocks
         if self.qubit_state == 0:
             for this_qubit, this_transmon in self.transmons.items():
                 mw_frequency_01 = this_transmon.clock_freqs.f01()
-                this_clock = f'{this_qubit}.01'
-                schedule.add_resource(ClockResource(name=this_clock, freq=mw_frequency_01))
+                this_clock = f"{this_qubit}.01"
+                schedule.add_resource(
+                    ClockResource(name=this_clock, freq=mw_frequency_01)
+                )
         elif self.qubit_state == 1:
             for this_qubit, this_transmon in self.transmons.items():
                 mw_frequency_12 = this_transmon.clock_freqs.f12()
-                this_clock = f'{this_qubit}.12'
-                schedule.add_resource(ClockResource(name=this_clock, freq=mw_frequency_12))
+                this_clock = f"{this_qubit}.12"
+                schedule.add_resource(
+                    ClockResource(name=this_clock, freq=mw_frequency_12)
+                )
         else:
-            raise ValueError(f'Invalid qubit state: {self.qubit_state}')
+            raise ValueError(f"Invalid qubit state: {self.qubit_state}")
 
         # This is the common reference operation so the qubits can be operated in parallel
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
         for this_qubit, mw_amp_array_val in mw_amplitudes.items():
-
             # unpack the static parameters
             this_transmon = self.transmons[this_qubit]
             mw_pulse_duration = this_transmon.rxy.duration()
             mw_pulse_port = this_transmon.ports.microwave()
 
             if self.qubit_state == 0:
-                this_clock = f'{this_qubit}.01'
+                this_clock = f"{this_qubit}.01"
             elif self.qubit_state == 1:
-                this_clock = f'{this_qubit}.12'
+                this_clock = f"{this_qubit}.12"
             else:
-                raise ValueError(f'Invalid qubit state: {self.qubit_state}')
+                raise ValueError(f"Invalid qubit state: {self.qubit_state}")
 
             schedule.add(
-                Reset(*qubits), ref_op=root_relaxation, ref_pt='end'
+                Reset(*qubits), ref_op=root_relaxation, ref_pt="end"
             )  # To enforce parallelism we refer to the root relaxation
 
             # The second for loop iterates over all amplitude values in the amplitudes batch:
@@ -108,7 +109,9 @@ class Rabi_Oscillations(BaseMeasurement):
                 )
 
                 schedule.add(
-                    measure_function(this_qubit, acq_index=acq_index, bin_mode=BinMode.AVERAGE),
+                    measure_function(
+                        this_qubit, acq_index=acq_index, bin_mode=BinMode.AVERAGE
+                    ),
                 )
 
                 schedule.add(Reset(this_qubit))
