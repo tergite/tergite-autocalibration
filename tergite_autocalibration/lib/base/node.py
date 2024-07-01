@@ -1,3 +1,4 @@
+import abc
 import collections
 import json
 import threading
@@ -57,7 +58,7 @@ with open(HARDWARE_CONFIG) as hw:
 matplotlib.use(settings.PLOTTING_BACKEND)
 
 
-class BaseNode:
+class BaseNode(abc.ABC):
 
     measurement_obj: "BaseMeasurement"
     analysis_obj: "BaseAnalysis"

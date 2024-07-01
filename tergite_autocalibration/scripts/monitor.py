@@ -48,11 +48,12 @@ class Monitor:
         self.supervisor = CalibrationSupervisor(cluster_mode=cluster_mode,
                                     cluster_ip=parsed_cluster_ip)
         self.cxn = REDIS_CONNECTION
-        self.node_park = "resonator_spectroscopy"
-
+        self.node_park = self.supervisor.node_factory.create_node.create_node(
+            "resonator_spectroscopy", self.qubits, couplers=self.couplers
+        )
     def __repr__(self):
         return "Calibration Monitor @@\n--------------\n" \
-            + f"Parking node: {self.node_park} \n Qubits: \n\t {self.qubits} \n Couplers: \n\t {self.couplers}"
+            + f"Parking node: {self.node_park.name} \n Qubits: \n\t {self.qubits} \n Couplers: \n\t {self.couplers}"
 
     def node_status(self, node:str=None):
         if node is None: node = self.node_park
@@ -67,12 +68,12 @@ class Monitor:
     def calibrate_node(self, node:str=None, **kwargs):
         self.node = node
         if node is None:
-            self.all_results = self.supervisor.calibrate_node(self.node_park, **kwargs)
-        else:
-            self.all_results = self.supervisor.calibrate_node(node, **kwargs)
-            self.node_park = node
+            node = self.node_park
+        node.calibrate(**kwargs)
+        self.node_park = node
 
     def next_node(self, node:str=None):
+        # TODO: How and when is this method called?
         if node is None:
             node = self.node_park
         print(cg[node])
