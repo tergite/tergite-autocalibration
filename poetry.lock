@@ -3857,12 +3857,12 @@ cffi = {version = "*", markers = "implementation_name == \"pypy\""}
 
 [[package]]
 name = "qblox-instruments"
-version = "0.11.1"
+version = "0.12.0"
 description = "Instrument drivers for Qblox devices."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "qblox_instruments-0.11.1.tar.gz", hash = "sha256:85e69f25a6e6ba25b261ae04d3d257f0cd4ab377a9b6e1d193edb17d750367ba"},
+    {file = "qblox_instruments-0.12.0.tar.gz", hash = "sha256:85e69f25a6e6ba25b261ae04d3d257f0cd4ab377a9b6e1d193edb17d750367ba"},
 ]
 
 [package.dependencies]
@@ -4032,13 +4032,13 @@ test = ["pytest", "pytest-mock"]
 
 [[package]]
 name = "quantify-scheduler"
-version = "0.18.0"
+version = "0.20.0"
 description = "Quantify-scheduler is a Python package for writing quantum programs featuring a hybrid gate-pulse control model with explicit timing control."
 optional = false
 python-versions = "<3.10,>=3.8"
 files = [
-    {file = "quantify-scheduler-0.18.0.tar.gz", hash = "sha256:abe59400cba445cefb1eded93a88832ae396232ca00b7292fab2dd7506023aa1"},
-    {file = "quantify_scheduler-0.18.0-py3-none-any.whl", hash = "sha256:20c76974ce4a11697e3a415e755a1b6c182f81c8ff54d0de82992fe00acf0eba"},
+    {file = "quantify-scheduler-0.20.0.tar.gz", hash = "sha256:abe59400cba445cefb1eded93a88832ae396232ca00b7292fab2dd7506023aa1"},
+    {file = "quantify_scheduler-0.20.0-py3-none-any.whl", hash = "sha256:20c76974ce4a11697e3a415e755a1b6c182f81c8ff54d0de82992fe00acf0eba"},
 ]
 
 [package.dependencies]
@@ -4054,7 +4054,7 @@ pandas = {version = "*", extras = ["output-formatting"]}
 pathvalidate = "*"
 plotly = "*"
 pydantic = ">=2.0"
-qblox-instruments = ">=0.11.0,<0.12.0"
+qblox-instruments = ">=0.12.0,<0.14.0"
 qcodes = ">=0.32.0"
 quantify-core = ">=0.7.1"
 rich = {version = "*", extras = ["jupyter"]}
