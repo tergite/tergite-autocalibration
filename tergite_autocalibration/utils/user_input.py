@@ -89,7 +89,7 @@ user_samplespace = {
 """
 
 ####################################################################
-target_node = "coupler_resonator_spectroscopy"
+target_node = "ro_amplitude_three_state_optimization"
 qubits = ["q06", "q07", "q08", "q09", "q10"]
 couplers = ["q06_q07"]
 user_samplespace = {
