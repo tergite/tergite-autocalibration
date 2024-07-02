@@ -5,7 +5,6 @@ fetch and compile the appropriate schedule
 import json
 from pathlib import Path
 
-# from pydantic_core.core_schema import decimal_schema
 from quantify_scheduler.backends import SerialCompiler
 from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
 from quantify_scheduler.json_utils import SchedulerJSONDecoder, SchedulerJSONEncoder
@@ -93,7 +92,6 @@ def load_redis_config_coupler(coupler: CompositeSquareEdge):
 def precompile(node: BaseNode, data_path: Path, bin_mode:str=None, repetitions:int=None):
     if node.name == 'tof':
         return None, 1
-    samplespace = node.samplespace
     qubits = node.all_qubits
 
     # backup old parameter values

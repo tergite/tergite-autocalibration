@@ -1,6 +1,7 @@
 '''Analyze the measured dataset and extract the qoi (quantity of interest)'''
 import collections
 from pathlib import Path
+import warnings
 
 import matplotlib
 # from quantify_core.analysis.calibration import rotate_to_calibrated_axis
@@ -8,7 +9,6 @@ import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
-import warnings
 
 from tergite_autocalibration.config import settings
 from tergite_autocalibration.config.coupler_config import qubit_types
@@ -41,7 +41,6 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
         # this refers to the qubit whose resonator was used for the measurement
         # not necessarily the element where the settable was applied
         this_qubit = result_dataset[var].attrs['qubit']
-        this_element = this_qubit
 
         ds = xr.Dataset()
         for var in data_vars_dict[this_qubit]:
@@ -54,6 +53,10 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
         for settable in ds.coords:
             if ds[settable].attrs['element_type'] == 'coupler':
                 this_element = 'coupler'
+            elif ds[settable].attrs['element_type'] == 'qubit':
+                this_element = this_qubit
+            else:
+                raise ValueError('Invalid Element Type')
 
         primary_plot_row = node.plots_per_qubit * (indx // column_grid)
         primary_axis = axs[primary_plot_row, indx % column_grid]
@@ -64,30 +67,6 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
         qoi = node_analysis.run_fitting()
 
         node_analysis.qoi = qoi
-
-        if node.type == 'adaptive_sweep':
-            # fetch relative kwargs, e.g. known minima in motzoi calibration
-            qubit_adaptive_kwargs = node.adaptive_kwargs[this_qubit]
-            # every adaptive iteration should update the samplespace ...
-            new_qubit_samplespace = node_analysis.updated_qubit_samplespace(**qubit_adaptive_kwargs)
-            for settable_key in new_qubit_samplespace.keys():
-                node.samplespace[settable_key].update(new_qubit_samplespace[settable_key])
-            # every adaptive iteration should also update the relevant kwargs
-            node.adaptive_kwargs[this_qubit] = node_analysis.updated_kwargs
-            if node.measurement_is_completed:
-                node_analysis.update_redis_trusted_values(node.name, this_qubit, redis_field)
-
-        # elif node.name in ['cz_calibration', 'cz_dynamic_phase', 'cz_calibration_ssro', 'cz_optimize_chevron'] and \
-        #         qubit_types[this_qubit] == 'Target':
-        #     node_analysis.update_redis_trusted_values(node.name, this_element, redis_field)
-        # elif node.name in ['cz_chevron'] and qubit_types[this_qubit] == 'Control':
-        #     node_analysis.update_redis_trusted_values(node.name, this_element, redis_field)
-        # elif node.name in ['coupler_spectroscopy']:
-        #     node_analysis.update_redis_trusted_values(node.name, this_element, redis_field)
-        #     this_element = node.coupler
-        # else:
-        #     node_analysis.update_redis_trusted_values(node.name, this_elementredis_field)
-        #     this_element = this_qubit
 
         node_analysis.update_redis_trusted_values(node.name, this_element, redis_field)
         all_results[this_element] = dict(zip(redis_field, qoi))
@@ -122,7 +101,7 @@ def post_process(result_dataset: xr.Dataset, node, data_path: Path):
     except FileNotFoundError:
         warnings.warn('File Not existing')
         pass
-    # plt.show()
+
     plt.show(block=True)
     # plt.pause(20)
     # plt.close()
