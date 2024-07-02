@@ -20,40 +20,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -131,7 +97,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Operation</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./configuration_files.html"> 
+    <a class="nav-link active" href="./configuration_files.html" aria-current="page"> 
 <span class="menu-text">Configuration Files</span></a>
   </li>  
   <li class="nav-item">
@@ -143,7 +109,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Creating New Nodes</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./node_types.html" aria-current="page"> 
+    <a class="nav-link" href="./node_types.html"> 
 <span class="menu-text">Node types</span></a>
   </li>  
 </ul>
@@ -162,7 +128,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#node-types" id="toc-node-types" class="nav-link active" data-scroll-target="#node-types">Node types</a></li>
+  <li><a href="#configuration-files" id="toc-configuration-files" class="nav-link active" data-scroll-target="#configuration-files">Configuration Files</a>
+  <ul class="collapse">
+  <li><a href="#hardware-configuration-file-json" id="toc-hardware-configuration-file-json" class="nav-link" data-scroll-target="#hardware-configuration-file-json">Hardware Configuration file (json):</a></li>
+  <li><a href="#device-configuration-file-toml" id="toc-device-configuration-file-toml" class="nav-link" data-scroll-target="#device-configuration-file-toml">Device Configuration file (toml):</a></li>
+  <li><a href="#vna-resonator-qubit-frequencies" id="toc-vna-resonator-qubit-frequencies" class="nav-link" data-scroll-target="#vna-resonator-qubit-frequencies">VNA resonator &amp; qubit frequencies</a></li>
+  <li><a href="#coupler-to-spi-mapping" id="toc-coupler-to-spi-mapping" class="nav-link" data-scroll-target="#coupler-to-spi-mapping">Coupler to SPI mapping</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -172,61 +144,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="node-types" class="level1">
-<h1>Node types</h1>
-<p>The execution of most of the nodes consists of a single schedule compilation, a single measurement and a single post-processing. Although for most of the nodes this workflow suffices, there are exceptions while this workflow can become limiting in more advanced implementations.</p>
-<p>To allow greater flexibilty in the node implementations the nodes are categorized:</p>
-<ul>
-<li>According to whether they compile once or multiple times:
-<ul>
-<li><code>node.type = simple_sweep</code>: if it compiles once</li>
-<li><code>node.type = parameterized_sweep</code>: if it compiles multiple times</li>
-</ul></li>
-<li>According to whether the sweeping parameters are swept whithin the schedule or not:
-<ul>
-<li>There is only <code>node.schedule_samplespace</code> if the sweeping takes place whithin the schedule</li>
-<li>There are both <code>node.schedule_samplespace</code> and <code>node.external_samplespace</code> if there are sweeping parameters outside of the scedule. For example the <code>coupler_spectroscopy</code> node sweeps the <code>dc_current</code> outside of the schedule:</li>
-</ul></li>
-</ul>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>  <span class="kw">class</span> Coupler_Spectroscopy_Node(BaseNode):</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    measurement_obj <span class="op">=</span> Two_Tones_Multidim</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    analysis_obj <span class="op">=</span> CouplerSpectroscopyAnalysis</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, name: <span class="bu">str</span>, all_qubits: <span class="bu">list</span>[<span class="bu">str</span>], couplers, <span class="op">**</span>schedule_keywords):</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>(name, all_qubits, <span class="op">**</span>schedule_keywords)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.couplers <span class="op">=</span> couplers</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.redis_field <span class="op">=</span> [<span class="st">'parking_current'</span>]</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.all_qubits <span class="op">=</span> <span class="va">self</span>.coupled_qubits</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.schedule_samplespace <span class="op">=</span> {</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">'spec_frequencies'</span>: {</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>                qubit: qubit_samples(qubit) <span class="cf">for</span> qubit <span class="kw">in</span> <span class="va">self</span>.all_qubits</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>            }</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        }</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.external_samplespace <span class="op">=</span> {</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>            <span class="st">'dc_currents'</span>: {</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.coupler: np.arange(<span class="op">-</span><span class="fl">2.5e-3</span>, <span class="fl">2.5e-3</span>, <span class="fl">500e-6</span>)</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>            },</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        }</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> pre_measurement_operation(<span class="va">self</span>, reduced_ext_space):</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        iteration_dict <span class="op">=</span> reduced_ext_space[<span class="st">'dc_currents'</span>]</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        this_iteration_value <span class="op">=</span> <span class="bu">list</span>(iteration_dict.values())[<span class="dv">0</span>]</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f'</span><span class="sc">{</span> this_iteration_value <span class="op">=</span> <span class="sc">}</span><span class="ss">'</span>)</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.spi_dac.set_dac_current(<span class="va">self</span>.dac, this_iteration_value)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>By default every node every node is assigned a <code>node.type</code> attribute at the <code>BaseNode</code> class:</p>
-<p><code>self.type = simple_sweep</code></p>
-<p>This attribute can be overwritten at the implementation of the class of each node. An example of a <code>parameterized_sweep</code> node type is <code>Randomized_Benchmarking</code> as each new iteration requires a the schedule to be recompiled with a different random seed.</p>
-<p>The <code>tergite_acl/scripts/node_supervisor.py</code> is responcible to distinguish between each node variation.</p>
-<section id="examples-of-nodes-requiring-an-externbal-samplespace" class="level4">
-<h4 class="anchored" data-anchor-id="examples-of-nodes-requiring-an-externbal-samplespace">Examples of nodes requiring an externbal samplespace:</h4>
-<ul>
-<li><code>coupler_spectroscopy</code> sweeps the <code>dc_current</code> which is set by the SPI rack not the cluster</li>
-<li><code>T1</code> sweeps a repetetion index to repeat the measurement many times</li>
-<li><code>randomized_benchmarking</code> sweeps different seeds. Although the seed is a schedule parameter, sweeping outside the schedule improves memory utilization.</li>
-</ul>
+<section id="configuration-files" class="level1">
+<h1>Configuration Files</h1>
+<section id="hardware-configuration-file-json" class="level2">
+<h2 class="anchored" data-anchor-id="hardware-configuration-file-json">Hardware Configuration file (json):</h2>
+<p>Here the connection is made between the Qblox cluster physical ports and clocks to the qubits and couplers of the QPU.</p>
+<p>The file must be placed at the directory <code>tergite-acl/config_dir/</code></p>
+<p>Given a <code>.csv</code> file after a mixer calibration the function <code>...</code> can create instantly the corresponding <code>JSON</code> file.</p>
+</section>
+<section id="device-configuration-file-toml" class="level2">
+<h2 class="anchored" data-anchor-id="device-configuration-file-toml">Device Configuration file (toml):</h2>
+<p>Here we set reasonable initial parameters</p>
+</section>
+<section id="vna-resonator-qubit-frequencies" class="level2">
+<h2 class="anchored" data-anchor-id="vna-resonator-qubit-frequencies">VNA resonator &amp; qubit frequencies</h2>
+<p>Here we input the initial values for the resonator and qubits frequencies, assumed that they have been acquired through VNA measurements, design targets or previous manual measurements. <code>/tergite_acl/config/VNA_values.py</code></p>
+</section>
+<section id="coupler-to-spi-mapping" class="level2">
+<h2 class="anchored" data-anchor-id="coupler-to-spi-mapping">Coupler to SPI mapping</h2>
 
 
 </section>

@@ -78,10 +78,12 @@ class R12(InstrumentChannel):
             vals=Numbers(min_value=-10, max_value=10, allow_nan=True),
         )
 
+
 class Spec(InstrumentChannel):
     """
     Submodule containing parameters for performing qubit spectroscopy measurements
     """
+
     def __init__(self, parent: InstrumentBase, name: str, **kwargs: Any) -> None:
         super().__init__(parent=parent, name=name)
         self.spec_amp = ManualParameter(
@@ -119,6 +121,7 @@ class Spec(InstrumentChannel):
             vals=Numbers(min_value=0, max_value=1e-3, allow_nan=True),
         )
 
+
 class Rxy_12(Rxy):
     """
     A single qubit rotation on the 12 transition.
@@ -126,15 +129,18 @@ class Rxy_12(Rxy):
 
     def __init__(self, qubit: str, theta: float = 180, phi: float = 0):
         super().__init__(theta=theta, phi=phi, qubit=qubit)
-        self.data["name"] = f"Rxy-12({theta:.8g}, {phi:.8g}, '{qubit}')",
-        self.data['gate_info']["unitary"]= None # this is not a Qubit operation
-        self.data['gate_info']["operation_type"]= "r12" # this key is used in compilation!
+        self.data["name"] = (f"Rxy-12({theta:.8g}, {phi:.8g}, '{qubit}')",)
+        self.data["gate_info"]["unitary"] = None  # this is not a Qubit operation
+        self.data["gate_info"][
+            "operation_type"
+        ] = "r12"  # this key is used in compilation!
 
         self._update()  # Update the Operation's internals
 
     def __str__(self) -> str:
         qubit = self.data["gate_info"]["qubits"][0]
         return f"{self.__class__.__name__}(qubit='{qubit}')"
+
 
 class Measure_RO1(Measure):
     def __init__(
@@ -159,15 +165,15 @@ class Measure_RO1(Measure):
             {
                 "name": f"Measure_RO1 {', '.join(qubits)}",
                 "gate_info": {
-                    'unitary': None,
-                    'plot_func': plot_func,
-                    'tex': r'$\langle0|$',
-                    'qubits': list(qubits),
-                    'acq_index': acq_index,
-                    'acq_protocol': acq_protocol,
-                    'bin_mode': bin_mode,
-                    'operation_type': 'measure_1',
-                    'acq_channel_override': None,
+                    "unitary": None,
+                    "plot_func": plot_func,
+                    "tex": r"$\langle0|$",
+                    "qubits": list(qubits),
+                    "acq_index": acq_index,
+                    "acq_protocol": acq_protocol,
+                    "bin_mode": bin_mode,
+                    "operation_type": "measure_1",
+                    "acq_channel_override": None,
                 },
             }
         )
@@ -197,15 +203,15 @@ class Measure_RO2(Measure):
             {
                 "name": f"Measure_RO2 {', '.join(qubits)}",
                 "gate_info": {
-                    'unitary': None,
-                    'plot_func': plot_func,
-                    'tex': r'$\langle0|$',
-                    'qubits': list(qubits),
-                    'acq_index': acq_index,
-                    'acq_protocol': acq_protocol,
-                    'bin_mode': bin_mode,
-                    'operation_type': 'measure_2',
-                    'acq_channel_override': None,
+                    "unitary": None,
+                    "plot_func": plot_func,
+                    "tex": r"$\langle0|$",
+                    "qubits": list(qubits),
+                    "acq_index": acq_index,
+                    "acq_protocol": acq_protocol,
+                    "bin_mode": bin_mode,
+                    "operation_type": "measure_2",
+                    "acq_channel_override": None,
                 },
             }
         )
@@ -235,15 +241,15 @@ class Measure_RO_Opt(Measure):
             {
                 "name": f"Measure_RO_Opt {', '.join(qubits)}",
                 "gate_info": {
-                    'unitary': None,
-                    'plot_func': plot_func,
-                    'tex': r'$\langle opt|$',
-                    'qubits': list(qubits),
-                    'acq_index': acq_index,
-                    'acq_protocol': acq_protocol,
-                    'bin_mode': bin_mode,
-                    'operation_type': 'measure_3state_opt',
-                    'acq_channel_override': None,
+                    "unitary": None,
+                    "plot_func": plot_func,
+                    "tex": r"$\langle opt|$",
+                    "qubits": list(qubits),
+                    "acq_index": acq_index,
+                    "acq_protocol": acq_protocol,
+                    "bin_mode": bin_mode,
+                    "operation_type": "measure_3state_opt",
+                    "acq_channel_override": None,
                 },
             }
         )

@@ -3,7 +3,6 @@ import xarray as xr
 
 from tergite_autocalibration.lib.analysis_base import BaseAnalysis
 
-
 class MotzoiAnalysis(BaseAnalysis):
     def __init__(self, dataset: xr.Dataset):
         super().__init__()
