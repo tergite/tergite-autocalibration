@@ -14,6 +14,7 @@ graph_dependencies = [
     ("resonator_spectroscopy", "coupler_resonator_spectroscopy"),
     # ('resonator_spectroscopy', 'qubit_01_spectroscopy_pulsed'),
     ("qubit_01_spectroscopy", "coupler_spectroscopy"),
+    ("qubit_01_spectroscopy", "coupler_resonator_spectroscopy"),
     ("resonator_spectroscopy", "qubit_01_spectroscopy"),
     ("resonator_spectroscopy", "qubit_01_cw_spectroscopy"),
     ("qubit_01_spectroscopy", "rabi_oscillations"),

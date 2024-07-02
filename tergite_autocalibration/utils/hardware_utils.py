@@ -1,6 +1,6 @@
 import json
-import time
 from pathlib import Path
+import time
 from typing import Dict
 
 from qblox_instruments import Cluster, SpiRack

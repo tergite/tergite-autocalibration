@@ -83,12 +83,15 @@ class Two_Tones_Multidim(BaseMeasurement):
             spec_pulse_duration = this_transmon.spec.spec_duration()
             mw_pulse_port = this_transmon.ports.microwave()
 
+            print(f"{ spec_pulse_amplitudes = }")
+
             if spec_pulse_amplitudes is None:
                 spec_amplitude = this_transmon.spec.spec_ampl_optimal()
                 print(
                     f"setting optimal spec_amplitude for {this_qubit} {spec_amplitude}"
                 )
                 amplitude_values = [spec_amplitude]
+
             else:
                 amplitude_values = spec_pulse_amplitudes[this_qubit]
 

@@ -9,6 +9,7 @@ from collections.abc import Iterable
 from tergite_autocalibration.config.settings import DATA_DIR
 
 
+
 def configure_dataset(
     raw_ds: xarray.Dataset,
     node,
@@ -104,9 +105,6 @@ def configure_dataset(
 
             coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
 
-        # if node.name in ['ro_amplitude_three_state_optimization']:
-        # coords_dict['state'] = ('state', qubit_states, {'qubit': measured_qubit, 'long_name': 'state', 'units': 'NA'})
-
         partial_ds = xarray.Dataset(coords=coords_dict)
 
         data_values = raw_ds[key].values
@@ -123,9 +121,6 @@ def configure_dataset(
                     states = coords_dict[key][1]
             data_values = reshufle_loop_dataset(data_values, ampls, states, loops)
 
-        # TODO this is not safe:
-        # This assumes that the inner settable variable is placed
-        # at the first position in the samplespace
         reshaping = reversed(node.dimensions)
         if node.name in ["ro_amplitude_optimization_gef"]:
             reshaping = [shots, dimensions[0], len(qubit_states)]
@@ -146,19 +141,6 @@ def configure_dataset(
             "long_name": f"y{measured_qubit}",
             "units": "NA",
         }
-        # qubit_state = ''
-        # if 'ro_opt_frequencies' in list(sweep_quantities):
-        # if 'ro_opt_frequencies' in list(sweep_quantities):
-        #     qubit_states = [0,1,2]
-
-        # TODO ro_frequency_optimization requires multiple measurements per qubit
-        # is_frequency_opt = node.name == 'ro_frequency_two_state_optimization' or node.name == 'ro_frequency_three_state_optimization'
-        # if is_frequency_opt:
-        #     qubit_states = [0,1,2]
-        #     qubit_state = qubit_states[key // n_qubits]
-        #     attributes['qubit_state'] = qubit_state
-
-        # partial_ds[f'y{measured_qubit}{qubit_state}'] = (tuple(coords_dict.keys()), data_values, attributes)
         partial_ds[f"y{measured_qubit}"] = (
             tuple(coords_dict.keys()),
             data_values,
@@ -190,24 +172,6 @@ def reshufle_loop_dataset(initial_array: np.ndarray, ampls, states, loops: int):
         reshuffled_array[new_index] = el
     reshuffled_array.reshape(*initial_shape)
     return reshuffled_array
-
-
-# def handle_ro_freq_optimization(complex_dataset: xarray.Dataset, states: list[int]) -> xarray.Dataset:
-#     breakpoint()
-#     # TODO probably this is not necessary, just set the qubit states at the samplespace, the dataset ends up the same anyway
-#     new_ds = xarray.Dataset(coords=complex_dataset.coords, attrs=complex_dataset.attrs)
-#     new_ds = new_ds.expand_dims(dim={'qubit_state': states})
-#     # TODO this for every var and every coord. It might cause
-#     # performance issues for larger datasets
-#     for coord in complex_dataset.coords:
-#         this_qubit = complex_dataset[coord].attrs['qubit']
-#         attributes = {'qubit': this_qubit, 'element_type': 'qubit'}
-#         values = []
-#         for var in complex_dataset.data_vars:
-#             if coord in complex_dataset[var].coords:
-#                 values.append(complex_dataset[var].values)
-#         new_ds[f'y{this_qubit}'] = (('qubit_state', coord), np.vstack(values), attributes)
-#     return new_ds
 
 
 def create_node_data_path(node) -> pathlib.Path:

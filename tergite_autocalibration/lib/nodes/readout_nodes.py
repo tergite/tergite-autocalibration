@@ -92,7 +92,7 @@ class Punchout_Node(BaseNode):
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             },
             "ro_amplitudes": {
-                qubit: np.linspace(0.005, 0.2, 8) for qubit in self.all_qubits
+                qubit: np.linspace(0.008, 0.06, 5) for qubit in self.all_qubits
             },
         }
 
@@ -126,10 +126,10 @@ class RO_frequency_three_state_optimization_Node(BaseNode):
         self.qubit_state = 2
 
         self.schedule_samplespace = {
-            "qubit_states": {qubit: [0, 1, 2] for qubit in self.all_qubits},
             "ro_opt_frequencies": {
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             },
+            "qubit_states": {qubit: [0, 1, 2] for qubit in self.all_qubits},
         }
 
 
@@ -179,10 +179,8 @@ class RO_amplitude_three_state_optimization_Node(BaseNode):
         self.all_qubits = all_qubits
         self.redis_field = ["measure_3state_opt:ro_ampl_3st_opt", "inv_cm_opt"]
         self.qubit_state = 2
-        self.measurement_obj = RO_amplitude_optimization
-        self.analysis_obj = OptimalRO_Three_state_AmplitudeAnalysis
         self.schedule_keywords = {}
-        self.schedule_keywords["loop_repetitions"] = 256
+        self.schedule_keywords["loop_repetitions"] = 1000
         self.plots_per_qubit = 3  #  fidelity plot, IQ shots, confusion matrix
         self.loops = self.schedule_keywords["loop_repetitions"]
 
