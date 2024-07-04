@@ -12,69 +12,37 @@ import numpy as np
 
 
 class Punchout(Measurement):
-
-    def __init__(self,transmons,qubit_state:int=0):
+    def __init__(self, transmons, qubit_state: int = 0):
         super().__init__(transmons)
         self.qubit_state = qubit_state
         self.transmons = transmons
 
-
     def schedule_function(
-            self, #Note, this is not used in the schedule
+        self,
+        ro_frequencies: dict[str, np.ndarray],
+        ro_amplitudes: dict[str, np.ndarray],
+        repetitions: int = 1024,
+    ) -> Schedule:
 
-            ro_frequencies: dict[str,np.ndarray],
-            ro_amplitudes: dict[str,np.ndarray],
-            repetitions: int = 1024,
-        ) -> Schedule:
-        """
-        Generate a schedule for performing a punchout spectroscopy mainly used to calibrate the amplitude of the readout pulse.
-
-        Schedule sequence
-            Reset -> Spectroscopy readout pulse -> SSBIntegrationComplex (Measurement)
-        Note: Similar to resonator spectroscopy, but here the amplitude of the readout pulse is also a sweeping parameter.
-
-        Parameters
-        ----------
-        self
-            Contains all qubit states.
-        qubits
-            The list of qubits on which to perform the experiment.
-        pulse_durations
-            Duration of the readout pulse for each qubit.
-        acquisition_delays
-            Start of data acquisition relative to the start of the readout pulse for each qubit.
-        integration_times
-            Integration time of the data acquisition for each qubit.
-        ports
-            Location on the device where the readout pulse is applied for each qubit.
-        ro_frequencies
-            Array of the sweeping frequencies of the readout pulse for each qubit.
-        ro_amplitudes
-            Array of the sweeping amplitudes of the readout pulse for each qubit.
-        repetitions
-            The amount of times the Schedule will be repeated.
-
-        Returns
-        -------
-        :
-            An experiment schedule.
-        """
-
-        schedule = Schedule("mltplx_punchout",repetitions)
+        schedule = Schedule("mltplx_punchout", repetitions)
         qubits = self.transmons.keys()
 
         qubits = self.transmons.keys()
 
         # Initialize the clock for each qubit
         for this_qubit, ro_array_val in ro_frequencies.items():
-            #Initialize ClockResource with the first frequency value
-            schedule.add_resource( ClockResource(name=f'{this_qubit}.ro', freq=ro_array_val[0]) )
+            # Initialize ClockResource with the first frequency value
+            schedule.add_resource(
+                ClockResource(name=f"{this_qubit}.ro", freq=ro_array_val[0])
+            )
 
-        #This is the common reference operation so the qubits can be operated in parallel
+        # This is the common reference operation so the qubits can be operated in parallel
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
         # The outer loop, iterates over all qubits
-        for acq_cha, (this_qubit, ro_amplitude_values) in enumerate(ro_amplitudes.items()):
+        for acq_cha, (this_qubit, ro_amplitude_values) in enumerate(
+            ro_amplitudes.items()
+        ):
             # unpack the static parameters
             this_transmon = self.transmons[this_qubit]
             ro_pulse_duration = this_transmon.measure.pulse_duration()
@@ -82,11 +50,11 @@ class Punchout(Measurement):
             integration_time = this_transmon.measure.integration_time()
             ro_port = this_transmon.ports.readout()
 
-            this_clock = f'{this_qubit}.ro'
+            this_clock = f"{this_qubit}.ro"
 
             # unpack the static parameters
             this_transmon = self.transmons[this_qubit]
-            pulse_duration = this_transmon.measure.pulse_duration()
+            ro_pulse_duration = this_transmon.measure.pulse_duration()
             acquisition_delay = this_transmon.measure.acq_delay()
             integration_time = this_transmon.measure.integration_time()
             ro_port = this_transmon.ports.readout()
@@ -95,16 +63,16 @@ class Punchout(Measurement):
             number_of_freqs = len(frequency_values)
 
             schedule.add(
-                    Reset(*qubits), ref_op=root_relaxation, ref_pt_new='end'
-            ) #To enforce parallelism we refer to the root relaxation
+                Reset(*qubits), ref_op=root_relaxation, ref_pt_new="end"
+            )  # To enforce parallelism we refer to the root relaxation
 
             # The intermediate loop, iterates over all ro_amplitudes
             for ampl_indx, ro_amplitude in enumerate(ro_amplitude_values):
 
-                #The inner for loop iterates over all frequency values in the frequency batch:
+                # The inner for loop iterates over all frequency values in the frequency batch:
                 for acq_index, ro_freq in enumerate(frequency_values):
-                #for acq_index, ro_freq in enumerate(ro_frequencies[this_qubit]):
-                    this_index = ampl_indx*number_of_freqs + acq_index
+                    # for acq_index, ro_freq in enumerate(ro_frequencies[this_qubit]):
+                    this_index = ampl_indx * number_of_freqs + acq_index
 
                     schedule.add(
                         SetClockFrequency(clock=this_clock, clock_freq_new=ro_freq),
@@ -113,7 +81,7 @@ class Punchout(Measurement):
                     schedule.add(
                         SquarePulse(
                             duration=ro_pulse_duration,
-                            amp=ro_amplitudes[this_qubit],
+                            amp=ro_amplitude,
                             port=ro_port,
                             clock=this_clock,
                         ),
@@ -127,7 +95,7 @@ class Punchout(Measurement):
                             clock=this_clock,
                             acq_index=this_index,
                             acq_channel=acq_cha,
-                            bin_mode=BinMode.AVERAGE
+                            bin_mode=BinMode.AVERAGE,
                         ),
                         ref_pt="start",
                         rel_time=acquisition_delay,

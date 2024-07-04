@@ -92,7 +92,7 @@ class Punchout_Node(BaseNode):
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             },
             "ro_amplitudes": {
-                qubit: np.linspace(0.008, 0.06, 5) for qubit in self.all_qubits
+                qubit: np.linspace(0.020, 0.25, 14) for qubit in self.all_qubits
             },
         }
 

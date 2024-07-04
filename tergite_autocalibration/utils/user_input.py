@@ -30,6 +30,7 @@ node reference
   all_XY
   check_cliffords
   cz_chevron
+  cz_chevron_test
   cz_chevron_amplitude
   cz_optimize_chevron
   reset_chevron
@@ -87,9 +88,8 @@ user_samplespace = {
         }
 }
 """
-
 ####################################################################
-target_node = "ro_amplitude_three_state_optimization"
+target_node = "cz_chevron_test"
 qubits = ["q06", "q07", "q08", "q09", "q10"]
 couplers = ["q06_q07"]
 user_samplespace = {

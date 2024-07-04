@@ -127,17 +127,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Getting started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./operation.html">
+    <a class="nav-link" href="./operation.html"> 
 <span class="menu-text">Operation</span></a>
-  </li>
+  </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./configuration_files.html">
+    <a class="nav-link" href="./configuration_files.html"> 
 <span class="menu-text">Configuration Files</span></a>
-  </li>
+  </li>  
   <li class="nav-item">
     <a class="nav-link" href="./available_nodes.html"> 
 <span class="menu-text">Available Nodes</span></a>
-  </li>
+  </li>  
   <li class="nav-item">
     <a class="nav-link active" href="./new_node_creation.html" aria-current="page"> 
 <span class="menu-text">Creating New Nodes</span></a>
@@ -183,8 +183,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="to-create-a-new-node" class="level1">
 <h1>To create a new node:</h1>
 <ol type="1">
-<li><p>In the file <code>tergite_acl/lib/node_factory.py</code> expand the dictionary <code>self.node_implementations</code> with a new entry: The key should be a string of the node name and the value should be the object that contains the implementation details. This object should be imported from either <code>tergite_acl/lib/nodes/qubit_control_nodes.py</code>, <code>tergite_acl/lib/nodes/coupler_nodes.py</code>, <code>tergite_acl/lib/nodes/readout_nodes.py</code> or <code>tergite_acl/lib/nodes/characterization_nodes.py</code></p></li>
-<li><p>In the file <code>tergite_acl/lib/nodes/graph.py</code> in the list <code>graph_dependencies</code> insert the edges that describe the position of the new node in the Directed Acyclic Graph. There are two entries required (or one entry if the new node is the last on its path):</p></li>
+<li><p>in the file <code>tergite_autocalibration/lib/node_factory.py</code> expand the dictionary <code>self.node_implementations</code> with a new entry: The key should be a string of the node name and the value should be the object that contains the implementation details. This object should be imported from either <code>tergite_autocalibration/lib/nodes/qubit_control_nodes.py</code>, <code>tergite_autocalibration/lib/nodes/coupler_nodes.py</code>, <code>tergite_autocalibration/lib/nodes/readout_nodes.py</code> or <code>tergite_autocalibration/lib/nodes/characterization_nodes.py</code></p></li>
+<li><p>In the file <code>tergite_autocalibration/lib/nodes/graph.py</code> in the list <code>graph_dependencies</code> insert the edges that describe the position of the new node in the Directed Acyclic Graph. There are two entries required (or one entry if the new node is the last on its path):</p></li>
 </ol>
 <ul>
 <li><code>('previous_node','new_node')</code></li>

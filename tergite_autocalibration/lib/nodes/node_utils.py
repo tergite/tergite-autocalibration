@@ -7,8 +7,8 @@ import numpy as np
 
 
 def resonator_samples(qubit: str) -> np.ndarray:
-    res_spec_samples = 101
-    sweep_range = 3.5e6
+    res_spec_samples = 81
+    sweep_range = 2.5e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
     min_freq = VNA_frequency - sweep_range / 2
     max_freq = VNA_frequency + sweep_range / 2
