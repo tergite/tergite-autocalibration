@@ -3,7 +3,6 @@ from pathlib import Path
 import numpy as np
 import scipy.optimize as optimize
 
-from tergite_autocalibration.config.coupler_config import coupler_spi_map
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
 from tergite_autocalibration.lib.analysis.coupler_spectroscopy_analysis import (
     CouplerSpectroscopyAnalysis,
@@ -27,7 +26,7 @@ from tergite_autocalibration.lib.analysis.reset_calibration_analysis import (
     ResetCalibrationSSROAnalysis,
 )
 from tergite_autocalibration.lib.base.node import BaseNode
-from tergite_autocalibration.lib.base.node_subclasses import ParametrizedSweepNode
+from tergite_autocalibration.lib.utils.node_subclasses import ParametrizedSweepNode
 from tergite_autocalibration.lib.calibration_schedules.cz_calibration import (
     CZ_calibration,
     CZ_calibration_SSRO,
@@ -50,7 +49,7 @@ from tergite_autocalibration.lib.calibration_schedules.resonator_spectroscopy im
 from tergite_autocalibration.lib.calibration_schedules.two_tone_multidim import (
     Two_Tones_Multidim,
 )
-from tergite_autocalibration.lib.nodes.node_utils import (
+from tergite_autocalibration.utils.user_input import (
     qubit_samples,
     resonator_samples,
 )

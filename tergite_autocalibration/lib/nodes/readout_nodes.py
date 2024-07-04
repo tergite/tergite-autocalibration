@@ -25,7 +25,7 @@ from tergite_autocalibration.lib.calibration_schedules.ro_frequency_optimization
     RO_frequency_optimization,
 )
 from tergite_autocalibration.lib.base.node import BaseNode
-from tergite_autocalibration.lib.nodes.node_utils import resonator_samples
+from tergite_autocalibration.utils.user_input import resonator_samples
 
 
 class Resonator_Spectroscopy_Node(BaseNode):

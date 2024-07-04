@@ -32,7 +32,7 @@ from tergite_autocalibration.config.settings import CLUSTER_IP, REDIS_CONNECTION
 from tergite_autocalibration.config.settings import CLUSTER_NAME
 from tergite_autocalibration.lib.base.node import BaseNode
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
-from tergite_autocalibration.lib.nodes.graph import filtered_topological_order
+from tergite_autocalibration.lib.utils.graph import filtered_topological_order
 from tergite_autocalibration.utils.dataset_utils import create_node_data_path
 from tergite_autocalibration.utils.enums import DataStatus
 from tergite_autocalibration.utils.enums import MeasurementMode

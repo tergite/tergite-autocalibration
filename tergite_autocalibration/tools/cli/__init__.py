@@ -71,7 +71,7 @@ def graph():
     help="Plot the calibration graph to the user specified target node in topological order."
 )
 def plot():
-    from tergite_autocalibration.lib.nodes.graph import filtered_topological_order
+    from tergite_autocalibration.lib.utils.graph import filtered_topological_order
     from tergite_autocalibration.utils.user_input import user_requested_calibration
     from tergite_autocalibration.utils.visuals import draw_arrow_chart
 

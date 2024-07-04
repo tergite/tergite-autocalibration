@@ -11,10 +11,8 @@ from tergite_autocalibration.lib.analysis.qubit_spectroscopy_multidim import (
 )
 from tergite_autocalibration.lib.analysis.rabi_analysis import RabiAnalysis
 from tergite_autocalibration.lib.analysis.ramsey_analysis import (
-    RamseyAnalysis,
     RamseyDetuningsAnalysis,
 )
-from tergite_autocalibration.lib.base.node_subclasses import ParametrizedSweepNode
 from tergite_autocalibration.lib.calibration_schedules.cw_two_nones_spectroscopy import (
     CW_Two_Tones_Spectroscopy,
 )
@@ -30,18 +28,12 @@ from tergite_autocalibration.lib.calibration_schedules.rabi_oscillations import 
 from tergite_autocalibration.lib.calibration_schedules.ramsey_detunings import (
     Ramsey_detunings,
 )
-from tergite_autocalibration.lib.calibration_schedules.ramsey_fringes import (
-    Ramsey_fringes,
-)
 from tergite_autocalibration.lib.calibration_schedules.two_tone_multidim import (
     Two_Tones_Multidim,
 )
-from tergite_autocalibration.lib.calibration_schedules.two_tones_spectroscopy import (
-    Two_Tones_Spectroscopy,
-)
 
 from tergite_autocalibration.lib.base.node import BaseNode
-from tergite_autocalibration.lib.nodes.node_utils import qubit_samples
+from tergite_autocalibration.utils.user_input import qubit_samples
 from tergite_autocalibration.utils.hardware_utils import set_qubit_LO
 
 

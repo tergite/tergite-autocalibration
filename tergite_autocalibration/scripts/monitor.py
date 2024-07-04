@@ -19,9 +19,9 @@ import optuna
 import tergite_autocalibration.utils.user_input as ui
 from tergite_autocalibration.config.settings import CLUSTER_IP, REDIS_CONNECTION
 from tergite_autocalibration.lib.nodes import (
-    graph as cg,
     characterization_nodes as calibrate_nodes,
 )
+from tergite_autocalibration.lib.utils import graph as cg
 from tergite_autocalibration.scripts.calibration_supervisor import CalibrationSupervisor
 from tergite_autocalibration.utils.enums import MeasurementMode
 from tergite_autocalibration.utils.reset_redis_node import ResetRedisNode
