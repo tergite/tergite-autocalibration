@@ -36,7 +36,6 @@ from tergite_autocalibration.lib.nodes.coupler_nodes import (
     CZ_Characterisation_Chevron_Node,
 )
 from tergite_autocalibration.lib.nodes.qubit_control_nodes import (
-    Adaptive_Ramsey_Fringes_Node,
     Motzoi_Parameter_Node,
     N_Rabi_Oscillations_Node,
     Qubit_01_Spectroscopy_CW_Node,
@@ -48,16 +47,13 @@ from tergite_autocalibration.lib.nodes.qubit_control_nodes import (
     Ramsey_Fringes_12_Node,
     Ramsey_Fringes_Node,
 )
-from tergite_autocalibration.lib.nodes.readout_nodes import (
-    Punchout_Node,
-    RO_amplitude_three_state_optimization_Node,
-    RO_amplitude_two_state_optimization_Node,
-    RO_frequency_two_state_optimization_Node,
-    RO_frequency_three_state_optimization_Node,
-    Resonator_Spectroscopy_1_Node,
-    Resonator_Spectroscopy_2_Node,
-    Resonator_Spectroscopy_Node,
-)
+from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.node import \
+    RO_amplitude_two_state_optimization_Node, RO_amplitude_three_state_optimization_Node
+from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.node import \
+    RO_frequency_two_state_optimization_Node, RO_frequency_three_state_optimization_Node
+from tergite_autocalibration.lib.nodes.readout.punchout.node import Punchout_Node
+from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.node import Resonator_Spectroscopy_Node, \
+    Resonator_Spectroscopy_1_Node, Resonator_Spectroscopy_2_Node
 
 
 class NodeFactory:
@@ -69,7 +65,6 @@ class NodeFactory:
             "qubit_01_cw_spectroscopy": Qubit_01_Spectroscopy_CW_Node,
             "rabi_oscillations": Rabi_Oscillations_Node,
             "ramsey_correction": Ramsey_Fringes_Node,
-            "adaptive_ramsey_correction": Adaptive_Ramsey_Fringes_Node,
             "resonator_spectroscopy_1": Resonator_Spectroscopy_1_Node,
             "qubit_12_spectroscopy_pulsed": Qubit_12_Spectroscopy_Pulsed_Node,
             "qubit_12_spectroscopy": Qubit_12_Spectroscopy_Multidim_Node,

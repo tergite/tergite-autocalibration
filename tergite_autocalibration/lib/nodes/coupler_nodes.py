@@ -43,7 +43,7 @@ from tergite_autocalibration.lib.calibration_schedules.randomized_benchmarking i
 from tergite_autocalibration.lib.calibration_schedules.reset_calibration import (
     Reset_calibration_SSRO,
 )
-from tergite_autocalibration.lib.calibration_schedules.resonator_spectroscopy import (
+from tergite_autocalibration.lib.nodes.readout.measurement_1.resonator_spectroscopy import (
     Resonator_Spectroscopy,
 )
 from tergite_autocalibration.lib.calibration_schedules.two_tone_multidim import (
