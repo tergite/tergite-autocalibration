@@ -7,7 +7,7 @@ project:
     - new_node_creation.qmd
     - node_types.qmd
   type: website
-  output-dir: docs
+  output-dir: ../docs
 
 
 website:
