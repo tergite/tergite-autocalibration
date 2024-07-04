@@ -9,7 +9,6 @@ from collections.abc import Iterable
 from tergite_autocalibration.config.settings import DATA_DIR
 
 
-
 def configure_dataset(
     raw_ds: xarray.Dataset,
     node,

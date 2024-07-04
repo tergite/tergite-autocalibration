@@ -1,5 +1,9 @@
 from tergite_autocalibration.utils.user_input import resonator_samples
-from .analysis import ResonatorSpectroscopyAnalysis, ResonatorSpectroscopy_1_Analysis, ResonatorSpectroscopy_2_Analysis
+from .analysis import (
+    ResonatorSpectroscopyAnalysis,
+    ResonatorSpectroscopy_1_Analysis,
+    ResonatorSpectroscopy_2_Analysis,
+)
 from .measurement import Resonator_Spectroscopy
 from ....base.node import BaseNode
 

@@ -31,7 +31,6 @@ class RO_amplitude_optimization(BaseMeasurement):
         loop_repetitions: int,
         qubit_states: dict[str, np.ndarray],
     ) -> Schedule:
-
         schedule = Schedule("ro_amplitude_optimization", repetitions=1)
 
         qubits = self.transmons.keys()

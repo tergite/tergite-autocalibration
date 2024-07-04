@@ -1,6 +1,5 @@
 from tergite_autocalibration.utils.user_input import resonator_samples
-from .analysis import OptimalROFrequencyAnalysis, \
-    OptimalRO_012_FrequencyAnalysis
+from .analysis import OptimalROFrequencyAnalysis, OptimalRO_012_FrequencyAnalysis
 from .measurement import RO_frequency_optimization
 from ....base.node import BaseNode
 

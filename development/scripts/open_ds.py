@@ -1,7 +1,7 @@
 import xarray as xr
 import matplotlib.pyplot as plt
 import importlib
-import tergite_autocalibration.lib.analysis.adaptive_motzoi_analysis as adm
+import development.scripts.adaptive_motzoi_analysis as adm
 
 importlib.reload(adm)
 

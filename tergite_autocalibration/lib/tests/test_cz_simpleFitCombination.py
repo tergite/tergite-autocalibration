@@ -2,16 +2,14 @@ from tergite_autocalibration.tests.utils.env import setup_test_env
 
 setup_test_env()
 
-import pytest
-from tergite_autocalibration.lib.analysis.cz_FitResultStatus import FitResultStatus
-from tergite_autocalibration.lib.analysis.cz_singleGateSimpleFitResult import (
+from tergite_autocalibration.lib.nodes.coupler.cz_chevron.cz_FitResultStatus import (
+    FitResultStatus,
+)
+from tergite_autocalibration.lib.nodes.coupler.cz_chevron.cz_singleGateSimpleFitResult import (
     CZSingleGateSimpleFitResult,
 )
-from tergite_autocalibration.lib.analysis.cz_firstStepCombination import (
+from tergite_autocalibration.lib.nodes.coupler.cz_chevron.cz_firstStepCombination import (
     CZFirstStepCombination,
-)
-from tergite_autocalibration.lib.analysis.cz_simpleFitAnalysisResult import (
-    CZSimpleFitAnalysisResult,
 )
 
 

@@ -42,10 +42,10 @@ from quantify_scheduler.json_utils import pathlib
 
 from tergite_autocalibration.config import settings
 from tergite_autocalibration.config.settings import REDIS_CONNECTION, HARDWARE_CONFIG
-from tergite_autocalibration.lib.analysis.tof_analysis import analyze_tof
+from tergite_autocalibration.experimental.tof_analysis import analyze_tof
 from tergite_autocalibration.lib.base.analysis import BaseAnalysis
-from tergite_autocalibration.lib.utils.demod_channels import ParallelDemodChannels
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
+from tergite_autocalibration.lib.utils.demod_channels import ParallelDemodChannels
 from tergite_autocalibration.lib.utils.redis import (
     load_redis_config,
     load_redis_config_coupler,

@@ -1,7 +1,7 @@
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 import quantify_scheduler.device_under_test.mock_setup as mock
 import numpy as np
-from tergite_autocalibration.lib.calibration_schedules.randomized_benchmarking import (
+from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.measurement import (
     Randomized_Benchmarking,
 )
 import toml

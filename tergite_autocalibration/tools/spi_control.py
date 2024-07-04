@@ -8,7 +8,6 @@ import time
 def run_existing_spi_control_sequence():
     coupler_spi_map = {
         "q12_q13": (1, "dac1"),
-
     }
 
     coupler = "q12_q13"

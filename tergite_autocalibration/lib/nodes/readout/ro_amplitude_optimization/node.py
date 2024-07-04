@@ -1,13 +1,14 @@
 import numpy as np
 
-from .analysis import OptimalRO_Two_state_AmplitudeAnalysis, \
-    OptimalRO_Three_state_AmplitudeAnalysis
+from .analysis import (
+    OptimalRO_Two_state_AmplitudeAnalysis,
+    OptimalRO_Three_state_AmplitudeAnalysis,
+)
 from .measurement import RO_amplitude_optimization
 from ....base.node import BaseNode
 
 
 class RO_amplitude_two_state_optimization_Node(BaseNode):
-
     measurement_obj = RO_amplitude_optimization
     analysis_obj = OptimalRO_Two_state_AmplitudeAnalysis
 
