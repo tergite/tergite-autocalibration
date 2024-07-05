@@ -8,7 +8,7 @@ from .analysis import (
 )
 from ...readout.resonator_spectroscopy.measurement import Resonator_Spectroscopy
 from ....base.node import BaseNode
-from ...qubit_control.spectroscopy.two_tone_multidim import (
+from ...qubit_control.spectroscopy.measurement import (
     Two_Tones_Multidim,
 )
 from tergite_autocalibration.utils.enums import MeasurementMode

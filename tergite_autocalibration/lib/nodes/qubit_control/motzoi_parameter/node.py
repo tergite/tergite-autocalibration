@@ -1,8 +1,8 @@
 import numpy as np
 
-from tergite_autocalibration.lib.nodes.qubit_control.motzoi_parameter.motzoi_analysis import MotzoiAnalysis
-from tergite_autocalibration.lib.base.node import BaseNode
-from tergite_autocalibration.lib.nodes.qubit_control.motzoi_parameter.motzoi_parameter import Motzoi_parameter
+from .analysis import MotzoiAnalysis
+from .measurement import Motzoi_parameter
+from ....base.node import BaseNode
 
 
 class Motzoi_Parameter_Node(BaseNode):

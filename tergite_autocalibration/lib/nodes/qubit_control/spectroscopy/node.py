@@ -1,13 +1,13 @@
 import numpy as np
 from qblox_instruments import Cluster
 
-from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.qubit_spectroscopy_analysis import QubitSpectroscopyAnalysis
-from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.qubit_spectroscopy_multidim import QubitSpectroscopyMultidim
-from tergite_autocalibration.lib.base.node import BaseNode
-from tergite_autocalibration.lib.nodes.qubit_control.qubit_spectroscopy.cw_two_nones_spectroscopy import CW_Two_Tones_Spectroscopy
-from tergite_autocalibration.lib.nodes.qubit_control.qubit_spectroscopy.two_tone_multidim import Two_Tones_Multidim
 from tergite_autocalibration.utils.hardware_utils import set_qubit_LO
 from tergite_autocalibration.utils.user_input import qubit_samples
+from .analysis import QubitSpectroscopyAnalysis, \
+    QubitSpectroscopyMultidim
+from .measurement import Two_Tones_Multidim, \
+    CW_Two_Tones_Spectroscopy
+from ....base.node import BaseNode
 
 
 class Qubit_01_Spectroscopy_CW_Node(BaseNode):

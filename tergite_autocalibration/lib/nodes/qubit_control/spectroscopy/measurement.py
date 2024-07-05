@@ -1,20 +1,20 @@
 """
 Module containing a schedule class for two-tone (qubit) spectroscopy calibration.
 """
+import numpy as np
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.gate_library import Measure, Reset, X
+from quantify_scheduler.operations.pulse_factories import long_square_pulse
 from quantify_scheduler.operations.pulse_library import (
     SetClockFrequency,
     SoftSquarePulse,
 )
-from quantify_scheduler.operations.pulse_factories import long_square_pulse
 from quantify_scheduler.resources import ClockResource
 from quantify_scheduler.schedules.schedule import Schedule
-from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
-from tergite_autocalibration.utils.extended_gates import Measure_RO1
-import numpy as np
 
-from tergite_autocalibration.lib.base.measurement import BaseMeasurement
+from tergite_autocalibration.utils.extended_gates import Measure_RO1
+from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
+from ....base.measurement import BaseMeasurement
 
 
 class Two_Tones_Multidim(BaseMeasurement):
@@ -159,5 +159,47 @@ class Two_Tones_Multidim(BaseMeasurement):
 
                     # update the relaxation for the next batch point
                     schedule.add(Reset(this_qubit))
+
+        return schedule
+
+
+class CW_Two_Tones_Spectroscopy(BaseMeasurement):
+    def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
+        super().__init__(transmons)
+        self.qubit_state = qubit_state
+        self.transmons = transmons
+
+    def schedule_function(self, repetitions: int = 1024, **kwargs) -> Schedule:
+        """
+        ***************************************************
+        This is just a measurement operation.
+        The cw qubit tone is handeled as an external parameter.
+        ***************************************************
+
+        Schedule sequence
+            Reset -> Measure
+        Parameters
+
+        ----------
+        repetitions
+            The amount of times the Schedule will be repeated.
+
+        """
+
+        schedule = Schedule("cw_qubit_spectroscopy", repetitions)
+
+        qubits = self.transmons.keys()
+
+        # This is the common reference operation so the qubits can be operated in parallel
+        root_relaxation = schedule.add(Reset(*qubits), label="Reset")
+
+        for this_qubit in qubits:
+            schedule.add(
+                Reset(this_qubit), ref_op=root_relaxation, ref_pt="end"
+            )  # To enforce parallelism we refer to the root relaxation
+
+            schedule.add(
+                Measure(this_qubit),
+            )
 
         return schedule

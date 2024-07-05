@@ -3,7 +3,7 @@ import numpy as np
 import xarray as xr
 from numpy.polynomial.polynomial import Polynomial
 
-from ...qubit_control.spectroscopy.qubit_spectroscopy_analysis import (
+from ...qubit_control.spectroscopy.analysis import (
     QubitSpectroscopyAnalysis,
 )
 from ....base.analysis import BaseAnalysis

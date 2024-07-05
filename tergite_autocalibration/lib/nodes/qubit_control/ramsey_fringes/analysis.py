@@ -7,7 +7,7 @@ from quantify_core.analysis.fitting_models import (
 )
 
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
-from tergite_autocalibration.lib.base.analysis import BaseAnalysis
+from ....base.analysis import BaseAnalysis
 
 
 class RamseyModel(lmfit.model.Model):
