@@ -8,6 +8,7 @@ from ....base.node import BaseNode
 
 COHERENCE_REPEATS = 3
 
+
 class T2_Node(BaseNode):
     measurement_obj = T2
     analysis_obj = T2Analysis
@@ -106,4 +107,3 @@ class T2_Echo_Node(BaseNode):
     @property
     def dimensions(self):
         return (len(self.samplespace["delays"][self.all_qubits[0]]), 1)
-

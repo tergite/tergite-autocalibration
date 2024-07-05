@@ -97,6 +97,7 @@ configs/**
 tergite_acl/utils/**.csv
 sequence.json
 tergite_autocalibration/utils/**.csv
+out/**
 
 # internal
 external/

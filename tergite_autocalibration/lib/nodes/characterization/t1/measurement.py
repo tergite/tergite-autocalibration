@@ -72,5 +72,3 @@ class T1(BaseMeasurement):
                 self.single_qubit_T1(schedule, this_qubit, acq_index, tau)
 
         return schedule
-
-

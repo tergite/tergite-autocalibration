@@ -2,7 +2,8 @@ import numpy as np
 
 from .analysis import RabiAnalysis, NRabiAnalysis
 from .measurement import (
-    Rabi_Oscillations, N_Rabi_Oscillations,
+    Rabi_Oscillations,
+    N_Rabi_Oscillations,
 )
 from ....base.node import BaseNode
 

@@ -1,4 +1,3 @@
-
 # FIXME: When it is decided which analysis we use, please put everything into the analysis.py file
 
 import glob

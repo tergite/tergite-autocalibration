@@ -1159,7 +1159,6 @@ class CZChevronAnalysisReset(BaseAnalysis):
         axis.set_title(f"CZ Chevron - Qubit {self.qubit[1:]}")
 
 
-
 class CZChevronAnalysisAmplitude:
     def __init__(self, dataset: xr.Dataset):
         # Here I am not sure about the order of qubit.
@@ -1250,4 +1249,3 @@ class CZChevronAnalysisAmplitude:
         axis.set_ylabel("Drive Amplitude (V)")
         axis.set_xlabel("Drive Frequency (Hz)")
         axis.set_title(f"CZ Chevron - Qubit {self.qubit[1:]}")
-

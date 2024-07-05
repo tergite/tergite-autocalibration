@@ -259,4 +259,3 @@ class QubitSpectroscopyMultidim(BaseAnalysis):
         # ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0)
         self.dataset[self.data_var].plot(ax=ax, x=self.frequency_coords)
         ax.scatter(self.qubit_freq, self.spec_ampl, s=52, c="red")
-

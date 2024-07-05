@@ -9,7 +9,8 @@ from quantify_scheduler.operations.gate_library import Measure, Reset, X90, Rxy,
 from quantify_scheduler.operations.pulse_library import (
     ResetClockPhase,
     SoftSquarePulse,
-    IdlePulse, NumericalPulse,
+    IdlePulse,
+    NumericalPulse,
 )
 from quantify_scheduler.resources import ClockResource
 

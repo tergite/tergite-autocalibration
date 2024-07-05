@@ -60,9 +60,10 @@ class RO_amplitude_three_state_optimization_Node(BaseNode):
                 qubit: np.tile(np.array([0, 1, 2], dtype=np.int16), self.loops)
                 for qubit in self.all_qubits
             },
+            # FIXME: Check on whether the samplespace can be bigger
             "ro_amplitudes": {
                 qubit: np.append(
-                    np.linspace(0.001, 0.025, 41), np.linspace(0.026, 0.2, 41)
+                    np.linspace(0.001, 0.025, 5), np.linspace(0.026, 0.2, 5)
                 )
                 for qubit in self.all_qubits
             },
