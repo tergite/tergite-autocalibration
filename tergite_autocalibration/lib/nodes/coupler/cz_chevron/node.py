@@ -7,10 +7,10 @@ from tergite_autocalibration.lib.nodes.coupler.cz_chevron.cz_chevron_analysis im
     CZChevronAnalysisReset,
 )
 from tergite_autocalibration.lib.nodes.coupler.cz_chevron.cz_firstStep_analysis import (
-    CZFirtStepAnalysis,
+    CZFirstStepAnalysis,
 )
 from tergite_autocalibration.lib.base.node import BaseNode
-from tergite_autocalibration.lib.nodes.coupler.cz_chevron.cz_chevron_reversed import (
+from tergite_autocalibration.lib.nodes.coupler.cz_chevron.measurement import (
     CZ_chevron,
     CZ_chevron_amplitude,
 )
@@ -100,7 +100,7 @@ class CZ_Chevron_Node(BaseNode):
 
 class CZ_Characterisation_Chevron_Node(BaseNode):
     measurement_obj = CZ_chevron
-    analysis_obj = CZFirtStepAnalysis
+    analysis_obj = CZFirstStepAnalysis
 
     def __init__(self, name: str, all_qubits: list[str], couplers: list[str]):
         super().__init__(name, all_qubits)
@@ -121,7 +121,7 @@ class CZ_Characterisation_Chevron_Node(BaseNode):
         )
         self.qubit_state = 0
         self.measurement_obj = CZ_chevron
-        self.analysis_obj = CZFirtStepAnalysis
+        self.analysis_obj = CZFirstStepAnalysis
         self.all_qubits = [q for bus in couplers for q in bus.split("_")]
         self.coupler_samplespace = self.samplespace
         self.schedule_samplespace = {

@@ -1,3 +1,5 @@
+# FIXME: When it is decided which analysis we use, please put everything into the analysis.py file
+
 from enum import Enum
 from functools import singledispatchmethod
 
@@ -1156,41 +1158,6 @@ class CZChevronAnalysisReset(BaseAnalysis):
         axis.set_xlabel("Drive Amplitude (V)")
         axis.set_title(f"CZ Chevron - Qubit {self.qubit[1:]}")
 
-        # self.fig.show()
-        # if self.result.status != SweepResultStatus.FOUND:
-        #     print("Not found optimal parameters.")
-        # else:
-        #     opt_freq, self.opt_cz = self.result.get_result()
-        #     self.opt_freq = opt_freq[1]
-        #     datarray = self.dataset[f'y{self.qubit}']
-        #     qubit = self.qubit
-        #     datarray.plot(ax=axis, x=f'cz_pulse_durations{qubit}',cmap='RdBu_r')
-        #     # # fig = axis.pcolormesh(amp,freq,magnitudes,shading='nearest',cmap='RdBu_r')
-        #     axis.scatter(
-        #         self.opt_cz,self.opt_freq,
-        #         c='r',
-        #         label = 'CZ Duration = {:.1f} ns'.format(self.opt_cz*1e9),
-        #         marker='X',s=150,
-        #         edgecolors='k', linewidth=1.0,zorder=10
-        #     )
-        #     # plt.scatter(opt_swap,opt_freq,c='b',label = 'SWAP12 Duration= {:.2f} V'.format(opt_swap),marker='X',s=200,edgecolors='k', linewidth=1.5,zorder=10)
-        #     axis.hlines(
-        #         self.opt_freq,self.amp[0],
-        #         self.amp[-1],
-        #         label = 'Frequency Detuning = {:.2f} MHz'.format(self.opt_freq/1e6),
-        #         colors='k',
-        #         linestyles='--',
-        #         linewidth=1.5
-        #     )
-        #     axis.vlines(self.opt_cz,self.freq[0],self.freq[-1],colors='k',linestyles='--',linewidth=1.5)
-        #     axis.legend(loc = 'lower center', bbox_to_anchor=(-0.15, -0.36, 1.4, .102), mode='expand', ncol=2,
-        #                 title = 'Optimal Gate Parameters', columnspacing=200,borderpad=1)
-        #     # # cbar = plt.colorbar(fig)
-        #     # # cbar.set_label('|2>-state Population', labelpad=10)
-        #     # axis.set_ylim([self.freq[0],self.freq[-1]])
-        #     # axis.set_ylim([self.amp[0],self.amp[-1]])
-        #     axis.set_xlabel('Parametric Drive Durations (s)')
-        #     axis.set_ylabel('Frequency Detuning (Hz)')
 
 
 class CZChevronAnalysisAmplitude:
@@ -1284,38 +1251,3 @@ class CZChevronAnalysisAmplitude:
         axis.set_xlabel("Drive Frequency (Hz)")
         axis.set_title(f"CZ Chevron - Qubit {self.qubit[1:]}")
 
-        # self.fig.show()
-        # if self.result.status != SweepResultStatus.FOUND:
-        #     print("Not found optimal parameters.")
-        # else:
-        #     opt_freq, self.opt_cz = self.result.get_result()
-        #     self.opt_freq = opt_freq[1]
-        #     datarray = self.dataset[f'y{self.qubit}']
-        #     qubit = self.qubit
-        #     datarray.plot(ax=axis, x=f'cz_pulse_durations{qubit}',cmap='RdBu_r')
-        #     # # fig = axis.pcolormesh(amp,freq,magnitudes,shading='nearest',cmap='RdBu_r')
-        #     axis.scatter(
-        #         self.opt_cz,self.opt_freq,
-        #         c='r',
-        #         label = 'CZ Duration = {:.1f} ns'.format(self.opt_cz*1e9),
-        #         marker='X',s=150,
-        #         edgecolors='k', linewidth=1.0,zorder=10
-        #     )
-        #     # plt.scatter(opt_swap,opt_freq,c='b',label = 'SWAP12 Duration= {:.2f} V'.format(opt_swap),marker='X',s=200,edgecolors='k', linewidth=1.5,zorder=10)
-        #     axis.hlines(
-        #         self.opt_freq,self.amp[0],
-        #         self.amp[-1],
-        #         label = 'Frequency Detuning = {:.2f} MHz'.format(self.opt_freq/1e6),
-        #         colors='k',
-        #         linestyles='--',
-        #         linewidth=1.5
-        #     )
-        #     axis.vlines(self.opt_cz,self.freq[0],self.freq[-1],colors='k',linestyles='--',linewidth=1.5)
-        #     axis.legend(loc = 'lower center', bbox_to_anchor=(-0.15, -0.36, 1.4, .102), mode='expand', ncol=2,
-        #                 title = 'Optimal Gate Parameters', columnspacing=200,borderpad=1)
-        #     # # cbar = plt.colorbar(fig)
-        #     # # cbar.set_label('|2>-state Population', labelpad=10)
-        #     # axis.set_ylim([self.freq[0],self.freq[-1]])
-        #     # axis.set_ylim([self.amp[0],self.amp[-1]])
-        #     axis.set_xlabel('Parametric Drive Durations (s)')
-        #     axis.set_ylabel('Frequency Detuning (Hz)')

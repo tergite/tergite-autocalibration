@@ -1,12 +1,12 @@
 from typing import Type
 import numpy as np
-from tergite_autocalibration.lib.nodes.coupler.cz_chevron.cz_FitResultStatus import (
+from tergite_autocalibration.lib.nodes.coupler.cz_chevron.utils.cz_FitResultStatus import (
     FitResultStatus,
 )
-from tergite_autocalibration.lib.nodes.coupler.cz_chevron.cz_simpleFitAnalysisResult import (
+from tergite_autocalibration.lib.nodes.coupler.cz_chevron.utils.cz_simpleFitAnalysisResult import (
     CZSimpleFitAnalysisResult,
 )
-from tergite_autocalibration.lib.nodes.coupler.cz_chevron.cz_singleGateSimpleFitResult import (
+from tergite_autocalibration.lib.nodes.coupler.cz_chevron.utils.cz_singleGateSimpleFitResult import (
     CZSingleGateSimpleFitResult,
 )
 

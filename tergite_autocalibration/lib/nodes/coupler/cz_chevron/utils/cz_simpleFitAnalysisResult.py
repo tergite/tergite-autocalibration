@@ -1,4 +1,4 @@
-from tergite_autocalibration.lib.nodes.coupler.cz_chevron.cz_FitResultStatus import (
+from tergite_autocalibration.lib.nodes.coupler.cz_chevron.utils.cz_FitResultStatus import (
     FitResultStatus,
 )
 

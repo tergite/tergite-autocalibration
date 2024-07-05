@@ -3,10 +3,10 @@ import numpy as np
 import xarray as xr
 from numpy.polynomial.polynomial import Polynomial
 
-from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.qubit_spectroscopy_analysis import (
+from ...qubit_control.spectroscopy.qubit_spectroscopy_analysis import (
     QubitSpectroscopyAnalysis,
 )
-from tergite_autocalibration.lib.base.analysis import BaseAnalysis
+from ....base.analysis import BaseAnalysis
 
 
 class CouplerSpectroscopyAnalysis(BaseAnalysis):

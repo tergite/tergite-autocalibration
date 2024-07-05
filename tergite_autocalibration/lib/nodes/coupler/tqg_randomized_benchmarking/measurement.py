@@ -10,9 +10,9 @@ from tergite_autocalibration.utils.extended_gates import Rxy_12
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 
 
-# from superconduction_qubit_tools.clifford_module.randomized_benchmarking import *
-# from superconduction_qubit_tools.clifford_module.cliffords_decomposition import (decompose_clifford_seq,)
-# from superconduction_qubit_tools.utils.clifford_module.from_list import (add_single_qubit_gates_to_schedule,add_two_qubit_gates_to_schedule,)
+# from superconducting_qubit_tools.clifford_module.randomized_benchmarking import *
+# from superconducting_qubit_tools.clifford_module.cliffords_decomposition import (decompose_clifford_seq,)
+# from superconducting_qubit_tools.utils.clifford_module.from_list import (add_single_qubit_gates_to_schedule,add_two_qubit_gates_to_schedule,)
 
 # FIXME: Feature-flagged installation of scqt required
 

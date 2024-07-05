@@ -1,8 +1,9 @@
 """
 Module containing a schedule class for Ramsey calibration. (1D parameter sweep, for 2D see ramsey_detunings.py)
 """
-from quantify_scheduler.enums import BinMode
+import numpy as np
 from quantify_scheduler import Schedule
+from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.gate_library import Measure, Reset, X
 from quantify_scheduler.operations.pulse_library import IdlePulse
 from quantify_scheduler.operations.pulse_library import (
@@ -11,11 +12,10 @@ from quantify_scheduler.operations.pulse_library import (
     ResetClockPhase,
 )
 from quantify_scheduler.resources import ClockResource
-from tergite_autocalibration.lib.base.measurement import BaseMeasurement
+
 from tergite_autocalibration.utils.extended_coupler_edge import CompositeSquareEdge
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
-
-import numpy as np
+from ....base.measurement import BaseMeasurement
 
 
 class CZ_chevron(BaseMeasurement):

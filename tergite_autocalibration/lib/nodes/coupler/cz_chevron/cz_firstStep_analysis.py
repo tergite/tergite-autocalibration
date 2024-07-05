@@ -1,21 +1,26 @@
+
+# FIXME: When it is decided which analysis we use, please put everything into the analysis.py file
+
 import glob
 from pathlib import Path
-import xarray as xr
 from typing import Type
-from tergite_autocalibration.lib.nodes.coupler.cz_chevron.cz_FitResultStatus import (
+
+import xarray as xr
+
+from .utils.cz_FitResultStatus import (
     FitResultStatus,
 )
-from tergite_autocalibration.lib.nodes.coupler.cz_chevron.cz_firstStepCombination import (
+from .utils.cz_firstStepCombination import (
     CZFirstStepCombination,
     CZSimpleFitAnalysisResult,
 )
-from tergite_autocalibration.lib.nodes.coupler.cz_chevron.cz_singleGateSimpleFit import (
+from .utils.cz_singleGateSimpleFit import (
     CZSingleGateSimpleFit,
 )
-from tergite_autocalibration.lib.base.analysis import BaseAnalysis
+from ....base.analysis import BaseAnalysis
 
 
-class CZFirtStepAnalysis(BaseAnalysis):
+class CZFirstStepAnalysis(BaseAnalysis):
     def __init__(
         self, baseFolder: Type[Path], date, dataFolder: Type[Path], qubit1, qubit2
     ):

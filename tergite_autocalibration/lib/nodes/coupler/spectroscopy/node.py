@@ -3,11 +3,12 @@ from pathlib import Path
 import numpy as np
 from scipy import optimize as optimize
 
-from tergite_autocalibration.lib.nodes.coupler.spectroscopy.coupler_spectroscopy_analysis import (
+from .analysis import (
     CouplerSpectroscopyAnalysis,
 )
-from tergite_autocalibration.lib.base.node import BaseNode
-from tergite_autocalibration.lib.nodes.qubit_control.qubit_spectroscopy.two_tone_multidim import (
+from ...readout.resonator_spectroscopy.measurement import Resonator_Spectroscopy
+from ....base.node import BaseNode
+from ...qubit_control.spectroscopy.two_tone_multidim import (
     Two_Tones_Multidim,
 )
 from tergite_autocalibration.utils.enums import MeasurementMode

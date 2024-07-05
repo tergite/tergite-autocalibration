@@ -99,7 +99,7 @@ tergite_autocalibration/utils/**.csv
 # internal
 external/
 workbench/
-tergite_autocalibration/lib/tests/results/AllFits_q17.png
-tergite_autocalibration/lib/tests/results/SummaryScan_q17.png
+tergite_autocalibration/lib/nodes/coupler/cz_chevron/tests/results/AllFits_q17.png
+tergite_autocalibration/lib/nodes/coupler/cz_chevron/tests/results/SummaryScan_q17.png
 
 tergite_acl/utils/clifford_module/**
