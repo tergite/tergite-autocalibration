@@ -86,6 +86,8 @@ __pycache__/
 .pytest_cache/
 
 # configs
+configs/**
+!configs/configs-readme.md
 !tergite_acl/config/__init__.py
 !tergite_acl/config/settings.py
 !tergite_autocalibration/config/__init__.py

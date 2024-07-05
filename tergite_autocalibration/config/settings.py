@@ -60,9 +60,11 @@ def _from_config(key_name_: str, cast_: type = str, default: T = None) -> T:
 
 
 # ---
-# Section with connectivity definitions
-MSS_MACHINE_ROOT_URL = _from_config(
-    "MSS_MACHINE_ROOT_URL", cast_=str, default="http://localhost:8002"
+# Default prefix for paths
+DEFAULT_PREFIX = _from_config(
+    "DEFAULT_PREFIX",
+    cast_=str,
+    default="calibration",
 )
 
 # ---
@@ -74,7 +76,7 @@ ROOT_DIR = _from_config(
 )
 
 # Data directory to store plots and datasets
-DATA_DIR = _from_config("DATA_DIR", cast_=Path, default=ROOT_DIR.joinpath("data"))
+DATA_DIR = _from_config("DATA_DIR", cast_=Path, default=ROOT_DIR.joinpath("out"))
 
 # If the data directory does not exist, it will be created automatically
 if not os.path.exists(DATA_DIR):
@@ -108,3 +110,10 @@ REDIS_CONNECTION = redis.Redis(decode_responses=True, port=REDIS_PORT)
 PLOTTING = _from_config("PLOTTING", cast_=bool, default=False)
 # This will be set in matplotlib
 PLOTTING_BACKEND = "tkagg" if PLOTTING else "agg"
+
+
+# ---
+# Section with connectivity definitions
+MSS_MACHINE_ROOT_URL = _from_config(
+    "MSS_MACHINE_ROOT_URL", cast_=str, default="http://localhost:8002"
+)
