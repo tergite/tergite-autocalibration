@@ -1,0 +1,59 @@
+# Node types
+The execution of most of the nodes consists of a single schedule compilation, a single measurement and a single post-processing.
+Although for most of the nodes this workflow suffices, there are exceptions while this workflow can become limiting in more advanced implementations.
+
+To allow greater flexibilty in the node implementations the nodes are categorized:
+
+- According to whether they compile once or multiple times:
+  - `node.type = simple_sweep`: if it compiles once
+  - `node.type = parameterized_sweep`: if it compiles multiple times
+
+- According to whether the sweeping parameters are swept whithin the schedule or not:
+  - There is only `node.schedule_samplespace` if the sweeping takes place whithin the schedule
+  - There are both `node.schedule_samplespace`  and `node.external_samplespace` if there are sweeping parameters outside of the scedule. For example
+  the `coupler_spectroscopy` node sweeps the `dc_current` outside of the schedule:
+
+```python
+  class Coupler_Spectroscopy_Node(BaseNode):
+    measurement_obj = Two_Tones_Multidim
+    analysis_obj = CouplerSpectroscopyAnalysis
+
+    def __init__(self, name: str, all_qubits: list[str], couplers, **schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
+        self.couplers = couplers
+        self.redis_field = ['parking_current']
+        self.all_qubits = self.coupled_qubits
+
+        self.schedule_samplespace = {
+            'spec_frequencies': {
+                qubit: qubit_samples(qubit) for qubit in self.all_qubits
+            }
+        }
+
+        self.external_samplespace = {
+            'dc_currents': {
+                self.coupler: np.arange(-2.5e-3, 2.5e-3, 500e-6)
+            },
+        }
+
+    def pre_measurement_operation(self, reduced_ext_space):
+        iteration_dict = reduced_ext_space['dc_currents']
+
+        this_iteration_value = list(iteration_dict.values())[0]
+        print(f'{ this_iteration_value = }')
+        self.spi_dac.set_dac_current(self.dac, this_iteration_value)
+```
+
+By default every node every node is assigned a `node.type` attribute at the `BaseNode` class:
+
+`self.type = simple_sweep`
+
+This attribute can be overwritten at the implementation of the class of each node. An example of a `parameterized_sweep` node type is `Randomized_Benchmarking` as each new iteration requires a the schedule to be recompiled with a different random seed.
+
+The `tergite_acl/scripts/node_supervisor.py` is responcible to distinguish between each node variation.
+
+#### Examples of nodes requiring an externbal samplespace:
+
+- `coupler_spectroscopy` sweeps the `dc_current` which is set by the SPI rack not the cluster
+- `T1` sweeps a repetetion index to repeat the measurement many times
+- `randomized_benchmarking` sweeps different seeds. Although the seed is a schedule parameter, sweeping outside the schedule improves memory utilization.

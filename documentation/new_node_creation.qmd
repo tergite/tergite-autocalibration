@@ -1,0 +1,64 @@
+# To create a new node:
+
+1. in the file `tergite_autocalibration/lib/node_factory.py` expand the dictionary `self.node_implementations`  with a new entry:
+The key should be a string of the node name and the value should be the object that contains the implementation details. This object should be imported from either `tergite_autocalibration/lib/nodes/qubit_control_nodes.py`,  `tergite_autocalibration/lib/nodes/coupler_nodes.py`, `tergite_autocalibration/lib/nodes/readout_nodes.py` or `tergite_autocalibration/lib/nodes/characterization_nodes.py`
+
+2. In the file `tergite_autocalibration/lib/nodes/graph.py` in the list `graph_dependencies` insert the edges that describe the position of the new node in the Directed Acyclic Graph. There are two entries required (or one entry if the new node is the last on its path):
+- `('previous_node','new_node')`
+- `('new_node', 'next_node')`
+
+3. In the `tergite_autocalibration/config/device_config.toml` set the quantity of interest at `nan` value
+
+
+
+## Node implementation object
+
+Each node implementation object should contain a reference to the measurement object, the analysis object, the list of redis fields that the analysis updates and the samplespace of the measurement. For example on the Rabi Rabi Oscillations Node:
+
+```python
+class Rabi_Oscillations_Node(BaseNode):
+    measurement_obj = Rabi_Oscillations
+    analysis_obj = RabiAnalysis
+
+    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
+        super().__init__(name, all_qubits, **node_dictionary)
+        self.redis_field = ['rxy:amp180']
+        self.schedule_samplespace = {
+            'mw_amplitudes': {
+                qubit: np.linspace(0.002, 0.80, 101) for qubit in self.all_qubits
+            }
+        }
+```
+
+
+### Creating a `measurement_obj`
+
+The `measurement_obj` is imported from `tergite_autocalibration/lib/calibration_schedules/` and contains the class that generates the appropriate measurement schedule.
+To initialize we require a dicttionary of the extended transmons:
+
+`transmons: dict[str, ExtendedTransmon]`
+
+It must contain a method called `schedule_function` that expects the `node.samplespace` as input and returns the complete schedule.
+
+
+### Creating an `analysis_obj`
+
+The `analysis_obj` is imported from `tergite_autocalibration/lib/analysis/` and contains the class that perform the analysis for a single qubit.
+It must contain a `run_fitting` method and a `plotter` method
+
+### Node types and samplespaces
+
+Nodes are divided in two distict categories:
+
+- `simple_sweep`: where the Quantify Schedule is compiled only once
+
+- `parameterized_sweep`: where the node requires multiple iterations and each iteration requires a new recompilation.
+
+Furthermore each node can expect two types of samplespaces:
+
+- `schedule_samplespace`: parameter values to be input to the schedule function
+
+- `exterbal_samplespace`: parameter values for quantities that are not set during a schedule
+
+
+[Details on the implementation on the Node types section](node_types.qmd).

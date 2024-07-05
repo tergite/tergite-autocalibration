@@ -9,14 +9,19 @@ from quantify_scheduler.backends.graph_compilation import OperationCompilationCo
 from quantify_scheduler.device_under_test.transmon_element import pulse_factories
 from quantify_scheduler.helpers.validators import Numbers
 from quantify_scheduler.device_under_test.edge import Edge
-from quantify_scheduler.operations.pulse_factories import composite_square_pulse
+
+# from quantify_scheduler.operations.pulse_factories import composite_square_pulse
 from quantify_scheduler.resources import BasebandClockResource
+from tergite_autocalibration.utils.extended_pulse_factories import (
+    composite_soft_square_pulse,
+)
 
 
 class Spec(InstrumentChannel):
     """
     Submodule containing parameters for performing qubit spectroscopy measurements
     """
+
     def __init__(self, parent: InstrumentBase, name: str, **kwargs: Any) -> None:
         super().__init__(parent=parent, name=name)
         self.spec_amp = ManualParameter(
@@ -54,15 +59,6 @@ class CZ(InstrumentChannel):
             instrument=self,
         )
 
-        self.cz_freq = ManualParameter(
-            name="cz_freq",
-            docstring=r"""AC flux frequency for a CZ gate""",
-            instrument=self,
-            unit="Hz",
-            initial_value=100e6,
-            vals=Numbers(min_value=0, max_value=1e12, allow_nan=True),
-        )
-
         self.cz_width = ManualParameter(
             name="cz_width",
             docstring=r"""AC flux pulse rising and lowering edge width""",
@@ -72,25 +68,43 @@ class CZ(InstrumentChannel):
             vals=Numbers(min_value=0, max_value=1e12, allow_nan=True),
         )
 
-        self.add_parameter(
-            name=f"{parent._parent_element_name}_phase_correction",
+        self.parent_phase_correction = ManualParameter(
+            name="parent_phase_correction",
             docstring=r"""The phase correction for the parent qubit after the"""
             r""" square pulse operation has been performed.""",
             unit="degrees",
-            parameter_class=ManualParameter,
             initial_value=0,
             vals=Numbers(min_value=-1e12, max_value=1e12, allow_nan=True),
         )
 
-        self.add_parameter(
-            name=f"{parent._child_element_name}_phase_correction",
-            docstring=r"""The phase correction for the child qubit after the"""
-            r""" Square pulse operation has been performed.""",
+        self.child_phase_correction = ManualParameter(
+            name="child_phase_correction",
+            docstring=r"""The phase correction for the parent qubit after the"""
+            r""" square pulse operation has been performed.""",
             unit="degrees",
-            parameter_class=ManualParameter,
             initial_value=0,
             vals=Numbers(min_value=-1e12, max_value=1e12, allow_nan=True),
         )
+
+        # self.add_parameter(
+        #     name=f"parent_phase_correction",
+        #     docstring=r"""The phase correction for the parent qubit after the"""
+        #     r""" square pulse operation has been performed.""",
+        #     unit="degrees",
+        #     parameter_class=ManualParameter,
+        #     initial_value=0,
+        #     vals=Numbers(min_value=-1e12, max_value=1e12, allow_nan=True),
+        # )
+
+        # self.add_parameter(
+        #     name=f"child_phase_correction",
+        #     docstring=r"""The phase correction for the child qubit after the"""
+        #     r""" Square pulse operation has been performed.""",
+        #     unit="degrees",
+        #     parameter_class=ManualParameter,
+        #     initial_value=0,
+        #     vals=Numbers(min_value=-1e12, max_value=1e12, allow_nan=True),
+        # )
 
         self.dc_flux = ManualParameter(
             name="dc_flux",
@@ -129,6 +143,19 @@ class CZ(InstrumentChannel):
         )
 
 
+class EdgeClocksFrequencies(InstrumentChannel):
+    def __init__(self, parent: InstrumentBase, name: str, **kwargs: Any) -> None:
+        super().__init__(parent=parent, name=name)
+
+        self.cz_freq = ManualParameter(
+            name="cz_freq",
+            docstring=r"""AC flux frequency for a CZ gate""",
+            instrument=self,
+            unit="Hz",
+            initial_value=100e6,
+            vals=Numbers(min_value=0, max_value=1e12, allow_nan=True),
+        )
+
 
 class CompositeSquareEdge(Edge):
     """
@@ -151,6 +178,7 @@ class CompositeSquareEdge(Edge):
 
         self.add_submodule("cz", CZ(self, "cz"))
         self.add_submodule("spec", Spec(self, "spec"))
+        self.add_submodule("clock_freqs", EdgeClocksFrequencies(self, "clock_freqs"))
 
     def generate_edge_config(self) -> Dict[str, Dict[str, OperationCompilationConfig]]:
         """
@@ -162,29 +190,25 @@ class CompositeSquareEdge(Edge):
         edge_op_config = {
             f"{self.name}": {
                 "CZ": OperationCompilationConfig(
-                    factory_func=composite_square_pulse,
+                    factory_func=composite_soft_square_pulse,
                     factory_kwargs={
-                        "square_port": self.name+":fl",
-                        "square_clock": self.name+".cz",
+                        "square_port": self.name + ":fl",
+                        "square_clock": self.name + ".cz",
                         "square_amp": self.cz.square_amp(),
                         "square_duration": self.cz.square_duration(),
-                        "virt_z_parent_qubit_phase": self.cz.parameters[
-                            f"{self._parent_element_name}_phase_correction"
-                        ](),
+                        "virt_z_parent_qubit_phase": self.cz.parent_phase_correction(),
                         "virt_z_parent_qubit_clock": f"{self.parent_device_element.name}.01",
-                        "virt_z_child_qubit_phase": self.cz.parameters[
-                            f"{self._child_element_name}_phase_correction"
-                        ](),
+                        "virt_z_child_qubit_phase": self.cz.child_phase_correction(),
                         "virt_z_child_qubit_clock": f"{self.child_device_element.name}.01",
                     },
                 ),
                 "spec": OperationCompilationConfig(
                     factory_func=pulse_factories.rxy_drag_pulse,
                     factory_kwargs={
-                        'coupler_spec_amp': self.spec.coupler_spec_amp(),
+                        "coupler_spec_amp": self.spec.coupler_spec_amp(),
                     },
-                    gate_info_factory_kwargs=['theta', 'phi'],
-                )
+                    gate_info_factory_kwargs=["theta", "phi"],
+                ),
             }
         }
 

@@ -1,7 +1,4 @@
-
-
 class QOI:
-
     def __init__(self):
         """
         Initialize the QOI

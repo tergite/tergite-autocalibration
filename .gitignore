@@ -18,6 +18,8 @@ send_to_lefteris.ps1
 
 #dataset folders
 202[3456789]*/
+data_directory/
+!dummy_datasets/*
 
 #data files
 *.nc
@@ -78,18 +80,29 @@ Thumbs.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
+/.quarto/
+
 
 .pytest_cache/
 
 # configs
-configs/
-tergite_autocalibration/config/**
+configs/**
+!configs/configs-readme.md
+!tergite_acl/config/__init__.py
+!tergite_acl/config/settings.py
 !tergite_autocalibration/config/__init__.py
 !tergite_autocalibration/config/settings.py
 
 # dev-generated artefacts
+tergite_acl/utils/**.csv
+sequence.json
 tergite_autocalibration/utils/**.csv
+out/**
 
 # internal
 external/
 workbench/
+tergite_autocalibration/lib/nodes/coupler/cz_chevron/tests/results/AllFits_q17.png
+tergite_autocalibration/lib/nodes/coupler/cz_chevron/tests/results/SummaryScan_q17.png
+
+tergite_acl/utils/clifford_module/**

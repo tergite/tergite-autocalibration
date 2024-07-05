@@ -12,19 +12,107 @@
 
 import ast
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum, unique
-from typing import Any, List, Optional, Tuple, TypeVar
+from numbers import Number
+from typing import Any, List, Tuple, TypeVar
+from typing import Hashable, Optional
 
 import redis
 
-from tergite_autocalibration.utils.representation import to_string
-
-from .date_time import utc_now_iso
 from .logger.bcc_logger import get_logger
+
+
+# ============================================================================
+# Logging initialization
+# ============================================================================
+
+logger = get_logger()
+
+
+def to_string(o: object) -> Optional[str]:
+    """Converts its argument into a string, such that
+    ast.literal_eval(o) == o.  The reason for not just using repr for
+    this purpose is that repr might be overridden by debugging tools,
+    or hypothetically, repr could change between python versions.
+
+    NOTE: the might be objects that we haven't covered yet: they can
+    be added later.
+    """
+
+    if isinstance(o, Number):
+        return str(o)
+    elif o is None:
+        return str(o)
+    elif isinstance(o, str):
+        # quote the string
+        return f"'{o}'"
+    if isinstance(o, bytes):
+        return str(o)
+    elif isinstance(o, list):
+        parts = [to_string(e) for e in o]
+        return f"[{', '.join(parts)}]"
+    elif isinstance(o, tuple):
+        parts = [to_string(e) for e in o]
+        return f"({', '.join(parts)})"
+    elif isinstance(o, dict):
+        parts = [f"{_quote_key(key)}: {to_string(value)}" for key, value in o.items()]
+        return f"{{{', '.join(parts)}}}"
+    else:
+        logger.error(f"Unsupported object: {o}")
+        logger.error("(was the calling function)", stacklevel=2)
+        return None
+
+
+def _quote_key(key: Hashable) -> Hashable:
+    """Quotes a dict key if it is a string, and otherwise just returns it"""
+    if isinstance(key, str):
+        return f"'{key}'"
+    else:
+        return key
+
+
+"""Read and write ISO 8601 UTC Z timestamps
+
+Since Python's standard libraries don't support the Z suffix, we
+provide these helper functions.
+"""
+
+
+def utc_now_iso(precision=6) -> str:
+    """Returns current time as an ISO 8601 UTC Z string.
+
+    If precision=n is provided, the fractional part of the seconds is
+    truncated to n decimals.
+    """
+    s = datetime.utcnow()
+    return utc_to_iso(s, precision)
+
+
+def utc_to_iso(t: datetime, precision=6) -> str:
+    """Converts a datetime instance in UTC into an ISO 8601 UTC Z string.
+
+    If precision=n is provided, the fractional part of the seconds is
+    truncated to n decimals.
+
+    NOTES: The given time t *MUST* be in UTC. If the timestamp was
+    created by utcfromtimestamp, this function is suitalbe.
+    """
+    s = t.isoformat()
+    if precision == 0:
+        s = s[:-7]  # remove microseconds and trailing decimal point
+    elif precision in range(1, 6):  # [1..5]
+        s = s[: -(6 - precision)]  # note that s[:-0] == ""
+    elif precision != 6:
+        print(f"invalid precision {precision}: defaulting to 6 (microsecods)")
+
+    return s + "Z"
+
 
 # ============================================================================
 # Types
 # ============================================================================
+
 Unit = str
 
 TimeStamp = str  # in ISO 8601 UTC Z with microsecond precision
@@ -35,14 +123,6 @@ Frequency = float
 Voltage = float
 
 Hex = str  # type(hex(5))
-
-
-# ============================================================================
-# Logging initialization
-# ============================================================================
-
-logger = get_logger()
-
 
 # ============================================================================
 # Initialization for Redis storage

@@ -7,6 +7,13 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 
 ## [Unreleased]
 
+### Added
+
+### Changed
+- Switch to quantify-scheduler version 0.20.0
+
+### Fixed
+
 ## [2024.04.0] - 2024-05-29
 
 This is part of the tergite release v2024.04 that updates the full pipeline for state discrimination hardware calibration
