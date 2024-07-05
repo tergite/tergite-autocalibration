@@ -9,15 +9,19 @@ from quantify_scheduler.backends.graph_compilation import OperationCompilationCo
 from quantify_scheduler.device_under_test.transmon_element import pulse_factories
 from quantify_scheduler.helpers.validators import Numbers
 from quantify_scheduler.device_under_test.edge import Edge
+
 # from quantify_scheduler.operations.pulse_factories import composite_square_pulse
 from quantify_scheduler.resources import BasebandClockResource
-from tergite_autocalibration.utils.extended_pulse_factories import composite_soft_square_pulse
+from tergite_autocalibration.utils.extended_pulse_factories import (
+    composite_soft_square_pulse,
+)
 
 
 class Spec(InstrumentChannel):
     """
     Submodule containing parameters for performing qubit spectroscopy measurements
     """
+
     def __init__(self, parent: InstrumentBase, name: str, **kwargs: Any) -> None:
         super().__init__(parent=parent, name=name)
         self.spec_amp = ManualParameter(
@@ -138,6 +142,7 @@ class CZ(InstrumentChannel):
             vals=Numbers(min_value=-10, max_value=10, allow_nan=True),
         )
 
+
 class EdgeClocksFrequencies(InstrumentChannel):
     def __init__(self, parent: InstrumentBase, name: str, **kwargs: Any) -> None:
         super().__init__(parent=parent, name=name)
@@ -150,6 +155,7 @@ class EdgeClocksFrequencies(InstrumentChannel):
             initial_value=100e6,
             vals=Numbers(min_value=0, max_value=1e12, allow_nan=True),
         )
+
 
 class CompositeSquareEdge(Edge):
     """
@@ -172,7 +178,7 @@ class CompositeSquareEdge(Edge):
 
         self.add_submodule("cz", CZ(self, "cz"))
         self.add_submodule("spec", Spec(self, "spec"))
-        self.add_submodule('clock_freqs', EdgeClocksFrequencies(self, "clock_freqs"))
+        self.add_submodule("clock_freqs", EdgeClocksFrequencies(self, "clock_freqs"))
 
     def generate_edge_config(self) -> Dict[str, Dict[str, OperationCompilationConfig]]:
         """
@@ -186,8 +192,8 @@ class CompositeSquareEdge(Edge):
                 "CZ": OperationCompilationConfig(
                     factory_func=composite_soft_square_pulse,
                     factory_kwargs={
-                        "square_port": self.name+":fl",
-                        "square_clock": self.name+".cz",
+                        "square_port": self.name + ":fl",
+                        "square_clock": self.name + ".cz",
                         "square_amp": self.cz.square_amp(),
                         "square_duration": self.cz.square_duration(),
                         "virt_z_parent_qubit_phase": self.cz.parent_phase_correction(),
@@ -199,10 +205,10 @@ class CompositeSquareEdge(Edge):
                 "spec": OperationCompilationConfig(
                     factory_func=pulse_factories.rxy_drag_pulse,
                     factory_kwargs={
-                        'coupler_spec_amp': self.spec.coupler_spec_amp(),
+                        "coupler_spec_amp": self.spec.coupler_spec_amp(),
                     },
-                    gate_info_factory_kwargs=['theta', 'phi'],
-                )
+                    gate_info_factory_kwargs=["theta", "phi"],
+                ),
             }
         }
 

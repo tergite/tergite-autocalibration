@@ -7,8 +7,7 @@ from qblox_instruments import Cluster, SpiRack
 from qcodes import validators
 
 from tergite_autocalibration.config.coupler_config import coupler_spi_map
-from tergite_autocalibration.config.settings import HARDWARE_CONFIG, REDIS_CONNECTION
-from tergite_autocalibration.functions.execution_worker import measure_node
+from tergite_autocalibration.config.settings import REDIS_CONNECTION, HARDWARE_CONFIG
 from tergite_autocalibration.utils.enums import MeasurementMode
 
 
@@ -80,7 +79,7 @@ def set_qubit_LO(cluster: Cluster, qubit: str, lo_frequency: float):
         this_module.out1_lo_freq(lo_frequency)
         this_module.out1_lo_en(True)
     else:
-        raise ValueError(f"Uknown output: {this_output}")
+        raise ValueError(f"Unknown output: {this_output}")
 
 
 def find_serial_port():
@@ -103,7 +102,6 @@ class SpiDAC:
             self.spi = SpiRack("loki_rack", port, is_dummy=is_dummy)
 
     def create_spi_dac(self, coupler: str):
-
         dc_current_step = 1e-6
         spi_mod_number, dac_name = coupler_spi_map[coupler]
 
@@ -130,7 +128,6 @@ class SpiDAC:
         self.spi.set_current_instant(dac, current)
 
     def set_parking_current(self, coupler: str) -> None:
-
         dac = self.create_spi_dac(coupler)
 
         if REDIS_CONNECTION.hexists(f"transmons:{coupler}", "parking_current"):
