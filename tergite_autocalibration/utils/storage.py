@@ -228,11 +228,11 @@ class BackendProperty:
 
     @classmethod
     def read(
-            cls,
-            property_type: PropertyType,
-            name: str,
-            component: Optional[str] = None,
-            component_id: Optional[str] = None,
+        cls,
+        property_type: PropertyType,
+        name: str,
+        component: Optional[str] = None,
+        component_id: Optional[str] = None,
     ) -> Optional[Tuple[_BackendProperty, TimeStamp, Counter]]:
         """Get the backend property from Redis associated with kind,
         name, component, and component_id, when relevant, together with its
@@ -314,11 +314,11 @@ class BackendProperty:
 
     @classmethod
     def read_value(
-            cls,
-            property_type: PropertyType,
-            name: str,
-            component: Optional[str] = None,
-            component_id: Optional[str] = None,
+        cls,
+        property_type: PropertyType,
+        name: str,
+        component: Optional[str] = None,
+        component_id: Optional[str] = None,
     ) -> Optional[T]:
         """Return the value associated with kind, name, component and
         component_id (if relevant).
@@ -349,11 +349,11 @@ class BackendProperty:
 
     @classmethod
     def get_counter(
-            cls,
-            property_type: PropertyType,
-            name: str,
-            component: Optional[str] = None,
-            component_id: Optional[str] = None,
+        cls,
+        property_type: PropertyType,
+        name: str,
+        component: Optional[str] = None,
+        component_id: Optional[str] = None,
     ) -> Optional[int]:
         # Gets the counter value of the property associated to the
         # given fields. If no counter value is set yet, but there is
@@ -383,11 +383,11 @@ class BackendProperty:
 
     @classmethod
     def reset_counter(
-            cls,
-            property_type: PropertyType,
-            name: str,
-            component: Optional[str] = None,
-            component_id: Optional[str] = None,
+        cls,
+        property_type: PropertyType,
+        name: str,
+        component: Optional[str] = None,
+        component_id: Optional[str] = None,
     ) -> bool:
         """Reset the associated counter. Return True if successful,
         and False otherwise.
@@ -425,11 +425,11 @@ class BackendProperty:
 
     @classmethod
     def get_timestamp(
-            cls,
-            property_type: PropertyType,
-            name: str,
-            component: Optional[str] = None,
-            component_id: Optional[str] = None,
+        cls,
+        property_type: PropertyType,
+        name: str,
+        component: Optional[str] = None,
+        component_id: Optional[str] = None,
     ) -> Optional[int]:
         """Returns the timestamp of the property associated with kind,
         name, component, and component_id. If no property is associated,
@@ -453,11 +453,11 @@ class BackendProperty:
 
     @classmethod
     def delete_property(
-            cls,
-            property_type: PropertyType,
-            name: str,
-            component: Optional[str] = None,
-            component_id: Optional[str] = None,
+        cls,
+        property_type: PropertyType,
+        name: str,
+        component: Optional[str] = None,
+        component_id: Optional[str] = None,
     ):
         """Deletes all Redis the key-value bindings associated with
         the identified property.
@@ -523,11 +523,11 @@ def _transaction(watch_keys: List[str], command: callable) -> Optional[list]:
 
 
 def create_redis_key(
-        property_type: PropertyType,
-        name: str,
-        component: Optional[str] = None,
-        component_id: Optional[str] = None,
-        field: Optional[str] = None,
+    property_type: PropertyType,
+    name: str,
+    component: Optional[str] = None,
+    component_id: Optional[str] = None,
+    field: Optional[str] = None,
 ) -> str:
     """Creates a Redis key from the given arguments, identifying a
     backend property. If 'field' is omitted, the key obtained is a
@@ -548,10 +548,10 @@ def create_redis_key(
 
 
 def set_component_property(
-        component: str,
-        name: str,
-        component_id: str,
-        **fields,
+    component: str,
+    name: str,
+    component_id: str,
+    **fields,
 ):
     """Set the component device property identified by
     property_type, name, component, and component_id, to the bindings given
@@ -566,9 +566,9 @@ def set_component_property(
 
 
 def get_component_property(
-        component: str,
-        name: str,
-        component_id: str,
+    component: str,
+    name: str,
+    component_id: str,
 ) -> Optional[Tuple[_BackendProperty, TimeStamp, Counter]]:
     property_type = PropertyType.DEVICE
     return BackendProperty.read(
@@ -577,9 +577,9 @@ def get_component_property(
 
 
 def get_component_value(
-        component: str,
-        name: str,
-        component_id: str,
+    component: str,
+    name: str,
+    component_id: str,
 ) -> Optional[T]:
     property_type = PropertyType.DEVICE
     return BackendProperty.read_value(
@@ -598,7 +598,7 @@ def set_resonator_property(name: str, component_id: str, **fields):
 
 
 def get_resonator_property(
-        name: str, component_id: str
+    name: str, component_id: str
 ) -> Optional[Tuple[_BackendProperty, TimeStamp, Counter]]:
     """Get all fields associated with the resonator property
     identified by the given arguments.
@@ -631,7 +631,7 @@ def set_qubit_property(name: str, component_id: str, **fields):
 
 
 def get_qubit_property(
-        name: str, component_id: str
+    name: str, component_id: str
 ) -> Optional[Tuple[_BackendProperty, TimeStamp, Counter]]:
     """Get all fields associated with the qubit property
     identified by the given arguments.
@@ -664,7 +664,7 @@ def set_coupler_property(name: str, component_id: str, **fields):
 
 
 def get_coupler_property(
-        name: str, component_id: str
+    name: str, component_id: str
 ) -> Optional[Tuple[_BackendProperty, TimeStamp, Counter]]:
     """Get all fields associated with the coupler property
     identified by the given arguments.

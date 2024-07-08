@@ -75,14 +75,18 @@ def measure_time_of_flight(cluster):
     # Print status of sequencer.
     # print(readout_module.get_sequencer_state(0))
     p0 = np.array(
-        readout_module.get_acquisitions(0)["single"]["acquisition"]["scope"]["path0"]["data"]
+        readout_module.get_acquisitions(0)["single"]["acquisition"]["scope"]["path0"][
+            "data"
+        ]
     )
     p1 = np.array(
-        readout_module.get_acquisitions(0)["single"]["acquisition"]["scope"]["path1"]["data"]
+        readout_module.get_acquisitions(0)["single"]["acquisition"]["scope"]["path1"][
+            "data"
+        ]
     )
     ds = xr.Dataset()
-    ds['p0'] = p0
-    ds['p1'] = p1
+    ds["p0"] = p0
+    ds["p1"] = p1
     return ds
 
     # Analysis

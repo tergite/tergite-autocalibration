@@ -3,7 +3,7 @@ class ClusterNotFoundError(BaseException):
         self.__msg = msg
 
     def __repr__(self):
-        return f'ClusterNotFoundError: {self.__msg}'
+        return f"ClusterNotFoundError: {self.__msg}"
 
     def __str__(self):
         return self.__msg

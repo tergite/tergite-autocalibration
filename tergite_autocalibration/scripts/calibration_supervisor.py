@@ -1,4 +1,21 @@
 # This code is part of Tergite
+#
+# (C) Copyright Eleftherios Moschandreou 2023, 2024
+# (C) Copyright Liangyu Chen 2023, 2024
+# (C) Copyright Stefan Hill 2024
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+#
+# Modified:
+#
+# - Martin Ahindura, 2023
+
 from ipaddress import IPv4Address
 from typing import Union, List
 
@@ -11,50 +28,24 @@ from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 
 from tergite_autocalibration.config import settings
-from tergite_autocalibration.config.settings import (
-    CLUSTER_IP,
-    REDIS_CONNECTION,
-    CLUSTER_NAME,
-)
-from tergite_autocalibration.functions.monitor_worker import monitor_node_calibration
-from tergite_autocalibration.lib.node_factory import NodeFactory
-from tergite_autocalibration.lib.nodes.graph import filtered_topological_order
+from tergite_autocalibration.config.settings import CLUSTER_IP, REDIS_CONNECTION
+from tergite_autocalibration.config.settings import CLUSTER_NAME
+from tergite_autocalibration.lib.base.node import BaseNode
+from tergite_autocalibration.lib.utils.node_factory import NodeFactory
+from tergite_autocalibration.lib.utils.graph import filtered_topological_order
 from tergite_autocalibration.utils.dataset_utils import create_node_data_path
-from tergite_autocalibration.utils.enums import MeasurementMode
 from tergite_autocalibration.utils.enums import DataStatus
+from tergite_autocalibration.utils.enums import MeasurementMode
 from tergite_autocalibration.utils.errors import ClusterNotFoundError
-from tergite_autocalibration.utils.hardware_utils import SpiDAC
 from tergite_autocalibration.utils.logger.tac_logger import logger
 from tergite_autocalibration.utils.redis_utils import (
     populate_initial_parameters,
     populate_node_parameters,
     populate_quantities_of_interest,
 )
-from tergite_autocalibration.utils.user_input import (
-    user_requested_calibration,
-    attenuation_setting,
-)
-from tergite_autocalibration.utils.visuals import draw_arrow_chart
-from tergite_autocalibration.config import settings
-from tergite_autocalibration.config.settings import CLUSTER_IP, REDIS_CONNECTION
-from tergite_autocalibration.lib.node_base import BaseNode
-from tergite_autocalibration.lib.nodes.graph import filtered_topological_order
-from tergite_autocalibration.lib.node_factory import NodeFactory
-from tergite_autocalibration.utils.logger.tac_logger import logger
-from tergite_autocalibration.utils.enums import MeasurementMode
-from tergite_autocalibration.utils.enums import DataStatus
+from tergite_autocalibration.utils.user_input import attenuation_setting
 from tergite_autocalibration.utils.user_input import user_requested_calibration
 from tergite_autocalibration.utils.visuals import draw_arrow_chart
-from tergite_autocalibration.utils.dataset_utils import create_node_data_path
-from tergite_autocalibration.utils.hardware_utils import SpiDAC, set_qubit_attenuation
-from tergite_autocalibration.functions.node_supervisor import monitor_node_calibration
-from tergite_autocalibration.utils.redis_utils import (
-    populate_initial_parameters,
-    populate_node_parameters,
-    populate_quantities_of_interest,
-)
-
-from tergite_autocalibration.utils.dummy_setup import dummy_setup
 
 colorama_init()
 
@@ -78,7 +69,6 @@ class CalibrationSupervisor:
         cluster_ip: Union[str, "IPv4Address"] = CLUSTER_IP,
         cluster_timeout: int = 222,
     ) -> None:
-
         # Read hardware related configuration steps
         self.cluster_mode: "MeasurementMode" = cluster_mode
         self.cluster_ip: Union[str, "IPv4Address"] = cluster_ip
@@ -103,13 +93,6 @@ class CalibrationSupervisor:
         self.node_factory = NodeFactory()
         self.topo_order = filtered_topological_order(self.target_node)
 
-        # TODO MERGE-CZ-GATE: Here, we could have a more general check or .env variable whether to use the spi rack
-        # if self.target_node == 'cz_chevron':
-        #     self.dacs = {}
-        #     self.spi = SpiDAC()
-        #     for coupler in self.couplers:
-        #         self.dacs[coupler] = self.spi.create_spi_dac(coupler)
-
     def _create_cluster(self) -> "Cluster":
         cluster_: "Cluster"
         if self.cluster_mode == MeasurementMode.real:
@@ -124,7 +107,6 @@ class CalibrationSupervisor:
             )
 
     def _create_lab_ic(self, clusters: Union["Cluster", List["Cluster"]]):
-
         ic_ = InstrumentCoordinator("lab_ic")
         if isinstance(clusters, Cluster):
             clusters = [clusters]
@@ -268,38 +250,14 @@ class CalibrationSupervisor:
                 "\u2691\u2691\u2691 "
                 + f"{Fore.RED}{Style.BRIGHT}Calibration required for Node {node_name}{Style.RESET_ALL}"
             )
-            node_calibration_status = self.calibrate_node(node)
+            logger.info(f"Calibrating node {node.name}")
+            # TODO: This could be in the node initializer
+            data_path = create_node_data_path(node)
+            measurement_result = node.calibrate(
+                data_path, self.lab_ic, self.measurement_mode
+            )
 
             # TODO : develop failure strategies ->
             # if node_calibration_status == DataStatus.out_of_spec:
             #     node_expand()
             #     node_calibration_status = self.calibrate_node(node)
-
-    def calibrate_node(self, node, **static_parameters) -> DataStatus:
-        if type(node) == str:
-            node = self.node_factory.create_node(
-                node, self.qubits, couplers=self.couplers, **static_parameters
-            )
-        logger.info(f"Calibrating node {node.name}")
-
-        # TODO MERGE-CZ-GATE: We should discuss the information flow here - what values are set and for which component?
-        """
-        if node_label in transmon_configuration:
-        write_calibrate_paras(node_label)
-        # node_dictionary = user_requested_calibration['node_dictionary']
-        if couplers is not None and len(couplers):
-            static_parameters["couplers"] = couplers
-        bin_mode = static_parameters.pop("bin_mode", None)
-        repetitions = static_parameters.pop("repetitions", None)
-        node = node_factory.create_node(node_label, qubits, **static_parameters)
-        """
-
-        # TODO: This should be in the node initializer
-        data_path = create_node_data_path(node)
-        # TODO: This should be the refactored such that the node can be run like node.calibrate()
-        measurement_result = monitor_node_calibration(
-            node, data_path, self.lab_ic, self.measurement_mode
-        )
-
-        # TODO MERGE-CZ-GATE: We should discuss the information flow here and see where these return args are used
-        return [str(data_path), measurement_result]
