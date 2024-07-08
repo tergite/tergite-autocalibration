@@ -18,44 +18,11 @@ class Punchout(BaseMeasurement):
         self.transmons = transmons
 
     def schedule_function(
-        self,  # Note, this is not used in the schedule
+        self,
         ro_frequencies: dict[str, np.ndarray],
         ro_amplitudes: dict[str, np.ndarray],
         repetitions: int = 1024,
     ) -> Schedule:
-        """
-        Generate a schedule for performing a punchout spectroscopy mainly used to calibrate the amplitude of the readout pulse.
-
-        Schedule sequence
-            Reset -> Spectroscopy readout pulse -> SSBIntegrationComplex (Measurement)
-        Note: Similar to resonator spectroscopy, but here the amplitude of the readout pulse is also a sweeping parameter.
-
-        Parameters
-        ----------
-        self
-            Contains all qubit states.
-        qubits
-            The list of qubits on which to perform the experiment.
-        pulse_durations
-            Duration of the readout pulse for each qubit.
-        acquisition_delays
-            Start of data acquisition relative to the start of the readout pulse for each qubit.
-        integration_times
-            Integration time of the data acquisition for each qubit.
-        ports
-            Location on the device where the readout pulse is applied for each qubit.
-        ro_frequencies
-            Array of the sweeping frequencies of the readout pulse for each qubit.
-        ro_amplitudes
-            Array of the sweeping amplitudes of the readout pulse for each qubit.
-        repetitions
-            The amount of times the Schedule will be repeated.
-
-        Returns
-        -------
-        :
-            An experiment schedule.
-        """
 
         schedule = Schedule("mltplx_punchout", repetitions)
         qubits = self.transmons.keys()
@@ -87,7 +54,7 @@ class Punchout(BaseMeasurement):
 
             # unpack the static parameters
             this_transmon = self.transmons[this_qubit]
-            pulse_duration = this_transmon.measure.pulse_duration()
+            ro_pulse_duration = this_transmon.measure.pulse_duration()
             acquisition_delay = this_transmon.measure.acq_delay()
             integration_time = this_transmon.measure.integration_time()
             ro_port = this_transmon.ports.readout()
@@ -113,7 +80,7 @@ class Punchout(BaseMeasurement):
                     schedule.add(
                         SquarePulse(
                             duration=ro_pulse_duration,
-                            amp=ro_amplitudes[this_qubit],
+                            amp=ro_amplitude,
                             port=ro_port,
                             clock=this_clock,
                         ),

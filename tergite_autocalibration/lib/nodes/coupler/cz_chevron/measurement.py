@@ -4,11 +4,26 @@ Module containing a schedule class for Ramsey calibration. (1D parameter sweep, 
 import numpy as np
 from quantify_scheduler import Schedule
 from quantify_scheduler.enums import BinMode
-from quantify_scheduler.operations.gate_library import Measure, Reset, X
-from quantify_scheduler.operations.pulse_library import IdlePulse
+from quantify_scheduler import Schedule
+from quantify_scheduler.operations.gate_library import Measure, Reset, X90, Rxy, X, CZ
 from quantify_scheduler.operations.pulse_library import (
+    GaussPulse,
+    SuddenNetZeroPulse,
+    ResetClockPhase,
+    IdlePulse,
+    DRAGPulse,
     SetClockFrequency,
+    NumericalPulse,
     SoftSquarePulse,
+    SquarePulse,
+)
+from quantify_scheduler.operations.pulse_library import (
+    RampPulse,
+    DRAGPulse,
+    SetClockFrequency,
+    NumericalPulse,
+    SoftSquarePulse,
+    SquarePulse,
     ResetClockPhase,
 )
 from quantify_scheduler.resources import ClockResource
@@ -33,8 +48,7 @@ class CZ_chevron(BaseMeasurement):
     def schedule_function(
         self,
         cz_pulse_frequencies: dict[str, np.ndarray],
-        cz_pulse_durations: dict[str, np.ndarray],
-        cz_pulse_amplitude: float = 0.2,
+        cz_pulse_amplitudes: dict[str, np.ndarray],
         repetitions: int = 1024,
     ) -> Schedule:
         """

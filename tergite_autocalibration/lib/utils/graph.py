@@ -49,6 +49,7 @@ graph_dependencies = [
     ("qubit_12_spectroscopy", "rabi_oscillations_12"),
     ("rabi_oscillations_12", "ramsey_correction_12"),
     ("ramsey_correction_12", "resonator_spectroscopy_2"),
+    ("resonator_spectroscopy_2", "cz_chevron_test"),
     ("resonator_spectroscopy_2", "ro_frequency_three_state_optimization"),
     ("ro_frequency_three_state_optimization", "ro_amplitude_three_state_optimization"),
     # ('coupler_spectroscopy', 'cz_chevron'),
