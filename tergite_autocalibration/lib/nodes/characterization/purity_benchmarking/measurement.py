@@ -12,6 +12,7 @@ class PurityBenchmarking(BaseMeasurement):
         super().__init__(transmons)
         self.qubit_state = qubit_state
         self.transmons = transmons
+        # Initialize dictionaries to store measurement and purity results for each qubit
         self.measurements = {qubit: {"X": [], "Y": [], "Z": []} for qubit in transmons}
         self.purity_results = {qubit: [] for qubit in transmons}
 
@@ -26,7 +27,8 @@ class PurityBenchmarking(BaseMeasurement):
         The goal is to measure the purity of the qubit states after applying each sequence of Clifford gates.
 
         Schedule sequence:
-            Reset -> Apply Clifford operations -> Measure X -> Reset -> Apply Clifford operations -> Measure Y -> Reset -> Apply Clifford operations -> Measure Z -> Calculate purity
+            Reset -> Apply Clifford operations -> Measure X -> Reset -> Apply Clifford operations -> Measure Y
+            -> Reset -> Apply Clifford operations -> Measure Z -> Calculate purity
 
         Parameters:
         ----------
@@ -41,20 +43,26 @@ class PurityBenchmarking(BaseMeasurement):
         Schedule:
             An experiment schedule.
         """  
+        # Create a new Schedule object with the specified number of repetitions
         schedule = Schedule("purity_benchmarking", repetitions)
         qubits = self.transmons.keys()
+        # This is the common reference operation so the qubits can be operated in parallel
         root_relaxation = schedule.add(Reset(*qubits), label="Start")
 
         for this_qubit, clifford_sequence_lengths in number_of_cliffords.items():
+            # Get the total number of Clifford gate decompositions available
             all_cliffords = len(cliffords.XY_decompositions)
+            # Use the seed for reproducibility of random sequences
             seed = seeds[this_qubit]
             rng = np.random.default_rng(seed)
             schedule.add(Reset(*qubits), ref_op=root_relaxation, ref_pt="end")
 
             for acq_index, this_number_of_cliffords in enumerate(clifford_sequence_lengths[:-3]):
+                # Generate a random sequence of Clifford operations
                 random_sequence = rng.integers(all_cliffords, size=this_number_of_cliffords)
 
                 def apply_clifford_sequence(schedule, qubit, random_sequence):
+                    # Apply a sequence of Clifford operations to the qubit
                     for sequence_index in random_sequence:
                         physical_gates = cliffords.XY_decompositions[sequence_index]
                         for gate_angles in physical_gates.values():
@@ -85,10 +93,11 @@ class PurityBenchmarking(BaseMeasurement):
                 self.measurements[this_qubit]["Y"].append(Measure(this_qubit, acq_index=acq_index))
                 self.measurements[this_qubit]["Z"].append(Measure(this_qubit, acq_index=acq_index))
 
+                # Calculate and store the purity of the qubit state
                 purity = self.calculate_purity(this_qubit, acq_index)
                 self.purity_results[this_qubit].append(purity)
 
-            # Add calibration points
+            # Add calibration points for the qubit
             schedule.add(Reset(this_qubit))
             schedule.add(Reset(this_qubit))
             schedule.add(Measure(this_qubit, acq_index=acq_index + 1))
@@ -110,15 +119,19 @@ class PurityBenchmarking(BaseMeasurement):
         return schedule
 
     def calculate_purity(self, qubit, acq_index):
+        # Retrieve measurement values for X, Y, Z bases
         x_value = self.measurements[qubit]["X"][acq_index]
         y_value = self.measurements[qubit]["Y"][acq_index]
         z_value = self.measurements[qubit]["Z"][acq_index]
 
+        # Calculate purity using the sum of squares of the measurement values
         purity = x_value**2 + y_value**2 + z_value**2
         return purity
 
     def get_measurements(self):
+        # Return the stored measurement results
         return self.measurements
 
     def get_purity_results(self):
+        # Return the stored purity results
         return self.purity_results
