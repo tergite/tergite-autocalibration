@@ -1,6 +1,3 @@
-"""
-Module containing classes that model, fit, and plot data from a purity benchmarking experiment.
-"""
 import lmfit
 import numpy as np
 import xarray as xr
@@ -69,14 +66,26 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
         self.number_of_cliffords_runs = dataset.dims[self.number_cliffords_coord] - 3
         self.normalized_data_dict = {}
 
+        # Store calibration points
+        self.calibration_points = {
+            "ground": [],
+            "excited": [],
+            "second_excited": []
+        }
+
         # Normalize the purity data for each repetition
         for repetition_index in range(self.number_of_repetitions):
             values = self.purity.isel({self.seed_coord: [repetition_index]}).values.flatten()
             data = values[:-3]
 
-            # Normalization to make the initial value 1
-            max_value = data[0]
-            normalized_data = data / max_value
+            # Calibration points are the last three values
+            ground, excited, second_excited = values[-3:]
+            self.calibration_points["ground"].append(ground)
+            self.calibration_points["excited"].append(excited)
+            self.calibration_points["second_excited"].append(second_excited)
+
+            # Normalization using ground state value
+            normalized_data = (data - ground) / (excited - ground)
 
             self.normalized_data_dict[repetition_index] = normalized_data
 
