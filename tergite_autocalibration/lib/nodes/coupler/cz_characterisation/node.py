@@ -1,9 +1,14 @@
 import numpy as np
 
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
+from tergite_autocalibration.lib.nodes.coupler.cz_characterisation.analysis import CZ_Frequency_And_Amplitude_Analysis
+from tergite_autocalibration.lib.nodes.coupler.cz_characterisation.measurement import CZ_Frequency_And_Amplitude
 from ....utils.node_subclasses import ParametrizedSweepNode
 
-class CZ_Amplitude_Node(ParametrizedSweepNode):
+class CZ_Characterisation_Fix_Duration_Node(ParametrizedSweepNode):
+    measurement_obj = CZ_Frequency_And_Amplitude
+    analysis_obj = CZ_Frequency_And_Amplitude_Analysis
+
     def __init__(self, name: str, couplers: list[str], **schedule_keywords):
         self.all_qubits = [q for bus in couplers for q in bus.split("_")]
         super().__init__(name, self.all_qubits, **schedule_keywords)
@@ -12,14 +17,10 @@ class CZ_Amplitude_Node(ParametrizedSweepNode):
         self.schedule_keywords = schedule_keywords
         self.backup = False
 
-        self.edges = couplers
-        self.coupler = self.couplers[0]
-        self.redis_field = ["cz_pulse_frequency", "cz_pulse_amplitude"]
-        self.qubit_state = 0
-        
-        self.coupler_samplespace = self.samplespace
+        self.redis_field = ["cz_pulse_frequency", "cz_pulse_amplitude","cz_parking_current"]
         self.node_dictionary["cz_pulse_duration"] = 120e-9 #Need to make it configurable
 
+        #Should these sample space move to user defined inputs?
         self.schedule_samplespace = {
             "cz_pulse_amplitudes": {
                 coupler: np.linspace(0.05, 0.3, 15) for coupler in self.couplers
@@ -30,8 +31,11 @@ class CZ_Amplitude_Node(ParametrizedSweepNode):
             },
         }
         self.external_samplespace = {
-            "current": {coupler: np.arange(-1200,-600,-10)*1e-6 for coupler in self.couplers}
+            "cz_parking_current": {coupler: np.arange(-1200,-600,-10)*1e-6 for coupler in self.couplers}
         }
+        # Not sure which one is correcgt
+        self.coupler_samplespace = self.samplespace
+        self.coupler_samplespace = self.schedule_samplespace
 
         self.validate()
 
