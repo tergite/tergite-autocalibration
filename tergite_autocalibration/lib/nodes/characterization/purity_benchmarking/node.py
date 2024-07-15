@@ -16,7 +16,7 @@ class Randomized_Benchmarking_Node(ParametrizedSweepNode):
         self.all_qubits = all_qubits
         self.schedule_keywords = schedule_keywords
         self.backup = False
-        self.redis_field = ["fidelity"]
+        self.redis_field = ["purity_fidelity"]
         self.schedule_keywords = {}
 
         self.initial_schedule_samplespace = {

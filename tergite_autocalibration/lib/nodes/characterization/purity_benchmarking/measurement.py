@@ -1,5 +1,5 @@
 import numpy as np
-from quantify_scheduler.operations.gate_library import Measure, Reset, Rxy, H, X
+from quantify_scheduler.operations.gate_library import Measure, Reset, X90, H, X, Rxy
 from quantify_scheduler.schedules.schedule import Schedule
 
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
@@ -12,9 +12,8 @@ class PurityBenchmarking(BaseMeasurement):
         super().__init__(transmons)
         self.qubit_state = qubit_state
         self.transmons = transmons
-        # Initialize dictionaries to store measurement and purity results for each qubit
-        self.measurements = {qubit: {"X": [], "Y": [], "Z": []} for qubit in transmons}
-        self.purity_results = {qubit: [] for qubit in transmons}
+        # Initialize dictionaries to store raw measurement data for each qubit
+        self.raw_measurements = {qubit: {"X": [], "Y": [], "Z": []} for qubit in transmons}
 
     def schedule_function(
         self,
@@ -79,7 +78,7 @@ class PurityBenchmarking(BaseMeasurement):
 
                 # Measure in Y basis
                 apply_clifford_sequence(schedule, this_qubit, random_sequence)
-                schedule.add(Rxy(this_qubit, np.pi / 2, np.pi / 2))  # Prepare for Y basis measurement
+                schedule.add(X90(this_qubit))  # Prepare for Y basis measurement
                 schedule.add(Measure(this_qubit, acq_index=acq_index))
                 schedule.add(Reset(this_qubit))
 
@@ -88,14 +87,10 @@ class PurityBenchmarking(BaseMeasurement):
                 schedule.add(Measure(this_qubit, acq_index=acq_index))
                 schedule.add(Reset(this_qubit))
 
-                # Store measurements
-                self.measurements[this_qubit]["X"].append(Measure(this_qubit, acq_index=acq_index))
-                self.measurements[this_qubit]["Y"].append(Measure(this_qubit, acq_index=acq_index))
-                self.measurements[this_qubit]["Z"].append(Measure(this_qubit, acq_index=acq_index))
-
-                # Calculate and store the purity of the qubit state
-                purity = self.calculate_purity(this_qubit, acq_index)
-                self.purity_results[this_qubit].append(purity)
+                # Store raw measurements
+                self.raw_measurements[this_qubit]["X"].append(Measure(this_qubit, acq_index=acq_index))
+                self.raw_measurements[this_qubit]["Y"].append(Measure(this_qubit, acq_index=acq_index))
+                self.raw_measurements[this_qubit]["Z"].append(Measure(this_qubit, acq_index=acq_index))
 
             # Add calibration points for the qubit
             schedule.add(Reset(this_qubit))
@@ -118,20 +113,5 @@ class PurityBenchmarking(BaseMeasurement):
 
         return schedule
 
-    def calculate_purity(self, qubit, acq_index):
-        # Retrieve measurement values for X, Y, Z bases
-        x_value = self.measurements[qubit]["X"][acq_index]
-        y_value = self.measurements[qubit]["Y"][acq_index]
-        z_value = self.measurements[qubit]["Z"][acq_index]
-
-        # Calculate purity using the sum of squares of the measurement values
-        purity = x_value**2 + y_value**2 + z_value**2
-        return purity
-
-    def get_measurements(self):
-        # Return the stored measurement results
-        return self.measurements
-
-    def get_purity_results(self):
-        # Return the stored purity results
-        return self.purity_results
+    def get_raw_measurements(self):
+        return self.raw_measurements

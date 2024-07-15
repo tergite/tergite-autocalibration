@@ -1,7 +1,8 @@
+from pyexpat import model
 import lmfit
+from matplotlib.axes import Axes
 import numpy as np
 import xarray as xr
-from matplotlib.axes import Axes
 
 from ....base.analysis import BaseAnalysis
 
@@ -72,29 +73,45 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
             "excited": [],
             "second_excited": []
         }
-
-        # Normalize the purity data for each repetition
+        
+        # Normalize purity data for each repetition
         for repetition_index in range(self.number_of_repetitions):
-            values = self.purity.isel({self.seed_coord: [repetition_index]}).values.flatten()
-            data = values[:-3]
+            measurements = self.purity.isel({self.seed_coord: [repetition_index]}).values.flatten()
+            data = measurements[:-3]  # Extract data points excluding calibration points
+            calibration_0 = measurements[-3]  # Calibration point 0
+            calibration_1 = measurements[-2]  # Calibration point 1
+            calibration_2 = measurements[-1]  # Calibration point 2
 
-            # Calibration points are the last three values
-            ground, excited, second_excited = values[-3:]
-            self.calibration_points["ground"].append(ground)
-            self.calibration_points["excited"].append(excited)
-            self.calibration_points["second_excited"].append(second_excited)
+            displacement_vector = calibration_1 - calibration_0  # Calculate displacement vector
+            data_translated_to_zero = data - calibration_0  # Translate data to zero reference
+            rotation_angle = np.angle(displacement_vector)  # Calculate rotation angle
+            rotated_data = data_translated_to_zero * np.exp(-1j * rotation_angle)  # Rotate data
+            rotated_0 = calibration_0 * np.exp(-1j * rotation_angle)  # Rotate calibration point 0
+            rotated_1 = calibration_1 * np.exp(-1j * rotation_angle)  # Rotate calibration point 1
+            rotated_2 = calibration_2 * np.exp(-1j * rotation_angle)  # Rotate calibration point 2
+            normalization = (rotated_1 - rotated_0).real  # Calculate normalization factor
+            real_rotated_data = rotated_data.real  # Extract real part of rotated data
+            self.normalized_data_dict[repetition_index] = real_rotated_data / normalization  # Store normalized data
 
-            # Normalization using ground state value
-            normalized_data = (data - ground) / (excited - ground)
+        self.fit_results = {}  # Dictionary to store fitting results
 
-            self.normalized_data_dict[repetition_index] = normalized_data
-
-        self.fit_results = {}
 
     def run_fitting(self):
-        # Sum and average the normalized data across all repetitions
-        sum_data = np.sum([arr for arr in self.normalized_data_dict.values()], axis=0)
-        self.sum = sum_data / len(self.normalized_data_dict)
+        # Calculate the purity from the normalized data
+        purity_results = {}
+        for repetition_index in range(self.number_of_repetitions):
+            x_value = self.normalized_data_dict[repetition_index]["X"]
+            y_value = self.normalized_data_dict[repetition_index]["Y"]
+            z_value = self.normalized_data_dict[repetition_index]["Z"]
+            x_exp = 1 - x_value
+            y_exp = 1 - y_value
+            z_exp = 1 - z_value
+            purity = x_exp**2 + y_exp**2 + z_exp**2
+            purity_results[repetition_index] = purity
+            
+        # Sum and average the normalized purity across all repetitions
+        sum_purity = np.sum([purity for purity in purity_results.values()], axis=0)
+        avg_purity = sum_purity / len(purity_results)
 
         # Initialize the exponential decay model
         model = ExpDecayModel()
@@ -102,8 +119,8 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
         n_cliffords = self.number_of_cliffords[:-3]
 
         # Generate initial parameter guesses and fit the model to the data
-        guess = model.guess(data=self.sum, m=n_cliffords)
-        fit_result = model.fit(self.sum, params=guess, m=n_cliffords)
+        guess = model.guess(data=avg_purity, m=n_cliffords)
+        fit_result = model.fit(avg_purity, params=guess, m=n_cliffords)
 
         # Generate fitted values for plotting
         self.fit_n_cliffords = np.linspace(n_cliffords[0], n_cliffords[-1], 400)
@@ -112,13 +129,17 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
         )
         self.fidelity = fit_result.params["p"].value
 
+        # Store fit results and report
+        self.fit_results = fit_result
+        self.fit_report = fit_result.fit_report()
+
         # Return the fitted parameter for fidelity
         return [self.fidelity]
 
     def plotter(self, ax: Axes):
         # Plot normalized data for each repetition with low transparency
         for repetition_index in range(self.number_of_repetitions):
-            real_values = self.normalized_data_dict[repetition_index]
+            real_values = self.normalized_data_dict[repetition_index]["X"]
             ax.plot(self.number_of_cliffords[:-3], real_values, alpha=0.2)
             ax.annotate(
                 f"{repetition_index}",
@@ -133,7 +154,7 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
             lw=2.5,
             label=f"p = {self.fidelity:.3f}",
         )
-        ax.plot(self.number_of_cliffords[:-3], self.sum, ls="dashed", c="black")
-        ax.set_ylabel("Normalized Purity")
+        ax.plot(self.number_of_cliffords[:-3], self.fit_results.best_fit, ls="dashed", c="black")
+        ax.set_ylabel("Purity")
         ax.set_xlabel("Number of Cliffords")
         ax.grid()
