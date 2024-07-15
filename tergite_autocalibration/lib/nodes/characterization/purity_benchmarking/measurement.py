@@ -87,11 +87,6 @@ class PurityBenchmarking(BaseMeasurement):
                 schedule.add(Measure(this_qubit, acq_index=acq_index))
                 schedule.add(Reset(this_qubit))
 
-                # Store raw measurements
-                self.raw_measurements[this_qubit]["X"].append(Measure(this_qubit, acq_index=acq_index))
-                self.raw_measurements[this_qubit]["Y"].append(Measure(this_qubit, acq_index=acq_index))
-                self.raw_measurements[this_qubit]["Z"].append(Measure(this_qubit, acq_index=acq_index))
-
             # Add calibration points for the qubit
             schedule.add(Reset(this_qubit))
             schedule.add(Reset(this_qubit))
@@ -112,6 +107,3 @@ class PurityBenchmarking(BaseMeasurement):
             schedule.add(Reset(this_qubit))
 
         return schedule
-
-    def get_raw_measurements(self):
-        return self.raw_measurements
