@@ -1,13 +1,13 @@
 import numpy as np
 
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
-from tergite_autocalibration.lib.nodes.coupler.cz_characterisation.analysis import CZ_Frequency_And_Amplitude_Analysis
-from tergite_autocalibration.lib.nodes.coupler.cz_characterisation.measurement import CZ_Frequency_And_Amplitude
+from tergite_autocalibration.lib.nodes.coupler.cz_characterisation.analysis import CZ_Characterisation_Fix_Duration_Analysis
+from tergite_autocalibration.lib.nodes.coupler.cz_characterisation.measurement import CZ_Characterisation_Fix_Duration
 from ....utils.node_subclasses import ParametrizedSweepNode
 
 class CZ_Characterisation_Fix_Duration_Node(ParametrizedSweepNode):
-    measurement_obj = CZ_Frequency_And_Amplitude
-    analysis_obj = CZ_Frequency_And_Amplitude_Analysis
+    measurement_obj = CZ_Characterisation_Fix_Duration
+    analysis_obj = CZ_Characterisation_Fix_Duration_Analysis
 
     def __init__(self, name: str, couplers: list[str], **schedule_keywords):
         self.all_qubits = [q for bus in couplers for q in bus.split("_")]

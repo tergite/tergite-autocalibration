@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
-from tergite_autocalibration.lib.nodes.coupler.cz_characterisation.analysis import CZ_Frequency_And_Amplitude_Analysis
-from tergite_autocalibration.lib.nodes.coupler.cz_characterisation.measurement import CZ_Frequency_And_Amplitude
+from tergite_autocalibration.lib.nodes.coupler.cz_characterisation.analysis import CZ_Characterisation_Fix_Duration_Analysis
+from tergite_autocalibration.lib.nodes.coupler.cz_characterisation.measurement import CZ_Characterisation_Fix_Duration
 from tergite_autocalibration.lib.nodes.coupler.cz_characterisation.node import CZ_Characterisation_Fix_Duration_Node
 from tergite_autocalibration.lib.utils.node_subclasses import ParametrizedSweepNode
 
@@ -21,8 +21,8 @@ def test_ValidationReturnErrorWithSameQubitCoupler():
  
 def test_MeasurementClassType():
     c = CZ_Characterisation_Fix_Duration_Node("cz_char_fixCurrent", couplers = ["q14_q15"])
-    assert isinstance(c.measurement_obj, type(CZ_Frequency_And_Amplitude)) 
+    assert isinstance(c.measurement_obj, type(CZ_Characterisation_Fix_Duration)) 
 
 def test_AnalysisClassType():
     c = CZ_Characterisation_Fix_Duration_Node("cz_char_fixCurrent", couplers = ["q14_q15"])
-    assert isinstance(c.analysis_obj, type(CZ_Frequency_And_Amplitude_Analysis)) 
+    assert isinstance(c.analysis_obj, type(CZ_Characterisation_Fix_Duration_Analysis)) 

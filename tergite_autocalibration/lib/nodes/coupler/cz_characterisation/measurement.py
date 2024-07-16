@@ -13,7 +13,7 @@ from quantify_scheduler.resources import ClockResource
 from quantify_scheduler.operations.gate_library import Measure, Reset, X
 from quantify_scheduler.enums import BinMode
 
-class CZ_Frequency_And_Amplitude(BaseMeasurement):
+class CZ_Characterisation_Fix_Duration(BaseMeasurement):
     def __init__(
         self,
         transmons: dict[str, ExtendedTransmon],
