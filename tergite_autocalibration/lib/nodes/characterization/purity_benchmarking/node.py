@@ -5,7 +5,7 @@ from .measurement import PurityBenchmarking
 from ....utils.node_subclasses import ParametrizedSweepNode
 
 
-class Randomized_Benchmarking_Node(ParametrizedSweepNode):
+class Purity_Benchmarking_Node(ParametrizedSweepNode):
     measurement_obj = PurityBenchmarking
     analysis_obj = PurityBenchmarkingAnalysis
 

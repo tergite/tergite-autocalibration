@@ -28,7 +28,7 @@ class ExpDecayModel(lmfit.model.Model):
         
         if m is None:
             return None
-        amplitude_guess = 1 / 2
+        amplitude_guess = data[0]
         self.set_param_hint("A", value=amplitude_guess)
 
         offset_guess = data[-1]
