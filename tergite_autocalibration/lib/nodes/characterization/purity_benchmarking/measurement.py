@@ -27,7 +27,7 @@ class PurityBenchmarking(BaseMeasurement):
 
         Schedule sequence:
             Reset -> Apply Clifford operations -> Measure X -> Reset -> Apply Clifford operations -> Measure Y
-            -> Reset -> Apply Clifford operations -> Measure Z -> Calculate purity
+            -> Reset -> Apply Clifford operations -> Measure Z
 
         Parameters:
         ----------
@@ -47,7 +47,7 @@ class PurityBenchmarking(BaseMeasurement):
         qubits = self.transmons.keys()
         # This is the common reference operation so the qubits can be operated in parallel
         root_relaxation = schedule.add(Reset(*qubits), label="Start")
-
+        
         for this_qubit, clifford_sequence_lengths in number_of_cliffords.items():
             # Get the total number of Clifford gate decompositions available
             all_cliffords = len(cliffords.XY_decompositions)

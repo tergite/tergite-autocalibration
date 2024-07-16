@@ -65,7 +65,7 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
         self.number_of_cliffords = dataset[self.number_cliffords_coord].values
         self.number_of_cliffords_runs = dataset.dims[self.number_cliffords_coord] - 3
         self.normalized_data_dict = {}
-        self.purity_results = {}
+        self.purity_results_dict = {}
 
         # Store calibration points
         self.calibration_points = {
@@ -100,7 +100,7 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
             x_exp = x_1_value - x_0_value
             y_exp = y_1_value - y_0_value
             z_exp = z_1_value - z_0_value
-            self.purity_results[repetition_index] = x_exp**2 + y_exp**2 + z_exp**2
+            self.purity_results_dict[repetition_index] = x_exp**2 + y_exp**2 + z_exp**2
 
         self.fit_results = {}  # Dictionary to store fitting results
 
@@ -108,8 +108,8 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
     def run_fitting(self):
         
         # Sum and average the normalized purity across all repetitions
-        sum_purity = np.sum([purity for purity in self.purity_results.values()], axis=0)
-        avg_purity = sum_purity / len(self.purity_results)
+        sum_purity = np.sum([purity for purity in self.purity_results_dict.values()], axis=0)
+        avg_purity = sum_purity / len(self.purity_results_dict)
 
         # Initialize the exponential decay model
         model = ExpDecayModel()
@@ -137,7 +137,7 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
     def plotter(self, ax: Axes):
         # Plot normalized data for each repetition with low transparency
         for repetition_index in range(self.number_of_repetitions):
-            real_values = self.purity_results[repetition_index]
+            real_values = self.purity_results_dict[repetition_index]
             ax.plot(self.number_of_cliffords[:-3], real_values, alpha=0.2)
             ax.annotate(
                 f"{repetition_index}",
