@@ -28,9 +28,11 @@ for pid in $pids; do
     ports+=( "$(ps -p "$pid" -o args= | awk -F'[:]' '/redis-server/ {print $NF}')" )
 done
 
+sorted_ports=$(for i in "${ports[@]}"; do echo "$i"; done | sort -n)
+
 echo "Redis instances are running on the following ports and configurations:"
 
-for port in "${ports[@]}"; do
+for port in "${sorted_ports[@]}"; do
     pidfile=$(redis-cli -p "$port" CONFIG GET pidfile | awk 'NR==2 {print $0}')
     echo "$port :: $pidfile"
 done
