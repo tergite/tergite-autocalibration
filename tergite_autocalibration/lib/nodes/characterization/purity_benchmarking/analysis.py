@@ -91,15 +91,19 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
             self.normalized_data_dict[repetition_index] = real_rotated_data / normalization  # Store normalized data
 
             # Calculate the purity from the normalized data
-            x_1_value = self.normalized_data_dict[repetition_index]["X"]
-            y_1_value = self.normalized_data_dict[repetition_index]["Y"]
-            z_1_value = self.normalized_data_dict[repetition_index]["Z"]
+            normalized_data = np.array(self.normalized_data_dict[repetition_index])
+            x_1_value = normalized_data[0::3].mean()
+            y_1_value = normalized_data[1::3].mean()
+            z_1_value = normalized_data[2::3].mean()
+            
             x_0_value = 1 - x_1_value
             y_0_value = 1 - y_1_value
             z_0_value = 1 - z_1_value
+            
             x_exp = x_1_value - x_0_value
             y_exp = y_1_value - y_0_value
             z_exp = z_1_value - z_0_value
+            
             self.purity_results_dict[repetition_index] = x_exp**2 + y_exp**2 + z_exp**2
 
         self.fit_results = {}  # Dictionary to store fitting results
