@@ -68,6 +68,7 @@ param_map = {
     "selectivity": ("qubit", "XY_crosstalk", None, None),
     "anharmonicity": ("qubit", "anharmonicity", None, None),
     "fidelity": ("qubit", "fidelity", None, None),
+    "purity_fidelity":("qubit", "purity_fidelity", None, None),
 }
 
 manual_param_map = {
