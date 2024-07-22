@@ -23,7 +23,7 @@ class Purity_Benchmarking_Node(ParametrizedSweepNode):
             "number_of_cliffords": {
                 # qubit: all_numbers for qubit in self.all_qubits
                 # qubit: np.array([2, 16, 128, 256,512, 768, 1024, 0, 1]) for qubit in self.all_qubits
-                qubit: np.array([0, 2, 4, 8, 16, 128, 256, 512, 1024, 0, 1, 2, 0, 2, 4, 8, 16, 128, 256, 512, 1024, 0, 2, 4, 8, 16, 128, 256, 512, 1024])
+                qubit: np.array(self.stack_number_of_cliffords([0, 2, 4, 8, 16, 128, 256, 512, 1024]))
                 for qubit in self.all_qubits
             },
         }
@@ -36,3 +36,6 @@ class Purity_Benchmarking_Node(ParametrizedSweepNode):
         self.schedule_samplespace = (
             self.initial_schedule_samplespace | reduced_ext_space
         )
+
+    def stack_number_of_cliffords(self, number_of_cliffords):
+        return list(number_of_cliffords) * 3 + [0, 1, 2]

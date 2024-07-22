@@ -63,8 +63,7 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
 
         # Extract the number of repetitions and the sequence lengths for Cliffords
         self.number_of_repetitions = dataset.sizes[self.seed_coord]
-        self.number_of_cliffords = dataset[self.number_cliffords_coord].values // 3
-        self.number_of_cliffords_runs = dataset.sizes[self.number_cliffords_coord] - 3
+        self.number_of_cliffords = np.unique(dataset[self.number_cliffords_coord].values[:-3])
         self.normalized_data_dict = {}
         self.purity_results_dict = {}
 
@@ -124,7 +123,7 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
         # Initialize the exponential decay model
         model = ExpDecayModel()
 
-        n_cliffords = self.number_of_cliffords[:-21]
+        n_cliffords = self.number_of_cliffords
         n_cliffords = np.array(n_cliffords)  # Ensure this is a numpy array
 
         # Generate initial parameter guesses and fit the model to the data
@@ -149,10 +148,10 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
         # Plot normalized data for each repetition with low transparency
         for repetition_index in range(self.number_of_repetitions):
             real_values = self.purity_results_dict[repetition_index]
-            ax.plot(self.number_of_cliffords[:-21], real_values, alpha=0.2)
+            ax.plot(self.number_of_cliffords, real_values, alpha=0.2)
             ax.annotate(
                 f"{repetition_index}",
-                (self.number_of_cliffords[:-21][-1], real_values[-1]),
+                (self.number_of_cliffords[-1], real_values[-1]),
             )
 
         # Plot the fitted curve, summed data, and add labels
@@ -163,7 +162,7 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
             lw=2.5,
             label=f"p = {self.fidelity:.3f}",
         )
-        ax.plot(self.number_of_cliffords[:-21], self.fit_results.best_fit, ls="dashed", c="black")
+        ax.plot(self.number_of_cliffords, self.fit_results.best_fit, ls="dashed", c="black")
         ax.set_ylabel("Purity")
         ax.set_xlabel("Number of Cliffords")
         ax.grid()
