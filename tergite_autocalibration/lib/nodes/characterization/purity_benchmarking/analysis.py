@@ -2,6 +2,7 @@ import lmfit
 from matplotlib.axes import Axes
 import numpy as np
 import xarray as xr
+import matplotlib.pyplot as plt
 
 from ....base.analysis import BaseAnalysis
 
@@ -61,9 +62,9 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
                 self.seed_coord = coord
 
         # Extract the number of repetitions and the sequence lengths for Cliffords
-        self.number_of_repetitions = dataset.dims[self.seed_coord]
-        self.number_of_cliffords = dataset[self.number_cliffords_coord].values
-        self.number_of_cliffords_runs = dataset.dims[self.number_cliffords_coord] - 3
+        self.number_of_repetitions = dataset.sizes[self.seed_coord]
+        self.number_of_cliffords = dataset[self.number_cliffords_coord].values // 3
+        self.number_of_cliffords_runs = dataset.sizes[self.number_cliffords_coord] - 3
         self.normalized_data_dict = {}
         self.purity_results_dict = {}
 
@@ -90,35 +91,41 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
             real_rotated_data = rotated_data.real  # Extract real part of rotated data
             self.normalized_data_dict[repetition_index] = real_rotated_data / normalization  # Store normalized data
 
-            # Calculate the purity from the normalized data
+            # Calculate the purity for each acquisition index
             normalized_data = np.array(self.normalized_data_dict[repetition_index])
-            x_1_value = normalized_data[0::3].mean()
-            y_1_value = normalized_data[1::3].mean()
-            z_1_value = normalized_data[2::3].mean()
+            purity_per_index = []
+            for i in range(len(normalized_data)//3):
+                x_1_value = normalized_data[3*i]
+                y_1_value = normalized_data[3*i + 1]
+                z_1_value = normalized_data[3*i + 2]
+                
+                x_0_value = 1 - x_1_value
+                y_0_value = 1 - y_1_value
+                z_0_value = 1 - z_1_value
+                
+                x_exp = x_1_value - x_0_value
+                y_exp = y_1_value - y_0_value
+                z_exp = z_1_value - z_0_value
+                
+                purity_per_index.append(x_exp**2 + y_exp**2 + z_exp**2)
+                print(x_exp**2 + y_exp**2 + z_exp**2)
             
-            x_0_value = 1 - x_1_value
-            y_0_value = 1 - y_1_value
-            z_0_value = 1 - z_1_value
+            self.purity_results_dict[repetition_index] = purity_per_index
             
-            x_exp = x_1_value - x_0_value
-            y_exp = y_1_value - y_0_value
-            z_exp = z_1_value - z_0_value
-            
-            self.purity_results_dict[repetition_index] = x_exp**2 + y_exp**2 + z_exp**2
-
         self.fit_results = {}  # Dictionary to store fitting results
 
 
     def run_fitting(self):
         
         # Sum and average the normalized purity across all repetitions
-        sum_purity = np.sum([purity for purity in self.purity_results_dict.values()], axis=0)
-        avg_purity = sum_purity / len(self.purity_results_dict)
-
+        sum_purity = np.array(np.sum([purity for purity in self.purity_results_dict.values()], axis=0))
+        avg_purity = np.array(sum_purity / len(self.purity_results_dict))
+        
         # Initialize the exponential decay model
         model = ExpDecayModel()
 
-        n_cliffords = self.number_of_cliffords[:-3]
+        n_cliffords = self.number_of_cliffords[:-21]
+        n_cliffords = np.array(n_cliffords)  # Ensure this is a numpy array
 
         # Generate initial parameter guesses and fit the model to the data
         guess = model.guess(data=avg_purity, m=n_cliffords)
@@ -142,10 +149,10 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
         # Plot normalized data for each repetition with low transparency
         for repetition_index in range(self.number_of_repetitions):
             real_values = self.purity_results_dict[repetition_index]
-            ax.plot(self.number_of_cliffords[:-3], real_values, alpha=0.2)
+            ax.plot(self.number_of_cliffords[:-21], real_values, alpha=0.2)
             ax.annotate(
                 f"{repetition_index}",
-                (self.number_of_cliffords[:-3][-1], real_values[-1]),
+                (self.number_of_cliffords[:-21][-1], real_values[-1]),
             )
 
         # Plot the fitted curve, summed data, and add labels
@@ -156,7 +163,7 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
             lw=2.5,
             label=f"p = {self.fidelity:.3f}",
         )
-        ax.plot(self.number_of_cliffords[:-3], self.fit_results.best_fit, ls="dashed", c="black")
+        ax.plot(self.number_of_cliffords[:-21], self.fit_results.best_fit, ls="dashed", c="black")
         ax.set_ylabel("Purity")
         ax.set_xlabel("Number of Cliffords")
         ax.grid()

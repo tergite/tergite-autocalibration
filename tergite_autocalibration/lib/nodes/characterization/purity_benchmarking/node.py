@@ -23,7 +23,7 @@ class Purity_Benchmarking_Node(ParametrizedSweepNode):
             "number_of_cliffords": {
                 # qubit: all_numbers for qubit in self.all_qubits
                 # qubit: np.array([2, 16, 128, 256,512, 768, 1024, 0, 1]) for qubit in self.all_qubits
-                qubit: np.array([0, 2, 4, 8, 16, 128, 256, 512, 1024, 0, 1, 2])
+                qubit: np.array([0, 2, 4, 8, 16, 128, 256, 512, 1024, 0, 1, 2, 0, 2, 4, 8, 16, 128, 256, 512, 1024, 0, 2, 4, 8, 16, 128, 256, 512, 1024])
                 for qubit in self.all_qubits
             },
         }

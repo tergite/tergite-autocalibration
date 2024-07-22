@@ -56,9 +56,9 @@ class PurityBenchmarking(BaseMeasurement):
             rng = np.random.default_rng(seed)
             schedule.add(Reset(*qubits), ref_op=root_relaxation, ref_pt="end")
 
-            for acq_index, this_number_of_cliffords in enumerate(clifford_sequence_lengths[:-3]):
+            for acq_index, this_number_of_cliffords in enumerate(clifford_sequence_lengths[:-21]):
                 # Generate a random sequence of Clifford operations
-                random_sequence = rng.integers(all_cliffords, size=this_number_of_cliffords)
+                random_sequence = rng.integers(all_cliffords, size=this_number_of_cliffords) // 24
 
                 def apply_clifford_sequence(schedule, qubit, random_sequence):
                     # Apply a sequence of Clifford operations to the qubit
@@ -88,21 +88,24 @@ class PurityBenchmarking(BaseMeasurement):
                 schedule.add(Reset(this_qubit))
 
             # Add calibration points for the qubit
-            calibration_acq_index = len(clifford_sequence_lengths[:-3]) * 3
+            calibration_acq_index = len(clifford_sequence_lengths[:-21])*3
 
             schedule.add(Reset(this_qubit))
+            schedule.add(Reset(this_qubit))
+            schedule.add(Measure(this_qubit, acq_index=calibration_acq_index))
+            schedule.add(Reset(this_qubit))
+
+            schedule.add(Reset(this_qubit))
+            schedule.add(Reset(this_qubit))
+            schedule.add(X(this_qubit))
             schedule.add(Measure(this_qubit, acq_index=calibration_acq_index + 1))
             schedule.add(Reset(this_qubit))
 
             schedule.add(Reset(this_qubit))
-            schedule.add(X(this_qubit))
-            schedule.add(Measure(this_qubit, acq_index=calibration_acq_index + 2))
-            schedule.add(Reset(this_qubit))
-
             schedule.add(Reset(this_qubit))
             schedule.add(X(this_qubit))
             schedule.add(Rxy_12(this_qubit))
-            schedule.add(Measure(this_qubit, acq_index=calibration_acq_index + 3))
+            schedule.add(Measure(this_qubit, acq_index=calibration_acq_index + 2))
             schedule.add(Reset(this_qubit))
 
         return schedule
