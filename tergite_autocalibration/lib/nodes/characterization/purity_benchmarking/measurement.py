@@ -58,7 +58,7 @@ class PurityBenchmarking(BaseMeasurement):
 
             for acq_index, this_number_of_cliffords in enumerate(clifford_sequence_lengths[:-21]):
                 # Generate a random sequence of Clifford operations
-                random_sequence = rng.integers(all_cliffords, size=this_number_of_cliffords) // 24
+                random_sequence = rng.integers(all_cliffords, size=this_number_of_cliffords // 3)
 
                 def apply_clifford_sequence(schedule, qubit, random_sequence):
                     # Apply a sequence of Clifford operations to the qubit
