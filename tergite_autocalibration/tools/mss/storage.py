@@ -20,7 +20,7 @@ from typing import Hashable, Optional
 
 import redis
 
-from .logger.bcc_logger import get_logger
+from tergite_autocalibration.tools.mss.bcc_logger import get_logger
 
 
 # ============================================================================
