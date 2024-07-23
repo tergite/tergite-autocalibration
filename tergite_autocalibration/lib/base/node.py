@@ -50,14 +50,14 @@ from tergite_autocalibration.lib.utils.redis import (
     load_redis_config,
     load_redis_config_coupler,
 )
-from tergite_autocalibration.utils.convert import structured_redis_storage
+from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 from tergite_autocalibration.utils.dataset_utils import (
     configure_dataset,
     retrieve_dummy_dataset,
     save_dataset,
 )
-from tergite_autocalibration.utils.enums import DataStatus
-from tergite_autocalibration.utils.enums import MeasurementMode
+from tergite_autocalibration.utils.dto.enums import DataStatus
+from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.extended_coupler_edge import CompositeSquareEdge
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 from tergite_autocalibration.utils.logger.tac_logger import logger
