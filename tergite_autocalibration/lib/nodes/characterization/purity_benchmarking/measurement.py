@@ -57,7 +57,7 @@ class PurityBenchmarking(BaseMeasurement):
             schedule.add(Reset(*qubits), ref_op=root_relaxation, ref_pt="end")
             acq_index = 0
 
-            for this_number_of_cliffords in clifford_sequence_lengths[:-3]:
+            for this_number_of_cliffords in np.unique(clifford_sequence_lengths[:-3]):
                 # Generate a random sequence of Clifford operations
                 random_sequence = rng.integers(all_cliffords, size=this_number_of_cliffords)
 
@@ -81,6 +81,7 @@ class PurityBenchmarking(BaseMeasurement):
                     schedule.add(Reset(this_qubit))
                     acq_index += 1
 
+            assert acq_index == len(clifford_sequence_lengths[:-3])
 
             schedule.add(Reset(this_qubit))
             schedule.add(Reset(this_qubit))
