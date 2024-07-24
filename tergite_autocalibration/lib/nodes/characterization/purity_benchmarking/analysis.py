@@ -29,9 +29,11 @@ class ExpDecayModel(lmfit.model.Model):
         
         if m is None:
             return None
+        # Guess is the first value
         amplitude_guess = data[0]
         self.set_param_hint("A", value=amplitude_guess)
 
+        # Guess is the last value
         offset_guess = data[-1]
         self.set_param_hint("B", value=offset_guess)
 
@@ -67,12 +69,6 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
         self.normalized_data_dict = {}
         self.purity_results_dict = {}
 
-        # Store calibration points
-        self.calibration_points = {
-            "ground": [],
-            "excited": []
-        }
-
         # Normalize purity data for each repetition
         for repetition_index in range(self.number_of_repetitions):
             measurements = self.purity.isel({self.seed_coord: [repetition_index]}).values.flatten()
@@ -94,20 +90,23 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
             normalized_data = np.array(self.normalized_data_dict[repetition_index])
             purity_per_index = []
             for i in range(len(normalized_data)//3):
+                # Excited state values
                 x_1_value = normalized_data[3*i]
                 y_1_value = normalized_data[3*i + 1]
                 z_1_value = normalized_data[3*i + 2]
                 
+                # Ground state values
                 x_0_value = 1 - x_1_value
                 y_0_value = 1 - y_1_value
                 z_0_value = 1 - z_1_value
-                
+
+                # Get the expecation values for the Pauli operators
                 x_exp = x_1_value - x_0_value
                 y_exp = y_1_value - y_0_value
                 z_exp = z_1_value - z_0_value
                 
+                # Calculate purity
                 purity_per_index.append(x_exp**2 + y_exp**2 + z_exp**2)
-                print(x_exp**2 + y_exp**2 + z_exp**2)
             
             self.purity_results_dict[repetition_index] = purity_per_index
             
@@ -123,8 +122,7 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
         # Initialize the exponential decay model
         model = ExpDecayModel()
 
-        n_cliffords = self.number_of_cliffords
-        n_cliffords = np.array(n_cliffords)  # Ensure this is a numpy array
+        n_cliffords = np.array(self.number_of_cliffords)
 
         # Generate initial parameter guesses and fit the model to the data
         guess = model.guess(data=avg_purity, m=n_cliffords)
