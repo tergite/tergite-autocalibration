@@ -10,10 +10,8 @@
 import warnings
 from typing import List, Any
 
-import redis
-
-import tergite_autocalibration.utils.storage as store
-from tergite_autocalibration.utils.logger.bcc_logger import get_logger
+import tergite_autocalibration.tools.mss.storage as store
+from tergite_autocalibration.tools.mss.bcc_logger import get_logger
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
 
 logger = get_logger()
@@ -68,7 +66,6 @@ param_map = {
     "selectivity": ("qubit", "XY_crosstalk", None, None),
     "anharmonicity": ("qubit", "anharmonicity", None, None),
     "fidelity": ("qubit", "fidelity", None, None),
-    "purity_fidelity": ("qubit", "purity_fidelity", None, None),
 }
 
 manual_param_map = {
@@ -104,7 +101,7 @@ def manual_checks(
         parsed_parameter_value_ = parameter_settings_[3](parsed_parameter_value_)
     except:
         if parameter_settings_[3] is not None:
-            logger.warning(
+            logger.debug(
                 f"Cannot parse {parameter_value_} for {parameter_name_} to {parameter_settings_[3].__name__}"
             )
 
@@ -129,7 +126,7 @@ def structured_redis_storage(field_key: str, comp_index: str, field_value, **kwa
             **kwarg,
         )
     else:
-        warnings.warn(
+        logger.debug(
             f"'{field_key}' is not in mapped parameter list in utilities/standard_redis_storage.py. "
             f"Please add appropriate parameter atributes in the map"
         )

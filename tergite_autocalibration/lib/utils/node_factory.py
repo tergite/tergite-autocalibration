@@ -12,117 +12,125 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from tergite_autocalibration.lib.nodes.characterization.t2.node import (
-    T2_Node,
-    T2_Echo_Node,
-)
-from tergite_autocalibration.lib.nodes.characterization.t1.node import T1_Node
-from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.node import (
-    Randomized_Benchmarking_Node,
-)
-from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.node import (
-    Purity_Benchmarking_Node,
-)
-from tergite_autocalibration.lib.nodes.characterization.all_xy.node import All_XY_Node
-from tergite_autocalibration.lib.nodes.coupler.cz_dynamic_phase.node import (
-    CZ_Dynamic_Phase_Node,
-    CZ_Dynamic_Phase_Swap_Node,
-)
-from tergite_autocalibration.lib.nodes.coupler.cz_calibration.node import (
-    CZ_Calibration_Node,
-    CZ_Calibration_SSRO_Node,
-    CZ_Calibration_Swap_Node,
-    CZ_Calibration_Swap_SSRO_Node,
-    Reset_Calibration_SSRO_Node,
-)
-from tergite_autocalibration.lib.nodes.coupler.cz_chevron.node import (
-    CZ_Chevron_Node,
-    CZ_Characterisation_Chevron_Node,
-    CZ_Chevron_Amplitude_Node,
-    CZ_Optimize_Chevron_Node,
-    CZ_Chevron_Sweep_Node,
-    Reset_Chevron_Node,
-)
-from tergite_autocalibration.lib.nodes.coupler.spectroscopy.node import (
-    Coupler_Spectroscopy_Node,
-    Coupler_Resonator_Spectroscopy_Node,
-)
-from tergite_autocalibration.lib.nodes.qubit_control.ramsey_fringes.node import (
-    Ramsey_Fringes_12_Node,
-    Ramsey_Fringes_Node,
-)
-from tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.node import (
-    Rabi_Oscillations_Node,
-    N_Rabi_Oscillations_Node,
-    Rabi_Oscillations_12_Node,
-)
-from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.node import (
-    Qubit_01_Spectroscopy_CW_Node,
-    Qubit_01_Spectroscopy_Multidim_Node,
-    Qubit_12_Spectroscopy_Pulsed_Node,
-    Qubit_12_Spectroscopy_Multidim_Node,
-)
-from tergite_autocalibration.lib.nodes.qubit_control.motzoi_parameter.node import (
-    Motzoi_Parameter_Node,
-)
-from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.node import (
-    RO_amplitude_two_state_optimization_Node,
-    RO_amplitude_three_state_optimization_Node,
-)
-from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.node import (
-    RO_frequency_two_state_optimization_Node,
-    RO_frequency_three_state_optimization_Node,
-)
-from tergite_autocalibration.lib.nodes.readout.punchout.node import Punchout_Node
-from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.node import (
-    Resonator_Spectroscopy_Node,
-    Resonator_Spectroscopy_1_Node,
-    Resonator_Spectroscopy_2_Node,
-)
-
 
 class NodeFactory:
-    def __init__(self):
-        self.node_implementations = {
-            "punchout": Punchout_Node,
-            "resonator_spectroscopy": Resonator_Spectroscopy_Node,
-            "qubit_01_spectroscopy": Qubit_01_Spectroscopy_Multidim_Node,
-            "qubit_01_cw_spectroscopy": Qubit_01_Spectroscopy_CW_Node,
-            "rabi_oscillations": Rabi_Oscillations_Node,
-            "ramsey_correction": Ramsey_Fringes_Node,
-            "resonator_spectroscopy_1": Resonator_Spectroscopy_1_Node,
-            "qubit_12_spectroscopy_pulsed": Qubit_12_Spectroscopy_Pulsed_Node,
-            "qubit_12_spectroscopy": Qubit_12_Spectroscopy_Multidim_Node,
-            "rabi_oscillations_12": Rabi_Oscillations_12_Node,
-            "ramsey_correction_12": Ramsey_Fringes_12_Node,
-            "resonator_spectroscopy_2": Resonator_Spectroscopy_2_Node,
-            "motzoi_parameter": Motzoi_Parameter_Node,
-            "n_rabi_oscillations": N_Rabi_Oscillations_Node,
-            "coupler_spectroscopy": Coupler_Spectroscopy_Node,
-            "coupler_resonator_spectroscopy": Coupler_Resonator_Spectroscopy_Node,
-            "T1": T1_Node,
-            "T2": T2_Node,
-            "T2_echo": T2_Echo_Node,
-            "all_XY": All_XY_Node,
-            "reset_chevron": Reset_Chevron_Node,
-            "cz_characterisation_chevron": CZ_Characterisation_Chevron_Node,
-            "reset_calibration_ssro": Reset_Calibration_SSRO_Node,
-            "cz_chevron": CZ_Chevron_Node,
-            # "cz_chevron_amplitude": CZ_Chevron_Amplitude_Node,
-            "cz_optimize_chevron": CZ_Optimize_Chevron_Node,
-            "cz_calibration": CZ_Calibration_Node,
-            "cz_calibration_swap": CZ_Calibration_Swap_Node,
-            "cz_calibration_ssro": CZ_Calibration_SSRO_Node,
-            "cz_calibration_swap_ssro": CZ_Calibration_Swap_SSRO_Node,
-            "cz_dynamic_phase": CZ_Dynamic_Phase_Node,
-            "cz_dynamic_phase_swap": CZ_Dynamic_Phase_Swap_Node,
-            "ro_frequency_two_state_optimization": RO_frequency_two_state_optimization_Node,
-            "ro_frequency_three_state_optimization": RO_frequency_three_state_optimization_Node,
-            "ro_amplitude_two_state_optimization": RO_amplitude_two_state_optimization_Node,
-            "ro_amplitude_three_state_optimization": RO_amplitude_three_state_optimization_Node,
-            "randomized_benchmarking": Randomized_Benchmarking_Node,
-            "purity_benchmarking": Purity_Benchmarking_Node,
-        }
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            from tergite_autocalibration.lib.nodes.characterization.t2.node import (
+                T2_Node,
+                T2_Echo_Node,
+            )
+            from tergite_autocalibration.lib.nodes.characterization.t1.node import (
+                T1_Node,
+            )
+            from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.node import (
+                Randomized_Benchmarking_Node,
+            )
+            from tergite_autocalibration.lib.nodes.characterization.all_xy.node import (
+                All_XY_Node,
+            )
+            from tergite_autocalibration.lib.nodes.coupler.cz_dynamic_phase.node import (
+                CZ_Dynamic_Phase_Node,
+                CZ_Dynamic_Phase_Swap_Node,
+            )
+            from tergite_autocalibration.lib.nodes.coupler.cz_calibration.node import (
+                CZ_Calibration_Node,
+                CZ_Calibration_SSRO_Node,
+                CZ_Calibration_Swap_Node,
+                CZ_Calibration_Swap_SSRO_Node,
+                Reset_Calibration_SSRO_Node,
+            )
+            from tergite_autocalibration.lib.nodes.coupler.cz_chevron.node import (
+                CZ_Chevron_Node,
+                CZ_Characterisation_Chevron_Node,
+                CZ_Chevron_Amplitude_Node,
+                CZ_Optimize_Chevron_Node,
+                CZ_Chevron_Sweep_Node,
+                Reset_Chevron_Node,
+            )
+            from tergite_autocalibration.lib.nodes.coupler.spectroscopy.node import (
+                Coupler_Spectroscopy_Node,
+                Coupler_Resonator_Spectroscopy_Node,
+            )
+            from tergite_autocalibration.lib.nodes.qubit_control.ramsey_fringes.node import (
+                Ramsey_Fringes_12_Node,
+                Ramsey_Fringes_Node,
+            )
+            from tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.node import (
+                Rabi_Oscillations_Node,
+                N_Rabi_Oscillations_Node,
+                Rabi_Oscillations_12_Node,
+            )
+            from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.node import (
+                Qubit_01_Spectroscopy_CW_Node,
+                Qubit_01_Spectroscopy_Multidim_Node,
+                Qubit_12_Spectroscopy_Pulsed_Node,
+                Qubit_12_Spectroscopy_Multidim_Node,
+            )
+            from tergite_autocalibration.lib.nodes.qubit_control.motzoi_parameter.node import (
+                Motzoi_Parameter_Node,
+            )
+            from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.node import (
+                RO_amplitude_two_state_optimization_Node,
+                RO_amplitude_three_state_optimization_Node,
+            )
+            from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.node import (
+                RO_frequency_two_state_optimization_Node,
+                RO_frequency_three_state_optimization_Node,
+            )
+            from tergite_autocalibration.lib.nodes.readout.punchout.node import (
+                Punchout_Node,
+            )
+            from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.node import (
+                Resonator_Spectroscopy_Node,
+                Resonator_Spectroscopy_1_Node,
+                Resonator_Spectroscopy_2_Node,
+            )
+
+            cls._instance = super(NodeFactory, cls).__new__(cls)
+
+            cls._instance.node_implementations = {
+                "punchout": Punchout_Node,
+                "resonator_spectroscopy": Resonator_Spectroscopy_Node,
+                "qubit_01_spectroscopy": Qubit_01_Spectroscopy_Multidim_Node,
+                "qubit_01_cw_spectroscopy": Qubit_01_Spectroscopy_CW_Node,
+                "rabi_oscillations": Rabi_Oscillations_Node,
+                "ramsey_correction": Ramsey_Fringes_Node,
+                "resonator_spectroscopy_1": Resonator_Spectroscopy_1_Node,
+                "qubit_12_spectroscopy_pulsed": Qubit_12_Spectroscopy_Pulsed_Node,
+                "qubit_12_spectroscopy": Qubit_12_Spectroscopy_Multidim_Node,
+                "rabi_oscillations_12": Rabi_Oscillations_12_Node,
+                "ramsey_correction_12": Ramsey_Fringes_12_Node,
+                "resonator_spectroscopy_2": Resonator_Spectroscopy_2_Node,
+                "motzoi_parameter": Motzoi_Parameter_Node,
+                "n_rabi_oscillations": N_Rabi_Oscillations_Node,
+                "coupler_spectroscopy": Coupler_Spectroscopy_Node,
+                "coupler_resonator_spectroscopy": Coupler_Resonator_Spectroscopy_Node,
+                "T1": T1_Node,
+                "T2": T2_Node,
+                "T2_echo": T2_Echo_Node,
+                "all_XY": All_XY_Node,
+                "reset_chevron": Reset_Chevron_Node,
+                "cz_characterisation_chevron": CZ_Characterisation_Chevron_Node,
+                "reset_calibration_ssro": Reset_Calibration_SSRO_Node,
+                "cz_chevron": CZ_Chevron_Node,
+                # "cz_chevron_amplitude": CZ_Chevron_Amplitude_Node,
+                "cz_optimize_chevron": CZ_Optimize_Chevron_Node,
+                "cz_calibration": CZ_Calibration_Node,
+                "cz_calibration_swap": CZ_Calibration_Swap_Node,
+                "cz_calibration_ssro": CZ_Calibration_SSRO_Node,
+                "cz_calibration_swap_ssro": CZ_Calibration_Swap_SSRO_Node,
+                "cz_dynamic_phase": CZ_Dynamic_Phase_Node,
+                "cz_dynamic_phase_swap": CZ_Dynamic_Phase_Swap_Node,
+                "ro_frequency_two_state_optimization": RO_frequency_two_state_optimization_Node,
+                "ro_frequency_three_state_optimization": RO_frequency_three_state_optimization_Node,
+                "ro_amplitude_two_state_optimization": RO_amplitude_two_state_optimization_Node,
+                "ro_amplitude_three_state_optimization": RO_amplitude_three_state_optimization_Node,
+                "randomized_benchmarking": Randomized_Benchmarking_Node,
+            }
+        return cls._instance
 
     def all_nodes(self):
         return list(self.node_implementations.keys())

@@ -1,7 +1,7 @@
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
 
 
-from tergite_autocalibration.utils.convert import structured_redis_storage
+from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 
 
 def populate_parking_currents(

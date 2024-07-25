@@ -34,9 +34,9 @@ from tergite_autocalibration.lib.base.node import BaseNode
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.lib.utils.graph import filtered_topological_order
 from tergite_autocalibration.utils.dataset_utils import create_node_data_path
-from tergite_autocalibration.utils.enums import DataStatus
-from tergite_autocalibration.utils.enums import MeasurementMode
-from tergite_autocalibration.utils.errors import ClusterNotFoundError
+from tergite_autocalibration.utils.dto.enums import DataStatus
+from tergite_autocalibration.utils.dto.enums import MeasurementMode
+from tergite_autocalibration.utils.logger.errors import ClusterNotFoundError
 from tergite_autocalibration.utils.logger.tac_logger import logger
 from tergite_autocalibration.utils.redis_utils import (
     populate_initial_parameters,
