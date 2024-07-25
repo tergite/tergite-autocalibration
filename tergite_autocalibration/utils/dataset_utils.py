@@ -57,7 +57,7 @@ def configure_dataset(
         coords_dict = {}
         measured_qubit = measurement_qubits[key_indx]
         dimensions = node.dimensions
-        print("node dimenstions are: ", dimensions)
+        # print("node dimenstions are: ", dimensions)
 
         if node.name in [
             "cz_calibration_ssro",

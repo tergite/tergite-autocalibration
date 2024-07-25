@@ -46,10 +46,11 @@ class N_Rabi_Oscillations_Node(BaseNode):
         super().__init__(name, all_qubits, **node_dictionary)
         self.redis_field = ["rxy:amp180"]
         self.backup = False
+        self.qubit_state = 0
 
         self.schedule_samplespace = {
             "mw_amplitudes_sweep": {
                 qubit: np.linspace(-0.045, 0.045, 40) for qubit in self.all_qubits
             },
-            "X_repetitions": {qubit: np.arange(1, 40, 8) for qubit in self.all_qubits},
+            "X_repetitions": {qubit: np.arange(1, 19, 6) for qubit in self.all_qubits},
         }

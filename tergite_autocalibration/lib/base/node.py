@@ -547,8 +547,9 @@ class BaseNode(abc.ABC):
         except FileNotFoundError:
             warnings.warn("File Not existing")
             pass
-        plt.show(block=True)
-
+        plt.show(block=False)
+        plt.pause(5)
+        plt.close()
         if self != "tof":
             all_results.update({"measurement_dataset": result_dataset.to_dict()})
 

@@ -116,7 +116,7 @@ class NodeFactory:
                 "cz_characterisation_chevron": CZ_Characterisation_Chevron_Node,
                 "reset_calibration_ssro": Reset_Calibration_SSRO_Node,
                 "cz_chevron": CZ_Chevron_Node,
-                # "cz_chevron_amplitude": CZ_Chevron_Amplitude_Node,
+                "cz_chevron_amplitude": CZ_Chevron_Amplitude_Node,
                 "cz_optimize_chevron": CZ_Optimize_Chevron_Node,
                 "cz_calibration": CZ_Calibration_Node,
                 "cz_calibration_swap": CZ_Calibration_Swap_Node,

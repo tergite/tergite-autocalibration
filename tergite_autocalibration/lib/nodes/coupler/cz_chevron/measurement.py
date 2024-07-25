@@ -183,7 +183,7 @@ class CZ_chevron_amplitude(BaseMeasurement):
         self,
         cz_pulse_frequencies: dict[str, np.ndarray],
         cz_pulse_amplitudes: dict[str, np.ndarray],
-        cz_pulse_duration: float = 240e-9,
+        cz_pulse_duration: float = 128e-9,
         repetitions: int = 1024,
     ) -> Schedule:
         """

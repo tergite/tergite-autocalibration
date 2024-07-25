@@ -205,10 +205,10 @@ class CZ_Chevron_Amplitude_Node(BaseNode):
         )
         self.schedule_samplespace = {
             "cz_pulse_amplitudes": {
-                coupler: np.linspace(0.05, 0.3, 15) for coupler in self.couplers
+                coupler: np.linspace(0.3, 0.8, 21) for coupler in self.couplers
             },
             "cz_pulse_frequencies": {
-                coupler: np.linspace(-10e6, 6e6, 15)
+                coupler: np.linspace(-20e6, 5e6, 11)
                 + self.transition_frequency(coupler)
                 for coupler in self.couplers
             },
@@ -238,7 +238,7 @@ class CZ_Chevron_Amplitude_Node(BaseNode):
             REDIS_CONNECTION.hget(f"transmons:{coupled_qubits[1]}", "clock_freqs:f12")
         )
         # ac_freq = np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12))
-        ac_freq = np.max(
+        ac_freq = np.min(
             [
                 np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12)),
                 np.abs(q1_f01 + q2_f01 - (q2_f01 + q2_f12)),
