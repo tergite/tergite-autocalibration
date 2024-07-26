@@ -469,6 +469,7 @@ class BaseNode(abc.ABC):
             # not necessarily the element where the settable was applied
             this_qubit = result_dataset[var].attrs["qubit"]
             this_element = this_qubit
+            # print(f'{result_dataset = }')
 
             ds = xr.Dataset()
             for var in data_vars_dict[this_qubit]:
@@ -476,11 +477,20 @@ class BaseNode(abc.ABC):
 
             ds.attrs["qubit"] = this_qubit
             ds.attrs["node"] = self.name
-
+            # print(f'{ds = }')
             # detect the element_type on which the settables act
             for settable in ds.coords:
-                if ds[settable].attrs["element_type"] == "coupler":
-                    this_element = "coupler"
+                # print(f'{settable = }')
+                # print(f'{ds[settable].attrs = }')
+                try:
+                    if ds[settable].attrs["element_type"] == "coupler":
+                        element_type = "coupler"
+                        # print(f'{ds[settable].attrs[element_type] = }')
+                        this_element = ds[settable].attrs[element_type]
+                        # print(f'{this_element = }')
+                except:
+                    print(f"No element_type for {settable}")
+                    # pass
 
             primary_plot_row = self.plots_per_qubit * (indx // column_grid)
             primary_axis = axs[primary_plot_row, indx % column_grid]
@@ -510,7 +520,7 @@ class BaseNode(abc.ABC):
                     node_analysis.update_redis_trusted_values(
                         self.name, this_qubit, redis_field
                     )
-
+            # print(f'{this_element = }')
             node_analysis.update_redis_trusted_values(
                 self.name, this_element, redis_field
             )

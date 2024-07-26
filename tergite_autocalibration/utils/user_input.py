@@ -39,6 +39,7 @@ node reference
   cz_calibration_ssro
   cz_dynamic_phase
   cz_dynamic_phase_swap
+  process_tomography_ssro
   tqg_randomized_benchmarking
   tqg_randomized_benchmarking_interleaved
 """
@@ -89,7 +90,7 @@ user_samplespace = {
 }
 """
 ####################################################################
-target_node = "cz_chevron_amplitude"
+target_node = "process_tomography_ssro"
 qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
 couplers = ["q23_q24"]
 user_samplespace = {

@@ -64,6 +64,7 @@ graph_dependencies = [
     # ('qubit_12_spectroscopy_multidim', 'cz_calibration'),
     ("ro_amplitude_three_state_optimization", "cz_calibration_ssro"),
     ("ro_amplitude_three_state_optimization", "cz_calibration_swap_ssro"),
+    ("ro_amplitude_three_state_optimization", "process_tomography_ssro"),
     # ('cz_calibration', 'cz_calibration_ssro'),
     ("cz_calibration", "cz_dynamic_phase"),
     ("cz_dynamic_phase", "cz_dynamic_phase_swap"),

@@ -205,10 +205,10 @@ class CZ_Chevron_Amplitude_Node(BaseNode):
         )
         self.schedule_samplespace = {
             "cz_pulse_amplitudes": {
-                coupler: np.linspace(0.3, 0.8, 21) for coupler in self.couplers
+                coupler: np.linspace(0.2, 0.6, 41) for coupler in self.couplers
             },
             "cz_pulse_frequencies": {
-                coupler: np.linspace(-20e6, 5e6, 11)
+                coupler: np.linspace(-15e6, 5e6, 21)
                 + self.transition_frequency(coupler)
                 for coupler in self.couplers
             },

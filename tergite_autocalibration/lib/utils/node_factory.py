@@ -50,6 +50,9 @@ class NodeFactory:
                 CZ_Chevron_Sweep_Node,
                 Reset_Chevron_Node,
             )
+            from tergite_autocalibration.lib.nodes.coupler.process_tomography.node import (
+                Process_Tomography_Node,
+            )
             from tergite_autocalibration.lib.nodes.coupler.spectroscopy.node import (
                 Coupler_Spectroscopy_Node,
                 Coupler_Resonator_Spectroscopy_Node,
@@ -115,6 +118,7 @@ class NodeFactory:
                 "reset_chevron": Reset_Chevron_Node,
                 "cz_characterisation_chevron": CZ_Characterisation_Chevron_Node,
                 "reset_calibration_ssro": Reset_Calibration_SSRO_Node,
+                "process_tomography_ssro": Process_Tomography_Node,
                 "cz_chevron": CZ_Chevron_Node,
                 "cz_chevron_amplitude": CZ_Chevron_Amplitude_Node,
                 "cz_optimize_chevron": CZ_Optimize_Chevron_Node,
