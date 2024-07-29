@@ -3,9 +3,9 @@ import numpy as np
 import pytest
 import xarray as xr
 from tergite_autocalibration.lib.base.analysis import BaseAnalysis
-from tergite_autocalibration.lib.nodes.coupler.cz_characterisation.CZ_Characterisation_Frequency_vs_Amplitude_Q1_Analysis import CZ_Characterisation_Frequency_vs_Amplitude_Q1_Analysis
-from tergite_autocalibration.lib.nodes.coupler.cz_characterisation.CZ_Characterisation_Frequency_vs_Amplitude_Q2_Analysis import CZ_Characterisation_Frequency_vs_Amplitude_Q2_Analysis
-from tergite_autocalibration.lib.nodes.coupler.cz_characterisation.CZ_Characterisation_Combined_Frequency_vs_Amplitude_Analysis import CZ_Characterisation_Combined_Frequency_vs_Amplitude_Analysis
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis import CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis import CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis import CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis
 
 @pytest.fixture(autouse=True)
 def setup_good_data():
@@ -19,21 +19,21 @@ def setup_good_data():
     d15.yq15.attrs["qubit"] = "q15"
     freqs = ds[f"cz_pulse_frequenciesq14_q15"].values / 1e6  # MHz
     amps = ds[f"cz_pulse_amplitudesq14_q15"].values # uA
-    q14Ana = CZ_Characterisation_Frequency_vs_Amplitude_Q1_Analysis(d14)
+    q14Ana = CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis(d14, freqs, amps)
     q14Res = q14Ana.run_fitting()
-    q15Ana = CZ_Characterisation_Frequency_vs_Amplitude_Q2_Analysis(d15)
+    q15Ana = CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis(d15, freqs, amps)
     q15Res = q15Ana.run_fitting()
 
     return q14Res, q15Res
 
 def test_combineGoodResultsReturnOneValidPoint(setup_good_data):
     q14Res, q15Res = setup_good_data
-    c = CZ_Characterisation_Combined_Frequency_vs_Amplitude_Analysis(q14Res, q15Res)
-    assert isinstance(c, CZ_Characterisation_Combined_Frequency_vs_Amplitude_Analysis)
+    c = CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis(q14Res, q15Res)
+    assert isinstance(c, CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis)
 
 
 def test_combineGoodResultsReturnOneValidPoint(setup_good_data):
     q14Res, q15Res = setup_good_data
-    c = CZ_Characterisation_Combined_Frequency_vs_Amplitude_Analysis(q14Res, q15Res)
+    c = CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis(q14Res, q15Res)
     r = c.are_two_qubits_compatible()
     assert r

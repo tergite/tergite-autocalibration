@@ -21,7 +21,7 @@ from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.
     Randomized_Benchmarking_Node,
 )
 from tergite_autocalibration.lib.nodes.characterization.all_xy.node import All_XY_Node
-from tergite_autocalibration.lib.nodes.coupler.cz_characterisation.node import CZ_Characterisation_Fix_Duration_Node
+from tergite_autocalibration.lib.nodes.coupler.cz_characterisation.node import CZ_Parametrisation_Fix_Duration_Node
 from tergite_autocalibration.lib.nodes.coupler.cz_dynamic_phase.node import (
     CZ_Dynamic_Phase_Node,
     CZ_Dynamic_Phase_Swap_Node,
@@ -105,7 +105,7 @@ class NodeFactory:
             "cz_characterisation_chevron": CZ_Characterisation_Chevron_Node,
             "reset_calibration_ssro": Reset_Calibration_SSRO_Node,
             "cz_chevron": CZ_Chevron_Node,
-            "cz_characterisation_fix_duration": CZ_Characterisation_Fix_Duration_Node,
+            "cz_characterisation_fix_duration": CZ_Parametrisation_Fix_Duration_Node,
             "cz_optimize_chevron": CZ_Optimize_Chevron_Node,
             "cz_calibration": CZ_Calibration_Node,
             "cz_calibration_swap": CZ_Calibration_Swap_Node,

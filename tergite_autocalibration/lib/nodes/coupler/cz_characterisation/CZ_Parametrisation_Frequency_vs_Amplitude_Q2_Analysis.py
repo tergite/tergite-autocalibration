@@ -1,10 +1,10 @@
 import numpy as np
 import xarray as xr
-from tergite_autocalibration.lib.nodes.coupler.cz_characterisation.CZ_Characterisation_Frequency_vs_Amplitude_Analysis import CZ_Characterisation_Frequency_vs_Amplitude_Analysis
+from tergite_autocalibration.lib.nodes.coupler.cz_characterisation.CZ_Parametrisation_Frequency_vs_Amplitude_Analysis import CZ_Parametrisation_Frequency_vs_Amplitude_Analysis
 
-class CZ_Characterisation_Frequency_vs_Amplitude_Q2_Analysis(CZ_Characterisation_Frequency_vs_Amplitude_Analysis):
-    def __init__(self, dataset: xr.Dataset):
-        super().__init__(dataset)
+class CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis(CZ_Parametrisation_Frequency_vs_Amplitude_Analysis):
+    def __init__(self, dataset: xr.Dataset, freqs, amps):
+        super().__init__(dataset, freqs, amps)
 
     def run_fitting(self) -> list[float, float]:
         print("WARNING TESTING CZ FREQUeNCY AND AMPLITUDE Q2 ANALYSIS")

@@ -1,7 +1,7 @@
 import numpy as np
 import xarray as xr
 
-class CZ_Characterisation_Combined_Frequency_vs_Amplitude_Analysis():
+class CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis():
     def __init__(self, res1: list[float], res2: list[float]):
         super().__init__()
         self.result_q1 = res1

@@ -1,7 +1,7 @@
 from tergite_autocalibration.lib.base.analysis import BaseAnalysis
 
 
-class CZ_Characterisation_Fix_Duration_Analysis(BaseAnalysis):
+class CZ_Parametrisation_Fix_Duration_Analysis(BaseAnalysis):
     def __init__(self) -> None:
         pass
 

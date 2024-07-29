@@ -1,10 +1,13 @@
+import os
 from pathlib import Path
+import matplotlib
 import numpy as np
+import numpy.testing as npt
 import pytest
 import xarray as xr
 from tergite_autocalibration.lib.base.analysis import BaseAnalysis
-from tergite_autocalibration.lib.nodes.coupler.cz_characterisation.CZ_Characterisation_Frequency_vs_Amplitude_Q1_Analysis import CZ_Characterisation_Frequency_vs_Amplitude_Q1_Analysis
-from tergite_autocalibration.lib.nodes.coupler.cz_characterisation.CZ_Characterisation_Frequency_vs_Amplitude_Q2_Analysis import CZ_Characterisation_Frequency_vs_Amplitude_Q2_Analysis
+from tergite_autocalibration.lib.nodes.coupler.cz_characterisation.CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis import CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis
+from tergite_autocalibration.lib.nodes.coupler.cz_characterisation.CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis import CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis
 
 @pytest.fixture(autouse=True)
 def setup_good_data():
@@ -22,24 +25,40 @@ def setup_good_data():
     
 def test_canCreateCorrectClass(setup_good_data):
     d14, d15, freqs, amps = setup_good_data
-    c = CZ_Characterisation_Frequency_vs_Amplitude_Q1_Analysis(d14)
-    assert isinstance(c, CZ_Characterisation_Frequency_vs_Amplitude_Q1_Analysis)
+    c = CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis(d14, freqs, amps)
+    assert isinstance(c, CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis)
     assert isinstance(c, BaseAnalysis)
-    c = CZ_Characterisation_Frequency_vs_Amplitude_Q2_Analysis(d15)
-    assert isinstance(c, CZ_Characterisation_Frequency_vs_Amplitude_Q2_Analysis)
+    c = CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis(d15, freqs, amps)
+    assert isinstance(c, CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis)
     assert isinstance(c, BaseAnalysis)
+
+def test_hasCorrectFreqsAndAmps(setup_good_data):
+    d14, d15, freqs, amps = setup_good_data
+    c14 = CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis(d14, freqs, amps)
+    npt.assert_array_equal(c14.frequencies, freqs)
+    npt.assert_array_equal(c14.amplitudes, amps)
+    c15 = CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis(d15, freqs, amps)
+    npt.assert_array_equal(c15.frequencies, freqs)
+    npt.assert_array_equal(c15.amplitudes, amps)
+
+def test_dataIsReadCorrectly(setup_good_data):
+    d14, d15, freqs, amps = setup_good_data
+    c14 = CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis(d14, freqs, amps)
+    npt.assert_array_equal(c14.dataset[f"y{c14.qubit}"].values, d14[f"yq14"].values)
+    c15 = CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis(d15, freqs, amps)
+    npt.assert_array_equal(c15.dataset[f"y{c15.qubit}"].values, d15[f"yq15"].values)
 
 def test_datasetHasQubitDefined(setup_good_data):
     d14, d15, freqs, amps = setup_good_data
-    c = CZ_Characterisation_Frequency_vs_Amplitude_Q1_Analysis(d14)
+    c = CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis(d14, freqs, amps)
     assert c.qubit == "q14"
-    c = CZ_Characterisation_Frequency_vs_Amplitude_Q2_Analysis(d15)
+    c = CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis(d15, freqs, amps)
     assert c.qubit == "q15"
 
 def test_canGetMaxFromQ1(setup_good_data):
     d14, d15, freqs, amps = setup_good_data
-    first_scan = CZ_Characterisation_Frequency_vs_Amplitude_Q1_Analysis(d14)
-    result = first_scan.run_fitting()
+    c = CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis(d14, freqs, amps)
+    result = c.run_fitting()
     indexBestFreq = np.where(freqs == result[0])[0]
     indexBestAmp = np.where(amps == result[1])[0] 
     assert indexBestFreq[0] == 9
@@ -47,11 +66,44 @@ def test_canGetMaxFromQ1(setup_good_data):
 
 def test_canGetMinFromQ2(setup_good_data):
     d14, d15, freqs, amps = setup_good_data
-    first_scan = CZ_Characterisation_Frequency_vs_Amplitude_Q2_Analysis(d15)
-    result = first_scan.run_fitting()
+    c = CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis(d15, freqs, amps)
+    result = c.run_fitting()
     indexBestFreq = np.where(freqs == result[0])[0]
     indexBestAmp = np.where(amps == result[1])[0] 
     assert indexBestFreq[0] == 10
     assert indexBestAmp[0] == 12
 
+def test_canPlot(setup_good_data):
+    matplotlib.use("Agg")
+    d14, d15, freqs, amps = setup_good_data
+    c14 = CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis(d14, freqs, amps)
+    result = c14.run_fitting()
+    folder_path = Path(__file__).parent / "results"
+    figure_path = folder_path / "Frequancy_Amplitude_q14.png"
+    # Remove the file if it already exists
+    if os.path.exists(figure_path):
+        os.remove(figure_path)
 
+    os.makedirs(folder_path, exist_ok=True)
+    c14.plotter(folder_path)
+    assert figure_path.exists(), "The PNG file should exist"
+    from PIL import Image
+
+    with Image.open(figure_path) as img:
+        assert img.format == "PNG", "File should be a PNG image"
+
+    c15= CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis(d15, freqs, amps)
+    result = c15.run_fitting()
+    folder_path = Path(__file__).parent / "results"
+    figure_path = folder_path / "Frequancy_Amplitude_q15.png"
+    # Remove the file if it already exists
+    if os.path.exists(figure_path):
+        os.remove(figure_path)
+
+    os.makedirs(folder_path, exist_ok=True)
+    c15.plotter(folder_path)
+    assert figure_path.exists(), "The PNG file should exist"
+    from PIL import Image
+
+    with Image.open(figure_path) as img:
+        assert img.format == "PNG", "File should be a PNG image"
