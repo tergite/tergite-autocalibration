@@ -21,7 +21,7 @@ from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.
     Randomized_Benchmarking_Node,
 )
 from tergite_autocalibration.lib.nodes.characterization.all_xy.node import All_XY_Node
-from tergite_autocalibration.lib.nodes.coupler.cz_characterisation.node import CZ_Parametrisation_Fix_Duration_Node
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.node import CZ_Parametrisation_Fix_Duration_Node
 from tergite_autocalibration.lib.nodes.coupler.cz_dynamic_phase.node import (
     CZ_Dynamic_Phase_Node,
     CZ_Dynamic_Phase_Swap_Node,

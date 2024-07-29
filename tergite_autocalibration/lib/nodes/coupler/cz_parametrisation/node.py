@@ -1,8 +1,8 @@
 import numpy as np
 
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
-from tergite_autocalibration.lib.nodes.coupler.cz_characterisation.analysis import CZ_Parametrisation_Fix_Duration_Analysis
-from tergite_autocalibration.lib.nodes.coupler.cz_characterisation.measurement import CZ_Parametrisation_Fix_Duration
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis import CZ_Parametrisation_Fix_Duration_Analysis
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.measurement import CZ_Parametrisation_Fix_Duration
 from ....utils.node_subclasses import ParametrizedSweepNode
 
 class CZ_Parametrisation_Fix_Duration_Node(ParametrizedSweepNode):
