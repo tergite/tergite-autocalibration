@@ -6,8 +6,8 @@ class CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis():
         super().__init__()
         self.result_q1 = res1
         self.result_q2 = res2
-        self.frequency_tollerance = 2.5 # MHz
-        self.amplitude_tollerance = 0.1
+        self.frequency_tollerance = 2.5e6 # Hz
+        self.amplitude_tollerance = 0.06
 
     def are_two_qubits_compatible(self):
         return self.are_frequencies_compatible() and self.are_amplitudes_compatible()

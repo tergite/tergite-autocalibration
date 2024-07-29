@@ -81,7 +81,7 @@ def test_canPlot(setup_good_data):
     c14 = CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis(d14, freqs, amps)
     result = c14.run_fitting()
     
-    figure_path = os.environ["DATA_DIR"] + "/Frequancy_Amplitude_q14.png"
+    figure_path = os.environ["DATA_DIR"] + "/Frequency_Amplitude_q14.png"
     # Remove the file if it already exists
     if os.path.exists(figure_path):
         os.remove(figure_path)
@@ -101,7 +101,65 @@ def test_canPlot(setup_good_data):
     c15= CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis(d15, freqs, amps)
     result = c15.run_fitting()
 
-    figure_path = os.environ["DATA_DIR"] + "/Frequancy_Amplitude_q15.png"
+    figure_path = os.environ["DATA_DIR"] + "/Frequency_Amplitude_q15.png"
+    # Remove the file if it already exists
+    if os.path.exists(figure_path):
+        os.remove(figure_path)
+
+    fig, ax = plt.subplots(figsize=(15, 7), num=1)
+    plt.Axes
+    c15.plotter(ax)
+    fig.savefig(figure_path)
+    plt.close()
+    
+    assert os.path.exists(figure_path)
+    from PIL import Image
+
+    with Image.open(figure_path) as img:
+        assert img.format == "PNG", "File should be a PNG image"
+
+@pytest.fixture(autouse=True)
+def setup_bad_data():
+    os.environ["DATA_DIR"] = str(Path(__file__).parent / "results")
+    dataset_path = Path(__file__).parent / "data" / "dataset_bad_quality_freq_amp.hdf5"
+    print(dataset_path)
+    ds = xr.open_dataset(dataset_path)
+    ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
+    d14 = ds.yq14.to_dataset()
+    d15 = ds.yq15.to_dataset()
+    d14.yq14.attrs["qubit"] = "q14"
+    d15.yq15.attrs["qubit"] = "q15"
+    freqs = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
+    amps = ds[f"cz_pulse_amplitudesq14_q15"].values # uA
+    return d14, d15, freqs, amps
+
+def test_canPlotBad(setup_bad_data):
+    matplotlib.use("Agg")
+    d14, d15, freqs, amps = setup_bad_data
+    c14 = CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis(d14, freqs, amps)
+    result = c14.run_fitting()
+    
+    figure_path = os.environ["DATA_DIR"] + "/Frequency_Amplitude_bad_q14.png"
+    # Remove the file if it already exists
+    if os.path.exists(figure_path):
+        os.remove(figure_path)
+
+    fig, ax = plt.subplots(figsize=(15, 7), num=1)
+    plt.Axes
+    c14.plotter(ax)
+    fig.savefig(figure_path)
+    plt.close()
+
+    assert os.path.exists(figure_path)
+    from PIL import Image
+
+    with Image.open(figure_path) as img:
+        assert img.format == "PNG", "File should be a PNG image"
+
+    c15= CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis(d15, freqs, amps)
+    result = c15.run_fitting()
+
+    figure_path = os.environ["DATA_DIR"] + "/Frequency_Amplitude_bad_q15.png"
     # Remove the file if it already exists
     if os.path.exists(figure_path):
         os.remove(figure_path)

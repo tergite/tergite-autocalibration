@@ -112,3 +112,7 @@ tergite_autocalibration/lib/nodes/coupler/cz_parametrisation/tests/results/Frequ
 tergite_autocalibration/lib/nodes/coupler/cz_parametrisation/tests/results/Frequancy_Amplitude_q15.png
 tergite_autocalibration/lib/nodes/coupler/cz_parametrisation/tests/resultsFrequancy_Amplitude_q14.png
 tergite_autocalibration/lib/nodes/coupler/cz_parametrisation/tests/resultsFrequancy_Amplitude_q15.png
+tergite_autocalibration/lib/nodes/coupler/cz_parametrisation/tests/results/Frequency_Amplitude_bad_q14.png
+tergite_autocalibration/lib/nodes/coupler/cz_parametrisation/tests/results/Frequency_Amplitude_bad_q15.png
+tergite_autocalibration/lib/nodes/coupler/cz_parametrisation/tests/results/Frequency_Amplitude_q14.png
+tergite_autocalibration/lib/nodes/coupler/cz_parametrisation/tests/results/Frequency_Amplitude_q15.png
