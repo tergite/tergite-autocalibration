@@ -1,5 +1,5 @@
 from tergite_autocalibration.lib.base.analysis import BaseAnalysis
-from tergite_autocalibration.lib.nodes.coupler.cz_characterisation.analysis import CZ_Parametrisation_Fix_Duration_Analysis
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis import CZ_Parametrisation_Fix_Duration_Analysis
 
 
 def test_CanCreate():
