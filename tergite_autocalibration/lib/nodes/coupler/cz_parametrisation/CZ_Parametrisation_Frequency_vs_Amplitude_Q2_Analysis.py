@@ -16,7 +16,7 @@ class CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis(CZ_Parametrisation_F
                 frequencies_coord = coord
             elif "amplitudes" in coord:
                 amplitudes_coord = coord
-        self.freqs = self.dataset[frequencies_coord].values / 1e6  # MHz
+        self.freqs = self.dataset[frequencies_coord].values  # Hz
         self.amps = self.dataset[amplitudes_coord].values  # bias
 
         magnitudes = np.array(

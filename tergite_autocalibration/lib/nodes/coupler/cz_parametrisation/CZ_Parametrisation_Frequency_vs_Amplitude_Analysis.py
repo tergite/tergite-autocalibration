@@ -16,16 +16,17 @@ class CZ_Parametrisation_Frequency_vs_Amplitude_Analysis(BaseAnalysis):
         self.opt_freq = -1
         self.opt_amp = -1
 
-    def plotter(self, outputFolder):
-        fig, ax = plt.subplots(figsize=(15, 7), num=1)
-
+    def plotter(self, axis: plt.Axes):
         datarray = self.dataset[f"y{self.qubit}"]
 
+        if datarray.size == 0:
+            raise ValueError(f"Data array for qubit {self.qubit} is empty.")
+        
         # Plot the data array on the single plot
-        datarray.plot(ax=ax, cmap="RdBu_r")
-
+        datarray.plot(ax=axis, cmap="RdBu_r")
+        #datarray.plot(ax=axis, x=f"cz_pulse_frequencies_sweep{self.qubit}", cmap="RdBu_r")
         # Scatter plot and lines on the same plot
-        ax.scatter(
+        axis.scatter(
             self.opt_freq,
             self.opt_amp,
             c="r",
@@ -36,7 +37,7 @@ class CZ_Parametrisation_Frequency_vs_Amplitude_Analysis(BaseAnalysis):
             linewidth=1.5,
             zorder=10,
         )
-        ax.vlines(
+        axis.vlines(
             self.opt_freq,
             self.amplitudes[0],
             self.amplitudes[-1],
@@ -45,7 +46,7 @@ class CZ_Parametrisation_Frequency_vs_Amplitude_Analysis(BaseAnalysis):
             linestyles="--",
             linewidth=1.5,
         )
-        ax.hlines(
+        axis.hlines(
             self.opt_amp,
             self.frequencies[0],
             self.frequencies[-1],
@@ -54,14 +55,10 @@ class CZ_Parametrisation_Frequency_vs_Amplitude_Analysis(BaseAnalysis):
             linewidth=1.5,
         )
 
-        ax.set_xlim([self.frequencies[0], self.frequencies[-1]])
-        ax.set_ylim([self.amplitudes[0], self.amplitudes[-1]])
-        ax.set_ylabel("Parametric Drive amplitude (V)")
-        ax.set_xlabel("Frequency Detuning (Hz)")
-        ax.set_title(f"CZ - Qubit {self.qubit[1:]}")
-        ax.legend()  # Add legend to the plot
+        axis.set_xlim([self.frequencies[0], self.frequencies[-1]])
+        axis.set_ylim([self.amplitudes[0], self.amplitudes[-1]])
+        axis.set_ylabel("Parametric Drive amplitude (V)")
+        axis.set_xlabel("Frequency Detuning (Hz)")
+        axis.set_title(f"CZ - Qubit {self.qubit[1:]}")
+        axis.legend()  # Add legend to the plot
 
-        plt.show()
-        fig.savefig(f"{outputFolder}/Frequancy_Amplitude_{self.qubit}.png")
-        plt.pause(3)
-        plt.close()
