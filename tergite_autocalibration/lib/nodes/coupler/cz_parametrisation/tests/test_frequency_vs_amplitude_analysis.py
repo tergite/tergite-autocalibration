@@ -81,7 +81,7 @@ def test_canPlot(setup_good_data):
     c14 = CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis(d14, freqs, amps)
     result = c14.run_fitting()
     
-    figure_path = os.environ["DATA_DIR"] + "Frequancy_Amplitude_q14.png"
+    figure_path = os.environ["DATA_DIR"] + "/Frequancy_Amplitude_q14.png"
     # Remove the file if it already exists
     if os.path.exists(figure_path):
         os.remove(figure_path)
@@ -101,7 +101,7 @@ def test_canPlot(setup_good_data):
     c15= CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis(d15, freqs, amps)
     result = c15.run_fitting()
 
-    figure_path = os.environ["DATA_DIR"] + "Frequancy_Amplitude_q15.png"
+    figure_path = os.environ["DATA_DIR"] + "/Frequancy_Amplitude_q15.png"
     # Remove the file if it already exists
     if os.path.exists(figure_path):
         os.remove(figure_path)
