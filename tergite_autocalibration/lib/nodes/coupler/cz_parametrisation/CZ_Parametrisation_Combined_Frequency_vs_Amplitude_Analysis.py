@@ -17,3 +17,8 @@ class CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis():
     
     def are_amplitudes_compatible(self):
         return abs(self.result_q1[1]-self.result_q2[1]) < self.amplitude_tollerance
+    
+    def best_parameters(self):
+        freq = (self.result_q1[0] + self.result_q2[0]) / 2
+        amp = (self.result_q1[1]+self.result_q2[1]) / 2
+        return [freq, amp]
