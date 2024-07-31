@@ -39,6 +39,7 @@ node reference
   cz_calibration_ssro
   cz_dynamic_phase
   cz_dynamic_phase_swap
+  process_tomography_ssro
   tqg_randomized_benchmarking
   tqg_randomized_benchmarking_interleaved
 """
@@ -62,8 +63,8 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 
 def qubit_samples(qubit: str, transition: str = "01") -> np.ndarray:
-    qub_spec_samples = 100
-    sweep_range = 8.0e6
+    qub_spec_samples = 51
+    sweep_range = 10e6
     if transition == "01":
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition == "12":
@@ -89,15 +90,15 @@ user_samplespace = {
 }
 """
 ####################################################################
-target_node = "ro_amplitude_three_state_optimization"
-qubits = ["q06", "q07", "q08", "q09", "q10"]
-couplers = ["q06_q07"]
+target_node = "reset_chevron"
+qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
+couplers = ["q23_q24"]
 user_samplespace = {
     "resonator_spectroscopy": {
         "ro_frequencies": {qubit: resonator_samples(qubit) for qubit in qubits}
     },
 }
-attenuation_setting = {"qubit": 10, "coupler": 34, "readout": 12}
+attenuation_setting = {'qubit':12, 'coupler':30, 'readout':6}
 
 ####################################################################
 

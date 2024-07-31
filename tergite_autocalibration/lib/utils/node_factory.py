@@ -48,7 +48,12 @@ class NodeFactory:
                 CZ_Chevron_Amplitude_Node,
                 CZ_Optimize_Chevron_Node,
                 CZ_Chevron_Sweep_Node,
+            )
+            from tergite_autocalibration.lib.nodes.coupler.reset_chevron.node import (
                 Reset_Chevron_Node,
+            )
+            from tergite_autocalibration.lib.nodes.coupler.process_tomography.node import (
+                Process_Tomography_Node,
             )
             from tergite_autocalibration.lib.nodes.coupler.spectroscopy.node import (
                 Coupler_Spectroscopy_Node,
@@ -62,6 +67,7 @@ class NodeFactory:
                 Rabi_Oscillations_Node,
                 N_Rabi_Oscillations_Node,
                 Rabi_Oscillations_12_Node,
+                N_Rabi_Oscillations_12_Node,
             )
             from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.node import (
                 Qubit_01_Spectroscopy_CW_Node,
@@ -71,6 +77,7 @@ class NodeFactory:
             )
             from tergite_autocalibration.lib.nodes.qubit_control.motzoi_parameter.node import (
                 Motzoi_Parameter_Node,
+                Motzoi_Parameter_12_Node
             )
             from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.node import (
                 RO_amplitude_two_state_optimization_Node,
@@ -106,6 +113,8 @@ class NodeFactory:
                 "resonator_spectroscopy_2": Resonator_Spectroscopy_2_Node,
                 "motzoi_parameter": Motzoi_Parameter_Node,
                 "n_rabi_oscillations": N_Rabi_Oscillations_Node,
+                "motzoi_parameter_12": Motzoi_Parameter_12_Node,
+                "n_rabi_oscillations_12": N_Rabi_Oscillations_12_Node,
                 "coupler_spectroscopy": Coupler_Spectroscopy_Node,
                 "coupler_resonator_spectroscopy": Coupler_Resonator_Spectroscopy_Node,
                 "T1": T1_Node,
@@ -115,8 +124,9 @@ class NodeFactory:
                 "reset_chevron": Reset_Chevron_Node,
                 "cz_characterisation_chevron": CZ_Characterisation_Chevron_Node,
                 "reset_calibration_ssro": Reset_Calibration_SSRO_Node,
+                "process_tomography_ssro": Process_Tomography_Node,
                 "cz_chevron": CZ_Chevron_Node,
-                # "cz_chevron_amplitude": CZ_Chevron_Amplitude_Node,
+                "cz_chevron_amplitude": CZ_Chevron_Amplitude_Node,
                 "cz_optimize_chevron": CZ_Optimize_Chevron_Node,
                 "cz_calibration": CZ_Calibration_Node,
                 "cz_calibration_swap": CZ_Calibration_Swap_Node,

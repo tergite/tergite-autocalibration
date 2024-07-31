@@ -48,6 +48,8 @@ def configure_dataset(
         "cz_calibration_ssro",
         "cz_calibration_swap_ssro",
         "reset_calibration_ssro",
+        "process_tomography_ssro",
+
     ]:
         qubit_states = ["c0", "c1", "c2"]  # for calibration points
 
@@ -57,15 +59,16 @@ def configure_dataset(
         coords_dict = {}
         measured_qubit = measurement_qubits[key_indx]
         dimensions = node.dimensions
-        print("node dimenstions are: ", dimensions)
+        # print("node dimenstions are: ", dimensions)
 
         if node.name in [
             "cz_calibration_ssro",
             "cz_calibration_swap_ssro",
             "reset_calibration_ssro",
+            "process_tomography_ssro",
         ]:
             # TODO: We are not sure about this one
-            dimensions[1] += len(qubit_states)  # for calibration points
+            # dimensions[0] += len(qubit_states)  # for calibration points
             shots = int(len(raw_ds[key].values[0]) / (np.product(dimensions)))
             coords_dict["shot"] = (
                 "shot",
@@ -99,12 +102,16 @@ def configure_dataset(
                 "units": "NA",
             }
 
+            # print(coord_attrs)
+
             if not isinstance(settable_values, Iterable):
                 settable_values = np.array([settable_values])
 
             coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
 
         partial_ds = xarray.Dataset(coords=coords_dict)
+
+        # print(partial_ds)
 
         data_values = raw_ds[key].values
 
@@ -128,6 +135,7 @@ def configure_dataset(
             "cz_calibration_ssro",
             "cz_calibration_swap_ssro",
             "reset_calibration_ssro",
+            "process_tomography_ssro",
         ]:
             reshaping = np.array([shots])
             reshaping = np.append(reshaping, dimensions)
@@ -145,7 +153,10 @@ def configure_dataset(
             data_values,
             attributes,
         )
+
+        # print(f'{partial_ds=}')
         dataset = xarray.merge([dataset, partial_ds])
+        # print(f'{dataset=}')
 
     return dataset
 
