@@ -62,3 +62,4 @@ Labber is being deprecated.
 - Liangyu Chen
 - Tong Liu
 - Martin Ahindura
+- Michele Faucci Giannelli
