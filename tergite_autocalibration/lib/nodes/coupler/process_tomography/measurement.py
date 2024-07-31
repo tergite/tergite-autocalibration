@@ -38,7 +38,7 @@ class Process_Tomography(BaseMeasurement):
         self,
         ramsey_phases: dict[str, np.ndarray],
         control_ons: dict[str, np.ndarray],
-        repetitions: int = 512,
+        repetitions: int = 4096,
         opt_cz_pulse_frequency: dict[str, float] = None,
         opt_cz_pulse_duration: dict[str, float] = None,
         opt_cz_pulse_amplitude: dict[str, float] = None,
@@ -165,14 +165,15 @@ class Process_Tomography(BaseMeasurement):
                         ref_op=buffer_start,
                         ref_pt="end",
                     )
-                    cz = shot.add(
-                        SoftSquarePulse(
-                            duration=cz_pulse_duration[this_coupler],
-                            amp=cz_pulse_amplitude[this_coupler],
-                            port=cz_pulse_port,
-                            clock=cz_clock,
-                        )
-                    )
+                    # cz = shot.add(
+                    #     SoftSquarePulse(
+                    #         duration=cz_pulse_duration[this_coupler],
+                    #         # amp=cz_pulse_amplitude[this_coupler],
+                    #         amp=0,
+                    #         port=cz_pulse_port,
+                    #         clock=cz_clock,
+                    #     )
+                    # )
 
                 buffer_end = shot.add(
                     IdlePulse(4e-9),
@@ -196,9 +197,12 @@ class Process_Tomography(BaseMeasurement):
                         Measure_RO_Opt(
                             this_qubit, acq_index=this_index, bin_mode=BinMode.APPEND
                         ),
-                        ref_op=end,
-                        ref_pt="end",
+                        # ref_op=end,
+                        # ref_pt="end",
                     )
+
+                relaxation = shot.add(Reset(*all_qubits), label=f"Reset_{cz_index}_{ramsey_index}_end")
+
 
             # Calibration points
             root_relaxation = shot.add(
@@ -218,6 +222,7 @@ class Process_Tomography(BaseMeasurement):
                 for level_index, state_level in enumerate(qubit_levels):
                     calib_index = this_index + level_index + 1
                     # print(f'{calib_index = }')
+                    shot.add(Reset(this_qubit))
                     if state_level == 0:
                         prep = shot.add(IdlePulse(40e-9))
                     elif state_level == 1:

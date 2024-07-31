@@ -90,7 +90,7 @@ user_samplespace = {
 }
 """
 ####################################################################
-target_node = "process_tomography_ssro"
+target_node = "reset_chevron"
 qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
 couplers = ["q23_q24"]
 user_samplespace = {

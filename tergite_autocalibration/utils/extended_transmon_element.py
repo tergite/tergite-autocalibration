@@ -156,7 +156,7 @@ class ExtendedTransmon(BasicTransmonElement):
             factory_func=pulse_factories.rxy_drag_pulse,
             factory_kwargs={
                 "amp180": self.r12.ef_amp180(),
-                "motzoi": 0,
+                "motzoi": self.r12.ef_motzoi(),
                 "port": self.ports.microwave(),
                 "clock": f"{self.name}.12",
                 "duration": self.rxy.duration(),
