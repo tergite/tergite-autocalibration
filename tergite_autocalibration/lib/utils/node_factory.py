@@ -3,7 +3,8 @@
 # (C) Copyright Eleftherios Moschandreou 2023, 2024
 # (C) Copyright Liangyu Chen 2023, 2024
 # (C) Copyright Stefan Hill 2024
-#
+# (C) Copyright Michele Faucci Giannelli 2024
+# #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
 # of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
@@ -33,10 +34,12 @@ from tergite_autocalibration.lib.nodes.coupler.cz_calibration.node import (
     CZ_Calibration_Swap_SSRO_Node,
     Reset_Calibration_SSRO_Node,
 )
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.node import (
+    CZ_Parametrisation_Fix_Duration_Node,
+)
 from tergite_autocalibration.lib.nodes.coupler.cz_chevron.node import (
     CZ_Chevron_Node,
     CZ_Characterisation_Chevron_Node,
-    CZ_Chevron_Amplitude_Node,
     CZ_Optimize_Chevron_Node,
     Reset_Chevron_Node,
 )
@@ -105,7 +108,7 @@ class NodeFactory:
             "cz_characterisation_chevron": CZ_Characterisation_Chevron_Node,
             "reset_calibration_ssro": Reset_Calibration_SSRO_Node,
             "cz_chevron": CZ_Chevron_Node,
-            "cz_characterisation_fix_duration": CZ_Parametrisation_Fix_Duration_Node,
+            "cz_parametrisation_fix_duration": CZ_Parametrisation_Fix_Duration_Node,
             "cz_optimize_chevron": CZ_Optimize_Chevron_Node,
             "cz_calibration": CZ_Calibration_Node,
             "cz_calibration_swap": CZ_Calibration_Swap_Node,
@@ -120,6 +123,7 @@ class NodeFactory:
             "randomized_benchmarking": Randomized_Benchmarking_Node,
         }
 
+
     def all_nodes(self):
         return list(self.node_implementations.keys())
 
@@ -128,3 +132,4 @@ class NodeFactory:
             node_name, all_qubits, **kwargs
         )
         return node_object
+
