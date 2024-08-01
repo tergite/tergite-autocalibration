@@ -4,23 +4,19 @@ from tergite_autocalibration.config.settings import REDIS_CONNECTION
 from tergite_autocalibration.lib.nodes.coupler.cz_chevron.cz_chevron_analysis import (
     CZChevronAnalysis,
     CZChevronAmplitudeAnalysis,
-    CZChevronAnalysisReset,
 )
 from tergite_autocalibration.lib.nodes.coupler.cz_chevron.cz_firstStep_analysis import (
     CZFirstStepAnalysis,
 )
 from tergite_autocalibration.lib.base.node import BaseNode
 from tergite_autocalibration.lib.nodes.coupler.cz_chevron.measurement import (
-    CZ_chevron,
-    CZ_chevron_amplitude,
-)
-from tergite_autocalibration.lib.nodes.coupler.cz_calibration.measurement import (
-    Reset_calibration_SSRO,
+    CZ_Chevron,
+    CZ_Chevron_Amplitude,
 )
 
 
 class CZ_Chevron_Node(BaseNode):
-    measurement_obj = CZ_chevron
+    measurement_obj = CZ_Chevron
     analysis_obj = CZChevronAnalysis
 
     def __init__(
@@ -101,7 +97,7 @@ class CZ_Chevron_Node(BaseNode):
 
 
 class CZ_Characterisation_Chevron_Node(BaseNode):
-    measurement_obj = CZ_chevron
+    measurement_obj = CZ_Chevron
     analysis_obj = CZFirstStepAnalysis
 
     def __init__(self, name: str, all_qubits: list[str], couplers: list[str]):
@@ -181,7 +177,7 @@ class CZ_Characterisation_Chevron_Node(BaseNode):
 
 
 class CZ_Chevron_Amplitude_Node(BaseNode):
-    measurement_obj = CZ_chevron_amplitude
+    measurement_obj = CZ_Chevron_Amplitude
     analysis_obj = CZChevronAmplitudeAnalysis
 
     def __init__(
@@ -205,10 +201,10 @@ class CZ_Chevron_Amplitude_Node(BaseNode):
         )
         self.schedule_samplespace = {
             "cz_pulse_amplitudes": {
-                coupler: np.linspace(0.05, 0.3, 15) for coupler in self.couplers
+                coupler: np.linspace(0.2, 0.6, 41) for coupler in self.couplers
             },
             "cz_pulse_frequencies": {
-                coupler: np.linspace(-10e6, 6e6, 15)
+                coupler: np.linspace(-15e6, 5e6, 21)
                 + self.transition_frequency(coupler)
                 for coupler in self.couplers
             },
@@ -238,7 +234,7 @@ class CZ_Chevron_Amplitude_Node(BaseNode):
             REDIS_CONNECTION.hget(f"transmons:{coupled_qubits[1]}", "clock_freqs:f12")
         )
         # ac_freq = np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12))
-        ac_freq = np.max(
+        ac_freq = np.min(
             [
                 np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12)),
                 np.abs(q1_f01 + q2_f01 - (q2_f01 + q2_f12)),
@@ -252,7 +248,7 @@ class CZ_Chevron_Amplitude_Node(BaseNode):
 
 
 class CZ_Optimize_Chevron_Node(BaseNode):
-    measurement_obj = CZ_chevron
+    measurement_obj = CZ_Chevron
     analysis_obj = CZChevronAnalysis
 
     def __init__(self, name: str, all_qubits: list[str], couplers: list[str]):
@@ -310,38 +306,8 @@ class CZ_Optimize_Chevron_Node(BaseNode):
         print(f"{ ac_freq/1e6 = } MHz for coupler: {coupler}")
         return ac_freq
 
-
-class Reset_Chevron_Node(BaseNode):
-    # TODO: Replaced Reset_CZ_Chevron with Reset_calibration_SSRO, is that correct?
-    measurement_obj = Reset_calibration_SSRO
-    analysis_obj = CZChevronAnalysisReset
-
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary
-    ):
-        super().__init__(name, all_qubits, **node_dictionary)
-        self.name = name
-        self.all_qubits = all_qubits
-        self.couplers = couplers
-        self.edges = couplers
-        self.coupler = self.couplers[0]
-        self.redis_field = ["reset_amplitude_qc", "reset_duration_qc"]
-        self.qubit_state = 0
-        self.coupled_qubits = self.couplers[0].split(sep="_")
-        self.schedule_samplespace = {
-            "cz_pulse_durations": {  # g
-                qubit: np.linspace(0.001, 0.1, 26) for qubit in self.coupled_qubits
-            },
-            "cz_pulse_amplitudes": {  # ft
-                qubit: np.linspace(0, -0.4, 26) for qubit in self.coupled_qubits
-            },
-        }
-        # self.node_dictionary['duration_offset'] = 0
-        # print(f'{ self.coupled_qubits = }')
-
-
 class CZ_Chevron_Sweep_Node(BaseNode):
-    measurement_obj = CZ_chevron
+    measurement_obj = CZ_Chevron
     analysis_obj = CZChevronAnalysis
 
     def __init__(self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords):

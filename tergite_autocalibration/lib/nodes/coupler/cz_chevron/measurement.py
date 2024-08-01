@@ -33,7 +33,7 @@ from tergite_autocalibration.utils.extended_transmon_element import ExtendedTran
 from ....base.measurement import BaseMeasurement
 
 
-class CZ_chevron(BaseMeasurement):
+class CZ_Chevron(BaseMeasurement):
     def __init__(
         self,
         transmons: dict[str, ExtendedTransmon],
@@ -167,7 +167,7 @@ class CZ_chevron(BaseMeasurement):
         return schedule
 
 
-class CZ_chevron_amplitude(BaseMeasurement):
+class CZ_Chevron_Amplitude(BaseMeasurement):
     def __init__(
         self,
         transmons: dict[str, ExtendedTransmon],
@@ -183,7 +183,7 @@ class CZ_chevron_amplitude(BaseMeasurement):
         self,
         cz_pulse_frequencies: dict[str, np.ndarray],
         cz_pulse_amplitudes: dict[str, np.ndarray],
-        cz_pulse_duration: float = 240e-9,
+        cz_pulse_duration: float = 128e-9,
         repetitions: int = 1024,
     ) -> Schedule:
         """
