@@ -1,6 +1,6 @@
 import click
 
-from tergite_autocalibration.utils.enums import MeasurementMode
+from tergite_autocalibration.utils.dto.enums import MeasurementMode
 
 
 @click.group()

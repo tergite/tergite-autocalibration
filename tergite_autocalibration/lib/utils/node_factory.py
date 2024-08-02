@@ -22,11 +22,15 @@ class NodeFactory:
                 T2_Node,
                 T2_Echo_Node,
             )
-            from tergite_autocalibration.lib.nodes.characterization.t1.node import T1_Node
+            from tergite_autocalibration.lib.nodes.characterization.t1.node import (
+                T1_Node,
+            )
             from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.node import (
                 Randomized_Benchmarking_Node,
             )
-            from tergite_autocalibration.lib.nodes.characterization.all_xy.node import All_XY_Node
+            from tergite_autocalibration.lib.nodes.characterization.all_xy.node import (
+                All_XY_Node,
+            )
             from tergite_autocalibration.lib.nodes.coupler.cz_dynamic_phase.node import (
                 CZ_Dynamic_Phase_Node,
                 CZ_Dynamic_Phase_Swap_Node,
@@ -44,8 +48,15 @@ class NodeFactory:
             from tergite_autocalibration.lib.nodes.coupler.cz_chevron.node import (
                 CZ_Chevron_Node,
                 CZ_Characterisation_Chevron_Node,
+                CZ_Chevron_Amplitude_Node,
                 CZ_Optimize_Chevron_Node,
+                CZ_Chevron_Sweep_Node,
+            )
+            from tergite_autocalibration.lib.nodes.coupler.reset_chevron.node import (
                 Reset_Chevron_Node,
+            )
+            from tergite_autocalibration.lib.nodes.coupler.process_tomography.node import (
+                Process_Tomography_Node,
             )
             from tergite_autocalibration.lib.nodes.coupler.spectroscopy.node import (
                 Coupler_Spectroscopy_Node,
@@ -59,6 +70,7 @@ class NodeFactory:
                 Rabi_Oscillations_Node,
                 N_Rabi_Oscillations_Node,
                 Rabi_Oscillations_12_Node,
+                N_Rabi_Oscillations_12_Node,
             )
             from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.node import (
                 Qubit_01_Spectroscopy_CW_Node,
@@ -68,6 +80,7 @@ class NodeFactory:
             )
             from tergite_autocalibration.lib.nodes.qubit_control.motzoi_parameter.node import (
                 Motzoi_Parameter_Node,
+                Motzoi_Parameter_12_Node
             )
             from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.node import (
                 RO_amplitude_two_state_optimization_Node,
@@ -77,7 +90,9 @@ class NodeFactory:
                 RO_frequency_two_state_optimization_Node,
                 RO_frequency_three_state_optimization_Node,
             )
-            from tergite_autocalibration.lib.nodes.readout.punchout.node import Punchout_Node
+            from tergite_autocalibration.lib.nodes.readout.punchout.node import (
+                Punchout_Node,
+            )
             from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.node import (
                 Resonator_Spectroscopy_Node,
                 Resonator_Spectroscopy_1_Node,
@@ -85,7 +100,6 @@ class NodeFactory:
             )
 
             cls._instance = super(NodeFactory, cls).__new__(cls)
-					   
             cls._instance.node_implementations = {
                 "punchout": Punchout_Node,
                 "resonator_spectroscopy": Resonator_Spectroscopy_Node,
@@ -112,6 +126,8 @@ class NodeFactory:
                 "reset_calibration_ssro": Reset_Calibration_SSRO_Node,
                 "cz_chevron": CZ_Chevron_Node,
                 "cz_parametrisation_fix_duration": CZ_Parametrisation_Fix_Duration_Node,
+                "process_tomography_ssro": Process_Tomography_Node,
+                "cz_chevron": CZ_Chevron_Node,
                 "cz_optimize_chevron": CZ_Optimize_Chevron_Node,
                 "cz_calibration": CZ_Calibration_Node,
                 "cz_calibration_swap": CZ_Calibration_Swap_Node,

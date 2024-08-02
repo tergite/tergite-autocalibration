@@ -34,9 +34,9 @@ from tergite_autocalibration.lib.base.node import BaseNode
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.lib.utils.graph import filtered_topological_order
 from tergite_autocalibration.utils.dataset_utils import create_node_data_path
-from tergite_autocalibration.utils.enums import DataStatus
-from tergite_autocalibration.utils.enums import MeasurementMode
-from tergite_autocalibration.utils.errors import ClusterNotFoundError
+from tergite_autocalibration.utils.dto.enums import DataStatus
+from tergite_autocalibration.utils.dto.enums import MeasurementMode
+from tergite_autocalibration.utils.logger.errors import ClusterNotFoundError
 from tergite_autocalibration.utils.logger.tac_logger import logger
 from tergite_autocalibration.utils.redis_utils import (
     populate_initial_parameters,
@@ -98,6 +98,8 @@ class CalibrationSupervisor:
         if self.cluster_mode == MeasurementMode.real:
             Cluster.close_all()
             cluster_ = Cluster(CLUSTER_NAME, str(self.cluster_ip))
+            cluster_.reset()
+            logger.info(f"Reseting Cluster at IP *{str(self.cluster_ip)[-3:]}")
             return cluster_
         else:
             raise ClusterNotFoundError(
@@ -119,7 +121,9 @@ class CalibrationSupervisor:
                         # print(f'Attenuation setting for {module.name} is {attenuation_setting["coupler"]}')
                     elif module.is_qrm_type and module.is_rf_type:
                         module.out0_att(attenuation_setting["readout"])  # Readout lines
-                        # print(f'Attenuation setting for {module.name} is {attenuation_setting["readout"]}')
+                        # print(
+                        #     f'Attenuation setting for {module.name} is {attenuation_setting["readout"]}'
+                        # )
                 except:
                     pass
             ic_.add_component(ClusterComponent(cluster))
