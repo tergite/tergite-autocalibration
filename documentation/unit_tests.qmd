@@ -16,7 +16,7 @@ Please organise the file using these sub-folders:
 !.gitignore     
 ```
 
-## General guideline
+## General guideline and information
 
 A good starting point, especially starting from scratch, it is to test for the class type, then that the inputs have the right formats and then move to some simple operation or trivial case.
 Build more complex cases from the simpler ones and exploits your tests to refector the code as needed. 
@@ -24,12 +24,42 @@ Try to test as many reasonable cases as possible, both successfull and not.
 Remeber to test for exceptions. 
 We also suggest to develop using test drive development tecniques that will ensure a high test coverage and a good code structure. Yes, do not forget to keep refactoring to improve the code.
 
-You can find some samples in the cz_parametrisation node, where all objects are tested.
+You can find some samples below taken from the cz_parametrisation node, where all objects are tested
 
 Currently there is no way to differentiate from tests that require a QPU (i.e. measurments) and those that do not (i.e. analyses).
 Since the latter are simpler to write, start with those that, in general, are more likely to benefit from unit tests as there is much more logic in the analysis than in the measurment.
 
 If you need to test some complex scenario, such as those involving sweep, it is probably easier to start writing code and tests from the lowest level and then compose those objects to hendle the more complex scenario considered. 
+
+## Example Tests
+
+### Test class type
+```python
+def test_canCreateCorrectType():
+    c = CZ_Parametrisation_Fix_Duration_Node("cz_char_fixCurrent", couplers = ["q14_q15"])
+    assert isinstance(c, CZ_Parametrisation_Fix_Duration_Node)
+    assert isinstance(c, ParametrizedSweepNode)
+```
+The suggested very first test is to istantiate the class and make sure it has the correct type(s) following any inheritance.
+
+### Test input parameters
+```python
+def test_CanGetQubitsFromCouplers():
+    c = CZ_Parametrisation_Fix_Duration_Node("cz_char_fixCurrent", couplers = ["q14_q15"])
+    assert c.all_qubits == ["q14", "q15"]
+    assert c.couplers == ['q14_q15']
+```
+Make sure all inputs and their manipulations are correctly initialised in the constructor, in this case the qubits are taken from the coupler pair
+
+### Test exception
+```python
+def test_ValidationReturnErrorWithSameQubitCoupler():
+    with pytest.raises(ValueError):
+       CZ_Parametrisation_Fix_Duration_Node("cz_char_fixCurrent", couplers = ["q14_q14"])
+```
+Inputs can be incorrect and should always be tested to avoid unexpected behaviour down the line which can be difficult to trace back to the origin. There are infinite number of possible errors, so it is impossible to cover them all, but at least the obvious ones should be considered. In this case a typical typing error with the couple have the same qubit twice.
+
+
 
 # Unit tests for infrastructure
 
