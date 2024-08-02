@@ -3,9 +3,16 @@ import numpy as np
 import pytest
 import xarray as xr
 from tergite_autocalibration.lib.base.analysis import BaseAnalysis
-from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis import CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis
-from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis import CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis
-from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis import CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis import (
+    CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis,
+)
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis import (
+    CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis,
+)
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis import (
+    CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis,
+)
+
 
 @pytest.fixture(autouse=True)
 def setup_good_data():
@@ -17,13 +24,14 @@ def setup_good_data():
     d15 = ds.yq15.to_dataset()
     d14.yq14.attrs["qubit"] = "q14"
     d15.yq15.attrs["qubit"] = "q15"
-    freqs = ds[f"cz_pulse_frequenciesq14_q15"].values # MHz
-    amps = ds[f"cz_pulse_amplitudesq14_q15"].values # uA
+    freqs = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
+    amps = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
     q14Ana = CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis(d14, freqs, amps)
     q14Res = q14Ana.run_fitting()
     q15Ana = CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis(d15, freqs, amps)
     q15Res = q15Ana.run_fitting()
     return q14Res, q15Res, freqs, amps
+
 
 def test_combineResultsReturnCorrectClass(setup_good_data):
     q14Res, q15Res, freqs, amps = setup_good_data
@@ -41,12 +49,14 @@ def test_combineGoodResultsReturnOneValidPoint(setup_good_data):
     r = c.are_two_qubits_compatible()
     assert r
 
+
 def test_combineGoodResultsReturnCorrectResults(setup_good_data):
     q14Res, q15Res, freqs, amps = setup_good_data
     c = CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis(q14Res, q15Res)
     r = c.best_parameters()
     assert r[0] == (freqs[10] + freqs[9]) / 2
     assert r[1] == (amps[12] + amps[13]) / 2
+
 
 @pytest.fixture(autouse=True)
 def setup_bad_data():
@@ -59,12 +69,13 @@ def setup_bad_data():
     d14.yq14.attrs["qubit"] = "q14"
     d15.yq15.attrs["qubit"] = "q15"
     freqs = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
-    amps = ds[f"cz_pulse_amplitudesq14_q15"].values # uA
+    amps = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
     q14Ana = CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis(d14, freqs, amps)
     q14Res = q14Ana.run_fitting()
     q15Ana = CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis(d15, freqs, amps)
     q15Res = q15Ana.run_fitting()
     return q14Res, q15Res
+
 
 def test_combineBadResultsReturnNoValidPoint(setup_bad_data):
     q14Res, q15Res = setup_bad_data

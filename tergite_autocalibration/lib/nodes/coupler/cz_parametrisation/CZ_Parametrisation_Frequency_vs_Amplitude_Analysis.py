@@ -3,6 +3,7 @@ import numpy as np
 import xarray as xr
 from tergite_autocalibration.lib.base.analysis import BaseAnalysis
 
+
 class CZ_Parametrisation_Frequency_vs_Amplitude_Analysis(BaseAnalysis):
     def __init__(self, dataset: xr.Dataset, freqs, amps):
         super().__init__()
@@ -21,10 +22,10 @@ class CZ_Parametrisation_Frequency_vs_Amplitude_Analysis(BaseAnalysis):
 
         if datarray.size == 0:
             raise ValueError(f"Data array for qubit {self.qubit} is empty.")
-        
+
         # Plot the data array on the single plot
         datarray.plot(ax=axis, cmap="RdBu_r")
-        #datarray.plot(ax=axis, x=f"cz_pulse_frequencies_sweep{self.qubit}", cmap="RdBu_r")
+        # datarray.plot(ax=axis, x=f"cz_pulse_frequencies_sweep{self.qubit}", cmap="RdBu_r")
         # Scatter plot and lines on the same plot
         axis.scatter(
             self.opt_freq,
@@ -61,4 +62,3 @@ class CZ_Parametrisation_Frequency_vs_Amplitude_Analysis(BaseAnalysis):
         axis.set_xlabel("Frequency Detuning (Hz)")
         axis.set_title(f"CZ - Qubit {self.qubit[1:]}")
         axis.legend()  # Add legend to the plot
-

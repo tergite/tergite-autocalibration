@@ -1,8 +1,13 @@
 from tergite_autocalibration.lib.base.analysis import BaseAnalysis
-from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis import CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation import (
+    CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis,
+)
 from typing import List, Tuple
 
-from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.utils.NoValidCombinationException import NoValidCombinationException
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.utils import (
+    NoValidCombinationException,
+)
+
 
 class CZ_Parametrisation_Fix_Duration_Analysis(BaseAnalysis):
     def __init__(self) -> None:
@@ -15,7 +20,12 @@ class CZ_Parametrisation_Fix_Duration_Analysis(BaseAnalysis):
         print("WARNING TESTING CZ FREQUeNCY AND AMPLITUDE ANALYSIS")
         return self.run_analysis_on_freq_amp_results()
 
-    def run_analysis_on_freq_amp_results(self, results : List[Tuple[CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis, float]] ):
+    def run_analysis_on_freq_amp_results(
+        self,
+        results: List[
+            Tuple[CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis, float]
+        ],
+    ):
         minCurrent = 1
         bestIndex = -1
         for index, result in enumerate(results):
@@ -30,6 +40,6 @@ class CZ_Parametrisation_Fix_Duration_Analysis(BaseAnalysis):
         self.opt_freq = results[bestIndex][0].best_parameters()[0]
         self.opt_amp = results[bestIndex][0].best_parameters()[1]
         self.opt_current = minCurrent
-        
+
     def plotter(self, axis):
         pass
