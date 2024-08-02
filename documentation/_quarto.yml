@@ -22,6 +22,8 @@ website:
         - href: new_node_creation.qmd
           text: Creating New Nodes
         - href: node_types.qmd
+        - href: unit_tests.qmd
+          text: How to add unit tests
 
 format:
   html:

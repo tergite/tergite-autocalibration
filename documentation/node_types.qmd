@@ -52,7 +52,7 @@ This attribute can be overwritten at the implementation of the class of each nod
 
 The `tergite_acl/scripts/node_supervisor.py` is responcible to distinguish between each node variation.
 
-#### Examples of nodes requiring an externbal samplespace:
+#### Examples of nodes requiring an external samplespace:
 
 - `coupler_spectroscopy` sweeps the `dc_current` which is set by the SPI rack not the cluster
 - `T1` sweeps a repetetion index to repeat the measurement many times

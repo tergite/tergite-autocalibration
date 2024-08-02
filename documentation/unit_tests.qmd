@@ -1,0 +1,36 @@
+# Unit tests for nodes
+
+## Folder structure
+
+The test should be created in a sub-folder of the node called tests.
+
+Please organise the file using these sub-folders:
+
+- data: place here any data file that is needed to create test cases, while it is possible to mock the data. Feel free to add a text file explaing how the data was produced. Mocking data is also possible but it may be not practical for complex datasets.
+- results: create this folder to store your results, i.e. files that would be created by your analysis such as the plots. It should be empty, do not commit your results. To assure this is the case, add a file name .gitinore in the folder with this code:
+```plaintext
+# Ignore everything in this directory
+*
+
+# But do not ignore this file
+!.gitignore     
+```
+
+## General guideline
+
+A good starting point, especially starting from scratch, it is to test for the class type, then that the inputs have the right formats and then move to some simple operation or trivial case.
+Build more complex cases from the simpler ones and exploits your tests to refector the code as needed. 
+Try to test as many reasonable cases as possible, both successfull and not. 
+Remeber to test for exceptions. 
+We also suggest to develop using test drive development tecniques that will ensure a high test coverage and a good code structure. Yes, do not forget to keep refactoring to improve the code.
+
+You can find some samples in the cz_parametrisation node, where all objects are tested.
+
+Currently there is no way to differentiate from tests that require a QPU (i.e. measurments) and those that do not (i.e. analyses).
+Since the latter are simpler to write, start with those that, in general, are more likely to benefit from unit tests as there is much more logic in the analysis than in the measurment.
+
+If you need to test some complex scenario, such as those involving sweep, it is probably easier to start writing code and tests from the lowest level and then compose those objects to hendle the more complex scenario considered. 
+
+# Unit tests for infrastructure
+
+Coming soon
