@@ -1,0 +1,35 @@
+# Introduction
+This and the following sections provide information on how to develop code in tergite-autocalibration. 
+
+## Additional installations
+Consider installing Quarto and other packages before you create your coda environemtn to have the path correctly initialised in your environment. This is not necessary but it can simplify operations later, especially using VSCode.
+
+After you install tergite with
+```python
+pip install -e .
+```
+
+run 
+```python
+poetry install --with dev,test
+```
+
+this will install the additional packages for developing code and running tests
+
+## Naming convention and style
+We use American English, please set any spell checker to this language.
+
+### Naming
+- The file names should be written using snake_case, with words written in lowercase and separated by underscores. 
+- Class names are in PascalCase (where all words are capitalized) divided by underscores (but sometimes we used simple PascalCase).
+- Methods should be in snake_case
+- Variables should be in snake_case 
+
+## Static code analyzer
+The code analyzer used in the project is black, which is installed as part of the dev dependencies.
+To use black, open a shell and run
+```python
+black .
+```
+
+Please make sure to run it before creating a PR.
