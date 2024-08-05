@@ -6,6 +6,7 @@ project:
     - available_nodes.qmd
     - new_node_creation.qmd
     - node_types.qmd
+    - unit_tests.qmd
   type: website
   output-dir: ../docs
 

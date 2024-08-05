@@ -70,6 +70,11 @@ acli calibration start
 acli --help
 ```
 
+## Official documentation
+
+The documentation is mantained in using [Quarto](https://quarto.org/). Install the tool locally and build the website to browse the documentation. Make sure to have quarto in your PATH before you crate the conda environment to simplify its use.
+
+
 ## Contribution Guidelines
 
 If you would like to contribute to tergite-webgui, please have a look at our

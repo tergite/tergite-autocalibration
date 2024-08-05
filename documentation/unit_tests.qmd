@@ -8,7 +8,7 @@ Please organise the file using these sub-folders:
 
 - data: place here any data file that is needed to create test cases, while it is possible to mock the data. Feel free to add a text file explaing how the data was produced. Mocking data is also possible but it may be not practical for complex datasets.
 - results: create this folder to store your results, i.e. files that would be created by your analysis such as the plots. It should be empty, do not commit your results. To assure this is the case, add a file name .gitinore in the folder with this code:
-```plaintext
+```python
 # Ignore everything in this directory
 *
 
@@ -243,6 +243,7 @@ def setup_data():
     list_of_results = [(c1, 0.1), (c2, 0.2), (c3, 0.3)]
     return list_of_results, freqs, amps, freqs_2, amps_2
 ```
+
 In this case, three points are loaded and the analysis is run on each of them. The results are returned for each point and can be used in different tests, for example by removing elements in the list_results array. 
 
 # Unit tests for infrastructure
