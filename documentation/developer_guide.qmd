@@ -21,15 +21,34 @@ We use American English, please set any spell checker to this language.
 
 ### Naming
 - The file names should be written using snake_case, with words written in lowercase and separated by underscores. 
-- Class names are in PascalCase (where all words are capitalized) divided by underscores (but sometimes we used simple PascalCase).
+- Class names should be in PascalCase (where all words are capitalized). Many class do not follow this rule and use CamelCase with underscore, they will be changed.
 - Methods should be in snake_case
 - Variables should be in snake_case 
 
-## Static code analyzer
+## Things to do before a commit
+### Copyright statement
+When you create or modify a file, make sure that add the following copyright text is present at the top of the file.
+Remember to add your name and do not delete previus contributors. If you add the statement to a file that does not have one, please check on git the names of contributors.
+```python
+# This code is part of Tergite Autocalibration
+#
+# (C) Copyright WRITE YOUR NAME HERE, 2024
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+``` 
+### Changelog
+Update the changelog in the sectionc called [Unreleased]. Please note that there are several sections titled "Added", "Change" and "Fixed"; place your text in the correct category. 
+
+### Static code analyzer
 The code analyzer used in the project is black, which is installed as part of the dev dependencies.
 To use black, open a shell and run
 ```python
 black .
 ```
-
-Please make sure to run it before creating a PR.
+Please make sure to run it before merging the PR.
