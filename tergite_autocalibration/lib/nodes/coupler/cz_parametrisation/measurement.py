@@ -1,8 +1,8 @@
 import numpy as np
 from quantify_scheduler import Schedule
-from tergite_autocalibration.lib.base.measurement import BaseMeasurement
-from tergite_autocalibration.utils.extended_coupler_edge import CompositeSquareEdge
-from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
+from ....base.measurement import BaseMeasurement
+from .....utils.extended_coupler_edge import CompositeSquareEdge
+from .....utils.extended_transmon_element import ExtendedTransmon
 from quantify_scheduler.operations.pulse_library import IdlePulse
 from quantify_scheduler.operations.pulse_library import (
     SetClockFrequency,
@@ -14,7 +14,7 @@ from quantify_scheduler.operations.gate_library import Measure, Reset, X
 from quantify_scheduler.enums import BinMode
 
 
-class CZ_Parametrisation_Fix_Duration(BaseMeasurement):
+class CZParametrisationFixDuration(BaseMeasurement):
     def __init__(
         self,
         transmons: dict[str, ExtendedTransmon],
