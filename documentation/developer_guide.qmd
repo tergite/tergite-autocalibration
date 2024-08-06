@@ -19,11 +19,16 @@ this will install the additional packages for developing code and running tests
 ## Naming convention and style
 We use American English, please set any spell checker to this language.
 
-### Naming
 - The file names should be written using snake_case, with words written in lowercase and separated by underscores. 
 - Class names should be in PascalCase (where all words are capitalized). Many class do not follow this rule and use CamelCase with underscore, they will be changed.
 - Methods should be in snake_case
 - Variables should be in snake_case 
+
+## IDE preloaded settings
+There are settings available in the repo for IDEs, recommending extensions and settings. Please discuss with the team before modifying these default settings, they should changed only with the consensus of the team. 
+
+### VSCode
+Black, quarto and python extensions are recommended. Some settings are recommended too.
 
 ## Things to do before a commit
 ### Copyright statement
