@@ -9,10 +9,10 @@ import pytest
 from pathlib import Path
 import xarray as xr
 import numpy as np
-from tergite_autocalibration.lib.nodes.coupler.cz_chevron.utils.cz_singleGateSimpleFit import (
+from ..utils.cz_singleGateSimpleFit import (
     CZSingleGateSimpleFit,
 )
-from tergite_autocalibration.lib.nodes.coupler.cz_chevron.utils.cz_singleGateSimpleFitResult import (
+from ..utils.cz_singleGateSimpleFitResult import (
     FitResultStatus,
 )
 

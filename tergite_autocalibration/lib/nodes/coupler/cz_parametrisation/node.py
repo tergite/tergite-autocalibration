@@ -2,7 +2,7 @@ import numpy as np
 
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis import (
-    CZ_Parametrisation_Fix_Duration_Analysis,
+    CZParametrisationFixDurationAnalysis,
 )
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.measurement import (
     CZ_Parametrisation_Fix_Duration,
@@ -12,7 +12,7 @@ from ....utils.node_subclasses import ParametrizedSweepNode
 
 class CZ_Parametrisation_Fix_Duration_Node(ParametrizedSweepNode):
     measurement_obj = CZ_Parametrisation_Fix_Duration
-    analysis_obj = CZ_Parametrisation_Fix_Duration_Analysis
+    analysis_obj = CZParametrisationFixDurationAnalysis
 
     def __init__(self, name: str, couplers: list[str], **schedule_keywords):
         self.all_qubits = [q for bus in couplers for q in bus.split("_")]

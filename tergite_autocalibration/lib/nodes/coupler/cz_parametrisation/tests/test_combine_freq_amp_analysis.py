@@ -2,15 +2,11 @@ from pathlib import Path
 import numpy as np
 import pytest
 import xarray as xr
-from tergite_autocalibration.lib.base.analysis import BaseAnalysis
-from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis import (
-    CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis,
-)
-from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis import (
-    CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis,
-)
-from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis import (
-    CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis,
+
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis import (
+    CombinedFrequencyVsAmplitudeAnalysis,
+    FrequencyVsAmplitudeQ1Analysis,
+    FrequencyVsAmplitudeQ2Analysis,
 )
 
 
@@ -26,22 +22,22 @@ def setup_good_data():
     d15.yq15.attrs["qubit"] = "q15"
     freqs = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
     amps = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
-    q14Ana = CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis(d14, freqs, amps)
+    q14Ana = FrequencyVsAmplitudeQ1Analysis(d14, freqs, amps)
     q14Res = q14Ana.run_fitting()
-    q15Ana = CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis(d15, freqs, amps)
+    q15Ana = FrequencyVsAmplitudeQ2Analysis(d15, freqs, amps)
     q15Res = q15Ana.run_fitting()
     return q14Res, q15Res, freqs, amps
 
 
 def test_combineResultsReturnCorrectClass(setup_good_data):
     q14Res, q15Res, freqs, amps = setup_good_data
-    c = CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis(q14Res, q15Res)
-    assert isinstance(c, CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis)
+    c = CombinedFrequencyVsAmplitudeAnalysis(q14Res, q15Res)
+    assert isinstance(c, CombinedFrequencyVsAmplitudeAnalysis)
 
 
 def test_combineGoodResultsReturnOneValidPoint(setup_good_data):
     q14Res, q15Res, freqs, amps = setup_good_data
-    c = CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis(q14Res, q15Res)
+    c = CombinedFrequencyVsAmplitudeAnalysis(q14Res, q15Res)
     r = c.are_frequencies_compatible()
     assert r
     r = c.are_amplitudes_compatible()
@@ -52,7 +48,7 @@ def test_combineGoodResultsReturnOneValidPoint(setup_good_data):
 
 def test_combineGoodResultsReturnCorrectResults(setup_good_data):
     q14Res, q15Res, freqs, amps = setup_good_data
-    c = CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis(q14Res, q15Res)
+    c = CombinedFrequencyVsAmplitudeAnalysis(q14Res, q15Res)
     r = c.best_parameters()
     assert r[0] == (freqs[10] + freqs[9]) / 2
     assert r[1] == (amps[12] + amps[13]) / 2
@@ -70,16 +66,16 @@ def setup_bad_data():
     d15.yq15.attrs["qubit"] = "q15"
     freqs = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
     amps = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
-    q14Ana = CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis(d14, freqs, amps)
+    q14Ana = FrequencyVsAmplitudeQ1Analysis(d14, freqs, amps)
     q14Res = q14Ana.run_fitting()
-    q15Ana = CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis(d15, freqs, amps)
+    q15Ana = FrequencyVsAmplitudeQ2Analysis(d15, freqs, amps)
     q15Res = q15Ana.run_fitting()
     return q14Res, q15Res
 
 
 def test_combineBadResultsReturnNoValidPoint(setup_bad_data):
     q14Res, q15Res = setup_bad_data
-    c = CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis(q14Res, q15Res)
+    c = CombinedFrequencyVsAmplitudeAnalysis(q14Res, q15Res)
     r = c.are_frequencies_compatible()
     assert r == False
     r = c.are_amplitudes_compatible()

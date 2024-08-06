@@ -7,7 +7,7 @@ import numpy as np
 import xarray as xr
 from scipy.optimize import leastsq
 
-from tergite_autocalibration.lib.base.analysis import BaseAnalysis
+from ....base.analysis import BaseAnalysis
 
 
 class SweepResultStatus(Enum):

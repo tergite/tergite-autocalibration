@@ -1,29 +1,24 @@
 from pathlib import Path
-
-import pytest
-from tergite_autocalibration.lib.base.analysis import BaseAnalysis
-from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis import (
-    CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis,
-)
-from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis import (
-    CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis,
-)
-from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis import (
-    CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis,
-)
-from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis import (
-    CZ_Parametrisation_Fix_Duration_Analysis,
-)
+from numpy import ndarray
 import xarray as xr
+import pytest
 
+from tergite_autocalibration.lib.base.analysis import BaseAnalysis
+
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis import (
+    CZParametrisationFixDurationAnalysis,
+    CombinedFrequencyVsAmplitudeAnalysis,
+    FrequencyVsAmplitudeQ1Analysis,
+    FrequencyVsAmplitudeQ2Analysis,
+)
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.utils.NoValidCombinationException import (
     NoValidCombinationException,
 )
 
 
 def test_CanCreate():
-    a = CZ_Parametrisation_Fix_Duration_Analysis()
-    assert isinstance(a, CZ_Parametrisation_Fix_Duration_Analysis)
+    a = CZParametrisationFixDurationAnalysis()
+    assert isinstance(a, CZParametrisationFixDurationAnalysis)
     assert isinstance(a, BaseAnalysis)
 
 
@@ -40,14 +35,13 @@ def setup_data():
     d15.yq15.attrs["qubit"] = "q15"
     freqs = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
     amps = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
-    q14Ana = CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis(d14, freqs, amps)
+    q14Ana = FrequencyVsAmplitudeQ1Analysis(d14, freqs, amps)
     q14Res = q14Ana.run_fitting()
-    q15Ana = CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis(d15, freqs, amps)
+    q15Ana = FrequencyVsAmplitudeQ2Analysis(d15, freqs, amps)
     q15Res = q15Ana.run_fitting()
-    c1 = CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis(q14Res, q15Res)
+    c1 = CombinedFrequencyVsAmplitudeAnalysis(q14Res, q15Res)
 
     dataset_path = Path(__file__).parent / "data" / "dataset_bad_quality_freq_amp.hdf5"
-    print(dataset_path)
     ds = xr.open_dataset(dataset_path)
     ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
     d14 = ds.yq14.to_dataset()
@@ -56,20 +50,19 @@ def setup_data():
     d15.yq15.attrs["qubit"] = "q15"
     freqs_bad = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
     amps_bad = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
-    q14Ana = CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis(
+    q14Ana = FrequencyVsAmplitudeQ1Analysis(
         d14, freqs_bad, amps_bad
     )
     q14Res = q14Ana.run_fitting()
-    q15Ana = CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis(
+    q15Ana = FrequencyVsAmplitudeQ2Analysis(
         d15, freqs_bad, amps_bad
     )
     q15Res = q15Ana.run_fitting()
-    c2 = CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis(q14Res, q15Res)
+    c2 = CombinedFrequencyVsAmplitudeAnalysis(q14Res, q15Res)
 
     dataset_path = (
         Path(__file__).parent / "data" / "dataset_good_quality_freq_amp_2.hdf5"
     )
-    print(dataset_path)
     ds = xr.open_dataset(dataset_path)
     ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
     d14 = ds.yq14.to_dataset()
@@ -78,19 +71,19 @@ def setup_data():
     d15.yq15.attrs["qubit"] = "q15"
     freqs_2 = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
     amps_2 = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
-    q14Ana = CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis(d14, freqs_2, amps_2)
+    q14Ana = FrequencyVsAmplitudeQ1Analysis(d14, freqs_2, amps_2)
     q14Res = q14Ana.run_fitting()
-    q15Ana = CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis(d15, freqs_2, amps_2)
+    q15Ana = FrequencyVsAmplitudeQ2Analysis(d15, freqs_2, amps_2)
     q15Res = q15Ana.run_fitting()
-    c3 = CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis(q14Res, q15Res)
+    c3 = CombinedFrequencyVsAmplitudeAnalysis(q14Res, q15Res)
 
     list_of_results = [(c1, 0.1), (c2, 0.2), (c3, 0.3)]
     return list_of_results, freqs, amps, freqs_2, amps_2
 
 
-def test_PickLowestCurrent(setup_data):
-    list_of_results, freqs, amps = setup_data
-    a = CZ_Parametrisation_Fix_Duration_Analysis()
+def test_PickLowestCurrent(setup_data: tuple[list[tuple[CombinedFrequencyVsAmplitudeAnalysis, float]], ndarray, ndarray, ndarray, ndarray]):
+    list_of_results, freqs, amps, freqs_2, amps_2 = setup_data
+    a = CZParametrisationFixDurationAnalysis()
     a.run_analysis_on_freq_amp_results(list_of_results)
 
     assert a.opt_index == 0
@@ -99,10 +92,10 @@ def test_PickLowestCurrent(setup_data):
     assert a.opt_current == 0.1
 
 
-def test_PickLowestCurrentWithoutBest(setup_data):
+def test_PickLowestCurrentWithoutBest(setup_data: tuple[list[tuple[CombinedFrequencyVsAmplitudeAnalysis, float]], ndarray, ndarray, ndarray, ndarray]):
     list_of_results, freqs, amps, freqs_2, amps_2 = setup_data
     list_of_results.pop(0)
-    a = CZ_Parametrisation_Fix_Duration_Analysis()
+    a = CZParametrisationFixDurationAnalysis()
     a.run_analysis_on_freq_amp_results(list_of_results)
 
     assert (
@@ -113,12 +106,26 @@ def test_PickLowestCurrentWithoutBest(setup_data):
     assert a.opt_current == 0.3
 
 
-def test_ReturnErrorIfNoGoodPoint(setup_data):
+def test_ReturnErrorIfNoGoodPoint(setup_data: tuple[list[tuple[CombinedFrequencyVsAmplitudeAnalysis, float]], ndarray, ndarray, ndarray, ndarray]):
     list_of_results, freqs, amps, freqs_2, amps_2 = setup_data
     print(len(list_of_results))
     list_of_results.pop(2)
     list_of_results.pop(0)
-    a = CZ_Parametrisation_Fix_Duration_Analysis()
+    a = CZParametrisationFixDurationAnalysis()
+    print(issubclass(NoValidCombinationException, Exception))
 
     with pytest.raises(NoValidCombinationException, match="No valid combination found"):
         a.run_analysis_on_freq_amp_results(list_of_results)
+
+def test_PickGoodValueIfSmallestInAbsolute(setup_data: tuple[list[tuple[CombinedFrequencyVsAmplitudeAnalysis, float]], ndarray, ndarray, ndarray, ndarray]):
+    list_of_results, freqs, amps, freqs_2, amps_2 = setup_data
+    print(len(list_of_results))
+    new_element = (list_of_results[2][0], -0.3)
+    list_of_results[2] = new_element
+    a = CZParametrisationFixDurationAnalysis()
+    a.run_analysis_on_freq_amp_results(list_of_results)
+
+    assert a.opt_index == 0
+    assert a.opt_freq == (freqs[10] + freqs[9]) / 2
+    assert a.opt_amp == (amps[12] + amps[13]) / 2
+    assert a.opt_current == 0.1
