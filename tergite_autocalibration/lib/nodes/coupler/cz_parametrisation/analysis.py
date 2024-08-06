@@ -5,7 +5,7 @@ from typing import List, Tuple
 
 from ....base.analysis import BaseAnalysis
 
-from .utils import (
+from .utils.no_valid_combination_exception import (
     NoValidCombinationException,
 )
 

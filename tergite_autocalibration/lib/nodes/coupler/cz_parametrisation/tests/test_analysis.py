@@ -11,7 +11,7 @@ from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis impor
     FrequencyVsAmplitudeQ1Analysis,
     FrequencyVsAmplitudeQ2Analysis,
 )
-from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.utils.NoValidCombinationException import (
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.utils.no_valid_combination_exception import (
     NoValidCombinationException,
 )
 
