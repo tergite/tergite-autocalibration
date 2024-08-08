@@ -34,7 +34,10 @@ requests:
 2. If you've added code that should be tested, add tests.
 3. If you've changed APIs, update the documentation.
 4. Ensure the test suite passes.
-5. Make sure your code lints.
+5. Make sure your code lints. This can be done by running:
+```
+black tergite_autocalibration --check
+```
 6. Issue that pull request!
 
 ## Any contributions you make will be under the Apache 2.0 Software Licenses

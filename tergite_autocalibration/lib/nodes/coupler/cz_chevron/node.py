@@ -344,25 +344,28 @@ class CZ_Chevron_Sweep_Node(BaseNode):
     measurement_obj = CZ_chevron
     analysis_obj = CZChevronAnalysis
 
-    def __init__(self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+    def __init__(
+        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
+    ):
         super().__init__(name, all_qubits, **schedule_keywords)
         self.name = name
         self.all_qubits = all_qubits
         self.couplers = couplers
         self.edges = couplers
         self.coupler = self.couplers[0]
-        self.redis_field = ['cz_pulse_frequency', 'cz_pulse_duration']
+        self.redis_field = ["cz_pulse_frequency", "cz_pulse_duration"]
         self.qubit_state = 0
-        self.all_qubits = [q for bus in couplers for q in bus.split('_')]
+        self.all_qubits = [q for bus in couplers for q in bus.split("_")]
 
         self.schedule_samplespace = {
-            'cz_pulse_amplitudes': {
+            "cz_pulse_amplitudes": {
                 coupler: np.linspace(0.2, 0.4, 10) for coupler in self.couplers
             },
-            'cz_pulse_frequencies': {
-                coupler: np.linspace(-15e6, 10e6, 26) + self.transition_frequency(coupler) for coupler in
-                self.couplers
-            }
+            "cz_pulse_frequencies": {
+                coupler: np.linspace(-15e6, 10e6, 26)
+                + self.transition_frequency(coupler)
+                for coupler in self.couplers
+            },
         }
 
         self.validate()
@@ -370,19 +373,32 @@ class CZ_Chevron_Sweep_Node(BaseNode):
     def validate(self) -> None:
         all_coupled_qubits = []
         for coupler in self.couplers:
-            all_coupled_qubits += coupler.split('_')
+            all_coupled_qubits += coupler.split("_")
         if len(all_coupled_qubits) > len(set(all_coupled_qubits)):
-            print('Couplers share qubits')
-            raise ValueError('Improper Couplers')
+            print("Couplers share qubits")
+            raise ValueError("Improper Couplers")
 
     def transition_frequency(self, coupler: str):
-        coupled_qubits = coupler.split(sep='_')
-        q1_f01 = float(REDIS_CONNECTION.hget(f'transmons:{coupled_qubits[0]}', "clock_freqs:f01"))
-        q2_f01 = float(REDIS_CONNECTION.hget(f'transmons:{coupled_qubits[1]}', "clock_freqs:f01"))
-        q1_f12 = float(REDIS_CONNECTION.hget(f'transmons:{coupled_qubits[0]}', "clock_freqs:f12"))
-        q2_f12 = float(REDIS_CONNECTION.hget(f'transmons:{coupled_qubits[1]}', "clock_freqs:f12"))
+        coupled_qubits = coupler.split(sep="_")
+        q1_f01 = float(
+            REDIS_CONNECTION.hget(f"transmons:{coupled_qubits[0]}", "clock_freqs:f01")
+        )
+        q2_f01 = float(
+            REDIS_CONNECTION.hget(f"transmons:{coupled_qubits[1]}", "clock_freqs:f01")
+        )
+        q1_f12 = float(
+            REDIS_CONNECTION.hget(f"transmons:{coupled_qubits[0]}", "clock_freqs:f12")
+        )
+        q2_f12 = float(
+            REDIS_CONNECTION.hget(f"transmons:{coupled_qubits[1]}", "clock_freqs:f12")
+        )
         # ac_freq = np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12))
-        ac_freq = np.max([np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12)), np.abs(q1_f01 + q2_f01 - (q2_f01 + q2_f12))])
+        ac_freq = np.max(
+            [
+                np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12)),
+                np.abs(q1_f01 + q2_f01 - (q2_f01 + q2_f12)),
+            ]
+        )
         ac_freq = int(ac_freq / 1e4) * 1e4
         # lo = 4.4e9 - (ac_freq - 450e6)
         # print(f'{ ac_freq/1e6 = } MHz for coupler: {coupler}')
