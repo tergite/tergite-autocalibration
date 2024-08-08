@@ -23,13 +23,13 @@ class Purity_Benchmarking_Node(ParametrizedSweepNode):
             "number_of_cliffords": {
                 # qubit: all_numbers for qubit in self.all_qubits
                 # qubit: np.array([2, 16, 128, 256,512, 768, 1024, 0, 1]) for qubit in self.all_qubits
-                qubit: self.stack_number_of_cliffords([0, 2, 4, 8, 16, 128, 256, 512, 1024])
+                qubit: self.stack_number_of_cliffords([0, 2, 4, 8, 16, 128, 256, 512])
                 for qubit in self.all_qubits
             },
         }
 
         self.external_samplespace = {
-            "seeds": {qubit: np.arange(5, dtype=np.int32) for qubit in self.all_qubits}
+            "seeds": {qubit: np.arange(10, dtype=np.int32) for qubit in self.all_qubits}
         }
 
     def pre_measurement_operation(self, reduced_ext_space: dict):
