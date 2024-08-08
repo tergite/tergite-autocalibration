@@ -33,7 +33,7 @@ graph_dependencies = [
     # ('randomized_benchmarking', 'T1'),
     ("T2_echo", "resonator_spectroscopy_1"),
     ("ramsey_correction", "T1"),
-        # ('n_rabi_oscillations', 'T1'),
+    # ('n_rabi_oscillations', 'T1'),
     ("resonator_spectroscopy_2", "T1"),
     ("resonator_spectroscopy_1", "ro_frequency_two_state_optimization"),
     ("ro_frequency_two_state_optimization", "ro_amplitude_two_state_optimization"),

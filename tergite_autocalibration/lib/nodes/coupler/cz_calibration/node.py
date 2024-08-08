@@ -67,9 +67,11 @@ class CZ_Calibration_SSRO_Node(BaseNode):
         self.schedule_samplespace = {
             "control_ons": {coupler: [False, True] for coupler in self.couplers},
             "ramsey_phases": {
-                coupler: np.append(np.linspace(0, 720, 25), [0, 1, 2]) for coupler in self.couplers
+                coupler: np.append(np.linspace(0, 720, 25), [0, 1, 2])
+                for coupler in self.couplers
             },
         }
+
 
 class CZ_Calibration_Swap_Node(BaseNode):
     measurement_obj = CZ_calibration

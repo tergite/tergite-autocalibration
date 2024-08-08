@@ -904,6 +904,7 @@ class CZChevronAmplitudeAnalysis(BaseAnalysis):
         axis.set_xlabel("Frequency Detuning (Hz)")
         axis.set_title(f"CZ Chevron - Qubit {self.qubit[1:]}")
 
+
 class CZChevronAnalysisAmplitude:
     def __init__(self, dataset: xr.Dataset):
         # Here I am not sure about the order of qubit.
