@@ -23,7 +23,7 @@ class Reset_Chevron_Node(BaseNode):
         self.couplers = couplers
         self.edges = couplers
         self.coupler = self.couplers[0]
-        self.redis_field = ['reset_amplitude_qc', 'reset_duration_qc']
+        self.redis_field = ["reset_amplitude_qc", "reset_duration_qc"]
         self.qubit_state = 0
         self.all_qubits = [q for bus in couplers for q in bus.split("_")]
         self.coupler_samplespace = self.samplespace
@@ -36,7 +36,6 @@ class Reset_Chevron_Node(BaseNode):
             # 'reset_pulse_amplitudes': {
             #     qubit: np.linspace(0.4, 0.4, 21) for qubit in self.coupled_qubits
             # },
-
             # For DC reset
             # q22_q23
             # 'reset_pulse_durations': {
@@ -46,10 +45,11 @@ class Reset_Chevron_Node(BaseNode):
             #     qubit: np.linspace(-0.14, -0.15, 4) for qubit in self.coupled_qubits
             # },
             # q23_q24
-            'reset_pulse_durations': {
-                coupler: 1e-9+np.linspace(0, 240, 41)*1e-9 for coupler in self.couplers
+            "reset_pulse_durations": {
+                coupler: 1e-9 + np.linspace(0, 240, 41) * 1e-9
+                for coupler in self.couplers
             },
-            'reset_pulse_amplitudes': {
+            "reset_pulse_amplitudes": {
                 coupler: np.linspace(-0.12, -0.26, 21) for coupler in self.couplers
             },
             # q24_q25
@@ -59,40 +59,35 @@ class Reset_Chevron_Node(BaseNode):
             # 'reset_pulse_amplitudes': {
             #     coupler: np.linspace(0.094, 0.1, 41) for coupler in self.couplers
             # },
-            
-            #cr g, f0 sweep
+            # cr g, f0 sweep
             # 'reset_pulse_durations': { # g
             #     qubit: np.linspace(0.075,0.175, 41)for qubit in self.coupled_qubits
             # },
             # 'reset_pulse_amplitudes': { # f0
             #     qubit: np.linspace(1.2, 1.7, 21) for qubit in self.coupled_qubits
             # },
-
-            #cr ft, t sweep
+            # cr ft, t sweep
             # 'reset_pulse_durations': {
             #     qubit: 2e-9+np.linspace(0, 60, 21)*1e-9 for qubit in self.coupled_qubits
             # },
             # 'reset_pulse_amplitudes': {
             #     qubit: np.linspace(0, 2, 21) for qubit in self.coupled_qubits
             # },
-
-            #cr square sweep
+            # cr square sweep
             # 'reset_pulse_durations': {
             #     qubit: 2e-9+np.linspace(0, 100, 21)*1e-9 for qubit in self.coupled_qubits
             # },
             # 'reset_pulse_amplitudes': {
             #     qubit: np.linspace(0, 0.2, 41) for qubit in self.coupled_qubits
             # },
-
-            #cr ramp sweep
+            # cr ramp sweep
             # 'reset_pulse_durations': {
             #     qubit: 2e-9+np.linspace(0, 40, 21)*1e-9 for qubit in self.coupled_qubits
             # },
             # 'reset_pulse_amplitudes': {
             #     qubit: np.linspace(0.2, 0.4, 41) for qubit in self.coupled_qubits
             # },
-
-            #qc sweep g,ft
+            # qc sweep g,ft
             # q23_q24
             # e
             # 'reset_pulse_durations': { # g
@@ -108,7 +103,6 @@ class Reset_Chevron_Node(BaseNode):
             # 'reset_pulse_amplitudes': { # ft
             #     qubit: np.linspace(-0.2, -0.3, 4) for qubit in self.coupled_qubits
             # },
-
             # q22_q23
             # 'reset_pulse_durations': { # g
             #     qubit: np.linspace(0.001,0.1, 26)for qubit in self.coupled_qubits
@@ -123,9 +117,7 @@ class Reset_Chevron_Node(BaseNode):
             # 'reset_pulse_amplitudes': { # ft
             #     qubit: np.linspace(-0.175, -0.275, 4) for qubit in self.coupled_qubits
             # }
-            
-
-            #qc sweep f0,t
+            # qc sweep f0,t
             # q23_q24
             # 'reset_pulse_durations': {
             #     qubit: self.node_dictionary['duration_offset']*1e-9+np.linspace(0, 4, 5)*1e-9 for qubit in self.coupled_qubits
@@ -140,7 +132,6 @@ class Reset_Chevron_Node(BaseNode):
             # 'reset_pulse_amplitudes': {
             #     qubit: np.linspace(0.9, 1.15, 31) for qubit in self.coupled_qubits
             # },
-
             # q22_q23
             # 'reset_pulse_durations': {
             #     qubit: self.node_dictionary['duration_offset']*1e-9+np.linspace(0, 4, 5)*1e-9 for qubit in self.coupled_qubits
@@ -155,7 +146,6 @@ class Reset_Chevron_Node(BaseNode):
             # 'reset_pulse_amplitudes': {
             #     qubit: np.linspace(0.725, 0.825, 31) for qubit in self.coupled_qubits
             # },
-
             # For AC reset
             # 'reset_pulse_durations': {
             #     qubit: 4e-9+np.arange(0e-9, 36*100e-9,400e-9) for qubit in self.coupled_qubits
