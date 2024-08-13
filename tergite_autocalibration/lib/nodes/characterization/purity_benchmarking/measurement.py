@@ -89,20 +89,15 @@ class PurityBenchmarking(BaseMeasurement):
                     acq_index += 1
 
             schedule.add(Reset(this_qubit))
-            schedule.add(Reset(this_qubit))
             schedule.add(Measure(this_qubit, acq_index=acq_index))
             schedule.add(Reset(this_qubit))
 
-            schedule.add(Reset(this_qubit))
-            schedule.add(Reset(this_qubit))
             schedule.add(X(this_qubit))
             schedule.add(Measure(this_qubit, acq_index=acq_index + 1))
             schedule.add(Reset(this_qubit))
 
             #This is not used so it could perhaps be removed.
             # If removed the "-3" should be changed to "-2"
-            schedule.add(Reset(this_qubit))
-            schedule.add(Reset(this_qubit))
             schedule.add(X(this_qubit))
             schedule.add(Rxy_12(this_qubit))
             schedule.add(Measure(this_qubit, acq_index=acq_index + 2))
