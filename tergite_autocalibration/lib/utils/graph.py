@@ -38,6 +38,8 @@ graph_dependencies = [
     # ('n_rabi_oscillations', 'T1'),
     ("n_rabi_oscillations", "randomized_benchmarking"),
     ("n_rabi_oscillations", "purity_benchmarking"),
+    # ('n_rabi_oscillations', 'T1'),
+    ("resonator_spectroscopy_2", "T1"),
     ("resonator_spectroscopy_1", "ro_frequency_two_state_optimization"),
     ("ro_frequency_two_state_optimization", "ro_amplitude_two_state_optimization"),
     ("T1", "T2"),

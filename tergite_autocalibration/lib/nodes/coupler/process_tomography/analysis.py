@@ -37,7 +37,6 @@ def mitigate(v, cm_inv):
     return w
 
 
-
 class ProcessTomographyAnalysis(BaseAnalysis):
     def __init__(self, dataset: xr.Dataset):
         super().__init__()
@@ -109,9 +108,9 @@ class ProcessTomographyAnalysis(BaseAnalysis):
             data_res = np.array([])
             for sweep in data_y_pred:
                 uniques, counts = np.unique(sweep, return_counts=True)
-                raw_prob = [0]*len(self.calibs)
-                for state_id,state in enumerate(uniques):
-                    raw_prob[int(state)] = counts[state_id]/len(sweep)
+                raw_prob = [0] * len(self.calibs)
+                for state_id, state in enumerate(uniques):
+                    raw_prob[int(state)] = counts[state_id] / len(sweep)
                 # print(f"{raw_prob = }")
                 mitigate_prob = mitigate(raw_prob, cm_inv)
                 data_res = np.append(data_res, mitigate_prob)
@@ -177,7 +176,7 @@ class ProcessTomographyAnalysis(BaseAnalysis):
         print(f"{self.g_magnitudes = }")
         print(f"{self.e_magnitudes = }")
         print(f"{self.f_magnitudes = }")
-        return [g_magnitudes_str,e_magnitudes_str, f_magnitudes_str]
+        return [g_magnitudes_str, e_magnitudes_str, f_magnitudes_str]
 
     def plotter(self, axis):
         # datarray = self.dataset[f'y{self.qubit}']
@@ -219,9 +218,9 @@ class ProcessTomographyAnalysis(BaseAnalysis):
             )
 
         # for index, magnitude in enumerate(self.magnitudes):
-            # breakpoint()
-            # axis.plot(self.fit_independents, self.fit_ys[index], "-", c=colors[index])
-            # axis.vlines(self.opt_cz[index],-10,10,colors='gray',linestyles='--',linewidth=1.5)
+        # breakpoint()
+        # axis.plot(self.fit_independents, self.fit_ys[index], "-", c=colors[index])
+        # axis.vlines(self.opt_cz[index],-10,10,colors='gray',linestyles='--',linewidth=1.5)
 
         # axis.plot(
         #     [],

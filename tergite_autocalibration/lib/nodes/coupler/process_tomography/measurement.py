@@ -22,6 +22,7 @@ from tergite_autocalibration.utils.extended_coupler_edge import CompositeSquareE
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 import itertools
 
+
 class Process_Tomography(BaseMeasurement):
     def __init__(
         self,
@@ -43,7 +44,6 @@ class Process_Tomography(BaseMeasurement):
         opt_cz_pulse_duration: dict[str, float] = None,
         opt_cz_pulse_amplitude: dict[str, float] = None,
     ) -> Schedule:
-        
         name = "process_tomography_ssro"
         schedule = Schedule(f"{name}")
 
@@ -130,29 +130,37 @@ class Process_Tomography(BaseMeasurement):
         number_of_phases = len(ramsey_phases_values)
         control_on_values = control_ons[all_couplers[0]]
 
-        state = ['g','e','+','-']
-        states =list(itertools.product(state, state))
+        state = ["g", "e", "+", "-"]
+        states = list(itertools.product(state, state))
         test_states = [dict(zip(all_qubits, s)) for s in states]
 
-        rotation = ['I','x90','y90']
-        rotations =list(itertools.product(rotation, rotation))
+        rotation = ["I", "x90", "y90"]
+        rotations = list(itertools.product(rotation, rotation))
         test_rotations = [dict(zip(all_qubits, s)) for s in rotations]
 
-        for cz_index,control_on in enumerate(control_on_values):
-            for ramsey_index, ramsey_phase in enumerate(ramsey_phases_values[:-3]): 
-                relaxation = shot.add(Reset(*all_qubits), label=f"Reset_{cz_index}_{ramsey_index}")
+        for cz_index, control_on in enumerate(control_on_values):
+            for ramsey_index, ramsey_phase in enumerate(ramsey_phases_values[:-3]):
+                relaxation = shot.add(
+                    Reset(*all_qubits), label=f"Reset_{cz_index}_{ramsey_index}"
+                )
 
                 test_state = test_states[int(ramsey_phase)]
                 # print(f'{test_state = }')
                 for this_qubit in all_qubits:
-                    if test_state[this_qubit] == 'g':
-                        end = shot.add(Rxy(0,0,this_qubit), ref_op=relaxation, ref_pt='end')
-                    elif test_state[this_qubit] == 'e':
-                        end = shot.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
-                    elif test_state[this_qubit] == '+':
-                        end = shot.add(Rxy(90,0,this_qubit), ref_op=relaxation, ref_pt='end')
-                    elif test_state[this_qubit] == '-':
-                        end = shot.add(Rxy(90,90,this_qubit), ref_op=relaxation, ref_pt='end')
+                    if test_state[this_qubit] == "g":
+                        end = shot.add(
+                            Rxy(0, 0, this_qubit), ref_op=relaxation, ref_pt="end"
+                        )
+                    elif test_state[this_qubit] == "e":
+                        end = shot.add(X(this_qubit), ref_op=relaxation, ref_pt="end")
+                    elif test_state[this_qubit] == "+":
+                        end = shot.add(
+                            Rxy(90, 0, this_qubit), ref_op=relaxation, ref_pt="end"
+                        )
+                    elif test_state[this_qubit] == "-":
+                        end = shot.add(
+                            Rxy(90, 90, this_qubit), ref_op=relaxation, ref_pt="end"
+                        )
 
                 buffer_start = shot.add(IdlePulse(4e-9), ref_op=end, ref_pt="end")
 
@@ -185,12 +193,18 @@ class Process_Tomography(BaseMeasurement):
                 test_rotation = test_rotations[int(control_on)]
                 # print(f'{test_state = }')
                 for this_qubit in all_qubits:
-                    if test_rotation[this_qubit] == 'I':
-                        end = shot.add(Rxy(0,0,this_qubit), ref_op=buffer_end, ref_pt='end')
-                    elif test_rotation[this_qubit] == 'x90':
-                        end = shot.add(Rxy(90,0,this_qubit), ref_op=buffer_end, ref_pt='end')
-                    elif test_rotation[this_qubit] == 'y90':
-                        end = shot.add(Rxy(90,90,this_qubit), ref_op=buffer_end, ref_pt='end')
+                    if test_rotation[this_qubit] == "I":
+                        end = shot.add(
+                            Rxy(0, 0, this_qubit), ref_op=buffer_end, ref_pt="end"
+                        )
+                    elif test_rotation[this_qubit] == "x90":
+                        end = shot.add(
+                            Rxy(90, 0, this_qubit), ref_op=buffer_end, ref_pt="end"
+                        )
+                    elif test_rotation[this_qubit] == "y90":
+                        end = shot.add(
+                            Rxy(90, 90, this_qubit), ref_op=buffer_end, ref_pt="end"
+                        )
 
                     this_index = cz_index * number_of_phases + ramsey_index
                     shot.add(
@@ -201,8 +215,9 @@ class Process_Tomography(BaseMeasurement):
                         # ref_pt="end",
                     )
 
-                relaxation = shot.add(Reset(*all_qubits), label=f"Reset_{cz_index}_{ramsey_index}_end")
-
+                relaxation = shot.add(
+                    Reset(*all_qubits), label=f"Reset_{cz_index}_{ramsey_index}_end"
+                )
 
             # Calibration points
             root_relaxation = shot.add(

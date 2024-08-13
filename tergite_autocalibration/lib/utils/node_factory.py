@@ -80,7 +80,7 @@ class NodeFactory:
             )
             from tergite_autocalibration.lib.nodes.qubit_control.motzoi_parameter.node import (
                 Motzoi_Parameter_Node,
-                Motzoi_Parameter_12_Node
+                Motzoi_Parameter_12_Node,
             )
             from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.node import (
                 RO_amplitude_two_state_optimization_Node,

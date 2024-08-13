@@ -63,16 +63,17 @@ class OptimalResult:
     def set_not_found(self):
         self.status = SweepResultStatus.NOT_FOUND
 
+
 class ResetChevronAnalysis(BaseAnalysis):
     def __init__(self, dataset: xr.Dataset):
         super().__init__()
         self.data_var = list(dataset.data_vars.keys())[0]
         self.S21 = dataset[self.data_var].values
         self.fit_results = {}
-        self.qubit = dataset[self.data_var].attrs['qubit']
-        dataset[f'y{self.qubit}'].values = np.abs(self.S21)
+        self.qubit = dataset[self.data_var].attrs["qubit"]
+        dataset[f"y{self.qubit}"].values = np.abs(self.S21)
         self.dataset = dataset
-        self.result = OptimalResult(f'reset_pulse_durations', "s")
+        self.result = OptimalResult(f"reset_pulse_durations", "s")
         # self.fig, self.axes = plt.subplots(1, 3, figsize=(20,5))
 
     def run_fitting(self):
@@ -81,13 +82,18 @@ class ResetChevronAnalysis(BaseAnalysis):
                 self.amplitudes_coord = coord
             elif "durations" in coord:
                 self.durations_coord = coord
-        amps = self.dataset[self.amplitudes_coord].values 
-        times = self.dataset[self.durations_coord].values # ns
+        amps = self.dataset[self.amplitudes_coord].values
+        times = self.dataset[self.durations_coord].values  # ns
         self.times = times
         self.amps = amps
-        magnitudes = np.array([[np.linalg.norm(u) for u in v] for v in self.dataset[f'y{self.qubit}']])
+        magnitudes = np.array(
+            [[np.linalg.norm(u) for u in v] for v in self.dataset[f"y{self.qubit}"]]
+        )
         self.min = np.min(magnitudes)
-        magnitudes = np.transpose((magnitudes - np.min(magnitudes)) / (np.max(magnitudes) - np.min(magnitudes)))
+        magnitudes = np.transpose(
+            (magnitudes - np.min(magnitudes))
+            / (np.max(magnitudes) - np.min(magnitudes))
+        )
         direct = True
         if direct:
             min_index = np.argmin(magnitudes)
@@ -116,15 +122,32 @@ class ResetChevronAnalysis(BaseAnalysis):
                 period = 1 / np.array(cs)
                 period_fit = []
                 for i, prob in enumerate(magnitudes):
+
                     def fitfunc(p):
-                        return p[0] * np.exp(-p[4] * times) * np.cos(2 * np.pi / p[1] * (times - p[2])) + p[3]
+                        return (
+                            p[0]
+                            * np.exp(-p[4] * times)
+                            * np.cos(2 * np.pi / p[1] * (times - p[2]))
+                            + p[3]
+                        )
 
                     def errfunc(p):
                         return prob - fitfunc(p)
 
                     # print(prob)
-                    out = leastsq(errfunc, np.array([np.max(prob), period[i], times[np.argmax(prob)], np.max(prob), 0]),
-                                  full_output=1)
+                    out = leastsq(
+                        errfunc,
+                        np.array(
+                            [
+                                np.max(prob),
+                                period[i],
+                                times[np.argmax(prob)],
+                                np.max(prob),
+                                0,
+                            ]
+                        ),
+                        full_output=1,
+                    )
                     p = out[0]
                     # axes[1].plot(times, prob, 'o', markersize=5)
                     # axes[1].plot(times, fitfunc(p), '-.', linewidth=1)
@@ -138,14 +161,29 @@ class ResetChevronAnalysis(BaseAnalysis):
                     times_cut = times[:times_cut_index]
 
                     def fitfunc(p):
-                        return p[0] * np.exp(-p[4] * times_cut) * np.cos(2 * np.pi / p[1] * (times_cut - p[2])) + p[3]
+                        return (
+                            p[0]
+                            * np.exp(-p[4] * times_cut)
+                            * np.cos(2 * np.pi / p[1] * (times_cut - p[2]))
+                            + p[3]
+                        )
 
                     def errfunc(p):
                         return prob[:times_cut_index] - fitfunc(p)
 
-                    out = leastsq(errfunc,
-                                  np.array([np.max(prob), period_fit[i], times[np.argmax(prob)], np.max(prob), 0]),
-                                  full_output=1)
+                    out = leastsq(
+                        errfunc,
+                        np.array(
+                            [
+                                np.max(prob),
+                                period_fit[i],
+                                times[np.argmax(prob)],
+                                np.max(prob),
+                                0,
+                            ]
+                        ),
+                        full_output=1,
+                    )
                     p = out[0]
                     amps.append(p[0])
                     period_fit[i] = p[1]
@@ -157,7 +195,9 @@ class ResetChevronAnalysis(BaseAnalysis):
                 period_fit = period_fit[period_fit < 500]
                 if len(period_fit) < 4:
                     # axes[2].set_title("No enough available points.")
-                    print(f"No enough available points. Please resweep once again or enlarge sweep range.")
+                    print(
+                        f"No enough available points. Please resweep once again or enlarge sweep range."
+                    )
                     self.opt_freq, self.opt_cz = 0, 0
                 else:
                     # ----------- Third round fit ------------#
@@ -169,9 +209,11 @@ class ResetChevronAnalysis(BaseAnalysis):
                     p_guess = np.array([p0_guess, p1_guess, fmin_guess, amp_max])
 
                     def fitfunc(p, xs):
-                        return np.heaviside(p[2] - xs, 0) * p[0] * (xs - p[2]) ** 2 + p[3] + np.heaviside(xs - p[2],
-                                                                                                          0) * p[1] * (
-                                    xs - p[2]) ** 2
+                        return (
+                            np.heaviside(p[2] - xs, 0) * p[0] * (xs - p[2]) ** 2
+                            + p[3]
+                            + np.heaviside(xs - p[2], 0) * p[1] * (xs - p[2]) ** 2
+                        )
 
                     def errfunc(p):
                         return amps - fitfunc(p, freq)
@@ -182,7 +224,8 @@ class ResetChevronAnalysis(BaseAnalysis):
                     # axes[2].legend()
                     if p[2] > freq[-1] or p[2] < freq[0] or p[0] > 0 or p[1] > 0:
                         print(
-                            "You should probably enlarge your sweep range. The optimial point is not in the current range.")
+                            "You should probably enlarge your sweep range. The optimial point is not in the current range."
+                        )
                         # axes[2].set_title(f"Optimal point not found ")
                         # self.result.set_not_found()
                         self.opt_freq, self.opt_cz = 0, 0
@@ -190,8 +233,10 @@ class ResetChevronAnalysis(BaseAnalysis):
                         # ----------- Fourth round fit ------------#
                         id_opt = np.argmax(fitfunc(p, freq))
                         id_left = (id_opt - 3) if (id_opt - 3) > 0 else 0
-                        id_right = (id_opt + 4) if (id_opt + 4) < len(freq) else len(freq)
-                        xs = freq[id_left: id_right]
+                        id_right = (
+                            (id_opt + 4) if (id_opt + 4) < len(freq) else len(freq)
+                        )
+                        xs = freq[id_left:id_right]
                         p_guess = [p0_guess, freq[id_opt], amps[id_opt]]
 
                         def fitfunc(p, xs):
@@ -199,7 +244,7 @@ class ResetChevronAnalysis(BaseAnalysis):
 
                         # ----------- find max amplitude ----------#
                         def errfunc(p):
-                            return amps[id_left: id_right] - fitfunc(p, xs)
+                            return amps[id_left:id_right] - fitfunc(p, xs)
 
                         out = leastsq(errfunc, p_guess)
                         p = out[0]
@@ -210,9 +255,11 @@ class ResetChevronAnalysis(BaseAnalysis):
 
                         # ---------- find gate time ---------------#
                         def errfunc(p):
-                            return period_fit[id_left: id_right] - fitfunc(p, xs)
+                            return period_fit[id_left:id_right] - fitfunc(p, xs)
 
-                        p0_guess = (period_fit[id_left] - period_fit[id_opt]) / (freq[id_left] - freq[id_opt]) ** 2
+                        p0_guess = (period_fit[id_left] - period_fit[id_opt]) / (
+                            freq[id_left] - freq[id_opt]
+                        ) ** 2
                         p_guess = [p0_guess, freq[id_opt], period_fit[id_opt]]
                         out = leastsq(errfunc, p_guess)
                         gate_time = fitfunc(out[0], f_opt)
@@ -231,26 +278,49 @@ class ResetChevronAnalysis(BaseAnalysis):
         return [self.opt_freq, self.opt_cz]
 
     def plotter(self, axis):
-        datarray = self.dataset[f'y{self.qubit}']
+        datarray = self.dataset[f"y{self.qubit}"]
         qubit = self.qubit
-        datarray.plot(ax=axis, x=self.amplitudes_coord, cmap='RdBu_r')
+        datarray.plot(ax=axis, x=self.amplitudes_coord, cmap="RdBu_r")
         # fig = axis.pcolormesh(amp,freq,magnitudes,shading='nearest',cmap='RdBu_r')
-        axis.scatter(0,0,label = 'Min = {:.4f}'.format(self.min))
-        axis.scatter(self.opt_freq, self.opt_cz, c='r', label='Duration = {:.1f} ns'.format(self.opt_cz * 1e9),
-                     marker='*', s=200, edgecolors='k', linewidth=0.5, zorder=10)
+        axis.scatter(0, 0, label="Min = {:.4f}".format(self.min))
+        axis.scatter(
+            self.opt_freq,
+            self.opt_cz,
+            c="r",
+            label="Duration = {:.1f} ns".format(self.opt_cz * 1e9),
+            marker="*",
+            s=200,
+            edgecolors="k",
+            linewidth=0.5,
+            zorder=10,
+        )
         # plt.scatter(opt_swap,opt_freq,c='b',label = 'SWAP12 Duration= {:.2f} V'.format(opt_swap),marker='X',s=200,edgecolors='k', linewidth=1.5,zorder=10)
-        axis.vlines(self.opt_freq, self.times[0], self.times[-1], label='Amplitude = {:.5f} V'.format(self.opt_freq),
-                    colors='k', linestyles='--', linewidth=1.5)
-        axis.hlines(self.opt_cz, self.amps[0], self.amps[-1], colors='k', linestyles='--', linewidth=1.5)
+        axis.vlines(
+            self.opt_freq,
+            self.times[0],
+            self.times[-1],
+            label="Amplitude = {:.5f} V".format(self.opt_freq),
+            colors="k",
+            linestyles="--",
+            linewidth=1.5,
+        )
+        axis.hlines(
+            self.opt_cz,
+            self.amps[0],
+            self.amps[-1],
+            colors="k",
+            linestyles="--",
+            linewidth=1.5,
+        )
         # axis.legend(loc = 'lower center', bbox_to_anchor=(-0.15, -0.36, 1.4, .102), mode='expand', ncol=2,
         #             title = 'Optimal Gate Parameters', columnspacing=200,borderpad=1)
         # cbar = plt.colorbar(fig)
         # cbar.set_label('|2>-state Population', labelpad=10)
         axis.set_xlim([self.amps[0], self.amps[-1]])
         axis.set_ylim([self.times[0], self.times[-1]])
-        axis.set_ylabel('Drive Durations (s)')
-        axis.set_xlabel('Drive Amplitude (V)')
-        axis.set_title(f'Reset Chevron - Qubit {self.qubit[1:]}')
+        axis.set_ylabel("Drive Durations (s)")
+        axis.set_xlabel("Drive Amplitude (V)")
+        axis.set_title(f"Reset Chevron - Qubit {self.qubit[1:]}")
 
         # self.fig.show()
         # if self.result.status != SweepResultStatus.FOUND:

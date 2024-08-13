@@ -23,7 +23,6 @@ class Punchout(BaseMeasurement):
         ro_amplitudes: dict[str, np.ndarray],
         repetitions: int = 1024,
     ) -> Schedule:
-
         schedule = Schedule("mltplx_punchout", repetitions)
         qubits = self.transmons.keys()
 

@@ -49,7 +49,6 @@ def configure_dataset(
         "cz_calibration_swap_ssro",
         "reset_calibration_ssro",
         "process_tomography_ssro",
-
     ]:
         qubit_states = ["c0", "c1", "c2"]  # for calibration points
 

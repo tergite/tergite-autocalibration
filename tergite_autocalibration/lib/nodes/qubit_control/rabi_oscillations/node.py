@@ -55,6 +55,7 @@ class N_Rabi_Oscillations_Node(BaseNode):
             "X_repetitions": {qubit: np.arange(1, 19, 6) for qubit in self.all_qubits},
         }
 
+
 class N_Rabi_Oscillations_12_Node(BaseNode):
     measurement_obj = N_Rabi_Oscillations
     analysis_obj = NRabiAnalysis
@@ -66,7 +67,8 @@ class N_Rabi_Oscillations_12_Node(BaseNode):
         self.qubit_state = 1
 
         self.schedule_samplespace = {
-            'mw_amplitudes_sweep': {qubit: np.linspace(-0.05, 0.05, 51) for qubit in self.all_qubits},
-            'X_repetitions': {qubit: np.arange(1, 4, 1) for qubit in self.all_qubits}
+            "mw_amplitudes_sweep": {
+                qubit: np.linspace(-0.05, 0.05, 51) for qubit in self.all_qubits
+            },
+            "X_repetitions": {qubit: np.arange(1, 4, 1) for qubit in self.all_qubits},
         }
-

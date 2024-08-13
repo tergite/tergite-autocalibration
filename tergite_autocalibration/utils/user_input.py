@@ -91,14 +91,14 @@ user_samplespace = {
 """
 ####################################################################
 target_node = "reset_chevron"
-qubits = [ 'q16','q17','q18','q19','q20','q21','q22','q23','q24','q25']
+qubits = ["q16", "q17", "q18", "q19", "q20", "q21", "q22", "q23", "q24", "q25"]
 couplers = ["q23_q24"]
 user_samplespace = {
     "resonator_spectroscopy": {
         "ro_frequencies": {qubit: resonator_samples(qubit) for qubit in qubits}
     },
 }
-attenuation_setting = {'qubit':12, 'coupler':30, 'readout':6}
+attenuation_setting = {"qubit": 12, "coupler": 30, "readout": 6}
 
 ####################################################################
 
