@@ -1,8 +1,10 @@
+"""
+Module containing classes that model, fit and plot data from the purity benchmarking experiment.
+"""
 import lmfit
 from matplotlib.axes import Axes
 import numpy as np
 import xarray as xr
-import matplotlib.pyplot as plt
 
 from ....base.analysis import BaseAnalysis
 
