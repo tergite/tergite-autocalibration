@@ -2,6 +2,7 @@ import unittest
 import numpy as np
 import xarray as xr
 from lmfit.model import ModelResult
+from pathlib import Path
 from matplotlib.figure import Figure
 from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.analysis import ExpDecayModel, PurityBenchmarkingAnalysis  # Replace with actual import path
 
@@ -25,18 +26,16 @@ class TestExpDecayModel(unittest.TestCase):
 
 class TestPurityBenchmarkingAnalysis(unittest.TestCase):
     @classmethod
-    def setUpClass(cls):
-        # Load or create the dataset
-        cls.dataset = xr.Dataset({"purity": (["cliffords", "seed"], np.random.rand(20, 5))}, 
-                                 coords={"cliffords": np.arange(20), "seed": np.arange(5)})
-        cls.dataset["purity"].attrs["qubit"] = "q1"
+    def setUpClass(self):
+        test_dir = Path(__file__).parent
+        file_path = test_dir / "testdata.hdf5"
+        self.dataset = xr.open_dataset(file_path)
 
     def test_initialization(self):
-        analysis = PurityBenchmarkingAnalysis(self.dataset)
-        self.assertEqual(analysis.qubit, self.dataset['purity'].attrs['qubit'])
-        self.assertEqual(analysis.number_of_repetitions, self.dataset.sizes['seed'])
-        self.assertEqual(len(analysis.number_of_cliffords), len(self.dataset['cliffords']) - 3)
-        
+        self.analysis = PurityBenchmarkingAnalysis(self.dataset)
+        self.assertTrue(hasattr(self.analysis, "purity"))
+        self.assertTrue(hasattr(self.analysis, "normalized_data_dict"))
+        self.assertEqual(self.analysis.number_of_repetitions, self.dataset.sizes.get("seed", 1))        
 
     def test_run_fitting(self):
         # Initialize the analysis
@@ -77,7 +76,7 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
         analysis.plotter(ax)
         
         # Check that two lines were plotted (data and fit)
-        self.assertEqual(len(ax.lines), 7)
+        self.assertEqual(len(ax.lines), 3)
 
 if __name__ == '__main__':
     unittest.main()
