@@ -6,17 +6,19 @@ from __future__ import annotations
 import numpy as np
 from quantify_scheduler import Schedule
 from quantify_scheduler.enums import BinMode
-from quantify_scheduler.operations.gate_library import Measure, Reset
+from quantify_scheduler.operations.gate_library import Measure, Reset, X
 from quantify_scheduler.operations.pulse_library import DRAGPulse
 from quantify_scheduler.resources import ClockResource
 
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 from ....base.measurement import BaseMeasurement
+from tergite_autocalibration.utils.extended_gates import Measure_RO1
 
 
 class Motzoi_parameter(BaseMeasurement):
     def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state=0):
         super().__init__(transmons)
+        self.qubit_state = qubit_state
         self.transmons = transmons
 
     def schedule_function(
@@ -48,7 +50,15 @@ class Motzoi_parameter(BaseMeasurement):
         :
             An experiment schedule.
         """
-        schedule = Schedule("mltplx_motzoi", repetitions)
+        if self.qubit_state == 0:
+            schedule_title = "mltplx_motzoi_01"
+            measure_function = Measure
+        elif self.qubit_state == 1:
+            schedule_title = "mltplx_motzoi_12"
+            measure_function = Measure_RO1
+        else:
+            raise ValueError(f"Invalid qubit state: {self.qubit_state}")
+        schedule = Schedule(schedule_title, repetitions)
 
         qubits = self.transmons.keys()
 
@@ -57,6 +67,12 @@ class Motzoi_parameter(BaseMeasurement):
             schedule.add_resource(
                 ClockResource(name=f"{this_qubit}.01", freq=mw_frequency)
             )
+            if self.qubit_state == 1:
+                mw_frequency_12 = this_transmon.clock_freqs.f12()
+                this_clock = f"{this_qubit}.12"
+                schedule.add_resource(
+                    ClockResource(name=this_clock, freq=mw_frequency_12)
+                )
 
         # This is the common reference operation so the qubits can be operated in parallel
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
@@ -73,6 +89,16 @@ class Motzoi_parameter(BaseMeasurement):
             motzoi_parameter_values = mw_motzois[this_qubit]
             number_of_motzois = len(motzoi_parameter_values)
 
+            if self.qubit_state == 1:
+                mw_amplitude = this_transmon.r12.ef_amp180()
+                this_clock = f"{this_qubit}.12"
+                measure_function = Measure_RO1
+            elif self.qubit_state == 0:
+                measure_function = Measure
+                this_clock = f"{this_qubit}.01"
+            else:
+                raise ValueError(f"Invalid qubit state: {self.qubit_state}")
+
             schedule.add(
                 Reset(*qubits), ref_op=root_relaxation, ref_pt_new="end"
             )  # To enforce parallelism we refer to the root relaxation
@@ -82,6 +108,8 @@ class Motzoi_parameter(BaseMeasurement):
                 # The inner for loop iterates over all motzoi values
                 for motzoi_index, mw_motzoi in enumerate(motzoi_parameter_values):
                     this_index = x_index * number_of_motzois + motzoi_index
+                    if self.qubit_state == 1:
+                        schedule.add(X(this_qubit))
                     for _ in range(this_x):
                         schedule.add(
                             DRAGPulse(
@@ -105,8 +133,31 @@ class Motzoi_parameter(BaseMeasurement):
                             ),
                         )
 
+                        if self.qubit_state == 0:
+                            schedule.add(
+                                DRAGPulse(
+                                    duration=mw_pulse_duration,
+                                    G_amp=mw_amplitude,
+                                    D_amp=mw_motzoi,
+                                    port=mw_pulse_port,
+                                    clock=this_clock,
+                                    phase=90,
+                                ),
+                            )
+                            # inversion pulse requires 180 deg phase
+                            schedule.add(
+                                DRAGPulse(
+                                    duration=mw_pulse_duration,
+                                    G_amp=mw_amplitude,
+                                    D_amp=mw_motzoi,
+                                    port=mw_pulse_port,
+                                    clock=this_clock,
+                                    phase=270,
+                                ),
+                            )
+
                     schedule.add(
-                        Measure(
+                        measure_function(
                             this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE
                         ),
                     )

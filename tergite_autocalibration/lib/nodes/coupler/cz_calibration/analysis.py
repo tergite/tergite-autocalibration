@@ -248,9 +248,9 @@ class CZCalibrationSSROAnalysis(BaseAnalysis):
         self.data_var = list(dataset.data_vars.keys())[0]
         self.qubit = dataset[self.data_var].attrs["qubit"]
         for coord in dataset.coords:
-            if f"control_ons{self.qubit}" in str(coord):
+            if f"control_ons" in str(coord):
                 self.sweep_coord = coord
-            elif f"ramsey_phases{self.qubit}" in str(coord):
+            elif f"ramsey_phases" in str(coord):
                 self.state_coord = coord
             elif "shot" in str(coord):
                 self.shot_coord = coord
@@ -316,17 +316,9 @@ class CZCalibrationSSROAnalysis(BaseAnalysis):
             data_res = np.array([])
             for sweep in data_y_pred:
                 uniques, counts = np.unique(sweep, return_counts=True)
-                # print('unique elements are: ', uniques)
-                if len(counts) == 1:
-                    counts = np.append(counts, 0)
-                elif len(counts) == 2 and uniques[1] == "c2":
-                    pop2 = counts[1]
-                    counts[1] = 0
-                    counts = np.append(counts, pop2)
-                elif len(counts) == 2:
-                    counts = np.append(counts, 0)
-
-                raw_prob = counts / len(sweep)
+                raw_prob = [0] * len(self.calibs)
+                for state_id, state in enumerate(uniques):
+                    raw_prob[int(state)] = counts[state_id] / len(sweep)
                 mitigate_prob = mitigate(raw_prob, cm_inv)
                 data_res = np.append(data_res, mitigate_prob)
             data_res = data_res.reshape(data_res_shape)
@@ -394,7 +386,12 @@ class CZCalibrationSSROAnalysis(BaseAnalysis):
                     for fit in self.fit_results
                 ]
             )
-            self.pop_loss = np.diff(np.flip(qois[0][0]))[0]
+            # print(qois)
+            # print(np.diff(np.flip(qois[0][0])))
+            try:
+                self.pop_loss = np.diff(np.flip(qois[0][0]))[0]
+            except:
+                self.pop_loss = 1
         else:
             self.pop_loss = np.diff(np.mean(self.fit_ys, axis=1))[0]
             # self.pop_loss = np.mean(np.diff(np.flip(self.fit_ys)))
@@ -434,16 +431,21 @@ class CZCalibrationSSROAnalysis(BaseAnalysis):
                 c=colors[index],
                 label=f"|2> {label[index]}",
             )
-            axis.plot(
-                self.independents,
-                magnitude[:-3, 0],
-                f"{marker[2]}",
-                c=colors[index],
-                label=f"0> {label[index]}",
-            )
+            # axis.plot(
+            #     self.independents,
+            #     magnitude[:-3, 0],
+            #     f"{marker[2]}",
+            #     c=colors[index],
+            #     label=f"0> {label[index]}",
+            # )
 
         for index, magnitude in enumerate(self.magnitudes):
-            axis.plot(self.fit_independents, self.fit_ys[index], "-", c=colors[index])
+            try:
+                axis.plot(
+                    self.fit_independents, self.fit_ys[index], "-", c=colors[index]
+                )
+            except:
+                pass
             axis.vlines(
                 self.opt_cz[index],
                 -10,
@@ -546,7 +548,7 @@ class ResetCalibrationSSROAnalysis(BaseAnalysis):
                 uniques, counts = np.unique(sweep, return_counts=True)
                 raw_prob = [0] * len(self.calibs)
                 for state_id, state in enumerate(uniques):
-                    raw_prob[int(state[1])] = counts[state_id]
+                    raw_prob[int(state)] = counts[state_id] / len(sweep)
                 raw_prob = counts / len(sweep)
                 mitigate_prob = mitigate(raw_prob, cm_inv)
                 data_res = np.append(data_res, mitigate_prob)

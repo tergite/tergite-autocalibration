@@ -121,9 +121,9 @@ class CalibrationSupervisor:
                         # print(f'Attenuation setting for {module.name} is {attenuation_setting["coupler"]}')
                     elif module.is_qrm_type and module.is_rf_type:
                         module.out0_att(attenuation_setting["readout"])  # Readout lines
-                        print(
-                            f'Attenuation setting for {module.name} is {attenuation_setting["readout"]}'
-                        )
+                        # print(
+                        #     f'Attenuation setting for {module.name} is {attenuation_setting["readout"]}'
+                        # )
                 except:
                     pass
             ic_.add_component(ClusterComponent(cluster))
