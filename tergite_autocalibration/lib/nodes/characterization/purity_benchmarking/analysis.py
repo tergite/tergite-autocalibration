@@ -59,31 +59,28 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
         self.qubit = dataset[self.data_var].attrs["qubit"]
         self.purity = dataset[self.data_var]
 
-        # Identify and store relevant coordinates
-        self.number_cliffords_coord, self.seed_coord = self._identify_coords(dataset)
-
-        # Extract the number of repetitions and sequence lengths for Cliffords
+        # Identify and store relevant coordinates and initialize data storage
+        self.number_cliffords_coord, self.seed_coord = self._identify_coords()
         self.number_of_repetitions = dataset.sizes[self.seed_coord]
         self.number_of_cliffords = np.unique(dataset[self.number_cliffords_coord].values[:-3])
 
-        # Initialize data storage dictionaries
         self.normalized_data_dict = {}
         self.purity_results_dict = {}
         self.fit_n_cliffords, self.fit_y, self.fidelity, self.fit_report = None, None, None, None
 
-        # Normalize and process the purity data
-        self._process_data()
+        # Process and normalize the purity data
+        self._process_and_normalize_data()
 
         self.fit_results = {}  # Dictionary to store fitting results
 
-    def _identify_coords(self, dataset):
+    def _identify_coords(self):
         """
-        Helper method to identify the coordinates related to the number of Cliffords and seed.
+        Identify the coordinates related to the number of Cliffords and seed.
         """
         number_cliffords_coord = None
         seed_coord = None
 
-        for coord in dataset[self.data_var].coords:
+        for coord in self.purity.coords:
             if "cliffords" in coord:
                 number_cliffords_coord = coord
             elif "seed" in coord:
@@ -91,9 +88,9 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
 
         return number_cliffords_coord, seed_coord
 
-    def _process_data(self):
+    def _process_and_normalize_data(self):
         """
-        Normalize purity data for each repetition and calculate the purity per index.
+        Process and normalize purity data for each repetition, and calculate the purity per index.
         """
         for repetition_index in range(self.number_of_repetitions):
             measurements = self.purity.isel({self.seed_coord: repetition_index}).values.flatten()
@@ -101,45 +98,32 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
             calibration_0, calibration_1 = measurements[-3], measurements[-2]
 
             # Normalize and rotate data
-            real_rotated_data = self._normalize_data(data, calibration_0, calibration_1)
-            self.normalized_data_dict[repetition_index] = real_rotated_data
+            displacement_vector = calibration_1 - calibration_0
+            data_translated_to_zero = data - calibration_0
+            rotation_angle = np.angle(displacement_vector)
+            rotated_data = data_translated_to_zero * np.exp(-1j * rotation_angle)
+
+            rotated_0 = calibration_0 * np.exp(-1j * rotation_angle)
+            rotated_1 = calibration_1 * np.exp(-1j * rotation_angle)
+            normalization = (rotated_1 - rotated_0).real
+
+            normalized_data = rotated_data.real / normalization
 
             # Calculate purity for each acquisition index
-            purity_per_index = self._calculate_purity(real_rotated_data)
+            purity_per_index = []
+            for i in range(len(normalized_data) // 3):
+                # Extract values for the Pauli operators
+                x_1, y_1, z_1 = normalized_data[3*i:3*(i+1)]
+                x_exp = 2 * x_1 - 1
+                y_exp = 2 * y_1 - 1
+                z_exp = 2 * z_1 - 1
+
+                # Calculate purity
+                purity_per_index.append(x_exp**2 + y_exp**2 + z_exp**2)
+
+            # Store normalized data and purity results
+            self.normalized_data_dict[repetition_index] = normalized_data
             self.purity_results_dict[repetition_index] = purity_per_index
-
-    def _normalize_data(self, data, calibration_0, calibration_1):
-        """
-        Normalize and rotate the data using calibration points.
-        """
-        displacement_vector = calibration_1 - calibration_0
-        data_translated_to_zero = data - calibration_0
-        rotation_angle = np.angle(displacement_vector)
-        rotated_data = data_translated_to_zero * np.exp(-1j * rotation_angle)
-
-        rotated_0 = calibration_0 * np.exp(-1j * rotation_angle)
-        rotated_1 = calibration_1 * np.exp(-1j * rotation_angle)
-        normalization = (rotated_1 - rotated_0).real
-
-        return rotated_data.real / normalization
-
-    def _calculate_purity(self, normalized_data):
-        """
-        Calculate the purity for each acquisition index from the normalized data.
-        """
-        purity_per_index = []
-
-        for i in range(len(normalized_data) // 3):
-            # Extract values for the Pauli operators
-            x_1, y_1, z_1 = normalized_data[3*i:3*(i+1)]
-            x_exp = 2 * x_1 - 1
-            y_exp = 2 * y_1 - 1
-            z_exp = 2 * z_1 - 1
-
-            # Calculate purity
-            purity_per_index.append(x_exp**2 + y_exp**2 + z_exp**2)
-
-        return purity_per_index
 
     def run_fitting(self):
         """
