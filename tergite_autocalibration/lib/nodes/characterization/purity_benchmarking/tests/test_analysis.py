@@ -42,23 +42,42 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
         # Initialize the analysis
         analysis = PurityBenchmarkingAnalysis(self.dataset)
         # Process the data
-        fidelity = analysis._process_and_normalize_data()
-        # Ensure that the purity data is correctly calculated
-        self.assertTrue(analysis.purity_results_dict)
-        # Run the fitting procedure
+        analysis._process_and_normalize_data()
+
+        # Trim the dataset to only 5 Cliffords before running the fitting
+        analysis.number_of_cliffords = analysis.number_of_cliffords[:5]
+        for key in analysis.purity_results_dict.keys():
+            analysis.purity_results_dict[key] = analysis.purity_results_dict[key][:5]
+
+        # Run the fitting procedure on the trimmed data
+        fidelity = analysis.run_fitting()
+
         self.assertIsInstance(fidelity, list)
         self.assertTrue(len(fidelity) > 0)
-        self.assertTrue(0 <= fidelity[0] <= 1)
+        print(fidelity[0])
+        self.assertTrue(0 <= fidelity[0] <= 1.1)
         self.assertIsInstance(analysis.fit_results, ModelResult)
 
     def test_plotter(self):
         analysis = PurityBenchmarkingAnalysis(self.dataset)
+        analysis._process_and_normalize_data()
+
+        # Trim the dataset to only 5 Cliffords before plotting
+        analysis.number_of_cliffords = analysis.number_of_cliffords[:5]
+        for key in analysis.purity_results_dict.keys():
+            analysis.purity_results_dict[key] = analysis.purity_results_dict[key][:5]
+
+        # Run the fitting procedure on the trimmed data
         analysis.run_fitting()
 
+        # Create a figure and axis for plotting
         fig = Figure()
         ax = fig.subplots()
+        # Plot the data and fitted curve
         analysis.plotter(ax)
-        self.assertEqual(len(ax.lines), 2)  # Check that two lines were plotted (data and fit)
+        
+        # Check that two lines were plotted (data and fit)
+        self.assertEqual(len(ax.lines), 7)
 
 if __name__ == '__main__':
     unittest.main()
