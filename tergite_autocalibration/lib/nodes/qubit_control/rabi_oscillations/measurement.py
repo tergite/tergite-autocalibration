@@ -122,6 +122,7 @@ class Rabi_Oscillations(BaseMeasurement):
 class N_Rabi_Oscillations(BaseMeasurement):
     def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
         super().__init__(transmons)
+        self.qubit_state = qubit_state
         self.transmons = transmons
 
     def schedule_function(
@@ -149,7 +150,15 @@ class N_Rabi_Oscillations(BaseMeasurement):
         :
             An experiment schedule.
         """
-        schedule = Schedule("mltplx_nrabi", repetitions)
+        if self.qubit_state == 0:
+            schedule_title = "mltplx_nrabi_01"
+            measure_function = Measure
+        elif self.qubit_state == 1:
+            schedule_title = "mltplx_nrabi_12"
+            measure_function = Measure_RO1
+        else:
+            raise ValueError(f"Invalid qubit state: {self.qubit_state}")
+        schedule = Schedule(schedule_title, repetitions)
 
         qubits = self.transmons.keys()
 
@@ -158,6 +167,12 @@ class N_Rabi_Oscillations(BaseMeasurement):
             schedule.add_resource(
                 ClockResource(name=f"{this_qubit}.01", freq=mw_frequency)
             )
+            if self.qubit_state == 1:
+                mw_frequency_12 = this_transmon.clock_freqs.f12()
+                this_clock = f"{this_qubit}.12"
+                schedule.add_resource(
+                    ClockResource(name=this_clock, freq=mw_frequency_12)
+                )
 
         # This is the common reference operation so the qubits can be operated in parallel
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
@@ -171,6 +186,17 @@ class N_Rabi_Oscillations(BaseMeasurement):
             mw_motzoi = this_transmon.rxy.motzoi()
 
             this_clock = f"{this_qubit}.01"
+
+            if self.qubit_state == 1:
+                mw_amplitude = this_transmon.r12.ef_amp180()
+                mw_motzoi = this_transmon.r12.ef_motzoi()
+                this_clock = f"{this_qubit}.12"
+                measure_function = Measure_RO1
+            elif self.qubit_state == 0:
+                measure_function = Measure
+                this_clock = f"{this_qubit}.01"
+            else:
+                raise ValueError(f"Invalid qubit state: {self.qubit_state}")
 
             mw_amplitudes_values = mw_amplitudes_sweep[this_qubit]
             number_of_amplitudes = len(mw_amplitudes_values)
@@ -186,6 +212,8 @@ class N_Rabi_Oscillations(BaseMeasurement):
                     mw_amplitudes_values
                 ):
                     this_index = x_index * number_of_amplitudes + mw_amplitude_index
+                    if self.qubit_state == 1:
+                        schedule.add(X(this_qubit))
                     for _ in range(this_x):
                         schedule.add(
                             DRAGPulse(
@@ -197,8 +225,40 @@ class N_Rabi_Oscillations(BaseMeasurement):
                                 phase=0,
                             ),
                         )
+                        schedule.add(
+                            DRAGPulse(
+                                duration=mw_pulse_duration,
+                                G_amp=mw_amplitude + mw_amplitude_correction,
+                                D_amp=mw_motzoi,
+                                port=mw_pulse_port,
+                                clock=this_clock,
+                                phase=0,
+                            ),
+                        )
+                        if self.qubit_state == 0:
+                            schedule.add(
+                                DRAGPulse(
+                                    duration=mw_pulse_duration,
+                                    G_amp=mw_amplitude + mw_amplitude_correction,
+                                    D_amp=mw_motzoi,
+                                    port=mw_pulse_port,
+                                    clock=this_clock,
+                                    phase=90,
+                                ),
+                            )
+                            schedule.add(
+                                DRAGPulse(
+                                    duration=mw_pulse_duration,
+                                    G_amp=mw_amplitude + mw_amplitude_correction,
+                                    D_amp=mw_motzoi,
+                                    port=mw_pulse_port,
+                                    clock=this_clock,
+                                    phase=90,
+                                ),
+                            )
+
                     schedule.add(
-                        Measure(
+                        measure_function(
                             this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE
                         ),
                     )

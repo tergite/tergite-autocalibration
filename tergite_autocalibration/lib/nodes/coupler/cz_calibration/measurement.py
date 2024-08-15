@@ -305,7 +305,7 @@ class CZ_calibration_SSRO(BaseMeasurement):
             print("swapping")
             name += "_swap"
 
-        all_couplers = self.couplers
+        all_couplers = list(self.couplers.keys())
         all_qubits = [coupler.split(sep="_") for coupler in all_couplers]
         print("these are all couplers: ", all_couplers)
         print("these are all qubits: ", all_qubits)
@@ -371,26 +371,23 @@ class CZ_calibration_SSRO(BaseMeasurement):
             schedule.add_resource(
                 ClockResource(
                     name=f"{this_coupler}.cz",
-                    freq=-cz_pulse_frequency[this_coupler] + 4.4e9,
+                    freq=-cz_pulse_frequency[this_coupler] + downconvert,
                 )
             )
             shot.add_resource(
                 ClockResource(
                     name=f"{this_coupler}.cz",
-                    freq=-cz_pulse_frequency[this_coupler] + 4.4e9,
+                    freq=-cz_pulse_frequency[this_coupler] + downconvert,
                 )
             )
         # print(ramsey_phases,qubits)
 
-        ramsey_phases_values = ramsey_phases[all_qubits[0]]
-        number_of_phases = len(ramsey_phases_values) + 3  # +3 for calibration points
-        control_on_values = control_ons[all_qubits[0]]
-
-        state = ["g", "e", "f"]
-        states = list(itertools.product(state, state))
+        ramsey_phases_values = ramsey_phases[all_couplers[0]]
+        number_of_phases = len(ramsey_phases_values)
+        control_on_values = control_ons[all_couplers[0]]
 
         for cz_index, control_on in enumerate(control_on_values):
-            for ramsey_index, ramsey_phase in enumerate(ramsey_phases_values):
+            for ramsey_index, ramsey_phase in enumerate(ramsey_phases_values[:-3]):
                 relaxation = shot.add(
                     Reset(*all_qubits), label=f"Reset_{cz_index}_{ramsey_index}"
                 )
