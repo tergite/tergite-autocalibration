@@ -54,7 +54,7 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
         self.assertIsInstance(fidelity, list)
         self.assertTrue(len(fidelity) > 0)
         print(fidelity[0])
-        self.assertTrue(0 <= fidelity[0] <= 1.1)
+        self.assertTrue(0 <= fidelity[0] <= 1.002)
         self.assertIsInstance(analysis.fit_results, ModelResult)
 
     def test_plotter(self):
