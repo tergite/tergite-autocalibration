@@ -115,6 +115,8 @@ class NodeFactory:
                 "resonator_spectroscopy_2": Resonator_Spectroscopy_2_Node,
                 "motzoi_parameter": Motzoi_Parameter_Node,
                 "n_rabi_oscillations": N_Rabi_Oscillations_Node,
+                "motzoi_parameter_12": Motzoi_Parameter_12_Node,
+                "n_rabi_oscillations_12": N_Rabi_Oscillations_12_Node,
                 "coupler_spectroscopy": Coupler_Spectroscopy_Node,
                 "coupler_resonator_spectroscopy": Coupler_Resonator_Spectroscopy_Node,
                 "T1": T1_Node,
