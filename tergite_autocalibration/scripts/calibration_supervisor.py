@@ -227,7 +227,9 @@ class CalibrationSupervisor:
                 elif is_calibrated == "calibrated":
                     status = DataStatus.in_spec
                 else:
-                    raise ValueError(f"status: {status}")
+                    raise ValueError(
+                        f"REDIS error: cannot find cs:{coupler}", node_name
+                    )
         else:
             for qubit in self.qubits:
                 # the calibrated, not_calibrated flags may be not necessary,
