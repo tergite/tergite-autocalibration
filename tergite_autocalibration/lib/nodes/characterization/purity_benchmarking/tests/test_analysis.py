@@ -42,7 +42,8 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
         analysis = PurityBenchmarkingAnalysis(self.dataset)
         # Process the data
         analysis._process_and_normalize_data()
-        self.assertTrue(0 <= (np.sum(list(analysis.purity_results_dict.values()))/len(analysis.purity_results_dict)) <= 50)
+        print((np.sum(list(analysis.purity_results_dict.values()))/len(analysis.purity_results_dict)))
+        self.assertTrue(56.1 <= (np.sum(list(analysis.purity_results_dict.values()))/len(analysis.purity_results_dict)) <= 56.2)
 
         # Trim the dataset to only 5 Cliffords before running the fitting
         analysis.number_of_cliffords = analysis.number_of_cliffords[:5]
