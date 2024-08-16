@@ -172,6 +172,7 @@ class CalibrationSupervisor:
             "cz_calibration_swap_ssro",
             "cz_dynamic_phase",
             "cz_dynamic_phase_swap",
+            "cz_parametrisation_fix_duration",
             "tqg_randomized_benchmarking",
             "tqg_randomized_benchmarking_interleaved",
         ]:
@@ -212,6 +213,7 @@ class CalibrationSupervisor:
             "cz_calibration_swap_ssro",
             "cz_dynamic_phase",
             "cz_dynamic_phase_swap",
+            "cz_parametrisation_fix_duration",
             "tqg_randomized_benchmarking",
             "tqg_randomized_benchmarking_interleaved",
         ]:
@@ -237,7 +239,7 @@ class CalibrationSupervisor:
                 elif is_calibrated == "calibrated":
                     status = DataStatus.in_spec
                 else:
-                    raise ValueError(f"status: {status}")
+                    raise ValueError(f"REDIS error: cannot find cs:{qubit}", node_name)
 
         if status == DataStatus.in_spec:
             print(
