@@ -14,8 +14,10 @@ class CZParametrisationFixDurationNode(ParametrizedSweepNode):
     measurement_obj = CZParametrisationFixDuration
     analysis_obj = CZParametrisationFixDurationAnalysis
 
-    def __init__(self, name: str, couplers: list[str], **schedule_keywords):
-        self.all_qubits = [q for bus in couplers for q in bus.split("_")]
+    def __init__(
+        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
+    ):
+        self.all_qubits = all_qubits  # [q for bus in couplers for q in bus.split("_")]
         super().__init__(name, self.all_qubits, **schedule_keywords)
         self.type = "parameterized_sweep"
         self.couplers = couplers
