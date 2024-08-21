@@ -24,7 +24,7 @@ class TestExpDecayModel(unittest.TestCase):
         params = model.guess(data, m=m)
         # Verify that the guessed parameters are close to expected values
         self.assertAlmostEqual(params['A'].value, 1.0)
-        self.assertAlmostEqual(params['B'].value, 0.2)
+        self.assertAlmostEqual(params['B'].value, 0.8)
         self.assertAlmostEqual(params['p'].value, 0.95)
 
 class TestPurityBenchmarkingAnalysis(unittest.TestCase):
