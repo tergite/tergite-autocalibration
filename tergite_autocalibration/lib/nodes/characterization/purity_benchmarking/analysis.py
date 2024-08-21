@@ -35,7 +35,7 @@ class ExpDecayModel(lmfit.model.Model):
 
         # Initial guesses
         amplitude_guess = data[0]
-        offset_guess = data[-1]
+        offset_guess = data[-4]
         p_guess = 0.95
 
         self.set_param_hint("A", value=amplitude_guess)

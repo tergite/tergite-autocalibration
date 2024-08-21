@@ -4,7 +4,7 @@ import xarray as xr
 from lmfit.model import ModelResult
 from pathlib import Path
 from matplotlib.figure import Figure
-from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.analysis import ExpDecayModel, PurityBenchmarkingAnalysis  # Replace with actual import path
+from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.analysis import ExpDecayModel, PurityBenchmarkingAnalysis
 
 class TestExpDecayModel(unittest.TestCase):
     def test_exponential_decay_model_initialization(self):
