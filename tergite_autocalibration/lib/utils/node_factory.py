@@ -29,7 +29,7 @@ class NodeFactory:
                 Randomized_Benchmarking_Node,
             )
             from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.node import (
-                Purity_Benchmarking_Node,
+                PurityBenchmarkingNode,
             )
             from tergite_autocalibration.lib.nodes.characterization.all_xy.node import (
                 All_XY_Node,
@@ -142,7 +142,7 @@ class NodeFactory:
                 "ro_amplitude_two_state_optimization": RO_amplitude_two_state_optimization_Node,
                 "ro_amplitude_three_state_optimization": RO_amplitude_three_state_optimization_Node,
                 "randomized_benchmarking": Randomized_Benchmarking_Node,
-                "purity_benchmarking": Purity_Benchmarking_Node,
+                "purity_benchmarking": PurityBenchmarkingNode,
             }
         return cls._instance
 

@@ -7,10 +7,7 @@ import numpy as np
 import xarray as xr
 
 from ....base.analysis import BaseAnalysis
-
-# Exponential decay function used for modeling
-def exponential_decay_function(m: float, p: float, A: float, B: float) -> float:
-    return A * p**m + B
+from tergite_autocalibration.utils.exponential_decay_function import exponential_decay_function
 
 class ExpDecayModel(lmfit.model.Model):
     """
