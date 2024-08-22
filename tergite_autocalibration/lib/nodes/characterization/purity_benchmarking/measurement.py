@@ -17,7 +17,7 @@ class PurityBenchmarking(BaseMeasurement):
         super().__init__(transmons)
         self.qubit_state = qubit_state
         self.transmons = transmons
-        # Initialize dictionaries to store raw measurement data for each qubit
+        # Initialize dictionaries to store raw measurement data for each qubit and each basis
         self.raw_measurements = {qubit: {"X": [], "Y": [], "Z": []} for qubit in transmons}
 
     def schedule_function(
@@ -63,7 +63,8 @@ class PurityBenchmarking(BaseMeasurement):
             rng = np.random.default_rng(seed)
             schedule.add(Reset(*qubits), ref_op=root_relaxation, ref_pt="end")
             acq_index = 0
-
+            # The removal of the three last is because the calibration
+            # Unique is because so we don't use the same number of cliffords twice
             for this_number_of_cliffords in np.unique(clifford_sequence_lengths[:-3]):
                 # Generate a random sequence of Clifford operations
                 random_sequence = rng.integers(all_cliffords, size=this_number_of_cliffords)
@@ -78,6 +79,7 @@ class PurityBenchmarking(BaseMeasurement):
                             schedule.add(Rxy(qubit=qubit, theta=theta, phi=phi))
                     return schedule
 
+                # Has to measure in every bases to be able to calculate purity
                 for basis in ["X", "Y", "Z"]:
                     apply_clifford_sequence(schedule, this_qubit, random_sequence)
                     if basis == "X": # Prepare for X basis measurement
@@ -88,6 +90,7 @@ class PurityBenchmarking(BaseMeasurement):
                     schedule.add(Reset(this_qubit))
                     acq_index += 1
 
+            # Calibration measurements
             schedule.add(Reset(this_qubit))
             schedule.add(Measure(this_qubit, acq_index=acq_index))
             schedule.add(Reset(this_qubit))
