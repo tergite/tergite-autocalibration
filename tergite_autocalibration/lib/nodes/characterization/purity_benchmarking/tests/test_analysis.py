@@ -4,28 +4,7 @@ import xarray as xr
 from lmfit.model import ModelResult
 from pathlib import Path
 from matplotlib.figure import Figure
-from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.analysis import ExpDecayModel, PurityBenchmarkingAnalysis
-
-class TestExpDecayModel(unittest.TestCase):
-    def test_exponential_decay_model_initialization(self):
-        model = ExpDecayModel()
-        # Ensure the model has parameter hints for 'A', 'B', and 'p'
-        self.assertTrue('A' in model.param_hints)
-        self.assertTrue('B' in model.param_hints)
-        self.assertTrue('p' in model.param_hints)
-        # Verify that 'B' and 'p' have a minimum value of 0
-        self.assertEqual(model.param_hints['B']['min'], 0)
-        self.assertEqual(model.param_hints['p']['min'], 0)
-
-    def test_guess_parameters(self):
-        model = ExpDecayModel()
-        data = np.array([1.0, 0.8, 0.6, 0.4, 0.2])  # Example data
-        m = np.array([0, 1, 2, 3, 4])  # Example m values
-        params = model.guess(data, m=m)
-        # Verify that the guessed parameters are close to expected values
-        self.assertAlmostEqual(params['A'].value, 1.0)
-        self.assertAlmostEqual(params['B'].value, 0.8)
-        self.assertAlmostEqual(params['p'].value, 0.95)
+from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.analysis import PurityBenchmarkingAnalysis
 
 class TestPurityBenchmarkingAnalysis(unittest.TestCase):
     @classmethod
@@ -44,7 +23,6 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
 
     def test_run_fitting(self):
         analysis = PurityBenchmarkingAnalysis(self.dataset)
-        analysis._process_and_normalize_data()
         # Verify the average purity result is within the expected range
         print((np.sum(list(analysis.purity_results_dict.values()))/len(analysis.purity_results_dict)))
         self.assertTrue(56.1 <= (np.sum(list(analysis.purity_results_dict.values()))/len(analysis.purity_results_dict)) <= 56.2)
@@ -63,7 +41,6 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
 
     def test_plotter(self):
         analysis = PurityBenchmarkingAnalysis(self.dataset)
-        analysis._process_and_normalize_data()
 
         # Trim the dataset to only 5 Cliffords before plotting, same reason as above
         analysis.number_of_cliffords = analysis.number_of_cliffords[:5]
