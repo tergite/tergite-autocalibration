@@ -59,8 +59,9 @@ class CZParametrisationFixDurationNode(ParametrizedSweepNode):
         for coupler in self.couplers:
             all_coupled_qubits += coupler.split("_")
         if len(all_coupled_qubits) > len(set(all_coupled_qubits)):
-            print("Couplers share qubits")
-            raise ValueError("Improper Couplers")
+            raise ValueError("Couplers with two identical qubits")
+        if not all(element in self.all_qubits for element in all_coupled_qubits):
+            raise ValueError("Cloupler qubits not in all qubits")
 
     def transition_frequency(self, coupler: str):
         coupled_qubits = coupler.split(sep="_")
