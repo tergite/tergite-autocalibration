@@ -28,7 +28,7 @@ Jinja2 = "3.1.2"
 numpy = "1.25.2"
 qblox-instruments = "0.12.0"
 qcodes = "0.39.1"
-quantify-core = "0.7.6"
+quantify-core = "0.7.3"
 quantify-scheduler = "0.20.0"
 redis = "5.0.0"
 scikit-learn = "1.2.2"
@@ -45,11 +45,6 @@ isort = "^5.12.0"
 [tool.poetry.group.test.dependencies]
 pytest = "^7.4.2"
 requests-mock = "^1.11.0"
-
-[tool.poetry.group.proprietary.dependencies]
-oqs-grace = {path = "./misc/oqs-grace"}
-oqs-licensing = {path = "./misc/oqs-licensing"}
-superconducting-qubit-tools = { git = "git@git.orangeqs.com:products/scqt.git", rev = "v24.30.0" }
 
 [tool.poetry.scripts]
 acli = "tergite_autocalibration.tools.cli:cli"
