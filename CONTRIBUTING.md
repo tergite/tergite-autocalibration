@@ -142,6 +142,19 @@ Each calibration node goes through the following phases in order:
 Datasets are stored in [`data_directory`](./data_directory)
 They can be browsed with the dataset browser (coming soon)
 
+## Installation of proprietary resources (optional, not recommended)
+We do not recommend to make your code having dependencies to proprietary software.
+If you still need to install proprietary dependencies, please do so by running:
+```
+poetry install --with proprietary
+```
+Make sure you have ssh access to all proprietary repositories, otherwise the installation will fail.
+If you need to update the proprietary dependencies, please do so in the `pyproject.toml` file and once you are done, please run:
+```
+poetry lock
+```
+This will ensure dependencies are resolvable. Please commit the `poetry.lock` file as well.
+
 ## References
 
 This document was adapted from [a gist by Brian A. Danielak](https://gist.github.com/briandk/3d2e8b3ec8daf5a27a62) which
