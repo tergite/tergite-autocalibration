@@ -45,7 +45,7 @@ class CZParametrisationFixDurationNode(ParametrizedSweepNode):
         }
         self.external_samplespace = {
             "cz_parking_current": {
-                coupler: np.arange(-1200, -600, -10) * 1e-6 for coupler in self.couplers
+                coupler: np.arange(0.05, 0.3, 10) * self.coupler_current for coupler in self.couplers
             }
         }
         # Not sure which one is correcgt
@@ -89,3 +89,9 @@ class CZParametrisationFixDurationNode(ParametrizedSweepNode):
         # print(f'{ ac_freq/1e6 = } MHz for coupler: {coupler}')
         # print(f'{ lo/1e9 = } GHz for coupler: {coupler}')
         return ac_freq
+
+    def coupler_current(self):
+        current = float(
+            REDIS_CONNECTION.hget(f"couplers:{self.couplers[0]}", "parking_current")
+        )
+        return current
