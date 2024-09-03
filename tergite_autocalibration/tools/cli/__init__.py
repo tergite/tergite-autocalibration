@@ -41,13 +41,28 @@ def node():
     help="Name of the node to be reset in redis e.g resonator_spectroscopy.",
 )
 @click.option(
-    "-a", required=False, is_flag=True, help="Use -a if you want to reset all nodes."
+    "-a", "--all", required=False, is_flag=True, help="Use -a if you want to reset all nodes."
 )
-def reset(name, a):
+@click.option(
+    "-f", "--from_node", required=False, help="Use -f node_name if you want to reset all nodes from specified node in chain."
+)
+def reset(name, all, from_node):
     from tergite_autocalibration.utils.reset_redis_node import ResetRedisNode
+    from tergite_autocalibration.lib.utils.graph import range_topological_order
+    from tergite_autocalibration.utils.user_input import user_requested_calibration
+
+    topo_order = range_topological_order(from_node, user_requested_calibration["target_node"])
 
     reset_obj_ = ResetRedisNode()
-    if a:
+    if from_node:
+        if click.confirm(
+            "Do you really want to reset all nodes from" + from_node + "? It might take some time to recalibrate them."
+        ):
+            for node in topo_order:
+                reset_obj_.reset_node(node)
+        else:
+            click.echo("Node reset aborted by user.")
+    elif all:
         if click.confirm(
             "Do you really want to reset all nodes? It might take some time to recalibrate them."
         ):
@@ -58,7 +73,7 @@ def reset(name, a):
         reset_obj_.reset_node(name)
     else:
         click.echo(
-            "Please enter a node name or use the --all option to reset all nodes."
+            "Please enter a node name or use the -a option to reset all nodes."
         )
 
 

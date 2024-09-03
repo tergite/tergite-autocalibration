@@ -21,6 +21,8 @@ class CZParametrisationFixDurationNode(ParametrizedSweepNode):
         super().__init__(name, self.all_qubits, **schedule_keywords)
         self.type = "parameterized_sweep"
         self.couplers = couplers
+        self.edges = couplers
+        self.coupler = couplers[0]
         self.schedule_keywords = schedule_keywords
         self.backup = False
 
@@ -34,23 +36,20 @@ class CZParametrisationFixDurationNode(ParametrizedSweepNode):
         )
 
         # Should these sample space move to user defined inputs?
-        self.schedule_samplespace = {
+        self.initial_schedule_samplespace = {
             "cz_pulse_amplitudes": {
                 coupler: np.linspace(0.05, 0.3, 15) for coupler in self.couplers
             },
             "cz_pulse_frequencies": {
-                qubit: np.linspace(-20e6, 20e6, 21)  # + self.ac_freq
-                for qubit in self.all_qubits
+                coupler: np.linspace(-20e6, 20e6, 21) + self.transition_frequency(coupler) for coupler in self.couplers
             },
         }
         self.external_samplespace = {
-            "cz_parking_current": {
-                coupler: np.arange(0.05, 0.3, 10) * self.coupler_current for coupler in self.couplers
+            "cz_parking_currents": {
+                coupler: np.array([-0.876, -0.7989, -0.713, -0.616]) for coupler in self.couplers
             }
+            #np.arange(-0.3, 0.3, 10) * self.coupler_current_range + self.coupler_current for coupler in self.couplers
         }
-        # Not sure which one is correcgt
-        self.coupler_samplespace = self.samplespace
-        self.coupler_samplespace = self.schedule_samplespace
 
         self.validate()
 
@@ -85,9 +84,7 @@ class CZParametrisationFixDurationNode(ParametrizedSweepNode):
             ]
         )
         ac_freq = int(ac_freq / 1e4) * 1e4
-        # lo = 4.4e9 - (ac_freq - 450e6)
-        # print(f'{ ac_freq/1e6 = } MHz for coupler: {coupler}')
-        # print(f'{ lo/1e9 = } GHz for coupler: {coupler}')
+        print(f"{ ac_freq/1e6 = } MHz for coupler: {coupler}")
         return ac_freq
 
     def coupler_current(self):
@@ -95,3 +92,14 @@ class CZParametrisationFixDurationNode(ParametrizedSweepNode):
             REDIS_CONNECTION.hget(f"couplers:{self.couplers[0]}", "parking_current")
         )
         return current
+
+    def coupler_current_range(self):
+        current_range = float(
+            REDIS_CONNECTION.hget(f"couplers:{self.couplers[0]}", "current_range")
+        )
+        return current_range
+
+    def pre_measurement_operation(self, reduced_ext_space: dict):
+        self.schedule_samplespace = (
+            self.initial_schedule_samplespace | reduced_ext_space
+        )

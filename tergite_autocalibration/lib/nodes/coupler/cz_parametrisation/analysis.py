@@ -101,14 +101,6 @@ class FrequencyVsAmplitudeQ1Analysis(
         return self.run_fitting_find_max()
 
     def run_fitting_find_max(self):
-        for coord in self.dataset[self.data_var].coords:
-            if "frequencies" in coord:
-                frequencies_coord = coord
-            elif "amplitudes" in coord:
-                amplitudes_coord = coord
-        self.freqs = self.dataset[frequencies_coord].values  # Hz
-        self.amps = self.dataset[amplitudes_coord].values  # bias
-
         magnitudes = np.array(
             [[np.linalg.norm(u) for u in v] for v in self.dataset[f"y{self.qubit}"]]
         )
@@ -118,8 +110,8 @@ class FrequencyVsAmplitudeQ1Analysis(
         )
         max_index = np.argmax(magnitudes)
         max_index = np.unravel_index(max_index, magnitudes.shape)
-        self.opt_freq = self.freqs[max_index[0]]
-        self.opt_amp = self.amps[max_index[1]]
+        self.opt_freq = self.frequencies[max_index[0]]
+        self.opt_amp = self.amplitudes[max_index[1]]
         print(self.opt_freq, self.opt_amp)
         return [self.opt_freq, self.opt_amp]
 
@@ -134,14 +126,6 @@ class FrequencyVsAmplitudeQ2Analysis(
         return self.run_fitting_find_min()
 
     def run_fitting_find_min(self):
-        for coord in self.dataset[self.data_var].coords:
-            if "frequencies" in coord:
-                frequencies_coord = coord
-            elif "amplitudes" in coord:
-                amplitudes_coord = coord
-        self.freqs = self.dataset[frequencies_coord].values  # Hz
-        self.amps = self.dataset[amplitudes_coord].values  # bias
-
         magnitudes = np.array(
             [[np.linalg.norm(u) for u in v] for v in self.dataset[f"y{self.qubit}"]]
         )
@@ -151,17 +135,48 @@ class FrequencyVsAmplitudeQ2Analysis(
         )
         min_index = np.argmin(magnitudes)
         min_index = np.unravel_index(min_index, magnitudes.shape)
-        self.opt_freq = self.freqs[min_index[0]]
-        self.opt_amp = self.amps[min_index[1]]
+        self.opt_freq = self.frequencies[min_index[0]]
+        self.opt_amp = self.amplitudes[min_index[1]]
         print(self.opt_freq, self.opt_amp)
         return [self.opt_freq, self.opt_amp]
     
 class CZParametrisationFixDurationAnalysis(BaseAnalysis):
-    def __init__(self) -> None:
+    def __init__(self, dataset: xr.Dataset) -> None:
+        super().__init__()
+        self.dataset = dataset
+        self.data_var = list(dataset.data_vars.keys())[0]
         self.opt_freq = -1
         self.opt_amp = -1
         self.opt_current = -1
+        self.get_coordinates()
+        self.process_dataset()
         pass
+
+    def get_coordinates(self):
+        for coord in self.dataset[self.data_var].coords:
+            if "cz_parking_currents" in coord:
+                self.number_of_currents = coord
+            elif "cz_pulse_frequencies" in coord:
+                self.frequency_coord = coord
+            elif "cz_pulse_amplitude" in coord:
+                self.amplitude_coord = coord
+
+    def process_dataset(self):
+        results = []
+        self.fit_results = {}
+        for current in self.number_of_currents:
+            S21 = self.dataset[self.data_var].values
+            d1 = np.abs(S21)
+            q1 = FrequencyVsAmplitudeQ1Analysis(d1, self.frequency_coord, self.amplitude_coord )
+            q1Res = q1.run_fitting()
+
+            data_var = list(self.dataset.data_vars.keys())[1]
+            S21 = self.dataset[data_var].values
+            d2 = np.abs(S21)
+            q2 = FrequencyVsAmplitudeQ2Analysis(d2, self.frequency_coord, self.amplitude_coord )
+            q2Res = q2.run_fitting()
+            c = CombinedFrequencyVsAmplitudeAnalysis(q1Res, q2Res)
+            results.append(c, current) 
 
     def run_fitting(self) -> list[float, float]:
         print("WARNING TESTING CZ FREQUeNCY AND AMPLITUDE ANALYSIS")

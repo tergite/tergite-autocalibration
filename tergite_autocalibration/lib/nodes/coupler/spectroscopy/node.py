@@ -27,14 +27,14 @@ class Coupler_Spectroscopy_Node(BaseNode):
         self.name = name
         self.all_qubits = all_qubits  # this is a Base attr, delete it here
         self.couplers = couplers
-        self.redis_field = ["parking_current"]
+        self.redis_field = ["parking_current", "current_range"]
         self.qubit_state = 0
         self.type = "spi_and_cluster_simple_sweep"
         # perform 2 tones while biasing the current
         self.coupled_qubits = self.get_coupled_qubits()
         self.coupler = self.couplers[0]
-        mode = MeasurementMode.real
-        self.spi_dac = SpiDAC(mode)
+        self.mode = MeasurementMode.real
+        self.spi_dac = SpiDAC(self.mode)
         self.dac = self.spi_dac.create_spi_dac(self.coupler)
 
         self.all_qubits = self.coupled_qubits
@@ -74,12 +74,9 @@ class Coupler_Spectroscopy_Node(BaseNode):
 
         optimization_guess = 100e-6
 
-        spi = SpiDAC()
-        dac = spi.create_spi_dac(optimization_element)
-
         def set_optimizing_parameter(optimizing_parameter):
             if self.name == "cz_chevron_optimize":
-                spi.set_dac_current(dac, optimizing_parameter)
+                self.spi.set_dac_current(self.dac, optimizing_parameter)
 
         def single_sweep(optimizing_parameter) -> float:
             set_optimizing_parameter(optimizing_parameter)
@@ -88,7 +85,7 @@ class Coupler_Spectroscopy_Node(BaseNode):
                 compiled_schedule,
                 lab_ic,
                 data_path,
-                cluster_mode=MeasurementMode.real,
+                cluster_status=MeasurementMode.real,
             )
 
             measurement_result_ = self.post_process(result_dataset, data_path=data_path)

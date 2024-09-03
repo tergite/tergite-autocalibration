@@ -27,14 +27,13 @@ class CZParametrisationFixDuration(BaseMeasurement):
         self.transmons = transmons
         self.qubit_state = qubit_state
         self.couplers = couplers
+        self.cz_pulse_duration = 240e-9
 
     def schedule_function(
         self,
-        cz_parking_currents: dict[str, np.ndarray],
         cz_pulse_frequencies: dict[str, np.ndarray],
         cz_pulse_amplitudes: dict[str, np.ndarray],
-        cz_pulse_duration: float = 240e-9,
-        repetitions: int = 1024,
+        cz_parking_currents: dict[str, float],
     ) -> Schedule:
         """
         Generate a schedule for performing a Ramsey fringe measurement on multiple qubits.
@@ -77,51 +76,46 @@ class CZParametrisationFixDuration(BaseMeasurement):
         :
             An experiment schedule.
         """
-        self.schedule = Schedule("CZ_Frequency_And_Amplitude", repetitions)
+        self.schedule = Schedule("CZ_Frequency_And_Amplitude")
 
-        cz_parking_currents_values = list(cz_parking_currents.values())[0]
         cz_frequency_values = np.array(list(cz_pulse_frequencies.values())[0])
         cz_amplitude_values = list(cz_pulse_amplitudes.values())[0]
 
-        for cz_current in cz_parking_currents_values:
-            self.redis_field = cz_current
-            self.loop_frequencies_and_aplitudes(
-                cz_amplitude_values, cz_frequency_values, cz_pulse_duration
-            )
+        self.loop_frequencies_and_aplitudes(
+            cz_amplitude_values, cz_frequency_values
+        )
 
         return self.schedule
 
     def loop_frequencies_and_aplitudes(
-        self, schedule, cz_amplitude_values, cz_frequency_values, cz_pulse_duration
-    ) -> Schedule:
-        coupler = list(self.couplers.keys())[0]
-        all_couplers = [coupler]
+        self, cz_amplitude_values, cz_frequency_values
+    ):
 
-        for this_coupler in all_couplers:
-            if this_coupler in ["q21_q22", "q22_q23", "q23_q24", "q24_q25"]:
+        for coupler in self.couplers:
+            if coupler in ["q21_q22", "q22_q23", "q23_q24", "q24_q25"]:
                 downconvert = 0
             else:
                 downconvert = 4.4e9
-            schedule.add_resource(
+            self.schedule.add_resource(
                 ClockResource(
                     name=coupler + ".cz", freq=-cz_frequency_values[0] + downconvert
                 )
             )
 
-        # The outer loop, iterates over all cz_frequencies
-        for freq_index, cz_frequency in enumerate(cz_frequency_values):
-            cz_clock = f"{coupler}.cz"
-            self.schedule.add(
-                SetClockFrequency(
-                    clock=cz_clock, clock_freq_new=-cz_frequency + downconvert
-                ),
-            )
-            self.loop_amplitudes(
-                coupler, cz_amplitude_values, freq_index, cz_pulse_duration
-            )
+            # The outer loop, iterates over all cz_frequencies
+            for freq_index, cz_frequency in enumerate(cz_frequency_values):
+                cz_clock = f"{coupler}.cz"
+                self.schedule.add(
+                    SetClockFrequency(
+                        clock=cz_clock, clock_freq_new=-cz_frequency + downconvert
+                    ),
+                )
+                self.loop_amplitudes(
+                    coupler, cz_amplitude_values, freq_index
+                )
 
     def loop_amplitudes(
-        self, coupler, cz_amplitude_values, freq_index, cz_pulse_duration
+        self, coupler, cz_amplitude_values, freq_index
     ):
         # The inner for loop iterates over cz pulse amplitude
         number_of_amplitudess = len(cz_amplitude_values)
@@ -140,9 +134,9 @@ class CZParametrisationFixDuration(BaseMeasurement):
             cz_clock = f"{coupler}.cz"
             cz_pulse_port = f"{coupler}:fl"
 
-            cz = self.schedule.add(
+            self.schedule.add(
                 SoftSquarePulse(
-                    duration=cz_pulse_duration,
+                    duration=self.cz_pulse_duration,
                     amp=cz_amplitude,
                     port=cz_pulse_port,
                     clock=cz_clock,
@@ -151,7 +145,7 @@ class CZParametrisationFixDuration(BaseMeasurement):
             buffer = self.schedule.add(IdlePulse(4e-9))
 
             for this_qubit in qubits:
-                logger.info(f"Add measure to {this_qubit}")
+                #logger.info(f"Add measure to {this_qubit}")
                 self.schedule.add(
                     Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
                     ref_op=buffer,

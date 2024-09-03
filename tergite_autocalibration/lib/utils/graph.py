@@ -13,9 +13,9 @@ graph_dependencies = [
     ("tof", "resonator_spectroscopy"),
     ("resonator_spectroscopy", "coupler_resonator_spectroscopy"),
     # ('resonator_spectroscopy', 'qubit_01_spectroscopy_pulsed'),
-    ("qubit_01_spectroscopy", "coupler_spectroscopy"),
     ("qubit_01_spectroscopy", "coupler_resonator_spectroscopy"),
     ("resonator_spectroscopy", "qubit_01_spectroscopy"),
+    ("qubit_01_spectroscopy", "coupler_spectroscopy"),
     ("resonator_spectroscopy", "qubit_01_cw_spectroscopy"),
     ("qubit_01_spectroscopy", "rabi_oscillations"),
     ("rabi_oscillations", "ramsey_correction"),
@@ -140,20 +140,23 @@ initial_pos = {
 
 # TODO add condition argument and explanation
 def filtered_topological_order(target_node: str):
-    target_ancestors = nx.ancestors(graph, target_node)
-    if "coupler_spectroscopy" in target_ancestors:
-        coupler_path = nx.shortest_path(
-            graph, "resonator_spectroscopy", "coupler_spectroscopy"
-        )
-        graph.remove_node("coupler_spectroscopy")
-    else:
-        coupler_path = []
+    return range_topological_order("resonator_spectroscopy", target_node)
 
+def range_topological_order(from_node: str, target_node: str):
+    target_ancestors = nx.ancestors(graph, target_node)
+    # if "coupler_spectroscopy" in target_ancestors:
+    #     coupler_path = nx.shortest_path(
+    #         graph, "resonator_spectroscopy", "coupler_spectroscopy"
+    #     )
+    #     graph.remove_node("coupler_spectroscopy")
+    # else:
+    #     coupler_path = []
+    coupler_path = []
     if target_node == "punchout":
         topo_order = ["punchout"]
     else:
         topo_order = nx.shortest_path(
-            graph, "resonator_spectroscopy", target_node, weight="weight"
+            graph, from_node, target_node, weight="weight"
         )
 
     def graph_condition(node, types):
@@ -168,7 +171,6 @@ def filtered_topological_order(target_node: str):
     # print(f'{ filtered_order = }')
     # quit()
     return filtered_order
-
 
 if __name__ == "__main__":
     # nx.draw_spring(graph, with_labels=True, k=1, pos = initial_pos)

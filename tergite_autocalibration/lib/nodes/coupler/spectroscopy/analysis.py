@@ -67,7 +67,7 @@ class CouplerSpectroscopyAnalysis(BaseAnalysis):
         self.parking_I = possible_I[np.argmin(np.abs(possible_I))]
         self.roots = roots
         self.root_frequencies = root_frequencies
-        return [self.parking_I]
+        return [self.parking_I, DeltaI]
 
     def plotter(self, ax: plt.Axes):
         self.dataset[self.data_var].plot(ax=ax, x=self.frequencies)
