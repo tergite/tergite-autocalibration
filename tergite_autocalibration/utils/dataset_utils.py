@@ -47,6 +47,10 @@ def configure_dataset(
     elif 'ssro' in node.name:
        qubit_states = ["c0", "c1", "c2"]  # for calibration points
 
+    print(node.name)
+    if 'cz_param' in node.name:
+        print("Here")
+        return raw_ds
 
     for key in keys:
         key_indx = key % n_qubits  # this is to handle ro_opt_frequencies node where

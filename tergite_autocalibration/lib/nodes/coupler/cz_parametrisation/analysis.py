@@ -34,10 +34,7 @@ class CombinedFrequencyVsAmplitudeAnalysis:
 class FrequencyVsAmplitudeAnalysis(BaseAnalysis):
     def __init__(self, dataset: xr.Dataset, freqs, amps):
         super().__init__()
-        self.data_var = list(dataset.data_vars.keys())[0]
-        self.S21 = dataset[self.data_var].values
-        self.qubit = dataset[self.data_var].attrs["qubit"]
-        dataset[f"y{self.qubit}"].values = np.abs(self.S21)
+        self.qubit = -1
         self.dataset = dataset
         self.frequencies = freqs
         self.amplitudes = amps
@@ -90,14 +87,22 @@ class FrequencyVsAmplitudeAnalysis(BaseAnalysis):
         axis.set_title(f"CZ - Qubit {self.qubit[1:]}")
         axis.legend()  # Add legend to the plot
 
-class FrequencyVsAmplitudeQ1Analysis(
-    FrequencyVsAmplitudeAnalysis
-):
+class FrequencyVsAmplitudeQ1Analysis(FrequencyVsAmplitudeAnalysis):
     def __init__(self, dataset: xr.Dataset, freqs, amps):
         super().__init__(dataset, freqs, amps)
+        #print(dataset)
+        self.data_var = list(dataset.data_vars.keys())[0]
+        self.qubit = dataset[self.data_var].attrs["qubit"]
+        ds_real = dataset[self.data_var].isel(ReIm=0)
+        ds_imag = dataset[self.data_var].isel(ReIm=1)
+        ds = ds_real + 1j * ds_imag
+        S21 = ds.values
+        abs_S21 = np.abs(S21)
+        dataset[f"y{self.qubit}"] = xr.DataArray(abs_S21, dims=ds.dims, coords=ds.coords)  # Ensure dims and coords match
+        self.dataset = dataset
 
     def run_fitting(self) -> list[float, float]:
-        print("WARNING TESTING CZ FREQUeNCY AND AMPLITUDE Q1 ANALYSIS")
+        print("Running FrequencyVsAmplitudeQ1Analysis")
         return self.run_fitting_find_max()
 
     def run_fitting_find_max(self):
@@ -115,14 +120,22 @@ class FrequencyVsAmplitudeQ1Analysis(
         print(self.opt_freq, self.opt_amp)
         return [self.opt_freq, self.opt_amp]
 
-class FrequencyVsAmplitudeQ2Analysis(
-    FrequencyVsAmplitudeAnalysis
-):
+class FrequencyVsAmplitudeQ2Analysis(FrequencyVsAmplitudeAnalysis):
     def __init__(self, dataset: xr.Dataset, freqs, amps):
         super().__init__(dataset, freqs, amps)
+        #print(dataset)
+        self.data_var = list(dataset.data_vars.keys())[1]
+        self.qubit = dataset[self.data_var].attrs["qubit"]
+        ds_real = dataset[self.data_var].isel(ReIm=0)
+        ds_imag = dataset[self.data_var].isel(ReIm=1)
+        ds = ds_real + 1j * ds_imag
+        S21 = ds.values
+        abs_S21 = np.abs(S21)
+        dataset[f"y{self.qubit}"] = xr.DataArray(abs_S21, dims=ds.dims, coords=ds.coords)  # Ensure dims and coords match
+        self.dataset = dataset
 
     def run_fitting(self) -> list[float, float]:
-        print("WARNING TESTING CZ FREQUeNCY AND AMPLITUDE Q2 ANALYSIS")
+        print("Running FrequencyVsAmplitudeQ2Analysis")
         return self.run_fitting_find_min()
 
     def run_fitting_find_min(self):
@@ -144,53 +157,56 @@ class CZParametrisationFixDurationAnalysis(BaseAnalysis):
     def __init__(self, dataset: xr.Dataset) -> None:
         super().__init__()
         self.dataset = dataset
-        self.data_var = list(dataset.data_vars.keys())[0]
+        #print(list(dataset.data_vars.keys()))
+        self.data_var = list(dataset.data_vars.keys())[1]
         self.opt_freq = -1
         self.opt_amp = -1
         self.opt_current = -1
         self.get_coordinates()
-        self.process_dataset()
         pass
 
     def get_coordinates(self):
         for coord in self.dataset[self.data_var].coords:
             if "cz_parking_currents" in coord:
-                self.number_of_currents = coord
+                self.current_coord = coord
+                self.current_values = self.dataset[coord].values
             elif "cz_pulse_frequencies" in coord:
                 self.frequency_coord = coord
+                self.frequency_values = self.dataset[coord].values
             elif "cz_pulse_amplitude" in coord:
                 self.amplitude_coord = coord
+                self.amplitude_values = self.dataset[coord].values
 
-    def process_dataset(self):
+    def run_fitting(self) -> list[float, float, float]:
+        print("Running CZParametrisationFixDurationAnalysis")
+        results = self.process_dataset()
+        return self.run_analysis_on_freq_amp_results(results)
+
+    def process_dataset(self) -> List[Tuple[CombinedFrequencyVsAmplitudeAnalysis, float]]:
         results = []
         self.fit_results = {}
-        for current in self.number_of_currents:
-            S21 = self.dataset[self.data_var].values
-            d1 = np.abs(S21)
-            q1 = FrequencyVsAmplitudeQ1Analysis(d1, self.frequency_coord, self.amplitude_coord )
+        for current_index, current in enumerate(self.current_values):
+            print(f"Processing current index: {current_index}, value: {current}")
+            sliced_dataset = self.dataset.isel({self.current_coord: current_index})
+
+            q1 = FrequencyVsAmplitudeQ1Analysis(sliced_dataset, self.frequency_values, self.amplitude_values )
             q1Res = q1.run_fitting()
 
-            data_var = list(self.dataset.data_vars.keys())[1]
-            S21 = self.dataset[data_var].values
-            d2 = np.abs(S21)
-            q2 = FrequencyVsAmplitudeQ2Analysis(d2, self.frequency_coord, self.amplitude_coord )
+            q2 = FrequencyVsAmplitudeQ2Analysis(sliced_dataset, self.frequency_values, self.amplitude_values )
             q2Res = q2.run_fitting()
             c = CombinedFrequencyVsAmplitudeAnalysis(q1Res, q2Res)
-            results.append(c, current) 
+            results.append([c, current]) 
 
-    def run_fitting(self) -> list[float, float]:
-        print("WARNING TESTING CZ FREQUeNCY AND AMPLITUDE ANALYSIS")
-        return self.run_analysis_on_freq_amp_results()
+        return results
 
     def run_analysis_on_freq_amp_results(
         self,
-        results: List[
-            Tuple[CombinedFrequencyVsAmplitudeAnalysis, float]
-        ],
+        results: List[Tuple[CombinedFrequencyVsAmplitudeAnalysis, float]]
     ):
         minCurrent = 1
         bestIndex = -1
         for index, result in enumerate(results):
+            print(results[0])
             if result[0].are_two_qubits_compatible() and abs(result[1]) < minCurrent:
                 minCurrent = result[1]
                 bestIndex = index
@@ -202,6 +218,8 @@ class CZParametrisationFixDurationAnalysis(BaseAnalysis):
         self.opt_freq = results[bestIndex][0].best_parameters()[0]
         self.opt_amp = results[bestIndex][0].best_parameters()[1]
         self.opt_current = minCurrent
+
+        return [self.opt_freq, self.opt_amp, self.opt_current]
 
     def plotter(self, axis):
         pass

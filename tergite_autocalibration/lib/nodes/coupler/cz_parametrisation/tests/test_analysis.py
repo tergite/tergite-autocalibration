@@ -1,4 +1,5 @@
 from pathlib import Path
+import numpy as np
 from numpy import ndarray
 import xarray as xr
 import pytest
@@ -17,7 +18,9 @@ from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.utils.no_valid
 
 
 def test_CanCreate():
-    a = CZParametrisationFixDurationAnalysis()
+    dataset_path = Path(__file__).parent / "data" / "dataset_good_quality_freq_amp.hdf5"
+    ds = xr.open_dataset(dataset_path)
+    a = CZParametrisationFixDurationAnalysis(ds)
     assert isinstance(a, CZParametrisationFixDurationAnalysis)
     assert isinstance(a, BaseAnalysis)
 
@@ -26,37 +29,24 @@ def test_CanCreate():
 def setup_data():
     # It should be a single dataset, but we do not have one yet, so we loop over existing files
     dataset_path = Path(__file__).parent / "data" / "dataset_good_quality_freq_amp.hdf5"
-    print(dataset_path)
     ds = xr.open_dataset(dataset_path)
-    ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
-    d14 = ds.yq14.to_dataset()
-    d15 = ds.yq15.to_dataset()
-    d14.yq14.attrs["qubit"] = "q14"
-    d15.yq15.attrs["qubit"] = "q15"
+
     freqs = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
     amps = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
-    q14Ana = FrequencyVsAmplitudeQ1Analysis(d14, freqs, amps)
+    q14Ana = FrequencyVsAmplitudeQ1Analysis(ds, freqs, amps)
     q14Res = q14Ana.run_fitting()
-    q15Ana = FrequencyVsAmplitudeQ2Analysis(d15, freqs, amps)
+    q15Ana = FrequencyVsAmplitudeQ2Analysis(ds, freqs, amps)
     q15Res = q15Ana.run_fitting()
     c1 = CombinedFrequencyVsAmplitudeAnalysis(q14Res, q15Res)
 
     dataset_path = Path(__file__).parent / "data" / "dataset_bad_quality_freq_amp.hdf5"
     ds = xr.open_dataset(dataset_path)
-    ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
-    d14 = ds.yq14.to_dataset()
-    d15 = ds.yq15.to_dataset()
-    d14.yq14.attrs["qubit"] = "q14"
-    d15.yq15.attrs["qubit"] = "q15"
+
     freqs_bad = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
     amps_bad = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
-    q14Ana = FrequencyVsAmplitudeQ1Analysis(
-        d14, freqs_bad, amps_bad
-    )
+    q14Ana = FrequencyVsAmplitudeQ1Analysis(ds, freqs_bad, amps_bad)
     q14Res = q14Ana.run_fitting()
-    q15Ana = FrequencyVsAmplitudeQ2Analysis(
-        d15, freqs_bad, amps_bad
-    )
+    q15Ana = FrequencyVsAmplitudeQ2Analysis(ds, freqs_bad, amps_bad)
     q15Res = q15Ana.run_fitting()
     c2 = CombinedFrequencyVsAmplitudeAnalysis(q14Res, q15Res)
 
@@ -64,26 +54,22 @@ def setup_data():
         Path(__file__).parent / "data" / "dataset_good_quality_freq_amp_2.hdf5"
     )
     ds = xr.open_dataset(dataset_path)
-    ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
-    d14 = ds.yq14.to_dataset()
-    d15 = ds.yq15.to_dataset()
-    d14.yq14.attrs["qubit"] = "q14"
-    d15.yq15.attrs["qubit"] = "q15"
+
     freqs_2 = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
     amps_2 = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
-    q14Ana = FrequencyVsAmplitudeQ1Analysis(d14, freqs_2, amps_2)
+    q14Ana = FrequencyVsAmplitudeQ1Analysis(ds, freqs_2, amps_2)
     q14Res = q14Ana.run_fitting()
-    q15Ana = FrequencyVsAmplitudeQ2Analysis(d15, freqs_2, amps_2)
+    q15Ana = FrequencyVsAmplitudeQ2Analysis(ds, freqs_2, amps_2)
     q15Res = q15Ana.run_fitting()
     c3 = CombinedFrequencyVsAmplitudeAnalysis(q14Res, q15Res)
 
     list_of_results = [(c1, 0.1), (c2, 0.2), (c3, 0.3)]
-    return list_of_results, freqs, amps, freqs_2, amps_2
+    return ds, list_of_results, freqs, amps, freqs_2, amps_2
 
 
-def test_PickLowestCurrent(setup_data: tuple[list[tuple[CombinedFrequencyVsAmplitudeAnalysis, float]], ndarray, ndarray, ndarray, ndarray]):
-    list_of_results, freqs, amps, freqs_2, amps_2 = setup_data
-    a = CZParametrisationFixDurationAnalysis()
+def test_PickLowestCurrent(setup_data: tuple[list[xr.Dataset, tuple[CombinedFrequencyVsAmplitudeAnalysis, float]], ndarray, ndarray, ndarray, ndarray]):
+    ds, list_of_results, freqs, amps, freqs_2, amps_2 = setup_data
+    a = CZParametrisationFixDurationAnalysis(ds)
     a.run_analysis_on_freq_amp_results(list_of_results)
 
     assert a.opt_index == 0
@@ -92,10 +78,10 @@ def test_PickLowestCurrent(setup_data: tuple[list[tuple[CombinedFrequencyVsAmpli
     assert a.opt_current == 0.1
 
 
-def test_PickLowestCurrentWithoutBest(setup_data: tuple[list[tuple[CombinedFrequencyVsAmplitudeAnalysis, float]], ndarray, ndarray, ndarray, ndarray]):
-    list_of_results, freqs, amps, freqs_2, amps_2 = setup_data
+def test_PickLowestCurrentWithoutBest(setup_data:  tuple[xr.Dataset, list[tuple[CombinedFrequencyVsAmplitudeAnalysis, float]], ndarray, ndarray, ndarray, ndarray]):
+    ds, list_of_results, freqs, amps, freqs_2, amps_2 = setup_data
     list_of_results.pop(0)
-    a = CZParametrisationFixDurationAnalysis()
+    a = CZParametrisationFixDurationAnalysis(ds)
     a.run_analysis_on_freq_amp_results(list_of_results)
 
     assert (
@@ -106,24 +92,54 @@ def test_PickLowestCurrentWithoutBest(setup_data: tuple[list[tuple[CombinedFrequ
     assert a.opt_current == 0.3
 
 
-def test_ReturnErrorIfNoGoodPoint(setup_data: tuple[list[tuple[CombinedFrequencyVsAmplitudeAnalysis, float]], ndarray, ndarray, ndarray, ndarray]):
-    list_of_results, freqs, amps, freqs_2, amps_2 = setup_data
+def test_ReturnErrorIfNoGoodPoint(setup_data: tuple[xr.Dataset, list[tuple[CombinedFrequencyVsAmplitudeAnalysis, float]], ndarray, ndarray, ndarray, ndarray]):
+    ds, list_of_results, freqs, amps, freqs_2, amps_2 = setup_data
     print(len(list_of_results))
     list_of_results.pop(2)
     list_of_results.pop(0)
-    a = CZParametrisationFixDurationAnalysis()
-    print(issubclass(NoValidCombinationException, Exception))
+    a = CZParametrisationFixDurationAnalysis(ds)
 
     with pytest.raises(NoValidCombinationException, match="No valid combination found"):
         a.run_analysis_on_freq_amp_results(list_of_results)
 
-def test_PickGoodValueIfSmallestInAbsolute(setup_data: tuple[list[tuple[CombinedFrequencyVsAmplitudeAnalysis, float]], ndarray, ndarray, ndarray, ndarray]):
-    list_of_results, freqs, amps, freqs_2, amps_2 = setup_data
+def test_PickGoodValueIfSmallestInAbsolute(setup_data: tuple[xr.Dataset, list[tuple[CombinedFrequencyVsAmplitudeAnalysis, float]], ndarray, ndarray, ndarray, ndarray]):
+    ds, list_of_results, freqs, amps, freqs_2, amps_2 = setup_data
     print(len(list_of_results))
     new_element = (list_of_results[2][0], -0.3)
     list_of_results[2] = new_element
-    a = CZParametrisationFixDurationAnalysis()
+    a = CZParametrisationFixDurationAnalysis(ds)
     a.run_analysis_on_freq_amp_results(list_of_results)
+
+    assert a.opt_index == 0
+    assert a.opt_freq == (freqs[10] + freqs[9]) / 2
+    assert a.opt_amp == (amps[12] + amps[13]) / 2
+    assert a.opt_current == 0.1
+
+@pytest.fixture(autouse=True)
+def setup_data_mutliple_files():
+    # It should be a single dataset, but we do not have one yet, so we loop over existing files
+    dataset_path = Path(__file__).parent / "data" / "dataset_fix_time_0.hdf5"
+    ds = xr.open_dataset(dataset_path)
+    combined_dataset = ds
+
+    combined_dataset = xr.Dataset()
+    for i in (1 , 2 , 3):
+        filename = "dataset_fix_time_" + str(i) + ".hdf5"
+        dataset_path = Path(__file__).parent / "data" / filename
+        ds = xr.open_dataset(dataset_path)
+        combined_dataset = xr.merge([combined_dataset, ds])
+    
+    freqs = ds[f"cz_pulse_frequenciesq06_q07"].values  # MHz
+    amps = ds[f"cz_pulse_amplitudesq06_q07"].values  # uA
+    currents = combined_dataset[f"cz_parking_currentsq06_q07"].values
+    print(combined_dataset)
+
+    return combined_dataset, freqs, amps
+
+def test_PickLowestCurrentCompleteAnalysis(setup_data_mutliple_files: tuple[xr.Dataset, ndarray, ndarray]):
+    ds, freqs, amps = setup_data_mutliple_files
+    a = CZParametrisationFixDurationAnalysis(ds)
+    a.run_fitting()
 
     assert a.opt_index == 0
     assert a.opt_freq == (freqs[10] + freqs[9]) / 2
