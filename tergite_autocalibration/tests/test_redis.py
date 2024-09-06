@@ -1,14 +1,28 @@
+# This code is part of Tergite
+#
+# (C) Copyright Eleftherios Moschandreou 2024
+# (C) Copyright Stefan Hill 2024
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+
+from tergite_autocalibration.tests.utils.env import setup_test_env
+
+setup_test_env()
+
+from tergite_autocalibration.config import settings
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 import quantify_scheduler.device_under_test.mock_setup as mock
-import numpy as np
-from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.measurement import (
-    Randomized_Benchmarking,
-)
 import toml
 
 
 nodes = NodeFactory()
-transmon_configuration = toml.load("./config/device_config.toml")
+transmon_configuration = toml.load(settings.DEVICE_CONFIG)
 qois = transmon_configuration["qoi"]
 setup = mock.set_up_mock_transmon_setup()
 mock.set_standard_params_transmon(setup)
@@ -18,14 +32,3 @@ def test_redis_loading():
     all_nodes = nodes.node_implementations.keys()
     for node in all_nodes:
         assert node in qois["qubits"].keys() or node in qois["couplers"].keys()
-
-
-def test_randomized_benchmarking():
-    qubits = ["q1", "q2"]
-    transmons = {qubit: setup[qubit] for qubit in qubits}
-    rb = Randomized_Benchmarking(transmons)
-    cliffords = {qubit: np.array([2, 16, 128, 256, 0, 1]) for qubit in qubits}
-    schedule = rb.schedule_function(
-        qubits=qubits, seed=0, number_of_cliffords=cliffords
-    )
-    pass

@@ -52,6 +52,19 @@ punchout.measure.pulse_amp = nan
 reset_chevron.reset_amplitude_qc = nan
 reset_chevron.reset_duration_qc = nan
 
+# FIXME: Temporary fix, because qoi should be refactored to not depend on the device_configuration.toml
+cz_characterisation_chevron = nan
+reset_calibration_ssro = nan
+cz_calibration_swap = nan
+cz_calibration_swap_ssro = nan
+n_rabi_oscillations_12 = nan
+purity_benchmarking = nan
+motzoi_parameter_12 = nan
+cz_dynamic_phase_swap = nan
+qubit_01_cw_spectroscopy = nan
+process_tomography_ssro = nan
+cz_chevron_amplitude = nan
+
 [qoi.couplers]
 coupler_spectroscopy.parking_current = nan
 coupler_resonator_spectroscopy.resonator_vs_flux= nan
