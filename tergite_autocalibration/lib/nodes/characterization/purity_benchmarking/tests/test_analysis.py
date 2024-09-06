@@ -1,7 +1,3 @@
-from tergite_autocalibration.tests.utils.env import setup_test_env
-
-setup_test_env()
-
 # This code is part of Tergite
 #
 # (C) Copyright Joel Sandås 2024
@@ -13,6 +9,10 @@ setup_test_env()
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
+
+from tergite_autocalibration.tests.utils.env import setup_test_env
+
+setup_test_env()
 
 from tergite_autocalibration.tests.utils.env import setup_test_env
 

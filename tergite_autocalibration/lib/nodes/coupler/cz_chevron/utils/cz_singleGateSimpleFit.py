@@ -1,3 +1,4 @@
+from tergite_autocalibration.config.settings import PLOTTING
 from tergite_autocalibration.lib.base.analysis import BaseAnalysis
 import xarray as xr
 import numpy as np
@@ -241,9 +242,10 @@ class CZSingleGateSimpleFit(BaseAnalysis):
                     color=color,
                 )
 
-        plt.show()
+        if PLOTTING:
+            plt.show()
+            plt.pause(3)
         fig.savefig(f"{outputFolder}/SummaryScan_{self.qubit}.png")
-        plt.pause(3)
         plt.close()
 
         num_plots = len(self.magnitudes)
@@ -282,7 +284,8 @@ class CZSingleGateSimpleFit(BaseAnalysis):
             axesAll[row, col].set_ylabel("Amplitude")
             axesAll[row, col].legend(loc="upper right")
 
-        plt.show()
+        if PLOTTING:
+            plt.show()
         figAll.savefig(f"{outputFolder}/AllFits_{self.qubit}.png")
         plt.close(figAll)
         plt.close("all")
