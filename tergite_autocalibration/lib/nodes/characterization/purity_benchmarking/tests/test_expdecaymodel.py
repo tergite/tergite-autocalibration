@@ -1,3 +1,7 @@
+from tergite_autocalibration.tests.utils.env import setup_test_env
+
+setup_test_env()
+
 import unittest
 import numpy as np
 from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.analysis import ExpDecayModel

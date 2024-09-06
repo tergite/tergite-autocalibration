@@ -1,3 +1,7 @@
+from tergite_autocalibration.tests.utils.env import setup_test_env
+
+setup_test_env()
+
 import unittest
 import numpy as np
 import xarray as xr
