@@ -8,6 +8,7 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 ## [Unreleased]
 
 ### Added
+- Calibration node for purity benchmarking
 
 ### Changed
 - Switch to quantify-scheduler version 0.20.0
