@@ -19,16 +19,19 @@ import numpy as np
 import xarray as xr
 
 from ....base.analysis import BaseAnalysis
-from tergite_autocalibration.utils.exponential_decay_function import exponential_decay_function
+from tergite_autocalibration.utils.exponential_decay_function import (
+    exponential_decay_function,
+)
+
 
 class ExpDecayModel(lmfit.model.Model):
     """
     Generate an exponential decay model that can be fit to purity benchmarking data.
     """
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(exponential_decay_function, *args, **kwargs)
-        
+
         # Set parameter hints for the fitting process
         self.set_param_hint("A", vary=True)
         self.set_param_hint("B", vary=True, min=0)
@@ -55,6 +58,7 @@ class ExpDecayModel(lmfit.model.Model):
         params = self.make_params()
         return lmfit.models.update_param_vals(params, self.prefix, **kws)
 
+
 class PurityBenchmarkingAnalysis(BaseAnalysis):
     """
     Analysis that fits an exponential decay function to purity benchmarking data.
@@ -71,11 +75,18 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
         # Identify and store relevant coordinates and initialize data storage
         self.number_cliffords_coord, self.seed_coord = self._identify_coords()
         self.number_of_repetitions = dataset.sizes[self.seed_coord]
-        self.number_of_cliffords = np.unique(dataset[self.number_cliffords_coord].values[:-3])
+        self.number_of_cliffords = np.unique(
+            dataset[self.number_cliffords_coord].values[:-3]
+        )
 
         self.normalized_data_dict = {}
         self.purity_results_dict = {}
-        self.fit_n_cliffords, self.fit_y, self.fidelity, self.fit_report = None, None, None, None
+        self.fit_n_cliffords, self.fit_y, self.fidelity, self.fit_report = (
+            None,
+            None,
+            None,
+            None,
+        )
 
         # Process and normalize the purity data
         self._process_and_normalize_data()
@@ -102,7 +113,9 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
         Process and normalize purity data for each repetition, and calculate the purity per index.
         """
         for repetition_index in range(self.number_of_repetitions):
-            measurements = self.purity.isel({self.seed_coord: repetition_index}).values.flatten()
+            measurements = self.purity.isel(
+                {self.seed_coord: repetition_index}
+            ).values.flatten()
             data = measurements[:-3]  # Data excluding calibration points
             calibration_0, calibration_1 = measurements[-3], measurements[-2]
 
@@ -122,7 +135,7 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
             purity_per_index = []
             for i in range(len(normalized_data) // 3):
                 # Extract values for the Pauli operators
-                x_1, y_1, z_1 = normalized_data[3*i:3*(i+1)]
+                x_1, y_1, z_1 = normalized_data[3 * i : 3 * (i + 1)]
                 x_exp = 2 * x_1 - 1
                 y_exp = 2 * y_1 - 1
                 z_exp = 2 * z_1 - 1
@@ -168,11 +181,24 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
         # Plot normalized data for each repetition with low transparency
         for repetition_index, real_values in self.purity_results_dict.items():
             ax.plot(self.number_of_cliffords, real_values, alpha=0.2)
-            ax.annotate(f"{repetition_index}", (self.number_of_cliffords[-1], real_values[-1]))
+            ax.annotate(
+                f"{repetition_index}", (self.number_of_cliffords[-1], real_values[-1])
+            )
 
         # Plot the fitted curve and add labels
-        ax.plot(self.fit_n_cliffords, self.fit_y, "ro-", lw=2.5, label=f"p = {self.fidelity:.3f}")
-        ax.plot(self.number_of_cliffords, self.fit_results.best_fit, ls="dashed", color="black")
+        ax.plot(
+            self.fit_n_cliffords,
+            self.fit_y,
+            "ro-",
+            lw=2.5,
+            label=f"p = {self.fidelity:.3f}",
+        )
+        ax.plot(
+            self.number_of_cliffords,
+            self.fit_results.best_fit,
+            ls="dashed",
+            color="black",
+        )
         ax.set_ylabel("Purity")
         ax.set_xlabel("Number of Cliffords")
         ax.grid()

@@ -7,7 +7,10 @@ import xarray as xr
 from matplotlib.axes import Axes
 
 from ....base.analysis import BaseAnalysis
-from tergite_autocalibration.utils.exponential_decay_function import exponential_decay_function
+from tergite_autocalibration.utils.exponential_decay_function import (
+    exponential_decay_function,
+)
+
 
 class ExpDecayModel(lmfit.model.Model):
     """
