@@ -22,6 +22,7 @@ from tergite_autocalibration.utils.extended_gates import Rxy_12
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 import tergite_autocalibration.utils.clifford_elements_decomposition as cliffords
 
+
 class PurityBenchmarking(BaseMeasurement):
     """Class that contains measurement scheduele for purity benchmarking"""
 
@@ -30,7 +31,9 @@ class PurityBenchmarking(BaseMeasurement):
         self.qubit_state = qubit_state
         self.transmons = transmons
         # Initialize dictionaries to store raw measurement data for each qubit and each basis
-        self.raw_measurements = {qubit: {"X": [], "Y": [], "Z": []} for qubit in transmons}
+        self.raw_measurements = {
+            qubit: {"X": [], "Y": [], "Z": []} for qubit in transmons
+        }
 
     def schedule_function(
         self,
@@ -40,11 +43,11 @@ class PurityBenchmarking(BaseMeasurement):
     ) -> Schedule:
         """
         Generate a schedule for performing purity benchmarking using Clifford gates.
-        The goal is to measure the purity of the qubit states after applying each sequence 
+        The goal is to measure the purity of the qubit states after applying each sequence
         of Clifford gates.
 
         Schedule sequence:
-            Reset -> Apply Clifford operations -> Measure X -> Reset -> 
+            Reset -> Apply Clifford operations -> Measure X -> Reset ->
             Apply Clifford operations -> Measure Y
             -> Reset -> Apply Clifford operations -> Measure Z
 
@@ -79,7 +82,9 @@ class PurityBenchmarking(BaseMeasurement):
             # Unique is because so we don't use the same number of cliffords twice
             for this_number_of_cliffords in np.unique(clifford_sequence_lengths[:-3]):
                 # Generate a random sequence of Clifford operations
-                random_sequence = rng.integers(all_cliffords, size=this_number_of_cliffords)
+                random_sequence = rng.integers(
+                    all_cliffords, size=this_number_of_cliffords
+                )
 
                 def apply_clifford_sequence(schedule, qubit, random_sequence):
                     # Apply a sequence of Clifford operations to the qubit
@@ -94,10 +99,10 @@ class PurityBenchmarking(BaseMeasurement):
                 # Has to measure in every bases to be able to calculate purity
                 for basis in ["X", "Y", "Z"]:
                     apply_clifford_sequence(schedule, this_qubit, random_sequence)
-                    if basis == "X": # Prepare for X basis measurement
-                        schedule.add(H(this_qubit))  
-                    elif basis == "Y": # Prepare for Y basis measurement
-                        schedule.add(X90(this_qubit)) 
+                    if basis == "X":  # Prepare for X basis measurement
+                        schedule.add(H(this_qubit))
+                    elif basis == "Y":  # Prepare for Y basis measurement
+                        schedule.add(X90(this_qubit))
                     schedule.add(Measure(this_qubit, acq_index=acq_index))
                     schedule.add(Reset(this_qubit))
                     acq_index += 1
@@ -111,7 +116,7 @@ class PurityBenchmarking(BaseMeasurement):
             schedule.add(Measure(this_qubit, acq_index=acq_index + 1))
             schedule.add(Reset(this_qubit))
 
-            #This is not used so it could perhaps be removed.
+            # This is not used so it could perhaps be removed.
             # If removed the "-3" should be changed to "-2"
             schedule.add(X(this_qubit))
             schedule.add(Rxy_12(this_qubit))
@@ -119,4 +124,3 @@ class PurityBenchmarking(BaseMeasurement):
             schedule.add(Reset(this_qubit))
 
         return schedule
-    

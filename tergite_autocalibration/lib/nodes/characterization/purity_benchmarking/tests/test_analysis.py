@@ -24,7 +24,10 @@ import xarray as xr
 from lmfit.model import ModelResult
 from pathlib import Path
 from matplotlib.figure import Figure
-from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.analysis import PurityBenchmarkingAnalysis
+from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.analysis import (
+    PurityBenchmarkingAnalysis,
+)
+
 
 class TestPurityBenchmarkingAnalysis(unittest.TestCase):
     @classmethod
@@ -39,13 +42,27 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
         # Check that the analysis object has the expected attributes
         self.assertTrue(hasattr(self.analysis, "purity"))
         self.assertTrue(hasattr(self.analysis, "normalized_data_dict"))
-        self.assertEqual(self.analysis.number_of_repetitions, self.dataset.sizes.get("seed", 1))        
+        self.assertEqual(
+            self.analysis.number_of_repetitions, self.dataset.sizes.get("seed", 1)
+        )
 
     def test_run_fitting(self):
         analysis = PurityBenchmarkingAnalysis(self.dataset)
         # Verify the average purity result is within the expected range
-        print((np.sum(list(analysis.purity_results_dict.values()))/len(analysis.purity_results_dict)))
-        self.assertTrue(56.1 <= (np.sum(list(analysis.purity_results_dict.values()))/len(analysis.purity_results_dict)) <= 56.2)
+        print(
+            (
+                np.sum(list(analysis.purity_results_dict.values()))
+                / len(analysis.purity_results_dict)
+            )
+        )
+        self.assertTrue(
+            56.1
+            <= (
+                np.sum(list(analysis.purity_results_dict.values()))
+                / len(analysis.purity_results_dict)
+            )
+            <= 56.2
+        )
 
         # Trim the dataset to only 5 Cliffords before running the fitting so it will fit the model
         analysis.number_of_cliffords = analysis.number_of_cliffords[:5]
@@ -71,9 +88,10 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
         fig = Figure()
         ax = fig.subplots()
         analysis.plotter(ax)
-        
+
         # Check that three lines were plotted (data and fit)
         self.assertEqual(len(ax.lines), 3)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
