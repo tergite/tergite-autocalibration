@@ -1,11 +1,22 @@
+# This code is part of Tergite
+#
+# (C) Copyright Michele Faucci Gianelli 2024
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+
 from pathlib import Path
-import numpy as np
-from numpy import ndarray
-import xarray as xr
+
 import pytest
+import xarray as xr
+from numpy import ndarray
 
 from tergite_autocalibration.lib.base.analysis import BaseAnalysis
-
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis import (
     CZParametrisationFixDurationAnalysis,
     CombinedFrequencyVsAmplitudeAnalysis,
