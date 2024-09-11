@@ -10,6 +10,7 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+
 def box_print(text: str):
     margin = 20
     print("\u2554" + "\u2550" * (len(text) + margin) + "\u2557")

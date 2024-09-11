@@ -57,6 +57,7 @@ QPU = [
     QPU_element("q25", "A7", 15, (4, 0)),
 ]
 
+
 def distance(element_1, element_2) -> int:
     x_distance = np.abs(element_1.grid_coords[0] - element_2.grid_coords[0])
     y_distance = np.abs(element_1.grid_coords[1] - element_2.grid_coords[1])
@@ -132,4 +133,3 @@ hits_neighbors("q21", LO_21)
 hits_neighbors("q22", LO_22)
 hits_neighbors("q20", LO_20)
 hits_neighbors("q25", LO_25)
-

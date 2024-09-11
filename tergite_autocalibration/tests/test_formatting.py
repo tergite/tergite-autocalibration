@@ -18,7 +18,10 @@ from pathlib import Path
 
 def test_license_headers():
     # Find the path to the root directory of the package
-    library_folder = str(Path(__file__)).split("tergite_autocalibration")[0] + "tergite_autocalibration"
+    library_folder = (
+        str(Path(__file__)).split("tergite_autocalibration")[0]
+        + "tergite_autocalibration"
+    )
 
     # Iterate over all files in the whole package
     for dir_path, _, filenames in os.walk(library_folder):

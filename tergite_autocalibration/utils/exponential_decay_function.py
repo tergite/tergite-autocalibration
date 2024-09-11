@@ -10,6 +10,7 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+
 def exponential_decay_function(m: float, p: float, A: float, B: float) -> float:
     """
     Exponential decay function.
