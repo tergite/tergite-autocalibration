@@ -1,3 +1,16 @@
+# This code is part of Tergite
+#
+# (C) Copyright Stefan Hill 2024
+# (C) Copyright Michele Faucci Gianelli 2024
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+
 from pathlib import Path
 import click
 
@@ -159,7 +172,7 @@ def start(c, d, r, name, push):
         if not folder_path.is_dir():
             print(f"Error: The specified folder '{folder_path}' does not exist.")
             exit(1)  # Exit with an error code
-            
+
         if not name:
             click.echo(
                 "You are trying to re-run the analysis on a specific node but you did not specify it."

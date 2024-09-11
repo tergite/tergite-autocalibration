@@ -1,14 +1,28 @@
+# This code is part of Tergite
+#
+# (C) Copyright Eleftherios Moschandreou 2023
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+
 """
 Module containing a schedule class for DRAG amplitude calibration.
 """
-from quantify_scheduler.resources import ClockResource
 from quantify_scheduler import Schedule
-from quantify_scheduler.operations.pulse_library import DRAGPulse
 from quantify_scheduler.operations.gate_library import Measure, Reset
-from measurements_base import Measurement_base
+from quantify_scheduler.operations.pulse_library import DRAGPulse
+from quantify_scheduler.resources import ClockResource
+
+from ..lib.base.measurement import BaseMeasurement
 
 
-class DRAG_amplitude(Measurement_base):
+class DRAG_amplitude(BaseMeasurement):
+    # TODO: This function is probably not implementing all recent changes in BaseMeasurement
     def __init__(self, transmons, connections):
         super().__init__(transmons, connections)
         self.experiment_parameters = [

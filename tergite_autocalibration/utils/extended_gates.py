@@ -1,22 +1,27 @@
+# This code is part of Tergite
+#
+# (C) Copyright Eleftherios Moschandreou 2024
+# (C) Copyright Liangyu Chen 2024
+# (c) Copyright Stefan Hill 2024
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+
 from __future__ import annotations
+
 import math
 from typing import Any, Literal, Optional
 
 from qcodes.instrument.channel import InstrumentChannel
 from qcodes.instrument.parameter import ManualParameter
 from qcodes.utils import validators
-from quantify_scheduler.backends.circuit_to_device import (
-    DeviceCompilationConfig,
-    OperationCompilationConfig,
-)
 from quantify_scheduler.device_under_test.transmon_element import (
-    BasicTransmonElement,
-    ClocksFrequencies,
-    DispersiveMeasurement,
     InstrumentBase,
-    measurement_factories,
-    pulse_factories,
-    pulse_library,
 )
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.helpers.validators import Numbers
