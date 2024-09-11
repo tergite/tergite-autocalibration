@@ -1,3 +1,16 @@
+# This code is part of Tergite
+#
+# (C) Copyright Liangyu Chen 2024
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+#
+# This is a modification of the following code:
 # Repository: https://gitlab.com/quantify-os/quantify-scheduler
 # Licensed according to the LICENCE file on the main branch
 """
@@ -9,15 +22,11 @@ and use that to create an instance of the operation itself.
 from __future__ import annotations
 
 from quantify_core.utilities import deprecated
-
 from quantify_scheduler.backends.qblox.operations import (
     pulse_factories as qblox_pulse_factories,
 )
 from quantify_scheduler.backends.qblox.operations.stitched_pulse import StitchedPulse
 from quantify_scheduler.operations import pulse_library
-from quantify_scheduler.resources import ClockResource
-import numpy as np
-import math
 
 
 def composite_soft_square_pulse(  # pylint: disable=too-many-arguments

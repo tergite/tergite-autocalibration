@@ -1,12 +1,26 @@
+# This code is part of Tergite
+#
+# (C) Copyright Eleftherios Moschandreou 2023
+# (C) Copyright Liangyu Chen 2023
+# (c) Copyright Stefan Hill 2023
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+
+from dataclasses import dataclass
+
+import numpy as np
+
 from tergite_autocalibration.config.VNA_values import (
     VNA_qubit_frequencies,
     VNA_resonator_frequencies,
     VNA_f12_frequencies,
 )
-import matplotlib.pyplot as plt
-from matplotlib.patches import Rectangle
-from dataclasses import dataclass
-import numpy as np
 
 
 @dataclass
@@ -43,22 +57,6 @@ QPU = [
     QPU_element("q25", "A7", 15, (4, 0)),
 ]
 
-# edge = {{'q11_q12':1},{'q12_q13':2},{'q13_q14':1},{'q14_q15':2},
-#         {'q11_q16':3},{'q12_q17':4},{'q13_q18':3},{'q14_q19':4},{'q15_q20':3},
-#         {'q16_q17':5},{'q17_q18':6},{'q18_q19':5},{'q19_q20':6},
-#         {'q16_q21':7},{'q17_q22':8},{'q18_q23':7},{'q19_q24':8},{'q20_q25':7},
-#         {'q21_q22':9},{'q22_q23':10},{'q23_q24':9},{'q24_q25':10},
-#         }
-
-# edge_group = [[1,6,9],[2,5,10],[3,8],[4,7]]
-
-# edge_group = {'q11_q12':1,'q12_q13':2,'q13_q14':1,'q14_q15':2,
-#         'q11_q16':3,'q12_q17':4,'q13_q18':3,'q14_q19':4,'q15_q20':3,
-#         'q16_q17':2,'q17_q18':1,'q18_q19':2,'q19_q20':1,
-#         'q16_q21':4,'q17_q22':3,'q18_q23':4,'q19_q24':3,'q20_q25':4,
-#         'q21_q22':1,'q22_q23':2,'q23_q24':1,'q24_q25':2}
-
-
 def distance(element_1, element_2) -> int:
     x_distance = np.abs(element_1.grid_coords[0] - element_2.grid_coords[0])
     y_distance = np.abs(element_1.grid_coords[1] - element_2.grid_coords[1])
@@ -80,7 +78,6 @@ def hits_neighbors(qubit: str, lo_freq: float):
         if q.label == qubit:
             element = q
 
-    # Code by Stefan Hill:
     neighbour_qubits = list(
         filter(lambda element_: distance(element, element_) == 1, QPU)
     )
@@ -136,26 +133,3 @@ hits_neighbors("q22", LO_22)
 hits_neighbors("q20", LO_20)
 hits_neighbors("q25", LO_25)
 
-
-# fig, ax = plt.subplots(1,1, figsize=(10,6))
-# for element in QPU:
-#     x_coord, y_coord = element.grid_coords
-#     x_coord *= 1.6
-#     y_coord *= 1.6
-#     ax.add_patch(Rectangle((x_coord,y_coord),1,1.2,color='dodgerblue', alpha=0.5))
-#     ann_text = f'{element.label}\nmodule{element.module}\n{element.XY_line}\n'
-#     ann_text += f'{element.res_freq:.3e}\nLO:{element.LO/1e9:.3f}\n{element.qubit_freq:.3e}  IF:{element.IF/1e6:.0f}\n'
-#     ann_text += f'{element.qubit_f12:.3e}  IF:{element.IF_12/1e6:.0f}'
-#     ann_style = {'fontsize': 14, 'fontweight': 'roman'}
-#     ax.annotate(ann_text, (x_coord,y_coord), **ann_style)
-# ax.set_xlim(left = 0, right = 5*1.6 - 0.6)
-# ax.set_ylim(bottom = 0, top = 6)
-# plt.tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)
-# plt.show()
-# fig, ax = plt.subplots(1,1, figsize=(10,4))
-# for qubit, f01 in VNA_qubit_frequencies.items():
-#     f12 = VNA_f12_frequencies[qubit]
-#     ax.axvline(x=f01)
-#     ax.axvline(x=f12)
-# plt.show()
-#
