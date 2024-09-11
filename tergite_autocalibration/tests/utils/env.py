@@ -18,7 +18,7 @@ TEST_SPI_SERIAL_PORT = "/dev/ttyACM0"
 TEST_RUN_MODE = "test"
 
 TEST_REDIS_PORT = "6379"
-TEST_PLOTTING = "True"
+TEST_PLOTTING = "False"
 
 
 def setup_test_env():

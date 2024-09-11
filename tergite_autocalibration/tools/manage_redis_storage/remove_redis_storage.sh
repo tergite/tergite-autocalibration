@@ -75,8 +75,9 @@ fi
 if [ -f "/etc/redis/redis_$REDIS_USER_VARIABLE.conf" ]; then
     echo "Redis instance connected to user $REDIS_USER_VARIABLE."
 else
-    echo "The redis instance on port $REDIS_USER_PORT is not connected to the --name argument."
+    echo "The redis instance on port $REDIS_USER_PORT is not connected to the user $REDIS_USER_VARIABLE."
     echo "Abort removing process."
+    exit 1
 fi
 
 # Ask again whether to continue to remove the redis instance
@@ -97,22 +98,13 @@ else
     exit 1
 fi
 
+# Stop redis service
+redis-cli -p "$REDIS_USER_PORT" shutdown
 
-# Find the PID of the redis instance to kill the server
-pid=$(ps -eo pid,args | grep ":$REDIS_USER_PORT" | awk 'NR==1 {print $1}')
-kill -9 "$pid"
-
-# Stop, disable and mask the service
-systemctl stop "redis-server-$REDIS_USER_VARIABLE.service"
-systemctl disable "redis-server-$REDIS_USER_VARIABLE.service"
-systemctl mask "redis-server-$REDIS_USER_VARIABLE.service"
-systemctl daemon-reload
-
-systemctl status "redis-server-$REDIS_USER_VARIABLE.service"
-
-
+# Remove redis configuration file
 rm "/etc/redis/redis_$REDIS_USER_VARIABLE.conf"
-rm "/lib/systemd/system/redis-server-$REDIS_USER_VARIABLE.service"
 
 echo ""
 echo "Redis storage removed for $REDIS_USER_VARIABLE on port $REDIS_USER_PORT."
+
+./list_redis_storage.sh

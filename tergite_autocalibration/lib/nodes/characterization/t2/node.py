@@ -42,6 +42,7 @@ class T2_Node(BaseNode):
             print(f"sleeping for {self.sleep_time} seconds")
             sleep(self.sleep_time)
 
+
 class T2_Echo_Node(BaseNode):
     measurement_obj = T2Echo
     analysis_obj = T2EchoAnalysis

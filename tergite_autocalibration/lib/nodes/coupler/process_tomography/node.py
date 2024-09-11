@@ -35,6 +35,8 @@ class Process_Tomography_Node(BaseNode):
         self.testing_group = 0  # The edge group to be tested. 0 means all edges.
         self.schedule_samplespace = {
             "control_ons": {coupler: range(9) for coupler in self.couplers},
-            "ramsey_phases": {coupler: np.append(range(16), [0, 1, 2])for coupler in self.couplers},
+            "ramsey_phases": {
+                coupler: np.append(range(16), [0, 1, 2]) for coupler in self.couplers
+            },
         }
         # self.validate()

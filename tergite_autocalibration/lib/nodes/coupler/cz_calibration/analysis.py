@@ -316,9 +316,9 @@ class CZCalibrationSSROAnalysis(BaseAnalysis):
             data_res = np.array([])
             for sweep in data_y_pred:
                 uniques, counts = np.unique(sweep, return_counts=True)
-                raw_prob = [0]*len(self.calibs)
-                for state_id,state in enumerate(uniques):
-                    raw_prob[int(state)] = counts[state_id]/len(sweep)
+                raw_prob = [0] * len(self.calibs)
+                for state_id, state in enumerate(uniques):
+                    raw_prob[int(state)] = counts[state_id] / len(sweep)
                 mitigate_prob = mitigate(raw_prob, cm_inv)
                 data_res = np.append(data_res, mitigate_prob)
             data_res = data_res.reshape(data_res_shape)
@@ -441,7 +441,9 @@ class CZCalibrationSSROAnalysis(BaseAnalysis):
 
         for index, magnitude in enumerate(self.magnitudes):
             try:
-                axis.plot(self.fit_independents, self.fit_ys[index], "-", c=colors[index])
+                axis.plot(
+                    self.fit_independents, self.fit_ys[index], "-", c=colors[index]
+                )
             except:
                 pass
             axis.vlines(
@@ -544,9 +546,9 @@ class ResetCalibrationSSROAnalysis(BaseAnalysis):
             data_res = np.array([])
             for sweep in data_y_pred:
                 uniques, counts = np.unique(sweep, return_counts=True)
-                raw_prob = [0]*len(self.calibs)
-                for state_id,state in enumerate(uniques):
-                    raw_prob[int(state)] = counts[state_id]/len(sweep)
+                raw_prob = [0] * len(self.calibs)
+                for state_id, state in enumerate(uniques):
+                    raw_prob[int(state)] = counts[state_id] / len(sweep)
                 raw_prob = counts / len(sweep)
                 mitigate_prob = mitigate(raw_prob, cm_inv)
                 data_res = np.append(data_res, mitigate_prob)

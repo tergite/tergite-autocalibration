@@ -93,24 +93,19 @@ cp "$TEMP_CONF_FILE" "/etc/redis/redis_$REDIS_USER_VARIABLE.conf"
 # Cleanup the temporary config file
 rm "$TEMP_CONF_FILE"
 
+# Fixing permission for the configuration file
+chown redis "/etc/redis/redis_$REDIS_USER_VARIABLE.conf"
+chmod u+rw "/etc/redis/redis_$REDIS_USER_VARIABLE.conf"
+
+# Fixing permissions for the log file
+chown redis "/var/log/redis/redis-server-$REDIS_USER_VARIABLE.log"
+chmod u+rw "/var/log/redis/redis-server-$REDIS_USER_VARIABLE.log"
 
 echo "Writing service configuration..."
-# Create a temporary service file
-TEMP_SERVICE_FILE="redis-server-$REDIS_USER_VARIABLE.service"
-# Replace the user names
-sed "s/REDIS_USER_VARIABLE/$REDIS_USER_VARIABLE/g" redis-server-template.service > "$TEMP_SERVICE_FILE"
-# Copy the service file
-cp "$TEMP_SERVICE_FILE" "/lib/systemd/system/redis-server-$REDIS_USER_VARIABLE.service"
-# Cleanup the temporary file
-rm "$TEMP_SERVICE_FILE"
-
-# Try to enable and start the service
-systemctl unmask "redis-server-$REDIS_USER_VARIABLE.service"
-systemctl enable "redis-server-$REDIS_USER_VARIABLE.service"
-systemctl start "redis-server-$REDIS_USER_VARIABLE.service"
-systemctl daemon-reload
+# Starting redis service from configuration
+runuser -u redis -- redis-server "/etc/redis/redis_$REDIS_USER_VARIABLE.conf" --daemonize yes
 
 echo ""
 echo "Redis storage created for $REDIS_USER_VARIABLE on port $REDIS_USER_PORT."
 
-systemctl status "redis-server-$REDIS_USER_VARIABLE.service"
+./list_redis_storage.sh

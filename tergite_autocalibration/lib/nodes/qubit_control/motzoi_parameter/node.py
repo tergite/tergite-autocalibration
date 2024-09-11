@@ -22,6 +22,7 @@ class Motzoi_Parameter_Node(BaseNode):
             "X_repetitions": {qubit: np.arange(1, 19, 6) for qubit in self.all_qubits},
         }
 
+
 class Motzoi_Parameter_12_Node(BaseNode):
     measurement_obj = Motzoi_parameter
     analysis_obj = MotzoiAnalysis
@@ -33,6 +34,8 @@ class Motzoi_Parameter_12_Node(BaseNode):
         self.motzoi_minima = []
         self.qubit_state = 1
         self.schedule_samplespace = {
-            'mw_motzois': {qubit: np.linspace(-0.3, 0.3, 51) for qubit in self.all_qubits},
-            'X_repetitions': {qubit: np.arange(1, 4, 1) for qubit in self.all_qubits}
+            "mw_motzois": {
+                qubit: np.linspace(-0.3, 0.3, 51) for qubit in self.all_qubits
+            },
+            "X_repetitions": {qubit: np.arange(1, 4, 1) for qubit in self.all_qubits},
         }
