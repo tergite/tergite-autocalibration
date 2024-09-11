@@ -1,11 +1,21 @@
+# This code is part of Tergite
+#
+# (C) Copyright Liangyu Chen 2024
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+
 import itertools
 
-import lmfit
 import numpy as np
 import xarray as xr
 from matplotlib import pyplot as plt
 from numpy.linalg import inv
-from quantify_core.analysis.fitting_models import fft_freq_phase_guess
 from scipy.linalg import norm
 from scipy.optimize import minimize
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis

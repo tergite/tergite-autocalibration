@@ -1,26 +1,36 @@
+# This code is part of Tergite
+#
+# (C) Copyright Liangyu Chen 2024
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+
 """
 Module containing a schedule class for Ramsey calibration. (1D parameter sweep, for 2D see ramsey_detunings.py)
 """
+import itertools
+
 import numpy as np
 from quantify_scheduler import Schedule
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.control_flow_library import Loop
-from quantify_scheduler.operations.gate_library import Measure, Reset, X90, Rxy, X, CZ
+from quantify_scheduler.operations.gate_library import Reset, Rxy, X
 from quantify_scheduler.operations.pulse_library import (
     ResetClockPhase,
-    SoftSquarePulse,
     IdlePulse,
-    NumericalPulse,
 )
 from quantify_scheduler.resources import ClockResource
 
-from tergite_autocalibration.config.coupler_config import qubit_types
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
-from ....base.measurement import BaseMeasurement
-from tergite_autocalibration.utils.extended_gates import Measure_RO_Opt, Rxy_12
 from tergite_autocalibration.utils.extended_coupler_edge import CompositeSquareEdge
+from tergite_autocalibration.utils.extended_gates import Measure_RO_Opt, Rxy_12
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
-import itertools
+from ....base.measurement import BaseMeasurement
 
 
 class Process_Tomography(BaseMeasurement):

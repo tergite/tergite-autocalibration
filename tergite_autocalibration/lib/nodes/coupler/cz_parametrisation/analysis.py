@@ -1,15 +1,27 @@
+# This code is part of Tergite
+#
+# (C) Copyright Michele Faucci Gianelli 2024
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+
 import warnings
-from matplotlib import pyplot as plt
-import numpy as np
-from tergite_autocalibration.utils.post_processing_utils import manage_plots
-import xarray as xr
 from typing import List, Tuple
 
-from ....base.analysis import BaseAnalysis, BaseCouplerAnalysis
+import numpy as np
+import xarray as xr
+from matplotlib import pyplot as plt
 
 from .utils.no_valid_combination_exception import (
     NoValidCombinationException,
 )
+from ....base.analysis import BaseAnalysis, BaseCouplerAnalysis
+
 
 class CombinedFrequencyVsAmplitudeAnalysis:
     def __init__(self, res1: list[float], res2: list[float]):
