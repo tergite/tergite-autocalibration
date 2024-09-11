@@ -81,14 +81,14 @@ class Coupler_Spectroscopy_Node(BaseNode):
         def single_sweep(optimizing_parameter) -> float:
             set_optimizing_parameter(optimizing_parameter)
 
-            result_dataset = self.measure_node(
+            self.measure_node(
                 compiled_schedule,
                 lab_ic,
                 data_path,
                 cluster_status=MeasurementMode.real,
             )
 
-            measurement_result_ = self.post_process(result_dataset, data_path=data_path)
+            measurement_result_ = self.post_process(data_path=data_path)
 
             optimization_quantity = measurement_result_[optimization_element][
                 self.optimization_field

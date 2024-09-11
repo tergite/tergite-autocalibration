@@ -17,6 +17,7 @@
 # - Martin Ahindura, 2023
 
 from ipaddress import IPv4Address
+from pathlib import Path
 from typing import Union, List
 
 import toml
@@ -68,15 +69,23 @@ class CalibrationSupervisor:
         cluster_mode: "MeasurementMode" = MeasurementMode.real,
         cluster_ip: Union[str, "IPv4Address"] = CLUSTER_IP,
         cluster_timeout: int = 222,
+        node_name = "",
+        data_path = ""
     ) -> None:
         # Read hardware related configuration steps
         self.cluster_mode: "MeasurementMode" = cluster_mode
         self.cluster_ip: Union[str, "IPv4Address"] = cluster_ip
         self.cluster_timeout: int = cluster_timeout
+        self.node_name_to_re_analyse = node_name
+        self.data_path = Path(data_path)
+        self.lab_ic = ""
 
         # Create objects to communicate with the hardware
-        self.cluster: "Cluster" = self._create_cluster()
-        self.lab_ic: "InstrumentCoordinator" = self._create_lab_ic(self.cluster)
+        if self.cluster_mode == MeasurementMode.re_analyse:
+            logger.info("Cluster will not be defined as there is no need to take a measurement in re-analysis mode.")
+        else:
+            self.cluster: "Cluster" = self._create_cluster()
+            self.lab_ic: "InstrumentCoordinator" = self._create_lab_ic(self.cluster)
 
         # TODO: user configuration could be a toml file
         # Read the calibration specific parameters
@@ -101,7 +110,7 @@ class CalibrationSupervisor:
             cluster_.reset()
             logger.info(f"Reseting Cluster at IP *{str(self.cluster_ip)[-3:]}")
             return cluster_
-        else:
+        else:            
             raise ClusterNotFoundError(
                 f"Cannot create cluster object from {self.cluster_ip}"
             )
@@ -243,7 +252,21 @@ class CalibrationSupervisor:
                 else:
                     raise ValueError(f"REDIS error: cannot find cs:{qubit}", node_name)
 
-        if status == DataStatus.in_spec:
+        print(node_name)
+        print(self.node_name_to_re_analyse)
+        if self.measurement_mode == MeasurementMode.re_analyse and node_name == self.node_name_to_re_analyse:
+            print(
+                "\u2691\u2691\u2691 "
+                + f"{Fore.RED}{Style.BRIGHT}Calibration required for Node {node_name}{Style.RESET_ALL}"
+            )
+            logger.info(f"Calibrating node {node.name}")
+            # TODO: This could be in the node initializer
+            node.calibrate(
+                self.data_path, self.lab_ic, self.measurement_mode
+            )
+
+
+        if status == DataStatus:
             print(
                 f" \u2714  {Fore.GREEN}{Style.BRIGHT}Node {node_name} in spec{Style.RESET_ALL}"
             )
@@ -257,7 +280,7 @@ class CalibrationSupervisor:
             logger.info(f"Calibrating node {node.name}")
             # TODO: This could be in the node initializer
             data_path = create_node_data_path(node)
-            measurement_result = node.calibrate(
+            node.calibrate(
                 data_path, self.lab_ic, self.measurement_mode
             )
 

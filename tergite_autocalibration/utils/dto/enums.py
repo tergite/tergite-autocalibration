@@ -18,3 +18,4 @@ class MeasurementMode(Enum):
 
     real = 0
     dummy = 1
+    re_analyse = 2

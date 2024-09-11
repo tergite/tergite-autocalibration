@@ -38,7 +38,7 @@ class CZParametrisationFixDurationNode(ParametrizedSweepNode):
         # Should these sample space move to user defined inputs?
         self.initial_schedule_samplespace = {
             "cz_pulse_amplitudes": {
-                coupler: np.linspace(0.05, 0.3, 15) for coupler in self.couplers
+                coupler: np.linspace(0.01, 0.35, 15) for coupler in self.couplers
             },
             "cz_pulse_frequencies": {
                 coupler: np.linspace(-20e6, 20e6, 21) + self.transition_frequency(coupler) for coupler in self.couplers
@@ -46,7 +46,7 @@ class CZParametrisationFixDurationNode(ParametrizedSweepNode):
         }
         self.external_samplespace = {
             "cz_parking_currents": {
-                coupler: np.array([-0.876, -0.7989, -0.713, -0.616]) for coupler in self.couplers
+                coupler: np.array([-0.640, -0.650, -0.660, -0.670, -0.680]) for coupler in self.couplers
             }
             #np.arange(-0.3, 0.3, 10) * self.coupler_current_range + self.coupler_current for coupler in self.couplers
         }

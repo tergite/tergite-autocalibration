@@ -1,3 +1,4 @@
+from pathlib import Path
 import click
 
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
@@ -113,12 +114,22 @@ def calibration():
     help="Use -d if you want to use the dummy cluster (not implemented)",
 )
 @click.option(
+    "-r",
+    required=False,
+    help="Use -r if you want to use rerun an analysis, give the path to the dataset folder (plots will be overwritten), you also need to specify the name of the node using -n",
+)
+@click.option(
+    "-n", "--name",
+    required=False,
+    help="Use to specify the node type to rerun, only works with -r option",
+)
+@click.option(
     "--push",
     required=False,
     is_flag=True,
     help="If --push the a backend will pushed to an MSS specified in MSS_MACHINE_ROOT_URL in the .env file.",
 )
-def start(c, d, push):
+def start(c, d, r, name, push):
     from ipaddress import ip_address, IPv4Address
 
     from tergite_autocalibration.config.settings import CLUSTER_IP
@@ -129,6 +140,8 @@ def start(c, d, push):
 
     cluster_mode: "MeasurementMode" = MeasurementMode.real
     parsed_cluster_ip: "IPv4Address" = CLUSTER_IP
+    node_name = ""
+    data_path = ""
 
     # Checks whether to start the cluster in dummy mode
     # TODO: The dummy cluster is currently not implemented
@@ -138,6 +151,25 @@ def start(c, d, push):
             "Trying to start the calibration supervisor with default cluster configuration"
         )
         cluster_mode = MeasurementMode.dummy
+
+    if r:
+        folder_path = Path(r)
+
+        # Check if the folder exists
+        if not folder_path.is_dir():
+            print(f"Error: The specified folder '{folder_path}' does not exist.")
+            exit(1)  # Exit with an error code
+            
+        if not name:
+            click.echo(
+                "You are trying to re-run the analysis on a specific node but you did not specify it."
+                "Please specify the node using -n or --name."
+            )
+            exit(1)  # Exit with an error exit
+
+        cluster_mode = MeasurementMode.re_analyse
+        data_path = folder_path
+        node_name = name
 
     # Check whether the ip address of the cluster is set correctly
     if c and not d:
@@ -151,7 +183,7 @@ def start(c, d, push):
             )
 
     supervisor = CalibrationSupervisor(
-        cluster_mode=cluster_mode, cluster_ip=parsed_cluster_ip
+        cluster_mode=cluster_mode, cluster_ip=parsed_cluster_ip, node_name=node_name, data_path=data_path
     )
     supervisor.calibrate_system()
     if push:

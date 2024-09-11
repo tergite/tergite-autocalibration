@@ -6,33 +6,35 @@ import xarray as xr
 from quantify_core.analysis import fitting_models as fm
 
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
-from tergite_autocalibration.lib.base.analysis import BaseAnalysis
+from tergite_autocalibration.lib.base.analysis import BaseQubitAnalysis
 
 model = fm.ResonatorModel()
 
 
-class ResonatorSpectroscopyAnalysis(BaseAnalysis):
+class ResonatorSpectroscopyAnalysis(BaseQubitAnalysis):
     """
     Analysis that fits the data of a resonator spectroscopy experiment.
     """
 
-    def __init__(self, dataset: xr.Dataset):
-        super().__init__()
-        data_var = list(dataset.data_vars.keys())[0]
-        coord = list(dataset[data_var].coords.keys())[0]
-
-        self.S21 = dataset[data_var].values
-        self.frequencies = dataset[coord].values
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
         self.fit_results = {}
 
     def run_fitting(self):
         # Fetch the resulting measurement variables from self
-        S21 = self.S21
-        frequencies = self.frequencies
+        frequencies = self.dataset[self.current_coord].values
+        print(frequencies)
+
+        if isinstance(self.S21, xr.Dataset):
+            data_var_name = list(self.S21.data_vars.keys())[0]  # Adjust if specific variable name is known
+            s21_dataarray = self.S21[data_var_name]
+        else:
+            raise TypeError("Expected self.S21 to be an xarray.DataArray")
+        s21_values = s21_dataarray.values
 
         # Gives an initial guess for the model parameters and then fits the model to the data.
-        guess = model.guess(S21, f=frequencies)
-        self.fitting_model = model.fit(S21, params=guess, f=frequencies)
+        guess = model.guess(s21_values, f=frequencies)
+        self.fitting_model = model.fit(s21_values, params=guess, f=frequencies)
 
         fit_result = self.fitting_model
 
@@ -57,7 +59,7 @@ class ResonatorSpectroscopyAnalysis(BaseAnalysis):
             )
         )
         # using the min value driectly
-        self.min_freq_data = frequencies[np.argmin(np.abs(S21))]
+        self.min_freq_data = frequencies[np.argmin(np.abs(s21_values))]
         # print(fit_Ql)
         # print(self.min_freq )
         return [self.minimum_freq, fit_Ql, self.min_freq_data]

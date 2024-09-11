@@ -12,10 +12,15 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import abc
+import collections
+from abc import ABC, abstractmethod
+from pathlib import Path
+import xarray as xr
 
 # TODO: we should have a conditional import depending on a feature flag here
-from matplotlib import pyplot as plt
+import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
+
 import numpy as np
 
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
@@ -23,13 +28,14 @@ from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 from tergite_autocalibration.utils.dto.qoi import QOI
 
 
-class BaseAnalysis(abc.ABC):
+class BaseAnalysis(ABC):
     """
     Base class for the analysis
     """
 
     def __init__(self):
         self._qoi = None
+        self.redis_fields = ""
 
     @property
     def qoi(self) -> "QOI":
@@ -39,7 +45,7 @@ class BaseAnalysis(abc.ABC):
     def qoi(self, value: "QOI"):
         self._qoi = value
 
-    @abc.abstractmethod
+    @abstractmethod
     def run_fitting(self) -> "QOI":
         """
         Run the fitting of the analysis function
@@ -50,7 +56,7 @@ class BaseAnalysis(abc.ABC):
         """
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def plotter(self, ax: "plt.Axes"):
         """
         Plot the fitted values from the analysis
@@ -70,9 +76,9 @@ class BaseAnalysis(abc.ABC):
     # -> It is probably not that much effort to implement several QOI classes
     # -> We could start with a BaseQOI and add more as soon as needed
     def update_redis_trusted_values(
-        self, node: str, this_element: str, transmon_parameters: list
+        self, node: str, this_element: str
     ):
-        for i, transmon_parameter in enumerate(transmon_parameters):
+        for i, transmon_parameter in enumerate(self.redis_fields):
             if "_" in this_element:
                 name = "couplers"
             else:
@@ -109,3 +115,147 @@ class BaseAnalysis(abc.ABC):
         real_rotated_data = rotated_data.real
         normalized_data = real_rotated_data / normalization
         return normalized_data
+
+    def manage_plots(self, column_grid: int, plots_per_qubit: int):
+        n_vars = len(self.data_vars)
+        n_coords = len(self.coords)
+        print("nvars: ", n_vars)
+        print("n_coords: ", n_coords)
+
+        rows = int(np.ceil(n_vars / column_grid))
+        rows = rows * plots_per_qubit
+
+        fig, axs = plt.subplots(
+            nrows=rows,
+            ncols=np.min((n_vars, n_coords, column_grid)),
+            squeeze=False,
+            figsize=(column_grid * 5, rows * 5),
+        )
+
+        return fig, axs
+    
+    def save_plots(self, data_path: Path):
+        self.fig.tight_layout()
+        preview_path = data_path / f"{self.name}_preview.png"
+        full_path = data_path / f"{self.name}.png"
+        self.fig.savefig(preview_path, bbox_inches="tight", dpi=100)
+        self.fig.savefig(full_path, bbox_inches="tight", dpi=400)
+        plt.show(block=False)
+        plt.pause(5)
+        plt.close()
+        print(f"Plots saved to {preview_path} and {full_path}")
+
+class BaseQubitAnalysis(BaseAnalysis, ABC):
+    def __init__(self, name, redis_fields):
+        self.name = name
+        self.redis_fields = redis_fields
+        self.dataset = None
+        self.S21 = None
+        self.data_var = None
+        self.data_vars = None
+        self.current_qubit = None
+        self.current_coord = None
+        self.coords = None
+
+        self.column_grid=5
+        self.plots_per_qubit=1
+
+    def run_analysis(self, data_path: Path):
+        self.dataset = self.open_dataset(data_path)
+        self.coords = self.dataset.coords
+        self.data_vars = self.dataset.data_vars
+        self.fig, self.axs = self.manage_plots(self.column_grid, self.plots_per_qubit)
+        analysis_results = self._analyze_all_qubits()
+        self.save_plots(data_path)
+        return analysis_results
+
+    def open_dataset(self, data_path: Path):
+        dataset_path = data_path / "dataset_0.hdf5" 
+        if not dataset_path.exists():
+            raise FileNotFoundError(f"Dataset file not found: {dataset_path}")
+
+        return xr.open_dataset(dataset_path)
+
+    def _analyze_all_qubits(self):
+        analysis_results = {}
+        qubit_data_dict = self._group_by_qubit()
+        index = 0
+        for this_qubit, qubit_data_vars in qubit_data_dict.items():
+            # Extract dataset for the current qubit
+            ds = xr.merge([self.dataset[var] for var in qubit_data_vars])
+            ds.attrs["qubit"] = this_qubit
+            
+            # Extract relevant frequency coordinate for this qubit
+            matching_coords = [coord for coord in ds.coords if this_qubit in coord]
+            if matching_coords:
+                selected_coord_name = matching_coords[0]
+                ds = ds.sel({selected_coord_name: slice(None)})  # Select all data along this coordinate
+
+            self.S21 = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
+            print("here")
+            print(self.S21)
+            print("after here")
+            self.data_var = list(ds.data_vars.keys())[0]  # Assume the first data_var is relevant
+            self.current_qubit = ds.attrs["qubit"]
+            self.current_coord = selected_coord_name
+
+            # Proceed with analysis for this qubit
+            analysis_results.update(self._analyze_single_qubit(this_qubit, index))
+            index = index + 1
+            
+        return analysis_results
+
+    def _group_by_qubit(self):
+        qubit_data_dict = collections.defaultdict(set)
+        for var in self.dataset.data_vars:
+            this_qubit = self.dataset[var].attrs["qubit"]
+            qubit_data_dict[this_qubit].add(var)
+        return qubit_data_dict
+
+    def _analyze_single_qubit(self, qubit_element, index):
+        self.qoi = self.run_fitting()
+
+        primary_plot_row = self.plots_per_qubit * (index // self.column_grid)
+        primary_axis = self.axs[primary_plot_row, index % self.column_grid]
+
+        self.plotter(primary_axis)  # Assuming node_analysis object is available
+
+        # Customize plot as needed
+        handles, labels = primary_axis.get_legend_handles_labels()
+        patch = mpatches.Patch(color="red", label=f"{qubit_element[0]}")
+        handles.append(patch)
+        primary_axis.legend(handles=handles, fontsize="small")
+
+        self.update_redis_trusted_values(self.name, qubit_element)
+        return {qubit_element: dict(zip(self.redis_fields, self.qoi))}
+
+class BaseCouplerAnalysis(BaseAnalysis, ABC):
+
+    def run_analysis(self, data_path: Path):
+        self.dataset = self.open_datasets(data_path)
+        this_element = self._extract_coupler_info()
+        analysis_results = self._run_coupler_analysis(this_element)
+
+        return analysis_results
+
+    @abstractmethod
+    def open_datasets(data_path, number_of_files):
+        pass
+
+
+    def _extract_coupler_info(self):
+        for settable in self.dataset.coords:
+            try:
+                if self.dataset[settable].attrs["element_type"] == "coupler":
+                    element_type = "coupler"
+                    this_element = self.dataset[settable].attrs[element_type]
+                    return this_element
+            except KeyError:
+                print(f"No element_type for {settable}")
+        return None
+    
+    def _run_coupler_analysis(self, this_element: str):
+        qoi = self.run_fitting()
+        self.qoi = qoi
+        self.update_redis_trusted_values(self.name, this_element)
+        return {this_element: dict(zip(self.redis_field, qoi))}

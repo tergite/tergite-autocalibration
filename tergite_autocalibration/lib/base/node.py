@@ -13,7 +13,6 @@
 # that they have been altered from the originals.
 
 import abc
-import collections
 import json
 import threading
 import time
@@ -23,8 +22,7 @@ from pathlib import Path
 from typing import List, Optional
 
 import matplotlib
-import matplotlib.patches as mpatches
-import matplotlib.pyplot as plt
+
 import numpy as np
 import tqdm
 import xarray
@@ -53,7 +51,6 @@ from tergite_autocalibration.lib.utils.redis import (
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 from tergite_autocalibration.utils.dataset_utils import (
     configure_dataset,
-    retrieve_dummy_dataset,
     save_dataset,
 )
 from tergite_autocalibration.utils.dto.enums import DataStatus
@@ -178,6 +175,13 @@ class BaseNode(abc.ABC):
         )
 
     def calibrate(self, data_path: Path, lab_ic, cluster_status):
+        if cluster_status != MeasurementMode.re_analyse:
+            self.run_measurement(data_path, lab_ic, cluster_status)
+        self.post_process(data_path)
+        logger.info("analysis completed")
+
+
+    def run_measurement(self, data_path: Path, lab_ic, cluster_status):
         compiled_schedule = self.precompile(data_path)
 
         if self.external_samplespace == {}:
@@ -242,11 +246,8 @@ class BaseNode(abc.ABC):
                     measurement=(current_iteration, iterations),
                 )
                 result_dataset = xarray.merge([result_dataset, ds])
-
         logger.info("measurement completed")
-        measurement_result = self.post_process(result_dataset, data_path=data_path)
-        logger.info("analysis completed")
-        return measurement_result
+
 
     def precompile(
         self, data_path: Path, bin_mode: str = None, repetitions: int = None
@@ -378,7 +379,6 @@ class BaseNode(abc.ABC):
         compiled_schedule: CompiledSchedule,
         lab_ic,
         data_path: pathlib.Path,
-        cluster_status=MeasurementMode.real,
         measurement=(1, 1),
     ):
         schedule_duration = compiled_schedule.get_schedule_duration()
@@ -396,17 +396,12 @@ class BaseNode(abc.ABC):
         )
 
         raw_dataset = self.execute_schedule(
-            compiled_schedule, lab_ic, schedule_duration, cluster_status
-        )
+            compiled_schedule, lab_ic, schedule_duration)
 
-        if cluster_status == MeasurementMode.real:
-            result_dataset = configure_dataset(raw_dataset, self)
-            save_dataset(result_dataset, self.name, data_path)
-        else:
-            result_dataset = retrieve_dummy_dataset(self)
+        result_dataset = configure_dataset(raw_dataset, self)
+        save_dataset(result_dataset, self.name, data_path)
 
         logger.info("Finished measurement")
-        return result_dataset
 
     def execute_schedule(
         self,
@@ -448,123 +443,16 @@ class BaseNode(abc.ABC):
 
         return raw_dataset
 
-    def post_process(self, result_dataset: xr.Dataset, data_path: Path):
-        if self.name == "tof":
-            tof = analyze_tof(result_dataset, True)
-            return
 
-        column_grid = 5
-        fig, axs = manage_plots(result_dataset, column_grid, self.plots_per_qubit)
+    def post_process(self, data_path: Path):
+        analysis_kwargs = getattr(self, "analysis_kwargs", dict())
+        print("Redis fields")
+        print(self.redis_field)
+        node_analysis = self.analysis_obj(self.name, self.redis_field, **analysis_kwargs)
 
-        qoi: list
-        data_status: DataStatus
-
-        data_vars_dict = collections.defaultdict(set)
-        for var in result_dataset.data_vars:
-            this_qubit = result_dataset[var].attrs["qubit"]
-            data_vars_dict[this_qubit].add(var)
-
-        all_results = {}
-        for indx, var in enumerate(result_dataset.data_vars):
-            # this refers to the qubit whose resonator was used for the measurement
-            # not necessarily the element where the settable was applied
-            this_qubit = result_dataset[var].attrs["qubit"]
-            this_element = this_qubit
-            # print(f'{result_dataset = }')
-
-            ds = xr.Dataset()
-            for var in data_vars_dict[this_qubit]:
-                ds = xr.merge([ds, result_dataset[var]])
-
-            ds.attrs["qubit"] = this_qubit
-            ds.attrs["node"] = self.name
-            # print(f'{ds = }')
-            # detect the element_type on which the settables act
-            for settable in ds.coords:
-                # print(f'{settable = }')
-                # print(f'{ds[settable].attrs = }')
-                try:
-                    if ds[settable].attrs["element_type"] == "coupler":
-                        element_type = "coupler"
-                        # print(f'{ds[settable].attrs[element_type] = }')
-                        this_element = ds[settable].attrs[element_type]
-                        # print(f'{this_element = }')
-                except:
-                    print(f"No element_type for {settable}")
-                    # pass
-
-            primary_plot_row = self.plots_per_qubit * (indx // column_grid)
-            primary_axis = axs[primary_plot_row, indx % column_grid]
-
-            redis_field = self.redis_field
-            analysis_kwargs = getattr(self, "analysis_kwargs", dict())
-            node_analysis = self.analysis_obj(ds, **analysis_kwargs)
-            qoi = node_analysis.run_fitting()
-
-            node_analysis.qoi = qoi
-
-            if self.type == "adaptive_sweep":
-                # TODO: Is there even an adaptive sweep anywere?
-                # fetch relative kwargs, e.g. known minima in motzoi calibration
-                qubit_adaptive_kwargs = self.adaptive_kwargs[this_qubit]
-                # every adaptive iteration should update the samplespace ...
-                new_qubit_samplespace = node_analysis.updated_qubit_samplespace(
-                    **qubit_adaptive_kwargs
-                )
-                for settable_key in new_qubit_samplespace.keys():
-                    self.samplespace[settable_key].update(
-                        new_qubit_samplespace[settable_key]
-                    )
-                # every adaptive iteration should also update the relevant kwargs
-                self.adaptive_kwargs[this_qubit] = node_analysis.updated_kwargs
-                if self.measurement_is_completed:
-                    node_analysis.update_redis_trusted_values(
-                        self.name, this_qubit, redis_field
-                    )
-            # print(f'{this_element = }')
-            node_analysis.update_redis_trusted_values(
-                self.name, this_element, redis_field
-            )
-            all_results[this_element] = dict(zip(redis_field, qoi))
-
-            if self.plots_per_qubit > 1:
-                list_of_secondary_axes = []
-                for plot_indx in range(1, self.plots_per_qubit):
-                    secondary_plot_row = primary_plot_row + plot_indx
-                    list_of_secondary_axes.append(
-                        axs[secondary_plot_row, indx % column_grid]
-                    )
-                node_analysis.plotter(
-                    primary_axis, secondary_axes=list_of_secondary_axes
-                )
-            else:
-                node_analysis.plotter(primary_axis)
-            handles, labels = primary_axis.get_legend_handles_labels()
-
-            patch = mpatches.Patch(color="red", label=f"{this_qubit}")
-            handles.append(patch)
-            primary_axis.legend(handles=handles, fontsize="small")
-            if self.plots_per_qubit > 1:
-                for secondary_ax in list_of_secondary_axes:
-                    secondary_ax.legend()
-
-        fig = plt.gcf()
-        fig.set_tight_layout(True)
-        try:
-            fig.savefig(f"{data_path}/{self.name}.png", bbox_inches="tight", dpi=400)
-            fig.savefig(
-                f"{data_path}/{self.name}_preview.png", bbox_inches="tight", dpi=100
-            )
-        except FileNotFoundError:
-            warnings.warn("File Not existing")
-            pass
-        plt.show(block=False)
-        plt.pause(5)
-        plt.close()
-        if self != "tof":
-            all_results.update({"measurement_dataset": result_dataset.to_dict()})
-
-        return all_results
+        analysis_results = node_analysis.run_analysis(data_path)
+        #self.plot_results(node_analysis, analysis_results, data_path)
+        return analysis_results
 
     def __str__(self):
         return f"Node representation for {self.name} on qubits {self.all_qubits}"
