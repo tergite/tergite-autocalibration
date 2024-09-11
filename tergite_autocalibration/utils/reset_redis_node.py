@@ -1,9 +1,23 @@
+# This code is part of Tergite
+#
+# (C) Copyright Eleftherios Moschandreou 2024
+# (C) Copyright Liangyu Chen 2024
+# (c) Copyright Stefan Hill 2024
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+
 import toml
 
 from tergite_autocalibration.config.settings import DEVICE_CONFIG, REDIS_CONNECTION
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
-from tergite_autocalibration.utils import user_input
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
+from tergite_autocalibration.utils import user_input
 
 
 class ResetRedisNode:

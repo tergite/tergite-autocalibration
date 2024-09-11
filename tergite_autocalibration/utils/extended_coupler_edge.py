@@ -1,17 +1,28 @@
+# This code is part of Tergite
+#
+# (C) Copyright Eleftherios Moschandreou 2023, 2024
+# (C) Copyright Liangyu Chen 2023, 2024
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+
 import math
 from typing import Dict, Any
 
 from qcodes.instrument import InstrumentChannel
 from qcodes.instrument.base import InstrumentBase
 from qcodes.instrument.parameter import ManualParameter
-
 from quantify_scheduler.backends.graph_compilation import OperationCompilationConfig
+from quantify_scheduler.device_under_test.edge import Edge
 from quantify_scheduler.device_under_test.transmon_element import pulse_factories
 from quantify_scheduler.helpers.validators import Numbers
-from quantify_scheduler.device_under_test.edge import Edge
 
 # from quantify_scheduler.operations.pulse_factories import composite_square_pulse
-from quantify_scheduler.resources import BasebandClockResource
 from tergite_autocalibration.utils.extended_pulse_factories import (
     composite_soft_square_pulse,
 )
