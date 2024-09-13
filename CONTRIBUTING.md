@@ -10,7 +10,7 @@
 
 ## Version Control
 
-Tergite is developed on a separate version control system and mirrored on Github.
+Tergite is developed on a separate version control system and mirrored on GitHub.
 If you are reading this on GitHub, then you are looking at a mirror. 
 
 ## Versioning
@@ -19,15 +19,15 @@ When versioning we follow the format `{year}.{month}.{patch_number}` e.g. `2023.
 
 ## Contacting the Tergite Developers
 
-Since the Github repositories are only mirrors, no Github pull requests or Github issue/bug reports 
-are looked at. Please get in touch via email <quantum.nextlabs@chalmers.se> instead. 
+Since the GitHub repositories are only mirrors, no GitHub pull requests or GitHub issue/bug reports 
+are looked at. Please get in touch via email <quantum-nextlabs@chalmers.se> instead. 
 
 Take note that the maintainers may not answer every email.
 
-## But We Use [Github Flow](https://docs.github.com/en/get-started/quickstart/github-flow), So All Code Changes Happen Through Pull Requests
+## But We Use [GitHub Flow](https://docs.github.com/en/get-started/quickstart/github-flow), So All Code Changes Happen Through Pull Requests
 
 Pull requests are the best way to propose changes to the codebase (we
-use [Github Flow](https://docs.github.com/en/get-started/quickstart/github-flow)). We actively welcome your pull
+use [GitHub Flow](https://docs.github.com/en/get-started/quickstart/github-flow)). We actively welcome your pull
 requests:
 
 1. Clone the repo and create your branch from `main`.
@@ -79,7 +79,7 @@ Please note that if your contribution is part of your employment or
 your contribution is the property of your employer, 
 you will also most likely need to sign a [corporate CLA](https://tergite.github.io/contributing/ccla.pdf).
 
-All signed CLAs are emails to us at <quantum.nextlabs@chalmers.se>.
+All signed CLAs are emails to us at <quantum-nextlabs@chalmers.se>.
 
 ## How to Use
 
@@ -115,18 +115,15 @@ acli --help
 A number of configurations can be added to the tergite-autocalibration.
 These include:
 
-### - [`tergite_autocalibration/utils/user_input.py`](tergite_autocalibration/utils/user_input.py)
+- [`tergite_autocalibration/utils/user_input.py`](tergite_autocalibration/utils/user_input.py) The sample-space for each node. The target node is also declared here.
 
-The sample-space for each node. 
-The target node is also declared here.
+- [`tergite_autocalibration/config/device_config.toml`](tergite_autocalibration/config/device_config.toml) A collection of reasonable initial values for the given device
 
-### - [`tergite_autocalibration/config/device_config.toml`](tergite_autocalibration/config/device_config.toml)
+- [`tergite_autocalibration/config/hardware_config.toml`](tergite_autocalibration/config/hardware_config.json) The hardware configuration for the QBlox cluster.
 
-A collection of reasonable initial values for the given device
+- [`dot-env-template.txt`](dot-env-template.txt) Other parameters like the path to the Qblox Cluster configuration file (including IP address).
 
-### - [`dot-env-template.txt`](dot-env-template.txt)
-
-Other parameters like the path to the Qblox Cluster configuration file (including IP address).
+The initial configurations for a specific device can be found under `data/devices`.
 
 ## Calibration Pipeline
 
@@ -141,6 +138,15 @@ Each calibration node goes through the following phases in order:
 
 Datasets are stored in [`data_directory`](./data_directory)
 They can be browsed with the dataset browser (coming soon)
+
+## Installation of proprietary resources (optional, not recommended)
+We do not recommend to make your code having dependencies to proprietary software.
+If you still need to install proprietary dependencies, please do so by running:
+```
+pip install -r requirements_proprietary.txt
+```
+Make sure you have ssh access to all proprietary repositories, otherwise the installation will fail.
+
 
 ## References
 

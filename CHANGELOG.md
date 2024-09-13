@@ -8,11 +8,13 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 ## [Unreleased]
 
 ### Added
+- superconducting_qubit_tools as conditional dependency
 - Calibration node for purity benchmarking
 - Redis storage manager
 
 ### Changed
 - Switch to quantify-scheduler version 0.20.0
+- Refactoring of the node classes to allow hierarchical class structures
 
 ### Fixed
 
