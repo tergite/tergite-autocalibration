@@ -3,7 +3,7 @@
 # (C) Copyright Eleftherios Moschandreou 2024
 # (C) Copyright Liangyu Chen 2024
 # (C) Copyright Tong Liu 2024
-# (C) Copyright Michele Faucci Gianelli 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -59,11 +59,11 @@ def configure_dataset(
         "ro_frequency_two_state_optimization",
     ]:
         qubit_states = [0, 1]
-    elif 'ssro' in node.name:
-       qubit_states = ["c0", "c1", "c2"]  # for calibration points
+    elif "ssro" in node.name:
+        qubit_states = ["c0", "c1", "c2"]  # for calibration points
 
     print(node.name)
-    #if 'cz_param' in node.name:
+    # if 'cz_param' in node.name:
     #    print("Here")
     #    return raw_ds
 
@@ -75,7 +75,7 @@ def configure_dataset(
         dimensions = node.dimensions
         print("node dimenstions are: ", dimensions)
 
-        if 'ssro' in node.name:
+        if "ssro" in node.name:
             # TODO: We are not sure about this one
             # dimensions[0] += len(qubit_states)  # for calibration points
             shots = int(len(raw_ds[key].values[0]) / (np.product(dimensions)))
@@ -99,19 +99,19 @@ def configure_dataset(
         #         {"qubit": measured_qubit, "long_name": "shot", "units": "NA"},
         #     )
         # elif node.name in [
-        #     'tqg_randomized_benchmarking_ssro', 
-        #     'tqg_randomized_benchmarking_interleaved_ssro', 
-        #     'randomized_benchmarking_ssro' 
+        #     'tqg_randomized_benchmarking_ssro',
+        #     'tqg_randomized_benchmarking_interleaved_ssro',
+        #     'randomized_benchmarking_ssro'
         #     ]:
         #     # TODO: We are not sure about this one
         #     dimensions[0] += len(qubit_states)  # for calibration points
         #     shots = int(len(raw_ds[key].values[0]) / (np.product(dimensions)))
         #     coords_dict['shot'] = ('shot', range(shots), {'qubit': measured_qubit, 'long_name': 'shot', 'units': 'NA'})
-        
+
         for quantity in sweep_quantities:
             # eg ['q1','q2',...] or ['q1_q2','q3_q4',...] :
             settable_elements = samplespace[quantity].keys()
-            #print('settable elements are: ', settable_elements)
+            # print('settable elements are: ', settable_elements)
             # distinguish if the settable is on a qubit or a coupler:
             if measured_qubit in settable_elements:
                 element = measured_qubit
@@ -133,12 +133,11 @@ def configure_dataset(
                 "long_name": f"{coord_key}",
                 "units": "NA",
             }
-            #print('coord attributes is: ', coord_attrs)
+            # print('coord attributes is: ', coord_attrs)
             # if node.name in ['cz_calibration_ssro','cz_calibration_swap_ssro', 'reset_calibration_ssro'] and 'ramsey_phases' in quantity:
             #     settable_values = np.append(np.array([settable_values]), np.array([qubit_states]))
             # elif node.name in ['tqg_randomized_benchmarking_ssro', 'tqg_randomized_benchmarking_interleaved_ssro', 'randomized_benchmarking_ssro',]:
             #     settable_values = np.append(np.array([settable_values]), np.array([qubit_states]))
-
 
             # print(coord_attrs)
 
@@ -146,7 +145,6 @@ def configure_dataset(
                 settable_values = np.array([settable_values])
 
             coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
-
 
         partial_ds = xarray.Dataset(coords=coords_dict)
 
@@ -170,7 +168,7 @@ def configure_dataset(
         if node.name in ["ro_amplitude_optimization_gef"]:
             reshaping = [shots, dimensions[0], len(qubit_states)]
             data_values = data_values.reshape(*reshaping)
-        elif 'ssro' in node.name:
+        elif "ssro" in node.name:
             reshaping = np.array([shots])
             reshaping = np.append(reshaping, dimensions)
             data_values = data_values.reshape(*reshaping)

@@ -3,7 +3,7 @@
 # (C) Copyright Eleftherios Moschandreou 2024
 # (C) Copyright Liangyu Chen 2024
 # (C) Copyright Amr Osman 2024
-# (C) Copyright Michele Faucci Gianelli 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -187,6 +187,7 @@ class CZ_Characterisation_Chevron_Node(BaseNode):
         ac_freq = int(ac_freq / 1e4) * 1e4
         print(f"{ ac_freq/1e6 = } MHz for coupler: {coupler}")
         return ac_freq
+
 
 class CZ_Optimize_Chevron_Node(BaseNode):
     measurement_obj = CZ_Chevron

@@ -89,7 +89,7 @@ class ResetChevronAnalysis(BaseAnalysis):
         self.result = OptimalResult(f"reset_pulse_durations", "s")
         # self.fig, self.axes = plt.subplots(1, 3, figsize=(20,5))
 
-    def run_fitting(self):
+    def analyse_qubit(self):
         for coord in self.dataset[self.data_var].coords:
             if "amplitudes" in coord:
                 self.amplitudes_coord = coord

@@ -2,7 +2,7 @@
 #
 # (C) Copyright Eleftherios Moschandreou 2023, 2024
 # (C) Copyright Liangyu Chen 2023, 2024
-# (C) Copyright Michele Faucci Gianelli 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -105,14 +105,14 @@ user_samplespace = {
 """
 ####################################################################
 target_node = "cz_parametrisation_fix_duration"
-qubits = [ 'q06','q07','q08','q09','q10','q11','q12','q13','q14','q15']
+qubits = ["q06", "q07", "q08", "q09", "q10", "q11", "q12", "q13", "q14", "q15"]
 couplers = ["q06_q07"]
 user_samplespace = {
     "resonator_spectroscopy": {
         "ro_frequencies": {qubit: resonator_samples(qubit) for qubit in qubits}
     },
 }
-attenuation_setting = {'qubit':10, 'coupler':34, 'readout':12}
+attenuation_setting = {"qubit": 10, "coupler": 34, "readout": 12}
 
 ####################################################################
 

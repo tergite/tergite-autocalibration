@@ -4,7 +4,7 @@
 # (C) Copyright Liangyu Chen 2023, 2024
 # (C) Copyright Amr Osman 2024
 # (C) Copyright Joel Sandås 2024
-# (C) Copyright Michele Faucci Gianelli 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -163,6 +163,7 @@ initial_pos = {
 def filtered_topological_order(target_node: str):
     return range_topological_order("resonator_spectroscopy", target_node)
 
+
 def range_topological_order(from_node: str, target_node: str):
     target_ancestors = nx.ancestors(graph, target_node)
     # if "coupler_spectroscopy" in target_ancestors:
@@ -176,9 +177,7 @@ def range_topological_order(from_node: str, target_node: str):
     if target_node == "punchout":
         topo_order = ["punchout"]
     else:
-        topo_order = nx.shortest_path(
-            graph, from_node, target_node, weight="weight"
-        )
+        topo_order = nx.shortest_path(graph, from_node, target_node, weight="weight")
 
     def graph_condition(node, types):
         is_without_type = "type" not in graph.nodes[node]
@@ -192,6 +191,7 @@ def range_topological_order(from_node: str, target_node: str):
     # print(f'{ filtered_order = }')
     # quit()
     return filtered_order
+
 
 if __name__ == "__main__":
     # nx.draw_spring(graph, with_labels=True, k=1, pos = initial_pos)

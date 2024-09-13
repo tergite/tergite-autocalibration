@@ -11,6 +11,7 @@ pip install -e .
 
 run 
 ```python
+pip install poetry
 poetry install --with dev,test
 ```
 

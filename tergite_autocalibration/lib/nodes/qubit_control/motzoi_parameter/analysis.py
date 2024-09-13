@@ -30,7 +30,7 @@ class MotzoiAnalysis(BaseAnalysis):
         # dataset[data_var].values = np.abs(self.S21)
         self.dataset = dataset
 
-    def run_fitting(self):
+    def analyse_qubit(self):
         motzoi_key = "mw_motzois" + self.qubit
         motzois = self.dataset[motzoi_key].size
         sums = []

@@ -1,7 +1,7 @@
 # This code is part of Tergite
 #
 # (C) Copyright Stefan Hill 2024
-# (C) Copyright Michele Faucci Gianelli 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -55,22 +55,33 @@ def node():
     help="Name of the node to be reset in redis e.g resonator_spectroscopy.",
 )
 @click.option(
-    "-a", "--all", required=False, is_flag=True, help="Use -a if you want to reset all nodes."
+    "-a",
+    "--all",
+    required=False,
+    is_flag=True,
+    help="Use -a if you want to reset all nodes.",
 )
 @click.option(
-    "-f", "--from_node", required=False, help="Use -f node_name if you want to reset all nodes from specified node in chain."
+    "-f",
+    "--from_node",
+    required=False,
+    help="Use -f node_name if you want to reset all nodes from specified node in chain.",
 )
 def reset(name, all, from_node):
     from tergite_autocalibration.utils.reset_redis_node import ResetRedisNode
     from tergite_autocalibration.lib.utils.graph import range_topological_order
     from tergite_autocalibration.utils.user_input import user_requested_calibration
 
-    topo_order = range_topological_order(from_node, user_requested_calibration["target_node"])
+    topo_order = range_topological_order(
+        from_node, user_requested_calibration["target_node"]
+    )
 
     reset_obj_ = ResetRedisNode()
     if from_node:
         if click.confirm(
-            "Do you really want to reset all nodes from" + from_node + "? It might take some time to recalibrate them."
+            "Do you really want to reset all nodes from"
+            + from_node
+            + "? It might take some time to recalibrate them."
         ):
             for node in topo_order:
                 reset_obj_.reset_node(node)
@@ -86,9 +97,7 @@ def reset(name, all, from_node):
     elif name is not None:
         reset_obj_.reset_node(name)
     else:
-        click.echo(
-            "Please enter a node name or use the -a option to reset all nodes."
-        )
+        click.echo("Please enter a node name or use the -a option to reset all nodes.")
 
 
 @cli.group(help="Handle operations related to the calibration graph.")
@@ -132,7 +141,8 @@ def calibration():
     help="Use -r if you want to use rerun an analysis, give the path to the dataset folder (plots will be overwritten), you also need to specify the name of the node using -n",
 )
 @click.option(
-    "-n", "--name",
+    "-n",
+    "--name",
     required=False,
     help="Use to specify the node type to rerun, only works with -r option",
 )
@@ -196,7 +206,10 @@ def start(c, d, r, name, push):
             )
 
     supervisor = CalibrationSupervisor(
-        cluster_mode=cluster_mode, cluster_ip=parsed_cluster_ip, node_name=node_name, data_path=data_path
+        cluster_mode=cluster_mode,
+        cluster_ip=parsed_cluster_ip,
+        node_name=node_name,
+        data_path=data_path,
     )
     supervisor.calibrate_system()
     if push:

@@ -83,7 +83,7 @@ class AdaptiveMotzoiAnalysis(BaseAnalysis):
         self.qubit = dataset[data_var].attrs["qubit"]
         self.samples = analysis_kwargs["samples"]
 
-    def run_fitting(self):
+    def analyse_qubit(self):
         model = MotzoiModel()
 
         motzois = self.independents

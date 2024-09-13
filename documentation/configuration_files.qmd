@@ -3,7 +3,7 @@
 ## Hardware Configuration file (json):
 Here the connection is made between the Qblox cluster physical ports and clocks to the qubits and couplers of the QPU.
 
-The file must be placed at the directory `tergite-acl/config_dir/`
+The file must be placed at the directory `configs/`
 
 Given a `.csv` file after a mixer calibration the function `...` can create instantly the corresponding `JSON` file.
 

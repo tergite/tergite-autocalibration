@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Michele Faucci Gianelli 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -61,7 +61,7 @@ def test_datasetHasQubitDefined(setup_good_data):
 def test_canGetBestFrequencyFromGoodChevronQ17(setup_good_data):
     d17, d22, freq, times = setup_good_data
     first_scan = CZSingleGateSimpleFit(d17, freq, times)
-    result = first_scan.run_fitting()
+    result = first_scan.analyse_qubit()
     indexBestPvalue = np.argmax(result.pvalues)
     assert indexBestPvalue == 6
     bestFreq = freq[indexBestPvalue]
@@ -73,7 +73,7 @@ def test_canGetBestFrequencyFromGoodChevronQ17(setup_good_data):
 def test_canGetBestFrequencyFromGoodChevronQ22(setup_good_data):
     d17, d22, freq, times = setup_good_data
     first_scan = CZSingleGateSimpleFit(d22, freq, times)
-    result = first_scan.run_fitting()
+    result = first_scan.analyse_qubit()
     bestFreq = freq[np.argmax(result.pvalues)]
     assert bestFreq == freq[5]
     assert max(result.pvalues) > 0.99
@@ -100,7 +100,7 @@ def setup_good_data_2():
 def test_canGetBestFrequencyFromGoodData2Chevron19(setup_good_data_2):
     d19, d22, freq, times = setup_good_data_2
     first_scan = CZSingleGateSimpleFit(d19, freq, times)
-    result = first_scan.run_fitting()
+    result = first_scan.analyse_qubit()
     indexBestPvalue = np.argmax(result.pvalues)
     assert indexBestPvalue == 16
     bestFreq = freq[indexBestPvalue]
@@ -112,7 +112,7 @@ def test_canGetBestFrequencyFromGoodData2Chevron19(setup_good_data_2):
 def test_canGetBestFrequencyFromGoodData2ChevronQ20(setup_good_data_2):
     d17, d20, freq, times = setup_good_data_2
     first_scan = CZSingleGateSimpleFit(d20, freq, times)
-    result = first_scan.run_fitting()
+    result = first_scan.analyse_qubit()
     indexBestPvalue = np.argmax(result.pvalues)
     assert indexBestPvalue == 14
     bestFreq = freq[indexBestPvalue]
@@ -138,7 +138,7 @@ def setup_medium_data():
 def test_canGetBestFrequencyFromMediumChevronQ17(setup_medium_data):
     d17, d22, freq, times = setup_medium_data
     first_scan = CZSingleGateSimpleFit(d17, freq, times)
-    result = first_scan.run_fitting()
+    result = first_scan.analyse_qubit()
     bestFreq = freq[np.argmax(result.pvalues)]
     # assert bestFreq == freq[11] #too unstable to be relevant, not crucial for final decision
     assert max(result.pvalues) < 0.9
@@ -148,7 +148,7 @@ def test_canGetBestFrequencyFromMediumChevronQ17(setup_medium_data):
 def test_canGetBestFrequencyFromMediumChevronQ22(setup_medium_data):
     d17, d22, freq, times = setup_medium_data
     first_scan = CZSingleGateSimpleFit(d22, freq, times)
-    result = first_scan.run_fitting()
+    result = first_scan.analyse_qubit()
     bestFreq = freq[np.argmax(result.pvalues)]
     # assert bestFreq == freq[3] # as above
     assert max(result.pvalues) > 0.9 or (max(p[0] for p in result.fittedParams)) < 0.21
@@ -172,7 +172,7 @@ def setup_poor_data():
 def test_canGetBestFrequencyFromPoorChevronQ17(setup_poor_data):
     d17, d22, freq, times = setup_poor_data
     first_scan = CZSingleGateSimpleFit(d17, freq, times)
-    result = first_scan.run_fitting()
+    result = first_scan.analyse_qubit()
     assert max(result.pvalues) < 0.8 or (max(p[0] for p in result.fittedParams)) < 0.21
     assert result.status == FitResultStatus.FOUND
 
@@ -180,7 +180,7 @@ def test_canGetBestFrequencyFromPoorChevronQ17(setup_poor_data):
 def test_canGetBestFrequencyFromPoorChevronQ22(setup_poor_data):
     d17, d22, freq, times = setup_poor_data
     first_scan = CZSingleGateSimpleFit(d22, freq, times)
-    result = first_scan.run_fitting()
+    result = first_scan.analyse_qubit()
     bestFreq = freq[np.argmax(result.pvalues)]
     assert bestFreq > freq[6]
     assert max(result.pvalues) < 0.8 or (max(p[0] for p in result.fittedParams)) < 0.21
@@ -205,7 +205,7 @@ def setup_bad_data():
 def test_canGetBestFrequencyFromBadChevronQ17(setup_bad_data):
     d17, d22, freq, times = setup_bad_data
     first_scan = CZSingleGateSimpleFit(d17, freq, times)
-    result = first_scan.run_fitting()
+    result = first_scan.analyse_qubit()
     bestFreq = freq[np.argmax(result.pvalues)]
     # assert bestFreq > freq[6] # as above
     assert max(result.pvalues) < 0.9 or (max(p[0] for p in result.fittedParams)) < 0.21
@@ -215,7 +215,7 @@ def test_canGetBestFrequencyFromBadChevronQ17(setup_bad_data):
 def test_canGetBestFrequencyFromBadChevronQ22(setup_bad_data):
     d17, d22, freq, times = setup_bad_data
     first_scan = CZSingleGateSimpleFit(d22, freq, times)
-    result = first_scan.run_fitting()
+    result = first_scan.analyse_qubit()
     freq = d22[f"cz_pulse_frequencies_sweepq22"].values  # MHz
     bestFreq = freq[np.argmax(result.pvalues)]
     # assert bestFreq == freq[8] as above
@@ -229,7 +229,7 @@ def test_plotsAreCreated(setup_good_data):
     matplotlib.use("Agg")
     d17, d22, freq, times = setup_good_data
     first_scan = CZSingleGateSimpleFit(d17, freq, times)
-    result = first_scan.run_fitting()
+    result = first_scan.analyse_qubit()
     folder_path = Path(__file__).parent / "results"
     os.makedirs(folder_path, exist_ok=True)
     first_scan.plotter(folder_path)

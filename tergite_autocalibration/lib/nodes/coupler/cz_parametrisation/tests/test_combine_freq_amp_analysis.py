@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Michele Faucci Gianelli 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -35,9 +35,9 @@ def setup_good_data():
     freqs = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
     amps = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
     q14Ana = FrequencyVsAmplitudeQ1Analysis(d14, freqs, amps)
-    q14Res = q14Ana.run_fitting()
+    q14Res = q14Ana.analyse_qubit()
     q15Ana = FrequencyVsAmplitudeQ2Analysis(d15, freqs, amps)
-    q15Res = q15Ana.run_fitting()
+    q15Res = q15Ana.analyse_qubit()
     return q14Res, q15Res, freqs, amps
 
 
@@ -79,9 +79,9 @@ def setup_bad_data():
     freqs = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
     amps = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
     q14Ana = FrequencyVsAmplitudeQ1Analysis(d14, freqs, amps)
-    q14Res = q14Ana.run_fitting()
+    q14Res = q14Ana.analyse_qubit()
     q15Ana = FrequencyVsAmplitudeQ2Analysis(d15, freqs, amps)
-    q15Res = q15Ana.run_fitting()
+    q15Res = q15Ana.analyse_qubit()
     return q14Res, q15Res
 
 

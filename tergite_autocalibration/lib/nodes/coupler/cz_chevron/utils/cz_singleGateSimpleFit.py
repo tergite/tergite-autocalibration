@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Michele Faucci Gianelli 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -57,7 +57,7 @@ class CZSingleGateSimpleFit(BaseAnalysis):
 
         return p[0] * np.cos(2 * np.pi / p[1] * (x - p[2])) + p[3]
 
-    def run_fitting(self) -> CZSingleGateSimpleFitResult:
+    def analyse_qubit(self) -> CZSingleGateSimpleFitResult:
         magnitudes = np.array(
             [[np.linalg.norm(u) for u in v] for v in self.dataset[f"y{self.qubit}"]]
         )

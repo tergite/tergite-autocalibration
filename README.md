@@ -4,15 +4,15 @@
 
 A commandline application to calibrate the WACQT quantum computers automatically.  
 
-This project contains an orchestration manager, a collection of calibration schedules and a collection of post-processing & analysis routines.  
-It was developed and tested on WACQT quantum computer at Chalmers university of Technology.
+This project contains a calibration supervisor, a collection of calibration schedules and a collection of post-processing & analysis routines.  
+It was developed and tested on WACQT Quantum Computer at Chalmers University of Technology.
 
 **This project is developed by a core group of collaborators.**    
 **Chalmers Next Labs AB (CNL) takes on the role of managing and maintaining this project.**
 
 ## Version Control
 
-The tergite stack is developed on a separate version control system and mirrored on Github.
+The Tergite stack is developed on a separate version control system and mirrored on GitHub.
 If you are reading this on GitHub, then you are looking at a mirror. 
 
 
@@ -24,7 +24,7 @@ If you are reading this on GitHub, then you are looking at a mirror.
 ## Quick Start
 
 - Ensure you have [conda](https://docs.anaconda.com/free/miniconda/index.html) installed. 
- (_You could simply have python +3.8 installed instead._)
+ (_You could simply have python +3.9 installed instead._)
 - Ensure you have [redis server](https://redis.io/) running
 
 ```shell

@@ -45,7 +45,7 @@ class All_XY_Analysis(BaseAnalysis):
                 str_label = "Y"
         return str_label
 
-    def run_fitting(self):
+    def analyse_qubit(self):
         self.rotated_data = self.rotate_to_probability_axis(self.S21)
         labels = []
         for index in self.independents[:-2]:

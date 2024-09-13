@@ -68,7 +68,7 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
         analysis.number_of_cliffords = analysis.number_of_cliffords[:5]
         for key in analysis.purity_results_dict.keys():
             analysis.purity_results_dict[key] = analysis.purity_results_dict[key][:5]
-        fidelity = analysis.run_fitting()
+        fidelity = analysis.analyse_qubit()
 
         # Verify that the fitting results are valid
         self.assertIsInstance(fidelity, list)
@@ -84,7 +84,7 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
         for key in analysis.purity_results_dict.keys():
             analysis.purity_results_dict[key] = analysis.purity_results_dict[key][:5]
 
-        analysis.run_fitting()
+        analysis.analyse_qubit()
         fig = Figure()
         ax = fig.subplots()
         analysis.plotter(ax)

@@ -3,7 +3,7 @@
 # (C) Copyright Eleftherios Moschandreou 2023, 2024
 # (C) Copyright Liangyu Chen 2023, 2024
 # (C) Copyright Stefan Hill 2024
-# (C) Copyright Michele Faucci Gianelli 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -13,9 +13,6 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 #
-# Modified:
-#
-# - Martin Ahindura, 2023
 
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -70,8 +67,8 @@ class CalibrationSupervisor:
         cluster_mode: "MeasurementMode" = MeasurementMode.real,
         cluster_ip: Union[str, "IPv4Address"] = CLUSTER_IP,
         cluster_timeout: int = 222,
-        node_name = "",
-        data_path = ""
+        node_name="",
+        data_path="",
     ) -> None:
         # Read hardware related configuration steps
         self.cluster_mode: "MeasurementMode" = cluster_mode
@@ -83,7 +80,9 @@ class CalibrationSupervisor:
 
         # Create objects to communicate with the hardware
         if self.cluster_mode == MeasurementMode.re_analyse:
-            logger.info("Cluster will not be defined as there is no need to take a measurement in re-analysis mode.")
+            logger.info(
+                "Cluster will not be defined as there is no need to take a measurement in re-analysis mode."
+            )
         else:
             self.cluster: "Cluster" = self._create_cluster()
             self.lab_ic: "InstrumentCoordinator" = self._create_lab_ic(self.cluster)
@@ -111,7 +110,7 @@ class CalibrationSupervisor:
             cluster_.reset()
             logger.info(f"Reseting Cluster at IP *{str(self.cluster_ip)[-3:]}")
             return cluster_
-        else:            
+        else:
             raise ClusterNotFoundError(
                 f"Cannot create cluster object from {self.cluster_ip}"
             )
@@ -168,6 +167,12 @@ class CalibrationSupervisor:
         # some nodes e.g. cw spectroscopy needs access to the instruments
         node.lab_instr_coordinator = self.cluster_ip
 
+        logger.info(
+            "Initialising paramaters for qubits: "
+            + str(self.qubits)
+            + " and couplers: "
+            + str(self.couplers)
+        )
         populate_initial_parameters(
             self.transmon_configuration, self.qubits, self.couplers, REDIS_CONNECTION
         )
@@ -255,19 +260,19 @@ class CalibrationSupervisor:
 
         print(node_name)
         print(self.node_name_to_re_analyse)
-        if self.measurement_mode == MeasurementMode.re_analyse and node_name == self.node_name_to_re_analyse:
+        if (
+            self.measurement_mode == MeasurementMode.re_analyse
+            and node_name == self.node_name_to_re_analyse
+        ):
             print(
                 "\u2691\u2691\u2691 "
                 + f"{Fore.RED}{Style.BRIGHT}Calibration required for Node {node_name}{Style.RESET_ALL}"
             )
             logger.info(f"Calibrating node {node.name}")
             # TODO: This could be in the node initializer
-            node.calibrate(
-                self.data_path, self.lab_ic, self.measurement_mode
-            )
+            node.calibrate(self.data_path, self.lab_ic, self.measurement_mode)
 
-
-        if status == DataStatus:
+        elif status == DataStatus:
             print(
                 f" \u2714  {Fore.GREEN}{Style.BRIGHT}Node {node_name} in spec{Style.RESET_ALL}"
             )
@@ -281,9 +286,7 @@ class CalibrationSupervisor:
             logger.info(f"Calibrating node {node.name}")
             # TODO: This could be in the node initializer
             data_path = create_node_data_path(node)
-            node.calibrate(
-                data_path, self.lab_ic, self.measurement_mode
-            )
+            node.calibrate(data_path, self.lab_ic, self.measurement_mode)
 
             # TODO : develop failure strategies ->
             # if node_calibration_status == DataStatus.out_of_spec:

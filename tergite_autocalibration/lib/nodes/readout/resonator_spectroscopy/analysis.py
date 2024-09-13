@@ -1,7 +1,7 @@
 # This code is part of Tergite
 #
 # (C) Copyright Eleftherios Moschandreou 2023
-# (C) Copyright Michele Faucci Gianelli 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -19,27 +19,31 @@ import xarray as xr
 from quantify_core.analysis import fitting_models as fm
 
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
-from tergite_autocalibration.lib.base.analysis import BaseQubitAnalysis
+from tergite_autocalibration.lib.base.analysis import (
+    BaseAllQubitsAnalysis,
+    BaseQubitAnalysis,
+)
 
 model = fm.ResonatorModel()
 
 
-class ResonatorSpectroscopyAnalysis(BaseQubitAnalysis):
+class ResonatorSpectroscopyQubitAnalysis(BaseQubitAnalysis):
     """
-    Analysis that fits the data of a resonator spectroscopy experiment.
+    Analysis that fits the data of a resonator spectroscopy experiment for one qubit.
     """
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
         self.fit_results = {}
 
-    def run_fitting(self):
-        # Fetch the resulting measurement variables from self
-        frequencies = self.dataset[self.current_coord].values
-        print(frequencies)
+    def analyse_qubit(self):
+        coord_name = list(self.coord.keys())[0]
+        frequencies = self.dataset.coords[coord_name].values
 
         if isinstance(self.S21, xr.Dataset):
-            data_var_name = list(self.S21.data_vars.keys())[0]  # Adjust if specific variable name is known
+            data_var_name = list(self.S21.data_vars.keys())[
+                0
+            ]  # Adjust if specific variable name is known
             s21_dataarray = self.S21[data_var_name]
         else:
             raise TypeError("Expected self.S21 to be an xarray.DataArray")
@@ -90,7 +94,7 @@ class ResonatorSpectroscopyAnalysis(BaseQubitAnalysis):
         ax.grid()
 
 
-class ResonatorSpectroscopy_1_Analysis(ResonatorSpectroscopyAnalysis):
+class ResonatorSpectroscopy1QubitAnalysis(ResonatorSpectroscopyQubitAnalysis):
     def __init__(self, dataset: xr.Dataset):
         self.dataset = dataset
         super().__init__(self.dataset)
@@ -109,7 +113,7 @@ class ResonatorSpectroscopy_1_Analysis(ResonatorSpectroscopyAnalysis):
         ax.grid()
 
 
-class ResonatorSpectroscopy_2_Analysis(ResonatorSpectroscopyAnalysis):
+class ResonatorSpectroscopy2QubitAnalysis(ResonatorSpectroscopyQubitAnalysis):
     def __init__(self, dataset: xr.Dataset):
         self.dataset = dataset
         super().__init__(self.dataset)
@@ -131,3 +135,24 @@ class ResonatorSpectroscopy_2_Analysis(ResonatorSpectroscopyAnalysis):
         ax.axvline(ro_freq_1, c="green", ls="dashed", label="frequency |1>")
         ax.axvline(ro_freq, c="blue", ls="dashed", label="frequency |0>")
         ax.grid()
+
+
+class ResonatorSpectroscopyNodeAnalysis(BaseAllQubitsAnalysis):
+    single_qubit_analysis_obj = ResonatorSpectroscopyQubitAnalysis
+
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+
+
+class ResonatorSpectroscopy1NodeAnalysis(BaseAllQubitsAnalysis):
+    single_qubit_analysis_obj = ResonatorSpectroscopy1QubitAnalysis
+
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+
+
+class ResonatorSpectroscopy2NodeAnalysis(BaseAllQubitsAnalysis):
+    single_qubit_analysis_obj = ResonatorSpectroscopy2QubitAnalysis
+
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)

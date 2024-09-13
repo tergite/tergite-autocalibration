@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Michele Faucci Gianelli 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -43,9 +43,9 @@ class CZParametrisationFixDurationNode(ParametrizedSweepNode):
             "cz_pulse_amplitude",
             "cz_parking_current",
         ]
-        self.node_dictionary["cz_pulse_duration"] = (
-            120e-9  # Need to make it configurable
-        )
+        self.node_dictionary[
+            "cz_pulse_duration"
+        ] = 120e-9  # Need to make it configurable
 
         # Should these sample space move to user defined inputs?
         self.initial_schedule_samplespace = {
@@ -53,14 +53,17 @@ class CZParametrisationFixDurationNode(ParametrizedSweepNode):
                 coupler: np.linspace(0.01, 0.35, 15) for coupler in self.couplers
             },
             "cz_pulse_frequencies": {
-                coupler: np.linspace(-20e6, 20e6, 21) + self.transition_frequency(coupler) for coupler in self.couplers
+                coupler: np.linspace(-20e6, 20e6, 21)
+                + self.transition_frequency(coupler)
+                for coupler in self.couplers
             },
         }
         self.external_samplespace = {
             "cz_parking_currents": {
-                coupler: np.array([-0.640, -0.650, -0.660, -0.670, -0.680]) for coupler in self.couplers
+                coupler: np.array([-0.640, -0.650, -0.660, -0.670, -0.680])
+                for coupler in self.couplers
             }
-            #np.arange(-0.3, 0.3, 10) * self.coupler_current_range + self.coupler_current for coupler in self.couplers
+            # np.arange(-0.3, 0.3, 10) * self.coupler_current_range + self.coupler_current for coupler in self.couplers
         }
 
         self.validate()

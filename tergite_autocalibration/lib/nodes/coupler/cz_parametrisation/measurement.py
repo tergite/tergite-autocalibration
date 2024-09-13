@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Michele Faucci Gianelli 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -92,16 +92,11 @@ class CZParametrisationFixDuration(BaseMeasurement):
         cz_frequency_values = np.array(list(cz_pulse_frequencies.values())[0])
         cz_amplitude_values = list(cz_pulse_amplitudes.values())[0]
 
-        self.loop_frequencies_and_aplitudes(
-            cz_amplitude_values, cz_frequency_values
-        )
+        self.loop_frequencies_and_aplitudes(cz_amplitude_values, cz_frequency_values)
 
         return self.schedule
 
-    def loop_frequencies_and_aplitudes(
-        self, cz_amplitude_values, cz_frequency_values
-    ):
-
+    def loop_frequencies_and_aplitudes(self, cz_amplitude_values, cz_frequency_values):
         for coupler in self.couplers:
             if coupler in ["q21_q22", "q22_q23", "q23_q24", "q24_q25"]:
                 downconvert = 0
@@ -121,13 +116,9 @@ class CZParametrisationFixDuration(BaseMeasurement):
                         clock=cz_clock, clock_freq_new=-cz_frequency + downconvert
                     ),
                 )
-                self.loop_amplitudes(
-                    coupler, cz_amplitude_values, freq_index
-                )
+                self.loop_amplitudes(coupler, cz_amplitude_values, freq_index)
 
-    def loop_amplitudes(
-        self, coupler, cz_amplitude_values, freq_index
-    ):
+    def loop_amplitudes(self, coupler, cz_amplitude_values, freq_index):
         # The inner for loop iterates over cz pulse amplitude
         number_of_amplitudess = len(cz_amplitude_values)
         qubits = coupler.split(sep="_")
@@ -156,7 +147,7 @@ class CZParametrisationFixDuration(BaseMeasurement):
             buffer = self.schedule.add(IdlePulse(4e-9))
 
             for this_qubit in qubits:
-                #logger.info(f"Add measure to {this_qubit}")
+                # logger.info(f"Add measure to {this_qubit}")
                 self.schedule.add(
                     Measure(this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE),
                     ref_op=buffer,

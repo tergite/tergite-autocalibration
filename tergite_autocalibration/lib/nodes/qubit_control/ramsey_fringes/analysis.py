@@ -83,7 +83,7 @@ class RamseyAnalysis(BaseAnalysis):
         self.qubit_frequency = float(REDIS_CONNECTION.hget(f"{redis_key}", redis_field))
         # print(redis_field,self.qubit_frequency)
 
-    def run_fitting(self):
+    def analyse_qubit(self):
         self.ramsey_delays = self.dataset.coords[self.delay_coord].values
         self.fit_ramsey_delays = np.linspace(
             self.ramsey_delays[0], self.ramsey_delays[-1], 400
@@ -175,7 +175,7 @@ class RamseyDetuningsAnalysis(BaseAnalysis):
         # print(redis_field,self.qubit_frequency)
         self.dataset = dataset
 
-    def run_fitting(self):
+    def analyse_qubit(self):
         model = RamseyModel()
         ramsey_delays = self.dataset.coords[self.delay_coord].values
         self.fit_ramsey_delays = np.linspace(ramsey_delays[0], ramsey_delays[-1], 400)

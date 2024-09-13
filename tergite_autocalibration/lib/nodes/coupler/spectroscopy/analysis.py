@@ -1,7 +1,7 @@
 # This code is part of Tergite
 #
 # (C) Copyright Eleftherios Moschandreou 2023, 2024
-# (C) Copyright Michele Faucci Gianelli 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -17,7 +17,7 @@ import xarray as xr
 from numpy.polynomial.polynomial import Polynomial
 
 from ...qubit_control.spectroscopy.analysis import (
-    QubitSpectroscopyAnalysis,
+    QubitSpectroscopyNodeAnalysis,
 )
 from ....base.analysis import BaseAnalysis
 
@@ -43,14 +43,14 @@ class CouplerSpectroscopyAnalysis(BaseAnalysis):
         s = d / mdev if mdev else np.zeros(len(d))
         return np.array(s > m)
 
-    def run_fitting(self):
+    def analyse_qubit(self):
         self.dc_currents = self.dataset[f"y{self.qubit}"][self.currents]
         self.detected_frequencies = []
         self.detected_currents = []
         for i, current in enumerate(self.dc_currents.values):
             partial_ds = self.dataset[f"y{self.qubit}"].isel({self.currents: [i]})[:, 0]
-            analysis = QubitSpectroscopyAnalysis(partial_ds.to_dataset())
-            qubit_frequency = analysis.run_fitting()[0]
+            analysis = QubitSpectroscopyNodeAnalysis(partial_ds.to_dataset())
+            qubit_frequency = analysis.analyse_qubit()[0]
             if not np.isnan(qubit_frequency):
                 self.detected_frequencies.append(qubit_frequency)
                 self.detected_currents.append(current)
