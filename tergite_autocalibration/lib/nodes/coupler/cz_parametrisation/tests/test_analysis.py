@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Michele Faucci Gianelli 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -45,9 +45,9 @@ def setup_data():
     freqs = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
     amps = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
     q14Ana = FrequencyVsAmplitudeQ1Analysis(ds, freqs, amps)
-    q14Res = q14Ana.run_fitting()
+    q14Res = q14Ana.analyse_qubit()
     q15Ana = FrequencyVsAmplitudeQ2Analysis(ds, freqs, amps)
-    q15Res = q15Ana.run_fitting()
+    q15Res = q15Ana.analyse_qubit()
     c1 = CombinedFrequencyVsAmplitudeAnalysis(q14Res, q15Res)
 
     dataset_path = Path(__file__).parent / "data" / "dataset_bad_quality_freq_amp.hdf5"
@@ -56,9 +56,9 @@ def setup_data():
     freqs_bad = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
     amps_bad = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
     q14Ana = FrequencyVsAmplitudeQ1Analysis(ds, freqs_bad, amps_bad)
-    q14Res = q14Ana.run_fitting()
+    q14Res = q14Ana.analyse_qubit()
     q15Ana = FrequencyVsAmplitudeQ2Analysis(ds, freqs_bad, amps_bad)
-    q15Res = q15Ana.run_fitting()
+    q15Res = q15Ana.analyse_qubit()
     c2 = CombinedFrequencyVsAmplitudeAnalysis(q14Res, q15Res)
 
     dataset_path = (
@@ -69,9 +69,9 @@ def setup_data():
     freqs_2 = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
     amps_2 = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
     q14Ana = FrequencyVsAmplitudeQ1Analysis(ds, freqs_2, amps_2)
-    q14Res = q14Ana.run_fitting()
+    q14Res = q14Ana.analyse_qubit()
     q15Ana = FrequencyVsAmplitudeQ2Analysis(ds, freqs_2, amps_2)
-    q15Res = q15Ana.run_fitting()
+    q15Res = q15Ana.analyse_qubit()
     c3 = CombinedFrequencyVsAmplitudeAnalysis(q14Res, q15Res)
 
     list_of_results = [(c1, 0.1), (c2, 0.2), (c3, 0.3)]
@@ -150,7 +150,7 @@ def setup_data_mutliple_files():
 def test_PickLowestCurrentCompleteAnalysis(setup_data_mutliple_files: tuple[xr.Dataset, ndarray, ndarray]):
     ds, freqs, amps = setup_data_mutliple_files
     a = CZParametrisationFixDurationAnalysis(ds)
-    a.run_fitting()
+    a.analyse_qubit()
 
     assert a.opt_index == 0
     assert a.opt_freq == (freqs[10] + freqs[9]) / 2

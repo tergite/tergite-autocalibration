@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Michele Faucci Gianelli 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -85,7 +85,7 @@ def test_datasetHasQubitDefined(setup_good_data):
 def test_canGetMaxFromQ1(setup_good_data):
     d14, d15, freqs, amps = setup_good_data
     c = FrequencyVsAmplitudeQ1Analysis(d14, freqs, amps)
-    result = c.run_fitting()
+    result = c.analyse_qubit()
     indexBestFreq = np.where(freqs == result[0])[0]
     indexBestAmp = np.where(amps == result[1])[0]
     assert indexBestFreq[0] == 9
@@ -95,7 +95,7 @@ def test_canGetMaxFromQ1(setup_good_data):
 def test_canGetMinFromQ2(setup_good_data):
     d14, d15, freqs, amps = setup_good_data
     c = FrequencyVsAmplitudeQ2Analysis(d15, freqs, amps)
-    result = c.run_fitting()
+    result = c.analyse_qubit()
     indexBestFreq = np.where(freqs == result[0])[0]
     indexBestAmp = np.where(amps == result[1])[0]
     assert indexBestFreq[0] == 10
@@ -106,7 +106,7 @@ def test_canPlot(setup_good_data):
     matplotlib.use("Agg")
     d14, d15, freqs, amps = setup_good_data
     c14 = FrequencyVsAmplitudeQ1Analysis(d14, freqs, amps)
-    result = c14.run_fitting()
+    result = c14.analyse_qubit()
 
     figure_path = os.environ["DATA_DIR"] + "/Frequency_Amplitude_q14.png"
     # Remove the file if it already exists
@@ -126,7 +126,7 @@ def test_canPlot(setup_good_data):
         assert img.format == "PNG", "File should be a PNG image"
 
     c15 = FrequencyVsAmplitudeQ2Analysis(d15, freqs, amps)
-    result = c15.run_fitting()
+    result = c15.analyse_qubit()
 
     figure_path = os.environ["DATA_DIR"] + "/Frequency_Amplitude_q15.png"
     # Remove the file if it already exists
@@ -166,7 +166,7 @@ def test_canPlotBad(setup_bad_data):
     matplotlib.use("Agg")
     d14, d15, freqs, amps = setup_bad_data
     c14 = FrequencyVsAmplitudeQ1Analysis(d14, freqs, amps)
-    result = c14.run_fitting()
+    result = c14.analyse_qubit()
 
     figure_path = os.environ["DATA_DIR"] + "/Frequency_Amplitude_bad_q14.png"
     # Remove the file if it already exists
@@ -186,7 +186,7 @@ def test_canPlotBad(setup_bad_data):
         assert img.format == "PNG", "File should be a PNG image"
 
     c15 = FrequencyVsAmplitudeQ2Analysis(d15, freqs, amps)
-    result = c15.run_fitting()
+    result = c15.analyse_qubit()
 
     figure_path = os.environ["DATA_DIR"] + "/Frequency_Amplitude_bad_q15.png"
     # Remove the file if it already exists

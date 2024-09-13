@@ -93,7 +93,7 @@ class OptimalRO_Two_state_AmplitudeAnalysis(OptimalROAmplitudeAnalysis):
         self.dataset = dataset
         super().__init__(self.dataset)
 
-    def run_fitting(self):
+    def analyse_qubit(self):
         self.run_initial_fitting()
         inv_cm_str = ",".join(
             str(element) for element in list(self.optimal_inv_cm.flatten())
@@ -210,7 +210,7 @@ class OptimalRO_Three_state_AmplitudeAnalysis(OptimalROAmplitudeAnalysis):
         self.dataset = dataset
         super().__init__(self.dataset)
 
-    def run_fitting(self):
+    def analyse_qubit(self):
         self.run_initial_fitting()
         inv_cm_str = ",".join(
             str(element) for element in list(self.optimal_inv_cm.flatten())

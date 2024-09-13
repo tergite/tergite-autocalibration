@@ -100,7 +100,7 @@ class RandomizedBenchmarkingAnalysis(BaseAnalysis):
 
         self.fit_results = {}
 
-    def run_fitting(self):
+    def analyse_qubit(self):
         sum = np.sum([arr for arr in self.normalized_data_dict.values()], axis=0)
         self.sum = sum / len(self.normalized_data_dict)
 

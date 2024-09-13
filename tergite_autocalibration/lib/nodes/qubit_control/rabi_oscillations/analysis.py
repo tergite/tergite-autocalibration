@@ -86,7 +86,7 @@ class RabiAnalysis(BaseAnalysis):
         self.fit_results = {}
         self.qubit = dataset[data_var].attrs["qubit"]
 
-    def run_fitting(self):
+    def analyse_qubit(self):
         # Initialize the Rabi model
         model = RabiModel()
 
@@ -142,7 +142,7 @@ class NRabiAnalysis(BaseAnalysis):
         dataset[f"y{self.qubit}"].values = np.abs(self.S21)
         self.dataset = dataset
 
-    def run_fitting(self):
+    def analyse_qubit(self):
         mw_amplitude_key = self.mw_amplitudes_coord
         # mw_amplitude_key = 'mw_amplitudes_sweep' + self.qubit
         mw_amplitudes = self.dataset[mw_amplitude_key].size

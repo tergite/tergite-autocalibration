@@ -50,7 +50,7 @@ class OptimalROFrequencyAnalysis(BaseAnalysis):
             dataset[data_var].isel({self.qubit_state_coord: [1]}).values.flatten()
         )  # S21 when qubit at |1>
 
-    def run_fitting(self):
+    def analyse_qubit(self):
         # Gives an initial guess for the model parameters and then fits the model to the data.
         guess_0 = model.guess(self.S21_0, f=self.frequencies)
         guess_1 = model.guess(self.S21_1, f=self.frequencies)
@@ -113,7 +113,7 @@ class OptimalRO_012_FrequencyAnalysis(OptimalROFrequencyAnalysis):
             dataset[data_var].isel({self.qubit_state_coord: [2]}).values.flatten()
         )  # S21 when qubit at |2>
 
-    def run_fitting(self):
+    def analyse_qubit(self):
         guess_2 = model.guess(self.S21_2, f=self.frequencies)
         self.fit_frequencies = np.linspace(
             self.frequencies[0], self.frequencies[-1], 400

@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Michele Faucci Gianelli 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -57,13 +57,13 @@ class CZFirstStepAnalysis(BaseAnalysis):
         self.times = ds[f"cz_pulse_durationsq{self.q1}_q{self.q2}"].values * 1e9  # ns
         g1 = CZSingleGateSimpleFit(d1, self.freq, self.times)
         g2 = CZSingleGateSimpleFit(d2, self.freq, self.times)
-        r1 = g1.run_fitting()
-        r2 = g2.run_fitting()
+        r1 = g1.analyse_qubit()
+        r2 = g2.analyse_qubit()
         # print("here")
         comb = CZFirstStepCombination(r1, r2, self.freq)
         return comb.Analyze()
 
-    def run_fitting(self) -> list[float, float, float, float, float]:
+    def analyse_qubit(self) -> list[float, float, float, float, float]:
         prefix = "q" + str(self.q1) + "_q" + str(self.q2) + "_" + self.date
         suffix = "all_results.py"
 

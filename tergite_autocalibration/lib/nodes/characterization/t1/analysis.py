@@ -44,7 +44,7 @@ class T1Analysis(BaseAnalysis):
         self.fit_results = {}
         self.qubit = dataset[self.data_var].attrs["qubit"]
 
-    def run_fitting(self):
+    def analyse_qubit(self):
         model = ExpDecayModel()
 
         delays = self.delays

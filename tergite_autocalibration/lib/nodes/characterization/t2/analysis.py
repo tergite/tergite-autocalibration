@@ -82,7 +82,7 @@ class T2Analysis(BaseAnalysis):
         self.fit_results = {}
         self.qubit = dataset[self.data_var].attrs["qubit"]
 
-    def run_fitting(self):
+    def analyse_qubit(self):
         model = T2Model()
 
         delays = self.delays
@@ -151,7 +151,7 @@ class T2EchoAnalysis(BaseAnalysis):
         self.fit_results = {}
         self.qubit = dataset[self.data_var].attrs["qubit"]
 
-    def run_fitting(self):
+    def analyse_qubit(self):
         model = ExpDecayModel()
 
         delays = self.delays

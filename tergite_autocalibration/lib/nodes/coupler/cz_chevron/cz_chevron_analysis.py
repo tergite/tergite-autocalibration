@@ -88,7 +88,7 @@ class CZChevronAnalysis(BaseAnalysis):
         dataset[f"y{self.qubit}"].values = np.abs(self.S21)
         self.dataset = dataset
 
-    def run_fitting(self) -> list[float, float]:
+    def analyse_qubit(self) -> list[float, float]:
         # There are two types of fitting with different fitting goals.
         # run_fitting_min_coupling_strength is more robust as it will use all measurment data.
         # I recommend using it initially.
@@ -497,7 +497,7 @@ class CZChevronAnalysisReset(BaseAnalysis):
         self.result = OptimalResult(f"cz_pulse_durations", "s")
         # self.fig, self.axes = plt.subplots(1, 3, figsize=(20,5))
 
-    def run_fitting(self):
+    def analyse_qubit(self):
         freq = self.dataset[f"cz_pulse_amplitudes{self.qubit}"].values  # MHz
         times = self.dataset[f"cz_pulse_durations{self.qubit}"].values  # ns
         self.amp = times

@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Michele Faucci Gianelli 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -122,7 +122,7 @@ class FrequencyVsAmplitudeQ1Analysis(FrequencyVsAmplitudeAnalysis):
         dataset[f"y{self.qubit}"] = xr.DataArray(abs_S21, dims=dataset.dims, coords=dataset.coords)  # Ensure dims and coords match
         self.dataset = dataset
 
-    def run_fitting(self) -> list[float, float]:
+    def analyse_qubit(self) -> list[float, float]:
         print("Running FrequencyVsAmplitudeQ1Analysis")
         return self.run_fitting_find_max()
 
@@ -155,7 +155,7 @@ class FrequencyVsAmplitudeQ2Analysis(FrequencyVsAmplitudeAnalysis):
         dataset[f"y{self.qubit}"] = xr.DataArray(abs_S21, dims=dataset.dims, coords=dataset.coords)  # Ensure dims and coords match
         self.dataset = dataset
 
-    def run_fitting(self) -> list[float, float]:
+    def analyse_qubit(self) -> list[float, float]:
         print("Running FrequencyVsAmplitudeQ2Analysis")
         return self.run_fitting_find_min()
 
@@ -201,7 +201,7 @@ class CZParametrisationFixDurationAnalysis(BaseCouplerAnalysis):
                 self.amplitude_coord = coord
                 self.amplitude_values = self.dataset[coord].values
 
-    def run_fitting(self) -> list[float, float, float]:
+    def analyse_qubit(self) -> list[float, float, float]:
         print("Running CZParametrisationFixDurationAnalysis")
         results = self.process_dataset()
         return self.run_analysis_on_freq_amp_results(results)
@@ -225,10 +225,10 @@ class CZParametrisationFixDurationAnalysis(BaseCouplerAnalysis):
             plt.show()
 
             q1 = FrequencyVsAmplitudeQ1Analysis(sliced_dataset, self.frequency_values, self.amplitude_values )
-            q1Res = q1.run_fitting()
+            q1Res = q1.analyse_qubit()
 
             q2 = FrequencyVsAmplitudeQ2Analysis(sliced_dataset, self.frequency_values, self.amplitude_values )
-            q2Res = q2.run_fitting()
+            q2Res = q2.analyse_qubit()
             c = CombinedFrequencyVsAmplitudeAnalysis(q1Res, q2Res)
             results.append([c, current]) 
 

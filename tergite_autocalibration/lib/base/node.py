@@ -3,7 +3,7 @@
 # (C) Copyright Eleftherios Moschandreou 2023, 2024
 # (C) Copyright Liangyu Chen 2023, 2024
 # (C) Copyright Stefan Hill 2024
-# (C) Copyright Michele Faucci Gianelli 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -42,7 +42,7 @@ from quantify_scheduler.json_utils import pathlib
 from tergite_autocalibration.config import settings
 from tergite_autocalibration.config.settings import REDIS_CONNECTION, HARDWARE_CONFIG
 from tergite_autocalibration.experimental.tof_analysis import analyze_tof
-from tergite_autocalibration.lib.base.analysis import BaseAnalysis
+from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.lib.utils.demod_channels import ParallelDemodChannels
 from tergite_autocalibration.lib.utils.redis import (
@@ -72,7 +72,7 @@ matplotlib.use(settings.PLOTTING_BACKEND)
 
 class BaseNode(abc.ABC):
     measurement_obj: "BaseMeasurement"
-    analysis_obj: "BaseAnalysis"
+    analysis_obj: "BaseNodeAnalysis"
 
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         self.name = name
@@ -451,7 +451,7 @@ class BaseNode(abc.ABC):
         print(self.redis_field)
         node_analysis = self.analysis_obj(self.name, self.redis_field, **analysis_kwargs)
 
-        analysis_results = node_analysis.run_analysis(data_path)
+        analysis_results = node_analysis.analyze_node(data_path)
         #self.plot_results(node_analysis, analysis_results, data_path)
         return analysis_results
 

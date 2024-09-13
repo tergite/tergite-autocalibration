@@ -3,7 +3,7 @@
 # (C) Copyright Eleftherios Moschandreou 2023, 2024
 # (C) Copyright Liangyu Chen 2023, 2024
 # (C) Copyright Stefan Hill 2024
-# (C) Copyright Michele Faucci Gianelli 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -13,9 +13,6 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 #
-# Modified:
-#
-# - Martin Ahindura, 2023
 
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -168,6 +165,7 @@ class CalibrationSupervisor:
         # some nodes e.g. cw spectroscopy needs access to the instruments
         node.lab_instr_coordinator = self.cluster_ip
 
+        logger.info("Initialising paramaters for qubits: " + str(self.qubits) + " and couplers: " + str(self.couplers))
         populate_initial_parameters(
             self.transmon_configuration, self.qubits, self.couplers, REDIS_CONNECTION
         )
@@ -266,8 +264,7 @@ class CalibrationSupervisor:
                 self.data_path, self.lab_ic, self.measurement_mode
             )
 
-
-        if status == DataStatus:
+        elif status == DataStatus:
             print(
                 f" \u2714  {Fore.GREEN}{Style.BRIGHT}Node {node_name} in spec{Style.RESET_ALL}"
             )

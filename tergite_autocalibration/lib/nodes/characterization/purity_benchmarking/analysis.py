@@ -147,7 +147,7 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
             self.normalized_data_dict[repetition_index] = normalized_data
             self.purity_results_dict[repetition_index] = purity_per_index
 
-    def run_fitting(self):
+    def analyse_qubit(self):
         """
         Fit the exponential decay model to the averaged purity data.
         """
