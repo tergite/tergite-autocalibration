@@ -76,9 +76,7 @@ class BaseAnalysis(ABC):
     # Cons: We would have to define and implement several QOI classes
     # -> It is probably not that much effort to implement several QOI classes
     # -> We could start with a BaseQOI and add more as soon as needed
-    def update_redis_trusted_values(
-        self, node: str, this_element: str
-    ):
+    def update_redis_trusted_values(self, node: str, this_element: str):
         for i, transmon_parameter in enumerate(self.redis_fields):
             if "_" in this_element:
                 name = "couplers"
@@ -116,6 +114,7 @@ class BaseAnalysis(ABC):
         real_rotated_data = rotated_data.real
         normalized_data = real_rotated_data / normalization
         return normalized_data
+
 
 class BaseNodeAnalysis(ABC):
     """
@@ -174,6 +173,7 @@ class BaseNodeAnalysis(ABC):
         plt.close()
         print(f"Plots saved to {preview_path} and {full_path}")
 
+
 class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
     single_qubit_analysis_obj: "BaseQubitAnalysis"
 
@@ -186,9 +186,9 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         self.coords = None
 
         self.qubit_analyses = []
-  
-        self.column_grid=5
-        self.plots_per_qubit=1
+
+        self.column_grid = 5
+        self.plots_per_qubit = 1
 
     def analyze_node(self, data_path: Path):
         self.dataset = self.open_dataset(data_path)
@@ -201,7 +201,7 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         return analysis_results
 
     def open_dataset(self, data_path: Path):
-        dataset_path = data_path / "dataset_0.hdf5" 
+        dataset_path = data_path / "dataset_0.hdf5"
         if not dataset_path.exists():
             raise FileNotFoundError(f"Dataset file not found: {dataset_path}")
 
@@ -214,18 +214,22 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         for this_qubit, qubit_data_vars in qubit_data_dict.items():
             ds = xr.merge([self.dataset[var] for var in qubit_data_vars])
             ds.attrs["qubit"] = this_qubit
-            
+
             matching_coords = [coord for coord in ds.coords if this_qubit in coord]
             if matching_coords:
                 selected_coord_name = matching_coords[0]
-                ds = ds.sel({selected_coord_name: slice(None)})  # Select all data along this coordinate
+                ds = ds.sel(
+                    {selected_coord_name: slice(None)}
+                )  # Select all data along this coordinate
 
-                qubit_analysis = self.single_qubit_analysis_obj(self.name, self.redis_fields)
+                qubit_analysis = self.single_qubit_analysis_obj(
+                    self.name, self.redis_fields
+                )
                 qubit_analysis._analyze_qubit(ds, this_qubit)
                 self.qubit_analyses.append(qubit_analysis)
 
             index = index + 1
-            
+
         return analysis_results
 
     def _group_by_qubit(self):
@@ -256,13 +260,15 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
         self.dataset = dataset
         self.qubit = dataset.attrs["qubit"]
         self.coord = dataset.coords
-        self.data_var = list(dataset.data_vars.keys())[0]  # Assume the first data_var is relevant
+        self.data_var = list(dataset.data_vars.keys())[
+            0
+        ]  # Assume the first data_var is relevant
         self.S21 = dataset.isel(ReIm=0) + 1j * dataset.isel(ReIm=1)
         self.magnitudes = np.abs(self.S21)
         self._qoi = self.analyse_qubit()
 
         self.update_redis_trusted_values(self.name, qubit_element)
-        return {qubit_element: dict(zip(self.redis_fields, self._qoi))}      
+        return {qubit_element: dict(zip(self.redis_fields, self._qoi))}
 
     def _plot(self, primary_axis):
         self.plotter(primary_axis)  # Assuming node_analysis object is available
@@ -273,8 +279,8 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
         handles.append(patch)
         primary_axis.legend(handles=handles, fontsize="small")
 
-class BaseCouplerAnalysis(BaseAnalysis, ABC):
 
+class BaseCouplerAnalysis(BaseAnalysis, ABC):
     def run_analysis(self, data_path: Path):
         self.dataset = self.open_datasets(data_path)
         this_element = self._extract_coupler_info()
@@ -286,7 +292,6 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
     def open_datasets(data_path, number_of_files):
         pass
 
-
     def _extract_coupler_info(self):
         for settable in self.dataset.coords:
             try:
@@ -297,7 +302,7 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
             except KeyError:
                 print(f"No element_type for {settable}")
         return None
-    
+
     def _run_coupler_analysis(self, this_element: str):
         self._qoi = self.analyse_qubit()
         self.update_redis_trusted_values(self.name, this_element)

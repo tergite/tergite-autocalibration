@@ -179,5 +179,3 @@ class CZ_Chevron(BaseMeasurement):
                         ref_pt="end",
                     )
         return schedule
-
-

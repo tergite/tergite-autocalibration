@@ -105,14 +105,14 @@ user_samplespace = {
 """
 ####################################################################
 target_node = "cz_parametrisation_fix_duration"
-qubits = [ 'q06','q07','q08','q09','q10','q11','q12','q13','q14','q15']
+qubits = ["q06", "q07", "q08", "q09", "q10", "q11", "q12", "q13", "q14", "q15"]
 couplers = ["q06_q07"]
 user_samplespace = {
     "resonator_spectroscopy": {
         "ro_frequencies": {qubit: resonator_samples(qubit) for qubit in qubits}
     },
 }
-attenuation_setting = {'qubit':10, 'coupler':34, 'readout':12}
+attenuation_setting = {"qubit": 10, "coupler": 34, "readout": 12}
 
 ####################################################################
 

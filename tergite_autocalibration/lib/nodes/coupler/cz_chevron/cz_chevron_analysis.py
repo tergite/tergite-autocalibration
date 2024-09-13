@@ -485,6 +485,7 @@ class CZChevronAnalysis(BaseAnalysis):
         axis.set_xlabel("Frequency Detuning (Hz)")
         axis.set_title(f"CZ Chevron - Qubit {self.qubit[1:]}")
 
+
 class CZChevronAnalysisReset(BaseAnalysis):
     def __init__(self, dataset: xr.Dataset):
         super().__init__()

@@ -188,6 +188,7 @@ class CZ_Characterisation_Chevron_Node(BaseNode):
         print(f"{ ac_freq/1e6 = } MHz for coupler: {coupler}")
         return ac_freq
 
+
 class CZ_Optimize_Chevron_Node(BaseNode):
     measurement_obj = CZ_Chevron
     analysis_obj = CZChevronAnalysis
