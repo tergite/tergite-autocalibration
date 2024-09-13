@@ -20,13 +20,23 @@ from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.utils.extended_coupler_edge import CompositeSquareEdge
 from tergite_autocalibration.utils.extended_gates import Rxy_12
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
+from tergite_autocalibration.utils.logger.tac_logger import logger
 
-
-# from superconducting_qubit_tools.clifford_module.randomized_benchmarking import *
-# from superconducting_qubit_tools.clifford_module.cliffords_decomposition import (decompose_clifford_seq,)
-# from superconducting_qubit_tools.utils.clifford_module.from_list import (add_single_qubit_gates_to_schedule,add_two_qubit_gates_to_schedule,)
-
-# FIXME: Feature-flagged installation of scqt required
+try:
+    from superconducting_qubit_tools.clifford_module.randomized_benchmarking import *
+    from superconducting_qubit_tools.clifford_module.cliffords_decomposition import (
+        decompose_clifford_seq,
+    )
+    from superconducting_qubit_tools.utils.clifford_module.from_list import (
+        add_single_qubit_gates_to_schedule,
+        add_two_qubit_gates_to_schedule,
+    )
+except ImportError:
+    logger.warning(
+        "Could not find package: superconducting-qubit-tools.",
+        "This is a proprietary licenced software.",
+        "Please make sure that you are having a correct licence and install the dependency",
+    )
 
 
 class TQG_Randomized_Benchmarking(BaseMeasurement):
