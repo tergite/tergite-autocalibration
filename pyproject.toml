@@ -9,7 +9,7 @@ authors = [
     "Stefan Hill <stefanhi@chalmers.se>"
 ]
 maintainers = [
-    "Chalmers Next Labs AB <quantum.nextlabs@chalmers.se>",
+    "Chalmers Next Labs AB <quantum-nextlabs@chalmers.se>",
 ]
 readme = "README.md"
 packages = [{include = "tergite_autocalibration"}]

@@ -14,6 +14,7 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 
 ### Changed
 - Switch to quantify-scheduler version 0.20.0
+- Refactoring of the node classes to allow hierarchical class structures
 
 ### Fixed
 
