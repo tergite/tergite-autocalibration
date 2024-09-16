@@ -148,8 +148,6 @@ class BaseNodeAnalysis(ABC):
     def manage_plots(self, column_grid: int, plots_per_qubit: int):
         n_vars = len(self.data_vars)
         n_coords = len(self.coords)
-        print("nvars: ", n_vars)
-        print("n_coords: ", n_coords)
 
         rows = int(np.ceil(n_vars / column_grid))
         rows = rows * plots_per_qubit
@@ -178,7 +176,6 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
     single_qubit_analysis_obj: "BaseQubitAnalysis"
 
     def __init__(self, name, redis_fields):
-        print("here")
         self.name = name
         self.redis_fields = redis_fields
         self.dataset = None

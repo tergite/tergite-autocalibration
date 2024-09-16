@@ -447,10 +447,7 @@ class BaseNode(abc.ABC):
 
     def post_process(self, data_path: Path):
         analysis_kwargs = getattr(self, "analysis_kwargs", dict())
-        print("Redis fields")
-        print(self.redis_field)
         node_analysis = self.analysis_obj(self.name, self.redis_field, **analysis_kwargs)
-
         analysis_results = node_analysis.analyze_node(data_path)
         #self.plot_results(node_analysis, analysis_results, data_path)
         return analysis_results

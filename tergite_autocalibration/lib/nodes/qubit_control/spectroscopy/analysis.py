@@ -96,13 +96,11 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
                 self.frequencies = coord
             elif "currents" in coord:
                 self.currents = coord
-        self.S21 = self.dataset[self.data_var].values
         self.independents = self.dataset[self.frequencies].values
         self.fit_results = {}
 
     def analyse_qubit(self):
         # Fetch the resulting measurement variables
-        self.magnitudes = np.abs(self.S21)
         frequencies = self.independents
 
         if not self.has_peak():
@@ -126,10 +124,6 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
             fit_result.params, **{model.independent_vars[0]: self.fit_freqs}
         )
 
-        # # Take maximal value directly
-        # self.max_freq = frequencies[np.argmax(self.magnitudes)]
-        # # print(self.max_freq)
-        # return [self.max_freq]
         return [self.freq]
 
     def reject_outliers(self, data, m=3.0):
@@ -215,21 +209,16 @@ class QubitSpectroscopyMultidim(BaseQubitAnalysis):
                 s21_values = s21_dataarray.values
 
                 these_magnitudes = s21_values[i]
-                print(these_magnitudes)
                 if not self.has_peak(these_magnitudes):
                     continue
 
-                # guess = model.guess(these_magnitudes, x=frequencies)
-                # fit_result = model.fit(these_magnitudes, params=guess, x=frequencies)
-                # qubit_freq = fit_result.params['x0'].value
-                # qubit_ampl =fit_result.params['A'].value
                 qubit_freq = self.frequencies[these_magnitudes.argmax()]
                 qubit_ampl = these_magnitudes.max()
-                # self.uncertainty = fit_result.params['x0'].stderr
                 if qubit_ampl > self.qubit_ampl:
                     self.qubit_ampl = qubit_ampl
                     self.qubit_freq = qubit_freq
                     self.spec_ampl = a
+
         else:
             if self.has_peak(self.magnitudes):
                 self.qubit_freq = self.frequencies[self.magnitudes.argmax()]
@@ -264,14 +253,6 @@ class QubitSpectroscopyMultidim(BaseQubitAnalysis):
         return self.hasPeak
 
     def plotter(self, ax):
-        # ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0)
-        print(f"Frequency Coordinate Name: {self.frequency_coords}")  # Should be a string like 'spec_frequenciesq06'
-        print(f"Frequency Values: {self.frequencies}")  # Actual values array
-
-        print(self.magnitudes[self.data_var])  # Check structure and dimensions
-        print(self.magnitudes[self.data_var].dims)  # Should match expected dimensions
-        print(self.magnitudes[self.data_var].coords)  # Check available coordinates
-
         self.magnitudes[self.data_var].plot(ax=ax, x=self.frequency_coords)  # Here, `self.frequency_coords` is the coordinate name
         ax.scatter(self.qubit_freq, self.spec_ampl, s=52, c="red")
 
