@@ -2,6 +2,7 @@
 #
 # (C) Copyright Eleftherios Moschandreou 2024
 # (C) Copyright Liangyu Chen 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -13,14 +14,14 @@
 
 import numpy as np
 
-from .analysis import MotzoiAnalysis
+from .analysis import Motzoi01NodeAnalysis, Motzoi12NodeAnalysis
 from .measurement import Motzoi_parameter
 from ....base.node import BaseNode
 
 
 class Motzoi_Parameter_Node(BaseNode):
     measurement_obj = Motzoi_parameter
-    analysis_obj = MotzoiAnalysis
+    analysis_obj = Motzoi01NodeAnalysis
 
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
@@ -38,7 +39,7 @@ class Motzoi_Parameter_Node(BaseNode):
 
 class Motzoi_Parameter_12_Node(BaseNode):
     measurement_obj = Motzoi_parameter
-    analysis_obj = MotzoiAnalysis
+    analysis_obj = Motzoi12NodeAnalysis
 
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)

@@ -131,6 +131,9 @@ class RabiNodeAnalysis(BaseAllQubitsAnalysis):
 class NRabiQubitAnalysis(BaseQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
+
+    def analyse_qubit(self):
+
         for coord in self.dataset[self.data_var].coords:
             if "amplitudes" in coord:
                 self.mw_amplitudes_coord = coord
@@ -139,21 +142,20 @@ class NRabiQubitAnalysis(BaseQubitAnalysis):
         self.independents = self.dataset[coord].values
         self.fit_results = {}
 
-    def analyse_qubit(self):
         mw_amplitude_key = self.mw_amplitudes_coord
         # mw_amplitude_key = 'mw_amplitudes_sweep' + self.qubit
-        mw_amplitudes = self.dataset[mw_amplitude_key].size
+        mw_amplitudes = self.magnitudes[mw_amplitude_key].size
         sums = []
         for this_amplitude_index in range(mw_amplitudes):
             this_sum = sum(
-                np.abs(self.dataset[f"y{self.qubit}"][this_amplitude_index].values)
+                np.abs(self.magnitudes[self.data_var][this_amplitude_index].values)
             )
             sums.append(this_sum)
 
         index_of_max = np.argmax(np.array(sums))
         self.previous_amplitude = fetch_redis_params("rxy:amp180", self.qubit)
         self.optimal_amp180 = (
-            self.dataset[mw_amplitude_key][index_of_max].values
+            self.magnitudes[mw_amplitude_key][index_of_max].values
             + self.previous_amplitude
         )
         self.index_of_max = index_of_max
@@ -161,10 +163,9 @@ class NRabiQubitAnalysis(BaseQubitAnalysis):
         return [self.optimal_amp180]
 
     def plotter(self, axis):
-        datarray = self.dataset[f"y{self.qubit}"]
-        qubit = self.qubit
+        datarray = self.magnitudes[self.data_var]
 
-        datarray.plot(ax=axis, x=f"mw_amplitudes_sweep{qubit}", cmap="RdBu_r")
+        datarray.plot(ax=axis, x=f"mw_amplitudes_sweep{self.qubit}", cmap="RdBu_r")
         axis.set_xlabel("mw amplitude correction")
         axis.axvline(
             # self.dataset[self.mw_amplitudes_coord][self.index_of_max].values,

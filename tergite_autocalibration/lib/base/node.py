@@ -17,7 +17,6 @@ import abc
 import json
 import threading
 import time
-import warnings
 from collections.abc import Iterable
 from pathlib import Path
 from typing import List, Optional
@@ -41,7 +40,6 @@ from quantify_scheduler.json_utils import pathlib
 
 from tergite_autocalibration.config import settings
 from tergite_autocalibration.config.settings import REDIS_CONNECTION, HARDWARE_CONFIG
-from tergite_autocalibration.experimental.tof_analysis import analyze_tof
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.lib.utils.demod_channels import ParallelDemodChannels
@@ -54,12 +52,10 @@ from tergite_autocalibration.utils.dataset_utils import (
     configure_dataset,
     save_dataset,
 )
-from tergite_autocalibration.utils.dto.enums import DataStatus
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.extended_coupler_edge import CompositeSquareEdge
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 from tergite_autocalibration.utils.logger.tac_logger import logger
-from tergite_autocalibration.utils.post_processing_utils import manage_plots
 
 colorama_init()
 
@@ -449,7 +445,6 @@ class BaseNode(abc.ABC):
         analysis_kwargs = getattr(self, "analysis_kwargs", dict())
         node_analysis = self.analysis_obj(self.name, self.redis_field, **analysis_kwargs)
         analysis_results = node_analysis.analyze_node(data_path)
-        #self.plot_results(node_analysis, analysis_results, data_path)
         return analysis_results
 
     def __str__(self):

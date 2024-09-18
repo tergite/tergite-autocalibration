@@ -26,6 +26,7 @@ import numpy as np
 
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
+from tergite_autocalibration.utils.logger.tac_logger import logger
 from tergite_autocalibration.utils.dto.qoi import QOI
 
 
@@ -170,7 +171,7 @@ class BaseNodeAnalysis(ABC):
         plt.show(block=False)
         plt.pause(5)
         plt.close()
-        print(f"Plots saved to {preview_path} and {full_path}")
+        logger.info(f"Plots saved to {preview_path} and {full_path}")
 
 class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
     single_qubit_analysis_obj: "BaseQubitAnalysis"
@@ -202,6 +203,7 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         if not dataset_path.exists():
             raise FileNotFoundError(f"Dataset file not found: {dataset_path}")
 
+        logger.info("Open dataset " + str(dataset_path))
         return xr.open_dataset(dataset_path)
 
     def _analyze_all_qubits(self):

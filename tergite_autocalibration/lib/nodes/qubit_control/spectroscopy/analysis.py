@@ -91,6 +91,7 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
     """
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
+
         for coord in self.dataset[self.data_var].coords:
             if "frequencies" in coord:
                 self.frequencies = coord
