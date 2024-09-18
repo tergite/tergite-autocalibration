@@ -45,6 +45,7 @@ class CombinedFrequencyVsAmplitudeAnalysis:
         amp = (self.result_q1[1] + self.result_q2[1]) / 2
         return [freq, amp]
 
+
 class FrequencyVsAmplitudeAnalysis(BaseAnalysis):
     def __init__(self, dataset: xr.Dataset, freqs, amps):
         super().__init__()
@@ -105,21 +106,24 @@ class FrequencyVsAmplitudeAnalysis(BaseAnalysis):
         axis.set_title(f"CZ - Qubit {self.qubit[1:]}")
         axis.legend()  # Add legend to the plot
 
+
 class FrequencyVsAmplitudeQ1Analysis(FrequencyVsAmplitudeAnalysis):
     def __init__(self, dataset: xr.Dataset, freqs, amps):
         super().__init__(dataset, freqs, amps)
-        #print(dataset)
+        # print(dataset)
         self.data_var = list(dataset.data_vars.keys())[0]
         self.qubit = dataset[self.data_var].attrs["qubit"]
-        #ds_real = dataset[self.data_var].isel(ReIm=0)
-        #ds_imag = dataset[self.data_var].isel(ReIm=1)
-        #ds = ds_real + 1j * ds_imag
-        #S21 = ds.values
-        S21=dataset[self.data_var].values
+        # ds_real = dataset[self.data_var].isel(ReIm=0)
+        # ds_imag = dataset[self.data_var].isel(ReIm=1)
+        # ds = ds_real + 1j * ds_imag
+        # S21 = ds.values
+        S21 = dataset[self.data_var].values
         abs_S21 = np.abs(S21)
         print("coordinates")
         print(dataset.coords)
-        dataset[f"y{self.qubit}"] = xr.DataArray(abs_S21, dims=dataset.dims, coords=dataset.coords)  # Ensure dims and coords match
+        dataset[f"y{self.qubit}"] = xr.DataArray(
+            abs_S21, dims=dataset.dims, coords=dataset.coords
+        )  # Ensure dims and coords match
         self.dataset = dataset
 
     def analyse_qubit(self) -> list[float, float]:
@@ -141,18 +145,21 @@ class FrequencyVsAmplitudeQ1Analysis(FrequencyVsAmplitudeAnalysis):
         print(self.opt_freq, self.opt_amp)
         return [self.opt_freq, self.opt_amp]
 
+
 class FrequencyVsAmplitudeQ2Analysis(FrequencyVsAmplitudeAnalysis):
     def __init__(self, dataset: xr.Dataset, freqs, amps):
         super().__init__(dataset, freqs, amps)
-        #print(dataset)
+        # print(dataset)
         self.data_var = list(dataset.data_vars.keys())[1]
         self.qubit = dataset[self.data_var].attrs["qubit"]
-        #ds_real = dataset[self.data_var].isel(ReIm=0)
-        #ds_imag = dataset[self.data_var].isel(ReIm=1)
-        #ds = ds_real + 1j * ds_imag
+        # ds_real = dataset[self.data_var].isel(ReIm=0)
+        # ds_imag = dataset[self.data_var].isel(ReIm=1)
+        # ds = ds_real + 1j * ds_imag
         S21 = dataset[self.data_var].values
         abs_S21 = np.abs(S21)
-        dataset[f"y{self.qubit}"] = xr.DataArray(abs_S21, dims=dataset.dims, coords=dataset.coords)  # Ensure dims and coords match
+        dataset[f"y{self.qubit}"] = xr.DataArray(
+            abs_S21, dims=dataset.dims, coords=dataset.coords
+        )  # Ensure dims and coords match
         self.dataset = dataset
 
     def analyse_qubit(self) -> list[float, float]:
@@ -173,7 +180,8 @@ class FrequencyVsAmplitudeQ2Analysis(FrequencyVsAmplitudeAnalysis):
         self.opt_amp = self.amplitudes[min_index[1]]
         print(self.opt_freq, self.opt_amp)
         return [self.opt_freq, self.opt_amp]
-    
+
+
 class CZParametrisationFixDurationAnalysis(BaseCouplerAnalysis):
     def __init__(self) -> None:
         super().__init__()
@@ -206,7 +214,9 @@ class CZParametrisationFixDurationAnalysis(BaseCouplerAnalysis):
         results = self.process_dataset()
         return self.run_analysis_on_freq_amp_results(results)
 
-    def process_dataset(self) -> List[Tuple[CombinedFrequencyVsAmplitudeAnalysis, float]]:
+    def process_dataset(
+        self,
+    ) -> List[Tuple[CombinedFrequencyVsAmplitudeAnalysis, float]]:
         results = []
         self.fit_results = {}
         for current_index, current in enumerate(self.current_values):
@@ -224,13 +234,17 @@ class CZParametrisationFixDurationAnalysis(BaseCouplerAnalysis):
             sliced_dataset.plot()
             plt.show()
 
-            q1 = FrequencyVsAmplitudeQ1Analysis(sliced_dataset, self.frequency_values, self.amplitude_values )
+            q1 = FrequencyVsAmplitudeQ1Analysis(
+                sliced_dataset, self.frequency_values, self.amplitude_values
+            )
             q1Res = q1.analyse_qubit()
 
-            q2 = FrequencyVsAmplitudeQ2Analysis(sliced_dataset, self.frequency_values, self.amplitude_values )
+            q2 = FrequencyVsAmplitudeQ2Analysis(
+                sliced_dataset, self.frequency_values, self.amplitude_values
+            )
             q2Res = q2.analyse_qubit()
             c = CombinedFrequencyVsAmplitudeAnalysis(q1Res, q2Res)
-            results.append([c, current]) 
+            results.append([c, current])
 
         self.q1_list.append(q1)
         self.q2_list.append(q2)
@@ -238,8 +252,7 @@ class CZParametrisationFixDurationAnalysis(BaseCouplerAnalysis):
         return results
 
     def run_analysis_on_freq_amp_results(
-        self,
-        results: List[Tuple[CombinedFrequencyVsAmplitudeAnalysis, float]]
+        self, results: List[Tuple[CombinedFrequencyVsAmplitudeAnalysis, float]]
     ):
         minCurrent = 1
         bestIndex = -1
@@ -273,18 +286,17 @@ class CZParametrisationFixDurationAnalysis(BaseCouplerAnalysis):
                 ncols=2,
                 squeeze=False,
                 figsize=(2, 1),
-              )
+            )
             self.q1_list[index].plotter(axs[0])
             self.q2_list[index].plotter(axs[1])
 
             fig = plt.gcf()
             fig.set_tight_layout(True)
-            name = "CZParametrisationFixDurationAnalysis_" + str(self.current_values[index])
+            name = "CZParametrisationFixDurationAnalysis_" + str(
+                self.current_values[index]
+            )
             try:
                 fig.savefig(f"{data_path}/{name}.png", bbox_inches="tight", dpi=400)
             except FileNotFoundError:
                 warnings.warn("File Not existing")
                 pass
-
-        
-

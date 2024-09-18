@@ -89,6 +89,7 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
     Analysis that fits a Lorentzian function to qubit spectroscopy data.
     The resulting fit can be analyzed to determine if a peak was found or not.
     """
+
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
 
@@ -187,7 +188,6 @@ class QubitSpectroscopyMultidim(BaseQubitAnalysis):
         self.frequency_coords = ""
 
     def analyse_qubit(self):
-
         for coord in self.dataset[self.data_var].coords:
             if "frequencies" in coord:
                 self.frequency_coords = coord
@@ -201,9 +201,10 @@ class QubitSpectroscopyMultidim(BaseQubitAnalysis):
         self.qubit_freq = 0
         if hasattr(self, "amplitudes"):
             for i, a in enumerate(self.amplitudes):
-
                 if isinstance(self.magnitudes, xr.Dataset):
-                    data_var_name = list(self.S21.data_vars.keys())[0]  # Adjust if specific variable name is known
+                    data_var_name = list(self.S21.data_vars.keys())[
+                        0
+                    ]  # Adjust if specific variable name is known
                     s21_dataarray = self.magnitudes[data_var_name]
                 else:
                     raise TypeError("Expected self.S21 to be an xarray.DataArray")
@@ -256,6 +257,7 @@ class QubitSpectroscopyMultidim(BaseQubitAnalysis):
     def plotter(self, ax):
         self.magnitudes[self.data_var].plot(ax=ax, x=self.frequency_coords)  # Here, `self.frequency_coords` is the coordinate name
         ax.scatter(self.qubit_freq, self.spec_ampl, s=52, c="red")
+
 
 class QubitSpectroscopyNodeAnalysis(BaseAllQubitsAnalysis):
     single_qubit_analysis_obj = QubitSpectroscopyAnalysis

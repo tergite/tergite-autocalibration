@@ -177,7 +177,6 @@ class BaseNode(abc.ABC):
         self.post_process(data_path)
         logger.info("analysis completed")
 
-
     def run_measurement(self, data_path: Path, lab_ic, cluster_status):
         compiled_schedule = self.precompile(data_path)
 
@@ -244,7 +243,6 @@ class BaseNode(abc.ABC):
                 )
                 result_dataset = xarray.merge([result_dataset, ds])
         logger.info("measurement completed")
-
 
     def precompile(
         self, data_path: Path, bin_mode: str = None, repetitions: int = None
@@ -393,7 +391,8 @@ class BaseNode(abc.ABC):
         )
 
         raw_dataset = self.execute_schedule(
-            compiled_schedule, lab_ic, schedule_duration)
+            compiled_schedule, lab_ic, schedule_duration
+        )
 
         result_dataset = configure_dataset(raw_dataset, self)
         save_dataset(result_dataset, self.name, data_path)
@@ -439,7 +438,6 @@ class BaseNode(abc.ABC):
         logger.info("Raw dataset acquired")
 
         return raw_dataset
-
 
     def post_process(self, data_path: Path):
         analysis_kwargs = getattr(self, "analysis_kwargs", dict())

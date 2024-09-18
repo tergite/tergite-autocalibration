@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Michele Faucci Giannelli 2024
+# (C) Copyright Stefan Hill 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -10,10 +10,9 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+# Note: This is the requirements file for conditional proprietary dependencies.
+# Please make sure you are having access to the repositories and own a license before you are using them.
 
-class NoValidCombinationException(Exception):
-    """Exception raised when no valid combination is found."""
-
-    def __init__(self, message="No valid combination found"):
-        self.message = message
-        super().__init__(self.message)
+./misc/oqs-grace
+./misc/oqs-licensing
+git+ssh://git@git.orangeqs.com/products/scqt.git@v24.30.0#egg=superconducting-qubit-tools

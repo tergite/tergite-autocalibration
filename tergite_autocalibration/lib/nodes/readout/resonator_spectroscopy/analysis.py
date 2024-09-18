@@ -19,14 +19,19 @@ import xarray as xr
 from quantify_core.analysis import fitting_models as fm
 
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
-from tergite_autocalibration.lib.base.analysis import BaseAllQubitsAnalysis, BaseQubitAnalysis
+from tergite_autocalibration.lib.base.analysis import (
+    BaseAllQubitsAnalysis,
+    BaseQubitAnalysis,
+)
 
 model = fm.ResonatorModel()
+
 
 class ResonatorSpectroscopyQubitAnalysis(BaseQubitAnalysis):
     """
     Analysis that fits the data of a resonator spectroscopy experiment for one qubit.
     """
+
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
         self.fit_results = {}
@@ -36,7 +41,9 @@ class ResonatorSpectroscopyQubitAnalysis(BaseQubitAnalysis):
         frequencies = self.dataset.coords[coord_name].values
 
         if isinstance(self.S21, xr.Dataset):
-            data_var_name = list(self.S21.data_vars.keys())[0]  # Adjust if specific variable name is known
+            data_var_name = list(self.S21.data_vars.keys())[
+                0
+            ]  # Adjust if specific variable name is known
             s21_dataarray = self.S21[data_var_name]
         else:
             raise TypeError("Expected self.S21 to be an xarray.DataArray")
@@ -85,6 +92,7 @@ class ResonatorSpectroscopyQubitAnalysis(BaseQubitAnalysis):
             label=f"f = {self.minimum_freq:.6E} ± {self.uncertainty:.1E} (Hz)",
         )
         ax.grid()
+
 
 class ResonatorSpectroscopy1QubitAnalysis(ResonatorSpectroscopyQubitAnalysis):
     def __init__(self, name, redis_fields):
@@ -135,11 +143,13 @@ class ResonatorSpectroscopyNodeAnalysis(BaseAllQubitsAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
 
+
 class ResonatorSpectroscopy1NodeAnalysis(BaseAllQubitsAnalysis):
     single_qubit_analysis_obj = ResonatorSpectroscopy1QubitAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
+
 
 class ResonatorSpectroscopy2NodeAnalysis(BaseAllQubitsAnalysis):
     single_qubit_analysis_obj = ResonatorSpectroscopy2QubitAnalysis
