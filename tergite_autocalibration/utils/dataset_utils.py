@@ -236,7 +236,7 @@ def get_test_data_path_for_node(node_name) -> pathlib.Path:
         path = "./tergite_autocalibration/lib/nodes/qubit_control/ramsey_fringes/tests/data_01"
     elif node_name == "motzoi_parameter":
         path = "./tergite_autocalibration/lib/nodes/qubit_control/motzoi_parameter/tests/data_01"
-    elif node_name == "nrabi_oscillations":
+    elif node_name == "n_rabi_oscillations":
         path = "./tergite_autocalibration/lib/nodes/qubit_control/rabi_oscillations/tests/data_nrabi_01"
     elif node_name == "resonator_spectroscopy_1":
         path = "tergite_autocalibration/lib/nodes/readout/resonator_spectroscopy/tests/data_1"
@@ -248,12 +248,17 @@ def get_test_data_path_for_node(node_name) -> pathlib.Path:
         path = "./tergite_autocalibration/lib/nodes/qubit_control/ramsey_fringes/tests/data_12"
     elif node_name == "motzoi_parameter_12":
         path = "./tergite_autocalibration/lib/nodes/qubit_control/motzoi_parameter/tests/data_12"
-    elif node_name == "nrabi_oscillations_12":
+    elif node_name == "n_rabi_oscillations_12":
         path = "./tergite_autocalibration/lib/nodes/qubit_control/rabi_oscillations/tests/data_nrabi_12"
     elif node_name == "resonator_spectroscopy_2":
         path = "tergite_autocalibration/lib/nodes/readout/resonator_spectroscopy/tests/data_2"
+    elif node_name == "ro_frequency_three_state_optimization":
+        path = "tergite_autocalibration/lib/nodes/readout/ro_frequency_optimization/tests/data"
+    elif node_name == "ro_amplitude_three_state_optimization":
+        path = "tergite_autocalibration/lib/nodes/readout/ro_amplitude_optimization/tests/data"
+
     else:
-        logger.info("No pat for node: " + node_name)
+        logger.info("No path for node: " + node_name)
         path = ""
 
     return pathlib.Path(path)

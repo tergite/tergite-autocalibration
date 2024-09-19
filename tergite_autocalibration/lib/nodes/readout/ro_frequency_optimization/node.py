@@ -2,6 +2,7 @@
 #
 # (C) Copyright Eleftherios Moschandreou 2023, 2024
 # (C) Copyright Liangyu Chen 2023, 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -12,14 +13,14 @@
 # that they have been altered from the originals.
 
 from tergite_autocalibration.utils.user_input import resonator_samples
-from .analysis import OptimalROFrequencyAnalysis, OptimalRO_012_FrequencyAnalysis
+from .analysis import OptimalRO01FrequencyNodeAnalysis, OptimalRO012FrequencyNodeAnalysis
 from .measurement import RO_frequency_optimization
 from ....base.node import BaseNode
 
 
 class RO_frequency_two_state_optimization_Node(BaseNode):
     measurement_obj = RO_frequency_optimization
-    analysis_obj = OptimalROFrequencyAnalysis
+    analysis_obj = OptimalRO01FrequencyNodeAnalysis
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
@@ -36,7 +37,7 @@ class RO_frequency_two_state_optimization_Node(BaseNode):
 
 class RO_frequency_three_state_optimization_Node(BaseNode):
     measurement_obj = RO_frequency_optimization
-    analysis_obj = OptimalRO_012_FrequencyAnalysis
+    analysis_obj = OptimalRO012FrequencyNodeAnalysis
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
