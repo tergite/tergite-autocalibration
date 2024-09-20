@@ -83,10 +83,8 @@ class RabiQubitAnalysis(BaseQubitAnalysis):
         self.fit_results = {}
 
     def analyse_qubit(self):
-        # Initialize the Rabi model
         model = RabiModel()
 
-        # Fetch the resulting measurement variables from self
         coord = list(self.dataset[self.data_var].coords.keys())[0]
         self.amplitudes = self.dataset[coord].values
 
@@ -107,7 +105,6 @@ class RabiQubitAnalysis(BaseQubitAnalysis):
         return [self.ampl]
 
     def plotter(self, ax):
-        # Plots the data and the fitted model of a Rabi experiment
         ax.plot(
             self.fit_amplitudes,
             self.fit_y,
@@ -143,22 +140,19 @@ class NRabiQubitAnalysis(BaseQubitAnalysis):
         self.fit_results = {}
 
         mw_amplitude_key = self.mw_amplitudes_coord
-        # mw_amplitude_key = 'mw_amplitudes_sweep' + self.qubit
         mw_amplitudes = self.magnitudes[mw_amplitude_key].size
         sums = []
         for this_amplitude_index in range(mw_amplitudes):
             this_sum = sum(
-                np.abs(self.magnitudes[self.data_var][this_amplitude_index].values)
+                self.magnitudes[self.data_var][this_amplitude_index].values
             )
             sums.append(this_sum)
 
-        index_of_max = np.argmax(np.array(sums))
+        index_of_min = np.argmin(np.array(sums))
         self.previous_amplitude = fetch_redis_params("rxy:amp180", self.qubit)
-        self.optimal_amp180 = (
-            self.magnitudes[mw_amplitude_key][index_of_max].values
-            + self.previous_amplitude
-        )
-        self.index_of_max = index_of_max
+        self.optimal_amp180 = self.magnitudes[mw_amplitude_key][index_of_min].values.item() + self.previous_amplitude
+        self.index_of_max = index_of_min
+        self.shift = self.magnitudes[mw_amplitude_key][index_of_min].values
 
         return [self.optimal_amp180]
 
@@ -167,9 +161,10 @@ class NRabiQubitAnalysis(BaseQubitAnalysis):
 
         datarray.plot(ax=axis, x=f"mw_amplitudes_sweep{self.qubit}", cmap="RdBu_r")
         axis.set_xlabel("mw amplitude correction")
+        line = self.shift
+
         axis.axvline(
-            # self.dataset[self.mw_amplitudes_coord][self.index_of_max].values,
-            self.optimal_amp180 - fetch_redis_params("rxy:amp180", self.qubit),
+            line,
             c="k",
             lw=4,
             linestyle="--",

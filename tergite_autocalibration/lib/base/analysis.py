@@ -245,6 +245,46 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
             analysis._plot(primary_axis)
 
 
+class BaseAllQubitsRepeatAnalysis(BaseAllQubitsAnalysis, ABC):
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+
+    def open_dataset(self, data_path: Path):
+        # Infer number of repeats by counting the number of dataset files
+        data_files = sorted(data_path.glob("*.hdf5"))
+        if not data_files:
+            raise FileNotFoundError(f"No dataset files found in {data_path}")
+
+        self.num_repeats = len(data_files)
+
+        # Load the first dataset to infer the qubit names
+        first_dataset = xr.open_dataset(data_files[0], engine="scipy")
+        self.all_qubits = [var for var in first_dataset.data_vars if var.startswith('yq')]
+        
+        datasets = []
+
+        for qubit in self.all_qubits:
+            qubit_datasets = []
+            for repeat_idx, file_path in enumerate(data_files):
+                file_path = data_path / f"dataset_{repeat_idx}.hdf5"
+                
+                ds = xr.open_dataset(file_path, engine="scipy")
+                
+                qubit_data = ds[[qubit]]
+
+                repeat_coord = f'repeat{qubit[1:]}'  # e.g., 'repeatq16'
+                if repeat_coord not in qubit_data.coords:
+                    qubit_data = qubit_data.assign_coords({repeat_coord: repeat_idx})
+
+                qubit_datasets.append(qubit_data)
+
+            merged_qubit_data = xr.concat(qubit_datasets, dim=repeat_coord)
+            datasets.append(merged_qubit_data)
+
+        merged_datasets = xr.merge(datasets)
+      
+        return merged_datasets
+    
 class BaseQubitAnalysis(BaseAnalysis, ABC):
     def __init__(self, name, redis_fields):
         self.name = name
@@ -259,9 +299,7 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
         self.dataset = dataset
         self.qubit = dataset.attrs["qubit"]
         self.coord = dataset.coords
-        self.data_var = list(dataset.data_vars.keys())[
-            0
-        ]  # Assume the first data_var is relevant
+        self.data_var = list(dataset.data_vars.keys())[0]  # Assume the first data_var is relevant
         self.S21 = dataset.isel(ReIm=0) + 1j * dataset.isel(ReIm=1)
         self.magnitudes = np.abs(self.S21)
         self._qoi = self.analyse_qubit()

@@ -104,9 +104,9 @@ user_samplespace = {
 }
 """
 ####################################################################
-target_node = "ro_amplitude_three_state_optimization"
-qubits = ["q06", "q07", "q08", "q09", "q10", "q11", "q12", "q13", "q14", "q15"]
-couplers = ["q06_q07"]
+target_node = "T2_echo"
+qubits = ["q16"] #["q06", "q07", "q08", "q09", "q10", "q11", "q12", "q13", "q14", "q15"]
+couplers = [] #["q06_q07"]
 user_samplespace = {
     "resonator_spectroscopy": {
         "ro_frequencies": {qubit: resonator_samples(qubit) for qubit in qubits}
