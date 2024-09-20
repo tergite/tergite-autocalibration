@@ -14,6 +14,7 @@
 from pathlib import Path
 
 from tergite_autocalibration.lib.base.node import BaseNode
+from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.logger.tac_logger import logger
 
 
@@ -36,7 +37,6 @@ class ParametrizedSweepNode(BaseNode):
             external_settable = list(self.external_samplespace.keys())[0]
             # elements may refer to qubits or couplers
             elements = self.external_samplespace[external_settable].keys()
-            print(elements)
             for element in elements:
                 qubit_specific_values = self.external_samplespace[external_settable][
                     element
@@ -49,14 +49,15 @@ class ParametrizedSweepNode(BaseNode):
             self.reduced_external_samplespace = reduced_external_samplespace
             pre_measurement_operation(reduced_ext_space=reduced_external_samplespace)
 
-            compiled_schedule = self.precompile(data_path)
+            if cluster_status != MeasurementMode.re_analyse:
+                compiled_schedule = self.precompile(data_path)
 
-            self.measure_node(
-                compiled_schedule,
-                lab_ic,
-                data_path,
-                cluster_status,
-            )
+                self.measure_node(
+                    compiled_schedule,
+                    lab_ic,
+                    data_path,
+                    cluster_status,
+                )
 
         logger.info("measurement completed")
         self.post_process(data_path=data_path)

@@ -104,7 +104,7 @@ class BaseT2QubitAnalysis(BaseQubitAnalysis, ABC):
     def _get_magnitudes(self, indx):
         magnitudes = self.magnitudes[self.data_var].isel({self.repeat_coord: indx})
         return magnitudes.values.flatten()
-
+        
     def plotter(self, ax):
         for indx in range(len(self.dataset.coords[self.repeat_coord])):
             magnitudes_flat = self._get_magnitudes(indx)
@@ -146,10 +146,11 @@ class T2NodeAnalysis(BaseAllQubitsRepeatAnalysis):
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-
+        self.repeat_coordinate_name = "repeat"
 
 class T2EchoNodeAnalysis(BaseAllQubitsRepeatAnalysis):
     single_qubit_analysis_obj = T2EchoQubitAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
+        self.repeat_coordinate_name = "repeat"

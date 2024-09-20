@@ -97,3 +97,4 @@ class T1NodeAnalysis(BaseAllQubitsRepeatAnalysis):
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
+        self.repeat_coordinate_name = "repeat"

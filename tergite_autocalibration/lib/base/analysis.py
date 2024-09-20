@@ -248,6 +248,7 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
 class BaseAllQubitsRepeatAnalysis(BaseAllQubitsAnalysis, ABC):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
+        self.repeat_coordinate_name = ""
 
     def open_dataset(self, data_path: Path):
         # Infer number of repeats by counting the number of dataset files
@@ -272,7 +273,7 @@ class BaseAllQubitsRepeatAnalysis(BaseAllQubitsAnalysis, ABC):
                 
                 qubit_data = ds[[qubit]]
 
-                repeat_coord = f'repeat{qubit[1:]}'  # e.g., 'repeatq16'
+                repeat_coord = f'{self.repeat_coordinate_name}{qubit[1:]}'  # e.g., 'repeatq16'
                 if repeat_coord not in qubit_data.coords:
                     qubit_data = qubit_data.assign_coords({repeat_coord: repeat_idx})
 
