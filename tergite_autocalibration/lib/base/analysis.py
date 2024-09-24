@@ -16,6 +16,8 @@
 import collections
 from abc import ABC, abstractmethod
 from pathlib import Path
+import re
+import pandas as pd
 import xarray as xr
 
 # TODO: we should have a conditional import depending on a feature flag here
@@ -46,17 +48,6 @@ class BaseAnalysis(ABC):
     @qoi.setter
     def qoi(self, value: "QOI"):
         self._qoi = value
-
-    @abstractmethod
-    def analyse_qubit(self) -> "QOI":
-        """
-        Run the fitting of the analysis function
-
-        Returns:
-            The quantity of interest as QOI wrapped object
-
-        """
-        pass
 
     @abstractmethod
     def plotter(self, ax: "plt.Axes"):
@@ -161,10 +152,10 @@ class BaseNodeAnalysis(ABC):
 
         return fig, axs
 
-    def save_plots(self, data_path: Path):
+    def save_plots(self):
         self.fig.tight_layout()
-        preview_path = data_path / f"{self.name}_preview.png"
-        full_path = data_path / f"{self.name}.png"
+        preview_path = self.data_path / f"{self.name}_preview.png"
+        full_path = self.data_path / f"{self.name}.png"
         self.fig.savefig(preview_path, bbox_inches="tight", dpi=100)
         self.fig.savefig(full_path, bbox_inches="tight", dpi=400)
         plt.show(block=False)
@@ -189,17 +180,18 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         self.plots_per_qubit = 1
 
     def analyze_node(self, data_path: Path):
-        self.dataset = self.open_dataset(data_path)
+        self.data_path = Path(data_path)
+        self.dataset = self.open_dataset()
         self.coords = self.dataset.coords
         self.data_vars = self.dataset.data_vars
         self.fig, self.axs = self.manage_plots(self.column_grid, self.plots_per_qubit)
         analysis_results = self._analyze_all_qubits()
         self._fill_plots()
-        self.save_plots(data_path)
+        self.save_plots()
         return analysis_results
 
-    def open_dataset(self, data_path: Path):
-        dataset_path = data_path / "dataset_0.hdf5"
+    def open_dataset(self):
+        dataset_path = self.data_path / "dataset_0.hdf5"
         if not dataset_path.exists():
             raise FileNotFoundError(f"Dataset file not found: {dataset_path}")
 
@@ -250,11 +242,11 @@ class BaseAllQubitsRepeatAnalysis(BaseAllQubitsAnalysis, ABC):
         super().__init__(name, redis_fields)
         self.repeat_coordinate_name = ""
 
-    def open_dataset(self, data_path: Path):
+    def open_dataset(self):
         # Infer number of repeats by counting the number of dataset files
-        data_files = sorted(data_path.glob("*.hdf5"))
+        data_files = sorted(self.data_path.glob("*.hdf5"))
         if not data_files:
-            raise FileNotFoundError(f"No dataset files found in {data_path}")
+            raise FileNotFoundError(f"No dataset files found in {self.data_path}")
 
         self.num_repeats = len(data_files)
 
@@ -267,7 +259,7 @@ class BaseAllQubitsRepeatAnalysis(BaseAllQubitsAnalysis, ABC):
         for qubit in self.all_qubits:
             qubit_datasets = []
             for repeat_idx, file_path in enumerate(data_files):
-                file_path = data_path / f"dataset_{repeat_idx}.hdf5"
+                file_path = self.data_path / f"dataset_{repeat_idx}.hdf5"
                 
                 ds = xr.open_dataset(file_path, engine="scipy")
                 
@@ -298,7 +290,9 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
 
     def _analyze_qubit(self, dataset, qubit_element):
         self.dataset = dataset
+        print(qubit_element)
         self.qubit = dataset.attrs["qubit"]
+        print(self.qubit)
         self.coord = dataset.coords
         self.data_var = list(dataset.data_vars.keys())[0]  # Assume the first data_var is relevant
         self.S21 = dataset.isel(ReIm=0) + 1j * dataset.isel(ReIm=1)
@@ -317,18 +311,42 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
         handles.append(patch)
         primary_axis.legend(handles=handles, fontsize="small")
 
+    @abstractmethod
+    def analyse_qubit(self) -> "QOI":
+        """
+        Run the fitting of the analysis function
+
+        Returns:
+            The quantity of interest as QOI wrapped object
+
+        """
+        pass
 
 class BaseCouplerAnalysis(BaseAnalysis, ABC):
-    def run_analysis(self, data_path: Path):
-        self.dataset = self.open_datasets(data_path)
-        this_element = self._extract_coupler_info()
-        analysis_results = self._run_coupler_analysis(this_element)
 
+    def __init__(self, name, redis_fields):
+        self.name = name
+        self.redis_fields = redis_fields
+        self.dataset = None
+        self.data_vars = None
+        self.coords = None
+        self.name_qubit_1 = ""
+        self.name_qubit_2 = ""
+
+    def _analyze_coupler(self, dataset, coupler_element):
+        self.name_qubit_1 = coupler_element[0:3]
+        self.name_qubit_2 = coupler_element[4:7]
+        self.dataset = dataset
+        self.coupler = dataset.attrs["coupler"]
+        self.coord = dataset.coords
+        self.data_var = list(dataset.data_vars.keys())[0]  # Assume the first data_var is relevant
+        self.S21 = dataset.isel(ReIm=0) + 1j * dataset.isel(ReIm=1)
+        self.magnitudes = np.abs(self.S21)
+
+        analysis_results = self._run_coupler_analysis(coupler_element)
+        self.update_redis_trusted_values(self.name, coupler_element)
+        
         return analysis_results
-
-    @abstractmethod
-    def open_datasets(data_path, number_of_files):
-        pass
 
     def _extract_coupler_info(self):
         for settable in self.dataset.coords:
@@ -342,6 +360,193 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
         return None
 
     def _run_coupler_analysis(self, this_element: str):
-        self._qoi = self.analyse_qubit()
-        self.update_redis_trusted_values(self.name, this_element)
-        return {this_element: dict(zip(self.redis_field, self._qoi))}
+        self._qoi = self.analyze_coupler()
+        return {this_element: dict(zip(self.redis_fields, self._qoi))}
+
+
+    def _plot(self, primary_axis, secondary_axis):
+        self.plotter(primary_axis, secondary_axis)  # Assuming node_analysis object is available
+
+        # Customize plot as needed
+        patch = mpatches.Patch(color="green", label=f"{self.coupler}")
+
+        #handles, labels = primary_axis.get_legend_handles_labels()
+        #handles.append(patch)
+        #primary_axis.legend(handles=handles, fontsize="small")
+        #handles, labels = secondary_axis.get_legend_handles_labels()
+        #handles.append(patch)
+        #secondary_axis.legend(handles=handles, fontsize="small")
+
+
+    @abstractmethod
+    def analyze_coupler():
+        pass
+
+class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
+    single_coupler_analysis_obj: "BaseCouplerAnalysis"
+
+    def __init__(self, name, redis_fields):
+        self.name = name
+        self.redis_fields = redis_fields
+        self.dataset = None
+        self.data_vars = None
+        self.coords = None
+
+        self.coupler_analyses = []
+
+        self.column_grid = 2
+        self.plots_per_qubit = 1
+
+    def analyze_node(self, data_path: Path):
+        self.data_path = Path(data_path)
+        self.dataset = self.open_dataset()
+        self.coords = self.dataset.coords
+        self.data_vars = self.dataset.data_vars
+        self.fig, self.axs = self.manage_plots(self.column_grid, self.plots_per_qubit)
+        analysis_results = self._analyze_all_couplers()
+        self._fill_plots()
+        self.save_plots()
+        return analysis_results
+
+    def open_dataset(self):
+        dataset_path = self.data_path / "dataset_0.hdf5"
+        if not dataset_path.exists():
+            raise FileNotFoundError(f"Dataset file not found: {dataset_path}")
+
+        logger.info("Open dataset " + str(dataset_path))
+        return xr.open_dataset(dataset_path)
+
+    def _analyze_all_couplers(self):
+        analysis_results = {}
+        coupler_data_dict = self._group_by_coupler()
+        index = 0
+        for this_coupler, coupler_data_vars in coupler_data_dict.items():
+            ds = xr.merge([self.dataset[var] for var in coupler_data_vars])
+            ds.attrs["coupler"] = this_coupler
+
+            matching_coords = [coord for coord in ds.coords if this_coupler in coord]
+            if matching_coords:
+                selected_coord_name = matching_coords[0]
+                ds = ds.sel(
+                    {selected_coord_name: slice(None)}
+                )  # Select all data along this coordinate
+
+                coupler_analysis = self.single_coupler_analysis_obj(
+                    self.name, self.redis_fields
+                )
+                coupler_analysis.data_path = self.data_path
+                coupler_analysis._analyze_coupler(ds, this_coupler)
+                self.coupler_analyses.append(coupler_analysis)
+
+            index = index + 1
+
+        return analysis_results
+
+    def _group_by_coupler(self):
+        coupler_data_dict = collections.defaultdict(set)
+        for var in self.dataset.data_vars:
+            # Find the relevant coordinate associated with the data variable
+            for coord in self.dataset[var].coords:
+                if "coupler" in self.dataset[coord].attrs:
+                    # Extract the coupler name from the coordinate's attribute
+                    this_coupler = self.dataset[coord].attrs["coupler"]
+                    coupler_data_dict[this_coupler].add(var)
+                    break  # Break if coupler found, move to the next variable
+        
+        return coupler_data_dict
+
+    def _fill_plots(self):
+        for index, analysis in enumerate(self.coupler_analyses):
+            primary_plot_row = self.plots_per_qubit * (index // self.column_grid)
+            primary_axis = self.axs[primary_plot_row, index % self.column_grid]
+            secondary_axis = self.axs[primary_plot_row, (index + 1) % self.column_grid]
+            analysis._plot(primary_axis, secondary_axis)
+
+class BaseAllCouplersRepeatAnalysis(BaseAllCouplersAnalysis, ABC):
+    single_coupler_analysis_obj: "BaseCouplerAnalysis"
+
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+        self.repeat_coordinate_name = ""
+
+    def _extract_coupler_from_coord(self, coord_name):
+        """
+        Extract the coupler name from a coordinate string.
+        Assumes the coupler name is the last 7 characters of the coordinate, such as q06_q07.
+        """
+        match = re.search(r'q\d{2}_q\d{2}', coord_name)
+        if match:
+            return match.group(0)
+        return None
+
+    def _extract_coupler_from_coord(self, coord_name):
+        # Assuming the coupler names follow a pattern like "q06_q07"
+        match = re.search(r'q\d{2}_q\d{2}', coord_name)
+        return match.group(0) if match else None
+
+    def open_dataset(self):
+        # Infer number of repeats by counting the number of dataset files
+        data_files = sorted(self.data_path.glob("dataset_[0-9]*.hdf5"))
+        if not data_files:
+            raise FileNotFoundError(f"No dataset files found in {self.data_path}")
+        
+        self.num_repeats = len(data_files)
+
+        # Load the first dataset to infer coupler-based coordinates
+        first_dataset = xr.open_dataset(data_files[0], engine="scipy")
+
+        # Step 1: Group data variables by qubit (assuming qubit data starts with 'yq')
+        self.all_qubits = [var for var in first_dataset.data_vars if var.startswith('yq')]
+
+        # Step 2: Group coordinates by coupler (based on the pattern in the coordinate names)
+        self.coupler_data_dict = collections.defaultdict(set)
+        for coord in first_dataset.coords:
+            coupler = self._extract_coupler_from_coord(coord)
+            if coupler:
+                self.coupler_data_dict[coupler].add(coord)
+
+        print(f"Identified coupler data: {self.coupler_data_dict}")
+
+        # You can now proceed to the rest of the merging process
+        merged_dataset = self.open_and_merge_datasets(data_files)
+        return merged_dataset
+    
+    def open_and_merge_datasets(self, data_files):
+        merged_coupler_datasets = []
+        
+        for file_idx, file_path in enumerate(data_files):
+            print(f"Opening dataset {file_idx + 1}/{len(data_files)}: {file_path}")
+            ds = xr.open_dataset(file_path, engine="scipy")
+            
+            # Step 3: Extract qubit-related data and identify couplers
+            for coupler, coords in self.coupler_data_dict.items():
+                qubits = coupler.split('_')
+                print(f"Processing coupler: {coupler}")
+                
+                qubit_data = [
+                    ds[var] for var in self.all_qubits
+                    if any(f"q{qubit[-2:]}" in var for qubit in qubits)
+                ]
+                print(f"Qubit data found for {coupler}: {[var.name for var in qubit_data]}")
+
+                if not qubit_data:
+                    print(f"No qubit data found for {coupler}")
+                    continue
+
+                # Instead of merging, keep each qubit data separate
+                for data in qubit_data:
+                    combined_dim = f'{self.repeat_coordinate_name}{coupler}'
+                    data.name = f"{data.name}"  # Rename to avoid conflicts
+                    merged_coupler_datasets.append(data)
+                
+        # Step 5: After all files are processed, merge everything into the final dataset
+        if merged_coupler_datasets:
+            print(f"Merging {len(merged_coupler_datasets)} datasets into final dataset.")
+            final_merged_dataset = xr.merge(merged_coupler_datasets)
+        else:
+            final_merged_dataset = xr.Dataset()
+        
+        print(f"Final merged dataset variables: {list(final_merged_dataset.data_vars)}")
+
+        return final_merged_dataset
+

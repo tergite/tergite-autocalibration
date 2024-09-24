@@ -17,25 +17,16 @@ import xarray as xr
 from numpy.polynomial.polynomial import Polynomial
 
 from ...qubit_control.spectroscopy.analysis import (
+    QubitSpectroscopyMultidim,
     QubitSpectroscopyNodeAnalysis,
+    QubitSpectroscopyNodeMultidim,
 )
-from ....base.analysis import BaseAnalysis
+from ....base.analysis import BaseAllCouplersAnalysis, BaseAnalysis
 
 
-class CouplerSpectroscopyAnalysis(BaseAnalysis):
-    def __init__(self, dataset: xr.Dataset):
-        super().__init__()
-        data_var = list(dataset.data_vars.keys())[0]
-        self.qubit = dataset[data_var].attrs["qubit"]
-        self.S21 = dataset[data_var].values
-        for coord in dataset[data_var].coords:
-            if "frequencies" in coord:
-                self.frequencies = coord
-            elif "currents" in coord:
-                self.currents = coord
-        dataset[f"y{self.qubit}"].values = np.abs(self.S21)
-        self.data_var = data_var
-        self.dataset = dataset.sortby(self.currents)
+class CouplerSpectroscopyQubitAnalysis(QubitSpectroscopyMultidim):
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
 
     def reject_outliers(self, data, m=4):
         d = np.abs(data - np.median(data))
@@ -44,13 +35,18 @@ class CouplerSpectroscopyAnalysis(BaseAnalysis):
         return np.array(s > m)
 
     def analyse_qubit(self):
+        for coord in self.dataset[self.data_var].coords:
+            if "frequencies" in coord:
+                self.frequencies = coord
+            elif "currents" in coord:
+                self.currents = coord
+        #self.dataset = self.dataset.sortby(self.currents)
+
         self.dc_currents = self.dataset[f"y{self.qubit}"][self.currents]
         self.detected_frequencies = []
         self.detected_currents = []
         for i, current in enumerate(self.dc_currents.values):
-            partial_ds = self.dataset[f"y{self.qubit}"].isel({self.currents: [i]})[:, 0]
-            analysis = QubitSpectroscopyNodeAnalysis(partial_ds.to_dataset())
-            qubit_frequency = analysis.analyse_qubit()[0]
+            qubit_frequency = super()._analyze_qubit()
             if not np.isnan(qubit_frequency):
                 self.detected_frequencies.append(qubit_frequency)
                 self.detected_currents.append(current)
@@ -97,3 +93,10 @@ class CouplerSpectroscopyAnalysis(BaseAnalysis):
                 c="orange",
                 label=f"parking current = {self.parking_I}",
             )
+
+class CouplerSpectroscopyNodeAnalysis(BaseAllCouplersAnalysis):
+    single_qubit_analysis_obj = CouplerSpectroscopyQubitAnalysis
+
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+        self.repeat_coordinate_name = "repeat"

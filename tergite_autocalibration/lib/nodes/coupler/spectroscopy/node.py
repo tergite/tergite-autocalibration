@@ -20,7 +20,7 @@ from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.hardware_utils import SpiDAC
 from tergite_autocalibration.utils.user_input import qubit_samples, resonator_samples
 from .analysis import (
-    CouplerSpectroscopyAnalysis,
+    CouplerSpectroscopyNodeAnalysis,
 )
 from ...qubit_control.spectroscopy.measurement import (
     Two_Tones_Multidim,
@@ -31,7 +31,7 @@ from ....base.node import BaseNode
 
 class Coupler_Spectroscopy_Node(BaseNode):
     measurement_obj = Two_Tones_Multidim
-    analysis_obj = CouplerSpectroscopyAnalysis
+    analysis_obj = CouplerSpectroscopyNodeAnalysis
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
@@ -123,7 +123,7 @@ class Coupler_Spectroscopy_Node(BaseNode):
 
 class Coupler_Resonator_Spectroscopy_Node(BaseNode):
     measurement_obj = Resonator_Spectroscopy
-    analysis_obj = CouplerSpectroscopyAnalysis
+    analysis_obj = CouplerSpectroscopyNodeAnalysis
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords

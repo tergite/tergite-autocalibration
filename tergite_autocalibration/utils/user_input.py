@@ -43,6 +43,7 @@ node reference
   randomized_benchmarking
   all_XY
   check_cliffords
+  cz_parametrisation_fix_duration
   cz_chevron
   cz_chevron_test
   cz_chevron_amplitude
@@ -104,9 +105,9 @@ user_samplespace = {
 }
 """
 ####################################################################
-target_node = "randomized_benchmarking"
-qubits = ["q16"] #["q06", "q07", "q08", "q09", "q10", "q11", "q12", "q13", "q14", "q15"]
-couplers = [] #["q06_q07"]
+target_node = "cz_parametrisation_fix_duration"
+qubits = ["q06","q07"] #["q06", "q07", "q08", "q09", "q10", "q11", "q12", "q13", "q14", "q15"]
+couplers = ["q06_q07"]
 user_samplespace = {
     "resonator_spectroscopy": {
         "ro_frequencies": {qubit: resonator_samples(qubit) for qubit in qubits}

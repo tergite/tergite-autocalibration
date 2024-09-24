@@ -22,7 +22,7 @@ from matplotlib import pyplot as plt
 
 from tergite_autocalibration.lib.base.analysis import BaseAnalysis
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis import (
-    FrequencyVsAmplitudeAnalysis,
+    FrequencyVsAmplitudeQubitAnalysis,
     FrequencyVsAmplitudeQ1Analysis,
     FrequencyVsAmplitudeQ2Analysis,
 )
@@ -48,11 +48,11 @@ def test_canCreateCorrectClass(setup_good_data):
     d14, d15, freqs, amps = setup_good_data
     c = FrequencyVsAmplitudeQ1Analysis(d14, freqs, amps)
     assert isinstance(c, FrequencyVsAmplitudeQ1Analysis)
-    assert isinstance(c, FrequencyVsAmplitudeAnalysis)
+    assert isinstance(c, FrequencyVsAmplitudeQubitAnalysis)
     assert isinstance(c, BaseAnalysis)
     c = FrequencyVsAmplitudeQ2Analysis(d15, freqs, amps)
     assert isinstance(c, FrequencyVsAmplitudeQ2Analysis)
-    assert isinstance(c, FrequencyVsAmplitudeAnalysis)
+    assert isinstance(c, FrequencyVsAmplitudeQubitAnalysis)
     assert isinstance(c, BaseAnalysis)
 
 
