@@ -220,7 +220,7 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
                 qubit_analysis = self.single_qubit_analysis_obj(
                     self.name, self.redis_fields
                 )
-                qubit_analysis._analyze_qubit(ds, this_qubit)
+                qubit_analysis._analyze_qubit(ds, this_qubit) #this_qubit shoulq be qXX
                 self.qubit_analyses.append(qubit_analysis)
 
             index = index + 1
@@ -294,7 +294,7 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
 
     def _analyze_qubit(self, dataset, qubit_element):
         self.dataset = dataset
-        self.qubit = qubit_element[1:]
+        self.qubit = qubit_element
         self.coord = dataset.coords
         self.data_var = list(dataset.data_vars.keys())[0]  # Assume the first data_var is relevant
         self.S21 = dataset.isel(ReIm=0) + 1j * dataset.isel(ReIm=1)
@@ -339,7 +339,7 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
         self.name_qubit_1 = coupler_element[0:3]
         self.name_qubit_2 = coupler_element[4:7]
         self.dataset = dataset
-        self.coupler = dataset.attrs["coupler"]
+        self.coupler = coupler_element
         self.coord = dataset.coords
         self.data_var = list(dataset.data_vars.keys())[0]  # Assume the first data_var is relevant
         self.S21 = dataset.isel(ReIm=0) + 1j * dataset.isel(ReIm=1)
