@@ -10,7 +10,6 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from pathlib import Path
 import warnings
 from typing import List, Tuple
 
@@ -296,7 +295,6 @@ class CZParametrisationFixDurationCouplerAnalysis(BaseCouplerAnalysis):
         return [self.opt_freq, self.opt_amp, self.opt_current]
 
     def plotter(self, primary_axis, secondary_axis):
-        print(self.opt_index)
         self.q1_list[self.opt_index].plotter(primary_axis)
         self.q2_list[self.opt_index].plotter(secondary_axis)
 

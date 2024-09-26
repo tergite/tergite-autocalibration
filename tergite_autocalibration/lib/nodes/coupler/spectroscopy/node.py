@@ -46,9 +46,11 @@ class Coupler_Spectroscopy_Node(BaseNode):
         # perform 2 tones while biasing the current
         self.coupled_qubits = self.get_coupled_qubits()
         self.coupler = self.couplers[0]
-        self.mode = MeasurementMode.real
-        self.spi_dac = SpiDAC(self.mode)
-        self.dac = self.spi_dac.create_spi_dac(self.coupler)
+
+        #This should go in node or in measurement
+        #self.mode = MeasurementMode.real
+        #self.spi_dac = SpiDAC(self.mode)
+        #self.dac = self.spi_dac.create_spi_dac(self.coupler)
 
         self.all_qubits = self.coupled_qubits
 
@@ -78,48 +80,6 @@ class Coupler_Spectroscopy_Node(BaseNode):
         this_iteration_value = list(iteration_dict.values())[0]
         print(f"{ this_iteration_value = }")
         self.spi_dac.set_dac_current(self.dac, this_iteration_value)
-
-    def calibrate(self, data_path: Path, lab_ic, cluster_status):
-        print("Performing optimized Sweep")
-        compiled_schedule = self.precompile(data_path)
-
-        optimization_element = "q13_q14"
-
-        optimization_guess = 100e-6
-
-        def set_optimizing_parameter(optimizing_parameter):
-            if self.name == "cz_chevron_optimize":
-                self.spi.set_dac_current(self.dac, optimizing_parameter)
-
-        def single_sweep(optimizing_parameter) -> float:
-            set_optimizing_parameter(optimizing_parameter)
-
-            self.measure_node(
-                compiled_schedule,
-                lab_ic,
-                data_path,
-                cluster_status=MeasurementMode.real,
-            )
-
-            measurement_result_ = self.post_process(data_path=data_path)
-
-            optimization_quantity = measurement_result_[optimization_element][
-                self.optimization_field
-            ]
-
-            return optimization_quantity
-
-        optimize.minimize(
-            single_sweep,
-            optimization_guess,
-            method="Nelder-Mead",
-            bounds=[(80e-6, 120e-6)],
-            options={"maxiter": 2},
-        )
-
-        # TODO MERGE-CZ-GATE: I guess this is under active development, so, we do not have a measurement_result?
-        return None
-
 
 class Coupler_Resonator_Spectroscopy_Node(BaseNode):
     measurement_obj = Resonator_Spectroscopy

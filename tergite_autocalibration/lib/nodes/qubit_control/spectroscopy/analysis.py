@@ -92,32 +92,31 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
+        self.fit_results = {}
 
+    def analyse_qubit(self):
+        # Fetch the resulting measurement variables
         for coord in self.dataset[self.data_var].coords:
             if "frequencies" in coord:
                 self.frequencies = coord
             elif "currents" in coord:
                 self.currents = coord
-        self.independents = self.dataset[self.frequencies].values
-        self.fit_results = {}
-
-    def analyse_qubit(self):
-        # Fetch the resulting measurement variables
-        frequencies = self.independents
+        
+        self.frequencies_value = self.dataset[self.frequencies].values
 
         if not self.has_peak():
-            return [np.mean(frequencies)]
+            return [np.mean(self.frequencies_value)]
 
         self.fit_freqs = np.linspace(
-            frequencies[0], frequencies[-1], 500
+            self.frequencies_value[0], self.frequencies_value[-1], 500
         )  # x-values for plotting
 
         # Initialize the Lorentzian model
         model = LorentzianModel()
 
         # Gives an initial guess for the model parameters and then fits the model to the data.
-        guess = model.guess(self.magnitudes, x=frequencies)
-        fit_result = model.fit(self.magnitudes, params=guess, x=frequencies)
+        guess = model.guess(self.magnitudes.to_dataarray().values, x=self.frequencies_value)
+        fit_result = model.fit(self.magnitudes.to_dataarray().values, params=guess, x=self.frequencies_value)
 
         self.freq = fit_result.params["x0"].value
         self.uncertainty = fit_result.params["x0"].stderr
@@ -126,7 +125,7 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
             fit_result.params, **{model.independent_vars[0]: self.fit_freqs}
         )
 
-        return [self.freq]
+        return self.freq
 
     def reject_outliers(self, data, m=3.0):
         # Filters out datapoints in data that deviate too far from the median
@@ -140,7 +139,8 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
         self, prom_coef: float = 6, wid_coef: float = 2.4, outlier_median: float = 3.0
     ):
         # Determines if the data contains one distinct peak or only noise
-        x = np.abs(self.S21)
+        x_dataarray = self.magnitudes.to_dataarray()
+        x = x_dataarray.values[0]
         x_filtered = self.reject_outliers(x, outlier_median)
         self.filtered_std = np.std(x_filtered)
         peaks, properties = signal.find_peaks(
@@ -167,7 +167,10 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
                 lw=3.0,
                 label=f"freq = {self.freq:.6E} ± {self.uncertainty:.1E} (Hz)",
             )
-        ax.plot(self.independents, self.magnitudes, "bo-", ms=3.0)
+
+        x_dataarray = self.magnitudes.to_dataarray()
+        x = x_dataarray.values[0]
+        ax.plot(self.frequencies_value, x, "bo-", ms=3.0)
         ax.set_title(f"Qubit Spectroscopy for {self.qubit}")
         ax.set_xlabel("frequency (Hz)")
         ax.set_ylabel("|S21| (V)")

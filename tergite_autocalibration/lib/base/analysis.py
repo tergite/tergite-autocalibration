@@ -136,6 +136,10 @@ class BaseNodeAnalysis(ABC):
         """
         pass
 
+    @abstractmethod
+    def open_dataset(self):
+        pass
+
     def manage_plots(self, column_grid: int, plots_per_qubit: int):
         n_vars = len(self.data_vars)
         n_coords = len(self.coords)
@@ -290,17 +294,15 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
 
     def _analyze_qubit(self, dataset, qubit_element):
         self.dataset = dataset
-        print(qubit_element)
-        self.qubit = dataset.attrs["qubit"]
-        print(self.qubit)
+        self.qubit = qubit_element[1:]
         self.coord = dataset.coords
         self.data_var = list(dataset.data_vars.keys())[0]  # Assume the first data_var is relevant
         self.S21 = dataset.isel(ReIm=0) + 1j * dataset.isel(ReIm=1)
         self.magnitudes = np.abs(self.S21)
         self._qoi = self.analyse_qubit()
 
-        self.update_redis_trusted_values(self.name, qubit_element)
-        return {qubit_element: dict(zip(self.redis_fields, self._qoi))}
+        self.update_redis_trusted_values(self.name, self.qubit)
+        return self._qoi
 
     def _plot(self, primary_axis):
         self.plotter(primary_axis)  # Assuming node_analysis object is available
@@ -535,7 +537,6 @@ class BaseAllCouplersRepeatAnalysis(BaseAllCouplersAnalysis, ABC):
 
                 # Instead of merging, keep each qubit data separate
                 for data in qubit_data:
-                    combined_dim = f'{self.repeat_coordinate_name}{coupler}'
                     data.name = f"{data.name}"  # Rename to avoid conflicts
                     merged_coupler_datasets.append(data)
                 
