@@ -13,7 +13,6 @@
 import pytest
 
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis import (
-    CZParametrisationFixDurationAnalysis,
     CZParametrisationFixDurationNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.measurement import (
