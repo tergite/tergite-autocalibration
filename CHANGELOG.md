@@ -11,6 +11,7 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 - superconducting_qubit_tools as conditional dependency
 - Calibration node for purity benchmarking
 - Redis storage manager
+- Dataset browser
 
 ### Changed
 - Switch to quantify-scheduler version 0.20.0
