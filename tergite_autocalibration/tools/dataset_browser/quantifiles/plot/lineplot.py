@@ -93,6 +93,7 @@ _OPTIONS = [
     },
 ]
 
+
 class LinePlot(BasePlot):
     def __init__(
         self,
@@ -159,7 +160,7 @@ class LinePlot(BasePlot):
 
             curve = self.plot.plot(
                 x_scaling * self.dataset[self.x_key].values,
-                y_scaling * magnitudes ,
+                y_scaling * magnitudes,
                 **next(options_generator),
                 name=curve_name,
                 connect="finite",

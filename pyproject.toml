@@ -36,6 +36,7 @@ toml = "0.10.2"
 python-dotenv = "1.0.1"
 click = "8.1.7"
 jokeapi = "1.0.5"
+quantifiles = { path = "tergite_autocalibration/tools/dataset_browser", develop = true }
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"

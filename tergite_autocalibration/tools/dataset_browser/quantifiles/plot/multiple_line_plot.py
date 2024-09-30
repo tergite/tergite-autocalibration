@@ -70,10 +70,18 @@ class MultipleLinePlot(BasePlot):
         self.set_data(dataset)
 
         set_label(
-            self.plot, "bottom", dataset[x_keys[0]].long_name, x_unit, dataset[x_keys[0]].attrs["units"]
+            self.plot,
+            "bottom",
+            dataset[x_keys[0]].long_name,
+            x_unit,
+            dataset[x_keys[0]].attrs["units"],
         )
         set_label(
-            self.plot, "left", dataset[x_keys[1]].long_name, y_unit, dataset[x_keys[1]].attrs["units"]
+            self.plot,
+            "left",
+            dataset[x_keys[1]].long_name,
+            y_unit,
+            dataset[x_keys[1]].attrs["units"],
         )
 
     def create_curves(self, dataset: xr.Dataset):
@@ -86,20 +94,23 @@ class MultipleLinePlot(BasePlot):
         curves = []
 
         for outer_index, outer_value in enumerate(dataset[outer_settable].values):
-            real_values = dataset[self.y_keys[0]].isel({outer_settable: outer_index})[:,0].values
-            imag_values = dataset[self.y_keys[0]].isel({outer_settable: outer_index})[:,1].values
+            real_values = (
+                dataset[self.y_keys[0]].isel({outer_settable: outer_index})[:, 0].values
+            )
+            imag_values = (
+                dataset[self.y_keys[0]].isel({outer_settable: outer_index})[:, 1].values
+            )
             magnitudes = np.sqrt(real_values**2 + imag_values**2)
 
             curve = self.plot.plot(
                 x_data,
-                magnitudes ,
+                magnitudes,
                 **next(options_generator),
                 # name=curve_name,
                 connect="finite",
             )
             curves.append(curve)
         return curves
-
 
         # limits = (np.nanmin(z_data), np.nanmax(z_data))
         # if limits[0] is not np.nan and limits[1] is not np.nan:

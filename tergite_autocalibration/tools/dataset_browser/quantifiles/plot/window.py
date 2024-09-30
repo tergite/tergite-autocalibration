@@ -97,6 +97,7 @@ class GettableSelector(QtWidgets.QWidget):
         main_layout.addLayout(checkbox_layout)
         main_layout.addWidget(box_frame)
 
+
 class CustomSelector(QtWidgets.QWidget):
     """
     A widget for selecting independentley the dependent and independentley
@@ -109,9 +110,10 @@ class CustomSelector(QtWidgets.QWidget):
     dataset : xarray.Dataset or None, optional
         The xarray dataset containing the data variable to be selected.
     """
+
     # Custom signal that is emitted when a settable and gettable
     # is selected from the two combo boxes
-    combo_selected = QtCore.pyqtSignal(str,str)
+    combo_selected = QtCore.pyqtSignal(str, str)
 
     def __init__(
         self,
@@ -163,12 +165,12 @@ class CustomSelector(QtWidgets.QWidget):
 
         settables = list(dataset.coords.keys())
         gettables = list(dataset.data_vars.keys())
-        settables = [cast(str,s) for s in settables]
-        gettables = [cast(str,g) for g in gettables]
+        settables = [cast(str, s) for s in settables]
+        gettables = [cast(str, g) for g in gettables]
         self.set_combo_box = QtWidgets.QComboBox()
         self.get_combo_box = QtWidgets.QComboBox()
-        self.set_combo_box.addItems(settables+gettables)
-        self.get_combo_box.addItems(settables+gettables)
+        self.set_combo_box.addItems(settables + gettables)
+        self.get_combo_box.addItems(settables + gettables)
 
         # self.set_combo_box.activated[str].connect(lambda x: print(dataset[x]))
         # self.get_combo_box.activated[str].connect(lambda x: print(dataset[x]))
@@ -176,7 +178,7 @@ class CustomSelector(QtWidgets.QWidget):
         self.get_combo_box.activated[str].connect(self.combo_option_selected)
 
         # # Add the title label and underline.
-        label = QtWidgets.QLabel('select dependent and independent variables:')
+        label = QtWidgets.QLabel("select dependent and independent variables:")
         # custom_underline = QtWidgets.QFrame()
         # # custom_underline.setFrameShape(QtWidgets.QFrame.HLine)
         # custom_underline.setFrameShadow(QtWidgets.QFrame.Sunken)
@@ -219,7 +221,6 @@ class GettableSelectBox(QtWidgets.QFrame):
 
     # Custom signal that is emitted when a checkbox is toggled
     gettable_toggled = QtCore.pyqtSignal(str, bool)
-
 
     def __init__(
         self, parent: QtWidgets.QWidget | None = None, dataset: xr.Dataset | None = None
@@ -274,7 +275,9 @@ class GettableSelectBox(QtWidgets.QFrame):
             layout.addWidget(gettable_box)
 
         self.custom_select_box = CustomSelector(dataset=dataset)
-        self.custom_select_box.checkbox.stateChanged.connect(self.gettable_select_mapper.map)
+        self.custom_select_box.checkbox.stateChanged.connect(
+            self.gettable_select_mapper.map
+        )
         layout.addWidget(self.custom_select_box)
         # Add another spacer to push the widgets so that they are centered
         layout.addSpacerItem(spacer)
@@ -305,6 +308,7 @@ class GettableSelectBox(QtWidgets.QFrame):
         """
         enabled = self._gettable_checkboxes[name].isChecked()
         self.gettable_toggled.emit(name, enabled)
+
 
 class NameAndTuidBox(QtWidgets.QFrame):
     def __init__(self, name: str, tuid: str):
@@ -498,7 +502,7 @@ class PlotWindow(QtWidgets.QMainWindow):
         )
 
         self.resize(
-            self._WINDOW_WIDTH + self._WINDOW_HEIGHT * (1+len(self.plots)),
+            self._WINDOW_WIDTH + self._WINDOW_HEIGHT * (1 + len(self.plots)),
             self._WINDOW_HEIGHT,
         )
 

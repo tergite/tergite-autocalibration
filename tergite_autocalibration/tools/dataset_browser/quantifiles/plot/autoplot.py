@@ -11,14 +11,12 @@ from quantifiles.plot.loki_window import PlotWindow
 from quantifiles.plot.multiple_line_plot import MultipleLinePlot
 
 
-
-#rename it to initial_plot
+# rename it to initial_plot
 def autoplot(dataset: xr.Dataset, device_config: dict) -> QtWidgets.QMainWindow:
-
     plot_window = PlotWindow(dataset, device_config)
 
     for var in dataset.data_vars:
-        qubit = dataset[var].attrs['qubit']
+        qubit = dataset[var].attrs["qubit"]
         gettable = cast(str, var)
         settables = list(dataset[var].coords.keys())
 
@@ -36,7 +34,7 @@ def autoplot(dataset: xr.Dataset, device_config: dict) -> QtWidgets.QMainWindow:
                 dataset, x_keys=settables, y_keys=gettable, parent=plot_window
             )
         else:
-            raise ValueError('Cant plot datasets with more than 2 settables :(')
+            raise ValueError("Cant plot datasets with more than 2 settables :(")
         plot_window.add_plot(qubit, plot_widget)
         if len(settables) == 2:
             plot_window.add_secondary_plot(qubit, secondary_plot_widget)

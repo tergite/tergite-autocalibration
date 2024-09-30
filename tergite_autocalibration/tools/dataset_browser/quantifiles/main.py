@@ -187,9 +187,9 @@ class ExperimentList(QtWidgets.QTreeWidget):
 
         tuid = selection[0].text(0)
         name = selection[0].text(1)
-        date = selection[0].text(2).replace('-','')
-        subpath = tuid + '-' + name
-        path = f'{date}/{subpath}'
+        date = selection[0].text(2).replace("-", "")
+        subpath = tuid + "-" + name
+        path = f"{date}/{subpath}"
         self.new_experiment_selected.emit(path)
 
     @QtCore.pyqtSlot(QtWidgets.QTreeWidgetItem, int)
@@ -326,12 +326,9 @@ class TopBar(QtWidgets.QWidget):
         """
         self.liveplotting_changed.emit(state == QtCore.Qt.Checked)
 
+
 class ExperimentPreview(QtWidgets.QLabel):
-    def __init__(
-            self,
-            datadir: str,
-            parent: QtWidgets.QWidget | None = None
-        ):
+    def __init__(self, datadir: str, parent: QtWidgets.QWidget | None = None):
         super().__init__(parent)
         self.datadir = datadir
 
@@ -351,10 +348,9 @@ class ExperimentPreview(QtWidgets.QLabel):
         # self.setFont(font)
 
     def display_image(self, image_path):
-
         # Check if the image file exists
         if QImageReader(image_path).size() == QSize(0, 0):
-            self.setText('Image not found')
+            self.setText("Image not found")
             return
 
         # image_reader = QImageReader(image_path)
@@ -374,7 +370,9 @@ class ExperimentPreview(QtWidgets.QLabel):
         # scaled_image = QPixmap.fromImage(image).scaled(label_width, label_height, transformMode=Qt.SmoothTransformation)
 
         scaled_image = image.scaled(
-            label_width, label_height, transformMode=Qt.SmoothTransformation
+            label_width,
+            label_height,
+            transformMode=Qt.SmoothTransformation
             # label_width, label_height, aspectRatioMode=Qt.KeepAspectRatio
         )
 
@@ -390,7 +388,7 @@ class ExperimentPreview(QtWidgets.QLabel):
 
     @QtCore.pyqtSlot(str)
     def display_datadir_path(self, date: str) -> None:
-    # def update_datadir(self, datadir: str) -> None:
+        # def update_datadir(self, datadir: str) -> None:
         folder_path = Path(self.datadir) / date
 
         # if folder_content is None:
@@ -398,22 +396,25 @@ class ExperimentPreview(QtWidgets.QLabel):
         # else:
         #     self.setText(f"Data directory: {folder_content}")
 
-        files = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
+        files = [
+            f
+            for f in os.listdir(folder_path)
+            if os.path.isfile(os.path.join(folder_path, f))
+        ]
 
         # Filter for PNG files
-        png_files = [f for f in files if f.lower().endswith('.png')]
+        png_files = [f for f in files if f.lower().endswith(".png")]
 
         if not png_files:
-            self.image_label.setText('No PNG image found in the selected folder')
+            self.image_label.setText("No PNG image found in the selected folder")
             return
 
         for png in png_files:
-            if '_preview' in png:
+            if "_preview" in png:
                 png_file = png
                 break
             else:
                 png_file = png
-
 
         # Assuming one png per file, let's use the first PNG file found in the folder
         image_path = os.path.join(folder_path, png_file)
@@ -511,7 +512,9 @@ class DataDirInspector(QtWidgets.QMainWindow):
         self.date_list.dates_selected.connect(self.set_date_selection)
         self.new_datadir_selected.connect(self.update_datadir)
         # self.experiment_list.experiment_selected.connect(self.experiment_preview.display_datadir_path)
-        self.experiment_list.new_experiment_selected.connect(self.experiment_preview.display_datadir_path)
+        self.experiment_list.new_experiment_selected.connect(
+            self.experiment_preview.display_datadir_path
+        )
         self._today_folder_monitor.new_measurement_found.connect(
             self._on_new_measurement
         )
@@ -536,8 +539,7 @@ class DataDirInspector(QtWidgets.QMainWindow):
         self._auto_open_plots = liveplotting
 
     @QtCore.pyqtSlot(str, str)
-    def open_plots(self, tuid: str, measurement_name:str) -> None:
-
+    def open_plots(self, tuid: str, measurement_name: str) -> None:
         # tuid = SplitTuid(tuid)
         # lockfile = os.path.join(
         #     _DATASET_LOCKS_DIR, tuid.tuid + "-" + DATASET_NAME + ".lock"
@@ -549,12 +551,12 @@ class DataDirInspector(QtWidgets.QMainWindow):
         # Load the dataset and create a plot
 
         # device_config = load_device_config(tuid)
-        device_config_path = f'{self.datadir}{tuid[:8]}/{tuid}-{measurement_name}/{measurement_name}.json'
+        device_config_path = f"{self.datadir}{tuid[:8]}/{tuid}-{measurement_name}/{measurement_name}.json"
         with open(device_config_path) as js:
             device_config = json.load(js)
 
         for element in device_config:
-            device_config[element] = device_config[element]['data']
+            device_config[element] = device_config[element]["data"]
 
         ds = safe_load_dataset(tuid)
         p = autoplot(ds, device_config)
