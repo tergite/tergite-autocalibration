@@ -658,6 +658,8 @@ def main(
         None.
     """
     app = QtWidgets.QApplication([])
+    # FIXME: test modification
+    x = 1
     logging.basicConfig(level=log_level)
     app.setApplicationName("Quantifiles")
     app.setWindowIcon(load_icon("icon.png"))
