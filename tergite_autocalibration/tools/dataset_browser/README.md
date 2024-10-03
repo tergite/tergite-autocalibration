@@ -73,7 +73,7 @@ git fetch quantifiles
 
 Now, assuming that there you can pull the changes into using a git subtree.
 ```
-git pull --prefix=tergite_autocalibration/tools/dataset_browser quantifiles main
+git subtree pull --prefix=tergite_autocalibration/tools/dataset_browser quantifiles main
 ```
 
 Resolve any conflicts that might have occurred during the merge and push the changes to the origin repository.
