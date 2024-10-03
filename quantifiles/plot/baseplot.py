@@ -37,10 +37,13 @@ class BasePlot(QtWidgets.QFrame):
             parent=self,
         )
         self.plot = pyqtgraph.PlotWidget()
+        self.secondary_plot = pyqtgraph.PlotWidget()
 
         self.setLayout(QtWidgets.QVBoxLayout())
-        self.layout().addWidget(self.header)
+        # self.layout().addWidget(self.header)
         self.layout().addWidget(self.plot)
+        # if len(dataset.coords) != len(dataset.data_vars):
+        #     self.layout().addWidget(self.secondary_plot)
 
         # Create a 'Copy to Clipboard' QAction and add it to the plot's context menu
         self.copy_action = QtGui.QAction(

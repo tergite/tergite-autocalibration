@@ -74,11 +74,24 @@ class ColorPlot(BasePlot):
         # Set the data
         self.set_data(dataset)
 
+        inner_settable = self.x_keys[0]
+        outer_settable = self.x_keys[1]
+        if "frequencies" in outer_settable:
+            inner_settable, outer_settable = outer_settable, inner_settable
+
         set_label(
-            self.plot, "bottom", dataset[x_keys[0]].long_name, x_unit, dataset[x_keys[0]].attrs["units"]
+            self.plot,
+            "bottom",
+            dataset[inner_settable].long_name,
+            x_unit,
+            dataset[inner_settable].attrs["units"],
         )
         set_label(
-            self.plot, "left", dataset[x_keys[1]].long_name, y_unit, dataset[x_keys[1]].attrs["units"]
+            self.plot,
+            "left",
+            dataset[outer_settable].long_name,
+            y_unit,
+            dataset[outer_settable].attrs["units"],
         )
 
     def set_data(self, dataset: xr.Dataset) -> None:
@@ -101,12 +114,20 @@ class ColorPlot(BasePlot):
 
         is_uniformly_spaced = True
         if is_uniformly_spaced:
-            x_data = self.x_scaling * dataset[self.x_keys[0]].values
-            y_data = self.y_scaling * dataset[self.x_keys[1]].values
+            # TODO: refactor this
+            inner_settable = self.x_keys[0]
+            outer_settable = self.x_keys[1]
+            if "frequencies" in outer_settable:
+                inner_settable, outer_settable = outer_settable, inner_settable
+            x_data = self.x_scaling * dataset[inner_settable].values
+            y_data = self.y_scaling * dataset[outer_settable].values
 
-            real_values = dataset[self.y_keys[0]].values[:,:,0]
-            imag_values = dataset[self.y_keys[0]].values[:,:,1]
-            data_values = np.transpose(np.sqrt(real_values**2 + imag_values**2))
+            real_values = dataset[self.y_keys[0]].values[:, :, 0]
+            imag_values = dataset[self.y_keys[0]].values[:, :, 1]
+            data_values = np.sqrt(real_values ** 2 + imag_values ** 2)
+            if "frequencies" in inner_settable:
+                data_values = np.transpose(data_values)
+            # data_values = np.transpose(np.sqrt(real_values ** 2 + imag_values ** 2))
             # z_data = np.reshape(
             #     dataset[self.z].values, (len(x_data), len(y_data)), order="F"
             # )
@@ -181,6 +202,4 @@ class ColorPlot(BasePlot):
         # y_unit = self.dataset[self.y].attrs["units"]
         # z_unit = self.dataset[self.z].attrs["units"]
 
-        return (
-            f"\nx = {x:.4e} \ny = {y:.3e} \nz = {z_value:.3e} "
-        )
+        return f"\nx = {x:.4e} \ny = {y:.3e} \nz = {z_value:.3e} "

@@ -19,79 +19,80 @@ _OPTIONS = [
         "symbolBrush": (0, 114, 189),
         "symbolPen": "w",
         "symbol": "p",
-        "symbolSize": 12,
+        "symbolSize": 8,
     },
     {
         "pen": (217, 83, 25),
         "symbolBrush": (217, 83, 25),
         "symbolPen": "w",
         "symbol": "h",
-        "symbolSize": 12,
+        "symbolSize": 8,
     },
     {
         "pen": (250, 194, 5),
         "symbolBrush": (250, 194, 5),
         "symbolPen": "w",
         "symbol": "t3",
-        "symbolSize": 12,
+        "symbolSize": 8,
     },
     {
         "pen": (54, 55, 55),
         "symbolBrush": (55, 55, 55),
         "symbolPen": "w",
         "symbol": "s",
-        "symbolSize": 12,
+        "symbolSize": 8,
     },
     {
         "pen": (119, 172, 48),
         "symbolBrush": (119, 172, 48),
         "symbolPen": "w",
         "symbol": "d",
-        "symbolSize": 12,
+        "symbolSize": 8,
     },
     {
         "pen": (19, 234, 201),
         "symbolBrush": (19, 234, 201),
         "symbolPen": "w",
         "symbol": "t1",
-        "symbolSize": 12,
+        "symbolSize": 8,
     },
     {
         "pen": (0, 0, 200),
         "symbolBrush": (0, 0, 200),
         "symbolPen": "w",
         "symbol": "o",
-        "symbolSize": 12,
+        "symbolSize": 8,
     },
     {
         "pen": (0, 128, 0),
         "symbolBrush": (0, 128, 0),
         "symbolPen": "w",
         "symbol": "t",
-        "symbolSize": 12,
+        "symbolSize": 8,
     },
     {
         "pen": (195, 46, 212),
         "symbolBrush": (195, 46, 212),
         "symbolPen": "w",
         "symbol": "t2",
-        "symbolSize": 12,
+        "symbolSize": 8,
     },
     {
         "pen": (237, 177, 32),
         "symbolBrush": (237, 177, 32),
         "symbolPen": "w",
         "symbol": "star",
-        "symbolSize": 12,
+        "symbolSize": 8,
     },
     {
         "pen": (126, 47, 142),
         "symbolBrush": (126, 47, 142),
         "symbolPen": "w",
         "symbol": "+",
-        "symbolSize": 12,
+        "symbolSize": 8,
     },
 ]
+
 
 class LinePlot(BasePlot):
     def __init__(
@@ -106,36 +107,42 @@ class LinePlot(BasePlot):
         self.y_keys = [y_keys] if isinstance(y_keys, str) else y_keys
         self.x_key = x_key
 
-        x_unit, self.x_scaling = get_si_unit_and_scaling(
-            self.dataset[x_key].attrs["units"]
-        )
-        y_unit, self.y_scaling = get_si_unit_and_scaling(
-            self.dataset[self.y_keys[0]].attrs["units"]
-        )
+        if "units" in self.dataset[x_key].attrs:
+            x_unit, self.x_scaling = get_si_unit_and_scaling(
+                self.dataset[x_key].attrs["units"]
+            )
+        else:
+            x_unit, self.x_scaling = "", 1
+        if "units" in self.dataset[self.y_keys[0]].attrs:
+            y_unit, self.y_scaling = get_si_unit_and_scaling(
+                self.dataset[self.y_keys[0]].attrs["units"]
+            )
+        else:
+            y_unit, self.y_scaling = "", 1
 
         self.curves = self.create_curves(self.x_scaling, self.y_scaling)
         if len(self.y_keys) > 1:
             self.plot.addLegend()
 
-        utils.set_label(
-            self.plot,
-            "bottom",
-            self.dataset[x_key].long_name,
-            x_unit,
-            self.dataset[x_key].attrs["units"],
-        )
-        utils.set_label(
-            self.plot,
-            "left",
-            self.dataset[self.y_keys[0]].long_name,
-            y_unit,
-            self.dataset[self.y_keys[0]].attrs["units"],
-        )
+        # utils.set_label(
+        #     self.plot,
+        #     "bottom",
+        #     self.dataset[x_key].name,
+        #     x_unit,
+        #     self.dataset[x_key].attrs["units"],
+        # )
+        # utils.set_label(
+        #     self.plot,
+        #     "left",
+        #     self.dataset[self.y_keys[0]].name,
+        #     y_unit,
+        #     self.dataset[self.y_keys[0]].attrs["units"],
+        # )
 
         self.plot.showGrid(x=True, y=True)
 
-        if all([self.dataset[key].attrs["units"] == "%" for key in self.y_keys]):
-            self.plot.setYRange(0, 1)
+        # if all([self.dataset[key].attrs["units"] == "%" for key in self.y_keys]):
+        #     self.plot.setYRange(0, 1)
 
         # self.set_data(self.dataset)
 
@@ -152,14 +159,14 @@ class LinePlot(BasePlot):
         options_generator = cycle(_OPTIONS)
         curves = []
         for y_var in self.y_keys:
-            curve_name = f"{self.dataset[y_var].name}: {self.dataset[y_var].long_name}"
+            curve_name = f"{self.dataset[y_var].name}: {self.dataset[y_var].name}"
             real_values = self.dataset[y_var].isel(ReIm=0).values
             imag_values = self.dataset[y_var].isel(ReIm=1).values
-            magnitudes = np.sqrt(real_values**2 + imag_values**2)
+            magnitudes = np.sqrt(real_values ** 2 + imag_values ** 2)
 
             curve = self.plot.plot(
                 x_scaling * self.dataset[self.x_key].values,
-                y_scaling * magnitudes ,
+                y_scaling * magnitudes,
                 **next(options_generator),
                 name=curve_name,
                 connect="finite",
@@ -168,8 +175,5 @@ class LinePlot(BasePlot):
         return curves
 
     def get_mouse_position_text(self, x: float, y: float) -> str:
-        text = (
-            f"\nx = {x:.3e} {self.dataset[self.x_key].attrs['units']} "
-            f"\ny = {y:.3e} {self.dataset[self.y_keys[0]].attrs['units']}"
-        )
+        text = f"\nx = {x:.3e}" f"\ny = {y:.3e}"
         return text
