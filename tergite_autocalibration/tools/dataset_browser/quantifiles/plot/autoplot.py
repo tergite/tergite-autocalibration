@@ -35,9 +35,10 @@ def autoplot(dataset: xr.Dataset, device_config: dict) -> QtWidgets.QMainWindow:
             )
         else:
             raise ValueError("Cant plot datasets with more than 2 settables :(")
-        plot_window.add_plot(qubit, plot_widget)
         if len(settables) == 2:
-            plot_window.add_secondary_plot(qubit, secondary_plot_widget)
+            plot_window.add_plot(qubit, plot_widget, secondary_plot_widget)
+        else:
+            plot_window.add_plot(qubit, plot_widget)
 
     return plot_window
 
