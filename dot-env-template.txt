@@ -32,6 +32,10 @@ DEVICE_CONFIG='device_config.toml'
 # CALIBRATION_CONFIG contains all values for the runtime of the program
 CALIBRATION_CONFIG='calibration_config.toml'
 
+# QOI_CONFIG contains the configuration for the node quantities of interest
+# This is a temporary configuration and the plan is to replace it with defaults and QOI objects on the node level
+QOI_CONFIG='qoi_config.toml'
+
 # Configuration variables
 # CLUSTER_IP is the IP address of the instrument cluster to connect with
 CLUSTER_IP='129.14.2.1'

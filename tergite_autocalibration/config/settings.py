@@ -105,6 +105,7 @@ CONFIG_DIR = _from_config(
 HARDWARE_CONFIG = CONFIG_DIR.joinpath(_from_config("HARDWARE_CONFIG", cast_=Path))
 DEVICE_CONFIG = CONFIG_DIR.joinpath(_from_config("DEVICE_CONFIG", cast_=Path))
 CALIBRATION_CONFIG = CONFIG_DIR.joinpath(_from_config("CALIBRATION_CONFIG", cast_=Path))
+QOI_CONFIG = CONFIG_DIR.joinpath(_from_config("QOI_CONFIG", cast_=Path))
 BACKEND_CONFIG = Path(__file__).parent / "backend_config_default.toml"
 
 # ---

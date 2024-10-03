@@ -96,9 +96,6 @@ class CalibrationSupervisor:
         self.user_samplespace = user_requested_calibration["user_samplespace"]
         self.measurement_mode = self.cluster_mode
 
-        # Read the device configuration
-        self.transmon_configuration = toml.load(settings.DEVICE_CONFIG)
-
         # Initialize the node structure
         self.node_factory = NodeFactory()
         self.topo_order = filtered_topological_order(CONFIG.target_node)
@@ -147,7 +144,7 @@ class CalibrationSupervisor:
         draw_arrow_chart(f"Qubits: {number_of_qubits}", self.topo_order)
 
         populate_quantities_of_interest(
-            self.transmon_configuration, self.qubits, self.couplers, REDIS_CONNECTION
+            self.qubits, self.couplers, REDIS_CONNECTION
         )
 
         for calibration_node in self.topo_order:
@@ -175,7 +172,7 @@ class CalibrationSupervisor:
             + str(self.couplers)
         )
         populate_initial_parameters(
-            self.transmon_configuration, self.qubits, self.couplers, REDIS_CONNECTION
+            self.qubits, self.couplers, REDIS_CONNECTION
         )
         # print(f'{node_name = }')
         # print(f'{self.couplers = }')
@@ -210,7 +207,6 @@ class CalibrationSupervisor:
         populate_node_parameters(
             node_name,
             is_node_calibrated,
-            self.transmon_configuration,
             self.qubits,
             self.couplers,
             REDIS_CONNECTION,

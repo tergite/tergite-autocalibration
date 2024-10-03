@@ -10,7 +10,9 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
+import toml
 
+from tergite_autocalibration.config import settings
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
 
 
@@ -36,9 +38,10 @@ def populate_parking_currents(
 
 
 def populate_initial_parameters(
-    transmon_configuration: dict, qubits: list, couplers: list, redis_connection
+        qubits: list, couplers: list, redis_connection
 ):
-    initial_device_config = transmon_configuration["initials"]
+    calibration_configuration = toml.load(settings.CALIBRATION_CONFIG)
+    initial_device_config = calibration_configuration["initials"]
 
     initial_qubit_parameters = initial_device_config["qubits"]
     initial_coupler_parameters = initial_device_config["couplers"]
@@ -91,12 +94,12 @@ def populate_initial_parameters(
 def populate_node_parameters(
     node_name: str,
     is_node_calibrated: bool,
-    transmon_configuration: dict,
     qubits: list,
     couplers: list,
     redis_connection,
 ):
     # Populate the Redis database with node specific parameter values from the toml file
+    transmon_configuration = toml.load(settings.CALIBRATION_CONFIG)
     if node_name in transmon_configuration and not is_node_calibrated:
         node_specific_dict = transmon_configuration[node_name]["all"]
         for field_key, field_value in node_specific_dict.items():
@@ -126,12 +129,12 @@ def populate_node_parameters(
                     structured_redis_storage(field_key, coupler, field_value)
 
 
-def populate_quantities_of_interest(
-    transmon_configuration: dict, qubits: list, couplers: list, redis_connection
+def populate_quantities_of_interest(qubits: list, couplers: list, redis_connection
 ):
     # Populate the Redis database with the quantities of interest, at Nan value
     # Only if the key does NOT already exist
-    quantities_of_interest = transmon_configuration["qoi"]
+    qoi_configuration = toml.load(settings.QOI_CONFIG)
+    quantities_of_interest = qoi_configuration["qoi"]
     qubit_quantities_of_interest = quantities_of_interest["qubits"]
     coupler_quantities_of_interest = quantities_of_interest["couplers"]
 

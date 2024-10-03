@@ -14,7 +14,7 @@
 
 import toml
 
-from tergite_autocalibration.config.settings import DEVICE_CONFIG, REDIS_CONNECTION
+from tergite_autocalibration.config.settings import QOI_CONFIG, REDIS_CONNECTION
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 from tergite_autocalibration.utils import user_input
@@ -26,9 +26,9 @@ class ResetRedisNode:
         self.couplers = user_input.couplers
         node_factory = NodeFactory()
         self.nodes = node_factory.all_nodes()
-        transmon_configuration = toml.load(DEVICE_CONFIG)
-        self.quantities_of_interest = transmon_configuration["qoi"]["qubits"]
-        self.coupler_quantities_of_interest = transmon_configuration["qoi"]["couplers"]
+        qoi_configuration = toml.load(QOI_CONFIG)
+        self.quantities_of_interest = qoi_configuration["qoi"]["qubits"]
+        self.coupler_quantities_of_interest = qoi_configuration["qoi"]["couplers"]
 
     def reset_node(self, remove_node):
         print(f"{ remove_node = }")

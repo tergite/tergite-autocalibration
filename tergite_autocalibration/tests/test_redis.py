@@ -22,7 +22,7 @@ import toml
 
 
 nodes = NodeFactory()
-transmon_configuration = toml.load(settings.DEVICE_CONFIG)
+transmon_configuration = toml.load(settings.QOI_CONFIG)
 qois = transmon_configuration["qoi"]
 setup = mock.set_up_mock_transmon_setup()
 mock.set_standard_params_transmon(setup)
