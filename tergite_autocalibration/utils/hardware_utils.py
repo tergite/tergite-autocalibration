@@ -16,10 +16,11 @@ import time
 from pathlib import Path
 from typing import Dict
 
+import toml
 from qblox_instruments import Cluster, SpiRack
 from qcodes import validators
 
-from tergite_autocalibration.config.coupler_config import coupler_spi_map
+from tergite_autocalibration.config import settings
 from tergite_autocalibration.config.settings import REDIS_CONNECTION, HARDWARE_CONFIG
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 
@@ -116,11 +117,14 @@ class SpiDAC:
 
     def create_spi_dac(self, coupler: str):
         dc_current_step = 1e-6
-        spi_mod_number, dac_name = coupler_spi_map[coupler]
 
-        spi_mod_name = f"module{spi_mod_number}"
+        spi_configuration = toml.load(settings.SPI_CONFIG)
+        spi_module_no = spi_configuration[coupler]["spi_module_no"]
+        dac_name = spi_configuration[coupler]["dac_name"]
+
+        spi_mod_name = f"module{spi_module_no}"
         if spi_mod_name not in self.spi.instrument_modules:
-            self.spi.add_spi_module(spi_mod_number, "S4g")
+            self.spi.add_spi_module(spi_module_no, "S4g")
         this_dac = self.spi.instrument_modules[spi_mod_name].instrument_modules[
             dac_name
         ]
