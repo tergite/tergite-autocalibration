@@ -18,7 +18,7 @@ from scipy import optimize as optimize
 
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.hardware_utils import SpiDAC
-from tergite_autocalibration.utils.user_input import qubit_samples, resonator_samples
+from ....utils.samplespace import resonator_samples, qubit_samples
 from .analysis import (
     CouplerSpectroscopyAnalysis,
 )

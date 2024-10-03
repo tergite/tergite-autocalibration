@@ -11,7 +11,7 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from tergite_autocalibration.utils.user_input import resonator_samples
+from ....utils.samplespace import resonator_samples
 from .analysis import OptimalROFrequencyAnalysis, OptimalRO_012_FrequencyAnalysis
 from .measurement import RO_frequency_optimization
 from ....base.node import BaseNode

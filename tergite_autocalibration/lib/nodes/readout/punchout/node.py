@@ -12,7 +12,7 @@
 
 import numpy as np
 
-from tergite_autocalibration.utils.user_input import resonator_samples
+from ....utils.samplespace import resonator_samples
 from .analysis import PunchoutAnalysis
 from .measurement import Punchout
 from ....base.node import BaseNode

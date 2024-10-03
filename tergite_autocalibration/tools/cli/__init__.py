@@ -12,6 +12,7 @@
 # that they have been altered from the originals.
 
 from pathlib import Path
+
 import click
 
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
@@ -70,10 +71,10 @@ def node():
 def reset(name, all, from_node):
     from tergite_autocalibration.utils.reset_redis_node import ResetRedisNode
     from tergite_autocalibration.lib.utils.graph import range_topological_order
-    from tergite_autocalibration.utils.user_input import user_requested_calibration
+    from tergite_autocalibration.config.calibration import CONFIG
 
     topo_order = range_topological_order(
-        from_node, user_requested_calibration["target_node"]
+        from_node, CONFIG.target_node
     )
 
     reset_obj_ = ResetRedisNode()
@@ -110,11 +111,11 @@ def graph():
 )
 def plot():
     from tergite_autocalibration.lib.utils.graph import filtered_topological_order
-    from tergite_autocalibration.utils.user_input import user_requested_calibration
+    from tergite_autocalibration.config.calibration import CONFIG
     from tergite_autocalibration.utils.visuals import draw_arrow_chart
 
-    n_qubits = len(user_requested_calibration["all_qubits"])
-    topo_order = filtered_topological_order(user_requested_calibration["target_node"])
+    n_qubits = len(CONFIG.qubits)
+    topo_order = filtered_topological_order(CONFIG.target_node)
     draw_arrow_chart(f"Qubits: {n_qubits}", topo_order)
 
 

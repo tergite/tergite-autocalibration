@@ -7,17 +7,17 @@
 DEFAULT_PREFIX='calibration'
 
 # Directory settings
-# ROOT_DIR defines the top-level folder of the tergite-autocalibration-lite folder
+# ROOT_DIR defines the top-level folder of the tergite-autocalibration folder
 # Default: two levels up from the config
-ROOT_DIR='/home/user/repos/tergite-autocalibration-lite'
+ROOT_DIR='/home/user/repos/tergite-autocalibration'
 
 # DATA_DIR defines where plots are stored
 # Default: create a directory called 'out' on root level
-DATA_DIR='/home/user/repos/tergite-autocalibration-lite/out'
+DATA_DIR='/home/user/repos/tergite-autocalibration/out'
 
 # CONFIG_DIR defines where the configuration is stored
 # Default: search for a directory called 'configs' on root level
-CONFIG_DIR='/home/user/repos/tergite-autocalibration-lite/configs'
+CONFIG_DIR='/home/user/repos/tergite-autocalibration/configs'
 
 
 # Configuration settings
@@ -28,6 +28,9 @@ HARDWARE_CONFIG='hardware_config.json'
 
 # DEVICE_CONFIG contains the initial values for the device configuration
 DEVICE_CONFIG='device_config.toml'
+
+# CALIBRATION_CONFIG contains all values for the runtime of the program
+CALIBRATION_CONFIG='calibration_config.toml'
 
 # Configuration variables
 # CLUSTER_IP is the IP address of the instrument cluster to connect with

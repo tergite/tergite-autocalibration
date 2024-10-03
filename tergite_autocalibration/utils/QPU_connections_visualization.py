@@ -16,11 +16,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from tergite_autocalibration.config.VNA_values import (
-    VNA_qubit_frequencies,
-    VNA_resonator_frequencies,
-    VNA_f12_frequencies,
-)
+from ..config.data import dh
 
 
 @dataclass
@@ -31,9 +27,9 @@ class QPU_element:
     grid_coords: tuple[int, int]
 
     def __post_init__(self):
-        self.res_freq = VNA_resonator_frequencies[self.label]
-        self.qubit_freq = VNA_qubit_frequencies[self.label]
-        self.qubit_f12 = VNA_f12_frequencies[self.label]
+        self.res_freq = dh.get_legacy("VNA_resonator_frequencies")[self.label]
+        self.qubit_freq = dh.get_legacy("VNA_qubit_frequencies")[self.label]
+        self.qubit_f12 = dh.get_legacy("VNA_f12_frequencies")[self.label]
         self.LO: float
         self.IF: float
         self.IF_12: float
@@ -84,8 +80,8 @@ def hits_neighbors(qubit: str, lo_freq: float):
     )
 
     # print(f'{ neighbour_qubits = }')
-    f01 = VNA_qubit_frequencies[qubit]
-    f12 = VNA_f12_frequencies[qubit]
+    f01 = dh.get_legacy("VNA_qubit_frequencies")[qubit]
+    f12 = dh.get_legacy("VNA_f12_frequencies")[qubit]
     i_freq = f01 - lo_freq
     i_freq_12 = f12 - lo_freq
 
@@ -110,8 +106,8 @@ def hits_neighbors(qubit: str, lo_freq: float):
 
     for neighbour_element in neighbour_qubits:
         neighbour_qubit = neighbour_element.label
-        neighbour_f01 = VNA_qubit_frequencies[neighbour_qubit]
-        neighbour_f12 = VNA_f12_frequencies[neighbour_qubit]
+        neighbour_f01 = dh.get_legacy("VNA_qubit_frequencies")[neighbour_qubit]
+        neighbour_f12 = dh.get_legacy("VNA_f12_frequencies")[neighbour_qubit]
         for harmonic, harmonic_freq in harmonics.items():
             if np.abs(harmonic_freq - neighbour_f01) < collision_tol:
                 print(

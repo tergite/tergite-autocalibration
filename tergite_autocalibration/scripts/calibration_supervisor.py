@@ -27,11 +27,12 @@ from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 
 from tergite_autocalibration.config import settings
+from tergite_autocalibration.config.data import dh
 from tergite_autocalibration.config.settings import CLUSTER_IP, REDIS_CONNECTION
 from tergite_autocalibration.config.settings import CLUSTER_NAME
 from tergite_autocalibration.lib.base.node import BaseNode
-from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.lib.utils.graph import filtered_topological_order
+from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.utils.dataset_utils import create_node_data_path
 from tergite_autocalibration.utils.dto.enums import DataStatus
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
@@ -42,9 +43,9 @@ from tergite_autocalibration.utils.redis_utils import (
     populate_node_parameters,
     populate_quantities_of_interest,
 )
-from tergite_autocalibration.utils.user_input import attenuation_setting
 from tergite_autocalibration.utils.user_input import user_requested_calibration
 from tergite_autocalibration.utils.visuals import draw_arrow_chart
+from tergite_autocalibration.config.calibration import CONFIG
 
 colorama_init()
 
@@ -89,9 +90,9 @@ class CalibrationSupervisor:
 
         # TODO: user configuration could be a toml file
         # Read the calibration specific parameters
-        self.qubits = user_requested_calibration["all_qubits"]
-        self.couplers = user_requested_calibration["couplers"]
-        self.target_node = user_requested_calibration["target_node"]
+        self.qubits = CONFIG.qubits
+        self.couplers = CONFIG.couplers
+        self.target_node = CONFIG.target_node
         self.user_samplespace = user_requested_calibration["user_samplespace"]
         self.measurement_mode = self.cluster_mode
 
@@ -100,7 +101,7 @@ class CalibrationSupervisor:
 
         # Initialize the node structure
         self.node_factory = NodeFactory()
-        self.topo_order = filtered_topological_order(self.target_node)
+        self.topo_order = filtered_topological_order(CONFIG.target_node)
 
     def _create_cluster(self) -> "Cluster":
         cluster_: "Cluster"
@@ -124,12 +125,12 @@ class CalibrationSupervisor:
             for module in cluster.modules:
                 try:
                     if module.is_qcm_type and module.is_rf_type:
-                        module.out0_att(attenuation_setting["qubit"])  # Control lines
+                        module.out0_att(dh.get_legacy("attenuation_setting")["qubit"])  # Control lines
                         # print(f'Attenuation setting for {module.name} is {attenuation_setting["qubit"]}')
-                        module.out1_att(attenuation_setting["coupler"])  # Flux lines
+                        module.out1_att(dh.get_legacy("attenuation_setting")["coupler"])  # Flux lines
                         # print(f'Attenuation setting for {module.name} is {attenuation_setting["coupler"]}')
                     elif module.is_qrm_type and module.is_rf_type:
-                        module.out0_att(attenuation_setting["readout"])  # Readout lines
+                        module.out0_att(dh.get_legacy("attenuation_setting")["readout"])  # Readout lines
                         # print(
                         #     f'Attenuation setting for {module.name} is {attenuation_setting["readout"]}'
                         # )
