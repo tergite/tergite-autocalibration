@@ -1,0 +1,28 @@
+stages:
+  - tests
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  PYTHON_VERSION: "3.9"
+  REDIS_PORT: 6378
+
+tests:
+  stage: tests
+  image: python:${PYTHON_VERSION}
+  script:
+    # Install redis
+    - apt-get update
+    - apt-get install redis -y
+    # Run the redis server
+    - redis-server --daemonize yes --port "$REDIS_PORT"
+
+    # Install project dependencies
+    - pip install -r requirements.txt
+
+    # Check formatting
+    - black --check tergite_autocalibration
+    # Run unit tests
+    - pytest tergite_autocalibration
+  cache:
+    paths:
+      - .cache/pip
