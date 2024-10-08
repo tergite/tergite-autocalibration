@@ -169,9 +169,9 @@ class BackendProperty:
     unit: Optional[Unit] = None
 
     component: Optional[str] = None  # "resonator", "qubit", "coupler"
-    component_id: Optional[
-        str
-    ] = None  # component id, e.g. "1", "2", etc, or perhaps "q1", "q2", etc
+    component_id: Optional[str] = (
+        None  # component id, e.g. "1", "2", etc, or perhaps "q1", "q2", etc
+    )
 
     long_name: Optional[str] = None
     notes: Optional[str] = None
