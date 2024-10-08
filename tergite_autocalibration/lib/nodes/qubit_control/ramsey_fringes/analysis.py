@@ -62,13 +62,13 @@ class RamseyModel(lmfit.model.Model):
         params = self.make_params()
         return lmfit.models.update_param_vals(params, self.prefix, **kws)
 
+
 class RamseyDetuningsBaseQubitAnalysis(BaseQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
         self.redis_field = ""
 
     def analyse_qubit(self):
-
         for coord in self.dataset[self.data_var].coords:
             if "delay" in coord:
                 self.delay_coord = coord
@@ -77,7 +77,9 @@ class RamseyDetuningsBaseQubitAnalysis(BaseQubitAnalysis):
         self.artificial_detunings = self.dataset.coords[self.detuning_coord].values
         redis_key = f"transmons:{self.qubit}"
 
-        self.qubit_frequency = float(REDIS_CONNECTION.hget(f"{redis_key}", self.redis_field))
+        self.qubit_frequency = float(
+            REDIS_CONNECTION.hget(f"{redis_key}", self.redis_field)
+        )
 
         self.fit_results = {}
 
@@ -85,7 +87,7 @@ class RamseyDetuningsBaseQubitAnalysis(BaseQubitAnalysis):
         ramsey_delays = self.dataset.coords[self.delay_coord].values
         self.fit_ramsey_delays = np.linspace(ramsey_delays[0], ramsey_delays[-1], 400)
 
-        #ToDo: make this a data member and plot all nested fits
+        # ToDo: make this a data member and plot all nested fits
         fits = []
         for indx, detuning in enumerate(self.dataset.coords[self.detuning_coord]):
             complex_values = self.magnitudes[self.data_var].isel(
@@ -132,6 +134,7 @@ class RamseyDetuningsBaseQubitAnalysis(BaseQubitAnalysis):
         ax.set_ylabel("Fitted detuning (Hz)")
 
         ax.grid()
+
 
 class RamseyDetunings01QubitAnalysis(RamseyDetuningsBaseQubitAnalysis):
     def __init__(self, name, redis_fields):

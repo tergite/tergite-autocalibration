@@ -101,7 +101,7 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
                 self.frequencies = coord
             elif "currents" in coord:
                 self.currents = coord
-        
+
         self.frequencies_value = self.dataset[self.frequencies].values
 
         if not self.has_peak():
@@ -115,8 +115,14 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
         model = LorentzianModel()
 
         # Gives an initial guess for the model parameters and then fits the model to the data.
-        guess = model.guess(self.magnitudes.to_dataarray().values, x=self.frequencies_value)
-        fit_result = model.fit(self.magnitudes.to_dataarray().values, params=guess, x=self.frequencies_value)
+        guess = model.guess(
+            self.magnitudes.to_dataarray().values, x=self.frequencies_value
+        )
+        fit_result = model.fit(
+            self.magnitudes.to_dataarray().values,
+            params=guess,
+            x=self.frequencies_value,
+        )
 
         self.freq = fit_result.params["x0"].value
         self.uncertainty = fit_result.params["x0"].stderr
@@ -258,7 +264,9 @@ class QubitSpectroscopyMultidim(BaseQubitAnalysis):
         return self.hasPeak
 
     def plotter(self, ax):
-        self.magnitudes[self.data_var].plot(ax=ax, x=self.frequency_coords)  # Here, `self.frequency_coords` is the coordinate name
+        self.magnitudes[self.data_var].plot(
+            ax=ax, x=self.frequency_coords
+        )  # Here, `self.frequency_coords` is the coordinate name
         ax.scatter(self.qubit_freq, self.spec_ampl, s=52, c="red")
 
 

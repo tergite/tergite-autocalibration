@@ -441,7 +441,9 @@ class BaseNode(abc.ABC):
 
     def post_process(self, data_path: Path):
         analysis_kwargs = getattr(self, "analysis_kwargs", dict())
-        node_analysis = self.analysis_obj(self.name, self.redis_field, **analysis_kwargs)
+        node_analysis = self.analysis_obj(
+            self.name, self.redis_field, **analysis_kwargs
+        )
         analysis_results = node_analysis.analyze_node(data_path)
         return analysis_results
 

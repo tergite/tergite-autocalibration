@@ -16,9 +16,16 @@ import matplotlib.patches as mpatches
 import numpy as np
 from numpy.polynomial.polynomial import Polynomial
 
-from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis import QubitSpectroscopyAnalysis
+from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis import (
+    QubitSpectroscopyAnalysis,
+)
 
-from ....base.analysis import BaseAllCouplersAnalysis, BaseCouplerAnalysis, BaseQubitAnalysis
+from ....base.analysis import (
+    BaseAllCouplersAnalysis,
+    BaseCouplerAnalysis,
+    BaseQubitAnalysis,
+)
+
 
 class QubitAnalysisForCouplerSpectroscopy(BaseQubitAnalysis):
     def __init__(self, name, redis_fields):
@@ -45,12 +52,12 @@ class QubitAnalysisForCouplerSpectroscopy(BaseQubitAnalysis):
         self.detected_frequencies = []
         self.detected_currents = []
         for i, current in enumerate(self.dc_currents.values):
-            ds = self.dataset.sel({self.current_coord: current}) 
+            ds = self.dataset.sel({self.current_coord: current})
 
             # Optionally drop the 'dc_currentsq09_q10' if it's not needed
             for coord in self.magnitudes.coords:
-                if 'dc_currents' in coord:
-                    ds = ds.drop_vars(coord)            
+                if "dc_currents" in coord:
+                    ds = ds.drop_vars(coord)
 
             freq_analysis = QubitSpectroscopyAnalysis(self.name, "")
             qubit_frequency = freq_analysis._analyze_qubit(ds, self.data_var)
@@ -93,7 +100,7 @@ class QubitAnalysisForCouplerSpectroscopy(BaseQubitAnalysis):
             ax.scatter(
                 self.root_frequencies, self.roots, s=64, c="black", label=r"$\Phi_0$"
             )
-        label="{:4.5f}".format(self.parking_I)
+        label = "{:4.5f}".format(self.parking_I)
         if hasattr(self, "parking_I"):
             ax.axhline(
                 self.parking_I,
@@ -111,12 +118,12 @@ class QubitAnalysisForCouplerSpectroscopy(BaseQubitAnalysis):
         handles.append(patch)
         ax.legend(handles=handles, fontsize="small")
 
+
 class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
         self.q1_analysis = None
         self.q2_analysis = None
-
 
     def analyze_coupler(self):
         for coord in self.dataset[self.data_var].coords:
@@ -126,14 +133,26 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
                 self.currents = coord
                 self.current_coord = coord
 
-        self.q1_analysis = QubitAnalysisForCouplerSpectroscopy(self.name, self.redis_fields)
-        self.q2_analysis = QubitAnalysisForCouplerSpectroscopy(self.name, self.redis_fields)
+        self.q1_analysis = QubitAnalysisForCouplerSpectroscopy(
+            self.name, self.redis_fields
+        )
+        self.q2_analysis = QubitAnalysisForCouplerSpectroscopy(
+            self.name, self.redis_fields
+        )
 
-        q1_data_var = [data_var for data_var in self.dataset.data_vars if self.name_qubit_1 in data_var]
+        q1_data_var = [
+            data_var
+            for data_var in self.dataset.data_vars
+            if self.name_qubit_1 in data_var
+        ]
         ds1 = self.dataset[q1_data_var]
         q1result = self.q1_analysis._analyze_qubit(ds1, q1_data_var[0])
 
-        q2_data_var = [data_var for data_var in self.dataset.data_vars if self.name_qubit_2 in data_var]
+        q2_data_var = [
+            data_var
+            for data_var in self.dataset.data_vars
+            if self.name_qubit_2 in data_var
+        ]
         ds2 = self.dataset[q2_data_var]
         self.q2_analysis._analyze_qubit(ds2, q2_data_var[0])
 
@@ -142,6 +161,7 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
     def plotter(self, primary_axis, secondary_axis):
         self.q1_analysis.plotter(primary_axis)
         self.q2_analysis.plotter(secondary_axis)
+
 
 class CouplerSpectroscopyNodeAnalysis(BaseAllCouplersAnalysis):
     single_coupler_analysis_obj = CouplerSpectroscopyAnalysis

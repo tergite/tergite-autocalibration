@@ -24,6 +24,7 @@ from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.anal
     PurityBenchmarkingQubitAnalysis,
 )
 
+
 # FIXME: These tests are marked as skip after the refactoring of the analysis classes
 #        Michele to integrate with new data files from Joel
 @unittest.skip
@@ -37,7 +38,7 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
 
     def test_initialization(self):
         self.analysis = PurityBenchmarkingQubitAnalysis("name", ["redis_field"])
-        self.analysis._analyze_qubit(self.dataset,"yq14")
+        self.analysis._analyze_qubit(self.dataset, "yq14")
         # Check that the analysis object has the expected attributes
         self.assertTrue(hasattr(self.analysis, "purity"))
         self.assertTrue(hasattr(self.analysis, "normalized_data_dict"))
@@ -47,7 +48,7 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
 
     def test_run_fitting(self):
         analysis = PurityBenchmarkingQubitAnalysis("name", ["redis_field"])
-        analysis._analyze_qubit(self.dataset,"yq14")
+        analysis._analyze_qubit(self.dataset, "yq14")
         # Verify the average purity result is within the expected range
         print(
             (
@@ -78,9 +79,9 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
 
     def test_plotter(self):
         analysis = PurityBenchmarkingQubitAnalysis("name", ["redis_field"])
-        analysis._analyze_qubit(self.dataset,"yq14")
-    
-            # Trim the dataset to only 5 Cliffords before plotting, same reason as above
+        analysis._analyze_qubit(self.dataset, "yq14")
+
+        # Trim the dataset to only 5 Cliffords before plotting, same reason as above
         analysis.number_of_cliffords = analysis.number_of_cliffords[:5]
         for key in analysis.purity_results_dict.keys():
             analysis.purity_results_dict[key] = analysis.purity_results_dict[key][:5]

@@ -47,10 +47,10 @@ class Coupler_Spectroscopy_Node(BaseNode):
         self.coupled_qubits = self.get_coupled_qubits()
         self.coupler = self.couplers[0]
 
-        #This should go in node or in measurement
-        #self.mode = MeasurementMode.real
-        #self.spi_dac = SpiDAC(self.mode)
-        #self.dac = self.spi_dac.create_spi_dac(self.coupler)
+        # This should go in node or in measurement
+        # self.mode = MeasurementMode.real
+        # self.spi_dac = SpiDAC(self.mode)
+        # self.dac = self.spi_dac.create_spi_dac(self.coupler)
 
         self.all_qubits = self.coupled_qubits
 
@@ -80,6 +80,7 @@ class Coupler_Spectroscopy_Node(BaseNode):
         this_iteration_value = list(iteration_dict.values())[0]
         print(f"{ this_iteration_value = }")
         self.spi_dac.set_dac_current(self.dac, this_iteration_value)
+
 
 class Coupler_Resonator_Spectroscopy_Node(BaseNode):
     measurement_obj = Resonator_Spectroscopy

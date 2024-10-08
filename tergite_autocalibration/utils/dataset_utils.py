@@ -225,11 +225,14 @@ def create_node_data_path(node) -> pathlib.Path:
     data_path = pathlib.Path(DATA_DIR / measurements_today / measurement_id)
     return data_path
 
+
 def get_test_data_path_for_node(node_name) -> pathlib.Path:
     if node_name == "resonator_spectroscopy":
         path = "tergite_autocalibration/lib/nodes/readout/resonator_spectroscopy/tests/data_0"
     elif node_name == "qubit_01_spectroscopy":
-        path  = "tergite_autocalibration/lib/nodes/qubit_control/spectroscopy/tests/data_01"
+        path = (
+            "tergite_autocalibration/lib/nodes/qubit_control/spectroscopy/tests/data_01"
+        )
     elif node_name == "rabi_oscillations":
         path = "tergite_autocalibration/lib/nodes/qubit_control/rabi_oscillations/tests/data_rabi_01"
     elif node_name == "ramsey_correction":
@@ -241,7 +244,9 @@ def get_test_data_path_for_node(node_name) -> pathlib.Path:
     elif node_name == "resonator_spectroscopy_1":
         path = "tergite_autocalibration/lib/nodes/readout/resonator_spectroscopy/tests/data_1"
     elif node_name == "qubit_12_spectroscopy":
-        path  = "tergite_autocalibration/lib/nodes/qubit_control/spectroscopy/tests/data_12"
+        path = (
+            "tergite_autocalibration/lib/nodes/qubit_control/spectroscopy/tests/data_12"
+        )
     elif node_name == "rabi_oscillations_12":
         path = "tergite_autocalibration/lib/nodes/qubit_control/rabi_oscillations/tests/data_rabi_12"
     elif node_name == "ramsey_correction_12":
@@ -259,13 +264,16 @@ def get_test_data_path_for_node(node_name) -> pathlib.Path:
     elif node_name == "T2":
         path = "tergite_autocalibration/lib/nodes/characterization/t2/tests/data_t2"
     elif node_name == "T2_echo":
-        path = "tergite_autocalibration/lib/nodes/characterization/t2/tests/data_t2_echo"
+        path = (
+            "tergite_autocalibration/lib/nodes/characterization/t2/tests/data_t2_echo"
+        )
 
     else:
         logger.info("No path for node: " + node_name)
         path = ""
 
     return pathlib.Path(path)
+
 
 def retrieve_dummy_dataset(node) -> xarray.Dataset:
     if node.name == "resonator_spectroscopy":

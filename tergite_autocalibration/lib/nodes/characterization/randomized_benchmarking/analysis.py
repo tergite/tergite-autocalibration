@@ -75,7 +75,9 @@ class RandomizedBenchmarkingQubitAnalysis(BaseQubitAnalysis):
 
         self.number_of_repetitions = self.dataset.dims[self.seed_coord]
         self.number_of_cliffords = self.dataset[self.number_cliffords_coord].values
-        self.number_of_cliffords_runs = self.dataset.dims[self.number_cliffords_coord] - 3
+        self.number_of_cliffords_runs = (
+            self.dataset.dims[self.number_cliffords_coord] - 3
+        )
         self.normalized_data_dict = {}
 
         for repetition_index in range(self.number_of_repetitions):
@@ -122,7 +124,7 @@ class RandomizedBenchmarkingQubitAnalysis(BaseQubitAnalysis):
     def _get_magnitudes(self, indx):
         magnitudes = self.magnitudes[self.data_var].isel({self.seed_coord: indx})
         return magnitudes.values.flatten()
-    
+
     def plotter(self, ax: Axes):
         for repetition_index in range(self.number_of_repetitions):
             real_values = self.normalized_data_dict[repetition_index]

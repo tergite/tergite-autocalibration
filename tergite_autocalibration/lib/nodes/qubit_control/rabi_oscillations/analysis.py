@@ -77,6 +77,7 @@ class RabiQubitAnalysis(BaseQubitAnalysis):
     """
     Analysis that fits a cosine function to Rabi oscillation data.
     """
+
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
         self.amplitudes = ""
@@ -93,8 +94,14 @@ class RabiQubitAnalysis(BaseQubitAnalysis):
         )  # x-values for plotting
 
         # Gives an initial guess for the model parameters and then fits the model to the data.
-        guess = model.guess(self.magnitudes[self.data_var].values, drive_amp=self.amplitudes)
-        fit_result = model.fit(self.magnitudes[self.data_var].values, params=guess, drive_amp=self.amplitudes)
+        guess = model.guess(
+            self.magnitudes[self.data_var].values, drive_amp=self.amplitudes
+        )
+        fit_result = model.fit(
+            self.magnitudes[self.data_var].values,
+            params=guess,
+            drive_amp=self.amplitudes,
+        )
 
         self.ampl = fit_result.params["amp180"].value
         self.uncertainty = fit_result.params["amp180"].stderr
@@ -112,12 +119,13 @@ class RabiQubitAnalysis(BaseQubitAnalysis):
             lw=3.0,
             label=f" π_ampl = {self.ampl:.2E} (V)",
         )
-        
+
         ax.plot(self.amplitudes, self.magnitudes[self.data_var].values, "bo-", ms=3.0)
         ax.set_title(f"Rabi Oscillations for {self.qubit}")
         ax.set_xlabel("Amplitude (V)")
         ax.set_ylabel("|S21| (V)")
         ax.grid()
+
 
 class RabiNodeAnalysis(BaseAllQubitsAnalysis):
     single_qubit_analysis_obj = RabiQubitAnalysis
@@ -125,12 +133,12 @@ class RabiNodeAnalysis(BaseAllQubitsAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
 
+
 class NRabiQubitAnalysis(BaseQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
 
     def analyse_qubit(self):
-
         for coord in self.dataset[self.data_var].coords:
             if "amplitudes" in coord:
                 self.mw_amplitudes_coord = coord
@@ -143,14 +151,15 @@ class NRabiQubitAnalysis(BaseQubitAnalysis):
         mw_amplitudes = self.magnitudes[mw_amplitude_key].size
         sums = []
         for this_amplitude_index in range(mw_amplitudes):
-            this_sum = sum(
-                self.magnitudes[self.data_var][this_amplitude_index].values
-            )
+            this_sum = sum(self.magnitudes[self.data_var][this_amplitude_index].values)
             sums.append(this_sum)
 
         index_of_min = np.argmin(np.array(sums))
         self.previous_amplitude = fetch_redis_params("rxy:amp180", self.qubit)
-        self.optimal_amp180 = self.magnitudes[mw_amplitude_key][index_of_min].values.item() + self.previous_amplitude
+        self.optimal_amp180 = (
+            self.magnitudes[mw_amplitude_key][index_of_min].values.item()
+            + self.previous_amplitude
+        )
         self.index_of_max = index_of_min
         self.shift = self.magnitudes[mw_amplitude_key][index_of_min].values
 
@@ -169,6 +178,7 @@ class NRabiQubitAnalysis(BaseQubitAnalysis):
             lw=4,
             linestyle="--",
         )
+
 
 class NRabiNodeAnalysis(BaseAllQubitsAnalysis):
     single_qubit_analysis_obj = NRabiQubitAnalysis

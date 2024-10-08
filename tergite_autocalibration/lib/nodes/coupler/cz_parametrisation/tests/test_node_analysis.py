@@ -23,18 +23,19 @@ from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.utils.no_valid
     NoValidCombinationException,
 )
 
+
 @pytest.fixture(autouse=True)
 def setup_data_mutliple_files():
     # It should be a single dataset, but we do not have one yet, so we loop over existing files
-    dataset_path = Path(__file__).parent / "data" #/ "dataset_fix_time_0.hdf5"
+    dataset_path = Path(__file__).parent / "data"  # / "dataset_fix_time_0.hdf5"
     node_analysis = CZParametrisationFixDurationNodeAnalysis("name", ["redis_field"])
     return node_analysis
 
 
 def test_InitSetDataMember(
-    setup_data_mutliple_files: CZParametrisationFixDurationNodeAnalysis
+    setup_data_mutliple_files: CZParametrisationFixDurationNodeAnalysis,
 ):
     node_analysis = setup_data_mutliple_files
 
     assert node_analysis.name == "name"
-    assert node_analysis.redis_fields ==  ["redis_field"]
+    assert node_analysis.redis_fields == ["redis_field"]

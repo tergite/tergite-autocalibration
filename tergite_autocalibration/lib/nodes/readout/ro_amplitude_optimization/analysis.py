@@ -22,7 +22,10 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
-from tergite_autocalibration.lib.base.analysis import BaseQubitAnalysis, BaseAllQubitsAnalysis
+from tergite_autocalibration.lib.base.analysis import (
+    BaseQubitAnalysis,
+    BaseAllQubitsAnalysis,
+)
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 
 
@@ -34,7 +37,6 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
         self.fit_results = {}
-
 
     def analyse_qubit(self):
         self.amplitude_coord = self._get_coord("amplitudes")
@@ -53,7 +55,9 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
 
     def IQ(self, index: int):
         """Extracts I/Q components from the dataset at a given index."""
-        IQ_complex = self.S21[self.data_var].isel({self.amplitude_coord: index}) # Use `.isel()` to index correctly
+        IQ_complex = self.S21[self.data_var].isel(
+            {self.amplitude_coord: index}
+        )  # Use `.isel()` to index correctly
         I = IQ_complex.real.values.flatten()
         Q = IQ_complex.imag.values.flatten()
         return np.array([I, Q]).T
@@ -90,13 +94,16 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
         ax.grid()
 
     def _plot(self, primary_axis, secondary_axes):
-        self.plotter(primary_axis, secondary_axes)  # Assuming node_analysis object is available
+        self.plotter(
+            primary_axis, secondary_axes
+        )  # Assuming node_analysis object is available
 
         # Customize plot as needed
         handles, labels = primary_axis.get_legend_handles_labels()
         patch = mpatches.Patch(color="red", label=f"{self.qubit}")
         handles.append(patch)
         primary_axis.legend(handles=handles, fontsize="small")
+
 
 class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
     def __init__(self, name, redis_fields):
@@ -298,6 +305,7 @@ class OptimalROThreeStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis)
         disp = ConfusionMatrixDisplay(confusion_matrix=optimal_confusion_matrix)
         disp.plot(ax=cm_axis)
 
+
 class OptimalROTwoStateAmplitudeNodeAnalysis(BaseAllQubitsAnalysis):
     single_qubit_analysis_obj = OptimalROTwoStateAmplitudeQubitAnalysis
 
@@ -319,9 +327,9 @@ class OptimalROTwoStateAmplitudeNodeAnalysis(BaseAllQubitsAnalysis):
 
             analysis._plot(primary_axis, list_of_secondary_axes)
 
+
 class OptimalROThreeStateAmplitudeNodeAnalysis(OptimalROTwoStateAmplitudeNodeAnalysis):
     single_qubit_analysis_obj = OptimalROThreeStateAmplitudeQubitAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-
