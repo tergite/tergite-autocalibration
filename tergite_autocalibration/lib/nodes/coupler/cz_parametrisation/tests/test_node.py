@@ -17,7 +17,7 @@ setup_test_env()
 import pytest
 
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis import (
-    CZParametrisationFixDurationAnalysis,
+    CZParametrisationFixDurationNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.measurement import (
     CZParametrisationFixDuration,
@@ -69,4 +69,4 @@ def test_AnalysisClassType():
     c = CZParametrisationFixDurationNode(
         "cz_char_fixCurrent", all_qubits=["q14", "q15"], couplers=["q14_q15"]
     )
-    assert isinstance(c.analysis_obj, type(CZParametrisationFixDurationAnalysis))
+    assert isinstance(c.analysis_obj, type(CZParametrisationFixDurationNodeAnalysis))

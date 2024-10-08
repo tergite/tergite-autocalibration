@@ -25,7 +25,7 @@ from lmfit.model import ModelResult
 from pathlib import Path
 from matplotlib.figure import Figure
 from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.analysis import (
-    PurityBenchmarkingAnalysis,
+    PurityBenchmarkingQubitAnalysis,
 )
 
 
@@ -38,7 +38,8 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
         self.dataset = xr.open_dataset(file_path)
 
     def test_initialization(self):
-        self.analysis = PurityBenchmarkingAnalysis(self.dataset)
+        self.analysis = PurityBenchmarkingQubitAnalysis("name", ["redis_field"])
+        self.analysis._analyze_qubit(self.dataset,"yq14")
         # Check that the analysis object has the expected attributes
         self.assertTrue(hasattr(self.analysis, "purity"))
         self.assertTrue(hasattr(self.analysis, "normalized_data_dict"))
@@ -47,7 +48,8 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
         )
 
     def test_run_fitting(self):
-        analysis = PurityBenchmarkingAnalysis(self.dataset)
+        analysis = PurityBenchmarkingQubitAnalysis("name", ["redis_field"])
+        analysis._analyze_qubit(self.dataset,"yq14")
         # Verify the average purity result is within the expected range
         print(
             (
@@ -77,9 +79,10 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
         self.assertIsInstance(analysis.fit_results, ModelResult)
 
     def test_plotter(self):
-        analysis = PurityBenchmarkingAnalysis(self.dataset)
-
-        # Trim the dataset to only 5 Cliffords before plotting, same reason as above
+        analysis = PurityBenchmarkingQubitAnalysis("name", ["redis_field"])
+        analysis._analyze_qubit(self.dataset,"yq14")
+    
+            # Trim the dataset to only 5 Cliffords before plotting, same reason as above
         analysis.number_of_cliffords = analysis.number_of_cliffords[:5]
         for key in analysis.purity_results_dict.keys():
             analysis.purity_results_dict[key] = analysis.purity_results_dict[key][:5]

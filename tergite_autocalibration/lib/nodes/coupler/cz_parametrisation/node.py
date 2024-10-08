@@ -14,7 +14,7 @@ import numpy as np
 
 from .....config.settings import REDIS_CONNECTION
 from .analysis import (
-    CZParametrisationFixDurationAnalysis,
+    CZParametrisationFixDurationNodeAnalysis,
 )
 from .measurement import (
     CZParametrisationFixDuration,
@@ -24,7 +24,7 @@ from ....utils.node_subclasses import ParametrizedSweepNode
 
 class CZParametrisationFixDurationNode(ParametrizedSweepNode):
     measurement_obj = CZParametrisationFixDuration
-    analysis_obj = CZParametrisationFixDurationAnalysis
+    analysis_obj = CZParametrisationFixDurationNodeAnalysis
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
@@ -34,6 +34,7 @@ class CZParametrisationFixDurationNode(ParametrizedSweepNode):
         self.type = "parameterized_sweep"
         self.couplers = couplers
         self.edges = couplers
+        print(couplers)
         self.coupler = couplers[0]
         self.schedule_keywords = schedule_keywords
         self.backup = False

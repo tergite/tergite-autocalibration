@@ -3,6 +3,7 @@
 # (C) Copyright Eleftherios Moschandreou 2023, 2024
 # (C) Copyright Liangyu Chen 2023, 2024
 # (C) Copyright Amr Osman 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -21,7 +22,7 @@ import xarray as xr
 from quantify_core.analysis.fitting_models import fft_freq_phase_guess
 
 from tergite_autocalibration.utils.redis_utils import fetch_redis_params
-from ....base.analysis import BaseAnalysis
+from ....base.analysis import BaseAllQubitsAnalysis, BaseQubitAnalysis
 
 
 # Cosine function that is fit to Rabi oscillations
@@ -72,35 +73,28 @@ class RabiModel(lmfit.model.Model):
         return lmfit.models.update_param_vals(params, self.prefix, **kws)
 
 
-class RabiAnalysis(BaseAnalysis):
+class RabiQubitAnalysis(BaseQubitAnalysis):
     """
     Analysis that fits a cosine function to Rabi oscillation data.
     """
-
-    def __init__(self, dataset: xr.Dataset):
-        super().__init__()
-        data_var = list(dataset.data_vars.keys())[0]
-        coord = list(dataset[data_var].coords.keys())[0]
-        self.S21 = dataset[data_var].values
-        self.independents = dataset[coord].values
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+        self.amplitudes = ""
         self.fit_results = {}
-        self.qubit = dataset[data_var].attrs["qubit"]
 
     def analyse_qubit(self):
-        # Initialize the Rabi model
         model = RabiModel()
 
-        # Fetch the resulting measurement variables from self
-        self.magnitudes = np.absolute(self.S21)
-        amplitudes = self.independents
+        coord = list(self.dataset[self.data_var].coords.keys())[0]
+        self.amplitudes = self.dataset[coord].values
 
         self.fit_amplitudes = np.linspace(
-            amplitudes[0], amplitudes[-1], 400
+            self.amplitudes[0], self.amplitudes[-1], 400
         )  # x-values for plotting
 
         # Gives an initial guess for the model parameters and then fits the model to the data.
-        guess = model.guess(self.magnitudes, drive_amp=amplitudes)
-        fit_result = model.fit(self.magnitudes, params=guess, drive_amp=amplitudes)
+        guess = model.guess(self.magnitudes[self.data_var].values, drive_amp=self.amplitudes)
+        fit_result = model.fit(self.magnitudes[self.data_var].values, params=guess, drive_amp=self.amplitudes)
 
         self.ampl = fit_result.params["amp180"].value
         self.uncertainty = fit_result.params["amp180"].stderr
@@ -111,7 +105,6 @@ class RabiAnalysis(BaseAnalysis):
         return [self.ampl]
 
     def plotter(self, ax):
-        # Plots the data and the fitted model of a Rabi experiment
         ax.plot(
             self.fit_amplitudes,
             self.fit_y,
@@ -119,60 +112,66 @@ class RabiAnalysis(BaseAnalysis):
             lw=3.0,
             label=f" π_ampl = {self.ampl:.2E} (V)",
         )
-        ax.plot(self.independents, self.magnitudes, "bo-", ms=3.0)
+        
+        ax.plot(self.amplitudes, self.magnitudes[self.data_var].values, "bo-", ms=3.0)
         ax.set_title(f"Rabi Oscillations for {self.qubit}")
         ax.set_xlabel("Amplitude (V)")
         ax.set_ylabel("|S21| (V)")
         ax.grid()
 
+class RabiNodeAnalysis(BaseAllQubitsAnalysis):
+    single_qubit_analysis_obj = RabiQubitAnalysis
 
-class NRabiAnalysis(BaseAnalysis):
-    def __init__(self, dataset: xr.Dataset):
-        super().__init__()
-        self.data_var = list(dataset.data_vars.keys())[0]
-        for coord in dataset[self.data_var].coords:
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+
+class NRabiQubitAnalysis(BaseQubitAnalysis):
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+
+    def analyse_qubit(self):
+
+        for coord in self.dataset[self.data_var].coords:
             if "amplitudes" in coord:
                 self.mw_amplitudes_coord = coord
             elif "repetitions" in coord:
                 self.X_repetitions = coord
-        self.S21 = dataset[self.data_var].values
-        self.independents = dataset[coord].values
+        self.independents = self.dataset[coord].values
         self.fit_results = {}
-        self.qubit = dataset[self.data_var].attrs["qubit"]
-        dataset[f"y{self.qubit}"].values = np.abs(self.S21)
-        self.dataset = dataset
 
-    def analyse_qubit(self):
         mw_amplitude_key = self.mw_amplitudes_coord
-        # mw_amplitude_key = 'mw_amplitudes_sweep' + self.qubit
-        mw_amplitudes = self.dataset[mw_amplitude_key].size
+        mw_amplitudes = self.magnitudes[mw_amplitude_key].size
         sums = []
         for this_amplitude_index in range(mw_amplitudes):
             this_sum = sum(
-                np.abs(self.dataset[f"y{self.qubit}"][this_amplitude_index].values)
+                self.magnitudes[self.data_var][this_amplitude_index].values
             )
             sums.append(this_sum)
 
-        index_of_max = np.argmax(np.array(sums))
+        index_of_min = np.argmin(np.array(sums))
         self.previous_amplitude = fetch_redis_params("rxy:amp180", self.qubit)
-        self.optimal_amp180 = (
-            self.dataset[mw_amplitude_key][index_of_max].values
-            + self.previous_amplitude
-        )
-        self.index_of_max = index_of_max
+        self.optimal_amp180 = self.magnitudes[mw_amplitude_key][index_of_min].values.item() + self.previous_amplitude
+        self.index_of_max = index_of_min
+        self.shift = self.magnitudes[mw_amplitude_key][index_of_min].values
 
         return [self.optimal_amp180]
 
     def plotter(self, axis):
-        datarray = self.dataset[f"y{self.qubit}"]
-        qubit = self.qubit
+        datarray = self.magnitudes[self.data_var]
 
-        datarray.plot(ax=axis, x=f"mw_amplitudes_sweep{qubit}", cmap="RdBu_r")
+        datarray.plot(ax=axis, x=f"mw_amplitudes_sweep{self.qubit}", cmap="RdBu_r")
         axis.set_xlabel("mw amplitude correction")
+        line = self.shift
+
         axis.axvline(
-            # self.dataset[self.mw_amplitudes_coord][self.index_of_max].values,
-            self.optimal_amp180 - fetch_redis_params("rxy:amp180", self.qubit),
+            line,
             c="k",
             lw=4,
             linestyle="--",
         )
+
+class NRabiNodeAnalysis(BaseAllQubitsAnalysis):
+    single_qubit_analysis_obj = NRabiQubitAnalysis
+
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
