@@ -18,7 +18,7 @@ tests:
 
     # Install project dependencies
     - pip install .
-    - pip install pytest black==7.4.2 requests-mock==1.11.0
+    - pip install pytest black==24.10.0 requests-mock==1.11.0
 
     # Check formatting
     - black --check tergite_autocalibration
