@@ -10,6 +10,10 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+from tergite_autocalibration.tests.utils.env import setup_test_env
+
+setup_test_env()
+
 import pytest
 
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis import (
