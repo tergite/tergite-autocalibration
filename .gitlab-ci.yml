@@ -17,8 +17,8 @@ tests:
     - redis-server --daemonize yes --port "$REDIS_PORT"
 
     # Install project dependencies
-    - pip install -e .
-    - poetry install --with test,dev
+    - pip install .
+    - pip install pytest, requests-mock==1.11.0
 
     # Check formatting
     - black --check tergite_autocalibration
