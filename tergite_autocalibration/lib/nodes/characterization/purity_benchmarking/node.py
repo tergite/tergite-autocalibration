@@ -12,14 +12,14 @@
 
 import numpy as np
 
-from .analysis import PurityBenchmarkingAnalysis
+from .analysis import PurityBenchmarkingNodeAnalysis
 from .measurement import PurityBenchmarking
 from ....utils.node_subclasses import ParametrizedSweepNode
 
 
 class PurityBenchmarkingNode(ParametrizedSweepNode):
     measurement_obj = PurityBenchmarking
-    analysis_obj = PurityBenchmarkingAnalysis
+    analysis_obj = PurityBenchmarkingNodeAnalysis
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)

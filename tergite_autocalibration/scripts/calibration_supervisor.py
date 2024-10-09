@@ -32,7 +32,10 @@ from tergite_autocalibration.config.settings import CLUSTER_NAME
 from tergite_autocalibration.lib.base.node import BaseNode
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.lib.utils.graph import filtered_topological_order
-from tergite_autocalibration.utils.dataset_utils import create_node_data_path
+from tergite_autocalibration.utils.dataset_utils import (
+    create_node_data_path,
+    get_test_data_path_for_node,
+)
 from tergite_autocalibration.utils.dto.enums import DataStatus
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.logger.errors import ClusterNotFoundError
@@ -258,19 +261,28 @@ class CalibrationSupervisor:
                 else:
                     raise ValueError(f"REDIS error: cannot find cs:{qubit}", node_name)
 
-        print(node_name)
-        print(self.node_name_to_re_analyse)
-        if (
-            self.measurement_mode == MeasurementMode.re_analyse
-            and node_name == self.node_name_to_re_analyse
-        ):
-            print(
-                "\u2691\u2691\u2691 "
-                + f"{Fore.RED}{Style.BRIGHT}Calibration required for Node {node_name}{Style.RESET_ALL}"
-            )
-            logger.info(f"Calibrating node {node.name}")
-            # TODO: This could be in the node initializer
-            node.calibrate(self.data_path, self.lab_ic, self.measurement_mode)
+        if self.measurement_mode == MeasurementMode.re_analyse:
+            print(status)
+            if (
+                node_name == self.node_name_to_re_analyse
+                or status != DataStatus.in_spec
+            ):
+                path = get_test_data_path_for_node(node_name)
+                if node_name == self.node_name_to_re_analyse:
+                    path = self.data_path
+
+                print(
+                    "\u2691\u2691\u2691 "
+                    + f"{Fore.RED}{Style.BRIGHT}Calibration required for Node {node_name}{Style.RESET_ALL}"
+                )
+                logger.info(f"Calibrating node {node.name}")
+
+                node.calibrate(path, self.lab_ic, self.measurement_mode)
+
+            else:
+                print(
+                    f" \u2714  {Fore.GREEN}{Style.BRIGHT}Node {node_name} in spec{Style.RESET_ALL}"
+                )
 
         elif status == DataStatus:
             print(

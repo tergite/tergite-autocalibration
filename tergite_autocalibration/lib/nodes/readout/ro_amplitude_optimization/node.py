@@ -1,6 +1,7 @@
 # This code is part of Tergite
 #
 # (C) Copyright Eleftherios Moschandreou 2023, 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -13,8 +14,8 @@
 import numpy as np
 
 from .analysis import (
-    OptimalRO_Two_state_AmplitudeAnalysis,
-    OptimalRO_Three_state_AmplitudeAnalysis,
+    OptimalROTwoStateAmplitudeNodeAnalysis,
+    OptimalROThreeStateAmplitudeNodeAnalysis,
 )
 from .measurement import RO_amplitude_optimization
 from ....base.node import BaseNode
@@ -22,7 +23,7 @@ from ....base.node import BaseNode
 
 class RO_amplitude_two_state_optimization_Node(BaseNode):
     measurement_obj = RO_amplitude_optimization
-    analysis_obj = OptimalRO_Two_state_AmplitudeAnalysis
+    analysis_obj = OptimalROTwoStateAmplitudeNodeAnalysis
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
@@ -54,7 +55,7 @@ class RO_amplitude_two_state_optimization_Node(BaseNode):
 
 class RO_amplitude_three_state_optimization_Node(BaseNode):
     measurement_obj = RO_amplitude_optimization
-    analysis_obj = OptimalRO_Three_state_AmplitudeAnalysis
+    analysis_obj = OptimalROThreeStateAmplitudeNodeAnalysis
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
