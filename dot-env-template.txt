@@ -22,17 +22,18 @@ CONFIG_DIR='/home/user/repos/tergite-autocalibration/configs'
 
 # Configuration settings
 # It is assumed that all these paths are relative to CONFIG_DIR
-# HARDWARE_CONFIG is what Q-BLOX needs to compile schedules on the hardware
+# CLUSTER_CONFIG is what Q-BLOX needs to compile schedules on the hardware
 # It should be a file in json format, there is no default file
-HARDWARE_CONFIG='hardware_config.json'
+CLUSTER_CONFIG='hardware_config.json'
 # SPI_CONFIG is the file to configure the wiring on the Q-BLOX Spi Rack
 SPI_CONFIG='spi_config.toml'
-
 # DEVICE_CONFIG contains the initial values for the device configuration
 DEVICE_CONFIG='device_config.toml'
 
 # CALIBRATION_CONFIG contains all values for the runtime of the program
 CALIBRATION_CONFIG='calibration_config.toml'
+# USER_SAMPLESPACE gives the possibility to define custom samplespaces
+USER_SAMPLESPACE='user_samplespace.py'
 
 # QOI_CONFIG contains the configuration for the node quantities of interest
 # This is a temporary configuration and the plan is to replace it with defaults and QOI objects on the node level

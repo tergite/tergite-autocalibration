@@ -21,7 +21,7 @@ from qblox_instruments import Cluster, SpiRack
 from qcodes import validators
 
 from tergite_autocalibration.config import settings
-from tergite_autocalibration.config.settings import REDIS_CONNECTION, HARDWARE_CONFIG
+from tergite_autocalibration.config.settings import REDIS_CONNECTION, CLUSTER_CONFIG
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 
 
@@ -30,7 +30,7 @@ def extract_cluster_port_mapping(qubit: str) -> Dict[str, str]:
     TODO this is not a good implementation.
     Look into cashing.
     """
-    with open(HARDWARE_CONFIG) as hw:
+    with open(CLUSTER_CONFIG) as hw:
         hw_config = json.load(hw)
 
     clusters_in_hw = []

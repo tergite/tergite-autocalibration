@@ -83,9 +83,9 @@ CONFIG_DIR='/home/lab-user/github/tergite-acl/config_dir/'
 
 # Configuration settings
 # It is assumed that all these paths are relative to CONFIG_DIR
-# HARDWARE_CONFIG is what Q-BLOX needs to compile schedules on the hardware
+# CLUSTER_CONFIG is what Q-BLOX needs to compile schedules on the hardware
 # It should be a file in json format, there is no default file
-HARDWARE_CONFIG='HARDWARE_CONFIGURATION.json'
+CLUSTER_CONFIG='CLUSTER_CONFIGURATION.json'
 
 # DEVICE_CONFIG contains the initial values for the device configuration
 DEVICE_CONFIG='device_config.toml'

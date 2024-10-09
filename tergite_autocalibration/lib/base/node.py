@@ -40,7 +40,7 @@ from quantify_scheduler.json_utils import SchedulerJSONEncoder
 from quantify_scheduler.json_utils import pathlib
 
 from tergite_autocalibration.config import settings
-from tergite_autocalibration.config.settings import REDIS_CONNECTION, HARDWARE_CONFIG
+from tergite_autocalibration.config.settings import REDIS_CONNECTION, CLUSTER_CONFIG
 from tergite_autocalibration.experimental.tof_analysis import analyze_tof
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
@@ -64,7 +64,7 @@ from tergite_autocalibration.utils.post_processing_utils import manage_plots
 colorama_init()
 
 
-with open(HARDWARE_CONFIG) as hw:
+with open(CLUSTER_CONFIG) as hw:
     hw_config = json.load(hw)
 
 matplotlib.use(settings.PLOTTING_BACKEND)

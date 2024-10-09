@@ -21,8 +21,11 @@ TEST_MSS_MACHINE_ROOT_URL = "http://localhost:8002"
 TEST_ROOT_DIR = str(Path(__file__).parent.parent.parent.parent)
 TEST_DATA_DIR = os.path.join(Path(__file__).parent.parent, "fixtures", "data")
 TEST_CONFIG_DIR = os.path.join(Path(__file__).parent.parent, "fixtures", "configs")
-TEST_HARDWARE_CONFIG = "hardware_config.json"
+TEST_CLUSTER_CONFIG = "cluster_config.json"
 TEST_DEVICE_CONFIG = "device_config.toml"
+TEST_CALIBRATION_CONFIG = "calibration_config.toml"
+TEST_SPI_CONFIG = "spi_config.toml"
+TEST_USER_SAMPLESPACE = "user_samplespace.py"
 
 TEST_CLUSTER_IP = "192.0.2.141"
 TEST_CLUSTER_NAME = "clusterA"
@@ -45,8 +48,11 @@ def setup_test_env():
     environ["ROOT_DIR"] = TEST_ROOT_DIR
     environ["DATA_DIR"] = TEST_DATA_DIR
     environ["CONFIG_DIR"] = TEST_CONFIG_DIR
-    environ["HARDWARE_CONFIG"] = TEST_HARDWARE_CONFIG
+    environ["CLUSTER_CONFIG"] = TEST_CLUSTER_CONFIG
+    environ["SPI_CONFIG"] = TEST_SPI_CONFIG
     environ["DEVICE_CONFIG"] = TEST_DEVICE_CONFIG
+    environ["CALIBRATION_CONFIG"] = TEST_CALIBRATION_CONFIG
+    environ["USER_SAMPLESPACE"] = TEST_USER_SAMPLESPACE
 
     environ["CLUSTER_IP"] = TEST_CLUSTER_IP
     environ["CLUSTER_NAME"] = TEST_CLUSTER_NAME

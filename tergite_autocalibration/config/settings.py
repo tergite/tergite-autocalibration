@@ -102,13 +102,17 @@ CONFIG_DIR = _from_config(
 
 # ---
 # Section with configuration files
-HARDWARE_CONFIG = CONFIG_DIR.joinpath(_from_config("HARDWARE_CONFIG", cast_=Path))
+CLUSTER_CONFIG = CONFIG_DIR.joinpath(_from_config("CLUSTER_CONFIG", cast_=Path))
 SPI_CONFIG = CONFIG_DIR.joinpath(_from_config("SPI_CONFIG", cast_=Path))
 DEVICE_CONFIG = CONFIG_DIR.joinpath(_from_config("DEVICE_CONFIG", cast_=Path))
+
 CALIBRATION_CONFIG = CONFIG_DIR.joinpath(_from_config("CALIBRATION_CONFIG", cast_=Path))
-QOI_CONFIG = CONFIG_DIR.joinpath(_from_config("QOI_CONFIG", cast_=Path))
 USER_SAMPLESPACE = CONFIG_DIR.joinpath((_from_config("USER_SAMPLESPACE", cast_=Path)))
+
 BACKEND_CONFIG = Path(__file__).parent / "backend_config_default.toml"
+
+# FIXME: This configuration is static and to be refactored together with the QOIs
+QOI_CONFIG = Path(__file__).parent / "qoi_config.toml"
 
 # ---
 # Section with other configuration variables
