@@ -26,6 +26,7 @@ class DataHandler:
 
             device_config = toml.load(DEVICE_CONFIG)
             # FIXME: Both layout and device should be fed into a Device object
+            # Right now we are not using the device configuration
             cls._layout = device_config["layout"]
 
             device_raw = device_config["device"]
@@ -41,6 +42,18 @@ class DataHandler:
                                     device_raw[device_subsection][key_][gsp_key_] = gsp_value_
                     device_raw[device_subsection].pop("all")
             cls._device = device_raw
+
+            # FIXME: Here, we are creating a temporary variable for the qubit type
+            _qubit_types = {}
+            for qubit in cls._device["qubit"]:
+                if int(qubit[1:]) % 2 == 0:
+                    # Even qubits are data/control qubits
+                    qubit_type = "Control"
+                else:
+                    # Odd qubits are ancilla/target qubits
+                    qubit_type = "Target"
+                _qubit_types[qubit] = qubit_type
+            cls._qubit_types = _qubit_types
 
         return cls._instance
 
@@ -82,6 +95,8 @@ class DataHandler:
                 "coupler": coupler_attenuation,
                 "resonator": resonator_attenuation,
             }
+        elif variable_name == "qubit_types":
+            return self._qubit_types
         else:
             logging.warning(f"Cannot return data value for legacy variable: {variable_name}")
 
