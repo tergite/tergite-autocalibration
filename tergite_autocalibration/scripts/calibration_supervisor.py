@@ -125,12 +125,18 @@ class CalibrationSupervisor:
             for module in cluster.modules:
                 try:
                     if module.is_qcm_type and module.is_rf_type:
-                        module.out0_att(dh.get_legacy("attenuation_setting")["qubit"])  # Control lines
+                        module.out0_att(
+                            dh.get_legacy("attenuation_setting")["qubit"]
+                        )  # Control lines
                         # print(f'Attenuation setting for {module.name} is {attenuation_setting["qubit"]}')
-                        module.out1_att(dh.get_legacy("attenuation_setting")["coupler"])  # Flux lines
+                        module.out1_att(
+                            dh.get_legacy("attenuation_setting")["coupler"]
+                        )  # Flux lines
                         # print(f'Attenuation setting for {module.name} is {attenuation_setting["coupler"]}')
                     elif module.is_qrm_type and module.is_rf_type:
-                        module.out0_att(dh.get_legacy("attenuation_setting")["readout"])  # Readout lines
+                        module.out0_att(
+                            dh.get_legacy("attenuation_setting")["readout"]
+                        )  # Readout lines
                         # print(
                         #     f'Attenuation setting for {module.name} is {attenuation_setting["readout"]}'
                         # )
@@ -146,9 +152,7 @@ class CalibrationSupervisor:
         number_of_qubits = len(self.qubits)
         draw_arrow_chart(f"Qubits: {number_of_qubits}", self.topo_order)
 
-        populate_quantities_of_interest(
-            self.qubits, self.couplers, REDIS_CONNECTION
-        )
+        populate_quantities_of_interest(self.qubits, self.couplers, REDIS_CONNECTION)
 
         for calibration_node in self.topo_order:
             self.inspect_node(calibration_node)
@@ -174,9 +178,7 @@ class CalibrationSupervisor:
             + " and couplers: "
             + str(self.couplers)
         )
-        populate_initial_parameters(
-            self.qubits, self.couplers, REDIS_CONNECTION
-        )
+        populate_initial_parameters(self.qubits, self.couplers, REDIS_CONNECTION)
         # print(f'{node_name = }')
         # print(f'{self.couplers = }')
         if node_name in [

@@ -37,9 +37,7 @@ def populate_parking_currents(
                 structured_redis_storage(parameter_key, coupler, parameter_value)
 
 
-def populate_initial_parameters(
-        qubits: list, couplers: list, redis_connection
-):
+def populate_initial_parameters(qubits: list, couplers: list, redis_connection):
     calibration_configuration = toml.load(settings.CALIBRATION_CONFIG)
     initial_device_config = calibration_configuration["initials"]
 
@@ -129,8 +127,7 @@ def populate_node_parameters(
                     structured_redis_storage(field_key, coupler, field_value)
 
 
-def populate_quantities_of_interest(qubits: list, couplers: list, redis_connection
-):
+def populate_quantities_of_interest(qubits: list, couplers: list, redis_connection):
     # Populate the Redis database with the quantities of interest, at Nan value
     # Only if the key does NOT already exist
     qoi_configuration = toml.load(settings.QOI_CONFIG)

@@ -195,7 +195,10 @@ class CZ_calibration(BaseMeasurement):
                 else:
                     if control_on:
                         for this_qubit in all_qubits:
-                            if dh.get_legacy("qubit_types")[this_qubit] == qubit_type_list[0]:
+                            if (
+                                dh.get_legacy("qubit_types")[this_qubit]
+                                == qubit_type_list[0]
+                            ):
                                 x = schedule.add(
                                     X(this_qubit), ref_op=relaxation, ref_pt="end"
                                 )
@@ -235,7 +238,10 @@ class CZ_calibration(BaseMeasurement):
                 if not dynamic:
                     if control_on:
                         for this_qubit in all_qubits:
-                            if dh.get_legacy("qubit_types")[this_qubit] == qubit_type_list[0]:
+                            if (
+                                dh.get_legacy("qubit_types")[this_qubit]
+                                == qubit_type_list[0]
+                            ):
                                 # print(this_qubit, dh.get_legacy("qubit_types")[this_qubit])
                                 x_end = schedule.add(
                                     X(this_qubit), ref_op=buffer_end, ref_pt="end"
@@ -415,7 +421,10 @@ class CZ_calibration_SSRO(BaseMeasurement):
                 else:
                     if control_on:
                         for this_qubit in all_qubits:
-                            if dh.get_legacy("qubit_types")[this_qubit] == qubit_type_list[0]:
+                            if (
+                                dh.get_legacy("qubit_types")[this_qubit]
+                                == qubit_type_list[0]
+                            ):
                                 # pass
                                 x = shot.add(
                                     X(this_qubit), ref_op=relaxation, ref_pt="end"
@@ -459,7 +468,10 @@ class CZ_calibration_SSRO(BaseMeasurement):
                 if not dynamic:
                     if control_on:
                         for this_qubit in all_qubits:
-                            if dh.get_legacy("qubit_types")[this_qubit] == qubit_type_list[0]:
+                            if (
+                                dh.get_legacy("qubit_types")[this_qubit]
+                                == qubit_type_list[0]
+                            ):
                                 # pass
                                 x_end = shot.add(
                                     X(this_qubit), ref_op=buffer_end, ref_pt="end"

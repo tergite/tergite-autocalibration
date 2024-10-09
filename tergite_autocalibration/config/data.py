@@ -34,12 +34,22 @@ class DataHandler:
                 if device_subsection in device_raw.keys():
                     global_subsection_properties = {}
                     if "all" in device_raw[device_subsection].keys():
-                        global_subsection_properties = device_raw[device_subsection]["all"]
+                        global_subsection_properties = device_raw[device_subsection][
+                            "all"
+                        ]
                     for key_, value_ in device_raw[device_subsection].items():
                         if key_.startswith("q"):
-                            for gsp_key_, gsp_value_ in global_subsection_properties.items():
-                                if gsp_key_ not in device_raw[device_subsection][key_].keys():
-                                    device_raw[device_subsection][key_][gsp_key_] = gsp_value_
+                            for (
+                                gsp_key_,
+                                gsp_value_,
+                            ) in global_subsection_properties.items():
+                                if (
+                                    gsp_key_
+                                    not in device_raw[device_subsection][key_].keys()
+                                ):
+                                    device_raw[device_subsection][key_][
+                                        gsp_key_
+                                    ] = gsp_value_
                     device_raw[device_subsection].pop("all")
             cls._device = device_raw
 
@@ -68,11 +78,20 @@ class DataHandler:
     def get_legacy(self, variable_name: str):
         # This method is temporary and to be deprecated as soon as possible
         if variable_name == "VNA_resonator_frequencies":
-            return {i_: keys_["VNA_frequency"] for i_, keys_ in self._device["resonator"].items()}
+            return {
+                i_: keys_["VNA_frequency"]
+                for i_, keys_ in self._device["resonator"].items()
+            }
         if variable_name == "VNA_qubit_frequencies":
-            return {i_: keys_["VNA_f01_frequency"] for i_, keys_ in self._device["qubit"].items()}
+            return {
+                i_: keys_["VNA_f01_frequency"]
+                for i_, keys_ in self._device["qubit"].items()
+            }
         if variable_name == "VNA_f12_frequencies":
-            return {i_: keys_["VNA_f12_frequency"] for i_, keys_ in self._device["qubit"].items()}
+            return {
+                i_: keys_["VNA_f12_frequency"]
+                for i_, keys_ in self._device["qubit"].items()
+            }
         if variable_name == "attenuation_setting":
             # FIXME: These are just some values, so that we do not have 0 in there
             qubit_attenuation = 10
@@ -98,7 +117,9 @@ class DataHandler:
         elif variable_name == "qubit_types":
             return self._qubit_types
         else:
-            logging.warning(f"Cannot return data value for legacy variable: {variable_name}")
+            logging.warning(
+                f"Cannot return data value for legacy variable: {variable_name}"
+            )
 
 
 dh = DataHandler()

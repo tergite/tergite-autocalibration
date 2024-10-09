@@ -29,7 +29,9 @@ class CalibrationConfig:
             cls._qubits = calibration_config["general"]["qubits"]
             cls._couplers = calibration_config["general"]["couplers"]
 
-            us_spec_ = importlib.util.spec_from_file_location("user_samplespace", USER_SAMPLESPACE)
+            us_spec_ = importlib.util.spec_from_file_location(
+                "user_samplespace", USER_SAMPLESPACE
+            )
             user_samplespace_ = importlib.util.module_from_spec(us_spec_)
             sys.modules["user_samplespace"] = user_samplespace_
             us_spec_.loader.exec_module(user_samplespace_)
