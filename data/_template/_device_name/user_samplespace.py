@@ -3,6 +3,7 @@
 # (C) Copyright Eleftherios Moschandreou 2023, 2024
 # (C) Copyright Liangyu Chen 2023, 2024
 # (C) Copyright Michele Faucci Giannelli 2024
+# (C) Copyright Chalmers Next Labs AB 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -12,8 +13,11 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+# This is an example file on how to create a custom samplespace for your node.
 
-from ..lib.utils.samplespace import resonator_samples
+
+from tergite_autocalibration.config.data import dh
+from tergite_autocalibration.lib.utils.samplespace import resonator_samples
 
 """
 user_samplespace schema:
@@ -31,19 +35,10 @@ user_samplespace = {
 }
 """
 ####################################################################
-qubits = ["q06", "q07", "q08", "q09", "q10", "q11", "q12", "q13", "q14", "q15"]
+qubits = dh.device["qubit"]
 user_samplespace = {
     "resonator_spectroscopy": {
         "ro_frequencies": {qubit: resonator_samples(qubit) for qubit in qubits}
     },
 }
-
 ####################################################################
-
-"""
-The dictionary user_requested_calibration
-is what we pass to the calibration supervisor
-"""
-user_requested_calibration = {
-    "user_samplespace": user_samplespace,
-}

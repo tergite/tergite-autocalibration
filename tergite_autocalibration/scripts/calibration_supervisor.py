@@ -93,7 +93,7 @@ class CalibrationSupervisor:
         self.qubits = CONFIG.qubits
         self.couplers = CONFIG.couplers
         self.target_node = CONFIG.target_node
-        self.user_samplespace = user_requested_calibration["user_samplespace"]
+        self.user_samplespace = CONFIG.user_samplespace
         self.measurement_mode = self.cluster_mode
 
         # Initialize the node structure

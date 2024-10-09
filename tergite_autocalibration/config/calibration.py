@@ -9,11 +9,12 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
-
+import importlib.util
+import sys
 from typing import List
 
 import toml
-from .settings import CALIBRATION_CONFIG
+from .settings import CALIBRATION_CONFIG, USER_SAMPLESPACE
 
 
 class CalibrationConfig:
@@ -28,6 +29,12 @@ class CalibrationConfig:
             cls._qubits = calibration_config["general"]["qubits"]
             cls._couplers = calibration_config["general"]["couplers"]
 
+            us_spec_ = importlib.util.spec_from_file_location("user_samplespace", USER_SAMPLESPACE)
+            user_samplespace_ = importlib.util.module_from_spec(us_spec_)
+            sys.modules["user_samplespace"] = user_samplespace_
+            us_spec_.loader.exec_module(user_samplespace_)
+            cls._user_samplespace = user_samplespace_.user_samplespace
+
         return cls._instance
 
     @property
@@ -41,6 +48,10 @@ class CalibrationConfig:
     @property
     def couplers(self) -> List[str]:
         return self._couplers
+
+    @property
+    def user_samplespace(self):
+        return self._user_samplespace
 
 
 CONFIG = CalibrationConfig()
