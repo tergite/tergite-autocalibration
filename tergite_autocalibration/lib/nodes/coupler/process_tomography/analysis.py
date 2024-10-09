@@ -1,6 +1,7 @@
 # This code is part of Tergite
 #
 # (C) Copyright Liangyu Chen 2024
+# (C) Copyright Chalmers Next Labs AB 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -21,7 +22,7 @@ from scipy.optimize import minimize
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import confusion_matrix
 
-from tergite_autocalibration.config.coupler_config import qubit_types
+from tergite_autocalibration.config.data import dh
 from ....base.analysis import BaseAnalysis
 
 
@@ -142,7 +143,7 @@ class ProcessTomographyAnalysis(BaseAnalysis):
         # self.fit_ys = []
 
         # for n, magnitude in enumerate(self.magnitudes):
-        #     if qubit_types[self.qubit] == "Target":
+        #     if dh.get_legacy("qubit_types")[self.qubit] == "Target":
         #         if n == 0:
         #             self.fit_ys.append(
         #                 [0, 0, 0, 1, 1, 1, 0, 0, 0]
@@ -158,7 +159,7 @@ class ProcessTomographyAnalysis(BaseAnalysis):
         #             )  # Target - ResetOn no leakage reduction
         #             # self.fit_ys.append([0,1,1,0,1,1,0,1,1]) # Control - ResetOn
 
-        #     # if qubit_types[self.qubit] == 'Target':
+        #     # if dh.get_legacy("qubit_types")[self.qubit] == 'Target':
         #     #     if n == 0:
         #     #         self.fit_ys.append([0,1,0,0,1,0,0,1,0]) # Target - ResetOff
         #     #     else:
@@ -249,5 +250,5 @@ class ProcessTomographyAnalysis(BaseAnalysis):
         axis.set_ylabel("Population")
         axis.set_xticklabels(states)
         axis.set_title(
-            f"{name} Calibration - {qubit_types[self.qubit]} Qubit {self.qubit[1:]}"
+            f"{name} Calibration - {dh.get_legacy('qubit_types')[self.qubit]} Qubit {self.qubit[1:]}"
         )
