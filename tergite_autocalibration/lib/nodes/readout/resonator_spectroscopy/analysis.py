@@ -95,9 +95,9 @@ class ResonatorSpectroscopyQubitAnalysis(BaseQubitAnalysis):
 
 
 class ResonatorSpectroscopy1QubitAnalysis(ResonatorSpectroscopyQubitAnalysis):
-    def __init__(self, dataset: xr.Dataset):
-        self.dataset = dataset
-        super().__init__(self.dataset)
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+        self.fit_results = {}
 
     def plotter(self, ax):
         # breakpoint()
@@ -114,9 +114,9 @@ class ResonatorSpectroscopy1QubitAnalysis(ResonatorSpectroscopyQubitAnalysis):
 
 
 class ResonatorSpectroscopy2QubitAnalysis(ResonatorSpectroscopyQubitAnalysis):
-    def __init__(self, dataset: xr.Dataset):
-        self.dataset = dataset
-        super().__init__(self.dataset)
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+        self.fit_results = {}
 
     def plotter(self, ax):
         this_qubit = self.dataset.attrs["qubit"]

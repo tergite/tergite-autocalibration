@@ -1,6 +1,7 @@
 # This code is part of Tergite
 #
 # (C) Copyright Joel Sandås 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -16,9 +17,8 @@ Module containing classes that model, fit and plot data from the purity benchmar
 import lmfit
 from matplotlib.axes import Axes
 import numpy as np
-import xarray as xr
 
-from ....base.analysis import BaseAnalysis
+from ....base.analysis import BaseAllQubitsRepeatAnalysis, BaseQubitAnalysis
 from tergite_autocalibration.utils.exponential_decay_function import (
     exponential_decay_function,
 )
@@ -59,24 +59,21 @@ class ExpDecayModel(lmfit.model.Model):
         return lmfit.models.update_param_vals(params, self.prefix, **kws)
 
 
-class PurityBenchmarkingAnalysis(BaseAnalysis):
+class PurityBenchmarkingQubitAnalysis(BaseQubitAnalysis):
     """
     Analysis that fits an exponential decay function to purity benchmarking data.
     """
 
-    def __init__(self, dataset: xr.Dataset):
-        super().__init__()
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+        self.fit_results = {}
 
-        # Extract primary data and attributes
-        self.data_var = list(dataset.data_vars.keys())[0]
-        self.qubit = dataset[self.data_var].attrs["qubit"]
-        self.purity = dataset[self.data_var]
-
+    def analyse_qubit(self):
         # Identify and store relevant coordinates and initialize data storage
         self.number_cliffords_coord, self.seed_coord = self._identify_coords()
-        self.number_of_repetitions = dataset.sizes[self.seed_coord]
+        self.number_of_repetitions = self.dataset.sizes[self.seed_coord]
         self.number_of_cliffords = np.unique(
-            dataset[self.number_cliffords_coord].values[:-3]
+            self.dataset[self.number_cliffords_coord].values[:-3]
         )
 
         self.normalized_data_dict = {}
@@ -90,6 +87,7 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
 
         # Process and normalize the purity data
         self._process_and_normalize_data()
+        self._fit_data()
 
         self.fit_results = {}  # Dictionary to store fitting results
 
@@ -100,7 +98,7 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
         number_cliffords_coord = None
         seed_coord = None
 
-        for coord in self.purity.coords:
+        for coord in self.dataset.coords:
             if "cliffords" in coord:
                 number_cliffords_coord = coord
             elif "seed" in coord:
@@ -113,7 +111,7 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
         Process and normalize purity data for each repetition, and calculate the purity per index.
         """
         for repetition_index in range(self.number_of_repetitions):
-            measurements = self.purity.isel(
+            measurements = self.magnitudes.isel(
                 {self.seed_coord: repetition_index}
             ).values.flatten()
             data = measurements[:-3]  # Data excluding calibration points
@@ -147,7 +145,7 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
             self.normalized_data_dict[repetition_index] = normalized_data
             self.purity_results_dict[repetition_index] = purity_per_index
 
-    def analyse_qubit(self):
+    def _fit_data(self):
         """
         Fit the exponential decay model to the averaged purity data.
         """
@@ -202,3 +200,11 @@ class PurityBenchmarkingAnalysis(BaseAnalysis):
         ax.set_ylabel("Purity")
         ax.set_xlabel("Number of Cliffords")
         ax.grid()
+
+
+class PurityBenchmarkingNodeAnalysis(BaseAllQubitsRepeatAnalysis):
+    single_qubit_analysis_obj = PurityBenchmarkingQubitAnalysis
+
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+        self.repeat_coordinate_name = "seeds"

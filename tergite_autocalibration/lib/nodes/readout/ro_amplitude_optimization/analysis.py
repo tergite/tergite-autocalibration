@@ -2,6 +2,7 @@
 #
 # (C) Copyright Eleftherios Moschandreou 2023, 2024
 # (C) Copyright Stefan Hill 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -15,45 +16,51 @@
 Module containing a class that fits data from a resonator spectroscopy experiment.
 """
 import numpy as np
-import xarray as xr
+import matplotlib.patches as mpatches
 from numpy.linalg import inv
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
-from tergite_autocalibration.lib.base.analysis import BaseAnalysis
+from tergite_autocalibration.lib.base.analysis import (
+    BaseQubitAnalysis,
+    BaseAllQubitsAnalysis,
+)
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 
 
-class OptimalROAmplitudeAnalysis(BaseAnalysis):
+class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
     """
     Analysis that  extracts the optimal RO amplitude.
     """
 
-    def __init__(self, dataset: xr.Dataset):
-        super().__init__()
-        self.dataset = dataset
-        self.qubit = dataset.attrs["qubit"]
-        self.data_var = list(dataset.data_vars.keys())[0]
-        self.S21 = self.dataset[self.data_var]
-
-        for coord in dataset.coords:
-            if "amplitudes" in str(coord):
-                self.amplitude_coord = coord
-            elif "state" in str(coord):
-                self.state_coord = coord
-            elif "shot" in str(coord):
-                self.shot_coord = coord
-        self.qubit_states = dataset[self.state_coord].values
-        self.amplitudes = dataset.coords[self.amplitude_coord]
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
         self.fit_results = {}
 
+    def analyse_qubit(self):
+        self.amplitude_coord = self._get_coord("amplitudes")
+        self.state_coord = self._get_coord("state")
+
+        self.qubit_states = self.dataset[self.state_coord].values
+        self.amplitudes = self.dataset.coords[self.amplitude_coord]
+        self.fit_results = {}
+
+    def _get_coord(self, keyword):
+        """Helper method to get coordinate matching the keyword."""
+        for coord in self.dataset.coords:
+            if keyword in str(coord):
+                return coord
+        raise ValueError(f"Coordinate for {keyword} not found in dataset")
+
     def IQ(self, index: int):
-        IQ_complex = self.S21.isel({self.amplitude_coord: [index]})
+        """Extracts I/Q components from the dataset at a given index."""
+        IQ_complex = self.S21[self.data_var].isel(
+            {self.amplitude_coord: index}
+        )  # Use `.isel()` to index correctly
         I = IQ_complex.real.values.flatten()
         Q = IQ_complex.imag.values.flatten()
-        IQ_samples = np.array([I, Q]).T
-        return IQ_samples
+        return np.array([I, Q]).T
 
     def run_initial_fitting(self):
         self.fidelities = []
@@ -80,20 +87,30 @@ class OptimalROAmplitudeAnalysis(BaseAnalysis):
         return
 
     def primary_plotter(self, ax):
-        this_qubit = self.dataset.attrs["qubit"]
         ax.set_xlabel("RO amplitude")
         ax.set_ylabel("assignment fidelity")
         ax.plot(self.amplitudes, self.fidelities)
         ax.plot(self.optimal_amplitude, self.fidelities[self.optimal_index], "*", ms=14)
         ax.grid()
 
+    def _plot(self, primary_axis, secondary_axes):
+        self.plotter(
+            primary_axis, secondary_axes
+        )  # Assuming node_analysis object is available
 
-class OptimalRO_Two_state_AmplitudeAnalysis(OptimalROAmplitudeAnalysis):
-    def __init__(self, dataset: xr.Dataset):
-        self.dataset = dataset
-        super().__init__(self.dataset)
+        # Customize plot as needed
+        handles, labels = primary_axis.get_legend_handles_labels()
+        patch = mpatches.Patch(color="red", label=f"{self.qubit}")
+        handles.append(patch)
+        primary_axis.legend(handles=handles, fontsize="small")
+
+
+class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
 
     def analyse_qubit(self):
+        super().analyse_qubit()
         self.run_initial_fitting()
         inv_cm_str = ",".join(
             str(element) for element in list(self.optimal_inv_cm.flatten())
@@ -205,12 +222,12 @@ class OptimalRO_Two_state_AmplitudeAnalysis(OptimalROAmplitudeAnalysis):
         structured_redis_storage("lda_intercept", this_element.strip("q"), intercept_)
 
 
-class OptimalRO_Three_state_AmplitudeAnalysis(OptimalROAmplitudeAnalysis):
-    def __init__(self, dataset: xr.Dataset):
-        self.dataset = dataset
-        super().__init__(self.dataset)
+class OptimalROThreeStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
 
     def analyse_qubit(self):
+        super().analyse_qubit()
         self.run_initial_fitting()
         inv_cm_str = ",".join(
             str(element) for element in list(self.optimal_inv_cm.flatten())
@@ -287,3 +304,32 @@ class OptimalRO_Three_state_AmplitudeAnalysis(OptimalROAmplitudeAnalysis):
         optimal_confusion_matrix = self.cms[self.optimal_index]
         disp = ConfusionMatrixDisplay(confusion_matrix=optimal_confusion_matrix)
         disp.plot(ax=cm_axis)
+
+
+class OptimalROTwoStateAmplitudeNodeAnalysis(BaseAllQubitsAnalysis):
+    single_qubit_analysis_obj = OptimalROTwoStateAmplitudeQubitAnalysis
+
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+        self.plots_per_qubit = 3
+
+    def _fill_plots(self):
+        for index, analysis in enumerate(self.qubit_analyses):
+            primary_plot_row = self.plots_per_qubit * (index // self.column_grid)
+            primary_axis = self.axs[primary_plot_row, index % self.column_grid]
+
+            list_of_secondary_axes = []
+            for plot_indx in range(1, self.plots_per_qubit):
+                secondary_plot_row = primary_plot_row + plot_indx
+                list_of_secondary_axes.append(
+                    self.axs[secondary_plot_row, index % self.column_grid]
+                )
+
+            analysis._plot(primary_axis, list_of_secondary_axes)
+
+
+class OptimalROThreeStateAmplitudeNodeAnalysis(OptimalROTwoStateAmplitudeNodeAnalysis):
+    single_qubit_analysis_obj = OptimalROThreeStateAmplitudeQubitAnalysis
+
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
