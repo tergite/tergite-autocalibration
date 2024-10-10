@@ -8,32 +8,6 @@
 # Note: This device configuration follows a standard, such that
 # it can be read by other backend components as well
 
-# --------------------------------------------------------------------------------
-# Device layout configuration section
-
-[layout]
-# The items of this section correspond to component types and their
-# sub-items correspond to their indices/identities. This also works as
-# a way to declare what components are supported/present in the
-# device.
-
-[layout.resonator.q06]
-position = { column = 0, row = 0 }
-
-[layout.resonator.q07]
-position = { column = 2, row = 0 }
-
-[layout.qubit.q06]
-position = { column = 0, row = 1 }
-
-[layout.qubit.q07]
-position = { column = 2, row = 1 }
-
-[layout.coupler.q06_q07]
-position = { column = 1, row = 1 }
-qubits = ["q06", "q07"]
-
-
 [device]
 # The items of this section describe general device properties known
 # after fabrication and first manual characterization steps. The general
@@ -199,3 +173,29 @@ VNA_f12_frequency = 4957127240.853312
 
 [device.coupler.all]
 attenuation = 34
+
+
+# --------------------------------------------------------------------------------
+# Device layout configuration section
+
+[layout]
+# The items of this section correspond to component types and their
+# sub-items correspond to their indices/identities. This also works as
+# a way to declare what components are supported/present in the
+# device.
+
+[layout.resonator.q06]
+position = { column = 0, row = 0 }
+
+[layout.resonator.q07]
+position = { column = 2, row = 0 }
+
+[layout.qubit.q06]
+position = { column = 0, row = 1 }
+
+[layout.qubit.q07]
+position = { column = 2, row = 1 }
+
+[layout.coupler.q06_q07]
+position = { column = 1, row = 1 }
+qubits = ["q06", "q07"]
