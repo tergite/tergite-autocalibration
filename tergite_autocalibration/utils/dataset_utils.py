@@ -297,19 +297,31 @@ def retrieve_dummy_dataset(node) -> xarray.Dataset:
 
 def save_dataset(
     result_dataset: xarray.Dataset, node_name: str, data_path: pathlib.Path
-):
+) -> None:
+    """
+    Save the measurement dataset to a file.
+
+    Args:
+        result_dataset (xarray.Dataset): The dataset to save.
+        node_name (str): Name of the node being measured.
+        data_path (pathlib.Path): Path where the dataset will be saved.
+    """
     data_path.mkdir(parents=True, exist_ok=True)
     measurement_id = data_path.stem[0:19]
-    result_dataset = result_dataset.assign_attrs(
-        {"name": node_name, "tuid": measurement_id}
-    )
+
+    result_dataset = result_dataset.assign_attrs({
+        "name": node_name,
+        "tuid": measurement_id
+    })
+
     result_dataset_real = to_real_dataset(result_dataset)
+
     # to_netcdf doesn't like complex numbers, convert to real/imag to save:
     count = 0
-    dataset_name = "dataset_" + str(count) + ".hdf5"
+    dataset_name = f"dataset_{node_name}_{count}.hdf5"
     while (data_path / dataset_name).is_file():
         count += 1
-        dataset_name = "dataset_" + str(count) + ".hdf5"
+        dataset_name = f"dataset_{node_name}_{count}.hdf5"
     result_dataset_real.to_netcdf(data_path / dataset_name)
 
 

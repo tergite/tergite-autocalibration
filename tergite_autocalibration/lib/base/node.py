@@ -19,7 +19,7 @@ import threading
 import time
 from collections.abc import Iterable
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 import matplotlib
 
@@ -374,37 +374,51 @@ class BaseNode(abc.ABC):
         compiled_schedule: CompiledSchedule,
         lab_ic,
         data_path: pathlib.Path,
-        measurement=(1, 1),
-    ):
-        schedule_duration = compiled_schedule.get_schedule_duration()
-        if "loop_repetitions" in self.node_dictionary:
-            schedule_duration *= self.node_dictionary["loop_repetitions"]
+        measurement: Tuple[int, int] = (1, 1),
+    ) -> None:
+        """
+        Execute a measurement for a node and save the resulting dataset.
 
-        measurement_message = ""
-        if measurement[1] > 1:
-            measurement_message = (
-                f". Measurement {measurement[0] + 1} of {measurement[1]}"
-            )
-        message = f"{schedule_duration:.2f} sec" + measurement_message
-        print(
-            f"schedule_duration = {Fore.CYAN}{Style.BRIGHT}{message}{Style.RESET_ALL}"
-        )
+        Args:
+            compiled_schedule (CompiledSchedule): The compiled schedule to execute.
+            lab_ic: The lab instrument controller.
+            data_path (pathlib.Path): Path where the dataset will be saved.
+            measurement (tuple): Tuple of (current_measurement, total_measurements).
+        """
 
-        raw_dataset = self.execute_schedule(
-            compiled_schedule, lab_ic, schedule_duration
-        )
+        schedule_duration = self._calculate_schedule_duration(compiled_schedule)
+        self._print_measurement_info(schedule_duration, measurement)
 
+        raw_dataset = self.execute_schedule(compiled_schedule, lab_ic, schedule_duration)
         result_dataset = configure_dataset(raw_dataset, self)
         save_dataset(result_dataset, self.name, data_path)
 
         logger.info("Finished measurement")
+
+    def _calculate_schedule_duration(self, compiled_schedule: CompiledSchedule) -> float:
+        """Calculate the total duration of the schedule."""
+        duration = compiled_schedule.get_schedule_duration()
+        if "loop_repetitions" in self.node_dictionary:
+            duration *= self.node_dictionary["loop_repetitions"]
+        return duration
+
+    @staticmethod
+    def _print_measurement_info(duration: float, measurement: Tuple[int, int]) -> None:
+        """Print information about the current measurement."""
+        measurement_message = (
+            f". Measurement {measurement[0] + 1} of {measurement[1]}"
+            if measurement[1] > 1 else ""
+        )
+        # Format the message with duration and the measurement message
+        message = f"{duration:.2f} sec{measurement_message}"
+        print(f"schedule_duration = {Fore.CYAN}{Style.BRIGHT}{message}{Style.RESET_ALL}")
 
     def execute_schedule(
         self,
         compiled_schedule: CompiledSchedule,
         lab_ic,
         schedule_duration: float,
-        cluster_status,
+        cluster_status=None,
     ) -> xarray.Dataset:
         # TODO: Could move to helper function, because is static
 
