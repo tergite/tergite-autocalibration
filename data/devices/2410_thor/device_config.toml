@@ -1,0 +1,71 @@
+# Device configuration file
+#
+# This file is meant to serve as examples to illustrate how to write
+# these configuration files, as well as for testing purposes. It can
+# be used as a template for configuring properties of the actual
+# device at hand.
+#
+# Note: This device configuration follows a standard, such that
+# it can be read by other backend components as well
+
+[device]
+# The items of this section describe general device properties known
+# after fabrication and first manual characterization steps. The general
+# section should contain relevant metadata
+name = "1024_thor"
+
+# -------------------- Resonator definitions --------------------
+# This section contains all resonator-specific properties
+
+# Values for specific resonators
+[device.resonator.all]
+attenuation = 10
+
+[device.resonator.q00]
+VNA_frequency = 6.48213e9
+
+[device.resonator.q01]
+VNA_frequency = 6.26093e9
+
+
+# -------------------- Qubit definitions --------------------
+# This section contains all qubit-specific properties
+
+[device.qubit.all]
+attenuation = 16
+
+[device.qubit.q00]
+VNA_f01_frequency = 3.848e9
+VNA_f12_frequency = 3.592e9
+
+[device.qubit.q01]
+VNA_f01_frequency = 3.384e9
+VNA_f12_frequency = 3.177e9
+
+# -------------------- Coupler definitions --------------------
+# This section contains all coupler-specific properties
+
+[device.coupler.all]
+attenuation = 20
+
+
+# --------------------------------------------------------------------------------
+# Device layout configuration section
+
+[layout]
+# The items of this section correspond to component types and their
+# sub-items correspond to their indices/identities. This also works as
+# a way to declare what components are supported/present in the
+# device.
+
+[layout.resonator.q00]
+position = { column = 0, row = 0 }
+
+[layout.resonator.q01]
+position = { column = 2, row = 0 }
+
+[layout.qubit.q00]
+position = { column = 0, row = 1 }
+
+[layout.qubit.q01]
+position = { column = 2, row = 1 }
