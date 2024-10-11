@@ -46,7 +46,6 @@ from tergite_autocalibration.utils.redis_utils import (
     populate_node_parameters,
     populate_quantities_of_interest,
 )
-from tergite_autocalibration.utils.user_input import user_requested_calibration
 from tergite_autocalibration.utils.visuals import draw_arrow_chart
 from tergite_autocalibration.config.calibration import CONFIG
 

@@ -24,7 +24,7 @@ CONFIG_DIR='/home/user/repos/tergite-autocalibration/configs'
 # It is assumed that all these paths are relative to CONFIG_DIR
 # CLUSTER_CONFIG is what Q-BLOX needs to compile schedules on the hardware
 # It should be a file in json format, there is no default file
-CLUSTER_CONFIG='hardware_config.json'
+CLUSTER_CONFIG='cluster_config.json'
 # SPI_CONFIG is the file to configure the wiring on the Q-BLOX Spi Rack
 SPI_CONFIG='spi_config.toml'
 # DEVICE_CONFIG contains the initial values for the device configuration

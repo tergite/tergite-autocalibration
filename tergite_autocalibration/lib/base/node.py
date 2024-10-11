@@ -22,11 +22,9 @@ from pathlib import Path
 from typing import List, Optional
 
 import matplotlib
-
 import numpy as np
 import tqdm
 import xarray
-import xarray as xr
 from colorama import Fore
 from colorama import Style
 from colorama import init as colorama_init
@@ -40,7 +38,6 @@ from quantify_scheduler.json_utils import pathlib
 
 from tergite_autocalibration.config import settings
 from tergite_autocalibration.config.settings import REDIS_CONNECTION, CLUSTER_CONFIG
-from tergite_autocalibration.experimental.tof_analysis import analyze_tof
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.lib.utils.demod_channels import ParallelDemodChannels
