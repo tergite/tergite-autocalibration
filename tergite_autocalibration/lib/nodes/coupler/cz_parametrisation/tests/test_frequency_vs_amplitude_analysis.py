@@ -67,27 +67,27 @@ def test_hasCorrectFreqsAndAmps(setup_good_data):
 def test_dataIsReadCorrectly(setup_good_data):
     d14, d15, freqs, amps = setup_good_data
     c14 = FrequencyVsAmplitudeQ1Analysis("name", ["redis_field"], freqs, amps)
-    c14._analyze_qubit(d14,"yq14")
+    c14.process_qubit(d14,"yq14")
     npt.assert_array_equal(c14.dataset[f"y{c14.qubit}"].values, d14[f"yq14"].values)
     c15 = FrequencyVsAmplitudeQ2Analysis("name", ["redis_field"], freqs, amps)
-    c15._analyze_qubit(d15,"yq15")
+    c15.process_qubit(d15,"yq15")
     npt.assert_array_equal(c15.dataset[f"y{c15.qubit}"].values, d15[f"yq15"].values)
 
 
 def test_datasetHasQubitDefined(setup_good_data):
     d14, d15, freqs, amps = setup_good_data
     c14 = FrequencyVsAmplitudeQ1Analysis("name", ["redis_field"], freqs, amps)
-    c14._analyze_qubit(d14,"yq14")
+    c14.process_qubit(d14,"yq14")
     assert c14.qubit == "q14"
     c15 = FrequencyVsAmplitudeQ1Analysis("name", ["redis_field"], freqs, amps)
-    c15._analyze_qubit(d15,"yq15")
+    c15.process_qubit(d15,"yq15")
     assert c15.qubit == "q15"
 
 
 def test_canGetMaxFromQ1(setup_good_data):
     d14, d15, freqs, amps = setup_good_data
     c14 = FrequencyVsAmplitudeQ1Analysis("name", ["redis_field"], freqs, amps)
-    result = c14._analyze_qubit(d14,"yq14")
+    result = c14.process_qubit(d14,"yq14")
     indexBestFreq = np.where(freqs == result[0])[0]
     indexBestAmp = np.where(amps == result[1])[0]
     assert indexBestFreq[0] == 9
@@ -97,7 +97,7 @@ def test_canGetMaxFromQ1(setup_good_data):
 def test_canGetMinFromQ2(setup_good_data):
     d14, d15, freqs, amps = setup_good_data
     c15 = FrequencyVsAmplitudeQ2Analysis("name", ["redis_field"], freqs, amps)
-    result = c15._analyze_qubit(d15,"yq15")
+    result = c15.process_qubit(d15,"yq15")
     indexBestFreq = np.where(freqs == result[0])[0]
     indexBestAmp = np.where(amps == result[1])[0]
     assert indexBestFreq[0] == 10
@@ -108,7 +108,7 @@ def test_canPlot(setup_good_data):
     matplotlib.use("Agg")
     d14, d15, freqs, amps = setup_good_data
     c14 = FrequencyVsAmplitudeQ1Analysis("name", ["redis_field"], freqs, amps)
-    c14._analyze_qubit(d14,"yq14")
+    c14.process_qubit(d14,"yq14")
 
     figure_path = os.environ["DATA_DIR"] + "/Frequency_Amplitude_q14.png"
     # Remove the file if it already exists
@@ -128,7 +128,7 @@ def test_canPlot(setup_good_data):
         assert img.format == "PNG", "File should be a PNG image"
 
     c15 = FrequencyVsAmplitudeQ2Analysis("name", ["redis_field"], freqs, amps)
-    c15._analyze_qubit(d15,"yq15")
+    c15.process_qubit(d15,"yq15")
 
     figure_path = os.environ["DATA_DIR"] + "/Frequency_Amplitude_q15.png"
     # Remove the file if it already exists
@@ -164,7 +164,7 @@ def test_canPlot_2(setup_good_data_2):
     matplotlib.use("Agg")
     d14, d15, freqs, amps = setup_good_data_2
     c14 = FrequencyVsAmplitudeQ1Analysis("name", ["redis_field"], freqs, amps)
-    c14._analyze_qubit(d14,"yq14")
+    c14.process_qubit(d14,"yq14")
 
     figure_path = os.environ["DATA_DIR"] + "/Frequency_Amplitude_2_q14.png"
     # Remove the file if it already exists
@@ -184,7 +184,7 @@ def test_canPlot_2(setup_good_data_2):
         assert img.format == "PNG", "File should be a PNG image"
 
     c15 = FrequencyVsAmplitudeQ2Analysis("name", ["redis_field"], freqs, amps)
-    c15._analyze_qubit(d15,"yq15")
+    c15.process_qubit(d15,"yq15")
 
     figure_path = os.environ["DATA_DIR"] + "/Frequency_Amplitude_2_q15.png"
     # Remove the file if it already exists
@@ -222,7 +222,7 @@ def test_canPlotBad(setup_bad_data):
     matplotlib.use("Agg")
     d14, d15, freqs, amps = setup_bad_data
     c14 = FrequencyVsAmplitudeQ1Analysis("name", ["redis_field"], freqs, amps)
-    c14._analyze_qubit(d14,"yq14")
+    c14.process_qubit(d14,"yq14")
 
     figure_path = os.environ["DATA_DIR"] + "/Frequency_Amplitude_bad_q14.png"
     # Remove the file if it already exists
@@ -242,7 +242,7 @@ def test_canPlotBad(setup_bad_data):
         assert img.format == "PNG", "File should be a PNG image"
 
     c15 = FrequencyVsAmplitudeQ2Analysis("name", ["redis_field"], freqs, amps)
-    c15._analyze_qubit(d15,"yq15")
+    c15.process_qubit(d15,"yq15")
 
     figure_path = os.environ["DATA_DIR"] + "/Frequency_Amplitude_bad_q15.png"
     # Remove the file if it already exists

@@ -53,7 +53,7 @@ class QubitAnalysisForCouplerSpectroscopy(BaseQubitAnalysis):
                     ds = ds.drop_vars(coord)            
 
             freq_analysis = QubitSpectroscopyAnalysis(self.name, "")
-            qubit_frequency = freq_analysis._analyze_qubit(ds, self.data_var)
+            qubit_frequency = freq_analysis.process_qubit(ds, self.data_var)
 
             if not np.isnan(qubit_frequency):
                 self.detected_frequencies.append(qubit_frequency)
@@ -131,11 +131,11 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
 
         q1_data_var = [data_var for data_var in self.dataset.data_vars if self.name_qubit_1 in data_var]
         ds1 = self.dataset[q1_data_var]
-        q1result = self.q1_analysis._analyze_qubit(ds1, q1_data_var[0])
+        q1result = self.q1_analysis.process_qubit(ds1, q1_data_var[0])
 
         q2_data_var = [data_var for data_var in self.dataset.data_vars if self.name_qubit_2 in data_var]
         ds2 = self.dataset[q2_data_var]
-        self.q2_analysis._analyze_qubit(ds2, q2_data_var[0])
+        self.q2_analysis.process_qubit(ds2, q2_data_var[0])
 
         return q1result
 

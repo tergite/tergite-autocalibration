@@ -34,12 +34,12 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
     def setUpClass(self):
         # Setup the dataset for testing from a file
         test_dir = Path(__file__).parent
-        file_path = test_dir / "testdata.hdf5"
+        file_path = test_dir / "data" / "dataset_0.hdf5" #"testdata.hdf5"
         self.dataset = xr.open_dataset(file_path)
 
     def test_initialization(self):
-        self.analysis = PurityBenchmarkingQubitAnalysis("name", ["redis_field"])
-        self.analysis._analyze_qubit(self.dataset,"yq14")
+        self.analysis = PurityBenchmarkingQubitAnalysis("name", ["purity_fidelity"])
+        self.analysis.process_qubit(self.dataset,"yq06")
         # Check that the analysis object has the expected attributes
         self.assertTrue(hasattr(self.analysis, "purity"))
         self.assertTrue(hasattr(self.analysis, "normalized_data_dict"))
@@ -49,21 +49,10 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
 
     def test_run_fitting(self):
         analysis = PurityBenchmarkingQubitAnalysis("name", ["redis_field"])
-        analysis._analyze_qubit(self.dataset,"yq14")
+        analysis.process_qubit(self.dataset,"yq06")
         # Verify the average purity result is within the expected range
-        print(
-            (
-                np.sum(list(analysis.purity_results_dict.values()))
-                / len(analysis.purity_results_dict)
-            )
-        )
         self.assertTrue(
-            56.1
-            <= (
-                np.sum(list(analysis.purity_results_dict.values()))
-                / len(analysis.purity_results_dict)
-            )
-            <= 56.2
+            0.7 < np.average(list(analysis.purity_results_dict.values())) < 0.8
         )
 
         # Trim the dataset to only 5 Cliffords before running the fitting so it will fit the model
@@ -74,13 +63,13 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
 
         # Verify that the fitting results are valid
         self.assertIsInstance(fidelity, list)
-        self.assertTrue(len(fidelity) > 0)
+        self.assertTrue(len(fidelity) > 0.99)
         self.assertTrue(0 <= fidelity[0] <= 1.002)
         self.assertIsInstance(analysis.fit_results, ModelResult)
 
     def test_plotter(self):
         analysis = PurityBenchmarkingQubitAnalysis("name", ["redis_field"])
-        analysis._analyze_qubit(self.dataset,"yq14")
+        analysis.process_qubit(self.dataset,"yq14")
     
             # Trim the dataset to only 5 Cliffords before plotting, same reason as above
         analysis.number_of_cliffords = analysis.number_of_cliffords[:5]

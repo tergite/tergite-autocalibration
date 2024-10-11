@@ -220,7 +220,7 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
                 qubit_analysis = self.single_qubit_analysis_obj(
                     self.name, self.redis_fields
                 )
-                qubit_analysis._analyze_qubit(ds, this_qubit) #this_qubit shoulq be qXX
+                qubit_analysis.process_qubit(ds, this_qubit) #this_qubit shoulq be qXX
                 self.qubit_analyses.append(qubit_analysis)
 
             index = index + 1
@@ -292,7 +292,7 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
         self.qubit = None
         self.coord = None
 
-    def _analyze_qubit(self, dataset, qubit_element):
+    def process_qubit(self, dataset, qubit_element):
         self.dataset = dataset
         self.qubit = qubit_element
         self.coord = dataset.coords
@@ -335,7 +335,7 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
         self.name_qubit_1 = ""
         self.name_qubit_2 = ""
 
-    def _analyze_coupler(self, dataset, coupler_element):
+    def process_coupler(self, dataset, coupler_element):
         self.name_qubit_1 = coupler_element[0:3]
         self.name_qubit_2 = coupler_element[4:7]
         self.dataset = dataset
@@ -437,7 +437,7 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
                     self.name, self.redis_fields
                 )
                 coupler_analysis.data_path = self.data_path
-                coupler_analysis._analyze_coupler(ds, this_coupler)
+                coupler_analysis.process_coupler(ds, this_coupler)
                 self.coupler_analyses.append(coupler_analysis)
 
             index = index + 1
