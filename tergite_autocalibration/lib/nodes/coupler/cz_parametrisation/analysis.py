@@ -219,10 +219,10 @@ class CZParametrisationFixDurationCouplerAnalysis(BaseCouplerAnalysis):
 
     def analyze_coupler(self) -> list[float, float, float]:
         print("Running CZParametrisationFixDurationAnalysis")
-        results = self.process_coupler()
+        results = self.run_coupler()
         return self.run_analysis_on_freq_amp_results(results)
 
-    def process_coupler(
+    def run_coupler(
         self,
     ) -> List[Tuple[CombinedFrequencyVsAmplitudeAnalysis, float]]:
         results = []

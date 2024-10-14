@@ -27,7 +27,6 @@ from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.anal
 
 # FIXME: These tests are marked as skip after the refactoring of the analysis classes
 #        Michele to integrate with new data files from Joel
-@unittest.skip
 class TestPurityBenchmarkingAnalysis(unittest.TestCase):
     @classmethod
     def setUpClass(self):
