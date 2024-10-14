@@ -35,12 +35,11 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
         file_path = test_dir / "data" / "dataset_0.hdf5"  # "testdata.hdf5"
         self.dataset = xr.open_dataset(file_path)
 
-    @unittest.skip
     def test_initialization(self):
         self.analysis = PurityBenchmarkingQubitAnalysis("name", ["purity_fidelity"])
         self.analysis.process_qubit(self.dataset, "yq06")
         # Check that the analysis object has the expected attributes
-        self.assertTrue(hasattr(self.analysis, "purity"))
+        self.assertTrue(hasattr(self.analysis, "purity_results_dict"))
         self.assertTrue(hasattr(self.analysis, "normalized_data_dict"))
         self.assertEqual(
             self.analysis.number_of_repetitions, self.dataset.sizes.get("seed", 1)
