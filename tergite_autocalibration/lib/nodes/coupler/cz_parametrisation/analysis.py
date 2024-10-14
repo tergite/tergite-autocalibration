@@ -62,7 +62,7 @@ class FrequencyVsAmplitudeQubitAnalysis(BaseQubitAnalysis):
         self.opt_freq = -1
         self.opt_amp = -1
 
-    def _analyze_qubit(self, dataset, qubit_var_name):
+    def process_qubit(self, dataset, qubit_var_name):
         # Access the specific DataArray for the qubit
         if qubit_var_name not in dataset.data_vars:
             raise ValueError(
@@ -219,10 +219,10 @@ class CZParametrisationFixDurationCouplerAnalysis(BaseCouplerAnalysis):
 
     def analyze_coupler(self) -> list[float, float, float]:
         print("Running CZParametrisationFixDurationAnalysis")
-        results = self.process_coupler()
+        results = self.run_coupler()
         return self.run_analysis_on_freq_amp_results(results)
 
-    def process_coupler(
+    def run_coupler(
         self,
     ) -> List[Tuple[CombinedFrequencyVsAmplitudeAnalysis, float]]:
         results = []
@@ -258,7 +258,7 @@ class CZParametrisationFixDurationCouplerAnalysis(BaseCouplerAnalysis):
                 self.frequency_values,
                 self.amplitude_values,
             )
-            q1Res = q1._analyze_qubit(ds1, q1_data_var[0])
+            q1Res = q1.process_qubit(ds1, q1_data_var[0])
 
             q2_data_var = [
                 data_var
@@ -280,7 +280,7 @@ class CZParametrisationFixDurationCouplerAnalysis(BaseCouplerAnalysis):
                 self.frequency_values,
                 self.amplitude_values,
             )
-            q2Res = q2._analyze_qubit(ds2, q2_data_var[0])
+            q2Res = q2.process_qubit(ds2, q2_data_var[0])
 
             c = CombinedFrequencyVsAmplitudeAnalysis(q1Res, q2Res)
             results.append([c, current])

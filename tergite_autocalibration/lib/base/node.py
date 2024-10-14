@@ -372,6 +372,7 @@ class BaseNode(abc.ABC):
         compiled_schedule: CompiledSchedule,
         lab_ic,
         data_path: pathlib.Path,
+        cluster_status=MeasurementMode.real,
         measurement=(1, 1),
     ):
         schedule_duration = compiled_schedule.get_schedule_duration()
@@ -389,7 +390,7 @@ class BaseNode(abc.ABC):
         )
 
         raw_dataset = self.execute_schedule(
-            compiled_schedule, lab_ic, schedule_duration
+            compiled_schedule, lab_ic, schedule_duration, cluster_status
         )
 
         result_dataset = configure_dataset(raw_dataset, self)
