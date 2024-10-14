@@ -207,6 +207,7 @@ class PurityBenchmarkingQubitAnalysis(BaseQubitAnalysis):
         ax.set_xlabel("Number of Cliffords")
         ax.grid()
 
+
 class PurityBenchmarkingNodeAnalysis(BaseAllQubitsRepeatAnalysis):
     single_qubit_analysis_obj = PurityBenchmarkingQubitAnalysis
 
