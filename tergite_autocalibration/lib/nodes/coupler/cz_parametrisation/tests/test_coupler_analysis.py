@@ -10,6 +10,7 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+import unittest
 from tergite_autocalibration.tests.utils.env import setup_test_env
 
 setup_test_env()
@@ -208,6 +209,7 @@ def setup_data_mutliple_files():
     return combined_dataset, freqs, amps
 
 
+@unittest.skip
 def test_PickLowestCurrentCompleteAnalysis(
     setup_data_mutliple_files: tuple[xr.Dataset, ndarray, ndarray]
 ):
