@@ -20,6 +20,7 @@ from typing import Hashable, Optional
 
 import redis
 
+from tergite_autocalibration.config import settings
 from tergite_autocalibration.tools.mss.bcc_logger import get_logger
 
 
@@ -128,7 +129,7 @@ Hex = str  # type(hex(5))
 # Initialization for Redis storage
 # ============================================================================
 
-red = redis.Redis(decode_responses=True)
+red = settings.REDIS_CONNECTION
 
 # ============================================================================
 # Constants

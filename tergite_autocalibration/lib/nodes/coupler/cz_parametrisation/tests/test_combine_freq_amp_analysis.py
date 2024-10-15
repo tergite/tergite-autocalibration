@@ -38,9 +38,9 @@ def setup_good_data():
     freqs = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
     amps = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
     c14 = FrequencyVsAmplitudeQ1Analysis("name", ["redis_field"], freqs, amps)
-    q14Res = c14._analyze_qubit(d14, "yq14")
+    q14Res = c14.process_qubit(d14, "yq14")
     c15 = FrequencyVsAmplitudeQ2Analysis("name", ["redis_field"], freqs, amps)
-    q15Res = c15._analyze_qubit(d15, "yq15")
+    q15Res = c15.process_qubit(d15, "yq15")
     return q14Res, q15Res, freqs, amps
 
 
@@ -81,9 +81,9 @@ def setup_bad_data():
     freqs = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
     amps = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
     c14 = FrequencyVsAmplitudeQ1Analysis("name", ["redis_field"], freqs, amps)
-    q14Res = c14._analyze_qubit(d14, "yq14")
+    q14Res = c14.process_qubit(d14, "yq14")
     c15 = FrequencyVsAmplitudeQ2Analysis("name", ["redis_field"], freqs, amps)
-    q15Res = c15._analyze_qubit(d15, "yq15")
+    q15Res = c15.process_qubit(d15, "yq15")
     return q14Res, q15Res
 
 

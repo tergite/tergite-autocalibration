@@ -122,7 +122,7 @@ class RandomizedBenchmarkingQubitAnalysis(BaseQubitAnalysis):
         return [self.fidelity]
 
     def _get_magnitudes(self, indx):
-        magnitudes = self.magnitudes[self.data_var].isel({self.seed_coord: indx})
+        magnitudes = self.S21[self.data_var].isel({self.seed_coord: indx})
         return magnitudes.values.flatten()
 
     def plotter(self, ax: Axes):

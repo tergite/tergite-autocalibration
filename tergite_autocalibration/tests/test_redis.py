@@ -35,4 +35,6 @@ mock.set_standard_params_transmon(setup)
 def test_redis_loading():
     all_nodes = nodes.node_implementations.keys()
     for node in all_nodes:
+        print(node)
+        print(transmon_configuration)
         assert node in qois["qubits"].keys() or node in qois["couplers"].keys()
