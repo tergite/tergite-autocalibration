@@ -192,19 +192,18 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         disp.plot(ax=cm_axis)
 
     def update_redis_trusted_values(
-        self, node: str, this_element: str, transmon_parameters: list
+        self, node: str, this_element: str
     ):
         """
         TODO: This method is a temporary solution to store the discriminator until we switch to ThresholdedAcquisition
         Args:
             node: The parent node
             this_element: Name of the qubit e.g. 'q12'
-            transmon_parameters: list of qois
 
         Returns:
 
         """
-        super().update_redis_trusted_values(node, this_element, transmon_parameters)
+        super().update_redis_trusted_values(node, this_element)
 
         # We read coefficients and intercept from the lda model
         coef_0_ = str(float(self.lda.coef_[0][0]))
