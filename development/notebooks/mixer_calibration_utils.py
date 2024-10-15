@@ -20,7 +20,7 @@ def _amp_ratio_phase_from_IQ(z_minus, z_plus):
 
     amp = ((I_minus + I_plus) ** 2 + (Q_plus - Q_minus) ** 2) ** 0.5
     phase = np.angle((I_minus + I_plus) + 1j * (Q_plus - Q_minus))
-    amp_ratio = (((I_plus - I_minus) ** 2 + (Q_plus + Q_minus) ** 2) / amp**2) ** 0.5
+    amp_ratio = (((I_plus - I_minus) ** 2 + (Q_plus + Q_minus) ** 2) / amp ** 2) ** 0.5
     phase_offset = np.angle(
         np.exp(1j * -phase) * ((I_plus - I_minus) + 1j * (Q_minus + Q_plus))
     )
@@ -80,7 +80,7 @@ class _LeakageCalibrationContextManager:
             out_lo_enable_param = self.cal_module.parameters[
                 f"out{self.cal_output}_lo_en"
             ]
-            marker_override_value = 2**self.cal_output
+            marker_override_value = 2 ** self.cal_output
 
         if self.lo_freq is not None:
             out_lo_param(self.lo_freq)
@@ -251,7 +251,7 @@ class _SidebandCalibrationContextManager:
             marker_override_value = 2
         else:
             out_lo_param = self.cal_module.parameters[f"out{self.cal_output}_lo_freq"]
-            marker_override_value = 2**self.cal_output
+            marker_override_value = 2 ** self.cal_output
 
         if self.lo_freq is not None:
             out_lo_param(self.lo_freq)

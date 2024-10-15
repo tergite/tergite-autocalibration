@@ -127,7 +127,7 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         intercept = self.lda.intercept_
         self.lamda = -A / B
         theta = np.rad2deg(np.arctan(self.lamda))
-        threshold = np.abs(intercept) / np.sqrt(A**2 + B**2)
+        threshold = np.abs(intercept) / np.sqrt(A ** 2 + B ** 2)
         threshold = threshold[0]
 
         self.y_intecept = +intercept / B
@@ -191,9 +191,7 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         disp = ConfusionMatrixDisplay(confusion_matrix=optimal_confusion_matrix)
         disp.plot(ax=cm_axis)
 
-    def update_redis_trusted_values(
-        self, node: str, this_element: str
-    ):
+    def update_redis_trusted_values(self, node: str, this_element: str):
         """
         TODO: This method is a temporary solution to store the discriminator until we switch to ThresholdedAcquisition
         Args:
