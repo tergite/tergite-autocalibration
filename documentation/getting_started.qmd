@@ -50,7 +50,7 @@ These files describe our initial knowledge on the system as well as the connecti
 
 ### The `.env` file.
 
-All the settings and paths are contained in the `.env` file. Since this file contains user specific settings, it is git-ignored, it must be created by the user. For convinience a template file `dot-env-template.txt` already exists.
+All the settings and paths are contained in the `.env` file. Since this file contains user specific settings, it is git-ignored, it must be created by the user. For convinience a template file `.example.env` already exists.
 
 First copy the template file to the `.env` (this creates the `.env` file if it doesn't exist):
 
