@@ -1,19 +1,165 @@
-# Configuration Files
+# Configuration
 
-## Hardware Configuration file (json):
-Here the connection is made between the Qblox cluster physical ports and clocks to the qubits and couplers of the QPU.
+To run the autocalibration you will need to configure it with a couple of different configuration files.
+Doing the configuration with a pre-built configuration package will take about 5-10 minutes.
+On an unknown experimental device without pre-built files, it probably takes slightly longer.
 
-The file must be placed at the directory `configs/`
 
-Given a `.csv` file after a mixer calibration the function `...` can create instantly the corresponding `JSON` file.
+## Environment variables
+Computer systems generally use `CAPITALIZED_GLOBAL_KEYS` on a system level e.g. to store global variables.
+There is a convention to store those variables in a `.env` file on the root-level of your project and load the variables before running a program.
+The template for the environmental variables of the tergite-autocalibration can be found in the `.example.env` file on root-level of the repository.
+E.g. if you have cloned the repository into `/home/user/repos/tergite-autocalibration`, then your example template should be located there.
 
-## Device Configuration file (toml):
+Copy the template and update values according to the instructions. The template file itself provides instructions on how to update the values.
+```shell
+cp .example.env .env
+```
+Values that can be set in the environment are e.g. `PLOTTING` and this variable determines whether plots should be shown.
 
-Here we set reasonable initial parameters
 
-## VNA resonator & qubit frequencies
+## Configuration package
+All other configuration files go into the folder that you have specified in the environmental variable `CONFIG_DIR`.
+A template for a full configuration package can be found in `data/_template/_device_name`.
+Some more pre-built configuration package can be found in `data/devices` under the respective device names.
 
-Here we input the initial values for the resonator and qubits frequencies, assumed that they have been acquired through VNA measurements, design targets or previous manual measurements.
-`/tergite_acl/config/VNA_values.py`
+A configuration package consists of the following five files:
 
-## Coupler to SPI mapping
+- Cluster configuration
+- SPI configuration (optional, only required for two-qubit calibration)
+- Device configuration
+- Calibration configuration
+- Custom user samplespace configuration (optional, only required if you are sweeping on a very specific range of parameters)
+
+All example configuration files should come with comments about usage and reasonable initial values.
+
+### Cluster configuration (.json):
+A QBLOX cluster consists of a couple of modules of which each can have multiple input/output options for SMI cables.
+In the cluster configuration the connection is made between these QBLOX cluster physical ports and clocks to the qubits and couplers of the QPU.
+
+Example: Definition of a qubit drive for |0> to |1> state)
+```
+{
+   "backend": "quantify_scheduler.backends.qblox_backend.hardware_compile",
+   "clusterA": {
+      "ref": "internal",
+      "instrument_type": "Cluster",
+      "clusterA_module2": {
+         "instrument_type": "QCM_RF",
+         "complex_output_0": {
+            "lo_freq": 3.946e9,
+            "dc_mixer_offset_I": 0,
+            "dc_mixer_offset_Q": 0,
+            "portclock_configs": [
+               {
+                  "port": "q00:mw",
+                  "clock": "q00.01",
+                  "mixer_amp_ratio": 1,
+                  "mixer_phase_error_deg": 0
+               }
+            ]
+         }
+      }
+   }
+}
+```
+
+The file in the template package is `cluster_configuration.json`.
+
+FIXME: This is to be changed after with the integration of the automatic mixer calibration
+The cluster configuration relies on some values that come from a mixer calibration.
+Given a `.csv` file after a mixer calibration the function `utils/hw_generator.py` can create instantly the corresponding `JSON` file.
+
+### SPI configuration (.toml | optional):
+When working with two-qubit gates, there has to be a current source for the coupler and in the QBLOX stack this is coming from the so called SPI rack.
+The SPI configuration is mapping the qubits to their respective modules in the SPI rack and can be further used to assign the couplers to groups.
+
+Example: Definition of a coupler
+```
+[couplers.q11_q12]
+spi_module_no = 1
+dac_name = "dac0"
+edge_group = 1
+```
+
+The file in the template package is `spi_config.toml`.
+
+### Device Configuration file (.toml):
+While the previous two configuration files have been used to configure the room temperature instruments, the device configuration defines the initial parameters and characteristics of chip itself.
+The device configuration is having two main sections -- the `[device]` and the `[layout]` section.
+In the `[device]` section prior knowledge about the device from the VNA are set for the resonator, qubit (drive) and the coupler.
+
+It is possible to either address a qubit individually, e.g. the following would set the VNA frequency for qubit `q06`:
+```
+[device.resonator.q06]
+VNA_frequency = 6832973301.189378
+```
+or for all qubits:
+```
+[device.resonator.all]
+attenuation = 12
+```
+
+In the `[layout]` section the positions of the qubits can be set.
+This is useful if one would like to e.g. plot the device.
+Qubits have an x (column) and a y (row) position:
+```
+[layout.resonator.q06]
+position = { column = 0, row = 0 }
+```
+
+The file in the template package is `device_config.toml`.
+
+### Calibration configuration (.toml):
+This file is solely configuring the calibration process itself i.e. everything that is related to running the calibration, its measurements and analyses.
+In the `[general]` section there are some settings such as the target node, the qubits and the couplers to calibrate.
+
+Example: Calibrate qubits `q01` and `q02` with coupler `q01_q02` up until the node `cz_calibration`.
+```
+[general]
+target_node = "cz_calibration"
+qubits = ["q01", "q02"]
+couplers = ["q01_q02"]
+```
+
+This is followed by the `[initials]` section where you can set the initial values for certain calibration nodes.
+Here, similarly to the device configuration, you can either address a single qubit or all qubits, by using either the qubit identifier e.g. `[q06]` or the `[all]` keyword.
+
+Example: Setting initial values.
+```
+[initials.qubits.all]
+measure.acq_delay = 220e-9
+[initials.qubits]
+q06.measure.pulse_amp = 0.03
+```
+
+Below, you can define node-specific parameters setting `[node_name.scope.property]` where scope are the qubits/couplers and the the property is a property known to the node.
+
+Example: Setting the reset duration for the resonator spectroscopy node.
+```
+[resonator_spectroscopy.all]
+reset.duration =  60e-6
+```
+
+The file in the template package is `calibration_config.toml`.
+
+### Custom user samplespace configuration (.py | optional):
+If you want to generate samplespaces with your own custom Python scripts, you can add a custom user samplespace configuration.
+The file must contain the definition of your samplespace according to the following schema:
+```
+user_samplespace = {
+    node1_name : {
+            "settable_of_node1_1": { 'q01': np.ndarray, 'q02': np.ndarray },
+            "settable_of_node1_2": { 'q01': np.ndarray, 'q02': np.ndarray },
+            ...
+        },
+    node2_name : {
+            "settable_of_node2_1": { 'q01': np.ndarray, 'q02': np.ndarray },
+            "settable_of_node2_2": { 'q01': np.ndarray, 'q02': np.ndarray },
+            ...
+        }
+}
+```
+Please note: Do not rename the variable `user_samplespace`, because it cannot be imported otherwise.
+
+The file in the template package is `user_samplespace.py`.

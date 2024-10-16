@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.56">
+<meta name="generator" content="quarto-1.5.53">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -132,7 +132,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./configuration_files.html"> 
-<span class="menu-text">Configuration Files</span></a>
+<span class="menu-text">Configuration</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./available_nodes.html"> 
@@ -173,11 +173,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a>
   <ul class="collapse">
   <li><a href="#additional-installations" id="toc-additional-installations" class="nav-link" data-scroll-target="#additional-installations">Additional installations</a></li>
-  <li><a href="#naming-convention-and-style" id="toc-naming-convention-and-style" class="nav-link" data-scroll-target="#naming-convention-and-style">Naming convention and style</a>
+  <li><a href="#naming-convention-and-style" id="toc-naming-convention-and-style" class="nav-link" data-scroll-target="#naming-convention-and-style">Naming convention and style</a></li>
+  <li><a href="#ide-preloaded-settings" id="toc-ide-preloaded-settings" class="nav-link" data-scroll-target="#ide-preloaded-settings">IDE preloaded settings</a>
   <ul class="collapse">
-  <li><a href="#naming" id="toc-naming" class="nav-link" data-scroll-target="#naming">Naming</a></li>
+  <li><a href="#vscode" id="toc-vscode" class="nav-link" data-scroll-target="#vscode">VSCode</a></li>
   </ul></li>
+  <li><a href="#things-to-do-before-a-commit" id="toc-things-to-do-before-a-commit" class="nav-link" data-scroll-target="#things-to-do-before-a-commit">Things to do before a commit</a>
+  <ul class="collapse">
+  <li><a href="#copyright-statement" id="toc-copyright-statement" class="nav-link" data-scroll-target="#copyright-statement">Copyright statement</a></li>
+  <li><a href="#changelog" id="toc-changelog" class="nav-link" data-scroll-target="#changelog">Changelog</a></li>
   <li><a href="#static-code-analyzer" id="toc-static-code-analyzer" class="nav-link" data-scroll-target="#static-code-analyzer">Static code analyzer</a></li>
+  </ul></li>
   </ul></li>
   </ul>
 </nav>
@@ -197,29 +203,57 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>After you install tergite with</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pip install <span class="op">-</span>e .</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>run</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>poetry install <span class="op">--</span><span class="cf">with</span> dev,test</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>pip install poetry</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>poetry install <span class="op">--</span><span class="cf">with</span> dev,test</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>this will install the additional packages for developing code and running tests</p>
 </section>
 <section id="naming-convention-and-style" class="level2">
 <h2 class="anchored" data-anchor-id="naming-convention-and-style">Naming convention and style</h2>
 <p>We use American English, please set any spell checker to this language.</p>
-<section id="naming" class="level3">
-<h3 class="anchored" data-anchor-id="naming">Naming</h3>
 <ul>
 <li>The file names should be written using snake_case, with words written in lowercase and separated by underscores.</li>
-<li>Class names are in PascalCase (where all words are capitalized) divided by underscores (but sometimes we used simple PascalCase).</li>
+<li>Class names should be in PascalCase (where all words are capitalized). Many class do not follow this rule and use CamelCase with underscore, they will be changed.</li>
 <li>Methods should be in snake_case</li>
 <li>Variables should be in snake_case</li>
 </ul>
 </section>
+<section id="ide-preloaded-settings" class="level2">
+<h2 class="anchored" data-anchor-id="ide-preloaded-settings">IDE preloaded settings</h2>
+<p>There are settings available in the repo for IDEs, recommending extensions and settings. Please discuss with the team before modifying these default settings, they should changed only with the consensus of the team.</p>
+<section id="vscode" class="level3">
+<h3 class="anchored" data-anchor-id="vscode">VSCode</h3>
+<p>Black, quarto and python extensions are recommended. Some settings are recommended too.</p>
 </section>
-<section id="static-code-analyzer" class="level2">
-<h2 class="anchored" data-anchor-id="static-code-analyzer">Static code analyzer</h2>
+</section>
+<section id="things-to-do-before-a-commit" class="level2">
+<h2 class="anchored" data-anchor-id="things-to-do-before-a-commit">Things to do before a commit</h2>
+<section id="copyright-statement" class="level3">
+<h3 class="anchored" data-anchor-id="copyright-statement">Copyright statement</h3>
+<p>When you create or modify a file, make sure that add the following copyright text is present at the top of the file. Remember to add your name and do not delete previus contributors. If you add the statement to a file that does not have one, please check on git the names of contributors.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This code is part of Tergite Autocalibration</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># (C) Copyright WRITE YOUR NAME HERE, 2024</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># This code is licensed under the Apache License, Version 2.0. You may</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># obtain a copy of this license in the LICENSE.txt file in the root directory</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Any modifications or derivative works of this code must retain this</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># copyright notice, and modified files need to carry a notice indicating</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># that they have been altered from the originals.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="changelog" class="level3">
+<h3 class="anchored" data-anchor-id="changelog">Changelog</h3>
+<p>Update the changelog in the sectionc called [Unreleased]. Please note that there are several sections titled “Added”, “Change” and “Fixed”; place your text in the correct category.</p>
+</section>
+<section id="static-code-analyzer" class="level3">
+<h3 class="anchored" data-anchor-id="static-code-analyzer">Static code analyzer</h3>
 <p>The code analyzer used in the project is black, which is installed as part of the dev dependencies. To use black, open a shell and run</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>black .</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Please make sure to run it before creating a PR.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>black .</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Please make sure to run it before merging the PR.</p>
 
 
+</section>
 </section>
 </section>
 

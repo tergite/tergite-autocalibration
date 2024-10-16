@@ -5,6 +5,7 @@ The structure is as follows:
 
 - `devices`: Please put files related to a specific chip into a subdirectory e.g. `fc8a` for the design with tha name
 
+
 If we are coming up with any other kind of data that we want to share, we can have a new folder for it.
 
 When uploading data, make sure to:
@@ -14,3 +15,6 @@ When uploading data, make sure to:
 - Instead, please commit only useful information in readable commonly used formats such as:
   - Mixer correction in csv format
   - Device configuration toml files
+  - ...
+
+Please note: If there are changes in the way we are formatting our configuration files, only the configuration files from current devices are updated.

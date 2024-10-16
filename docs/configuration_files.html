@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.56">
+<meta name="generator" content="quarto-1.5.53">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -98,11 +98,15 @@ ul.task-list li input[type="checkbox"] {
   </li>  
   <li class="nav-item">
     <a class="nav-link active" href="./configuration_files.html" aria-current="page"> 
-<span class="menu-text">Configuration Files</span></a>
+<span class="menu-text">Configuration</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./available_nodes.html"> 
 <span class="menu-text">Available Nodes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./developer_guide.html"> 
+<span class="menu-text">Developer Guide</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./new_node_creation.html"> 
@@ -113,7 +117,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Node types</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./unit_tests.qmd"> 
+    <a class="nav-link" href="./unit_tests.html"> 
 <span class="menu-text">How to add unit tests</span></a>
   </li>  
 </ul>
@@ -132,12 +136,17 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#configuration-files" id="toc-configuration-files" class="nav-link active" data-scroll-target="#configuration-files">Configuration Files</a>
+  <li><a href="#configuration" id="toc-configuration" class="nav-link active" data-scroll-target="#configuration">Configuration</a>
   <ul class="collapse">
-  <li><a href="#hardware-configuration-file-json" id="toc-hardware-configuration-file-json" class="nav-link" data-scroll-target="#hardware-configuration-file-json">Hardware Configuration file (json):</a></li>
-  <li><a href="#device-configuration-file-toml" id="toc-device-configuration-file-toml" class="nav-link" data-scroll-target="#device-configuration-file-toml">Device Configuration file (toml):</a></li>
-  <li><a href="#vna-resonator-qubit-frequencies" id="toc-vna-resonator-qubit-frequencies" class="nav-link" data-scroll-target="#vna-resonator-qubit-frequencies">VNA resonator &amp; qubit frequencies</a></li>
-  <li><a href="#coupler-to-spi-mapping" id="toc-coupler-to-spi-mapping" class="nav-link" data-scroll-target="#coupler-to-spi-mapping">Coupler to SPI mapping</a></li>
+  <li><a href="#environment-variables" id="toc-environment-variables" class="nav-link" data-scroll-target="#environment-variables">Environment variables</a></li>
+  <li><a href="#configuration-package" id="toc-configuration-package" class="nav-link" data-scroll-target="#configuration-package">Configuration package</a>
+  <ul class="collapse">
+  <li><a href="#cluster-configuration-.json" id="toc-cluster-configuration-.json" class="nav-link" data-scroll-target="#cluster-configuration-.json">Cluster configuration (.json):</a></li>
+  <li><a href="#spi-configuration-.toml-optional" id="toc-spi-configuration-.toml-optional" class="nav-link" data-scroll-target="#spi-configuration-.toml-optional">SPI configuration (.toml | optional):</a></li>
+  <li><a href="#device-configuration-file-.toml" id="toc-device-configuration-file-.toml" class="nav-link" data-scroll-target="#device-configuration-file-.toml">Device Configuration file (.toml):</a></li>
+  <li><a href="#calibration-configuration-.toml" id="toc-calibration-configuration-.toml" class="nav-link" data-scroll-target="#calibration-configuration-.toml">Calibration configuration (.toml):</a></li>
+  <li><a href="#custom-user-samplespace-configuration-.py-optional" id="toc-custom-user-samplespace-configuration-.py-optional" class="nav-link" data-scroll-target="#custom-user-samplespace-configuration-.py-optional">Custom user samplespace configuration (.py | optional):</a></li>
+  </ul></li>
   </ul></li>
   </ul>
 </nav>
@@ -148,26 +157,122 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<section id="configuration-files" class="level1">
-<h1>Configuration Files</h1>
-<section id="hardware-configuration-file-json" class="level2">
-<h2 class="anchored" data-anchor-id="hardware-configuration-file-json">Hardware Configuration file (json):</h2>
-<p>Here the connection is made between the Qblox cluster physical ports and clocks to the qubits and couplers of the QPU.</p>
-<p>The file must be placed at the directory <code>tergite-acl/config_dir/</code></p>
-<p>Given a <code>.csv</code> file after a mixer calibration the function <code>...</code> can create instantly the corresponding <code>JSON</code> file.</p>
+<section id="configuration" class="level1">
+<h1>Configuration</h1>
+<p>To run the autocalibration you will need to configure it with a couple of different configuration files. Doing the configuration with a pre-built configuration package will take about 5-10 minutes. On an unknown experimental device without pre-built files, it probably takes slightly longer.</p>
+<section id="environment-variables" class="level2">
+<h2 class="anchored" data-anchor-id="environment-variables">Environment variables</h2>
+<p>Computer systems generally use <code>CAPITALIZED_GLOBAL_KEYS</code> on a system level e.g.&nbsp;to store global variables. There is a convention to store those variables in a <code>.env</code> file on the root-level of your project and load the variables before running a program. The template for the environmental variables of the tergite-autocalibration can be found in the <code>.example.env</code> file on root-level of the repository. E.g. if you have cloned the repository into <code>/home/user/repos/tergite-autocalibration</code>, then your example template should be located there.</p>
+<p>Copy the template and update values according to the instructions. The template file itself provides instructions on how to update the values.</p>
+<pre class="shell"><code>cp .example.env .env</code></pre>
+<p>Values that can be set in the environment are e.g.&nbsp;<code>PLOTTING</code> and this variable determines whether plots should be shown.</p>
 </section>
-<section id="device-configuration-file-toml" class="level2">
-<h2 class="anchored" data-anchor-id="device-configuration-file-toml">Device Configuration file (toml):</h2>
-<p>Here we set reasonable initial parameters</p>
+<section id="configuration-package" class="level2">
+<h2 class="anchored" data-anchor-id="configuration-package">Configuration package</h2>
+<p>All other configuration files go into the folder that you have specified in the environmental variable <code>CONFIG_DIR</code>. A template for a full configuration package can be found in <code>data/_template/_device_name</code>. Some more pre-built configuration package can be found in <code>data/devices</code> under the respective device names.</p>
+<p>A configuration package consists of the following five files:</p>
+<ul>
+<li>Cluster configuration</li>
+<li>SPI configuration (optional, only required for two-qubit calibration)</li>
+<li>Device configuration</li>
+<li>Calibration configuration</li>
+<li>Custom user samplespace configuration (optional, only required if you are sweeping on a very specific range of parameters)</li>
+</ul>
+<p>All example configuration files should come with comments about usage and reasonable initial values.</p>
+<section id="cluster-configuration-.json" class="level3">
+<h3 class="anchored" data-anchor-id="cluster-configuration-.json">Cluster configuration (.json):</h3>
+<p>A QBLOX cluster consists of a couple of modules of which each can have multiple input/output options for SMI cables. In the cluster configuration the connection is made between these QBLOX cluster physical ports and clocks to the qubits and couplers of the QPU.</p>
+<p>Example: Definition of a qubit drive for |0&gt; to |1&gt; state)</p>
+<pre><code>{
+   "backend": "quantify_scheduler.backends.qblox_backend.hardware_compile",
+   "clusterA": {
+      "ref": "internal",
+      "instrument_type": "Cluster",
+      "clusterA_module2": {
+         "instrument_type": "QCM_RF",
+         "complex_output_0": {
+            "lo_freq": 3.946e9,
+            "dc_mixer_offset_I": 0,
+            "dc_mixer_offset_Q": 0,
+            "portclock_configs": [
+               {
+                  "port": "q00:mw",
+                  "clock": "q00.01",
+                  "mixer_amp_ratio": 1,
+                  "mixer_phase_error_deg": 0
+               }
+            ]
+         }
+      }
+   }
+}</code></pre>
+<p>The file in the template package is <code>cluster_configuration.json</code>.</p>
+<p>FIXME: This is to be changed after with the integration of the automatic mixer calibration The cluster configuration relies on some values that come from a mixer calibration. Given a <code>.csv</code> file after a mixer calibration the function <code>utils/hw_generator.py</code> can create instantly the corresponding <code>JSON</code> file.</p>
 </section>
-<section id="vna-resonator-qubit-frequencies" class="level2">
-<h2 class="anchored" data-anchor-id="vna-resonator-qubit-frequencies">VNA resonator &amp; qubit frequencies</h2>
-<p>Here we input the initial values for the resonator and qubits frequencies, assumed that they have been acquired through VNA measurements, design targets or previous manual measurements. <code>/tergite_acl/config/VNA_values.py</code></p>
+<section id="spi-configuration-.toml-optional" class="level3">
+<h3 class="anchored" data-anchor-id="spi-configuration-.toml-optional">SPI configuration (.toml | optional):</h3>
+<p>When working with two-qubit gates, there has to be a current source for the coupler and in the QBLOX stack this is coming from the so called SPI rack. The SPI configuration is mapping the qubits to their respective modules in the SPI rack and can be further used to assign the couplers to groups.</p>
+<p>Example: Definition of a coupler</p>
+<pre><code>[couplers.q11_q12]
+spi_module_no = 1
+dac_name = "dac0"
+edge_group = 1</code></pre>
+<p>The file in the template package is <code>spi_config.toml</code>.</p>
 </section>
-<section id="coupler-to-spi-mapping" class="level2">
-<h2 class="anchored" data-anchor-id="coupler-to-spi-mapping">Coupler to SPI mapping</h2>
+<section id="device-configuration-file-.toml" class="level3">
+<h3 class="anchored" data-anchor-id="device-configuration-file-.toml">Device Configuration file (.toml):</h3>
+<p>While the previous two configuration files have been used to configure the room temperature instruments, the device configuration defines the initial parameters and characteristics of chip itself. The device configuration is having two main sections – the <code>[device]</code> and the <code>[layout]</code> section. In the <code>[device]</code> section prior knowledge about the device from the VNA are set for the resonator, qubit (drive) and the coupler.</p>
+<p>It is possible to either address a qubit individually, e.g.&nbsp;the following would set the VNA frequency for qubit <code>q06</code>:</p>
+<pre><code>[device.resonator.q06]
+VNA_frequency = 6832973301.189378</code></pre>
+<p>or for all qubits:</p>
+<pre><code>[device.resonator.all]
+attenuation = 12</code></pre>
+<p>In the <code>[layout]</code> section the positions of the qubits can be set. This is useful if one would like to e.g.&nbsp;plot the device. Qubits have an x (column) and a y (row) position:</p>
+<pre><code>[layout.resonator.q06]
+position = { column = 0, row = 0 }</code></pre>
+<p>The file in the template package is <code>device_config.toml</code>.</p>
+</section>
+<section id="calibration-configuration-.toml" class="level3">
+<h3 class="anchored" data-anchor-id="calibration-configuration-.toml">Calibration configuration (.toml):</h3>
+<p>This file is solely configuring the calibration process itself i.e.&nbsp;everything that is related to running the calibration, its measurements and analyses. In the <code>[general]</code> section there are some settings such as the target node, the qubits and the couplers to calibrate.</p>
+<p>Example: Calibrate qubits <code>q01</code> and <code>q02</code> with coupler <code>q01_q02</code> up until the node <code>cz_calibration</code>.</p>
+<pre><code>[general]
+target_node = "cz_calibration"
+qubits = ["q01", "q02"]
+couplers = ["q01_q02"]</code></pre>
+<p>This is followed by the <code>[initials]</code> section where you can set the initial values for certain calibration nodes. Here, similarly to the device configuration, you can either address a single qubit or all qubits, by using either the qubit identifier e.g.&nbsp;<code>[q06]</code> or the <code>[all]</code> keyword.</p>
+<p>Example: Setting initial values.</p>
+<pre><code>[initials.qubits.all]
+measure.acq_delay = 220e-9
+[initials.qubits]
+q06.measure.pulse_amp = 0.03</code></pre>
+<p>Below, you can define node-specific parameters setting <code>[node_name.scope.property]</code> where scope are the qubits/couplers and the the property is a property known to the node.</p>
+<p>Example: Setting the reset duration for the resonator spectroscopy node.</p>
+<pre><code>[resonator_spectroscopy.all]
+reset.duration =  60e-6</code></pre>
+<p>The file in the template package is <code>calibration_config.toml</code>.</p>
+</section>
+<section id="custom-user-samplespace-configuration-.py-optional" class="level3">
+<h3 class="anchored" data-anchor-id="custom-user-samplespace-configuration-.py-optional">Custom user samplespace configuration (.py | optional):</h3>
+<p>If you want to generate samplespaces with your own custom Python scripts, you can add a custom user samplespace configuration. The file must contain the definition of your samplespace according to the following schema:</p>
+<pre><code>user_samplespace = {
+    node1_name : {
+            "settable_of_node1_1": { 'q01': np.ndarray, 'q02': np.ndarray },
+            "settable_of_node1_2": { 'q01': np.ndarray, 'q02': np.ndarray },
+            ...
+        },
+    node2_name : {
+            "settable_of_node2_1": { 'q01': np.ndarray, 'q02': np.ndarray },
+            "settable_of_node2_2": { 'q01': np.ndarray, 'q02': np.ndarray },
+            ...
+        }
+}</code></pre>
+<p>Please note: Do not rename the variable <code>user_samplespace</code>, because it cannot be imported otherwise.</p>
+<p>The file in the template package is <code>user_samplespace.py</code>.</p>
 
 
+</section>
 </section>
 </section>
 
