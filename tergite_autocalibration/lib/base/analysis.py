@@ -255,7 +255,7 @@ class BaseAllQubitsRepeatAnalysis(BaseAllQubitsAnalysis, ABC):
         self.num_repeats = len(data_files)
 
         # Load the first dataset to infer the qubit names
-        first_dataset = xr.open_dataset(data_files[0], engine="scipy")
+        first_dataset = xr.open_dataset(data_files[0], engine="netcdf4")
         self.all_qubits = [
             var for var in first_dataset.data_vars if var.startswith("yq")
         ]
@@ -267,7 +267,7 @@ class BaseAllQubitsRepeatAnalysis(BaseAllQubitsAnalysis, ABC):
             for repeat_idx, file_path in enumerate(data_files):
                 file_path = self.data_path / f"dataset_{repeat_idx}.hdf5"
 
-                ds = xr.open_dataset(file_path, engine="scipy")
+                ds = xr.open_dataset(file_path, engine="netcdf4")
 
                 qubit_data = ds[[qubit]]
 

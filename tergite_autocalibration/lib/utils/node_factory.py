@@ -27,7 +27,7 @@ class NodeFactory:
                 T1_Node,
             )
             from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.node import (
-                Randomized_Benchmarking_Node,
+                RandomizedBenchmarkingSSRONode,
             )
             from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.node import (
                 PurityBenchmarkingNode,
@@ -36,12 +36,12 @@ class NodeFactory:
                 All_XY_Node,
             )
             from tergite_autocalibration.lib.nodes.coupler.cz_dynamic_phase.node import (
-                CZ_Dynamic_Phase_Node,
-                CZ_Dynamic_Phase_Swap_Node,
+                CZDynamicPhaseNode,
+                CZDynamicPhaseSwapNode,
             )
             from tergite_autocalibration.lib.nodes.coupler.cz_calibration.node import (
                 CZ_Calibration_Node,
-                CZ_Calibration_SSRO_Node,
+                CZCalibrationSSRONode,
                 CZ_Calibration_Swap_Node,
                 CZ_Calibration_Swap_SSRO_Node,
                 Reset_Calibration_SSRO_Node,
@@ -53,7 +53,6 @@ class NodeFactory:
                 CZ_Chevron_Node,
                 CZ_Characterisation_Chevron_Node,
                 CZ_Optimize_Chevron_Node,
-                CZ_Chevron_Sweep_Node,
             )
             from tergite_autocalibration.lib.nodes.coupler.reset_chevron.node import (
                 Reset_Chevron_Node,
@@ -136,15 +135,15 @@ class NodeFactory:
                 "cz_optimize_chevron": CZ_Optimize_Chevron_Node,
                 "cz_calibration": CZ_Calibration_Node,
                 "cz_calibration_swap": CZ_Calibration_Swap_Node,
-                "cz_calibration_ssro": CZ_Calibration_SSRO_Node,
+                "cz_calibration_ssro": CZCalibrationSSRONode,
                 "cz_calibration_swap_ssro": CZ_Calibration_Swap_SSRO_Node,
-                "cz_dynamic_phase": CZ_Dynamic_Phase_Node,
-                "cz_dynamic_phase_swap": CZ_Dynamic_Phase_Swap_Node,
+                "cz_dynamic_phase": CZDynamicPhaseNode,
+                "cz_dynamic_phase_swap": CZDynamicPhaseSwapNode,
                 "ro_frequency_two_state_optimization": RO_frequency_two_state_optimization_Node,
                 "ro_frequency_three_state_optimization": RO_frequency_three_state_optimization_Node,
                 "ro_amplitude_two_state_optimization": RO_amplitude_two_state_optimization_Node,
                 "ro_amplitude_three_state_optimization": RO_amplitude_three_state_optimization_Node,
-                "randomized_benchmarking": Randomized_Benchmarking_Node,
+                "randomized_benchmarking_ssro": RandomizedBenchmarkingSSRONode,
                 "purity_benchmarking": PurityBenchmarkingNode,
             }
         return cls._instance

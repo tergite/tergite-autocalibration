@@ -57,7 +57,7 @@ class CZ_Calibration_Node(BaseNode):
         }
 
 
-class CZ_Calibration_SSRO_Node(BaseNode):
+class CZCalibrationSSRONode(BaseNode):
     measurement_obj = CZ_calibration_SSRO
     analysis_obj = CZCalibrationSSROAnalysis
 

@@ -23,7 +23,7 @@ from ..cz_calibration.measurement import (
 from ....base.node import BaseNode
 
 
-class CZ_Dynamic_Phase_Node(BaseNode):
+class CZDynamicPhaseNode(BaseNode):
     measurement_obj = CZ_calibration
     analysis_obj = CZCalibrationAnalysis
 
@@ -52,7 +52,7 @@ class CZ_Dynamic_Phase_Node(BaseNode):
         }
 
 
-class CZ_Dynamic_Phase_Swap_Node(BaseNode):
+class CZDynamicPhaseSwapNode(BaseNode):
     measurement_obj = CZ_calibration
     analysis_obj = CZCalibrationAnalysis
 

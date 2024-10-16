@@ -6,7 +6,8 @@ authors = [
     "Eleftherios Moschandreou <elemos@chalmers.se>",
     "Liangyu Chen <liangyuc@chalmers.se>",
     "Tong Liu <liuto@chalmers.se>",
-    "Stefan Hill <stefanhi@chalmers.se>"
+    "Stefan Hill <stefanhi@chalmers.se>",
+    "Michele Faucci Giannelli <faucci@chalmser.se>"
 ]
 maintainers = [
     "Chalmers Next Labs AB <quantum-nextlabs@chalmers.se>",
@@ -36,6 +37,8 @@ toml = "0.10.2"
 python-dotenv = "1.0.1"
 click = "8.1.7"
 jokeapi = "1.0.5"
+optuna = "4.0.0"
+netcdf4 = "1.7.1.post2"
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
