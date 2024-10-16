@@ -14,16 +14,16 @@
 
 import toml
 
+from tergite_autocalibration.config.calibration import CONFIG
 from tergite_autocalibration.config.settings import QOI_CONFIG, REDIS_CONNECTION
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
-from tergite_autocalibration.utils import user_input
 
 
 class ResetRedisNode:
     def __init__(self):
-        self.qubits = user_input.qubits
-        self.couplers = user_input.couplers
+        self.qubits = CONFIG.qubits
+        self.couplers = CONFIG.couplers
         node_factory = NodeFactory()
         self.nodes = node_factory.all_nodes()
         qoi_configuration = toml.load(QOI_CONFIG)

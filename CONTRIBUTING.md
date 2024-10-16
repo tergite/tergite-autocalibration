@@ -112,18 +112,7 @@ acli --help
 
 ## Configuration
 
-A number of configurations can be added to the tergite-autocalibration.
-These include:
-
-- [`tergite_autocalibration/utils/user_input.py`](tergite_autocalibration/utils/user_input.py) The sample-space for each node. The target node is also declared here.
-
-- [`tergite_autocalibration/config/device_config.toml`](tergite_autocalibration/config/device_config.toml) A collection of reasonable initial values for the given device
-
-- [`tergite_autocalibration/config/hardware_config.toml`](tergite_autocalibration/config/hardware_config.json) The hardware configuration for the QBlox cluster.
-
-- [`dot-env-template.txt`](dot-env-template.txt) Other parameters like the path to the Qblox Cluster configuration file (including IP address).
-
-The initial configurations for a specific device can be found under `data/devices`.
+Please read the respective section in the [README.md](./README.md)
 
 ## Calibration Pipeline
 

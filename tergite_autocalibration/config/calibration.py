@@ -9,6 +9,7 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
+
 import importlib.util
 import sys
 from typing import List
@@ -29,13 +30,16 @@ class CalibrationConfig:
             cls._qubits = calibration_config["general"]["qubits"]
             cls._couplers = calibration_config["general"]["couplers"]
 
-            us_spec_ = importlib.util.spec_from_file_location(
-                "user_samplespace", USER_SAMPLESPACE
-            )
-            user_samplespace_ = importlib.util.module_from_spec(us_spec_)
-            sys.modules["user_samplespace"] = user_samplespace_
-            us_spec_.loader.exec_module(user_samplespace_)
-            cls._user_samplespace = user_samplespace_.user_samplespace
+            if USER_SAMPLESPACE is not None:
+                us_spec_ = importlib.util.spec_from_file_location(
+                    "user_samplespace", USER_SAMPLESPACE
+                )
+                user_samplespace_ = importlib.util.module_from_spec(us_spec_)
+                sys.modules["user_samplespace"] = user_samplespace_
+                us_spec_.loader.exec_module(user_samplespace_)
+                cls._user_samplespace = user_samplespace_.user_samplespace
+            else:
+                cls._user_samplespace = {}
 
         return cls._instance
 

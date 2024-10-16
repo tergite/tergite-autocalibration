@@ -98,15 +98,21 @@ class DataHandler:
             coupler_attenuation = 34
             resonator_attenuation = 12
             try:
-                qubit_attenuation = list(self._device["qubit"].items())[0]
+                qubit_attenuation = list(self._device["qubit"].items())[0][1][
+                    "attenuation"
+                ]
             except IndexError:
                 pass
             try:
-                coupler_attenuation = list(self._device["coupler"].items())[0]
+                coupler_attenuation = list(self._device["coupler"].items())[0][1][
+                    "attenuation"
+                ]
             except IndexError:
                 pass
             try:
-                resonator_attenuation = list(self._device["resonator"].items())[0]
+                resonator_attenuation = list(self._device["resonator"].items())[0][1][
+                    "attenuation"
+                ]
             except IndexError:
                 pass
             return {
