@@ -30,6 +30,7 @@ from tergite_autocalibration.utils.exponential_decay_function import (
     exponential_decay_function,
 )
 
+
 def mitigate(v, cm_inv):
     u = np.dot(v, cm_inv)
 
@@ -39,13 +40,16 @@ def mitigate(v, cm_inv):
     def con(t):
         return t[0] + t[1] + t[2] - 1
 
-    cons = ({'type': 'eq', 'fun': con},
-            {'type': 'ineq', 'fun': lambda t: t[0]},
-            {'type': 'ineq', 'fun': lambda t: t[1]},
-            {'type': 'ineq', 'fun': lambda t: t[2]})
-    result = minimize(m, v, method='SLSQP', constraints=cons)
+    cons = (
+        {"type": "eq", "fun": con},
+        {"type": "ineq", "fun": lambda t: t[0]},
+        {"type": "ineq", "fun": lambda t: t[1]},
+        {"type": "ineq", "fun": lambda t: t[2]},
+    )
+    result = minimize(m, v, method="SLSQP", constraints=cons)
     w = np.abs(np.round(result.x, 10))
     return w
+
 
 class ExpDecayModel(lmfit.model.Model):
     """
@@ -89,14 +93,19 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
 
     def analyse_qubit(self):
         for coord in self.dataset[self.data_var].coords:
-            if 'cliffords' in coord:
+            if "cliffords" in coord:
                 self.number_cliffords_coord = coord
-            elif 'seed' in coord:
+            elif "seed" in coord:
                 self.seed_coord = coord
-            elif 'shot' in str(coord):
+            elif "shot" in str(coord):
                 self.shot_coord = coord
 
-        self.independents = np.array([float(val) for val in self.dataset[self.number_cliffords_coord].values[:-3]])
+        self.independents = np.array(
+            [
+                float(val)
+                for val in self.dataset[self.number_cliffords_coord].values[:-3]
+            ]
+        )
         self.calibs = self.dataset[self.number_cliffords_coord].values[-3:]
 
         self.number_of_repetitions = self.dataset.dims[self.seed_coord]
@@ -113,7 +122,9 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
             y = np.repeat(self.calibs, self.shots)
             IQ_complex = np.array([])
             for state, _ in enumerate(self.calibs):
-                IQ_complex_0 = self.S21[self.data_var].isel({self.seed_coord: indx, self.number_cliffords_coord: -3 + state})
+                IQ_complex_0 = self.S21[self.data_var].isel(
+                    {self.seed_coord: indx, self.number_cliffords_coord: -3 + state}
+                )
                 IQ_complex = np.append(IQ_complex, IQ_complex_0)
             I = IQ_complex.real.flatten()
             Q = IQ_complex.imag.flatten()
@@ -123,7 +134,7 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
             y_pred = cla.predict(IQ)
 
             cm = confusion_matrix(y, y_pred)
-            cm_norm = confusion_matrix(y, y_pred, normalize='true')
+            cm_norm = confusion_matrix(y, y_pred, normalize="true")
             cm_inv = inv(cm_norm)
             assignment = np.trace(cm_norm) / len(self.calibs)
 
@@ -139,13 +150,13 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
             data_res_shape.append(len(self.calibs))
 
             data_res = np.array([])
-            
+
             for sweep in data_y_pred:
                 uniques, counts = np.unique(sweep, return_counts=True)
                 if len(counts) == 1:
                     counts = np.append(counts, 0)
                     counts = np.append(counts, 0)
-                elif len(counts) == 2 and uniques[1] == 'c2':
+                elif len(counts) == 2 and uniques[1] == "c2":
                     pop2 = counts[1]
                     counts[1] = 0
                     counts = np.append(counts, pop2)
@@ -166,30 +177,38 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
 
         sum2 = np.sum([arr for arr in self.magnitudes2], axis=0)
         self.sum2 = sum2 / self.number_of_repetitions
-        self.number_of_cliffords = [int(num_clif) for num_clif in self.number_of_cliffords[:-3]]
+        self.number_of_cliffords = [
+            int(num_clif) for num_clif in self.number_of_cliffords[:-3]
+        ]
         model = ExpDecayModel()
 
         guess = model.guess(data=self.sum, m=self.number_of_cliffords)
         fit_result = model.fit(self.sum, params=guess, m=self.number_of_cliffords)
 
-        self.fit_n_cliffords = np.linspace(self.number_of_cliffords[0], self.number_of_cliffords[-1], 400)
-        self.fit_y = model.eval(fit_result.params, **{model.independent_vars[0]: self.fit_n_cliffords})
+        self.fit_n_cliffords = np.linspace(
+            self.number_of_cliffords[0], self.number_of_cliffords[-1], 400
+        )
+        self.fit_y = model.eval(
+            fit_result.params, **{model.independent_vars[0]: self.fit_n_cliffords}
+        )
 
         # Gives an initial guess for the model parameters and then fits the model to the data.
         guess2 = model.guess(data=self.sum2, m=self.number_of_cliffords)
 
         # Adjust the parameters for an inverted decaying exponential fit
-        guess2['A'].value = -abs(max(self.sum2))  # Force 'a' to be negative
-        guess2['p'].value = 0.998 
+        guess2["A"].value = -abs(max(self.sum2))  # Force 'a' to be negative
+        guess2["p"].value = 0.998
         fit_result2 = model.fit(self.sum2, params=guess2, m=self.number_of_cliffords)
-        self.fit_y2 = model.eval(fit_result2.params, **{model.independent_vars[0]: self.fit_n_cliffords})
+        self.fit_y2 = model.eval(
+            fit_result2.params, **{model.independent_vars[0]: self.fit_n_cliffords}
+        )
 
         fidelities = []
         for trace in self.magnitudes:
             # Gives an initial guess for the model parameters and then fits the model to the data.
             guess = model.guess(data=trace, m=self.number_of_cliffords)
             fit_result = model.fit(trace, params=guess, m=self.number_of_cliffords)
-            fidelities.append(fit_result.params['p'].value)
+            fidelities.append(fit_result.params["p"].value)
 
         self.fidelity = np.mean(np.array(fidelities))
         self.fidelity_error = np.std(np.array(fidelities))
@@ -200,12 +219,12 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
             guess2 = model.guess(data=trace, m=self.number_of_cliffords)
 
             # Adjust the parameters for an inverted decaying exponential fit
-            guess2['A'].value = -abs(max(trace))  # Force 'a' to be negative
-            guess2['p'].value = 0.998 
+            guess2["A"].value = -abs(max(trace))  # Force 'a' to be negative
+            guess2["p"].value = 0.998
             fit_result2 = model.fit(trace, params=guess2, m=self.number_of_cliffords)
-            leakage_i = fit_result2.params['p'].value
+            leakage_i = fit_result2.params["p"].value
 
-            leakage_i = 1-leakage_i
+            leakage_i = 1 - leakage_i
             leakage.append(leakage_i)
 
         self.leakage = np.mean(np.array(leakage))
@@ -213,29 +232,79 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
 
         return self.fidelity, self.fidelity_error, self.leakage, self.leakage_error
 
-
     def plotter(self, ax: Axes):
-        marker = ['o', 's','^',  '--']
+        marker = ["o", "s", "^", "--"]
         x = range(3)
-        colors = plt.get_cmap('RdBu_r')(np.linspace(0.2, 0.8, len(x)))
+        colors = plt.get_cmap("RdBu_r")(np.linspace(0.2, 0.8, len(x)))
 
         for index, magnitude in enumerate(self.all_magnitudes):
             if index == 0:
-                ax.plot(self.number_of_cliffords, magnitude[:-3, 2], f'{marker[1]}', c='b', label=f'2>', markerfacecolor='none')
-                ax.plot(self.number_of_cliffords, magnitude[:-3, 0], f'{marker[0]}', c='b', label=f'0>', markerfacecolor='none')
-                ax.plot(self.number_of_cliffords, magnitude[:-3, 1], f'{marker[2]}', c='b', label=f'1>', markerfacecolor='none')
+                ax.plot(
+                    self.number_of_cliffords,
+                    magnitude[:-3, 2],
+                    f"{marker[1]}",
+                    c="b",
+                    label=f"2>",
+                    markerfacecolor="none",
+                )
+                ax.plot(
+                    self.number_of_cliffords,
+                    magnitude[:-3, 0],
+                    f"{marker[0]}",
+                    c="b",
+                    label=f"0>",
+                    markerfacecolor="none",
+                )
+                ax.plot(
+                    self.number_of_cliffords,
+                    magnitude[:-3, 1],
+                    f"{marker[2]}",
+                    c="b",
+                    label=f"1>",
+                    markerfacecolor="none",
+                )
             else:
-                ax.plot(self.number_of_cliffords, magnitude[:-3, 2], f'{marker[1]}', c='b', markerfacecolor='none')
-                ax.plot(self.number_of_cliffords, magnitude[:-3, 0], f'{marker[0]}', c='b', markerfacecolor='none')
-                ax.plot(self.number_of_cliffords, magnitude[:-3, 1], f'{marker[2]}', c='b', markerfacecolor='none')
+                ax.plot(
+                    self.number_of_cliffords,
+                    magnitude[:-3, 2],
+                    f"{marker[1]}",
+                    c="b",
+                    markerfacecolor="none",
+                )
+                ax.plot(
+                    self.number_of_cliffords,
+                    magnitude[:-3, 0],
+                    f"{marker[0]}",
+                    c="b",
+                    markerfacecolor="none",
+                )
+                ax.plot(
+                    self.number_of_cliffords,
+                    magnitude[:-3, 1],
+                    f"{marker[2]}",
+                    c="b",
+                    markerfacecolor="none",
+                )
 
-        ax.plot(self.fit_n_cliffords, self.fit_y, 'r--', lw=2, label=f'p = {self.fidelity:.4f} ± {self.fidelity_error:.4f}' )
-        ax.plot(self.fit_n_cliffords, self.fit_y2, 'k--', lw=2, label=f'l = {self.leakage:.4f} ± {self.leakage_error:.4f}')
+        ax.plot(
+            self.fit_n_cliffords,
+            self.fit_y,
+            "r--",
+            lw=2,
+            label=f"p = {self.fidelity:.4f} ± {self.fidelity_error:.4f}",
+        )
+        ax.plot(
+            self.fit_n_cliffords,
+            self.fit_y2,
+            "k--",
+            lw=2,
+            label=f"l = {self.leakage:.4f} ± {self.leakage_error:.4f}",
+        )
 
         # Set labels and title
-        ax.set_ylabel('population', fontsize=20)
-        ax.set_xlabel('number of cliffords', fontsize=20)
-        ax.tick_params(axis='both', which='major', labelsize=20)
+        ax.set_ylabel("population", fontsize=20)
+        ax.set_xlabel("number of cliffords", fontsize=20)
+        ax.tick_params(axis="both", which="major", labelsize=20)
 
         # Set y-axis limits to be between 0 and 1
         ax.set_ylim(-0.05, 1.05)

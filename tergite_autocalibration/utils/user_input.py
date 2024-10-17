@@ -95,7 +95,9 @@ user_samplespace = {
 """
 ####################################################################
 target_node = "randomized_benchmarking_ssro"
-qubits = ["q07",]  # ["q06", "q07", "q08", "q09", "q10", "q11", "q12", "q13", "q14", "q15"]
+qubits = [
+    "q07",
+]  # ["q06", "q07", "q08", "q09", "q10", "q11", "q12", "q13", "q14", "q15"]
 couplers = ["q06_q07"]
 user_samplespace = {
     "resonator_spectroscopy": {
@@ -105,7 +107,7 @@ user_samplespace = {
 # attenuation_setting = {'qubit':30, 'coupler':30, 'readout':50}
 # attenuation_setting = {'qubit':16, 'coupler':20, 'readout':40}
 # attenuation_setting = {'qubit':16, 'coupler':20, 'readout':30}
-attenuation_setting = {'qubit':16, 'coupler':20, 'readout':10}
+attenuation_setting = {"qubit": 16, "coupler": 20, "readout": 10}
 # attenuation_setting = {'qubit':60, 'coupler':60, 'readout':10}
 
 
