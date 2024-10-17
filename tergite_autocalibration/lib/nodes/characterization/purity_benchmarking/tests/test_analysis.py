@@ -45,7 +45,6 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
             self.analysis.number_of_repetitions, self.dataset.sizes.get("seed", 1)
         )
 
-    @unittest.skip
     def test_run_fitting(self):
         analysis = PurityBenchmarkingQubitAnalysis("name", ["redis_field"])
         analysis.process_qubit(self.dataset, "yq06")
@@ -66,7 +65,6 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
         self.assertTrue(0 <= fidelity[0] <= 1.002)
         self.assertIsInstance(analysis.fit_results, ModelResult)
 
-    @unittest.skip
     def test_plotter(self):
         analysis = PurityBenchmarkingQubitAnalysis("name", ["redis_field"])
         analysis.process_qubit(self.dataset, "yq14")
