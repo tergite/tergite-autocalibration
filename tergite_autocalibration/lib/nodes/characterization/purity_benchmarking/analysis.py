@@ -134,7 +134,7 @@ class PurityBenchmarkingQubitAnalysis(BaseQubitAnalysis):
                 z_exp = 2 * z_1 - 1
 
                 # Calculate purity
-                purity_per_index.append(x_exp**2 + y_exp**2 + z_exp**2)
+                purity_per_index.append(x_exp ** 2 + y_exp ** 2 + z_exp ** 2)
 
             # Store normalized data and purity results
             self.normalized_data_dict[repetition_index] = normalized_data

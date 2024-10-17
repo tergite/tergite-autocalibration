@@ -32,7 +32,7 @@ def lorentzian_function(
     A: float,
     c: float,
 ) -> float:
-    return A * width**2 / ((x - x0) ** 2 + width**2) + c
+    return A * width ** 2 / ((x - x0) ** 2 + width ** 2) + c
 
 
 class LorentzianModel(lmfit.model.Model):

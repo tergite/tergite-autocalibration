@@ -71,7 +71,7 @@ class ResonatorSpectroscopyQubitAnalysis(BaseQubitAnalysis):
                 - 2 * fit_Qe * np.cos(fit_ph)
                 + fit_Ql
                 + np.sqrt(
-                    4 * fit_Qe**2 - 4 * fit_Qe * fit_Ql * np.cos(fit_ph) + fit_Ql**2
+                    4 * fit_Qe ** 2 - 4 * fit_Qe * fit_Ql * np.cos(fit_ph) + fit_Ql ** 2
                 )
             )
         )

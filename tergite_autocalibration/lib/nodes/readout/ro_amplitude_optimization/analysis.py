@@ -127,7 +127,7 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         intercept = self.lda.intercept_
         self.lamda = -A / B
         theta = np.rad2deg(np.arctan(self.lamda))
-        threshold = np.abs(intercept) / np.sqrt(A**2 + B**2)
+        threshold = np.abs(intercept) / np.sqrt(A ** 2 + B ** 2)
         threshold = threshold[0]
 
         self.y_intecept = +intercept / B
