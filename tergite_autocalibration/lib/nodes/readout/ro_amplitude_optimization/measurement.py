@@ -181,7 +181,8 @@ class RO_amplitude_optimization(BaseMeasurement):
                     # shot.add(IdlePulse(20e-9))
         schedule.add(IdlePulse(20e-9))
         # schedule.add(shot, validate=False)
-        schedule.add(shot, control_flow=Loop(loop_repetitions), validate=False)
+        # FIXME: Quantify-scheduler 0.21.2 doesnt seem to have the validate keyword any longer? Verify this is correct.
+        schedule.add(shot, control_flow=Loop(loop_repetitions))#, validate=False)
         schedule.add(IdlePulse(20e-9))
 
         return schedule

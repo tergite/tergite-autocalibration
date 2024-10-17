@@ -70,7 +70,7 @@ class ExtendedTransmon(BasicTransmonElement):
             "edges": {},
         }
         cfg_dict["elements"][f"{self.name}"]["measure_1"] = OperationCompilationConfig(
-            factory_func=measurement_factories.dispersive_measurement,
+            factory_func=measurement_factories.dispersive_measurement_transmon,
             factory_kwargs={
                 "port": self.ports.readout(),
                 # use different clock: ####
@@ -101,7 +101,7 @@ class ExtendedTransmon(BasicTransmonElement):
             ],
         )
         cfg_dict["elements"][f"{self.name}"]["measure_2"] = OperationCompilationConfig(
-            factory_func=measurement_factories.dispersive_measurement,
+            factory_func=measurement_factories.dispersive_measurement_transmon,
             factory_kwargs={
                 "port": self.ports.readout(),
                 # use different clock: ####
@@ -134,7 +134,7 @@ class ExtendedTransmon(BasicTransmonElement):
         )
         cfg_dict["elements"][f"{self.name}"]["measure_3state_opt"] = (
             OperationCompilationConfig(
-                factory_func=measurement_factories.dispersive_measurement,
+                factory_func=measurement_factories.dispersive_measurement_transmon,
                 factory_kwargs={
                     "port": self.ports.readout(),
                     # use different clock: ####
