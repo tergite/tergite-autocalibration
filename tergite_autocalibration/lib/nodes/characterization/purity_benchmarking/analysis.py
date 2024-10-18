@@ -19,9 +19,7 @@ from matplotlib.axes import Axes
 import numpy as np
 
 from ....base.analysis import BaseAllQubitsRepeatAnalysis, BaseQubitAnalysis
-from tergite_autocalibration.lib.utils.functions import (
-    exponential_decay_function,
-)
+from ....utils.functions import exponential_decay_function
 
 
 class ExpDecayModel(lmfit.model.Model):
@@ -128,13 +126,13 @@ class PurityBenchmarkingQubitAnalysis(BaseQubitAnalysis):
             purity_per_index = []
             for i in range(len(normalized_data) // 3):
                 # Extract values for the Pauli operators
-                x_1, y_1, z_1 = normalized_data[3 * i : 3 * (i + 1)]
+                x_1, y_1, z_1 = normalized_data[3 * i: 3 * (i + 1)]
                 x_exp = 2 * x_1 - 1
                 y_exp = 2 * y_1 - 1
                 z_exp = 2 * z_1 - 1
 
                 # Calculate purity
-                purity_per_index.append(x_exp**2 + y_exp**2 + z_exp**2)
+                purity_per_index.append(x_exp ** 2 + y_exp ** 2 + z_exp ** 2)
 
             # Store normalized data and purity results
             self.normalized_data_dict[repetition_index] = normalized_data
