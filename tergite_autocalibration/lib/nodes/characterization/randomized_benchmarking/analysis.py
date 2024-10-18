@@ -17,11 +17,10 @@ Module containing classes that model, fit and plot data from a Rabi experiment.
 """
 import lmfit
 import numpy as np
-import xarray as xr
 from matplotlib.axes import Axes
 
 from ....base.analysis import BaseAllQubitsRepeatAnalysis, BaseQubitAnalysis
-from tergite_autocalibration.utils.exponential_decay_function import (
+from tergite_autocalibration.lib.utils.functions import (
     exponential_decay_function,
 )
 
