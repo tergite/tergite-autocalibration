@@ -150,7 +150,6 @@ class BaseNode(abc.ABC):
             dimensions.append(len(self.external_samplespace[quantity][first_element]))
         return dimensions
 
-
     def calibrate(self, data_path: Path, lab_ic, cluster_status):
         if cluster_status != MeasurementMode.re_analyse:
             self.run_measurement(data_path, lab_ic, cluster_status)
