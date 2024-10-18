@@ -19,7 +19,7 @@ from matplotlib.axes import Axes
 import numpy as np
 
 from ....base.analysis import BaseAllQubitsRepeatAnalysis, BaseQubitAnalysis
-from ....utils.functions import exponential_decay_function
+from tergite_autocalibration.lib.utils.functions import exponential_decay_function
 
 
 class ExpDecayModel(lmfit.model.Model):
