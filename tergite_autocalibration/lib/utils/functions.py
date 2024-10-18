@@ -20,4 +20,4 @@ def exponential_decay_function(m: float, p: float, A: float, B: float) -> float:
     :param B: Offset.
     :return: Result of the exponential decay function.
     """
-    return A * p ** m + B
+    return A * p**m + B
