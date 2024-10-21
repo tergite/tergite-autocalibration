@@ -49,8 +49,8 @@
 
 
 [general]
-target_node = "ro_duration_three_state_optimization"
-qubits = ["q00", "q01"]
+target_node = "ro_amplitude_two_state_optimization"
+qubits = ["q00"]
 couplers = []
 
 # This section contains initial values for all qubits

@@ -35,7 +35,7 @@ user_samplespace = {
 }
 """
 ####################################################################
-qubits = dh.device["qubit"]
+qubits = ["q00"]
 user_samplespace = {
     "resonator_spectroscopy": {
         "ro_frequencies": {qubit: resonator_samples(qubit) for qubit in qubits}
