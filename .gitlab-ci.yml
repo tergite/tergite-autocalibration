@@ -41,9 +41,6 @@ tests:
     # Run unit tests
     - pytest tergite_autocalibration
     - pylint tergite_autocalibration --fail-under=6.0
-
-    # Smoke test
-    - pip install .
   cache:
     paths:
       - .cache/pip

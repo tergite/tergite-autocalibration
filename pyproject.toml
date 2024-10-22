@@ -27,11 +27,11 @@ h5py = "3.7.0"
 Jinja2 = "3.1.2"
 numpy = ">=2.0"
 qblox-instruments = "0.14.1"
-qcodes = "0.39.1"
+qcodes = "0.49.0"
 quantify-core = "0.7.7"
 quantify-scheduler = "0.21.2"
 redis = "5.0.0"
-scikit-learn = "1.2.2"
+scikit-learn = "1.5.2"
 toml = "0.10.2"
 python-dotenv = "1.0.1"
 requests = "^2.32.3"
@@ -44,7 +44,7 @@ black = "^24.10.0"
 isort = "^5.12.0"
 
 [tool.poetry.group.test.dependencies]
-pytest = "^7.4.5"
+pytest = "^8.3.3"
 requests-mock = "^1.11.0"
 
 [tool.poetry.scripts]
