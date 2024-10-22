@@ -130,12 +130,6 @@ def calibration():
     help="Takes the cluster ip address as argument. If not set, it will try take CLUSTER_IP in the .env file.",
 )
 @click.option(
-    "-d",
-    required=False,
-    is_flag=True,
-    help="Use -d if you want to use the dummy cluster (not implemented)",
-)
-@click.option(
     "-r",
     required=False,
     help="Use -r if you want to use rerun an analysis, give the path to the dataset folder (plots will be overwritten), you also need to specify the name of the node using -n",
@@ -165,15 +159,6 @@ def start(c, d, r, name, push):
     parsed_cluster_ip: "IPv4Address" = CLUSTER_IP
     node_name = ""
     data_path = ""
-
-    # Checks whether to start the cluster in dummy mode
-    # TODO: The dummy cluster is currently not implemented
-    if d:
-        click.echo(
-            "The option to run on a dummy cluster is currently not implemented. "
-            "Trying to start the calibration supervisor with default cluster configuration"
-        )
-        cluster_mode = MeasurementMode.dummy
 
     if r:
         folder_path = Path(r)

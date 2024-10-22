@@ -21,14 +21,12 @@ class DataStatus(Enum):
     out_of_spec = 2
     bad_data = 3
     undefined = 4
-
-
-# Used to distinguish running on dummy or real clusters
+    
+    
 class MeasurementMode(Enum):
     """
-    Used to set the cluster mode e.g. dummy cluster or real cluster
+    Used to set the cluster mode e.g.  real cluster or re analyse
     """
 
     real = 0
-    dummy = 1
     re_analyse = 2

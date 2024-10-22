@@ -110,9 +110,8 @@ def find_serial_port():
 class SpiDAC:
     def __init__(self, measurement_mode: MeasurementMode) -> None:
         port = find_serial_port()
-        is_dummy = measurement_mode == MeasurementMode.dummy
         if port is not None:
-            self.spi = SpiRack("loki_rack", port, is_dummy=is_dummy)
+            self.spi = SpiRack("loki_rack", port, is_dummy=False)
 
     def create_spi_dac(self, coupler: str):
         dc_current_step = 1e-6

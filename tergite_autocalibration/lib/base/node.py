@@ -431,9 +431,7 @@ class BaseNode(abc.ABC):
 
         def display_progress():
             steps = int(schedule_duration * 5)
-            if cluster_status == MeasurementMode.dummy:
-                progress_sleep = 0.004
-            elif cluster_status == MeasurementMode.real:
+            if cluster_status == MeasurementMode.real:
                 progress_sleep = 0.2
             for _ in tqdm.tqdm(
                 range(steps), desc=compiled_schedule.name, colour="blue"
