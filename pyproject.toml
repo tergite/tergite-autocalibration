@@ -15,7 +15,7 @@ readme = "README.md"
 packages = [{include = "tergite_autocalibration"}]
 
 [tool.poetry.dependencies]
-python = ">= 3.9, < 3.10"
+python = ">= 3.10, < 3.11"
 pyqt5-qt5 = [
     { version = "5.15.2", platform = "linux" },
     { version = "5.15.2", platform = "win32" },
@@ -25,15 +25,16 @@ colorama = "0.4.6"
 h5netcdf = "1.0.2"
 h5py = "3.7.0"
 Jinja2 = "3.1.2"
-numpy = "1.25.2"
+numpy = ">=2.0"
 qblox-instruments = "0.14.1"
 qcodes = "0.39.1"
-quantify-core = "0.7.6"
+quantify-core = "0.7.7"
 quantify-scheduler = "0.21.2"
 redis = "5.0.0"
 scikit-learn = "1.2.2"
 toml = "0.10.2"
 python-dotenv = "1.0.1"
+requests = "^2.32.3"
 click = "8.1.7"
 jokeapi = "1.0.5"
 
