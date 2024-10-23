@@ -32,7 +32,10 @@ from tergite_autocalibration.config.settings import CLUSTER_NAME
 from tergite_autocalibration.lib.base.node import BaseNode
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.lib.utils.graph import filtered_topological_order
-from tergite_autocalibration.utils.dataset_utils import create_node_data_path, get_test_data_path_for_node
+from tergite_autocalibration.utils.dataset_utils import (
+    create_node_data_path,
+    get_test_data_path_for_node,
+)
 from tergite_autocalibration.utils.dto.enums import DataStatus
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.logger.errors import ClusterNotFoundError
@@ -44,7 +47,7 @@ from tergite_autocalibration.utils.redis_utils import (
 )
 from tergite_autocalibration.utils.user_input import attenuation_setting
 from tergite_autocalibration.utils.user_input import user_requested_calibration
-from tergite_autocalibration.utils.visuals import draw_arrow_chart
+from tergite_autocalibration.utils.logger.visuals import draw_arrow_chart
 
 colorama_init()
 
@@ -260,7 +263,10 @@ class CalibrationSupervisor:
 
         if self.measurement_mode == MeasurementMode.re_analyse:
             print(status)
-            if  node_name == self.node_name_to_re_analyse or status != DataStatus.in_spec:
+            if (
+                node_name == self.node_name_to_re_analyse
+                or status != DataStatus.in_spec
+            ):
                 path = get_test_data_path_for_node(node_name)
                 if node_name == self.node_name_to_re_analyse:
                     path = self.data_path
@@ -271,11 +277,9 @@ class CalibrationSupervisor:
                 )
                 logger.info(f"Calibrating node {node.name}")
 
-                node.calibrate(
-                    path, self.lab_ic, self.measurement_mode
-                )
+                node.calibrate(path, self.lab_ic, self.measurement_mode)
 
-            else :
+            else:
                 print(
                     f" \u2714  {Fore.GREEN}{Style.BRIGHT}Node {node_name} in spec{Style.RESET_ALL}"
                 )

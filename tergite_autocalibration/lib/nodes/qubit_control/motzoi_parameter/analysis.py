@@ -33,8 +33,7 @@ class MotzoiBaseQubitAnalysis(BaseQubitAnalysis):
 
         # Calculate the sum of the magnitudes for each motzoi index
         sums = [
-            np.sum(self.magnitudes[self.data_var][i].values)
-            for i in range(motzois)
+            np.sum(self.magnitudes[self.data_var][i].values) for i in range(motzois)
         ]
 
         # Find the index with the minimum sum (optimal motzoi)
@@ -45,12 +44,19 @@ class MotzoiBaseQubitAnalysis(BaseQubitAnalysis):
         return [self.optimal_motzoi]
 
     def plotter(self, axis):
-        datarray = self.magnitudes[self.data_var]  
+        datarray = self.magnitudes[self.data_var]
         datarray.plot(ax=axis, x=f"mw_motzois{self.qubit}", cmap="RdBu_r")
 
         # Mark the optimal motzoi on the plot
-        axis.axvline(self.optimal_motzoi, c="k", lw=4, linestyle="--", label=f"Optimal Motzoi: {self.optimal_motzoi}")
+        axis.axvline(
+            self.optimal_motzoi,
+            c="k",
+            lw=4,
+            linestyle="--",
+            label=f"Optimal Motzoi: {self.optimal_motzoi}",
+        )
         axis.legend()
+
 
 class Motzoi01QubitAnalysis(MotzoiBaseQubitAnalysis):
     def __init__(self, name, redis_fields):

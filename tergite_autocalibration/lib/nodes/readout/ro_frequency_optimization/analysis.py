@@ -20,7 +20,10 @@ import xarray as xr
 from quantify_core.analysis import fitting_models as fm
 
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
-from tergite_autocalibration.lib.base.analysis import BaseAllQubitsAnalysis, BaseQubitAnalysis
+from tergite_autocalibration.lib.base.analysis import (
+    BaseAllQubitsAnalysis,
+    BaseQubitAnalysis,
+)
 
 model = fm.ResonatorModel()
 
@@ -38,9 +41,7 @@ class OptimalRO01FrequencyQubitAnalysis(BaseQubitAnalysis):
         self.magnitudes_1 = []
         self.qubit_state_coord = ""
 
-
     def analyse_qubit(self):
-
         for coord in self.dataset.coords:
             if "frequencies" in str(coord):
                 self.frequencies = self.dataset[coord].values
@@ -50,19 +51,26 @@ class OptimalRO01FrequencyQubitAnalysis(BaseQubitAnalysis):
                 self.qubit_state_coord = coord
 
         self.magnitudes_0 = (
-            self.magnitudes[self.data_var].isel({self.qubit_state_coord: [0]}).values.flatten()
+            self.magnitudes[self.data_var]
+            .isel({self.qubit_state_coord: [0]})
+            .values.flatten()
         )  # S21 when qubit at |0>
         self.magnitudes_1 = (
-            self.magnitudes[self.data_var].isel({self.qubit_state_coord: [1]}).values.flatten()
+            self.magnitudes[self.data_var]
+            .isel({self.qubit_state_coord: [1]})
+            .values.flatten()
         )  # S21 when qubit at |1>
-
 
         # Gives an initial guess for the model parameters and then fits the model to the data.
         guess_0 = model.guess(self.magnitudes_0, f=self.frequencies)
         guess_1 = model.guess(self.magnitudes_1, f=self.frequencies)
         fit_frequencies = np.linspace(self.frequencies[0], self.frequencies[-1], 400)
-        self.fit_result_0 = model.fit(self.magnitudes_0, params=guess_0, f=self.frequencies)
-        self.fit_result_1 = model.fit(self.magnitudes_1, params=guess_1, f=self.frequencies)
+        self.fit_result_0 = model.fit(
+            self.magnitudes_0, params=guess_0, f=self.frequencies
+        )
+        self.fit_result_1 = model.fit(
+            self.magnitudes_1, params=guess_1, f=self.frequencies
+        )
         self.fit_IQ_0 = model.eval(self.fit_result_0.params, f=fit_frequencies)
         self.fit_IQ_1 = model.eval(self.fit_result_1.params, f=fit_frequencies)
 
@@ -116,7 +124,9 @@ class OptimalRO012FrequencyQubitAnalysis(OptimalRO01FrequencyQubitAnalysis):
     def analyse_qubit(self):
         super().analyse_qubit()
         self.magnitudes_2 = (
-            self.magnitudes[self.data_var].isel({self.qubit_state_coord: [2]}).values.flatten()
+            self.magnitudes[self.data_var]
+            .isel({self.qubit_state_coord: [2]})
+            .values.flatten()
         )  # S21 when qubit at |2>
 
         guess_2 = model.guess(self.magnitudes_2, f=self.frequencies)
@@ -124,7 +134,9 @@ class OptimalRO012FrequencyQubitAnalysis(OptimalRO01FrequencyQubitAnalysis):
             self.frequencies[0], self.frequencies[-1], 400
         )
 
-        self.fit_result_2 = model.fit(self.magnitudes_2, params=guess_2, f=self.frequencies)
+        self.fit_result_2 = model.fit(
+            self.magnitudes_2, params=guess_2, f=self.frequencies
+        )
         self.fit_IQ_2 = model.eval(self.fit_result_2.params, f=self.fit_frequencies)
 
         fit_values_2 = self.fit_result_2.values
@@ -158,11 +170,14 @@ class OptimalRO012FrequencyQubitAnalysis(OptimalRO01FrequencyQubitAnalysis):
         )
         ax.grid()
 
+
 class OptimalRO01FrequencyNodeAnalysis(BaseAllQubitsAnalysis):
     single_qubit_analysis_obj = OptimalRO01FrequencyQubitAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
+
+
 class OptimalRO012FrequencyNodeAnalysis(BaseAllQubitsAnalysis):
     single_qubit_analysis_obj = OptimalRO012FrequencyQubitAnalysis
 

@@ -17,11 +17,10 @@ Module containing classes that model, fit and plot data from a Rabi experiment.
 """
 import lmfit
 import numpy as np
-import xarray as xr
 from matplotlib.axes import Axes
 
 from ....base.analysis import BaseAllQubitsRepeatAnalysis, BaseQubitAnalysis
-from tergite_autocalibration.utils.exponential_decay_function import (
+from tergite_autocalibration.lib.utils.functions import (
     exponential_decay_function,
 )
 
@@ -75,7 +74,9 @@ class RandomizedBenchmarkingQubitAnalysis(BaseQubitAnalysis):
 
         self.number_of_repetitions = self.dataset.dims[self.seed_coord]
         self.number_of_cliffords = self.dataset[self.number_cliffords_coord].values
-        self.number_of_cliffords_runs = self.dataset.dims[self.number_cliffords_coord] - 3
+        self.number_of_cliffords_runs = (
+            self.dataset.dims[self.number_cliffords_coord] - 3
+        )
         self.normalized_data_dict = {}
 
         for repetition_index in range(self.number_of_repetitions):
@@ -120,9 +121,9 @@ class RandomizedBenchmarkingQubitAnalysis(BaseQubitAnalysis):
         return [self.fidelity]
 
     def _get_magnitudes(self, indx):
-        magnitudes = self.magnitudes[self.data_var].isel({self.seed_coord: indx})
+        magnitudes = self.S21[self.data_var].isel({self.seed_coord: indx})
         return magnitudes.values.flatten()
-    
+
     def plotter(self, ax: Axes):
         for repetition_index in range(self.number_of_repetitions):
             real_values = self.normalized_data_dict[repetition_index]

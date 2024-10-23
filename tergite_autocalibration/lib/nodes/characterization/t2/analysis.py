@@ -18,7 +18,10 @@ import numpy as np
 import xarray as xr
 from quantify_core.analysis.fitting_models import fft_freq_phase_guess, ExpDecayModel
 
-from tergite_autocalibration.lib.base.analysis import BaseQubitAnalysis, BaseAllQubitsRepeatAnalysis
+from tergite_autocalibration.lib.base.analysis import (
+    BaseQubitAnalysis,
+    BaseAllQubitsRepeatAnalysis,
+)
 from tergite_autocalibration.lib.nodes.characterization.t1.analysis import cos_func
 
 
@@ -61,7 +64,9 @@ class T2Model(lmfit.model.Model):
         params = self.make_params()
         return lmfit.models.update_param_vals(params, self.prefix, **kws)
 
+
 from abc import ABC, abstractmethod
+
 
 class BaseT2QubitAnalysis(BaseQubitAnalysis, ABC):
     def __init__(self, name, redis_fields):
@@ -104,7 +109,7 @@ class BaseT2QubitAnalysis(BaseQubitAnalysis, ABC):
     def _get_magnitudes(self, indx):
         magnitudes = self.magnitudes[self.data_var].isel({self.repeat_coord: indx})
         return magnitudes.values.flatten()
-        
+
     def plotter(self, ax):
         for indx in range(len(self.dataset.coords[self.repeat_coord])):
             magnitudes_flat = self._get_magnitudes(indx)
@@ -119,6 +124,7 @@ class BaseT2QubitAnalysis(BaseQubitAnalysis, ABC):
         ax.set_ylabel("|S21| (V)")
         ax.grid()
 
+
 class T2QubitAnalysis(BaseT2QubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
@@ -126,10 +132,11 @@ class T2QubitAnalysis(BaseT2QubitAnalysis):
 
     def fit_model(self, magnitudes_flat, guess):
         return self.model.fit(magnitudes_flat, params=guess, x=self.delays)
-    
+
     def _extract_t2_time(self, fit_result):
         return fit_result.params["x0"].value
-    
+
+
 class T2EchoQubitAnalysis(BaseT2QubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
@@ -137,16 +144,18 @@ class T2EchoQubitAnalysis(BaseT2QubitAnalysis):
 
     def fit_model(self, magnitudes_flat, guess):
         return self.model.fit(magnitudes_flat, params=guess, t=self.delays)
-    
+
     def _extract_t2_time(self, fit_result):
         return fit_result.params["tau"].value
-    
+
+
 class T2NodeAnalysis(BaseAllQubitsRepeatAnalysis):
     single_qubit_analysis_obj = T2QubitAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
         self.repeat_coordinate_name = "repeat"
+
 
 class T2EchoNodeAnalysis(BaseAllQubitsRepeatAnalysis):
     single_qubit_analysis_obj = T2EchoQubitAnalysis

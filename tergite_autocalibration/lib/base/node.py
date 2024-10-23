@@ -22,11 +22,9 @@ from pathlib import Path
 from typing import List, Optional, Tuple
 
 import matplotlib
-
 import numpy as np
 import tqdm
 import xarray
-import xarray as xr
 from colorama import Fore
 from colorama import Style
 from colorama import init as colorama_init
@@ -42,7 +40,6 @@ from tergite_autocalibration.config import settings
 from tergite_autocalibration.config.settings import REDIS_CONNECTION, HARDWARE_CONFIG
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
-from tergite_autocalibration.lib.utils.demod_channels import ParallelDemodChannels
 from tergite_autocalibration.lib.utils.redis import (
     load_redis_config,
     load_redis_config_coupler,
@@ -78,7 +75,6 @@ class BaseNode(abc.ABC):
         self.type = "simple_sweep"  # TODO better as Enum type
         self.qubit_state = 0  # can be 0 or 1 or 2
         self.plots_per_qubit = 1  # can be 0 or 1 or 2
-        self.build_demod_channels()
 
         self.redis_field: List[str]
         self.coupler: Optional[List[str]]
@@ -153,23 +149,6 @@ class BaseNode(abc.ABC):
         for quantity in external_settable_quantities:
             dimensions.append(len(self.external_samplespace[quantity][first_element]))
         return dimensions
-
-    def build_demod_channels(self):
-        """
-        The default demodulation channels are multiplexed single-qubit channels,
-        which means that you only readout one qubit in parallel.
-        It works when you only calibrate single qubits.
-        In many cases, you also need jointly readout multiple qubits such as quantum
-        state tomography.
-        Rewrite this method in these nodes.
-
-        TODO: Add parameters to the global variables
-        """
-        self.demod_channels = (
-            ParallelDemodChannels.build_multiplexed_single_demod_channel(
-                self.all_qubits, ["0", "1"], "IQ", REDIS_CONNECTION
-            )
-        )
 
     def calibrate(self, data_path: Path, lab_ic, cluster_status):
         if cluster_status != MeasurementMode.re_analyse:
@@ -374,6 +353,7 @@ class BaseNode(abc.ABC):
         compiled_schedule: CompiledSchedule,
         lab_ic,
         data_path: pathlib.Path,
+        cluster_status=MeasurementMode.real,
         measurement: Tuple[int, int] = (1, 1),
     ) -> None:
         """
@@ -389,7 +369,7 @@ class BaseNode(abc.ABC):
         schedule_duration = self._calculate_schedule_duration(compiled_schedule)
         self._print_measurement_info(schedule_duration, measurement)
 
-        raw_dataset = self.execute_schedule(compiled_schedule, lab_ic, schedule_duration)
+        raw_dataset = self.execute_schedule(compiled_schedule, lab_ic, schedule_duration, cluster_status)
         result_dataset = configure_dataset(raw_dataset, self)
         save_dataset(result_dataset, self.name, data_path)
 
@@ -453,7 +433,9 @@ class BaseNode(abc.ABC):
 
     def post_process(self, data_path: Path):
         analysis_kwargs = getattr(self, "analysis_kwargs", dict())
-        node_analysis = self.analysis_obj(self.name, self.redis_field, **analysis_kwargs)
+        node_analysis = self.analysis_obj(
+            self.name, self.redis_field, **analysis_kwargs
+        )
         analysis_results = node_analysis.analyze_node(data_path)
         return analysis_results
 

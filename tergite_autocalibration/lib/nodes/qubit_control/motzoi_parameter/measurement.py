@@ -88,7 +88,8 @@ class Motzoi_parameter(BaseMeasurement):
                 )
 
         # This is the common reference operation so the qubits can be operated in parallel
-        root_relaxation = schedule.add(Reset(*qubits), label="Reset")
+        # FIXME: This should be configurable, quantify-scheduler 0.21.1 does seem to need a duration multiple of 4ns
+        root_relaxation = schedule.add(Reset(*qubits, duration=4e-9), label="Reset")
 
         # The outer loop, iterates over all qubits
         for this_qubit, X_values in X_repetitions.items():

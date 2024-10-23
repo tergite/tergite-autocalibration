@@ -1,6 +1,7 @@
 """
 Module containing classes that model, fit and plot data from a Rabi experiment.
 """
+
 import lmfit
 import numpy as np
 import xarray as xr
