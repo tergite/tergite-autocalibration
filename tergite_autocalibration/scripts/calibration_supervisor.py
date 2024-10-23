@@ -32,10 +32,7 @@ from tergite_autocalibration.config.settings import CLUSTER_NAME
 from tergite_autocalibration.lib.base.node import BaseNode
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.lib.utils.graph import filtered_topological_order
-from tergite_autocalibration.utils.dataset_utils import (
-    create_node_data_path,
-    get_test_data_path_for_node,
-)
+from tergite_autocalibration.utils.dataset_utils import create_node_data_path
 from tergite_autocalibration.utils.dto.enums import DataStatus
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.logger.errors import ClusterNotFoundError
@@ -267,7 +264,6 @@ class CalibrationSupervisor:
                 node_name == self.node_name_to_re_analyse
                 or status != DataStatus.in_spec
             ):
-                path = get_test_data_path_for_node(node_name)
                 if node_name == self.node_name_to_re_analyse:
                     path = self.data_path
 
