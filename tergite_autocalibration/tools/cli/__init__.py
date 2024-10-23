@@ -146,7 +146,7 @@ def calibration():
     is_flag=True,
     help="If --push the a backend will pushed to an MSS specified in MSS_MACHINE_ROOT_URL in the .env file.",
 )
-def start(c, d, r, name, push):
+def start(c, r, name, push):
     from ipaddress import ip_address, IPv4Address
 
     from tergite_autocalibration.config.settings import CLUSTER_IP
