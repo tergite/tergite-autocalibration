@@ -20,9 +20,17 @@ def box_print(text: str):
 
 
 def draw_arrow_chart(header: str, node_list: list[str]):
-    # max_length = max(len(item) for item in node_list)
-    # total_length = sum([len(node)//2 for node in node_list]) + 2*len(node_list) + 6
-    total_length = sum([6 for node in node_list]) + 2 * len(node_list) + 6
+    """
+    Draw the chart of the node sequence on the command line
+
+    Args:
+        header: Headline description
+        node_list: Node sequence to print
+
+    Returns:
+
+    """
+    total_length = sum([6 for _ in node_list]) + 2 * len(node_list) + 6
     total_length = max(60, total_length)
     print("\u2554" + "\u2550" * total_length + "\u2557")
     length = 0
@@ -38,6 +46,5 @@ def draw_arrow_chart(header: str, node_list: list[str]):
                 + " " * (total_length - length - len(item) - 2)
                 + "\u2551"
             )
-            # length += len(item) // 2
             length += 6
     print("\u255a" + "\u2550" * total_length + "\u255d")

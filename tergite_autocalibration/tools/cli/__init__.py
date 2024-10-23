@@ -110,7 +110,7 @@ def graph():
 def plot():
     from tergite_autocalibration.lib.utils.graph import filtered_topological_order
     from tergite_autocalibration.config.calibration import CONFIG
-    from tergite_autocalibration.utils.visuals import draw_arrow_chart
+    from tergite_autocalibration.utils.logger.visuals import draw_arrow_chart
 
     n_qubits = len(CONFIG.qubits)
     topo_order = filtered_topological_order(CONFIG.target_node)
