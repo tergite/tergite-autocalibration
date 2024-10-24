@@ -264,8 +264,7 @@ class CalibrationSupervisor:
                 node_name == self.node_name_to_re_analyse
                 or status != DataStatus.in_spec
             ):
-                if node_name == self.node_name_to_re_analyse:
-                    path = self.data_path
+                path = self.data_path
 
                 print(
                     "\u2691\u2691\u2691 "
