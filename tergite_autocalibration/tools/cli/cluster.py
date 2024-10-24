@@ -22,7 +22,7 @@ def reboot():
     from tergite_autocalibration.config.settings import CLUSTER_IP
 
     if typer.confirm(
-            "Do you really want to reboot the cluster? This operation can interrupt ongoing measurements."
+        "Do you really want to reboot the cluster? This operation can interrupt ongoing measurements."
     ):
         typer.echo(f"Reboot cluster with IP:{CLUSTER_IP}")
         cluster_ = Cluster("cluster", CLUSTER_IP)
