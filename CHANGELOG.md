@@ -14,6 +14,7 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 - GitLab CI/CD
 
 ### Changed
+- Migrated cli from click to typer
 - Switch to quantify-scheduler version 0.20.0
 - Refactoring of the node classes to allow hierarchical class structures
 
