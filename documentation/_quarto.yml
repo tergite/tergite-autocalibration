@@ -4,8 +4,10 @@ project:
     - operation.qmd
     - configuration_files.qmd
     - available_nodes.qmd
+    - developer_guide.qmd
     - new_node_creation.qmd
     - node_types.qmd
+    - unit_tests.qmd
   type: website
   output-dir: ../docs
 
@@ -19,9 +21,13 @@ website:
         - href: operation.qmd
         - href: configuration_files.qmd
         - href: available_nodes.qmd
+        - href: developer_guide.qmd
+          text: Developer Guide
         - href: new_node_creation.qmd
           text: Creating New Nodes
         - href: node_types.qmd
+        - href: unit_tests.qmd
+          text: How to add unit tests
 
 format:
   html:

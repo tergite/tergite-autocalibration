@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.53">
+<meta name="generator" content="quarto-1.5.56">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -146,6 +146,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="./node_types.html"> 
 <span class="menu-text">Node types</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./unit_tests.qmd"> 
+<span class="menu-text">How to add unit tests</span></a>
+  </li>  
 </ul>
           </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
@@ -169,6 +173,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#creating-a-measurement_obj" id="toc-creating-a-measurement_obj" class="nav-link" data-scroll-target="#creating-a-measurement_obj">Creating a <code>measurement_obj</code></a></li>
   <li><a href="#creating-an-analysis_obj" id="toc-creating-an-analysis_obj" class="nav-link" data-scroll-target="#creating-an-analysis_obj">Creating an <code>analysis_obj</code></a></li>
   <li><a href="#node-types-and-samplespaces" id="toc-node-types-and-samplespaces" class="nav-link" data-scroll-target="#node-types-and-samplespaces">Node types and samplespaces</a></li>
+  <li><a href="#folder-structure" id="toc-folder-structure" class="nav-link" data-scroll-target="#folder-structure">Folder structure</a></li>
+  <li><a href="#documentation" id="toc-documentation" class="nav-link" data-scroll-target="#documentation">Documentation</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -228,8 +234,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Furthermore each node can expect two types of samplespaces:</p>
 <ul>
 <li><p><code>schedule_samplespace</code>: parameter values to be input to the schedule function</p></li>
-<li><p><code>exterbal_samplespace</code>: parameter values for quantities that are not set during a schedule</p></li>
+<li><p><code>external_samplespace</code>: parameter values for quantities that are not set during a schedule</p></li>
 </ul>
+</section>
+<section id="folder-structure" class="level3">
+<h3 class="anchored" data-anchor-id="folder-structure">Folder structure</h3>
+<p>Please create a new node in a separate folder, so that is is clearer what the new node is meant to do Add an empty <strong>init</strong>.py file to the folder, this is needed to mark the folder as part of the packege and allow imports from these folders</p>
+<p>To keep the code clean, please create sub-folders following this scheme:</p>
+<ul>
+<li>tests: create unit tests in here, more on tests in href: unit_tests</li>
+<li>utils: any utility class, such as enum, errors and similar classes should be placed here</li>
+</ul>
+</section>
+<section id="documentation" class="level3">
+<h3 class="anchored" data-anchor-id="documentation">Documentation</h3>
+<p>Please add your node to the list of available nodes in this Documentation.</p>
+<p>Add ny relevant information on how to use your node, dependencies and reference to publication as needed for allowing other to use the code you developed.</p>
 <p><a href="./node_types.html">Details on the implementation on the Node types section</a>.</p>
 
 

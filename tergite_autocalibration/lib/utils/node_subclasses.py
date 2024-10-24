@@ -1,6 +1,7 @@
 # This code is part of Tergite
 #
 # (C) Copyright Stefan Hill 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -12,9 +13,8 @@
 
 from pathlib import Path
 
-import xarray
-
 from tergite_autocalibration.lib.base.node import BaseNode
+from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.logger.tac_logger import logger
 
 
@@ -30,8 +30,7 @@ class ParametrizedSweepNode(BaseNode):
         # node.external_dimensions is defined in the node_base
         iterations = self.external_dimensions[0]
 
-        result_dataset = xarray.Dataset()
-
+        print(iterations)
         for current_iteration in range(iterations):
             reduced_external_samplespace = {}
             qubit_values = {}
@@ -42,6 +41,7 @@ class ParametrizedSweepNode(BaseNode):
                 qubit_specific_values = self.external_samplespace[external_settable][
                     element
                 ]
+                print(qubit_specific_values)
                 external_value = qubit_specific_values[current_iteration]
                 qubit_values[element] = external_value
 
@@ -49,18 +49,16 @@ class ParametrizedSweepNode(BaseNode):
             self.reduced_external_samplespace = reduced_external_samplespace
             pre_measurement_operation(reduced_ext_space=reduced_external_samplespace)
 
-            compiled_schedule = self.precompile(data_path)
+            if cluster_status != MeasurementMode.re_analyse:
+                compiled_schedule = self.precompile(data_path)
 
-            ds = self.measure_node(
-                compiled_schedule,
-                lab_ic,
-                data_path,
-                cluster_status,
-            )
-
-            result_dataset = xarray.merge([result_dataset, ds])
+                self.measure_node(
+                    compiled_schedule,
+                    lab_ic,
+                    data_path,
+                    cluster_status,
+                )
 
         logger.info("measurement completed")
-        measurement_result = self.post_process(result_dataset, data_path=data_path)
+        self.post_process(data_path=data_path)
         logger.info("analysis completed")
-        return measurement_result

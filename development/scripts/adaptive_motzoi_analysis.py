@@ -1,6 +1,7 @@
 """
 Module containing classes that model, fit and plot data from a Rabi experiment.
 """
+
 import lmfit
 import numpy as np
 import xarray as xr
@@ -83,7 +84,7 @@ class AdaptiveMotzoiAnalysis(BaseAnalysis):
         self.qubit = dataset[data_var].attrs["qubit"]
         self.samples = analysis_kwargs["samples"]
 
-    def run_fitting(self):
+    def analyse_qubit(self):
         model = MotzoiModel()
 
         motzois = self.independents

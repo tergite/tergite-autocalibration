@@ -3,6 +3,7 @@
 # (C) Copyright Eleftherios Moschandreou 2023, 2024
 # (C) Copyright Liangyu Chen 2023, 2024
 # (C) Copyright Stefan Hill 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -12,11 +13,9 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 #
-# Modified:
-#
-# - Martin Ahindura, 2023
 
 from ipaddress import IPv4Address
+from pathlib import Path
 from typing import Union, List
 
 import toml
@@ -33,7 +32,10 @@ from tergite_autocalibration.config.settings import CLUSTER_NAME
 from tergite_autocalibration.lib.base.node import BaseNode
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.lib.utils.graph import filtered_topological_order
-from tergite_autocalibration.utils.dataset_utils import create_node_data_path
+from tergite_autocalibration.utils.dataset_utils import (
+    create_node_data_path,
+    get_test_data_path_for_node,
+)
 from tergite_autocalibration.utils.dto.enums import DataStatus
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.logger.errors import ClusterNotFoundError
@@ -45,7 +47,7 @@ from tergite_autocalibration.utils.redis_utils import (
 )
 from tergite_autocalibration.utils.user_input import attenuation_setting
 from tergite_autocalibration.utils.user_input import user_requested_calibration
-from tergite_autocalibration.utils.visuals import draw_arrow_chart
+from tergite_autocalibration.utils.logger.visuals import draw_arrow_chart
 
 colorama_init()
 
@@ -68,15 +70,25 @@ class CalibrationSupervisor:
         cluster_mode: "MeasurementMode" = MeasurementMode.real,
         cluster_ip: Union[str, "IPv4Address"] = CLUSTER_IP,
         cluster_timeout: int = 222,
+        node_name="",
+        data_path="",
     ) -> None:
         # Read hardware related configuration steps
         self.cluster_mode: "MeasurementMode" = cluster_mode
         self.cluster_ip: Union[str, "IPv4Address"] = cluster_ip
         self.cluster_timeout: int = cluster_timeout
+        self.node_name_to_re_analyse = node_name
+        self.data_path = Path(data_path)
+        self.lab_ic = ""
 
         # Create objects to communicate with the hardware
-        self.cluster: "Cluster" = self._create_cluster()
-        self.lab_ic: "InstrumentCoordinator" = self._create_lab_ic(self.cluster)
+        if self.cluster_mode == MeasurementMode.re_analyse:
+            logger.info(
+                "Cluster will not be defined as there is no need to take a measurement in re-analysis mode."
+            )
+        else:
+            self.cluster: "Cluster" = self._create_cluster()
+            self.lab_ic: "InstrumentCoordinator" = self._create_lab_ic(self.cluster)
 
         # TODO: user configuration could be a toml file
         # Read the calibration specific parameters
@@ -158,6 +170,12 @@ class CalibrationSupervisor:
         # some nodes e.g. cw spectroscopy needs access to the instruments
         node.lab_instr_coordinator = self.cluster_ip
 
+        logger.info(
+            "Initialising paramaters for qubits: "
+            + str(self.qubits)
+            + " and couplers: "
+            + str(self.couplers)
+        )
         populate_initial_parameters(
             self.transmon_configuration, self.qubits, self.couplers, REDIS_CONNECTION
         )
@@ -172,6 +190,7 @@ class CalibrationSupervisor:
             "cz_calibration_swap_ssro",
             "cz_dynamic_phase",
             "cz_dynamic_phase_swap",
+            "cz_parametrisation_fix_duration",
             "tqg_randomized_benchmarking",
             "tqg_randomized_benchmarking_interleaved",
         ]:
@@ -212,6 +231,7 @@ class CalibrationSupervisor:
             "cz_calibration_swap_ssro",
             "cz_dynamic_phase",
             "cz_dynamic_phase_swap",
+            "cz_parametrisation_fix_duration",
             "tqg_randomized_benchmarking",
             "tqg_randomized_benchmarking_interleaved",
         ]:
@@ -225,7 +245,9 @@ class CalibrationSupervisor:
                 elif is_calibrated == "calibrated":
                     status = DataStatus.in_spec
                 else:
-                    raise ValueError(f"status: {status}")
+                    raise ValueError(
+                        f"REDIS error: cannot find cs:{coupler}", node_name
+                    )
         else:
             for qubit in self.qubits:
                 # the calibrated, not_calibrated flags may be not necessary,
@@ -237,9 +259,32 @@ class CalibrationSupervisor:
                 elif is_calibrated == "calibrated":
                     status = DataStatus.in_spec
                 else:
-                    raise ValueError(f"status: {status}")
+                    raise ValueError(f"REDIS error: cannot find cs:{qubit}", node_name)
 
-        if status == DataStatus.in_spec:
+        if self.measurement_mode == MeasurementMode.re_analyse:
+            print(status)
+            if (
+                node_name == self.node_name_to_re_analyse
+                or status != DataStatus.in_spec
+            ):
+                path = get_test_data_path_for_node(node_name)
+                if node_name == self.node_name_to_re_analyse:
+                    path = self.data_path
+
+                print(
+                    "\u2691\u2691\u2691 "
+                    + f"{Fore.RED}{Style.BRIGHT}Calibration required for Node {node_name}{Style.RESET_ALL}"
+                )
+                logger.info(f"Calibrating node {node.name}")
+
+                node.calibrate(path, self.lab_ic, self.measurement_mode)
+
+            else:
+                print(
+                    f" \u2714  {Fore.GREEN}{Style.BRIGHT}Node {node_name} in spec{Style.RESET_ALL}"
+                )
+
+        elif status == DataStatus:
             print(
                 f" \u2714  {Fore.GREEN}{Style.BRIGHT}Node {node_name} in spec{Style.RESET_ALL}"
             )
@@ -253,9 +298,7 @@ class CalibrationSupervisor:
             logger.info(f"Calibrating node {node.name}")
             # TODO: This could be in the node initializer
             data_path = create_node_data_path(node)
-            measurement_result = node.calibrate(
-                data_path, self.lab_ic, self.measurement_mode
-            )
+            node.calibrate(data_path, self.lab_ic, self.measurement_mode)
 
             # TODO : develop failure strategies ->
             # if node_calibration_status == DataStatus.out_of_spec:

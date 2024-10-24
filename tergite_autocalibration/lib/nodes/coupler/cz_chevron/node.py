@@ -3,6 +3,7 @@
 # (C) Copyright Eleftherios Moschandreou 2024
 # (C) Copyright Liangyu Chen 2024
 # (C) Copyright Amr Osman 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -14,18 +15,16 @@
 
 import numpy as np
 
-from tergite_autocalibration.config.settings import REDIS_CONNECTION
-from tergite_autocalibration.lib.nodes.coupler.cz_chevron.cz_chevron_analysis import (
+from .....config.settings import REDIS_CONNECTION
+from .cz_chevron_analysis import (
     CZChevronAnalysis,
-    CZChevronAmplitudeAnalysis,
 )
-from tergite_autocalibration.lib.nodes.coupler.cz_chevron.cz_firstStep_analysis import (
+from .cz_firstStep_analysis import (
     CZFirstStepAnalysis,
 )
-from tergite_autocalibration.lib.base.node import BaseNode
-from tergite_autocalibration.lib.nodes.coupler.cz_chevron.measurement import (
+from ....base.node import BaseNode
+from .measurement import (
     CZ_Chevron,
-    CZ_Chevron_Amplitude,
 )
 
 
@@ -132,7 +131,7 @@ class CZ_Characterisation_Chevron_Node(BaseNode):
             "cz_pulse_duration",
         )
         self.qubit_state = 0
-        self.measurement_obj = CZ_chevron
+        self.measurement_obj = None
         self.analysis_obj = CZFirstStepAnalysis
         self.all_qubits = [q for bus in couplers for q in bus.split("_")]
         self.coupler_samplespace = self.samplespace
@@ -187,77 +186,6 @@ class CZ_Characterisation_Chevron_Node(BaseNode):
         )
         ac_freq = int(ac_freq / 1e4) * 1e4
         print(f"{ ac_freq/1e6 = } MHz for coupler: {coupler}")
-        return ac_freq
-
-
-class CZ_Chevron_Amplitude_Node(BaseNode):
-    measurement_obj = CZ_Chevron_Amplitude
-    analysis_obj = CZChevronAmplitudeAnalysis
-
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary
-    ):
-        super().__init__(name, all_qubits, **node_dictionary)
-        self.name = name
-        self.all_qubits = all_qubits
-        self.couplers = couplers
-        self.edges = couplers
-        self.coupler = self.couplers[0]
-        self.redis_field = ["cz_pulse_frequency", "cz_pulse_amplitude"]
-        self.qubit_state = 0
-        self.all_qubits = [q for bus in couplers for q in bus.split("_")]
-        self.coupler_samplespace = self.samplespace
-        self.node_dictionary["cz_pulse_duration"] = 128e-9
-        REDIS_CONNECTION.hset(
-            f"couplers:{self.coupler}",
-            "cz_pulse_duration",
-            self.node_dictionary["cz_pulse_duration"] * 2,
-        )
-        self.schedule_samplespace = {
-            "cz_pulse_amplitudes": {
-                coupler: np.linspace(0.2, 0.6, 41) for coupler in self.couplers
-            },
-            "cz_pulse_frequencies": {
-                coupler: np.linspace(-15e6, 5e6, 21)
-                + self.transition_frequency(coupler)
-                for coupler in self.couplers
-            },
-        }
-        self.validate()
-
-    def validate(self) -> None:
-        all_coupled_qubits = []
-        for coupler in self.couplers:
-            all_coupled_qubits += coupler.split("_")
-        if len(all_coupled_qubits) > len(set(all_coupled_qubits)):
-            print("Couplers share qubits")
-            raise ValueError("Improper Couplers")
-
-    def transition_frequency(self, coupler: str):
-        coupled_qubits = coupler.split(sep="_")
-        q1_f01 = float(
-            REDIS_CONNECTION.hget(f"transmons:{coupled_qubits[0]}", "clock_freqs:f01")
-        )
-        q2_f01 = float(
-            REDIS_CONNECTION.hget(f"transmons:{coupled_qubits[1]}", "clock_freqs:f01")
-        )
-        q1_f12 = float(
-            REDIS_CONNECTION.hget(f"transmons:{coupled_qubits[0]}", "clock_freqs:f12")
-        )
-        q2_f12 = float(
-            REDIS_CONNECTION.hget(f"transmons:{coupled_qubits[1]}", "clock_freqs:f12")
-        )
-        # ac_freq = np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12))
-        ac_freq = np.min(
-            [
-                np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12)),
-                np.abs(q1_f01 + q2_f01 - (q2_f01 + q2_f12)),
-            ]
-        )
-        ac_freq = int(ac_freq / 1e4) * 1e4
-        # lo = 4.4e9 - (ac_freq - 450e6)
-        # print(f'{ ac_freq/1e6 = } MHz for coupler: {coupler}')
-        # print(f'{ lo/1e9 = } GHz for coupler: {coupler}')
         return ac_freq
 
 

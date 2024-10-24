@@ -21,19 +21,24 @@ def test_license_headers():
         + "tergite_autocalibration"
     )
 
+    excluded_files = ["dataset_browser"]
+
     # Iterate over all files in the whole package
     for dir_path, _, filenames in os.walk(library_folder):
         for filename in filenames:
             if filename.endswith(".py"):
                 file_path = dir_path + "/" + filename
+
+                # Check whether we should exclude the file based on its path e.g. some build files
+                if any(substr_ in file_path for substr_ in excluded_files):
+                    continue
+
                 # Check whether the file has more than one line of code and contains a license header
-                try:
-                    with open(file_path, "r", encoding="utf-8") as file:
-                        lines = file.readlines()
-                        line_count = len(lines)
-                        if line_count > 0:
-                            assert lines[0].startswith("# This code is part of Tergite")
-                        else:
-                            print(f"Empty file: {file_path}")
-                except Exception as e:
-                    print(f"Error reading {file_path}: {e}")
+                with open(file_path, "r", encoding="utf-8") as file:
+                    lines = file.readlines()
+                    line_count = len(lines)
+                    if line_count > 0:
+                        print(f"Check file: {file_path}")
+                        assert lines[0].startswith("# This code is part of Tergite")
+                    else:
+                        print(f"Empty file: {file_path}")

@@ -1,0 +1,56 @@
+# This code is part of Tergite
+#
+# (C) Copyright Chalmers Next Labs 2024
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+
+include:
+  - local: ".gitlab/functions/pipeline-functions.yml"
+
+stages:
+  - tests
+  - post_merge_actions
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  PYTHON_VERSION: "3.9"
+  REDIS_PORT: 6378
+
+tests:
+  stage: tests
+  image: python:${PYTHON_VERSION}
+  script:
+    # Install redis
+    - apt-get update
+    - apt-get install redis ffmpeg libsm6 libxext6  -y
+    # Run the redis server
+    - redis-server --daemonize yes --port "$REDIS_PORT"
+
+    # Install project dependencies
+    - pip install .
+    - pip install pytest black==24.10.0 requests-mock==1.11.0 pylint
+
+    # Check formatting
+    - black --check tergite_autocalibration
+    # Run unit tests
+    - pytest tergite_autocalibration
+    - pylint tergite_autocalibration --fail-under=6.0
+  cache:
+    paths:
+      - .cache/pip
+
+
+post_merge_actions:
+  stage: post_merge_actions
+  image: ubuntu:latest
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "refactoring/main"'
+  script:
+    # Run a wiki update
+    - !reference [.update_wiki, script]

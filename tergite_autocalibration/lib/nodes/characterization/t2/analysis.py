@@ -3,6 +3,7 @@
 # (C) Copyright Eleftherios Moschandreou 2024
 # (C) Copyright Liangyu Chen 2024
 # (C) Copyright Amr Osman 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -17,7 +18,10 @@ import numpy as np
 import xarray as xr
 from quantify_core.analysis.fitting_models import fft_freq_phase_guess, ExpDecayModel
 
-from tergite_autocalibration.lib.base.analysis import BaseAnalysis
+from tergite_autocalibration.lib.base.analysis import (
+    BaseQubitAnalysis,
+    BaseAllQubitsRepeatAnalysis,
+)
 from tergite_autocalibration.lib.nodes.characterization.t1.analysis import cos_func
 
 
@@ -61,137 +65,101 @@ class T2Model(lmfit.model.Model):
         return lmfit.models.update_param_vals(params, self.prefix, **kws)
 
 
-class T2Analysis(BaseAnalysis):
-    """
-    Analysis that fits an exponential decay function to obtain
-    the T2 coherence time from experiment data.
-    """
+from abc import ABC, abstractmethod
 
-    def __init__(self, dataset: xr.Dataset):
-        super().__init__()
-        self.dataset = dataset
-        self.data_var = list(dataset.data_vars.keys())[0]
-        for coord in dataset[self.data_var].coords:
-            if "repeat" in coord:
-                self.repeat_coord = coord
-            elif "delays" in coord:
-                self.delays_coord = coord
-        self.S21 = dataset[self.data_var].values
-        self.delays = dataset[self.delays_coord].values
 
-        self.fit_results = {}
-        self.qubit = dataset[self.data_var].attrs["qubit"]
-
-    def run_fitting(self):
-        model = T2Model()
-
-        delays = self.delays
-        self.fit_delays = np.linspace(
-            delays[0], delays[-1], 400
-        )  # x-values for plotting
+class BaseT2QubitAnalysis(BaseQubitAnalysis, ABC):
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
         self.T2_times = []
-        for indx, repeat in enumerate(self.dataset.coords[self.repeat_coord]):
-            complex_values = self.dataset[self.data_var].isel(
-                {self.repeat_coord: [indx]}
-            )
-            magnitudes = np.array(np.absolute(complex_values.values).flat)
 
-            # Gives an initial guess for the model parameters and then fits the model to the data.
-            guess = model.guess(data=magnitudes, x=delays)
-            fit_result = model.fit(magnitudes, params=guess, x=delays)
+    def analyse_qubit(self):
+        self._identify_coords()
+        self.fit_delays = np.linspace(self.delays[0], self.delays[-1], 400)
+        for indx in range(len(self.dataset.coords[self.repeat_coord])):
+            magnitudes_flat = self._get_magnitudes(indx)
+            guess = self.model.guess(data=magnitudes_flat, delay=self.delays)
+            fit_result = self.fit_model(magnitudes_flat, guess)
 
-            self.fit_delays = np.linspace(delays[0], delays[-1], 400)
-            self.fit_y = model.eval(
-                fit_result.params, **{model.independent_vars[0]: self.fit_delays}
+            self.fit_y = self.model.eval(
+                fit_result.params, **{self.model.independent_vars[0]: self.fit_delays}
             )
-            self.T2_times.append(fit_result.params["x0"].value)
+            self.T2_times.append(self._extract_t2_time(fit_result))
+
         self.average_T2 = np.mean(self.T2_times)
         self.error = np.std(self.T2_times)
         return [self.average_T2]
 
+    @abstractmethod
+    def fit_model(self, magnitudes_flat, guess):
+        pass
+
+    @abstractmethod
+    def _extract_t2_time(self, fit_result):
+        pass
+
+    def _identify_coords(self):
+        for coord in self.dataset[self.data_var].coords:
+            if "repeat" in coord:
+                self.repeat_coord = coord
+            elif "delays" in coord:
+                self.delays_coord = coord
+        self.delays = self.dataset[self.delays_coord].values
+
+    def _get_magnitudes(self, indx):
+        magnitudes = self.magnitudes[self.data_var].isel({self.repeat_coord: indx})
+        return magnitudes.values.flatten()
+
     def plotter(self, ax):
-        for indx, repeat in enumerate(self.dataset.coords[self.repeat_coord]):
-            complex_values = self.dataset[self.data_var].isel(
-                {self.repeat_coord: [indx]}
-            )
-            magnitudes = np.array(np.absolute(complex_values.values).flat)
-            ax.plot(self.delays, magnitudes)
+        for indx in range(len(self.dataset.coords[self.repeat_coord])):
+            magnitudes_flat = self._get_magnitudes(indx)
+            ax.plot(self.delays, magnitudes_flat)
         ax.plot(
             self.fit_delays,
             self.fit_y,
             label=f"Mean T2 = {self.average_T2 * 1e6:.1f} ± {self.error * 1e6:.1f} μs",
         )
-        # ax.plot(self.fit_delays, self.fit_y, 'r-', lw=3.0)
-        # ax.plot(self.independents, self.magnitudes, 'bo-', ms=3.0)
         ax.set_title(f"T2 experiment for {self.qubit}")
         ax.set_xlabel("Delay (s)")
         ax.set_ylabel("|S21| (V)")
-
         ax.grid()
 
 
-class T2EchoAnalysis(BaseAnalysis):
-    """
-    Analysis that fits an exponential decay function to obtain
-    the T1 relaxation time from experiment data.
-    """
+class T2QubitAnalysis(BaseT2QubitAnalysis):
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+        self.model = T2Model()
 
-    def __init__(self, dataset: xr.Dataset):
-        super().__init__()
-        self.dataset = dataset
-        self.data_var = list(dataset.data_vars.keys())[0]
-        for coord in dataset[self.data_var].coords:
-            if "repeat" in coord:
-                self.repeat_coord = coord
-            elif "delays" in coord:
-                self.delays_coord = coord
-        self.S21 = dataset[self.data_var].values
-        self.delays = dataset[self.delays_coord].values
+    def fit_model(self, magnitudes_flat, guess):
+        return self.model.fit(magnitudes_flat, params=guess, x=self.delays)
 
-        self.fit_results = {}
-        self.qubit = dataset[self.data_var].attrs["qubit"]
+    def _extract_t2_time(self, fit_result):
+        return fit_result.params["x0"].value
 
-    def run_fitting(self):
-        model = ExpDecayModel()
 
-        delays = self.delays
-        self.fit_delays = np.linspace(
-            delays[0], delays[-1], 400
-        )  # x-values for plotting
-        self.T2E_times = []
-        for indx, repeat in enumerate(self.dataset.coords[self.repeat_coord]):
-            complex_values = self.dataset[self.data_var].isel(
-                {self.repeat_coord: [indx]}
-            )
-            magnitudes = np.array(np.absolute(complex_values.values).flat)
+class T2EchoQubitAnalysis(BaseT2QubitAnalysis):
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+        self.model = ExpDecayModel()
 
-            # Gives an initial guess for the model parameters and then fits the model to the data.
-            guess = model.guess(data=magnitudes, delay=delays)
-            fit_result = model.fit(magnitudes, params=guess, t=delays)
-            self.fit_y = model.eval(
-                fit_result.params, **{model.independent_vars[0]: self.fit_delays}
-            )
-            self.T2E_times.append(fit_result.params["tau"].value)
-        self.average_T2E = np.mean(self.T2E_times)
-        self.error = np.std(self.T2E_times)
-        return [self.average_T2E]
+    def fit_model(self, magnitudes_flat, guess):
+        return self.model.fit(magnitudes_flat, params=guess, t=self.delays)
 
-    def plotter(self, ax):
-        for indx, repeat in enumerate(self.dataset.coords[self.repeat_coord]):
-            complex_values = self.dataset[self.data_var].isel(
-                {self.repeat_coord: [indx]}
-            )
-            magnitudes = np.array(np.absolute(complex_values.values).flat)
-            ax.plot(self.delays, magnitudes)
-        ax.plot(
-            self.fit_delays,
-            self.fit_y,
-            label=f"Mean T2E = {self.average_T2E * 1e6:.1f} ± {self.error * 1e6:.1f} μs",
-        )
-        # ax.plot(self.fit_delays, self.fit_y, 'r-', lw=3.0)
-        # ax.plot(self.independents, self.magnitudes, 'bo-', ms=3.0)
-        ax.set_title(f"T2 Echo experiment for {self.qubit}")
-        ax.set_xlabel("Delay (s)")
-        ax.set_ylabel("|S21| (V)")
+    def _extract_t2_time(self, fit_result):
+        return fit_result.params["tau"].value
 
-        ax.grid()
+
+class T2NodeAnalysis(BaseAllQubitsRepeatAnalysis):
+    single_qubit_analysis_obj = T2QubitAnalysis
+
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+        self.repeat_coordinate_name = "repeat"
+
+
+class T2EchoNodeAnalysis(BaseAllQubitsRepeatAnalysis):
+    single_qubit_analysis_obj = T2EchoQubitAnalysis
+
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+        self.repeat_coordinate_name = "repeat"

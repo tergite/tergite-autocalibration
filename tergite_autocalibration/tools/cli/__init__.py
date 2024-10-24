@@ -1,6 +1,7 @@
 # This code is part of Tergite
 #
 # (C) Copyright Stefan Hill 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -10,6 +11,7 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+from pathlib import Path
 import click
 
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
@@ -53,13 +55,39 @@ def node():
     help="Name of the node to be reset in redis e.g resonator_spectroscopy.",
 )
 @click.option(
-    "-a", required=False, is_flag=True, help="Use -a if you want to reset all nodes."
+    "-a",
+    "--all",
+    required=False,
+    is_flag=True,
+    help="Use -a if you want to reset all nodes.",
 )
-def reset(name, a):
+@click.option(
+    "-f",
+    "--from_node",
+    required=False,
+    help="Use -f node_name if you want to reset all nodes from specified node in chain.",
+)
+def reset(name, all, from_node):
     from tergite_autocalibration.utils.reset_redis_node import ResetRedisNode
+    from tergite_autocalibration.lib.utils.graph import range_topological_order
+    from tergite_autocalibration.utils.user_input import user_requested_calibration
+
+    topo_order = range_topological_order(
+        from_node, user_requested_calibration["target_node"]
+    )
 
     reset_obj_ = ResetRedisNode()
-    if a:
+    if from_node:
+        if click.confirm(
+            "Do you really want to reset all nodes from"
+            + from_node
+            + "? It might take some time to recalibrate them."
+        ):
+            for node in topo_order:
+                reset_obj_.reset_node(node)
+        else:
+            click.echo("Node reset aborted by user.")
+    elif all:
         if click.confirm(
             "Do you really want to reset all nodes? It might take some time to recalibrate them."
         ):
@@ -69,9 +97,7 @@ def reset(name, a):
     elif name is not None:
         reset_obj_.reset_node(name)
     else:
-        click.echo(
-            "Please enter a node name or use the --all option to reset all nodes."
-        )
+        click.echo("Please enter a node name or use the -a option to reset all nodes.")
 
 
 @cli.group(help="Handle operations related to the calibration graph.")
@@ -85,7 +111,7 @@ def graph():
 def plot():
     from tergite_autocalibration.lib.utils.graph import filtered_topological_order
     from tergite_autocalibration.utils.user_input import user_requested_calibration
-    from tergite_autocalibration.utils.visuals import draw_arrow_chart
+    from tergite_autocalibration.utils.logger.visuals import draw_arrow_chart
 
     n_qubits = len(user_requested_calibration["all_qubits"])
     topo_order = filtered_topological_order(user_requested_calibration["target_node"])
@@ -110,12 +136,23 @@ def calibration():
     help="Use -d if you want to use the dummy cluster (not implemented)",
 )
 @click.option(
+    "-r",
+    required=False,
+    help="Use -r if you want to use rerun an analysis, give the path to the dataset folder (plots will be overwritten), you also need to specify the name of the node using -n",
+)
+@click.option(
+    "-n",
+    "--name",
+    required=False,
+    help="Use to specify the node type to rerun, only works with -r option",
+)
+@click.option(
     "--push",
     required=False,
     is_flag=True,
     help="If --push the a backend will pushed to an MSS specified in MSS_MACHINE_ROOT_URL in the .env file.",
 )
-def start(c, d, push):
+def start(c, d, r, name, push):
     from ipaddress import ip_address, IPv4Address
 
     from tergite_autocalibration.config.settings import CLUSTER_IP
@@ -126,6 +163,8 @@ def start(c, d, push):
 
     cluster_mode: "MeasurementMode" = MeasurementMode.real
     parsed_cluster_ip: "IPv4Address" = CLUSTER_IP
+    node_name = ""
+    data_path = ""
 
     # Checks whether to start the cluster in dummy mode
     # TODO: The dummy cluster is currently not implemented
@@ -135,6 +174,25 @@ def start(c, d, push):
             "Trying to start the calibration supervisor with default cluster configuration"
         )
         cluster_mode = MeasurementMode.dummy
+
+    if r:
+        folder_path = Path(r)
+
+        # Check if the folder exists
+        if not folder_path.is_dir():
+            print(f"Error: The specified folder '{folder_path}' does not exist.")
+            exit(1)  # Exit with an error code
+
+        if not name:
+            click.echo(
+                "You are trying to re-run the analysis on a specific node but you did not specify it."
+                "Please specify the node using -n or --name."
+            )
+            exit(1)  # Exit with an error exit
+
+        cluster_mode = MeasurementMode.re_analyse
+        data_path = folder_path
+        node_name = name
 
     # Check whether the ip address of the cluster is set correctly
     if c and not d:
@@ -148,7 +206,10 @@ def start(c, d, push):
             )
 
     supervisor = CalibrationSupervisor(
-        cluster_mode=cluster_mode, cluster_ip=parsed_cluster_ip
+        cluster_mode=cluster_mode,
+        cluster_ip=parsed_cluster_ip,
+        node_name=node_name,
+        data_path=data_path,
     )
     supervisor.calibrate_system()
     if push:

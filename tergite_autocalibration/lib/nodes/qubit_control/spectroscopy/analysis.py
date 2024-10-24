@@ -2,6 +2,7 @@
 #
 # (C) Copyright Eleftherios Moschandreou 2023, 2024
 # (C) Copyright Liangyu Chen 2023, 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -20,7 +21,7 @@ import numpy as np
 import xarray as xr
 from scipy import signal
 
-from ....base.analysis import BaseAnalysis
+from ....base.analysis import BaseAllQubitsAnalysis, BaseQubitAnalysis
 
 
 # Lorentzian function that is fit to qubit spectroscopy peaks
@@ -83,43 +84,45 @@ class LorentzianModel(lmfit.model.Model):
         return lmfit.models.update_param_vals(params, self.prefix, **kws)
 
 
-class QubitSpectroscopyAnalysis(BaseAnalysis):
+class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
     """
     Analysis that fits a Lorentzian function to qubit spectroscopy data.
     The resulting fit can be analyzed to determine if a peak was found or not.
     """
 
-    def __init__(self, dataset: xr.Dataset):
-        super().__init__()
-        data_var = list(dataset.data_vars.keys())[0]
-        for coord in dataset[data_var].coords:
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+        self.fit_results = {}
+
+    def analyse_qubit(self):
+        # Fetch the resulting measurement variables
+        for coord in self.dataset[self.data_var].coords:
             if "frequencies" in coord:
                 self.frequencies = coord
             elif "currents" in coord:
                 self.currents = coord
-        self.S21 = dataset[data_var].values
-        self.independents = dataset[self.frequencies].values
-        self.fit_results = {}
-        self.qubit = dataset[data_var].attrs["qubit"]
 
-    def run_fitting(self):
-        # Fetch the resulting measurement variables
-        self.magnitudes = np.abs(self.S21)
-        frequencies = self.independents
+        self.frequencies_value = self.dataset[self.frequencies].values
 
         if not self.has_peak():
-            return [np.mean(frequencies)]
+            return [np.mean(self.frequencies_value)]
 
         self.fit_freqs = np.linspace(
-            frequencies[0], frequencies[-1], 500
+            self.frequencies_value[0], self.frequencies_value[-1], 500
         )  # x-values for plotting
 
         # Initialize the Lorentzian model
         model = LorentzianModel()
 
         # Gives an initial guess for the model parameters and then fits the model to the data.
-        guess = model.guess(self.magnitudes, x=frequencies)
-        fit_result = model.fit(self.magnitudes, params=guess, x=frequencies)
+        guess = model.guess(
+            self.magnitudes.to_dataarray().values, x=self.frequencies_value
+        )
+        fit_result = model.fit(
+            self.magnitudes.to_dataarray().values,
+            params=guess,
+            x=self.frequencies_value,
+        )
 
         self.freq = fit_result.params["x0"].value
         self.uncertainty = fit_result.params["x0"].stderr
@@ -128,11 +131,7 @@ class QubitSpectroscopyAnalysis(BaseAnalysis):
             fit_result.params, **{model.independent_vars[0]: self.fit_freqs}
         )
 
-        # # Take maximal value directly
-        # self.max_freq = frequencies[np.argmax(self.magnitudes)]
-        # # print(self.max_freq)
-        # return [self.max_freq]
-        return [self.freq]
+        return self.freq
 
     def reject_outliers(self, data, m=3.0):
         # Filters out datapoints in data that deviate too far from the median
@@ -146,7 +145,8 @@ class QubitSpectroscopyAnalysis(BaseAnalysis):
         self, prom_coef: float = 6, wid_coef: float = 2.4, outlier_median: float = 3.0
     ):
         # Determines if the data contains one distinct peak or only noise
-        x = np.abs(self.S21)
+        x_dataarray = self.magnitudes.to_dataarray()
+        x = x_dataarray.values[0]
         x_filtered = self.reject_outliers(x, outlier_median)
         self.filtered_std = np.std(x_filtered)
         peaks, properties = signal.find_peaks(
@@ -173,71 +173,66 @@ class QubitSpectroscopyAnalysis(BaseAnalysis):
                 lw=3.0,
                 label=f"freq = {self.freq:.6E} ± {self.uncertainty:.1E} (Hz)",
             )
-        ax.plot(self.independents, self.magnitudes, "bo-", ms=3.0)
+
+        x_dataarray = self.magnitudes.to_dataarray()
+        x = x_dataarray.values[0]
+        ax.plot(self.frequencies_value, x, "bo-", ms=3.0)
         ax.set_title(f"Qubit Spectroscopy for {self.qubit}")
         ax.set_xlabel("frequency (Hz)")
         ax.set_ylabel("|S21| (V)")
         ax.grid()
 
 
-class QubitSpectroscopyMultidim(BaseAnalysis):
+class QubitSpectroscopyMultidim(BaseQubitAnalysis):
     """
     Analysis that fits a Lorentzian function to qubit spectroscopy data.
     The resulting fit can be analyzed to determine if a peak was found or not.
     """
 
-    def __init__(self, dataset: xr.Dataset):
-        super().__init__()
-        data_var = list(dataset.data_vars.keys())[0]
-        self.qubit = dataset[data_var].attrs["qubit"]
-        S21 = dataset[data_var].values
-        for coord in dataset[data_var].coords:
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+        self.fit_results = {}
+        self.frequencies = []
+        self.amplitudes = []
+        self.frequency_coords = ""
+
+    def analyse_qubit(self):
+        for coord in self.dataset[self.data_var].coords:
             if "frequencies" in coord:
                 self.frequency_coords = coord
-                self.frequencies = dataset.coords[coord].values
+                self.frequencies = self.dataset.coords[coord].values
             elif "amplitudes" in coord:
                 self.amplitude_coords = coord
-                self.amplitudes = dataset.coords[coord].values
-
-        dataset[data_var].values = np.abs(S21)
-
-        self.fit_results = {}
-        self.data_var = data_var
-        self.dataset = dataset
-
-    def run_fitting(self):
-        # Initialize the Lorentzian model
-        # model = LorentzianModel()
-
-        magnitudes = np.abs(self.dataset[self.data_var].values)
-
-        frequencies = self.frequencies
-
-        # self.fit_freqs = np.linspace(frequencies[0], frequencies[-1], 500)  # x-values for plotting
+                self.amplitudes = self.dataset.coords[coord].values
 
         self.spec_ampl = 0
         self.qubit_ampl = 0
         self.qubit_freq = 0
         if hasattr(self, "amplitudes"):
             for i, a in enumerate(self.amplitudes):
-                these_magnitudes = magnitudes[i]
+                if isinstance(self.magnitudes, xr.Dataset):
+                    data_var_name = list(self.S21.data_vars.keys())[
+                        0
+                    ]  # Adjust if specific variable name is known
+                    s21_dataarray = self.magnitudes[data_var_name]
+                else:
+                    raise TypeError("Expected self.S21 to be an xarray.DataArray")
+                s21_values = s21_dataarray.values
+
+                these_magnitudes = s21_values[i]
                 if not self.has_peak(these_magnitudes):
                     continue
 
-                # guess = model.guess(these_magnitudes, x=frequencies)
-                # fit_result = model.fit(these_magnitudes, params=guess, x=frequencies)
-                # qubit_freq = fit_result.params['x0'].value
-                # qubit_ampl =fit_result.params['A'].value
-                qubit_freq = frequencies[these_magnitudes.argmax()]
+                qubit_freq = self.frequencies[these_magnitudes.argmax()]
                 qubit_ampl = these_magnitudes.max()
-                # self.uncertainty = fit_result.params['x0'].stderr
                 if qubit_ampl > self.qubit_ampl:
                     self.qubit_ampl = qubit_ampl
                     self.qubit_freq = qubit_freq
                     self.spec_ampl = a
+
         else:
-            if self.has_peak(magnitudes):
-                self.qubit_freq = frequencies[magnitudes.argmax()]
+            if self.has_peak(self.magnitudes):
+                self.qubit_freq = self.frequencies[self.magnitudes.argmax()]
 
         return [self.qubit_freq, self.spec_ampl]
 
@@ -269,6 +264,21 @@ class QubitSpectroscopyMultidim(BaseAnalysis):
         return self.hasPeak
 
     def plotter(self, ax):
-        # ax.plot( self.fit_freqs, self.fit_y,'r-',lw=3.0)
-        self.dataset[self.data_var].plot(ax=ax, x=self.frequency_coords)
+        self.magnitudes[self.data_var].plot(
+            ax=ax, x=self.frequency_coords
+        )  # Here, `self.frequency_coords` is the coordinate name
         ax.scatter(self.qubit_freq, self.spec_ampl, s=52, c="red")
+
+
+class QubitSpectroscopyNodeAnalysis(BaseAllQubitsAnalysis):
+    single_qubit_analysis_obj = QubitSpectroscopyAnalysis
+
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+
+
+class QubitSpectroscopyNodeMultidim(BaseAllQubitsAnalysis):
+    single_qubit_analysis_obj = QubitSpectroscopyMultidim
+
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)

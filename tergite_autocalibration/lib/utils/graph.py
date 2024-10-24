@@ -4,6 +4,7 @@
 # (C) Copyright Liangyu Chen 2023, 2024
 # (C) Copyright Amr Osman 2024
 # (C) Copyright Joel Sandås 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -28,9 +29,9 @@ graph_dependencies = [
     ("tof", "resonator_spectroscopy"),
     ("resonator_spectroscopy", "coupler_resonator_spectroscopy"),
     # ('resonator_spectroscopy', 'qubit_01_spectroscopy_pulsed'),
-    ("qubit_01_spectroscopy", "coupler_spectroscopy"),
     ("qubit_01_spectroscopy", "coupler_resonator_spectroscopy"),
     ("resonator_spectroscopy", "qubit_01_spectroscopy"),
+    ("qubit_01_spectroscopy", "coupler_spectroscopy"),
     ("resonator_spectroscopy", "qubit_01_cw_spectroscopy"),
     ("qubit_01_spectroscopy", "rabi_oscillations"),
     ("rabi_oscillations", "ramsey_correction"),
@@ -42,7 +43,6 @@ graph_dependencies = [
     ("motzoi_parameter", "n_rabi_oscillations"),
     ("n_rabi_oscillations", "resonator_spectroscopy_1"),
     # ('randomized_benchmarking', 'T1'),
-    ("n_rabi_oscillations", "resonator_spectroscopy_1"),
     ("n_rabi_oscillations", "all_XY"),
     # ('n_rabi_oscillations', 'T1'),
     # ('randomized_benchmarking', 'T1'),
@@ -79,6 +79,7 @@ graph_dependencies = [
     # ('rabi_oscillations', 'reset_chevron'),
     # ('cz_chevron', 'cz_calibration'),
     ("resonator_spectroscopy_2", "cz_chevron"),
+    ("resonator_spectroscopy_2", "cz_parametrisation_fix_duration"),
     ("resonator_spectroscopy_2", "cz_chevron_amplitude"),
     ("resonator_spectroscopy_2", "reset_chevron"),
     ("ro_amplitude_three_state_optimization", "reset_calibration_ssro"),
@@ -159,21 +160,29 @@ initial_pos = {
 
 # TODO add condition argument and explanation
 def filtered_topological_order(target_node: str):
-    target_ancestors = nx.ancestors(graph, target_node)
-    if "coupler_spectroscopy" in target_ancestors:
-        coupler_path = nx.shortest_path(
-            graph, "resonator_spectroscopy", "coupler_spectroscopy"
-        )
-        graph.remove_node("coupler_spectroscopy")
-    else:
-        coupler_path = []
+    return range_topological_order("resonator_spectroscopy", target_node)
 
+
+def range_topological_order(from_node: str, target_node: str):
+    print(
+        graph.has_successor(
+            "resonator_spectroscopy_2", "cz_parametrisation_fix_duration"
+        )
+    )
+    print(graph.has_successor("resonator_spectroscopy", "qubit_01_spectroscopy"))
+    target_ancestors = nx.ancestors(graph, target_node)
+    # if "coupler_spectroscopy" in target_ancestors:
+    #     coupler_path = nx.shortest_path(
+    #         graph, "resonator_spectroscopy", "coupler_spectroscopy"
+    #     )
+    #     graph.remove_node("coupler_spectroscopy")
+    # else:
+    #     coupler_path = []
+    coupler_path = []
     if target_node == "punchout":
         topo_order = ["punchout"]
     else:
-        topo_order = nx.shortest_path(
-            graph, "resonator_spectroscopy", target_node, weight="weight"
-        )
+        topo_order = nx.shortest_path(graph, from_node, target_node, weight="weight")
 
     def graph_condition(node, types):
         is_without_type = "type" not in graph.nodes[node]

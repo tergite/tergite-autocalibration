@@ -2,6 +2,7 @@
 #
 # (C) Copyright Eleftherios Moschandreou 2023, 2024
 # (C) Copyright Liangyu Chen 2023, 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -42,6 +43,7 @@ node reference
   randomized_benchmarking
   all_XY
   check_cliffords
+  cz_parametrisation_fix_duration
   cz_chevron
   cz_chevron_test
   cz_chevron_amplitude
@@ -103,15 +105,18 @@ user_samplespace = {
 }
 """
 ####################################################################
-target_node = "reset_chevron"
-qubits = ["q16", "q17", "q18", "q19", "q20", "q21", "q22", "q23", "q24", "q25"]
-couplers = ["q23_q24"]
+target_node = "cz_parametrisation_fix_duration"
+qubits = [
+    "q06",
+    "q07",
+]  # ["q06", "q07", "q08", "q09", "q10", "q11", "q12", "q13", "q14", "q15"]
+couplers = ["q06_q07"]
 user_samplespace = {
     "resonator_spectroscopy": {
         "ro_frequencies": {qubit: resonator_samples(qubit) for qubit in qubits}
     },
 }
-attenuation_setting = {"qubit": 12, "coupler": 30, "readout": 6}
+attenuation_setting = {"qubit": 10, "coupler": 34, "readout": 12}
 
 ####################################################################
 

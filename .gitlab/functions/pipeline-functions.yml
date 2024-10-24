@@ -1,0 +1,31 @@
+# This code is part of Tergite
+#
+# (C) Copyright Chalmers Next Labs 2024
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+
+.update_wiki: &update_wiki
+  script:
+    - apt-get update
+    - apt-get install git -y
+    - echo "Clone wiki repository"
+    - git clone https://tergite-autocalibration:$AUTOCALIBRATION_WIKI_ACCESS_TOKEN@gitlab.quantum.chalmersnextlabs.se/chalmersnextlabs-quantum/autocalibration/tergite-autocalibration.wiki.git
+    - cp -r documentation/*.qmd tergite-autocalibration.wiki/home
+    - cd tergite-autocalibration.wiki
+    - find . -type f -name "*.qmd" -exec bash -c 'mv "$0" "${0%.qmd}.md"' {} \;
+    - git config --global user.email "git@gitlab.quantum.chalmersnextlabs.se"
+    - git config --global user.name "GitLab CI/CD"
+    - git add .
+    - |
+      if ! git diff-index --quiet HEAD --; then
+        git commit -m "Automatic wiki update from CI/CD triggered by MR"
+        git push origin main
+      else
+        echo "No changes to commit"
+      fi

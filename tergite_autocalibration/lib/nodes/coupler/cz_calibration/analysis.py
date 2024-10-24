@@ -129,7 +129,7 @@ class CZCalibrationAnalysis(BaseAnalysis):
         self.data = real_rotated_data / normalization
         self.dataset = dataset
 
-    def run_fitting(self):
+    def analyse_qubit(self):
         # self.testing_group = 0
         self.dynamic = self.dataset.attrs["node"][:16] == "cz_dynamic_phase"
         self.swap = self.dataset.attrs["node"][-4:] == "swap"
@@ -279,7 +279,7 @@ class CZCalibrationSSROAnalysis(BaseAnalysis):
 
         self.dataset = dataset
 
-    def run_fitting(self):
+    def analyse_qubit(self):
         # self.testing_group = 0
         self.dynamic = self.dataset.attrs["node"] == "cz_dynamic_phase"
         self.swap = self.dataset.attrs["node"][15:19] == "swap"
@@ -513,7 +513,7 @@ class ResetCalibrationSSROAnalysis(BaseAnalysis):
         # dataset[f'y{self.qubit}'].values = np.abs(self.S21)
         self.dataset = dataset
 
-    def run_fitting(self):
+    def analyse_qubit(self):
         # self.testing_group = 0
         self.dynamic = self.dataset.attrs["node"] == "cz_dynamic_phase"
         self.all_magnitudes = []

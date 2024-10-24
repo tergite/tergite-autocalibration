@@ -3,6 +3,7 @@
 # (C) Copyright Eleftherios Moschandreou 2024
 # (C) Copyright Liangyu Chen 2024
 # (C) Copyright Tong Liu 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -21,6 +22,7 @@ import numpy as np
 import xarray
 
 from tergite_autocalibration.config.settings import DATA_DIR
+from tergite_autocalibration.utils.logger.tac_logger import logger
 
 
 def configure_dataset(
@@ -58,13 +60,13 @@ def configure_dataset(
         "ro_frequency_two_state_optimization",
     ]:
         qubit_states = [0, 1]
-    elif node.name in [
-        "cz_calibration_ssro",
-        "cz_calibration_swap_ssro",
-        "reset_calibration_ssro",
-        "process_tomography_ssro",
-    ]:
+    elif "ssro" in node.name:
         qubit_states = ["c0", "c1", "c2"]  # for calibration points
+
+    print(node.name)
+    # if 'cz_param' in node.name:
+    #    print("Here")
+    #    return raw_ds
 
     for key in keys:
         key_indx = key % n_qubits  # this is to handle ro_opt_frequencies node where
@@ -72,14 +74,9 @@ def configure_dataset(
         coords_dict = {}
         measured_qubit = measurement_qubits[key_indx]
         dimensions = node.dimensions
-        # print("node dimenstions are: ", dimensions)
+        print("node dimenstions are: ", dimensions)
 
-        if node.name in [
-            "cz_calibration_ssro",
-            "cz_calibration_swap_ssro",
-            "reset_calibration_ssro",
-            "process_tomography_ssro",
-        ]:
+        if "ssro" in node.name:
             # TODO: We are not sure about this one
             # dimensions[0] += len(qubit_states)  # for calibration points
             shots = int(len(raw_ds[key].values[0]) / (np.product(dimensions)))
@@ -88,11 +85,34 @@ def configure_dataset(
                 range(shots),
                 {"qubit": measured_qubit, "long_name": "shot", "units": "NA"},
             )
+        # if node.name in [
+        #     "cz_calibration_ssro",
+        #     "cz_calibration_swap_ssro",
+        #     "reset_calibration_ssro",
+        #     "process_tomography_ssro",
+        # ]:
+        #     # TODO: We are not sure about this one
+        #     dimensions[1] += len(qubit_states)  # for calibration points
+        #     shots = int(len(raw_ds[key].values[0]) / (np.product(dimensions)))
+        #     coords_dict["shot"] = (
+        #         "shot",
+        #         range(shots),
+        #         {"qubit": measured_qubit, "long_name": "shot", "units": "NA"},
+        #     )
+        # elif node.name in [
+        #     'tqg_randomized_benchmarking_ssro',
+        #     'tqg_randomized_benchmarking_interleaved_ssro',
+        #     'randomized_benchmarking_ssro'
+        #     ]:
+        #     # TODO: We are not sure about this one
+        #     dimensions[0] += len(qubit_states)  # for calibration points
+        #     shots = int(len(raw_ds[key].values[0]) / (np.product(dimensions)))
+        #     coords_dict['shot'] = ('shot', range(shots), {'qubit': measured_qubit, 'long_name': 'shot', 'units': 'NA'})
 
         for quantity in sweep_quantities:
             # eg ['q1','q2',...] or ['q1_q2','q3_q4',...] :
             settable_elements = samplespace[quantity].keys()
-
+            # print('settable elements are: ', settable_elements)
             # distinguish if the settable is on a qubit or a coupler:
             if measured_qubit in settable_elements:
                 element = measured_qubit
@@ -114,6 +134,11 @@ def configure_dataset(
                 "long_name": f"{coord_key}",
                 "units": "NA",
             }
+            # print('coord attributes is: ', coord_attrs)
+            # if node.name in ['cz_calibration_ssro','cz_calibration_swap_ssro', 'reset_calibration_ssro'] and 'ramsey_phases' in quantity:
+            #     settable_values = np.append(np.array([settable_values]), np.array([qubit_states]))
+            # elif node.name in ['tqg_randomized_benchmarking_ssro', 'tqg_randomized_benchmarking_interleaved_ssro', 'randomized_benchmarking_ssro',]:
+            #     settable_values = np.append(np.array([settable_values]), np.array([qubit_states]))
 
             # print(coord_attrs)
 
@@ -144,12 +169,7 @@ def configure_dataset(
         if node.name in ["ro_amplitude_optimization_gef"]:
             reshaping = [shots, dimensions[0], len(qubit_states)]
             data_values = data_values.reshape(*reshaping)
-        elif node.name in [
-            "cz_calibration_ssro",
-            "cz_calibration_swap_ssro",
-            "reset_calibration_ssro",
-            "process_tomography_ssro",
-        ]:
+        elif "ssro" in node.name:
             reshaping = np.array([shots])
             reshaping = np.append(reshaping, dimensions)
             data_values = data_values.reshape(*reshaping)
@@ -204,6 +224,55 @@ def create_node_data_path(node) -> pathlib.Path:
     measurement_id = time_id + "-" + str(uuid4())[:6] + f"-{node.name}"
     data_path = pathlib.Path(DATA_DIR / measurements_today / measurement_id)
     return data_path
+
+
+def get_test_data_path_for_node(node_name) -> pathlib.Path:
+    if node_name == "resonator_spectroscopy":
+        path = "tergite_autocalibration/lib/nodes/readout/resonator_spectroscopy/tests/data_0"
+    elif node_name == "qubit_01_spectroscopy":
+        path = (
+            "tergite_autocalibration/lib/nodes/qubit_control/spectroscopy/tests/data_01"
+        )
+    elif node_name == "rabi_oscillations":
+        path = "tergite_autocalibration/lib/nodes/qubit_control/rabi_oscillations/tests/data_rabi_01"
+    elif node_name == "ramsey_correction":
+        path = "./tergite_autocalibration/lib/nodes/qubit_control/ramsey_fringes/tests/data_01"
+    elif node_name == "motzoi_parameter":
+        path = "./tergite_autocalibration/lib/nodes/qubit_control/motzoi_parameter/tests/data_01"
+    elif node_name == "n_rabi_oscillations":
+        path = "./tergite_autocalibration/lib/nodes/qubit_control/rabi_oscillations/tests/data_nrabi_01"
+    elif node_name == "resonator_spectroscopy_1":
+        path = "tergite_autocalibration/lib/nodes/readout/resonator_spectroscopy/tests/data_1"
+    elif node_name == "qubit_12_spectroscopy":
+        path = (
+            "tergite_autocalibration/lib/nodes/qubit_control/spectroscopy/tests/data_12"
+        )
+    elif node_name == "rabi_oscillations_12":
+        path = "tergite_autocalibration/lib/nodes/qubit_control/rabi_oscillations/tests/data_rabi_12"
+    elif node_name == "ramsey_correction_12":
+        path = "./tergite_autocalibration/lib/nodes/qubit_control/ramsey_fringes/tests/data_12"
+    elif node_name == "motzoi_parameter_12":
+        path = "./tergite_autocalibration/lib/nodes/qubit_control/motzoi_parameter/tests/data_12"
+    elif node_name == "n_rabi_oscillations_12":
+        path = "./tergite_autocalibration/lib/nodes/qubit_control/rabi_oscillations/tests/data_nrabi_12"
+    elif node_name == "resonator_spectroscopy_2":
+        path = "tergite_autocalibration/lib/nodes/readout/resonator_spectroscopy/tests/data_2"
+    elif node_name == "ro_frequency_three_state_optimization":
+        path = "tergite_autocalibration/lib/nodes/readout/ro_frequency_optimization/tests/data"
+    elif node_name == "T1":
+        path = "tergite_autocalibration/lib/nodes/characterization/t1/tests/data"
+    elif node_name == "T2":
+        path = "tergite_autocalibration/lib/nodes/characterization/t2/tests/data_t2"
+    elif node_name == "T2_echo":
+        path = (
+            "tergite_autocalibration/lib/nodes/characterization/t2/tests/data_t2_echo"
+        )
+
+    else:
+        logger.info("No path for node: " + node_name)
+        path = ""
+
+    return pathlib.Path(path)
 
 
 def retrieve_dummy_dataset(node) -> xarray.Dataset:

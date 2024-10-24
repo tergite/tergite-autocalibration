@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Michele Faucci Gianelli 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -14,7 +14,7 @@ from tergite_autocalibration.tests.utils.env import setup_test_env
 
 setup_test_env()
 
-from tergite_autocalibration.lib.nodes.coupler.cz_chevron.utils.cz_singleGateSimpleFitResult import (
+from ..utils.cz_singleGateSimpleFitResult import (
     CZSingleGateSimpleFitResult,
     FitResultStatus,
 )

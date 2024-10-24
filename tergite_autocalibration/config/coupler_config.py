@@ -3,6 +3,7 @@
 # (C) Copyright Eleftherios Moschandreou 2024
 # (C) Copyright Liangyu Chen 2024
 # (C) Amr Osman 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -37,21 +38,21 @@ all_qubits = [
 
 coupler_spi_map = {
     # SPI A
-    # 'q11_q12': (1, 'dac0'),
-    # 'q12_q13': (1, 'dac1'),
-    # 'q13_q14': (1, 'dac2'),
-    # 'q14_q15': (1, 'dac3'),
-    # 'q08_q09': (2, 'dac0'),
-    # 'q12_q17': (2, 'dac1'),
-    # 'q07_q12': (2, 'dac2'),
-    # 'q08_q13': (2, 'dac3'),
-    # 'q09_q14': (3, 'dac0'),
-    # 'q06_q07': (3, 'dac1'),
-    # 'q09_q10': (3, 'dac2'),
-    # 'q11_q16': (3, 'dac3'),
-    # 'q07_q08': (4, 'dac0'),
-    # 'q10_q15': (4, 'dac1'),
-    # 'q06_q11': (4, 'dac2'),
+    "q11_q12": (1, "dac0"),
+    "q12_q13": (1, "dac1"),
+    "q13_q14": (1, "dac2"),
+    "q14_q15": (1, "dac3"),
+    "q08_q09": (2, "dac0"),
+    "q12_q17": (2, "dac1"),
+    "q07_q12": (2, "dac2"),
+    "q08_q13": (2, "dac3"),
+    "q09_q14": (3, "dac0"),
+    "q06_q07": (3, "dac1"),
+    "q09_q10": (3, "dac2"),
+    "q11_q16": (3, "dac3"),
+    "q07_q08": (4, "dac0"),
+    "q10_q15": (4, "dac1"),
+    "q06_q11": (4, "dac2"),
     # SPI B
     "q16_q17": (1, "dac0"),
     "q17_q18": (1, "dac1"),

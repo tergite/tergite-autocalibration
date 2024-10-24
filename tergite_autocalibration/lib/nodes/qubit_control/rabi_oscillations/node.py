@@ -3,6 +3,7 @@
 # (C) Copyright Eleftherios Moschandreou 2023, 2024
 # (C) Copyright Liangyu Chen 2023, 2024
 # (C) Copyright Amr Osman 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -14,7 +15,7 @@
 
 import numpy as np
 
-from .analysis import RabiAnalysis, NRabiAnalysis
+from .analysis import RabiNodeAnalysis, NRabiNodeAnalysis
 from .measurement import (
     Rabi_Oscillations,
     N_Rabi_Oscillations,
@@ -24,7 +25,7 @@ from ....base.node import BaseNode
 
 class Rabi_Oscillations_Node(BaseNode):
     measurement_obj = Rabi_Oscillations
-    analysis_obj = RabiAnalysis
+    analysis_obj = RabiNodeAnalysis
 
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
@@ -38,7 +39,7 @@ class Rabi_Oscillations_Node(BaseNode):
 
 class Rabi_Oscillations_12_Node(BaseNode):
     measurement_obj = Rabi_Oscillations
-    analysis_obj = RabiAnalysis
+    analysis_obj = RabiNodeAnalysis
 
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
@@ -54,7 +55,7 @@ class Rabi_Oscillations_12_Node(BaseNode):
 
 class N_Rabi_Oscillations_Node(BaseNode):
     measurement_obj = N_Rabi_Oscillations
-    analysis_obj = NRabiAnalysis
+    analysis_obj = NRabiNodeAnalysis
 
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
@@ -72,7 +73,7 @@ class N_Rabi_Oscillations_Node(BaseNode):
 
 class N_Rabi_Oscillations_12_Node(BaseNode):
     measurement_obj = N_Rabi_Oscillations
-    analysis_obj = NRabiAnalysis
+    analysis_obj = NRabiNodeAnalysis
 
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)

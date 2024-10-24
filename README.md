@@ -70,6 +70,12 @@ acli calibration start
 acli --help
 ```
 
+## Official documentation
+
+The documentation is mantained in using [Quarto](https://quarto.org/). The documentation for the public version of the code is available [here](https://tergite.github.io/tergite-autocalibration/getting_started.html). 
+To visualise the lates version of the documentation, install Quarto locally and build the website to browse the documentation. Make sure to have quarto in your PATH before you crate the conda environment to simplify its use in VSCode. You can install the Quarto extension 
+
+
 ## Contribution Guidelines
 
 If you would like to contribute to tergite-webgui, please have a look at our

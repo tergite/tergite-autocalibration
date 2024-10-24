@@ -3,7 +3,8 @@
 # (C) Copyright Eleftherios Moschandreou 2023, 2024
 # (C) Copyright Liangyu Chen 2023, 2024
 # (C) Copyright Stefan Hill 2024
-#
+# (C) Copyright Michele Faucci Giannelli 2024
+# #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
 # of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
@@ -45,12 +46,13 @@ class NodeFactory:
                 CZ_Calibration_Swap_SSRO_Node,
                 Reset_Calibration_SSRO_Node,
             )
+            from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.node import (
+                CZParametrisationFixDurationNode,
+            )
             from tergite_autocalibration.lib.nodes.coupler.cz_chevron.node import (
                 CZ_Chevron_Node,
                 CZ_Characterisation_Chevron_Node,
-                CZ_Chevron_Amplitude_Node,
                 CZ_Optimize_Chevron_Node,
-                CZ_Chevron_Sweep_Node,
             )
             from tergite_autocalibration.lib.nodes.coupler.reset_chevron.node import (
                 Reset_Chevron_Node,
@@ -100,7 +102,6 @@ class NodeFactory:
             )
 
             cls._instance = super(NodeFactory, cls).__new__(cls)
-
             cls._instance.node_implementations = {
                 "punchout": Punchout_Node,
                 "resonator_spectroscopy": Resonator_Spectroscopy_Node,
@@ -127,9 +128,9 @@ class NodeFactory:
                 "reset_chevron": Reset_Chevron_Node,
                 "cz_characterisation_chevron": CZ_Characterisation_Chevron_Node,
                 "reset_calibration_ssro": Reset_Calibration_SSRO_Node,
+                "cz_parametrisation_fix_duration": CZParametrisationFixDurationNode,
                 "process_tomography_ssro": Process_Tomography_Node,
                 "cz_chevron": CZ_Chevron_Node,
-                "cz_chevron_amplitude": CZ_Chevron_Amplitude_Node,
                 "cz_optimize_chevron": CZ_Optimize_Chevron_Node,
                 "cz_calibration": CZ_Calibration_Node,
                 "cz_calibration_swap": CZ_Calibration_Swap_Node,

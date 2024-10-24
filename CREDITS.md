@@ -19,3 +19,7 @@ Improvements on the CZ gate automatic tune-up
 ## Tong Liu
 
 Added demodulation channels
+
+## Michele Faucci Giannelli
+
+Automated the scan for starting parameters, bias current, amplitude, frequency (and time if not fixed) of CZ gate  

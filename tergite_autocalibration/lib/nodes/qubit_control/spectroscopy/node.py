@@ -16,14 +16,14 @@ from qblox_instruments import Cluster
 
 from tergite_autocalibration.utils.hardware_utils import set_qubit_LO
 from tergite_autocalibration.utils.user_input import qubit_samples
-from .analysis import QubitSpectroscopyAnalysis, QubitSpectroscopyMultidim
+from .analysis import QubitSpectroscopyNodeAnalysis, QubitSpectroscopyNodeMultidim
 from .measurement import Two_Tones_Multidim, CW_Two_Tones_Spectroscopy
 from ....base.node import BaseNode
 
 
 class Qubit_01_Spectroscopy_CW_Node(BaseNode):
     measurement_obj = CW_Two_Tones_Spectroscopy
-    analysis_obj = QubitSpectroscopyMultidim
+    analysis_obj = QubitSpectroscopyNodeMultidim
 
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
@@ -48,7 +48,7 @@ class Qubit_01_Spectroscopy_CW_Node(BaseNode):
 
 class Qubit_01_Spectroscopy_Multidim_Node(BaseNode):
     measurement_obj = Two_Tones_Multidim
-    analysis_obj = QubitSpectroscopyMultidim
+    analysis_obj = QubitSpectroscopyNodeMultidim
 
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
@@ -66,7 +66,7 @@ class Qubit_01_Spectroscopy_Multidim_Node(BaseNode):
 
 class Qubit_12_Spectroscopy_Pulsed_Node(BaseNode):
     measurement_obj = Two_Tones_Multidim
-    analysis_obj = QubitSpectroscopyAnalysis
+    analysis_obj = QubitSpectroscopyNodeAnalysis
 
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
@@ -84,7 +84,7 @@ class Qubit_12_Spectroscopy_Pulsed_Node(BaseNode):
 
 class Qubit_12_Spectroscopy_Multidim_Node(BaseNode):
     measurement_obj = Two_Tones_Multidim
-    analysis_obj = QubitSpectroscopyMultidim
+    analysis_obj = QubitSpectroscopyNodeMultidim
 
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.53">
+<meta name="generator" content="quarto-1.5.56">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -146,6 +146,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link active" href="./node_types.html" aria-current="page"> 
 <span class="menu-text">Node types</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./unit_tests.qmd"> 
+<span class="menu-text">How to add unit tests</span></a>
+  </li>  
 </ul>
           </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
@@ -220,8 +224,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><code>self.type = simple_sweep</code></p>
 <p>This attribute can be overwritten at the implementation of the class of each node. An example of a <code>parameterized_sweep</code> node type is <code>Randomized_Benchmarking</code> as each new iteration requires a the schedule to be recompiled with a different random seed.</p>
 <p>The <code>tergite_acl/scripts/node_supervisor.py</code> is responcible to distinguish between each node variation.</p>
-<section id="examples-of-nodes-requiring-an-externbal-samplespace" class="level4">
-<h4 class="anchored" data-anchor-id="examples-of-nodes-requiring-an-externbal-samplespace">Examples of nodes requiring an externbal samplespace:</h4>
+<section id="examples-of-nodes-requiring-an-external-samplespace" class="level4">
+<h4 class="anchored" data-anchor-id="examples-of-nodes-requiring-an-external-samplespace">Examples of nodes requiring an external samplespace:</h4>
 <ul>
 <li><code>coupler_spectroscopy</code> sweeps the <code>dc_current</code> which is set by the SPI rack not the cluster</li>
 <li><code>T1</code> sweeps a repetetion index to repeat the measurement many times</li>

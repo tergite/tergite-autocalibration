@@ -102,7 +102,7 @@ out/**
 # internal
 external/
 workbench/
-tergite_autocalibration/lib/nodes/coupler/cz_chevron/tests/results/AllFits_q17.png
-tergite_autocalibration/lib/nodes/coupler/cz_chevron/tests/results/SummaryScan_q17.png
+tergite_autocalibration/lib/nodes/coupler/cz_chevron/tests/results/**
 
 tergite_acl/utils/clifford_module/**
+tergite_autocalibration/lib/nodes/coupler/cz_characterisation/tests/results/**

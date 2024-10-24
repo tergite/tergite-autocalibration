@@ -31,7 +31,7 @@ class PunchoutAnalysis(BaseAnalysis):
         self.data_var = data_var
         self.dataset = dataset
 
-    def run_fitting(self):
+    def analyse_qubit(self):
         magnitudes = self.dataset[f"y{self.qubit}"].values
         norm_magnitudes = magnitudes / np.max(magnitudes, axis=0)
         self.dataset[f"y{self.qubit}"].values = norm_magnitudes
