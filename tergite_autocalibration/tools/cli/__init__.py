@@ -12,34 +12,34 @@
 # that they have been altered from the originals.
 
 from pathlib import Path
+
 import click
+import typer
 
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
+from .cluster import cluster_cli
+from .graph import graph_cli
+from .joke import joke_cli
+
+app = typer.Typer(no_args_is_help=True)
+app.add_typer(cluster_cli,
+              name="cluster",
+              help="Handle operations related to the cluster.",
+              no_args_is_help=True)
+app.add_typer(joke_cli,
+              name="joke",
+              help="Tells a joke.",
+              no_args_is_help=True)
+app.add_typer(graph_cli,
+              name="graph",
+              help="Handle operations related to the calibration graph.",
+              no_args_is_help=True)
+
 
 
 @click.group()
 def cli():
     pass
-
-
-@cli.group(help="Handle operations related to the cluster.")
-def cluster():
-    pass
-
-
-@cluster.command(help="Reboot the cluster.")
-def reboot():
-    from qblox_instruments import Cluster
-    from tergite_autocalibration.config.settings import CLUSTER_IP
-
-    if click.confirm(
-        "Do you really want to reboot the cluster? This operation can interrupt ongoing measurements."
-    ):
-        click.echo(f"Reboot cluster with IP:{CLUSTER_IP}")
-        cluster_ = Cluster("cluster", CLUSTER_IP)
-        cluster_.reboot()
-    else:
-        click.echo("Rebooting cluster aborted by user.")
 
 
 @cli.group(help="Handle operations related to the node.")
@@ -79,9 +79,9 @@ def reset(name, all, from_node):
     reset_obj_ = ResetRedisNode()
     if from_node:
         if click.confirm(
-            "Do you really want to reset all nodes from"
-            + from_node
-            + "? It might take some time to recalibrate them."
+                "Do you really want to reset all nodes from"
+                + from_node
+                + "? It might take some time to recalibrate them."
         ):
             for node in topo_order:
                 reset_obj_.reset_node(node)
@@ -89,7 +89,7 @@ def reset(name, all, from_node):
             click.echo("Node reset aborted by user.")
     elif all:
         if click.confirm(
-            "Do you really want to reset all nodes? It might take some time to recalibrate them."
+                "Do you really want to reset all nodes? It might take some time to recalibrate them."
         ):
             reset_obj_.reset_node("all")
         else:
@@ -98,24 +98,6 @@ def reset(name, all, from_node):
         reset_obj_.reset_node(name)
     else:
         click.echo("Please enter a node name or use the -a option to reset all nodes.")
-
-
-@cli.group(help="Handle operations related to the calibration graph.")
-def graph():
-    pass
-
-
-@graph.command(
-    help="Plot the calibration graph to the user specified target node in topological order."
-)
-def plot():
-    from tergite_autocalibration.lib.utils.graph import filtered_topological_order
-    from tergite_autocalibration.utils.user_input import user_requested_calibration
-    from tergite_autocalibration.utils.logger.visuals import draw_arrow_chart
-
-    n_qubits = len(user_requested_calibration["all_qubits"])
-    topo_order = filtered_topological_order(user_requested_calibration["target_node"])
-    draw_arrow_chart(f"Qubits: {n_qubits}", topo_order)
 
 
 @cli.group(help="Handle operations related to the calibration supervisor.")
@@ -214,22 +196,3 @@ def start(c, d, r, name, push):
     supervisor.calibrate_system()
     if push:
         update_mss()
-
-
-@cli.command(help="Handle operations related to the well-being of the user.")
-def joke():
-    import asyncio
-    from jokeapi import Jokes
-
-    async def print_joke():
-        j = await Jokes()  # Initialise the class
-        joke_ = await j.get_joke(
-            blacklist=["racist", "religious", "political", "nsfw", "sexist"]
-        )  # Retrieve a random joke
-        if joke_["type"] == "single":  # Print the joke
-            print(joke_["joke"])
-        else:
-            print(joke_["setup"])
-            print(joke_["delivery"])
-
-    asyncio.run(print_joke())

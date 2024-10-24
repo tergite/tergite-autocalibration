@@ -48,7 +48,7 @@ requests-mock = "^1.11.0"
 
 [tool.poetry.scripts]
 acli = "tergite_autocalibration.tools.cli:cli"
-tcli = "tergite_autocalibration.tools.tcli:app"
+tcli = "tergite_autocalibration.tools.cli:app"
 
 [build-system]
 requires = ["poetry-core"]
