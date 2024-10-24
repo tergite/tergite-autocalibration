@@ -16,6 +16,7 @@ def complete_name(incomplete: str):
 
 app = typer.Typer()
 
+# https://github.com/fastapi/typer/issues/141 -> To remove the add completion hint
 
 @app.command()
 def main(
