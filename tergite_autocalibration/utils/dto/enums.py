@@ -21,8 +21,8 @@ class DataStatus(Enum):
     out_of_spec = 2
     bad_data = 3
     undefined = 4
-    
-    
+
+
 class MeasurementMode(Enum):
     """
     Used to set the cluster mode e.g.  real cluster or re analyse

@@ -369,13 +369,17 @@ class BaseNode(abc.ABC):
         schedule_duration = self._calculate_schedule_duration(compiled_schedule)
         self._print_measurement_info(schedule_duration, measurement)
 
-        raw_dataset = self.execute_schedule(compiled_schedule, lab_ic, schedule_duration, cluster_status)
+        raw_dataset = self.execute_schedule(
+            compiled_schedule, lab_ic, schedule_duration, cluster_status
+        )
         result_dataset = configure_dataset(raw_dataset, self)
         save_dataset(result_dataset, self.name, data_path)
 
         logger.info("Finished measurement")
 
-    def _calculate_schedule_duration(self, compiled_schedule: CompiledSchedule) -> float:
+    def _calculate_schedule_duration(
+        self, compiled_schedule: CompiledSchedule
+    ) -> float:
         """Calculate the total duration of the schedule."""
         duration = compiled_schedule.get_schedule_duration()
         if "loop_repetitions" in self.node_dictionary:
@@ -387,11 +391,14 @@ class BaseNode(abc.ABC):
         """Print information about the current measurement."""
         measurement_message = (
             f". Measurement {measurement[0] + 1} of {measurement[1]}"
-            if measurement[1] > 1 else ""
+            if measurement[1] > 1
+            else ""
         )
         # Format the message with duration and the measurement message
         message = f"{duration:.2f} sec{measurement_message}"
-        print(f"schedule_duration = {Fore.CYAN}{Style.BRIGHT}{message}{Style.RESET_ALL}")
+        print(
+            f"schedule_duration = {Fore.CYAN}{Style.BRIGHT}{message}{Style.RESET_ALL}"
+        )
 
     def execute_schedule(
         self,

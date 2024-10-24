@@ -240,10 +240,9 @@ def save_dataset(
     data_path.mkdir(parents=True, exist_ok=True)
     measurement_id = data_path.stem[0:19]
 
-    result_dataset = result_dataset.assign_attrs({
-        "name": node_name,
-        "tuid": measurement_id
-    })
+    result_dataset = result_dataset.assign_attrs(
+        {"name": node_name, "tuid": measurement_id}
+    )
 
     result_dataset_real = to_real_dataset(result_dataset)
 
