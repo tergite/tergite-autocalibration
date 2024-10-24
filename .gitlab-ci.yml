@@ -19,7 +19,7 @@ stages:
 
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-  PYTHON_VERSION: "3.9"
+  PYTHON_VERSION: "3.10"
   REDIS_PORT: 6378
 
 tests:
