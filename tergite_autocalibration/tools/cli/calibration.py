@@ -31,14 +31,6 @@ def start(
             help="Takes the cluster ip address as argument. If not set, it will try take CLUSTER_IP in the .env file.",
         ),
     ] = None,
-    d: Annotated[
-        bool,
-        typer.Option(
-            "-d",
-            is_flag=True,
-            help="Use -d if you want to use the dummy cluster (not implemented)",
-        ),
-    ] = False,
     r: Annotated[
         str,
         typer.Option(
@@ -76,15 +68,6 @@ def start(
     node_name = ""
     data_path = ""
 
-    # Checks whether to start the cluster in dummy mode
-    # TODO: The dummy cluster is currently not implemented
-    if d:
-        typer.echo(
-            "The option to run on a dummy cluster is currently not implemented. "
-            "Trying to start the calibration supervisor with default cluster configuration"
-        )
-        cluster_mode = MeasurementMode.dummy
-
     if r:
         folder_path = Path(r)
 
@@ -105,7 +88,7 @@ def start(
         node_name = name
 
     # Check whether the ip address of the cluster is set correctly
-    if c and not d:
+    if c:
         if len(c) >= 0:
             cluster_mode = MeasurementMode.real
             parsed_cluster_ip = ip_address(c)
