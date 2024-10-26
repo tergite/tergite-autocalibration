@@ -25,7 +25,7 @@ class ResetRedisNode:
         self.qubits = user_input.qubits
         self.couplers = user_input.couplers
         node_factory = NodeFactory()
-        self.nodes = node_factory.all_nodes()
+        self.nodes = node_factory.all_node_names()
         transmon_configuration = toml.load(DEVICE_CONFIG)
         self.quantities_of_interest = transmon_configuration["qoi"]["qubits"]
         self.coupler_quantities_of_interest = transmon_configuration["qoi"]["couplers"]
