@@ -86,7 +86,7 @@ class NodeFactory:
         # If the node implementations are not crawled yet, search for them in the nodes module
         if len(self._node_implementation_paths) == 0:
             self._node_implementation_paths = find_inheriting_classes_ast_recursive(
-                Path(__file__).parent.parent / "nodes", "BaseNode"
+                Path(__file__).parent.parent / "nodes"
             )
 
         # If class is unknown has never been initialized before, get it from the mapping

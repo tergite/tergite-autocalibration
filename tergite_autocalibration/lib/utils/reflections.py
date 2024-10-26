@@ -44,7 +44,7 @@ def import_class_from_file(class_name: str, file_path: Union[str, Path]):
 
 
 def find_inheriting_classes_ast_recursive(
-    directory: Union[str, Path], base_class_name: str
+    directory: Union[str, Path], base_class_name: str = None
 ):
     """
     Recursively finds all classes in a directory and its subdirectories that inherit
@@ -77,7 +77,7 @@ def find_inheriting_classes_ast_recursive(
                             if (
                                 isinstance(base, ast.Name)
                                 and base.id == base_class_name
-                            ):
+                            ) or base_class_name is None:
                                 inheriting_classes[node.name] = filepath
                                 break
 
