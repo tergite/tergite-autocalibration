@@ -29,7 +29,6 @@ class NodeFactory:
 
     def __new__(cls):
         if cls._instance is None:
-
             cls._instance = super(NodeFactory, cls).__new__(cls)
             cls._instance.node_name_mapping = {
                 "punchout": "Punchout_Node",
@@ -84,7 +83,6 @@ class NodeFactory:
     def create_node(
         self, node_name: str, all_qubits: list[str], **kwargs
     ) -> "BaseNode":
-
         # If the node implementations are not crawled yet, search for them in the nodes module
         if len(self._node_implementation_paths) == 0:
             self._node_implementation_paths = find_inheriting_classes_ast_recursive(
@@ -113,7 +111,9 @@ class NodeFactory:
                 self._node_classes[node_name] = node_cls
             # Otherwise raise an exception
             else:
-                raise NotImplementedError(f"No class implementation for node {node_name} found.")
+                raise NotImplementedError(
+                    f"No class implementation for node {node_name} found."
+                )
 
         node_obj = self._node_classes[node_name](node_name, all_qubits, **kwargs)
         return node_obj

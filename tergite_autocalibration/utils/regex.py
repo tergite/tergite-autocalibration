@@ -20,9 +20,3 @@ def camel_to_snake(camel_str):
     # Insert underscores before digits
     snake_str = re.sub(r"(\D)(\d)", r"\1_\2", snake_str)
     return snake_str.lower()
-
-
-if __name__ == "__main__":
-    camel_case_string = "Camel2CaseString"
-    snake_case_string = camel_to_snake(camel_case_string)
-    print(snake_case_string)
