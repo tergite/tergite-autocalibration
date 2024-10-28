@@ -69,7 +69,7 @@ from tergite_autocalibration.config.VNA_values import (
 
 
 def resonator_samples(qubit: str) -> np.ndarray:
-    res_spec_samples = 101
+    res_spec_samples = 51
     sweep_range = 4.0e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
     min_freq = VNA_frequency - sweep_range / 2 - 0.5e6
@@ -105,7 +105,7 @@ user_samplespace = {
 }
 """
 ####################################################################
-target_node = "cz_parametrisation_fix_duration"
+target_node = "resonator_spectroscopy"
 qubits = [
     "q01",
     "q02",
@@ -116,7 +116,7 @@ user_samplespace = {
         "ro_frequencies": {qubit: resonator_samples(qubit) for qubit in qubits}
     },
 }
-attenuation_setting = {"qubit": 10, "coupler": 34, "readout": 12}
+attenuation_setting = {"qubit": 0, "coupler": 34, "readout": 0}
 
 ####################################################################
 

@@ -443,8 +443,14 @@ class BaseNode(abc.ABC):
 
     def post_process(self, data_path: Path):
         analysis_kwargs = getattr(self, "analysis_kwargs", dict())
+        if self.qubit_qois is not None:
+            redis_fields =  self.qubit_qois
+        elif self.coupler_qois is not None:
+            redis_fields =  self.coupler_qois
+        else:
+            raise ValueError('Quantities of Interest are missing from the node implementation')
         node_analysis = self.analysis_obj(
-            self.name, self.redis_field, **analysis_kwargs
+            self.name, redis_fields, **analysis_kwargs
         )
         analysis_results = node_analysis.analyze_node(data_path)
         return analysis_results
