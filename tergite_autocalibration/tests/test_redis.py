@@ -33,7 +33,7 @@ mock.set_standard_params_transmon(setup)
 # FIXME: This test becomes redundant as soon as we are moving towards the new qoi structure, then we remove the skip
 @pytest.mark.skip
 def test_redis_loading():
-    all_nodes = nodes.node_implementations.keys()
+    all_nodes = nodes.node_name_mapping.keys()
     for node in all_nodes:
         print(node)
         print(transmon_configuration)

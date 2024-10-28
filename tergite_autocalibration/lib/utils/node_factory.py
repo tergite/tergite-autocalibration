@@ -13,145 +13,116 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+import typing
+from pathlib import Path
+
+from .reflections import find_inheriting_classes_ast_recursive, import_class_from_file
+from ...utils.regex import camel_to_snake
+
+if typing.TYPE_CHECKING:
+    from ..base.node import BaseNode
+
 
 class NodeFactory:
     _instance = None
 
     def __new__(cls):
         if cls._instance is None:
-            from tergite_autocalibration.lib.nodes.characterization.t2.node import (
-                T2_Node,
-                T2_Echo_Node,
-            )
-            from tergite_autocalibration.lib.nodes.characterization.t1.node import (
-                T1_Node,
-            )
-            from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.node import (
-                Randomized_Benchmarking_Node,
-            )
-            from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.node import (
-                PurityBenchmarkingNode,
-            )
-            from tergite_autocalibration.lib.nodes.characterization.all_xy.node import (
-                All_XY_Node,
-            )
-            from tergite_autocalibration.lib.nodes.coupler.cz_dynamic_phase.node import (
-                CZ_Dynamic_Phase_Node,
-                CZ_Dynamic_Phase_Swap_Node,
-            )
-            from tergite_autocalibration.lib.nodes.coupler.cz_calibration.node import (
-                CZ_Calibration_Node,
-                CZ_Calibration_SSRO_Node,
-                CZ_Calibration_Swap_Node,
-                CZ_Calibration_Swap_SSRO_Node,
-                Reset_Calibration_SSRO_Node,
-            )
-            from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.node import (
-                CZParametrisationFixDurationNode,
-            )
-            from tergite_autocalibration.lib.nodes.coupler.cz_chevron.node import (
-                CZ_Chevron_Node,
-                CZ_Characterisation_Chevron_Node,
-                CZ_Optimize_Chevron_Node,
-            )
-            from tergite_autocalibration.lib.nodes.coupler.reset_chevron.node import (
-                Reset_Chevron_Node,
-            )
-            from tergite_autocalibration.lib.nodes.coupler.process_tomography.node import (
-                Process_Tomography_Node,
-            )
-            from tergite_autocalibration.lib.nodes.coupler.spectroscopy.node import (
-                Coupler_Spectroscopy_Node,
-                Coupler_Resonator_Spectroscopy_Node,
-            )
-            from tergite_autocalibration.lib.nodes.qubit_control.ramsey_fringes.node import (
-                Ramsey_Fringes_12_Node,
-                Ramsey_Fringes_Node,
-            )
-            from tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.node import (
-                Rabi_Oscillations_Node,
-                N_Rabi_Oscillations_Node,
-                Rabi_Oscillations_12_Node,
-                N_Rabi_Oscillations_12_Node,
-            )
-            from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.node import (
-                Qubit_01_Spectroscopy_CW_Node,
-                Qubit_01_Spectroscopy_Multidim_Node,
-                Qubit_12_Spectroscopy_Pulsed_Node,
-                Qubit_12_Spectroscopy_Multidim_Node,
-            )
-            from tergite_autocalibration.lib.nodes.qubit_control.motzoi_parameter.node import (
-                Motzoi_Parameter_Node,
-                Motzoi_Parameter_12_Node,
-            )
-            from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.node import (
-                RO_amplitude_two_state_optimization_Node,
-                RO_amplitude_three_state_optimization_Node,
-            )
-            from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.node import (
-                RO_frequency_two_state_optimization_Node,
-                RO_frequency_three_state_optimization_Node,
-            )
-            from tergite_autocalibration.lib.nodes.readout.punchout.node import (
-                Punchout_Node,
-            )
-            from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.node import (
-                Resonator_Spectroscopy_Node,
-                Resonator_Spectroscopy_1_Node,
-                Resonator_Spectroscopy_2_Node,
-            )
-
             cls._instance = super(NodeFactory, cls).__new__(cls)
-            cls._instance.node_implementations = {
-                "punchout": Punchout_Node,
-                "resonator_spectroscopy": Resonator_Spectroscopy_Node,
-                "qubit_01_spectroscopy": Qubit_01_Spectroscopy_Multidim_Node,
-                "qubit_01_cw_spectroscopy": Qubit_01_Spectroscopy_CW_Node,
-                "rabi_oscillations": Rabi_Oscillations_Node,
-                "ramsey_correction": Ramsey_Fringes_Node,
-                "resonator_spectroscopy_1": Resonator_Spectroscopy_1_Node,
-                "qubit_12_spectroscopy_pulsed": Qubit_12_Spectroscopy_Pulsed_Node,
-                "qubit_12_spectroscopy": Qubit_12_Spectroscopy_Multidim_Node,
-                "rabi_oscillations_12": Rabi_Oscillations_12_Node,
-                "ramsey_correction_12": Ramsey_Fringes_12_Node,
-                "resonator_spectroscopy_2": Resonator_Spectroscopy_2_Node,
-                "motzoi_parameter": Motzoi_Parameter_Node,
-                "n_rabi_oscillations": N_Rabi_Oscillations_Node,
-                "motzoi_parameter_12": Motzoi_Parameter_12_Node,
-                "n_rabi_oscillations_12": N_Rabi_Oscillations_12_Node,
-                "coupler_spectroscopy": Coupler_Spectroscopy_Node,
-                "coupler_resonator_spectroscopy": Coupler_Resonator_Spectroscopy_Node,
-                "T1": T1_Node,
-                "T2": T2_Node,
-                "T2_echo": T2_Echo_Node,
-                "all_XY": All_XY_Node,
-                "reset_chevron": Reset_Chevron_Node,
-                "cz_characterisation_chevron": CZ_Characterisation_Chevron_Node,
-                "reset_calibration_ssro": Reset_Calibration_SSRO_Node,
-                "cz_parametrisation_fix_duration": CZParametrisationFixDurationNode,
-                "process_tomography_ssro": Process_Tomography_Node,
-                "cz_chevron": CZ_Chevron_Node,
-                "cz_optimize_chevron": CZ_Optimize_Chevron_Node,
-                "cz_calibration": CZ_Calibration_Node,
-                "cz_calibration_swap": CZ_Calibration_Swap_Node,
-                "cz_calibration_ssro": CZ_Calibration_SSRO_Node,
-                "cz_calibration_swap_ssro": CZ_Calibration_Swap_SSRO_Node,
-                "cz_dynamic_phase": CZ_Dynamic_Phase_Node,
-                "cz_dynamic_phase_swap": CZ_Dynamic_Phase_Swap_Node,
-                "ro_frequency_two_state_optimization": RO_frequency_two_state_optimization_Node,
-                "ro_frequency_three_state_optimization": RO_frequency_three_state_optimization_Node,
-                "ro_amplitude_two_state_optimization": RO_amplitude_two_state_optimization_Node,
-                "ro_amplitude_three_state_optimization": RO_amplitude_three_state_optimization_Node,
-                "randomized_benchmarking": Randomized_Benchmarking_Node,
-                "purity_benchmarking": PurityBenchmarkingNode,
-            }
+            cls.__init__(cls._instance)
         return cls._instance
 
-    def all_nodes(self):
-        return list(self.node_implementations.keys())
+    def __init__(self):
+        self.node_name_mapping = {
+            "punchout": "Punchout_Node",
+            "resonator_spectroscopy": "Resonator_Spectroscopy_Node",
+            "qubit_01_spectroscopy": "Qubit_01_Spectroscopy_Multidim_Node",
+            "qubit_01_cw_spectroscopy": "Qubit_01_Spectroscopy_CW_Node",
+            "rabi_oscillations": "Rabi_Oscillations_Node",
+            "ramsey_correction": "Ramsey_Fringes_Node",
+            "resonator_spectroscopy_1": "Resonator_Spectroscopy_1_Node",
+            "qubit_12_spectroscopy_pulsed": "Qubit_12_Spectroscopy_Pulsed_Node",
+            "qubit_12_spectroscopy": "Qubit_12_Spectroscopy_Multidim_Node",
+            "rabi_oscillations_12": "Rabi_Oscillations_12_Node",
+            "ramsey_correction_12": "Ramsey_Fringes_12_Node",
+            "resonator_spectroscopy_2": "Resonator_Spectroscopy_2_Node",
+            "motzoi_parameter": "Motzoi_Parameter_Node",
+            "n_rabi_oscillations": "N_Rabi_Oscillations_Node",
+            "motzoi_parameter_12": "Motzoi_Parameter_12_Node",
+            "n_rabi_oscillations_12": "N_Rabi_Oscillations_12_Node",
+            "coupler_spectroscopy": "Coupler_Spectroscopy_Node",
+            "coupler_resonator_spectroscopy": "Coupler_Resonator_Spectroscopy_Node",
+            "T1": "T1_Node",
+            "T2": "T2_Node",
+            "T2_echo": "T2_Echo_Node",
+            "all_XY": "All_XY_Node",
+            "reset_chevron": "Reset_Chevron_Node",
+            "cz_characterisation_chevron": "CZ_Characterisation_Chevron_Node",
+            "reset_calibration_ssro": "Reset_Calibration_SSRO_Node",
+            "cz_parametrisation_fix_duration": "CZParametrisationFixDurationNode",
+            "process_tomography_ssro": "Process_Tomography_Node",
+            "cz_chevron": "CZ_Chevron_Node",
+            "cz_optimize_chevron": "CZ_Optimize_Chevron_Node",
+            "cz_calibration": "CZ_Calibration_Node",
+            "cz_calibration_swap": "CZ_Calibration_Swap_Node",
+            "cz_calibration_ssro": "CZ_Calibration_SSRO_Node",
+            "cz_calibration_swap_ssro": "CZ_Calibration_Swap_SSRO_Node",
+            "cz_dynamic_phase": "CZ_Dynamic_Phase_Node",
+            "cz_dynamic_phase_swap": "CZ_Dynamic_Phase_Swap_Node",
+            "ro_frequency_two_state_optimization": "RO_frequency_two_state_optimization_Node",
+            "ro_frequency_three_state_optimization": "RO_frequency_three_state_optimization_Node",
+            "ro_amplitude_two_state_optimization": "RO_amplitude_two_state_optimization_Node",
+            "ro_amplitude_three_state_optimization": "RO_amplitude_three_state_optimization_Node",
+            "randomized_benchmarking": "Randomized_Benchmarking_Node",
+            "purity_benchmarking": "PurityBenchmarkingNode",
+        }
+        self._node_implementation_paths = {}
+        self._node_classes = {}
 
-    def create_node(self, node_name: str, all_qubits: list[str], **kwargs):
-        node_object = self.node_implementations[node_name](
-            node_name, all_qubits, **kwargs
-        )
-        return node_object
+    def all_node_names(self):
+        return list(self.node_name_mapping.keys())
+
+    def create_node(
+        self, node_name: str, all_qubits: list[str], **kwargs
+    ) -> "BaseNode":
+        # If the node implementations are not crawled yet, search for them in the nodes module
+        if len(self._node_implementation_paths) == 0:
+            # TODO: Please not that this implementation will temporarily return also classes that do not extend BaseNode
+            #       This is less robust, but more efficient, but might cause issues e.g. when detecting node
+            #       node implementations automatically. However, for now, this does not expect to cause any problem,
+            #       because it is caught later after the import of the class below.
+            self._node_implementation_paths = find_inheriting_classes_ast_recursive(
+                Path(__file__).parent.parent / "nodes"
+            )
+
+        # If class is unknown has never been initialized before, get it from the mapping
+        if node_name not in self._node_classes.keys():
+            cls_name = None
+            # Check whether the class is in the mapping
+            if node_name in self.node_name_mapping.keys():
+                cls_name = self.node_name_mapping[node_name]
+            # Otherwise go through the crawled implementations
+            else:
+                # If there is a class in the modules library that follows the camel case version of the given string,
+                # this class can be loaded dynamically as well.
+                for node_implementation_name in self._node_implementation_paths.keys():
+                    if camel_to_snake(node_implementation_name) == node_name:
+                        cls_name = node_implementation_name
+                        break
+            # If there is a class and module found, load it into the memory
+            if cls_name is not None:
+                node_cls = import_class_from_file(
+                    cls_name, self._node_implementation_paths[cls_name]
+                )
+                if issubclass(node_cls, BaseNode):
+                    self._node_classes[node_name] = node_cls
+                else:
+                    raise TypeError(f"Class {node_cls} does not extend BaseNode.")
+            # Otherwise raise an exception
+            else:
+                raise NotImplementedError(
+                    f"No class implementation for node {node_name} found."
+                )
+
+        node_obj = self._node_classes[node_name](node_name, all_qubits, **kwargs)
+        return node_obj
