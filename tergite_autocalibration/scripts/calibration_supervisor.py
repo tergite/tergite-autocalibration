@@ -74,6 +74,8 @@ class CalibrationSupervisor:
         measurement_mode: "MeasurementMode",
         cluster_ip: Union[str, "IPv4Address"] = CLUSTER_IP,
         cluster_timeout: int = 222,
+        node_name='',
+        data_path=''
     ) -> None:
         # Read hardware related configuration steps
         self.measurement_mode: "MeasurementMode" = measurement_mode
