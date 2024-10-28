@@ -136,6 +136,19 @@ pip install -r requirements_proprietary.txt
 ```
 Make sure you have ssh access to all proprietary repositories, otherwise the installation will fail.
 
+When you are using imports of proprietary resources in the code, please make sure that they are wrapped with a `try` and `catch` statement.
+```
+try:
+    from superconducting_qubit_tools.clifford_module.randomized_benchmarking import *
+except ImportError:
+    logger.warning(
+        "Could not find package: superconducting-qubit-tools.",
+        "This is a proprietary licenced software.",
+        "Please make sure that you are having a correct licence and install the dependency",
+    )
+```
+Please try to use proprietary resources only on experimental features and do not integrate them into the default workflows.
+The scope of the Tergite project is to be as open-source as possible.
 
 ## References
 

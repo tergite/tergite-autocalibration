@@ -164,20 +164,6 @@ def filtered_topological_order(target_node: str):
 
 
 def range_topological_order(from_node: str, target_node: str):
-    print(
-        graph.has_successor(
-            "resonator_spectroscopy_2", "cz_parametrisation_fix_duration"
-        )
-    )
-    print(graph.has_successor("resonator_spectroscopy", "qubit_01_spectroscopy"))
-    target_ancestors = nx.ancestors(graph, target_node)
-    # if "coupler_spectroscopy" in target_ancestors:
-    #     coupler_path = nx.shortest_path(
-    #         graph, "resonator_spectroscopy", "coupler_spectroscopy"
-    #     )
-    #     graph.remove_node("coupler_spectroscopy")
-    # else:
-    #     coupler_path = []
     coupler_path = []
     if target_node == "punchout":
         topo_order = ["punchout"]
@@ -193,8 +179,6 @@ def range_topological_order(from_node: str, target_node: str):
 
     filtered_order = [node for node in topo_order if graph_condition(node, "refine")]
     filtered_order = coupler_path + filtered_order
-    # print(f'{ filtered_order = }')
-    # quit()
     return filtered_order
 
 

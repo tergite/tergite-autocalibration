@@ -19,7 +19,7 @@ stages:
 
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-  PYTHON_VERSION: "3.9"
+  PYTHON_VERSION: "3.10"
   REDIS_PORT: 6378
 
 tests:
@@ -50,7 +50,7 @@ post_merge_actions:
   stage: post_merge_actions
   image: ubuntu:latest
   rules:
-    - if: '$CI_COMMIT_BRANCH == "refactoring/main"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
   script:
     # Run a wiki update
     - !reference [.update_wiki, script]
