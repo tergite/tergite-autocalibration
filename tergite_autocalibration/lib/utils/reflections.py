@@ -81,4 +81,12 @@ def find_inheriting_classes_ast_recursive(
                                 inheriting_classes[node.name] = filepath
                                 break
 
+    # TODO: We could have this function be even more sophisticated by checking inheritances in the post-processing.
+    #       One possible implementation could be to find the inheritance recursively on a simplified AST.
+    #       E.g.:
+    #       - In the loop above, for each class store the parent-class
+    #       - Then represent the information as tree
+    #       - Have an efficient tree-search algorithm that finds recursively finds the ancestors for the parent
+    #       - Filter the results in the `inheriting_classes` variable
+
     return inheriting_classes
