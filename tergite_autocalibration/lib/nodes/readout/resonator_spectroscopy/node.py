@@ -24,11 +24,11 @@ from ....base.node import BaseNode
 class Resonator_Spectroscopy_Node(BaseNode):
     measurement_obj = Resonator_Spectroscopy
     analysis_obj = ResonatorSpectroscopyNodeAnalysis
+    qubit_qois = ["clock_freqs:readout", "Ql", "resonator_minimum"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
 
-        self.redis_field = ["clock_freqs:readout", "Ql", "resonator_minimum"]
         self.schedule_samplespace = {
             "ro_frequencies": {
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits

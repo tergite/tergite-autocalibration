@@ -287,7 +287,7 @@ class CalibrationSupervisor:
             logger.info(f"Calibrating node {node.name}")
             # TODO: This could be in the node initializer
             data_path = create_node_data_path(node)
-            measurement_result = node.calibrate(data_path, self.measurement_mode)
+            measurement_result = node.calibrate(data_path, self.lab_ic,  self.measurement_mode)
 
             # TODO:  develop failure strategies ->
             # if node_calibration_status == DataStatus.out_of_spec:

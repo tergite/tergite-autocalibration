@@ -66,6 +66,9 @@ matplotlib.use(settings.PLOTTING_BACKEND)
 class BaseNode(abc.ABC):
     measurement_obj: "BaseMeasurement"
     analysis_obj: "BaseNodeAnalysis"
+    qubit_qois: list[str] | None = None  # after python 3.10 we can remove the Union
+    
+    coupler_qois: list[str] | None = None
 
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         self.name = name
