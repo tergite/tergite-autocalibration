@@ -83,7 +83,7 @@ To run the calibration, make sure to have the following configuration files in p
 
 - [`spi_config.toml`] The configuration for the SPI rack (only necessary if you are running two qubit calibrations).
 
-- [`calibration_config.toml`] Define which qubits/couplers are calibrated and what are the calibration parameters for a specific node.
+- [`node_config.toml`] Define which qubits/couplers are calibrated and what are the calibration parameters for a specific node.
 
 
 Configuration packages for specific devices can be found in `data/devices`.

@@ -110,9 +110,8 @@ position = { column = 0, row = 0 }
 
 The file in the template package is `device_config.toml`.
 
-### Calibration configuration (.toml):
-This file is solely configuring the calibration process itself i.e. everything that is related to running the calibration, its measurements and analyses.
-In the `[general]` section there are some settings such as the target node, the qubits and the couplers to calibrate.
+### Run configuration (.toml):
+In this file there are some settings such as the target node, the qubits and the couplers to calibrate.
 
 Example: Calibrate qubits `q01` and `q02` with coupler `q01_q02` up until the node `cz_calibration`.
 ```
@@ -133,6 +132,7 @@ measure.acq_delay = 220e-9
 q06.measure.pulse_amp = 0.03
 ```
 
+### Node configuration (.toml):
 Below, you can define node-specific parameters setting `[node_name.scope.property]` where scope are the qubits/couplers and the the property is a property known to the node.
 
 Example: Setting the reset duration for the resonator spectroscopy node.
@@ -141,7 +141,7 @@ Example: Setting the reset duration for the resonator spectroscopy node.
 reset.duration =  60e-6
 ```
 
-The file in the template package is `calibration_config.toml`.
+The file in the template package is `node_config.toml`.
 
 ### Custom user samplespace configuration (.py | optional):
 If you want to generate samplespaces with your own custom Python scripts, you can add a custom user samplespace configuration.

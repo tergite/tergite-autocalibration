@@ -102,11 +102,13 @@ CONFIG_DIR = _from_config(
 
 # ---
 # Section with configuration files
+RUN_CONFIG = CONFIG_DIR.joinpath(_from_config("RUN_CONFIG", cast_=Path))
+
 CLUSTER_CONFIG = CONFIG_DIR.joinpath(_from_config("CLUSTER_CONFIG", cast_=Path))
 SPI_CONFIG = CONFIG_DIR.joinpath(_from_config("SPI_CONFIG", cast_=Path))
 DEVICE_CONFIG = CONFIG_DIR.joinpath(_from_config("DEVICE_CONFIG", cast_=Path))
 
-CALIBRATION_CONFIG = CONFIG_DIR.joinpath(_from_config("CALIBRATION_CONFIG", cast_=Path))
+NODE_CONFIG = CONFIG_DIR.joinpath(_from_config("NODE_CONFIG", cast_=Path))
 USER_SAMPLESPACE = CONFIG_DIR.joinpath((_from_config("USER_SAMPLESPACE", cast_=Path)))
 
 BACKEND_CONFIG = Path(__file__).parent / "backend_config_default.toml"

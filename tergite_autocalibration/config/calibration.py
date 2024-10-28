@@ -15,7 +15,7 @@ import sys
 from typing import List
 
 import toml
-from .settings import CALIBRATION_CONFIG, USER_SAMPLESPACE
+from .settings import RUN_CONFIG, USER_SAMPLESPACE
 
 
 class CalibrationConfig:
@@ -25,10 +25,10 @@ class CalibrationConfig:
         if cls._instance is None:
             cls._instance = super(CalibrationConfig, cls).__new__(cls)
 
-            calibration_config = toml.load(CALIBRATION_CONFIG)
-            cls._target_node = calibration_config["general"]["target_node"]
-            cls._qubits = calibration_config["general"]["qubits"]
-            cls._couplers = calibration_config["general"]["couplers"]
+            run_config = toml.load(RUN_CONFIG)
+            cls._target_node = run_config["general"]["target_node"]
+            cls._qubits = run_config["general"]["qubits"]
+            cls._couplers = run_config["general"]["couplers"]
 
             if USER_SAMPLESPACE is not None:
                 us_spec_ = importlib.util.spec_from_file_location(

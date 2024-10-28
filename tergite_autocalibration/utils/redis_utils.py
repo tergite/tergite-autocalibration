@@ -38,8 +38,11 @@ def populate_parking_currents(
 
 
 def populate_initial_parameters(qubits: list, couplers: list, redis_connection):
-    calibration_configuration = toml.load(settings.CALIBRATION_CONFIG)
-    initial_device_config = calibration_configuration["initials"]
+    # TODO: Here, change the way we load it, should come from the device_config.toml
+    #       Temporary solution would be a legacy method inside the data handler
+    # This is the wrong file loaded, it should not work!
+    node_configuration = toml.load(settings.NODE_CONFIG)
+    initial_device_config = node_configuration["initials"]
 
     initial_qubit_parameters = initial_device_config["qubits"]
     initial_coupler_parameters = initial_device_config["couplers"]
@@ -97,7 +100,7 @@ def populate_node_parameters(
     redis_connection,
 ):
     # Populate the Redis database with node specific parameter values from the toml file
-    transmon_configuration = toml.load(settings.CALIBRATION_CONFIG)
+    transmon_configuration = toml.load(settings.NODE_CONFIG)
     if node_name in transmon_configuration and not is_node_calibrated:
         node_specific_dict = transmon_configuration[node_name]["all"]
         for field_key, field_value in node_specific_dict.items():
