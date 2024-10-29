@@ -24,6 +24,7 @@ from tergite_autocalibration.config.settings import REDIS_CONNECTION, HARDWARE_C
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 
 
+# TODO: This whole function does not seem to be used at all
 def extract_cluster_port_mapping(qubit: str) -> Dict[str, str]:
     """
     TODO this is not a good implementation.
@@ -32,6 +33,7 @@ def extract_cluster_port_mapping(qubit: str) -> Dict[str, str]:
     with open(HARDWARE_CONFIG) as hw:
         hw_config = json.load(hw)
 
+    # TODO: The cluster configuration here only seems to load the keys
     clusters_in_hw = []
     for key in hw_config.keys():
         if "cluster" in key:
@@ -41,6 +43,7 @@ def extract_cluster_port_mapping(qubit: str) -> Dict[str, str]:
         raise ValueError("Something Wrong with the Cluster HW_config")
 
     cluster_name = clusters_in_hw[0]
+    # TODO: The cluster configuration inside the hardware
     cluster_config = hw_config[cluster_name]
 
     # _cluster_port_mapping: {}
@@ -66,6 +69,7 @@ def extract_cluster_port_mapping(qubit: str) -> Dict[str, str]:
         raise ValueError("qubit not present in the configuration")
 
 
+# TODO: Here, we already have a function to set attenuation
 def set_qubit_attenuation(cluster: Cluster, qubit: str, att_in_db: int):
     qubit_to_out_map = extract_cluster_port_mapping(qubit)
     cluster_name, this_module_name = qubit_to_out_map["module"].split("_")
@@ -79,6 +83,7 @@ def set_qubit_attenuation(cluster: Cluster, qubit: str, att_in_db: int):
         raise ValueError(f"Uknown output: {this_output}")
 
 
+# TODO: This function does not seem to be used
 def set_qubit_LO(cluster: Cluster, qubit: str, lo_frequency: float):
     qubit_to_out_map = extract_cluster_port_mapping(qubit)
     cluster_name, this_module_name = qubit_to_out_map["module"].split("_")
@@ -94,7 +99,7 @@ def set_qubit_LO(cluster: Cluster, qubit: str, lo_frequency: float):
     else:
         raise ValueError(f"Unknown output: {this_output}")
 
-
+# TODO: SPI related configurations could go to a separate file
 def find_serial_port():
     path = Path("/dev/")
     for file in path.iterdir():

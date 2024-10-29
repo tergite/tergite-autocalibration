@@ -10,6 +10,8 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+# TODO: This whole file would have to be reworked
+
 import csv
 import json
 
