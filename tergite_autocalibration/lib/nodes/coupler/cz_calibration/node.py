@@ -3,6 +3,7 @@
 # (C) Copyright Eleftherios Moschandreou 2024
 # (C) Copyright Liangyu Chen 2024
 # (C) Copyright Amr Osman 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -15,9 +16,8 @@
 import numpy as np
 
 from .analysis import (
-    CZCalibrationAnalysis,
-    CZCalibrationSSROAnalysis,
-    ResetCalibrationSSROAnalysis,
+    CZCalibrationSSRONodeAnalysis,
+    ResetCalibrationSSRONodeAnalysis,
 )
 from .measurement import (
     CZ_calibration,
@@ -27,39 +27,9 @@ from .measurement import (
 from ....base.node import BaseNode
 
 
-class CZ_Calibration_Node(BaseNode):
-    measurement_obj = CZ_calibration
-    analysis_obj = CZCalibrationAnalysis
-
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
-    ):
-        super().__init__(name, all_qubits, **schedule_keywords)
-        self.name = name
-        self.all_qubits = all_qubits
-        self.couplers = couplers
-        self.edges = couplers
-        self.coupler = self.couplers[0]
-        self.coupled_qubits = couplers[0].split(sep="_")
-        self.redis_field = ["cz_phase", "cz_pop_loss"]
-        self.qubit_state = 2
-        self.testing_group = 0  # The edge group to be tested. 0 means all edges.
-        self.schedule_keywords = schedule_keywords
-        self.schedule_keywords["dynamic"] = False
-        self.schedule_keywords["swap_type"] = False
-
-        self.schedule_samplespace = {
-            "ramsey_phases": {
-                qubit: np.append(np.linspace(0, 360, 25), [0, 1])
-                for qubit in self.coupled_qubits
-            },
-            "control_ons": {qubit: [False, True] for qubit in self.coupled_qubits},
-        }
-
-
 class CZCalibrationSSRONode(BaseNode):
     measurement_obj = CZ_calibration_SSRO
-    analysis_obj = CZCalibrationSSROAnalysis
+    analysis_obj = CZCalibrationSSRONodeAnalysis
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
@@ -87,41 +57,9 @@ class CZCalibrationSSRONode(BaseNode):
         }
 
 
-class CZ_Calibration_Swap_Node(BaseNode):
-    measurement_obj = CZ_calibration
-    analysis_obj = CZCalibrationAnalysis
-
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
-    ):
-        super().__init__(name, all_qubits, **schedule_keywords)
-        self.name = name
-        self.all_qubits = all_qubits
-        self.couplers = couplers
-        self.edges = couplers
-        self.coupler = self.couplers[0]
-        self.coupled_qubits = couplers[0].split(sep="_")
-        self.redis_field = ["cz_phase", "cz_pop_loss"]
-        self.qubit_state = 2
-        self.testing_group = 0  # The edge group to be tested. 0 means all edges.
-
-        self.schedule_keywords["dynamic"] = False
-        self.schedule_keywords["swap_type"] = True
-        self.schedule_samplespace = {
-            "ramsey_phases": {
-                qubit: np.append(np.linspace(0, 360, 25), [0, 1])
-                for qubit in self.coupled_qubits
-            },
-            "control_ons": {qubit: [False, True] for qubit in self.coupled_qubits},
-        }
-        # self.schedule_keywords['use_edge'] = False
-        # self.schedule_keywords['number_of_cz'] = 1
-        # self.validate()
-
-
-class CZ_Calibration_Swap_SSRO_Node(BaseNode):
+class CZCalibrationSwapSSRONode(BaseNode):
     measurement_obj = CZ_calibration_SSRO
-    analysis_obj = CZCalibrationSSROAnalysis
+    analysis_obj = CZCalibrationSSRONodeAnalysis
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
@@ -132,7 +70,6 @@ class CZ_Calibration_Swap_SSRO_Node(BaseNode):
         self.couplers = couplers
         self.coupler = couplers[0]
         self.coupled_qubits = couplers[0].split(sep="_")
-        # self.schedule_keywords = kwargs
         self.edges = couplers
         self.redis_field = ["cz_phase", "cz_pop_loss", "cz_leakage"]
         self.qubit_state = 2
@@ -149,9 +86,9 @@ class CZ_Calibration_Swap_SSRO_Node(BaseNode):
         # self.validate()
 
 
-class Reset_Calibration_SSRO_Node(BaseNode):
+class ResetCalibrationSSRONode(BaseNode):
     measurement_obj = Reset_calibration_SSRO
-    analysis_obj = ResetCalibrationSSROAnalysis
+    analysis_obj = ResetCalibrationSSRONodeAnalysis
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
@@ -162,9 +99,7 @@ class Reset_Calibration_SSRO_Node(BaseNode):
         self.couplers = couplers
         self.edges = couplers
         self.coupler = couplers[0]
-        # print(couplers)
         self.coupled_qubits = couplers[0].split(sep="_")
-        # print(self.coupled_qubits)
         # self.schedule_keywords = kwargs
         self.redis_field = [
             "reset_fidelity",
@@ -180,4 +115,4 @@ class Reset_Calibration_SSRO_Node(BaseNode):
             "control_ons": {qubit: [False, True] for qubit in self.coupled_qubits},
             "ramsey_phases": {qubit: range(9) for qubit in self.coupled_qubits},
         }
-        # self.validate()
+
