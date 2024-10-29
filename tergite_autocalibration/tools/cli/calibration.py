@@ -60,6 +60,7 @@ def start(
     from tergite_autocalibration.config.settings import CLUSTER_IP
     from tergite_autocalibration.scripts.calibration_supervisor import (
         CalibrationSupervisor,
+        CalibrationConfig
     )
     from tergite_autocalibration.scripts.db_backend_update import update_mss
 
@@ -98,12 +99,13 @@ def start(
                 "Trying to start the calibration supervisor with default cluster configuration."
             )
 
-    supervisor = CalibrationSupervisor(
-        cluster_mode=cluster_mode,
-        cluster_ip=parsed_cluster_ip,
-        node_name=node_name,
-        data_path=data_path,
+    config = CalibrationConfig(
+        cluster_mode=cluster_mode, 
+        cluster_ip=parsed_cluster_ip, 
+        node_name=node_name, 
+        data_path=Path(data_path)
     )
+    supervisor = CalibrationSupervisor(config)
     supervisor.calibrate_system()
     if push:
         update_mss()

@@ -14,9 +14,10 @@
 # that they have been altered from the originals.
 #
 
-from ipaddress import IPv4Address
+from ipaddress import IPv4Address, IPv6Address
 from pathlib import Path
 from typing import Union, List
+from dataclasses import dataclass, field
 
 import toml
 from colorama import Fore
@@ -60,39 +61,90 @@ def update_to_user_samplespace(node: BaseNode, user_samplespace: dict):
             raise KeyError(f"{settable} not in any samplespace")
     return
 
-
-class CalibrationSupervisor:
-    def __init__(
-        self,
-        cluster_mode: "MeasurementMode" = MeasurementMode.real,
-        cluster_ip: Union[str, "IPv4Address"] = CLUSTER_IP,
-        cluster_timeout: int = 222,
-        node_name="",
-        data_path="",
-    ) -> None:
-        # Read hardware related configuration steps
-        self.cluster_mode: "MeasurementMode" = cluster_mode
-        self.cluster_ip: Union[str, "IPv4Address"] = cluster_ip
-        self.cluster_timeout: int = cluster_timeout
-        self.node_name_to_re_analyse = node_name
-        self.data_path = Path(data_path)
+@dataclass
+class CalibrationConfig:
+    cluster_mode: "MeasurementMode" = MeasurementMode.real
+    cluster_ip: Union[str, "IPv4Address", "IPv6Address"] = CLUSTER_IP
+    cluster_timeout: int = 222
+    node_name: str = ""
+    data_path: Path = Path("")
+    
+    qubits: List[str] = field(default_factory=lambda: user_requested_calibration["all_qubits"])
+    couplers: List[str] = field(default_factory=lambda: user_requested_calibration["couplers"])
+    target_node: str = user_requested_calibration["target_node"]
+    user_samplespace: dict = field(default_factory=lambda: user_requested_calibration["user_samplespace"])
+    
+    transmon_configuration: dict = field(default_factory=lambda: toml.load(settings.DEVICE_CONFIG))
+ 
+ 
+class HardwareManager:
+    def __init__(self, config: CalibrationConfig) -> None:
+        self.config = config
         self.lab_ic = ""
-
+        
         # Create objects to communicate with the hardware
-        if self.cluster_mode == MeasurementMode.re_analyse:
+        if self.config.cluster_mode == MeasurementMode.re_analyse:
             logger.info(
                 "Cluster will not be defined as there is no need to take a measurement in re-analysis mode."
             )
         else:
             self.cluster: "Cluster" = self._create_cluster()
-            self.lab_ic: "InstrumentCoordinator" = self._create_lab_ic(self.cluster)
+            self.lab_ic: "InstrumentCoordinator" = self._create_instrument_coordinator(self.cluster)
+    
+    def _create_cluster(self) -> "Cluster":
+        cluster: "Cluster"
+        if self.config.cluster_mode == MeasurementMode.real:
+            Cluster.close_all()
+            cluster = Cluster(CLUSTER_NAME, str(self.config.cluster_ip))
+            cluster.reset()
+            logger.info(f"Reseting Cluster at IP *{str(self.config.cluster_ip)[-3:]}")
+            return cluster
+        else:
+            raise ClusterNotFoundError(
+                f"Cannot create cluster object from {self.config.cluster_ip}"
+            )
+            
+    def _create_instrument_coordinator(self, clusters: Union["Cluster", List["Cluster"]]) -> InstrumentCoordinator:
+        instrument_coordinator = InstrumentCoordinator("lab_ic")
+        if isinstance(clusters, Cluster):
+            clusters = [clusters]
+        for cluster in clusters:
+            # Set the attenuation values for the modules
+            for module in self.cluster.modules:
+                try:
+                    if module.is_qcm_type and module.is_rf_type:
+                        module.out0_att(attenuation_setting["qubit"]) # Control lines
+                        module.out1_att(attenuation_setting["coupler"]) # Flux lines
+                    elif module.is_qrm_type and module.is_rf_type:
+                        module.out0_att(attenuation_setting["readout"]) # Readout lines
+                except:
+                    pass
+            instrument_coordinator.add_component(ClusterComponent(cluster))
+            instrument_coordinator.timeout(self.config.cluster_timeout)
+        return instrument_coordinator
+    
+    def get_instrument_coordinator(self):
+        """Access the instrument coordinator for use by other classes."""
+        return self.lab_ic
+
+
+class CalibrationSupervisor:
+    def __init__(
+        self,
+        config: CalibrationConfig
+    ) -> None:
+        self.config = config
+        self.hardware_manager = HardwareManager(config=config)
+        self.lab_ic = self.hardware_manager.get_instrument_coordinator()
+        self.cluster_mode = self.config.cluster_mode
+        self.cluster_ip = config.cluster_ip
 
         # TODO: user configuration could be a toml file
         # Read the calibration specific parameters
-        self.qubits = user_requested_calibration["all_qubits"]
-        self.couplers = user_requested_calibration["couplers"]
-        self.target_node = user_requested_calibration["target_node"]
-        self.user_samplespace = user_requested_calibration["user_samplespace"]
+        self.qubits = self.config.qubits
+        self.couplers = self.config.couplers
+        self.target_node = self.config.target_node
+        self.user_samplespace = self.config.user_samplespace
         self.measurement_mode = self.cluster_mode
 
         # Read the device configuration
@@ -101,43 +153,6 @@ class CalibrationSupervisor:
         # Initialize the node structure
         self.node_factory = NodeFactory()
         self.topo_order = filtered_topological_order(self.target_node)
-
-    def _create_cluster(self) -> "Cluster":
-        cluster_: "Cluster"
-        if self.cluster_mode == MeasurementMode.real:
-            Cluster.close_all()
-            cluster_ = Cluster(CLUSTER_NAME, str(self.cluster_ip))
-            cluster_.reset()
-            logger.info(f"Reseting Cluster at IP *{str(self.cluster_ip)[-3:]}")
-            return cluster_
-        else:
-            raise ClusterNotFoundError(
-                f"Cannot create cluster object from {self.cluster_ip}"
-            )
-
-    def _create_lab_ic(self, clusters: Union["Cluster", List["Cluster"]]):
-        ic_ = InstrumentCoordinator("lab_ic")
-        if isinstance(clusters, Cluster):
-            clusters = [clusters]
-        for cluster in clusters:
-            # Set the attenuation values for the modules
-            for module in cluster.modules:
-                try:
-                    if module.is_qcm_type and module.is_rf_type:
-                        module.out0_att(attenuation_setting["qubit"])  # Control lines
-                        # print(f'Attenuation setting for {module.name} is {attenuation_setting["qubit"]}')
-                        module.out1_att(attenuation_setting["coupler"])  # Flux lines
-                        # print(f'Attenuation setting for {module.name} is {attenuation_setting["coupler"]}')
-                    elif module.is_qrm_type and module.is_rf_type:
-                        module.out0_att(attenuation_setting["readout"])  # Readout lines
-                        # print(
-                        #     f'Attenuation setting for {module.name} is {attenuation_setting["readout"]}'
-                        # )
-                except:
-                    pass
-            ic_.add_component(ClusterComponent(cluster))
-            ic_.timeout(self.cluster_timeout)
-        return ic_
 
     def calibrate_system(self):
         # TODO: everything which is not in the inspect or calibrate function should go here
