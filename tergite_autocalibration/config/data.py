@@ -17,6 +17,21 @@ import toml
 from .settings import DEVICE_CONFIG
 
 
+def update_nested(target, updates):
+    for key, value in updates.items():
+        if key in target:
+            # If the key exists in target, check if both values are dicts
+            if isinstance(value, dict) and isinstance(target[key], dict):
+                # Recursively update nested dictionaries without overwriting
+                update_nested(target[key], value)
+            else:
+                # Skip if the key exists and is not a dictionary
+                continue
+        else:
+            # If the key does not exist in target, add it
+            target[key] = value
+
+
 class DataHandler:
     _instance = None
 
@@ -39,17 +54,7 @@ class DataHandler:
                         ]
                     for key_, value_ in device_raw[device_subsection].items():
                         if key_.startswith("q"):
-                            for (
-                                gsp_key_,
-                                gsp_value_,
-                            ) in global_subsection_properties.items():
-                                if (
-                                    gsp_key_
-                                    not in device_raw[device_subsection][key_].keys()
-                                ):
-                                    device_raw[device_subsection][key_][
-                                        gsp_key_
-                                    ] = gsp_value_
+                            update_nested(device_raw[device_subsection][key_], global_subsection_properties)
                     device_raw[device_subsection].pop("all")
             cls._device = device_raw
 

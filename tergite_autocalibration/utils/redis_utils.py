@@ -13,6 +13,7 @@
 import toml
 
 from tergite_autocalibration.config import settings
+from tergite_autocalibration.config.data import dh
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
 
 
@@ -38,35 +39,32 @@ def populate_parking_currents(
 
 
 def populate_initial_parameters(qubits: list, couplers: list, redis_connection):
-    # TODO: Here, change the way we load it, should come from the device_config.toml
-    #       Temporary solution would be a legacy method inside the data handler
-    # This is the wrong file loaded, it should not work!
-    node_configuration = toml.load(settings.NODE_CONFIG)
-    # TODO: Here, we should load a legacy endpoint inside the data handler
-    #       As long as we maintain a structure that load_redis_config can load, we do not break anything here
-    initial_device_config = node_configuration["initials"]
+    # TODO: This way of loading the device configuration is very simple.
+    #       Making it more robust would require some more engineering on the data handler.
+    initial_device_config = dh.device
 
-    initial_qubit_parameters = initial_device_config["qubits"]
-    initial_coupler_parameters = initial_device_config["couplers"]
+    initial_qubit_parameters = initial_device_config["qubit"]
+    initial_coupler_parameters = initial_device_config["coupler"]
 
     # Populate the Redis database with the initial 'reasonable'
     # parameter values from the toml file
 
     for qubit in qubits:
         # parameter common to all qubits:
-        for module_key, module_value in initial_qubit_parameters["all"].items():
-            if isinstance(module_value, dict):
-                for parameter_key, parameter_value in module_value.items():
-                    sub_module_key = module_key + ":" + parameter_key
-                    redis_connection.hset(
-                        f"transmons:{qubit}", sub_module_key, parameter_value
-                    )
-                    structured_redis_storage(
-                        sub_module_key, qubit.strip("q"), parameter_value
-                    )
-            else:
-                redis_connection.hset(f"transmons:{qubit}", module_key, module_value)
-                structured_redis_storage(module_key, qubit.strip("q"), module_value)
+        if "all" in initial_qubit_parameters.keys():
+            for module_key, module_value in initial_qubit_parameters["all"].items():
+                if isinstance(module_value, dict):
+                    for parameter_key, parameter_value in module_value.items():
+                        sub_module_key = module_key + ":" + parameter_key
+                        redis_connection.hset(
+                            f"transmons:{qubit}", sub_module_key, parameter_value
+                        )
+                        structured_redis_storage(
+                            sub_module_key, qubit.strip("q"), parameter_value
+                        )
+                else:
+                    redis_connection.hset(f"transmons:{qubit}", module_key, module_value)
+                    structured_redis_storage(module_key, qubit.strip("q"), module_value)
 
         # parameter specific to each qubit:
         for module_key, module_value in initial_qubit_parameters[qubit].items():
