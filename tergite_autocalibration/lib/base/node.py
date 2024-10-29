@@ -25,19 +25,17 @@ import matplotlib
 import numpy as np
 import tqdm
 import xarray
-from colorama import Fore
-from colorama import Style
+from colorama import Fore, Style
 from colorama import init as colorama_init
 from quantify_scheduler.backends import SerialCompiler
 from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
 from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
     CompiledSchedule,
 )
-from quantify_scheduler.json_utils import SchedulerJSONEncoder
-from quantify_scheduler.json_utils import pathlib
+from quantify_scheduler.json_utils import SchedulerJSONEncoder, pathlib
 
 from tergite_autocalibration.config import settings
-from tergite_autocalibration.config.settings import REDIS_CONNECTION, HARDWARE_CONFIG
+from tergite_autocalibration.config.settings import HARDWARE_CONFIG, REDIS_CONNECTION
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.lib.utils.redis import (
@@ -45,10 +43,7 @@ from tergite_autocalibration.lib.utils.redis import (
     load_redis_config_coupler,
 )
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
-from tergite_autocalibration.utils.dataset_utils import (
-    configure_dataset,
-    save_dataset,
-)
+from tergite_autocalibration.utils.dataset_utils import configure_dataset, save_dataset
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.extended_coupler_edge import CompositeSquareEdge
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
@@ -66,6 +61,8 @@ matplotlib.use(settings.PLOTTING_BACKEND)
 class BaseNode(abc.ABC):
     measurement_obj: "BaseMeasurement"
     analysis_obj: "BaseNodeAnalysis"
+    qubit_qois: list[str] | None = None
+    coupler_qois: list[str] | None = None
 
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         self.name = name
@@ -76,7 +73,6 @@ class BaseNode(abc.ABC):
         self.qubit_state = 0  # can be 0 or 1 or 2
         self.plots_per_qubit = 1  # can be 0 or 1 or 2
 
-        self.redis_field: List[str]
         self.coupler: Optional[List[str]]
 
         self.lab_instr_coordinator = None
@@ -88,6 +84,17 @@ class BaseNode(abc.ABC):
         self.reduced_external_samplespace = {}
 
         self.samplespace = self.schedule_samplespace | self.external_samplespace
+
+        if self.qubit_qois is not None:
+            self.redis_fields = self.qubit_qois
+            if self.coupler_qois is not None:
+                self.redis_fields = self.qubit_qois + self.coupler_qois
+        elif self.coupler_qois is not None:
+            self.redis_fields = self.coupler_qois
+        else:
+            raise ValueError(
+                "Quantities of Interest are missing from the node implementation"
+            )
 
     def pre_measurement_operation(self):
         """
@@ -441,7 +448,7 @@ class BaseNode(abc.ABC):
     def post_process(self, data_path: Path):
         analysis_kwargs = getattr(self, "analysis_kwargs", dict())
         node_analysis = self.analysis_obj(
-            self.name, self.redis_field, **analysis_kwargs
+            self.name, self.redis_fields, **analysis_kwargs
         )
         analysis_results = node_analysis.analyze_node(data_path)
         return analysis_results

@@ -14,22 +14,19 @@
 
 import numpy as np
 
+from ....base.node import BaseNode
 from .analysis import (
     CZCalibrationAnalysis,
     CZCalibrationSSROAnalysis,
     ResetCalibrationSSROAnalysis,
 )
-from .measurement import (
-    CZ_calibration,
-    CZ_calibration_SSRO,
-    Reset_calibration_SSRO,
-)
-from ....base.node import BaseNode
+from .measurement import CZ_calibration, CZ_calibration_SSRO, Reset_calibration_SSRO
 
 
 class CZ_Calibration_Node(BaseNode):
     measurement_obj = CZ_calibration
     analysis_obj = CZCalibrationAnalysis
+    coupler_qois = ["cz_phase", "cz_pop_loss"]
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
@@ -41,7 +38,6 @@ class CZ_Calibration_Node(BaseNode):
         self.edges = couplers
         self.coupler = self.couplers[0]
         self.coupled_qubits = couplers[0].split(sep="_")
-        self.redis_field = ["cz_phase", "cz_pop_loss"]
         self.qubit_state = 2
         self.testing_group = 0  # The edge group to be tested. 0 means all edges.
         self.schedule_keywords = schedule_keywords
@@ -60,6 +56,7 @@ class CZ_Calibration_Node(BaseNode):
 class CZ_Calibration_SSRO_Node(BaseNode):
     measurement_obj = CZ_calibration_SSRO
     analysis_obj = CZCalibrationSSROAnalysis
+    coupler_qois = ["cz_phase", "cz_pop_loss", "cz_leakage"]
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
@@ -71,7 +68,6 @@ class CZ_Calibration_SSRO_Node(BaseNode):
         self.coupler = couplers[0]
         self.coupled_qubits = couplers[0].split(sep="_")
         self.edges = couplers
-        self.redis_field = ["cz_phase", "cz_pop_loss", "cz_leakage"]
         self.qubit_state = 2
         self.testing_group = 0  # The edge group to be tested. 0 means all edges.
         self.schedule_keywords = schedule_keywords
@@ -90,6 +86,7 @@ class CZ_Calibration_SSRO_Node(BaseNode):
 class CZ_Calibration_Swap_Node(BaseNode):
     measurement_obj = CZ_calibration
     analysis_obj = CZCalibrationAnalysis
+    coupler_qois = ["cz_phase", "cz_pop_loss"]
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
@@ -101,7 +98,6 @@ class CZ_Calibration_Swap_Node(BaseNode):
         self.edges = couplers
         self.coupler = self.couplers[0]
         self.coupled_qubits = couplers[0].split(sep="_")
-        self.redis_field = ["cz_phase", "cz_pop_loss"]
         self.qubit_state = 2
         self.testing_group = 0  # The edge group to be tested. 0 means all edges.
 
@@ -122,6 +118,7 @@ class CZ_Calibration_Swap_Node(BaseNode):
 class CZ_Calibration_Swap_SSRO_Node(BaseNode):
     measurement_obj = CZ_calibration_SSRO
     analysis_obj = CZCalibrationSSROAnalysis
+    coupler_qois = ["cz_phase", "cz_pop_loss", "cz_leakage"]
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
@@ -134,7 +131,6 @@ class CZ_Calibration_Swap_SSRO_Node(BaseNode):
         self.coupled_qubits = couplers[0].split(sep="_")
         # self.schedule_keywords = kwargs
         self.edges = couplers
-        self.redis_field = ["cz_phase", "cz_pop_loss", "cz_leakage"]
         self.qubit_state = 2
         self.testing_group = 0  # The edge group to be tested. 0 means all edges.
         self.schedule_keywords["dynamic"] = False
@@ -152,6 +148,12 @@ class CZ_Calibration_Swap_SSRO_Node(BaseNode):
 class Reset_Calibration_SSRO_Node(BaseNode):
     measurement_obj = Reset_calibration_SSRO
     analysis_obj = ResetCalibrationSSROAnalysis
+    coupler_qois = [
+        "reset_fidelity",
+        "reset_leakage",
+        "all_fidelity",
+        "all_fidelity_f",
+    ]
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
@@ -166,12 +168,6 @@ class Reset_Calibration_SSRO_Node(BaseNode):
         self.coupled_qubits = couplers[0].split(sep="_")
         # print(self.coupled_qubits)
         # self.schedule_keywords = kwargs
-        self.redis_field = [
-            "reset_fidelity",
-            "reset_leakage",
-            "all_fidelity",
-            "all_fidelity_f",
-        ]
         self.qubit_state = 2
         self.testing_group = 0  # The edge group to be tested. 0 means all edges.
         self.dynamic = False

@@ -75,7 +75,6 @@ class NodeFactory:
                 N_Rabi_Oscillations_12_Node,
             )
             from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.node import (
-                Qubit_01_Spectroscopy_CW_Node,
                 Qubit_01_Spectroscopy_Multidim_Node,
                 Qubit_12_Spectroscopy_Pulsed_Node,
                 Qubit_12_Spectroscopy_Multidim_Node,
@@ -106,7 +105,6 @@ class NodeFactory:
                 "punchout": Punchout_Node,
                 "resonator_spectroscopy": Resonator_Spectroscopy_Node,
                 "qubit_01_spectroscopy": Qubit_01_Spectroscopy_Multidim_Node,
-                "qubit_01_cw_spectroscopy": Qubit_01_Spectroscopy_CW_Node,
                 "rabi_oscillations": Rabi_Oscillations_Node,
                 "ramsey_correction": Ramsey_Fringes_Node,
                 "resonator_spectroscopy_1": Resonator_Spectroscopy_1_Node,

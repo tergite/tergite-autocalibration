@@ -25,11 +25,11 @@ from ....base.node import BaseNode
 class T1_Node(BaseNode):
     measurement_obj = T1
     analysis_obj = T1NodeAnalysis
+    qubit_qois = ["t1_time"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
         self.all_qubits = all_qubits
-        self.redis_field = ["t1_time"]
         self.backup = False
 
         self.schedule_keywords = {

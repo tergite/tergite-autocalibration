@@ -99,7 +99,7 @@ def start(
             )
 
     supervisor = CalibrationSupervisor(
-        cluster_mode=cluster_mode,
+        measurement_mode=cluster_mode,
         cluster_ip=parsed_cluster_ip,
         node_name=node_name,
         data_path=data_path,
