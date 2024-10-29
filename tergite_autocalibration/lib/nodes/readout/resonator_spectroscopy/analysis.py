@@ -52,15 +52,17 @@ class ResonatorSpectroscopyQubitAnalysis(BaseQubitAnalysis):
         # Gives an initial guess for the model parameters and then fits the model to the data.
         guess = model.guess(self.s21_values, f=self.frequencies)
         try:
-            self.fitting_model = model.fit(self.s21_values, params=guess, f=self.frequencies)
+            self.fitting_model = model.fit(
+                self.s21_values, params=guess, f=self.frequencies
+            )
             if not self.fitting_model.success:
-                    print("Fit was unsuccessful.")
-                    print("Reason:", self.fitting_model.message)
-        
+                print("Fit was unsuccessful.")
+                print("Reason:", self.fitting_model.message)
+
         except Exception as e:
             print("Could not fit the resonator data")
             print(e)
-        
+
         finally:
             # if the return params are not returned the later stages complains
             # TODO later stages should handle non fitted results
