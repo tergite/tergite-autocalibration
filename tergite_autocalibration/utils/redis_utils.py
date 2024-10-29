@@ -42,6 +42,8 @@ def populate_initial_parameters(qubits: list, couplers: list, redis_connection):
     #       Temporary solution would be a legacy method inside the data handler
     # This is the wrong file loaded, it should not work!
     node_configuration = toml.load(settings.NODE_CONFIG)
+    # TODO: Here, we should load a legacy endpoint inside the data handler
+    #       As long as we maintain a structure that load_redis_config can load, we do not break anything here
     initial_device_config = node_configuration["initials"]
 
     initial_qubit_parameters = initial_device_config["qubits"]
