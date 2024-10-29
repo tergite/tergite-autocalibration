@@ -40,10 +40,10 @@ class Resonator_Spectroscopy_1_Node(BaseNode):
     measurement_obj = Resonator_Spectroscopy
     analysis_obj = ResonatorSpectroscopy1NodeAnalysis
     qubit_qois = [
-            "extended_clock_freqs:readout_1",
-            "Ql_1",
-            "resonator_minimum_1",
-        ]
+        "extended_clock_freqs:readout_1",
+        "Ql_1",
+        "resonator_minimum_1",
+    ]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)

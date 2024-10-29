@@ -67,7 +67,7 @@ class BaseNode(abc.ABC):
     measurement_obj: "BaseMeasurement"
     analysis_obj: "BaseNodeAnalysis"
     qubit_qois: list[str] | None = None  # after python 3.10 we can remove the Union
-    
+
     coupler_qois: list[str] | None = None
 
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
@@ -444,14 +444,14 @@ class BaseNode(abc.ABC):
     def post_process(self, data_path: Path):
         analysis_kwargs = getattr(self, "analysis_kwargs", dict())
         if self.qubit_qois is not None:
-            redis_fields =  self.qubit_qois
+            redis_fields = self.qubit_qois
         elif self.coupler_qois is not None:
-            redis_fields =  self.coupler_qois
+            redis_fields = self.coupler_qois
         else:
-            raise ValueError('Quantities of Interest are missing from the node implementation')
-        node_analysis = self.analysis_obj(
-            self.name, redis_fields, **analysis_kwargs
-        )
+            raise ValueError(
+                "Quantities of Interest are missing from the node implementation"
+            )
+        node_analysis = self.analysis_obj(self.name, redis_fields, **analysis_kwargs)
         analysis_results = node_analysis.analyze_node(data_path)
         return analysis_results
 

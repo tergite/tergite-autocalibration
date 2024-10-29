@@ -19,7 +19,6 @@ from .measurement import Two_Tones_Multidim
 from ....base.node import BaseNode
 
 
-
 class Qubit_01_Spectroscopy_Multidim_Node(BaseNode):
     measurement_obj = Two_Tones_Multidim
     analysis_obj = QubitSpectroscopyNodeMultidim

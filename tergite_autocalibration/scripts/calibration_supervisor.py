@@ -74,8 +74,8 @@ class CalibrationSupervisor:
         measurement_mode: "MeasurementMode",
         cluster_ip: Union[str, "IPv4Address"] = CLUSTER_IP,
         cluster_timeout: int = 222,
-        node_name='',
-        data_path=''
+        node_name="",
+        data_path="",
     ) -> None:
         # Read hardware related configuration steps
         self.measurement_mode: "MeasurementMode" = measurement_mode
@@ -287,7 +287,9 @@ class CalibrationSupervisor:
             logger.info(f"Calibrating node {node.name}")
             # TODO: This could be in the node initializer
             data_path = create_node_data_path(node)
-            measurement_result = node.calibrate(data_path, self.lab_ic,  self.measurement_mode)
+            measurement_result = node.calibrate(
+                data_path, self.lab_ic, self.measurement_mode
+            )
 
             # TODO:  develop failure strategies ->
             # if node_calibration_status == DataStatus.out_of_spec:

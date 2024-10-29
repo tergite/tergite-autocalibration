@@ -27,7 +27,7 @@ class Motzoi_Parameter_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.backup = False
-        self.motzoi_minima = [] # NOTE: is this needed?
+        self.motzoi_minima = []  # NOTE: is this needed?
         self.qubit_state = 0
         self.schedule_samplespace = {
             "mw_motzois": {
@@ -45,7 +45,7 @@ class Motzoi_Parameter_12_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
         self.backup = False
-        self.motzoi_minima = [] # NOTE: is this needed?
+        self.motzoi_minima = []  # NOTE: is this needed?
         self.qubit_state = 1
         self.schedule_samplespace = {
             "mw_motzois": {
