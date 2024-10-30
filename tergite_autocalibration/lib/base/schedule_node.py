@@ -5,7 +5,10 @@ from quantify_scheduler.instrument_coordinator.utility import xarray
 
 from tergite_autocalibration.config.settings import HARDWARE_CONFIG
 from tergite_autocalibration.lib.base.node import BaseNode
-from tergite_autocalibration.lib.utils.device import configure_device, save_serial_device
+from tergite_autocalibration.lib.utils.device import (
+    configure_device,
+    save_serial_device,
+)
 from tergite_autocalibration.lib.utils.validators import (
     MixedSamplespace,
     Samplespace,
@@ -14,9 +17,11 @@ from tergite_autocalibration.lib.utils.validators import (
     get_number_of_batches,
     reduce_batch,
 )
+from tergite_autocalibration.utils.measurement_utils import reduce_samplespace
 
 with open(HARDWARE_CONFIG) as hw:
     hw_config = json.load(hw)
+
 
 class ScheduleNode(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
@@ -76,7 +81,6 @@ class ScheduleNode(BaseNode):
                 compiled_schedule = self.precompile(device)
                 result_dataset = self.measure_compiled_schedule(
                     compiled_schedule,
-                    data_path,
                     cluster_status=cluster_status,
                 )
             elif isinstance(validated_samplespace.root, MixedSamplespace):
@@ -92,7 +96,6 @@ class ScheduleNode(BaseNode):
                     compiled_schedule = self.precompile(device)
                     ds = self.measure_compiled_schedule(
                         compiled_schedule,
-                        data_path,
                         cluster_status=cluster_status,
                         measurement=(batch_index, number_of_batches),
                     )
@@ -122,7 +125,6 @@ class ScheduleNode(BaseNode):
 
                 ds = self.measure_compiled_schedule(
                     compiled_schedule,
-                    data_path,
                     cluster_status,
                     measurement=(current_iteration, iterations),
                 )

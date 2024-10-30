@@ -152,7 +152,7 @@ class BaseNode(abc.ABC):
         self.post_process(data_path)
         logger.info("analysis completed")
 
-    def precompile(self, device: QuantumDevice):
+    def precompile(self, device: QuantumDevice) -> CompiledSchedule:
         constants.GRID_TIME_TOLERANCE_TIME = 5e-2
         if self.name == "tof":
             return None, 1
