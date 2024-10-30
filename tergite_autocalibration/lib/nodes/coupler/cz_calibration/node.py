@@ -20,7 +20,6 @@ from .analysis import (
     ResetCalibrationSSRONodeAnalysis,
 )
 from .measurement import (
-    CZ_calibration,
     CZ_calibration_SSRO,
     Reset_calibration_SSRO,
 )
@@ -115,4 +114,3 @@ class ResetCalibrationSSRONode(BaseNode):
             "control_ons": {qubit: [False, True] for qubit in self.coupled_qubits},
             "ramsey_phases": {qubit: range(9) for qubit in self.coupled_qubits},
         }
-

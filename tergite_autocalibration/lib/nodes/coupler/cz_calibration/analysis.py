@@ -27,7 +27,6 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import confusion_matrix
 
 from tergite_autocalibration.config.coupler_config import qubit_types
-from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.analysis import RandomizedBenchmarkingSSROQubitAnalysis
 from ....base.analysis import BaseAllQubitsAnalysis, BaseQubitAnalysis
 
 
@@ -485,6 +484,7 @@ class ResetCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
         axis.set_title(
             f"{name} Calibration - {qubit_types[self.qubit]} Qubit {self.qubit[1:]}"
         )
+
 
 class ResetCalibrationSSRONodeAnalysis(BaseAllQubitsAnalysis):
     single_qubit_analysis_obj = ResetCalibrationSSROQubitAnalysis

@@ -15,7 +15,7 @@
 from ..cz_calibration.node import (
     CZCalibrationSSRONode,
 )
-from ..cz_dynamic_phase.node import CZDynamicPhaseNode, CZDynamicPhaseSwapNode
+from ..cz_dynamic_phase.node import CZDynamicPhaseSSRONode, CZDynamicPhaseSwapSSRONode
 
 from .measurement import (
     TQGRandomizedBenchmarkingSSRO,
@@ -235,7 +235,7 @@ class CZRBOptimizeSSRONode(ParametrizedSweepNode):
         for key, value in cz_param.items():
             self.redis_connection.hset(f"couplers:{self.coupler}", key, value)
 
-        node_dynamic_phase = CZDynamicPhaseNode(
+        node_dynamic_phase = CZDynamicPhaseSSRONode(
             "cz_dynamic_phase", self.all_qubits, self.couplers
         )
 
@@ -243,7 +243,7 @@ class CZRBOptimizeSSRONode(ParametrizedSweepNode):
             self.data_path, self.lab_ic, self.cluster_status
         )
 
-        node_dynamic_phase_swap = CZDynamicPhaseSwapNode(
+        node_dynamic_phase_swap = CZDynamicPhaseSwapSSRONode(
             "cz_dynamic_phase_swap", self.all_qubits, self.couplers
         )
 
@@ -407,7 +407,7 @@ class CZRBOptimizeSSRONode(ParametrizedSweepNode):
         for key, value in cz_param.items():
             self.redis_connection.hset(f"couplers:{self.coupler}", key, value)
 
-        node_dynamic_phase = CZDynamicPhaseNode(
+        node_dynamic_phase = CZDynamicPhaseSSRONode(
             "cz_dynamic_phase", self.all_qubits, self.couplers, **self.schedule_keywords
         )
 
@@ -415,7 +415,7 @@ class CZRBOptimizeSSRONode(ParametrizedSweepNode):
             self.data_path, self.lab_ic, self.cluster_status
         )
 
-        node_dynamic_phase_swap = CZDynamicPhaseSwapNode(
+        node_dynamic_phase_swap = CZDynamicPhaseSwapSSRONode(
             "cz_dynamic_phase_swap", self.all_qubits, self.couplers
         )
 

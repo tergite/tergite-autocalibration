@@ -15,17 +15,17 @@
 import numpy as np
 
 from ..cz_calibration.analysis import (
-    CZCalibrationAnalysis,
+    CZCalibrationSSRONodeAnalysis,
 )
 from ..cz_calibration.measurement import (
-    CZ_calibration,
+    CZ_calibration_SSRO,
 )
 from ....base.node import BaseNode
 
 
-class CZDynamicPhaseNode(BaseNode):
-    measurement_obj = CZ_calibration
-    analysis_obj = CZCalibrationAnalysis
+class CZDynamicPhaseSSRONode(BaseNode):
+    measurement_obj = CZ_calibration_SSRO
+    analysis_obj = CZCalibrationSSRONodeAnalysis
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary
@@ -52,9 +52,9 @@ class CZDynamicPhaseNode(BaseNode):
         }
 
 
-class CZDynamicPhaseSwapNode(BaseNode):
-    measurement_obj = CZ_calibration
-    analysis_obj = CZCalibrationAnalysis
+class CZDynamicPhaseSwapSSRONode(BaseNode):
+    measurement_obj = CZ_calibration_SSRO
+    analysis_obj = CZCalibrationSSRONodeAnalysis
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary
