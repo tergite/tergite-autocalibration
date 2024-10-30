@@ -19,7 +19,7 @@ from quantify_scheduler.backends.qblox_backend import QbloxHardwareCompilationCo
 
 def migrate_qblox_hardware_configuration(file_path_):
     # Load the hardware configuration
-    with open(file_path, 'r') as file_:
+    with open(file_path_, "r") as file_:
         hardware_config_transmon_old_style = json.load(file_)
 
     # Migrate to the new structure of the hardware configuration
@@ -28,14 +28,16 @@ def migrate_qblox_hardware_configuration(file_path_):
     )
 
     # Serialize the hardware configuration object
-    serialized_config = hardware_config_transmon_new_style.model_dump_json(exclude_unset=True)
+    serialized_config = hardware_config_transmon_new_style.model_dump_json(
+        exclude_unset=True
+    )
 
     # Let the output file path be the same as the input
     base, ext = os.path.splitext(file_path_)
     new_file_path = f"{base}_new_auto_migrated{ext}"
 
     # Write the hardware configuration to the new file
-    with open(new_file_path, 'w') as file_:
+    with open(new_file_path, "w") as file_:
         json.dump(json.loads(serialized_config), file_, indent=4)
 
     print(f"File saved as: {new_file_path}")

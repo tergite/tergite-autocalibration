@@ -99,6 +99,7 @@ def set_qubit_LO(cluster: Cluster, qubit: str, lo_frequency: float):
     else:
         raise ValueError(f"Unknown output: {this_output}")
 
+
 # TODO: SPI related configurations could go to a separate file
 def find_serial_port():
     path = Path("/dev/")

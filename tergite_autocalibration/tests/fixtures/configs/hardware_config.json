@@ -1,547 +1,902 @@
 {
-   "backend": "quantify_scheduler.backends.qblox_backend.hardware_compile",
-   "clusterA": {
-      "ref": "internal",
-      "instrument_type": "Cluster",
-      "clusterA_module1": {
-         "instrument_type": "QCM_RF",
-         "complex_output_0": {
-            "lo_freq": 4536000000.0,
-            "dc_mixer_offset_I": 0.0,
-            "dc_mixer_offset_Q": 0.0,
-            "portclock_configs": [
-               {
-                  "port": "q06:mw",
-                  "clock": "q06.01",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q06:mw",
-                  "clock": "q06.12",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               }
+    "config_type": "quantify_scheduler.backends.qblox_backend.QbloxHardwareCompilationConfig",
+    "hardware_description": {
+        "clusterA": {
+            "instrument_type": "Cluster",
+            "ref": "internal",
+            "modules": {
+                "1": {
+                    "instrument_type": "QCM_RF"
+                },
+                "2": {
+                    "instrument_type": "QCM_RF"
+                },
+                "3": {
+                    "instrument_type": "QCM_RF"
+                },
+                "4": {
+                    "instrument_type": "QCM_RF"
+                },
+                "5": {
+                    "instrument_type": "QCM_RF"
+                },
+                "6": {
+                    "instrument_type": "QCM_RF"
+                },
+                "7": {
+                    "instrument_type": "QCM_RF"
+                },
+                "8": {
+                    "instrument_type": "QCM_RF"
+                },
+                "9": {
+                    "instrument_type": "QCM_RF"
+                },
+                "10": {
+                    "instrument_type": "QCM_RF"
+                },
+                "16": {
+                    "instrument_type": "QRM_RF"
+                },
+                "17": {
+                    "instrument_type": "QRM_RF"
+                }
+            }
+        }
+    },
+    "hardware_options": {
+        "modulation_frequencies": {
+            "q06:mw-q06.01": {
+                "lo_freq": 4536000000.0
+            },
+            "q06:mw-q06.12": {
+                "lo_freq": 4536000000.0
+            },
+            "q07:mw-q07.01": {
+                "lo_freq": 4407000000.0
+            },
+            "q07:mw-q07.12": {
+                "lo_freq": 4407000000.0
+            },
+            "q08:mw-q08.01": {
+                "lo_freq": 4339000000.0
+            },
+            "q08:mw-q08.12": {
+                "lo_freq": 4339000000.0
+            },
+            "q09:mw-q09.01": {
+                "lo_freq": 5215000000.0
+            },
+            "q09:mw-q09.12": {
+                "lo_freq": 5215000000.0
+            },
+            "q10:mw-q10.01": {
+                "lo_freq": 4420000000.0
+            },
+            "q10:mw-q10.12": {
+                "lo_freq": 4420000000.0
+            },
+            "q11:mw-q11.01": {
+                "lo_freq": 4885000000.0
+            },
+            "q11:mw-q11.12": {
+                "lo_freq": 4885000000.0
+            },
+            "q12:mw-q12.01": {
+                "lo_freq": 4458000000.0
+            },
+            "q12:mw-q12.12": {
+                "lo_freq": 4458000000.0
+            },
+            "q13:mw-q13.01": {
+                "lo_freq": 5110000000.0
+            },
+            "q13:mw-q13.12": {
+                "lo_freq": 5110000000.0
+            },
+            "q14:mw-q14.01": {
+                "lo_freq": 4445000000.0
+            },
+            "q14:mw-q14.12": {
+                "lo_freq": 4445000000.0
+            },
+            "q15:mw-q15.01": {
+                "lo_freq": 4855000000.0
+            },
+            "q15:mw-q15.12": {
+                "lo_freq": 4855000000.0
+            },
+            "q06:res-q06.ro": {
+                "lo_freq": 6866000000.0
+            },
+            "q07:res-q07.ro": {
+                "lo_freq": 6866000000.0
+            },
+            "q08:res-q08.ro": {
+                "lo_freq": 6866000000.0
+            },
+            "q09:res-q09.ro": {
+                "lo_freq": 6866000000.0
+            },
+            "q10:res-q10.ro": {
+                "lo_freq": 6866000000.0
+            },
+            "q06:res-q06.ro1": {
+                "lo_freq": 6866000000.0
+            },
+            "q07:res-q07.ro1": {
+                "lo_freq": 6866000000.0
+            },
+            "q08:res-q08.ro1": {
+                "lo_freq": 6866000000.0
+            },
+            "q09:res-q09.ro1": {
+                "lo_freq": 6866000000.0
+            },
+            "q10:res-q10.ro1": {
+                "lo_freq": 6866000000.0
+            },
+            "q06:res-q06.ro2": {
+                "lo_freq": 6866000000.0
+            },
+            "q07:res-q07.ro2": {
+                "lo_freq": 6866000000.0
+            },
+            "q08:res-q08.ro2": {
+                "lo_freq": 6866000000.0
+            },
+            "q09:res-q09.ro2": {
+                "lo_freq": 6866000000.0
+            },
+            "q10:res-q10.ro2": {
+                "lo_freq": 6866000000.0
+            },
+            "q06:res-q06.ro_2st_opt": {
+                "lo_freq": 6866000000.0
+            },
+            "q07:res-q07.ro_2st_opt": {
+                "lo_freq": 6866000000.0
+            },
+            "q08:res-q08.ro_2st_opt": {
+                "lo_freq": 6866000000.0
+            },
+            "q09:res-q09.ro_2st_opt": {
+                "lo_freq": 6866000000.0
+            },
+            "q10:res-q10.ro_2st_opt": {
+                "lo_freq": 6866000000.0
+            },
+            "q06:res-q06.ro_3st_opt": {
+                "lo_freq": 6866000000.0
+            },
+            "q07:res-q07.ro_3st_opt": {
+                "lo_freq": 6866000000.0
+            },
+            "q08:res-q08.ro_3st_opt": {
+                "lo_freq": 6866000000.0
+            },
+            "q09:res-q09.ro_3st_opt": {
+                "lo_freq": 6866000000.0
+            },
+            "q10:res-q10.ro_3st_opt": {
+                "lo_freq": 6866000000.0
+            },
+            "q11:res-q11.ro": {
+                "lo_freq": 6838000000.0
+            },
+            "q12:res-q12.ro": {
+                "lo_freq": 6838000000.0
+            },
+            "q13:res-q13.ro": {
+                "lo_freq": 6838000000.0
+            },
+            "q14:res-q14.ro": {
+                "lo_freq": 6838000000.0
+            },
+            "q15:res-q15.ro": {
+                "lo_freq": 6838000000.0
+            },
+            "q11:res-q11.ro1": {
+                "lo_freq": 6838000000.0
+            },
+            "q12:res-q12.ro1": {
+                "lo_freq": 6838000000.0
+            },
+            "q13:res-q13.ro1": {
+                "lo_freq": 6838000000.0
+            },
+            "q14:res-q14.ro1": {
+                "lo_freq": 6838000000.0
+            },
+            "q15:res-q15.ro1": {
+                "lo_freq": 6838000000.0
+            },
+            "q11:res-q11.ro2": {
+                "lo_freq": 6838000000.0
+            },
+            "q12:res-q12.ro2": {
+                "lo_freq": 6838000000.0
+            },
+            "q13:res-q13.ro2": {
+                "lo_freq": 6838000000.0
+            },
+            "q14:res-q14.ro2": {
+                "lo_freq": 6838000000.0
+            },
+            "q15:res-q15.ro2": {
+                "lo_freq": 6838000000.0
+            },
+            "q11:res-q11.ro_2st_opt": {
+                "lo_freq": 6838000000.0
+            },
+            "q12:res-q12.ro_2st_opt": {
+                "lo_freq": 6838000000.0
+            },
+            "q13:res-q13.ro_2st_opt": {
+                "lo_freq": 6838000000.0
+            },
+            "q14:res-q14.ro_2st_opt": {
+                "lo_freq": 6838000000.0
+            },
+            "q15:res-q15.ro_2st_opt": {
+                "lo_freq": 6838000000.0
+            },
+            "q11:res-q11.ro_3st_opt": {
+                "lo_freq": 6838000000.0
+            },
+            "q12:res-q12.ro_3st_opt": {
+                "lo_freq": 6838000000.0
+            },
+            "q13:res-q13.ro_3st_opt": {
+                "lo_freq": 6838000000.0
+            },
+            "q14:res-q14.ro_3st_opt": {
+                "lo_freq": 6838000000.0
+            },
+            "q15:res-q15.ro_3st_opt": {
+                "lo_freq": 6838000000.0
+            }
+        },
+        "mixer_corrections": {
+            "q06:mw-q06.01": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q06:mw-q06.12": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q07:mw-q07.01": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q07:mw-q07.12": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q08:mw-q08.01": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q08:mw-q08.12": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q09:mw-q09.01": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q09:mw-q09.12": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q10:mw-q10.01": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q10:mw-q10.12": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q11:mw-q11.01": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q11:mw-q11.12": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q12:mw-q12.01": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q12:mw-q12.12": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q13:mw-q13.01": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q13:mw-q13.12": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q14:mw-q14.01": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q14:mw-q14.12": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q15:mw-q15.01": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q15:mw-q15.12": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q06:res-q06.ro": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q07:res-q07.ro": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q08:res-q08.ro": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q09:res-q09.ro": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q10:res-q10.ro": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q06:res-q06.ro1": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q07:res-q07.ro1": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q08:res-q08.ro1": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q09:res-q09.ro1": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q10:res-q10.ro1": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q06:res-q06.ro2": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q07:res-q07.ro2": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q08:res-q08.ro2": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q09:res-q09.ro2": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q10:res-q10.ro2": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q06:res-q06.ro_2st_opt": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q07:res-q07.ro_2st_opt": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q08:res-q08.ro_2st_opt": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q09:res-q09.ro_2st_opt": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q10:res-q10.ro_2st_opt": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q06:res-q06.ro_3st_opt": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q07:res-q07.ro_3st_opt": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q08:res-q08.ro_3st_opt": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q09:res-q09.ro_3st_opt": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q10:res-q10.ro_3st_opt": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q11:res-q11.ro": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q12:res-q12.ro": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q13:res-q13.ro": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q14:res-q14.ro": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q15:res-q15.ro": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q11:res-q11.ro1": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q12:res-q12.ro1": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q13:res-q13.ro1": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q14:res-q14.ro1": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q15:res-q15.ro1": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q11:res-q11.ro2": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q12:res-q12.ro2": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q13:res-q13.ro2": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q14:res-q14.ro2": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q15:res-q15.ro2": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q11:res-q11.ro_2st_opt": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q12:res-q12.ro_2st_opt": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q13:res-q13.ro_2st_opt": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q14:res-q14.ro_2st_opt": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q15:res-q15.ro_2st_opt": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q11:res-q11.ro_3st_opt": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q12:res-q12.ro_3st_opt": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q13:res-q13.ro_3st_opt": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q14:res-q14.ro_3st_opt": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            },
+            "q15:res-q15.ro_3st_opt": {
+                "dc_offset_i": 0.0,
+                "dc_offset_q": 0.0,
+                "amp_ratio": 1.0,
+                "phase_error": 0.0
+            }
+        }
+    },
+    "connectivity": {
+        "graph": {
+            "directed": false,
+            "multigraph": false,
+            "graph": {},
+            "nodes": [
+                {
+                    "instrument_name": "clusterA",
+                    "id": "clusterA.module1.complex_output_0"
+                },
+                {
+                    "instrument_name": "QuantumDevice",
+                    "id": "q06:mw"
+                },
+                {
+                    "instrument_name": "clusterA",
+                    "id": "clusterA.module2.complex_output_0"
+                },
+                {
+                    "instrument_name": "QuantumDevice",
+                    "id": "q07:mw"
+                },
+                {
+                    "instrument_name": "clusterA",
+                    "id": "clusterA.module3.complex_output_0"
+                },
+                {
+                    "instrument_name": "QuantumDevice",
+                    "id": "q08:mw"
+                },
+                {
+                    "instrument_name": "clusterA",
+                    "id": "clusterA.module4.complex_output_0"
+                },
+                {
+                    "instrument_name": "QuantumDevice",
+                    "id": "q09:mw"
+                },
+                {
+                    "instrument_name": "clusterA",
+                    "id": "clusterA.module5.complex_output_0"
+                },
+                {
+                    "instrument_name": "QuantumDevice",
+                    "id": "q10:mw"
+                },
+                {
+                    "instrument_name": "clusterA",
+                    "id": "clusterA.module6.complex_output_0"
+                },
+                {
+                    "instrument_name": "QuantumDevice",
+                    "id": "q11:mw"
+                },
+                {
+                    "instrument_name": "clusterA",
+                    "id": "clusterA.module7.complex_output_0"
+                },
+                {
+                    "instrument_name": "QuantumDevice",
+                    "id": "q12:mw"
+                },
+                {
+                    "instrument_name": "clusterA",
+                    "id": "clusterA.module8.complex_output_0"
+                },
+                {
+                    "instrument_name": "QuantumDevice",
+                    "id": "q13:mw"
+                },
+                {
+                    "instrument_name": "clusterA",
+                    "id": "clusterA.module9.complex_output_0"
+                },
+                {
+                    "instrument_name": "QuantumDevice",
+                    "id": "q14:mw"
+                },
+                {
+                    "instrument_name": "clusterA",
+                    "id": "clusterA.module10.complex_output_0"
+                },
+                {
+                    "instrument_name": "QuantumDevice",
+                    "id": "q15:mw"
+                },
+                {
+                    "instrument_name": "clusterA",
+                    "id": "clusterA.module16.complex_output_0"
+                },
+                {
+                    "instrument_name": "QuantumDevice",
+                    "id": "q06:res"
+                },
+                {
+                    "instrument_name": "QuantumDevice",
+                    "id": "q07:res"
+                },
+                {
+                    "instrument_name": "QuantumDevice",
+                    "id": "q08:res"
+                },
+                {
+                    "instrument_name": "QuantumDevice",
+                    "id": "q09:res"
+                },
+                {
+                    "instrument_name": "QuantumDevice",
+                    "id": "q10:res"
+                },
+                {
+                    "instrument_name": "clusterA",
+                    "id": "clusterA.module17.complex_output_0"
+                },
+                {
+                    "instrument_name": "QuantumDevice",
+                    "id": "q11:res"
+                },
+                {
+                    "instrument_name": "QuantumDevice",
+                    "id": "q12:res"
+                },
+                {
+                    "instrument_name": "QuantumDevice",
+                    "id": "q13:res"
+                },
+                {
+                    "instrument_name": "QuantumDevice",
+                    "id": "q14:res"
+                },
+                {
+                    "instrument_name": "QuantumDevice",
+                    "id": "q15:res"
+                }
+            ],
+            "links": [
+                {
+                    "source": "clusterA.module1.complex_output_0",
+                    "target": "q06:mw"
+                },
+                {
+                    "source": "clusterA.module2.complex_output_0",
+                    "target": "q07:mw"
+                },
+                {
+                    "source": "clusterA.module3.complex_output_0",
+                    "target": "q08:mw"
+                },
+                {
+                    "source": "clusterA.module4.complex_output_0",
+                    "target": "q09:mw"
+                },
+                {
+                    "source": "clusterA.module5.complex_output_0",
+                    "target": "q10:mw"
+                },
+                {
+                    "source": "clusterA.module6.complex_output_0",
+                    "target": "q11:mw"
+                },
+                {
+                    "source": "clusterA.module7.complex_output_0",
+                    "target": "q12:mw"
+                },
+                {
+                    "source": "clusterA.module8.complex_output_0",
+                    "target": "q13:mw"
+                },
+                {
+                    "source": "clusterA.module9.complex_output_0",
+                    "target": "q14:mw"
+                },
+                {
+                    "source": "clusterA.module10.complex_output_0",
+                    "target": "q15:mw"
+                },
+                {
+                    "source": "clusterA.module16.complex_output_0",
+                    "target": "q06:res"
+                },
+                {
+                    "source": "clusterA.module16.complex_output_0",
+                    "target": "q07:res"
+                },
+                {
+                    "source": "clusterA.module16.complex_output_0",
+                    "target": "q08:res"
+                },
+                {
+                    "source": "clusterA.module16.complex_output_0",
+                    "target": "q09:res"
+                },
+                {
+                    "source": "clusterA.module16.complex_output_0",
+                    "target": "q10:res"
+                },
+                {
+                    "source": "clusterA.module17.complex_output_0",
+                    "target": "q11:res"
+                },
+                {
+                    "source": "clusterA.module17.complex_output_0",
+                    "target": "q12:res"
+                },
+                {
+                    "source": "clusterA.module17.complex_output_0",
+                    "target": "q13:res"
+                },
+                {
+                    "source": "clusterA.module17.complex_output_0",
+                    "target": "q14:res"
+                },
+                {
+                    "source": "clusterA.module17.complex_output_0",
+                    "target": "q15:res"
+                }
             ]
-         }
-      },
-      "clusterA_module2": {
-         "instrument_type": "QCM_RF",
-         "complex_output_0": {
-            "lo_freq": 4407000000.0,
-            "dc_mixer_offset_I": 0.0,
-            "dc_mixer_offset_Q": 0.0,
-            "portclock_configs": [
-               {
-                  "port": "q07:mw",
-                  "clock": "q07.01",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q07:mw",
-                  "clock": "q07.12",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               }
-            ]
-         }
-      },
-      "clusterA_module3": {
-         "instrument_type": "QCM_RF",
-         "complex_output_0": {
-            "lo_freq": 4339000000.0,
-            "dc_mixer_offset_I": 0.0,
-            "dc_mixer_offset_Q": 0.0,
-            "portclock_configs": [
-               {
-                  "port": "q08:mw",
-                  "clock": "q08.01",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q08:mw",
-                  "clock": "q08.12",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               }
-            ]
-         }
-      },
-      "clusterA_module4": {
-         "instrument_type": "QCM_RF",
-         "complex_output_0": {
-            "lo_freq": 5215000000.0,
-            "dc_mixer_offset_I": 0.0,
-            "dc_mixer_offset_Q": 0.0,
-            "portclock_configs": [
-               {
-                  "port": "q09:mw",
-                  "clock": "q09.01",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q09:mw",
-                  "clock": "q09.12",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               }
-            ]
-         }
-      },
-      "clusterA_module5": {
-         "instrument_type": "QCM_RF",
-         "complex_output_0": {
-            "lo_freq": 4420000000.0,
-            "dc_mixer_offset_I": 0.0,
-            "dc_mixer_offset_Q": 0.0,
-            "portclock_configs": [
-               {
-                  "port": "q10:mw",
-                  "clock": "q10.01",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q10:mw",
-                  "clock": "q10.12",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               }
-            ]
-         }
-      },
-      "clusterA_module6": {
-         "instrument_type": "QCM_RF",
-         "complex_output_0": {
-            "lo_freq": 4885000000.0,
-            "dc_mixer_offset_I": 0.0,
-            "dc_mixer_offset_Q": 0.0,
-            "portclock_configs": [
-               {
-                  "port": "q11:mw",
-                  "clock": "q11.01",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q11:mw",
-                  "clock": "q11.12",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               }
-            ]
-         }
-      },
-      "clusterA_module7": {
-         "instrument_type": "QCM_RF",
-         "complex_output_0": {
-            "lo_freq": 4458000000.0,
-            "dc_mixer_offset_I": 0.0,
-            "dc_mixer_offset_Q": 0.0,
-            "portclock_configs": [
-               {
-                  "port": "q12:mw",
-                  "clock": "q12.01",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q12:mw",
-                  "clock": "q12.12",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               }
-            ]
-         }
-      },
-      "clusterA_module8": {
-         "instrument_type": "QCM_RF",
-         "complex_output_0": {
-            "lo_freq": 5110000000.0,
-            "dc_mixer_offset_I": 0.0,
-            "dc_mixer_offset_Q": 0.0,
-            "portclock_configs": [
-               {
-                  "port": "q13:mw",
-                  "clock": "q13.01",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q13:mw",
-                  "clock": "q13.12",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               }
-            ]
-         }
-      },
-      "clusterA_module9": {
-         "instrument_type": "QCM_RF",
-         "complex_output_0": {
-            "lo_freq": 4445000000.0,
-            "dc_mixer_offset_I": 0.0,
-            "dc_mixer_offset_Q": 0.0,
-            "portclock_configs": [
-               {
-                  "port": "q14:mw",
-                  "clock": "q14.01",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q14:mw",
-                  "clock": "q14.12",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               }
-            ]
-         }
-      },
-      "clusterA_module10": {
-         "instrument_type": "QCM_RF",
-         "complex_output_0": {
-            "lo_freq": 4855000000.0,
-            "dc_mixer_offset_I": 0.0,
-            "dc_mixer_offset_Q": 0.0,
-            "portclock_configs": [
-               {
-                  "port": "q15:mw",
-                  "clock": "q15.01",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q15:mw",
-                  "clock": "q15.12",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               }
-            ]
-         }
-      },
-      "clusterA_module16": {
-         "instrument_type": "QRM_RF",
-         "complex_output_0": {
-            "lo_freq": 6866000000.0,
-            "dc_mixer_offset_I": 0.0,
-            "dc_mixer_offset_Q": 0.0,
-            "portclock_configs": [
-               {
-                  "port": "q06:res",
-                  "clock": "q06.ro",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q07:res",
-                  "clock": "q07.ro",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q08:res",
-                  "clock": "q08.ro",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q09:res",
-                  "clock": "q09.ro",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q10:res",
-                  "clock": "q10.ro",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q06:res",
-                  "clock": "q06.ro1",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q07:res",
-                  "clock": "q07.ro1",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q08:res",
-                  "clock": "q08.ro1",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q09:res",
-                  "clock": "q09.ro1",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q10:res",
-                  "clock": "q10.ro1",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q06:res",
-                  "clock": "q06.ro2",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q07:res",
-                  "clock": "q07.ro2",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q08:res",
-                  "clock": "q08.ro2",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q09:res",
-                  "clock": "q09.ro2",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q10:res",
-                  "clock": "q10.ro2",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q06:res",
-                  "clock": "q06.ro_2st_opt",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q07:res",
-                  "clock": "q07.ro_2st_opt",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q08:res",
-                  "clock": "q08.ro_2st_opt",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q09:res",
-                  "clock": "q09.ro_2st_opt",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q10:res",
-                  "clock": "q10.ro_2st_opt",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q06:res",
-                  "clock": "q06.ro_3st_opt",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q07:res",
-                  "clock": "q07.ro_3st_opt",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q08:res",
-                  "clock": "q08.ro_3st_opt",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q09:res",
-                  "clock": "q09.ro_3st_opt",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q10:res",
-                  "clock": "q10.ro_3st_opt",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               }
-            ]
-         }
-      },
-      "clusterA_module17": {
-         "instrument_type": "QRM_RF",
-         "complex_output_0": {
-            "lo_freq": 6838000000.0,
-            "dc_mixer_offset_I": 0.0,
-            "dc_mixer_offset_Q": 0.0,
-            "portclock_configs": [
-               {
-                  "port": "q11:res",
-                  "clock": "q11.ro",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q12:res",
-                  "clock": "q12.ro",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q13:res",
-                  "clock": "q13.ro",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q14:res",
-                  "clock": "q14.ro",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q15:res",
-                  "clock": "q15.ro",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q11:res",
-                  "clock": "q11.ro1",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q12:res",
-                  "clock": "q12.ro1",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q13:res",
-                  "clock": "q13.ro1",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q14:res",
-                  "clock": "q14.ro1",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q15:res",
-                  "clock": "q15.ro1",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q11:res",
-                  "clock": "q11.ro2",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q12:res",
-                  "clock": "q12.ro2",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q13:res",
-                  "clock": "q13.ro2",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q14:res",
-                  "clock": "q14.ro2",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q15:res",
-                  "clock": "q15.ro2",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q11:res",
-                  "clock": "q11.ro_2st_opt",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q12:res",
-                  "clock": "q12.ro_2st_opt",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q13:res",
-                  "clock": "q13.ro_2st_opt",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q14:res",
-                  "clock": "q14.ro_2st_opt",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q15:res",
-                  "clock": "q15.ro_2st_opt",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q11:res",
-                  "clock": "q11.ro_3st_opt",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q12:res",
-                  "clock": "q12.ro_3st_opt",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q13:res",
-                  "clock": "q13.ro_3st_opt",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q14:res",
-                  "clock": "q14.ro_3st_opt",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               },
-               {
-                  "port": "q15:res",
-                  "clock": "q15.ro_3st_opt",
-                  "mixer_amp_ratio": 1.0,
-                  "mixer_phase_error_deg": 0.0
-               }
-            ]
-         }
-      }
-   }
+        }
+    }
 }
