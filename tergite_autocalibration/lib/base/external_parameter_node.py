@@ -1,7 +1,19 @@
-from quantify_scheduler.instrument_coordinator.utility import xarray
-from tergite_autocalibration.lib.base.node import BaseNode
-from tergite_autocalibration.utils.measurement_utils import reduce_samplespace
+import json
+
 import numpy as np
+from quantify_scheduler.instrument_coordinator.utility import xarray
+
+from tergite_autocalibration.config.settings import HARDWARE_CONFIG
+from tergite_autocalibration.lib.base.node import BaseNode
+from tergite_autocalibration.lib.utils.device import (
+    configure_device,
+    save_serial_device,
+)
+from tergite_autocalibration.utils.measurement_utils import reduce_samplespace
+
+# TODO: maybe this deosn't belong here
+with open(HARDWARE_CONFIG) as hw:
+    hw_config = json.load(hw)
 
 
 class ExternalParameterNode(BaseNode):
@@ -35,7 +47,13 @@ class ExternalParameterNode(BaseNode):
 
         result_dataset = xarray.Dataset()
 
-        compiled_schedule = self.precompile(data_path, cluster_status)
+        qubits = self.all_qubits
+        couplers = self.couplers
+        device = configure_device(self.name, qubits, couplers)
+        device.hardware_config(hw_config)
+        save_serial_device(self.name, device, data_path)
+        compiled_schedule = self.precompile(device)
+        device.close()
 
         self.initial_operation()
 
@@ -52,7 +70,6 @@ class ExternalParameterNode(BaseNode):
 
             ds = self.measure_compiled_schedule(
                 compiled_schedule,
-                data_path,
                 cluster_status,
                 measurement=(current_iteration, iterations),
             )
@@ -62,3 +79,5 @@ class ExternalParameterNode(BaseNode):
 
         # example of final Operation is ramping the current back to 0 in coupler spectroscopy
         self.final_operation()
+
+        return result_dataset

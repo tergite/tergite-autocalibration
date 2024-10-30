@@ -11,11 +11,12 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from pathlib import Path
-
 import numpy as np
 from scipy import optimize as optimize
 
+from tergite_autocalibration.lib.base.external_parameter_node import (
+    ExternalParameterNode,
+)
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.hardware_utils import SpiDAC
 from tergite_autocalibration.utils.user_input import qubit_samples, resonator_samples
@@ -26,7 +27,7 @@ from ...readout.resonator_spectroscopy.measurement import Resonator_Spectroscopy
 from .analysis import CouplerSpectroscopyNodeAnalysis
 
 
-class Coupler_Spectroscopy_Node(BaseNode):
+class Coupler_Spectroscopy_Node(ExternalParameterNode):
     measurement_obj = Two_Tones_Multidim
     analysis_obj = CouplerSpectroscopyNodeAnalysis
     coupler_qois = ["parking_current", "current_range"]
@@ -79,7 +80,7 @@ class Coupler_Spectroscopy_Node(BaseNode):
         self.spi_dac.set_dac_current(self.dac, this_iteration_value)
 
 
-class Coupler_Resonator_Spectroscopy_Node(BaseNode):
+class Coupler_Resonator_Spectroscopy_Node(ExternalParameterNode):
     measurement_obj = Resonator_Spectroscopy
     analysis_obj = CouplerSpectroscopyNodeAnalysis
     coupler_qois = ["resonator_flux_quantum"]

@@ -19,6 +19,7 @@ from tergite_autocalibration.lib.utils.validators import (
 )
 from tergite_autocalibration.utils.measurement_utils import reduce_samplespace
 
+# TODO: maybe this deosn't belong here
 with open(HARDWARE_CONFIG) as hw:
     hw_config = json.load(hw)
 
