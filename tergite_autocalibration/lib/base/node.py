@@ -15,38 +15,27 @@
 
 import abc
 import json
-import threading
-import time
 from collections.abc import Iterable
 from pathlib import Path
 from typing import List, Optional, Tuple
 
 import matplotlib
 import numpy as np
-import tqdm
-import xarray
 from colorama import Fore, Style
 from colorama import init as colorama_init
 from quantify_scheduler.backends import SerialCompiler
-from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
 from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
     CompiledSchedule,
+    InstrumentCoordinator,
 )
-from quantify_scheduler.json_utils import SchedulerJSONEncoder, pathlib
+from quantify_scheduler.json_utils import pathlib
 
 from tergite_autocalibration.config import settings
-from tergite_autocalibration.config.settings import HARDWARE_CONFIG, REDIS_CONNECTION
+from tergite_autocalibration.config.settings import HARDWARE_CONFIG
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
-from tergite_autocalibration.lib.utils.redis import (
-    load_redis_config,
-    load_redis_config_coupler,
-)
-from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 from tergite_autocalibration.utils.dataset_utils import configure_dataset, save_dataset
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
-from tergite_autocalibration.utils.extended_coupler_edge import CompositeSquareEdge
-from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 from tergite_autocalibration.utils.logger.tac_logger import logger
 
 colorama_init()
@@ -100,7 +89,7 @@ class BaseNode(abc.ABC):
 
     def measure_node(self, data_path, cluster_status):
         """
-        Tp be implemented by the Classes that define the Node Type:
+        To be implemented by the Classes that define the Node Type:
         ScheduleNode or ExternalParameterNode
         """
         pass
@@ -114,8 +103,9 @@ class BaseNode(abc.ABC):
     def initial_operation(self):
         """
         To be implemented by the child measurement nodes.
-        This is called before the execution of ALL the iteration
-        samples of the external samplespace.
+        This is called before the execution of each and every iteration
+        of the samples of the external samplespace.
+        See coupler_spectroscopy for examples.
         """
         pass
 
@@ -125,6 +115,7 @@ class BaseNode(abc.ABC):
         This is called after ALL the iteration samples of the
         external samplespace have been executed.
         e.g. set back the dc_current to 0 in coupler_spectroscopy.
+        See coupler_spectroscopy for examples.
         """
         pass
 
@@ -160,16 +151,13 @@ class BaseNode(abc.ABC):
         self.post_process(data_path)
         logger.info("analysis completed")
 
-    def precompile(
-        self, data_path: Path, bin_mode: str = None, repetitions: int = None
-    ):
+    def precompile(self, data_path: Path):
         if self.name == "tof":
             return None, 1
         qubits = self.all_qubits
 
         # # NOTE: IS THIS BEING USED?
         # # backup old parameter values
-        # # TODO:
         # if self.backup:
         #     fields = self.redis_field
         #     for field in fields:
