@@ -1,6 +1,7 @@
+from typing import Dict, Union
+
 from numpy._typing import NDArray
 from pydantic import ConfigDict, RootModel
-from typing import Dict, Union
 
 
 class SimpleSamplespace(RootModel):
@@ -37,6 +38,10 @@ class Array(RootModel):
 
 
 def get_number_of_batches(samplespace: Dict[str, Dict[str, list[NDArray]]]):
+    """
+    if the samplespace is a list of NDarrays,
+    return the number of individual arrays per qubit
+    """
     for qubit_dict in samplespace.values():
         qubit_dict = dict(qubit_dict)
         q = Array(qubit_dict)
@@ -49,6 +54,10 @@ def get_number_of_batches(samplespace: Dict[str, Dict[str, list[NDArray]]]):
 
 
 def get_batched_coord(samplespace: Dict[str, Dict[str, list[NDArray]]]) -> str:
+    """
+    if the samplespace is a list of NDarrays,
+    return the name of the settable, e.g. 'frequencies'
+    """
     for settable, qubit_dict in samplespace.items():
         qubit_dict = dict(qubit_dict)
         q = Array(qubit_dict)
@@ -58,6 +67,11 @@ def get_batched_coord(samplespace: Dict[str, Dict[str, list[NDArray]]]) -> str:
 
 
 def reduce_batch(samplespace, batch: int):
+    """
+    if the samplespace is a list of NDarrays,
+    keep only the array of index=batch. the reduced samplespace
+    has the same structure as a regular samplespace.
+    """
     reduced_samplespace = {}
     for settable, qubit_dict in samplespace.items():
         qubit_dict = dict(qubit_dict)

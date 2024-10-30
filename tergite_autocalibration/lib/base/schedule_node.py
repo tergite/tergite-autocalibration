@@ -1,7 +1,11 @@
+import json
+
 import numpy as np
 from quantify_scheduler.instrument_coordinator.utility import xarray
 
+from tergite_autocalibration.config.settings import HARDWARE_CONFIG
 from tergite_autocalibration.lib.base.node import BaseNode
+from tergite_autocalibration.lib.utils.device import configure_device, save_serial_device
 from tergite_autocalibration.lib.utils.validators import (
     MixedSamplespace,
     Samplespace,
@@ -10,8 +14,9 @@ from tergite_autocalibration.lib.utils.validators import (
     get_number_of_batches,
     reduce_batch,
 )
-from tergite_autocalibration.utils.measurement_utils import reduce_samplespace
 
+with open(HARDWARE_CONFIG) as hw:
+    hw_config = json.load(hw)
 
 class ScheduleNode(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
@@ -40,12 +45,13 @@ class ScheduleNode(BaseNode):
 
     def measure_node(self, data_path, cluster_status) -> xarray.Dataset:
         """
-        This correspond to simple cluster schedules
+        Measurements that involve only schedule parametres
         """
         result_dataset = self.measure_schedule_node(
             data_path,
             cluster_status=cluster_status,
         )
+
         return result_dataset
 
     def measure_schedule_node(
@@ -53,26 +59,37 @@ class ScheduleNode(BaseNode):
         data_path,
         cluster_status,
     ) -> xarray.Dataset:
+
+        qubits = self.all_qubits
+        couplers = self.couplers
+        device = configure_device(self.name, qubits, couplers)
+        device.hardware_config(hw_config)
+        save_serial_device(self.name, device, data_path)
+
         if self.outer_schedule_samplespace == {}:
-            """
-            This correspond to simple cluster schedules
-            """
             validated_samplespace = Samplespace(self.schedule_samplespace)
 
             if isinstance(validated_samplespace.root, SimpleSamplespace):
-                compiled_schedule = self.precompile(data_path, cluster_status)
+                """
+                This correspond to simple cluster schedules
+                """
+                compiled_schedule = self.precompile(device)
                 result_dataset = self.measure_compiled_schedule(
                     compiled_schedule,
                     data_path,
                     cluster_status=cluster_status,
                 )
             elif isinstance(validated_samplespace.root, MixedSamplespace):
+                """
+                This correspond to schedules with instructions number
+                greater than the instructions limit of the QCM_RF
+                """
                 number_of_batches = get_number_of_batches(self.samplespace)
                 batched_coord = get_batched_coord(self.samplespace)
                 result_dataset = xarray.Dataset()
                 for batch_index in range(number_of_batches):
                     self.samplespace = reduce_batch(self.samplespace, batch_index)
-                    compiled_schedule = self.precompile(data_path, cluster_status)
+                    compiled_schedule = self.precompile(device)
                     ds = self.measure_compiled_schedule(
                         compiled_schedule,
                         data_path,
@@ -84,6 +101,11 @@ class ScheduleNode(BaseNode):
                     )
 
         else:
+            """
+            This correspond to schedules where the measurement points
+            are more than the memory limit of the QRM_RF.
+            For example large single shots measurements
+            """
             iterations = self.outer_schedule_dimensions
             outer_dim = list(self.outer_schedule_samplespace.keys())[0]
 
@@ -96,7 +118,7 @@ class ScheduleNode(BaseNode):
                 element_dict = list(self.reduced_outer_samplespace.values())[0]
                 current_value = list(element_dict.values())[0]
 
-                compiled_schedule = self.precompile(data_path, cluster_status)
+                compiled_schedule = self.precompile(device)
 
                 ds = self.measure_compiled_schedule(
                     compiled_schedule,
@@ -106,5 +128,7 @@ class ScheduleNode(BaseNode):
                 )
                 ds = ds.expand_dims({outer_dim: np.array([current_value])})
                 result_dataset = xarray.merge([ds, result_dataset])
+
+        device.close()
 
         return result_dataset

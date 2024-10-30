@@ -14,35 +14,33 @@
 # that they have been altered from the originals.
 
 import abc
-import json
 from collections.abc import Iterable
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import List, Literal, Optional, Tuple
 
 import matplotlib
 import numpy as np
+import quantify_scheduler.backends.qblox.constants as constants
+import xarray
 from colorama import Fore, Style
 from colorama import init as colorama_init
 from quantify_scheduler.backends import SerialCompiler
+from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
 from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
     CompiledSchedule,
     InstrumentCoordinator,
 )
-from quantify_scheduler.json_utils import pathlib
 
 from tergite_autocalibration.config import settings
-from tergite_autocalibration.config.settings import HARDWARE_CONFIG
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
+from tergite_autocalibration.lib.utils.schedule_execution import execute_schedule
 from tergite_autocalibration.utils.dataset_utils import configure_dataset, save_dataset
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.logger.tac_logger import logger
 
 colorama_init()
 
-
-with open(HARDWARE_CONFIG) as hw:
-    hw_config = json.load(hw)
 
 matplotlib.use(settings.PLOTTING_BACKEND)
 
@@ -61,10 +59,11 @@ class BaseNode(abc.ABC):
         self.qubit_state = 0  # can be 0 or 1 or 2
         self.plots_per_qubit = 1  # can be 0 or 1 or 2
 
-        self.coupler: Optional[List[str]]
+        self.couplers: Optional[List[str] | None]
 
         self.lab_instr_coordinator: InstrumentCoordinator
 
+        self.measured_elements: Literal["Single_Qubits", "Couplers"]
         self.schedule_samplespace = {}
         self.external_samplespace = {}
         self.outer_schedule_samplespace = {}
@@ -87,12 +86,13 @@ class BaseNode(abc.ABC):
                 "Quantities of Interest are missing from the node implementation"
             )
 
-    def measure_node(self, data_path, cluster_status):
+    def measure_node(self, data_path, cluster_status) -> xarray.Dataset:
+        result_dataset = xarray.Dataset()
         """
         To be implemented by the Classes that define the Node Type:
         ScheduleNode or ExternalParameterNode
         """
-        pass
+        return result_dataset
 
     def pre_measurement_operation(self):
         """
@@ -147,16 +147,21 @@ class BaseNode(abc.ABC):
 
     def calibrate(self, data_path: Path, cluster_status):
         if cluster_status != MeasurementMode.re_analyse:
-            self.measure_node(data_path, cluster_status)
+            result_dataset = self.measure_node(data_path, cluster_status)
+            save_dataset(result_dataset, self.name, data_path)
         self.post_process(data_path)
         logger.info("analysis completed")
 
-    def precompile(self, data_path: Path):
+    def precompile(self, device: QuantumDevice):
+        constants.GRID_TIME_TOLERANCE_TIME = 5e-2
         if self.name == "tof":
             return None, 1
+
         qubits = self.all_qubits
+        couplers = self.couplers
 
         # # NOTE: IS THIS BEING USED?
+        # # NOTE: DOES IT BELONG HERE?
         # # backup old parameter values
         # if self.backup:
         #     fields = self.redis_field
@@ -182,11 +187,9 @@ class BaseNode(abc.ABC):
         #                     REDIS_CONNECTION.hset(key, field, "nan")
         #                     structured_redis_storage(key, coupler, value)
 
-        device = configure_device(self.name, qubits, couplers)
-        device.hardware_config(hw_config)
         transmons = {qubit: device.get_element(qubit) for qubit in qubits}
 
-        if self.schedule_acts_on_edge:
+        if self.measured_elements == "Couplers":
             edges = {coupler: device.get_edge(coupler) for coupler in couplers}
             node_class = self.measurement_obj(transmons, edges)
         else:
@@ -200,14 +203,10 @@ class BaseNode(abc.ABC):
         schedule = node_class.schedule_function(**self.samplespace, **schedule_keywords)
         compilation_config = device.generate_compilation_config()
 
-        save_serial_device(self.name, device, data_path)
-
-        device.close()
-
         # after the compilation_config is acquired, free the transmon resources
         for extended_transmon in transmons.values():
             extended_transmon.close()
-        if hasattr(self, "edges"):
+        if self.measured_elements == "Couplers":
             for extended_edge in edges.values():
                 extended_edge.close()
 
@@ -222,10 +221,9 @@ class BaseNode(abc.ABC):
     def measure_compiled_schedule(
         self,
         compiled_schedule: CompiledSchedule,
-        data_path: pathlib.Path,
         cluster_status=MeasurementMode.real,
         measurement: Tuple[int, int] = (1, 1),
-    ) -> None:
+    ) -> xarray.Dataset:
         """
         Execute a measurement for a node and save the resulting dataset.
 
@@ -238,16 +236,16 @@ class BaseNode(abc.ABC):
         schedule_duration = self._calculate_schedule_duration(compiled_schedule)
         self._print_measurement_info(schedule_duration, measurement)
 
-        raw_dataset = self.execute_schedule(
+        raw_dataset = execute_schedule(
             compiled_schedule,
-            self.lab_instr_coordinator,
             schedule_duration,
+            self.lab_instr_coordinator,
             cluster_status,
         )
         result_dataset = configure_dataset(raw_dataset, self)
-        save_dataset(result_dataset, self.name, data_path)
 
         logger.info("Finished measurement")
+        return result_dataset
 
     def _calculate_schedule_duration(
         self, compiled_schedule: CompiledSchedule

@@ -1,17 +1,16 @@
 import threading
 import time
 
+import tqdm
+import xarray
+from colorama import Fore, Style
 from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
     CompiledSchedule,
     InstrumentCoordinator,
 )
-import tqdm
-import xarray
 
-from tergite_autocalibration.utils.enums import MeasurementMode
 from tergite_autocalibration.utils.logger.tac_logger import logger
-from colorama import Fore
-from colorama import Style
+from tergite_autocalibration.utils.dto.enums import MeasurementMode
 
 
 def execute_schedule(
