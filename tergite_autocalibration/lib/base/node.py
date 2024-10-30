@@ -59,11 +59,11 @@ class BaseNode(abc.ABC):
         self.qubit_state = 0  # can be 0 or 1 or 2
         self.plots_per_qubit = 1  # can be 0 or 1 or 2
 
-        self.couplers: Optional[List[str] | None]
+        self.couplers: Optional[List[str] | None] = None
 
         self.lab_instr_coordinator: InstrumentCoordinator
 
-        self.measured_elements: Literal["Single_Qubits", "Couplers"]
+        self.measured_elements: Literal["Single_Qubits", "Couplers"] = "Single_Qubits"
         self.schedule_samplespace = {}
         self.external_samplespace = {}
         self.outer_schedule_samplespace = {}

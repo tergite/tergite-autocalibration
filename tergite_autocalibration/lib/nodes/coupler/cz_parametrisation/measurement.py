@@ -23,7 +23,7 @@ from quantify_scheduler.operations.pulse_library import (
 from quantify_scheduler.resources import ClockResource
 
 from ....base.measurement import BaseMeasurement
-from .....utils.extended_coupler_edge import CompositeSquareEdge
+from .....utils.extended_coupler_edge import ExtendedCompositeSquareEdge
 from .....utils.extended_transmon_element import ExtendedTransmon
 
 
@@ -31,7 +31,7 @@ class CZParametrisationFixDuration(BaseMeasurement):
     def __init__(
         self,
         transmons: dict[str, ExtendedTransmon],
-        couplers: dict[str, CompositeSquareEdge],
+        couplers: dict[str, ExtendedCompositeSquareEdge],
         qubit_state: int = 0,
     ):
         super().__init__(transmons)

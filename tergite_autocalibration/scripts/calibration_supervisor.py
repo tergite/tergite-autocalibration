@@ -193,8 +193,7 @@ class CalibrationSupervisor:
         populate_initial_parameters(
             self.transmon_configuration, self.qubits, self.couplers, REDIS_CONNECTION
         )
-        # print(f'{node_name = }')
-        # print(f'{self.couplers = }')
+
         if node_name in [
             "coupler_spectroscopy",
             "cz_chevron",
@@ -211,7 +210,7 @@ class CalibrationSupervisor:
                 REDIS_CONNECTION.hget(f"cs:{coupler}", node_name) == "calibrated"
                 for coupler in self.couplers
             ]
-            # print(f'{coupler_statuses=}')
+
             # node is calibrated only when all couplers have the node calibrated:
             is_node_calibrated = all(coupler_statuses)
         else:
@@ -289,7 +288,7 @@ class CalibrationSupervisor:
             # TODO: This could be in the node initializer
             data_path = create_node_data_path(node)
             measurement_result = node.calibrate(
-                data_path, self.lab_ic, self.measurement_mode
+                data_path, self.measurement_mode
             )
 
             # TODO:  develop failure strategies ->

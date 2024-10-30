@@ -42,11 +42,6 @@ def configure_dataset(
 
     samplespace = schedule_samplespace | external_samplespace
 
-    # if hasattr(node, 'spi_samplespace'):
-    #     spi_samplespace = node.spi_samplespace
-    #     # merge the samplespaces: | is the dictionary merging operator
-    #     samplespace = samplespace | spi_samplespace
-
     sweep_quantities = samplespace.keys()
 
     n_qubits = len(measurement_qubits)
@@ -63,7 +58,6 @@ def configure_dataset(
     elif "ssro" in node.name:
         qubit_states = ["c0", "c1", "c2"]  # for calibration points
 
-    print(node.name)
     # if 'cz_param' in node.name:
     #    print("Here")
     #    return raw_ds
@@ -74,7 +68,6 @@ def configure_dataset(
         coords_dict = {}
         measured_qubit = measurement_qubits[key_indx]
         dimensions = node.dimensions
-        print("node dimenstions are: ", dimensions)
 
         if "ssro" in node.name:
             # TODO: We are not sure about this one

@@ -27,7 +27,7 @@ from quantify_scheduler.operations.pulse_library import (
 from quantify_scheduler.resources import ClockResource
 
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
-from tergite_autocalibration.utils.extended_coupler_edge import CompositeSquareEdge
+from tergite_autocalibration.utils.extended_coupler_edge import ExtendedCompositeSquareEdge
 from tergite_autocalibration.utils.extended_gates import Measure_RO_Opt, Rxy_12
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 from ....base.measurement import BaseMeasurement
@@ -37,7 +37,7 @@ class Process_Tomography(BaseMeasurement):
     def __init__(
         self,
         transmons: dict[str, ExtendedTransmon],
-        couplers: dict[str, CompositeSquareEdge],
+        couplers: dict[str, ExtendedCompositeSquareEdge],
         qubit_state: int = 0,
     ):
         super().__init__(transmons)
