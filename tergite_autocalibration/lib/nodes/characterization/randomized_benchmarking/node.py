@@ -15,12 +15,13 @@
 
 import numpy as np
 
+from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
+
 from .analysis import RandomizedBenchmarkingNodeAnalysis
 from .measurement import Randomized_Benchmarking
-from ....utils.node_subclasses import ParametrizedSweepNode
 
 
-class Randomized_Benchmarking_Node(ParametrizedSweepNode):
+class Randomized_Benchmarking_Node(ScheduleNode):
     measurement_obj = Randomized_Benchmarking
     analysis_obj = RandomizedBenchmarkingNodeAnalysis
     qubit_qois = ["fidelity"]
