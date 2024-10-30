@@ -264,7 +264,6 @@ class BaseNode(abc.ABC):
                             structured_redis_storage(key, coupler, value)
 
         device = QuantumDevice(f"Loki_{self.name}")
-        # TODO: Here, we are loading the hardware configuration into the device
         device.hardware_config(hw_config)
 
         transmons = {}
