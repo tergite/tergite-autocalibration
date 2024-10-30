@@ -1,6 +1,8 @@
 import json
-from quantify_scheduler.json_utils import SchedulerJSONEncoder
+
 from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
+from quantify_scheduler.json_utils import SchedulerJSONEncoder
+
 from tergite_autocalibration.lib.utils.redis import (
     load_redis_config,
     load_redis_config_coupler,
