@@ -3,6 +3,7 @@
 # (C) Copyright Eleftherios Moschandreou 2024
 # (C) Copyright Liangyu Chen 2024
 # (C) Copyright Amr Osman 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -16,19 +17,19 @@ from time import sleep
 
 import numpy as np
 
-from .analysis import T2Analysis, T2EchoAnalysis
+from .analysis import T2NodeAnalysis, T2EchoNodeAnalysis
 from .measurement import T2, T2Echo
 from ....base.node import BaseNode
 
 
 class T2_Node(BaseNode):
     measurement_obj = T2
-    analysis_obj = T2Analysis
+    analysis_obj = T2NodeAnalysis
+    qubit_qois = ["t2_time"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
         self.all_qubits = all_qubits
-        self.redis_field = ["t2_time"]
         self.backup = False
 
         self.number_or_repeated_T2s = 1
@@ -59,12 +60,12 @@ class T2_Node(BaseNode):
 
 class T2_Echo_Node(BaseNode):
     measurement_obj = T2Echo
-    analysis_obj = T2EchoAnalysis
+    analysis_obj = T2EchoNodeAnalysis
+    qubit_qois = ["t2_echo_time"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
         self.all_qubits = all_qubits
-        self.redis_field = ["t2_echo_time"]
         self.backup = False
 
         self.number_or_repeated_T2s = 1

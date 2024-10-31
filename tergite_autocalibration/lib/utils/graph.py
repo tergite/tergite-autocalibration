@@ -43,7 +43,6 @@ graph_dependencies = [
     ("motzoi_parameter", "n_rabi_oscillations"),
     ("n_rabi_oscillations", "resonator_spectroscopy_1"),
     # ('randomized_benchmarking', 'T1'),
-    ("n_rabi_oscillations", "resonator_spectroscopy_1"),
     ("n_rabi_oscillations", "all_XY"),
     # ('n_rabi_oscillations', 'T1'),
     # ('randomized_benchmarking', 'T1'),
@@ -165,14 +164,6 @@ def filtered_topological_order(target_node: str):
 
 
 def range_topological_order(from_node: str, target_node: str):
-    target_ancestors = nx.ancestors(graph, target_node)
-    # if "coupler_spectroscopy" in target_ancestors:
-    #     coupler_path = nx.shortest_path(
-    #         graph, "resonator_spectroscopy", "coupler_spectroscopy"
-    #     )
-    #     graph.remove_node("coupler_spectroscopy")
-    # else:
-    #     coupler_path = []
     coupler_path = []
     if target_node == "punchout":
         topo_order = ["punchout"]
@@ -188,8 +179,6 @@ def range_topological_order(from_node: str, target_node: str):
 
     filtered_order = [node for node in topo_order if graph_condition(node, "refine")]
     filtered_order = coupler_path + filtered_order
-    # print(f'{ filtered_order = }')
-    # quit()
     return filtered_order
 
 

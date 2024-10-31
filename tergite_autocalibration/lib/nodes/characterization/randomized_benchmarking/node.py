@@ -3,6 +3,7 @@
 # (C) Copyright Eleftherios Moschandreou 2024
 # (C) Copyright Liangyu Chen 2024
 # (C) Copyright Amr Osman 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -14,14 +15,15 @@
 
 import numpy as np
 
-from .analysis import RandomizedBenchmarkingAnalysis
+from .analysis import RandomizedBenchmarkingNodeAnalysis
 from .measurement import Randomized_Benchmarking
 from ....utils.node_subclasses import ParametrizedSweepNode
 
 
 class Randomized_Benchmarking_Node(ParametrizedSweepNode):
     measurement_obj = Randomized_Benchmarking
-    analysis_obj = RandomizedBenchmarkingAnalysis
+    analysis_obj = RandomizedBenchmarkingNodeAnalysis
+    qubit_qois = ["fidelity"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
@@ -30,7 +32,6 @@ class Randomized_Benchmarking_Node(ParametrizedSweepNode):
         self.all_qubits = all_qubits
         self.schedule_keywords = schedule_keywords
         self.backup = False
-        self.redis_field = ["fidelity"]
         self.schedule_keywords = {}
 
         self.initial_schedule_samplespace = {

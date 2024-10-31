@@ -19,19 +19,17 @@ from scipy import optimize as optimize
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.hardware_utils import SpiDAC
 from tergite_autocalibration.utils.user_input import qubit_samples, resonator_samples
-from .analysis import (
-    CouplerSpectroscopyAnalysis,
-)
-from ...qubit_control.spectroscopy.measurement import (
-    Two_Tones_Multidim,
-)
-from ...readout.resonator_spectroscopy.measurement import Resonator_Spectroscopy
+
 from ....base.node import BaseNode
+from ...qubit_control.spectroscopy.measurement import Two_Tones_Multidim
+from ...readout.resonator_spectroscopy.measurement import Resonator_Spectroscopy
+from .analysis import CouplerSpectroscopyNodeAnalysis
 
 
 class Coupler_Spectroscopy_Node(BaseNode):
     measurement_obj = Two_Tones_Multidim
-    analysis_obj = CouplerSpectroscopyAnalysis
+    analysis_obj = CouplerSpectroscopyNodeAnalysis
+    coupler_qois = ["parking_current", "current_range"]
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
@@ -40,15 +38,16 @@ class Coupler_Spectroscopy_Node(BaseNode):
         self.name = name
         self.all_qubits = all_qubits  # this is a Base attr, delete it here
         self.couplers = couplers
-        self.redis_field = ["parking_current", "current_range"]
         self.qubit_state = 0
         self.type = "spi_and_cluster_simple_sweep"
         # perform 2 tones while biasing the current
         self.coupled_qubits = self.get_coupled_qubits()
         self.coupler = self.couplers[0]
-        self.mode = MeasurementMode.real
-        self.spi_dac = SpiDAC(self.mode)
-        self.dac = self.spi_dac.create_spi_dac(self.coupler)
+
+        # This should go in node or in measurement
+        # self.mode = MeasurementMode.real
+        # self.spi_dac = SpiDAC(self.mode)
+        # self.dac = self.spi_dac.create_spi_dac(self.coupler)
 
         self.all_qubits = self.coupled_qubits
 
@@ -79,57 +78,16 @@ class Coupler_Spectroscopy_Node(BaseNode):
         print(f"{ this_iteration_value = }")
         self.spi_dac.set_dac_current(self.dac, this_iteration_value)
 
-    def calibrate(self, data_path: Path, lab_ic, cluster_status):
-        print("Performing optimized Sweep")
-        compiled_schedule = self.precompile(data_path)
-
-        optimization_element = "q13_q14"
-
-        optimization_guess = 100e-6
-
-        def set_optimizing_parameter(optimizing_parameter):
-            if self.name == "cz_chevron_optimize":
-                self.spi.set_dac_current(self.dac, optimizing_parameter)
-
-        def single_sweep(optimizing_parameter) -> float:
-            set_optimizing_parameter(optimizing_parameter)
-
-            self.measure_node(
-                compiled_schedule,
-                lab_ic,
-                data_path,
-                cluster_status=MeasurementMode.real,
-            )
-
-            measurement_result_ = self.post_process(data_path=data_path)
-
-            optimization_quantity = measurement_result_[optimization_element][
-                self.optimization_field
-            ]
-
-            return optimization_quantity
-
-        optimize.minimize(
-            single_sweep,
-            optimization_guess,
-            method="Nelder-Mead",
-            bounds=[(80e-6, 120e-6)],
-            options={"maxiter": 2},
-        )
-
-        # TODO MERGE-CZ-GATE: I guess this is under active development, so, we do not have a measurement_result?
-        return None
-
 
 class Coupler_Resonator_Spectroscopy_Node(BaseNode):
     measurement_obj = Resonator_Spectroscopy
-    analysis_obj = CouplerSpectroscopyAnalysis
+    analysis_obj = CouplerSpectroscopyNodeAnalysis
+    coupler_qois = ["resonator_flux_quantum"]
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
     ):
         super().__init__(name, all_qubits, **schedule_keywords)
-        self.redis_field = ["resonator_flux_quantum"]
         self.qubit_state = 0
         self.couplers = couplers
         self.coupler = self.couplers[0]

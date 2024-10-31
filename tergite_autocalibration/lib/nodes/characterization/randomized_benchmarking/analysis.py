@@ -2,6 +2,7 @@
 #
 # (C) Copyright Eleftherios Moschandreou 2023, 2024
 # (C) Copyright Amr Osman 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -16,11 +17,10 @@ Module containing classes that model, fit and plot data from a Rabi experiment.
 """
 import lmfit
 import numpy as np
-import xarray as xr
 from matplotlib.axes import Axes
 
-from ....base.analysis import BaseAnalysis
-from tergite_autocalibration.utils.exponential_decay_function import (
+from ....base.analysis import BaseAllQubitsRepeatAnalysis, BaseQubitAnalysis
+from tergite_autocalibration.lib.utils.functions import (
     exponential_decay_function,
 )
 
@@ -56,32 +56,36 @@ class ExpDecayModel(lmfit.model.Model):
         return lmfit.models.update_param_vals(params, self.prefix, **kws)
 
 
-class RandomizedBenchmarkingAnalysis(BaseAnalysis):
+class RandomizedBenchmarkingQubitAnalysis(BaseQubitAnalysis):
     """
     Analysis that fits an exponential decay function to randomized benchmarking data.
     """
 
-    def __init__(self, dataset: xr.Dataset):
-        super().__init__()
-        self.data_var = list(dataset.data_vars.keys())[0]
-        self.qubit = dataset[self.data_var].attrs["qubit"]
-        self.S21 = dataset[self.data_var]
-        for coord in dataset[self.data_var].coords:
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+        self.fit_results = {}
+
+    def analyse_qubit(self):
+        for coord in self.dataset[self.data_var].coords:
             if "cliffords" in coord:
                 self.number_cliffords_coord = coord
             elif "seed" in coord:
                 self.seed_coord = coord
-        self.number_of_repetitions = dataset.dims[self.seed_coord]
-        self.number_of_cliffords = dataset[self.number_cliffords_coord].values
-        self.number_of_cliffords_runs = dataset.dims[self.number_cliffords_coord] - 3
+
+        self.number_of_repetitions = self.dataset.dims[self.seed_coord]
+        self.number_of_cliffords = self.dataset[self.number_cliffords_coord].values
+        self.number_of_cliffords_runs = (
+            self.dataset.dims[self.number_cliffords_coord] - 3
+        )
         self.normalized_data_dict = {}
+
         for repetition_index in range(self.number_of_repetitions):
-            complex_values = self.S21.isel({self.seed_coord: [repetition_index]})
-            measurements = complex_values.values.flatten()
-            data = measurements[:-3]
-            calibration_0 = measurements[-3]
-            calibration_1 = measurements[-2]
-            calibration_2 = measurements[-1]
+            magnitudes_flat = self._get_magnitudes(repetition_index)
+
+            data = magnitudes_flat[:-3]
+            calibration_0 = magnitudes_flat[-3]
+            calibration_1 = magnitudes_flat[-2]
+            calibration_2 = magnitudes_flat[-1]
             # print('these are the zero and one points respectively: ', calibration_0, calibration_1)
             # print('these are the unrotated data points: ', data)
             displacement_vector = calibration_1 - calibration_0
@@ -98,9 +102,6 @@ class RandomizedBenchmarkingAnalysis(BaseAnalysis):
                 real_rotated_data / normalization
             )
 
-        self.fit_results = {}
-
-    def analyse_qubit(self):
         sum = np.sum([arr for arr in self.normalized_data_dict.values()], axis=0)
         self.sum = sum / len(self.normalized_data_dict)
 
@@ -118,6 +119,10 @@ class RandomizedBenchmarkingAnalysis(BaseAnalysis):
         )
         self.fidelity = fit_result.params["p"].value
         return [self.fidelity]
+
+    def _get_magnitudes(self, indx):
+        magnitudes = self.S21[self.data_var].isel({self.seed_coord: indx})
+        return magnitudes.values.flatten()
 
     def plotter(self, ax: Axes):
         for repetition_index in range(self.number_of_repetitions):
@@ -138,3 +143,11 @@ class RandomizedBenchmarkingAnalysis(BaseAnalysis):
         ax.plot(self.number_of_cliffords[:-3], self.sum, ls="dashed", c="black")
         ax.set_ylabel(f"|S21| (V)")
         ax.grid()
+
+
+class RandomizedBenchmarkingNodeAnalysis(BaseAllQubitsRepeatAnalysis):
+    single_qubit_analysis_obj = RandomizedBenchmarkingQubitAnalysis
+
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+        self.repeat_coordinate_name = "seeds"

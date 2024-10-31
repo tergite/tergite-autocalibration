@@ -13,38 +13,44 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 #
+# Modified:
+#
+# - Martin Ahindura, 2023
 
 from ipaddress import IPv4Address
-from pathlib import Path
-from typing import Union, List
+from typing import List, Union
 
 import toml
-from colorama import Fore
-from colorama import Style
+from colorama import Fore, Style
 from colorama import init as colorama_init
 from qblox_instruments import Cluster
+from qblox_instruments.types import ClusterType
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 
 from tergite_autocalibration.config import settings
-from tergite_autocalibration.config.settings import CLUSTER_IP, REDIS_CONNECTION
-from tergite_autocalibration.config.settings import CLUSTER_NAME
+from tergite_autocalibration.config.settings import (
+    CLUSTER_IP,
+    CLUSTER_NAME,
+    REDIS_CONNECTION,
+)
 from tergite_autocalibration.lib.base.node import BaseNode
-from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.lib.utils.graph import filtered_topological_order
+from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.utils.dataset_utils import create_node_data_path
-from tergite_autocalibration.utils.dto.enums import DataStatus
-from tergite_autocalibration.utils.dto.enums import MeasurementMode
+from tergite_autocalibration.utils.dto.enums import DataStatus, MeasurementMode
 from tergite_autocalibration.utils.logger.errors import ClusterNotFoundError
 from tergite_autocalibration.utils.logger.tac_logger import logger
+from tergite_autocalibration.utils.logger.visuals import draw_arrow_chart
 from tergite_autocalibration.utils.redis_utils import (
     populate_initial_parameters,
     populate_node_parameters,
     populate_quantities_of_interest,
 )
-from tergite_autocalibration.utils.user_input import attenuation_setting
-from tergite_autocalibration.utils.user_input import user_requested_calibration
-from tergite_autocalibration.utils.visuals import draw_arrow_chart
+from tergite_autocalibration.utils.user_input import (
+    attenuation_setting,
+    user_requested_calibration,
+)
 
 colorama_init()
 
@@ -62,30 +68,24 @@ def update_to_user_samplespace(node: BaseNode, user_samplespace: dict):
 
 
 class CalibrationSupervisor:
+    calibration_node_factory = NodeFactory()
+
     def __init__(
         self,
-        cluster_mode: "MeasurementMode" = MeasurementMode.real,
+        measurement_mode: "MeasurementMode",
         cluster_ip: Union[str, "IPv4Address"] = CLUSTER_IP,
         cluster_timeout: int = 222,
         node_name="",
         data_path="",
     ) -> None:
         # Read hardware related configuration steps
-        self.cluster_mode: "MeasurementMode" = cluster_mode
+        self.measurement_mode: "MeasurementMode" = measurement_mode
         self.cluster_ip: Union[str, "IPv4Address"] = cluster_ip
         self.cluster_timeout: int = cluster_timeout
-        self.node_name_to_re_analyse = node_name
-        self.data_path = Path(data_path)
-        self.lab_ic = ""
 
         # Create objects to communicate with the hardware
-        if self.cluster_mode == MeasurementMode.re_analyse:
-            logger.info(
-                "Cluster will not be defined as there is no need to take a measurement in re-analysis mode."
-            )
-        else:
-            self.cluster: "Cluster" = self._create_cluster()
-            self.lab_ic: "InstrumentCoordinator" = self._create_lab_ic(self.cluster)
+        self.cluster: "Cluster" = self._create_cluster()
+        self.lab_ic: "InstrumentCoordinator" = self._create_lab_ic(self.cluster)
 
         # TODO: user configuration could be a toml file
         # Read the calibration specific parameters
@@ -93,27 +93,40 @@ class CalibrationSupervisor:
         self.couplers = user_requested_calibration["couplers"]
         self.target_node = user_requested_calibration["target_node"]
         self.user_samplespace = user_requested_calibration["user_samplespace"]
-        self.measurement_mode = self.cluster_mode
 
         # Read the device configuration
         self.transmon_configuration = toml.load(settings.DEVICE_CONFIG)
 
         # Initialize the node structure
-        self.node_factory = NodeFactory()
         self.topo_order = filtered_topological_order(self.target_node)
 
     def _create_cluster(self) -> "Cluster":
         cluster_: "Cluster"
-        if self.cluster_mode == MeasurementMode.real:
+        if self.measurement_mode == MeasurementMode.real:
             Cluster.close_all()
-            cluster_ = Cluster(CLUSTER_NAME, str(self.cluster_ip))
+            try:
+                cluster_ = Cluster(CLUSTER_NAME, str(self.cluster_ip))
+            except ConnectionRefusedError:
+                msg = "Cluster is disconnected. Maybe it has crushed? Try flick it off and on"
+                print("-" * len(msg))
+                print(f"{Fore.LIGHTRED_EX}{Style.BRIGHT}{msg}{Style.RESET_ALL}")
+                print("-" * len(msg))
+                quit()
+            print(
+                f" \n\u26A0 {Fore.MAGENTA}{Style.BRIGHT}Reseting Cluster at IP *{str(self.cluster_ip)[-3:]}{Style.RESET_ALL}\n"
+            )
             cluster_.reset()
-            logger.info(f"Reseting Cluster at IP *{str(self.cluster_ip)[-3:]}")
             return cluster_
         else:
-            raise ClusterNotFoundError(
-                f"Cannot create cluster object from {self.cluster_ip}"
-            )
+            Cluster.close_all()
+            dummy_setup = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1, 16)}
+            dummy_setup["16"] = ClusterType.CLUSTER_QRM_RF
+            dummy_setup["17"] = ClusterType.CLUSTER_QRM_RF
+            cluster_ = Cluster(CLUSTER_NAME, dummy_cfg=dummy_setup)
+            # raise ClusterNotFoundError(
+            #     f"Cannot create cluster object from {self.cluster_ip}"
+            # )
+            return cluster_
 
     def _create_lab_ic(self, clusters: Union["Cluster", List["Cluster"]]):
         ic_ = InstrumentCoordinator("lab_ic")
@@ -145,34 +158,38 @@ class CalibrationSupervisor:
         number_of_qubits = len(self.qubits)
         draw_arrow_chart(f"Qubits: {number_of_qubits}", self.topo_order)
 
+        # TODO: check if coupler node status throws error after REDISFLUSHALL
         populate_quantities_of_interest(
-            self.transmon_configuration, self.qubits, self.couplers, REDIS_CONNECTION
+            self.topo_order,
+            self.qubits,
+            self.couplers,
+            self.calibration_node_factory,
+            REDIS_CONNECTION,
         )
+        #        populate_active_reset_parameters(
+        #            self.transmon_configuration, self.qubits, REDIS_CONNECTION
+        #        )
 
         for calibration_node in self.topo_order:
             self.inspect_node(calibration_node)
             logger.info(f"{calibration_node} node is completed")
 
     def inspect_node(self, node_name: str):
-        # TODO: the inspect node function could be part of the node
         logger.info(f"Inspecting node {node_name}")
 
-        node: BaseNode = self.node_factory.create_node(
-            node_name, self.qubits, couplers=self.couplers
+        node: BaseNode = self.calibration_node_factory.create_node(
+            node_name,
+            self.qubits,
+            couplers=self.couplers,
+            measurement_mode=self.measurement_mode,
         )
 
         if node.name in self.user_samplespace:
             update_to_user_samplespace(node, self.user_samplespace)
 
-        # some nodes e.g. cw spectroscopy needs access to the instruments
-        node.lab_instr_coordinator = self.cluster_ip
+        # it's maybe useful to give access to the ic
+        node.lab_instr_coordinator = self.lab_ic
 
-        logger.info(
-            "Initialising paramaters for qubits: "
-            + str(self.qubits)
-            + " and couplers: "
-            + str(self.couplers)
-        )
         populate_initial_parameters(
             self.transmon_configuration, self.qubits, self.couplers, REDIS_CONNECTION
         )
@@ -187,7 +204,6 @@ class CalibrationSupervisor:
             "cz_calibration_swap_ssro",
             "cz_dynamic_phase",
             "cz_dynamic_phase_swap",
-            "cz_parametrisation_fix_duration",
             "tqg_randomized_benchmarking",
             "tqg_randomized_benchmarking_interleaved",
         ]:
@@ -221,6 +237,9 @@ class CalibrationSupervisor:
         if node_name in [
             "coupler_spectroscopy",
             "cz_chevron",
+            "cz_chevron_duration_single_shots_experimental",
+            "cz_calibration_single_shots_experimental",
+            "cz_chevron_experimental",
             "cz_optimize_chevron",
             "cz_chevron_amplitude",
             "cz_calibration",
@@ -228,7 +247,6 @@ class CalibrationSupervisor:
             "cz_calibration_swap_ssro",
             "cz_dynamic_phase",
             "cz_dynamic_phase_swap",
-            "cz_parametrisation_fix_duration",
             "tqg_randomized_benchmarking",
             "tqg_randomized_benchmarking_interleaved",
         ]:
@@ -242,9 +260,7 @@ class CalibrationSupervisor:
                 elif is_calibrated == "calibrated":
                     status = DataStatus.in_spec
                 else:
-                    raise ValueError(
-                        f"REDIS error: cannot find cs:{coupler}", node_name
-                    )
+                    raise ValueError(f"status: {status}")
         else:
             for qubit in self.qubits:
                 # the calibrated, not_calibrated flags may be not necessary,
@@ -256,23 +272,9 @@ class CalibrationSupervisor:
                 elif is_calibrated == "calibrated":
                     status = DataStatus.in_spec
                 else:
-                    raise ValueError(f"REDIS error: cannot find cs:{qubit}", node_name)
+                    raise ValueError(f"status: {status}")
 
-        print(node_name)
-        print(self.node_name_to_re_analyse)
-        if (
-            self.measurement_mode == MeasurementMode.re_analyse
-            and node_name == self.node_name_to_re_analyse
-        ):
-            print(
-                "\u2691\u2691\u2691 "
-                + f"{Fore.RED}{Style.BRIGHT}Calibration required for Node {node_name}{Style.RESET_ALL}"
-            )
-            logger.info(f"Calibrating node {node.name}")
-            # TODO: This could be in the node initializer
-            node.calibrate(self.data_path, self.lab_ic, self.measurement_mode)
-
-        elif status == DataStatus:
+        if status == DataStatus.in_spec:
             print(
                 f" \u2714  {Fore.GREEN}{Style.BRIGHT}Node {node_name} in spec{Style.RESET_ALL}"
             )
@@ -286,9 +288,11 @@ class CalibrationSupervisor:
             logger.info(f"Calibrating node {node.name}")
             # TODO: This could be in the node initializer
             data_path = create_node_data_path(node)
-            node.calibrate(data_path, self.lab_ic, self.measurement_mode)
+            measurement_result = node.calibrate(
+                data_path, self.lab_ic, self.measurement_mode
+            )
 
-            # TODO : develop failure strategies ->
+            # TODO:  develop failure strategies ->
             # if node_calibration_status == DataStatus.out_of_spec:
             #     node_expand()
             #     node_calibration_status = self.calibrate_node(node)

@@ -14,7 +14,7 @@ import numpy as np
 
 from .....config.settings import REDIS_CONNECTION
 from .analysis import (
-    CZParametrisationFixDurationAnalysis,
+    CZParametrisationFixDurationNodeAnalysis,
 )
 from .measurement import (
     CZParametrisationFixDuration,
@@ -24,7 +24,7 @@ from ....utils.node_subclasses import ParametrizedSweepNode
 
 class CZParametrisationFixDurationNode(ParametrizedSweepNode):
     measurement_obj = CZParametrisationFixDuration
-    analysis_obj = CZParametrisationFixDurationAnalysis
+    analysis_obj = CZParametrisationFixDurationNodeAnalysis
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
@@ -34,6 +34,7 @@ class CZParametrisationFixDurationNode(ParametrizedSweepNode):
         self.type = "parameterized_sweep"
         self.couplers = couplers
         self.edges = couplers
+        print(couplers)
         self.coupler = couplers[0]
         self.schedule_keywords = schedule_keywords
         self.backup = False
@@ -43,9 +44,9 @@ class CZParametrisationFixDurationNode(ParametrizedSweepNode):
             "cz_pulse_amplitude",
             "cz_parking_current",
         ]
-        self.node_dictionary[
-            "cz_pulse_duration"
-        ] = 120e-9  # Need to make it configurable
+        self.node_dictionary["cz_pulse_duration"] = (
+            120e-9  # Need to make it configurable
+        )
 
         # Should these sample space move to user defined inputs?
         self.initial_schedule_samplespace = {

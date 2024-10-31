@@ -10,6 +10,10 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+from tergite_autocalibration.tests.utils.env import setup_test_env
+
+setup_test_env()
+
 from pathlib import Path
 
 import pytest
@@ -27,17 +31,16 @@ def setup_good_data():
     dataset_path = Path(__file__).parent / "data" / "dataset_good_quality_freq_amp.hdf5"
     print(dataset_path)
     ds = xr.open_dataset(dataset_path)
-    ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
-    d14 = ds.yq14.to_dataset()
-    d15 = ds.yq15.to_dataset()
+    d14 = ds["yq14"].to_dataset()
+    d15 = ds["yq15"].to_dataset()
     d14.yq14.attrs["qubit"] = "q14"
     d15.yq15.attrs["qubit"] = "q15"
     freqs = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
     amps = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
-    q14Ana = FrequencyVsAmplitudeQ1Analysis(d14, freqs, amps)
-    q14Res = q14Ana.analyse_qubit()
-    q15Ana = FrequencyVsAmplitudeQ2Analysis(d15, freqs, amps)
-    q15Res = q15Ana.analyse_qubit()
+    c14 = FrequencyVsAmplitudeQ1Analysis("name", ["redis_field"], freqs, amps)
+    q14Res = c14.process_qubit(d14, "yq14")
+    c15 = FrequencyVsAmplitudeQ2Analysis("name", ["redis_field"], freqs, amps)
+    q15Res = c15.process_qubit(d15, "yq15")
     return q14Res, q15Res, freqs, amps
 
 
@@ -71,17 +74,16 @@ def setup_bad_data():
     dataset_path = Path(__file__).parent / "data" / "dataset_bad_quality_freq_amp.hdf5"
     print(dataset_path)
     ds = xr.open_dataset(dataset_path)
-    ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
-    d14 = ds.yq14.to_dataset()
-    d15 = ds.yq15.to_dataset()
+    d14 = ds["yq14"].to_dataset()
+    d15 = ds["yq15"].to_dataset()
     d14.yq14.attrs["qubit"] = "q14"
     d15.yq15.attrs["qubit"] = "q15"
     freqs = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
     amps = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
-    q14Ana = FrequencyVsAmplitudeQ1Analysis(d14, freqs, amps)
-    q14Res = q14Ana.analyse_qubit()
-    q15Ana = FrequencyVsAmplitudeQ2Analysis(d15, freqs, amps)
-    q15Res = q15Ana.analyse_qubit()
+    c14 = FrequencyVsAmplitudeQ1Analysis("name", ["redis_field"], freqs, amps)
+    q14Res = c14.process_qubit(d14, "yq14")
+    c15 = FrequencyVsAmplitudeQ2Analysis("name", ["redis_field"], freqs, amps)
+    q15Res = c15.process_qubit(d15, "yq15")
     return q14Res, q15Res
 
 

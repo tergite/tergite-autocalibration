@@ -3,6 +3,7 @@
 # (C) Copyright Eleftherios Moschandreou 2024
 # (C) Copyright Liangyu Chen 2024
 # (C) Copyright Amr Osman 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -16,19 +17,19 @@ from time import sleep
 
 import numpy as np
 
-from .analysis import T1Analysis
+from .analysis import T1NodeAnalysis
 from .measurement import T1
 from ....base.node import BaseNode
 
 
 class T1_Node(BaseNode):
     measurement_obj = T1
-    analysis_obj = T1Analysis
+    analysis_obj = T1NodeAnalysis
+    qubit_qois = ["t1_time"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
         self.all_qubits = all_qubits
-        self.redis_field = ["t1_time"]
         self.backup = False
 
         self.schedule_keywords = {

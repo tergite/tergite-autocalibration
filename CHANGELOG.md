@@ -8,13 +8,25 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 ## [Unreleased]
 
 ### Added
-- superconducting_qubit_tools as conditional dependency
-- Calibration node for purity benchmarking
-- Redis storage manager
 - Dataset browser
 
 ### Changed
-- Switch to quantify-scheduler version 0.20.0
+- Migrated cli from click to typer
+- Switch to quantify-scheduler version 0.21.2
+- Switch to qblox-instruments version 0.14.1 (qblox-firmware should be 9.0.1)
+- Upgrade to Python version 3.10
+
+### Fixed
+
+## [2024.09.0] - 2024-09-16
+
+### Added
+- superconducting_qubit_tools as conditional dependency
+- Calibration node for purity benchmarking
+- Redis storage manager
+- GitLab CI/CD
+
+### Changed
 - Refactoring of the node classes to allow hierarchical class structures
 
 ### Fixed
