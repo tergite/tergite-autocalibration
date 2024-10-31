@@ -37,7 +37,6 @@ class NodeFactory:
             "punchout": "Punchout_Node",
             "resonator_spectroscopy": "Resonator_Spectroscopy_Node",
             "qubit_01_spectroscopy": "Qubit_01_Spectroscopy_Multidim_Node",
-            "qubit_01_cw_spectroscopy": "Qubit_01_Spectroscopy_CW_Node",
             "rabi_oscillations": "Rabi_Oscillations_Node",
             "ramsey_correction": "Ramsey_Fringes_Node",
             "resonator_spectroscopy_1": "Resonator_Spectroscopy_1_Node",
@@ -81,6 +80,9 @@ class NodeFactory:
 
     def all_node_names(self):
         return list(self.node_name_mapping.keys())
+
+    def get_node_class(self, node_name: str) -> typing.Type["BaseNode"]:
+        pass
 
     def create_node(
         self, node_name: str, all_qubits: list[str], **kwargs
