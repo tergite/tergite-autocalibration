@@ -37,7 +37,7 @@ python-dotenv = "1.0.1"
 requests = "^2.32.3"
 typer = "^0.12.5"
 jokeapi = "1.0.5"
-quantifiles = { path = "tergite_autocalibration/tools/dataset_browser", develop = true }
+quantifiles = { path = "./tergite_autocalibration/tools/dataset_browser", develop = true }
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
