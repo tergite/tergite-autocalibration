@@ -16,21 +16,16 @@
 import numpy as np
 
 from .....config.settings import REDIS_CONNECTION
-from .cz_chevron_analysis import (
-    CZChevronAnalysis,
-)
-from .cz_firstStep_analysis import (
-    CZFirstStepAnalysis,
-)
 from ....base.node import BaseNode
-from .measurement import (
-    CZ_Chevron,
-)
+from .cz_chevron_analysis import CZChevronAnalysis
+from .cz_firstStep_analysis import CZFirstStepAnalysis
+from .measurement import CZ_Chevron
 
 
 class CZ_Chevron_Node(BaseNode):
     measurement_obj = CZ_Chevron
     analysis_obj = CZChevronAnalysis
+    coupler_qois = ["cz_pulse_frequency", "cz_pulse_duration"]
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary
@@ -41,7 +36,6 @@ class CZ_Chevron_Node(BaseNode):
         self.couplers = couplers
         self.edges = couplers
         self.coupler = self.couplers[0]
-        self.redis_field = ["cz_pulse_frequency", "cz_pulse_duration"]
         self.qubit_state = 0
         self.all_qubits = [q for bus in couplers for q in bus.split("_")]
         self.coupler_samplespace = self.samplespace
@@ -112,18 +106,18 @@ class CZ_Chevron_Node(BaseNode):
 class CZ_Characterisation_Chevron_Node(BaseNode):
     measurement_obj = CZ_Chevron
     analysis_obj = CZFirstStepAnalysis
+    coupler_qois = [
+        "cz_parking_current",
+        "cz_pulse_amplitude",
+        "cz_pulse_frequency",
+        "cz_pulse_duration",
+    ]
 
     def __init__(self, name: str, all_qubits: list[str], couplers: list[str]):
         super().__init__(name, all_qubits)
         self.type = "characterisation_sweep"
         self.couplers = couplers
         self.coupler = self.couplers[0]
-        self.redis_field = [
-            "cz_parking_current",
-            "cz_pulse_amplitude",
-            "cz_pulse_frequency",
-            "cz_pulse_duration",
-        ]
         self.optimization_field = (
             "cz_parking_current",
             "cz_pulse_amplitude",
@@ -192,13 +186,13 @@ class CZ_Characterisation_Chevron_Node(BaseNode):
 class CZ_Optimize_Chevron_Node(BaseNode):
     measurement_obj = CZ_Chevron
     analysis_obj = CZChevronAnalysis
+    coupler_qois = ["cz_pulse_frequency", "cz_pulse_duration"]
 
     def __init__(self, name: str, all_qubits: list[str], couplers: list[str]):
         super().__init__(name, all_qubits)
         self.type = "optimized_sweep"
         self.couplers = couplers
         self.coupler = self.couplers[0]
-        self.redis_field = ["cz_pulse_frequency", "cz_pulse_duration"]
         self.optimization_field = "cz_pulse_duration"
         self.qubit_state = 0
         self.all_qubits = [q for bus in couplers for q in bus.split("_")]
@@ -252,6 +246,7 @@ class CZ_Optimize_Chevron_Node(BaseNode):
 class CZ_Chevron_Sweep_Node(BaseNode):
     measurement_obj = CZ_Chevron
     analysis_obj = CZChevronAnalysis
+    coupler_qois = ["cz_pulse_frequency", "cz_pulse_duration"]
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
@@ -262,7 +257,6 @@ class CZ_Chevron_Sweep_Node(BaseNode):
         self.couplers = couplers
         self.edges = couplers
         self.coupler = self.couplers[0]
-        self.redis_field = ["cz_pulse_frequency", "cz_pulse_duration"]
         self.qubit_state = 0
         self.all_qubits = [q for bus in couplers for q in bus.split("_")]
 

@@ -22,12 +22,12 @@ from ....base.node import BaseNode
 class Motzoi_Parameter_Node(BaseNode):
     measurement_obj = Motzoi_parameter
     analysis_obj = Motzoi01NodeAnalysis
+    qubit_qois = ["rxy:motzoi"]
 
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ["rxy:motzoi"]
         self.backup = False
-        self.motzoi_minima = []
+        self.motzoi_minima = []  # NOTE: is this needed?
         self.qubit_state = 0
         self.schedule_samplespace = {
             "mw_motzois": {
@@ -40,12 +40,12 @@ class Motzoi_Parameter_Node(BaseNode):
 class Motzoi_Parameter_12_Node(BaseNode):
     measurement_obj = Motzoi_parameter
     analysis_obj = Motzoi12NodeAnalysis
+    qubit_qois = ["r12:ef_motzoi"]
 
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ["r12:ef_motzoi"]
         self.backup = False
-        self.motzoi_minima = []
+        self.motzoi_minima = []  # NOTE: is this needed?
         self.qubit_state = 1
         self.schedule_samplespace = {
             "mw_motzois": {

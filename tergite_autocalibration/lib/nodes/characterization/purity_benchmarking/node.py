@@ -20,6 +20,7 @@ from ....utils.node_subclasses import ParametrizedSweepNode
 class PurityBenchmarkingNode(ParametrizedSweepNode):
     measurement_obj = PurityBenchmarking
     analysis_obj = PurityBenchmarkingNodeAnalysis
+    qubit_qois = ["purity_fidelity"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
@@ -28,7 +29,6 @@ class PurityBenchmarkingNode(ParametrizedSweepNode):
         self.all_qubits = all_qubits
         self.schedule_keywords = schedule_keywords
         self.backup = False
-        self.redis_field = ["purity_fidelity"]
         self.schedule_keywords = {}
 
         self.initial_schedule_samplespace = {

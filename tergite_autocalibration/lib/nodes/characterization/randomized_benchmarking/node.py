@@ -23,6 +23,7 @@ from ....utils.node_subclasses import ParametrizedSweepNode
 class Randomized_Benchmarking_Node(ParametrizedSweepNode):
     measurement_obj = Randomized_Benchmarking
     analysis_obj = RandomizedBenchmarkingNodeAnalysis
+    qubit_qois = ["fidelity"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
@@ -31,7 +32,6 @@ class Randomized_Benchmarking_Node(ParametrizedSweepNode):
         self.all_qubits = all_qubits
         self.schedule_keywords = schedule_keywords
         self.backup = False
-        self.redis_field = ["fidelity"]
         self.schedule_keywords = {}
 
         self.initial_schedule_samplespace = {

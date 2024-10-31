@@ -23,10 +23,10 @@ from ....base.node import BaseNode
 class Ramsey_Fringes_12_Node(BaseNode):
     measurement_obj = Ramsey_detunings
     analysis_obj = RamseyDetunings12NodeAnalysis
+    qubit_qois = ["clock_freqs:f12"]
 
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ["clock_freqs:f12"]
         self.qubit_state = 1
         self.backup = False
         self.schedule_samplespace = {
@@ -42,10 +42,10 @@ class Ramsey_Fringes_12_Node(BaseNode):
 class Ramsey_Fringes_Node(BaseNode):
     measurement_obj = Ramsey_detunings
     analysis_obj = RamseyDetunings01NodeAnalysis
+    qubit_qois = ["clock_freqs:f01"]
 
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ["clock_freqs:f01"]
         self.backup = False
         self.schedule_samplespace = {
             "ramsey_delays": {

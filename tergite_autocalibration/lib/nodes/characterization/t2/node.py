@@ -25,11 +25,11 @@ from ....base.node import BaseNode
 class T2_Node(BaseNode):
     measurement_obj = T2
     analysis_obj = T2NodeAnalysis
+    qubit_qois = ["t2_time"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
         self.all_qubits = all_qubits
-        self.redis_field = ["t2_time"]
         self.backup = False
 
         self.number_or_repeated_T2s = 1
@@ -61,11 +61,11 @@ class T2_Node(BaseNode):
 class T2_Echo_Node(BaseNode):
     measurement_obj = T2Echo
     analysis_obj = T2EchoNodeAnalysis
+    qubit_qois = ["t2_echo_time"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
         self.all_qubits = all_qubits
-        self.redis_field = ["t2_echo_time"]
         self.backup = False
 
         self.number_or_repeated_T2s = 1
