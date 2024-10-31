@@ -74,7 +74,7 @@ def resonator_samples(qubit: str) -> np.ndarray:
     VNA_frequency = VNA_resonator_frequencies[qubit]
     min_freq = VNA_frequency - sweep_range / 2 - 0.5e6
     max_freq = VNA_frequency + sweep_range / 2
-    return np.linspace(min_freq, max_freq, res_spec_samples)
+    return [np.linspace(min_freq, max_freq-2e6, res_spec_samples),np.linspace(max_freq-2e6, max_freq, res_spec_samples) ]
 
 
 def qubit_samples(qubit: str, transition: str = "01") -> np.ndarray:

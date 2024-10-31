@@ -152,8 +152,12 @@ class BaseNode(abc.ABC):
         self.post_process(data_path)
         logger.info("analysis completed")
 
-    def precompile(self, device: QuantumDevice) -> CompiledSchedule:
+    def precompile(
+            self, device: QuantumDevice, schedule_samplespace: dict
+    ) -> CompiledSchedule:
         constants.GRID_TIME_TOLERANCE_TIME = 5e-2
+
+        # TODO: put 'tof' out of its misery
         if self.name == "tof":
             return None, 1
 
@@ -194,22 +198,21 @@ class BaseNode(abc.ABC):
             node_class = self.measurement_obj(transmons, edges)
         else:
             node_class = self.measurement_obj(transmons)
+        schedule = node_class.schedule_function(**schedule_samplespace, **self.schedule_keywords)
 
+        # TODO: Probably the compiler desn't need to be created every time self.precompile() is called.
         compiler = SerialCompiler(name=f"{self.name}_compiler")
 
-        self.samplespace = self.schedule_samplespace | self.reduced_outer_samplespace
-        schedule_keywords = self.schedule_keywords
-
-        schedule = node_class.schedule_function(**self.samplespace, **schedule_keywords)
         compilation_config = device.generate_compilation_config()
 
-        # after the compilation_config is acquired, free the transmon resources
-        for extended_transmon in transmons.values():
-            extended_transmon.close()
-        if self.measured_elements == "Couplers":
-            for extended_edge in edges.values():
-                extended_edge.close()
-
+        # TODO: check if this required:
+        # # after the compilation_config is acquired, free the transmon resources
+        # for extended_transmon in transmons.values():
+        #     extended_transmon.close()
+        # if self.measured_elements == "Couplers":
+        #     for extended_edge in edges.values():
+        #         extended_edge.close()
+        #
         logger.info("Starting Compiling")
 
         compiled_schedule = compiler.compile(

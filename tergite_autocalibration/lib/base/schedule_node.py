@@ -66,6 +66,8 @@ class ScheduleNode(BaseNode):
         cluster_status,
     ) -> xarray.Dataset:
 
+        # TODO: IMPORTANT
+        # Rethink device managing. When and where is created, configured, updated, closed
         qubits = self.all_qubits
         couplers = self.couplers
         device = configure_device(self.name, qubits, couplers)
@@ -79,7 +81,7 @@ class ScheduleNode(BaseNode):
                 """
                 This correspond to simple cluster schedules
                 """
-                compiled_schedule = self.precompile(device)
+                compiled_schedule = self.precompile(device, self.schedule_samplespace)
                 result_dataset = self.measure_compiled_schedule(
                     compiled_schedule,
                     cluster_status=cluster_status,
@@ -89,12 +91,13 @@ class ScheduleNode(BaseNode):
                 This correspond to schedules with instructions number
                 greater than the instructions limit of the QCM_RF
                 """
-                number_of_batches = get_number_of_batches(self.samplespace)
-                batched_coord = get_batched_coord(self.samplespace)
+                batched_schedule_samplespace = self.schedule_samplespace
+                number_of_batches = get_number_of_batches(batched_schedule_samplespace)
+                batched_coord = get_batched_coord(batched_schedule_samplespace)
                 result_dataset = xarray.Dataset()
                 for batch_index in range(number_of_batches):
-                    self.samplespace = reduce_batch(self.samplespace, batch_index)
-                    compiled_schedule = self.precompile(device)
+                    reduced_schedule_samplespace = reduce_batch(batched_schedule_samplespace, batch_index)
+                    compiled_schedule = self.precompile(device, reduced_schedule_samplespace)
                     ds = self.measure_compiled_schedule(
                         compiled_schedule,
                         cluster_status=cluster_status,
@@ -116,13 +119,14 @@ class ScheduleNode(BaseNode):
             result_dataset = xarray.Dataset()
 
             for current_iteration in range(iterations):
-                self.reduced_outer_samplespace = reduce_samplespace(
+                reduced_outer_samplespace = reduce_samplespace(
                     current_iteration, self.outer_schedule_samplespace
                 )
-                element_dict = list(self.reduced_outer_samplespace.values())[0]
+                element_dict = list(reduced_outer_samplespace.values())[0]
                 current_value = list(element_dict.values())[0]
 
-                compiled_schedule = self.precompile(device)
+                samplespace = self.schedule_samplespace | reduced_outer_samplespace
+                compiled_schedule = self.precompile(device, samplespace)
 
                 ds = self.measure_compiled_schedule(
                     compiled_schedule,
@@ -132,6 +136,7 @@ class ScheduleNode(BaseNode):
                 ds = ds.expand_dims({outer_dim: np.array([current_value])})
                 result_dataset = xarray.merge([ds, result_dataset])
 
+        # TODO: same TODO as when the device was configured
         device.close()
 
         return result_dataset
