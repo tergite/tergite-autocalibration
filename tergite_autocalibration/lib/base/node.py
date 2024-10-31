@@ -64,14 +64,16 @@ class BaseNode(abc.ABC):
         self.lab_instr_coordinator: InstrumentCoordinator
 
         self.measured_elements: Literal["Single_Qubits", "Couplers"] = "Single_Qubits"
+
         self.schedule_samplespace = {}
         self.external_samplespace = {}
+        
+        # These may be modified while the node runs
         self.outer_schedule_samplespace = {}
         self.initial_schedule_samplespace = {}
-        self.schedule_keywords = {}
         self.reduced_external_samplespace = {}
-        self.reduced_outer_samplespace = {}
         self.loops = None
+        self.schedule_keywords = {}
 
         self.samplespace = self.schedule_samplespace | self.external_samplespace
 

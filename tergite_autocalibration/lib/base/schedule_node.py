@@ -97,12 +97,14 @@ class ScheduleNode(BaseNode):
                 result_dataset = xarray.Dataset()
                 for batch_index in range(number_of_batches):
                     reduced_schedule_samplespace = reduce_batch(batched_schedule_samplespace, batch_index)
+                    self.schedule_samplespace = reduced_schedule_samplespace
                     compiled_schedule = self.precompile(device, reduced_schedule_samplespace)
                     ds = self.measure_compiled_schedule(
                         compiled_schedule,
                         cluster_status=cluster_status,
                         measurement=(batch_index, number_of_batches),
                     )
+                    breakpoint()
                     result_dataset = xarray.concat(
                         [ds, result_dataset], dim=batched_coord
                     )
