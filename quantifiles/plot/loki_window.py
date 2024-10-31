@@ -404,6 +404,7 @@ class PlotWindowContent(QtWidgets.QWidget):
     def add_plot(self, plot: QtWidgets.QWidget, secondary_plot: QtWidgets.QWidget):
         self.plot_tab.add_plot(plot, secondary_plot)
 
+
 class PlotWindow(QtWidgets.QMainWindow):
     _WINDOW_TITLE: str = "Quantifiles plot window"
     _WINDOW_HEIGHT: int = 600
@@ -521,7 +522,6 @@ class PlotWindow(QtWidgets.QMainWindow):
                 self.secondary_plots[name].setVisible(enabled)
         else:
             self.secondary_plots[name].setVisible(enabled)
-
 
     # @QtCore.pyqtSlot(str, str)
     # def plot_custom_graph(self, x_variable: str, y_variable: str):

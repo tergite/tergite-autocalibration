@@ -2,11 +2,10 @@ from __future__ import annotations
 
 import argparse
 import logging
+from pathlib import Path
 
 from quantifiles import version
 from quantifiles.main import main
-
-from pathlib import Path
 
 __all__ = ["quantifiles", "__version__"]
 

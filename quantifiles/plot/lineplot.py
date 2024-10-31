@@ -162,7 +162,7 @@ class LinePlot(BasePlot):
             curve_name = f"{self.dataset[y_var].name}: {self.dataset[y_var].name}"
             real_values = self.dataset[y_var].isel(ReIm=0).values
             imag_values = self.dataset[y_var].isel(ReIm=1).values
-            magnitudes = np.sqrt(real_values ** 2 + imag_values ** 2)
+            magnitudes = np.sqrt(real_values**2 + imag_values**2)
 
             curve = self.plot.plot(
                 x_scaling * self.dataset[self.x_key].values,
