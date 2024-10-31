@@ -372,7 +372,7 @@ class ExperimentPreview(QtWidgets.QLabel):
         scaled_image = image.scaled(
             label_width,
             label_height,
-            transformMode=Qt.SmoothTransformation
+            transformMode=Qt.SmoothTransformation,
             # label_width, label_height, aspectRatioMode=Qt.KeepAspectRatio
         )
 

@@ -124,7 +124,7 @@ class ColorPlot(BasePlot):
 
             real_values = dataset[self.y_keys[0]].values[:, :, 0]
             imag_values = dataset[self.y_keys[0]].values[:, :, 1]
-            data_values = np.sqrt(real_values ** 2 + imag_values ** 2)
+            data_values = np.sqrt(real_values**2 + imag_values**2)
             if "frequencies" in inner_settable:
                 data_values = np.transpose(data_values)
             # data_values = np.transpose(np.sqrt(real_values ** 2 + imag_values ** 2))

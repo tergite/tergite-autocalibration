@@ -102,7 +102,7 @@ class MultipleLinePlot(BasePlot):
             imag_values = (
                 dataset[self.y_keys[0]].isel({outer_settable: outer_index})[:, 1].values
             )
-            magnitudes = np.sqrt(real_values ** 2 + imag_values ** 2)
+            magnitudes = np.sqrt(real_values**2 + imag_values**2)
 
             curve = self.plot.plot(
                 x_data,
