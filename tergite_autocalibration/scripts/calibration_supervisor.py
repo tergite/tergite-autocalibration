@@ -95,6 +95,8 @@ class CalibrationSupervisor:
         self.qubits = user_requested_calibration["all_qubits"]
         self.couplers = user_requested_calibration["couplers"]
         self.target_node = user_requested_calibration["target_node"]
+        if self.cluster_mode == MeasurementMode.re_analyse:
+            self.target_node = self.node_name_to_re_analyse
         self.user_samplespace = user_requested_calibration["user_samplespace"]
         self.measurement_mode = self.cluster_mode
 
@@ -146,6 +148,7 @@ class CalibrationSupervisor:
         # TODO: everything which is not in the inspect or calibrate function should go here
         logger.info("Starting System Calibration")
         number_of_qubits = len(self.qubits)
+        print(self.topo_order)
         draw_arrow_chart(f"Qubits: {number_of_qubits}", self.topo_order)
 
         populate_quantities_of_interest(
@@ -263,6 +266,7 @@ class CalibrationSupervisor:
 
         if self.measurement_mode == MeasurementMode.re_analyse:
             print(status)
+            self.target_node = node_name
             if (
                 node_name == self.node_name_to_re_analyse
                 or status != DataStatus.in_spec

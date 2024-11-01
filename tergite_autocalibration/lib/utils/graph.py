@@ -61,9 +61,8 @@ graph_dependencies = [
     ("resonator_spectroscopy_2", "cz_parametrisation_fix_duration"),
     ("resonator_spectroscopy_2", "cz_chevron_amplitude"),
     ("resonator_spectroscopy_2", "reset_chevron"),
-    ("ro_amplitude_three_state_optimization", "reset_calibration_ssro"),
-    ("resonator_spectroscopy_2", "cz_calibration"),
-    ("ro_amplitude_three_state_optimization", "cz_calibration_ssro"),
+    ("resonator_spectroscopy_2", "reset_calibration_ssro"),
+    ("resonator_spectroscopy_2", "cz_calibration_ssro"),
     ("ro_amplitude_three_state_optimization", "cz_calibration_swap_ssro"),
     ("ro_amplitude_three_state_optimization", "process_tomography_ssro"),
     ("cz_calibration", "cz_dynamic_phase"),
@@ -137,6 +136,7 @@ initial_pos = {
 
 # TODO add condition argument and explanation
 def filtered_topological_order(target_node: str):
+    print("Targeting node: " + target_node)
     return range_topological_order("resonator_spectroscopy", target_node)
 
 

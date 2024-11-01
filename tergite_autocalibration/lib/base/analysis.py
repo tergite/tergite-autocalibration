@@ -209,6 +209,7 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         for this_qubit, qubit_data_vars in qubit_data_dict.items():
             ds = xr.merge([self.dataset[var] for var in qubit_data_vars])
             ds.attrs["qubit"] = this_qubit
+            ds.attrs["node"] = self.name
 
             matching_coords = [coord for coord in ds.coords if this_qubit in coord]
             if matching_coords:

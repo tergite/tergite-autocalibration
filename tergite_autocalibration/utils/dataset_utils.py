@@ -259,6 +259,8 @@ def get_test_data_path_for_node(node_name) -> pathlib.Path:
         path = "tergite_autocalibration/lib/nodes/readout/resonator_spectroscopy/tests/data_2"
     elif node_name == "ro_frequency_three_state_optimization":
         path = "tergite_autocalibration/lib/nodes/readout/ro_frequency_optimization/tests/data"
+    elif node_name == "ro_amplitude_three_state_optimization":
+        path = "tergite_autocalibration/lib/nodes/readout/ro_amplitude_optimization/tests/data"
     elif node_name == "T1":
         path = "tergite_autocalibration/lib/nodes/characterization/t1/tests/data"
     elif node_name == "T2":
@@ -266,6 +268,10 @@ def get_test_data_path_for_node(node_name) -> pathlib.Path:
     elif node_name == "T2_echo":
         path = (
             "tergite_autocalibration/lib/nodes/characterization/t2/tests/data_t2_echo"
+        )
+    elif node_name == "randomized_benchmarking_ssro":
+        path = (
+            "tergite_autocalibration/lib/nodes/characterization/randomized_benchmarking/tests/data"
         )
 
     else:
