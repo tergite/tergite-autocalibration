@@ -137,7 +137,7 @@ class CZCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
             y = np.repeat(self.calibs, self.shots)
             IQ_complex = np.array([])
             for state, _ in enumerate(self.calibs):
-                IQ_complex_0 = self.dataset[self.data_var].isel(
+                IQ_complex_0 = self.magnitudes[self.data_var].isel(
                     {self.sweep_coord: indx, self.state_coord: -3 + state}
                 )
                 IQ_complex = np.append(IQ_complex, IQ_complex_0)
@@ -161,22 +161,30 @@ class CZCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
             # plt.show()
 
             # Classify data shots
-            raw_data = self.dataset[self.data_var].isel({self.sweep_coord: indx}).values
+            raw_data = self.magnitudes[self.data_var].isel({self.sweep_coord: indx}).values
+            print(raw_data)
             raw_shape = raw_data.shape
             I = raw_data.real.flatten()
             Q = raw_data.imag.flatten()
             IQ = np.array([I, Q]).T
+            print(IQ)
             data_y_pred = cla.predict(IQ.reshape(-1, 2))
+            print("clapredict")
+            print(data_y_pred)
             # breakpoint()
             data_y_pred = np.transpose(data_y_pred.reshape(raw_shape))
+            print(data_y_pred)
             data_res_shape = list(data_y_pred.shape[:-1])
             data_res_shape.append(len(self.calibs))
 
             data_res = np.array([])
             for sweep in data_y_pred:
+                print(sweep)
                 uniques, counts = np.unique(sweep, return_counts=True)
+                print(uniques)
                 raw_prob = [0] * len(self.calibs)
                 for state_id, state in enumerate(uniques):
+                    print(state)
                     raw_prob[int(state)] = counts[state_id] / len(sweep)
                 mitigate_prob = mitigate(raw_prob, cm_inv)
                 data_res = np.append(data_res, mitigate_prob)
@@ -351,7 +359,7 @@ class ResetCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
             y = np.repeat(self.calibs, self.shots)
             IQ_complex = np.array([])
             for state, _ in enumerate(self.calibs):
-                IQ_complex_0 = self.dataset[self.data_var].isel(
+                IQ_complex_0 = self.S21[self.data_var].isel(
                     {self.sweep_coord: indx, self.state_coord: -3 + state}
                 )
                 IQ_complex = np.append(IQ_complex, IQ_complex_0)
@@ -374,7 +382,7 @@ class ResetCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
             # plt.show()
 
             # Classify data shots
-            raw_data = self.dataset[self.data_var].isel({self.sweep_coord: indx}).values
+            raw_data = self.S21[self.data_var].isel({self.sweep_coord: indx}).values
             raw_shape = raw_data.shape
             I = raw_data.real.flatten()
             Q = raw_data.imag.flatten()

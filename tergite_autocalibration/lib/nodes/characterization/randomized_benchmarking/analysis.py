@@ -26,7 +26,7 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import confusion_matrix
 
 from ....base.analysis import BaseAllQubitsRepeatAnalysis, BaseQubitAnalysis
-from tergite_autocalibration.utils.exponential_decay_function import (
+from tergite_autocalibration.lib.utils.functions import (
     exponential_decay_function,
 )
 

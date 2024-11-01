@@ -15,6 +15,7 @@
 
 import numpy as np
 
+from ....base.node import BaseNode
 from .analysis import (
     CZCalibrationSSRONodeAnalysis,
     ResetCalibrationSSRONodeAnalysis,
@@ -29,6 +30,7 @@ from ....base.node import BaseNode
 class CZCalibrationSSRONode(BaseNode):
     measurement_obj = CZ_calibration_SSRO
     analysis_obj = CZCalibrationSSRONodeAnalysis
+    coupler_qois = ["cz_phase", "cz_pop_loss"]
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
@@ -40,7 +42,6 @@ class CZCalibrationSSRONode(BaseNode):
         self.coupler = couplers[0]
         self.coupled_qubits = couplers[0].split(sep="_")
         self.edges = couplers
-        self.redis_field = ["cz_phase", "cz_pop_loss", "cz_leakage"]
         self.qubit_state = 2
         self.testing_group = 0  # The edge group to be tested. 0 means all edges.
         self.schedule_keywords = schedule_keywords
@@ -59,7 +60,8 @@ class CZCalibrationSSRONode(BaseNode):
 class CZCalibrationSwapSSRONode(BaseNode):
     measurement_obj = CZ_calibration_SSRO
     analysis_obj = CZCalibrationSSRONodeAnalysis
-
+    coupler_qois = ["cz_phase", "cz_pop_loss"]
+    
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
     ):
@@ -70,7 +72,6 @@ class CZCalibrationSwapSSRONode(BaseNode):
         self.coupler = couplers[0]
         self.coupled_qubits = couplers[0].split(sep="_")
         self.edges = couplers
-        self.redis_field = ["cz_phase", "cz_pop_loss", "cz_leakage"]
         self.qubit_state = 2
         self.testing_group = 0  # The edge group to be tested. 0 means all edges.
         self.schedule_keywords["dynamic"] = False
@@ -88,7 +89,13 @@ class CZCalibrationSwapSSRONode(BaseNode):
 class ResetCalibrationSSRONode(BaseNode):
     measurement_obj = Reset_calibration_SSRO
     analysis_obj = ResetCalibrationSSRONodeAnalysis
-
+    coupler_qois = [
+        "reset_fidelity",
+        "reset_leakage",
+        "all_fidelity",
+        "all_fidelity_f",
+    ]
+    
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
     ):
@@ -100,12 +107,6 @@ class ResetCalibrationSSRONode(BaseNode):
         self.coupler = couplers[0]
         self.coupled_qubits = couplers[0].split(sep="_")
         # self.schedule_keywords = kwargs
-        self.redis_field = [
-            "reset_fidelity",
-            "reset_leakage",
-            "all_fidelity",
-            "all_fidelity_f",
-        ]
         self.qubit_state = 2
         self.testing_group = 0  # The edge group to be tested. 0 means all edges.
         self.dynamic = False

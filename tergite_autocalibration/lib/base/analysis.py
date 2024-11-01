@@ -171,7 +171,7 @@ class BaseNodeAnalysis(ABC):
 class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
     single_qubit_analysis_obj: "BaseQubitAnalysis"
 
-    def __init__(self, name, redis_fields):
+    def __init__(self, name: str, redis_fields):
         self.name = name
         self.redis_fields = redis_fields
         self.dataset = None
@@ -194,8 +194,9 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         self.save_plots()
         return analysis_results
 
-    def open_dataset(self):
-        dataset_path = self.data_path / "dataset_0.hdf5"
+    def open_dataset(self) -> xr.Dataset:
+        dataset_name = f"dataset_{self.name}_0.hdf5"
+        dataset_path = self.data_path / dataset_name
         if not dataset_path.exists():
             raise FileNotFoundError(f"Dataset file not found: {dataset_path}")
 
@@ -243,11 +244,11 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
 
 
 class BaseAllQubitsRepeatAnalysis(BaseAllQubitsAnalysis, ABC):
-    def __init__(self, name, redis_fields):
+    def __init__(self, name: str, redis_fields):
         super().__init__(name, redis_fields)
         self.repeat_coordinate_name = ""
 
-    def open_dataset(self):
+    def open_dataset(self) -> xr.Dataset:
         # Infer number of repeats by counting the number of dataset files
         data_files = sorted(self.data_path.glob("*.hdf5"))
         if not data_files:
@@ -266,7 +267,8 @@ class BaseAllQubitsRepeatAnalysis(BaseAllQubitsAnalysis, ABC):
         for qubit in self.all_qubits:
             qubit_datasets = []
             for repeat_idx, file_path in enumerate(data_files):
-                file_path = self.data_path / f"dataset_{repeat_idx}.hdf5"
+                dataset_name = f"dataset_{self.name}_{repeat_idx}.hdf5"
+                file_path = self.data_path / dataset_name
 
                 ds = xr.open_dataset(file_path, engine="netcdf4")
 
@@ -422,7 +424,8 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
         return analysis_results
 
     def open_dataset(self):
-        dataset_path = self.data_path / "dataset_0.hdf5"
+        dataset_name = f"dataset_{self.name}_0.hdf5"
+        dataset_path = self.data_path / dataset_name
         if not dataset_path.exists():
             raise FileNotFoundError(f"Dataset file not found: {dataset_path}")
 

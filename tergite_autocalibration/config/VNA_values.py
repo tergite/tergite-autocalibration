@@ -13,6 +13,7 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+
 VNA_resonator_frequencies = {
     "q06": 6832973301.189378,
     "q07": 7086671753.192583,
@@ -79,3 +80,4 @@ VNA_f12_frequencies = {
     "q24": 4376704319.238517,
     "q25": 4957127240.853312,
 }
+

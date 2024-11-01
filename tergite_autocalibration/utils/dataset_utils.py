@@ -226,104 +226,32 @@ def create_node_data_path(node) -> pathlib.Path:
     return data_path
 
 
-def get_test_data_path_for_node(node_name) -> pathlib.Path:
-    if node_name == "resonator_spectroscopy":
-        path = "tergite_autocalibration/lib/nodes/readout/resonator_spectroscopy/tests/data_0"
-    elif node_name == "qubit_01_spectroscopy":
-        path = (
-            "tergite_autocalibration/lib/nodes/qubit_control/spectroscopy/tests/data_01"
-        )
-    elif node_name == "rabi_oscillations":
-        path = "tergite_autocalibration/lib/nodes/qubit_control/rabi_oscillations/tests/data_rabi_01"
-    elif node_name == "ramsey_correction":
-        path = "./tergite_autocalibration/lib/nodes/qubit_control/ramsey_fringes/tests/data_01"
-    elif node_name == "motzoi_parameter":
-        path = "./tergite_autocalibration/lib/nodes/qubit_control/motzoi_parameter/tests/data_01"
-    elif node_name == "n_rabi_oscillations":
-        path = "./tergite_autocalibration/lib/nodes/qubit_control/rabi_oscillations/tests/data_nrabi_01"
-    elif node_name == "resonator_spectroscopy_1":
-        path = "tergite_autocalibration/lib/nodes/readout/resonator_spectroscopy/tests/data_1"
-    elif node_name == "qubit_12_spectroscopy":
-        path = (
-            "tergite_autocalibration/lib/nodes/qubit_control/spectroscopy/tests/data_12"
-        )
-    elif node_name == "rabi_oscillations_12":
-        path = "tergite_autocalibration/lib/nodes/qubit_control/rabi_oscillations/tests/data_rabi_12"
-    elif node_name == "ramsey_correction_12":
-        path = "./tergite_autocalibration/lib/nodes/qubit_control/ramsey_fringes/tests/data_12"
-    elif node_name == "motzoi_parameter_12":
-        path = "./tergite_autocalibration/lib/nodes/qubit_control/motzoi_parameter/tests/data_12"
-    elif node_name == "n_rabi_oscillations_12":
-        path = "./tergite_autocalibration/lib/nodes/qubit_control/rabi_oscillations/tests/data_nrabi_12"
-    elif node_name == "resonator_spectroscopy_2":
-        path = "tergite_autocalibration/lib/nodes/readout/resonator_spectroscopy/tests/data_2"
-    elif node_name == "ro_frequency_three_state_optimization":
-        path = "tergite_autocalibration/lib/nodes/readout/ro_frequency_optimization/tests/data"
-    elif node_name == "ro_amplitude_three_state_optimization":
-        path = "tergite_autocalibration/lib/nodes/readout/ro_amplitude_optimization/tests/data"
-    elif node_name == "T1":
-        path = "tergite_autocalibration/lib/nodes/characterization/t1/tests/data"
-    elif node_name == "T2":
-        path = "tergite_autocalibration/lib/nodes/characterization/t2/tests/data_t2"
-    elif node_name == "T2_echo":
-        path = (
-            "tergite_autocalibration/lib/nodes/characterization/t2/tests/data_t2_echo"
-        )
-    elif node_name == "randomized_benchmarking_ssro":
-        path = (
-            "tergite_autocalibration/lib/nodes/characterization/randomized_benchmarking/tests/data"
-        )
-
-    else:
-        logger.info("No path for node: " + node_name)
-        path = ""
-
-    return pathlib.Path(path)
-
-
-def retrieve_dummy_dataset(node) -> xarray.Dataset:
-    if node.name == "resonator_spectroscopy":
-        ds_path = "tergite_autocalibration/utils/dummy_datasets/20240510-131804-430-b5461c-resonator_spectroscopy/dataset.hdf5"
-    elif node.name == "qubit_01_cw_spectroscopy":
-        ds_path = "tergite_autocalibration/utils/dummy_datasets/20240510-131804-430-b5461c-resonator_spectroscopy/dataset.hdf5"
-    elif node.name == "qubit_01_spectroscopy":
-        ds_path = "tergite_autocalibration/utils/dummy_datasets/20240524-122934-019-3b1942-qubit_01_spectroscopy/dataset.hdf5"
-    elif node.name == "rabi_oscillations":
-        ds_path = "tergite_autocalibration/utils/dummy_datasets/20240524-123137-122-974556-rabi_oscillations/dataset.hdf5"
-    elif node.name == "ramsey_correction":
-        ds_path = "tergite_autocalibration/utils/dummy_datasets/20240312-092539-970-23d58e-ramsey_correction/dataset.hdf5"
-    elif node.name == "adaptive_ramsey_correction":
-        ds_path = "tergite_autocalibration/utils/dummy_datasets/20240312-092539-970-23d58e-ramsey_correction/dataset.hdf5"
-    else:
-        raise ValueError("Node does not have a stored dummy dataset")
-
-    real_dataset = xarray.open_dataset(ds_path)
-    dummy_ds = real_dataset.isel(ReIm=0) + 1j * real_dataset.isel(ReIm=1)
-
-    # TODO probably this is not needed for newer datasets
-    for data_var in dummy_ds.data_vars:
-        dummy_ds[data_var].attrs.update({"qubit": data_var[1:]})
-    for coord in dummy_ds.coords:
-        dummy_ds[coord].attrs.update({"element_type": "qubit"})
-
-    return dummy_ds
-
-
 def save_dataset(
     result_dataset: xarray.Dataset, node_name: str, data_path: pathlib.Path
-):
+) -> None:
+    """
+    Save the measurement dataset to a file.
+
+    Args:
+        result_dataset (xarray.Dataset): The dataset to save.
+        node_name (str): Name of the node being measured.
+        data_path (pathlib.Path): Path where the dataset will be saved.
+    """
     data_path.mkdir(parents=True, exist_ok=True)
     measurement_id = data_path.stem[0:19]
+
     result_dataset = result_dataset.assign_attrs(
         {"name": node_name, "tuid": measurement_id}
     )
+
     result_dataset_real = to_real_dataset(result_dataset)
+
     # to_netcdf doesn't like complex numbers, convert to real/imag to save:
     count = 0
-    dataset_name = "dataset_" + str(count) + ".hdf5"
+    dataset_name = f"dataset_{node_name}_{count}.hdf5"
     while (data_path / dataset_name).is_file():
         count += 1
-        dataset_name = "dataset_" + str(count) + ".hdf5"
+        dataset_name = f"dataset_{node_name}_{count}.hdf5"
     result_dataset_real.to_netcdf(data_path / dataset_name)
 
 

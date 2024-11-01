@@ -37,6 +37,10 @@ RB_REPEATS = 10
 
 
 class TQGRandomizedBenchmarkingSSRONode(ParametrizedSweepNode):
+    coupler_qois = ["tqg_fidelity"]
+    measurement_obj = TQGRandomizedBenchmarkingSSRO
+    analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
+
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
     ):
@@ -51,9 +55,6 @@ class TQGRandomizedBenchmarkingSSRONode(ParametrizedSweepNode):
         self.coupled_qubits = couplers[0].split(sep="_")
 
         self.backup = False
-        self.redis_field = ["tqg_fidelity"]
-        self.measurement_obj = TQGRandomizedBenchmarkingSSRO
-        self.analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
         self.qubit_state = 2
         # TODO change it a dictionary like samplespace
 
@@ -91,6 +92,10 @@ class TQGRandomizedBenchmarkingSSRONode(ParametrizedSweepNode):
 
 
 class TQGRandomizedBenchmarkingInterleavedSSRONode(ParametrizedSweepNode):
+    coupler_qois = ["tqg_fidelity_interleaved"]
+    measurement_obj = TQGRandomizedBenchmarkingSSRO
+    analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
+    
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
     ):
@@ -104,9 +109,7 @@ class TQGRandomizedBenchmarkingInterleavedSSRONode(ParametrizedSweepNode):
         self.coupled_qubits = couplers[0].split(sep="_")
         self.schedule_keywords = schedule_keywords
         self.backup = False
-        self.redis_field = ["tqg_fidelity_interleaved"]
-        self.measurement_obj = TQGRandomizedBenchmarkingSSRO
-        self.analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
+
         self.qubit_state = 2
         self.schedule_keywords["interleaving_clifford_id"] = 4386
         # TODO change it a dictionary like samplespace
@@ -146,6 +149,7 @@ class TQGRandomizedBenchmarkingInterleavedSSRONode(ParametrizedSweepNode):
 class CZRBOptimizeSSRONode(ParametrizedSweepNode):
     measurement_obj = TQGRandomizedBenchmarkingSSRO
     analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
+    coupler_qois = ["tqg_fidelity_interleaved"]
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
@@ -158,7 +162,6 @@ class CZRBOptimizeSSRONode(ParametrizedSweepNode):
         self.coupler = couplers[0]
         self.coupled_qubits = couplers[0].split(sep="_")
         self.edges = couplers
-        self.redis_field = ["tqg_fidelity_interleaved"]
         self.qubit_state = 2
         self.testing_group = 0  # The edge group to be tested. 0 means all edges.
         self.schedule_keywords = schedule_keywords
