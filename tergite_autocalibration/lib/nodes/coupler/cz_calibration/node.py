@@ -61,7 +61,7 @@ class CZCalibrationSwapSSRONode(BaseNode):
     measurement_obj = CZ_calibration_SSRO
     analysis_obj = CZCalibrationSSRONodeAnalysis
     coupler_qois = ["cz_phase", "cz_pop_loss"]
-    
+
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
     ):
@@ -95,7 +95,7 @@ class ResetCalibrationSSRONode(BaseNode):
         "all_fidelity",
         "all_fidelity_f",
     ]
-    
+
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
     ):

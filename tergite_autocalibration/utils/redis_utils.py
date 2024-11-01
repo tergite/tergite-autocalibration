@@ -96,7 +96,6 @@ def populate_active_reset_parameters(
     # Populate the Redis database with the initial active reset
     # parameter values from the toml file
     for qubit in qubits:
-
         # parameter specific to each qubit:
         for module_key, module_value in ar_qubit_parameters[qubit].items():
             if isinstance(module_value, dict):

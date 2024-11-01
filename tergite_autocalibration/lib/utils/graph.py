@@ -68,8 +68,11 @@ graph_dependencies = [
     ("cz_calibration_ssro", "cz_dynamic_phase_ssro"),
     ("cz_dynamic_phase_ssro", "cz_dynamic_phase_swap_ssro"),
     ("resonator_spectroscopy_2", "tqg_randomized_benchmarking_ssro"),
-#    ("cz_dynamic_phase_swap_ssro", "tqg_randomized_benchmarking_ssro"),
-    ("tqg_randomized_benchmarking_ssro", "tqg_randomized_benchmarking_interleaved_ssro"),
+    #    ("cz_dynamic_phase_swap_ssro", "tqg_randomized_benchmarking_ssro"),
+    (
+        "tqg_randomized_benchmarking_ssro",
+        "tqg_randomized_benchmarking_interleaved_ssro",
+    ),
 ]
 
 graph.add_edges_from(graph_dependencies)

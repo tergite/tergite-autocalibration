@@ -151,7 +151,6 @@ class TQGRandomizedBenchmarkingSSRO(BaseMeasurement):
         for acq_index, this_number_of_cliffords in enumerate(
             clifford_sequence_lengths[:-3]
         ):
-
             # schedule.add(X(this_qubit))
             # random_sequence = rng.integers(all_cliffords, size=this_number_of_cliffords)
 

@@ -95,7 +95,7 @@ class TQGRandomizedBenchmarkingInterleavedSSRONode(ParametrizedSweepNode):
     coupler_qois = ["tqg_fidelity_interleaved"]
     measurement_obj = TQGRandomizedBenchmarkingSSRO
     analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
-    
+
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
     ):

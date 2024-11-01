@@ -161,7 +161,9 @@ class CZCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
             # plt.show()
 
             # Classify data shots
-            raw_data = self.magnitudes[self.data_var].isel({self.sweep_coord: indx}).values
+            raw_data = (
+                self.magnitudes[self.data_var].isel({self.sweep_coord: indx}).values
+            )
             print(raw_data)
             raw_shape = raw_data.shape
             I = raw_data.real.flatten()
