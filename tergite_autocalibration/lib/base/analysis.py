@@ -511,8 +511,7 @@ class BaseAllCouplersRepeatAnalysis(BaseAllCouplersAnalysis, ABC):
         self.num_repeats = len(data_files)
 
         # Load the first dataset to infer coupler-based coordinates
-        first_dataset = xr.open_dataset(data_files[0])
-        # first_dataset = xr.open_dataset(data_files[0], engine="scipy")
+        first_dataset = xr.open_dataset(data_files[0], engine="scipy")
 
         # Step 1: Group data variables by qubit (assuming qubit data starts with 'yq')
         self.all_qubits = [
@@ -537,8 +536,7 @@ class BaseAllCouplersRepeatAnalysis(BaseAllCouplersAnalysis, ABC):
 
         for file_idx, file_path in enumerate(data_files):
             print(f"Opening dataset {file_idx + 1}/{len(data_files)}: {file_path}")
-            ds = xr.open_dataset(file_path)
-            # ds = xr.open_dataset(file_path, engine="scipy")
+            ds = xr.open_dataset(file_path, engine="scipy")
 
             # Step 3: Extract qubit-related data and identify couplers
             for coupler, coords in self.coupler_data_dict.items():
