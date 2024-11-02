@@ -5,15 +5,8 @@ from quantify_scheduler.instrument_coordinator.utility import xarray
 
 from tergite_autocalibration.config.settings import HARDWARE_CONFIG
 from tergite_autocalibration.lib.base.node import BaseNode
-from tergite_autocalibration.lib.utils.device import (
-    configure_device,
-    save_serial_device,
-)
 from tergite_autocalibration.utils.measurement_utils import reduce_samplespace
 
-# TODO: maybe this deosn't belong here
-with open(HARDWARE_CONFIG) as hw:
-    hw_config = json.load(hw)
 
 
 class ExternalParameterNode(BaseNode):
@@ -41,19 +34,13 @@ class ExternalParameterNode(BaseNode):
         dimensions = len(self.external_samplespace[settable][first_element])
         return dimensions
 
-    def measure_node(self, data_path, cluster_status) -> xarray.Dataset:
+    def measure_node(self, cluster_status) -> xarray.Dataset:
         iterations = self.external_dimensions
         external_dim = list(self.external_samplespace.keys())[0]
 
         result_dataset = xarray.Dataset()
 
-        qubits = self.all_qubits
-        couplers = self.couplers
-        device = configure_device(self.name, qubits, couplers)
-        device.hardware_config(hw_config)
-        save_serial_device(self.name, device, data_path)
-        compiled_schedule = self.precompile(device, self.schedule_samplespace)
-        device.close()
+        compiled_schedule = self.precompile( self.schedule_samplespace)
 
         self.initial_operation()
 

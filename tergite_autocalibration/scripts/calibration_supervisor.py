@@ -175,25 +175,11 @@ class CalibrationSupervisor:
             logger.info(f"{calibration_node} node is completed")
 
     def inspect_node(self, node_name: str):
+        # TODO: this function must be split
         logger.info(f"Inspecting node {node_name}")
-
-        node: BaseNode = self.calibration_node_factory.create_node(
-            node_name,
-            self.qubits,
-            couplers=self.couplers,
-            measurement_mode=self.measurement_mode,
-        )
-
-        if node.name in self.user_samplespace:
-            update_to_user_samplespace(node, self.user_samplespace)
-
-        # it's maybe useful to give access to the ic
-        node.lab_instr_coordinator = self.lab_ic
-
         populate_initial_parameters(
             self.transmon_configuration, self.qubits, self.couplers, REDIS_CONNECTION
         )
-
         if node_name in [
             "coupler_spectroscopy",
             "cz_chevron",
@@ -229,6 +215,8 @@ class CalibrationSupervisor:
             self.couplers,
             REDIS_CONNECTION,
         )
+
+
 
         # Check Redis if node is calibrated
         status = DataStatus.undefined
@@ -284,6 +272,18 @@ class CalibrationSupervisor:
                 "\u2691\u2691\u2691 "
                 + f"{Fore.RED}{Style.BRIGHT}Calibration required for Node {node_name}{Style.RESET_ALL}"
             )
+
+            node: BaseNode = self.calibration_node_factory.create_node(
+                node_name,
+                self.qubits,
+                couplers=self.couplers,
+                measurement_mode=self.measurement_mode,
+            )
+            if node.name in self.user_samplespace:
+                update_to_user_samplespace(node, self.user_samplespace)
+            # it's maybe useful to give access to the ic
+            node.lab_instr_coordinator = self.lab_ic
+
             logger.info(f"Calibrating node {node.name}")
             # TODO: This could be in the node initializer
             data_path = create_node_data_path(node)

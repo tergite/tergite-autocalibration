@@ -1,14 +1,7 @@
-import json
-
 import numpy as np
 from quantify_scheduler.instrument_coordinator.utility import xarray
 
-from tergite_autocalibration.config.settings import HARDWARE_CONFIG
 from tergite_autocalibration.lib.base.node import BaseNode
-from tergite_autocalibration.lib.utils.device import (
-    configure_device,
-    save_serial_device,
-)
 from tergite_autocalibration.lib.utils.validators import (
     MixedSamplespace,
     Samplespace,
@@ -18,11 +11,6 @@ from tergite_autocalibration.lib.utils.validators import (
     reduce_batch,
 )
 from tergite_autocalibration.utils.measurement_utils import reduce_samplespace
-
-# TODO: maybe this doesn't belong here
-with open(HARDWARE_CONFIG) as hw:
-    hw_config = json.load(hw)
-
 
 class ScheduleNode(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
@@ -49,12 +37,11 @@ class ScheduleNode(BaseNode):
         dimensions = len(self.outer_schedule_samplespace[settable][first_element])
         return dimensions
 
-    def measure_node(self, data_path, cluster_status) -> xarray.Dataset:
+    def measure_node(self, cluster_status) -> xarray.Dataset:
         """
         Measurements that involve only schedule parametres
         """
         result_dataset = self.measure_schedule_node(
-            data_path,
             cluster_status=cluster_status,
         )
 
@@ -62,17 +49,8 @@ class ScheduleNode(BaseNode):
 
     def measure_schedule_node(
         self,
-        data_path,
         cluster_status,
     ) -> xarray.Dataset:
-
-        # TODO: IMPORTANT
-        # Rethink device managing. When and where is created, configured, updated, closed
-        qubits = self.all_qubits
-        couplers = self.couplers
-        device = configure_device(self.name, qubits, couplers)
-        device.hardware_config(hw_config)
-        save_serial_device(self.name, device, data_path)
 
         if self.outer_schedule_samplespace == {}:
             validated_samplespace = Samplespace(self.schedule_samplespace)
@@ -81,7 +59,7 @@ class ScheduleNode(BaseNode):
                 """
                 This correspond to simple cluster schedules
                 """
-                compiled_schedule = self.precompile(device, self.schedule_samplespace)
+                compiled_schedule = self.precompile( self.schedule_samplespace)
                 result_dataset = self.measure_compiled_schedule(
                     compiled_schedule,
                     cluster_status=cluster_status,
@@ -98,7 +76,7 @@ class ScheduleNode(BaseNode):
                 for batch_index in range(number_of_batches):
                     reduced_schedule_samplespace = reduce_batch(batched_schedule_samplespace, batch_index)
                     self.schedule_samplespace = reduced_schedule_samplespace
-                    compiled_schedule = self.precompile(device, reduced_schedule_samplespace)
+                    compiled_schedule = self.precompile( reduced_schedule_samplespace)
                     ds = self.measure_compiled_schedule(
                         compiled_schedule,
                         cluster_status=cluster_status,
@@ -125,7 +103,7 @@ class ScheduleNode(BaseNode):
                 current_value = list(element_dict.values())[0]
 
                 samplespace = self.schedule_samplespace | reduced_outer_samplespace
-                compiled_schedule = self.precompile(device, samplespace)
+                compiled_schedule = self.precompile(samplespace)
 
                 ds = self.measure_compiled_schedule(
                     compiled_schedule,
@@ -134,8 +112,5 @@ class ScheduleNode(BaseNode):
                 )
                 ds = ds.expand_dims({outer_dim: np.array([current_value])})
                 result_dataset = xarray.merge([ds, result_dataset])
-
-        # TODO: same TODO as when the device was configured
-        device.close()
 
         return result_dataset

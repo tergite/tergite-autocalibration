@@ -34,6 +34,7 @@ from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
 from tergite_autocalibration.config import settings
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
+from tergite_autocalibration.lib.utils.device import DeviceConfiguration
 from tergite_autocalibration.lib.utils.schedule_execution import execute_schedule
 from tergite_autocalibration.utils.dataset_utils import configure_dataset, save_dataset
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
@@ -58,11 +59,8 @@ class BaseNode(abc.ABC):
         self.backup = False
         self.qubit_state = 0  # can be 0 or 1 or 2
         self.plots_per_qubit = 1  # can be 0 or 1 or 2
-
         self.couplers: Optional[List[str] | None] = None
-
         self.lab_instr_coordinator: InstrumentCoordinator
-
         self.measured_elements: Literal["Single_Qubits", "Couplers"] = "Single_Qubits"
 
         self.schedule_samplespace = {}
@@ -88,7 +86,13 @@ class BaseNode(abc.ABC):
                 "Quantities of Interest are missing from the node implementation"
             )
 
-    def measure_node(self, data_path, cluster_status) -> xarray.Dataset:
+        # NOTE: In the future this will be problematic.
+        # Having the device creation in the init will prohibit concurrent
+        # initialization of two different nodes
+        self.device_manager = DeviceConfiguration(self.all_qubits, self.couplers)
+        self.device = self.device_manager.configure_device(self.name)
+
+    def measure_node(self, cluster_status) -> xarray.Dataset:
         result_dataset = xarray.Dataset()
         """
         To be implemented by the Classes that define the Node Type:
@@ -149,22 +153,20 @@ class BaseNode(abc.ABC):
 
     def calibrate(self, data_path: Path, cluster_status):
         if cluster_status != MeasurementMode.re_analyse:
-            result_dataset = self.measure_node(data_path, cluster_status)
+            result_dataset = self.measure_node(cluster_status)
+            self.device_manager.save_serial_device(self.name, self.device, data_path)
+            # After the measurement free the device resources
+            self.device_manager.close_device()
             save_dataset(result_dataset, self.name, data_path)
         self.post_process(data_path)
         logger.info("analysis completed")
 
-    def precompile(
-            self, device: QuantumDevice, schedule_samplespace: dict
-    ) -> CompiledSchedule:
+    def precompile( self, schedule_samplespace: dict) -> CompiledSchedule:
         constants.GRID_TIME_TOLERANCE_TIME = 5e-2
 
         # TODO: put 'tof' out of its misery
         if self.name == "tof":
             return None, 1
-
-        qubits = self.all_qubits
-        couplers = self.couplers
 
         # # NOTE: IS THIS BEING USED?
         # # NOTE: DOES IT BELONG HERE?
@@ -193,10 +195,10 @@ class BaseNode(abc.ABC):
         #                     REDIS_CONNECTION.hset(key, field, "nan")
         #                     structured_redis_storage(key, coupler, value)
 
-        transmons = {qubit: device.get_element(qubit) for qubit in qubits}
+        transmons = self.device_manager.transmons
 
         if self.measured_elements == "Couplers":
-            edges = {coupler: device.get_edge(coupler) for coupler in couplers}
+            edges = self.device_manager.edges
             node_class = self.measurement_obj(transmons, edges)
         else:
             node_class = self.measurement_obj(transmons)
@@ -205,18 +207,8 @@ class BaseNode(abc.ABC):
         # TODO: Probably the compiler desn't need to be created every time self.precompile() is called.
         compiler = SerialCompiler(name=f"{self.name}_compiler")
 
-        compilation_config = device.generate_compilation_config()
-
-        # TODO: check if this required:
-        # # after the compilation_config is acquired, free the transmon resources
-        # for extended_transmon in transmons.values():
-        #     extended_transmon.close()
-        # if self.measured_elements == "Couplers":
-        #     for extended_edge in edges.values():
-        #         extended_edge.close()
-        #
+        compilation_config = self.device.generate_compilation_config()
         logger.info("Starting Compiling")
-
         compiled_schedule = compiler.compile(
             schedule=schedule, config=compilation_config
         )
@@ -282,6 +274,7 @@ class BaseNode(abc.ABC):
         )
         analysis_results = node_analysis.analyze_node(data_path)
         return analysis_results
+
 
     def __str__(self):
         return f"Node representation for {self.name} on qubits {self.all_qubits}"
