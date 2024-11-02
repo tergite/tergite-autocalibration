@@ -18,7 +18,7 @@ import lmfit
 from matplotlib.axes import Axes
 import numpy as np
 
-from ....base.analysis import BaseAllQubitsRepeatAnalysis, BaseQubitAnalysis
+from ....base.analysis import BaseAllQubitsAnalysis, BaseQubitAnalysis
 from tergite_autocalibration.lib.utils.functions import exponential_decay_function
 
 
@@ -206,7 +206,7 @@ class PurityBenchmarkingQubitAnalysis(BaseQubitAnalysis):
         ax.grid()
 
 
-class PurityBenchmarkingNodeAnalysis(BaseAllQubitsRepeatAnalysis):
+class PurityBenchmarkingNodeAnalysis(BaseAllQubitsAnalysis):
     single_qubit_analysis_obj = PurityBenchmarkingQubitAnalysis
 
     def __init__(self, name, redis_fields):

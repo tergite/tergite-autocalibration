@@ -21,7 +21,6 @@ from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.hardware_utils import SpiDAC
 from tergite_autocalibration.utils.user_input import qubit_samples, resonator_samples
 
-from ....base.node import BaseNode
 from ...qubit_control.spectroscopy.measurement import Two_Tones_Multidim
 from ...readout.resonator_spectroscopy.measurement import Resonator_Spectroscopy
 from .analysis import CouplerSpectroscopyNodeAnalysis

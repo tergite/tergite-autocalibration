@@ -37,10 +37,7 @@ def configure_dataset(
 
     keys = raw_ds.data_vars.keys()
     measurement_qubits = node.all_qubits
-    schedule_samplespace = node.schedule_samplespace
-    external_samplespace = node.reduced_external_samplespace
-
-    samplespace = schedule_samplespace | external_samplespace
+    samplespace = node.schedule_samplespace
 
     sweep_quantities = samplespace.keys()
 
@@ -237,9 +234,9 @@ def save_dataset(
         {"name": node_name, "tuid": measurement_id}
     )
 
+    # to_netcdf doesn't like complex numbers, convert to real/imag to save:
     result_dataset_real = to_real_dataset(result_dataset)
 
-    # to_netcdf doesn't like complex numbers, convert to real/imag to save:
     count = 0
     dataset_name = f"dataset_{node_name}_{count}.hdf5"
     while (data_path / dataset_name).is_file():

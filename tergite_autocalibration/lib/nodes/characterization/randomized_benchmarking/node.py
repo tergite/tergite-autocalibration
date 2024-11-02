@@ -29,7 +29,6 @@ class Randomized_Benchmarking_Node(ScheduleNode):
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
         self.name = name
-        self.type = "parameterized_sweep"
         self.all_qubits = all_qubits
         self.schedule_keywords = schedule_keywords
         self.backup = False

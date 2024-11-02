@@ -17,8 +17,6 @@ node reference
   punchout
   resonator_spectroscopy
   qubit_01_spectroscopy
-  qubit_01_spectroscopy_pulsed
-  qubit_01_cw_spectroscopy
   rabi_oscillations
   ramsey_correction
   resonator_spectroscopy_1
@@ -74,7 +72,7 @@ def resonator_samples(qubit: str) -> np.ndarray:
     VNA_frequency = VNA_resonator_frequencies[qubit]
     min_freq = VNA_frequency - sweep_range / 2 - 0.5e6
     max_freq = VNA_frequency + sweep_range / 2
-    return [np.linspace(min_freq, max_freq-2e6, res_spec_samples),np.linspace(max_freq-2e6, max_freq, res_spec_samples) ]
+    return [np.linspace(min_freq, max_freq-2e6, res_spec_samples),np.linspace(max_freq-1.9e6, max_freq, res_spec_samples) ]
 
 
 def qubit_samples(qubit: str, transition: str = "01") -> np.ndarray:
@@ -86,7 +84,8 @@ def qubit_samples(qubit: str, transition: str = "01") -> np.ndarray:
         VNA_frequency = VNA_f12_frequencies[qubit]
     min_freq = VNA_frequency - sweep_range / 2
     max_freq = VNA_frequency + sweep_range / 2
-    return np.linspace(min_freq, max_freq, qub_spec_samples)
+    # return np.linspace(min_freq, max_freq, qub_spec_samples)
+    return [np.linspace(min_freq, max_freq-5e6, qub_spec_samples),np.linspace(max_freq-4.9e6, max_freq, qub_spec_samples) ]
 
 
 """
@@ -105,7 +104,7 @@ user_samplespace = {
 }
 """
 ####################################################################
-target_node = "resonator_spectroscopy"
+target_node = "T1"
 qubits = [
     "q01",
     "q02",

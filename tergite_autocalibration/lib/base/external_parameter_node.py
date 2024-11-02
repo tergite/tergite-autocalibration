@@ -52,7 +52,7 @@ class ExternalParameterNode(BaseNode):
         device = configure_device(self.name, qubits, couplers)
         device.hardware_config(hw_config)
         save_serial_device(self.name, device, data_path)
-        compiled_schedule = self.precompile(device)
+        compiled_schedule = self.precompile(device, self.schedule_samplespace)
         device.close()
 
         self.initial_operation()

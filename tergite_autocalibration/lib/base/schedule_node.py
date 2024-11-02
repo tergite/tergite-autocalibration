@@ -13,13 +13,13 @@ from tergite_autocalibration.lib.utils.validators import (
     MixedSamplespace,
     Samplespace,
     SimpleSamplespace,
-    get_batched_coord,
+    get_batched_dimensions,
     get_number_of_batches,
     reduce_batch,
 )
 from tergite_autocalibration.utils.measurement_utils import reduce_samplespace
 
-# TODO: maybe this deosn't belong here
+# TODO: maybe this doesn't belong here
 with open(HARDWARE_CONFIG) as hw:
     hw_config = json.load(hw)
 
@@ -93,8 +93,8 @@ class ScheduleNode(BaseNode):
                 """
                 batched_schedule_samplespace = self.schedule_samplespace
                 number_of_batches = get_number_of_batches(batched_schedule_samplespace)
-                batched_coord = get_batched_coord(batched_schedule_samplespace)
-                result_dataset = xarray.Dataset()
+                batched_dimensions = get_batched_dimensions(batched_schedule_samplespace)
+                result_dataset = xarray.Dataset(coords={coord: [] for coord in batched_dimensions})
                 for batch_index in range(number_of_batches):
                     reduced_schedule_samplespace = reduce_batch(batched_schedule_samplespace, batch_index)
                     self.schedule_samplespace = reduced_schedule_samplespace
@@ -104,10 +104,7 @@ class ScheduleNode(BaseNode):
                         cluster_status=cluster_status,
                         measurement=(batch_index, number_of_batches),
                     )
-                    breakpoint()
-                    result_dataset = xarray.concat(
-                        [ds, result_dataset], dim=batched_coord
-                    )
+                    result_dataset = xarray.combine_by_coords([ result_dataset ,  ds ], data_vars='minimal')
 
         else:
             """

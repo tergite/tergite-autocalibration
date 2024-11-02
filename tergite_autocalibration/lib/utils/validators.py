@@ -37,7 +37,7 @@ class Array(RootModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
-def get_number_of_batches(samplespace: Dict[str, Dict[str, list[NDArray]]]):
+def get_number_of_batches(samplespace: Dict[str, Union[Dict[str, NDArray], Dict[str, list[NDArray]]]]):
     """
     if the samplespace is a list of NDarrays,
     return the number of individual arrays per qubit
@@ -48,22 +48,24 @@ def get_number_of_batches(samplespace: Dict[str, Dict[str, list[NDArray]]]):
         if isinstance(q.root, BatchedArray):
             for element, samples in qubit_dict.items():
                 number_of_batches = len(samples)
-        else:
-            raise TypeError("samplespace does not contain batches")
+    print(f'{ number_of_batches = }')
     return number_of_batches
 
 
-def get_batched_coord(samplespace: Dict[str, Dict[str, list[NDArray]]]) -> str:
+def get_batched_dimensions(samplespace: Dict[str, Dict[str, list[NDArray]]]) -> list[str]:
     """
     if the samplespace is a list of NDarrays,
     return the name of the settable, e.g. 'frequencies'
     """
+    batched_dimensions = []
     for settable, qubit_dict in samplespace.items():
         qubit_dict = dict(qubit_dict)
         q = Array(qubit_dict)
         if isinstance(q.root, BatchedArray):
-            batched_coord = settable
-    return batched_coord
+            for qubit in qubit_dict:
+                batched_dimensions.append(str(settable)+str(qubit))
+            
+    return batched_dimensions
 
 
 def reduce_batch(samplespace, batch: int):

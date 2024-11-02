@@ -17,12 +17,15 @@ from time import sleep
 
 import numpy as np
 
+from tergite_autocalibration.lib.base.external_parameter_node import (
+    ExternalParameterNode,
+)
+
 from .analysis import T1NodeAnalysis
 from .measurement import T1
-from ....base.node import BaseNode
 
 
-class T1_Node(BaseNode):
+class T1_Node(ExternalParameterNode):
     measurement_obj = T1
     analysis_obj = T1NodeAnalysis
     qubit_qois = ["t1_time"]
@@ -42,17 +45,17 @@ class T1_Node(BaseNode):
 
         self.schedule_samplespace = {
             "delays": {
-                qubit: 8e-9 + np.arange(0, 300e-6, 6e-6) for qubit in self.all_qubits
+                qubit: 8e-9 + np.arange(0, 30e-6, 6e-6) for qubit in self.all_qubits
             }
         }
         self.external_samplespace = {
-            "repeat": {
+            "T1_repetitions": {
                 qubit: range(self.number_or_repeated_T1s) for qubit in self.all_qubits
             }
         }
 
     def pre_measurement_operation(self, reduced_ext_space):
-        iteration_dict = reduced_ext_space["repeat"]
+        iteration_dict = reduced_ext_space["T1_repetitions"]
         # there is some redundancy that all qubits have the same
         # iteration index, that's why we keep the first value->
         this_iteration = list(iteration_dict.values())[0]

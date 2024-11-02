@@ -21,7 +21,7 @@ import numpy as np
 import xarray as xr
 from quantify_core.analysis.fitting_models import ExpDecayModel
 
-from ....base.analysis import BaseAllQubitsRepeatAnalysis, BaseQubitAnalysis
+from ....base.analysis import BaseAllQubitsAnalysis, BaseQubitAnalysis
 
 
 def cos_func(
@@ -44,8 +44,8 @@ class T1QubitAnalysis(BaseQubitAnalysis):
 
     def analyse_qubit(self):
         for coord in self.dataset[self.data_var].coords:
-            if "repeat" in coord:
-                self.repeat_coord = coord
+            if "repetition" in coord:
+                self.repetitions_coord = coord
             elif "delays" in coord:
                 self.delays_coord = coord
 
@@ -57,8 +57,8 @@ class T1QubitAnalysis(BaseQubitAnalysis):
             self.delays[0], self.delays[-1], 400
         )  # x-values for plotting
         self.T1_times = []
-        for indx, repeat in enumerate(self.dataset.coords[self.repeat_coord]):
-            magnitudes = self.magnitudes[self.data_var].isel({self.repeat_coord: indx})
+        for indx, repeat in enumerate(self.dataset.coords[self.repetitions_coord]):
+            magnitudes = self.magnitudes[self.data_var].isel({self.repetitions_coord: indx})
             magnitudes_flat = magnitudes.values.flatten()
 
             # Gives an initial guess for the model parameters and then fits the model to the data.
@@ -73,8 +73,8 @@ class T1QubitAnalysis(BaseQubitAnalysis):
         return [self.average_T1]
 
     def plotter(self, ax):
-        for indx, repeat in enumerate(self.dataset.coords[self.repeat_coord]):
-            magnitudes = self.magnitudes[self.data_var].isel({self.repeat_coord: indx})
+        for indx, repeat in enumerate(self.dataset.coords[self.repetitions_coord]):
+            magnitudes = self.magnitudes[self.data_var].isel({self.repetitions_coord: indx})
             magnitudes_flat = magnitudes.values.flatten()
             ax.plot(self.delays, magnitudes_flat)
         # ax.plot( self.fit_delays , self.fit_y,'r-', lw=3.0, label=f'T1 = {self.T1_time * 1e6:.1f} μs')
@@ -92,7 +92,7 @@ class T1QubitAnalysis(BaseQubitAnalysis):
         ax.grid()
 
 
-class T1NodeAnalysis(BaseAllQubitsRepeatAnalysis):
+class T1NodeAnalysis(BaseAllQubitsAnalysis):
     single_qubit_analysis_obj = T1QubitAnalysis
 
     def __init__(self, name, redis_fields):

@@ -242,50 +242,53 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
             analysis._plot(primary_axis)
 
 
-class BaseAllQubitsRepeatAnalysis(BaseAllQubitsAnalysis, ABC):
-    def __init__(self, name: str, redis_fields):
-        super().__init__(name, redis_fields)
-        self.repeat_coordinate_name = ""
-
-    def open_dataset(self) -> xr.Dataset:
-        # Infer number of repeats by counting the number of dataset files
-        data_files = sorted(self.data_path.glob("*.hdf5"))
-        if not data_files:
-            raise FileNotFoundError(f"No dataset files found in {self.data_path}")
-
-        self.num_repeats = len(data_files)
-
-        # Load the first dataset to infer the qubit names
-        first_dataset = xr.open_dataset(data_files[0], engine="scipy")
-        self.all_qubits = [
-            var for var in first_dataset.data_vars if var.startswith("yq")
-        ]
-
-        datasets = []
-
-        for qubit in self.all_qubits:
-            qubit_datasets = []
-            for repeat_idx, file_path in enumerate(data_files):
-                file_path = self.data_path / f"dataset_{repeat_idx}.hdf5"
-
-                ds = xr.open_dataset(file_path, engine="scipy")
-
-                qubit_data = ds[[qubit]]
-
-                repeat_coord = (
-                    f"{self.repeat_coordinate_name}{qubit[1:]}"  # e.g., 'repeatq16'
-                )
-                if repeat_coord not in qubit_data.coords:
-                    qubit_data = qubit_data.assign_coords({repeat_coord: repeat_idx})
-
-                qubit_datasets.append(qubit_data)
-
-            merged_qubit_data = xr.concat(qubit_datasets, dim=repeat_coord)
-            datasets.append(merged_qubit_data)
-
-        merged_datasets = xr.merge(datasets)
-
-        return merged_datasets
+# class BaseAllQubitsRepeatAnalysis(BaseAllQubitsAnalysis, ABC):
+#     def __init__(self, name: str, redis_fields):
+#         super().__init__(name, redis_fields)
+#         self.repeat_coordinate_name = ""
+#
+#     def open_dataset(self) -> xr.Dataset:
+#         # Infer number of repeats by counting the number of dataset files
+#         data_files = sorted(self.data_path.glob("*.hdf5"))
+#         if not data_files:
+#             raise FileNotFoundError(f"No dataset files found in {self.data_path}")
+#
+#         self.num_repeats = len(data_files)
+#
+#         # Load the first dataset to infer the qubit names
+#         first_dataset = xr.open_dataset(data_files[0])
+#         # first_dataset = xr.open_dataset(data_files[0], engine="scipy")
+#         self.all_qubits = [
+#             var for var in first_dataset.data_vars if var.startswith("yq")
+#         ]
+#
+#         datasets = []
+#
+#         for qubit in self.all_qubits:
+#             qubit_datasets = []
+#             for repeat_idx, file_path in enumerate(data_files):
+#                 breakpoint()
+#                 file_path = self.data_path / f"dataset_{repeat_idx}.hdf5"
+#
+#                 # ds = xr.open_dataset(file_path, engine="scipy")
+#                 ds = xr.open_dataset(file_path)
+#
+#                 qubit_data = ds[[qubit]]
+#
+#                 repeat_coord = (
+#                     f"{self.repeat_coordinate_name}{qubit[1:]}"  # e.g., 'repeatq16'
+#                 )
+#                 if repeat_coord not in qubit_data.coords:
+#                     qubit_data = qubit_data.assign_coords({repeat_coord: repeat_idx})
+#
+#                 qubit_datasets.append(qubit_data)
+#
+#             merged_qubit_data = xr.concat(qubit_datasets, dim=repeat_coord)
+#             datasets.append(merged_qubit_data)
+#
+#         merged_datasets = xr.merge(datasets)
+#
+#         return merged_datasets
 
 
 class BaseQubitAnalysis(BaseAnalysis, ABC):
@@ -508,7 +511,8 @@ class BaseAllCouplersRepeatAnalysis(BaseAllCouplersAnalysis, ABC):
         self.num_repeats = len(data_files)
 
         # Load the first dataset to infer coupler-based coordinates
-        first_dataset = xr.open_dataset(data_files[0], engine="scipy")
+        first_dataset = xr.open_dataset(data_files[0])
+        # first_dataset = xr.open_dataset(data_files[0], engine="scipy")
 
         # Step 1: Group data variables by qubit (assuming qubit data starts with 'yq')
         self.all_qubits = [
@@ -533,7 +537,8 @@ class BaseAllCouplersRepeatAnalysis(BaseAllCouplersAnalysis, ABC):
 
         for file_idx, file_path in enumerate(data_files):
             print(f"Opening dataset {file_idx + 1}/{len(data_files)}: {file_path}")
-            ds = xr.open_dataset(file_path, engine="scipy")
+            ds = xr.open_dataset(file_path)
+            # ds = xr.open_dataset(file_path, engine="scipy")
 
             # Step 3: Extract qubit-related data and identify couplers
             for coupler, coords in self.coupler_data_dict.items():
