@@ -8,7 +8,6 @@ from tergite_autocalibration.lib.base.node import BaseNode
 from tergite_autocalibration.utils.measurement_utils import reduce_samplespace
 
 
-
 class ExternalParameterNode(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, schedule_keywords=schedule_keywords)
@@ -40,7 +39,7 @@ class ExternalParameterNode(BaseNode):
 
         result_dataset = xarray.Dataset()
 
-        compiled_schedule = self.precompile( self.schedule_samplespace)
+        compiled_schedule = self.precompile(self.schedule_samplespace)
 
         self.initial_operation()
 

@@ -16,15 +16,16 @@ from tergite_autocalibration.utils.extended_transmon_element import ExtendedTran
 with open(HARDWARE_CONFIG) as hw:
     hw_config = json.load(hw)
 
-class DeviceConfiguration():
+
+class DeviceConfiguration:
     def __init__(self, qubits: list[str], couplers: list[str]) -> None:
         self.qubits = qubits
         self.couplers = couplers
         self.transmons: dict[str, ExtendedTransmon] = {}
         self.edges: dict[str, ExtendedCompositeSquareEdge] = {}
         self.device: QuantumDevice
-        
-    def configure_device(self, name:str) -> QuantumDevice:
+
+    def configure_device(self, name: str) -> QuantumDevice:
         device = QuantumDevice(f"Device_{name}")
         for channel, qubit in enumerate(self.qubits):
             transmon = ExtendedTransmon(qubit)
@@ -43,7 +44,7 @@ class DeviceConfiguration():
         device.hardware_config(hw_config)
         self.device = device
         return device
-    
+
     def close_device(self):
         # after the compilation_config is acquired, free the transmon resources
         for transmon in self.transmons.values():

@@ -58,7 +58,9 @@ class T1QubitAnalysis(BaseQubitAnalysis):
         )  # x-values for plotting
         self.T1_times = []
         for indx, repeat in enumerate(self.dataset.coords[self.repetitions_coord]):
-            magnitudes = self.magnitudes[self.data_var].isel({self.repetitions_coord: indx})
+            magnitudes = self.magnitudes[self.data_var].isel(
+                {self.repetitions_coord: indx}
+            )
             magnitudes_flat = magnitudes.values.flatten()
 
             # Gives an initial guess for the model parameters and then fits the model to the data.
@@ -74,7 +76,9 @@ class T1QubitAnalysis(BaseQubitAnalysis):
 
     def plotter(self, ax):
         for indx, repeat in enumerate(self.dataset.coords[self.repetitions_coord]):
-            magnitudes = self.magnitudes[self.data_var].isel({self.repetitions_coord: indx})
+            magnitudes = self.magnitudes[self.data_var].isel(
+                {self.repetitions_coord: indx}
+            )
             magnitudes_flat = magnitudes.values.flatten()
             ax.plot(self.delays, magnitudes_flat)
         # ax.plot( self.fit_delays , self.fit_y,'r-', lw=3.0, label=f'T1 = {self.T1_time * 1e6:.1f} μs')

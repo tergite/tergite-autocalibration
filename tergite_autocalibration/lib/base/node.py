@@ -65,7 +65,7 @@ class BaseNode(abc.ABC):
 
         self.schedule_samplespace = {}
         self.external_samplespace = {}
-        
+
         # These may be modified while the node runs
         self.outer_schedule_samplespace = {}
         self.initial_schedule_samplespace = {}
@@ -161,7 +161,7 @@ class BaseNode(abc.ABC):
         self.post_process(data_path)
         logger.info("analysis completed")
 
-    def precompile( self, schedule_samplespace: dict) -> CompiledSchedule:
+    def precompile(self, schedule_samplespace: dict) -> CompiledSchedule:
         constants.GRID_TIME_TOLERANCE_TIME = 5e-2
 
         # TODO: put 'tof' out of its misery
@@ -202,7 +202,9 @@ class BaseNode(abc.ABC):
             node_class = self.measurement_obj(transmons, edges)
         else:
             node_class = self.measurement_obj(transmons)
-        schedule = node_class.schedule_function(**schedule_samplespace, **self.schedule_keywords)
+        schedule = node_class.schedule_function(
+            **schedule_samplespace, **self.schedule_keywords
+        )
 
         # TODO: Probably the compiler desn't need to be created every time self.precompile() is called.
         compiler = SerialCompiler(name=f"{self.name}_compiler")
@@ -274,7 +276,6 @@ class BaseNode(abc.ABC):
         )
         analysis_results = node_analysis.analyze_node(data_path)
         return analysis_results
-
 
     def __str__(self):
         return f"Node representation for {self.name} on qubits {self.all_qubits}"

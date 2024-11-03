@@ -41,9 +41,12 @@ def test_batched_samplespaces():
         raise TypeError("Invalid samplespace type")
 
     assert err_info.type is TypeError
-    assert get_batched_dimensions(batched_samplespace) == ["frequenciesq01","frequenciesq02","frequenciesq03"]
+    assert get_batched_dimensions(batched_samplespace) == [
+        "frequenciesq01",
+        "frequenciesq02",
+        "frequenciesq03",
+    ]
     reduced_space = reduce_batch(batched_samplespace, 0)
     assert len(reduced_space["frequencies"]["q01"]) == 11
     assert len(reduced_space["frequencies"]["q02"]) == 11
     assert len(reduced_space["frequencies"]["q03"]) == 11
-

@@ -38,7 +38,9 @@ from quantify_scheduler.operations.pulse_library import (
 )
 from quantify_scheduler.resources import ClockResource
 
-from tergite_autocalibration.utils.extended_coupler_edge import ExtendedCompositeSquareEdge
+from tergite_autocalibration.utils.extended_coupler_edge import (
+    ExtendedCompositeSquareEdge,
+)
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 from tergite_autocalibration.utils.extended_gates import Measure_RO1, Rxy_12
 from ....base.measurement import BaseMeasurement

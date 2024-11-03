@@ -49,6 +49,7 @@ class NodeFactory:
             from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.node import (
                 CZParametrisationFixDurationNode,
             )
+
             # from tergite_autocalibration.lib.nodes.coupler.cz_chevron.node import (
             #     CZ_Chevron_Node,
             #     CZ_Characterisation_Chevron_Node,

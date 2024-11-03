@@ -49,7 +49,7 @@ class OptimalResult:
         self.status = SweepResultStatus.NOT_AVAILABLE
 
     def get_result(self):
-        ""
+        """
         If we found the optimal result, check if we need some
         supplementary information asscoiated with the optimal result.
         If so, we return them as a tuple.
