@@ -3,7 +3,7 @@ import pytest
 
 # from tergite_autocalibration.lib.utils.device import configure_device
 from tergite_autocalibration.lib.utils.validators import (
-    get_batched_coord,
+    get_batched_dimensions,
     get_number_of_batches,
     reduce_batch,
 )
@@ -35,13 +35,15 @@ def test_batched_samplespaces():
     }
     number_of_bathes_correct = get_number_of_batches(batched_samplespace)
     assert number_of_bathes_correct == 2
+
     with pytest.raises(TypeError) as err_info:
         get_number_of_batches(not_batched_samplespace)
         raise TypeError("Invalid samplespace type")
-    assert err_info.type is TypeError
 
-    assert get_batched_coord(batched_samplespace) == "frequencies"
+    assert err_info.type is TypeError
+    assert get_batched_dimensions(batched_samplespace) == ["frequenciesq01","frequenciesq02","frequenciesq03"]
     reduced_space = reduce_batch(batched_samplespace, 0)
     assert len(reduced_space["frequencies"]["q01"]) == 11
     assert len(reduced_space["frequencies"]["q02"]) == 11
     assert len(reduced_space["frequencies"]["q03"]) == 11
+

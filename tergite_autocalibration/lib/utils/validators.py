@@ -48,7 +48,8 @@ def get_number_of_batches(samplespace: Dict[str, Union[Dict[str, NDArray], Dict[
         if isinstance(q.root, BatchedArray):
             for element, samples in qubit_dict.items():
                 number_of_batches = len(samples)
-    print(f'{ number_of_batches = }')
+        else:
+            number_of_batches = 1
     return number_of_batches
 
 
