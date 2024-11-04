@@ -17,7 +17,7 @@ import numpy as np
 from scipy import optimize as optimize
 
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
-from tergite_autocalibration.utils.hardware_utils import SpiDAC
+from tergite_autocalibration.utils.hardware.spi import SpiDAC
 from tergite_autocalibration.utils.user_input import qubit_samples, resonator_samples
 
 from ....base.node import BaseNode

@@ -15,7 +15,10 @@
 import csv
 import json
 
+from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
+
 from tergite_autocalibration.config.settings import CONFIG_DIR
+
 
 mixer_file = CONFIG_DIR / "initial.csv"
 json_config_file = CONFIG_DIR / "HARDWARE_CONFIGURATION_LOKIA_20240504.json"
