@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.56">
+<meta name="generator" content="quarto-1.5.53">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -105,6 +105,10 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Available Nodes</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="./developer_guide.html"> 
+<span class="menu-text">Developer Guide</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="./new_node_creation.html"> 
 <span class="menu-text">Creating New Nodes</span></a>
   </li>  
@@ -113,7 +117,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Node types</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./unit_tests.qmd"> 
+    <a class="nav-link" href="./unit_tests.html"> 
 <span class="menu-text">How to add unit tests</span></a>
   </li>  
 </ul>
@@ -133,6 +137,17 @@ ul.task-list li input[type="checkbox"] {
    
   <ul>
   <li><a href="#operation" id="toc-operation" class="nav-link active" data-scroll-target="#operation">Operation</a></li>
+  <li><a href="#cli" id="toc-cli" class="nav-link" data-scroll-target="#cli">CLI</a>
+  <ul class="collapse">
+  <li><a href="#main-commands" id="toc-main-commands" class="nav-link" data-scroll-target="#main-commands">Main Commands</a></li>
+  <li><a href="#cluster-commands" id="toc-cluster-commands" class="nav-link" data-scroll-target="#cluster-commands">Cluster Commands</a></li>
+  <li><a href="#node-commands" id="toc-node-commands" class="nav-link" data-scroll-target="#node-commands">Node Commands</a></li>
+  <li><a href="#graph-commands" id="toc-graph-commands" class="nav-link" data-scroll-target="#graph-commands">Graph Commands</a></li>
+  <li><a href="#calibration-commands" id="toc-calibration-commands" class="nav-link" data-scroll-target="#calibration-commands">Calibration Commands</a></li>
+  <li><a href="#dataset-browser" id="toc-dataset-browser" class="nav-link" data-scroll-target="#dataset-browser">Dataset browser</a></li>
+  <li><a href="#joke-command" id="toc-joke-command" class="nav-link" data-scroll-target="#joke-command">Joke Command</a></li>
+  <li><a href="#notes" id="toc-notes" class="nav-link" data-scroll-target="#notes">Notes</a></li>
+  </ul></li>
   <li><a href="#structure" id="toc-structure" class="nav-link" data-scroll-target="#structure">Structure</a></li>
   <li><a href="#data-browsing" id="toc-data-browsing" class="nav-link" data-scroll-target="#data-browsing">Data browsing</a></li>
   <li><a href="#development" id="toc-development" class="nav-link" data-scroll-target="#development">Development</a></li>
@@ -158,6 +173,107 @@ ul.task-list li input[type="checkbox"] {
 <p>or</p>
 <p><strong><code>acli calibration start</code></strong></p>
 </section>
+<section id="cli" class="level2">
+<h2 class="anchored" data-anchor-id="cli">CLI</h2>
+<p>This document provides an overview of the Command Line Interface (CLI) options and their functionalities.</p>
+<section id="main-commands" class="level3">
+<h3 class="anchored" data-anchor-id="main-commands">Main Commands</h3>
+<p>The autocalibration CLI is organized into several main command groups:</p>
+<ul>
+<li><code>cluster</code>: Handle operations related to the cluster</li>
+<li><code>node</code>: Handle operations related to the node</li>
+<li><code>graph</code>: Handle operations related to the calibration graph</li>
+<li><code>calibration</code>: Handle operations related to the calibration supervisor</li>
+<li><code>joke</code>: Handle operations related to the well-being of the user</li>
+</ul>
+</section>
+<section id="cluster-commands" class="level3">
+<h3 class="anchored" data-anchor-id="cluster-commands">Cluster Commands</h3>
+<section id="cluster-reboot" class="level4">
+<h4 class="anchored" data-anchor-id="cluster-reboot"><code>cluster reboot</code></h4>
+<p>Reboots the cluster.</p>
+<p><strong>Usage:</strong></p>
+<pre><code>acli cluster reboot</code></pre>
+<p>This command will prompt for confirmation before rebooting the cluster, as it can interrupt ongoing measurements.</p>
+</section>
+</section>
+<section id="node-commands" class="level3">
+<h3 class="anchored" data-anchor-id="node-commands">Node Commands</h3>
+<section id="node-reset" class="level4">
+<h4 class="anchored" data-anchor-id="node-reset"><code>node reset</code></h4>
+<p>Resets all parameters in Redis for the specified node(s).</p>
+<p><strong>Usage:</strong></p>
+<pre><code>acli node reset [OPTIONS]</code></pre>
+<p><strong>Options:</strong></p>
+<ul>
+<li><code>-n, --name TEXT</code>: Name of the node to be reset in Redis (e.g., resonator_spectroscopy)</li>
+<li><code>-a, --all</code>: Reset all nodes</li>
+<li><code>-f, --from_node TEXT</code>: Reset all nodes from the specified node in the chain</li>
+</ul>
+</section>
+</section>
+<section id="graph-commands" class="level3">
+<h3 class="anchored" data-anchor-id="graph-commands">Graph Commands</h3>
+<section id="graph-plot" class="level4">
+<h4 class="anchored" data-anchor-id="graph-plot"><code>graph plot</code></h4>
+<p>Plots the calibration graph to the user-specified target node in topological order.</p>
+<p><strong>Usage:</strong></p>
+<pre><code>acli graph plot</code></pre>
+<p>This command visualizes the calibration graph using an arrow chart.</p>
+</section>
+</section>
+<section id="calibration-commands" class="level3">
+<h3 class="anchored" data-anchor-id="calibration-commands">Calibration Commands</h3>
+<section id="calibration-start" class="level4">
+<h4 class="anchored" data-anchor-id="calibration-start"><code>calibration start</code></h4>
+<p>Starts the calibration supervisor.</p>
+<p><strong>Usage:</strong></p>
+<pre><code>acli calibration start [OPTIONS]</code></pre>
+<p><strong>Options:</strong></p>
+<ul>
+<li><code>-c TEXT</code>: Cluster IP address (if not set, it will use CLUSTER_IP from the .env file)</li>
+<li><code>-r TEXT</code>: Rerun an analysis (specify the path to the dataset folder)</li>
+<li><code>-n, --name TEXT</code>: Specify the node type to rerun (works only with -r option)</li>
+<li><code>--push</code>: Push a backend to an MSS specified in MSS_MACHINE_ROOT_URL in the .env file</li>
+<li><code>--browser</code>: Will open the dataset browser in the background and plot the measurement results live</li>
+</ul>
+</section>
+</section>
+<section id="dataset-browser" class="level3">
+<h3 class="anchored" data-anchor-id="dataset-browser">Dataset browser</h3>
+<section id="browser" class="level4">
+<h4 class="anchored" data-anchor-id="browser"><code>browser</code></h4>
+<p>Starts the dataset browser.</p>
+<p><strong>Usage:</strong></p>
+<pre><code>acli browser --datadir [OPTIONS]</code></pre>
+<p><strong>Options:</strong></p>
+<ul>
+<li><code>--datadir PATH</code>: Folder to take the plot data from</li>
+<li><code>--liveplotting</code>: Whether plots should be updated in real time (default: False)</li>
+<li><code>--log-level INT</code>: Log-level as in the Python <code>logging</code> package to be used in the logs (default: 30)</li>
+</ul>
+</section>
+</section>
+<section id="joke-command" class="level3">
+<h3 class="anchored" data-anchor-id="joke-command">Joke Command</h3>
+<section id="joke" class="level4">
+<h4 class="anchored" data-anchor-id="joke"><code>joke</code></h4>
+<p>Prints a random joke to lighten the mood.</p>
+<p><strong>Usage:</strong></p>
+<pre><code>acli joke</code></pre>
+<p>This command fetches and displays a random joke, excluding potentially offensive content.</p>
+</section>
+</section>
+<section id="notes" class="level3">
+<h3 class="anchored" data-anchor-id="notes">Notes</h3>
+<ul>
+<li>The CLI uses the Click library for command-line interface creation.</li>
+<li>Some commands may require additional configuration or environment variables to be set.</li>
+<li>When using the <code>-r</code> option for rerunning analysis, make sure to also specify the node name using <code>-n</code>.</li>
+</ul>
+<p>For more detailed information about each command, use the <code>--help</code> option with any command or subcommand.</p>
+</section>
+</section>
 <section id="structure" class="level2">
 <h2 class="anchored" data-anchor-id="structure">Structure</h2>
 <p>For each calibration node: compilation -&gt; execution -&gt; post-processing -&gt; redis updating</p>
@@ -168,7 +284,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="development" class="level2">
 <h2 class="anchored" data-anchor-id="development">Development</h2>
-<p>When submitting contributions, please prepend your commit messages with: <code>fix:</code> for bug fixes <code>feat:</code> for introducing a new feature (e.g.&nbsp;a new measurement node or a new analysis class) <code>chore:</code> for refractoring changes or any change that doesn’t affect the functionality of the code <code>docs:</code> for changes in the README, docstrings etc <code>test:</code> or <code>dev:</code> for testing or development changes (e.g.&nbsp;profiling scripts)</p>
+<p>When submitting contributions, please prepend your commit messages with: <code>fix:</code> for bug fixes <code>feat:</code> for introducing a new feature (e.g.&nbsp;a new measurement node or a new analysis class) <code>chore:</code> for refactoring changes or any change that doesn’t affect the functionality of the code <code>docs:</code> for changes in the README, docstrings etc <code>test:</code> or <code>dev:</code> for testing or development changes (e.g.&nbsp;profiling scripts)</p>
 
 
 </section>
