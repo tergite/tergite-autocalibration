@@ -58,3 +58,22 @@ To use black, open a shell and run
 black .
 ```
 Please make sure to run it before merging the PR.
+
+If your pipeline is still showing an error when you are running black, please make sure that you have installed the right version of black.
+You can check that by running
+```
+black --version
+```
+If your black version differs, it might be possible that you have had installed a version of black either in your base environment or via apt.
+To remove these versions, please deactivate your conda environment with `conda deactivate` and then run:
+```
+sudo apt remote black
+```
+or
+```
+pip uninstall black
+```
+Next, please activate again your Python environment and install the correct version black as defined in the `pyproject.toml` file.
+```
+pip install black==VERSION_FROM_PYPROJECT_TOML
+```
