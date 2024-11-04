@@ -49,7 +49,7 @@ Remember to add your name and do not delete previus contributors. If you add the
 # that they have been altered from the originals.
 ``` 
 ### Changelog
-Update the changelog in the sectionc called [Unreleased]. Please note that there are several sections titled "Added", "Change" and "Fixed"; place your text in the correct category. 
+Update the changelog in the section called [Unreleased]. Please note that there are several sections titled "Added", "Change" and "Fixed"; place your text in the correct category.
 
 ### Static code analyzer
 The code analyzer used in the project is black, which is installed as part of the dev dependencies.
