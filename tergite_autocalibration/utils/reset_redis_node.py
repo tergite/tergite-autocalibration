@@ -12,7 +12,7 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import toml
+import itertools
 
 from tergite_autocalibration.config.calibration import CONFIG
 from tergite_autocalibration.config.settings import QOI_CONFIG, REDIS_CONNECTION
@@ -20,24 +20,34 @@ from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 
 
+# NOTE: does this need to be a class?
 class ResetRedisNode:
+    node_factory = NodeFactory()
+    nodes = node_factory.all_nodes()
+    factory_dict = node_factory.node_implementations
+
     def __init__(self):
         self.qubits = CONFIG.qubits
         self.couplers = CONFIG.couplers
-        node_factory = NodeFactory()
-        self.nodes = node_factory.all_node_names()
-        qoi_configuration = toml.load(QOI_CONFIG)
-        self.quantities_of_interest = qoi_configuration["qoi"]["qubits"]
-        self.coupler_quantities_of_interest = qoi_configuration["qoi"]["couplers"]
+
+        qois = [self.factory_dict[node].qubit_qois for node in self.nodes]
+        qois = [qoi for qoi in qois if qoi is not None]  # filter out Nones
+        self.quantities_of_interest = list(itertools.chain.from_iterable(qois))
+        coupler_qois = [self.factory_dict[node].coupler_qois for node in self.nodes]
+        coupler_qois = [
+            qoi for qoi in coupler_qois if qoi is not None
+        ]  # filter out Nones
+        self.coupler_quantities_of_interest = list(
+            itertools.chain.from_iterable(coupler_qois)
+        )
 
     def reset_node(self, remove_node):
         print(f"{ remove_node = }")
         if not remove_node == "all":
-            if remove_node in self.quantities_of_interest:
-                remove_fields = self.quantities_of_interest[remove_node].keys()
-            elif remove_node in self.coupler_quantities_of_interest:
-                remove_fields = self.coupler_quantities_of_interest[remove_node].keys()
-            else:
+            remove_fields = self.factory_dict[remove_node].qubit_qois
+            if remove_fields is None:
+                remove_fields = self.factory_dict[remove_node].coupler_qois
+            if remove_fields is None:
                 raise ValueError(f"{remove_node} is not present in the list of qois")
 
         # TODO Why flush?
@@ -53,6 +63,12 @@ class ResetRedisNode:
                     if "motzoi" in field:
                         REDIS_CONNECTION.hset(key, field, "0")
                         structured_redis_storage(key, qubit.strip("q"), 0)
+                    if "measure_3state_opt:pulse_amp" in field:
+                        REDIS_CONNECTION.hset(key, field, "0")
+                        structured_redis_storage(key, qubit.strip("q"), 0)
+                    if "measure_2state_opt:pulse_amp" in field:
+                        REDIS_CONNECTION.hset(key, field, "0")
+                        structured_redis_storage(key, qubit.strip("q"), 0)
                 for node in self.nodes:
                     REDIS_CONNECTION.hset(cs_key, node, "not_calibrated")
             elif remove_node in self.nodes:
@@ -60,6 +76,9 @@ class ResetRedisNode:
                     REDIS_CONNECTION.hset(key, field, "nan")
                     structured_redis_storage(key, qubit.strip("q"), None)
                     if "motzoi" in field:
+                        REDIS_CONNECTION.hset(key, field, "0")
+                        structured_redis_storage(key, qubit.strip("q"), 0)
+                    if "measure_3state_opt.pulse_amp" in field:
                         REDIS_CONNECTION.hset(key, field, "0")
                         structured_redis_storage(key, qubit.strip("q"), 0)
                 REDIS_CONNECTION.hset(cs_key, remove_node, "not_calibrated")

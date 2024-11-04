@@ -1,0 +1,95 @@
+# This code is part of Tergite
+#
+# (C) Copyright Tong Liu 2024
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+
+import time
+from pathlib import Path
+
+from qblox_instruments import SpiRack
+from qcodes import validators
+
+from tergite_autocalibration.config.coupler_config import coupler_spi_map
+from tergite_autocalibration.config.settings import REDIS_CONNECTION
+from tergite_autocalibration.utils.dto.enums import MeasurementMode
+
+
+def find_serial_port():
+    path = Path("/dev/")
+    for file in path.iterdir():
+        if file.name.startswith("ttyA"):
+            port = str(file.absolute())
+            break
+    else:
+        print("Couldn't find the serial port. Please check the connection.")
+        port = None
+    return port
+
+
+class SpiDAC:
+    def __init__(self, measurement_mode: MeasurementMode) -> None:
+        port = find_serial_port()
+        if port is not None:
+            self.spi = SpiRack("loki_rack", port)
+
+    def create_spi_dac(self, coupler: str):
+        dc_current_step = 1e-6
+        spi_mod_number, dac_name = coupler_spi_map[coupler]
+
+        spi_mod_name = f"module{spi_mod_number}"
+        if spi_mod_name not in self.spi.instrument_modules:
+            self.spi.add_spi_module(spi_mod_number, "S4g")
+        this_dac = self.spi.instrument_modules[spi_mod_name].instrument_modules[
+            dac_name
+        ]
+
+        this_dac.span("range_min_bi")
+        this_dac.current.vals = validators.Numbers(min_value=-3.1e-3, max_value=3.1e-3)
+
+        this_dac.ramping_enabled(True)
+        this_dac.ramp_rate(40e-6)
+        this_dac.ramp_max_step(dc_current_step)
+        return this_dac
+
+    def set_dacs_zero(self) -> None:
+        self.spi.set_dacs_zero()
+        return
+
+    def set_currenet_instant(self, dac, current) -> None:
+        self.spi.set_current_instant(dac, current)
+
+    def set_parking_current(self, coupler: str) -> None:
+        dac = self.create_spi_dac(coupler)
+
+        if REDIS_CONNECTION.hexists(f"transmons:{coupler}", "parking_current"):
+            parking_current = float(
+                REDIS_CONNECTION.hget(f"transmons:{coupler}", "parking_current")
+            )
+        else:
+            raise ValueError("parking current is not present on redis")
+        dac.current(parking_current)
+
+        while dac.is_ramping():
+            print(f"ramping {dac.current()}")
+            time.sleep(1)
+        print("Finished ramping")
+        print(f"{ parking_current = }")
+        print(f"{ dac.current() = }")
+        return
+
+    def set_dac_current(self, dac, target_current) -> None:
+        dac.current(target_current)
+        while dac.is_ramping():
+            print(f"ramping {dac.current()}")
+            time.sleep(1)
+        print("Finished ramping")
+        print(f"{ target_current = }")
+        print(f"{ dac.current() = }")
+        return

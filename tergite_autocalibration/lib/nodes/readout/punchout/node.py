@@ -21,10 +21,10 @@ from ....base.node import BaseNode
 class Punchout_Node(BaseNode):
     measurement_obj = Punchout
     analysis_obj = PunchoutAnalysis
+    qubit_qois = ["measure:pulse_amp"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
-        self.redis_field = ["measure:pulse_amp"]
 
         self.schedule_samplespace = {
             "ro_frequencies": {
