@@ -244,13 +244,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="changelog" class="level3">
 <h3 class="anchored" data-anchor-id="changelog">Changelog</h3>
-<p>Update the changelog in the sectionc called [Unreleased]. Please note that there are several sections titled “Added”, “Change” and “Fixed”; place your text in the correct category.</p>
+<p>Update the changelog in the section called [Unreleased]. Please note that there are several sections titled “Added”, “Change” and “Fixed”; place your text in the correct category.</p>
 </section>
 <section id="static-code-analyzer" class="level3">
 <h3 class="anchored" data-anchor-id="static-code-analyzer">Static code analyzer</h3>
 <p>The code analyzer used in the project is black, which is installed as part of the dev dependencies. To use black, open a shell and run</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>black .</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Please make sure to run it before merging the PR.</p>
+<p>If your pipeline is still showing an error when you are running black, please make sure that you have installed the right version of black. You can check that by running</p>
+<pre><code>black --version</code></pre>
+<p>If your black version differs, it might be possible that you have had installed a version of black either in your base environment or via apt. To remove these versions, please deactivate your conda environment with <code>conda deactivate</code> and then run:</p>
+<pre><code>sudo apt remote black</code></pre>
+<p>or</p>
+<pre><code>pip uninstall black</code></pre>
+<p>Next, please activate again your Python environment and install the correct version black as defined in the <code>pyproject.toml</code> file.</p>
+<pre><code>pip install black==VERSION_FROM_PYPROJECT_TOML</code></pre>
 
 
 </section>

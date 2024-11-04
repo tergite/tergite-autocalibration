@@ -13,27 +13,38 @@
 # that they have been altered from the originals.
 
 import itertools
+from typing import ClassVar, TYPE_CHECKING
 
 from tergite_autocalibration.config.calibration import CONFIG
-from tergite_autocalibration.config.settings import QOI_CONFIG, REDIS_CONNECTION
+from tergite_autocalibration.config.settings import REDIS_CONNECTION
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
+
+if TYPE_CHECKING:
+    from tergite_autocalibration.lib.base.node import BaseNode
 
 
 # NOTE: does this need to be a class?
 class ResetRedisNode:
     node_factory = NodeFactory()
-    nodes = node_factory.all_nodes()
-    factory_dict = node_factory.node_implementations
+    node_names = node_factory.all_node_names()
+    factory_dict = None
 
     def __init__(self):
         self.qubits = CONFIG.qubits
         self.couplers = CONFIG.couplers
 
-        qois = [self.factory_dict[node].qubit_qois for node in self.nodes]
+        self.factory_dict: ClassVar[str, type["BaseNode"]] = {
+            node_name: self.node_factory.get_node_class(node_name)
+            for node_name in self.node_names
+        }
+
+        qois = [self.factory_dict[node].qubit_qois for node in self.node_names]
         qois = [qoi for qoi in qois if qoi is not None]  # filter out Nones
         self.quantities_of_interest = list(itertools.chain.from_iterable(qois))
-        coupler_qois = [self.factory_dict[node].coupler_qois for node in self.nodes]
+        coupler_qois = [
+            self.factory_dict[node].coupler_qois for node in self.node_names
+        ]
         coupler_qois = [
             qoi for qoi in coupler_qois if qoi is not None
         ]  # filter out Nones
@@ -69,9 +80,9 @@ class ResetRedisNode:
                     if "measure_2state_opt:pulse_amp" in field:
                         REDIS_CONNECTION.hset(key, field, "0")
                         structured_redis_storage(key, qubit.strip("q"), 0)
-                for node in self.nodes:
+                for node in self.node_names:
                     REDIS_CONNECTION.hset(cs_key, node, "not_calibrated")
-            elif remove_node in self.nodes:
+            elif remove_node in self.node_names:
                 for field in remove_fields:
                     REDIS_CONNECTION.hset(key, field, "nan")
                     structured_redis_storage(key, qubit.strip("q"), None)
@@ -93,9 +104,9 @@ class ResetRedisNode:
                 for field in fields:
                     REDIS_CONNECTION.hset(key, field, "nan")
                     structured_redis_storage(key, coupler, None)
-                for node in self.nodes:
+                for node in self.node_names:
                     REDIS_CONNECTION.hset(cs_key, node, "not_calibrated")
-            elif remove_node in self.nodes:
+            elif remove_node in self.node_names:
                 for field in remove_fields:
                     REDIS_CONNECTION.hset(key, field, "nan")
                     structured_redis_storage(key, coupler, None)

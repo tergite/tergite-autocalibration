@@ -4,7 +4,8 @@
 # (C) Copyright Liangyu Chen 2023, 2024
 # (C) Copyright Stefan Hill 2024
 # (C) Copyright Michele Faucci Giannelli 2024
-# #
+# (C) Copyright Chalmers Next Labs 2024
+#
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
 # of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
@@ -13,17 +14,16 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import typing
 from pathlib import Path
+from typing import Dict, List, Union
 
 from .reflections import find_inheriting_classes_ast_recursive, import_class_from_file
-from ...utils.regex import camel_to_snake
-
 from ..base.node import BaseNode
+from ...utils.regex import camel_to_snake
 
 
 class NodeFactory:
-    _instance = None
+    _instance: "NodeFactory" = None
 
     def __new__(cls):
         if cls._instance is None:
@@ -32,7 +32,7 @@ class NodeFactory:
         return cls._instance
 
     def __init__(self):
-        self.node_name_mapping = {
+        self.node_name_mapping: Dict[str, str] = {
             "punchout": "Punchout_Node",
             "resonator_spectroscopy": "Resonator_Spectroscopy_Node",
             "qubit_01_spectroscopy": "Qubit_01_Spectroscopy_Multidim_Node",
@@ -74,15 +74,13 @@ class NodeFactory:
             "randomized_benchmarking": "Randomized_Benchmarking_Node",
             "purity_benchmarking": "PurityBenchmarkingNode",
         }
-        self._node_implementation_paths = {}
-        self._node_classes = {}
+        self._node_implementation_paths: Dict[str, Union[str, Path]] = {}
+        self._node_classes: Dict[str, type["BaseNode"]] = {}
 
-    def all_node_names(self):
+    def all_node_names(self) -> List[str]:
         return list(self.node_name_mapping.keys())
 
-    def create_node(
-        self, node_name: str, all_qubits: list[str], **kwargs
-    ) -> "BaseNode":
+    def get_node_class(self, node_name: str) -> type["BaseNode"]:
         # If the node implementations are not crawled yet, search for them in the nodes module
         if len(self._node_implementation_paths) == 0:
             # TODO: Please not that this implementation will temporarily return also classes that do not extend BaseNode
@@ -121,6 +119,17 @@ class NodeFactory:
                 raise NotImplementedError(
                     f"No class implementation for node {node_name} found."
                 )
+        return self._node_classes[node_name]
 
-        node_obj = self._node_classes[node_name](node_name, all_qubits, **kwargs)
+    def create_node(
+        self, node_name: str, all_qubits: list[str], **kwargs
+    ) -> "BaseNode":
+        # Check whether node class is already inside the dict
+        if node_name not in self._node_classes.keys():
+            node_cls = self.get_node_class(node_name)
+        else:
+            node_cls = self._node_classes[node_name]
+
+        # Create an instance of the node class
+        node_obj = node_cls(node_name, all_qubits, **kwargs)
         return node_obj

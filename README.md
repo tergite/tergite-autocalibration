@@ -18,7 +18,7 @@ If you are reading this on GitHub, then you are looking at a mirror.
 
 ## Dependencies
 
-- [Python 3.9+](https://www.python.org/)
+- [Python 3.10+](https://www.python.org/)
 - [Redis](https://redis.io/)
 
 ## Quick Start
@@ -41,7 +41,7 @@ git clone git@github.com:tergite/tergite-autocalibration.git
 - Create conda environment
 
 ```shell
-conda create -n tac -y python=3.9
+conda create -n tac -y python=3.10
 conda activate tac
 ```
 

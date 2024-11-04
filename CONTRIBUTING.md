@@ -126,7 +126,10 @@ Each calibration node goes through the following phases in order:
 ## Datasets
 
 Datasets are stored in [`data_directory`](./data_directory)
-They can be browsed with the dataset browser (coming soon)
+They can be browsed with the dataset browser:
+```
+acli browser --datadir PATH_TO_DATA_DIRECTORY
+```
 
 ## Installation of proprietary resources (optional, not recommended)
 We do not recommend to make your code having dependencies to proprietary software.
