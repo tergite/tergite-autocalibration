@@ -16,7 +16,18 @@ from typing import Annotated
 
 import typer
 
+from tergite_autocalibration.lib.utils.node_factory import NodeFactory
+
 node_cli = typer.Typer()
+
+node_factory = NodeFactory()
+node_names = node_factory.all_node_names()
+
+
+def complete_node_name(incomplete: str):
+    for node_name in node_names:
+        if node_name.startswith(incomplete):
+            yield node_name
 
 
 @node_cli.command(help="Reset all parameters in redis for the node specified.")
@@ -27,6 +38,7 @@ def reset(
             "--name",
             "-n",
             help="Name of the node to be reset in redis e.g resonator_spectroscopy.",
+            autocompletion=complete_node_name,
         ),
     ] = None,
     all: Annotated[
@@ -44,6 +56,7 @@ def reset(
             "--from-node",
             "-f",
             help="If you want to reset all nodes from specified node in chain.",
+            autocompletion=complete_node_name,
         ),
     ] = None,
 ):
