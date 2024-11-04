@@ -54,7 +54,10 @@ class DataHandler:
                         ]
                     for key_, value_ in device_raw[device_subsection].items():
                         if key_.startswith("q"):
-                            update_nested(device_raw[device_subsection][key_], global_subsection_properties)
+                            update_nested(
+                                device_raw[device_subsection][key_],
+                                global_subsection_properties,
+                            )
                     device_raw[device_subsection].pop("all")
             cls._device = device_raw
 

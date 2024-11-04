@@ -61,7 +61,9 @@ def populate_initial_parameters(qubits: list, couplers: list, redis_connection):
                             sub_module_key, qubit.strip("q"), parameter_value
                         )
                 else:
-                    redis_connection.hset(f"transmons:{qubit}", module_key, module_value)
+                    redis_connection.hset(
+                        f"transmons:{qubit}", module_key, module_value
+                    )
                     structured_redis_storage(module_key, qubit.strip("q"), module_value)
 
         # parameter specific to each qubit:

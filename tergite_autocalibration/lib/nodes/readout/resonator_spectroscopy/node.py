@@ -17,7 +17,9 @@ from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.analysis i
     ResonatorSpectroscopy1NodeAnalysis,
     ResonatorSpectroscopy2NodeAnalysis,
 )
-from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.measurement import Resonator_Spectroscopy
+from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.measurement import (
+    Resonator_Spectroscopy,
+)
 from tergite_autocalibration.lib.base.node import BaseNode
 
 
