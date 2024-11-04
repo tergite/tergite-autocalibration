@@ -18,9 +18,9 @@ from quantify_scheduler.json_utils import SchedulerJSONEncoder, SchedulerJSONDec
 
 from tergite_autocalibration.config.data import dh
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
-from tergite_autocalibration.utils import extended_transmon_element
-from tergite_autocalibration.utils.extended_coupler_edge import CompositeSquareEdge
-from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
+from tergite_autocalibration.utils.dto import extended_transmon_element
+from tergite_autocalibration.utils.dto.extended_coupler_edge import CompositeSquareEdge
+from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
 def load_redis_config(transmon: ExtendedTransmon, channel: int):

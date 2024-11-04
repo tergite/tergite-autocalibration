@@ -20,7 +20,6 @@
 from ipaddress import IPv4Address
 from typing import List, Union
 
-import toml
 from colorama import Fore, Style
 from colorama import init as colorama_init
 from qblox_instruments import Cluster
@@ -28,7 +27,6 @@ from qblox_instruments.types import ClusterType
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 
-from tergite_autocalibration.config import settings
 from tergite_autocalibration.config.data import dh
 from tergite_autocalibration.config.settings import (
     CLUSTER_IP,
@@ -38,12 +36,10 @@ from tergite_autocalibration.config.settings import (
 from tergite_autocalibration.lib.base.node import BaseNode
 from tergite_autocalibration.lib.utils.graph import filtered_topological_order
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
-from tergite_autocalibration.utils.dataset_utils import create_node_data_path
+from tergite_autocalibration.utils.io.dataset_utils import create_node_data_path
 from tergite_autocalibration.utils.dto.enums import DataStatus, MeasurementMode
-from tergite_autocalibration.utils.logger.errors import ClusterNotFoundError
 from tergite_autocalibration.utils.logger.tac_logger import logger
-from tergite_autocalibration.utils.logger.visuals import draw_arrow_chart
-from tergite_autocalibration.utils.redis_utils import (
+from tergite_autocalibration.utils.backend.redis_utils import (
     populate_initial_parameters,
     populate_node_parameters,
     populate_quantities_of_interest,

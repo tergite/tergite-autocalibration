@@ -20,8 +20,8 @@ from quantify_scheduler.operations.gate_library import Measure, Reset, Rxy, X
 from quantify_scheduler.schedules.schedule import Schedule
 
 import tergite_autocalibration.utils.clifford_elements_decomposition as cliffords
-from tergite_autocalibration.utils.extended_gates import Rxy_12
-from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
+from tergite_autocalibration.utils.dto.extended_gates import Rxy_12
+from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 from ....base.measurement import BaseMeasurement
 
 

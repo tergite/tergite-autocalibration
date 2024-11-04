@@ -24,7 +24,7 @@ from tergite_autocalibration.lib.nodes import (
 from tergite_autocalibration.lib.utils import graph as cg
 from tergite_autocalibration.scripts.calibration_supervisor import CalibrationSupervisor
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
-from tergite_autocalibration.utils.reset_redis_node import ResetRedisNode
+from tergite_autocalibration.utils.backend.reset_redis_node import ResetRedisNode
 
 qubits_10 = [f"q{i}" for i in range(16, 26)]
 

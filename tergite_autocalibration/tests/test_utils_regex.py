@@ -10,7 +10,7 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from tergite_autocalibration.utils.regex import camel_to_snake
+from tergite_autocalibration.utils.misc.regex import camel_to_snake
 
 
 def test_basic_conversion():

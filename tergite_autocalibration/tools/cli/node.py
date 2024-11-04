@@ -60,7 +60,7 @@ def reset(
         ),
     ] = None,
 ):
-    from tergite_autocalibration.utils.reset_redis_node import ResetRedisNode
+    from tergite_autocalibration.utils.backend.reset_redis_node import ResetRedisNode
     from tergite_autocalibration.lib.utils.graph import range_topological_order
     from tergite_autocalibration.config.calibration import CONFIG
 
