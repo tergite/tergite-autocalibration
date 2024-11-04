@@ -97,6 +97,24 @@ acli calibration start [OPTIONS]
 - `-r TEXT`: Rerun an analysis (specify the path to the dataset folder)
 - `-n, --name TEXT`: Specify the node type to rerun (works only with -r option)
 - `--push`: Push a backend to an MSS specified in MSS_MACHINE_ROOT_URL in the .env file
+- `--browser`: Will open the dataset browser in the background and plot the measurement results live
+
+### Dataset browser ###
+
+#### `browser` ####
+
+Starts the dataset browser.
+
+**Usage:**
+```
+acli browser --datadir [OPTIONS]
+```
+
+**Options:**
+
+- `--datadir PATH`: Folder to take the plot data from
+- `--liveplotting`: Whether plots should be updated in real time (default: False)
+- `--log-level INT`: Log-level as in the Python `logging` package to be used in the logs (default: 30)
 
 ### Joke Command ###
 
@@ -132,6 +150,6 @@ Can be browsed with the dataset browser (coming soon)
 When submitting  contributions, please prepend your commit messages with:
 `fix:` for bug fixes
 `feat:` for introducing a new feature (e.g. a new measurement node or a new analysis class)
-`chore:` for refractoring changes or any change that doesn't affect the functionality of the code
+`chore:` for refactoring changes or any change that doesn't affect the functionality of the code
 `docs:` for changes in the README, docstrings etc
 `test:` or `dev:` for testing or development changes (e.g. profiling scripts)
