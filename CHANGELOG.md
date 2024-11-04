@@ -8,6 +8,7 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 ## [Unreleased]
 
 ### Added
+- Dataset browser
 
 ### Changed
 - Migrated cli from click to typer
