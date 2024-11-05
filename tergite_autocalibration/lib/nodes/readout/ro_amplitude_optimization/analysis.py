@@ -12,9 +12,6 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-"""
-Module containing a class that fits data from a resonator spectroscopy experiment.
-"""
 import numpy as np
 import matplotlib.patches as mpatches
 from numpy.linalg import inv
@@ -41,7 +38,9 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
     def analyse_qubit(self):
         self.amplitude_coord = self._get_coord("amplitudes")
         self.state_coord = self._get_coord("state")
+        self.loop_coord = self._get_coord("loops")
 
+        self.dataset = self.dataset.stack(shots=[self.loop_coord, self.state_coord])
         self.qubit_states = self.dataset[self.state_coord].values
         self.amplitudes = self.dataset.coords[self.amplitude_coord]
         self.fit_results = {}
@@ -56,7 +55,7 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
     def IQ(self, index: int):
         """Extracts I/Q components from the dataset at a given index."""
         IQ_complex = self.S21[self.data_var].isel(
-            {self.amplitude_coord: index}
+            {self.amplitude_coord: [index]}
         )  # Use `.isel()` to index correctly
         I = IQ_complex.real.values.flatten()
         Q = IQ_complex.imag.values.flatten()
@@ -67,7 +66,7 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
         self.cms = []
 
         y = self.qubit_states
-        n_states = len(np.unique(y))
+        n_states = len(y)
 
         self.lda = LinearDiscriminantAnalysis(solver="svd", store_covariance=True)
 
@@ -103,6 +102,89 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
         patch = mpatches.Patch(color="red", label=f"{self.qubit}")
         handles.append(patch)
         primary_axis.legend(handles=handles, fontsize="small")
+
+
+class Three_Class_Boundary:
+    def __init__(self, lda: LinearDiscriminantAnalysis):
+        if len(lda.classes_) != 3:
+            raise ValueError("The Classifcation classes are not 3.")
+        A0 = lda.coef_[0][0]
+        B0 = lda.coef_[0][1]
+        A1 = lda.coef_[1][0]
+        B1 = lda.coef_[1][1]
+        A2 = lda.coef_[2][0]
+        B2 = lda.coef_[2][1]
+        slope0 = -A0 / B0
+        slope1 = -A1 / B1
+        slope2 = -A2 / B2
+        intercept0 = lda.intercept_[0]
+        intercept1 = lda.intercept_[1]
+        intercept2 = lda.intercept_[2]
+        y_intercept0 = intercept0 / B0
+        y_intercept1 = intercept1 / B1
+        y_intercept2 = intercept2 / B2
+        self.slopes = (slope0, slope1, slope2)
+        self.y_intercepts = (y_intercept0, y_intercept1, y_intercept2)
+
+    def intersection_I(self, index_a: int, index_b: int):
+        numerator = self.y_intercepts[index_a] - self.y_intercepts[index_b]
+        denominator = self.slopes[index_a] - self.slopes[index_b]
+        return numerator / denominator
+
+    def intersection_Q(self, index_a: int, index_b: int):
+        numerator = self.y_intercepts[index_a] - self.y_intercepts[index_b]
+        denominator = self.slopes[index_a] - self.slopes[index_b]
+        return (
+            self.slopes[index_a] * numerator / denominator - self.y_intercepts[index_a]
+        )
+
+    def omega(self, index_a: int, index_b: int):
+        """
+        Be careful: angle defined in the [0,360) range
+        """
+        i_point = self.intersection_I(index_a, index_b)
+        q_point = self.intersection_Q(index_a, index_b)
+        omega_in_rad = np.arctan2(
+            [q_point - self.centroid[1]], [i_point - self.centroid[0]]
+        )
+        omega = (np.rad2deg(omega_in_rad) + 360) % 360
+        return omega[0]
+
+    @property
+    def centroid(self):
+        centroid_I = (
+            self.intersection_I(0, 1)
+            + self.intersection_I(1, 2)
+            + self.intersection_I(2, 0)
+        )
+        centroid_Q = (
+            self.intersection_Q(0, 1)
+            + self.intersection_Q(1, 2)
+            + self.intersection_Q(2, 0)
+        )
+        return (centroid_I / 3, centroid_Q / 3)
+
+    @property
+    def omega_01(self):
+        return self.omega(0, 1)
+
+    @property
+    def omega_12(self):
+        return self.omega(1, 2)
+
+    @property
+    def omega_20(self):
+        return self.omega(2, 0)
+
+    def boundary_line(self, class_a, class_b) -> tuple[np.ndarray, np.ndarray]:
+        i_point = self.intersection_I(class_a, class_b)
+        q_point = self.intersection_Q(class_a, class_b)
+        i_values = np.linspace(self.centroid[0], i_point, 100)
+        boundary_slope = (q_point - self.centroid[1]) / (i_point - self.centroid[0])
+        return (
+            i_values,
+            boundary_slope * (i_values - self.centroid[0]) + self.centroid[1],
+        )
 
 
 class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
@@ -235,6 +317,13 @@ class OptimalROThreeStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis)
         optimal_IQ = self.IQ(self.optimal_index)
         optimal_y = self.lda.fit(optimal_IQ, y).predict(optimal_IQ)
 
+        self.boundary = Three_Class_Boundary(self.lda)
+        self.centroid_I = self.boundary.centroid[0]
+        self.centroid_Q = self.boundary.centroid[1]
+        self.omega_01 = self.boundary.omega_01
+        self.omega_12 = self.boundary.omega_12
+        self.omega_20 = self.boundary.omega_20
+
         true_positives = y == optimal_y
         tp0 = true_positives[y == 0]
         tp1 = true_positives[y == 1]
@@ -249,7 +338,15 @@ class OptimalROThreeStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis)
         self.IQ1_fp = IQ1[~tp1]
         self.IQ2_tp = IQ2[tp2]  # True Positive when sending 2
         self.IQ2_fp = IQ2[~tp2]
-        return [self.optimal_amplitude, inv_cm_str]
+        return [
+            self.optimal_amplitude,
+            self.centroid_I,
+            self.centroid_Q,
+            self.omega_01,
+            self.omega_12,
+            self.omega_20,
+            inv_cm_str,
+        ]
 
     def plotter(self, ax, secondary_axes):
         self.primary_plotter(ax)
@@ -261,7 +358,7 @@ class OptimalROThreeStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis)
             self.IQ0_tp[:, 1],
             marker=".",
             s=mark_size,
-            color="red",
+            color="blue",
             label="send 0 and read 0",
         )
         iq_axis.scatter(
@@ -269,14 +366,14 @@ class OptimalROThreeStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis)
             self.IQ0_fp[:, 1],
             marker="x",
             s=mark_size,
-            color="orange",
+            color="dodgerblue",
         )
         iq_axis.scatter(
             self.IQ1_tp[:, 0],
             self.IQ1_tp[:, 1],
             marker=".",
             s=mark_size,
-            color="blue",
+            color="red",
             label="send 1 and read 1",
         )
         iq_axis.scatter(
@@ -284,10 +381,15 @@ class OptimalROThreeStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis)
             self.IQ1_fp[:, 1],
             marker="x",
             s=mark_size,
-            color="dodgerblue",
+            color="orange",
         )
         iq_axis.scatter(
-            self.IQ2_tp[:, 0], self.IQ2_tp[:, 1], marker=".", s=mark_size, color="green"
+            self.IQ2_tp[:, 0],
+            self.IQ2_tp[:, 1],
+            marker=".",
+            s=mark_size,
+            color="green",
+            label="send 2 and read 2",
         )
         iq_axis.scatter(
             self.IQ2_fp[:, 0],
@@ -295,6 +397,27 @@ class OptimalROThreeStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis)
             marker="x",
             s=mark_size,
             color="lime",
+        )
+        iq_axis.plot(
+            self.boundary.boundary_line(0, 1)[0],
+            self.boundary.boundary_line(0, 1)[1],
+            color="blueviolet",
+            lw=4,
+        )
+        iq_axis.plot(
+            self.boundary.boundary_line(1, 2)[0],
+            self.boundary.boundary_line(1, 2)[1],
+            color="firebrick",
+            lw=4,
+        )
+        iq_axis.plot(
+            self.boundary.boundary_line(2, 0)[0],
+            self.boundary.boundary_line(2, 0)[1],
+            color="cyan",
+            lw=4,
+        )
+        iq_axis.scatter(
+            self.centroid_I, self.centroid_Q, marker="*", s=480, color="black", zorder=2
         )
 
         cm_axis = secondary_axes[1]

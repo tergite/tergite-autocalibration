@@ -17,23 +17,23 @@ from .analysis import (
     OptimalROTwoStateAmplitudeNodeAnalysis,
     OptimalROThreeStateAmplitudeNodeAnalysis,
 )
-from .measurement import RO_amplitude_optimization
+from .measurement import RO_amplitude_optimization, RO_amplitude_optimization_refectored
 from ....base.node import BaseNode
 
 
 class RO_amplitude_two_state_optimization_Node(BaseNode):
     measurement_obj = RO_amplitude_optimization
     analysis_obj = OptimalROTwoStateAmplitudeNodeAnalysis
+    qubit_qois = [
+        "measure_2state_opt:ro_ampl_2st_opt",
+        "measure_2state_opt:rotation",
+        "measure_2state_opt:threshold",
+    ]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
         self.name = name
         self.all_qubits = all_qubits
-        self.redis_field = [
-            "measure_2state_opt:ro_ampl_2st_opt",
-            "measure_2state_opt:rotation",
-            "measure_2state_opt:threshold",
-        ]
         self.qubit_state = 1
         # FIXME: This is a sort of hack to ignore the couplers
         self.schedule_keywords = {}
@@ -53,15 +53,59 @@ class RO_amplitude_two_state_optimization_Node(BaseNode):
         }
 
 
-class RO_amplitude_three_state_optimization_Node(BaseNode):
-    measurement_obj = RO_amplitude_optimization
-    analysis_obj = OptimalROThreeStateAmplitudeNodeAnalysis
+class RO_amplitude_three_state_optimization_Node_refactored(BaseNode):
+    measurement_obj = RO_amplitude_optimization_refectored
+    analysis_obj = OptimalRO_Three_state_AmplitudeAnalysis
+    qubit_qois = [
+        "measure_3state_opt:pulse_amp",
+        "centroid_I",
+        "centroid_Q",
+        "omega_01",
+        "omega_12",
+        "omega_20",
+        "inv_cm_opt",
+    ]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
         self.name = name
         self.all_qubits = all_qubits
-        self.redis_field = ["measure_3state_opt:ro_ampl_3st_opt", "inv_cm_opt"]
+        self.qubit_state = 2
+        self.schedule_keywords = {}
+        self.schedule_keywords["loop_repetitions"] = 1024
+        self.plots_per_qubit = 3  #  --> fidelity plot, IQ shots, confusion matrix
+        self.loops = self.schedule_keywords["loop_repetitions"]
+
+        self.schedule_samplespace = {
+            "qubit_states": {
+                qubit: np.array([0, 1, 2], dtype=np.int16) for qubit in self.all_qubits
+            },
+            "ro_amplitudes": {
+                qubit: np.append(
+                    np.linspace(0.010, 0.075, 11), np.linspace(0.080, 0.15, 7)
+                )
+                for qubit in self.all_qubits
+            },
+        }
+
+
+class RO_amplitude_three_state_optimization_Node(BaseNode):
+    measurement_obj = RO_amplitude_optimization
+    analysis_obj = OptimalROThreeStateAmplitudeNodeAnalysis
+    qubit_qois = [
+        "measure_3state_opt:pulse_amp",
+        "centroid_I",
+        "centroid_Q",
+        "omega_01",
+        "omega_12",
+        "omega_20",
+        "inv_cm_opt",
+    ]
+
+    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
+        self.name = name
+        self.all_qubits = all_qubits
         self.qubit_state = 2
         self.schedule_keywords = {}
         self.schedule_keywords["loop_repetitions"] = 1000
@@ -73,7 +117,6 @@ class RO_amplitude_three_state_optimization_Node(BaseNode):
                 qubit: np.tile(np.array([0, 1, 2], dtype=np.int16), self.loops)
                 for qubit in self.all_qubits
             },
-            # FIXME: Check on whether the samplespace can be bigger
             "ro_amplitudes": {
                 qubit: np.append(
                     np.linspace(0.001, 0.025, 5), np.linspace(0.026, 0.2, 5)
