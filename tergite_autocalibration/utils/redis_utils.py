@@ -12,6 +12,8 @@
 # that they have been altered from the originals.
 
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
+
+
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 
 
@@ -96,7 +98,6 @@ def populate_active_reset_parameters(
     # Populate the Redis database with the initial active reset
     # parameter values from the toml file
     for qubit in qubits:
-
         # parameter specific to each qubit:
         for module_key, module_value in ar_qubit_parameters[qubit].items():
             if isinstance(module_value, dict):

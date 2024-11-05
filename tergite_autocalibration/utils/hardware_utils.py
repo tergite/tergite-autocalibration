@@ -23,6 +23,12 @@ from tergite_autocalibration.config.coupler_config import coupler_spi_map
 from tergite_autocalibration.config.settings import REDIS_CONNECTION, HARDWARE_CONFIG
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 
+from colorama import Fore
+from colorama import Style
+from colorama import init as colorama_init
+
+colorama_init()
+
 
 def extract_cluster_port_mapping(qubit: str) -> Dict[str, str]:
     """
@@ -107,13 +113,24 @@ def find_serial_port():
     return port
 
 
+class DummyDAC:
+    def create_spi_dac(self, coupler: str):
+        pass
+
+    def set_dac_current(self, dac, target_current) -> None:
+        print(f"Dummy DAC to current {target_current}")
+
+
 class SpiDAC:
     def __init__(self, measurement_mode: MeasurementMode) -> None:
         port = find_serial_port()
+        self.is_dummy = measurement_mode == MeasurementMode.dummy
         if port is not None:
-            self.spi = SpiRack("loki_rack", port)
+            self.spi = SpiRack("loki_rack", port, is_dummy=self.is_dummy)
 
     def create_spi_dac(self, coupler: str):
+        if self.is_dummy:
+            return
         dc_current_step = 1e-6
         spi_mod_number, dac_name = coupler_spi_map[coupler]
 
@@ -148,22 +165,31 @@ class SpiDAC:
             )
         else:
             raise ValueError("parking current is not present on redis")
-        dac.current(parking_current)
 
-        while dac.is_ramping():
-            print(f"ramping {dac.current()}")
-            time.sleep(1)
+        # dac.current(parking_current)
+        self.ramp_current(dac, parking_current)
         print("Finished ramping")
-        print(f"{ parking_current = }")
-        print(f"{ dac.current() = }")
+        print(f"Current is now: { dac.current() * 1000:.4f} mA")
         return
 
     def set_dac_current(self, dac, target_current) -> None:
+        if self.is_dummy:
+            print(
+                f"Dummy DAC to current {target_current}. NO REAL CURRENT is generated"
+            )
+            return
+        self.ramp_current(dac, target_current)
+
+    def ramp_current(self, dac, target_current):
         dac.current(target_current)
+        ramp_counter = 0
+        print(f"{Fore.YELLOW}{Style.DIM}{'Ramping current (mA)'}")
         while dac.is_ramping():
-            print(f"ramping {dac.current()}")
+            ramp_counter += 1
+            print_termination = " -> "
+            if ramp_counter % 8 == 0:
+                print_termination = "\n"
+            print(f"{dac.current() * 1000:3.4f}", end=print_termination, flush=True)
             time.sleep(1)
-        print("Finished ramping")
-        print(f"{ target_current = }")
-        print(f"{ dac.current() = }")
-        return
+        print(f"{Style.RESET_ALL}")
+        print(end="\n")

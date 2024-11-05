@@ -33,48 +33,26 @@ def configure_dataset(
     The dataset retrieved from the instrument coordinator is
     too bare-bones. Here the dims, coords and data_vars are configured
     """
-    dataset = xarray.Dataset()
+    dataset = xarray.Dataset(attrs={"elements": []})
 
-    keys = raw_ds.data_vars.keys()
+    raw_ds_keys = raw_ds.data_vars.keys()
     measurement_qubits = node.all_qubits
     schedule_samplespace = node.schedule_samplespace
-    external_samplespace = node.reduced_external_samplespace
 
-    samplespace = schedule_samplespace | external_samplespace
-
-    # if hasattr(node, 'spi_samplespace'):
-    #     spi_samplespace = node.spi_samplespace
-    #     # merge the samplespaces: | is the dictionary merging operator
-    #     samplespace = samplespace | spi_samplespace
+    samplespace = schedule_samplespace
 
     sweep_quantities = samplespace.keys()
 
     n_qubits = len(measurement_qubits)
-    if node.name in [
-        "ro_amplitude_three_state_optimization",
-        "ro_frequency_three_state_optimization",
-    ]:
-        qubit_states = [0, 1, 2]
-    elif node.name in [
-        "ro_amplitude_two_state_optimization",
-        "ro_frequency_two_state_optimization",
-    ]:
-        qubit_states = [0, 1]
-    elif "ssro" in node.name:
+    if "ssro" in node.name:
         qubit_states = ["c0", "c1", "c2"]  # for calibration points
 
-    print(node.name)
-    # if 'cz_param' in node.name:
-    #    print("Here")
-    #    return raw_ds
-
-    for key in keys:
+    for key in raw_ds_keys:
         key_indx = key % n_qubits  # this is to handle ro_opt_frequencies node where
 
         coords_dict = {}
         measured_qubit = measurement_qubits[key_indx]
         dimensions = node.dimensions
-        print("node dimenstions are: ", dimensions)
 
         if "ssro" in node.name:
             # TODO: We are not sure about this one
@@ -85,40 +63,19 @@ def configure_dataset(
                 range(shots),
                 {"qubit": measured_qubit, "long_name": "shot", "units": "NA"},
             )
-        # if node.name in [
-        #     "cz_calibration_ssro",
-        #     "cz_calibration_swap_ssro",
-        #     "reset_calibration_ssro",
-        #     "process_tomography_ssro",
-        # ]:
-        #     # TODO: We are not sure about this one
-        #     dimensions[1] += len(qubit_states)  # for calibration points
-        #     shots = int(len(raw_ds[key].values[0]) / (np.product(dimensions)))
-        #     coords_dict["shot"] = (
-        #         "shot",
-        #         range(shots),
-        #         {"qubit": measured_qubit, "long_name": "shot", "units": "NA"},
-        #     )
-        # elif node.name in [
-        #     'tqg_randomized_benchmarking_ssro',
-        #     'tqg_randomized_benchmarking_interleaved_ssro',
-        #     'randomized_benchmarking_ssro'
-        #     ]:
-        #     # TODO: We are not sure about this one
-        #     dimensions[0] += len(qubit_states)  # for calibration points
-        #     shots = int(len(raw_ds[key].values[0]) / (np.product(dimensions)))
-        #     coords_dict['shot'] = ('shot', range(shots), {'qubit': measured_qubit, 'long_name': 'shot', 'units': 'NA'})
 
         for quantity in sweep_quantities:
-            # eg ['q1','q2',...] or ['q1_q2','q3_q4',...] :
+            # eg settable_elements -> ['q1','q2',...] or ['q1_q2','q3_q4',...] :
             settable_elements = samplespace[quantity].keys()
-            # print('settable elements are: ', settable_elements)
+
             # distinguish if the settable is on a qubit or a coupler:
             if measured_qubit in settable_elements:
                 element = measured_qubit
                 element_type = "qubit"
             else:
                 matching = [s for s in settable_elements if measured_qubit in s]
+                # TODO: len(matching) == 1 implies that we operate on only 1 coupler.
+                # To be changed in future
                 if len(matching) == 1 and "_" in matching[0]:
                     element = matching[0]
                     element_type = "coupler"
@@ -131,53 +88,47 @@ def configure_dataset(
             coord_attrs = {
                 "element_type": element_type,  # 'element_type' is ether 'qubit' or 'coupler'
                 element_type: element,
+                "measured_qubit": measured_qubit,
                 "long_name": f"{coord_key}",
                 "units": "NA",
             }
-            # print('coord attributes is: ', coord_attrs)
-            # if node.name in ['cz_calibration_ssro','cz_calibration_swap_ssro', 'reset_calibration_ssro'] and 'ramsey_phases' in quantity:
-            #     settable_values = np.append(np.array([settable_values]), np.array([qubit_states]))
-            # elif node.name in ['tqg_randomized_benchmarking_ssro', 'tqg_randomized_benchmarking_interleaved_ssro', 'randomized_benchmarking_ssro',]:
-            #     settable_values = np.append(np.array([settable_values]), np.array([qubit_states]))
 
-            # print(coord_attrs)
 
             if not isinstance(settable_values, Iterable):
                 settable_values = np.array([settable_values])
 
             coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
 
+        if node.loops is not None:
+            coords_dict["loops"] = (
+                "loops",
+                np.arange(node.loops),
+                {"element_type": "NA"},
+            )
+
         partial_ds = xarray.Dataset(coords=coords_dict)
 
-        # print(partial_ds)
 
         data_values = raw_ds[key].values
 
-        if (
-            node.name == "ro_amplitude_two_state_optimization"
-            or node.name == "ro_amplitude_three_state_optimization"
-        ):
-            loops = node.schedule_keywords["loop_repetitions"]
-            for key in coords_dict.keys():
-                if measured_qubit in key and "ro_amplitudes" in key:
-                    ampls = coords_dict[key][1]
-                elif measured_qubit in key and "qubit_states" in key:
-                    states = coords_dict[key][1]
-            data_values = reshufle_loop_dataset(data_values, ampls, states, loops)
 
         reshaping = reversed(node.dimensions)
-        if node.name in ["ro_amplitude_optimization_gef"]:
-            reshaping = [shots, dimensions[0], len(qubit_states)]
-            data_values = data_values.reshape(*reshaping)
-        elif "ssro" in node.name:
+        if "ssro" in node.name:
             reshaping = np.array([shots])
             reshaping = np.append(reshaping, dimensions)
             data_values = data_values.reshape(*reshaping)
         else:
-            data_values = data_values.reshape(*reshaping)
-            data_values = np.transpose(data_values)
+            data_values = data_values.reshape(*node.dimensions, order="F")
+
+        # determine if this dataarray examines a qubit or a coupler:
+        # TODO: this needs improvement
+        element = measured_qubit
+        if node.couplers is not None:
+            element = node.couplers[0]
+
         attributes = {
             "qubit": measured_qubit,
+            "element": element,
             "long_name": f"y{measured_qubit}",
             "units": "NA",
         }
@@ -187,9 +138,8 @@ def configure_dataset(
             attributes,
         )
 
-        # print(f'{partial_ds=}')
         dataset = xarray.merge([dataset, partial_ds])
-        # print(f'{dataset=}')
+        dataset.attrs["elements"].append(element)
 
     return dataset
 
@@ -198,24 +148,6 @@ def to_real_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
     ds = iq_dataset.expand_dims("ReIm", axis=-1)  # Add ReIm axis at the end
     ds = xarray.concat([ds.real, ds.imag], dim="ReIm")
     return ds
-
-
-def reshufle_loop_dataset(initial_array: np.ndarray, ampls, states, loops: int):
-    initial_shape = initial_array.shape
-    initial_array = initial_array.flatten()
-    states = np.unique(states)
-    reshuffled_array = np.empty_like(initial_array)
-    n_states = len(states)
-    for i, el in enumerate(initial_array):
-        measurements_per_loop = len(ampls) * n_states
-        amplitude_group = (i % measurements_per_loop) // n_states
-        new_index_group = amplitude_group * loops * n_states
-        loop_number = i // measurements_per_loop
-        new_index = new_index_group + loop_number * n_states + i % n_states
-        reshuffled_array[new_index] = el
-    reshuffled_array.reshape(*initial_shape)
-    return reshuffled_array
-
 
 def create_node_data_path(node) -> pathlib.Path:
     measurement_date = datetime.now()
