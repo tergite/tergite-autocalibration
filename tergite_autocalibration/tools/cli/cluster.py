@@ -29,3 +29,11 @@ def reboot():
         cluster_.reboot()
     else:
         typer.echo("Rebooting cluster aborted by user.")
+
+
+@cluster_cli.command(help="Prints a list of available clusters.")
+def find():
+    from qblox_instruments import PlugAndPlay
+
+    with PlugAndPlay() as pnp:
+        pnp.print_devices()

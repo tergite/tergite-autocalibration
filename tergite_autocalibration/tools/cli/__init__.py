@@ -10,13 +10,14 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
-import logging
-from typing import Annotated, Union
+
+from typing import Annotated
 
 import typer
 
 from .calibration import calibration_cli
 from .cluster import cluster_cli
+from .config import config_cli
 from .graph import graph_cli
 from .node import node_cli
 
@@ -44,6 +45,12 @@ cli.add_typer(
     graph_cli,
     name="graph",
     help="Handle operations related to the calibration graph.",
+    no_args_is_help=True,
+)
+cli.add_typer(
+    config_cli,
+    name="config",
+    help="Configure the calibration, get and set values.",
     no_args_is_help=True,
 )
 

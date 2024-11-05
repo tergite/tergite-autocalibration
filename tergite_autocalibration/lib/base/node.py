@@ -43,17 +43,15 @@ from tergite_autocalibration.lib.utils.redis import (
     load_redis_config_coupler,
 )
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
-from tergite_autocalibration.utils.io.dataset_utils import configure_dataset, save_dataset
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.dto.extended_coupler_edge import CompositeSquareEdge
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
+from tergite_autocalibration.utils.io.dataset_utils import configure_dataset, save_dataset
 from tergite_autocalibration.utils.logger.tac_logger import logger
 
 colorama_init()
 
 
-with open(CLUSTER_CONFIG) as hw:
-    hw_config = json.load(hw)
 
 matplotlib.use(settings.PLOTTING_BACKEND)
 
@@ -95,6 +93,9 @@ class BaseNode(abc.ABC):
             raise ValueError(
                 "Quantities of Interest are missing from the node implementation"
             )
+
+        with open(CLUSTER_CONFIG) as hw:
+            self.hw_config = json.load(hw)
 
     def pre_measurement_operation(self):
         """
@@ -264,7 +265,7 @@ class BaseNode(abc.ABC):
                             structured_redis_storage(key, coupler, value)
 
         device = QuantumDevice(f"Loki_{self.name}")
-        device.hardware_config(hw_config)
+        device.hardware_config(self.hw_config)
 
         transmons = {}
         for channel, qubit in enumerate(qubits):
