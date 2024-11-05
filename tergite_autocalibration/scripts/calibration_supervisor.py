@@ -85,7 +85,7 @@ class CalibrationSupervisor:
         self.cluster_timeout: int = cluster_timeout
         self.node_name_to_re_analyse = node_name
         self.data_path = Path(data_path)
-        
+
         # Create objects to communicate with the hardware
         self.cluster: "Cluster" = self._create_cluster()
         self.lab_ic: "InstrumentCoordinator" = self._create_lab_ic(self.cluster)

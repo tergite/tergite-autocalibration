@@ -26,10 +26,10 @@ class CZParametrisationFixDurationNode(ParametrizedSweepNode):
     measurement_obj = CZParametrisationFixDuration
     analysis_obj = CZParametrisationFixDurationNodeAnalysis
     coupler_qois = [
-            "cz_pulse_frequency",
-            "cz_pulse_amplitude",
-            "cz_parking_current",
-        ]
+        "cz_pulse_frequency",
+        "cz_pulse_amplitude",
+        "cz_parking_current",
+    ]
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords

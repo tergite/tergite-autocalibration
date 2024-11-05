@@ -22,7 +22,8 @@ from tergite_autocalibration.utils import extended_transmon_element
 from tergite_autocalibration.utils.extended_coupler_edge import CompositeSquareEdge
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 
-np.set_printoptions(legacy='1.25')
+np.set_printoptions(legacy="1.25")
+
 
 def load_redis_config(transmon: ExtendedTransmon, channel: int):
     qubit = transmon.name
