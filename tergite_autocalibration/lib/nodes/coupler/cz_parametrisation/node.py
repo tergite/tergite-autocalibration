@@ -25,6 +25,11 @@ from ....utils.node_subclasses import ParametrizedSweepNode
 class CZParametrisationFixDurationNode(ParametrizedSweepNode):
     measurement_obj = CZParametrisationFixDuration
     analysis_obj = CZParametrisationFixDurationNodeAnalysis
+    coupler_qois = [
+            "cz_pulse_frequency",
+            "cz_pulse_amplitude",
+            "cz_parking_current",
+        ]
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
@@ -39,11 +44,6 @@ class CZParametrisationFixDurationNode(ParametrizedSweepNode):
         self.schedule_keywords = schedule_keywords
         self.backup = False
 
-        self.redis_field = [
-            "cz_pulse_frequency",
-            "cz_pulse_amplitude",
-            "cz_parking_current",
-        ]
         self.node_dictionary["cz_pulse_duration"] = (
             120e-9  # Need to make it configurable
         )
