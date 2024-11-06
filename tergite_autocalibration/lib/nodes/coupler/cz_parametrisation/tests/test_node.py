@@ -10,26 +10,24 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+from tergite_autocalibration.lib.utils.node_subclasses import ParametrizedSweepNode
 from tergite_autocalibration.tests.utils.env import setup_test_env
 
 setup_test_env()
 
 import pytest
 
-from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis import (
+from ...cz_parametrisation.analysis import (
     CZParametrizationFixDurationNodeAnalysis,
 )
-from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.measurement import (
+from ...cz_parametrisation.measurement import (
     CZParametrizationFixDuration,
 )
-from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.node import (
+from ...cz_parametrisation.node import (
     CZParametrizationFixDurationNode,
 )
-from tergite_autocalibration.lib.utils.node_subclasses import ParametrizedSweepNode
 
 
-# FIXME: All tests in this file are marked as skip
-#        Michele has a fix that is related to how things are loaded in redis
 @pytest.mark.skip
 def test_canCreateCorrectType():
     c = CZParametrizationFixDurationNode(

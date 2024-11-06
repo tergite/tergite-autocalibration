@@ -1,6 +1,7 @@
 # This code is part of Tergite
 #
 # (C) Copyright Joel Sandås 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -20,13 +21,11 @@ import xarray as xr
 from lmfit.model import ModelResult
 from pathlib import Path
 from matplotlib.figure import Figure
-from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.analysis import (
+from ...purity_benchmarking.analysis import (
     PurityBenchmarkingQubitAnalysis,
 )
 
 
-# FIXME: These tests are marked as skip after the refactoring of the analysis classes
-#        Michele to integrate with new data files from Joel
 class TestPurityBenchmarkingAnalysis(unittest.TestCase):
     @classmethod
     def setUpClass(self):
