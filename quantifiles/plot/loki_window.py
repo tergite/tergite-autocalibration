@@ -259,8 +259,11 @@ class PlotTab(QtWidgets.QWidget):
         )
 
         self.plot_layout = QtWidgets.QHBoxLayout(self)
+
         plot_container = QtWidgets.QWidget()
         plot_container.setLayout(self.plot_layout)
+        # self.plot_layout.addWidget(line_container)
+
         plot_container.setSizePolicy(
             QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
         )
@@ -276,11 +279,20 @@ class PlotTab(QtWidgets.QWidget):
         # layout.addWidget(splitter)
         self.setLayout(layout)
 
-    def add_plot(self, plot: QtWidgets.QWidget):
-        self.plot_layout.addWidget(plot)
+    def add_plot(self, plot: QtWidgets.QWidget, secondary_plot: QtWidgets.QWidget):
+        lines_layout = QtWidgets.QVBoxLayout()
+
+        lines_layout.addWidget(plot)
+        lines_layout.addWidget(secondary_plot)
+        line_container = QtWidgets.QWidget()
+        line_container.setLayout(lines_layout)
+        self.plot_layout.addWidget(line_container)
+
         plot.setSizePolicy(
             QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred
         )
+        # text_label = QtWidgets.QLabel("My_Label")
+        # self.main_and_secondary_plot_layout.addWidget(text_label)
         # plot.setFixedSize(200,200)
 
 
@@ -389,9 +401,8 @@ class PlotWindowContent(QtWidgets.QWidget):
 
         self.setLayout(layout)
 
-    def add_plot(self, plot: QtWidgets.QWidget):
-        self.plot_tab.add_plot(plot)
-
+    def add_plot(self, plot: QtWidgets.QWidget, secondary_plot: QtWidgets.QWidget):
+        self.plot_tab.add_plot(plot, secondary_plot)
 
 class PlotWindow(QtWidgets.QMainWindow):
     _WINDOW_TITLE: str = "Quantifiles plot window"
@@ -410,6 +421,7 @@ class PlotWindow(QtWidgets.QMainWindow):
 
         self.N_gettables = len(list(dataset.data_vars.keys()))
         self.plots = {}
+        self.secondary_plots = {}
 
         tuid = self.dataset.tuid if hasattr(self.dataset, "tuid") else "no tuid"
         name = self.dataset.name if hasattr(self.dataset, "name") else "no name"
@@ -429,6 +441,9 @@ class PlotWindow(QtWidgets.QMainWindow):
         canvas.plot_tab.gettable_select_box.gettable_toggled.connect(
             self.toggle_gettable
         )
+        canvas.plot_tab.gettable_select_box.gettable_toggled.connect(
+            self.toggle_secondary_plot
+        )
 
         # canvas.plot_tab.gettable_select_box.custom_select_box.combo_selected.connect(
         #     self.plot_custom_graph
@@ -440,9 +455,13 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.raise_()
         self.activateWindow()
 
-    def add_plot(self, name: str, plot: BasePlot):
-        self.canvas.add_plot(plot)
+    def add_plot(self, name: str, plot: BasePlot, secondary_plot: BasePlot = None):
+        self.canvas.add_plot(plot, secondary_plot)
+        # if secondary_plot is not None:
+        #     self.canvas.add_plot(secondary_plot)
         self.plots[name] = plot
+        if secondary_plot is not None:
+            self.secondary_plots[name] = secondary_plot
         plot.mouse_text_changed.connect(
             self.canvas.plot_tab.gettable_select_box.on_new_mouse_pos_text
         )
@@ -452,19 +471,19 @@ class PlotWindow(QtWidgets.QMainWindow):
             self._WINDOW_HEIGHT,
         )
 
-    def add_secondary_plot(self, name: str, plot: BasePlot):
-        self.canvas.add_plot(plot)
-        self.plots[name] = plot
-        plot.mouse_text_changed.connect(
-            self.canvas.plot_tab.gettable_select_box.on_new_mouse_pos_text
-        )
+    # def add_secondary_plot(self, name: str, plot: BasePlot):
+    #     self.canvas.add_plot(plot)
+    #     self.plots[name] = plot
+    #     plot.mouse_text_changed.connect(
+    #         self.canvas.plot_tab.gettable_select_box.on_new_mouse_pos_text
+    #     )
+    #
+    #     self.resize(
+    #         self._WINDOW_WIDTH + self._WINDOW_HEIGHT * len(self.plots),
+    #         self._WINDOW_HEIGHT,
+    #     )
 
-        self.resize(
-            self._WINDOW_WIDTH + self._WINDOW_HEIGHT * len(self.plots),
-            self._WINDOW_HEIGHT,
-        )
-
-        # logger.debug(f"Added plot with name {name} to {self.__class__.__name__}")
+    # logger.debug(f"Added plot with name {name} to {self.__class__.__name__}")
 
     # def add_custom_plot(self, plot: BasePlot):
     #     current_layout = self.canvas.plot_tab.plot_layout
@@ -494,6 +513,15 @@ class PlotWindow(QtWidgets.QMainWindow):
         else:
             self.plots[name].setVisible(enabled)
         # logger.debug(f"Toggled visibility of plot with name {name} to {enabled}")
+
+    @QtCore.pyqtSlot(str, bool)
+    def toggle_secondary_plot(self, name: str, enabled: bool):
+        if name == "all qubits":
+            for name in self.plots.keys():
+                self.secondary_plots[name].setVisible(enabled)
+        else:
+            self.secondary_plots[name].setVisible(enabled)
+
 
     # @QtCore.pyqtSlot(str, str)
     # def plot_custom_graph(self, x_variable: str, y_variable: str):

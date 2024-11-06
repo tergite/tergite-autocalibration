@@ -57,7 +57,7 @@ class MultipleLinePlot(BasePlot):
         # )
 
         # self.plot.addItem(self.img)
-        self.curves = self.create_curves(dataset)
+        self.create_curves(dataset)
 
         x_unit, self.x_scaling = units.get_si_unit_and_scaling(
             dataset[x_keys[0]].attrs["units"]
@@ -72,16 +72,16 @@ class MultipleLinePlot(BasePlot):
         set_label(
             self.plot,
             "bottom",
-            dataset[x_keys[0]].long_name,
+            dataset[x_keys[1]].long_name,
             x_unit,
-            dataset[x_keys[0]].attrs["units"],
+            dataset[x_keys[1]].attrs["units"],
         )
         set_label(
             self.plot,
             "left",
-            dataset[x_keys[1]].long_name,
+            dataset[x_keys[0]].long_name,
             y_unit,
-            dataset[x_keys[1]].attrs["units"],
+            dataset[x_keys[0]].attrs["units"],
         )
 
     def create_curves(self, dataset: xr.Dataset):
@@ -89,6 +89,8 @@ class MultipleLinePlot(BasePlot):
 
         inner_settable = self.x_keys[0]
         outer_settable = self.x_keys[1]
+        if "frequencies" in outer_settable:
+            inner_settable, outer_settable = outer_settable, inner_settable
 
         x_data = dataset[inner_settable].values
         curves = []
@@ -109,7 +111,7 @@ class MultipleLinePlot(BasePlot):
                 # name=curve_name,
                 connect="finite",
             )
-            curves.append(curve)
+            # curves.append(curve)
         return curves
 
         # limits = (np.nanmin(z_data), np.nanmax(z_data))
