@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QApplication
 from pyqtgraph.widgets import PlotWidget
 
 
@@ -33,3 +35,7 @@ def set_label(
         label,
         units=unit,
     )
+
+
+def copy_to_clipboard(widget: QtWidgets.QWidget) -> None:
+    QApplication.clipboard().setImage(widget.grab().toImage())

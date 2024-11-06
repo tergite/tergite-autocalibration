@@ -260,22 +260,28 @@ class DataDirInspector(QtWidgets.QMainWindow):
 
         # create menu bar
         menu = self.menuBar()
-        fileMenu = menu.addMenu("&File")
+        file_menu = menu.addMenu("&File")
 
         # create Open and Reload actions
         open_action = QtWidgets.QAction("&Open", self)
         open_action.setShortcut("Ctrl+O")
         open_action.triggered.connect(self.configure_datadir)
-        fileMenu.addAction(open_action)
+        file_menu.addAction(open_action)
 
         reload_action = QtWidgets.QAction("&Reload", self)
         reload_action.setShortcut("R")
         reload_action.triggered.connect(self.reload_datadir)
-        fileMenu.addAction(reload_action)
+        file_menu.addAction(reload_action)
+
+        # create Exit action
+        exit_action = QtWidgets.QAction("&Exit", self)
+        exit_action.setShortcut("Ctrl+Q")
+        exit_action.triggered.connect(self.close)
+        file_menu.addAction(exit_action)
 
         # set window size
         screen = QDesktopWidget().screenGeometry()
-        self.resize(screen.width() * 0.6, screen.height() * 0.6)
+        self.resize(int(screen.width() * 0.6), int(screen.height() * 0.6))
 
         # connect signals and slots
         self.experiment_list.experiment_activated.connect(self.open_plots)
@@ -350,6 +356,21 @@ class DataDirInspector(QtWidgets.QMainWindow):
 def main(
     datadir: str | Path | None = None, log_level: int | str = logging.WARNING
 ) -> None:
+    """
+    The main function for the Quantifiles application. Initializes the Qt application,
+    sets the application name and icon, creates the main window with the specified data
+    directory (or None if not provided), and starts the event loop.
+
+    Parameters
+    ----------
+    datadir: str | Path | None, optional (default: None) Path to the data directory to open on launch. If None, the
+    user will have to select a data directory manually.
+    log_level: int | str, optional (default: logging.WARNING) The logging level to use. Can be an integer or a string.
+
+    Returns
+    -------
+        None.
+    """
     app = QtWidgets.QApplication([])
     logging.basicConfig(level=log_level)
     app.setApplicationName("Quantifiles")
