@@ -1,6 +1,7 @@
 # This code is part of Tergite
 #
 # (C) Copyright Liangyu Chen 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -13,7 +14,7 @@
 import numpy as np
 
 from .analysis import (
-    ProcessTomographyAnalysis,
+    ProcessTomographyNodeAnalysis,
 )
 from .measurement import (
     Process_Tomography,
@@ -23,7 +24,7 @@ from ....base.node import BaseNode
 
 class Process_Tomography_Node(BaseNode):
     measurement_obj = Process_Tomography
-    analysis_obj = ProcessTomographyAnalysis
+    analysis_obj = ProcessTomographyNodeAnalysis
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary
@@ -34,10 +35,7 @@ class Process_Tomography_Node(BaseNode):
         self.couplers = couplers
         self.edges = couplers
         self.coupler = couplers[0]
-        # print(couplers)
         self.coupled_qubits = couplers[0].split(sep="_")
-        # print(self.coupled_qubits)
-        # self.node_dictionary = kwargs
         self.redis_field = [
             "pop_g",
             "pop_e",
@@ -51,4 +49,3 @@ class Process_Tomography_Node(BaseNode):
                 coupler: np.append(range(16), [0, 1, 2]) for coupler in self.couplers
             },
         }
-        # self.validate()
