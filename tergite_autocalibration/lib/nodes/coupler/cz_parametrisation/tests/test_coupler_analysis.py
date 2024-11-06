@@ -185,7 +185,11 @@ def test_PickGoodValueIfSmallestInAbsolute(
 @pytest.fixture(autouse=True)
 def setup_data_mutliple_files():
     # It should be a single dataset, but we do not have one yet, so we loop over existing files
-    dataset_path = Path(__file__).parent / "data" / "dataset_cz_parametrization_fix_duration_0.hdf5"
+    dataset_path = (
+        Path(__file__).parent
+        / "data"
+        / "dataset_cz_parametrization_fix_duration_0.hdf5"
+    )
     ds = xr.open_dataset(dataset_path, engine="scipy")
     combined_dataset = ds
 

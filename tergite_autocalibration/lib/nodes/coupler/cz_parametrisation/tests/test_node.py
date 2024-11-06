@@ -33,7 +33,9 @@ from tergite_autocalibration.lib.utils.node_subclasses import ParametrizedSweepN
 @pytest.mark.skip
 def test_canCreateCorrectType():
     c = CZParametrizationFixDurationNode(
-        "cz_char_fixCurrent", all_qubits=["q14", "q15"], couplers=["q14_q15"], 
+        "cz_char_fixCurrent",
+        all_qubits=["q14", "q15"],
+        couplers=["q14_q15"],
     )
     assert isinstance(c, CZParametrizationFixDurationNode)
     assert isinstance(c, ParametrizedSweepNode)

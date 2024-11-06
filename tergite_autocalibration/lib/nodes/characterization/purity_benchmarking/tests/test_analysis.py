@@ -32,7 +32,9 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
     def setUpClass(self):
         # Setup the dataset for testing from a file
         test_dir = Path(__file__).parent
-        file_path = test_dir / "data" / "dataset_purity_benchmarking_0.hdf5"  # "testdata.hdf5"
+        file_path = (
+            test_dir / "data" / "dataset_purity_benchmarking_0.hdf5"
+        )  # "testdata.hdf5"
         self.dataset = xr.open_dataset(file_path)
 
     def test_initialization(self):
