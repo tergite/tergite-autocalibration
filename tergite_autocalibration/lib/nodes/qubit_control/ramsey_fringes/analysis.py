@@ -76,10 +76,8 @@ class RamseyDetuningsBaseQubitAnalysis(BaseQubitAnalysis):
                 self.detuning_coord = coord
         self.artificial_detunings = self.dataset.coords[self.detuning_coord].values
         redis_key = f"transmons:{self.qubit}"
-
-        self.qubit_frequency = float(
-            REDIS_CONNECTION.hget(f"{redis_key}", self.redis_field)
-        )
+        redis_value = REDIS_CONNECTION.hget(f"{redis_key}", self.redis_field)
+        self.qubit_frequency = float(redis_value)
 
         self.fit_results = {}
 

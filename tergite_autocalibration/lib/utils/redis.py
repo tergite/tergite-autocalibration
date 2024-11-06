@@ -12,6 +12,7 @@
 # that they have been altered from the originals.
 
 import json
+import numpy as np
 
 import numpy as np
 from quantify_scheduler.json_utils import SchedulerJSONDecoder, SchedulerJSONEncoder
@@ -24,8 +25,12 @@ from tergite_autocalibration.utils.extended_coupler_edge import (
 )
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 
+<<<<<<< HEAD
 np.set_printoptions(legacy="1.25")
 
+=======
+np.set_printoptions(legacy='1.25')
+>>>>>>> 129c75b (First version with reset_chevron working)
 
 def load_redis_config(transmon: ExtendedTransmon, channel: int):
     qubit = transmon.name
