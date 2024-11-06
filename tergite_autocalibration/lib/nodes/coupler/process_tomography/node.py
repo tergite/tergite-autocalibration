@@ -22,10 +22,15 @@ from .measurement import (
 from ....base.node import BaseNode
 
 
-class Process_Tomography_Node(BaseNode):
+class ProcessTomographySSRONode(BaseNode):
     measurement_obj = Process_Tomography
     analysis_obj = ProcessTomographyNodeAnalysis
-
+    coupler_qois = [
+            "pop_g",
+            "pop_e",
+            "pop_f",
+        ]
+    
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary
     ):
@@ -36,11 +41,6 @@ class Process_Tomography_Node(BaseNode):
         self.edges = couplers
         self.coupler = couplers[0]
         self.coupled_qubits = couplers[0].split(sep="_")
-        self.redis_field = [
-            "pop_g",
-            "pop_e",
-            "pop_f",
-        ]
         self.qubit_state = 2
         self.testing_group = 0  # The edge group to be tested. 0 means all edges.
         self.schedule_samplespace = {
