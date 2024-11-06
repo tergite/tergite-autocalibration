@@ -409,6 +409,12 @@ class PlotWindow(QtWidgets.QMainWindow):
             self.toggle_gettable
         )
 
+        # make sure the window is on top, and that it is activated. Does not always work on Windows due to Windows not
+        # allowing this if the application is not the active window.
+        self.show()
+        self.raise_()
+        self.activateWindow()
+
     def add_plot(self, name: str, plot: BasePlot):
         self.canvas.add_plot(plot)
         self.plots[name] = plot
