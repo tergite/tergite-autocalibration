@@ -26,11 +26,11 @@ class ProcessTomographySSRONode(BaseNode):
     measurement_obj = Process_Tomography
     analysis_obj = ProcessTomographyNodeAnalysis
     coupler_qois = [
-            "pop_g",
-            "pop_e",
-            "pop_f",
-        ]
-    
+        "pop_g",
+        "pop_e",
+        "pop_f",
+    ]
+
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary
     ):
