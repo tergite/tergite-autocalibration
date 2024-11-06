@@ -314,6 +314,7 @@ class ResetChevronQubitAnalysis(BaseQubitAnalysis):
         handles.append(patch)
         axis.legend(handles=handles, fontsize="small")
 
+
 class ResetChevronCouplerAnalysis(BaseCouplerAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
