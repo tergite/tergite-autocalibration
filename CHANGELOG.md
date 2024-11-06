@@ -5,9 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project follows versions of format `{year}.{month}.{patch_number}`.
 
-## [Unreleased]
+## [0.2.0] - 2023-04-12
 
 ### Added
+
+- Added splitter to the plot window, allowing users to resize the left and right panels.
+- Made the auto plot windows pop up as active windows on some operating systems.
+- Added colorbar to the 2d plots.
+- Added a warning on selecting an invalid data directory.
+- Added a "Close all plots" action to the browser window under the "File" menu for convenience.
 
 ### Changed
 - Migrated cli from click to typer

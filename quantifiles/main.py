@@ -361,6 +361,12 @@ class DataDirInspector(QtWidgets.QMainWindow):
         reload_action.triggered.connect(self.reload_datadir)
         file_menu.addAction(reload_action)
 
+        # create Close all plots action
+        close_plots_action = QtWidgets.QAction("&Close all plots", self)
+        close_plots_action.setShortcut("X")
+        close_plots_action.triggered.connect(self.close_all_plots)
+        file_menu.addAction(close_plots_action)
+
         # create Exit action
         exit_action = QtWidgets.QAction("&Exit", self)
         exit_action.setShortcut("Ctrl+Q")
@@ -424,6 +430,11 @@ class DataDirInspector(QtWidgets.QMainWindow):
 
         # Reselect the dates to update
         self.set_date_selection(self._selected_dates)
+
+    @QtCore.pyqtSlot()
+    def close_all_plots(self) -> None:
+        for plot in self.plots:
+            plot.close()
 
     @QtCore.pyqtSlot()
     def _update_date_list(self) -> None:
