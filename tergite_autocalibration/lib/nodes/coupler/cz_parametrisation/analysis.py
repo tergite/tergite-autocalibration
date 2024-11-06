@@ -349,7 +349,7 @@ class CZParametrisationFixDurationCouplerAnalysis(BaseCouplerAnalysis):
                 pass
 
 
-class CZParametrisationFixDurationNodeAnalysis(BaseAllCouplersRepeatAnalysis):
+class CZParametrizationFixDurationNodeAnalysis(BaseAllCouplersRepeatAnalysis):
     single_coupler_analysis_obj = CZParametrisationFixDurationCouplerAnalysis
 
     def __init__(self, name, redis_fields):

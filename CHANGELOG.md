@@ -8,6 +8,7 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 ## [0.2.1] - 2023-04-13
 
 ### Added
+- Dataset browser
 
 - Added labels to the colorbar in the 2d plots.
 - Added a search function to the snapshot treeview, allowing users to search for specific keys in the snapshot.

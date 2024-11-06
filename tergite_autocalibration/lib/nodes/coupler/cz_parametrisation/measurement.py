@@ -27,7 +27,7 @@ from .....utils.extended_coupler_edge import ExtendedCompositeSquareEdge
 from .....utils.extended_transmon_element import ExtendedTransmon
 
 
-class CZParametrisationFixDuration(BaseMeasurement):
+class CZParametrizationFixDuration(BaseMeasurement):
     def __init__(
         self,
         transmons: dict[str, ExtendedTransmon],

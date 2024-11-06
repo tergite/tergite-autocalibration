@@ -78,7 +78,7 @@ graph_dependencies = [
     # ('rabi_oscillations', 'reset_chevron'),
     # ('cz_chevron', 'cz_calibration'),
     ("resonator_spectroscopy_2", "cz_chevron"),
-    ("resonator_spectroscopy_2", "cz_parametrisation_fix_duration"),
+    ("resonator_spectroscopy_2", "cz_parametrization_fix_duration"),
     ("resonator_spectroscopy_2", "cz_chevron_amplitude"),
     ("resonator_spectroscopy_2", "reset_chevron"),
     ("ro_amplitude_three_state_optimization", "reset_calibration_ssro"),
