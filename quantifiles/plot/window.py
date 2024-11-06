@@ -14,6 +14,24 @@ logger = logging.getLogger(__name__)
 
 
 class GettableSelector(QtWidgets.QWidget):
+    """
+    A widget for selecting variables in a given xarray dataset.
+
+    Parameters
+    ----------
+    parent : QtWidgets.QWidget or None, optional
+        The parent widget of the selector. If None, it will be a top-level widget.
+    gettable_name : str, optional
+        The name of the xarray data variable to be selected.
+    dataset : xarray.Dataset or None, optional
+        The xarray dataset containing the data variable to be selected.
+
+    Attributes
+    ----------
+    checkbox : QtWidgets.QCheckBox
+        The checkbox used to select the data variable.
+    """
+
     def __init__(
         self,
         parent: QtWidgets.QWidget | None = None,
@@ -21,13 +39,17 @@ class GettableSelector(QtWidgets.QWidget):
         dataset: xr.Dataset | None = None,
     ):
         super().__init__(parent)
+
+        # Get the long name and units of the data variable.
         gettable_long_name = dataset[gettable_name].long_name
         gettable_units = dataset[gettable_name].attrs["units"]
         box_title = f"{gettable_long_name} ({gettable_units})"
 
+        # Set up the main layout of the widget.
         main_layout = QtWidgets.QHBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
 
+        # Set up the checkbox for selecting the data variable.
         self.checkbox = QtWidgets.QCheckBox()
         self.checkbox.setChecked(True)
         self.checkbox.setToolTip(f"Select to include {gettable_name} in plot")
@@ -39,10 +61,10 @@ class GettableSelector(QtWidgets.QWidget):
         checkbox_layout.addWidget(self.checkbox)
         checkbox_layout.setAlignment(QtCore.Qt.AlignRight)
 
-        grid_layout = QtWidgets.QGridLayout()
-        grid_layout.setHorizontalSpacing(10)
-        grid_layout.setVerticalSpacing(5)
+        # Set up the box containing the variable selection options.
+        box_layout = QtWidgets.QVBoxLayout()
 
+        # Add the title label and underline.
         label = QtWidgets.QLabel(box_title)
         underline = QtWidgets.QFrame()
         underline.setFrameShape(QtWidgets.QFrame.HLine)
@@ -50,20 +72,17 @@ class GettableSelector(QtWidgets.QWidget):
 
         grid_layout.addWidget(label, 0, 0)
         grid_layout.addWidget(underline, 1, 0)
-<<<<<<< HEAD
 
         grid_layout.addLayout(param_table_layout, 2, 1)
-=======
->>>>>>> 78bdeeb (improve gettable box)
 
+        # Add a label for each settable variable.
         for row_index, settable_name in enumerate(dataset[gettable_name].coords.keys()):
             settable_long_name = dataset[gettable_name][settable_name].long_name
-
-            label_short_name = QtWidgets.QLabel(str(settable_name))
-            label_long_name = QtWidgets.QLabel(str(settable_long_name))
-            label_settable_unit = QtWidgets.QLabel(
-                str(dataset[gettable_name][settable_name].attrs["units"])
+            settable_units = dataset[gettable_name][settable_name].attrs["units"]
+            settable_label = QtWidgets.QLabel(
+                f"{settable_name} - {settable_long_name} ({settable_units})"
             )
+            box_layout.addWidget(settable_label)
 
             label_short_name.setToolTip("name attribute")
             label_long_name.setToolTip("long_name attribute")
@@ -88,49 +107,84 @@ class GettableSelector(QtWidgets.QWidget):
         )
 
         main_layout.addLayout(checkbox_layout)
-        main_layout.addWidget(grid_frame)
+        main_layout.addWidget(box_frame)
 
 
 class GettableSelectBox(QtWidgets.QFrame):
+    """
+    A widget for selecting data variables from an xarray Dataset.
+    """
+
+    # Custom signal that is emitted when a checkbox is toggled
     gettable_toggled = QtCore.pyqtSignal(str, bool)
 
     def __init__(
-        self, parent: QtWidgets.QWidget | None = None, dataset: xr.Dataset | None = None
+        self,
+        parent: QtWidgets.QWidget | None = None,
+        dataset: xr.Dataset | None = None
     ):
+        """
+        Initialize the GettableSelectBox widget.
+
+        Parameters
+        ----------
+        parent : QWidget or None
+            The parent widget of this widget.
+        dataset : xarray.Dataset or None
+            The dataset containing the data variables to select.
+        """
         super().__init__(parent)
+
         layout = QtWidgets.QVBoxLayout(self)
 
+        # Add a label to the top of the widget
         label = QtWidgets.QLabel("Dataset contents:")
+        layout.addWidget(label)
+
+        # Add a spacer to push the rest of the widgets down
         spacer = QtWidgets.QSpacerItem(
             25, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
         )
         layout.addSpacerItem(spacer)
-        layout.addWidget(label)
 
+        # Set the style and size policy of this widget
         self.setFrameStyle(QtWidgets.QFrame.StyledPanel | QtWidgets.QFrame.Plain)
         self.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         self.setLayout(layout)
 
+        # Create a signal mapper to map signals from the checkbox to the gettable name
         self.gettable_select_mapper = QSignalMapper()
         self.gettable_select_mapper.mapped[str].connect(self.gettable_state_changed)
 
         self._gettable_checkboxes = {}
+
+        # Add a GettableSelector widget for each data variable in the dataset
         for idx, gettable_name in enumerate(dataset.data_vars.keys()):
-            gettable_box = GettableSelector(
-                gettable_name=gettable_name, dataset=dataset
-            )
+            gettable_box = GettableSelector(gettable_name=gettable_name, dataset=dataset)
+
+            # Connect the checkbox in the GettableSelector widget to the signal mapper
             gettable_box.checkbox.stateChanged.connect(self.gettable_select_mapper.map)
             self.gettable_select_mapper.setMapping(gettable_box.checkbox, gettable_name)
+
             self._gettable_checkboxes[gettable_name] = gettable_box.checkbox
 
-            layout.addWidget(
-                gettable_box,
-            )
+            layout.addWidget(gettable_box)
+
+        # Add another spacer to push the widgets so they are centered
         layout.addSpacerItem(spacer)
 
     def gettable_state_changed(self, name: str):
+        """
+        Emit the gettable_toggled signal with the name of the toggled checkbox and its state.
+
+        Parameters
+        ----------
+        name : str
+            The name of the data variable associated with the toggled checkbox.
+        """
         enabled = self._gettable_checkboxes[name].isChecked()
         self.gettable_toggled.emit(name, enabled)
+
 
 
 class NameAndTuidBox(QtWidgets.QFrame):
