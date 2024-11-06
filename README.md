@@ -66,6 +66,8 @@ cp dot-env-template.txt .env
 =======
 To install Quantifiles from source, first clone the repository:
 
+To install Quantifiles from source, first clone the repository:
+
 ```bash
 git clone https://gitlab.com/dcrielaard/quantifiles.git
 cd quantifiles
@@ -93,6 +95,11 @@ quantifiles [--datadir DATADIR]
 ```
 
 If you don't specify the data directory, you can still access it by selecting File->Open in the application.
+<<<<<<< HEAD
+=======
+
+Alternatively, you can also use the executable file located in the Scripts folder, which will be generated upon installation.
+>>>>>>> a4947cf (improved the read me)
 
 Alternatively, you can also use the executable file located in the Scripts folder, which will be generated upon installation.
 >>>>>>> e2932d5 (improved the read me)
@@ -107,6 +114,7 @@ acli calibration start
 acli --help
 ```
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 ## Official documentation
 
@@ -135,6 +143,11 @@ We welcome contributions to Quantifiles! If you have an idea for a feature, or i
 
 Feel free to dive in!
 >>>>>>> e2932d5 (improved the read me)
+=======
+We welcome contributions to Quantifiles! If you have an idea for a feature, or if you encounter a bug, please [open an issue](https://gitlab.com/dcrielaard/quantifiles/issues/new) or submit a pull request.
+
+Feel free to dive in!
+>>>>>>> a4947cf (improved the read me)
 
 ## License
 
