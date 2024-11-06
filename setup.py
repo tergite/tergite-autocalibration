@@ -9,7 +9,7 @@ with open("LICENSE") as f:
 
 setup(
     name="quantifiles",
-    version="0.0.2",
+    version="0.0.3",
     description="Simple databrowser for quantify datasets.",
     long_description=readme,
     author="Damien Crielaard",
@@ -17,6 +17,7 @@ setup(
     url="https://gitlab.com/dcrielaard/quantifiles",
     license=license,
     packages=find_packages(exclude=("test_data",)),
+    entry_points={"gui_scripts": ["quantifiles=quantifiles.main:main"]},
     install_requires=[
         "numpy",
         "matplotlib",
@@ -28,5 +29,6 @@ setup(
         "pyqt5",
         "quantify-core",
     ],
+    options={"build_exe": {"include_files": ["icon.png"]}},
     python_requires=">=3.7",
 )

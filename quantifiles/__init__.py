@@ -6,7 +6,7 @@ from pathlib import Path
 
 __all__ = ["quantifiles"]
 
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 
 _static_reference = None
 
