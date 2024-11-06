@@ -18,10 +18,10 @@ from functools import singledispatchmethod
 import numpy as np
 import xarray as xr
 from scipy.optimize import leastsq
+import matplotlib.patches as mpatches
 
 from ....base.analysis import (
     BaseAllCouplersAnalysis,
-    BaseAllCouplersRepeatAnalysis,
     BaseCouplerAnalysis,
     BaseQubitAnalysis,
 )
@@ -306,7 +306,13 @@ class ResetChevronQubitAnalysis(BaseQubitAnalysis):
         axis.set_ylabel("Drive Durations (s)")
         axis.set_xlabel("Drive Amplitude (V)")
         axis.set_title(f"Reset Chevron - Qubit {self.qubit[1:]}")
+        axis.legend()  # Add legend to the plot
 
+        # Customize plot as needed
+        handles, labels = axis.get_legend_handles_labels()
+        patch = mpatches.Patch(color="red", label=f"{self.qubit}")
+        handles.append(patch)
+        axis.legend(handles=handles, fontsize="small")
 
 class ResetChevronCouplerAnalysis(BaseCouplerAnalysis):
     def __init__(self, name, redis_fields):
