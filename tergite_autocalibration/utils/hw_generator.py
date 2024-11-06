@@ -14,7 +14,6 @@ import csv
 import json
 
 
-
 class HW_Config_Generator:
     def __init__(
         self,
@@ -31,9 +30,9 @@ class HW_Config_Generator:
 
     def generate_initial_hw_config(self):
         HW_CONFIG = {}
-        HW_CONFIG[
-            "backend"
-        ] = "quantify_scheduler.backends.qblox_backend.hardware_compile"
+        HW_CONFIG["backend"] = (
+            "quantify_scheduler.backends.qblox_backend.hardware_compile"
+        )
         HW_CONFIG[f"{self.cluster_name}"] = {
             "ref": "internal",
             "instrument_type": "Cluster",
@@ -44,10 +43,7 @@ class HW_Config_Generator:
         QRM_config = {}
         for module, qrm_qubits in self.module_to_ro_line_qubit_map.items():
             qrm_module_config = self.mixer_calibrations[module]
-            qrm_config = self.qrm_hw(
-                qrm_qubits,
-                ** qrm_module_config
-            )
+            qrm_config = self.qrm_hw(qrm_qubits, **qrm_module_config)
             QRM_config[f"{self.cluster_name}_{module}"] = qrm_config
         return QRM_config
 
@@ -153,6 +149,7 @@ class HW_Config_Generator:
 
 if __name__ == "main":
     from tergite_autocalibration.config.settings import CONFIG_DIR
+
     mixer_file = CONFIG_DIR / "initial.csv"
     json_config_file = CONFIG_DIR / "HARDWARE_CONFIGURATION_LOKIA_20240504.json"
     CLUSTER_NAME = "clusterA"
@@ -209,4 +206,3 @@ if __name__ == "main":
 #
 # with open(json_config_file, "w") as f:
 #     json.dump(HW_CONFIG, f, indent=3)
-
