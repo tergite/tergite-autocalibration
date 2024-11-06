@@ -11,30 +11,12 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import json
 import numpy as np
 from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 
 from .analysis import QubitSpectroscopyNodeAnalysis, QubitSpectroscopyNodeMultidim
 from .measurement import Two_Tones_Multidim
-
-with open("./configs/VNA_values.json") as vna:
-    VNA = json.load(vna)
-VNA_qubit_frequencies = VNA["VNA_qubit_frequencies"]
-VNA_f12_frequencies = VNA["VNA_f12_frequencies"]
-
-
-def qubit_samples(qubit: str, transition: str = "01") -> np.ndarray:
-    qub_spec_samples = 51
-    sweep_range = 10e6
-    if transition == "01":
-        VNA_frequency = VNA_qubit_frequencies[qubit]
-    elif transition == "12":
-        VNA_frequency = VNA_f12_frequencies[qubit]
-    min_freq = VNA_frequency - sweep_range / 2
-    max_freq = VNA_frequency + sweep_range / 2
-    return np.linspace(min_freq, max_freq, qub_spec_samples)
-
+from tergite_autocalibration.utils.user_input import qubit_samples
 
 class Qubit_01_Spectroscopy_Multidim_Node(ScheduleNode):
     measurement_obj = Two_Tones_Multidim
