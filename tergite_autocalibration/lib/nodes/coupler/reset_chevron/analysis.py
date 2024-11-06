@@ -19,7 +19,12 @@ import numpy as np
 import xarray as xr
 from scipy.optimize import leastsq
 
-from ....base.analysis import BaseAllCouplersAnalysis, BaseAllCouplersRepeatAnalysis, BaseCouplerAnalysis, BaseQubitAnalysis
+from ....base.analysis import (
+    BaseAllCouplersAnalysis,
+    BaseAllCouplersRepeatAnalysis,
+    BaseCouplerAnalysis,
+    BaseQubitAnalysis,
+)
 
 
 class SweepResultStatus(Enum):
@@ -106,7 +111,7 @@ class ResetChevronQubitAnalysis(BaseQubitAnalysis):
             min_index = np.unravel_index(min_index, magnitudes.shape)
             self.opt_freq = self.amps[min_index[0]]
             self.opt_cz = self.times[min_index[1]]
-            #print(self.opt_freq, self.opt_cz)
+            # print(self.opt_freq, self.opt_cz)
         else:
             tstep = times[1] - times[0]
             # ----------- First round fit ------------#
@@ -256,7 +261,7 @@ class ResetChevronQubitAnalysis(BaseQubitAnalysis):
                         gate_time = fitfunc(out[0], f_opt)
                         # ---------- show final result ------------#
 
-                        #print(f_opt, gate_time)
+                        # print(f_opt, gate_time)
                         self.opt_freq = f_opt * 1e6
                         self.opt_cz = gate_time / 1e9
             except:
@@ -320,9 +325,7 @@ class ResetChevronCouplerAnalysis(BaseCouplerAnalysis):
             if self.name_qubit_1 in data_var
         ]
         ds1 = self.dataset[q1_data_var]
-        matching_coords = [
-            coord for coord in ds1.coords if self.name_qubit_1 in coord
-        ]
+        matching_coords = [coord for coord in ds1.coords if self.name_qubit_1 in coord]
         if matching_coords:
             selected_coord_name = matching_coords[0]
             ds1 = ds1.sel({selected_coord_name: slice(None)})
@@ -336,9 +339,7 @@ class ResetChevronCouplerAnalysis(BaseCouplerAnalysis):
             if self.name_qubit_2 in data_var
         ]
         ds2 = self.dataset[q2_data_var]
-        matching_coords = [
-            coord for coord in ds2.coords if self.name_qubit_2 in coord
-        ]
+        matching_coords = [coord for coord in ds2.coords if self.name_qubit_2 in coord]
         if matching_coords:
             selected_coord_name = matching_coords[0]
             ds2 = ds2.sel({selected_coord_name: slice(None)})
@@ -350,11 +351,11 @@ class ResetChevronCouplerAnalysis(BaseCouplerAnalysis):
         print(res2)
 
         return res1
-    
 
     def plotter(self, primary_axis, secondary_axis):
         self.q1.plotter(primary_axis)
         self.q2.plotter(secondary_axis)
+
 
 class ResetChevronNodeAnalysis(BaseAllCouplersAnalysis):
     single_coupler_analysis_obj = ResetChevronCouplerAnalysis
