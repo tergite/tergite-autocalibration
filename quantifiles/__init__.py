@@ -4,12 +4,12 @@ import argparse
 import logging
 from pathlib import Path
 
-from quantifiles import version
+# from quantifiles import version
 from quantifiles.main import main
 
 __all__ = ["quantifiles", "__version__"]
 
-__version__ = version.__version__
+# __version__ = version.__version__
 
 
 def quantifiles(
