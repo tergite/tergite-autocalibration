@@ -14,17 +14,17 @@ import numpy as np
 
 from .....config.settings import REDIS_CONNECTION
 from .analysis import (
-    CZParametrisationFixDurationNodeAnalysis,
+    CZParametrizationFixDurationNodeAnalysis,
 )
 from .measurement import (
-    CZParametrisationFixDuration,
+    CZParametrizationFixDuration,
 )
 from ....utils.node_subclasses import ParametrizedSweepNode
 
 
-class CZParametrisationFixDurationNode(ParametrizedSweepNode):
-    measurement_obj = CZParametrisationFixDuration
-    analysis_obj = CZParametrisationFixDurationNodeAnalysis
+class CZParametrizationFixDurationNode(ParametrizedSweepNode):
+    measurement_obj = CZParametrizationFixDuration
+    analysis_obj = CZParametrizationFixDurationNodeAnalysis
     coupler_qois = [
         "cz_pulse_frequency",
         "cz_pulse_amplitude",

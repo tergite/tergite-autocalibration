@@ -292,7 +292,7 @@ class BaseNode(abc.ABC):
             "cz_calibration_swap_ssro",
             "cz_dynamic_phase",
             "cz_dynamic_phase_swap",
-            "cz_parametrisation_fix_duration",
+            "cz_parametrization_fix_duration",
             "reset_chevron",
             "reset_calibration_ssro",
             "tqg_randomized_benchmarking",
