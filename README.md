@@ -36,7 +36,6 @@ redis-server
 
 - Clone the repo
 
-<<<<<<< HEAD
 ```shell
 git clone git@github.com:tergite/tergite-autocalibration.git
 ```
@@ -63,46 +62,6 @@ cp dot-env-template.txt .env
 ```
 
 - Start the automatic calibration
-=======
-To install Quantifiles from source, first clone the repository:
-
-To install Quantifiles from source, first clone the repository:
-
-```bash
-git clone https://gitlab.com/dcrielaard/quantifiles.git
-cd quantifiles
-```
-
-Then, install the application in a virtual environment using pip:
-```bash
-pip install -e .
-```
-
-### Install with pipenv
-
-If you prefer to use pipenv for managing your virtual environment, you can install Quantifiles with the following command:
-
-```bash
-pipenv install git+https://gitlab.com/dcrielaard/quantifiles.git#egg=quantifiles
-```
-
-## Usage
-
-You can launch the application by running the following command in your terminal:
-
-```bash
-quantifiles [--datadir DATADIR] [--liveplotting] [--loglevel LOGLEVEL]
-```
-
-If you don't specify the data directory, you can still access it by selecting File->Open in the application.
-<<<<<<< HEAD
-=======
-
-Alternatively, you can also use the executable file located in the Scripts folder, which will be generated upon installation.
->>>>>>> a4947cf (improved the read me)
-
-Alternatively, you can also use the executable file located in the Scripts folder, which will be generated upon installation.
->>>>>>> e2932d5 (improved the read me)
 
 ```shell
 acli calibration start
@@ -114,8 +73,6 @@ acli calibration start
 acli --help
 ```
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 ## Official documentation
 
 The documentation is mantained in using [Quarto](https://quarto.org/). The documentation for the public version of the code is available [here](https://tergite.github.io/tergite-autocalibration/getting_started.html). 
@@ -138,16 +95,6 @@ Special credit goes to the authors of this project as seen in the [CREDITS](./CR
 
 To view the changelog for each version, have a look at
 the [CHANGELOG.md](./CHANGELOG.md) file.
-=======
-We welcome contributions to Quantifiles! If you have an idea for a feature, or if you encounter a bug, please [open an issue](https://gitlab.com/dcrielaard/quantifiles/issues/new) or submit a pull request.
-
-Feel free to dive in!
->>>>>>> e2932d5 (improved the read me)
-=======
-We welcome contributions to Quantifiles! If you have an idea for a feature, or if you encounter a bug, please [open an issue](https://gitlab.com/dcrielaard/quantifiles/issues/new) or submit a pull request.
-
-Feel free to dive in!
->>>>>>> a4947cf (improved the read me)
 
 ## License
 
@@ -161,4 +108,3 @@ This project was sponsored by:
 -   [Nordic e-Infrastructure Collaboration (NeIC)](https://neic.no) and [NordForsk](https://www.nordforsk.org/sv) under the [NordIQuEst](https://neic.no/nordiquest/) project
 -   [European Union's Horizon Europe](https://research-and-innovation.ec.europa.eu/funding/funding-opportunities/funding-programmes-and-open-calls/horizon-europe_en) under the [OpenSuperQ](https://cordis.europa.eu/project/id/820363) project
 -   [European Union's Horizon Europe](https://research-and-innovation.ec.europa.eu/funding/funding-opportunities/funding-programmes-and-open-calls/horizon-europe_en) under the [OpenSuperQPlus](https://opensuperqplus.eu/) project
- 
