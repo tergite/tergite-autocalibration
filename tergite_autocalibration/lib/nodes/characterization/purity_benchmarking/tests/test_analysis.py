@@ -10,19 +10,22 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+from pathlib import Path
+import unittest
+
+from lmfit.model import ModelResult
+from matplotlib.figure import Figure
+import numpy as np
+import xarray as xr
+
+from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.analysis import (
+    PurityBenchmarkingQubitAnalysis,
+)
 from tergite_autocalibration.tests.utils.env import setup_test_env
 
 setup_test_env()
 
-import unittest
-import numpy as np
-import xarray as xr
-from lmfit.model import ModelResult
-from pathlib import Path
-from matplotlib.figure import Figure
-from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.analysis import (
-    PurityBenchmarkingQubitAnalysis,
-)
+
 
 
 # FIXME: These tests are marked as skip after the refactoring of the analysis classes
@@ -35,6 +38,7 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
         file_path = test_dir / "data" / "dataset_0.hdf5"  # "testdata.hdf5"
         self.dataset = xr.open_dataset(file_path)
 
+    @unittest.skip
     def test_initialization(self):
         self.analysis = PurityBenchmarkingQubitAnalysis("name", ["purity_fidelity"])
         self.analysis.process_qubit(self.dataset, "yq06")

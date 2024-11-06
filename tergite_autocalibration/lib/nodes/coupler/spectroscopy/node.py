@@ -19,12 +19,38 @@ from tergite_autocalibration.lib.base.external_parameter_node import (
 )
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.hardware_utils import SpiDAC
-from tergite_autocalibration.utils.user_input import qubit_samples, resonator_samples
 
 from ...qubit_control.spectroscopy.measurement import Two_Tones_Multidim
 from ...readout.resonator_spectroscopy.measurement import Resonator_Spectroscopy
 from .analysis import CouplerSpectroscopyNodeAnalysis
+import json
 
+with open('./configs/VNA_values.json') as vna:
+    VNA = json.load(vna)
+VNA_resonator_frequencies = VNA['VNA_resonator_frequencies']
+VNA_qubit_frequencies = VNA['VNA_qubit_frequencies']
+VNA_f12_frequencies = VNA['VNA_f12_frequencies']
+
+
+def qubit_samples(qubit: str, transition: str = "01") -> np.ndarray:
+    qub_spec_samples = 51
+    sweep_range = 10e6
+    if transition == "01":
+        VNA_frequency = VNA_qubit_frequencies[qubit]
+    elif transition == "12":
+        VNA_frequency = VNA_f12_frequencies[qubit]
+    min_freq = VNA_frequency - sweep_range / 2
+    max_freq = VNA_frequency + sweep_range / 2
+    return np.linspace(min_freq, max_freq, qub_spec_samples)
+
+
+def resonator_samples(qubit: str) -> np.ndarray:
+    res_spec_samples = 70
+    sweep_range = 5.0e6
+    VNA_frequency = VNA_resonator_frequencies[qubit]
+    min_freq = VNA_frequency - sweep_range / 2
+    max_freq = VNA_frequency + sweep_range / 2
+    return np.linspace(min_freq, max_freq, res_spec_samples)
 
 class Coupler_Spectroscopy_Node(ExternalParameterNode):
     measurement_obj = Two_Tones_Multidim

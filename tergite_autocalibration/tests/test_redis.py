@@ -11,23 +11,24 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+import pytest
+import quantify_scheduler.device_under_test.mock_setup as mock
+import toml
+
+from tergite_autocalibration.config import settings
+from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.tests.utils.env import setup_test_env
 
 setup_test_env()
 
-import pytest
 
-from tergite_autocalibration.config import settings
-from tergite_autocalibration.lib.utils.node_factory import NodeFactory
-import quantify_scheduler.device_under_test.mock_setup as mock
-import toml
 
 
 nodes = NodeFactory()
 transmon_configuration = toml.load(settings.DEVICE_CONFIG)
 qois = transmon_configuration["qoi"]
-setup = mock.set_up_mock_transmon_setup()
-mock.set_standard_params_transmon(setup)
+# setup = mock.set_up_mock_transmon_setup()
+# mock.set_standard_params_transmon(setup)
 
 
 # FIXME: This test becomes redundant as soon as we are moving towards the new qoi structure, then we remove the skip
