@@ -103,9 +103,6 @@ CONFIG_DIR = _from_config(
 # ---
 # Section with configuration files
 HARDWARE_CONFIG = CONFIG_DIR.joinpath(_from_config("HARDWARE_CONFIG", cast_=Path))
-INITIAL_FREQUENCIES_CONFIG = CONFIG_DIR.joinpath(
-    _from_config("INITIAL_FREQUENCIES_CONFIG", cast_=Path)
-)
 DEVICE_CONFIG = CONFIG_DIR.joinpath(_from_config("DEVICE_CONFIG", cast_=Path))
 BACKEND_CONFIG = Path(__file__).parent / "backend_config_default.toml"
 
