@@ -21,9 +21,9 @@ from .measurement import RO_frequency_optimization
 from ....base.node import BaseNode
 import numpy as np
 
-with open('./configs/VNA_values.json') as vna:
+with open("./configs/VNA_values.json") as vna:
     VNA = json.load(vna)
-VNA_resonator_frequencies = VNA['VNA_resonator_frequencies']
+VNA_resonator_frequencies = VNA["VNA_resonator_frequencies"]
 
 
 def resonator_samples(qubit: str) -> np.ndarray:
@@ -33,6 +33,7 @@ def resonator_samples(qubit: str) -> np.ndarray:
     min_freq = VNA_frequency - sweep_range / 2
     max_freq = VNA_frequency + sweep_range / 2
     return np.linspace(min_freq, max_freq, res_spec_samples)
+
 
 class RO_frequency_two_state_optimization_Node(BaseNode):
     measurement_obj = RO_frequency_optimization

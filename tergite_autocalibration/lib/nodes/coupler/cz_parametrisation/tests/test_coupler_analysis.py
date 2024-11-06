@@ -40,8 +40,6 @@ from tergite_autocalibration.tests.utils.env import setup_test_env
 setup_test_env()
 
 
-
-
 def test_CanCreate():
     dataset_path = Path(__file__).parent / "data" / "dataset_good_quality_freq_amp.hdf5"
     ds = xr.open_dataset(dataset_path, engine="scipy")

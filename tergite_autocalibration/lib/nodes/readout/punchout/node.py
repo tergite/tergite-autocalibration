@@ -17,9 +17,9 @@ from .analysis import PunchoutAnalysis
 from .measurement import Punchout
 from ....base.node import BaseNode
 
-with open('./configs/VNA_values.json') as vna:
+with open("./configs/VNA_values.json") as vna:
     VNA = json.load(vna)
-VNA_resonator_frequencies = VNA['VNA_resonator_frequencies']
+VNA_resonator_frequencies = VNA["VNA_resonator_frequencies"]
 
 
 def resonator_samples(qubit: str) -> np.ndarray:
@@ -29,6 +29,7 @@ def resonator_samples(qubit: str) -> np.ndarray:
     min_freq = VNA_frequency - sweep_range / 2
     max_freq = VNA_frequency + sweep_range / 2
     return np.linspace(min_freq, max_freq, res_spec_samples)
+
 
 class Punchout_Node(BaseNode):
     measurement_obj = Punchout

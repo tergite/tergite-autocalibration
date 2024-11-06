@@ -21,12 +21,11 @@ from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.measurement im
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.node import (
     CZParametrisationFixDurationNode,
 )
+
 # from tergite_autocalibration.lib.utils.node_subclasses import ParametrizedSweepNode
 from tergite_autocalibration.tests.utils.env import setup_test_env
 
 setup_test_env()
-
-
 
 
 # FIXME: All tests in this file are marked as skip

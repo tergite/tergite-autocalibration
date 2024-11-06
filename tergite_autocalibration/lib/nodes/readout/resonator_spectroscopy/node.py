@@ -24,9 +24,9 @@ from .analysis import (
 )
 from .measurement import Resonator_Spectroscopy
 
-with open('./configs/VNA_values.json') as vna:
+with open("./configs/VNA_values.json") as vna:
     VNA = json.load(vna)
-VNA_resonator_frequencies = VNA['VNA_resonator_frequencies']
+VNA_resonator_frequencies = VNA["VNA_resonator_frequencies"]
 
 
 def resonator_samples(qubit: str) -> np.ndarray:

@@ -26,8 +26,6 @@ from tergite_autocalibration.tests.utils.env import setup_test_env
 setup_test_env()
 
 
-
-
 # FIXME: These tests are marked as skip after the refactoring of the analysis classes
 #        Michele to integrate with new data files from Joel
 class TestPurityBenchmarkingAnalysis(unittest.TestCase):

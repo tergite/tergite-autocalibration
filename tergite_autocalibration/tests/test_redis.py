@@ -22,8 +22,6 @@ from tergite_autocalibration.tests.utils.env import setup_test_env
 setup_test_env()
 
 
-
-
 nodes = NodeFactory()
 transmon_configuration = toml.load(settings.DEVICE_CONFIG)
 qois = transmon_configuration["qoi"]
