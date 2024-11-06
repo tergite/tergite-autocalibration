@@ -12,8 +12,8 @@ from quantifiles.plot.baseplot import BasePlot
 from quantifiles.plot.lineplot import LinePlot
 from quantifiles.plot.snapshot import SnapshotTab
 
-class QubitSelector(QtWidgets.QWidget):
 
+class QubitSelector(QtWidgets.QWidget):
     def __init__(
         self,
         parent: QtWidgets.QWidget | None = None,
@@ -43,7 +43,6 @@ class QubitSelector(QtWidgets.QWidget):
         checkbox_layout = QtWidgets.QVBoxLayout()
         checkbox_layout.addWidget(self.checkbox)
         checkbox_layout.setAlignment(QtCore.Qt.AlignRight)
-
 
         # Set up the box containing the variable selection options.
         box_layout = QtWidgets.QVBoxLayout()
@@ -86,7 +85,6 @@ class QubitSelectBox(QtWidgets.QFrame):
     # Custom signal that is emitted when a checkbox is toggled
     gettable_toggled = QtCore.pyqtSignal(str, bool)
 
-
     def __init__(
         self, parent: QtWidgets.QWidget | None = None, dataset: xr.Dataset | None = None
     ):
@@ -116,7 +114,9 @@ class QubitSelectBox(QtWidgets.QFrame):
 
         # Set the style and size policy of this widget
         self.setFrameStyle(QtWidgets.QFrame.StyledPanel | QtWidgets.QFrame.Plain)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        self.setSizePolicy(
+            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
+        )
         self.setLayout(layout)
 
         # Create a signal mapper to map signals from the checkbox to the gettable name
@@ -125,18 +125,16 @@ class QubitSelectBox(QtWidgets.QFrame):
 
         self._gettable_checkboxes = {}
 
-        all_qubits_box = QubitSelector(qubit_name='all qubits', dataset=dataset)
+        all_qubits_box = QubitSelector(qubit_name="all qubits", dataset=dataset)
         all_qubits_box.checkbox.stateChanged.connect(self.gettable_select_mapper.map)
-        self.gettable_select_mapper.setMapping(all_qubits_box.checkbox, 'all qubits')
-        self._gettable_checkboxes['all qubits'] = all_qubits_box.checkbox
+        self.gettable_select_mapper.setMapping(all_qubits_box.checkbox, "all qubits")
+        self._gettable_checkboxes["all qubits"] = all_qubits_box.checkbox
         layout.addWidget(all_qubits_box)
 
         # Add a GettableSelector widget for each data variable in the dataset
-        qubits = set([dataset[coord].attrs['qubit'] for coord in dataset.coords])
+        qubits = set([dataset[coord].attrs["qubit"] for coord in dataset.coords])
         for qubit_name in qubits:
-            qubit_box = QubitSelector(
-                qubit_name=qubit_name, dataset=dataset
-            )
+            qubit_box = QubitSelector(qubit_name=qubit_name, dataset=dataset)
 
             # Connect the checkbox in the QubitSelector widget to the signal mapper
             qubit_box.checkbox.stateChanged.connect(self.gettable_select_mapper.map)
@@ -179,7 +177,6 @@ class QubitSelectBox(QtWidgets.QFrame):
         """
         enabled = self._gettable_checkboxes[name].isChecked()
         self.gettable_toggled.emit(name, enabled)
-
 
 
 class NameAndTuidBox(QtWidgets.QFrame):
@@ -237,6 +234,7 @@ class NameAndTuidBox(QtWidgets.QFrame):
             clipboard = QtWidgets.QApplication.clipboard()
             clipboard.setText(value)
 
+
 class PlotTab(QtWidgets.QWidget):
     def __init__(self, dataset: xr.Dataset | None):
         super().__init__()
@@ -287,7 +285,6 @@ class PlotTab(QtWidgets.QWidget):
 
 
 class DeviceTab(QtWidgets.QWidget):
-
     def __init__(self, device_config: dict[str, any]):
         """
         Initializes a new instance of the SnapshotTab class with the given snapshot dictionary.
@@ -357,8 +354,6 @@ class DeviceTab(QtWidgets.QWidget):
                 item.setText(1, str(value))
 
 
-
-
 class PlotWindowContent(QtWidgets.QWidget):
     def __init__(
         self,
@@ -383,7 +378,7 @@ class PlotWindowContent(QtWidgets.QWidget):
 
         # Add the tabs
         tab_widget.addTab(self.plot_tab, "Plots")
-        tab_widget.addTab(self.device_tab, 'Device')
+        tab_widget.addTab(self.device_tab, "Device")
         # if device_config is not None:
         #     # logger.debug("Adding snapshot tab")
         #     tab_widget.addTab(SnapshotTab(snapshot=device_config), "Snapshot")
@@ -398,18 +393,17 @@ class PlotWindowContent(QtWidgets.QWidget):
         self.plot_tab.add_plot(plot)
 
 
-
 class PlotWindow(QtWidgets.QMainWindow):
     _WINDOW_TITLE: str = "Quantifiles plot window"
     _WINDOW_HEIGHT: int = 600
     _WINDOW_WIDTH: int = 300
 
     def __init__(
-            self,
-            dataset: xr.Dataset,
-            device_config: dict[str, Any] | None = None,
-            parent: QtWidgets.QWidget | None = None
-        ):
+        self,
+        dataset: xr.Dataset,
+        device_config: dict[str, Any] | None = None,
+        parent: QtWidgets.QWidget | None = None,
+    ):
         super().__init__(parent)
         self.dataset = dataset
         self.device_config = device_config
@@ -426,7 +420,9 @@ class PlotWindow(QtWidgets.QMainWindow):
         #     f"Initialized {self.__class__.__name__} with title: {self.windowTitle()}"
         # )
 
-        canvas = PlotWindowContent(self, dataset=dataset, device_config=self.device_config)
+        canvas = PlotWindowContent(
+            self, dataset=dataset, device_config=self.device_config
+        )
         self.canvas = canvas
         self.setCentralWidget(canvas)
 
@@ -492,7 +488,7 @@ class PlotWindow(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot(str, bool)
     def toggle_gettable(self, name: str, enabled: bool):
-        if name == 'all qubits':
+        if name == "all qubits":
             for name in self.plots.keys():
                 self.plots[name].setVisible(enabled)
         else:

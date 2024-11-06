@@ -348,7 +348,6 @@ class ExperimentPreview(QtWidgets.QLabel):
         # self.setFont(font)
 
     def display_image(self, image_path):
-
         # Check if the image file exists
         if QImageReader(image_path).size() == QSize(0, 0):
             self.setText("Image not found")
