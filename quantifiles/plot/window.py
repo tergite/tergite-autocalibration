@@ -51,6 +51,8 @@ class GettableSelector(QtWidgets.QWidget):
         grid_layout.addWidget(label, 0, 0)
         grid_layout.addWidget(underline, 1, 0)
 
+        grid_layout.addLayout(param_table_layout, 2, 1)
+
         for row_index, settable_name in enumerate(dataset[gettable_name].coords.keys()):
             settable_long_name = dataset[gettable_name][settable_name].long_name
 
@@ -62,6 +64,13 @@ class GettableSelector(QtWidgets.QWidget):
 
             label_short_name.setToolTip("name attribute")
             label_long_name.setToolTip("long_name attribute")
+
+            param_row_layout = QtWidgets.QHBoxLayout()
+            param_row_layout.addWidget(label_short_name)
+            param_row_layout.addWidget(label_long_name)
+            param_row_layout.addWidget(label_settable_unit)
+
+            param_table_layout.addLayout(param_row_layout)
 
             grid_layout.addWidget(label_short_name, row_index + 2, 0)
             grid_layout.addWidget(label_long_name, row_index + 2, 1)
