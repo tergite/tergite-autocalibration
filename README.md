@@ -1,6 +1,9 @@
 # tergite-autocalibration
 
-![CI](https://github.com/tergite/tergite-autocalibration/actions/workflows/ci.yml/badge.svg)
+[![pipeline status](https://gitlab.com/dcrielaard/quantifiles/badges/main/pipeline.svg)](https://gitlab.com/dcrielaard/quantifiles/-/commits/main) 
+[![PyPi](https://img.shields.io/pypi/v/quantifiles.svg)](https://pypi.org/pypi/quantifiles)
+[![License](https://img.shields.io/badge/License-BSD_2--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)
+[![Code style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 A commandline application to calibrate the WACQT quantum computers automatically.  
 
