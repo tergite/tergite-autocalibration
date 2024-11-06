@@ -18,6 +18,7 @@ from .analysis import QubitSpectroscopyNodeAnalysis, QubitSpectroscopyNodeMultid
 from .measurement import Two_Tones_Multidim
 from tergite_autocalibration.utils.user_input import qubit_samples
 
+
 class Qubit_01_Spectroscopy_Multidim_Node(ScheduleNode):
     measurement_obj = Two_Tones_Multidim
     analysis_obj = QubitSpectroscopyNodeMultidim

@@ -20,6 +20,7 @@ from .analysis import (
 )
 from .measurement import Resonator_Spectroscopy
 
+
 class Resonator_Spectroscopy_Node(ScheduleNode):
     measurement_obj = Resonator_Spectroscopy
     analysis_obj = ResonatorSpectroscopyNodeAnalysis

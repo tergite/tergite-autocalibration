@@ -95,7 +95,7 @@ class GettableSelector(QtWidgets.QWidget):
             grid_layout.addWidget(label_long_name, row_index + 2, 1)
             grid_layout.addWidget(label_settable_unit, row_index + 2, 2)
 
-        grid_layout.setContentsMargins(10, 5, 10, 5)
+            grid_layout.setContentsMargins(10, 5, 10, 5)
 
             grid_layout.addWidget(label_short_name, row_index + 2, 0)
             grid_layout.addWidget(label_long_name, row_index + 2, 1)
