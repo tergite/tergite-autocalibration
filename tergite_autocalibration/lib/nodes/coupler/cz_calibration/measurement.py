@@ -15,6 +15,8 @@
 """
 Module containing a schedule class for Ramsey calibration. (1D parameter sweep, for 2D see ramsey_detunings.py)
 """
+import itertools
+
 import numpy as np
 from quantify_scheduler import Schedule
 from quantify_scheduler.enums import BinMode
@@ -30,11 +32,10 @@ from quantify_scheduler.resources import ClockResource
 
 from tergite_autocalibration.config.coupler_config import qubit_types
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
-from ....base.measurement import BaseMeasurement
-from tergite_autocalibration.utils.extended_gates import Measure_RO_Opt, Rxy_12
+from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.utils.extended_coupler_edge import CompositeSquareEdge
+from tergite_autocalibration.utils.extended_gates import Measure_RO_Opt, Rxy_12
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
-import itertools
 
 
 class CZ_calibration(BaseMeasurement):

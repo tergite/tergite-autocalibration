@@ -13,8 +13,10 @@
 import numpy as np
 import xarray as xr
 
-from .measurement import all_XY_angles
-from ....base.analysis import BaseAnalysis
+from tergite_autocalibration.lib.base.analysis import BaseAnalysis
+from tergite_autocalibration.lib.nodes.characterization.all_xy.measurement import (
+    all_XY_angles,
+)
 
 
 class All_XY_Analysis(BaseAnalysis):

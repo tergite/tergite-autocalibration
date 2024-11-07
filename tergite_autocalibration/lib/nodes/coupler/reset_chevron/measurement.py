@@ -17,35 +17,20 @@ Module containing a schedule class for Ramsey calibration. (1D parameter sweep, 
 import numpy as np
 from quantify_scheduler import Schedule
 from quantify_scheduler.enums import BinMode
-from quantify_scheduler import Schedule
-from quantify_scheduler.operations.gate_library import Measure, Reset, X90, Rxy, X, CZ
+from quantify_scheduler.operations.gate_library import Measure, Reset, Rxy, X
 from quantify_scheduler.operations.pulse_library import (
-    GaussPulse,
-    SuddenNetZeroPulse,
-    ResetClockPhase,
     IdlePulse,
-    DRAGPulse,
-    SetClockFrequency,
-    NumericalPulse,
-    SoftSquarePulse,
-    SquarePulse,
 )
 from quantify_scheduler.operations.pulse_library import (
     RampPulse,
-    DRAGPulse,
-    SetClockFrequency,
-    NumericalPulse,
-    SoftSquarePulse,
-    SquarePulse,
-    ResetClockPhase,
 )
 from quantify_scheduler.resources import ClockResource
 
+from tergite_autocalibration.config.coupler_config import qubit_types
+from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.utils.extended_coupler_edge import CompositeSquareEdge
+from tergite_autocalibration.utils.extended_gates import Rxy_12
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
-from tergite_autocalibration.utils.extended_gates import Measure_RO1, Rxy_12
-from ....base.measurement import BaseMeasurement
-from tergite_autocalibration.config.coupler_config import edge_group, qubit_types
 
 
 class Reset_Chevron_DC(BaseMeasurement):

@@ -20,8 +20,8 @@ from quantify_scheduler.operations.pulse_library import DRAGPulse
 from quantify_scheduler.operations.pulse_library import IdlePulse, SquarePulse
 from quantify_scheduler.resources import ClockResource
 
+from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
-from ....base.measurement import BaseMeasurement
 
 
 class RO_amplitude_optimization(BaseMeasurement):

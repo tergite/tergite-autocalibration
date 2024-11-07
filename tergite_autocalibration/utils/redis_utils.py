@@ -161,7 +161,7 @@ def populate_quantities_of_interest(
     # Populate the Redis database with the quantities of interest, at Nan value
     # Only if the key does NOT already exist
     for node_name in calibration_nodes:
-        node = calibration_node_factory.node_implementations[node_name]
+        node = calibration_node_factory.get_node_class(node_name)
         qubit_qois = node.qubit_qois
         if qubit_qois is not None:
             for qubit in qubits:
