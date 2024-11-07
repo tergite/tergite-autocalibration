@@ -18,7 +18,9 @@ from time import sleep
 import numpy as np
 
 from tergite_autocalibration.lib.base.node import BaseNode
-from tergite_autocalibration.lib.nodes.characterization.t1.analysis import T1NodeAnalysis
+from tergite_autocalibration.lib.nodes.characterization.t1.analysis import (
+    T1NodeAnalysis,
+)
 from tergite_autocalibration.lib.nodes.characterization.t1.measurement import T1
 
 

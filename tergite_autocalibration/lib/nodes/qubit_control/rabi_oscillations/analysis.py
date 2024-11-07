@@ -20,7 +20,10 @@ import lmfit
 import numpy as np
 from quantify_core.analysis.fitting_models import fft_freq_phase_guess
 
-from tergite_autocalibration.lib.base.analysis import BaseAllQubitsAnalysis, BaseQubitAnalysis
+from tergite_autocalibration.lib.base.analysis import (
+    BaseAllQubitsAnalysis,
+    BaseQubitAnalysis,
+)
 from tergite_autocalibration.utils.redis_utils import fetch_redis_params
 
 

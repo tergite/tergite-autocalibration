@@ -14,9 +14,13 @@
 import numpy as np
 
 from tergite_autocalibration.lib.base.node import BaseNode
-from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis import QubitSpectroscopyNodeAnalysis, \
-    QubitSpectroscopyNodeMultidim
-from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement import Two_Tones_Multidim
+from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis import (
+    QubitSpectroscopyNodeAnalysis,
+    QubitSpectroscopyNodeMultidim,
+)
+from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement import (
+    Two_Tones_Multidim,
+)
 from tergite_autocalibration.utils.user_input import qubit_samples
 
 

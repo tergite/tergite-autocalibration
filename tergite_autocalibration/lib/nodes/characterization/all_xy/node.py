@@ -13,7 +13,9 @@
 import numpy as np
 
 from tergite_autocalibration.lib.base.node import BaseNode
-from tergite_autocalibration.lib.nodes.characterization.all_xy.analysis import All_XY_Analysis
+from tergite_autocalibration.lib.nodes.characterization.all_xy.analysis import (
+    All_XY_Analysis,
+)
 from tergite_autocalibration.lib.nodes.characterization.all_xy.measurement import All_XY
 
 

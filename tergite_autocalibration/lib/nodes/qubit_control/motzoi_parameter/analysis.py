@@ -13,7 +13,10 @@
 
 import numpy as np
 
-from tergite_autocalibration.lib.base.analysis import BaseQubitAnalysis, BaseAllQubitsAnalysis
+from tergite_autocalibration.lib.base.analysis import (
+    BaseQubitAnalysis,
+    BaseAllQubitsAnalysis,
+)
 
 
 class MotzoiBaseQubitAnalysis(BaseQubitAnalysis):

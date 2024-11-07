@@ -20,7 +20,10 @@ Module containing a class that fits and plots data from a T1 experiment.
 import numpy as np
 from quantify_core.analysis.fitting_models import ExpDecayModel
 
-from tergite_autocalibration.lib.base.analysis import BaseAllQubitsRepeatAnalysis, BaseQubitAnalysis
+from tergite_autocalibration.lib.base.analysis import (
+    BaseAllQubitsRepeatAnalysis,
+    BaseQubitAnalysis,
+)
 
 
 def cos_func(
