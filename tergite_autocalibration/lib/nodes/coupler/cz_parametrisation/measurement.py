@@ -22,9 +22,9 @@ from quantify_scheduler.operations.pulse_library import (
 )
 from quantify_scheduler.resources import ClockResource
 
-from ....base.measurement import BaseMeasurement
-from .....utils.extended_coupler_edge import CompositeSquareEdge
-from .....utils.extended_transmon_element import ExtendedTransmon
+from tergite_autocalibration.lib.base.measurement import BaseMeasurement
+from tergite_autocalibration.utils.extended_coupler_edge import CompositeSquareEdge
+from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 
 
 class CZParametrizationFixDuration(BaseMeasurement):

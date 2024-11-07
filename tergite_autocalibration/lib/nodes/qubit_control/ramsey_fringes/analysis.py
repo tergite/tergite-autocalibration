@@ -15,14 +15,16 @@
 
 import lmfit
 import numpy as np
-import xarray as xr
 from quantify_core.analysis.fitting_models import (
     exp_damp_osc_func,
     fft_freq_phase_guess,
 )
 
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
-from ....base.analysis import BaseAllQubitsAnalysis, BaseQubitAnalysis
+from tergite_autocalibration.lib.base.analysis import (
+    BaseAllQubitsAnalysis,
+    BaseQubitAnalysis,
+)
 
 
 class RamseyModel(lmfit.model.Model):
