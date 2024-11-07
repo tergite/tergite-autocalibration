@@ -16,7 +16,7 @@ from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.measuremen
     Resonator_Spectroscopy,
 )
 from tergite_autocalibration.utils.user_input import resonator_samples
-from .analysis import (
+from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.analysis import (
     ResonatorSpectroscopyNodeAnalysis,
     ResonatorSpectroscopy1NodeAnalysis,
     ResonatorSpectroscopy2NodeAnalysis,
