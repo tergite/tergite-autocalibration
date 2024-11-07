@@ -79,7 +79,7 @@ left_panel = urwid.WidgetPlaceholder(urwid.Pile([]))
 
 
 output_text = urwid.Text("")
-right_pane = urwid.Filler(output_text, valign="top")
+right_panel = urwid.Filler(output_text, valign="top")
 
 
 # ------------------------------------------------------------
@@ -209,10 +209,40 @@ def input_redis_port():
 def on_redis_submit(_, edit_):
     state["REDIS_PORT"] = edit_.get_edit_text()
     refresh_dot_env_output()
+    input_plotting()
 
 
 def on_redis_select(_, option_):
     state["REDIS_PORT"] = option_
+    refresh_dot_env_output()
+    input_plotting()
+
+
+# ----------
+# REDIS_PORT
+# ----------
+def input_plotting():
+    caption_text_ = urwid.Text(
+        "Do you want to see plots?\n"
+        "Note: You can only see plots if you are having a graphical interface or X11 port forwarding activated."
+    )
+    plotting_yes_button_ = urwid.Button("Yes")
+    urwid.connect_signal(plotting_yes_button_, "click", on_plotting_submit, True)
+    plotting_yes_button_ = urwid.AttrMap(
+        plotting_yes_button_, None, focus_map="reversed"
+    )
+    plotting_no_button_ = urwid.Button("No")
+    urwid.connect_signal(plotting_no_button_, "click", on_plotting_submit, False)
+    plotting_no_button_ = urwid.AttrMap(plotting_no_button_, None, focus_map="reversed")
+
+    # Update left panel
+    left_panel.original_widget = urwid.Pile(
+        [caption_text_, urwid.Divider(), plotting_yes_button_, plotting_no_button_]
+    )
+
+
+def on_plotting_submit(_, option_):
+    state["PLOTTING"] = option_
     refresh_dot_env_output()
 
 
@@ -220,8 +250,60 @@ def on_redis_select(_, option_):
 # INITIAL SETUP
 # -------------
 left_panel.original_widget = input_default_prefix()
-refresh_dot_env_output()  # Initialize output display with the current state
-layout = urwid.Columns([("weight", 1, left_panel), ("weight", 1, right_pane)])
+refresh_dot_env_output()
+
+header = urwid.Filler(
+    urwid.Padding(
+        urwid.AttrMap(
+            urwid.Text(
+                "Autocalibration configuration wizard",
+                align="left",
+            ),
+            "bold",
+        ),
+        left=1,
+        right=1,
+    ),
+    top=1,
+    bottom=0,
+    valign="top",
+)
+
+line = urwid.Filler(
+    urwid.Padding(
+        urwid.Divider("-"),
+        left=1,
+        right=1,
+    ),
+    valign="top",
+)
+
+body_layout = urwid.Columns(
+    [
+        (
+            "weight",
+            1,
+            urwid.Filler(
+                urwid.Padding(left_panel, left=1, right=1),
+                top=1,
+                bottom=1,
+                valign="top",
+            ),
+        ),
+        (
+            "weight",
+            1,
+            urwid.Filler(
+                urwid.Padding(right_panel, left=1, right=1),
+                top=1,
+                bottom=1,
+                valign="top",
+            ),
+        ),
+    ]
+)
+
+layout = urwid.Pile([("pack", header), ("pack", line), ("pack", body_layout)])
 
 
 def main():
