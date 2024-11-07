@@ -19,7 +19,7 @@ import lmfit
 import numpy as np
 from matplotlib.axes import Axes
 
-from ....base.analysis import BaseAllQubitsRepeatAnalysis, BaseQubitAnalysis
+from tergite_autocalibration.lib.base.analysis import BaseAllQubitsRepeatAnalysis, BaseQubitAnalysis
 from tergite_autocalibration.lib.utils.functions import (
     exponential_decay_function,
 )

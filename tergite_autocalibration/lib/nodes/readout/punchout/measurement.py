@@ -13,14 +13,15 @@
 """
 Module containing a schedule class for punchout (readout amplitude) calibration.
 """
+import numpy as np
+from quantify_scheduler import Schedule
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.acquisition_library import SSBIntegrationComplex
-from quantify_scheduler.resources import ClockResource
-from quantify_scheduler import Schedule
-from quantify_scheduler.operations.pulse_library import SquarePulse, SetClockFrequency
 from quantify_scheduler.operations.gate_library import Reset
+from quantify_scheduler.operations.pulse_library import SquarePulse, SetClockFrequency
+from quantify_scheduler.resources import ClockResource
+
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
-import numpy as np
 
 
 class Punchout(BaseMeasurement):

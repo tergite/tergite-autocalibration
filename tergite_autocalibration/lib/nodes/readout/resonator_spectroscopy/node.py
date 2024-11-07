@@ -11,14 +11,14 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+from tergite_autocalibration.lib.base.node import BaseNode
+from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.measurement import Resonator_Spectroscopy
 from tergite_autocalibration.utils.user_input import resonator_samples
 from .analysis import (
     ResonatorSpectroscopyNodeAnalysis,
     ResonatorSpectroscopy1NodeAnalysis,
     ResonatorSpectroscopy2NodeAnalysis,
 )
-from .measurement import Resonator_Spectroscopy
-from ....base.node import BaseNode
 
 
 class Resonator_Spectroscopy_Node(BaseNode):

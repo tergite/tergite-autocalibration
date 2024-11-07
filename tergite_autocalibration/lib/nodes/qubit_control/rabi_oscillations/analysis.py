@@ -18,11 +18,10 @@ Module containing classes that model, fit and plot data from a Rabi experiment.
 """
 import lmfit
 import numpy as np
-import xarray as xr
 from quantify_core.analysis.fitting_models import fft_freq_phase_guess
 
+from tergite_autocalibration.lib.base.analysis import BaseAllQubitsAnalysis, BaseQubitAnalysis
 from tergite_autocalibration.utils.redis_utils import fetch_redis_params
-from ....base.analysis import BaseAllQubitsAnalysis, BaseQubitAnalysis
 
 
 # Cosine function that is fit to Rabi oscillations

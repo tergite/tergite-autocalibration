@@ -15,9 +15,11 @@
 
 import numpy as np
 
-from .analysis import RandomizedBenchmarkingNodeAnalysis
-from .measurement import Randomized_Benchmarking
-from ....utils.node_subclasses import ParametrizedSweepNode
+from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.analysis import \
+    RandomizedBenchmarkingNodeAnalysis
+from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.measurement import \
+    Randomized_Benchmarking
+from tergite_autocalibration.lib.utils.node_subclasses import ParametrizedSweepNode
 
 
 class Randomized_Benchmarking_Node(ParametrizedSweepNode):
