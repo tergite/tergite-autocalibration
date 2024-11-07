@@ -11,27 +11,9 @@
 # that they have been altered from the originals.
 
 """
-Username
-- Can be prefilled
-
-Root dir
-- Can be prefilled
-
 - Data dir and config dir can be prefilled as well
 
 - Load a configuration package? (later)
-
-cluster ip
-- Can be found by search
-- cluster name as well (we should set meaningful cluster names)
-
-redis port
-- check whether there is a redis instance running?
-- if not offer the option to start one?
-
-Do you want to see plots?
-- plotting variable
-
 
 Then we need this view with the qubits
 - input of the qubits
@@ -244,6 +226,52 @@ def input_plotting():
 def on_plotting_submit(_, option_):
     state["PLOTTING"] = option_
     refresh_dot_env_output()
+    input_qubits()
+
+
+# --------------------------------------------------------
+# This is now the section starting for the run_config.toml
+# ------
+# qubits
+# ------
+def input_qubits():
+    caption_text_ = urwid.Text(
+        "Please enter the qubits you want to use.\n"
+        "You can enter by space (q01 q02 q03 ...), comma (q01,q02,q03), comma and space (q01, q02, q03) "
+        "or by a range (q01-q05), or a combination of spaces and ranges."
+    )
+    input_ = urwid.Edit("qubits: ", "")
+
+    button_ = urwid.Button("Submit")
+    urwid.connect_signal(button_, "click", on_submit_qubits, input_)
+    qubits_button_ = urwid.AttrMap(button_, None, focus_map="reversed")
+
+    return urwid.Pile([caption_text_, urwid.Divider(), input_, qubits_button_])
+
+
+def on_submit_qubits(_, edit_):
+    # Parse and go
+    pass
+
+def input_cluster_modules():
+    caption_text_ = urwid.Text(
+        "Please select the modules inside the cluster that are used for the calibration."
+    )
+    options_ = helpers.get_cluster_modules()
+    choices_ = [urwid.Divider()]
+
+    # Add the list of cluster tuples, the tuples are of form:
+    # (cluster_ip: str, cluster_name: str, firmware_version: str)
+    for option_ in options_:
+        option_str_ = f"{option_[0]} - {option_[1]})"
+        button_ = urwid.Button(option_str_)
+        urwid.connect_signal(button_, "click", on_cluster_module_toggle, option_)
+        choices_.append(urwid.AttrMap(button_, None, focus_map="reversed"))
+
+    # Update left panel
+    left_panel.original_widget = urwid.Pile([caption_text_] + choices_)
+
+def on_cluster_module_toggle():
 
 
 # -------------
