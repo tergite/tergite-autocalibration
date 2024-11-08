@@ -36,7 +36,6 @@ from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.utils.no_valid
 )
 
 
-
 def test_CanCreate():
     dataset_path = Path(__file__).parent / "data" / "dataset_good_quality_freq_amp.hdf5"
     ds = xr.open_dataset(dataset_path, engine="scipy")
