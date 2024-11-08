@@ -1,6 +1,7 @@
 # This code is part of Tergite
 #
 # (C) Copyright Liangyu Chen 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -13,17 +14,22 @@
 import numpy as np
 
 from tergite_autocalibration.lib.base.node import BaseNode
-from tergite_autocalibration.lib.nodes.coupler.process_tomography.analysis import (
-    ProcessTomographyAnalysis,
+from tergite_autocalibration.lib.nodes.characterization.process_tomography.analysis import (
+    ProcessTomographyNodeAnalysis,
 )
-from tergite_autocalibration.lib.nodes.coupler.process_tomography.measurement import (
+from tergite_autocalibration.lib.nodes.characterization.process_tomography.measurement import (
     Process_Tomography,
 )
 
 
-class Process_Tomography_Node(BaseNode):
+class ProcessTomographySSRONode(BaseNode):
     measurement_obj = Process_Tomography
-    analysis_obj = ProcessTomographyAnalysis
+    analysis_obj = ProcessTomographyNodeAnalysis
+    coupler_qois = [
+        "pop_g",
+        "pop_e",
+        "pop_f",
+    ]
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary
@@ -34,15 +40,7 @@ class Process_Tomography_Node(BaseNode):
         self.couplers = couplers
         self.edges = couplers
         self.coupler = couplers[0]
-        # print(couplers)
         self.coupled_qubits = couplers[0].split(sep="_")
-        # print(self.coupled_qubits)
-        # self.node_dictionary = kwargs
-        self.redis_field = [
-            "pop_g",
-            "pop_e",
-            "pop_f",
-        ]
         self.qubit_state = 2
         self.testing_group = 0  # The edge group to be tested. 0 means all edges.
         self.schedule_samplespace = {
@@ -51,4 +49,3 @@ class Process_Tomography_Node(BaseNode):
                 coupler: np.append(range(16), [0, 1, 2]) for coupler in self.couplers
             },
         }
-        # self.validate()

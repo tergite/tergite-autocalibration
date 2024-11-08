@@ -13,19 +13,19 @@
 import numpy as np
 
 from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.analysis import (
-    RandomizedBenchmarkingAnalysis,
+    RandomizedBenchmarkingNodeAnalysis,
 )
-from tergite_autocalibration.lib.utils.node_subclasses import ParametrizedSweepNode
-from .measurement import (
+from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.measurement import (
     TQG_Randomized_Benchmarking,
 )
+from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 
 RB_REPEATS = 10
 
 
-class TQG_Randomized_Benchmarking_Node(ParametrizedSweepNode):
+class TQG_Randomized_Benchmarking_Node(ScheduleNode):
     measurement_obj = TQG_Randomized_Benchmarking
-    analysis_obj = RandomizedBenchmarkingAnalysis
+    analysis_obj = RandomizedBenchmarkingNodeAnalysis
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary
@@ -86,9 +86,9 @@ class TQG_Randomized_Benchmarking_Node(ParametrizedSweepNode):
         return cluster_samplespace
 
 
-class TQG_Randomized_Benchmarking_Interleaved_Node(ParametrizedSweepNode):
+class TQG_Randomized_Benchmarking_Interleaved_Node(ScheduleNode):
     measurement_obj = TQG_Randomized_Benchmarking
-    analysis_obj = RandomizedBenchmarkingAnalysis
+    analysis_obj = RandomizedBenchmarkingNodeAnalysis
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary
