@@ -10,12 +10,38 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+import getpass
 import os
+from sys import platform
 from typing import List, Tuple
+
+import subprocess
+import platform
+
+from enum import Enum
+
+
+class OperatingSystem(Enum):
+    LINUX = "LINUX"
+    MAC = "MAC"
+    WINDOWS = "WINDOWS"
+    UNDEFINED = "UNDEFINED"
+
+
+def get_os() -> "OperatingSystem":
+    system = platform.system()
+    if system == "Linux":
+        return OperatingSystem.LINUX
+    elif system == "Darwin":
+        return OperatingSystem.MAC
+    elif system == "Windows":
+        return OperatingSystem.WINDOWS
+    else:
+        return OperatingSystem.UNDEFINED
 
 
 def get_username() -> str:
-    return os.getlogin()
+    return getpass.getuser()
 
 
 def get_cwd() -> str:
@@ -34,10 +60,100 @@ def get_available_clusters() -> List[Tuple[str, str, str]]:
     return clusters
 
 
+def _parse_ss_redis_output(ss_in_: "subprocess.CompletedProcess") -> List[str]:
+    redis_instances = set()
+    for line in ss_in_.stdout.splitlines():
+        if "redis-server" in line:
+            parts = line.split()
+            # Extract port
+            address = parts[3]  # Local address including port
+
+            # Parse the port from the local address
+            port = address.split(":")[-1]
+            redis_instances.add(port)
+
+    return list(sorted(redis_instances))
+
+
+def _get_available_redis_instances_linux() -> List[str]:
+    try:
+        # Run `ss` to list all listening TCP connections with process info
+        result_ = subprocess.run(
+            ["ss", "-ltnp"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+        )
+        # Parse the output to look for Redis instances
+        return _parse_ss_redis_output(result_)
+
+    except Exception as e:
+        print("Error:", e)
+        return []
+
+
+def _get_available_redis_instances_wsl() -> List[str]:
+    try:
+        # Run `wsl ss` to list all listening TCP connections with process info
+        result = subprocess.run(
+            ["wsl", "ss", "-ltnp"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+        # Parse the output to look for Redis instances
+        return _parse_ss_redis_output(result)
+
+    except Exception as e:
+        print("Error:", e)
+        return []
+
+
+def _get_available_redis_instances_mac() -> List[str]:
+    """
+    Find all redis instances on macOS
+
+    Returns: List of redis instances, sorted in ascending order
+
+    """
+    try:
+        # Run `lsof` to list all processes with network connections
+        result = subprocess.run(
+            ["lsof", "-iTCP", "-sTCP:LISTEN"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+        # Parse the output to find Redis instances
+        redis_instances = set()
+        for line in result.stdout.splitlines():
+            if "redis-ser" in line:
+                parts = line.split()
+                port_info = parts[8]
+
+                # Extract the port from the port information (e.g., "*:6379" or "localhost:6380")
+                port = port_info.split(":")[-1]
+                redis_instances.add(port)
+        return list(sorted(redis_instances))
+
+    except Exception as e:
+        print("Error:", e)
+        return []
+
+
 def get_available_redis_instances() -> List[str]:
-    # TODO: Find a way to grep the redis instances efficiently via some low level functions
-    redis_instances = ["6379", "6380"]
-    return redis_instances
+    """
+    This is a robust implementation to find a redis instance cross-platform
+
+    Returns: List of redis instances, sorted in ascending order
+
+    """
+    operating_system_ = get_os()
+    if operating_system_ == OperatingSystem.LINUX:
+        return _get_available_redis_instances_linux()
+    elif operating_system_ == OperatingSystem.MAC:
+        return _get_available_redis_instances_mac()
+    elif operating_system_ == OperatingSystem.WINDOWS:
+        return _get_available_redis_instances_wsl()
+    else:
+        return []
 
 
 def get_cluster_modules() -> List[Tuple[str, str]]:
@@ -52,3 +168,7 @@ def get_cluster_modules() -> List[Tuple[str, str]]:
         ("module7", "QRM"),
     ]
     return modules
+
+
+if __name__ == "__main__":
+    print(get_available_redis_instances())

@@ -353,11 +353,11 @@ def input_qubit_drive_module_mapping():
     )
 
 
-def on_toggle_qubit_in_drive_module_mapping():
+def on_toggle_qubit_in_drive_module_mapping(_, qubit_value_):
     pass
 
 
-def on_toggle_module_in_drive_module_mapping():
+def on_toggle_module_in_drive_module_mapping(_, module_value_):
     pass
 
 
