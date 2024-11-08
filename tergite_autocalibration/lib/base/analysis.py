@@ -183,9 +183,9 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         self.column_grid = 5
         self.plots_per_qubit = 1
 
-    def analyze_node(self, data_path: Path):
+    def analyze_node(self, data_path: Path, index:int = 0):
         self.data_path = Path(data_path)
-        self.dataset = self.open_dataset()
+        self.dataset = self.open_dataset(index)
         self.coords = self.dataset.coords
         self.data_vars = self.dataset.data_vars
         self.fig, self.axs = self.manage_plots(self.column_grid, self.plots_per_qubit)
@@ -194,8 +194,8 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         self.save_plots()
         return analysis_results
 
-    def open_dataset(self) -> xr.Dataset:
-        dataset_name = f"dataset_{self.name}_0.hdf5"
+    def open_dataset(self, index: int) -> xr.Dataset:
+        dataset_name = f"dataset_{self.name}_{index}.hdf5"
         dataset_path = self.data_path / dataset_name
         if not dataset_path.exists():
             raise FileNotFoundError(f"Dataset file not found: {dataset_path}")
@@ -210,6 +210,7 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         for this_qubit, qubit_data_vars in qubit_data_dict.items():
             ds = xr.merge([self.dataset[var] for var in qubit_data_vars])
             ds.attrs["qubit"] = this_qubit
+            ds.attrs["node"] = self.name
 
             matching_coords = [coord for coord in ds.coords if this_qubit in coord]
             if matching_coords:
@@ -286,6 +287,20 @@ class BaseAllQubitsRepeatAnalysis(BaseAllQubitsAnalysis, ABC):
         merged_datasets = xr.merge(datasets)
 
         return merged_datasets
+
+class MultipleBaseAllQubitsAnalysis(BaseAllQubitsAnalysis, ABC):
+    node_analysis_obj = BaseAllQubitsAnalysis
+    
+    def __init__(self, name: str, redis_fields):
+        super().__init__(name, redis_fields)
+        self.loop_range = ""    
+
+    def analyze_node(self, data_path: Path):
+        for i in self.loop_range:
+            qubit_analysis = self.node_analysis_obj(
+                self.name, self.redis_fields
+            )
+            qubit_analysis.analyze_node(data_path, i) 
 
 
 class BaseQubitAnalysis(BaseAnalysis, ABC):
@@ -434,11 +449,17 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
         analysis_results = {}
         coupler_data_dict = self._group_by_coupler()
         index = 0
+        if len(coupler_data_dict) == 0:
+            logger.error("Dataset does not have valid coordinates")
+        print(coupler_data_dict)
         for this_coupler, coupler_data_vars in coupler_data_dict.items():
+            print(this_coupler)
             ds = xr.merge([self.dataset[var] for var in coupler_data_vars])
             ds.attrs["coupler"] = this_coupler
+            ds.attrs["node"] = self.name
 
             matching_coords = [coord for coord in ds.coords if this_coupler in coord]
+            print(matching_coords)
             if matching_coords:
                 selected_coord_name = matching_coords[0]
                 ds = ds.sel(

@@ -12,6 +12,7 @@
 # that they have been altered from the originals.
 
 import itertools
+import warnings
 
 import numpy as np
 import xarray as xr
@@ -24,16 +25,15 @@ from sklearn.metrics import confusion_matrix
 
 from tergite_autocalibration.config.coupler_config import qubit_types
 from tergite_autocalibration.lib.base.analysis import (
-    BaseAllCouplersAnalysis,
-    BaseCouplerAnalysis,
+    BaseAllQubitsAnalysis,
     BaseQubitAnalysis,
+    MultipleBaseAllQubitsAnalysis,
 )
-
+from tergite_autocalibration.utils.logger.tac_logger import logger
 
 def mitigate(v, cm_inv):
     u = np.dot(v, cm_inv)
 
-    # print(u,np.sum(u))
     def m(t):
         return norm(u - np.array(t))
 
@@ -48,7 +48,6 @@ def mitigate(v, cm_inv):
     )
     result = minimize(m, v, method="SLSQP", constraints=cons)
     w = np.abs(np.round(result.x, 10))
-    # print(w)
     return w
 
 
@@ -136,9 +135,9 @@ class ProcessTomographyQubitAnalysis(BaseQubitAnalysis):
             str(element) for element in list(self.f_magnitudes.flatten())
         )
 
-        print(f"{self.g_magnitudes = }")
-        print(f"{self.e_magnitudes = }")
-        print(f"{self.f_magnitudes = }")
+        logger.debug(f"{self.g_magnitudes = }")
+        logger.debug(f"{self.e_magnitudes = }")
+        logger.debug(f"{self.f_magnitudes = }")
         return [g_magnitudes_str, e_magnitudes_str, f_magnitudes_str]
 
     def plotter(self, axis):
@@ -180,58 +179,27 @@ class ProcessTomographyQubitAnalysis(BaseQubitAnalysis):
             f"{name} Calibration - {qubit_types[self.qubit]} Qubit {self.qubit[1:]}"
         )
 
-
-class ProcessTomographyCouplerAnalysis(BaseCouplerAnalysis):
-    def __init__(self, name, redis_fields):
-        super().__init__(name, redis_fields)
-        self.data_path = ""
-        self.q1 = ""
-        self.q2 = ""
-        pass
-
-    def analyze_coupler(self) -> list[float, float, float]:
-        self.fit_results = {}
-
-        q1_data_var = [
-            data_var
-            for data_var in self.dataset.data_vars
-            if self.name_qubit_1 in data_var
-        ]
-        ds1 = self.dataset[q1_data_var]
-        matching_coords = [coord for coord in ds1.coords if self.name_qubit_1 in coord]
-        if matching_coords:
-            selected_coord_name = matching_coords[0]
-            ds1 = ds1.sel({selected_coord_name: slice(None)})
-
-        self.q1 = ProcessTomographyQubitAnalysis(self.name, self.redis_fields)
-        res1 = self.q1.process_qubit(ds1, q1_data_var[0])
-
-        q2_data_var = [
-            data_var
-            for data_var in self.dataset.data_vars
-            if self.name_qubit_2 in data_var
-        ]
-        ds2 = self.dataset[q2_data_var]
-        matching_coords = [coord for coord in ds2.coords if self.name_qubit_2 in coord]
-        if matching_coords:
-            selected_coord_name = matching_coords[0]
-            ds2 = ds2.sel({selected_coord_name: slice(None)})
-
-        self.q2 = ProcessTomographyQubitAnalysis(self.name, self.redis_fields)
-        res2 = self.q2.process_qubit(ds2, q2_data_var[0])
-
-        return res1
-
-    def plotter(self, primary_axis, secondary_axis):
-        self.q1.plotter(primary_axis)
-        self.q2.plotter(secondary_axis)
+    def save_plot(self):
+        self.fig.tight_layout()
+        preview_path = self.data_path / f"{self.name}_preview.png"
+        full_path = self.data_path / f"{self.name}.png"
+        self.fig.savefig(preview_path, bbox_inches="tight", dpi=100)
+        self.fig.savefig(full_path, bbox_inches="tight", dpi=400)
+        plt.show(block=False)
+        plt.pause(5)
+        plt.close()
+        logger.info(f"Plots saved to {preview_path} and {full_path}")        
 
 
-class ProcessTomographyNodeAnalysis(BaseAllCouplersAnalysis):
-    single_coupler_analysis_obj = ProcessTomographyCouplerAnalysis
+class SingleProcessTomographyNodeAnalysis(BaseAllQubitsAnalysis):
+    single_qubit_analysis_obj = ProcessTomographyQubitAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
 
-    def save_plots(self):
-        super().save_plots()
+class ProcessTomographyNodeAnalysis(MultipleBaseAllQubitsAnalysis):
+    node_analysis_obj = SingleProcessTomographyNodeAnalysis
+
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+        self.loop_range = range(9)
