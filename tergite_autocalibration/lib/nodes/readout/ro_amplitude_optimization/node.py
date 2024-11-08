@@ -22,6 +22,7 @@ from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.analysi
 )
 from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 
+
 class RO_amplitude_two_state_optimization_Node(ScheduleNode):
     measurement_obj = RO_amplitude_optimization
     analysis_obj = OptimalROTwoStateAmplitudeNodeAnalysis
@@ -52,7 +53,6 @@ class RO_amplitude_two_state_optimization_Node(ScheduleNode):
                 qubit: np.linspace(0.001, 0.01, 11) for qubit in self.all_qubits
             },
         }
-
 
 
 class RO_amplitude_three_state_optimization_Node(ScheduleNode):
