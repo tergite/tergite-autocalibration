@@ -2,6 +2,7 @@
 #
 # (C) Copyright Liangyu Chen 2024
 # (C) Copyright Amr Osman 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -11,16 +12,19 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-# FIXME: When it is decided which analysis we use, please put everything into the analysis.py file
-
 from enum import Enum
 from functools import singledispatchmethod
 
 import numpy as np
 import xarray as xr
 from scipy.optimize import leastsq
+import matplotlib.patches as mpatches
 
-from tergite_autocalibration.lib.base.analysis import BaseAnalysis
+from ....base.analysis import (
+    BaseAllCouplersAnalysis,
+    BaseCouplerAnalysis,
+    BaseQubitAnalysis,
+)
 
 
 class SweepResultStatus(Enum):
@@ -77,19 +81,13 @@ class OptimalResult:
         self.status = SweepResultStatus.NOT_FOUND
 
 
-class ResetChevronAnalysis(BaseAnalysis):
-    def __init__(self, dataset: xr.Dataset):
-        super().__init__()
-        self.data_var = list(dataset.data_vars.keys())[0]
-        self.S21 = dataset[self.data_var].values
-        self.fit_results = {}
-        self.qubit = dataset[self.data_var].attrs["qubit"]
-        dataset[f"y{self.qubit}"].values = np.abs(self.S21)
-        self.dataset = dataset
-        self.result = OptimalResult(f"reset_pulse_durations", "s")
-        # self.fig, self.axes = plt.subplots(1, 3, figsize=(20,5))
+class ResetChevronQubitAnalysis(BaseQubitAnalysis):
 
     def analyse_qubit(self):
+
+        self.fit_results = {}
+        self.result = OptimalResult(f"reset_pulse_durations", "s")
+
         for coord in self.dataset[self.data_var].coords:
             if "amplitudes" in coord:
                 self.amplitudes_coord = coord
@@ -100,7 +98,7 @@ class ResetChevronAnalysis(BaseAnalysis):
         self.times = times
         self.amps = amps
         magnitudes = np.array(
-            [[np.linalg.norm(u) for u in v] for v in self.dataset[f"y{self.qubit}"]]
+            [[np.linalg.norm(u) for u in v] for v in self.magnitudes[f"{self.qubit}"]]
         )
         self.min = np.min(magnitudes)
         magnitudes = np.transpose(
@@ -113,15 +111,8 @@ class ResetChevronAnalysis(BaseAnalysis):
             min_index = np.unravel_index(min_index, magnitudes.shape)
             self.opt_freq = self.amps[min_index[0]]
             self.opt_cz = self.times[min_index[1]]
-            print(self.opt_freq, self.opt_cz)
+            # print(self.opt_freq, self.opt_cz)
         else:
-            # fig, axes = self.fig, self.axes
-            # sc = axes[0].imshow(magnitudes, aspect='auto', cmap='jet', extent=[times[0], times[-1], freq[-1], freq[0]])
-            # plt.colorbar(sc)
-            # axes[0].set_xlabel("Times")
-            # axes[0].set_ylabel("Frequency")
-            # axes[0].set_xlim(times[0], times[-1])
-            # axes[0].set_ylim(freq[-1], freq[0])
             tstep = times[1] - times[0]
             # ----------- First round fit ------------#
             cs = []
@@ -162,12 +153,9 @@ class ResetChevronAnalysis(BaseAnalysis):
                         full_output=1,
                     )
                     p = out[0]
-                    # axes[1].plot(times, prob, 'o', markersize=5)
-                    # axes[1].plot(times, fitfunc(p), '-.', linewidth=1)
                     period_fit.append(p[1])
                 period_fit = np.array(period_fit)
                 # ----------- Second round fit ------------#
-                # Only fit the data in the first period
                 amps = []
                 for i, prob in enumerate(magnitudes):
                     times_cut_index = np.argmin(np.abs(times - period_fit[i]))
@@ -214,7 +202,6 @@ class ResetChevronAnalysis(BaseAnalysis):
                     self.opt_freq, self.opt_cz = 0, 0
                 else:
                     # ----------- Third round fit ------------#
-                    # axes[2].plot(freq, amps, 'bo', label="exp")
                     amp_max = np.max(amps)
                     fmin_guess = np.mean(freq)
                     p0_guess = (amps[0] - amp_max) / (freq[0] - fmin_guess) ** 2
@@ -233,14 +220,11 @@ class ResetChevronAnalysis(BaseAnalysis):
 
                     out = leastsq(errfunc, p_guess)
                     p = out[0]
-                    # axes[2].plot(freq, fitfunc(p, freq), 'k-', label="fit")
-                    # axes[2].legend()
+
                     if p[2] > freq[-1] or p[2] < freq[0] or p[0] > 0 or p[1] > 0:
                         print(
                             "You should probably enlarge your sweep range. The optimial point is not in the current range."
                         )
-                        # axes[2].set_title(f"Optimal point not found ")
-                        # self.result.set_not_found()
                         self.opt_freq, self.opt_cz = 0, 0
                     else:
                         # ----------- Fourth round fit ------------#
@@ -261,7 +245,6 @@ class ResetChevronAnalysis(BaseAnalysis):
 
                         out = leastsq(errfunc, p_guess)
                         p = out[0]
-                        # axes[2].plot(xs, fitfunc(p, xs), 'm--', label="fine-fit")
                         freq_fit = np.linspace(xs[0], xs[-1], 100)
                         data_fit = fitfunc(p, freq_fit)
                         f_opt = freq_fit[np.argmax(data_fit)]
@@ -277,12 +260,8 @@ class ResetChevronAnalysis(BaseAnalysis):
                         out = leastsq(errfunc, p_guess)
                         gate_time = fitfunc(out[0], f_opt)
                         # ---------- show final result ------------#
-                        # axes[2].vlines(f_opt, np.min(amps), np.max(amps), 'g', linestyle='--', linewidth=1.5)
-                        # axes[2].set_title(f"The optimal frequency is {f_opt}.")
-                        # self.result.set_result((f_opt, gate_time))
-                        # print(self.result.get_result())
-                        # result, result_add = self.result.get_result()
-                        print(f_opt, gate_time)
+
+                        # print(f_opt, gate_time)
                         self.opt_freq = f_opt * 1e6
                         self.opt_cz = gate_time / 1e9
             except:
@@ -291,10 +270,8 @@ class ResetChevronAnalysis(BaseAnalysis):
         return [self.opt_freq, self.opt_cz]
 
     def plotter(self, axis):
-        datarray = self.dataset[f"y{self.qubit}"]
-        qubit = self.qubit
+        datarray = self.magnitudes[f"{self.qubit}"]
         datarray.plot(ax=axis, x=self.amplitudes_coord, cmap="RdBu_r")
-        # fig = axis.pcolormesh(amp,freq,magnitudes,shading='nearest',cmap='RdBu_r')
         axis.scatter(0, 0, label="Min = {:.4f}".format(self.min))
         axis.scatter(
             self.opt_freq,
@@ -307,7 +284,6 @@ class ResetChevronAnalysis(BaseAnalysis):
             linewidth=0.5,
             zorder=10,
         )
-        # plt.scatter(opt_swap,opt_freq,c='b',label = 'SWAP12 Duration= {:.2f} V'.format(opt_swap),marker='X',s=200,edgecolors='k', linewidth=1.5,zorder=10)
         axis.vlines(
             self.opt_freq,
             self.times[0],
@@ -325,48 +301,74 @@ class ResetChevronAnalysis(BaseAnalysis):
             linestyles="--",
             linewidth=1.5,
         )
-        # axis.legend(loc = 'lower center', bbox_to_anchor=(-0.15, -0.36, 1.4, .102), mode='expand', ncol=2,
-        #             title = 'Optimal Gate Parameters', columnspacing=200,borderpad=1)
-        # cbar = plt.colorbar(fig)
-        # cbar.set_label('|2>-state Population', labelpad=10)
         axis.set_xlim([self.amps[0], self.amps[-1]])
         axis.set_ylim([self.times[0], self.times[-1]])
         axis.set_ylabel("Drive Durations (s)")
         axis.set_xlabel("Drive Amplitude (V)")
         axis.set_title(f"Reset Chevron - Qubit {self.qubit[1:]}")
+        axis.legend()  # Add legend to the plot
 
-        # self.fig.show()
-        # if self.result.status != SweepResultStatus.FOUND:
-        #     print("Not found optimal parameters.")
-        # else:
-        #     opt_freq, self.opt_cz = self.result.get_result()
-        #     self.opt_freq = opt_freq[1]
-        #     datarray = self.dataset[f'y{self.qubit}']
-        #     qubit = self.qubit
-        #     datarray.plot(ax=axis, x=f'cz_pulse_durations{qubit}',cmap='RdBu_r')
-        #     # # fig = axis.pcolormesh(amp,freq,magnitudes,shading='nearest',cmap='RdBu_r')
-        #     axis.scatter(
-        #         self.opt_cz,self.opt_freq,
-        #         c='r',
-        #         label = 'CZ Duration = {:.1f} ns'.format(self.opt_cz*1e9),
-        #         marker='X',s=150,
-        #         edgecolors='k', linewidth=1.0,zorder=10
-        #     )
-        #     # plt.scatter(opt_swap,opt_freq,c='b',label = 'SWAP12 Duration= {:.2f} V'.format(opt_swap),marker='X',s=200,edgecolors='k', linewidth=1.5,zorder=10)
-        #     axis.hlines(
-        #         self.opt_freq,self.amp[0],
-        #         self.amp[-1],
-        #         label = 'Frequency Detuning = {:.2f} MHz'.format(self.opt_freq/1e6),
-        #         colors='k',
-        #         linestyles='--',
-        #         linewidth=1.5
-        #     )
-        #     axis.vlines(self.opt_cz,self.freq[0],self.freq[-1],colors='k',linestyles='--',linewidth=1.5)
-        #     axis.legend(loc = 'lower center', bbox_to_anchor=(-0.15, -0.36, 1.4, .102), mode='expand', ncol=2,
-        #                 title = 'Optimal Gate Parameters', columnspacing=200,borderpad=1)
-        #     # # cbar = plt.colorbar(fig)
-        #     # # cbar.set_label('|2>-state Population', labelpad=10)
-        #     # axis.set_ylim([self.freq[0],self.freq[-1]])
-        #     # axis.set_ylim([self.amp[0],self.amp[-1]])
-        #     axis.set_xlabel('Parametric Drive Durations (s)')
-        #     axis.set_ylabel('Frequency Detuning (Hz)')
+        # Customize plot as needed
+        handles, labels = axis.get_legend_handles_labels()
+        patch = mpatches.Patch(color="red", label=f"{self.qubit}")
+        handles.append(patch)
+        axis.legend(handles=handles, fontsize="small")
+
+
+class ResetChevronCouplerAnalysis(BaseCouplerAnalysis):
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+        self.data_path = ""
+        self.q1 = ""
+        self.q2 = ""
+        pass
+
+    def analyze_coupler(self) -> list[float, float, float]:
+        self.fit_results = {}
+
+        q1_data_var = [
+            data_var
+            for data_var in self.dataset.data_vars
+            if self.name_qubit_1 in data_var
+        ]
+        ds1 = self.dataset[q1_data_var]
+        matching_coords = [coord for coord in ds1.coords if self.name_qubit_1 in coord]
+        if matching_coords:
+            selected_coord_name = matching_coords[0]
+            ds1 = ds1.sel({selected_coord_name: slice(None)})
+
+        self.q1 = ResetChevronQubitAnalysis(self.name, self.redis_fields)
+        res1 = self.q1.process_qubit(ds1, q1_data_var[0])
+
+        q2_data_var = [
+            data_var
+            for data_var in self.dataset.data_vars
+            if self.name_qubit_2 in data_var
+        ]
+        ds2 = self.dataset[q2_data_var]
+        matching_coords = [coord for coord in ds2.coords if self.name_qubit_2 in coord]
+        if matching_coords:
+            selected_coord_name = matching_coords[0]
+            ds2 = ds2.sel({selected_coord_name: slice(None)})
+
+        self.q2 = ResetChevronQubitAnalysis(self.name, self.redis_fields)
+        res2 = self.q2.process_qubit(ds2, q2_data_var[0])
+
+        print(res1)
+        print(res2)
+
+        return res1
+
+    def plotter(self, primary_axis, secondary_axis):
+        self.q1.plotter(primary_axis)
+        self.q2.plotter(secondary_axis)
+
+
+class ResetChevronNodeAnalysis(BaseAllCouplersAnalysis):
+    single_coupler_analysis_obj = ResetChevronCouplerAnalysis
+
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+
+    def save_plots(self):
+        super().save_plots()

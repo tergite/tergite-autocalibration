@@ -17,7 +17,6 @@ import collections
 from abc import ABC, abstractmethod
 from pathlib import Path
 import re
-import pandas as pd
 import xarray as xr
 
 # TODO: we should have a conditional import depending on a feature flag here
@@ -256,7 +255,7 @@ class BaseAllQubitsRepeatAnalysis(BaseAllQubitsAnalysis, ABC):
         self.num_repeats = len(data_files)
 
         # Load the first dataset to infer the qubit names
-        first_dataset = xr.open_dataset(data_files[0], engine="scipy")
+        first_dataset = xr.open_dataset(data_files[0])
         self.all_qubits = [
             var for var in first_dataset.data_vars if var.startswith("yq")
         ]
@@ -266,9 +265,10 @@ class BaseAllQubitsRepeatAnalysis(BaseAllQubitsAnalysis, ABC):
         for qubit in self.all_qubits:
             qubit_datasets = []
             for repeat_idx, file_path in enumerate(data_files):
+                breakpoint()
                 file_path = self.data_path / f"dataset_{repeat_idx}.hdf5"
 
-                ds = xr.open_dataset(file_path, engine="scipy")
+                ds = xr.open_dataset(file_path)
 
                 qubit_data = ds[[qubit]]
 

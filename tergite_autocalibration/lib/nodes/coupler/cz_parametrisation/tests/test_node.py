@@ -17,15 +17,14 @@ setup_test_env()
 import pytest
 
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis import (
-    CZParametrisationFixDurationNodeAnalysis,
+    CZParametrizationFixDurationNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.measurement import (
-    CZParametrisationFixDuration,
+    CZParametrizationFixDuration,
 )
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.node import (
     CZParametrisationFixDurationNode,
 )
-from tergite_autocalibration.lib.utils.node_subclasses import ParametrizedSweepNode
 
 
 # FIXME: All tests in this file are marked as skip
@@ -33,10 +32,12 @@ from tergite_autocalibration.lib.utils.node_subclasses import ParametrizedSweepN
 @pytest.mark.skip
 def test_canCreateCorrectType():
     c = CZParametrisationFixDurationNode(
-        "cz_char_fixCurrent", all_qubits=["q14", "q15"], couplers=["q14_q15"]
+        "cz_char_fixCurrent",
+        all_qubits=["q14", "q15"],
+        couplers=["q14_q15"],
     )
     assert isinstance(c, CZParametrisationFixDurationNode)
-    assert isinstance(c, ParametrizedSweepNode)
+    # assert isinstance(c, ParametrizedSweepNode)
 
 
 @pytest.mark.skip
@@ -69,7 +70,7 @@ def test_MeasurementClassType():
     c = CZParametrisationFixDurationNode(
         "cz_char_fixCurrent", all_qubits=["q14", "q15"], couplers=["q14_q15"]
     )
-    assert isinstance(c.measurement_obj, type(CZParametrisationFixDuration))
+    assert isinstance(c.measurement_obj, type(CZParametrizationFixDuration))
 
 
 @pytest.mark.skip
@@ -77,4 +78,4 @@ def test_AnalysisClassType():
     c = CZParametrisationFixDurationNode(
         "cz_char_fixCurrent", all_qubits=["q14", "q15"], couplers=["q14_q15"]
     )
-    assert isinstance(c.analysis_obj, type(CZParametrisationFixDurationNodeAnalysis))
+    assert isinstance(c.analysis_obj, type(CZParametrizationFixDurationNodeAnalysis))
