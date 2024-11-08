@@ -15,11 +15,6 @@
 
 - Load a configuration package? (later)
 
-Then we need this view with the qubits
-- input of the qubits
-
-- cluster modules
-- we can identify which ones are readout and which ones are drive
 
 device templates
 - we should have template for the 25 qubit chip
@@ -40,6 +35,7 @@ to be thought through
 import urwid
 
 from tergite_autocalibration.tools.cli.config import helpers
+from tergite_autocalibration.tools.cli.config.parsers import parse_input_qubit
 
 # Trying to follow a model view controller pattern
 # Everything in one file, because Python would create some circular imports otherwise
@@ -68,7 +64,7 @@ right_panel = urwid.Filler(output_text, valign="top")
 # This function is called to update the view on the right side
 def refresh_dot_env_output():
     # Format the current state to display on the right side
-    output_ = "This is the output written to the .env file:\n"
+    output_ = ""
     for key_, value_ in state.items():
         output_ += f"{key_}: {value_}\n"
     output_text.set_text(output_)
@@ -85,7 +81,7 @@ def input_default_prefix():
     )
     input_ = urwid.Edit("DEFAULT_PREFIX: ", helpers.get_username())
 
-    button_ = urwid.Button("Submit")
+    button_ = urwid.Button("OK")
     urwid.connect_signal(button_, "click", on_submit_default_prefix, input_)
     default_prefix_button_ = urwid.AttrMap(button_, None, focus_map="reversed")
 
@@ -111,7 +107,7 @@ def input_root_dir():
     )
     input_ = urwid.Edit("ROOT_DIR: ", helpers.get_cwd())
 
-    button_ = urwid.Button("Submit")
+    button_ = urwid.Button("OK")
     urwid.connect_signal(button_, "click", on_submit_root_dir, input_)
     default_prefix_button_ = urwid.AttrMap(button_, None, focus_map="reversed")
 
@@ -242,36 +238,127 @@ def input_qubits():
     )
     input_ = urwid.Edit("qubits: ", "")
 
-    button_ = urwid.Button("Submit")
+    button_ = urwid.Button("OK")
     urwid.connect_signal(button_, "click", on_submit_qubits, input_)
     qubits_button_ = urwid.AttrMap(button_, None, focus_map="reversed")
 
-    return urwid.Pile([caption_text_, urwid.Divider(), input_, qubits_button_])
+    left_panel.original_widget = urwid.Pile(
+        [caption_text_, urwid.Divider(), input_, qubits_button_]
+    )
 
 
 def on_submit_qubits(_, edit_):
     # Parse and go
-    pass
+    qubit_str_ = edit_.get_edit_text()
+    state["qubits"] = parse_input_qubit(qubit_str_)
+    refresh_dot_env_output()
+    input_cluster_modules()
+
 
 def input_cluster_modules():
     caption_text_ = urwid.Text(
         "Please select the modules inside the cluster that are used for the calibration."
     )
     options_ = helpers.get_cluster_modules()
+    state["cluster_modules"] = []
     choices_ = [urwid.Divider()]
 
-    # Add the list of cluster tuples, the tuples are of form:
-    # (cluster_ip: str, cluster_name: str, firmware_version: str)
+    # Add the list of cluster module tuples, the tuples are of form:
+    # (module_name: str, module_type: str)
     for option_ in options_:
-        option_str_ = f"{option_[0]} - {option_[1]})"
+        option_str_ = f"{option_[0]} - ({option_[1]})"
         button_ = urwid.Button(option_str_)
-        urwid.connect_signal(button_, "click", on_cluster_module_toggle, option_)
+        urwid.connect_signal(button_, "click", on_toggle_cluster_modules, option_)
         choices_.append(urwid.AttrMap(button_, None, focus_map="reversed"))
 
-    # Update left panel
-    left_panel.original_widget = urwid.Pile([caption_text_] + choices_)
+    button_ = urwid.Button("OK")
+    urwid.connect_signal(button_, "click", on_submit_cluster_modules)
+    cluster_modules_button_ = urwid.AttrMap(button_, None, focus_map="reversed")
 
-def on_cluster_module_toggle():
+    # Update left panel
+    left_panel.original_widget = urwid.Pile(
+        [caption_text_] + choices_ + [urwid.Divider("-"), cluster_modules_button_]
+    )
+
+
+def on_toggle_cluster_modules(_, option_):
+    if option_ in state["cluster_modules"]:
+        state["cluster_modules"].remove(option_)
+    else:
+        state["cluster_modules"].append(option_)
+    # Sort output by module name
+    state["cluster_modules"] = sorted(state["cluster_modules"], key=lambda x_: x_[0])
+    refresh_dot_env_output()
+
+
+def on_submit_cluster_modules(_):
+    refresh_dot_env_output()
+    input_qubit_drive_module_mapping()
+
+
+def input_qubit_drive_module_mapping():
+    caption_text_ = urwid.Text(
+        "Please create the mapping from the qubits to the modules.\n"
+        "On the left side select a qubit and then the respective module on the right side."
+    )
+    qubit_options_ = state["qubits"]
+    qubit_choices_ = [urwid.Divider()]
+
+    for qubit_option_ in qubit_options_:
+        option_str_ = f"{qubit_option_}"
+        button_ = urwid.Button(option_str_)
+        urwid.connect_signal(button_, "click", on_toggle_qubit_in_drive_module_mapping, qubit_option_)
+        qubit_choices_.append(urwid.AttrMap(button_, None, focus_map="reversed"))
+
+    module_options_ = state["cluster_modules"]
+    module_choices_ = [urwid.Divider()]
+
+    for module_option_ in module_options_:
+        option_str_ = f"{module_option_}"
+        button_ = urwid.Button(option_str_)
+        urwid.connect_signal(button_, "click", on_toggle_module_in_drive_module_mapping, module_option_)
+        module_choices_.append(urwid.AttrMap(button_, None, focus_map="reversed"))
+
+    button_ = urwid.Button("OK")
+    urwid.connect_signal(button_, "click", on_submit_cluster_modules)
+    qubit_drive_module_button_ = urwid.AttrMap(button_, None, focus_map="reversed")
+
+    qubit_input_ = urwid.Pile(qubit_choices_)
+    module_input_ = urwid.Pile(module_choices_)
+
+    qubit_map_widget_ = urwid.Columns(
+        [
+            (
+                "weight",
+                1,
+                urwid.Filler(
+                    urwid.Padding(qubit_input_, left=1, right=1),
+                    valign="top",
+                ),
+            ),
+            (
+                "weight",
+                1,
+                urwid.Filler(
+                    urwid.Padding(module_input_, left=1, right=1),
+                    valign="top",
+                ),
+            ),
+        ]
+    )
+
+    # Update left panel
+    left_panel.original_widget = urwid.Pile(
+        [caption_text_, qubit_map_widget_, urwid.Divider(), qubit_drive_module_button_]
+    )
+
+
+def on_toggle_qubit_in_drive_module_mapping():
+    pass
+
+
+def on_toggle_module_in_drive_module_mapping():
+    pass
 
 
 # -------------
