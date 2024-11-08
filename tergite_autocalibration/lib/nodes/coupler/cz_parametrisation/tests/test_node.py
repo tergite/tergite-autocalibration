@@ -10,7 +10,7 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from tergite_autocalibration.lib.utils.node_subclasses import ParametrizedSweepNode
+from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 from tergite_autocalibration.tests.utils.env import setup_test_env
 
 setup_test_env()
@@ -36,7 +36,7 @@ def test_canCreateCorrectType():
         couplers=["q14_q15"],
     )
     assert isinstance(c, CZParametrisationFixDurationNode)
-    # assert isinstance(c, ParametrizedSweepNode)
+    assert isinstance(c, ScheduleNode)
 
 
 @pytest.mark.skip

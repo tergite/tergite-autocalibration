@@ -38,7 +38,7 @@ If you need to test some complex scenario, such as those involving sweep, it is 
 def test_canCreateCorrectType():
     c = CZ_Parametrization_Fix_Duration_Node("cz_char_fixCurrent", couplers = ["q14_q15"])
     assert isinstance(c, CZ_Parametrization_Fix_Duration_Node)
-    assert isinstance(c, ParametrizedSweepNode)
+    assert isinstance(c, ScheduleNode)
 ```
 The suggested very first test is to istantiate the class and make sure it has the correct type(s) following any inheritance.
 
