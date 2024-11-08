@@ -23,25 +23,25 @@ from ...cz_parametrisation.analysis import (
 from ...cz_parametrisation.measurement import (
     CZParametrizationFixDuration,
 )
-from ...cz_parametrisation.node import (
-    CZParametrizationFixDurationNode,
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.node import (
+    CZParametrisationFixDurationNode,
 )
 
 
 @pytest.mark.skip
 def test_canCreateCorrectType():
-    c = CZParametrizationFixDurationNode(
+    c = CZParametrisationFixDurationNode(
         "cz_char_fixCurrent",
         all_qubits=["q14", "q15"],
         couplers=["q14_q15"],
     )
-    assert isinstance(c, CZParametrizationFixDurationNode)
-    assert isinstance(c, ParametrizedSweepNode)
+    assert isinstance(c, CZParametrisationFixDurationNode)
+    # assert isinstance(c, ParametrizedSweepNode)
 
 
 @pytest.mark.skip
 def test_CanGetQubitsFromCouplers():
-    c = CZParametrizationFixDurationNode(
+    c = CZParametrisationFixDurationNode(
         "cz_char_fixCurrent", all_qubits=["q14", "q15"], couplers=["q14_q15"]
     )
     assert c.all_qubits == ["q14", "q15"]
@@ -51,7 +51,7 @@ def test_CanGetQubitsFromCouplers():
 @pytest.mark.skip
 def test_ValidationReturnErrorWithSameQubitCoupler():
     with pytest.raises(ValueError):
-        CZParametrizationFixDurationNode(
+        CZParametrisationFixDurationNode(
             "cz_char_fixCurrent", all_qubits=["q14", "q15"], couplers=["q14_q14"]
         )
 
@@ -59,14 +59,14 @@ def test_ValidationReturnErrorWithSameQubitCoupler():
 @pytest.mark.skip
 def test_ValidationReturnErrorWithQubitsNotMatchingClouples():
     with pytest.raises(ValueError):
-        CZParametrizationFixDurationNode(
+        CZParametrisationFixDurationNode(
             "cz_char_fixCurrent", all_qubits=["q14", "q16"], couplers=["q14_q15"]
         )
 
 
 @pytest.mark.skip
 def test_MeasurementClassType():
-    c = CZParametrizationFixDurationNode(
+    c = CZParametrisationFixDurationNode(
         "cz_char_fixCurrent", all_qubits=["q14", "q15"], couplers=["q14_q15"]
     )
     assert isinstance(c.measurement_obj, type(CZParametrizationFixDuration))
@@ -74,7 +74,7 @@ def test_MeasurementClassType():
 
 @pytest.mark.skip
 def test_AnalysisClassType():
-    c = CZParametrizationFixDurationNode(
+    c = CZParametrisationFixDurationNode(
         "cz_char_fixCurrent", all_qubits=["q14", "q15"], couplers=["q14_q15"]
     )
     assert isinstance(c.analysis_obj, type(CZParametrizationFixDurationNodeAnalysis))

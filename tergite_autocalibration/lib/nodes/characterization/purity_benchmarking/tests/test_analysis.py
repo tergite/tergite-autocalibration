@@ -15,13 +15,15 @@ from tergite_autocalibration.tests.utils.env import setup_test_env
 
 setup_test_env()
 
+from pathlib import Path
 import unittest
+
+from lmfit.model import ModelResult
+from matplotlib.figure import Figure
 import numpy as np
 import xarray as xr
-from lmfit.model import ModelResult
-from pathlib import Path
-from matplotlib.figure import Figure
-from ...purity_benchmarking.analysis import (
+
+from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.analysis import (
     PurityBenchmarkingQubitAnalysis,
 )
 

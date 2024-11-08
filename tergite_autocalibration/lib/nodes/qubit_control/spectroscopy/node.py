@@ -13,7 +13,6 @@
 
 import numpy as np
 
-from tergite_autocalibration.lib.base.node import BaseNode
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis import (
     QubitSpectroscopyNodeAnalysis,
     QubitSpectroscopyNodeMultidim,
@@ -21,10 +20,13 @@ from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis impor
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement import (
     Two_Tones_Multidim,
 )
+
+# TODO: check input
 from tergite_autocalibration.utils.user_input import qubit_samples
+from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 
 
-class Qubit_01_Spectroscopy_Multidim_Node(BaseNode):
+class Qubit_01_Spectroscopy_Multidim_Node(ScheduleNode):
     measurement_obj = Two_Tones_Multidim
     analysis_obj = QubitSpectroscopyNodeMultidim
     qubit_qois = ["clock_freqs:f01", "spec:spec_ampl_optimal"]
@@ -42,25 +44,23 @@ class Qubit_01_Spectroscopy_Multidim_Node(BaseNode):
         }
 
 
-class Qubit_12_Spectroscopy_Pulsed_Node(BaseNode):
+class Qubit_12_Spectroscopy_Pulsed_Node(ScheduleNode):
     measurement_obj = Two_Tones_Multidim
     analysis_obj = QubitSpectroscopyNodeAnalysis
     qubit_qois = ["clock_freqs:f12"]
 
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.sweep_range = self.node_dictionary.pop("sweep_range", None)
         self.qubit_state = 1
 
         self.schedule_samplespace = {
             "spec_frequencies": {
-                qubit: qubit_samples(qubit, "12", sweep_range=self.sweep_range)
-                for qubit in self.all_qubits
+                qubit: qubit_samples(qubit, "12") for qubit in self.all_qubits
             }
         }
 
 
-class Qubit_12_Spectroscopy_Multidim_Node(BaseNode):
+class Qubit_12_Spectroscopy_Multidim_Node(ScheduleNode):
     measurement_obj = Two_Tones_Multidim
     analysis_obj = QubitSpectroscopyNodeMultidim
     qubit_qois = ["clock_freqs:f12", "spec:spec_ampl_12_optimal"]
