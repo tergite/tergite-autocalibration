@@ -354,9 +354,6 @@ class ResetChevronCouplerAnalysis(BaseCouplerAnalysis):
         self.q2 = ResetChevronQubitAnalysis(self.name, self.redis_fields)
         res2 = self.q2.process_qubit(ds2, q2_data_var[0])
 
-        print(res1)
-        print(res2)
-
         return res1
 
     def plotter(self, primary_axis, secondary_axis):

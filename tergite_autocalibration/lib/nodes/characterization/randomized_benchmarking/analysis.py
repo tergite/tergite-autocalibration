@@ -17,8 +17,8 @@ import numpy as np
 from matplotlib.axes import Axes
 
 from tergite_autocalibration.lib.base.analysis import (
-    BaseAllQubitsAnalysis,
     BaseQubitAnalysis,
+    BaseAllQubitsRepeatAnalysis,
 )
 from tergite_autocalibration.lib.utils.functions import (
     exponential_decay_function,
@@ -145,7 +145,7 @@ class RandomizedBenchmarkingQubitAnalysis(BaseQubitAnalysis):
         ax.grid()
 
 
-class RandomizedBenchmarkingNodeAnalysis(BaseAllQubitsAnalysis):
+class RandomizedBenchmarkingNodeAnalysis(BaseAllQubitsRepeatAnalysis):
     single_qubit_analysis_obj = RandomizedBenchmarkingQubitAnalysis
 
     def __init__(self, name, redis_fields):

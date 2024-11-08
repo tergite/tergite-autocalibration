@@ -40,7 +40,6 @@ from tergite_autocalibration.lib.utils.graph import filtered_topological_order
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.utils.dataset_utils import create_node_data_path
 from tergite_autocalibration.utils.dto.enums import DataStatus, MeasurementMode
-from tergite_autocalibration.utils.logger.errors import ClusterNotFoundError
 from tergite_autocalibration.utils.logger.tac_logger import logger
 from tergite_autocalibration.utils.logger.visuals import draw_arrow_chart
 from tergite_autocalibration.utils.redis_utils import (
@@ -194,6 +193,8 @@ class CalibrationSupervisor:
             "cz_calibration_swap_ssro",
             "cz_dynamic_phase",
             "cz_dynamic_phase_swap",
+            "reset_chevron",
+            "process_tomography_ssro",
             "tqg_randomized_benchmarking",
             "tqg_randomized_benchmarking_interleaved",
         ]:
@@ -223,7 +224,6 @@ class CalibrationSupervisor:
 
         # Check Redis if node is calibrated
         status = DataStatus.undefined
-
         if node_name in [
             "coupler_spectroscopy",
             "cz_chevron",
@@ -237,6 +237,8 @@ class CalibrationSupervisor:
             "cz_calibration_swap_ssro",
             "cz_dynamic_phase",
             "cz_dynamic_phase_swap",
+            "reset_chevron",
+            "process_tomography_ssro",
             "tqg_randomized_benchmarking",
             "tqg_randomized_benchmarking_interleaved",
         ]:
@@ -264,34 +266,7 @@ class CalibrationSupervisor:
                 else:
                     raise ValueError(f"status: {status}")
 
-        if self.measurement_mode == MeasurementMode.re_analyse:
-            print(status)
-            if (
-                node_name == self.node_name_to_re_analyse
-                or status != DataStatus.in_spec
-            ):
-                path = self.data_path
-
-                print(
-                    "\u2691\u2691\u2691 "
-                    + f"{Fore.RED}{Style.BRIGHT}Calibration required for Node {node_name}{Style.RESET_ALL}"
-                )
-                logger.info(f"Calibrating node {node.name}")
-
-                node.calibrate(path, self.lab_ic, self.measurement_mode)
-
-            else:
-                print(
-                    f" \u2714  {Fore.GREEN}{Style.BRIGHT}Node {node_name} in spec{Style.RESET_ALL}"
-                )
-
-        elif status == DataStatus.in_spec:
-            print(
-                f" \u2714  {Fore.GREEN}{Style.BRIGHT}Node {node_name} in spec{Style.RESET_ALL}"
-            )
-            return
-
-        elif status == DataStatus.out_of_spec:
+        if status == DataStatus.out_of_spec:
             print(
                 "\u2691\u2691\u2691 "
                 + f"{Fore.RED}{Style.BRIGHT}Calibration required for Node {node_name}{Style.RESET_ALL}"
@@ -311,9 +286,32 @@ class CalibrationSupervisor:
             logger.info(f"Calibrating node {node.name}")
             # TODO: This could be in the node initializer
             data_path = create_node_data_path(node)
+            if self.measurement_mode == MeasurementMode.re_analyse:
+                data_path = self.data_path
             measurement_result = node.calibrate(data_path, self.measurement_mode)
 
             # TODO:  develop failure strategies ->
             # if node_calibration_status == DataStatus.out_of_spec:
             #     node_expand()
             #     node_calibration_status = self.calibrate_node(node)
+
+        elif self.measurement_mode == MeasurementMode.re_analyse:
+            if (
+                node_name == self.node_name_to_re_analyse
+                or status != DataStatus.in_spec
+            ):
+                path = self.data_path
+
+                print(
+                    "\u2691\u2691\u2691 "
+                    + f"{Fore.RED}{Style.BRIGHT}Calibration required for Node {node_name}{Style.RESET_ALL}"
+                )
+                logger.info(f"Calibrating node {node_name}")
+
+                node.calibrate(path, self.lab_ic, self.measurement_mode)
+
+        elif status == DataStatus.in_spec:
+            print(
+                f" \u2714  {Fore.GREEN}{Style.BRIGHT}Node {node_name} in spec{Style.RESET_ALL}"
+            )
+            return
