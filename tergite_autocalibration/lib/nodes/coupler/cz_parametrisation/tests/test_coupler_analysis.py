@@ -10,6 +10,10 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+from tergite_autocalibration.tests.utils.env import setup_test_env
+
+setup_test_env()
+
 from pathlib import Path
 import unittest
 
@@ -30,9 +34,7 @@ from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis impor
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.utils.no_valid_combination_exception import (
     NoValidCombinationException,
 )
-from tergite_autocalibration.tests.utils.env import setup_test_env
 
-setup_test_env()
 
 
 def test_CanCreate():

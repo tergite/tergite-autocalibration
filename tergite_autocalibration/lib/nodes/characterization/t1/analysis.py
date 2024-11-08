@@ -21,7 +21,7 @@ import numpy as np
 from quantify_core.analysis.fitting_models import ExpDecayModel
 
 from tergite_autocalibration.lib.base.analysis import (
-    BaseAllQubitsAnalysis,
+    BaseAllQubitsRepeatAnalysis,
     BaseQubitAnalysis,
 )
 
@@ -98,7 +98,7 @@ class T1QubitAnalysis(BaseQubitAnalysis):
         ax.grid()
 
 
-class T1NodeAnalysis(BaseAllQubitsAnalysis):
+class T1NodeAnalysis(BaseAllQubitsRepeatAnalysis):
     single_qubit_analysis_obj = T1QubitAnalysis
 
     def __init__(self, name, redis_fields):

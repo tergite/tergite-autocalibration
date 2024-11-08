@@ -39,7 +39,6 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
         )  # "testdata.hdf5"
         self.dataset = xr.open_dataset(file_path)
 
-    @unittest.skip
     def test_initialization(self):
         self.analysis = PurityBenchmarkingQubitAnalysis("name", ["purity_fidelity"])
         self.analysis.process_qubit(self.dataset, "yq06")
