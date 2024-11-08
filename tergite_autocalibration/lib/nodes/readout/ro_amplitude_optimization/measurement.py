@@ -155,8 +155,6 @@ class RO_amplitude_optimization(BaseMeasurement):
         schedule = Schedule("RO_amplitude_optimization", repetitions=1)
         ro_shot_schedule = self.ro_shot(ro_amplitudes, qubit_states)
 
-        schedule.add(
-            ro_shot_schedule, control_flow=Loop(loop_repetitions)
-        )
+        schedule.add(ro_shot_schedule, control_flow=Loop(loop_repetitions))
         schedule.add(IdlePulse(20e-9))
         return schedule

@@ -143,9 +143,9 @@ class Rxy_12(Rxy):
         super().__init__(theta=theta, phi=phi, qubit=qubit)
         self.data["name"] = (f"Rxy-12({theta:.8g}, {phi:.8g}, '{qubit}')",)
         self.data["gate_info"]["unitary"] = None  # this is not a Qubit operation
-        self.data["gate_info"]["operation_type"] = (
-            "r12"  # this key is used in compilation!
-        )
+        self.data["gate_info"][
+            "operation_type"
+        ] = "r12"  # this key is used in compilation!
 
         self._update()  # Update the Operation's internals
 
