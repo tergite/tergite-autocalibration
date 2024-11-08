@@ -27,10 +27,10 @@ class RO_amplitude_two_state_optimization_Node(BaseNode):
     measurement_obj = RO_amplitude_optimization
     analysis_obj = OptimalROTwoStateAmplitudeNodeAnalysis
     qubit_qois = [
-            "measure_2state_opt:ro_ampl_2st_opt",
-            "measure_2state_opt:rotation",
-            "measure_2state_opt:threshold",
-        ]
+        "measure_2state_opt:ro_ampl_2st_opt",
+        "measure_2state_opt:rotation",
+        "measure_2state_opt:threshold",
+    ]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
@@ -59,7 +59,7 @@ class RO_amplitude_three_state_optimization_Node(BaseNode):
     measurement_obj = RO_amplitude_optimization
     analysis_obj = OptimalROThreeStateAmplitudeNodeAnalysis
     qubit_qois = ["measure_3state_opt:ro_ampl_3st_opt", "inv_cm_opt"]
-    
+
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
         self.name = name

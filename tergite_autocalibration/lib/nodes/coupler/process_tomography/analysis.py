@@ -31,6 +31,7 @@ from tergite_autocalibration.lib.base.analysis import (
 )
 from tergite_autocalibration.utils.logger.tac_logger import logger
 
+
 def mitigate(v, cm_inv):
     u = np.dot(v, cm_inv)
 
@@ -188,7 +189,7 @@ class ProcessTomographyQubitAnalysis(BaseQubitAnalysis):
         plt.show(block=False)
         plt.pause(5)
         plt.close()
-        logger.info(f"Plots saved to {preview_path} and {full_path}")        
+        logger.info(f"Plots saved to {preview_path} and {full_path}")
 
 
 class SingleProcessTomographyNodeAnalysis(BaseAllQubitsAnalysis):
@@ -196,6 +197,7 @@ class SingleProcessTomographyNodeAnalysis(BaseAllQubitsAnalysis):
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
+
 
 class ProcessTomographyNodeAnalysis(MultipleBaseAllQubitsAnalysis):
     node_analysis_obj = SingleProcessTomographyNodeAnalysis

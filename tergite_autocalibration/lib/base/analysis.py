@@ -183,7 +183,7 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         self.column_grid = 5
         self.plots_per_qubit = 1
 
-    def analyze_node(self, data_path: Path, index:int = 0):
+    def analyze_node(self, data_path: Path, index: int = 0):
         self.data_path = Path(data_path)
         self.dataset = self.open_dataset(index)
         self.coords = self.dataset.coords
@@ -288,19 +288,18 @@ class BaseAllQubitsRepeatAnalysis(BaseAllQubitsAnalysis, ABC):
 
         return merged_datasets
 
+
 class MultipleBaseAllQubitsAnalysis(BaseAllQubitsAnalysis, ABC):
     node_analysis_obj = BaseAllQubitsAnalysis
-    
+
     def __init__(self, name: str, redis_fields):
         super().__init__(name, redis_fields)
-        self.loop_range = ""    
+        self.loop_range = ""
 
     def analyze_node(self, data_path: Path):
         for i in self.loop_range:
-            qubit_analysis = self.node_analysis_obj(
-                self.name, self.redis_fields
-            )
-            qubit_analysis.analyze_node(data_path, i) 
+            qubit_analysis = self.node_analysis_obj(self.name, self.redis_fields)
+            qubit_analysis.analyze_node(data_path, i)
 
 
 class BaseQubitAnalysis(BaseAnalysis, ABC):
