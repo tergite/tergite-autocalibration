@@ -15,10 +15,13 @@
 
 import numpy as np
 
+from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.analysis import (
+    RandomizedBenchmarkingNodeAnalysis,
+)
+from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.measurement import (
+    Randomized_Benchmarking,
+)
 from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
-
-from .analysis import RandomizedBenchmarkingNodeAnalysis
-from .measurement import Randomized_Benchmarking
 
 
 class Randomized_Benchmarking_Node(ScheduleNode):

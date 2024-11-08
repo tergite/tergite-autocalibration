@@ -15,10 +15,13 @@
 Module containing classes that model, fit and plot data from the purity benchmarking experiment.
 """
 import lmfit
-from matplotlib.axes import Axes
 import numpy as np
+from matplotlib.axes import Axes
 
-from ....base.analysis import BaseAllQubitsAnalysis, BaseQubitAnalysis
+from tergite_autocalibration.lib.base.analysis import (
+    BaseAllQubitsAnalysis,
+    BaseQubitAnalysis,
+)
 from tergite_autocalibration.lib.utils.functions import exponential_decay_function
 
 

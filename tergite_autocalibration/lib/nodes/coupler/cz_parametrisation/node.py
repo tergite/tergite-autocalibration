@@ -12,11 +12,14 @@
 
 import numpy as np
 
+from tergite_autocalibration.config.settings import REDIS_CONNECTION
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis import (
+    CZParametrisationFixDurationNodeAnalysis,
+)
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.measurement import (
+    CZParametrisationFixDuration,
+)
 from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
-
-from .....config.settings import REDIS_CONNECTION
-from .analysis import CZParametrisationFixDurationNodeAnalysis
-from .measurement import CZParametrisationFixDuration
 
 
 class CZParametrisationFixDurationNode(ScheduleNode):

@@ -21,8 +21,10 @@ from tergite_autocalibration.lib.base.external_parameter_node import (
     ExternalParameterNode,
 )
 
-from .analysis import T1NodeAnalysis
-from .measurement import T1
+from tergite_autocalibration.lib.nodes.characterization.t1.analysis import (
+    T1NodeAnalysis,
+)
+from tergite_autocalibration.lib.nodes.characterization.t1.measurement import T1
 
 
 class T1_Node(ExternalParameterNode):

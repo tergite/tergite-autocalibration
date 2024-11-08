@@ -12,10 +12,13 @@
 
 import numpy as np
 
+from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.analysis import (
+    PurityBenchmarkingNodeAnalysis,
+)
+from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.measurement import (
+    PurityBenchmarking,
+)
 from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
-
-from .analysis import PurityBenchmarkingNodeAnalysis
-from .measurement import PurityBenchmarking
 
 
 class PurityBenchmarkingNode(ScheduleNode):
