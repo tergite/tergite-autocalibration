@@ -294,7 +294,7 @@ class CalibrationSupervisor:
             # if node_calibration_status == DataStatus.out_of_spec:
             #     node_expand()
             #     node_calibration_status = self.calibrate_node(node)
-    
+
         elif self.measurement_mode == MeasurementMode.re_analyse:
             if (
                 node_name == self.node_name_to_re_analyse
