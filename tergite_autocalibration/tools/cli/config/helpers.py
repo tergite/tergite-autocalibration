@@ -77,12 +77,39 @@ def _parse_ss_redis_output(ss_in_: "subprocess.CompletedProcess") -> List[str]:
 
 def _get_available_redis_instances_linux() -> List[str]:
     try:
-        # Run `ss` to list all listening TCP connections with process info
-        result_ = subprocess.run(
-            ["ss", "-ltnp"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+        # Get all running processes with `ps aux`
+        ps_result = subprocess.run(
+            ["ps", "aux"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
         )
-        # Parse the output to look for Redis instances
-        return _parse_ss_redis_output(result_)
+
+        # Filter for Redis processes
+        redis_pids = []
+        for line in ps_result.stdout.splitlines():
+            if "redis-server" in line:
+                parts = line.split()
+                pid = parts[1]  # PID is the second column in ps output
+                redis_pids.append(pid)
+
+        # For each Redis PID, check the listening ports
+        redis_instances = set()
+        for pid in redis_pids:
+            # Run ss or netstat to get network connections for the PID
+            net_result = subprocess.run(
+                ["ss", "-ltnp"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+
+            # Parse the output and find connections for the Redis PID
+            for line in net_result.stdout.splitlines():
+                if pid in line:
+                    parts = line.split()
+                    address = parts[3]  # Local address (host:port)
+                    port = address.split(":")[-1]  # Extract port from address
+                    redis_instances.add(port)
+
+        return list(sorted(redis_instances))
 
     except Exception as e:
         print("Error:", e)
