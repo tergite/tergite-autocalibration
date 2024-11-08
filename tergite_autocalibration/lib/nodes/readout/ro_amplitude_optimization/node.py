@@ -13,12 +13,14 @@
 
 import numpy as np
 
+from tergite_autocalibration.lib.base.node import BaseNode
+from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.measurement import (
+    RO_amplitude_optimization,
+)
 from .analysis import (
     OptimalROTwoStateAmplitudeNodeAnalysis,
     OptimalROThreeStateAmplitudeNodeAnalysis,
 )
-from .measurement import RO_amplitude_optimization, RO_amplitude_optimization_refectored
-from ....base.node import BaseNode
 
 
 class RO_amplitude_two_state_optimization_Node(BaseNode):

@@ -11,17 +11,21 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from tergite_autocalibration.utils.user_input import resonator_samples
-from .analysis import (
+from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
+from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.measurement import (
+    Resonator_Spectroscopy,
+)
+from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.analysis import (
     ResonatorSpectroscopyNodeAnalysis,
     ResonatorSpectroscopy1NodeAnalysis,
     ResonatorSpectroscopy2NodeAnalysis,
 )
-from .measurement import Resonator_Spectroscopy
-from ....base.node import BaseNode
+
+# TODO: check location
+from tergite_autocalibration.utils.user_input import resonator_samples
 
 
-class Resonator_Spectroscopy_Node(BaseNode):
+class Resonator_Spectroscopy_Node(ScheduleNode):
     measurement_obj = Resonator_Spectroscopy
     analysis_obj = ResonatorSpectroscopyNodeAnalysis
     qubit_qois = ["clock_freqs:readout", "Ql", "resonator_minimum"]
@@ -36,7 +40,7 @@ class Resonator_Spectroscopy_Node(BaseNode):
         }
 
 
-class Resonator_Spectroscopy_1_Node(BaseNode):
+class Resonator_Spectroscopy_1_Node(ScheduleNode):
     measurement_obj = Resonator_Spectroscopy
     analysis_obj = ResonatorSpectroscopy1NodeAnalysis
     qubit_qois = [
@@ -56,7 +60,7 @@ class Resonator_Spectroscopy_1_Node(BaseNode):
         }
 
 
-class Resonator_Spectroscopy_2_Node(BaseNode):
+class Resonator_Spectroscopy_2_Node(ScheduleNode):
     measurement_obj = Resonator_Spectroscopy
     analysis_obj = ResonatorSpectroscopy2NodeAnalysis
     qubit_qois = ["extended_clock_freqs:readout_2"]

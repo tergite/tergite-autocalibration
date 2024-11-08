@@ -14,13 +14,13 @@
 
 import numpy as np
 
-from ..cz_calibration.analysis import (
+from tergite_autocalibration.lib.base.node import BaseNode
+from tergite_autocalibration.lib.nodes.coupler.cz_calibration.analysis import (
     CZCalibrationAnalysis,
 )
-from ..cz_calibration.measurement import (
+from tergite_autocalibration.lib.nodes.coupler.cz_calibration.measurement import (
     CZ_calibration,
 )
-from ....base.node import BaseNode
 
 
 class CZ_Dynamic_Phase_Node(BaseNode):

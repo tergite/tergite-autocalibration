@@ -12,13 +12,13 @@
 
 import numpy as np
 
-from .analysis import (
+from tergite_autocalibration.lib.base.node import BaseNode
+from tergite_autocalibration.lib.nodes.coupler.process_tomography.analysis import (
     ProcessTomographyAnalysis,
 )
-from .measurement import (
+from tergite_autocalibration.lib.nodes.coupler.process_tomography.measurement import (
     Process_Tomography,
 )
-from ....base.node import BaseNode
 
 
 class Process_Tomography_Node(BaseNode):

@@ -15,12 +15,16 @@
 
 import numpy as np
 
-from .analysis import RandomizedBenchmarkingNodeAnalysis
-from .measurement import Randomized_Benchmarking
-from ....utils.node_subclasses import ParametrizedSweepNode
+from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.analysis import (
+    RandomizedBenchmarkingNodeAnalysis,
+)
+from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.measurement import (
+    Randomized_Benchmarking,
+)
+from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 
 
-class Randomized_Benchmarking_Node(ParametrizedSweepNode):
+class Randomized_Benchmarking_Node(ScheduleNode):
     measurement_obj = Randomized_Benchmarking
     analysis_obj = RandomizedBenchmarkingNodeAnalysis
     qubit_qois = ["fidelity"]
@@ -28,7 +32,6 @@ class Randomized_Benchmarking_Node(ParametrizedSweepNode):
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
         self.name = name
-        self.type = "parameterized_sweep"
         self.all_qubits = all_qubits
         self.schedule_keywords = schedule_keywords
         self.backup = False

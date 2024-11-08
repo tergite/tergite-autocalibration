@@ -13,9 +13,9 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import pathlib
 from collections.abc import Iterable
 from datetime import datetime
+import pathlib
 from uuid import uuid4
 
 import numpy as np
@@ -37,9 +37,7 @@ def configure_dataset(
 
     raw_ds_keys = raw_ds.data_vars.keys()
     measurement_qubits = node.all_qubits
-    schedule_samplespace = node.schedule_samplespace
-
-    samplespace = schedule_samplespace
+    samplespace = node.schedule_samplespace
 
     sweep_quantities = samplespace.keys()
 
@@ -93,7 +91,6 @@ def configure_dataset(
                 "units": "NA",
             }
 
-
             if not isinstance(settable_values, Iterable):
                 settable_values = np.array([settable_values])
 
@@ -108,9 +105,7 @@ def configure_dataset(
 
         partial_ds = xarray.Dataset(coords=coords_dict)
 
-
         data_values = raw_ds[key].values
-
 
         reshaping = reversed(node.dimensions)
         if "ssro" in node.name:
@@ -149,6 +144,7 @@ def to_real_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
     ds = xarray.concat([ds.real, ds.imag], dim="ReIm")
     return ds
 
+
 def create_node_data_path(node) -> pathlib.Path:
     measurement_date = datetime.now()
     measurements_today = measurement_date.date().strftime("%Y%m%d")
@@ -176,9 +172,9 @@ def save_dataset(
         {"name": node_name, "tuid": measurement_id}
     )
 
+    # to_netcdf doesn't like complex numbers, convert to real/imag to save:
     result_dataset_real = to_real_dataset(result_dataset)
 
-    # to_netcdf doesn't like complex numbers, convert to real/imag to save:
     count = 0
     dataset_name = f"dataset_{node_name}_{count}.hdf5"
     while (data_path / dataset_name).is_file():
@@ -187,6 +183,7 @@ def save_dataset(
     result_dataset_real.to_netcdf(data_path / dataset_name)
 
 
+# TODO: how does this function work?
 def tunneling_qubits(data_values: np.ndarray) -> np.ndarray:
     if data_values.shape[0] == 1:
         # Single-qubit demodulation

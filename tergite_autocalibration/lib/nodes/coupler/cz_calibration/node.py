@@ -14,13 +14,17 @@
 
 import numpy as np
 
-from ....base.node import BaseNode
-from .analysis import (
+from tergite_autocalibration.lib.base.node import BaseNode
+from tergite_autocalibration.lib.nodes.coupler.cz_calibration.analysis import (
     CZCalibrationAnalysis,
     CZCalibrationSSROAnalysis,
     ResetCalibrationSSROAnalysis,
 )
-from .measurement import CZ_calibration, CZ_calibration_SSRO, Reset_calibration_SSRO
+from tergite_autocalibration.lib.nodes.coupler.cz_calibration.measurement import (
+    CZ_calibration,
+    CZ_calibration_SSRO,
+    Reset_calibration_SSRO,
+)
 
 
 class CZ_Calibration_Node(BaseNode):

@@ -12,13 +12,13 @@
 
 import numpy as np
 
+from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.analysis import (
+    RandomizedBenchmarkingAnalysis,
+)
+from tergite_autocalibration.lib.utils.node_subclasses import ParametrizedSweepNode
 from .measurement import (
     TQG_Randomized_Benchmarking,
 )
-from ...characterization.randomized_benchmarking.analysis import (
-    RandomizedBenchmarkingAnalysis,
-)
-from ....utils.node_subclasses import ParametrizedSweepNode
 
 RB_REPEATS = 10
 
