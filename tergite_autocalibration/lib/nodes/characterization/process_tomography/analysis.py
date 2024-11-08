@@ -12,7 +12,6 @@
 # that they have been altered from the originals.
 
 import itertools
-import warnings
 
 import numpy as np
 import xarray as xr

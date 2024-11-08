@@ -14,10 +14,10 @@
 import numpy as np
 
 from tergite_autocalibration.lib.base.node import BaseNode
-from tergite_autocalibration.lib.nodes.coupler.process_tomography.analysis import (
+from tergite_autocalibration.lib.nodes.characterization.process_tomography.analysis import (
     ProcessTomographyNodeAnalysis,
 )
-from tergite_autocalibration.lib.nodes.coupler.process_tomography.measurement import (
+from tergite_autocalibration.lib.nodes.characterization.process_tomography.measurement import (
     Process_Tomography,
 )
 
