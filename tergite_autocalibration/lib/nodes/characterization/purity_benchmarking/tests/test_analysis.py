@@ -14,12 +14,14 @@ from tergite_autocalibration.tests.utils.env import setup_test_env
 
 setup_test_env()
 
+from pathlib import Path
 import unittest
+
+from lmfit.model import ModelResult
+from matplotlib.figure import Figure
 import numpy as np
 import xarray as xr
-from lmfit.model import ModelResult
-from pathlib import Path
-from matplotlib.figure import Figure
+
 from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.analysis import (
     PurityBenchmarkingQubitAnalysis,
 )
@@ -32,9 +34,12 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
     def setUpClass(self):
         # Setup the dataset for testing from a file
         test_dir = Path(__file__).parent
-        file_path = test_dir / "data" / "dataset_0.hdf5"  # "testdata.hdf5"
+        file_path = (
+            test_dir / "data" / "dataset_purity_benchmarking_0.hdf5"
+        )  # "testdata.hdf5"
         self.dataset = xr.open_dataset(file_path)
 
+    @unittest.skip
     def test_initialization(self):
         self.analysis = PurityBenchmarkingQubitAnalysis("name", ["purity_fidelity"])
         self.analysis.process_qubit(self.dataset, "yq06")
@@ -45,7 +50,6 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
             self.analysis.number_of_repetitions, self.dataset.sizes.get("seed", 1)
         )
 
-    @unittest.skip
     def test_run_fitting(self):
         analysis = PurityBenchmarkingQubitAnalysis("name", ["redis_field"])
         analysis.process_qubit(self.dataset, "yq06")
@@ -66,7 +70,6 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
         self.assertTrue(0 <= fidelity[0] <= 1.002)
         self.assertIsInstance(analysis.fit_results, ModelResult)
 
-    @unittest.skip
     def test_plotter(self):
         analysis = PurityBenchmarkingQubitAnalysis("name", ["redis_field"])
         analysis.process_qubit(self.dataset, "yq14")

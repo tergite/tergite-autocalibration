@@ -27,7 +27,7 @@ from tergite_autocalibration.utils.extended_coupler_edge import ExtendedComposit
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 
 
-class CZParametrisationFixDuration(BaseMeasurement):
+class CZParametrizationFixDuration(BaseMeasurement):
     def __init__(
         self,
         transmons: dict[str, ExtendedTransmon],

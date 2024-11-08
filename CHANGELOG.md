@@ -5,10 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project follows versions of format `{year}.{month}.{patch_number}`.
 
-## [Unreleased]
+## [0.2.1] - 2023-04-13
 
 ### Added
 - Dataset browser
+
+- Added labels to the colorbar in the 2d plots.
+- Added a search function to the snapshot treeview, allowing users to search for specific keys in the snapshot.
+
+### Bug Fixes
+- Fixed bug where the colorbar levels were sometimes not being set correctly.
+
+## [0.2.0] - 2023-04-12
+
+### Added
+
+- Added splitter to the plot window, allowing users to resize the left and right panels.
+- Made the auto plot windows pop up as active windows on some operating systems.
+- Added colorbar to the 2d plots.
+- Added a warning on selecting an invalid data directory.
+- Added a "Close all plots" action to the browser window under the "File" menu for convenience.
 
 ### Changed
 - Migrated cli from click to typer

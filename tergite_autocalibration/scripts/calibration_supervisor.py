@@ -18,6 +18,7 @@
 # - Martin Ahindura, 2023
 
 from ipaddress import IPv4Address
+from pathlib import Path
 from typing import List, Union
 
 import toml
@@ -82,6 +83,8 @@ class CalibrationSupervisor:
         self.measurement_mode: "MeasurementMode" = measurement_mode
         self.cluster_ip: Union[str, "IPv4Address"] = cluster_ip
         self.cluster_timeout: int = cluster_timeout
+        self.node_name_to_re_analyse = node_name
+        self.data_path = Path(data_path)
 
         # Create objects to communicate with the hardware
         self.cluster: "Cluster" = self._create_cluster()
@@ -92,6 +95,8 @@ class CalibrationSupervisor:
         self.qubits = user_requested_calibration["all_qubits"]
         self.couplers = user_requested_calibration["couplers"]
         self.target_node = user_requested_calibration["target_node"]
+        if self.measurement_mode == MeasurementMode.re_analyse:
+            self.target_node = self.node_name_to_re_analyse
         self.user_samplespace = user_requested_calibration["user_samplespace"]
 
         # Read the device configuration
@@ -259,7 +264,28 @@ class CalibrationSupervisor:
                 else:
                     raise ValueError(f"status: {status}")
 
-        if status == DataStatus.in_spec:
+        if self.measurement_mode == MeasurementMode.re_analyse:
+            print(status)
+            if (
+                node_name == self.node_name_to_re_analyse
+                or status != DataStatus.in_spec
+            ):
+                path = self.data_path
+
+                print(
+                    "\u2691\u2691\u2691 "
+                    + f"{Fore.RED}{Style.BRIGHT}Calibration required for Node {node_name}{Style.RESET_ALL}"
+                )
+                logger.info(f"Calibrating node {node.name}")
+
+                node.calibrate(path, self.lab_ic, self.measurement_mode)
+
+            else:
+                print(
+                    f" \u2714  {Fore.GREEN}{Style.BRIGHT}Node {node_name} in spec{Style.RESET_ALL}"
+                )
+
+        elif status == DataStatus.in_spec:
             print(
                 f" \u2714  {Fore.GREEN}{Style.BRIGHT}Node {node_name} in spec{Style.RESET_ALL}"
             )

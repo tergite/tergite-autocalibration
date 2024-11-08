@@ -10,28 +10,19 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import unittest
-from tergite_autocalibration.tests.utils.env import setup_test_env
-
-setup_test_env()
-
 from pathlib import Path
+import unittest
 
+from numpy import ndarray
 import pytest
 import xarray as xr
-from numpy import ndarray
 
 from tergite_autocalibration.lib.base.analysis import (
-    BaseAllCouplersAnalysis,
-    BaseAllCouplersRepeatAnalysis,
-    BaseAllQubitsRepeatAnalysis,
     BaseAnalysis,
     BaseCouplerAnalysis,
-    BaseNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis import (
     CZParametrisationFixDurationCouplerAnalysis,
-    CZParametrisationFixDurationNodeAnalysis,
     CombinedFrequencyVsAmplitudeAnalysis,
     FrequencyVsAmplitudeQ1Analysis,
     FrequencyVsAmplitudeQ2Analysis,
@@ -39,6 +30,9 @@ from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis impor
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.utils.no_valid_combination_exception import (
     NoValidCombinationException,
 )
+from tergite_autocalibration.tests.utils.env import setup_test_env
+
+setup_test_env()
 
 
 def test_CanCreate():
@@ -190,13 +184,17 @@ def test_PickGoodValueIfSmallestInAbsolute(
 @pytest.fixture(autouse=True)
 def setup_data_mutliple_files():
     # It should be a single dataset, but we do not have one yet, so we loop over existing files
-    dataset_path = Path(__file__).parent / "data" / "dataset_0.hdf5"
+    dataset_path = (
+        Path(__file__).parent
+        / "data"
+        / "dataset_cz_parametrization_fix_duration_0.hdf5"
+    )
     ds = xr.open_dataset(dataset_path, engine="scipy")
     combined_dataset = ds
 
     # combined_dataset = xr.Dataset()
     for i in (1, 2, 3):
-        filename = "dataset_" + str(i) + ".hdf5"
+        filename = "dataset_cz_parametrization_fix_duration_" + str(i) + ".hdf5"
         dataset_path = Path(__file__).parent / "data" / filename
         ds = xr.open_dataset(dataset_path, engine="scipy")
         combined_dataset = xr.merge([combined_dataset, ds])
@@ -209,7 +207,6 @@ def setup_data_mutliple_files():
     return combined_dataset, freqs, amps
 
 
-@unittest.skip
 def test_PickLowestCurrentCompleteAnalysis(
     setup_data_mutliple_files: tuple[xr.Dataset, ndarray, ndarray]
 ):

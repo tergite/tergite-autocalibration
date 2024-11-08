@@ -12,6 +12,7 @@
 # that they have been altered from the originals.
 
 import json
+import numpy as np
 
 import numpy as np
 from quantify_scheduler.json_utils import SchedulerJSONDecoder, SchedulerJSONEncoder
