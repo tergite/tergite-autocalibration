@@ -15,7 +15,7 @@ include:
 
 stages:
   - tests
-  - run_application
+  - application_run
   - post_merge_actions
 
 variables:
