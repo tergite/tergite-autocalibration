@@ -68,6 +68,9 @@ application_run:
     - echo "Listing data files:"
     - ls -R "$CI_PROJECT_DIR/data"
 
+    # Reset redis
+    - echo "y" | acli node reset -a
+    
     # Run the main application command
     - |
       acli calibration start -r "$CI_PROJECT_DIR/datasets/fc8_unit_tests_6-15" -n randomized_benchmarking_ssro
