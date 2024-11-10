@@ -22,6 +22,8 @@ variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   PYTHON_VERSION: "3.10"
   REDIS_PORT: 6378
+  HARDWARE_CONFIG: './data/devices/fc8a/240705_hardware_config_loke_a.json'
+  DEVICE_CONFIG: './data/devices/fc8a/240705_device_config.toml'
 
 tests:
   stage: tests
