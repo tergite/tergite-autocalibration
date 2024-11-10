@@ -24,6 +24,9 @@ variables:
   REDIS_PORT: 6378
   HARDWARE_CONFIG: './data/devices/fc8a/240705_hardware_config_loke_a.json'
   DEVICE_CONFIG: './data/devices/fc8a/240705_device_config.toml'
+  CLUSTER_IP: '192.0.2.141'
+  CLUSTER_NAME: 'clusterA'
+  SPI_SERIAL_PORT: '/dev/ttyACM0'
 
 tests:
   stage: tests
