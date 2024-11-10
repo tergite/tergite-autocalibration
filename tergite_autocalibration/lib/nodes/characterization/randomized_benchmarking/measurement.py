@@ -27,6 +27,7 @@ from tergite_autocalibration.utils.extended_gates import Measure_RO_Opt, Rxy_12
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 from quantify_scheduler.resources import ClockResource
 
+
 class Randomized_Benchmarking_SSRO(BaseMeasurement):
     def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
         super().__init__(transmons)
