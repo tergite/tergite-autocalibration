@@ -71,7 +71,7 @@ class NodeFactory:
             "ro_frequency_three_state_optimization": "RO_frequency_three_state_optimization_Node",
             "ro_amplitude_two_state_optimization": "RO_amplitude_two_state_optimization_Node",
             "ro_amplitude_three_state_optimization": "RO_amplitude_three_state_optimization_Node",
-            "randomized_benchmarking": "RandomizedBenchmarkingSSRONode",
+            "randomized_benchmarking_ssro": "RandomizedBenchmarkingSSRONode",
             "tqg_randomized_benchmarking_ssro": "TQGRandomizedBenchmarkingSSRONode",
             "tqg_randomized_benchmarking_interleaved_ssro": "TQGRandomizedBenchmarkingInterleavedSSRONode",
             "purity_benchmarking": "PurityBenchmarkingNode",
