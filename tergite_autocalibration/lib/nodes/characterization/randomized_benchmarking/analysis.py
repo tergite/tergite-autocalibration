@@ -12,9 +12,6 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-"""
-Module containing classes that model, fit and plot data from a Rabi experiment.
-"""
 import lmfit
 from scipy.linalg import norm
 from scipy.optimize import minimize
@@ -25,7 +22,10 @@ from matplotlib.axes import Axes
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import confusion_matrix
 
-from ....base.analysis import BaseAllQubitsRepeatAnalysis, BaseQubitAnalysis
+from tergite_autocalibration.lib.base.analysis import (
+    BaseQubitAnalysis,
+    BaseAllQubitsRepeatAnalysis,
+)
 from tergite_autocalibration.lib.utils.functions import (
     exponential_decay_function,
 )

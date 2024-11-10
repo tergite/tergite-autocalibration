@@ -15,11 +15,13 @@
 # that they have been altered from the originals.
 
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Dict, List, Union, TYPE_CHECKING
 
 from .reflections import find_inheriting_classes_ast_recursive, import_class_from_file
-from ..base.node import BaseNode
 from ...utils.regex import camel_to_snake
+
+if TYPE_CHECKING:
+    from ..base.node import BaseNode
 
 
 class NodeFactory:
@@ -58,7 +60,7 @@ class NodeFactory:
             "cz_characterisation_chevron": "CZ_Characterisation_Chevron_Node",
             "reset_calibration_ssro": "ResetCalibrationSSRONode",
             "cz_parametrisation_fix_duration": "CZParametrisationFixDurationNode",
-            "process_tomography_ssro": "Process_Tomography_Node",
+            "process_tomography_ssro": "ProcessTomographySSRONode",
             "cz_chevron": "CZ_Chevron_Node",
             "cz_optimize_chevron": "CZ_Optimize_Chevron_Node",
             "cz_calibration_ssro": "CZCalibrationSSRONode",
@@ -81,6 +83,10 @@ class NodeFactory:
         return list(self.node_name_mapping.keys())
 
     def get_node_class(self, node_name: str) -> type["BaseNode"]:
+        # This is to avoid importing BaseNode when calling the factory in the cli
+        global BaseNode
+        from ..base.node import BaseNode
+
         # If the node implementations are not crawled yet, search for them in the nodes module
         if len(self._node_implementation_paths) == 0:
             # TODO: Please not that this implementation will temporarily return also classes that do not extend BaseNode

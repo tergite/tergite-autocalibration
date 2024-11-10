@@ -22,11 +22,10 @@ from quantify_scheduler.schedules.schedule import Schedule
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.control_flow_library import Loop
 import tergite_autocalibration.utils.clifford_elements_decomposition as cliffords
-from tergite_autocalibration.utils.extended_gates import Rxy_12, Measure_RO_Opt
+from tergite_autocalibration.lib.base.measurement import BaseMeasurement
+from tergite_autocalibration.utils.extended_gates import Measure_RO_Opt, Rxy_12
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
-from ....base.measurement import BaseMeasurement
 from quantify_scheduler.resources import ClockResource
-
 
 class Randomized_Benchmarking_SSRO(BaseMeasurement):
     def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):

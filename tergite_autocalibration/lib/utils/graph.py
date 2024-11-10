@@ -58,7 +58,7 @@ graph_dependencies = [
     ("ro_amplitude_three_state_optimization", "cz_characterisation_chevron"),
     ("cz_characterisation_chevron", "cz_chevron"),
     ("resonator_spectroscopy_2", "cz_chevron"),
-    ("resonator_spectroscopy_2", "cz_parametrisation_fix_duration"),
+    ("resonator_spectroscopy_2", "cz_parametrization_fix_duration"),
     ("resonator_spectroscopy_2", "cz_chevron_amplitude"),
     ("resonator_spectroscopy_2", "reset_chevron"),
     ("resonator_spectroscopy_2", "reset_calibration_ssro"),

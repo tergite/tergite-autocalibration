@@ -37,15 +37,7 @@ def configure_dataset(
 
     keys = raw_ds.data_vars.keys()
     measurement_qubits = node.all_qubits
-    schedule_samplespace = node.schedule_samplespace
-    external_samplespace = node.reduced_external_samplespace
-
-    samplespace = schedule_samplespace | external_samplespace
-
-    # if hasattr(node, 'spi_samplespace'):
-    #     spi_samplespace = node.spi_samplespace
-    #     # merge the samplespaces: | is the dictionary merging operator
-    #     samplespace = samplespace | spi_samplespace
+    samplespace = node.schedule_samplespace
 
     sweep_quantities = samplespace.keys()
 
@@ -63,7 +55,6 @@ def configure_dataset(
     elif "ssro" in node.name:
         qubit_states = ["c0", "c1", "c2"]  # for calibration points
 
-    print(node.name)
     # if 'cz_param' in node.name:
     #    print("Here")
     #    return raw_ds
@@ -74,7 +65,6 @@ def configure_dataset(
         coords_dict = {}
         measured_qubit = measurement_qubits[key_indx]
         dimensions = node.dimensions
-        print("node dimenstions are: ", dimensions)
 
         if "ssro" in node.name:
             # TODO: We are not sure about this one
@@ -244,9 +234,9 @@ def save_dataset(
         {"name": node_name, "tuid": measurement_id}
     )
 
+    # to_netcdf doesn't like complex numbers, convert to real/imag to save:
     result_dataset_real = to_real_dataset(result_dataset)
 
-    # to_netcdf doesn't like complex numbers, convert to real/imag to save:
     count = 0
     dataset_name = f"dataset_{node_name}_{count}.hdf5"
     while (data_path / dataset_name).is_file():

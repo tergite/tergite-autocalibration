@@ -12,10 +12,10 @@
 
 import numpy as np
 
+from tergite_autocalibration.lib.base.node import BaseNode
+from tergite_autocalibration.lib.nodes.readout.punchout.analysis import PunchoutAnalysis
+from tergite_autocalibration.lib.nodes.readout.punchout.measurement import Punchout
 from tergite_autocalibration.utils.user_input import resonator_samples
-from .analysis import PunchoutAnalysis
-from .measurement import Punchout
-from ....base.node import BaseNode
 
 
 class Punchout_Node(BaseNode):

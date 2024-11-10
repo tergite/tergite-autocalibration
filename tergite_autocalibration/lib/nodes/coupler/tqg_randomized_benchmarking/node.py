@@ -17,27 +17,18 @@ from ..cz_calibration.node import (
 )
 from ..cz_dynamic_phase.node import CZDynamicPhaseSSRONode, CZDynamicPhaseSwapSSRONode
 
-from .measurement import (
-    TQGRandomizedBenchmarkingSSRO,
-)
-from ...characterization.randomized_benchmarking.analysis import (
+from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.analysis import (
     RandomizedBenchmarkingSSRONodeAnalysis,
 )
-from ....utils.node_subclasses import ParametrizedSweepNode
-from .....config.coupler_config import qubit_types
-
-from pathlib import Path
-import numpy as np
-import optuna
-from datetime import datetime
-import os
-import redis
+from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.measurement import (
+    TQGRandomizedBenchmarkingSSRO,
+)
+from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 
 RB_REPEATS = 10
 
 
-class TQGRandomizedBenchmarkingSSRONode(ParametrizedSweepNode):
-    coupler_qois = ["tqg_fidelity"]
+class TQG_Randomized_Benchmarking_Node(ScheduleNode):
     measurement_obj = TQGRandomizedBenchmarkingSSRO
     analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
 
@@ -146,10 +137,9 @@ class TQGRandomizedBenchmarkingInterleavedSSRONode(ParametrizedSweepNode):
         ]
 
 
-class CZRBOptimizeSSRONode(ParametrizedSweepNode):
+class TQG_Randomized_Benchmarking_Interleaved_Node(ScheduleNode):
     measurement_obj = TQGRandomizedBenchmarkingSSRO
     analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
-    coupler_qois = ["tqg_fidelity_interleaved"]
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords

@@ -15,16 +15,15 @@
 
 import numpy as np
 
-from ....base.node import BaseNode
-from .analysis import (
+from tergite_autocalibration.lib.base.node import BaseNode
+from tergite_autocalibration.lib.nodes.coupler.cz_calibration.analysis import (
     CZCalibrationSSRONodeAnalysis,
     ResetCalibrationSSRONodeAnalysis,
 )
-from .measurement import (
+from tergite_autocalibration.lib.nodes.coupler.cz_calibration.measurement import (
     CZ_calibration_SSRO,
     Reset_calibration_SSRO,
 )
-from ....base.node import BaseNode
 
 
 class CZCalibrationSSRONode(BaseNode):
@@ -106,7 +105,6 @@ class ResetCalibrationSSRONode(BaseNode):
         self.edges = couplers
         self.coupler = couplers[0]
         self.coupled_qubits = couplers[0].split(sep="_")
-        # self.schedule_keywords = kwargs
         self.qubit_state = 2
         self.testing_group = 0  # The edge group to be tested. 0 means all edges.
         self.dynamic = False
