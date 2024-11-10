@@ -78,7 +78,7 @@ application_run:
       qubits = ["q14", "q15",]
       couplers = ["q14_q15"]
       EOL
-    - cp user_input.py $CI_PROJECT_DIR/utils
+    - cp user_input.py $CI_PROJECT_DIR/tergite-autocalibration/utils
 
     # Run the main application command
     - |
