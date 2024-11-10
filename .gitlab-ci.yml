@@ -27,7 +27,6 @@ variables:
   CLUSTER_IP: '192.0.2.141'
   CLUSTER_NAME: 'clusterA'
   SPI_SERIAL_PORT: '/dev/ttyACM0'
-  PLOTTING: "false"
 
 tests:
   stage: tests
