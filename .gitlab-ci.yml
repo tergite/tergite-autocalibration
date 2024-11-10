@@ -46,7 +46,7 @@ tests:
     paths:
       - .cache/pip
 
-run_application:
+application_run:
   stage: application_run
   image: python:${PYTHON_VERSION}
   script:
@@ -61,11 +61,11 @@ run_application:
     
     # Run the main application command
     - |
-      acli calibration start -r "dataset/fc8_unit_tests_6-15" -n randomized_benchmarking_ssro
+      acli calibration start -r "./dataset/fc8_unit_tests_6-15" -n randomized_benchmarking_ssro
 
     # Verify output
     - |
-      OUTPUT_FILE="dataset/fc8_unit_tests_6-15/randomized_benchmarking_ssro.png"
+      OUTPUT_FILE="./dataset/fc8_unit_tests_6-15/randomized_benchmarking_ssro.png"
       if [ -f "$OUTPUT_FILE" ]; then
         echo "Output file $OUTPUT_FILE exists. Application ran successfully."
       else
