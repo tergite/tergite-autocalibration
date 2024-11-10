@@ -70,11 +70,11 @@ application_run:
 
     # Run the main application command
     - |
-      acli calibration start -r "$CI_PROJECT_DIR/dataset/fc8_unit_tests_6-15" -n randomized_benchmarking_ssro
+      acli calibration start -r "$CI_PROJECT_DIR/datasets/fc8_unit_tests_6-15" -n randomized_benchmarking_ssro
 
     # Verify output
     - |
-      OUTPUT_FILE="$CI_PROJECT_DIR/dataset/fc8_unit_tests_6-15/randomized_benchmarking_ssro.png"
+      OUTPUT_FILE="$CI_PROJECT_DIR/datasets/fc8_unit_tests_6-15/randomized_benchmarking_ssro.png"
       if [ -f "$OUTPUT_FILE" ]; then
         echo "Output file $OUTPUT_FILE exists. Application ran successfully."
       else
