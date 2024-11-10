@@ -17,9 +17,12 @@ from time import sleep
 
 import numpy as np
 
-from .analysis import T2NodeAnalysis, T2EchoNodeAnalysis
-from .measurement import T2, T2Echo
-from ....base.node import BaseNode
+from tergite_autocalibration.lib.nodes.characterization.t2.analysis import (
+    T2NodeAnalysis,
+    T2EchoNodeAnalysis,
+)
+from tergite_autocalibration.lib.nodes.characterization.t2.measurement import T2, T2Echo
+from tergite_autocalibration.lib.base.node import BaseNode
 
 
 class T2_Node(BaseNode):

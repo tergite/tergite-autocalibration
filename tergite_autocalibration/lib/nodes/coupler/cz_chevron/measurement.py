@@ -30,7 +30,9 @@ from quantify_scheduler.operations.pulse_library import (
 from quantify_scheduler.resources import ClockResource
 
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
-from tergite_autocalibration.utils.extended_coupler_edge import CompositeSquareEdge
+from tergite_autocalibration.utils.extended_coupler_edge import (
+    ExtendedCompositeSquareEdge,
+)
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 
 
@@ -38,7 +40,7 @@ class CZ_Chevron(BaseMeasurement):
     def __init__(
         self,
         transmons: dict[str, ExtendedTransmon],
-        couplers: dict[str, CompositeSquareEdge],
+        couplers: dict[str, ExtendedCompositeSquareEdge],
         qubit_state: int = 0,
     ):
         super().__init__(transmons)

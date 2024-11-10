@@ -19,10 +19,13 @@ from pathlib import Path
 import numpy as np
 import optuna
 from tergite_autocalibration.lib.utils import redis
-from ..cz_calibration.node import (
+from tergite_autocalibration.lib.nodes.coupler.cz_calibration.node import (
     CZCalibrationSSRONode,
 )
-from ..cz_dynamic_phase.node import CZDynamicPhaseSSRONode, CZDynamicPhaseSwapSSRONode
+from tergite_autocalibration.lib.nodes.coupler.cz_dynamic_phase.node import (
+    CZDynamicPhaseSSRONode,
+    CZDynamicPhaseSwapSSRONode,
+)
 
 from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.analysis import (
     RandomizedBenchmarkingSSRONodeAnalysis,

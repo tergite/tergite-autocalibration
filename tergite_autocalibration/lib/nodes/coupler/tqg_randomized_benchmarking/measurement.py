@@ -19,13 +19,10 @@ from quantify_scheduler.resources import ClockResource
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.control_flow_library import Loop
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
-from tergite_autocalibration.utils.extended_coupler_edge import CompositeSquareEdge
+from tergite_autocalibration.utils.extended_coupler_edge import (
+    ExtendedCompositeSquareEdge,
+)
 from tergite_autocalibration.utils.extended_gates import Rxy_12, Measure_RO_Opt
-from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
-
-from tergite_autocalibration.lib.base.measurement import BaseMeasurement
-from tergite_autocalibration.utils.extended_coupler_edge import CompositeSquareEdge
-from tergite_autocalibration.utils.extended_gates import Rxy_12
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 from tergite_autocalibration.utils.logger.tac_logger import logger
 
@@ -51,7 +48,7 @@ class TQGRandomizedBenchmarkingSSRO(BaseMeasurement):
     def __init__(
         self,
         transmons: dict[str, ExtendedTransmon],
-        couplers: dict[str, CompositeSquareEdge],
+        couplers: dict[str, ExtendedCompositeSquareEdge],
         qubit_state: int = 0,
     ):
         super().__init__(transmons)
