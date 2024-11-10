@@ -12,6 +12,13 @@
 # that they have been altered from the originals.
 
 
+import datetime
+import os
+from pathlib import Path
+
+import numpy as np
+import optuna
+from tergite_autocalibration.lib.utils import redis
 from ..cz_calibration.node import (
     CZCalibrationSSRONode,
 )
@@ -24,11 +31,12 @@ from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.measu
     TQGRandomizedBenchmarkingSSRO,
 )
 from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
+from tergite_autocalibration.config.coupler_config import qubit_types
 
 RB_REPEATS = 10
 
 
-class TQG_Randomized_Benchmarking_Node(ScheduleNode):
+class TQGRandomizedBenchmarkingSSRONode(ScheduleNode):
     measurement_obj = TQGRandomizedBenchmarkingSSRO
     analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
 
@@ -82,7 +90,7 @@ class TQG_Randomized_Benchmarking_Node(ScheduleNode):
         ]
 
 
-class TQGRandomizedBenchmarkingInterleavedSSRONode(ParametrizedSweepNode):
+class TQGRandomizedBenchmarkingInterleavedSSRONode(ScheduleNode):
     coupler_qois = ["tqg_fidelity_interleaved"]
     measurement_obj = TQGRandomizedBenchmarkingSSRO
     analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis

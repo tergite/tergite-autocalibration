@@ -25,7 +25,7 @@ from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.
 from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 
 
-class Randomized_Benchmarking_SSRO_Node(ScheduleNode):
+class RandomizedBenchmarkingSSRONode(ScheduleNode):
     measurement_obj = Randomized_Benchmarking_SSRO
     analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
     qubit_qois = ["fidelity"]

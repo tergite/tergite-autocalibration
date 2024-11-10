@@ -59,7 +59,7 @@ class NodeFactory:
             "reset_chevron": "Reset_Chevron_Node",
             "cz_characterisation_chevron": "CZ_Characterisation_Chevron_Node",
             "reset_calibration_ssro": "ResetCalibrationSSRONode",
-            "cz_parametrisation_fix_duration": "CZParametrisationFixDurationNode",
+            "cz_parametrisation_fix_duration": "CZParametrizationFixDurationNode",
             "process_tomography_ssro": "ProcessTomographySSRONode",
             "cz_chevron": "CZ_Chevron_Node",
             "cz_optimize_chevron": "CZ_Optimize_Chevron_Node",
