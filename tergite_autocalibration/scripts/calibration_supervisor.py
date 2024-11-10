@@ -266,11 +266,13 @@ class CalibrationSupervisor:
                 else:
                     raise ValueError(f"status: {status}")
 
-        if ((
+        if (
             status == DataStatus.in_spec
             and self.measurement_mode == MeasurementMode.re_analyse
-            and self.node_name_to_re_analyse != node_name) or
-            (status == DataStatus.in_spec and self.measurement_mode != MeasurementMode.re_analyse)
+            and self.node_name_to_re_analyse != node_name
+        ) or (
+            status == DataStatus.in_spec
+            and self.measurement_mode != MeasurementMode.re_analyse
         ):
             print(
                 f" \u2714  {Fore.GREEN}{Style.BRIGHT}Node {node_name} in spec{Style.RESET_ALL}"

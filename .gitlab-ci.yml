@@ -70,7 +70,16 @@ application_run:
 
     # Reset redis
     - echo "y" | acli node reset -a
-    
+
+    # Dynamically create a custom user_inputs.py file in the pipeline
+    - |
+      cat <<EOL > user_input.py
+      target_node = "randomized_benchmarking_ssro"
+      qubits = ["q14", "q15",]
+      couplers = ["q14_q15"]
+      EOL
+    - cp user_input.py $CI_PROJECT_DIR/utils
+
     # Run the main application command
     - |
       acli calibration start -r "$CI_PROJECT_DIR/datasets/fc8_unit_tests_6-15" -n randomized_benchmarking_ssro
