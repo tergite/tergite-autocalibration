@@ -22,11 +22,12 @@ variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   PYTHON_VERSION: "3.10"
   REDIS_PORT: 6378
-  HARDWARE_CONFIG: './data/devices/fc8a/240705_hardware_config_loke_a.json'
-  DEVICE_CONFIG: './data/devices/fc8a/240705_device_config.toml'
+  HARDWARE_CONFIG: '$CI_PROJECT_DIR/data/devices/fc8a/240705_hardware_config_loke_a.json'
+  DEVICE_CONFIG: '$CI_PROJECT_DIR/data/devices/fc8a/240705_device_config.toml'
   CLUSTER_IP: '192.0.2.141'
   CLUSTER_NAME: 'clusterA'
   SPI_SERIAL_PORT: '/dev/ttyACM0'
+  PLOTTING: False
 
 tests:
   stage: tests
@@ -64,13 +65,17 @@ application_run:
     # Install project dependencies
     - pip install .
     
+    # Debug: List files to confirm paths
+    - echo "Listing data files:"
+    - ls -R "$CI_PROJECT_DIR/data"
+
     # Run the main application command
     - |
-      acli calibration start -r "./dataset/fc8_unit_tests_6-15" -n randomized_benchmarking_ssro
+      acli calibration start -r "$CI_PROJECT_DIR/dataset/fc8_unit_tests_6-15" -n randomized_benchmarking_ssro
 
     # Verify output
     - |
-      OUTPUT_FILE="./dataset/fc8_unit_tests_6-15/randomized_benchmarking_ssro.png"
+      OUTPUT_FILE="$CI_PROJECT_DIR/dataset/fc8_unit_tests_6-15/randomized_benchmarking_ssro.png"
       if [ -f "$OUTPUT_FILE" ]; then
         echo "Output file $OUTPUT_FILE exists. Application ran successfully."
       else
@@ -78,9 +83,6 @@ application_run:
         exit 1
       fi
 
-  only:
-    - merge_requests
-    - main
   cache:
     paths:
       - .cache/pip
