@@ -79,7 +79,7 @@ application_run:
       couplers = ["q14_q15"]
       EOL
 
-    - ls -R "$CI_PROJECT_DIR/
+    - ls -R "$CI_PROJECT_DIR/"
     - ls -R "$CI_PROJECT_DIR/tergite_autocalibration"
     - ls -R "$CI_PROJECT_DIR/tergite_autocalibration/utils"
 
