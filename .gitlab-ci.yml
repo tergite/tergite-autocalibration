@@ -79,12 +79,12 @@ application_run:
       couplers = ["q14_q15"]
       EOL
 
-    - echo user_input.py
-    - echo $CI_PROJECT_DIR/tergite_autocalibration/utils/user_input.py
+    - cat user_input.py
+    - cat $CI_PROJECT_DIR/tergite_autocalibration/utils/user_input.py
 
     - cp user_input.py $CI_PROJECT_DIR/tergite_autocalibration/utils/
                                       
-    - echo $CI_PROJECT_DIR/tergite_autocalibration/utils/user_input.py
+    - cat $CI_PROJECT_DIR/tergite_autocalibration/utils/user_input.py
 
     # Run the main application command
     - |
