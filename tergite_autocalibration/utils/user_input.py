@@ -111,9 +111,10 @@ user_samplespace = {
 ####################################################################
 target_node = "randomized_benchmarking_ssro"
 qubits = [
-    "q07",
+    "q14",
+    "q15",
 ]  # ["q06", "q07", "q08", "q09", "q10", "q11", "q12", "q13", "q14", "q15"]
-couplers = ["q06_q07"]
+couplers = ["q14_q15"]
 user_samplespace = {
     "resonator_spectroscopy": {
         "ro_frequencies": {qubit: resonator_samples(qubit) for qubit in qubits}
