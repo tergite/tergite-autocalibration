@@ -14,6 +14,7 @@ from ..config.parsers import (
     parse_input_qubit,
 )
 
+
 def test_single_space_separated():
     input_str = "q01 q02 q03"
     expected_output = ["q01", "q02", "q03"]

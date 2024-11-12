@@ -76,7 +76,6 @@ class DataHandler:
             if SPI_CONFIG:
                 cls.spi = toml.load(SPI_CONFIG)
 
-
         return cls._instance
 
     def __init__(self):

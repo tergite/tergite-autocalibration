@@ -307,7 +307,9 @@ def input_qubit_drive_module_mapping():
     for qubit_option_ in qubit_options_:
         option_str_ = f"{qubit_option_}"
         button_ = urwid.Button(option_str_)
-        urwid.connect_signal(button_, "click", on_toggle_qubit_in_drive_module_mapping, qubit_option_)
+        urwid.connect_signal(
+            button_, "click", on_toggle_qubit_in_drive_module_mapping, qubit_option_
+        )
         qubit_choices_.append(urwid.AttrMap(button_, None, focus_map="reversed"))
 
     module_options_ = state["cluster_modules"]
@@ -316,7 +318,9 @@ def input_qubit_drive_module_mapping():
     for module_option_ in module_options_:
         option_str_ = f"{module_option_}"
         button_ = urwid.Button(option_str_)
-        urwid.connect_signal(button_, "click", on_toggle_module_in_drive_module_mapping, module_option_)
+        urwid.connect_signal(
+            button_, "click", on_toggle_module_in_drive_module_mapping, module_option_
+        )
         module_choices_.append(urwid.AttrMap(button_, None, focus_map="reversed"))
 
     button_ = urwid.Button("OK")
