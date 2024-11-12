@@ -14,7 +14,7 @@ import logging
 
 import toml
 
-from .settings import DEVICE_CONFIG
+from .settings import DEVICE_CONFIG, SPI_CONFIG
 
 
 def update_nested(target, updates):
@@ -73,6 +73,10 @@ class DataHandler:
                 _qubit_types[qubit] = qubit_type
             cls._qubit_types = _qubit_types
 
+            if SPI_CONFIG:
+                cls.spi = toml.load(SPI_CONFIG)
+
+
         return cls._instance
 
     def __init__(self):
@@ -130,6 +134,8 @@ class DataHandler:
             }
         elif variable_name == "qubit_types":
             return self._qubit_types
+        elif variable_name == "coupler_spi_mapping":
+            return self.spi["couplers"]
         else:
             logging.warning(
                 f"Cannot return data value for legacy variable: {variable_name}"

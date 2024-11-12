@@ -299,6 +299,16 @@ class CalibrationSupervisor:
             ):
                 path = self.data_path
 
+                # FIXME: This is duplicated above?
+                node: BaseNode = self.calibration_node_factory.create_node(
+                    node_name,
+                    self.qubits,
+                    couplers=self.couplers,
+                    measurement_mode=self.measurement_mode,
+                )
+                if node.name in self.user_samplespace:
+                    update_to_user_samplespace(node, self.user_samplespace)
+
                 print(
                     "\u2691\u2691\u2691 "
                     + f"{Fore.RED}{Style.BRIGHT}Calibration required for Node {node_name}{Style.RESET_ALL}"

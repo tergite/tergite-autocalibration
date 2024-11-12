@@ -14,6 +14,7 @@
 # that they have been altered from the originals.
 
 import abc
+import json
 from collections.abc import Iterable
 from pathlib import Path
 from typing import List, Literal, Optional, Tuple

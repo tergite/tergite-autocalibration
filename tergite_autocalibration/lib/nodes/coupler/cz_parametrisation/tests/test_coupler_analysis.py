@@ -15,7 +15,6 @@ from tergite_autocalibration.tests.utils.env import setup_test_env
 setup_test_env()
 
 from pathlib import Path
-import unittest
 
 from numpy import ndarray
 import pytest

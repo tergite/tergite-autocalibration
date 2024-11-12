@@ -12,7 +12,6 @@
 # that they have been altered from the originals.
 
 import pytest
-import quantify_scheduler.device_under_test.mock_setup as mock
 import toml
 
 from tergite_autocalibration.config import settings

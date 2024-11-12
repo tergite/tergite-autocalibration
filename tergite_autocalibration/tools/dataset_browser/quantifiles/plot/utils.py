@@ -6,10 +6,8 @@ import xarray as xr
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication
 from pyqtgraph.widgets import PlotWidget
-from quantify_core.data.handling import locate_experiment_container, DATASET_NAME
-from quantify_core.data.types import TUID
-
 from quantifiles.watcher import FileMonitor
+from quantify_core.data.handling import locate_experiment_container, DATASET_NAME
 
 
 def set_label(
