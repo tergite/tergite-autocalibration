@@ -38,7 +38,7 @@ from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.utils.dto.extended_coupler_edge import (
     ExtendedCompositeSquareEdge,
 )
-from tergite_autocalibration.utils.dto.extended_gates import Rxy_12
+from tergite_autocalibration.utils.dto.extended_gates import Rxy_12, Measure_RO_3state_Opt
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
@@ -496,7 +496,7 @@ class CZ_calibration_SSRO(BaseMeasurement):
                     this_index = cz_index * number_of_phases + ramsey_index
 
                     shot.add(
-                        Measure_RO_Opt(
+                        Measure_RO_3state_Opt(
                             this_qubit, acq_index=this_index, bin_mode=BinMode.APPEND
                         ),
                         ref_op=buffer_end,
@@ -538,7 +538,7 @@ class CZ_calibration_SSRO(BaseMeasurement):
                     else:
                         raise ValueError("State Input Error")
                     shot.add(
-                        Measure_RO_Opt(
+                        Measure_RO_3state_Opt(
                             this_qubit, acq_index=calib_index, bin_mode=BinMode.APPEND
                         ),
                         ref_op=prep,
@@ -919,7 +919,7 @@ class Reset_calibration_SSRO(BaseMeasurement):
                     this_index = cz_index * number_of_phases + ramsey_index
                     # print(f'{this_index = }')
                     shot.add(
-                        Measure_RO_Opt(
+                        Measure_RO_3state_Opt(
                             this_qubit, acq_index=this_index, bin_mode=BinMode.APPEND
                         ),
                         ref_op=buffer_end,
@@ -963,7 +963,7 @@ class Reset_calibration_SSRO(BaseMeasurement):
                     else:
                         raise ValueError("State Input Error")
                     shot.add(
-                        Measure_RO_Opt(
+                        Measure_RO_3state_Opt(
                             this_qubit, acq_index=calib_index, bin_mode=BinMode.APPEND
                         ),
                         ref_op=prep,

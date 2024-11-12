@@ -67,7 +67,7 @@ class Monitor:
         cluster_mode: "MeasurementMode" = MeasurementMode.real
         parsed_cluster_ip: "IPv4Address" = CLUSTER_IP
         self.supervisor = CalibrationSupervisor(
-            cluster_mode=cluster_mode, cluster_ip=parsed_cluster_ip
+            measurement_mode=cluster_mode, cluster_ip=parsed_cluster_ip
         )
         self.cxn = REDIS_CONNECTION
         self.node_park = self.supervisor.node_factory.create_node.create_node(

@@ -31,7 +31,7 @@ from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.utils.dto.extended_coupler_edge import (
     ExtendedCompositeSquareEdge,
 )
-from tergite_autocalibration.utils.dto.extended_gates import Rxy_12
+from tergite_autocalibration.utils.dto.extended_gates import Rxy_12, Measure_RO_3state_Opt
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
@@ -220,7 +220,7 @@ class Process_Tomography(BaseMeasurement):
 
                     this_index = cz_index * number_of_phases + ramsey_index
                     shot.add(
-                        Measure_RO_Opt(
+                        Measure_RO_3state_Opt(
                             this_qubit, acq_index=this_index, bin_mode=BinMode.APPEND
                         ),
                         # ref_op=end,
@@ -266,7 +266,7 @@ class Process_Tomography(BaseMeasurement):
                     else:
                         raise ValueError("State Input Error")
                     shot.add(
-                        Measure_RO_Opt(
+                        Measure_RO_3state_Opt(
                             this_qubit, acq_index=calib_index, bin_mode=BinMode.APPEND
                         ),
                         ref_op=prep,
