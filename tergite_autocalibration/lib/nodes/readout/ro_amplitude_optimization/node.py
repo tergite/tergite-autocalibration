@@ -13,7 +13,6 @@
 
 import numpy as np
 
-from tergite_autocalibration.lib.base.node import BaseNode
 from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.measurement import (
     RO_amplitude_optimization,
 )
@@ -21,9 +20,10 @@ from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.analysi
     OptimalROTwoStateAmplitudeNodeAnalysis,
     OptimalROThreeStateAmplitudeNodeAnalysis,
 )
+from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 
 
-class RO_amplitude_two_state_optimization_Node(BaseNode):
+class RO_amplitude_two_state_optimization_Node(ScheduleNode):
     measurement_obj = RO_amplitude_optimization
     analysis_obj = OptimalROTwoStateAmplitudeNodeAnalysis
     qubit_qois = [
@@ -55,10 +55,18 @@ class RO_amplitude_two_state_optimization_Node(BaseNode):
         }
 
 
-class RO_amplitude_three_state_optimization_Node(BaseNode):
+class RO_amplitude_three_state_optimization_Node(ScheduleNode):
     measurement_obj = RO_amplitude_optimization
     analysis_obj = OptimalROThreeStateAmplitudeNodeAnalysis
-    qubit_qois = ["measure_3state_opt:ro_ampl_3st_opt", "inv_cm_opt"]
+    qubit_qois = [
+        "measure_3state_opt:pulse_amp",
+        "centroid_I",
+        "centroid_Q",
+        "omega_01",
+        "omega_12",
+        "omega_20",
+        "inv_cm_opt",
+    ]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
@@ -75,7 +83,6 @@ class RO_amplitude_three_state_optimization_Node(BaseNode):
                 qubit: np.tile(np.array([0, 1, 2], dtype=np.int16), self.loops)
                 for qubit in self.all_qubits
             },
-            # FIXME: Check on whether the samplespace can be bigger
             "ro_amplitudes": {
                 qubit: np.append(
                     np.linspace(0.001, 0.025, 5), np.linspace(0.026, 0.2, 5)
