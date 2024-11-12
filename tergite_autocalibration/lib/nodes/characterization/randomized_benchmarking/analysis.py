@@ -12,14 +12,14 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-"""
-Module containing classes that model, fit and plot data from a Rabi experiment.
-"""
 import lmfit
 import numpy as np
 from matplotlib.axes import Axes
 
-from ....base.analysis import BaseAllQubitsRepeatAnalysis, BaseQubitAnalysis
+from tergite_autocalibration.lib.base.analysis import (
+    BaseQubitAnalysis,
+    BaseAllQubitsRepeatAnalysis,
+)
 from tergite_autocalibration.lib.utils.functions import (
     exponential_decay_function,
 )

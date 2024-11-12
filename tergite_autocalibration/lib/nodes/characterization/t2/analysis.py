@@ -15,7 +15,6 @@
 
 import lmfit
 import numpy as np
-import xarray as xr
 from quantify_core.analysis.fitting_models import fft_freq_phase_guess, ExpDecayModel
 
 from tergite_autocalibration.lib.base.analysis import (

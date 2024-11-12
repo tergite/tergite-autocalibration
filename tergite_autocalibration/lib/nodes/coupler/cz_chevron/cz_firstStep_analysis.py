@@ -18,17 +18,17 @@ from typing import Type
 
 import xarray as xr
 
-from .utils.cz_FitResultStatus import (
+from tergite_autocalibration.lib.base.analysis import BaseAnalysis
+from tergite_autocalibration.lib.nodes.coupler.cz_chevron.utils.cz_FitResultStatus import (
     FitResultStatus,
 )
-from .utils.cz_firstStepCombination import (
+from tergite_autocalibration.lib.nodes.coupler.cz_chevron.utils.cz_firstStepCombination import (
     CZFirstStepCombination,
     CZSimpleFitAnalysisResult,
 )
-from .utils.cz_singleGateSimpleFit import (
+from tergite_autocalibration.lib.nodes.coupler.cz_chevron.utils.cz_singleGateSimpleFit import (
     CZSingleGateSimpleFit,
 )
-from ....base.analysis import BaseAnalysis
 
 
 class CZFirstStepAnalysis(BaseAnalysis):

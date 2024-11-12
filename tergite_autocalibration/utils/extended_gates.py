@@ -230,7 +230,7 @@ class Measure_RO2(Measure):
         self._update()
 
 
-class Measure_RO_Opt(Measure):
+class Measure_RO_3state_Opt(Measure):
     def __init__(
         self,
         *qubits: str,
@@ -246,12 +246,14 @@ class Measure_RO_Opt(Measure):
             ]
         ] = None,
         bin_mode: BinMode | None = None,
+        feedback_trigger_label: Optional[str] = None,
+        # **kwargs: Any,
     ):
         super().__init__(qubits[0], acq_index=acq_index, bin_mode=bin_mode)
         plot_func = "quantify_scheduler.calibration_schedules._visualization.circuit_diagram.meter"
         self.data.update(
             {
-                "name": f"Measure_RO_Opt {', '.join(qubits)}",
+                "name": f"Measure_RO_3state_Opt {', '.join(qubits)}",
                 "gate_info": {
                     "unitary": None,
                     "plot_func": plot_func,
@@ -262,6 +264,7 @@ class Measure_RO_Opt(Measure):
                     "bin_mode": bin_mode,
                     "operation_type": "measure_3state_opt",
                     "acq_channel_override": None,
+                    "feedback_trigger_label": feedback_trigger_label,
                 },
             }
         )

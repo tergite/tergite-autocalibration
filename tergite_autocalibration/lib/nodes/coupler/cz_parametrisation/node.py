@@ -12,19 +12,24 @@
 
 import numpy as np
 
-from .....config.settings import REDIS_CONNECTION
-from .analysis import (
-    CZParametrisationFixDurationNodeAnalysis,
+from tergite_autocalibration.config.settings import REDIS_CONNECTION
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis import (
+    CZParametrizationFixDurationNodeAnalysis,
 )
-from .measurement import (
-    CZParametrisationFixDuration,
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.measurement import (
+    CZParametrizationFixDuration,
 )
-from ....utils.node_subclasses import ParametrizedSweepNode
+from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 
 
-class CZParametrisationFixDurationNode(ParametrizedSweepNode):
-    measurement_obj = CZParametrisationFixDuration
-    analysis_obj = CZParametrisationFixDurationNodeAnalysis
+class CZParametrizationFixDurationNode(ScheduleNode):
+    measurement_obj = CZParametrizationFixDuration
+    analysis_obj = CZParametrizationFixDurationNodeAnalysis
+    coupler_qois = [
+        "cz_pulse_frequency",
+        "cz_pulse_amplitude",
+        "cz_parking_current",
+    ]
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
@@ -39,11 +44,6 @@ class CZParametrisationFixDurationNode(ParametrizedSweepNode):
         self.schedule_keywords = schedule_keywords
         self.backup = False
 
-        self.redis_field = [
-            "cz_pulse_frequency",
-            "cz_pulse_amplitude",
-            "cz_parking_current",
-        ]
         self.node_dictionary["cz_pulse_duration"] = (
             120e-9  # Need to make it configurable
         )
