@@ -59,6 +59,13 @@ class ScheduleNode(BaseNode):
 
         return result_dataset
 
+    def generate_dummy_dataset(self) -> xarray.Dataset:
+        result_dataset = xarray.Dataset()
+        """
+        To be implemented by the Node Implementation Classes.
+        """
+        return result_dataset
+
     def measure_schedule_node(
         self,
         cluster_status,
@@ -103,7 +110,6 @@ class ScheduleNode(BaseNode):
                     result_dataset = xarray.combine_by_coords(
                         [result_dataset, ds], data_vars="minimal"
                     )
-
         else:
             """
             This correspond to schedules where the measurement points
