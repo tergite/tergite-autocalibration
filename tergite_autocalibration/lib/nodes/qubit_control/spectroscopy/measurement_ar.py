@@ -1,5 +1,6 @@
 import numpy as np
 from quantify_scheduler.enums import BinMode
+from quantify_scheduler.operations.control_flow_library import Loop
 from quantify_scheduler.operations.gate_library import Measure, Reset, X
 from quantify_scheduler.operations.pulse_factories import long_square_pulse
 from quantify_scheduler.operations.pulse_library import (
@@ -15,6 +16,7 @@ from tergite_autocalibration.utils.extended_gates import Measure_RO1
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 from quantify_scheduler.backends.qblox.operations.gate_library import ConditionalReset
 
+
 class Two_Tones_Multidim_AR(BaseMeasurement):
     def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
         super().__init__(transmons)
@@ -26,26 +28,9 @@ class Two_Tones_Multidim_AR(BaseMeasurement):
         self,
         spec_frequencies: dict[str, np.ndarray],
         spec_pulse_amplitudes: dict[str, np.ndarray] = None,
-        repetitions: int = 1024,
     ) -> Schedule:
-        """
-        Generate a schedule for performing two-tone (qubit) spectroscopy to locate the qubits resonance frequency for multiple qubits.
 
-        Schedule sequence
-            Reset -> Spectroscopy pulse -> Measure
-
-        Parameters
-        ----------
-        repetitions
-            The amount of times the Schedule will be repeated.
-
-        Returns
-        -------
-        :
-            An experiment schedule.
-        """
-
-        schedule = Schedule("multiplexed_qubit_spec_AR", repetitions)
+        schedule = Schedule("multiplexed_qubit_spec_AR", repetitions=1)
 
         # Initialize the clock for each qubit
         # Initialize ClockResource with the first frequency value
@@ -61,7 +46,6 @@ class Two_Tones_Multidim_AR(BaseMeasurement):
             else:
                 raise ValueError(f"Invalid qubit state: {self.qubit_state}")
 
-        # This is the common reference operation so the qubits can be operated in parallel
         qubits = self.transmons.keys()
 
         if self.qubit_state == 0:
@@ -84,8 +68,9 @@ class Two_Tones_Multidim_AR(BaseMeasurement):
             ro_duration = this_transmon.measure.pulse_duration()
             rxy_duration = this_transmon.rxy.duration()
 
-            stagger_time = acq_channel * (364e-9 + ro_duration + rxy_duration)
-            buffer_time = len(qubits) * (364e-9 + ro_duration + rxy_duration)
+            cr_duration = 364e-9 + ro_duration + rxy_duration + 4e-9
+            stagger_time = acq_channel * cr_duration
+            buffer_time = len(qubits) * cr_duration
 
             # long pulses require more efficient memory management
             if spec_pulse_duration > 6.5e-6:
@@ -139,10 +124,15 @@ class Two_Tones_Multidim_AR(BaseMeasurement):
                         raise ValueError(f"Invalid qubit state: {self.qubit_state}")
 
                     # ACTIVE RESET BLOCK, the buffer and stagger times ensure that
-                    # the conditional operations do not overlap
+                    # the conditional operations do not overlap  #################
                     schedule.add(IdlePulse(stagger_time))
                     schedule.add(ConditionalReset(this_qubit, acq_index=2 * this_index))
-                    schedule.add(IdlePulse(buffer_time - stagger_time))
+                    schedule.add(
+                        IdlePulse(4e-9 + buffer_time - stagger_time - cr_duration)
+                    )
+                    print(f"{ stagger_time = }")
+                    print(f"{ 4e-9 + buffer_time - stagger_time -cr_duration = }")
+                    ##############################################################
 
                     schedule.add(
                         SpectroscopyPulse(

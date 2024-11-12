@@ -17,8 +17,7 @@ node reference
   punchout
   resonator_spectroscopy
   qubit_01_spectroscopy
-  qubit_01_spectroscopy_pulsed
-  qubit_01_cw_spectroscopy
+  qubit_01_spectroscopy_AR
   rabi_oscillations
   ramsey_correction
   resonator_spectroscopy_1
@@ -78,7 +77,7 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 
 def qubit_samples(qubit: str, transition: str = "01") -> np.ndarray:
-    qub_spec_samples = 51
+    qub_spec_samples = 11
     sweep_range = 10e6
     if transition == "01":
         VNA_frequency = VNA_qubit_frequencies[qubit]
@@ -105,7 +104,7 @@ user_samplespace = {
 }
 """
 ####################################################################
-target_node = "rabi_oscillations"
+target_node = "qubit_01_spectroscopy_AR"
 qubits = ["q06", "q07", "q08", "q09", "q10"]
 # qubits =   ["q06", "q07", "q08", "q09", "q10", "q11", "q12", "q13", "q14", "q15"]
 couplers = ["q06_q07"]

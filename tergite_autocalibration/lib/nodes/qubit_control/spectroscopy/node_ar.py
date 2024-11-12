@@ -12,6 +12,7 @@
 # that they have been altered from the originals.
 
 import numpy as np
+
 # import xarray
 # from tergite_autocalibration.config.VNA_values import (
 #     VNA_qubit_frequencies,
@@ -20,10 +21,9 @@ import numpy as np
 # from lmfit.models import LorentzianModel
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis import (
     QubitSpectroscopyNodeAnalysis,
-    QubitSpectroscopyNodeMultidim,
 )
-from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement_ar import Two_Tones_Multidim_AR
-    Two_Tones_Multidim,
+from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement_ar import (
+    Two_Tones_Multidim_AR,
 )
 
 # TODO: check input
@@ -33,7 +33,7 @@ from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 
 class Qubit_01_Spectroscopy_Multidim_AR_Node(ScheduleNode):
     measurement_obj = Two_Tones_Multidim_AR
-    analysis_obj = QubitSpectroscopyMultidim
+    analysis_obj = QubitSpectroscopyNodeAnalysis
     qubit_qois = ["clock_freqs:f01", "spec:spec_ampl_optimal"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_kwargs):
@@ -41,7 +41,7 @@ class Qubit_01_Spectroscopy_Multidim_AR_Node(ScheduleNode):
 
         self.schedule_samplespace = {
             "spec_pulse_amplitudes": {
-                qubit: np.linspace(4e-4, 8e-3, 5) for qubit in self.all_qubits
+                qubit: np.linspace(4e-4, 8e-3, 2) for qubit in self.all_qubits
             },
             "spec_frequencies": {
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
