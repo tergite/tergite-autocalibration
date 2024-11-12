@@ -100,6 +100,13 @@ class BaseNode(abc.ABC):
         """
         return result_dataset
 
+    def generate_dummy_dataset(self) -> xarray.Dataset:
+        result_dataset = xarray.Dataset()
+        """
+        To be implemented by the Node Implementation Classes.
+        """
+        return result_dataset
+
     def pre_measurement_operation(self):
         """
         To be implemented by the child measurement nodes
@@ -235,12 +242,16 @@ class BaseNode(abc.ABC):
         schedule_duration = self._calculate_schedule_duration(compiled_schedule)
         self._print_measurement_info(schedule_duration, measurement)
 
-        raw_dataset = execute_schedule(
-            compiled_schedule,
-            schedule_duration,
-            self.lab_instr_coordinator,
-            cluster_status,
-        )
+        if cluster_status == MeasurementMode.real:
+            raw_dataset = execute_schedule(
+                compiled_schedule,
+                schedule_duration,
+                self.lab_instr_coordinator,
+                cluster_status,
+            )
+        elif cluster_status == MeasurementMode.dummy:
+            raw_dataset = self.generate_dummy_dataset()
+
         result_dataset = configure_dataset(raw_dataset, self)
 
         logger.info("Finished measurement")

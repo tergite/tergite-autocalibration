@@ -85,6 +85,8 @@ class ResonatorSpectroscopyQubitAnalysis(BaseQubitAnalysis):
         ax.set_xlabel("Frequency (Hz)")
         ax.set_ylabel("|S21| (V)")
         self.fitting_model.plot_fit(ax, numpoints=400, xlabel=None, title=None)
+        if self.uncertainty is None:
+            self.uncertainty = 0
         ax.axvline(
             self.minimum_freq,
             c="blue",

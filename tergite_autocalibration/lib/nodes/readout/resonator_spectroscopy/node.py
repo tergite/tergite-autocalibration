@@ -11,6 +11,8 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+import xarray
+from tergite_autocalibration.config.VNA_values import VNA_resonator_frequencies
 from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.analysis import (
     ResonatorSpectroscopy1NodeAnalysis,
@@ -20,9 +22,22 @@ from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.analysis i
 from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.measurement import (
     Resonator_Spectroscopy,
 )
+import numpy as np
+from quantify_core.analysis import fitting_models as fm
 
 # TODO: check location
 from tergite_autocalibration.utils.user_input import resonator_samples
+
+
+class Resonator_Spectroscopy_Base(ScheduleNode):
+    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
+
+        self.schedule_samplespace = {
+            "ro_frequencies": {
+                qubit: resonator_samples(qubit) for qubit in self.all_qubits
+            }
+        }
 
 
 class Resonator_Spectroscopy_Node(ScheduleNode):
@@ -38,6 +53,37 @@ class Resonator_Spectroscopy_Node(ScheduleNode):
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             }
         }
+
+    def generate_dummy_dataset(self):
+        dataset = xarray.Dataset()
+        resonator = fm.ResonatorModel()
+        for index, qubit in enumerate(self.all_qubits):
+            ro_freq = VNA_resonator_frequencies[qubit]
+            # if qubit == 'q02':
+            #     ro_freq = ro_freq + 10e6
+            true_params = resonator.make_params(
+                fr=ro_freq,
+                Ql=15000,
+                Qe=20000,
+                A=0.01,
+                theta=0.5,
+                phi_v=0,
+                phi_0=0,
+                # f_0=ro_freq, Q=10000, Q_e_real=9000, Q_e_imag=-9000
+            )
+            samples = resonator_samples(qubit)
+            number_of_samples = len(samples)
+            frequncies = np.linspace(samples[0], samples[-1], number_of_samples)
+            true_s21 = resonator.eval(params=true_params, f=frequncies)
+            noise_scale = 0.0001
+            np.random.seed(123)
+            measured_s21 = true_s21 + 1 * noise_scale * (
+                np.random.randn(number_of_samples)
+                + 1j * np.random.randn(number_of_samples)
+            )
+            data_array = xarray.DataArray(measured_s21)
+            dataset[index] = data_array
+        return dataset
 
 
 class Resonator_Spectroscopy_1_Node(ScheduleNode):

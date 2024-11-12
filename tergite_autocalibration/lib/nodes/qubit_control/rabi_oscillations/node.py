@@ -14,6 +14,7 @@
 # that they have been altered from the originals.
 
 import numpy as np
+import xarray
 
 from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 
@@ -25,6 +26,7 @@ from tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.measureme
     N_Rabi_Oscillations,
     Rabi_Oscillations,
 )
+from lmfit.models import SineModel
 
 
 class Rabi_Oscillations_Node(ScheduleNode):
@@ -39,6 +41,24 @@ class Rabi_Oscillations_Node(ScheduleNode):
                 qubit: np.linspace(0.002, 0.90, 61) for qubit in self.all_qubits
             }
         }
+
+    def generate_dummy_dataset(self):
+        rabi = SineModel()
+        dataset = xarray.Dataset()
+        for index, qubit in enumerate(self.all_qubits):
+            samples = self.schedule_samplespace["mw_amplitudes"][qubit]
+            true_params = rabi.make_params(amplitude=0.2, frequency=10, shift=0)
+            true_s21 = rabi.eval(params=true_params, x=samples)
+            noise_scale = 0.02
+            np.random.seed(123)
+            measured_s21 = np.abs(true_s21)
+            # measured_s21 = true_s21 + 0 * noise_scale * (
+            #     np.random.randn(number_of_samples)
+            #     + 1j * np.random.randn(number_of_samples)
+            # )
+            data_array = xarray.DataArray(measured_s21)
+            dataset[index] = data_array
+        return dataset
 
 
 class Rabi_Oscillations_12_Node(ScheduleNode):

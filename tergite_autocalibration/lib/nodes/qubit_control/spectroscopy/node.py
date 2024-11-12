@@ -12,11 +12,17 @@
 # that they have been altered from the originals.
 
 import numpy as np
+import xarray
 
+from tergite_autocalibration.config.VNA_values import (
+    VNA_qubit_frequencies,
+    VNA_f12_frequencies,
+)
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis import (
     QubitSpectroscopyNodeAnalysis,
     QubitSpectroscopyNodeMultidim,
 )
+from lmfit.models import LorentzianModel
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement import (
     Two_Tones_Multidim,
 )
@@ -36,12 +42,42 @@ class Qubit_01_Spectroscopy_Multidim_Node(ScheduleNode):
 
         self.schedule_samplespace = {
             "spec_pulse_amplitudes": {
-                qubit: np.linspace(4e-4, 8e-3, 5) for qubit in self.all_qubits
+                qubit: np.linspace(4e-4, 8e-3, 3) for qubit in self.all_qubits
             },
             "spec_frequencies": {
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
             },
         }
+
+    def generate_dummy_dataset(self):
+        peak = LorentzianModel()
+        dataset = xarray.Dataset()
+        first_qubit = self.all_qubits[0]
+        number_of_amplitudes = len(
+            self.schedule_samplespace["spec_pulse_amplitudes"][first_qubit]
+        )
+        for index, qubit in enumerate(self.all_qubits):
+            qubit_freq = VNA_qubit_frequencies[qubit]
+            true_params = peak.make_params(
+                amplitude=0.2, center=qubit_freq, sigma=0.3e6
+            )
+            samples = qubit_samples(qubit)
+            number_of_samples = len(samples)
+            frequncies = np.linspace(samples[0], samples[-1], number_of_samples)
+            true_s21 = peak.eval(params=true_params, x=frequncies)
+            noise_scale = 0.001
+
+            np.random.seed(123)
+            measured_s21 = true_s21 + 0 * noise_scale * (
+                np.random.randn(number_of_samples)
+                + 1j * np.random.randn(number_of_samples)
+            )
+            measured_s21 = np.repeat(measured_s21, number_of_amplitudes)
+            data_array = xarray.DataArray(measured_s21)
+
+            # Add the DataArray to the Dataset with an integer name (converted to string)
+            dataset[index] = data_array
+        return dataset
 
 
 class Qubit_12_Spectroscopy_Pulsed_Node(ScheduleNode):

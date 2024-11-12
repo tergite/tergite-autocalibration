@@ -105,11 +105,9 @@ user_samplespace = {
 }
 """
 ####################################################################
-target_node = "resonator_spectroscopy"
-qubits = [
-    "q01",
-    "q02",
-]  # ["q06", "q07", "q08", "q09", "q10", "q11", "q12", "q13", "q14", "q15"]
+target_node = "rabi_oscillations"
+qubits = ["q06", "q07", "q08", "q09", "q10"]
+# qubits =   ["q06", "q07", "q08", "q09", "q10", "q11", "q12", "q13", "q14", "q15"]
 couplers = ["q06_q07"]
 user_samplespace = {
     "resonator_spectroscopy": {
