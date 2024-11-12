@@ -36,16 +36,16 @@ If you need to test some complex scenario, such as those involving sweep, it is 
 ### Test class type
 ```python
 def test_canCreateCorrectType():
-    c = CZ_Parametrisation_Fix_Duration_Node("cz_char_fixCurrent", couplers = ["q14_q15"])
-    assert isinstance(c, CZ_Parametrisation_Fix_Duration_Node)
-    assert isinstance(c, ParametrizedSweepNode)
+    c = CZ_Parametrization_Fix_Duration_Node("cz_char_fixCurrent", couplers = ["q14_q15"])
+    assert isinstance(c, CZ_Parametrization_Fix_Duration_Node)
+    assert isinstance(c, ScheduleNode)
 ```
 The suggested very first test is to istantiate the class and make sure it has the correct type(s) following any inheritance.
 
 ### Test input parameters
 ```python
 def test_CanGetQubitsFromCouplers():
-    c = CZ_Parametrisation_Fix_Duration_Node("cz_char_fixCurrent", couplers = ["q14_q15"])
+    c = CZ_Parametrization_Fix_Duration_Node("cz_char_fixCurrent", couplers = ["q14_q15"])
     assert c.all_qubits == ["q14", "q15"]
     assert c.couplers == ['q14_q15']
 ```
@@ -55,7 +55,7 @@ Make sure all inputs and their manipulations are correctly initialised in the co
 ```python
 def test_ValidationReturnErrorWithSameQubitCoupler():
     with pytest.raises(ValueError):
-       CZ_Parametrisation_Fix_Duration_Node("cz_char_fixCurrent", couplers = ["q14_q14"])
+       CZ_Parametrization_Fix_Duration_Node("cz_char_fixCurrent", couplers = ["q14_q14"])
 ```
 Inputs can be incorrect and should always be tested to avoid unexpected behaviour down the line which can be difficult to trace back to the origin. There are infinite number of possible errors, so it is impossible to cover them all, but at least the obvious ones should be considered. In this case a typical typing error with the couple have the same qubit twice.
 

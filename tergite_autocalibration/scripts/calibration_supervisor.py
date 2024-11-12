@@ -18,6 +18,7 @@
 # - Martin Ahindura, 2023
 
 from ipaddress import IPv4Address
+from pathlib import Path
 from typing import List, Union
 
 from colorama import Fore, Style
@@ -77,6 +78,8 @@ class CalibrationSupervisor:
         self.measurement_mode: "MeasurementMode" = measurement_mode
         self.cluster_ip: Union[str, "IPv4Address"] = cluster_ip
         self.cluster_timeout: int = cluster_timeout
+        self.node_name_to_re_analyse = node_name
+        self.data_path = Path(data_path)
 
         # Create objects to communicate with the hardware
         self.cluster: "Cluster" = self._create_cluster()
@@ -87,6 +90,8 @@ class CalibrationSupervisor:
         self.qubits = CONFIG.qubits
         self.couplers = CONFIG.couplers
         self.target_node = CONFIG.target_node
+        if self.measurement_mode == MeasurementMode.re_analyse:
+            self.target_node = self.node_name_to_re_analyse
         self.user_samplespace = CONFIG.user_samplespace
         self.measurement_mode = self.cluster_mode
 
@@ -174,24 +179,9 @@ class CalibrationSupervisor:
             logger.info(f"{calibration_node} node is completed")
 
     def inspect_node(self, node_name: str):
+        # TODO: this function must be split
         logger.info(f"Inspecting node {node_name}")
-
-        node: BaseNode = self.calibration_node_factory.create_node(
-            node_name,
-            self.qubits,
-            couplers=self.couplers,
-            measurement_mode=self.measurement_mode,
-        )
-
-        if node.name in self.user_samplespace:
-            update_to_user_samplespace(node, self.user_samplespace)
-
-        # it's maybe useful to give access to the ic
-        node.lab_instr_coordinator = self.lab_ic
-
         populate_initial_parameters(self.qubits, self.couplers, REDIS_CONNECTION)
-        # print(f'{node_name = }')
-        # print(f'{self.couplers = }')
         if node_name in [
             "coupler_spectroscopy",
             "cz_chevron",
@@ -201,6 +191,8 @@ class CalibrationSupervisor:
             "cz_calibration_swap_ssro",
             "cz_dynamic_phase",
             "cz_dynamic_phase_swap",
+            "reset_chevron",
+            "process_tomography_ssro",
             "tqg_randomized_benchmarking",
             "tqg_randomized_benchmarking_interleaved",
         ]:
@@ -208,7 +200,7 @@ class CalibrationSupervisor:
                 REDIS_CONNECTION.hget(f"cs:{coupler}", node_name) == "calibrated"
                 for coupler in self.couplers
             ]
-            # print(f'{coupler_statuses=}')
+
             # node is calibrated only when all couplers have the node calibrated:
             is_node_calibrated = all(coupler_statuses)
         else:
@@ -229,7 +221,6 @@ class CalibrationSupervisor:
 
         # Check Redis if node is calibrated
         status = DataStatus.undefined
-
         if node_name in [
             "coupler_spectroscopy",
             "cz_chevron",
@@ -243,6 +234,8 @@ class CalibrationSupervisor:
             "cz_calibration_swap_ssro",
             "cz_dynamic_phase",
             "cz_dynamic_phase_swap",
+            "reset_chevron",
+            "process_tomography_ssro",
             "tqg_randomized_benchmarking",
             "tqg_randomized_benchmarking_interleaved",
         ]:
@@ -270,25 +263,52 @@ class CalibrationSupervisor:
                 else:
                     raise ValueError(f"status: {status}")
 
-        if status == DataStatus.in_spec:
-            print(
-                f" \u2714  {Fore.GREEN}{Style.BRIGHT}Node {node_name} in spec{Style.RESET_ALL}"
-            )
-            return
-
-        elif status == DataStatus.out_of_spec:
+        if status == DataStatus.out_of_spec:
             print(
                 "\u2691\u2691\u2691 "
                 + f"{Fore.RED}{Style.BRIGHT}Calibration required for Node {node_name}{Style.RESET_ALL}"
             )
+
+            node: BaseNode = self.calibration_node_factory.create_node(
+                node_name,
+                self.qubits,
+                couplers=self.couplers,
+                measurement_mode=self.measurement_mode,
+            )
+            if node.name in self.user_samplespace:
+                update_to_user_samplespace(node, self.user_samplespace)
+            # it's maybe useful to give access to the ic
+            node.lab_instr_coordinator = self.lab_ic
+
             logger.info(f"Calibrating node {node.name}")
             # TODO: This could be in the node initializer
             data_path = create_node_data_path(node)
-            measurement_result = node.calibrate(
-                data_path, self.lab_ic, self.measurement_mode
-            )
+            if self.measurement_mode == MeasurementMode.re_analyse:
+                data_path = self.data_path
+            measurement_result = node.calibrate(data_path, self.measurement_mode)
 
             # TODO:  develop failure strategies ->
             # if node_calibration_status == DataStatus.out_of_spec:
             #     node_expand()
             #     node_calibration_status = self.calibrate_node(node)
+
+        elif self.measurement_mode == MeasurementMode.re_analyse:
+            if (
+                node_name == self.node_name_to_re_analyse
+                or status != DataStatus.in_spec
+            ):
+                path = self.data_path
+
+                print(
+                    "\u2691\u2691\u2691 "
+                    + f"{Fore.RED}{Style.BRIGHT}Calibration required for Node {node_name}{Style.RESET_ALL}"
+                )
+                logger.info(f"Calibrating node {node_name}")
+
+                node.calibrate(path, self.lab_ic, self.measurement_mode)
+
+        elif status == DataStatus.in_spec:
+            print(
+                f" \u2714  {Fore.GREEN}{Style.BRIGHT}Node {node_name} in spec{Style.RESET_ALL}"
+            )
+            return

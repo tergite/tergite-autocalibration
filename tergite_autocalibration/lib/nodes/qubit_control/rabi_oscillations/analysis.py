@@ -22,6 +22,10 @@ from quantify_core.analysis.fitting_models import fft_freq_phase_guess
 
 from tergite_autocalibration.utils.backend.redis_utils import fetch_redis_params
 from ....base.analysis import BaseAllQubitsAnalysis, BaseQubitAnalysis
+from tergite_autocalibration.lib.base.analysis import (
+    BaseAllQubitsAnalysis,
+    BaseQubitAnalysis,
+)
 
 
 # Cosine function that is fit to Rabi oscillations

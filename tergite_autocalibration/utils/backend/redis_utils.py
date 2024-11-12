@@ -15,6 +15,8 @@ import toml
 from tergite_autocalibration.config import settings
 from tergite_autocalibration.config.data import dh
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
+
+
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 
 
@@ -102,7 +104,6 @@ def populate_active_reset_parameters(
     # Populate the Redis database with the initial active reset
     # parameter values from the toml file
     for qubit in qubits:
-
         # parameter specific to each qubit:
         for module_key, module_value in ar_qubit_parameters[qubit].items():
             if isinstance(module_value, dict):
@@ -167,7 +168,7 @@ def populate_quantities_of_interest(
     # Populate the Redis database with the quantities of interest, at Nan value
     # Only if the key does NOT already exist
     for node_name in calibration_nodes:
-        node = calibration_node_factory.node_implementations[node_name]
+        node = calibration_node_factory.get_node_class(node_name)
         qubit_qois = node.qubit_qois
         if qubit_qois is not None:
             for qubit in qubits:

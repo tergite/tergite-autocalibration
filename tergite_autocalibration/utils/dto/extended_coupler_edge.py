@@ -168,7 +168,7 @@ class EdgeClocksFrequencies(InstrumentChannel):
         )
 
 
-class CompositeSquareEdge(Edge):
+class ExtendedCompositeSquareEdge(Edge):
     """
     An example Edge implementation which connects two BasicTransmonElements within a
     QuantumDevice. This edge implements a square flux pulse and two virtual z

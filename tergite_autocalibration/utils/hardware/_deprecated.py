@@ -19,6 +19,12 @@ from qblox_instruments import Cluster
 
 from tergite_autocalibration.config.settings import CLUSTER_CONFIG
 
+from colorama import Fore
+from colorama import Style
+from colorama import init as colorama_init
+
+colorama_init()
+
 
 def extract_cluster_port_mapping(qubit: str) -> Dict[str, str]:
     """

@@ -15,11 +15,15 @@
 
 import numpy as np
 
-from .....config.settings import REDIS_CONNECTION
-from ....base.node import BaseNode
-from .cz_chevron_analysis import CZChevronAnalysis
-from .cz_firstStep_analysis import CZFirstStepAnalysis
-from .measurement import CZ_Chevron
+from tergite_autocalibration.config.settings import REDIS_CONNECTION
+from tergite_autocalibration.lib.base.node import BaseNode
+from tergite_autocalibration.lib.nodes.coupler.cz_chevron.cz_chevron_analysis import (
+    CZChevronAnalysis,
+)
+from tergite_autocalibration.lib.nodes.coupler.cz_chevron.cz_firstStep_analysis import (
+    CZFirstStepAnalysis,
+)
+from tergite_autocalibration.lib.nodes.coupler.cz_chevron.measurement import CZ_Chevron
 
 
 class CZ_Chevron_Node(BaseNode):

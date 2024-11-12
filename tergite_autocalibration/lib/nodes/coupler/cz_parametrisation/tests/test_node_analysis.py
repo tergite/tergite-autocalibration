@@ -17,7 +17,7 @@ import xarray as xr
 from numpy import ndarray
 
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis import (
-    CZParametrisationFixDurationNodeAnalysis,
+    CZParametrizationFixDurationNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.utils.no_valid_combination_exception import (
     NoValidCombinationException,
@@ -28,12 +28,12 @@ from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.utils.no_valid
 def setup_data_mutliple_files():
     # It should be a single dataset, but we do not have one yet, so we loop over existing files
     dataset_path = Path(__file__).parent / "data"  # / "dataset_fix_time_0.hdf5"
-    node_analysis = CZParametrisationFixDurationNodeAnalysis("name", ["redis_field"])
+    node_analysis = CZParametrizationFixDurationNodeAnalysis("name", ["redis_field"])
     return node_analysis
 
 
 def test_InitSetDataMember(
-    setup_data_mutliple_files: CZParametrisationFixDurationNodeAnalysis,
+    setup_data_mutliple_files: CZParametrizationFixDurationNodeAnalysis,
 ):
     node_analysis = setup_data_mutliple_files
 

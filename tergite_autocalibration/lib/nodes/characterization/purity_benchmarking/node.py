@@ -12,12 +12,16 @@
 
 import numpy as np
 
-from .analysis import PurityBenchmarkingNodeAnalysis
-from .measurement import PurityBenchmarking
-from ....utils.node_subclasses import ParametrizedSweepNode
+from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.analysis import (
+    PurityBenchmarkingNodeAnalysis,
+)
+from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.measurement import (
+    PurityBenchmarking,
+)
+from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 
 
-class PurityBenchmarkingNode(ParametrizedSweepNode):
+class PurityBenchmarkingNode(ScheduleNode):
     measurement_obj = PurityBenchmarking
     analysis_obj = PurityBenchmarkingNodeAnalysis
     qubit_qois = ["purity_fidelity"]

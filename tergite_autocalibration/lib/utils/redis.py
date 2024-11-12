@@ -13,14 +13,20 @@
 # that they have been altered from the originals.
 
 import json
+import numpy as np
 
-from quantify_scheduler.json_utils import SchedulerJSONEncoder, SchedulerJSONDecoder
+import numpy as np
+from quantify_scheduler.json_utils import SchedulerJSONDecoder, SchedulerJSONEncoder
 
 from tergite_autocalibration.config.data import dh
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
 from tergite_autocalibration.utils.dto import extended_transmon_element
-from tergite_autocalibration.utils.dto.extended_coupler_edge import CompositeSquareEdge
+from tergite_autocalibration.utils.dto.extended_coupler_edge import (
+    ExtendedCompositeSquareEdge,
+)
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
+
+np.set_printoptions(legacy="1.25")
 
 
 def load_redis_config(transmon: ExtendedTransmon, channel: int):
@@ -65,7 +71,7 @@ def load_redis_config(transmon: ExtendedTransmon, channel: int):
     return transmon
 
 
-def load_redis_config_coupler(coupler: CompositeSquareEdge):
+def load_redis_config_coupler(coupler: ExtendedCompositeSquareEdge):
     bus = coupler.name
     bus_qubits = bus.split("_")
     redis_config = REDIS_CONNECTION.hgetall(f"couplers:{bus}")
@@ -83,6 +89,23 @@ def load_redis_config_coupler(coupler: CompositeSquareEdge):
             )
             coupler.cz.child_phase_correction(float(redis_config["cz_dynamic_target"]))
     except:
-        print(f"No coupler configuration found for {bus}")
+        # print(f"No coupler configuration found for {bus}")
         pass
-    return
+    return coupler
+
+
+def update_redis_values(node_name: str, qoi_results: dict[str, dict]):
+    for element, redis_fields_values in qoi_results.items():
+        if "_" in element:
+            name = "couplers"
+        else:
+            name = "transmons"
+        for field, value in redis_fields_values.items():
+            # Setting the value in the tergite-autocalibration-lite format
+            REDIS_CONNECTION.hset(f"{name}:{element}", field, value)
+            # Setting the value in the standard redis storage
+            # structured_redis_storage(
+            #     transmon_parameter, element.strip("q"), self._qoi[i]
+            # )
+            REDIS_CONNECTION.hset(f"cs:{element}", node_name, "calibrated")
+    pass

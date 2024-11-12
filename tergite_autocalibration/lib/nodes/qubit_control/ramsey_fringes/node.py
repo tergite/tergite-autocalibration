@@ -15,9 +15,14 @@
 
 import numpy as np
 
-from .analysis import RamseyDetunings01NodeAnalysis, RamseyDetunings12NodeAnalysis
-from .measurement import Ramsey_detunings
-from ....base.node import BaseNode
+from tergite_autocalibration.lib.base.node import BaseNode
+from tergite_autocalibration.lib.nodes.qubit_control.ramsey_fringes.analysis import (
+    RamseyDetunings01NodeAnalysis,
+    RamseyDetunings12NodeAnalysis,
+)
+from tergite_autocalibration.lib.nodes.qubit_control.ramsey_fringes.measurement import (
+    Ramsey_detunings,
+)
 
 
 class Ramsey_Fringes_12_Node(BaseNode):

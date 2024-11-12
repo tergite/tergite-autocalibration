@@ -27,7 +27,7 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import confusion_matrix
 
 from tergite_autocalibration.config.data import dh
-from ....base.analysis import BaseAnalysis
+from tergite_autocalibration.lib.base.analysis import BaseAnalysis
 
 
 # Cosine function that is fit to Rabi oscillations
