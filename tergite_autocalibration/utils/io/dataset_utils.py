@@ -13,16 +13,15 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+import pathlib
 from collections.abc import Iterable
 from datetime import datetime
-import pathlib
 from uuid import uuid4
 
 import numpy as np
 import xarray
 
 from tergite_autocalibration.config.settings import DATA_DIR
-from tergite_autocalibration.utils.logger.tac_logger import logger
 
 
 def configure_dataset(

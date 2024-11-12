@@ -32,20 +32,12 @@ from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
 )
 
 from tergite_autocalibration.config import settings
-from tergite_autocalibration.config.settings import REDIS_CONNECTION, CLUSTER_CONFIG
+from tergite_autocalibration.config.settings import CLUSTER_CONFIG
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.lib.utils.device import DeviceConfiguration
 from tergite_autocalibration.lib.utils.schedule_execution import execute_schedule
-from tergite_autocalibration.utils.dataset_utils import configure_dataset, save_dataset
-from tergite_autocalibration.lib.utils.redis import (
-    load_redis_config,
-    load_redis_config_coupler,
-)
-from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
-from tergite_autocalibration.utils.dto.extended_coupler_edge import CompositeSquareEdge
-from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 from tergite_autocalibration.utils.io.dataset_utils import configure_dataset, save_dataset
 from tergite_autocalibration.utils.logger.tac_logger import logger
 

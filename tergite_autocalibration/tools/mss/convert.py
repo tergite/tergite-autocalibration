@@ -20,12 +20,11 @@
 # this file can be discarded when no mapping would be
 # necessary.
 
-import warnings
 from typing import List, Any
 
 import tergite_autocalibration.tools.mss.storage as store
-from tergite_autocalibration.tools.mss.bcc_logger import get_logger
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
+from tergite_autocalibration.tools.mss.bcc_logger import get_logger
 
 logger = get_logger()
 

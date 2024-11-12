@@ -404,7 +404,7 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
         # secondary_axis.legend(handles=handles, fontsize="small")
 
     @abstractmethod
-    def analyze_coupler():
+    def analyze_coupler(self):
         pass
 
 

@@ -10,9 +10,6 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import csv
-import json
-
 
 class HW_Config_Generator:
     def __init__(

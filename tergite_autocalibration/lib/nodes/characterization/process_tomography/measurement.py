@@ -31,7 +31,7 @@ from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.utils.dto.extended_coupler_edge import (
     ExtendedCompositeSquareEdge,
 )
-from tergite_autocalibration.utils.dto.extended_gates import Measure_RO_3state_Opt, Rxy_12
+from tergite_autocalibration.utils.dto.extended_gates import Rxy_12
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 

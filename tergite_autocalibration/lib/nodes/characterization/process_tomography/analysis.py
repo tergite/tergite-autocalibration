@@ -15,7 +15,6 @@
 import itertools
 
 import numpy as np
-import xarray as xr
 from matplotlib import pyplot as plt
 from numpy.linalg import inv
 from scipy.linalg import norm

@@ -15,7 +15,7 @@ import numpy as np
 from tergite_autocalibration.lib.base.node import BaseNode
 from tergite_autocalibration.lib.nodes.readout.punchout.analysis import PunchoutAnalysis
 from tergite_autocalibration.lib.nodes.readout.punchout.measurement import Punchout
-from tergite_autocalibration.utils.samplespace import resonator_samples
+from tergite_autocalibration.lib.utils.samplespace import resonator_samples
 
 
 class Punchout_Node(BaseNode):

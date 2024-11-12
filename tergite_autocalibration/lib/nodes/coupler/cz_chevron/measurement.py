@@ -16,6 +16,7 @@
 Module containing a schedule class for Ramsey calibration. (1D parameter sweep, for 2D see ramsey_detunings.py)
 """
 import numpy as np
+from quantify_scheduler import Schedule
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.gate_library import Measure, Reset, X
 from quantify_scheduler.operations.pulse_library import (
@@ -53,7 +54,7 @@ class CZ_Chevron(BaseMeasurement):
         cz_pulse_frequencies: dict[str, np.ndarray],
         cz_pulse_amplitudes: dict[str, np.ndarray],
         repetitions: int = 1024,
-    ) -> Schedule:
+    ) -> "Schedule":
         """
         Generate a schedule for performing a Ramsey fringe measurement on multiple qubits.
         Can be used both to finetune the qubit frequency and to measure the qubit dephasing time T_2. (1D parameter sweep)
