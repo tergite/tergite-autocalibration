@@ -38,6 +38,7 @@ class Qubit_01_Spectroscopy_Multidim_AR_Node(ScheduleNode):
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_kwargs):
         super().__init__(name, all_qubits, **schedule_kwargs)
+        self.is_ar = True
 
         self.schedule_samplespace = {
             "spec_pulse_amplitudes": {

@@ -57,6 +57,7 @@ class BaseNode(abc.ABC):
         self.all_qubits = all_qubits
         self.node_dictionary = node_dictionary
         self.backup = False
+        self.is_ar = False
         self.qubit_state = 0  # can be 0 or 1 or 2
         self.plots_per_qubit = 1  # can be 0 or 1 or 2
         self.couplers: Optional[List[str] | None] = None

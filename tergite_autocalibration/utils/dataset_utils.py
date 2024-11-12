@@ -107,6 +107,9 @@ def configure_dataset(
 
         data_values = raw_ds[key].values
 
+        if node.is_ar:
+            data_values = filter_ar_acquisitions(data_values)
+
         reshaping = reversed(node.dimensions)
         if "ssro" in node.name:
             reshaping = np.array([shots])
@@ -137,6 +140,10 @@ def configure_dataset(
         dataset.attrs["elements"].append(element)
 
     return dataset
+
+
+def filter_ar_acquisitions(data_array: np.ndarray) -> np.ndarray:
+    pass
 
 
 def to_real_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
