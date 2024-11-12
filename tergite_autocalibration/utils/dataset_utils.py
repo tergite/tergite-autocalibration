@@ -108,7 +108,9 @@ def configure_dataset(
         data_values = raw_ds[key].values
 
         if node.is_ar:
-            data_values = filter_ar_acquisitions(data_values)
+            # In AR the even indices capture the controled reset
+            # aqcuisitions and should be discarded
+            data_values = data_values[1::2]
 
         reshaping = reversed(node.dimensions)
         if "ssro" in node.name:
@@ -142,8 +144,6 @@ def configure_dataset(
     return dataset
 
 
-def filter_ar_acquisitions(data_array: np.ndarray) -> np.ndarray:
-    pass
 
 
 def to_real_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
