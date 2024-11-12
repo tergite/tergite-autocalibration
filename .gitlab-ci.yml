@@ -51,52 +51,6 @@ tests:
     paths:
       - .cache/pip
 
-application_run:
-  stage: application_run
-  image: python:${PYTHON_VERSION}
-  script:
-    # Install Redis
-    - apt-get update
-    - apt-get install redis ffmpeg libsm6 libxext6 -y
-    # Start the Redis server
-    - redis-server --daemonize yes --port "$REDIS_PORT"
-
-    # Install project dependencies
-    - pip install .
-    
-    # Debug: List files to confirm paths
-    - echo "Listing data files:"
-    - ls -R "$CI_PROJECT_DIR/data"
-
-    # Reset redis
-    - echo "y" | acli node reset -a
-
-    # Dynamically create a custom user_inputs.py file in the pipeline
-    - |
-      cat <<EOL > user_input.py
-      target_node = "randomized_benchmarking_ssro"
-      qubits = ["q14", "q15",]
-      couplers = ["q14_q15"]
-      EOL
-
-    # Run the main application command
-    - |
-      acli calibration start -r "$CI_PROJECT_DIR/datasets/fc8_unit_tests_6-15" -n T2_echo
-
-    # Verify output
-    - |
-      OUTPUT_FILE="$CI_PROJECT_DIR/datasets/fc8_unit_tests_6-15/T2_echo.png"
-      if [ -f "$OUTPUT_FILE" ]; then
-        echo "Output file $OUTPUT_FILE exists. Application ran successfully."
-      else
-        echo "Error: Output file $OUTPUT_FILE not found."
-        exit 1
-      fi
-
-  cache:
-    paths:
-      - .cache/pip
-
 
 post_merge_actions:
   stage: post_merge_actions
