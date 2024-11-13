@@ -47,13 +47,6 @@ cli.add_typer(
     help="Handle operations related to the calibration graph.",
     no_args_is_help=True,
 )
-cli.add_typer(
-    config_cli,
-    name="config",
-    help="Configure the calibration, get and set values.",
-    no_args_is_help=True,
-)
-
 
 @cli.command(help="Open the dataset browser (quantifiles).")
 def browser(
