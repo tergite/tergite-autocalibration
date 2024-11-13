@@ -17,7 +17,6 @@ import typer
 
 from .calibration import calibration_cli
 from .cluster import cluster_cli
-from .config import config_cli
 from .graph import graph_cli
 from .node import node_cli
 
