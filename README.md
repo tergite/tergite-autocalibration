@@ -23,8 +23,8 @@ If you are reading this on GitHub, then you are looking at a mirror.
 
 ## Quick Start
 
-- Ensure you have [conda](https://docs.anaconda.com/free/miniconda/index.html) installed. 
- _(You could simply have python +3.9 installed instead.)_
+- Ensure you have [conda](https://docs.anaconda.com/free/miniconda/index.html) installed.
+  _(You could simply have python +3.10 installed instead.)_
 - Ensure you have a [redis server](https://redis.io/) instance running
 - The standard port for a redis server is `6379`, so, this is going to be filled in the `.env` configuration later.
 

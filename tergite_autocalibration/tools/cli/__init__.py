@@ -47,6 +47,7 @@ cli.add_typer(
     no_args_is_help=True,
 )
 
+
 @cli.command(help="Open the dataset browser (quantifiles).")
 def browser(
     datadir: Annotated[
