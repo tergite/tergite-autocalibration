@@ -113,9 +113,6 @@ USER_SAMPLESPACE = CONFIG_DIR.joinpath((_from_config("USER_SAMPLESPACE", cast_=P
 
 BACKEND_CONFIG = Path(__file__).parent / "backend_config_default.toml"
 
-# FIXME: This configuration is static and to be refactored together with the QOIs
-QOI_CONFIG = Path(__file__).parent / "qoi_config.toml"
-
 # ---
 # Section with other configuration variables
 CLUSTER_IP = ip_address(_from_config("CLUSTER_IP", cast_=str))
