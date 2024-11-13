@@ -9,12 +9,13 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
-
+import json
 import logging
 
 import toml
+from quantify_scheduler.backends.qblox_backend import QbloxHardwareCompilationConfig
 
-from .settings import DEVICE_CONFIG, SPI_CONFIG
+from .settings import DEVICE_CONFIG, SPI_CONFIG, CLUSTER_CONFIG
 
 
 def update_nested(target, updates):
@@ -73,6 +74,13 @@ class DataHandler:
                 _qubit_types[qubit] = qubit_type
             cls._qubit_types = _qubit_types
 
+            if CLUSTER_CONFIG:
+                with open(CLUSTER_CONFIG, "r") as f_:
+                    cluster_config_json = json.load(f_)
+                    cls.cluster_config = QbloxHardwareCompilationConfig.model_validate(
+                        cluster_config_json
+                    )
+
             if SPI_CONFIG:
                 cls.spi = toml.load(SPI_CONFIG)
 
@@ -108,6 +116,7 @@ class DataHandler:
             qubit_attenuation = 10
             coupler_attenuation = 34
             resonator_attenuation = 12
+            # TODO: We are now just using the first attenuation value in here,
             try:
                 qubit_attenuation = list(self._device["qubit"].items())[0][1][
                     "attenuation"
