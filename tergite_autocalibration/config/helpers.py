@@ -80,4 +80,6 @@ def load_configuration_snapshot(filepath: Union[str, Path]):
     Returns:
 
     """
-    raise NotImplementedError("Loading configuration snapshots is not implemented for now.")
+    raise NotImplementedError(
+        "Loading configuration snapshots is not implemented for now."
+    )
