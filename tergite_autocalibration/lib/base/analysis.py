@@ -268,7 +268,7 @@ class BaseAllQubitsRepeatAnalysis(BaseAllQubitsAnalysis, ABC):
         for qubit in self.all_qubits:
             qubit_datasets = []
             for repeat_idx, file_path in enumerate(data_files):
-                dataset_name = f"dataset_{self.name}_{index}.hdf5"
+                dataset_name = f"dataset_{self.name}_{repeat_idx}.hdf5"
                 file_path = self.data_path / dataset_name
 
                 ds = xr.open_dataset(file_path, engine="scipy")
