@@ -14,19 +14,15 @@
 # This file contains all functionality related to the system settings and configuration.
 # If you are adding variables, please make sure that they are upper case, because in the code, it should be
 # clear that these variables are sort of global configuration environment variables
+
 import logging
 import os
-import typing
 from ipaddress import ip_address
 from pathlib import Path
 
 import redis
-from dotenv import dotenv_values
 
-from tergite_autocalibration.config.helpers import from_environment
-
-T = typing.TypeVar("T")
-config = dotenv_values(Path(__file__).parent.parent.parent.joinpath(".env"))
+from tergite_autocalibration.config.utils import from_environment
 
 # ---
 # Default prefix for paths
