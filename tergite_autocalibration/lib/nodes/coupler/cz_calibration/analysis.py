@@ -48,7 +48,6 @@ def cos_func(
 def mitigate(v, cm_inv):
     u = np.dot(v, cm_inv)
 
-    # print(u,np.sum(u))
     def m(t):
         return norm(u - np.array(t))
 
@@ -63,7 +62,7 @@ def mitigate(v, cm_inv):
     )
     result = minimize(m, v, method="SLSQP", constraints=cons)
     w = np.abs(np.round(result.x, 10))
-    # print(w)
+
     return w
 
 
@@ -94,8 +93,6 @@ class CZModel(lmfit.model.Model):
 
         amp_guess = abs(max(data) - min(data)) / 2  # amp is positive by convention
         offs_guess = np.mean(data)
-
-        # breakpoint()
 
         # Frequency guess is obtained using a fast fourier transform (FFT).
         (freq_guess, _) = fft_freq_phase_guess(data, drive_amp)
@@ -148,8 +145,6 @@ class CZCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
             I = IQ_complex.real.flatten()
             Q = IQ_complex.imag.flatten()
             IQ = np.array([I, Q]).T
-            # IQ = IQ_complex.reshape(-1,2)
-            # breakpoint()
             lda = LinearDiscriminantAnalysis(solver="svd", store_covariance=True)
             cla = lda.fit(IQ, y)
             y_pred = cla.predict(IQ)
@@ -158,39 +153,25 @@ class CZCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
             cm_norm = confusion_matrix(y, y_pred, normalize="true")
             cm_inv = inv(cm_norm)
             assignment = np.trace(cm_norm) / len(self.calibs)
-            # print(f'{assignment = }')
-            # print(f'{cm_norm = }')
-            # disp = ConfusionMatrixDisplay(confusion_matrix=cm_norm)
-            # disp.plot()
-            # plt.show()
 
             # Classify data shots
             raw_data = (
                 self.magnitudes[self.data_var].isel({self.sweep_coord: indx}).values
             )
-            print(raw_data)
             raw_shape = raw_data.shape
             I = raw_data.real.flatten()
             Q = raw_data.imag.flatten()
             IQ = np.array([I, Q]).T
-            print(IQ)
             data_y_pred = cla.predict(IQ.reshape(-1, 2))
-            print("clapredict")
-            print(data_y_pred)
-            # breakpoint()
             data_y_pred = np.transpose(data_y_pred.reshape(raw_shape))
-            print(data_y_pred)
             data_res_shape = list(data_y_pred.shape[:-1])
             data_res_shape.append(len(self.calibs))
 
             data_res = np.array([])
             for sweep in data_y_pred:
-                print(sweep)
                 uniques, counts = np.unique(sweep, return_counts=True)
-                print(uniques)
                 raw_prob = [0] * len(self.calibs)
                 for state_id, state in enumerate(uniques):
-                    print(state)
                     raw_prob[int(state)] = counts[state_id] / len(sweep)
                 mitigate_prob = mitigate(raw_prob, cm_inv)
                 data_res = np.append(data_res, mitigate_prob)
@@ -211,7 +192,6 @@ class CZCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
                     fit = True
                     model = CZModel()
                     # magnitude = np.transpose(values)[15]
-                    # breakpoint()
                     guess = model.guess(magnitude, drive_amp=self.independents)
                     fit_result = model.fit(
                         magnitude, params=guess, drive_amp=self.independents
@@ -238,7 +218,6 @@ class CZCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
                 )
                 self.opt_cz = qois[0][0]
                 self.cphase = 180 - np.abs(np.abs(np.diff(self.opt_cz))[0] - 180)
-                # print(qois)
                 self.err = np.sqrt(np.sum(np.array(qois[1][0]) ** 2))
             else:
                 self.cphase = 0
@@ -248,7 +227,6 @@ class CZCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
             self.cphase = 0
             self.err = 0
             self.opt_cz = [0] * 2
-        # self.cphase = 0
         if fit:
             qois = np.transpose(
                 [
@@ -259,15 +237,12 @@ class CZCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
                     for fit in self.fit_results
                 ]
             )
-            # print(qois)
-            # print(np.diff(np.flip(qois[0][0])))
             try:
                 self.pop_loss = np.diff(np.flip(qois[0][0]))[0]
             except:
                 self.pop_loss = 1
         else:
             self.pop_loss = np.diff(np.mean(self.fit_ys, axis=1))[0]
-            # self.pop_loss = np.mean(np.diff(np.flip(self.fit_ys)))
         self.leakage = np.diff(
             np.flip(np.mean(self.all_magnitudes[:, :-3, 2], axis=1))
         )[0]
@@ -381,11 +356,6 @@ class ResetCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
             cm_norm = confusion_matrix(y, y_pred, normalize="true")
             cm_inv = inv(cm_norm)
             assignment = np.trace(cm_norm) / len(self.calibs)
-            # print(f'{assignment = }')
-            # print(f'{cm_norm = }')
-            # disp = ConfusionMatrixDisplay(confusion_matrix=cm_norm)
-            # disp.plot()
-            # plt.show()
 
             # Classify data shots
             raw_data = self.S21[self.data_var].isel({self.sweep_coord: indx}).values
@@ -394,7 +364,6 @@ class ResetCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
             Q = raw_data.imag.flatten()
             IQ = np.array([I, Q]).T
             data_y_pred = cla.predict(IQ.reshape(-1, 2))
-            # breakpoint()
             data_y_pred = np.transpose(data_y_pred.reshape(raw_shape))
             data_res_shape = list(data_y_pred.shape[:-1])
             data_res_shape.append(len(self.calibs))
@@ -411,6 +380,7 @@ class ResetCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
             data_res = data_res.reshape(data_res_shape)
             self.all_magnitudes.append(data_res)
         self.all_magnitudes = np.array(self.all_magnitudes)
+
         # Fitting the 1 state data
         self.magnitudes = self.all_magnitudes[:, :-3, 1]
         self.f_magnitudes = self.all_magnitudes[:, :-3, 2]
@@ -465,7 +435,6 @@ class ResetCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
                 c=colors[index],
                 label=f"|1> {label[index]}",
             )
-            # axis.plot(self.independents,magnitude[:-3,1],f'{marker[index]}',c = colors(2+4),label=f'|1> {label[index]}')
             axis.plot(
                 self.independents,
                 magnitude[:-3, 2],
@@ -475,9 +444,7 @@ class ResetCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
             )
 
         for index, magnitude in enumerate(self.magnitudes):
-            # breakpoint()
             axis.plot(self.fit_independents, self.fit_ys[index], "-", c=colors[index])
-            # axis.vlines(self.opt_cz[index],-10,10,colors='gray',linestyles='--',linewidth=1.5)
 
         axis.plot(
             [],

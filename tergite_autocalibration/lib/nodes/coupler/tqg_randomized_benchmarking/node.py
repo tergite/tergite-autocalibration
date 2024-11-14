@@ -148,7 +148,7 @@ class TQGRandomizedBenchmarkingInterleavedSSRONode(ScheduleNode):
         ]
 
 
-class TQG_Randomized_Benchmarking_Interleaved_Node(ScheduleNode):
+class CZRBOptimizeSSRONode(ScheduleNode):
     measurement_obj = TQGRandomizedBenchmarkingSSRO
     analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
 
