@@ -29,7 +29,6 @@ TEST_SPI_CONFIG = "spi_config.toml"
 TEST_USER_SAMPLESPACE = "user_samplespace.py"
 
 TEST_CLUSTER_IP = "192.0.2.141"
-TEST_CLUSTER_NAME = "clusterA"
 TEST_SPI_SERIAL_PORT = "/dev/ttyACM0"
 
 TEST_RUN_MODE = "test"
@@ -60,7 +59,6 @@ def setup_test_env():
     environ["USER_SAMPLESPACE"] = TEST_USER_SAMPLESPACE
 
     environ["CLUSTER_IP"] = TEST_CLUSTER_IP
-    environ["CLUSTER_NAME"] = TEST_CLUSTER_NAME
     environ["SPI_SERIAL_PORT"] = TEST_SPI_SERIAL_PORT
 
     environ["RUN_MODE"] = TEST_RUN_MODE

@@ -9,6 +9,7 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
+
 import os
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -25,7 +26,6 @@ from tergite_autocalibration.tests.utils.env import (
     TEST_NODE_CONFIG,
     TEST_USER_SAMPLESPACE,
     TEST_CLUSTER_IP,
-    TEST_CLUSTER_NAME,
     TEST_SPI_SERIAL_PORT,
     TEST_REDIS_PORT,
     TEST_PLOTTING,
@@ -44,7 +44,6 @@ from tergite_autocalibration.config.settings import (
     NODE_CONFIG,
     USER_SAMPLESPACE,
     CLUSTER_IP,
-    CLUSTER_NAME,
     SPI_SERIAL_PORT,
     REDIS_PORT,
     PLOTTING,
@@ -65,7 +64,6 @@ def test_global_variables():
     assert USER_SAMPLESPACE == Path(os.path.join(CONFIG_DIR, TEST_USER_SAMPLESPACE))
 
     assert CLUSTER_IP == IPv4Address(TEST_CLUSTER_IP)
-    assert CLUSTER_NAME == TEST_CLUSTER_NAME
     assert SPI_SERIAL_PORT == TEST_SPI_SERIAL_PORT
 
     assert REDIS_PORT == int(TEST_REDIS_PORT)

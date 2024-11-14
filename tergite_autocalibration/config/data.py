@@ -94,6 +94,11 @@ class DataHandler:
     def device(self):
         return self._device
 
+    @property
+    def cluster_name(self):
+        # TODO: This is under the assumption that there is only one cluster defined in the cluster config
+        return str(list(self.cluster_config.hardware_description.keys())[0])
+
     def get_legacy(self, variable_name: str):
         # This method is temporary and to be deprecated as soon as possible
         if variable_name == "VNA_resonator_frequencies":

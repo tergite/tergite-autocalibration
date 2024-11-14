@@ -32,7 +32,6 @@ from tergite_autocalibration.config.calibration import CONFIG
 from tergite_autocalibration.config.data import dh
 from tergite_autocalibration.config.settings import (
     CLUSTER_IP,
-    CLUSTER_NAME,
     REDIS_CONNECTION,
 )
 from tergite_autocalibration.lib.base.node import BaseNode
@@ -103,7 +102,7 @@ class CalibrationSupervisor:
         if self.measurement_mode == MeasurementMode.real:
             Cluster.close_all()
             try:
-                cluster_ = Cluster(CLUSTER_NAME, str(self.cluster_ip))
+                cluster_ = Cluster(dh.cluster_name, str(self.cluster_ip))
             except ConnectionRefusedError:
                 msg = "Cluster is disconnected. Maybe it has crushed? Try flick it off and on"
                 print("-" * len(msg))
@@ -120,7 +119,7 @@ class CalibrationSupervisor:
             dummy_setup = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1, 16)}
             dummy_setup["16"] = ClusterType.CLUSTER_QRM_RF
             dummy_setup["17"] = ClusterType.CLUSTER_QRM_RF
-            cluster_ = Cluster(CLUSTER_NAME, dummy_cfg=dummy_setup)
+            cluster_ = Cluster(dh.cluster_name, dummy_cfg=dummy_setup)
             # raise ClusterNotFoundError(
             #     f"Cannot create cluster object from {self.cluster_ip}"
             # )
