@@ -1,7 +1,8 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2023, 2024
-# (C) Copyright Liangyu Chen 2023, 2024
+# (C) Copyright Eleftherios Moschandreou 2024
+# (C) Copyright Liangyu Chen 2024
+# (C) Copyright Amr Osman 2024
 # (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
@@ -31,30 +32,33 @@ node reference
   ro_frequency_three_state_optimization
   ro_amplitude_two_state_optimization
   ro_amplitude_three_state_optimization
+  ro_duration_three_state_optimization
+  ro_characterization
   coupler_spectroscopy
   coupler_resonator_spectroscopy
   motzoi_parameter
   n_rabi_oscillations
-  randomized_benchmarking
   state_discrimination
   T1
   T2
   T2_echo
-  randomized_benchmarking
+  randomized_benchmarking_ssro
   all_XY
   check_cliffords
-  cz_parametrisation_fix_duration
   cz_chevron
   cz_chevron_test
   cz_chevron_amplitude
   cz_optimize_chevron
   reset_chevron
+  reset_chevron_long
   reset_calibration_ssro
+  reset_calibration_optimize_ssro
   cz_calibration
   cz_calibration_ssro
   cz_dynamic_phase
   cz_dynamic_phase_swap
   process_tomography_ssro
+  process_tomography_full_ssro
   tqg_randomized_benchmarking
   tqg_randomized_benchmarking_interleaved
 """
@@ -78,8 +82,8 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 
 def qubit_samples(qubit: str, transition: str = "01") -> np.ndarray:
-    qub_spec_samples = 51
-    sweep_range = 10e6
+    qub_spec_samples = 101
+    sweep_range = 20e6
     if transition == "01":
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition == "12":
@@ -105,18 +109,23 @@ user_samplespace = {
 }
 """
 ####################################################################
-target_node = "resonator_spectroscopy"
+target_node = "randomized_benchmarking_ssro"
 qubits = [
-    "q01",
-    "q02",
+    "q14",
+    "q15",
 ]  # ["q06", "q07", "q08", "q09", "q10", "q11", "q12", "q13", "q14", "q15"]
-couplers = ["q06_q07"]
+couplers = ["q14_q15"]
 user_samplespace = {
     "resonator_spectroscopy": {
         "ro_frequencies": {qubit: resonator_samples(qubit) for qubit in qubits}
     },
 }
-attenuation_setting = {"qubit": 0, "coupler": 34, "readout": 0}
+# attenuation_setting = {'qubit':30, 'coupler':30, 'readout':50}
+# attenuation_setting = {'qubit':16, 'coupler':20, 'readout':40}
+# attenuation_setting = {'qubit':16, 'coupler':20, 'readout':30}
+attenuation_setting = {"qubit": 16, "coupler": 20, "readout": 10}
+# attenuation_setting = {'qubit':60, 'coupler':60, 'readout':10}
+
 
 ####################################################################
 

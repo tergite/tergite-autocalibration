@@ -136,7 +136,8 @@ class BaseNodeAnalysis(ABC):
         pass
 
     @abstractmethod
-    def open_dataset(self):
+    def open_dataset(self, index: int = None) -> xr.Dataset:
+        """Abstract method to be implemented by subclasses to open a dataset."""
         pass
 
     def manage_plots(self, column_grid: int, plots_per_qubit: int):
@@ -247,9 +248,10 @@ class BaseAllQubitsRepeatAnalysis(BaseAllQubitsAnalysis, ABC):
         super().__init__(name, redis_fields)
         self.repeat_coordinate_name = ""
 
-    def open_dataset(self) -> xr.Dataset:
+    def open_dataset(self, index: int = None) -> xr.Dataset:
         # Infer number of repeats by counting the number of dataset files
-        data_files = sorted(self.data_path.glob("*.hdf5"))
+        dataset_name = f"dataset_{self.name}_*.hdf5"
+        data_files = sorted(self.data_path.glob(dataset_name))
         if not data_files:
             raise FileNotFoundError(f"No dataset files found in {self.data_path}")
 
@@ -266,9 +268,10 @@ class BaseAllQubitsRepeatAnalysis(BaseAllQubitsAnalysis, ABC):
         for qubit in self.all_qubits:
             qubit_datasets = []
             for repeat_idx, file_path in enumerate(data_files):
-                file_path = self.data_path / f"dataset_{repeat_idx}.hdf5"
+                dataset_name = f"dataset_{self.name}_{repeat_idx}.hdf5"
+                file_path = self.data_path / dataset_name
 
-                ds = xr.open_dataset(file_path)
+                ds = xr.open_dataset(file_path, engine="scipy")
 
                 qubit_data = ds[[qubit]]
 

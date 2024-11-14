@@ -42,7 +42,7 @@ adaptive_motzoi_parameter.rxy.motzoi = 0
 
 rabi_oscillations_12.r12.ef_amp180 = nan
 
-randomized_benchmarking.fidelity = nan
+randomized_benchmarking_ssro.fidelity = nan
 T1.t1_time = nan
 T2.t2_time = nan
 T2_echo.t2_echo_time = nan

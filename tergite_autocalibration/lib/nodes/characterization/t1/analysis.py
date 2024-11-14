@@ -46,7 +46,7 @@ class T1QubitAnalysis(BaseQubitAnalysis):
 
     def analyse_qubit(self):
         for coord in self.dataset[self.data_var].coords:
-            if "repetition" in coord:
+            if "repeat" in coord:
                 self.repetitions_coord = coord
             elif "delays" in coord:
                 self.delays_coord = coord

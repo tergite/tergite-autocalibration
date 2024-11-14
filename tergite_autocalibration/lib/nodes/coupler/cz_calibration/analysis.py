@@ -3,6 +3,7 @@
 # (C) Copyright Eleftherios Moschandreou 2024
 # (C) Copyright Liangyu Chen 2024
 # (C) Copyright Amr Osman 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -26,7 +27,11 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import confusion_matrix
 
 from tergite_autocalibration.config.coupler_config import qubit_types
-from tergite_autocalibration.lib.base.analysis import BaseAnalysis
+from tergite_autocalibration.lib.base.analysis import (
+    BaseAllQubitsAnalysis,
+    BaseAnalysis,
+    BaseQubitAnalysis,
+)
 
 
 # Cosine function that is fit to Rabi oscillations
@@ -43,7 +48,6 @@ def cos_func(
 def mitigate(v, cm_inv):
     u = np.dot(v, cm_inv)
 
-    # print(u,np.sum(u))
     def m(t):
         return norm(u - np.array(t))
 
@@ -58,7 +62,7 @@ def mitigate(v, cm_inv):
     )
     result = minimize(m, v, method="SLSQP", constraints=cons)
     w = np.abs(np.round(result.x, 10))
-    # print(w)
+
     return w
 
 
@@ -90,8 +94,6 @@ class CZModel(lmfit.model.Model):
         amp_guess = abs(max(data) - min(data)) / 2  # amp is positive by convention
         offs_guess = np.mean(data)
 
-        # breakpoint()
-
         # Frequency guess is obtained using a fast fourier transform (FFT).
         (freq_guess, _) = fft_freq_phase_guess(data, drive_amp)
 
@@ -103,165 +105,12 @@ class CZModel(lmfit.model.Model):
         return lmfit.models.update_param_vals(params, self.prefix, **kws)
 
 
-class CZCalibrationAnalysis(BaseAnalysis):
-    def __init__(self, dataset: xr.Dataset):
-        super().__init__()
-        data_var = list(dataset.data_vars.keys())[0]
-        coord = list(dataset[data_var].coords.keys())[0]
-        self.S21 = dataset[data_var].values
-        self.independents = dataset[coord].values
-        self.fit_results = {}
-        self.qubit = dataset[data_var].attrs["qubit"]
-
-        measurements = self.S21
-        data = measurements[:-2]
-        calibration_0 = measurements[-2]
-        calibration_1 = measurements[-1]
-        displacement_vector = calibration_1 - calibration_0
-        data_translated_to_zero = data - calibration_0
-
-        rotation_angle = np.angle(displacement_vector)
-        rotated_data = data_translated_to_zero * np.exp(-1j * rotation_angle)
-        rotated_0 = calibration_0 * np.exp(-1j * rotation_angle)
-        rotated_1 = calibration_1 * np.exp(-1j * rotation_angle)
-        normalization = (rotated_1 - rotated_0).real
-        real_rotated_data = rotated_data.real
-        self.data = real_rotated_data / normalization
-        self.dataset = dataset
+class CZCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
 
     def analyse_qubit(self):
-        # self.testing_group = 0
-        self.dynamic = self.dataset.attrs["node"][:16] == "cz_dynamic_phase"
-        self.swap = self.dataset.attrs["node"][-4:] == "swap"
-        qubit_type_list = ["Control", "Target"]
-        if self.swap:
-            qubit_type_list.reverse()
-
-        self.freq = self.dataset[f"control_ons{self.qubit}"].values
-        self.amp = self.dataset[f"ramsey_phases{self.qubit}"].values[:-2]
-        magnitudes = self.data
-        self.magnitudes = np.transpose(magnitudes)
-        # self.magnitudes = np.transpose((magnitudes - np.min(magnitudes))/(np.max(magnitudes)-np.min(magnitudes)))
-        self.fit_amplitudes = np.linspace(self.amp[0], self.amp[-1], 400)
-
-        self.fit_results, self.fit_ys = [], []
-
-        for magnitude in self.magnitudes:
-            if qubit_types[self.qubit] == qubit_type_list[1]:
-                fit = True
-                model = CZModel()
-                # magnitude = np.transpose(values)[15]
-                guess = model.guess(magnitude, drive_amp=self.amp)
-                fit_result = model.fit(magnitude, params=guess, drive_amp=self.amp)
-                fit_y = model.eval(
-                    fit_result.params,
-                    **{model.independent_vars[0]: self.fit_amplitudes},
-                )
-                self.fit_results.append(fit_result)
-            else:
-                fit = False
-                fit_y = [np.mean(magnitude)] * 400
-            self.fit_ys.append(fit_y)
-        if fit:
-            try:
-                qois = np.transpose(
-                    [
-                        [
-                            [fit.result.params[p].value, fit.result.params[p].stderr]
-                            for p in ["cz"]
-                        ]
-                        for fit in self.fit_results
-                    ]
-                )
-                self.opt_cz = qois[0][0]
-                self.cphase = 180 - np.abs(np.abs(np.diff(self.opt_cz))[0] - 180)
-                # self.cphase = np.abs(np.diff(self.opt_cz))[0]
-                print(qois)
-                self.err = np.sqrt(np.sum(np.array(qois[1][0]) ** 2))
-            except:
-                print("fitting failed ....")
-                self.cphase = 0
-                self.err = 0
-                self.opt_cz = [0] * 2
-
-        else:
-            self.cphase = 0
-            self.err = 0
-            self.opt_cz = [0] * 2
-        if fit:
-            qois = np.transpose(
-                [
-                    [
-                        [fit.result.params[p].value, fit.result.params[p].stderr]
-                        for p in ["amplitude"]
-                    ]
-                    for fit in self.fit_results
-                ]
-            )
-            self.pop_loss = np.diff(np.flip(qois[0][0]), axis=0)[0]
-        else:
-            self.pop_loss = np.diff(np.mean(self.fit_ys, axis=1))[0]
-
-        return [self.cphase, self.pop_loss]
-
-    def plotter(self, axis):
-        # datarray = self.dataset[f'y{self.qubit}']
-        # qubit = self.qubit
-
-        if self.dynamic:
-            label = ["Gate Off", "Gate On"]
-            name = "Dynamic Phase"
-        else:
-            label = ["Control Off", "Control On"]
-            name = "CZ"
-        x = range(len(label))
-        colors = plt.get_cmap("RdBu_r")(np.linspace(0.2, 0.8, len(x)))
-        for index, magnitude in enumerate(self.magnitudes):
-            axis.plot(self.amp, magnitude, ".", c=colors[index])
-            axis.plot(
-                self.fit_amplitudes,
-                self.fit_ys[index],
-                "-",
-                c=colors[index],
-                label=label[index],
-            )
-            axis.vlines(
-                self.opt_cz[index],
-                -10,
-                10,
-                colors="gray",
-                linestyles="--",
-                linewidth=1.5,
-            )
-
-        axis.vlines(
-            0,
-            -10,
-            -10,
-            colors="gray",
-            linestyles="--",
-            label="{:} = {:.1f}+/-{:.1f} \n pop_loss = {:.2f}".format(
-                name, self.cphase, self.err, self.pop_loss
-            ),
-            zorder=-10,
-        )
-
-        # axis.legend(loc = 'upper right')
-        axis.set_xlim([self.amp[0], self.amp[-1]])
-        axis.set_ylim(np.min(self.magnitudes), np.max(self.magnitudes))
-        axis.set_xlabel("Phase (deg)")
-        axis.set_ylabel("Population")
-        axis.set_title(
-            f"{name} Calibration - {qubit_types[self.qubit]} Qubit {self.qubit[1:]}"
-        )
-
-
-class CZCalibrationSSROAnalysis(BaseAnalysis):
-    def __init__(self, dataset: xr.Dataset):
-        super().__init__()
-        self.data_var = list(dataset.data_vars.keys())[0]
-        self.qubit = dataset[self.data_var].attrs["qubit"]
-        for coord in dataset.coords:
+        for coord in self.dataset.coords:
             if f"control_ons" in str(coord):
                 self.sweep_coord = coord
             elif f"ramsey_phases" in str(coord):
@@ -270,16 +119,13 @@ class CZCalibrationSSROAnalysis(BaseAnalysis):
                 self.shot_coord = coord
 
         self.independents = np.array(
-            [float(val) for val in dataset[self.state_coord].values[:-3]]
+            [float(val) for val in self.dataset[self.state_coord].values[:-3]]
         )
-        self.calibs = dataset[self.state_coord].values[-3:]
-        self.sweeps = dataset.coords[self.sweep_coord]
-        self.shots = len(dataset[self.shot_coord].values)
+        self.calibs = self.dataset[self.state_coord].values[-3:]
+        self.sweeps = self.dataset.coords[self.sweep_coord]
+        self.shots = len(self.dataset[self.shot_coord].values)
         self.fit_results = {}
 
-        self.dataset = dataset
-
-    def analyse_qubit(self):
         # self.testing_group = 0
         self.dynamic = self.dataset.attrs["node"] == "cz_dynamic_phase"
         self.swap = self.dataset.attrs["node"][15:19] == "swap"
@@ -292,15 +138,13 @@ class CZCalibrationSSROAnalysis(BaseAnalysis):
             y = np.repeat(self.calibs, self.shots)
             IQ_complex = np.array([])
             for state, _ in enumerate(self.calibs):
-                IQ_complex_0 = self.dataset[self.data_var].isel(
+                IQ_complex_0 = self.magnitudes[self.data_var].isel(
                     {self.sweep_coord: indx, self.state_coord: -3 + state}
                 )
                 IQ_complex = np.append(IQ_complex, IQ_complex_0)
             I = IQ_complex.real.flatten()
             Q = IQ_complex.imag.flatten()
             IQ = np.array([I, Q]).T
-            # IQ = IQ_complex.reshape(-1,2)
-            # breakpoint()
             lda = LinearDiscriminantAnalysis(solver="svd", store_covariance=True)
             cla = lda.fit(IQ, y)
             y_pred = cla.predict(IQ)
@@ -309,20 +153,16 @@ class CZCalibrationSSROAnalysis(BaseAnalysis):
             cm_norm = confusion_matrix(y, y_pred, normalize="true")
             cm_inv = inv(cm_norm)
             assignment = np.trace(cm_norm) / len(self.calibs)
-            # print(f'{assignment = }')
-            # print(f'{cm_norm = }')
-            # disp = ConfusionMatrixDisplay(confusion_matrix=cm_norm)
-            # disp.plot()
-            # plt.show()
 
             # Classify data shots
-            raw_data = self.dataset[self.data_var].isel({self.sweep_coord: indx}).values
+            raw_data = (
+                self.magnitudes[self.data_var].isel({self.sweep_coord: indx}).values
+            )
             raw_shape = raw_data.shape
             I = raw_data.real.flatten()
             Q = raw_data.imag.flatten()
             IQ = np.array([I, Q]).T
             data_y_pred = cla.predict(IQ.reshape(-1, 2))
-            # breakpoint()
             data_y_pred = np.transpose(data_y_pred.reshape(raw_shape))
             data_res_shape = list(data_y_pred.shape[:-1])
             data_res_shape.append(len(self.calibs))
@@ -352,7 +192,6 @@ class CZCalibrationSSROAnalysis(BaseAnalysis):
                     fit = True
                     model = CZModel()
                     # magnitude = np.transpose(values)[15]
-                    # breakpoint()
                     guess = model.guess(magnitude, drive_amp=self.independents)
                     fit_result = model.fit(
                         magnitude, params=guess, drive_amp=self.independents
@@ -379,7 +218,6 @@ class CZCalibrationSSROAnalysis(BaseAnalysis):
                 )
                 self.opt_cz = qois[0][0]
                 self.cphase = 180 - np.abs(np.abs(np.diff(self.opt_cz))[0] - 180)
-                # print(qois)
                 self.err = np.sqrt(np.sum(np.array(qois[1][0]) ** 2))
             else:
                 self.cphase = 0
@@ -389,7 +227,6 @@ class CZCalibrationSSROAnalysis(BaseAnalysis):
             self.cphase = 0
             self.err = 0
             self.opt_cz = [0] * 2
-        # self.cphase = 0
         if fit:
             qois = np.transpose(
                 [
@@ -400,24 +237,18 @@ class CZCalibrationSSROAnalysis(BaseAnalysis):
                     for fit in self.fit_results
                 ]
             )
-            # print(qois)
-            # print(np.diff(np.flip(qois[0][0])))
             try:
                 self.pop_loss = np.diff(np.flip(qois[0][0]))[0]
             except:
                 self.pop_loss = 1
         else:
             self.pop_loss = np.diff(np.mean(self.fit_ys, axis=1))[0]
-            # self.pop_loss = np.mean(np.diff(np.flip(self.fit_ys)))
         self.leakage = np.diff(
             np.flip(np.mean(self.all_magnitudes[:, :-3, 2], axis=1))
         )[0]
         return [self.cphase, self.pop_loss, self.leakage]
 
     def plotter(self, axis):
-        # datarray = self.dataset[f'y{self.qubit}']
-        # qubit = self.qubit
-
         if self.dynamic:
             label = ["Gate Off", "Gate On"]
             name = "Dynamic Phase"
@@ -427,7 +258,6 @@ class CZCalibrationSSROAnalysis(BaseAnalysis):
         x = range(len(label))
         marker = [".", "*", "1", "--"]
         colors = plt.get_cmap("RdBu_r")(np.linspace(0.2, 0.8, len(x)))
-        # colors = plt.get_cmap('tab20c')
 
         for index, magnitude in enumerate(self.all_magnitudes):
             axis.plot(
@@ -437,7 +267,6 @@ class CZCalibrationSSROAnalysis(BaseAnalysis):
                 c=colors[index],
                 label=f"|1> {label[index]}",
             )
-            # axis.plot(self.independents,magnitude[:-3,1],f'{marker[index]}',c = colors(2+4),label=f'|1> {label[index]}')
             axis.plot(
                 self.independents,
                 magnitude[:-3, 2],
@@ -445,13 +274,6 @@ class CZCalibrationSSROAnalysis(BaseAnalysis):
                 c=colors[index],
                 label=f"|2> {label[index]}",
             )
-            # axis.plot(
-            #     self.independents,
-            #     magnitude[:-3, 0],
-            #     f"{marker[2]}",
-            #     c=colors[index],
-            #     label=f"0> {label[index]}",
-            # )
 
         for index, magnitude in enumerate(self.magnitudes):
             try:
@@ -490,31 +312,27 @@ class CZCalibrationSSROAnalysis(BaseAnalysis):
         )
 
 
-class ResetCalibrationSSROAnalysis(BaseAnalysis):
-    def __init__(self, dataset: xr.Dataset):
-        super().__init__()
-        self.data_var = list(dataset.data_vars.keys())[0]
-        self.qubit = dataset[self.data_var].attrs["qubit"]
-        for coord in dataset.coords:
+class ResetCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+
+    def analyse_qubit(self):
+        for coord in self.dataset.coords:
             if f"control_ons{self.qubit}" in str(coord):
                 self.sweep_coord = coord
             elif f"ramsey_phases{self.qubit}" in str(coord):
                 self.state_coord = coord
             elif "shot" in str(coord):
                 self.shot_coord = coord
-        # self.S21 = dataset[data_var].values
-        self.independents = np.array(
-            [float(val) for val in dataset[self.state_coord].values[:-3]]
-        )
-        self.calibs = dataset[self.state_coord].values[-3:]
-        self.sweeps = dataset.coords[self.sweep_coord]
-        self.shots = len(dataset[self.shot_coord].values)
-        self.fit_results = {}
-        # dataset[f'y{self.qubit}'].values = np.abs(self.S21)
-        self.dataset = dataset
 
-    def analyse_qubit(self):
-        # self.testing_group = 0
+        self.independents = np.array(
+            [float(val) for val in self.dataset[self.state_coord].values[:-3]]
+        )
+        self.calibs = self.dataset[self.state_coord].values[-3:]
+        self.sweeps = self.dataset.coords[self.sweep_coord]
+        self.shots = len(self.dataset[self.shot_coord].values)
+        self.fit_results = {}
+
         self.dynamic = self.dataset.attrs["node"] == "cz_dynamic_phase"
         self.all_magnitudes = []
         for indx, _ in enumerate(self.sweeps):
@@ -522,15 +340,14 @@ class ResetCalibrationSSROAnalysis(BaseAnalysis):
             y = np.repeat(self.calibs, self.shots)
             IQ_complex = np.array([])
             for state, _ in enumerate(self.calibs):
-                IQ_complex_0 = self.dataset[self.data_var].isel(
+                IQ_complex_0 = self.S21[self.data_var].isel(
                     {self.sweep_coord: indx, self.state_coord: -3 + state}
                 )
                 IQ_complex = np.append(IQ_complex, IQ_complex_0)
             I = IQ_complex.real.flatten()
             Q = IQ_complex.imag.flatten()
             IQ = np.array([I, Q]).T
-            # IQ = IQ_complex.reshape(-1,2)
-            # breakpoint()
+
             lda = LinearDiscriminantAnalysis(solver="svd", store_covariance=True)
             cla = lda.fit(IQ, y)
             y_pred = cla.predict(IQ)
@@ -539,20 +356,14 @@ class ResetCalibrationSSROAnalysis(BaseAnalysis):
             cm_norm = confusion_matrix(y, y_pred, normalize="true")
             cm_inv = inv(cm_norm)
             assignment = np.trace(cm_norm) / len(self.calibs)
-            # print(f'{assignment = }')
-            # print(f'{cm_norm = }')
-            # disp = ConfusionMatrixDisplay(confusion_matrix=cm_norm)
-            # disp.plot()
-            # plt.show()
 
             # Classify data shots
-            raw_data = self.dataset[self.data_var].isel({self.sweep_coord: indx}).values
+            raw_data = self.S21[self.data_var].isel({self.sweep_coord: indx}).values
             raw_shape = raw_data.shape
             I = raw_data.real.flatten()
             Q = raw_data.imag.flatten()
             IQ = np.array([I, Q]).T
             data_y_pred = cla.predict(IQ.reshape(-1, 2))
-            # breakpoint()
             data_y_pred = np.transpose(data_y_pred.reshape(raw_shape))
             data_res_shape = list(data_y_pred.shape[:-1])
             data_res_shape.append(len(self.calibs))
@@ -569,16 +380,11 @@ class ResetCalibrationSSROAnalysis(BaseAnalysis):
             data_res = data_res.reshape(data_res_shape)
             self.all_magnitudes.append(data_res)
         self.all_magnitudes = np.array(self.all_magnitudes)
+
         # Fitting the 1 state data
         self.magnitudes = self.all_magnitudes[:, :-3, 1]
         self.f_magnitudes = self.all_magnitudes[:, :-3, 2]
 
-        # self.freq = self.dataset[f'control_ons{self.qubit}'].values
-        # self.amp = self.dataset[f'ramsey_phases{self.qubit}'].values
-        # magnitudes = self.dataset[f'y{self.qubit}'].values
-        # self.magnitudes = np.transpose(magnitudes)
-        # self.magnitudes = np.transpose((magnitudes - np.min(magnitudes))/(np.max(magnitudes)-np.min(magnitudes)))
-        # breakpoint()
         self.fit_independents = self.independents
         self.fit_ys = []
 
@@ -597,18 +403,7 @@ class ResetCalibrationSSROAnalysis(BaseAnalysis):
                     self.fit_ys.append(
                         [0, 1, 0, 0, 1, 0, 0, 1, 0]
                     )  # Target - ResetOn no leakage reduction
-                    # self.fit_ys.append([0,1,1,0,1,1,0,1,1]) # Control - ResetOn
 
-            # if qubit_types[self.qubit] == 'Target':
-            #     if n == 0:
-            #         self.fit_ys.append([0,1,0,0,1,0,0,1,0]) # Target - ResetOff
-            #     else:
-            #         self.fit_ys.append([0,0,0,0,0,0,0,0,0]) # Target - ResetOn
-            # else:
-            #     if n == 0:
-            #         self.fit_ys.append([0,0,0,1,1,1,0,0,0]) # Control - ResetOff
-            #     else:
-            #         self.fit_ys.append([0,0,0,1,1,1,1,1,1]) # Control - ResetOn
         self.fit_ys = np.array(self.fit_ys)
         self.pop_loss = 1 - np.sum(np.abs(self.magnitudes - self.fit_ys)) / 9
         self.leakage = np.mean(self.f_magnitudes[-1])
@@ -621,8 +416,6 @@ class ResetCalibrationSSROAnalysis(BaseAnalysis):
         return [self.pop_loss, self.leakage, magnitudes_str, f_magnitudes_str]
 
     def plotter(self, axis):
-        # datarray = self.dataset[f'y{self.qubit}']
-        # qubit = self.qubit
         state = ["0", "1", "2"]
         states = list(itertools.product(state, state))
         states = [state[0] + state[1] for state in states]
@@ -642,7 +435,6 @@ class ResetCalibrationSSROAnalysis(BaseAnalysis):
                 c=colors[index],
                 label=f"|1> {label[index]}",
             )
-            # axis.plot(self.independents,magnitude[:-3,1],f'{marker[index]}',c = colors(2+4),label=f'|1> {label[index]}')
             axis.plot(
                 self.independents,
                 magnitude[:-3, 2],
@@ -652,9 +444,7 @@ class ResetCalibrationSSROAnalysis(BaseAnalysis):
             )
 
         for index, magnitude in enumerate(self.magnitudes):
-            # breakpoint()
             axis.plot(self.fit_independents, self.fit_ys[index], "-", c=colors[index])
-            # axis.vlines(self.opt_cz[index],-10,10,colors='gray',linestyles='--',linewidth=1.5)
 
         axis.plot(
             [],
@@ -675,3 +465,17 @@ class ResetCalibrationSSROAnalysis(BaseAnalysis):
         axis.set_title(
             f"{name} Calibration - {qubit_types[self.qubit]} Qubit {self.qubit[1:]}"
         )
+
+
+class ResetCalibrationSSRONodeAnalysis(BaseAllQubitsAnalysis):
+    single_qubit_analysis_obj = ResetCalibrationSSROQubitAnalysis
+
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+
+
+class CZCalibrationSSRONodeAnalysis(BaseAllQubitsAnalysis):
+    single_qubit_analysis_obj = CZCalibrationSSROQubitAnalysis
+
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
