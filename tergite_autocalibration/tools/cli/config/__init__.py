@@ -42,12 +42,20 @@ def save(
             help="Path to store the configuration at. If not set, it will assume the current directory.",
         ),
     ] = None,
-    zip_file: Annotated[
+    no_zip_file: Annotated[
         bool,
         typer.Option(
             "--no-zip-file",
             is_flag=True,
             help="If --no-zip-file, the configuration files will be stored into a folder and not zipped.",
+        ),
+    ] = False,
+    no_env_file: Annotated[
+        bool,
+        typer.Option(
+            "--no-env-file",
+            is_flag=True,
+            help="If --no-env-file, the configuration package will not contain the .env file.",
         ),
     ] = False,
 ):
@@ -59,7 +67,9 @@ def save(
     if filepath is None:
         filepath = os.path.join(get_cwd(), "configuration_snapshot")
 
-    save_configuration_snapshot(filepath, zip_file=not zip_file)
+    save_configuration_snapshot(
+        filepath, zip_file=not no_zip_file, save_env=not no_env_file
+    )
 
 
 @config_cli.command(help="Restore and load a configuration snapshot.")
