@@ -61,7 +61,7 @@ def save(
 ):
     import os.path
 
-    from tergite_autocalibration.config.io import save_configuration_snapshot
+    from tergite_autocalibration.config.io_ import save_configuration_snapshot
     from .helpers import get_cwd
 
     if filepath is None:
