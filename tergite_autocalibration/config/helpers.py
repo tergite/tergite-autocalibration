@@ -126,6 +126,15 @@ def load_configuration_snapshot(filepath: Union[str, Path]):
     Returns:
 
     """
-    raise NotImplementedError(
-        "Loading configuration snapshots is not implemented for now."
-    )
+
+    if filepath.endswith("zip"):
+        # Unzip it
+        pass
+
+    # Search for the configuration.meta.toml file
+    # If not there, raise an error
+
+    # If there is a .env file, load it
+
+    # Where do we load the configuration files?
+

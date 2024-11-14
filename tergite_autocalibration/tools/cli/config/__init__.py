@@ -71,7 +71,24 @@ def save(
 
 
 @config_cli.command(help="Restore and load a configuration snapshot.")
-def load():
+def load(
+    filepath: Annotated[
+        str,
+        typer.Option(
+            "--filepath",
+            "-f",
+            help="Path to store the configuration at. If not set, it will assume the current directory.",
+        ),
+    ] = None,
+    template: Annotated[
+        str,
+        typer.Option(
+            "--template",
+            "-t",
+            help="Shortcut to load the configuration from a template in the templates path.",
+        ),
+    ] = None,
+):
     raise NotImplementedError()
 
 
