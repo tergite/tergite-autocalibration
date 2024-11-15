@@ -17,69 +17,69 @@
 # SPI A configuration
 # -------------------
 
-[couplers.q11_q12]
+[q11_q12]
 spi_module_no = 1
 dac_name = "dac0"
 edge_group = 1
 
-[couplers.q12_q13]
+[q12_q13]
 spi_module_no = 1
 dac_name = "dac1"
 edge_group = 2
 
-[couplers.q13_q14]
+[q13_q14]
 spi_module_no = 1
 dac_name = "dac2"
 edge_group = 1
 
-[couplers.q14_q15]
+[q14_q15]
 spi_module_no = 1
 dac_name = "dac3"
 edge_group = 2
 
-[couplers.q08_q09]
+[q08_q09]
 spi_module_no = 2
 dac_name = "dac0"
 
-[couplers.q12_q17]
+[q12_q17]
 spi_module_no = 2
 dac_name = "dac1"
 edge_group = 4
 
-[couplers.q07_q12]
+[q07_q12]
 spi_module_no = 2
 dac_name = "dac2"
 
-[couplers.q08_q13]
+[q08_q13]
 spi_module_no = 2
 dac_name = "dac3"
 
-[couplers.q09_q14]
+[q09_q14]
 spi_module_no = 3
 dac_name = "dac0"
 
-[couplers.q06_q07]
+[q06_q07]
 spi_module_no = 3
 dac_name = "dac1"
 
-[couplers.q09_q10]
+[q09_q10]
 spi_module_no = 3
 dac_name = "dac2"
 
-[couplers.q11_q16]
+[q11_q16]
 spi_module_no = 3
 dac_name = "dac3"
 edge_group = 3
 
-[couplers.q07_q08]
+[q07_q08]
 spi_module_no = 4
 dac_name = "dac0"
 
-[couplers.q10_q15]
+[q10_q15]
 spi_module_no = 4
 dac_name = "dac1"
 
-[couplers.q06_q11]
+[q06_q11]
 spi_module_no = 4
 dac_name = "dac2"
 
@@ -88,82 +88,82 @@ dac_name = "dac2"
 # SPI B configuration
 # -------------------
 
-[couplers.q16_q17]
+[q16_q17]
 spi_module_no = 1
 dac_name = "dac0"
 edge_group = 2
 
-[couplers.q17_q18]
+[q17_q18]
 spi_module_no = 1
 dac_name = "dac1"
 edge_group = 1
 
-[couplers.q18_q19]
+[q18_q19]
 spi_module_no = 1
 dac_name = "dac2"
 edge_group = 2
 
-[couplers.q19_q20]
+[q19_q20]
 spi_module_no = 1
 dac_name = "dac3"
 edge_group = 1
 
-[couplers.q18_q23]
+[q18_q23]
 spi_module_no = 2
 dac_name = "dac0"
 edge_group = 4
 
-[couplers.q17_q22]
+[q17_q22]
 spi_module_no = 2
 dac_name = "dac1"
 edge_group = 3
 
-[couplers.q16_q21]
+[q16_q21]
 spi_module_no = 2
 dac_name = "dac2"
 edge_group = 4
 
-[couplers.q19_q24]
+[q19_q24]
 spi_module_no = 2
 dac_name = "dac3"
 edge_group = 3
 
-[couplers.q20_q25]
+[q20_q25]
 spi_module_no = 3
 dac_name = "dac0"
 edge_group = 4
 
-[couplers.q21_q22]
+[q21_q22]
 spi_module_no = 3
 dac_name = "dac1"
 edge_group = 1
 
-[couplers.q22_q23]
+[q22_q23]
 spi_module_no = 3
 dac_name = "dac2"
 edge_group = 2
 
-[couplers.q23_q24]
+[q23_q24]
 spi_module_no = 3
 dac_name = "dac3"
 edge_group = 1
 
-[couplers.q24_q25]
+[q24_q25]
 spi_module_no = 4
 dac_name = "dac0"
 edge_group = 2
 
-[couplers.q13_q18]
+[q13_q18]
 spi_module_no = 4
 dac_name = "dac1"
 edge_group = 3
 
-[couplers.q15_q20]
+[q15_q20]
 spi_module_no = 4
 dac_name = "dac2"
 edge_group = 3
 
-[couplers.q14_q19]
+[q14_q19]
 spi_module_no = 4
 dac_name = "dac3"
 edge_group = 4
