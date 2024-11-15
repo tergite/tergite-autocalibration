@@ -164,8 +164,8 @@ class BaseNode(abc.ABC):
             result_dataset = self.measure_node(cluster_status)
             self.device_manager.save_serial_device(self.name, self.device, data_path)
             # After the measurement free the device resources
-            self.device_manager.close_device()
             save_dataset(result_dataset, self.name, data_path)
+        self.device_manager.close_device()
         self.post_process(data_path)
         logger.info("analysis completed")
 
@@ -175,33 +175,6 @@ class BaseNode(abc.ABC):
         # TODO: put 'tof' out of its misery
         if self.name == "tof":
             return None, 1
-
-        # # NOTE: IS THIS BEING USED?
-        # # NOTE: DOES IT BELONG HERE?
-        # # backup old parameter values
-        # if self.backup:
-        #     fields = self.redis_field
-        #     for field in fields:
-        #         field_backup = field + "_backup"
-        #         for qubit in qubits:
-        #             key = f"transmons:{qubit}"
-        #             if field in REDIS_CONNECTION.hgetall(key).keys():
-        #                 value = REDIS_CONNECTION.hget(key, field)
-        #                 REDIS_CONNECTION.hset(key, field_backup, value)
-        #                 REDIS_CONNECTION.hset(key, field, "nan")
-        #                 structured_redis_storage(field_backup, qubit.strip("q"), value)
-        #                 REDIS_CONNECTION.hset(key, field, "nan")
-        #                 structured_redis_storage(field, qubit.strip("q"), None)
-        #         if getattr(self, "coupler", None) is not None:
-        #             couplers = self.coupler
-        #             for coupler in couplers:
-        #                 key = f"couplers:{coupler}"
-        #                 if field in REDIS_CONNECTION.hgetall(key).keys():
-        #                     value = REDIS_CONNECTION.hget(key, field)
-        #                     REDIS_CONNECTION.hset(key, field_backup, value)
-        #                     structured_redis_storage(field_backup, coupler, value)
-        #                     REDIS_CONNECTION.hset(key, field, "nan")
-        #                     structured_redis_storage(key, coupler, value)
 
         transmons = self.device_manager.transmons
 

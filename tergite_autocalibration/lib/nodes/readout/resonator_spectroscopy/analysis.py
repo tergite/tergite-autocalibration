@@ -77,8 +77,7 @@ class ResonatorSpectroscopyQubitAnalysis(BaseQubitAnalysis):
         )
         # using the min value driectly
         self.min_freq_data = frequencies[np.argmin(np.abs(s21_values))]
-        # print(fit_Ql)
-        # print(self.min_freq )
+
         return [self.minimum_freq, fit_Ql, self.min_freq_data]
 
     def plotter(self, ax):

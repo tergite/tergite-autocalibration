@@ -10,7 +10,8 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-# TODO: This whole file would have to be reworked
+import csv
+import json
 
 
 class HW_Config_Generator:
@@ -178,3 +179,30 @@ if __name__ == "main":
     qrm_modules = list(module_to_ro_line_qubit_map.keys())
 
     qubits = module_to_qubit_map.values()
+# with open(mixer_file) as csvfile:
+#     reader = csv.reader(csvfile)
+#     # skip first row
+#     next(reader)
+#     for row in reader:
+#         if all(row):
+#             label = row[0]
+#             module = row[1]
+#             complex_out = row[2]
+#             lo_freq = float(row[3])
+#
+#             if module in qrm_modules:
+#                 qrm_qubits = module_to_ro_line_qubit_map[module]
+#                 qrm_config = qrm_hw(
+#                     qrm_qubits,
+#                     lo=lo_freq,
+#                 )
+#                 HW_CONFIG[f"{CLUSTER_NAME}"][f"{CLUSTER_NAME}_{module}"] = qrm_config
+#             else:
+#                 qcm_config = qcm_hw(
+#                     module=module,
+#                     lo=lo_freq,
+#                 )
+#                 HW_CONFIG[f"{CLUSTER_NAME}"][f"{CLUSTER_NAME}_{module}"] = qcm_config
+#
+# with open(json_config_file, "w") as f:
+#     json.dump(HW_CONFIG, f, indent=3)
