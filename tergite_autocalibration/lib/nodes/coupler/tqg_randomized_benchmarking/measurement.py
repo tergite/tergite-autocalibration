@@ -22,7 +22,7 @@ from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.utils.extended_coupler_edge import (
     ExtendedCompositeSquareEdge,
 )
-from tergite_autocalibration.utils.extended_gates import Rxy_12, Measure_RO_Opt
+from tergite_autocalibration.utils.extended_gates import Rxy_12, Measure_RO_3state_Opt
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 from tergite_autocalibration.utils.logger.tac_logger import logger
 
@@ -183,7 +183,7 @@ class TQGRandomizedBenchmarkingSSRO(BaseMeasurement):
                 this_index = acq_index
 
                 shot.add(
-                    Measure_RO_Opt(
+                    Measure_RO_3state_Opt(
                         this_qubit, acq_index=acq_index, bin_mode=BinMode.APPEND
                     ),
                     ref_op=buffer,
@@ -221,7 +221,7 @@ class TQGRandomizedBenchmarkingSSRO(BaseMeasurement):
                 else:
                     raise ValueError("State Input Error")
                 shot.add(
-                    Measure_RO_Opt(
+                    Measure_RO_3state_Opt(
                         this_qubit, acq_index=calib_index, bin_mode=BinMode.APPEND
                     ),
                     ref_op=prep,
@@ -230,7 +230,7 @@ class TQGRandomizedBenchmarkingSSRO(BaseMeasurement):
                 shot.add(Reset(this_qubit))
 
         schedule.add(IdlePulse(16e-9))
-        print(schedule.add(shot, control_flow=Loop(repetitions), validate=False))
+        print(schedule.add(shot, control_flow=Loop(repetitions)))
         schedule.add(IdlePulse(16e-9))
 
         return schedule

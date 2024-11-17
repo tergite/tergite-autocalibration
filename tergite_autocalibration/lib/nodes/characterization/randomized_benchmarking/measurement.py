@@ -23,7 +23,7 @@ from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.control_flow_library import Loop
 import tergite_autocalibration.utils.clifford_elements_decomposition as cliffords
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
-from tergite_autocalibration.utils.extended_gates import Measure_RO_Opt, Rxy_12
+from tergite_autocalibration.utils.extended_gates import Measure_RO_3state_Opt, Rxy_12
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 from quantify_scheduler.resources import ClockResource
 
@@ -127,7 +127,7 @@ class Randomized_Benchmarking_SSRO(BaseMeasurement):
                     )
                 # buffer = shot.add(IdlePulse(40e-9))
                 shot.add(
-                    Measure_RO_Opt(
+                    Measure_RO_3state_Opt(
                         this_qubit, acq_index=acq_index, bin_mode=BinMode.APPEND
                     ),
                     ref_op=recovery_gate,
@@ -168,7 +168,7 @@ class Randomized_Benchmarking_SSRO(BaseMeasurement):
                 else:
                     raise ValueError("State Input Error")
                 shot.add(
-                    Measure_RO_Opt(
+                    Measure_RO_3state_Opt(
                         this_qubit, acq_index=calib_index, bin_mode=BinMode.APPEND
                     ),
                     ref_op=prep,
@@ -177,7 +177,7 @@ class Randomized_Benchmarking_SSRO(BaseMeasurement):
                 shot.add(Reset(this_qubit))
 
         schedule.add(IdlePulse(16e-9))
-        print(schedule.add(shot, control_flow=Loop(repetitions), validate=False))
+        print(schedule.add(shot, control_flow=Loop(repetitions)))
         schedule.add(IdlePulse(16e-9))
 
         return schedule

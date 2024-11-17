@@ -72,7 +72,7 @@ from tergite_autocalibration.config.VNA_values import (
 
 
 def resonator_samples(qubit: str) -> np.ndarray:
-    res_spec_samples = 51
+    res_spec_samples = 81
     sweep_range = 4.0e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
     min_freq = VNA_frequency - sweep_range / 2 - 0.5e6
@@ -81,7 +81,7 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 
 def qubit_samples(qubit: str, transition: str = "01") -> np.ndarray:
-    qub_spec_samples = 101
+    qub_spec_samples = 4
     sweep_range = 20e6
     if transition == "01":
         VNA_frequency = VNA_qubit_frequencies[qubit]
@@ -109,7 +109,8 @@ user_samplespace = {
 """
 ####################################################################
 target_node = "qubit_01_spectroscopy_AR"
-qubits = ["q06", "q07", "q08", "q09", "q10"]
+qubits = ["q06",'q07']
+# qubits = ["q06", "q07", "q08", "q09", "q10"]
 # qubits =   ["q06", "q07", "q08", "q09", "q10", "q11", "q12", "q13", "q14", "q15"]
 couplers = ["q06_q07"]
 user_samplespace = {
@@ -120,7 +121,7 @@ user_samplespace = {
 # attenuation_setting = {'qubit':30, 'coupler':30, 'readout':50}
 # attenuation_setting = {'qubit':16, 'coupler':20, 'readout':40}
 # attenuation_setting = {'qubit':16, 'coupler':20, 'readout':30}
-attenuation_setting = {"qubit": 16, "coupler": 20, "readout": 10}
+attenuation_setting = {"qubit": 12, "coupler": 20, "readout": 10}
 # attenuation_setting = {'qubit':60, 'coupler':60, 'readout':10}
 
 

@@ -49,7 +49,7 @@ class Qubit_01_Spectroscopy_Multidim_AR_Node(ScheduleNode):
 
         self.schedule_samplespace = {
             "spec_pulse_amplitudes": {
-                qubit: np.linspace(4e-4, 8e-3, 2) for qubit in self.all_qubits
+                qubit: np.linspace(4e-3, 8e-3, 1) for qubit in self.all_qubits
             },
             "spec_frequencies": {
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits

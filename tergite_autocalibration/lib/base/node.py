@@ -39,6 +39,7 @@ from tergite_autocalibration.lib.utils.schedule_execution import execute_schedul
 from tergite_autocalibration.utils.dataset_utils import configure_dataset, save_dataset
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.logger.tac_logger import logger
+import matplotlib.pyplot as plt
 
 colorama_init()
 
@@ -195,6 +196,17 @@ class BaseNode(abc.ABC):
         compiled_schedule = compiler.compile(
             schedule=schedule, config=compilation_config
         )
+        with open(f"timing_instructions_table_{self.name}.html", 'w') as f:
+            f.write(
+                compiled_schedule.timing_table.hide(
+                    subset=['waveform_op_id','operation_hash'], axis=1
+                ).to_html()
+            )
+
+        fig = compiled_schedule.plot_pulse_diagram(plot_backend='plotly')
+        fig.write_html(f'{self.name}_plotly.html')
+        # compiled_schedule.plot_pulse_diagram(multiple_subplots=True)
+        # fig.show()
 
         return compiled_schedule
 
@@ -223,6 +235,7 @@ class BaseNode(abc.ABC):
                 self.lab_instr_coordinator,
                 cluster_status,
             )
+            breakpoint()
         elif cluster_status == MeasurementMode.dummy:
             raw_dataset = self.generate_dummy_dataset()
 

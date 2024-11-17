@@ -68,6 +68,8 @@ class Two_Tones_Multidim_AR(BaseMeasurement):
             ro_duration = this_transmon.measure.pulse_duration()
             rxy_duration = this_transmon.rxy.duration()
 
+            print(f'{ ro_duration = }')
+            print(f'{ rxy_duration = }')
             cr_duration = 364e-9 + ro_duration + rxy_duration + 4e-9
             stagger_time = acq_channel * cr_duration
             buffer_time = len(qubits) * cr_duration
@@ -127,11 +129,12 @@ class Two_Tones_Multidim_AR(BaseMeasurement):
                     # the conditional operations do not overlap  #################
                     schedule.add(IdlePulse(stagger_time))
                     schedule.add(ConditionalReset(this_qubit, acq_index=2 * this_index))
+                    # schedule.add(Reset(this_qubit))
                     schedule.add(
-                        IdlePulse(4e-9 + buffer_time - stagger_time - cr_duration)
+                        IdlePulse(buffer_time - stagger_time - cr_duration)
                     )
-                    print(f"{ stagger_time = }")
-                    print(f"{ 4e-9 + buffer_time - stagger_time -cr_duration = }")
+                    # print(f"{ stagger_time = }")
+                    # print(f"{ 4e-9 + buffer_time - stagger_time -cr_duration = }")
                     ##############################################################
 
                     schedule.add(
@@ -146,6 +149,7 @@ class Two_Tones_Multidim_AR(BaseMeasurement):
                     schedule.add(
                         measure_function(
                             this_qubit,
+                            # acq_index=this_index,
                             acq_index=2 * this_index + 1,
                             bin_mode=BinMode.AVERAGE,
                             acq_protocol="ThresholdedAcquisition",

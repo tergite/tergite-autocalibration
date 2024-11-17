@@ -162,7 +162,7 @@ class BaseNodeAnalysis(ABC):
         full_path = self.data_path / f"{self.name}.png"
         self.fig.savefig(preview_path, bbox_inches="tight", dpi=100)
         self.fig.savefig(full_path, bbox_inches="tight", dpi=400)
-        plt.show(block=False)
+        plt.show(block=True)
         plt.pause(5)
         plt.close()
         logger.info(f"Plots saved to {preview_path} and {full_path}")
