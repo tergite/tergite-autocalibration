@@ -11,6 +11,7 @@
 # that they have been altered from the originals.
 
 import os
+import shutil
 from pathlib import Path
 from typing import Annotated
 
@@ -32,21 +33,6 @@ def complete_template_name(incomplete: str):
             yield template_name
 
 
-@config_cli.command(help="Get a configuration value.")
-def get():
-    # Look up configuration value
-    # Put it into the clipboard
-    raise NotImplementedError()
-
-
-@config_cli.command(help="Set a configuration value.")
-def set():
-    # Validate input
-    # Write into configuration
-    # Maybe can have a batch version of the command to set all values from a file
-    raise NotImplementedError()
-
-
 @config_cli.command(help="Save the whole configuration snapshot.")
 def save(
     filepath: Annotated[
@@ -54,61 +40,70 @@ def save(
         typer.Option(
             "--filepath",
             "-f",
-            help="Path to store the configuration at. If not set, it will assume the current directory.",
+            help="Path to store the configuration at.",
         ),
     ] = None,
-    # no_zip: Annotated[
-    #     bool,
-    #     typer.Option(
-    #         "--no-zip",
-    #         is_flag=True,
-    #         help="If --no-zip, the configuration files will be stored into a folder and not zipped.",
-    #     ),
-    # ] = False,
-    # no_env: Annotated[
-    #     bool,
-    #     typer.Option(
-    #         "--no-env",
-    #         is_flag=True,
-    #         help="If --no-env, the configuration package will not contain the .env file.",
-    #     ),
-    # ] = False,
+    as_zip: Annotated[
+        bool,
+        typer.Option(
+            "--as-zip",
+            "-z",
+            is_flag=True,
+            help="If --no-zip, the configuration files will be stored into a folder and not zipped.",
+        ),
+    ] = False,
 ):
+    """
+    CLI endpoint to save configuration packages.
+    Will store the configuration that is currently located in the root directory of the autocalibration.
+
+    Args:
+        filepath: Path to where the configuration will be saved
+        as_zip: Whether to zip the configuration package
+
+    Returns:
+
+    """
+
     from tergite_autocalibration.config.settings import ROOT_DIR
     from tergite_autocalibration.config.handler import MetaConfiguration
 
+    # Check whether filepath parameter is given
     if filepath is None:
-        typer.echo(
-            "Cannot store configuration package, please provide a valid filepath."
-        )
+        typer.echo("Please provide a path with the -f parameter.")
         return
 
+    # Create the absolute path from the filepath
     abs_filepath = os.path.abspath(filepath)
-    typer.echo(abs_filepath)
 
+    # This is the path to the meta configuration for the current application
     meta_config_path = os.path.join(ROOT_DIR, "configuration.meta.toml")
 
+    # Abort if there is no such meta configuration
     if not os.path.exists(meta_config_path):
         typer.echo(
-            "Cannot find meta configuration. "
+            "Cannot find meta configuration.\n"
             "Please make sure your autocalibration is properly configured before trying to save a configuration package"
         )
         return
 
+    # Otherwise load the meta configuration object
     meta_config = MetaConfiguration.from_toml(meta_config_path)
 
+    # Basic check whether there might be conflicting files at the target location that might be overwritten
     if os.path.exists(abs_filepath):
-        overwrite = typer.confirm(
-            "The filepath where you want to store your configuration package already exists. "
+        typer.confirm(
+            "The filepath where you want to store your configuration package already exists.\n"
             "Do you wish to continue?",
             abort=True,
         )
-        if overwrite:
-            meta_config.copy(abs_filepath)
-        else:
-            typer.echo("Aborting...")
-    else:
-        meta_config.copy(abs_filepath)
+    # Copy the configuration package to the target location
+    configuration_to_export = meta_config.copy(abs_filepath)
+
+    # If the configuration should be saved as zip file, then zip it and remove the folder
+    if as_zip:
+        shutil.make_archive(abs_filepath, format="zip", root_dir=abs_filepath)
+        configuration_to_export.delete()
 
 
 @config_cli.command(help="Restore and load a configuration snapshot.")
@@ -131,17 +126,36 @@ def load(
         ),
     ] = None,
 ):
+    """
+    CLI endpoint to load configuration packages. Will copy the package to the root directory.
+
+    Args:
+        filepath: Path to a configuration package
+        template: Name to a configuration package from the templates folder
+
+    Returns:
+
+    """
+
     from tergite_autocalibration.config.handler import MetaConfiguration
     from tergite_autocalibration.config.settings import ROOT_DIR
 
+    # This is the case where a template path is given to the know templates directory
     if template is not None:
         meta_config = MetaConfiguration.from_toml(
             os.path.join(config_templates_path, template, "configuration.meta.toml")
         )
+
+    # This is the case where a filepath in the filesystem is given
     elif filepath is not None:
-        meta_config = MetaConfiguration.from_toml(
-            os.path.join(filepath, "configuration.meta.toml")
-        )
+        # Make sure that it is the absolute filepath to the source
+        filepath = os.path.abspath(filepath)
+        # Check, because it could be either the path to the meta configuration or its parent directory
+        if filepath.endswith("configuration.meta.toml"):
+            filepath = os.path.join(filepath, "configuration.meta.toml")
+        meta_config = MetaConfiguration.from_toml(filepath)
+
+    # In any other case load the .default template for the meta configuration
     else:
         typer.echo(
             "No configuration package specified. Loading default configuration..."
@@ -149,6 +163,15 @@ def load(
         meta_config = MetaConfiguration.from_toml(
             os.path.join(config_templates_path, ".default", "configuration.meta.toml")
         )
+
+    # Basic check whether there is not already a configuration package in place that would be overwritten
+    if os.path.exists(os.path.join(ROOT_DIR, "configuration.meta.toml")):
+        typer.confirm(
+            "There is already a configuration package loaded, do you want to overwrite it?",
+            abort=True,
+        )
+
+    # Copy the meta configuration to the root directory
     meta_config.copy(ROOT_DIR)
 
 
@@ -156,7 +179,7 @@ def load(
 def show():
     # Show all configuration values
     # What should the inputs be?
-    pass
+    raise NotImplementedError()
 
 
 @config_cli.command(help="Run the configuration wizard.")

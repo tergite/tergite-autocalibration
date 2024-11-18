@@ -9,7 +9,7 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
-
+import logging
 import os
 import shutil
 from typing import Dict, Union
@@ -115,13 +115,12 @@ class MetaConfiguration:
         for file_path in file_paths:
             try:
                 os.remove(file_path)
-                print(f"Config file '{file_path}' deleted successfully.")
             except FileNotFoundError:
-                print(f"Config file '{file_path}' not found.")
+                logging.error(f"Config file '{file_path}' not found.")
             except PermissionError:
-                print(f"Permission denied to delete the config file '{file_path}'.")
+                logging.error(f"Permission denied to delete the config file '{file_path}'.")
             except Exception as e:
-                print(f"An error occurred: {e}")
+                logging.error(f"An error occurred: {e}")
 
     def delete(self):
         self._delete_config_files()
