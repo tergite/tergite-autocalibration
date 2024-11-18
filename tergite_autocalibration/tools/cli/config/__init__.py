@@ -10,11 +10,26 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+import os
+from pathlib import Path
 from typing import Annotated
 
 import typer
 
 config_cli = typer.Typer()
+
+config_templates_path = os.path.join(
+    Path(__file__).parent.parent.parent.parent.parent, "templates"
+)
+template_names = [
+    entry_.name for entry_ in os.scandir(config_templates_path) if entry_.is_dir()
+]
+
+
+def complete_template_name(incomplete: str):
+    for template_name in template_names:
+        if template_name.startswith(incomplete):
+            yield template_name
 
 
 @config_cli.command(help="Get a configuration value.")
@@ -42,32 +57,58 @@ def save(
             help="Path to store the configuration at. If not set, it will assume the current directory.",
         ),
     ] = None,
-    no_zip: Annotated[
-        bool,
-        typer.Option(
-            "--no-zip",
-            is_flag=True,
-            help="If --no-zip, the configuration files will be stored into a folder and not zipped.",
-        ),
-    ] = False,
-    no_env: Annotated[
-        bool,
-        typer.Option(
-            "--no-env",
-            is_flag=True,
-            help="If --no-env, the configuration package will not contain the .env file.",
-        ),
-    ] = False,
+    # no_zip: Annotated[
+    #     bool,
+    #     typer.Option(
+    #         "--no-zip",
+    #         is_flag=True,
+    #         help="If --no-zip, the configuration files will be stored into a folder and not zipped.",
+    #     ),
+    # ] = False,
+    # no_env: Annotated[
+    #     bool,
+    #     typer.Option(
+    #         "--no-env",
+    #         is_flag=True,
+    #         help="If --no-env, the configuration package will not contain the .env file.",
+    #     ),
+    # ] = False,
 ):
-    import os.path
-
-    from tergite_autocalibration.config.io_ import save_configuration_snapshot
-    from .helpers import get_cwd
+    from tergite_autocalibration.config.settings import ROOT_DIR
+    from tergite_autocalibration.config.handler import MetaConfiguration
 
     if filepath is None:
-        filepath = os.path.join(get_cwd(), "configuration_snapshot")
+        typer.echo(
+            "Cannot store configuration package, please provide a valid filepath."
+        )
+        return
 
-    save_configuration_snapshot(filepath, zip_file=not no_zip, save_env=not no_env)
+    abs_filepath = os.path.abspath(filepath)
+    typer.echo(abs_filepath)
+
+    meta_config_path = os.path.join(ROOT_DIR, "configuration.meta.toml")
+
+    if not os.path.exists(meta_config_path):
+        typer.echo(
+            "Cannot find meta configuration. "
+            "Please make sure your autocalibration is properly configured before trying to save a configuration package"
+        )
+        return
+
+    meta_config = MetaConfiguration.from_toml(meta_config_path)
+
+    if os.path.exists(abs_filepath):
+        overwrite = typer.confirm(
+            "The filepath where you want to store your configuration package already exists. "
+            "Do you wish to continue?",
+            abort=True,
+        )
+        if overwrite:
+            meta_config.copy(abs_filepath)
+        else:
+            typer.echo("Aborting...")
+    else:
+        meta_config.copy(abs_filepath)
 
 
 @config_cli.command(help="Restore and load a configuration snapshot.")
@@ -86,10 +127,29 @@ def load(
             "--template",
             "-t",
             help="Shortcut to load the configuration from a template in the templates path.",
+            autocompletion=complete_template_name,
         ),
     ] = None,
 ):
-    raise NotImplementedError()
+    from tergite_autocalibration.config.handler import MetaConfiguration
+    from tergite_autocalibration.config.settings import ROOT_DIR
+
+    if template is not None:
+        meta_config = MetaConfiguration.from_toml(
+            os.path.join(config_templates_path, template, "configuration.meta.toml")
+        )
+    elif filepath is not None:
+        meta_config = MetaConfiguration.from_toml(
+            os.path.join(filepath, "configuration.meta.toml")
+        )
+    else:
+        typer.echo(
+            "No configuration package specified. Loading default configuration..."
+        )
+        meta_config = MetaConfiguration.from_toml(
+            os.path.join(config_templates_path, ".default", "configuration.meta.toml")
+        )
+    meta_config.copy(ROOT_DIR)
 
 
 @config_cli.command(help="List available configuration values.")
