@@ -54,3 +54,4 @@ post_merge_actions:
   script:
     # Run a wiki update
     - !reference [.update_wiki, script]
+

@@ -8,6 +8,9 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 ## [Unreleased]
 
 ### Added
+- Dataset browser
+- ScheduleNode and ExternalParameterSweepNode as subclasses of BaseNode
+- DeviceManager class
 
 ### Changed
 - Migrated cli from click to typer

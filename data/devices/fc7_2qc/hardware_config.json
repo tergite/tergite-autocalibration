@@ -84,7 +84,7 @@
                {
                   "port": "q00:res",
                   "clock": "q00.ro2",
-                  "mixer_amp_ratq15io": 1.0,
+                  "mixer_amp_ratio": 1.0,
                   "mixer_phase_error_deg": 0
                },
                {

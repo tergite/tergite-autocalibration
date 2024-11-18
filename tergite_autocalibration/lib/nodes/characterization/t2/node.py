@@ -1,4 +1,5 @@
 # This code is part of Tergite
+
 #
 # (C) Copyright Eleftherios Moschandreou 2024
 # (C) Copyright Liangyu Chen 2024
@@ -17,12 +18,17 @@ from time import sleep
 
 import numpy as np
 
-from .analysis import T2NodeAnalysis, T2EchoNodeAnalysis
-from .measurement import T2, T2Echo
-from ....base.node import BaseNode
+from tergite_autocalibration.lib.nodes.characterization.t2.analysis import (
+    T2NodeAnalysis,
+    T2EchoNodeAnalysis,
+)
+from tergite_autocalibration.lib.nodes.characterization.t2.measurement import T2, T2Echo
+from tergite_autocalibration.lib.base.external_parameter_node import (
+    ExternalParameterNode,
+)
 
 
-class T2_Node(BaseNode):
+class T2_Node(ExternalParameterNode):
     measurement_obj = T2
     analysis_obj = T2NodeAnalysis
     qubit_qois = ["t2_time"]
@@ -58,7 +64,7 @@ class T2_Node(BaseNode):
             sleep(self.sleep_time)
 
 
-class T2_Echo_Node(BaseNode):
+class T2_Echo_Node(ExternalParameterNode):
     measurement_obj = T2Echo
     analysis_obj = T2EchoNodeAnalysis
     qubit_qois = ["t2_echo_time"]
