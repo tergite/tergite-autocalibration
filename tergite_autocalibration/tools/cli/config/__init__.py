@@ -40,7 +40,9 @@ def save(
         typer.Option(
             "--filepath",
             "-f",
-            help="Path to store the configuration at.",
+            "-p",
+            help="Path to store the configuration at. "
+            "If it ends with .zip, the configuration package will become an archive",
         ),
     ] = None,
     as_zip: Annotated[
@@ -49,7 +51,7 @@ def save(
             "--as-zip",
             "-z",
             is_flag=True,
-            help="If --no-zip, the configuration files will be stored into a folder and not zipped.",
+            help="If --as-zip, the configuration files will be archived.",
         ),
     ] = False,
 ):
@@ -73,10 +75,17 @@ def save(
         typer.echo("Please provide a path with the -f parameter.")
         return
 
+    # Automatically set the .zip parameter if the output is a zip file
+    if filepath.endswith(".zip"):
+        filepath = filepath.removesuffix(".zip")
+        as_zip = True
+
     # Create the absolute path from the filepath
     abs_filepath = os.path.abspath(filepath)
 
     # This is the path to the meta configuration for the current application
+    if abs_filepath.endswith("configuration.meta.toml"):
+        abs_filepath = os.path.dirname(abs_filepath)
     meta_config_path = os.path.join(ROOT_DIR, "configuration.meta.toml")
 
     # Abort if there is no such meta configuration
@@ -98,12 +107,13 @@ def save(
             abort=True,
         )
     # Copy the configuration package to the target location
-    configuration_to_export = meta_config.copy(abs_filepath)
+    meta_config.copy(abs_filepath)
 
     # If the configuration should be saved as zip file, then zip it and remove the folder
     if as_zip:
         shutil.make_archive(abs_filepath, format="zip", root_dir=abs_filepath)
-        configuration_to_export.delete()
+        # Remove the temporary directory from the zipping process
+        shutil.rmtree(abs_filepath)
 
 
 @config_cli.command(help="Restore and load a configuration snapshot.")
@@ -113,7 +123,8 @@ def load(
         typer.Option(
             "--filepath",
             "-f",
-            help="Path to store the configuration at. If not set, it will assume the current directory.",
+            "-p",
+            help="Path to load the configuration from.",
         ),
     ] = None,
     template: Annotated[
@@ -140,6 +151,16 @@ def load(
     from tergite_autocalibration.config.handler import MetaConfiguration
     from tergite_autocalibration.config.settings import ROOT_DIR
 
+    # Basic check whether there is not already a configuration package in place that would be overwritten
+    if os.path.exists(os.path.join(ROOT_DIR, "configuration.meta.toml")):
+        typer.confirm(
+            "There is already a configuration package loaded, do you want to overwrite it?",
+            abort=True,
+        )
+
+    # We have to store the path of the temporary files from unzipping to clean-up later
+    clean_temp_folder = None
+
     # This is the case where a template path is given to the know templates directory
     if template is not None:
         meta_config = MetaConfiguration.from_toml(
@@ -150,10 +171,21 @@ def load(
     elif filepath is not None:
         # Make sure that it is the absolute filepath to the source
         filepath = os.path.abspath(filepath)
-        # Check, because it could be either the path to the meta configuration or its parent directory
-        if filepath.endswith("configuration.meta.toml"):
-            filepath = os.path.join(filepath, "configuration.meta.toml")
-        meta_config = MetaConfiguration.from_toml(filepath)
+        # Check whether it is an archive, because then it would load it from the .zip
+        if filepath.endswith(".zip"):
+            clean_temp_folder = filepath.removesuffix(".zip")
+            if os.path.exists(clean_temp_folder):
+                typer.confirm(
+                    f"The directory {clean_temp_folder} already exists and would be overwritten during loading.\n"
+                    "Do you want to proceed?",
+                    abort=True,
+                )
+            meta_config = MetaConfiguration.from_zip(filepath)
+        else:
+            # Check, because it could be either the path to the meta configuration or its parent directory
+            if not filepath.endswith("configuration.meta.toml"):
+                filepath = os.path.join(filepath, "configuration.meta.toml")
+            meta_config = MetaConfiguration.from_toml(filepath)
 
     # In any other case load the .default template for the meta configuration
     else:
@@ -164,15 +196,12 @@ def load(
             os.path.join(config_templates_path, ".default", "configuration.meta.toml")
         )
 
-    # Basic check whether there is not already a configuration package in place that would be overwritten
-    if os.path.exists(os.path.join(ROOT_DIR, "configuration.meta.toml")):
-        typer.confirm(
-            "There is already a configuration package loaded, do you want to overwrite it?",
-            abort=True,
-        )
-
     # Copy the meta configuration to the root directory
     meta_config.copy(ROOT_DIR)
+
+    # Check whether there is anything to clean
+    if clean_temp_folder is not None:
+        shutil.rmtree(clean_temp_folder)
 
 
 @config_cli.command(help="List available configuration values.")

@@ -65,8 +65,15 @@ class MetaConfiguration:
             )
 
     @staticmethod
-    def from_zip():
-        raise NotImplementedError()
+    def from_zip(meta_config_zip_path: str):
+        # Unzip the archive in the way it works on macOS such that it creates a folder with the same name
+        meta_config_folder_path = os.path.splitext(meta_config_zip_path)[0]
+        shutil.unpack_archive(meta_config_zip_path, meta_config_folder_path)
+
+        # Load the configuration from the .toml file inside
+        return MetaConfiguration.from_toml(
+            os.path.join(meta_config_folder_path, "configuration.meta.toml")
+        )
 
     def move(self, to: str) -> "MetaConfiguration":
         # Copy the configuration to the new location
@@ -118,7 +125,9 @@ class MetaConfiguration:
             except FileNotFoundError:
                 logging.error(f"Config file '{file_path}' not found.")
             except PermissionError:
-                logging.error(f"Permission denied to delete the config file '{file_path}'.")
+                logging.error(
+                    f"Permission denied to delete the config file '{file_path}'."
+                )
             except Exception as e:
                 logging.error(f"An error occurred: {e}")
 

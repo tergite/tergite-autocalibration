@@ -55,26 +55,26 @@ CONFIG_DIR = from_environment(
 
 # ---
 # Section with configuration files
-# RUN_CONFIG = CONFIG_DIR.joinpath(
-#     from_environment("RUN_CONFIG", cast_=Path, default="run_config.toml")
-# )
-#
-# CLUSTER_CONFIG = CONFIG_DIR.joinpath(
-#     from_environment("CLUSTER_CONFIG", cast_=Path, default="cluster_config.json")
-# )
-# SPI_CONFIG = CONFIG_DIR.joinpath(
-#     from_environment("SPI_CONFIG", cast_=Path, default="spi_config.toml")
-# )
-# DEVICE_CONFIG = CONFIG_DIR.joinpath(
-#     from_environment("DEVICE_CONFIG", cast_=Path, default="device_config.toml")
-# )
-#
-# NODE_CONFIG = CONFIG_DIR.joinpath(
-#     from_environment("NODE_CONFIG", cast_=Path, default="node_config.toml")
-# )
-# USER_SAMPLESPACE = CONFIG_DIR.joinpath(
-#     (from_environment("USER_SAMPLESPACE", cast_=Path, default="user_samplespace.py"))
-# )
+RUN_CONFIG = CONFIG_DIR.joinpath(
+    from_environment("RUN_CONFIG", cast_=Path, default="run_config.toml")
+)
+
+CLUSTER_CONFIG = CONFIG_DIR.joinpath(
+    from_environment("CLUSTER_CONFIG", cast_=Path, default="cluster_config.json")
+)
+SPI_CONFIG = CONFIG_DIR.joinpath(
+    from_environment("SPI_CONFIG", cast_=Path, default="spi_config.toml")
+)
+DEVICE_CONFIG = CONFIG_DIR.joinpath(
+    from_environment("DEVICE_CONFIG", cast_=Path, default="device_config.toml")
+)
+
+NODE_CONFIG = CONFIG_DIR.joinpath(
+    from_environment("NODE_CONFIG", cast_=Path, default="node_config.toml")
+)
+USER_SAMPLESPACE = CONFIG_DIR.joinpath(
+    (from_environment("USER_SAMPLESPACE", cast_=Path, default="user_samplespace.py"))
+)
 
 BACKEND_CONFIG = Path(__file__).parent / "backend_config_default.toml"
 
