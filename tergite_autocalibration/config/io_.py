@@ -15,6 +15,8 @@ import shutil
 from pathlib import Path
 from typing import Union
 
+from tomlkit import parse
+
 from tergite_autocalibration.config.settings import (
     RUN_CONFIG,
     CLUSTER_CONFIG,
@@ -86,7 +88,21 @@ def load_configuration_snapshot(filepath: Union[str, Path]):
         pass
 
     # Search for the configuration.meta.toml file
-    # If not there, raise an error
+    meta_config_path = os.path.join(filepath, "configuration.meta.toml")
+
+    # Read the TOML file
+    if os.path.isfile(meta_config_path):
+        with open(meta_config_path, "r") as f:
+            meta_config = parse(f.read())
+
+        config_path_prefix = os.path.join(filepath, meta_config["path_prefix"])
+        for file_key_, file_name_ in meta_config["files"]:
+            shutil.copy(os.path.join())
+
+    else:
+        raise FileNotFoundError(
+            "Please make sure the configuration package contains a configuration.meta.toml file."
+        )
 
     # If there is a .env file, load it
 

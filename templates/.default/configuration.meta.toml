@@ -20,6 +20,9 @@
 path_prefix = 'configs'
 
 
+# This section contains the relative paths plus the path_prefix to the configuration files
+[files]
+
 # ---
 # Run-time related configurations
 # ---
