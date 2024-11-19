@@ -16,10 +16,10 @@ from pathlib import Path
 from colorama import Fore, Style
 from qblox_instruments import SpiRack
 from qcodes import validators
-
 # TODO MERGE: Where does this one come from?
 from tergite_autocalibration.config.coupler_config import coupler_spi_map
-from tergite_autocalibration.config.settings import REDIS_CONNECTION
+
+from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 
 

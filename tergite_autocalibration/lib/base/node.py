@@ -32,7 +32,7 @@ from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
     InstrumentCoordinator,
 )
 
-from tergite_autocalibration.config import settings
+import tergite_autocalibration.config.globals
 from tergite_autocalibration.config.settings import CLUSTER_CONFIG
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
@@ -48,7 +48,7 @@ from tergite_autocalibration.utils.logger.tac_logger import logger
 colorama_init()
 
 
-matplotlib.use(settings.PLOTTING_BACKEND)
+matplotlib.use(tergite_autocalibration.config.globals.PLOTTING_BACKEND)
 
 
 class BaseNode(abc.ABC):

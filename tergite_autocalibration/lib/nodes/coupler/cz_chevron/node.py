@@ -15,7 +15,7 @@
 
 import numpy as np
 
-from tergite_autocalibration.config.settings import REDIS_CONNECTION
+from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.lib.base.node import BaseNode
 from tergite_autocalibration.lib.nodes.coupler.cz_chevron.cz_chevron_analysis import (
     CZChevronAnalysis,

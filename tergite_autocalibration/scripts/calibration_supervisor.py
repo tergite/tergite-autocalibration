@@ -30,9 +30,9 @@ from quantify_scheduler.instrument_coordinator.components.qblox import ClusterCo
 
 from tergite_autocalibration.config.calibration import CONFIG
 from tergite_autocalibration.config.data import dh
+from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.config.settings import (
     CLUSTER_IP,
-    REDIS_CONNECTION,
 )
 from tergite_autocalibration.lib.base.node import BaseNode
 from tergite_autocalibration.lib.utils.graph import filtered_topological_order

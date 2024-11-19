@@ -16,7 +16,7 @@ import itertools
 from typing import ClassVar, TYPE_CHECKING
 
 from tergite_autocalibration.config.calibration import CONFIG
-from tergite_autocalibration.config.settings import REDIS_CONNECTION
+from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 
