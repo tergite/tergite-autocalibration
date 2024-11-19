@@ -70,8 +70,11 @@ class Two_Tones_Multidim_AR(BaseMeasurement):
             print(f'{ ro_duration = }')
             print(f'{ rxy_duration = }')
             cr_duration = 364e-9 + ro_duration + rxy_duration + 4e-9
-            stagger_time = acq_channel * cr_duration
-            buffer_time = len(qubits) * cr_duration
+            ar_stagger_time = acq_channel * cr_duration
+            ar_buffer_time = len(qubits) * cr_duration
+            # TODO: this can be refined:
+            measurement_stagger_time = acq_channel * (ro_duration + 252e-9)
+            measurement_buffer_time = len(qubits) * (ro_duration + 252e-9)
 
             # long pulses require more efficient memory management
             if spec_pulse_duration > 6.5e-6:
@@ -126,17 +129,15 @@ class Two_Tones_Multidim_AR(BaseMeasurement):
 
                     # ACTIVE RESET BLOCK, the buffer and stagger times ensure that
                     # the conditional operations do not overlap  #################
-                    schedule.add(IdlePulse(stagger_time))
+                    schedule.add(IdlePulse(ar_stagger_time))
                     schedule.add(ConditionalReset(this_qubit, acq_index=2 * this_index))
-                    # schedule.add(Reset(this_qubit))
                     schedule.add(
-                        IdlePulse(buffer_time - stagger_time - cr_duration)
+                        IdlePulse(ar_buffer_time - ar_stagger_time - cr_duration)
                     )
-                    # print(f"{ stagger_time = }")
-                    # print(f"{ 4e-9 + buffer_time - stagger_time -cr_duration = }")
                     ##############################################################
 
-
+                    # Stagger also the Spectroscopy measurements to avoid trigger overlapings
+                    schedule.add(IdlePulse(measurement_stagger_time))
                     schedule.add(
                         SpectroscopyPulse(
                             duration=spec_pulse_duration,
@@ -154,6 +155,9 @@ class Two_Tones_Multidim_AR(BaseMeasurement):
                             bin_mode=BinMode.AVERAGE,
                             acq_protocol="ThresholdedAcquisition",
                         ),
+                    )
+                    schedule.add(
+                        IdlePulse(measurement_buffer_time - measurement_buffer_time - ro_duration)
                     )
 
         return schedule

@@ -203,6 +203,7 @@ class BaseNode(abc.ABC):
 
         fig = compiled_schedule.plot_pulse_diagram(plot_backend='plotly')
         fig.write_html(f'{self.name}_plotly.html')
+        quit()
 
         return compiled_schedule
 
