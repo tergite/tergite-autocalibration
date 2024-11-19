@@ -25,7 +25,6 @@ import xarray
 from colorama import Fore, Style
 from colorama import init as colorama_init
 from quantify_scheduler.backends import SerialCompiler
-from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
 from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
     CompiledSchedule,
     InstrumentCoordinator,
@@ -39,7 +38,6 @@ from tergite_autocalibration.lib.utils.schedule_execution import execute_schedul
 from tergite_autocalibration.utils.dataset_utils import configure_dataset, save_dataset
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.logger.tac_logger import logger
-import matplotlib.pyplot as plt
 
 colorama_init()
 
@@ -205,8 +203,6 @@ class BaseNode(abc.ABC):
 
         fig = compiled_schedule.plot_pulse_diagram(plot_backend='plotly')
         fig.write_html(f'{self.name}_plotly.html')
-        # compiled_schedule.plot_pulse_diagram(multiple_subplots=True)
-        # fig.show()
 
         return compiled_schedule
 
@@ -235,7 +231,6 @@ class BaseNode(abc.ABC):
                 self.lab_instr_coordinator,
                 cluster_status,
             )
-            breakpoint()
         elif cluster_status == MeasurementMode.dummy:
             raw_dataset = self.generate_dummy_dataset()
 

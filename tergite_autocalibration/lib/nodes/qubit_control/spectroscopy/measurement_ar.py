@@ -1,6 +1,5 @@
 import numpy as np
 from quantify_scheduler.enums import BinMode
-from quantify_scheduler.operations.control_flow_library import Loop
 from quantify_scheduler.operations.gate_library import Measure, Reset, X
 from quantify_scheduler.operations.pulse_factories import long_square_pulse
 from quantify_scheduler.operations.pulse_library import (
@@ -136,6 +135,7 @@ class Two_Tones_Multidim_AR(BaseMeasurement):
                     # print(f"{ stagger_time = }")
                     # print(f"{ 4e-9 + buffer_time - stagger_time -cr_duration = }")
                     ##############################################################
+
 
                     schedule.add(
                         SpectroscopyPulse(
