@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Stefan Hill 2024
+# (C) Copyright Chalmers Next Labs 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -14,11 +14,12 @@ import os.path
 
 import redis
 
+from tergite_autocalibration.config.handler import ConfigurationHandler
 from tergite_autocalibration.config.package import ConfigurationPackage
 from tergite_autocalibration.config.settings import REDIS_PORT, PLOTTING, CONFIG_DIR
 
-CONFIG = ConfigurationPackage.from_toml(
-    os.path.join(CONFIG_DIR, "configuration.meta.toml")
+CONFIG = ConfigurationHandler.from_configuration_package(
+    ConfigurationPackage.from_toml(os.path.join(CONFIG_DIR, "configuration.meta.toml"))
 )
 
 REDIS_CONNECTION = redis.Redis(decode_responses=True, port=REDIS_PORT)
