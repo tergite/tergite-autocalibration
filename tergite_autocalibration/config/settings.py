@@ -28,7 +28,7 @@ from tergite_autocalibration.config.utils import from_environment
 DEFAULT_PREFIX = from_environment(
     "DEFAULT_PREFIX",
     cast_=str,
-    default=getpass.getuser(),
+    default=getpass.getuser().replace(" ", ""),
 )
 
 # ---
