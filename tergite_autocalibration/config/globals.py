@@ -14,7 +14,7 @@ import os.path
 
 import redis
 
-from tergite_autocalibration.config.handler import ConfigurationPackage
+from tergite_autocalibration.config.package import ConfigurationPackage
 from tergite_autocalibration.config.settings import REDIS_PORT, PLOTTING, CONFIG_DIR
 
 CONFIG = ConfigurationPackage.from_toml(

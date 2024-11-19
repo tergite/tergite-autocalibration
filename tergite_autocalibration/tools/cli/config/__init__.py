@@ -68,7 +68,7 @@ def save(
     """
 
     from tergite_autocalibration.config.settings import ROOT_DIR
-    from tergite_autocalibration.config.handler import ConfigurationPackage
+    from tergite_autocalibration.config.package import ConfigurationPackage
 
     # Check whether filepath parameter is given
     if filepath is None:
@@ -148,7 +148,7 @@ def load(
 
     """
 
-    from tergite_autocalibration.config.handler import ConfigurationPackage
+    from tergite_autocalibration.config.package import ConfigurationPackage
     from tergite_autocalibration.config.settings import ROOT_DIR
 
     # Basic check whether there is not already a configuration package in place that would be overwritten
