@@ -16,16 +16,17 @@
 Module containing a schedule class for randomized benchmarking measurement.
 """
 import numpy as np
-from quantify_scheduler.operations.gate_library import Reset, Rxy, X
-from quantify_scheduler.operations.pulse_library import IdlePulse
-from quantify_scheduler.schedules.schedule import Schedule
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.control_flow_library import Loop
+from quantify_scheduler.operations.gate_library import Reset, Rxy, X
+from quantify_scheduler.operations.pulse_library import IdlePulse
+from quantify_scheduler.resources import ClockResource
+from quantify_scheduler.schedules.schedule import Schedule
+
 import tergite_autocalibration.utils.clifford_elements_decomposition as cliffords
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
-from tergite_autocalibration.utils.extended_gates import Measure_RO_Opt, Rxy_12
+from tergite_autocalibration.utils.extended_gates import Measure_RO_3state_Opt, Rxy_12
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
-from quantify_scheduler.resources import ClockResource
 
 
 class Randomized_Benchmarking_SSRO(BaseMeasurement):
@@ -127,7 +128,7 @@ class Randomized_Benchmarking_SSRO(BaseMeasurement):
                     )
                 # buffer = shot.add(IdlePulse(40e-9))
                 shot.add(
-                    Measure_RO_Opt(
+                    Measure_RO_3state_Opt(
                         this_qubit, acq_index=acq_index, bin_mode=BinMode.APPEND
                     ),
                     ref_op=recovery_gate,
@@ -168,7 +169,7 @@ class Randomized_Benchmarking_SSRO(BaseMeasurement):
                 else:
                     raise ValueError("State Input Error")
                 shot.add(
-                    Measure_RO_Opt(
+                    Measure_RO_3state_Opt(
                         this_qubit, acq_index=calib_index, bin_mode=BinMode.APPEND
                     ),
                     ref_op=prep,
