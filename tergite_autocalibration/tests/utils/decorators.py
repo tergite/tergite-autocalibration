@@ -9,7 +9,6 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
-
 from functools import wraps
 from typing import Dict, Any
 
@@ -17,7 +16,7 @@ from typing import Dict, Any
 GLOBAL_VARIABLES = {"ABC": 123, "CDE": 345}
 
 
-def set_test_env(variables: Dict[str, Any]):
+def set_global_var(variables: Dict[str, Any]):
     def inner_decorator_fn_(fn_):
         @wraps(fn_)
         def wrapper(*args, **kwargs):
@@ -42,6 +41,6 @@ def set_test_env(variables: Dict[str, Any]):
     return inner_decorator_fn_
 
 
-@set_test_env({"ABC": 345})
+@set_global_var({"ABC": 345})
 def test_setting_env_variables():
     print(GLOBAL_VARIABLES)

@@ -68,7 +68,7 @@ def save(
     """
 
     from tergite_autocalibration.config.settings import ROOT_DIR
-    from tergite_autocalibration.config.handler import MetaConfiguration
+    from tergite_autocalibration.config.handler import ConfigurationPackage
 
     # Check whether filepath parameter is given
     if filepath is None:
@@ -97,7 +97,7 @@ def save(
         return
 
     # Otherwise load the meta configuration object
-    meta_config = MetaConfiguration.from_toml(meta_config_path)
+    configuration_package = ConfigurationPackage.from_toml(meta_config_path)
 
     # Basic check whether there might be conflicting files at the target location that might be overwritten
     if os.path.exists(abs_filepath):
@@ -107,7 +107,7 @@ def save(
             abort=True,
         )
     # Copy the configuration package to the target location
-    meta_config.copy(abs_filepath)
+    configuration_package.copy(abs_filepath)
 
     # If the configuration should be saved as zip file, then zip it and remove the folder
     if as_zip:
@@ -148,7 +148,7 @@ def load(
 
     """
 
-    from tergite_autocalibration.config.handler import MetaConfiguration
+    from tergite_autocalibration.config.handler import ConfigurationPackage
     from tergite_autocalibration.config.settings import ROOT_DIR
 
     # Basic check whether there is not already a configuration package in place that would be overwritten
@@ -163,7 +163,7 @@ def load(
 
     # This is the case where a template path is given to the know templates directory
     if template is not None:
-        meta_config = MetaConfiguration.from_toml(
+        configuration_package = ConfigurationPackage.from_toml(
             os.path.join(config_templates_path, template, "configuration.meta.toml")
         )
 
@@ -180,24 +180,24 @@ def load(
                     "Do you want to proceed?",
                     abort=True,
                 )
-            meta_config = MetaConfiguration.from_zip(filepath)
+            configuration_package = ConfigurationPackage.from_zip(filepath)
         else:
             # Check, because it could be either the path to the meta configuration or its parent directory
             if not filepath.endswith("configuration.meta.toml"):
                 filepath = os.path.join(filepath, "configuration.meta.toml")
-            meta_config = MetaConfiguration.from_toml(filepath)
+            configuration_package = ConfigurationPackage.from_toml(filepath)
 
     # In any other case load the .default template for the meta configuration
     else:
         typer.echo(
             "No configuration package specified. Loading default configuration..."
         )
-        meta_config = MetaConfiguration.from_toml(
+        configuration_package = ConfigurationPackage.from_toml(
             os.path.join(config_templates_path, ".default", "configuration.meta.toml")
         )
 
     # Copy the meta configuration to the root directory
-    meta_config.copy(ROOT_DIR)
+    configuration_package.copy(ROOT_DIR)
 
     # Check whether there is anything to clean
     if clean_temp_folder is not None:

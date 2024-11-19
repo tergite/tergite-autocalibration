@@ -9,6 +9,7 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
+
 import logging
 import os
 import shutil
@@ -17,7 +18,7 @@ from typing import Dict, Union
 from tomlkit import parse
 
 
-class MetaConfiguration:
+class ConfigurationPackage:
 
     def __init__(self):
         self.meta_path = None
@@ -31,9 +32,9 @@ class MetaConfiguration:
         }
 
     @staticmethod
-    def from_toml(meta_config_path: str) -> "MetaConfiguration":
+    def from_toml(meta_config_path: str) -> "ConfigurationPackage":
         # Create a MetaConfiguration instance to be returned
-        return_obj = MetaConfiguration()
+        return_obj = ConfigurationPackage()
 
         # Check whether the .toml file exists
         if os.path.isfile(meta_config_path):
@@ -71,11 +72,11 @@ class MetaConfiguration:
         shutil.unpack_archive(meta_config_zip_path, meta_config_folder_path)
 
         # Load the configuration from the .toml file inside
-        return MetaConfiguration.from_toml(
+        return ConfigurationPackage.from_toml(
             os.path.join(meta_config_folder_path, "configuration.meta.toml")
         )
 
-    def move(self, to: str) -> "MetaConfiguration":
+    def move(self, to: str) -> "ConfigurationPackage":
         # Copy the configuration to the new location
         moved_configuration = self.copy(to)
         # Cleanup the old location
@@ -86,7 +87,7 @@ class MetaConfiguration:
         self.meta_path = moved_configuration.meta_path
         return self
 
-    def copy(self, to: str) -> "MetaConfiguration":
+    def copy(self, to: str) -> "ConfigurationPackage":
 
         # Get the absolute path to where to copy and create the destination directory
         abs_path_to = os.path.abspath(to)
@@ -111,7 +112,7 @@ class MetaConfiguration:
             # Copy the file to the new directory
             shutil.copy(file_path, new_file_path)
 
-        return MetaConfiguration.from_toml(new_path_to_meta)
+        return ConfigurationPackage.from_toml(new_path_to_meta)
 
     def _delete_config_files(self, include_meta: bool = True):
 
@@ -134,13 +135,3 @@ class MetaConfiguration:
     def delete(self):
         self._delete_config_files()
         del self
-
-
-class ConfigurationPackage:
-
-    def __init__(self):
-        pass
-
-    @staticmethod
-    def from_configuration_meta(filepath):
-        pass
