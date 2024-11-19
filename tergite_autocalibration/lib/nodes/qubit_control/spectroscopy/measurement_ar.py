@@ -67,14 +67,15 @@ class Two_Tones_Multidim_AR(BaseMeasurement):
             ro_duration = this_transmon.measure.pulse_duration()
             rxy_duration = this_transmon.rxy.duration()
 
-            print(f'{ ro_duration = }')
-            print(f'{ rxy_duration = }')
+            print(f"{ ro_duration = }")
+            print(f"{ rxy_duration = }")
             cr_duration = 364e-9 + ro_duration + rxy_duration + 4e-9
             ar_stagger_time = acq_channel * cr_duration
             ar_buffer_time = len(qubits) * cr_duration
             # TODO: this can be refined:
+            spectroscopy_time = ro_duration + spec_pulse_duration
             measurement_stagger_time = acq_channel * (ro_duration + 252e-9)
-            measurement_buffer_time = len(qubits) * (ro_duration + 252e-9)
+            measurement_buffer_time = len(qubits) * (spectroscopy_time + 252e-9)
 
             # long pulses require more efficient memory management
             if spec_pulse_duration > 6.5e-6:
@@ -157,7 +158,11 @@ class Two_Tones_Multidim_AR(BaseMeasurement):
                         ),
                     )
                     schedule.add(
-                        IdlePulse(measurement_buffer_time - measurement_buffer_time - ro_duration)
+                        IdlePulse(
+                            measurement_buffer_time
+                            - measurement_stagger_time
+                            - spectroscopy_time
+                        )
                     )
 
         return schedule
