@@ -82,10 +82,14 @@ class R12(InstrumentChannel):
             unit="",
             vals=Numbers(min_value=-10, max_value=10, allow_nan=True),
         )
+        ef_motzoi = kwargs.get("ef_motzoi", 0)
+        if math.isnan(ef_motzoi):
+            ef_motzoi = 0
+
         self.motzoi = ManualParameter(
             name="ef_motzoi",
             instrument=self,
-            initial_value=kwargs.get("ef_motzoi", 0),
+            initial_value=ef_motzoi,
             unit="",
             vals=validators.Numbers(min_value=-1, max_value=1),
         )
