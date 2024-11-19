@@ -16,8 +16,8 @@ from ipaddress import IPv4Address
 import numpy as np
 import optuna
 
-from tergite_autocalibration.config.calibration import CONFIG
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
+from tergite_autocalibration.config.legacy import LEGACY_CONFIG
 from tergite_autocalibration.config.settings import CLUSTER_IP
 from tergite_autocalibration.lib.nodes import (
     characterization_nodes as calibrate_nodes,
@@ -58,8 +58,8 @@ class Monitor:
     couplers = UserInputObject()
 
     def __init__(self):
-        self.qubits = CONFIG.qubits
-        self.couplers = CONFIG.couplers
+        self.qubits = LEGACY_CONFIG.qubits
+        self.couplers = LEGACY_CONFIG.couplers
         self.nodes = [
             (f.split("_Node")[0]).lower()
             for f in dir(calibrate_nodes)
@@ -123,8 +123,8 @@ class OptimizeNode:
         self.monitor = Monitor()
         self.reset_redis = ResetRedisNode()
         self.node = node
-        self.qubits = CONFIG.qubits
-        self.couplers = CONFIG.couplers
+        self.qubits = LEGACY_CONFIG.qubits
+        self.couplers = LEGACY_CONFIG.couplers
         sampler = optuna.samplers.CmaEsSampler(with_margin=True)
         self.study = optuna.create_study(sampler=sampler)
         self.trails = trails

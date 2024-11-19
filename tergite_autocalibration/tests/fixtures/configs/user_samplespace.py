@@ -16,7 +16,7 @@
 # This is an example file on how to create a custom samplespace for your node.
 
 
-from tergite_autocalibration.config.data import dh
+from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.utils.samplespace import resonator_samples
 
 """

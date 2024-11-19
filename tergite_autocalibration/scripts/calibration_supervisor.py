@@ -28,9 +28,8 @@ from qblox_instruments.types import ClusterType
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 
-from tergite_autocalibration.config.calibration import CONFIG
-from tergite_autocalibration.config.data import dh
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
+from tergite_autocalibration.config.legacy import LEGACY_CONFIG, dh
 from tergite_autocalibration.config.settings import (
     CLUSTER_IP,
 )
@@ -86,16 +85,16 @@ class CalibrationSupervisor:
 
         # TODO: user configuration could be a toml file
         # Read the calibration specific parameters
-        self.qubits = CONFIG.qubits
-        self.couplers = CONFIG.couplers
-        self.target_node = CONFIG.target_node
+        self.qubits = LEGACY_CONFIG.qubits
+        self.couplers = LEGACY_CONFIG.couplers
+        self.target_node = LEGACY_CONFIG.target_node
         if self.measurement_mode == MeasurementMode.re_analyse:
             self.target_node = self.node_name_to_re_analyse
-        self.user_samplespace = CONFIG.user_samplespace
+        self.user_samplespace = LEGACY_CONFIG.user_samplespace
         self.measurement_mode = self.cluster_mode
 
         # Initialize the node structure
-        self.topo_order = filtered_topological_order(CONFIG.target_node)
+        self.topo_order = filtered_topological_order(LEGACY_CONFIG.target_node)
 
     def _create_cluster(self) -> "Cluster":
         cluster_: "Cluster"

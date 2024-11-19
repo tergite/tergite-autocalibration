@@ -14,7 +14,7 @@ from tergite_autocalibration.tests.utils.env import setup_test_env
 
 setup_test_env()
 
-from tergite_autocalibration.config.data import dh
+from tergite_autocalibration.config.legacy import dh
 
 
 def test_data_handler():

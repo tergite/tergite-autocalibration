@@ -26,7 +26,7 @@ from scipy.optimize import minimize
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import confusion_matrix
 
-from tergite_autocalibration.config.data import dh
+from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.base.analysis import BaseAnalysis
 
 

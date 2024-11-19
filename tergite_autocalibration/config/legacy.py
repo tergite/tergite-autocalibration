@@ -9,13 +9,68 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
+
+import importlib.util
 import json
 import logging
+import sys
+from typing import List
 
 import toml
 from quantify_scheduler.backends.qblox_backend import QbloxHardwareCompilationConfig
 
-from .settings import DEVICE_CONFIG, SPI_CONFIG, CLUSTER_CONFIG
+from .settings import (
+    RUN_CONFIG,
+    USER_SAMPLESPACE,
+    DEVICE_CONFIG,
+    CLUSTER_CONFIG,
+    SPI_CONFIG,
+)
+
+
+class LegacyCalibrationConfig:
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(LegacyCalibrationConfig, cls).__new__(cls)
+
+            run_config = toml.load(RUN_CONFIG)
+            cls._target_node = run_config["general"]["target_node"]
+            cls._qubits = run_config["general"]["qubits"]
+            cls._couplers = run_config["general"]["couplers"]
+
+            if USER_SAMPLESPACE is not None:
+                us_spec_ = importlib.util.spec_from_file_location(
+                    "user_samplespace", USER_SAMPLESPACE
+                )
+                user_samplespace_ = importlib.util.module_from_spec(us_spec_)
+                sys.modules["user_samplespace"] = user_samplespace_
+                us_spec_.loader.exec_module(user_samplespace_)
+                cls._user_samplespace = user_samplespace_.user_samplespace
+            else:
+                cls._user_samplespace = {}
+
+        return cls._instance
+
+    @property
+    def target_node(self) -> str:
+        return self._target_node
+
+    @property
+    def qubits(self) -> List[str]:
+        return self._qubits
+
+    @property
+    def couplers(self) -> List[str]:
+        return self._couplers
+
+    @property
+    def user_samplespace(self):
+        return self._user_samplespace
+
+
+LEGACY_CONFIG = LegacyCalibrationConfig()
 
 
 def update_nested(target, updates):

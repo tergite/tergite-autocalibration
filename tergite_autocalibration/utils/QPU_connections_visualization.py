@@ -16,7 +16,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from ..config.data import dh
+from ..config.legacy import dh
 
 
 @dataclass

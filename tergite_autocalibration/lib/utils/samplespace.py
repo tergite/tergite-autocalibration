@@ -15,7 +15,7 @@
 
 import numpy as np
 
-from tergite_autocalibration.config.data import dh
+from tergite_autocalibration.config.legacy import dh
 
 
 def resonator_samples(qubit: str) -> np.ndarray:
