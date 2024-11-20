@@ -14,7 +14,6 @@
 # that they have been altered from the originals.
 
 import abc
-import json
 from collections.abc import Iterable
 from pathlib import Path
 from typing import List, Literal, Optional, Tuple
@@ -33,7 +32,7 @@ from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
 )
 
 import tergite_autocalibration.config.globals
-from tergite_autocalibration.config.settings import CLUSTER_CONFIG
+from tergite_autocalibration.config.handler import CONFIG
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.lib.utils.device import DeviceConfiguration
@@ -90,9 +89,6 @@ class BaseNode(abc.ABC):
             raise ValueError(
                 "Quantities of Interest are missing from the node implementation"
             )
-
-        with open(CLUSTER_CONFIG) as hw:
-            self.hw_config = json.load(hw)
 
         # NOTE: In the future this will be problematic.
         # Having the device creation in the init will prohibit concurrent
@@ -177,7 +173,7 @@ class BaseNode(abc.ABC):
             return None, 1
 
         device = QuantumDevice(f"Loki_{self.name}")
-        device.hardware_config(self.hw_config)
+        device.hardware_config(CONFIG.cluster)
 
         transmons = self.device_manager.transmons
 

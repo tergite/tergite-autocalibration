@@ -9,24 +9,25 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
+
 import json
-from typing import TYPE_CHECKING
+import os
 
 from quantify_scheduler.backends.qblox_backend import QbloxHardwareCompilationConfig
 
 from tergite_autocalibration.config.device import DeviceConfiguration
 from tergite_autocalibration.config.node import NodeConfiguration
+from tergite_autocalibration.config.package import ConfigurationPackage
 from tergite_autocalibration.config.run import RunConfiguration
+from tergite_autocalibration.config.settings import CONFIG_DIR
+from tergite_autocalibration.config.spi import SpiConfiguration
 from tergite_autocalibration.config.user_samplespace import UserSamplespaceConfiguration
-
-if TYPE_CHECKING:
-    from tergite_autocalibration.config.package import ConfigurationPackage
 
 
 class ConfigurationHandler:
 
     def __init__(self):
-        self.rc: "RunConfiguration" = RunConfiguration()
+        self.run: "RunConfiguration" = RunConfiguration()
         # TODO: This configuration has to be replace with the actual device definition
         self.device: "DeviceConfiguration" = DeviceConfiguration()
         self.node: "NodeConfiguration" = NodeConfiguration()
@@ -34,6 +35,7 @@ class ConfigurationHandler:
             UserSamplespaceConfiguration()
         )
         self.cluster: "QbloxHardwareCompilationConfig"
+        self.spi: "SpiConfiguration" = SpiConfiguration()
 
     @staticmethod
     def from_configuration_package(
@@ -41,8 +43,10 @@ class ConfigurationHandler:
     ) -> "ConfigurationHandler":
         return_obj = ConfigurationHandler()
 
-        return_obj.rc = configuration_package.config_files["run_config"]
+        return_obj.run = configuration_package.config_files["run_config"]
         return_obj.device = configuration_package.config_files["device_config"]
+        return_obj.spi = configuration_package.config_files["spi_config"]
+        return_obj.node = configuration_package.config_files["node_config"]
         return_obj.samplespace = configuration_package.config_files["user_samplespace"]
 
         with open(configuration_package.config_files["cluster_config"], "r") as f_:
@@ -52,3 +56,8 @@ class ConfigurationHandler:
             )
 
         return return_obj
+
+
+CONFIG = ConfigurationHandler.from_configuration_package(
+    ConfigurationPackage.from_toml(os.path.join(CONFIG_DIR, "configuration.meta.toml"))
+)

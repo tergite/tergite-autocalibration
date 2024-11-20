@@ -11,21 +11,13 @@
 # that they have been altered from the originals.
 
 import importlib.util
-import json
 import logging
 import sys
 from typing import List
 
 import toml
-from quantify_scheduler.backends.qblox_backend import QbloxHardwareCompilationConfig
 
-from .settings import (
-    RUN_CONFIG,
-    USER_SAMPLESPACE,
-    DEVICE_CONFIG,
-    CLUSTER_CONFIG,
-    SPI_CONFIG,
-)
+from .handler import CONFIG
 
 
 class LegacyCalibrationConfig:
@@ -35,14 +27,14 @@ class LegacyCalibrationConfig:
         if cls._instance is None:
             cls._instance = super(LegacyCalibrationConfig, cls).__new__(cls)
 
-            run_config = toml.load(RUN_CONFIG)
+            run_config = toml.load(CONFIG.run)
             cls._target_node = run_config["general"]["target_node"]
             cls._qubits = run_config["general"]["qubits"]
             cls._couplers = run_config["general"]["couplers"]
 
-            if USER_SAMPLESPACE is not None:
+            if CONFIG.samplespace is not None:
                 us_spec_ = importlib.util.spec_from_file_location(
-                    "user_samplespace", USER_SAMPLESPACE
+                    "user_samplespace", CONFIG.samplespace
                 )
                 user_samplespace_ = importlib.util.module_from_spec(us_spec_)
                 sys.modules["user_samplespace"] = user_samplespace_
@@ -95,7 +87,7 @@ class DataHandler:
         if cls._instance is None:
             cls._instance = super(DataHandler, cls).__new__(cls)
 
-            device_config = toml.load(DEVICE_CONFIG)
+            device_config = toml.load(CONFIG.device)
             # FIXME: Both layout and device should be fed into a Device object
             # Right now we are not using the device configuration
             cls._layout = device_config["layout"]
@@ -129,15 +121,11 @@ class DataHandler:
                 _qubit_types[qubit] = qubit_type
             cls._qubit_types = _qubit_types
 
-            if CLUSTER_CONFIG:
-                with open(CLUSTER_CONFIG, "r") as f_:
-                    cluster_config_json = json.load(f_)
-                    cls.cluster_config = QbloxHardwareCompilationConfig.model_validate(
-                        cluster_config_json
-                    )
+            if CONFIG.cluster is not None:
+                cls.cluster_config = CONFIG.cluster
 
-            if SPI_CONFIG:
-                cls.spi = toml.load(SPI_CONFIG)
+            if CONFIG.spi is not None:
+                cls.spi = toml.load(CONFIG.spi)
 
         return cls._instance
 

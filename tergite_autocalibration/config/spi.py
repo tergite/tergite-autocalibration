@@ -10,11 +10,10 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import redis
+from tergite_autocalibration.config.base import TOMLConfigurationFile
 
-from tergite_autocalibration.config.settings import REDIS_PORT, PLOTTING
 
-REDIS_CONNECTION = redis.Redis(decode_responses=True, port=REDIS_PORT)
+class SpiConfiguration(TOMLConfigurationFile):
 
-# This will be set in matplotlib
-PLOTTING_BACKEND = "tkagg" if PLOTTING else "agg"
+    def __init__(self):
+        super().__init__()

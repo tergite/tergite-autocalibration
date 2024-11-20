@@ -52,42 +52,9 @@ CONFIG_DIR = from_environment("CONFIG_DIR", cast_=Path, default=ROOT_DIR)
 
 # ---
 # Section with configuration files
-RUN_CONFIG = CONFIG_DIR.joinpath(
-    from_environment(
-        "RUN_CONFIG", cast_=Path, default=os.path.join("configs", "run_config.toml")
-    )
-)
-
-CLUSTER_CONFIG = CONFIG_DIR.joinpath(
-    from_environment(
-        "CLUSTER_CONFIG",
-        cast_=Path,
-        default=os.path.join("configs", "cluster_config.json"),
-    )
-)
 SPI_CONFIG = CONFIG_DIR.joinpath(
     from_environment(
         "SPI_CONFIG", cast_=Path, default=os.path.join("configs", "spi_config.toml")
-    )
-)
-DEVICE_CONFIG = CONFIG_DIR.joinpath(
-    from_environment(
-        "DEVICE_CONFIG",
-        cast_=Path,
-        default=os.path.join("configs", "device_config.toml"),
-    )
-)
-
-NODE_CONFIG = CONFIG_DIR.joinpath(
-    from_environment(
-        "NODE_CONFIG", cast_=Path, default=os.path.join("configs", "node_config.toml")
-    )
-)
-USER_SAMPLESPACE = CONFIG_DIR.joinpath(
-    from_environment(
-        "USER_SAMPLESPACE",
-        cast_=Path,
-        default=os.path.join("configs", "user_samplespace.py"),
     )
 )
 

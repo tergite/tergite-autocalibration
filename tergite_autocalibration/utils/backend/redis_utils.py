@@ -10,10 +10,11 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
+
 import toml
 
-from tergite_autocalibration.config import settings
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
+from tergite_autocalibration.config.handler import CONFIG
 from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 
@@ -126,7 +127,7 @@ def populate_node_parameters(
     redis_connection,
 ):
     # Populate the Redis database with node specific parameter values from the toml file
-    transmon_configuration = toml.load(settings.NODE_CONFIG)
+    transmon_configuration = toml.load(CONFIG.node)
     if node_name in transmon_configuration and not is_node_calibrated:
         node_specific_dict = transmon_configuration[node_name]["all"]
         for field_key, field_value in node_specific_dict.items():
