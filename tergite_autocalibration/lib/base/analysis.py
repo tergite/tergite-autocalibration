@@ -14,21 +14,20 @@
 # that they have been altered from the originals.
 
 import collections
+import re
 from abc import ABC, abstractmethod
 from pathlib import Path
-import re
-import xarray as xr
 
 # TODO: we should have a conditional import depending on a feature flag here
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
-
 import numpy as np
+import xarray as xr
 
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
-from tergite_autocalibration.utils.logger.tac_logger import logger
 from tergite_autocalibration.utils.dto.qoi import QOI
+from tergite_autocalibration.utils.logger.tac_logger import logger
 
 
 class BaseAnalysis(ABC):
@@ -459,20 +458,27 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
             ds.attrs["coupler"] = this_coupler
             ds.attrs["node"] = self.name
 
-            matching_coords = [coord for coord in ds.coords if this_coupler in coord]
-            print(matching_coords)
-            if matching_coords:
-                selected_coord_name = matching_coords[0]
-                ds = ds.sel(
-                    {selected_coord_name: slice(None)}
-                )  # Select all data along this coordinate
+            # matching_coords = [coord for coord in ds.coords if this_coupler in coord]
+            coupler_analysis = self.single_coupler_analysis_obj(
+                self.name, self.redis_fields
+            )
+            coupler_analysis.data_path = self.data_path
+            coupler_analysis.process_coupler(ds, this_coupler)
+            self.coupler_analyses.append(coupler_analysis)
 
-                coupler_analysis = self.single_coupler_analysis_obj(
-                    self.name, self.redis_fields
-                )
-                coupler_analysis.data_path = self.data_path
-                coupler_analysis.process_coupler(ds, this_coupler)
-                self.coupler_analyses.append(coupler_analysis)
+            # print(matching_coords)
+            # if matching_coords:
+            #     selected_coord_name = matching_coords[0]
+            #     ds = ds.sel(
+            #         {selected_coord_name: slice(None)}
+            #     )  # Select all data along this coordinate
+            #
+            #     coupler_analysis = self.single_coupler_analysis_obj(
+            #         self.name, self.redis_fields
+            #     )
+            #     coupler_analysis.data_path = self.data_path
+            #     coupler_analysis.process_coupler(ds, this_coupler)
+            #     self.coupler_analyses.append(coupler_analysis)
 
             index = index + 1
 
@@ -481,13 +487,16 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
     def _group_by_coupler(self):
         coupler_data_dict = collections.defaultdict(set)
         for var in self.dataset.data_vars:
+            if "_" in self.dataset[var].element:
+                this_coupler = self.dataset[var].element
+                coupler_data_dict[this_coupler].add(var)
             # Find the relevant coordinate associated with the data variable
-            for coord in self.dataset[var].coords:
-                if "coupler" in self.dataset[coord].attrs:
-                    # Extract the coupler name from the coordinate's attribute
-                    this_coupler = self.dataset[coord].attrs["coupler"]
-                    coupler_data_dict[this_coupler].add(var)
-                    break  # Break if coupler found, move to the next variable
+            # for coord in self.dataset[var].coords:
+            #     if "coupler" in self.dataset[coord].attrs:
+            #         # Extract the coupler name from the coordinate's attribute
+            #         this_coupler = self.dataset[coord].attrs["coupler"]
+            #         coupler_data_dict[this_coupler].add(var)
+            #         break  # Break if coupler found, move to the next variable
 
         return coupler_data_dict
 
