@@ -67,6 +67,9 @@ cz_pulse_amplitude = 0.3
 cz_pulse_width = 4e-9
 
 
+[device.coupler.q00_q01]
+attenuation = 10
+
 # --------------------------------------------------------------------------------
 # Device layout configuration section
 

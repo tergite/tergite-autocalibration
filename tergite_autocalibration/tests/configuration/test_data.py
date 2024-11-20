@@ -18,14 +18,14 @@ from tergite_autocalibration.config.legacy import dh
 
 
 def test_data_handler():
-    assert "q06" in dh.device["qubit"].keys()
+    assert "q00" in dh.device["qubit"].keys()
 
 
 def test_data_handler_legacy():
-    assert dh.get_legacy("VNA_resonator_frequencies")["q06"] == 6832973301.189378
-    assert dh.get_legacy("VNA_qubit_frequencies")["q06"] == 4641051698.389338
-    assert dh.get_legacy("VNA_f12_frequencies")["q06"] == 4.507e9
+    assert dh.get_legacy("VNA_resonator_frequencies")["q00"] == 6.48213e9
+    assert dh.get_legacy("VNA_qubit_frequencies")["q00"] == 3.848e9
+    assert dh.get_legacy("VNA_f12_frequencies")["q00"] == 3.592e9
 
-    assert dh.get_legacy("attenuation_setting")["qubit"] == 10
-    assert dh.get_legacy("attenuation_setting")["coupler"] == 34
-    assert dh.get_legacy("attenuation_setting")["resonator"] == 12
+    assert dh.get_legacy("attenuation_setting")["qubit"] == 6
+    assert dh.get_legacy("attenuation_setting")["coupler"] == 10
+    assert dh.get_legacy("attenuation_setting")["resonator"] == 10

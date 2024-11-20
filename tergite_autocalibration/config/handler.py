@@ -51,7 +51,7 @@ class ConfigurationHandler:
 
         with open(configuration_package.config_files["cluster_config"], "r") as f_:
             cluster_config_json = json.load(f_)
-            return_obj.cluster_config = QbloxHardwareCompilationConfig.model_validate(
+            return_obj.cluster = QbloxHardwareCompilationConfig.model_validate(
                 cluster_config_json
             )
 
