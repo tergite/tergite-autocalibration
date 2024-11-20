@@ -70,7 +70,7 @@ def start(
     from tergite_autocalibration.config.settings import CLUSTER_IP, DATA_DIR
     from tergite_autocalibration.scripts.calibration_supervisor import (
         CalibrationSupervisor,
-        CalibrationConfig
+        CalibrationConfig,
     )
     from tergite_autocalibration.scripts.db_backend_update import update_mss
 
@@ -114,12 +114,12 @@ def start(
         typer.echo("Starting dataset browser...")
         proc = multiprocessing.Process(target=quantifiles, args=(DATA_DIR, True, 30))
         proc.start()
-        
+
     config = CalibrationConfig(
-        cluster_mode=cluster_mode, 
-        cluster_ip=parsed_cluster_ip, 
-        node_name=node_name, 
-        data_path=Path(data_path)
+        cluster_mode=cluster_mode,
+        cluster_ip=parsed_cluster_ip,
+        node_name=node_name,
+        data_path=Path(data_path),
     )
     supervisor = CalibrationSupervisor(config)
     supervisor.calibrate_system()
