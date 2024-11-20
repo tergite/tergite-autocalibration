@@ -82,7 +82,7 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 
 def qubit_samples(qubit: str, transition: str = "01") -> np.ndarray:
-    qub_spec_samples = 101
+    qub_spec_samples = 51
     sweep_range = 20e6
     if transition == "01":
         VNA_frequency = VNA_qubit_frequencies[qubit]
@@ -109,11 +109,8 @@ user_samplespace = {
 }
 """
 ####################################################################
-target_node = "randomized_benchmarking_ssro"
-qubits = [
-    "q14",
-    "q15",
-]  # ["q06", "q07", "q08", "q09", "q10", "q11", "q12", "q13", "q14", "q15"]
+target_node = "T1"
+qubits = ["q06", "q07", "q08", "q09", "q10"]
 couplers = ["q14_q15"]
 user_samplespace = {
     "resonator_spectroscopy": {
