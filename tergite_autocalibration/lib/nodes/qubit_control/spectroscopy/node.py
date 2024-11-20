@@ -13,26 +13,26 @@
 
 import numpy as np
 import xarray
+from lmfit.models import LorentzianModel
 
 from tergite_autocalibration.config.VNA_values import (
-    VNA_qubit_frequencies,
     VNA_f12_frequencies,
+    VNA_qubit_frequencies,
 )
+from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis import (
     QubitSpectroscopyNodeAnalysis,
     QubitSpectroscopyNodeMultidim,
 )
-from lmfit.models import LorentzianModel
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement import (
     Two_Tones_Multidim,
+)
+from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement_ar import (
+    Two_Tones_Multidim_AR,
 )
 
 # TODO: check input
 from tergite_autocalibration.utils.user_input import qubit_samples
-from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
-from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement_ar import (
-    Two_Tones_Multidim_AR,
-)
 
 
 class Qubit_01_Spectroscopy_Multidim_Node(ScheduleNode):
@@ -45,7 +45,7 @@ class Qubit_01_Spectroscopy_Multidim_Node(ScheduleNode):
 
         self.schedule_samplespace = {
             "spec_pulse_amplitudes": {
-                qubit: np.linspace(4e-4, 8e-3, 3) for qubit in self.all_qubits
+                qubit: np.linspace(4e-4, 8e-3, 7) for qubit in self.all_qubits
             },
             "spec_frequencies": {
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
@@ -81,25 +81,6 @@ class Qubit_01_Spectroscopy_Multidim_Node(ScheduleNode):
             # Add the DataArray to the Dataset with an integer name (converted to string)
             dataset[index] = data_array
         return dataset
-
-
-# class Qubit_01_Spectroscopy_Multidim_AR_Node(ScheduleNode):
-#     measurement_obj = Two_Tones_Multidim_AR
-#     analysis_obj = QubitSpectroscopyNodeAnalysis
-#     qubit_qois = ["clock_freqs:f01", "spec:spec_ampl_optimal"]
-#
-#     def __init__(self, name: str, all_qubits: list[str], **schedule_kwargs):
-#         super().__init__(name, all_qubits, **schedule_kwargs)
-#
-#         self.schedule_samplespace = {
-#             "spec_pulse_amplitudes": {
-#                 qubit: np.linspace(4e-4, 8e-3, 5) for qubit in self.all_qubits
-#             },
-#             "spec_frequencies": {
-#                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
-#             },
-#         }
-#
 
 
 class Qubit_12_Spectroscopy_Pulsed_Node(ScheduleNode):

@@ -1,4 +1,5 @@
 import numpy as np
+from quantify_scheduler.backends.qblox.operations.gate_library import ConditionalReset
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.gate_library import Measure, Reset, X
 from quantify_scheduler.operations.pulse_factories import long_square_pulse
@@ -13,7 +14,6 @@ from quantify_scheduler.schedules.schedule import Schedule
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.utils.extended_gates import Measure_RO1
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
-from quantify_scheduler.backends.qblox.operations.gate_library import ConditionalReset
 
 
 class Two_Tones_Multidim_AR(BaseMeasurement):
@@ -29,7 +29,7 @@ class Two_Tones_Multidim_AR(BaseMeasurement):
         spec_pulse_amplitudes: dict[str, np.ndarray] = None,
     ) -> Schedule:
 
-        schedule = Schedule("multiplexed_qubit_spec_AR", repetitions=1)
+        schedule = Schedule("multiplexed_qubit_spec_AR", repetitions=1024)
 
         # Initialize the clock for each qubit
         # Initialize ClockResource with the first frequency value
