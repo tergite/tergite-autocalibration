@@ -13,6 +13,9 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 #
+# Modified:
+#
+# - Martin Ahindura, 2023
 
 from ipaddress import IPv4Address, IPv6Address
 from pathlib import Path
@@ -20,32 +23,35 @@ from typing import Union, List
 from dataclasses import dataclass, field
 
 import toml
-from colorama import Fore
-from colorama import Style
+from colorama import Fore, Style
 from colorama import init as colorama_init
 from qblox_instruments import Cluster
+from qblox_instruments.types import ClusterType
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 
 from tergite_autocalibration.config import settings
-from tergite_autocalibration.config.settings import CLUSTER_IP, REDIS_CONNECTION
-from tergite_autocalibration.config.settings import CLUSTER_NAME
+from tergite_autocalibration.config.settings import (
+    CLUSTER_IP,
+    CLUSTER_NAME,
+    REDIS_CONNECTION,
+)
 from tergite_autocalibration.lib.base.node import BaseNode
-from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.lib.utils.graph import filtered_topological_order
+from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.utils.dataset_utils import create_node_data_path
-from tergite_autocalibration.utils.dto.enums import DataStatus
-from tergite_autocalibration.utils.dto.enums import MeasurementMode
-from tergite_autocalibration.utils.logger.errors import ClusterNotFoundError
+from tergite_autocalibration.utils.dto.enums import DataStatus, MeasurementMode
 from tergite_autocalibration.utils.logger.tac_logger import logger
+from tergite_autocalibration.utils.logger.visuals import draw_arrow_chart
 from tergite_autocalibration.utils.redis_utils import (
     populate_initial_parameters,
     populate_node_parameters,
     populate_quantities_of_interest,
 )
-from tergite_autocalibration.utils.user_input import attenuation_setting
-from tergite_autocalibration.utils.user_input import user_requested_calibration
-from tergite_autocalibration.utils.logger.visuals import draw_arrow_chart
+from tergite_autocalibration.utils.user_input import (
+    attenuation_setting,
+    user_requested_calibration,
+)
 
 colorama_init()
 
@@ -95,16 +101,31 @@ class HardwareManager:
             # Ensure all previous connections are closed before creating a new cluster instance
             Cluster.close_all()
             
-             # Create a new cluster instance using the specified cluster name and IP address
-            cluster = Cluster(CLUSTER_NAME, str(self.config.cluster_ip))
+            try:
+                # Create a new cluster instance using the specified cluster name and IP address
+                cluster = Cluster(CLUSTER_NAME, str(self.config.cluster_ip))
+            except ConnectionRefusedError:
+                msg = "Cluster is disconnected. Maybe it has crushed? Try flick it off and on"
+                print("-" * len(msg))
+                print(f"{Fore.LIGHTRED_EX}{Style.BRIGHT}{msg}{Style.RESET_ALL}")
+                print("-" * len(msg))
+                quit()
+                
+            print(
+                f" \n\u26A0 {Fore.MAGENTA}{Style.BRIGHT}Reseting Cluster at IP *{str(self.config.cluster_ip)[-3:]}{Style.RESET_ALL}\n"
+            )
             cluster.reset() # Reset the cluster to a default state for consistency
-            logger.info(f"Reseting Cluster at IP *{str(self.config.cluster_ip)[-3:]}")
             return cluster
         else:
-            # Raise an error if the cluster cannot be created in the current mode
-            raise ClusterNotFoundError(
-                f"Cannot create cluster object from {self.config.cluster_ip}"
-            )
+            Cluster.close_all()
+            dummy_setup = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1, 16)}
+            dummy_setup["16"] = ClusterType.CLUSTER_QRM_RF
+            dummy_setup["17"] = ClusterType.CLUSTER_QRM_RF
+            cluster = Cluster(CLUSTER_NAME, dummy_cfg=dummy_setup)
+            # raise ClusterNotFoundError(
+            #     f"Cannot create cluster object from {self.cluster_ip}"
+            # )
+            return cluster
             
     def _create_instrument_coordinator(self, clusters: Union["Cluster", List["Cluster"]]) -> "InstrumentCoordinator":
         """
@@ -154,7 +175,7 @@ class NodeManager:
         return filtered_topological_order(target_node)
 
     def inspect_node(self, node_name: str):
-        # TODO: the inspect node function could be part of the node
+        # TODO: this function must be split
         logger.info(f"Inspecting node {node_name}")
 
         # Initialize node and update samplespace
@@ -197,7 +218,7 @@ class NodeManager:
                 )
                 logger.info(f"Calibrating node {node.name}")
 
-                node.calibrate(path, self.lab_ic, self.config.cluster_mode)
+                node.calibrate(path, self.config.cluster_mode)
 
             else:
                 print(
@@ -210,17 +231,36 @@ class NodeManager:
             )
             return
 
-        elif status == DataStatus.out_of_spec:
+        else:
             print(
                 "\u2691\u2691\u2691 "
                 + f"{Fore.RED}{Style.BRIGHT}Calibration required for Node {node_name}{Style.RESET_ALL}"
             )
+
+            node = self.node_factory.create_node(
+                node_name,
+                self.config.qubits,
+                couplers=self.config.couplers,
+                measurement_mode=self.config.cluster_mode,
+            )
+            if node.name in self.config.user_samplespace:
+                self.update_to_user_samplespace(node, self.config.user_samplespace)
+                
+            # it's maybe useful to give access to the ic
+            node.lab_instr_coordinator = self.lab_ic
+
             logger.info(f"Calibrating node {node.name}")
             # TODO: This could be in the node initializer
-            data_path = create_node_data_path(node)
-            node.calibrate(data_path, self.lab_ic, self.config.cluster_mode)
+            if self.config.cluster_mode == MeasurementMode.re_analyse:
+                data_path = self.config.data_path
+            else:
+                data_path = create_node_data_path(node)
+                
+            node.calibrate(data_path, self.config.cluster_mode)
 
-            # TODO : develop failure strategies ->
+            measurement_result = node.calibrate(data_path, self.config.cluster_mode)
+
+            # TODO:  develop failure strategies ->
             # if node_calibration_status == DataStatus.out_of_spec:
             #     node_expand()
             #     node_calibration_status = self.calibrate_node(node)
@@ -258,7 +298,8 @@ class NodeManager:
             "cz_calibration_swap_ssro",
             "cz_dynamic_phase",
             "cz_dynamic_phase_swap",
-            "cz_parametrisation_fix_duration",
+            "reset_chevron",
+            "process_tomography_ssro",
             "tqg_randomized_benchmarking",
             "tqg_randomized_benchmarking_interleaved",
         ]:
@@ -277,18 +318,21 @@ class NodeManager:
         """Queries Redis for the calibration status of each qubit or coupler associated with the node, 
            determining if the node is within or out of specification."""
         if node_name in [
-            "coupler_spectroscopy", 
-            "cz_chevron", 
-            "cz_optimize_chevron", 
+            "coupler_spectroscopy",
+            "cz_chevron",
+            "cz_chevron_duration_single_shots_experimental",
+            "cz_calibration_single_shots_experimental",
+            "cz_chevron_experimental",
+            "cz_optimize_chevron",
             "cz_chevron_amplitude",
-            "cz_calibration", 
-            "cz_calibration_ssro", 
+            "cz_calibration_ssro",
             "cz_calibration_swap_ssro",
-            "cz_dynamic_phase", 
-            "cz_dynamic_phase_swap", 
-            "cz_parametrisation_fix_duration",
-            "tqg_randomized_benchmarking", 
-            "tqg_randomized_benchmarking_interleaved",
+            "cz_dynamic_phase_ssro",
+            "cz_dynamic_phase_swap_ssro",
+            "reset_chevron",
+            "process_tomography_ssro",
+            "tqg_randomized_benchmarking_ssro",
+            "tqg_randomized_benchmarking_interleaved_ssro",
         ]:
             for coupler in self.config.couplers:
                 is_calibrated = REDIS_CONNECTION.hget(f"cs:{coupler}", node_name)
@@ -324,7 +368,7 @@ class NodeManager:
         """Performs calibration on the node and saves data to a specified path."""
         data_path = create_node_data_path(node)
         logger.info(f"Calibrating node {node.name}")
-        node.calibrate(data_path, self.lab_ic, self.config.cluster_mode)
+        node.calibrate(data_path, self.config.cluster_mode)
 
     @staticmethod
     def update_to_user_samplespace(node: BaseNode, user_samplespace: dict) -> None:
@@ -349,12 +393,19 @@ class CalibrationSupervisor:
     def calibrate_system(self):
         # TODO: everything which is not in the inspect or calibrate function should go here
         logger.info("Starting System Calibration")
-        draw_arrow_chart(f"Qubits: {len(self.config.qubits)}", self.topo_order)
+        number_of_qubits = len(self.config.qubits)
+        draw_arrow_chart(f"Qubits: {number_of_qubits}", self.topo_order)
 
+        # TODO: check if coupler node status throws error after REDISFLUSHALL
         populate_quantities_of_interest(
-            self.config.transmon_configuration, self.config.qubits, self.config.couplers, REDIS_CONNECTION
+            self.topo_order,
+            self.config.qubits, 
+            self.config.couplers,
+            self.node_manager.node_factory,
+            REDIS_CONNECTION,
         )
 
         for calibration_node in self.topo_order:
             self.node_manager.inspect_node(calibration_node)
             logger.info(f"{calibration_node} node is completed")
+            

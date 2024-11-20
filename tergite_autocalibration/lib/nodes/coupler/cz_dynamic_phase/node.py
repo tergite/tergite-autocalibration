@@ -14,18 +14,18 @@
 
 import numpy as np
 
-from ..cz_calibration.analysis import (
-    CZCalibrationAnalysis,
+from tergite_autocalibration.lib.base.node import BaseNode
+from tergite_autocalibration.lib.nodes.coupler.cz_calibration.analysis import (
+    CZCalibrationSSRONodeAnalysis,
 )
-from ..cz_calibration.measurement import (
-    CZ_calibration,
+from tergite_autocalibration.lib.nodes.coupler.cz_calibration.measurement import (
+    CZ_calibration_SSRO,
 )
-from ....base.node import BaseNode
 
 
-class CZ_Dynamic_Phase_Node(BaseNode):
-    measurement_obj = CZ_calibration
-    analysis_obj = CZCalibrationAnalysis
+class CZDynamicPhaseSSRONode(BaseNode):
+    measurement_obj = CZ_calibration_SSRO
+    analysis_obj = CZCalibrationSSRONodeAnalysis
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary
@@ -52,9 +52,9 @@ class CZ_Dynamic_Phase_Node(BaseNode):
         }
 
 
-class CZ_Dynamic_Phase_Swap_Node(BaseNode):
-    measurement_obj = CZ_calibration
-    analysis_obj = CZCalibrationAnalysis
+class CZDynamicPhaseSwapSSRONode(BaseNode):
+    measurement_obj = CZ_calibration_SSRO
+    analysis_obj = CZCalibrationSSRONodeAnalysis
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary

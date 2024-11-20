@@ -11,27 +11,32 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from pathlib import Path
-
 import numpy as np
-from scipy import optimize as optimize
 
-from tergite_autocalibration.utils.dto.enums import MeasurementMode
-from tergite_autocalibration.utils.hardware_utils import SpiDAC
-from tergite_autocalibration.utils.user_input import qubit_samples, resonator_samples
-from .analysis import (
+from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
     CouplerSpectroscopyNodeAnalysis,
 )
-from ...qubit_control.spectroscopy.measurement import (
+from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement import (
     Two_Tones_Multidim,
 )
-from ...readout.resonator_spectroscopy.measurement import Resonator_Spectroscopy
-from ....base.node import BaseNode
+from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.measurement import (
+    Resonator_Spectroscopy,
+)
+from tergite_autocalibration.utils.dto.enums import MeasurementMode
+from tergite_autocalibration.utils.hardware.spi import SpiDAC
+
+# TODO: check location
+from tergite_autocalibration.utils.user_input import qubit_samples
+
+from tergite_autocalibration.lib.base.external_parameter_node import (
+    ExternalParameterNode,
+)
 
 
-class Coupler_Spectroscopy_Node(BaseNode):
+class Coupler_Spectroscopy_Node(ExternalParameterNode):
     measurement_obj = Two_Tones_Multidim
     analysis_obj = CouplerSpectroscopyNodeAnalysis
+    coupler_qois = ["parking_current", "current_range"]
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
@@ -40,7 +45,6 @@ class Coupler_Spectroscopy_Node(BaseNode):
         self.name = name
         self.all_qubits = all_qubits  # this is a Base attr, delete it here
         self.couplers = couplers
-        self.redis_field = ["parking_current", "current_range"]
         self.qubit_state = 0
         self.type = "spi_and_cluster_simple_sweep"
         # perform 2 tones while biasing the current
@@ -82,15 +86,15 @@ class Coupler_Spectroscopy_Node(BaseNode):
         self.spi_dac.set_dac_current(self.dac, this_iteration_value)
 
 
-class Coupler_Resonator_Spectroscopy_Node(BaseNode):
+class Coupler_Resonator_Spectroscopy_Node(ExternalParameterNode):
     measurement_obj = Resonator_Spectroscopy
     analysis_obj = CouplerSpectroscopyNodeAnalysis
+    coupler_qois = ["resonator_flux_quantum"]
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
     ):
         super().__init__(name, all_qubits, **schedule_keywords)
-        self.redis_field = ["resonator_flux_quantum"]
         self.qubit_state = 0
         self.couplers = couplers
         self.coupler = self.couplers[0]

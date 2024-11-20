@@ -6,7 +6,8 @@ authors = [
     "Eleftherios Moschandreou <elemos@chalmers.se>",
     "Liangyu Chen <liangyuc@chalmers.se>",
     "Tong Liu <liuto@chalmers.se>",
-    "Stefan Hill <stefanhi@chalmers.se>"
+    "Stefan Hill <stefanhi@chalmers.se>",
+    "Michele Faucci Giannelli <faucci@chalmser.se>"
 ]
 maintainers = [
     "Chalmers Next Labs AB <quantum-nextlabs@chalmers.se>",
@@ -26,9 +27,9 @@ h5netcdf = "1.4.0"
 h5py = "3.7.0"
 Jinja2 = "3.1.2"
 numpy = ">=2.0"
-qblox-instruments = "0.14.1"
+qblox-instruments = "0.14.2"
 qcodes = "0.49.0"
-quantify-core = "0.7.7"
+quantify-core = "0.7.8"
 quantify-scheduler = "0.21.2"
 redis = "5.0.0"
 scikit-learn = "1.5.2"
@@ -37,6 +38,9 @@ python-dotenv = "1.0.1"
 requests = "^2.32.3"
 typer = "^0.12.5"
 jokeapi = "1.0.5"
+optuna = "4.0.0"
+netcdf4 = "1.7.1.post2"
+quantifiles = { path = "./tergite_autocalibration/tools/dataset_browser", develop = true }
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"

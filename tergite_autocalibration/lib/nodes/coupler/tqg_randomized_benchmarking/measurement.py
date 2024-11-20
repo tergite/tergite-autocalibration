@@ -1,6 +1,7 @@
 # This code is part of Tergite
 #
 # (C) Copyright Amr Osman 2024
+# (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -12,23 +13,28 @@
 
 import numpy as np
 from quantify_scheduler import Schedule
-from quantify_scheduler.operations.gate_library import Reset, Measure, X
+from quantify_scheduler.enums import BinMode
+from quantify_scheduler.operations.control_flow_library import Loop
+from quantify_scheduler.operations.gate_library import Reset, X
 from quantify_scheduler.operations.pulse_library import IdlePulse
 from quantify_scheduler.resources import ClockResource
 
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
-from tergite_autocalibration.utils.extended_coupler_edge import CompositeSquareEdge
-from tergite_autocalibration.utils.extended_gates import Rxy_12
+from tergite_autocalibration.utils.extended_coupler_edge import (
+    ExtendedCompositeSquareEdge,
+)
+from tergite_autocalibration.utils.extended_gates import Rxy_12, Measure_RO_3state_Opt
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 from tergite_autocalibration.utils.logger.tac_logger import logger
 
 try:
-    from superconducting_qubit_tools.clifford_module.randomized_benchmarking import *
+    from superconducting_qubit_tools.clifford_module.randomized_benchmarking import (
+        randomized_benchmarking_sequence,
+    )
     from superconducting_qubit_tools.clifford_module.cliffords_decomposition import (
         decompose_clifford_seq,
     )
     from superconducting_qubit_tools.utils.clifford_module.from_list import (
-        add_single_qubit_gates_to_schedule,
         add_two_qubit_gates_to_schedule,
     )
 except ImportError:
@@ -39,11 +45,11 @@ except ImportError:
     )
 
 
-class TQG_Randomized_Benchmarking(BaseMeasurement):
+class TQGRandomizedBenchmarkingSSRO(BaseMeasurement):
     def __init__(
         self,
         transmons: dict[str, ExtendedTransmon],
-        couplers: dict[str, CompositeSquareEdge],
+        couplers: dict[str, ExtendedCompositeSquareEdge],
         qubit_state: int = 0,
     ):
         super().__init__(transmons)
@@ -53,7 +59,7 @@ class TQG_Randomized_Benchmarking(BaseMeasurement):
 
     def schedule_function(
         self,
-        seed: int,
+        seeds: int,
         number_of_cliffords: dict[str, np.ndarray],
         interleaving_clifford_id: int = None,
         apply_inverse_gate: bool = True,
@@ -80,10 +86,28 @@ class TQG_Randomized_Benchmarking(BaseMeasurement):
             An experiment schedule.
         """
         if interleaving_clifford_id is None:
-            name = "tqg_randomized_benchmarking"
+            name = "tqg_randomized_benchmarking_ssro"
         else:
-            name = "tqg_randomized_benchmarking_interleaved"
-        schedule = Schedule(name, repetitions)
+            name = "tqg_randomized_benchmarking_interleaved_ssro"
+        schedule = Schedule(f"{name}")
+        print("interleaved or not", name)
+        shot = Schedule(f"shot")
+        shot.add(IdlePulse(16e-9))
+
+        # Initialize ClockResource with the first frequency value
+        for this_qubit, this_transmon in self.transmons.items():
+            ro_frequency = this_transmon.extended_clock_freqs.readout_3state_opt()
+            schedule.add_resource(
+                ClockResource(name=f"{this_qubit}.ro_3st_opt", freq=ro_frequency)
+            )
+            mw_frequency_01 = this_transmon.clock_freqs.f01()
+            schedule.add_resource(
+                ClockResource(name=f"{this_qubit}.01", freq=mw_frequency_01)
+            )
+            mw_frequency_12 = this_transmon.clock_freqs.f12()
+            schedule.add_resource(
+                ClockResource(name=f"{this_qubit}.12", freq=mw_frequency_12)
+            )
 
         qubits = list(self.transmons.keys())
         coupler_names = self.couplers.keys()
@@ -102,17 +126,24 @@ class TQG_Randomized_Benchmarking(BaseMeasurement):
                         - self.couplers[this_coupler].clock_freqs.cz_freq(),
                     )
                 )
+                shot.add_resource(
+                    ClockResource(
+                        name=f"{this_coupler}.cz",
+                        freq=downconvert
+                        - self.couplers[this_coupler].clock_freqs.cz_freq(),
+                    )
+                )
 
-        print(self.couplers[this_coupler].clock_freqs.cz_freq())
+        print("coupler frequency is", self.couplers[this_coupler].clock_freqs.cz_freq())
         # This is the common reference operation so the qubits can be operated in parallel
-        root_relaxation = schedule.add(Reset(*qubits), label="Start")
+        root_relaxation = shot.add(Reset(*qubits), label="Start")
 
         # The first for loop iterates over all qubits:
         # for this_qubit, clifford_sequence_lengths in number_of_cliffords.items():
         clifford_sequence_lengths = list(number_of_cliffords.values())[0]
 
         # all_cliffords = len(cliffords.XY_decompositions)
-        # rng = np.random.default_rng(seed)
+        # rng = np.random.default_rng(seeds)
 
         # The inner for loop iterates over the random clifford sequence lengths
         for acq_index, this_number_of_cliffords in enumerate(
@@ -121,59 +152,86 @@ class TQG_Randomized_Benchmarking(BaseMeasurement):
             # schedule.add(X(this_qubit))
             # random_sequence = rng.integers(all_cliffords, size=this_number_of_cliffords)
 
-            start = schedule.add(IdlePulse(4e-9))
+            start = shot.add(IdlePulse(16e-9))
 
             # for clifford_index, sequence_index in enumerate(random_sequence):
             # n_cl = 1
             index = 0
-            # seed = 42
-            # interleaving_clifford_id = 4386 #CZ
-            # interleaving_clifford_id = None
-            # apply_inverse_gate = False
-            # qubit_names_list = ['Q1', 'Q2']
+
             clifford_seq = randomized_benchmarking_sequence(
                 n_cl=this_number_of_cliffords,
                 meas_basis_index=index,
-                seed=seed,
+                seed=seeds[next(iter(seeds))],
                 interleaving_clifford_id=interleaving_clifford_id,
                 apply_inverse_gate=apply_inverse_gate,
                 number_of_qubits=2,
             )
-            physical_gates = decompose_clifford_seq(clifford_seq, ["q23", "q24"])
-
-            separation_time = 260e-9
+            # print('clifford sequence is: ', clifford_seq)
+            physical_gates = decompose_clifford_seq(
+                clifford_seq, [qubits[0], qubits[1]]
+            )
+            # print('physical gates are: ', physical_gates)
+            separation_time = 300e-9
             # schedule = Schedule('rb_sequence_generation')
-            reset = schedule.add(Reset(*qubits))
+            reset = shot.add(Reset(*qubits))
 
             add_two_qubit_gates_to_schedule(
-                schedule, physical_gates, ref_op=reset, separation_time=separation_time
+                shot, physical_gates, ref_op=reset, separation_time=separation_time
             )
 
-            buffer = schedule.add(IdlePulse(4e-9))
+            buffer = shot.add(IdlePulse(20e-9))
             for this_qubit in qubits:
-                schedule.add(
-                    Measure(this_qubit, acq_index=acq_index),
+                this_index = acq_index
+
+                shot.add(
+                    Measure_RO_3state_Opt(
+                        this_qubit, acq_index=acq_index, bin_mode=BinMode.APPEND
+                    ),
                     ref_op=buffer,
                     ref_pt="end",
                 )
-                end = schedule.add(Reset(this_qubit))
+            root_relaxation = shot.add(Reset(*qubits), label=f"Reset_tqgRB_{acq_index}")
 
         for this_qubit in qubits:
-            # 0 calibration point
-            schedule.add(Reset(this_qubit), ref_op=end, ref_pt="end")
-            schedule.add(Measure(this_qubit, acq_index=acq_index + 1))
+            qubit_levels = range(self.qubit_state + 1)
+            number_of_levels = len(qubit_levels)
 
-            # 1 calibration point
-            schedule.add(Reset(this_qubit))
-            schedule.add(X(this_qubit))
-            schedule.add(Measure(this_qubit, acq_index=acq_index + 2))
-            schedule.add(Reset(this_qubit))
+            shot.add(
+                Reset(*qubits), ref_op=root_relaxation, ref_pt_new="end"
+            )  # To enforce parallelism we refer to the root relaxation
+            # The intermediate for-loop iterates over all ro_amplitudes:
+            # for ampl_indx, ro_amplitude in enumerate(ro_amplitude_values):
+            # The inner for-loop iterates over all qubit levels:
+            for level_index, state_level in enumerate(qubit_levels):
+                calib_index = this_index + level_index + 1
 
-            # 2 calibration point
-            schedule.add(Reset(this_qubit))
-            schedule.add(Reset(this_qubit))
-            schedule.add(X(this_qubit))
-            schedule.add(Rxy_12(this_qubit))
-            schedule.add(Measure(this_qubit, acq_index=acq_index + 3))
-            schedule.add(Reset(this_qubit))
+                # print(f'{calib_index = }')
+                if state_level == 0:
+                    prep = shot.add(IdlePulse(40e-9))
+                elif state_level == 1:
+                    prep = shot.add(
+                        X(this_qubit),
+                    )
+                elif state_level == 2:
+                    shot.add(
+                        X(this_qubit),
+                    )
+                    prep = shot.add(
+                        Rxy_12(this_qubit),
+                    )
+                else:
+                    raise ValueError("State Input Error")
+                shot.add(
+                    Measure_RO_3state_Opt(
+                        this_qubit, acq_index=calib_index, bin_mode=BinMode.APPEND
+                    ),
+                    ref_op=prep,
+                    ref_pt="end",
+                )
+                shot.add(Reset(this_qubit))
+
+        schedule.add(IdlePulse(16e-9))
+        print(schedule.add(shot, control_flow=Loop(repetitions), validate=False))
+        schedule.add(IdlePulse(16e-9))
+
         return schedule

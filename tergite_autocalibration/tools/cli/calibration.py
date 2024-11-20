@@ -11,7 +11,8 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
-
+import multiprocessing
+import threading
 from pathlib import Path
 from typing import Annotated
 
@@ -54,10 +55,19 @@ def start(
             help="If --push the a backend will pushed to an MSS specified in MSS_MACHINE_ROOT_URL in the .env file.",
         ),
     ] = False,
+    browser: Annotated[
+        bool,
+        typer.Option(
+            "--browser",
+            is_flag=True,
+            help="Opens the quantifiles data browser in the background with live plotting enabled.",
+        ),
+    ] = False,
 ):
     from ipaddress import ip_address, IPv4Address
+    from quantifiles import quantifiles
 
-    from tergite_autocalibration.config.settings import CLUSTER_IP
+    from tergite_autocalibration.config.settings import CLUSTER_IP, DATA_DIR
     from tergite_autocalibration.scripts.calibration_supervisor import (
         CalibrationSupervisor,
         CalibrationConfig
@@ -99,6 +109,12 @@ def start(
                 "Trying to start the calibration supervisor with default cluster configuration."
             )
 
+    # Start the quantifiles dataset browser in the background
+    if browser:
+        typer.echo("Starting dataset browser...")
+        proc = multiprocessing.Process(target=quantifiles, args=(DATA_DIR, True, 30))
+        proc.start()
+        
     config = CalibrationConfig(
         cluster_mode=cluster_mode, 
         cluster_ip=parsed_cluster_ip, 
@@ -107,5 +123,7 @@ def start(
     )
     supervisor = CalibrationSupervisor(config)
     supervisor.calibrate_system()
+
+    # Push the results of the calibration to MSS
     if push:
         update_mss()

@@ -12,19 +12,19 @@
 
 import numpy as np
 
+from tergite_autocalibration.lib.base.node import BaseNode
+from tergite_autocalibration.lib.nodes.readout.punchout.analysis import PunchoutAnalysis
+from tergite_autocalibration.lib.nodes.readout.punchout.measurement import Punchout
 from tergite_autocalibration.utils.user_input import resonator_samples
-from .analysis import PunchoutAnalysis
-from .measurement import Punchout
-from ....base.node import BaseNode
 
 
 class Punchout_Node(BaseNode):
     measurement_obj = Punchout
     analysis_obj = PunchoutAnalysis
+    qubit_qois = ["measure:pulse_amp"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
-        self.redis_field = ["measure:pulse_amp"]
 
         self.schedule_samplespace = {
             "ro_frequencies": {

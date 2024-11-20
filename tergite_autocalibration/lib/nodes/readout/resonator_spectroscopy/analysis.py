@@ -38,7 +38,7 @@ class ResonatorSpectroscopyQubitAnalysis(BaseQubitAnalysis):
 
     def analyse_qubit(self):
         coord_name = list(self.coord.keys())[0]
-        frequencies = self.dataset.coords[coord_name].values
+        self.frequencies = self.dataset.coords[coord_name].values
 
         if isinstance(self.S21, xr.Dataset):
             data_var_name = list(self.S21.data_vars.keys())[
@@ -47,50 +47,64 @@ class ResonatorSpectroscopyQubitAnalysis(BaseQubitAnalysis):
             s21_dataarray = self.S21[data_var_name]
         else:
             raise TypeError("Expected self.S21 to be an xarray.DataArray")
-        s21_values = s21_dataarray.values
+        self.s21_values = s21_dataarray.values
 
         # Gives an initial guess for the model parameters and then fits the model to the data.
-        guess = model.guess(s21_values, f=frequencies)
-        self.fitting_model = model.fit(s21_values, params=guess, f=frequencies)
+        guess = model.guess(self.s21_values, f=self.frequencies)
+        try:
+            self.fitting_model = model.fit(
+                self.s21_values, params=guess, f=self.frequencies
+            )
+            if not self.fitting_model.success:
+                print("Fit was unsuccessful.")
+                print("Reason:", self.fitting_model.message)
 
-        fit_result = self.fitting_model
+        except Exception as e:
+            print("Could not fit the resonator data")
+            print(e)
 
-        fit_fr = fit_result.params["fr"].value
-        self.uncertainty = fit_result.params["fr"].stderr
+        finally:
+            # if the return params are not returned the later stages complains
+            # TODO later stages should handle non fitted results
+            fit_result = self.fitting_model
 
-        fit_Ql = fit_result.params["Ql"].value
-        fit_Qe = fit_result.params["Qe"].value
-        fit_ph = fit_result.params["theta"].value
+            fit_fr = fit_result.params["fr"].value
+            self.uncertainty = fit_result.params["fr"].stderr
 
-        # analytical expression, probably an interpolation of the fit would be better
-        self.minimum_freq = (
-            fit_fr
-            / (4 * fit_Qe * fit_Ql * np.sin(fit_ph))
-            * (
-                4 * fit_Qe * fit_Ql * np.sin(fit_ph)
-                - 2 * fit_Qe * np.cos(fit_ph)
-                + fit_Ql
-                + np.sqrt(
-                    4 * fit_Qe**2 - 4 * fit_Qe * fit_Ql * np.cos(fit_ph) + fit_Ql**2
+            fit_Ql = fit_result.params["Ql"].value
+            fit_Qe = fit_result.params["Qe"].value
+            fit_ph = fit_result.params["theta"].value
+
+            # analytical expression, probably an interpolation of the fit would be better
+            self.minimum_freq = (
+                fit_fr
+                / (4 * fit_Qe * fit_Ql * np.sin(fit_ph))
+                * (
+                    4 * fit_Qe * fit_Ql * np.sin(fit_ph)
+                    - 2 * fit_Qe * np.cos(fit_ph)
+                    + fit_Ql
+                    + np.sqrt(
+                        4 * fit_Qe**2 - 4 * fit_Qe * fit_Ql * np.cos(fit_ph) + fit_Ql**2
+                    )
                 )
             )
-        )
-        # using the min value driectly
-        self.min_freq_data = frequencies[np.argmin(np.abs(s21_values))]
-        # print(fit_Ql)
-        # print(self.min_freq )
-        return [self.minimum_freq, fit_Ql, self.min_freq_data]
+            # using the min value driectly
+            self.min_freq_data = self.frequencies[np.argmin(np.abs(self.s21_values))]
+            return [self.minimum_freq, fit_Ql, self.min_freq_data]
 
     def plotter(self, ax):
         ax.set_xlabel("Frequency (Hz)")
         ax.set_ylabel("|S21| (V)")
-        self.fitting_model.plot_fit(ax, numpoints=400, xlabel=None, title=None)
-        ax.axvline(
-            self.minimum_freq,
-            c="blue",
-            ls="solid",
-            label=f"f = {self.minimum_freq:.6E} ± {self.uncertainty:.1E} (Hz)",
-        )
+        if self.fitting_model.success:
+            self.fitting_model.plot_fit(ax, numpoints=400, xlabel=None, title=None)
+            ax.axvline(
+                self.minimum_freq,
+                c="blue",
+                ls="solid",
+                label=f"f = {self.minimum_freq:.6E} ± {self.uncertainty:.1E} (Hz)",
+            )
+        else:
+            ax.plot(self.frequencies, np.abs(self.s21_values))
         ax.grid()
 
 

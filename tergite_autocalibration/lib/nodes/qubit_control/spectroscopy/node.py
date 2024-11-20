@@ -12,47 +12,27 @@
 # that they have been altered from the originals.
 
 import numpy as np
-from qblox_instruments import Cluster
 
-from tergite_autocalibration.utils.hardware_utils import set_qubit_LO
+from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis import (
+    QubitSpectroscopyNodeAnalysis,
+    QubitSpectroscopyNodeMultidim,
+)
+from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement import (
+    Two_Tones_Multidim,
+)
+
+# TODO: check input
 from tergite_autocalibration.utils.user_input import qubit_samples
-from .analysis import QubitSpectroscopyNodeAnalysis, QubitSpectroscopyNodeMultidim
-from .measurement import Two_Tones_Multidim, CW_Two_Tones_Spectroscopy
-from ....base.node import BaseNode
+from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 
 
-class Qubit_01_Spectroscopy_CW_Node(BaseNode):
-    measurement_obj = CW_Two_Tones_Spectroscopy
-    analysis_obj = QubitSpectroscopyNodeMultidim
-
-    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
-        self.sweep_range = self.node_dictionary.pop("sweep_range", None)
-        self.redis_field = ["clock_freqs:f01"]
-
-        self.operations_args = []
-
-        self.external_samplespace = {
-            "cw_frequencies": {qubit: qubit_samples(qubit) for qubit in self.all_qubits}
-        }
-
-    def pre_measurement_operation(self, reduced_ext_space):
-        settable = list(reduced_ext_space.keys())[0]
-        for instrument in self.lab_instr_coordinator.values():
-            if type(instrument) == Cluster:
-                cluster = instrument
-        for qubit in self.all_qubits:
-            lo_frequency = reduced_ext_space[settable][qubit]
-            set_qubit_LO(cluster, qubit, lo_frequency)
-
-
-class Qubit_01_Spectroscopy_Multidim_Node(BaseNode):
+class Qubit_01_Spectroscopy_Multidim_Node(ScheduleNode):
     measurement_obj = Two_Tones_Multidim
     analysis_obj = QubitSpectroscopyNodeMultidim
+    qubit_qois = ["clock_freqs:f01", "spec:spec_ampl_optimal"]
 
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ["clock_freqs:f01", "spec:spec_ampl_optimal"]
 
         self.schedule_samplespace = {
             "spec_pulse_amplitudes": {
@@ -64,31 +44,29 @@ class Qubit_01_Spectroscopy_Multidim_Node(BaseNode):
         }
 
 
-class Qubit_12_Spectroscopy_Pulsed_Node(BaseNode):
+class Qubit_12_Spectroscopy_Pulsed_Node(ScheduleNode):
     measurement_obj = Two_Tones_Multidim
     analysis_obj = QubitSpectroscopyNodeAnalysis
+    qubit_qois = ["clock_freqs:f12"]
 
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.sweep_range = self.node_dictionary.pop("sweep_range", None)
-        self.redis_field = ["clock_freqs:f12"]
         self.qubit_state = 1
 
         self.schedule_samplespace = {
             "spec_frequencies": {
-                qubit: qubit_samples(qubit, "12", sweep_range=self.sweep_range)
-                for qubit in self.all_qubits
+                qubit: qubit_samples(qubit, "12") for qubit in self.all_qubits
             }
         }
 
 
-class Qubit_12_Spectroscopy_Multidim_Node(BaseNode):
+class Qubit_12_Spectroscopy_Multidim_Node(ScheduleNode):
     measurement_obj = Two_Tones_Multidim
     analysis_obj = QubitSpectroscopyNodeMultidim
+    qubit_qois = ["clock_freqs:f12", "spec:spec_ampl_12_optimal"]
 
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
         super().__init__(name, all_qubits, **node_dictionary)
-        self.redis_field = ["clock_freqs:f12", "spec:spec_ampl_12_optimal"]
         self.qubit_state = 1
 
         self.schedule_samplespace = {

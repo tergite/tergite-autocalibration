@@ -15,7 +15,6 @@
 
 import lmfit
 import numpy as np
-import xarray as xr
 from quantify_core.analysis.fitting_models import fft_freq_phase_guess, ExpDecayModel
 
 from tergite_autocalibration.lib.base.analysis import (
@@ -78,8 +77,7 @@ class BaseT2QubitAnalysis(BaseQubitAnalysis, ABC):
         self.fit_delays = np.linspace(self.delays[0], self.delays[-1], 400)
         for indx in range(len(self.dataset.coords[self.repeat_coord])):
             magnitudes_flat = self._get_magnitudes(indx)
-            guess = self.model.guess(data=magnitudes_flat, delay=self.delays)
-            fit_result = self.fit_model(magnitudes_flat, guess)
+            fit_result = self.fit_model(magnitudes_flat)
 
             self.fit_y = self.model.eval(
                 fit_result.params, **{self.model.independent_vars[0]: self.fit_delays}
@@ -91,7 +89,7 @@ class BaseT2QubitAnalysis(BaseQubitAnalysis, ABC):
         return [self.average_T2]
 
     @abstractmethod
-    def fit_model(self, magnitudes_flat, guess):
+    def fit_model(self, magnitudes_flat):
         pass
 
     @abstractmethod
@@ -130,7 +128,8 @@ class T2QubitAnalysis(BaseT2QubitAnalysis):
         super().__init__(name, redis_fields)
         self.model = T2Model()
 
-    def fit_model(self, magnitudes_flat, guess):
+    def fit_model(self, magnitudes_flat):
+        guess = self.model.guess(data=magnitudes_flat, x=self.delays)
         return self.model.fit(magnitudes_flat, params=guess, x=self.delays)
 
     def _extract_t2_time(self, fit_result):
@@ -142,7 +141,8 @@ class T2EchoQubitAnalysis(BaseT2QubitAnalysis):
         super().__init__(name, redis_fields)
         self.model = ExpDecayModel()
 
-    def fit_model(self, magnitudes_flat, guess):
+    def fit_model(self, magnitudes_flat):
+        guess = self.model.guess(data=magnitudes_flat, delay=self.delays)
         return self.model.fit(magnitudes_flat, params=guess, t=self.delays)
 
     def _extract_t2_time(self, fit_result):

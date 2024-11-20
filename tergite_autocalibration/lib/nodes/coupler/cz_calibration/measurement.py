@@ -15,6 +15,8 @@
 """
 Module containing a schedule class for Ramsey calibration. (1D parameter sweep, for 2D see ramsey_detunings.py)
 """
+import itertools
+
 import numpy as np
 from quantify_scheduler import Schedule
 from quantify_scheduler.enums import BinMode
@@ -30,18 +32,19 @@ from quantify_scheduler.resources import ClockResource
 
 from tergite_autocalibration.config.coupler_config import qubit_types
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
-from ....base.measurement import BaseMeasurement
-from tergite_autocalibration.utils.extended_gates import Measure_RO_Opt, Rxy_12
-from tergite_autocalibration.utils.extended_coupler_edge import CompositeSquareEdge
+from tergite_autocalibration.lib.base.measurement import BaseMeasurement
+from tergite_autocalibration.utils.extended_coupler_edge import (
+    ExtendedCompositeSquareEdge,
+)
+from tergite_autocalibration.utils.extended_gates import Measure_RO_3state_Opt, Rxy_12
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
-import itertools
 
 
 class CZ_calibration(BaseMeasurement):
     def __init__(
         self,
         transmons: dict[str, ExtendedTransmon],
-        couplers: dict[str, CompositeSquareEdge],
+        couplers: dict[str, ExtendedCompositeSquareEdge],
         qubit_state: int = 0,
     ):
         super().__init__(transmons)
@@ -285,7 +288,7 @@ class CZ_calibration_SSRO(BaseMeasurement):
     def __init__(
         self,
         transmons: dict[str, ExtendedTransmon],
-        couplers: dict[str, CompositeSquareEdge],
+        couplers: dict[str, ExtendedCompositeSquareEdge],
         qubit_state: int = 0,
     ):
         super().__init__(transmons)
@@ -479,7 +482,7 @@ class CZ_calibration_SSRO(BaseMeasurement):
                     this_index = cz_index * number_of_phases + ramsey_index
 
                     shot.add(
-                        Measure_RO_Opt(
+                        Measure_RO_3state_Opt(
                             this_qubit, acq_index=this_index, bin_mode=BinMode.APPEND
                         ),
                         ref_op=buffer_end,
@@ -521,7 +524,7 @@ class CZ_calibration_SSRO(BaseMeasurement):
                     else:
                         raise ValueError("State Input Error")
                     shot.add(
-                        Measure_RO_Opt(
+                        Measure_RO_3state_Opt(
                             this_qubit, acq_index=calib_index, bin_mode=BinMode.APPEND
                         ),
                         ref_op=prep,
@@ -733,7 +736,7 @@ class Reset_calibration_SSRO(BaseMeasurement):
     def __init__(
         self,
         transmons: dict[str, ExtendedTransmon],
-        couplers: dict[str, CompositeSquareEdge],
+        couplers: dict[str, ExtendedCompositeSquareEdge],
         qubit_state: int = 0,
     ):
         super().__init__(transmons)
@@ -902,7 +905,7 @@ class Reset_calibration_SSRO(BaseMeasurement):
                     this_index = cz_index * number_of_phases + ramsey_index
                     # print(f'{this_index = }')
                     shot.add(
-                        Measure_RO_Opt(
+                        Measure_RO_3state_Opt(
                             this_qubit, acq_index=this_index, bin_mode=BinMode.APPEND
                         ),
                         ref_op=buffer_end,
@@ -946,7 +949,7 @@ class Reset_calibration_SSRO(BaseMeasurement):
                     else:
                         raise ValueError("State Input Error")
                     shot.add(
-                        Measure_RO_Opt(
+                        Measure_RO_3state_Opt(
                             this_qubit, acq_index=calib_index, bin_mode=BinMode.APPEND
                         ),
                         ref_op=prep,

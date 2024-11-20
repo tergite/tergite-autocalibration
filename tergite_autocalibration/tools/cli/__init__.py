@@ -10,6 +10,8 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
+import logging
+from typing import Annotated, Union
 
 import typer
 
@@ -44,6 +46,36 @@ cli.add_typer(
     help="Handle operations related to the calibration graph.",
     no_args_is_help=True,
 )
+
+
+@cli.command(help="Open the dataset browser (quantifiles).")
+def browser(
+    datadir: Annotated[
+        str,
+        typer.Option(
+            "--datadir",
+            help="Path to the data directory with your measurement results.",
+        ),
+    ] = None,
+    liveplotting: Annotated[
+        bool,
+        typer.Option(
+            "--liveplotting",
+            is_flag=True,
+            help="Path to the data directory with your measurement results.",
+        ),
+    ] = False,
+    log_level: Annotated[
+        int,
+        typer.Option(
+            "--log-level",
+            help="Path to the data directory with your measurement results.",
+        ),
+    ] = 30,
+):
+    from quantifiles import quantifiles
+
+    quantifiles(datadir, liveplotting, log_level)
 
 
 @cli.command(help="Tell a joke.")
