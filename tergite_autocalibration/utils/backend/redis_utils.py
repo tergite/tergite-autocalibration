@@ -13,8 +13,7 @@
 
 import toml
 
-from tergite_autocalibration.config.globals import REDIS_CONNECTION
-from tergite_autocalibration.config.handler import CONFIG
+from tergite_autocalibration.config.globals import REDIS_CONNECTION, CONFIG
 from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 

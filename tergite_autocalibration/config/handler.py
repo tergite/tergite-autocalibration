@@ -11,7 +11,6 @@
 # that they have been altered from the originals.
 
 import json
-import os
 
 from quantify_scheduler.backends.qblox_backend import QbloxHardwareCompilationConfig
 
@@ -19,7 +18,6 @@ from tergite_autocalibration.config.device import DeviceConfiguration
 from tergite_autocalibration.config.node import NodeConfiguration
 from tergite_autocalibration.config.package import ConfigurationPackage
 from tergite_autocalibration.config.run import RunConfiguration
-from tergite_autocalibration.config.settings import CONFIG_DIR
 from tergite_autocalibration.config.spi import SpiConfiguration
 from tergite_autocalibration.config.user_samplespace import UserSamplespaceConfiguration
 
@@ -56,8 +54,3 @@ class ConfigurationHandler:
             )
 
         return return_obj
-
-
-CONFIG = ConfigurationHandler.from_configuration_package(
-    ConfigurationPackage.from_toml(os.path.join(CONFIG_DIR, "configuration.meta.toml"))
-)

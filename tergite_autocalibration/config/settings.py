@@ -50,14 +50,6 @@ if not os.path.exists(DATA_DIR):
 # Path to the definition of the configuration package
 CONFIG_DIR = from_environment("CONFIG_DIR", cast_=Path, default=ROOT_DIR)
 
-# ---
-# Section with configuration files
-SPI_CONFIG = CONFIG_DIR.joinpath(
-    from_environment(
-        "SPI_CONFIG", cast_=Path, default=os.path.join("configs", "spi_config.toml")
-    )
-)
-
 BACKEND_CONFIG = Path(__file__).parent / "backend_config_default.toml"
 
 # ---

@@ -32,7 +32,7 @@ from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
 )
 
 import tergite_autocalibration.config.globals
-from tergite_autocalibration.config.handler import CONFIG
+from tergite_autocalibration.config.globals import CONFIG
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.lib.utils.device import DeviceConfiguration

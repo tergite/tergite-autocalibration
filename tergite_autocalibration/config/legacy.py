@@ -17,7 +17,7 @@ from typing import List
 
 import toml
 
-from .handler import CONFIG
+from .globals import CONFIG
 
 
 class LegacyCalibrationConfig:
