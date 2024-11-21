@@ -108,7 +108,7 @@ user_samplespace = {
 }
 """
 ####################################################################
-target_node = "ramsey_correction"
+target_node = "ro_frequency_three_state_optimization"
 qubits = ["q06", "q07", "q08", "q09", "q10"]
 # qubits =   ["q06", "q07", "q08", "q09", "q10", "q11", "q12", "q13", "q14", "q15"]
 couplers = ["q06_q07"]
