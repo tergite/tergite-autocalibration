@@ -52,7 +52,7 @@ class Resonator_Spectroscopy_1_Node(ScheduleNode):
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
         self.qubit_state = 1
-        self.schedule_keywords['qubit_state'] = self.qubit_state
+        self.schedule_keywords["qubit_state"] = self.qubit_state
 
         self.schedule_samplespace = {
             "ro_frequencies": {
@@ -69,7 +69,7 @@ class Resonator_Spectroscopy_2_Node(ScheduleNode):
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
         self.qubit_state = 2
-        self.schedule_keywords['qubit_state'] = self.qubit_state
+        self.schedule_keywords["qubit_state"] = self.qubit_state
 
         self.schedule_samplespace = {
             "ro_frequencies": {

@@ -33,7 +33,7 @@ class Motzoi_Parameter_Node(ScheduleNode):
         super().__init__(name, all_qubits, **schedule_keywords)
         self.motzoi_minima = []  # NOTE: is this needed?
         self.qubit_state = 0
-        self.schedule_keywords['qubit_state'] = self.qubit_state
+        self.schedule_keywords["qubit_state"] = self.qubit_state
         self.schedule_samplespace = {
             "mw_motzois": {
                 qubit: np.linspace(-0.4, 0.1, 51) for qubit in self.all_qubits
@@ -51,7 +51,7 @@ class Motzoi_Parameter_12_Node(ScheduleNode):
         super().__init__(name, all_qubits, **schedule_keywords)
         self.motzoi_minima = []  # NOTE: is this needed?
         self.qubit_state = 1
-        self.schedule_keywords['qubit_state'] = self.qubit_state
+        self.schedule_keywords["qubit_state"] = self.qubit_state
         self.schedule_samplespace = {
             "mw_motzois": {
                 qubit: np.linspace(-0.3, 0.3, 51) for qubit in self.all_qubits

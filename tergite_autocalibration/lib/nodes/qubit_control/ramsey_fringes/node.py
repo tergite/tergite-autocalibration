@@ -33,7 +33,7 @@ class Ramsey_Fringes_12_Node(ScheduleNode):
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
         self.qubit_state = 1
-        self.schedule_keywords['qubit_state'] = self.qubit_state
+        self.schedule_keywords["qubit_state"] = self.qubit_state
         self.schedule_samplespace = {
             "ramsey_delays": {
                 qubit: np.arange(4e-9, 2048e-9, 8 * 8e-9) for qubit in self.all_qubits

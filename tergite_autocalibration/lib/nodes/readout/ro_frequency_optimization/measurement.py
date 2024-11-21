@@ -149,7 +149,9 @@ class RO_frequency_optimization(BaseMeasurement):
             for this_qubit, this_transmon in self.transmons.items():
                 mw_frequency_12 = this_transmon.clock_freqs.f12()
                 this_clock = f"{this_qubit}.12"
-                schedule.add_resource(ClockResource(name=this_clock, freq=mw_frequency_12))
+                schedule.add_resource(
+                    ClockResource(name=this_clock, freq=mw_frequency_12)
+                )
 
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
