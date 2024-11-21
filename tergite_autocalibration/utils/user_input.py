@@ -81,8 +81,8 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 
 def qubit_samples(qubit: str, transition: str = "01") -> np.ndarray:
-    qub_spec_samples = 11
-    sweep_range = 20e6
+    qub_spec_samples = 81
+    sweep_range = 8e6
     if transition == "01":
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition == "12":
@@ -108,7 +108,7 @@ user_samplespace = {
 }
 """
 ####################################################################
-target_node = "resonator_spectroscopy"
+target_node = "ramsey_correction"
 qubits = ["q06", "q07", "q08", "q09", "q10"]
 # qubits =   ["q06", "q07", "q08", "q09", "q10", "q11", "q12", "q13", "q14", "q15"]
 couplers = ["q06_q07"]
