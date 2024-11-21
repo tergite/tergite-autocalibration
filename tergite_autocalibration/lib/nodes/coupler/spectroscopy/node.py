@@ -44,6 +44,7 @@ class Coupler_Spectroscopy_Node(ExternalParameterNode):
         self.name = name
         self.couplers = couplers
         self.qubit_state = 0
+        self.schedule_keywords["qubit_state"] = self.qubit_state
         self.coupled_qubits = self.get_coupled_qubits()
         self.coupler = self.couplers[0]
 
@@ -61,7 +62,7 @@ class Coupler_Spectroscopy_Node(ExternalParameterNode):
         }
 
         self.external_samplespace = {
-            "dc_currents": {self.coupler: np.arange(-2.5e-4, 2.5e-4, 250e-6)},
+            "dc_currents": {self.coupler: np.arange(-2.5e-3, 2.5e-4, 280e-6)},
         }
         # self.validate()
 

@@ -19,7 +19,6 @@ node reference
   resonator_spectroscopy
   qubit_01_spectroscopy
   qubit_01_spectroscopy_pulsed
-  qubit_01_cw_spectroscopy
   rabi_oscillations
   ramsey_correction
   resonator_spectroscopy_1
@@ -44,7 +43,6 @@ node reference
   T2_echo
   randomized_benchmarking_ssro
   all_XY
-  check_cliffords
   cz_chevron
   cz_chevron_test
   cz_chevron_amplitude
@@ -82,8 +80,8 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 
 def qubit_samples(qubit: str, transition: str = "01") -> np.ndarray:
-    qub_spec_samples = 11
-    sweep_range = 20e6
+    qub_spec_samples = 51
+    sweep_range = 8e6
     if transition == "01":
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition == "12":
@@ -109,7 +107,7 @@ user_samplespace = {
 }
 """
 ####################################################################
-target_node = "ro_amplitude_three_state_optimization"
+target_node = "coupler_spectroscopy"
 qubits = ["q06", "q07", "q08", "q09", "q10"]
 couplers = ["q06_q07"]
 user_samplespace = {
