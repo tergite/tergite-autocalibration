@@ -18,7 +18,12 @@ from pathlib import Path
 
 import numpy as np
 import optuna
-from tergite_autocalibration.lib.utils import redis
+
+from tergite_autocalibration.config.coupler_config import qubit_types
+from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
+from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.analysis import (
+    RandomizedBenchmarkingSSRONodeAnalysis,
+)
 from tergite_autocalibration.lib.nodes.coupler.cz_calibration.node import (
     CZCalibrationSSRONode,
 )
@@ -26,15 +31,10 @@ from tergite_autocalibration.lib.nodes.coupler.cz_dynamic_phase.node import (
     CZDynamicPhaseSSRONode,
     CZDynamicPhaseSwapSSRONode,
 )
-
-from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.analysis import (
-    RandomizedBenchmarkingSSRONodeAnalysis,
-)
 from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.measurement import (
     TQGRandomizedBenchmarkingSSRO,
 )
-from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
-from tergite_autocalibration.config.coupler_config import qubit_types
+from tergite_autocalibration.lib.utils import redis
 
 RB_REPEATS = 10
 
@@ -48,9 +48,8 @@ class TQGRandomizedBenchmarkingSSRONode(ScheduleNode):
     ):
         super().__init__(name, all_qubits, **schedule_keywords)
         self.name = name
-        self.type = "parameterized_sweep"
-        self.all_qubits = all_qubits
-        self.couplers = couplers
+        self.all_qubits = all_qubits  # is this needed?
+        self.couplers = couplers  # is this needed?
         self.edges = couplers
         self.coupler = self.couplers[0]
         self.schedule_keywords = schedule_keywords
@@ -59,6 +58,7 @@ class TQGRandomizedBenchmarkingSSRONode(ScheduleNode):
         self.backup = False
         self.qubit_state = 2
         # TODO change it a dictionary like samplespace
+        self.schedule_keywords["qubit_state"] = self.qubit_state
 
         self.external_samplespace = {
             "seeds": {
@@ -114,6 +114,7 @@ class TQGRandomizedBenchmarkingInterleavedSSRONode(ScheduleNode):
 
         self.qubit_state = 2
         self.schedule_keywords["interleaving_clifford_id"] = 4386
+        self.schedule_keywords["qubit_state"] = self.qubit_state
         # TODO change it a dictionary like samplespace
         self.external_samplespace = {
             "seeds": {
@@ -166,6 +167,7 @@ class CZRBOptimizeSSRONode(ScheduleNode):
         self.qubit_state = 2
         self.testing_group = 0  # The edge group to be tested. 0 means all edges.
         self.schedule_keywords = schedule_keywords
+        self.schedule_keywords["qubit_state"] = self.qubit_state
         self.qubit_type_list = ["Control", "Target"]
         # if self.swap:
         #     qubit_type_list.reverse()

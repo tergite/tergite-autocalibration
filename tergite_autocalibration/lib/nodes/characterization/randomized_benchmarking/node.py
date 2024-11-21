@@ -15,14 +15,13 @@
 
 import numpy as np
 
-
+from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.analysis import (
     RandomizedBenchmarkingSSRONodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.measurement import (
     Randomized_Benchmarking_SSRO,
 )
-from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 
 
 class RandomizedBenchmarkingSSRONode(ScheduleNode):
@@ -42,6 +41,7 @@ class RandomizedBenchmarkingSSRONode(ScheduleNode):
         self.qubit_state = 2
         self.schedule_keywords = {}
         # TODO change it a dictionary like samplespace
+        self.schedule_keywords["qubit_state"] = self.qubit_state
 
         RB_REPEATS = 10
         self.external_samplespace = {

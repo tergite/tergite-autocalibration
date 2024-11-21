@@ -40,6 +40,7 @@ class RO_amplitude_two_state_optimization_Node(ScheduleNode):
         # FIXME: This is a sort of hack to ignore the couplers
         self.schedule_keywords = {}
         self.schedule_keywords["loop_repetitions"] = 1000
+        self.schedule_keywords['qubit_state'] = self.qubit_state
         self.plots_per_qubit = 3  #  fidelity plot, IQ shots, confusion matrix
 
         self.loops = self.schedule_keywords["loop_repetitions"]
@@ -75,6 +76,7 @@ class RO_amplitude_three_state_optimization_Node(ScheduleNode):
         self.qubit_state = 2
         self.schedule_keywords = {}
         self.schedule_keywords["loop_repetitions"] = 1000
+        self.schedule_keywords['qubit_state'] = self.qubit_state
         self.plots_per_qubit = 3  #  fidelity plot, IQ shots, confusion matrix
         self.loops = self.schedule_keywords["loop_repetitions"]
 

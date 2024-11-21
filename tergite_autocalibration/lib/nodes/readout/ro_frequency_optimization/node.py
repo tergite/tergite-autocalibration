@@ -12,7 +12,7 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from tergite_autocalibration.lib.base.node import BaseNode
+from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.measurement import (
     RO_frequency_optimization,
 )
@@ -23,7 +23,7 @@ from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.analysi
 )
 
 
-class RO_frequency_two_state_optimization_Node(BaseNode):
+class RO_frequency_two_state_optimization_Node(ScheduleNode):
     measurement_obj = RO_frequency_optimization
     analysis_obj = OptimalRO01FrequencyNodeAnalysis
     qubit_qois = ["extended_clock_freqs:readout_2state_opt"]
@@ -31,6 +31,7 @@ class RO_frequency_two_state_optimization_Node(BaseNode):
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
         self.qubit_state = 0
+        self.schedule_keywords['qubit_state'] = self.qubit_state
 
         self.schedule_samplespace = {
             "ro_opt_frequencies": {
@@ -40,7 +41,7 @@ class RO_frequency_two_state_optimization_Node(BaseNode):
         }
 
 
-class RO_frequency_three_state_optimization_Node(BaseNode):
+class RO_frequency_three_state_optimization_Node(ScheduleNode):
     measurement_obj = RO_frequency_optimization
     analysis_obj = OptimalRO012FrequencyNodeAnalysis
     qubit_qois = ["extended_clock_freqs:readout_3state_opt"]
@@ -50,6 +51,7 @@ class RO_frequency_three_state_optimization_Node(BaseNode):
         self.name = name
         self.all_qubits = all_qubits
         self.qubit_state = 2
+        self.schedule_keywords['qubit_state'] = self.qubit_state
 
         self.schedule_samplespace = {
             "ro_opt_frequencies": {
