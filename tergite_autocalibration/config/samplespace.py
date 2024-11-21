@@ -13,7 +13,7 @@
 from tergite_autocalibration.config.base import BaseConfigurationFile
 
 
-class UserSamplespaceConfiguration(BaseConfigurationFile):
+class SamplespaceConfiguration(BaseConfigurationFile):
 
     def __init__(self):
         super().__init__()

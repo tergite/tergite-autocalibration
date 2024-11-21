@@ -147,7 +147,7 @@ class HW_Config_Generator:
 
 
 if __name__ == "main":
-    from tergite_autocalibration.config.settings import CONFIG_DIR
+    from tergite_autocalibration.config.env import CONFIG_DIR
 
     mixer_file = CONFIG_DIR / "initial.csv"
     json_config_file = CONFIG_DIR / "HARDWARE_CONFIGURATION_LOKIA_20240504.json"

@@ -14,8 +14,8 @@ import copy
 from collections import abc, UserList, defaultdict
 from functools import singledispatchmethod
 
+from tergite_autocalibration.config.env import REDIS_PORT
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
-from tergite_autocalibration.config.settings import REDIS_PORT
 
 
 def nested_dd():

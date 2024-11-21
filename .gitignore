@@ -90,7 +90,7 @@ configs/**
 !tergite_acl/config/__init__.py
 !tergite_acl/config/settings.py
 !tergite_autocalibration/config/__init__.py
-!tergite_autocalibration/config/settings.py
+!tergite_autocalibration/config/env.py
 configuration.meta.toml
 
 # dev-generated artefacts

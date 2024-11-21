@@ -17,7 +17,7 @@ from typing import Dict
 from colorama import init as colorama_init
 from qblox_instruments import Cluster
 
-from tergite_autocalibration.config.settings import CLUSTER_CONFIG
+from tergite_autocalibration.config.env import CLUSTER_CONFIG
 
 colorama_init()
 

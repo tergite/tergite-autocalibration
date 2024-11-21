@@ -55,6 +55,20 @@ cli.add_typer(
 )
 
 
+@cli.command(help="Quickly runs to set reasonable defaults for the configuration.")
+def quickstart():
+    """
+    Runs the quickstart and set up the autocalibration with reasonable default values.
+    This is to some extent similar to `acli config load -t .default`, but additionally sets up the .env file.
+
+    Returns:
+
+    """
+    from .config import load
+
+    load(template=".default")
+
+
 @cli.command(help="Open the dataset browser (quantifiles).")
 def browser(
     datadir: Annotated[
@@ -69,17 +83,29 @@ def browser(
         typer.Option(
             "--liveplotting",
             is_flag=True,
-            help="Path to the data directory with your measurement results.",
+            help="Whether plots should be updated live during measurements.",
         ),
     ] = False,
     log_level: Annotated[
         int,
         typer.Option(
             "--log-level",
-            help="Path to the data directory with your measurement results.",
+            help="Sets the log level of the application.",
         ),
     ] = 30,
 ):
+    """
+    This is to open the quantifiles databrowser.
+    This endpoint is essentially just a wrapper for the `quantifiles` endpoint.
+
+    Args:
+        datadir: Path to the data directory with your measurement results.
+        liveplotting: Whether plots should be updated live during measurements.
+        log_level: Sets the log level of the application. This is implemented with Python `logging`.
+
+    Returns:
+
+    """
     from quantifiles import quantifiles
 
     quantifiles(datadir, liveplotting, log_level)

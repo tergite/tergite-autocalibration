@@ -67,7 +67,7 @@ def start(
     from ipaddress import ip_address, IPv4Address
     from quantifiles import quantifiles
 
-    from tergite_autocalibration.config.settings import CLUSTER_IP, DATA_DIR
+    from tergite_autocalibration.config.env import CLUSTER_IP, DATA_DIR
     from tergite_autocalibration.scripts.calibration_supervisor import (
         CalibrationSupervisor,
     )

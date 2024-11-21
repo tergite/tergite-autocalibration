@@ -23,7 +23,7 @@ import json
 import requests
 import toml
 
-from tergite_autocalibration.config.settings import MSS_MACHINE_ROOT_URL, BACKEND_CONFIG
+from tergite_autocalibration.config.env import MSS_MACHINE_ROOT_URL, BACKEND_CONFIG
 from tergite_autocalibration.tools.mss.convert import store_manual_parameters
 from tergite_autocalibration.tools.mss.storage import get_component_value
 

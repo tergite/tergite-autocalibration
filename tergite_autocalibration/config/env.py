@@ -20,16 +20,45 @@ import logging
 import os
 from ipaddress import ip_address
 from pathlib import Path
+from typing import Union
 
+from tergite_autocalibration.config.base import BaseConfigurationFile
 from tergite_autocalibration.config.utils import from_environment
 
-# ---
-# Default prefix for paths
-DEFAULT_PREFIX = from_environment(
-    "DEFAULT_PREFIX",
-    cast_=str,
-    default=getpass.getuser().replace(" ", ""),
-)
+
+class EnvironmentConfiguration(BaseConfigurationFile):
+
+    def __init__(self):
+        super().__init__()
+
+        self.default_prefix: str = getpass.getuser().replace(" ", "")
+
+        self.root_dir: "Path" = Path(__file__).parent.parent.parent
+        self.data_dir: "Path" = self.root_dir.joinpath("out")
+        self.config_dir: "Path" = self.root_dir
+
+        self.backend_config: "Path" = (
+            Path(__file__).parent / "backend_config_default.toml"
+        )
+
+        self.cluster_ip: str
+        self.spi_serial_port: str
+
+        self.redis_port: int = 6379
+        self.plotting: bool = True
+
+        self.mss_machine_root_url: str = "http://localhost:8002"
+
+    @staticmethod
+    def from_dot_env(
+        filepath: Union[str, Path] = Path(__file__).parent.parent.parent.joinpath(
+            ".env"
+        )
+    ):
+        return_obj = EnvironmentConfiguration()
+
+        return return_obj
+
 
 # ---
 # Section with directory configurations

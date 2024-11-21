@@ -13,9 +13,9 @@ import os
 
 import redis
 
+from tergite_autocalibration.config.env import REDIS_PORT, PLOTTING, CONFIG_DIR
 from tergite_autocalibration.config.handler import ConfigurationHandler
 from tergite_autocalibration.config.package import ConfigurationPackage
-from tergite_autocalibration.config.settings import REDIS_PORT, PLOTTING, CONFIG_DIR
 
 REDIS_CONNECTION = redis.Redis(decode_responses=True, port=REDIS_PORT)
 

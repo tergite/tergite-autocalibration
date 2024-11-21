@@ -32,7 +32,7 @@ from tergite_autocalibration.tests.utils.env import (
 
 setup_test_env()
 
-from tergite_autocalibration.config.settings import (
+from tergite_autocalibration.config.env import (
     ROOT_DIR,
     DATA_DIR,
     CONFIG_DIR,
