@@ -466,20 +466,6 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
             coupler_analysis.process_coupler(ds, this_coupler)
             self.coupler_analyses.append(coupler_analysis)
 
-            # print(matching_coords)
-            # if matching_coords:
-            #     selected_coord_name = matching_coords[0]
-            #     ds = ds.sel(
-            #         {selected_coord_name: slice(None)}
-            #     )  # Select all data along this coordinate
-            #
-            #     coupler_analysis = self.single_coupler_analysis_obj(
-            #         self.name, self.redis_fields
-            #     )
-            #     coupler_analysis.data_path = self.data_path
-            #     coupler_analysis.process_coupler(ds, this_coupler)
-            #     self.coupler_analyses.append(coupler_analysis)
-
             index = index + 1
 
         return analysis_results
@@ -490,13 +476,6 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
             if "_" in self.dataset[var].element:
                 this_coupler = self.dataset[var].element
                 coupler_data_dict[this_coupler].add(var)
-            # Find the relevant coordinate associated with the data variable
-            # for coord in self.dataset[var].coords:
-            #     if "coupler" in self.dataset[coord].attrs:
-            #         # Extract the coupler name from the coordinate's attribute
-            #         this_coupler = self.dataset[coord].attrs["coupler"]
-            #         coupler_data_dict[this_coupler].add(var)
-            #         break  # Break if coupler found, move to the next variable
 
         return coupler_data_dict
 

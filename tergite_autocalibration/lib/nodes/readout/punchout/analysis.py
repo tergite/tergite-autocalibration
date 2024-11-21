@@ -22,9 +22,6 @@ from tergite_autocalibration.lib.base.analysis import (
 class PunchoutAnalysis(BaseQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-        # data_var = list(self.dataset.data_vars.keys())[0]
-        # self.qubit = self.dataset[data_var].attrs["qubit"]
-        # self.S21 = self.dataset[data_var].values
 
     def analyse_qubit(self):
         for coord in self.dataset[self.data_var].coords:
