@@ -14,8 +14,8 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import networkx as nx
 import matplotlib.pyplot as plt
+import networkx as nx
 
 graph = nx.DiGraph()
 
@@ -34,6 +34,7 @@ graph_dependencies = [
     ("qubit_01_spectroscopy", "coupler_spectroscopy"),
     ("qubit_01_spectroscopy", "rabi_oscillations"),
     ("rabi_oscillations", "ramsey_correction"),
+    ("rabi_oscillations", "T1"),
     ("ramsey_correction", "motzoi_parameter"),
     ("adaptive_ramsey_correction", "adaptive_motzoi_parameter"),
     ("motzoi_parameter", "n_rabi_oscillations"),
@@ -49,7 +50,6 @@ graph_dependencies = [
     ("n_rabi_oscillations_12", "resonator_spectroscopy_2"),
     ("resonator_spectroscopy_2", "ro_frequency_three_state_optimization"),
     ("ro_frequency_three_state_optimization", "ro_amplitude_three_state_optimization"),
-    ("resonator_spectroscopy_2", "T1"),
     ("T1", "T2"),
     ("T2", "T2_echo"),
     ("T2_echo", "randomized_benchmarking_ssro"),
