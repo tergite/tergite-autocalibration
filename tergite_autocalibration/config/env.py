@@ -66,8 +66,9 @@ class EnvironmentConfiguration(BaseConfigurationFile):
         return return_obj
 
     # Getter and setter
-        # Write values into the environment and into the file
-        # We need a template file for the .env file
+    # Write values into the environment and into the file
+    # We need a template file for the .env file
+
 
 # ---
 # Section with directory configurations
