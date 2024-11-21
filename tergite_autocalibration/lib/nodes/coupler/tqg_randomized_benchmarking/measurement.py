@@ -13,11 +13,12 @@
 
 import numpy as np
 from quantify_scheduler import Schedule
+from quantify_scheduler.enums import BinMode
+from quantify_scheduler.operations.control_flow_library import Loop
 from quantify_scheduler.operations.gate_library import Reset, X
 from quantify_scheduler.operations.pulse_library import IdlePulse
 from quantify_scheduler.resources import ClockResource
-from quantify_scheduler.enums import BinMode
-from quantify_scheduler.operations.control_flow_library import Loop
+
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.utils.extended_coupler_edge import (
     ExtendedCompositeSquareEdge,
