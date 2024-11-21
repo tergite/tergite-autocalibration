@@ -57,8 +57,17 @@ class EnvironmentConfiguration(BaseConfigurationFile):
     ):
         return_obj = EnvironmentConfiguration()
 
+        # Load .env file
+        # Dump values into the environment
+        # Then load them from the environment
+        # We do not need to take care of the defaults any longer, because they are already set
+        # We can get rid of the utils.py
+
         return return_obj
 
+    # Getter and setter
+        # Write values into the environment and into the file
+        # We need a template file for the .env file
 
 # ---
 # Section with directory configurations
