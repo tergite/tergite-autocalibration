@@ -172,9 +172,9 @@ class CalibrationSupervisor:
             self.calibration_node_factory,
             REDIS_CONNECTION,
         )
-        populate_active_reset_parameters(
-            self.transmon_configuration, self.qubits, REDIS_CONNECTION
-        )
+        # populate_active_reset_parameters(
+        #     self.transmon_configuration, self.qubits, REDIS_CONNECTION
+        # )
 
         for calibration_node in self.topo_order:
             self.inspect_node(calibration_node)

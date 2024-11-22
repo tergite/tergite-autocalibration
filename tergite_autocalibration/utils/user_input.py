@@ -17,6 +17,7 @@
 node reference
   punchout
   resonator_spectroscopy
+  resonator_relaxation
   qubit_01_spectroscopy
   qubit_01_spectroscopy_AR
   rabi_oscillations
@@ -72,7 +73,7 @@ from tergite_autocalibration.config.VNA_values import (
 
 def resonator_samples(qubit: str) -> np.ndarray:
     res_spec_samples = 81
-    sweep_range = 4.0e6
+    sweep_range = 3.0e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
     min_freq = VNA_frequency - sweep_range / 2 - 0.5e6
     max_freq = VNA_frequency + sweep_range / 2
@@ -107,7 +108,7 @@ user_samplespace = {
 }
 """
 ####################################################################
-target_node = "ro_frequency_three_state_optimization"
+target_node = "resonator_relaxation"
 qubits = ["q06", "q07", "q08", "q09", "q10"]
 # qubits =   ["q06", "q07", "q08", "q09", "q10", "q11", "q12", "q13", "q14", "q15"]
 couplers = ["q06_q07"]

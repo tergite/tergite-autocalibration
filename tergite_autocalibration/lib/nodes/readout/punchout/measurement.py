@@ -37,7 +37,6 @@ class Punchout(BaseMeasurement):
         repetitions: int = 1024,
     ) -> Schedule:
         schedule = Schedule("mltplx_punchout", repetitions)
-        qubits = self.transmons.keys()
 
         qubits = self.transmons.keys()
 
@@ -63,13 +62,6 @@ class Punchout(BaseMeasurement):
             ro_port = this_transmon.ports.readout()
 
             this_clock = f"{this_qubit}.ro"
-
-            # unpack the static parameters
-            this_transmon = self.transmons[this_qubit]
-            ro_pulse_duration = this_transmon.measure.pulse_duration()
-            acquisition_delay = this_transmon.measure.acq_delay()
-            integration_time = this_transmon.measure.integration_time()
-            ro_port = this_transmon.ports.readout()
 
             frequency_values = ro_frequencies[this_qubit]
             number_of_freqs = len(frequency_values)
