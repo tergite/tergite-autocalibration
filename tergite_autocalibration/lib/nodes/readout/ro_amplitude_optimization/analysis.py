@@ -12,24 +12,21 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import numpy as np
 import matplotlib.patches as mpatches
+import numpy as np
 from numpy.linalg import inv
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
 
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
 from tergite_autocalibration.lib.base.analysis import (
-    BaseQubitAnalysis,
     BaseAllQubitsAnalysis,
+    BaseQubitAnalysis,
 )
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 
 
 class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
-    """
-    Analysis that  extracts the optimal RO amplitude.
-    """
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
@@ -40,9 +37,10 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
         self.state_coord = self._get_coord("state")
         self.loop_coord = self._get_coord("loops")
 
-        self.dataset = self.dataset.stack(shots=[self.loop_coord, self.state_coord])
-        self.qubit_states = self.dataset[self.state_coord].values
-        self.amplitudes = self.dataset.coords[self.amplitude_coord]
+        breakpoint()
+        self.S21 = self.S21.stack(shots=[self.loop_coord, self.state_coord])
+        self.qubit_states = self.S21[self.state_coord].values
+        self.amplitudes = self.S21.coords[self.amplitude_coord]
         self.fit_results = {}
 
     def _get_coord(self, keyword):
