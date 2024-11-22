@@ -63,7 +63,7 @@ class CalibrationConfig:
     """
 
     cluster_mode: "MeasurementMode" = MeasurementMode.real
-    cluster_ip: Union[str, "IPv4Address", "IPv6Address"] = CLUSTER_IP
+    cluster_ip: "IPv4Address" = CLUSTER_IP
     cluster_timeout: int = 222
     data_path: Path = Path("")
     qubits: List[str] = field(
@@ -82,6 +82,10 @@ class CalibrationConfig:
 
 
 class HardwareManager:
+    """
+    Manages hardware setup, including initializing clusters and instrument coordinators.
+    """
+
     def __init__(self, config: "CalibrationConfig") -> None:
         # Store the configuration settings and initialize the instrument coordinator
         self.config = config
@@ -177,6 +181,24 @@ class HardwareManager:
 
 
 class NodeManager:
+    """
+    Manages the initilazation and inspection of node.
+    """
+
+    NODE_TYPES = [
+        "coupler_spectroscopy",
+        "cz_chevron",
+        "cz_optimize_chevron",
+        "cz_calibration_ssro",
+        "cz_calibration_swap_ssro",
+        "cz_dynamic_phase_ssro",
+        "cz_dynamic_phase_swap_ssro",
+        "reset_chevron",
+        "process_tomography_ssro",
+        "tqg_randomized_benchmarking_ssro",
+        "tqg_randomized_benchmarking_interleaved_ssro",
+    ]
+
     def __init__(
         self, lab_ic: "InstrumentCoordinator", config: "CalibrationConfig"
     ) -> None:
@@ -199,7 +221,7 @@ class NodeManager:
             self.config.couplers,
             REDIS_CONNECTION,
         )
-        
+
         # Check Redis if node is calibrated
         status: "DataStatus" = self._check_calibration_status_redis(node_name)
 
@@ -212,28 +234,28 @@ class NodeManager:
             REDIS_CONNECTION,
         )
 
+        # Log status
         if status == DataStatus.in_spec:
-            print(
+            logger.info(
                 f" \u2714  {Fore.GREEN}{Style.BRIGHT}Node {node_name} in spec{Style.RESET_ALL}"
             )
-            return
-
         else:
-            print(
-                "\u2691\u2691\u2691 "
-                + f"{Fore.RED}{Style.BRIGHT}Calibration required for Node {node_name}{Style.RESET_ALL}"
+            logger.warning(
+                f"\u2691\u2691\u2691 {Fore.RED}{Style.BRIGHT}Calibration required for Node {node_name}{Style.RESET_ALL}"
             )
 
             # Initialize node and update samplespace
             node = self._initialize_node(node_name)
-
             logger.info(f"Calibrating node {node.name}")
-            
-            if self.config.cluster_mode == MeasurementMode.re_analyse:
-                data_path = self.config.data_path
-            else:
-                data_path = create_node_data_path(node)
 
+            # Determine the data path for calibration
+            data_path = (
+                self.config.data_path
+                if self.config.cluster_mode == MeasurementMode.re_analyse
+                else create_node_data_path(node)
+            )
+
+            # Perform calibration
             node.calibrate(data_path, self.config.cluster_mode)
 
             # TODO:  develop failure strategies ->
@@ -242,7 +264,7 @@ class NodeManager:
             #     node_calibration_status = self.calibrate_node(node)
 
     def _initialize_node(self, node_name: str) -> BaseNode:
-        """Initializes a node and updates it with user-defined samplespace."""
+        """Initializes a node and updates it with user-defined samplespace if available."""
         node = self.node_factory.create_node(
             node_name, self.config.qubits, couplers=self.config.couplers
         )
@@ -254,52 +276,26 @@ class NodeManager:
         # Assign the lab instrument coordinator to the node
         node.lab_instr_coordinator = self.lab_ic
 
-        # Initialize parameters
+        # Log initialization details
         logger.info(
-            "Initialising paramaters for qubits: "
-            + str(self.config.qubits)
-            + " and couplers: "
-            + str(self.config.couplers)
+            f"Initializing parameters for qubits: {self.config.qubits} "
+            f"and couplers: {self.config.couplers}"
         )
         return node
 
     def _check_calibration_status_redis(self, node_name: str) -> DataStatus:
         """Queries Redis for the calibration status of each qubit or coupler associated with the node,
         determining if the node is within or out of specification."""
-        if node_name in [
-            "coupler_spectroscopy",
-            "cz_chevron",
-            "cz_optimize_chevron",
-            "cz_calibration_ssro",
-            "cz_calibration_swap_ssro",
-            "cz_dynamic_phase_ssro",
-            "cz_dynamic_phase_swap_ssro",
-            "reset_chevron",
-            "process_tomography_ssro",
-            "tqg_randomized_benchmarking_ssro",
-            "tqg_randomized_benchmarking_interleaved_ssro",
-        ]:
-            for coupler in self.config.couplers:
-                is_calibrated = REDIS_CONNECTION.hget(f"cs:{coupler}", node_name)
-                if is_calibrated == "not_calibrated":
-                    return DataStatus.out_of_spec
-                elif is_calibrated == "calibrated":
-                    continue
-                else:
-                    raise ValueError(
-                        f"REDIS error: cannot find cs:{coupler}", node_name
-                    )
-            return DataStatus.in_spec
-        else:
-            for qubit in self.config.qubits:
-                is_calibrated = REDIS_CONNECTION.hget(f"cs:{qubit}", node_name)
-                if is_calibrated == "not_calibrated":
-                    return DataStatus.out_of_spec
-                elif is_calibrated == "calibrated":
-                    continue
-                else:
-                    raise ValueError(f"REDIS error: cannot find cs:{qubit}", node_name)
-            return DataStatus.in_spec
+        elements = (
+            self.config.couplers if node_name in self.NODE_TYPES else self.config.qubits
+        )
+        for element in elements:
+            status = REDIS_CONNECTION.hget(f"cs:{element}", node_name)
+            if status == "not_calibrated":
+                return DataStatus.out_of_spec
+            elif status != "calibrated":
+                raise ValueError(f"REDIS error: cannot find cs:{element}", node_name)
+        return DataStatus.in_spec
 
     @staticmethod
     def update_to_user_samplespace(node: BaseNode, user_samplespace: dict) -> None:
