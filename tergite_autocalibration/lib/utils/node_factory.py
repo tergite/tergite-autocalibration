@@ -37,6 +37,7 @@ class NodeFactory:
         self.node_name_mapping: Dict[str, str] = {
             "punchout": "Punchout_Node",
             "resonator_spectroscopy": "Resonator_Spectroscopy_Node",
+            "resonator_relaxation": "Resonator_Relaxation_Node",
             "qubit_01_spectroscopy": "Qubit_01_Spectroscopy_Multidim_Node",
             "qubit_01_spectroscopy_AR": "Qubit_01_Spectroscopy_Multidim_AR_Node",
             "rabi_oscillations": "Rabi_Oscillations_Node",
