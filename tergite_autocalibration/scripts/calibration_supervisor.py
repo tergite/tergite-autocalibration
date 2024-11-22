@@ -17,10 +17,10 @@
 #
 # - Martin Ahindura, 2023
 
-from ipaddress import IPv4Address, IPv6Address
+from dataclasses import dataclass, field
+from ipaddress import IPv4Address
 from pathlib import Path
 from typing import Union, List
-from dataclasses import dataclass, field
 
 import toml
 from colorama import Fore, Style
@@ -185,7 +185,7 @@ class NodeManager:
     Manages the initilazation and inspection of node.
     """
 
-    NODE_TYPES = [
+    COUPLER_NODE_NAMES = [
         "coupler_spectroscopy",
         "cz_chevron",
         "cz_optimize_chevron",
@@ -287,7 +287,7 @@ class NodeManager:
         """Queries Redis for the calibration status of each qubit or coupler associated with the node,
         determining if the node is within or out of specification."""
         elements = (
-            self.config.couplers if node_name in self.NODE_TYPES else self.config.qubits
+            self.config.couplers if node_name in self.COUPLER_NODE_NAMES else self.config.qubits
         )
         for element in elements:
             status = REDIS_CONNECTION.hget(f"cs:{element}", node_name)
