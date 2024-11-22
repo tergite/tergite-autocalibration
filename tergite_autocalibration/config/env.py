@@ -16,14 +16,13 @@
 # clear that these variables are sort of global configuration environment variables
 
 import getpass
-import logging
 import os
-from ipaddress import ip_address
 from pathlib import Path
 from typing import Union
 
+from dotenv import dotenv_values, set_key
+
 from tergite_autocalibration.config.base import BaseConfigurationFile
-from tergite_autocalibration.config.utils import from_environment
 from tergite_autocalibration.utils.reflections import ASTParser
 
 
@@ -31,6 +30,12 @@ class EnvironmentConfiguration(BaseConfigurationFile):
 
     def __init__(self):
         super().__init__()
+
+        # NOTE: For all the variables set here, it is important that they are the lower case version
+        # of the respective variable in the .env file. E.g.:
+        # self.root_dir refers to ROOT_DIR in the .env file
+        # If this convention is not followed, it is not possible to automatically update the .env file
+        # through the getters and setters.
 
         self.default_prefix: str = getpass.getuser().replace(" ", "")
 
@@ -56,63 +61,48 @@ class EnvironmentConfiguration(BaseConfigurationFile):
             ".env"
         )
     ):
+        """
+        Load the values from the .env file actually into the os environment.
+
+        Args:
+            filepath: Path to the .env file. Can be overwritten by setting an environment variable
+                      called `TAC_TEST_ENV_FILEPATH`. Then the environment will be loaded from that
+                      location instead.
+
+        Returns:
+            An instance of `EnvironmentConfiguration` which has all values from the environment set.
+
+        """
         return_obj = EnvironmentConfiguration()
 
-        # Load .env file
-        # Dump values into the environment
-        # Then load them from the environment
-        # We do not need to take care of the defaults any longer, because they are already set
-        # We can get rid of the utils.py
+        print(filepath)
+        # Check whether the .env file exists
+        if not os.path.exists(filepath):
+            raise EnvironmentError("The .env file configuration cannot be found.")
+
+        print(filepath)
+        # Then write the filepath also to the return object, so, it can be used later on
+        return_obj.filepath = filepath
+
+        # Load the .env file and propagate the values into the environment
+        env_values_ = dotenv_values(filepath)
+        for env_key_, env_value_ in env_values_.items():
+            os.environ[env_key_] = env_value_
+
+        # Iterate over the variables in the constructor and set them from the environment
+        for variable_name_ in ASTParser.get_init_attribute_names(
+            EnvironmentConfiguration
+        ):
+            if variable_name_ in os.environ:
+                return_obj.__setattr__(variable_name_, os.environ[variable_name_])
 
         return return_obj
 
     def __setattr__(self, key_, value_):
-        # Custom logic for attributes in _initialized_attributes
+        # Write the changes to the .env file directly
         if key_ in ASTParser.get_init_attribute_names(EnvironmentConfiguration):
-            # We need a template file for the .env file
-            pass
+            if self.filepath is not None:
+                set_key(self.filepath, key_.upper(), str(value_))
 
         # Delegate to the base class for all other cases
         super().__setattr__(key_, value_)
-
-
-# ---
-# Section with directory configurations
-
-# Root directory of the project
-ROOT_DIR = from_environment(
-    "ROOT_DIR", cast_=Path, default=Path(__file__).parent.parent.parent
-)
-
-# Data directory to store plots and datasets
-DATA_DIR = from_environment("DATA_DIR", cast_=Path, default=ROOT_DIR.joinpath("out"))
-
-# If the data directory does not exist, it will be created automatically
-if not os.path.exists(DATA_DIR):
-    os.makedirs(DATA_DIR)
-    logging.info(f"Initialised DATA_DIR -> {DATA_DIR}")
-
-# Path to the definition of the configuration package
-CONFIG_DIR = from_environment("CONFIG_DIR", cast_=Path, default=ROOT_DIR)
-
-BACKEND_CONFIG = Path(__file__).parent / "backend_config_default.toml"
-
-# ---
-# Section with other configuration variables
-CLUSTER_IP = ip_address(from_environment("CLUSTER_IP", cast_=str))
-SPI_SERIAL_PORT = from_environment("SPI_SERIAL_PORT", cast_=str)
-
-# ---
-# Section for redis connectivity
-REDIS_PORT = from_environment("REDIS_PORT", cast_=int, default=6379)
-
-# ---
-# Section for plotting
-PLOTTING = from_environment("PLOTTING", cast_=bool, default=False)
-
-
-# ---
-# Section with connectivity definitions
-MSS_MACHINE_ROOT_URL = from_environment(
-    "MSS_MACHINE_ROOT_URL", cast_=str, default="http://localhost:8002"
-)

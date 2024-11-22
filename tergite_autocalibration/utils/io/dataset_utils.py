@@ -21,7 +21,7 @@ from uuid import uuid4
 import numpy as np
 import xarray
 
-from tergite_autocalibration.config.env import DATA_DIR
+from tergite_autocalibration.config.globals import DATA_DIR
 
 
 def configure_dataset(

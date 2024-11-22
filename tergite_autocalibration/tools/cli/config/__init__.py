@@ -67,7 +67,7 @@ def save(
 
     """
 
-    from tergite_autocalibration.config.env import ROOT_DIR
+    from tergite_autocalibration.config.globals import ENV
     from tergite_autocalibration.config.package import ConfigurationPackage
 
     # Check whether filepath parameter is given
@@ -86,7 +86,7 @@ def save(
     # This is the path to the meta configuration for the current application
     if abs_filepath.endswith("configuration.meta.toml"):
         abs_filepath = os.path.dirname(abs_filepath)
-    meta_config_path = os.path.join(ROOT_DIR, "configuration.meta.toml")
+    meta_config_path = os.path.join(ENV.root_dir, "configuration.meta.toml")
 
     # Abort if there is no such meta configuration
     if not os.path.exists(meta_config_path):
@@ -149,10 +149,10 @@ def load(
     """
 
     from tergite_autocalibration.config.package import ConfigurationPackage
-    from tergite_autocalibration.config.env import ROOT_DIR
+    from tergite_autocalibration.config.globals import ENV
 
     # Basic check whether there is not already a configuration package in place that would be overwritten
-    if os.path.exists(os.path.join(ROOT_DIR, "configuration.meta.toml")):
+    if os.path.exists(os.path.join(ENV.root_dir, "configuration.meta.toml")):
         typer.confirm(
             "There is already a configuration package loaded, do you want to overwrite it?",
             abort=True,

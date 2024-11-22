@@ -14,7 +14,7 @@ from os import walk
 
 import xarray as xr
 
-from tergite_autocalibration.config.env import DATA_DIR
+from tergite_autocalibration.config.globals import DATA_DIR
 
 
 def extract_ds_date(filename: str) -> int:

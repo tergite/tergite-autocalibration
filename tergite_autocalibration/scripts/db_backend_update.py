@@ -15,19 +15,22 @@
 # - Martin Ahindura, 2023
 # - Stefan Hill, 2024
 #
-# CAUTION: This updater is coming from tergite-bcc and a copy exists there as well.
+# NOTE: This updater is coming from tergite-bcc and a copy exists there as well.
 # Please make sure to update both files, if you are changing one of them!
 
 import json
+from pathlib import Path
 
 import requests
 import toml
 
-from tergite_autocalibration.config.env import MSS_MACHINE_ROOT_URL, BACKEND_CONFIG
+from tergite_autocalibration.config.globals import ENV
 from tergite_autocalibration.tools.mss.convert import store_manual_parameters
 from tergite_autocalibration.tools.mss.storage import get_component_value
 
-mss_url = str(MSS_MACHINE_ROOT_URL)
+BACKEND_CONFIG = Path(__file__).parent / "backend_config_default.toml"
+
+mss_url = str(ENV.mss_machine_root_url)
 
 
 def create_backend_snapshot() -> dict:

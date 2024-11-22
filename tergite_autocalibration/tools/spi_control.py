@@ -17,6 +17,8 @@ import time
 from qblox_instruments import SpiRack
 from qblox_instruments.qcodes_drivers.spi_rack_modules import S4gModule
 
+from tergite_autocalibration.config.globals import ENV
+
 
 def run_existing_spi_control_sequence():
     coupler_spi_map = {
@@ -29,7 +31,7 @@ def run_existing_spi_control_sequence():
     dc_current_step = round(dc_current_step / 1e-6) * 1e-6
     spi_mod_number, dac_name = coupler_spi_map[coupler]
     spi_mod_name = f"module{spi_mod_number}"
-    spi = SpiRack("loki_rack", "/dev/ttyACM0")
+    spi = SpiRack("loki_rack", ENV.spi_serial_port)
     spi.add_spi_module(spi_mod_number, S4gModule)
     dac0 = spi.instrument_modules[spi_mod_name].instrument_modules["dac0"]
     dac1 = spi.instrument_modules[spi_mod_name].instrument_modules["dac1"]
@@ -94,7 +96,7 @@ def run_new_spi_control_sequence():
     from qblox_instruments import SpiRack
     from qblox_instruments.qcodes_drivers.spi_rack_modules import S4gModule
 
-    spi = SpiRack("lokiB", "/dev/ttyACM0")
+    spi = SpiRack("lokiB", ENV.spi_serial_port)
     spi.add_spi_module(1, S4gModule)
     spi.add_spi_module(2, S4gModule)
     spi.add_spi_module(3, S4gModule)

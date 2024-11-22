@@ -10,4 +10,18 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-# TODO: Here we should test the .env configuration handler
+import os
+
+
+def is_pytest() -> bool:
+    """
+    Check whether it is running a pytest
+
+    Returns: True if the application is running as a pytest
+
+    """
+    try:
+        _ = os.environ["PYTEST_VERSION"]
+        return True
+    except KeyError:
+        return False

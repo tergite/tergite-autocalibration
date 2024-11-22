@@ -75,7 +75,7 @@ Thumbs.db
 *.wmv
 
 # Environment variables
-.env
+.env_
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

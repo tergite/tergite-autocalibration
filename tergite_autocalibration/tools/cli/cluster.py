@@ -19,7 +19,7 @@ cluster_cli = typer.Typer()
 @cluster_cli.command(help="Reboot the cluster.")
 def reboot():
     from qblox_instruments import Cluster
-    from tergite_autocalibration.config.env import CLUSTER_IP
+    from tergite_autocalibration.config.globals import CLUSTER_IP
 
     if typer.confirm(
         "Do you really want to reboot the cluster? This operation can interrupt ongoing measurements."

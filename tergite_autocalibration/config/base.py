@@ -16,7 +16,15 @@ from abc import ABC
 class BaseConfigurationFile(ABC):
 
     def __init__(self):
-        pass
+        self._filepath = None
+
+    @property
+    def filepath(self):
+        return self._filepath
+
+    @filepath.setter
+    def filepath(self, value):
+        self._filepath = value
 
 
 class TOMLConfigurationFile(BaseConfigurationFile):

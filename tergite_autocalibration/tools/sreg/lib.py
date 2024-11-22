@@ -14,8 +14,7 @@ import copy
 from collections import abc, UserList, defaultdict
 from functools import singledispatchmethod
 
-from tergite_autocalibration.config.env import REDIS_PORT
-from tergite_autocalibration.config.globals import REDIS_CONNECTION
+from tergite_autocalibration.config.globals import ENV, REDIS_CONNECTION
 
 
 def nested_dd():
@@ -164,7 +163,7 @@ class SRegistry(AttrDict):
 
     def __repr__(self):
         return f"SRegistry for redis connection binded to \n \
-                 Port: {REDIS_PORT}."
+                 Port: {ENV.redis_port}."
 
     def copy(self):
         return SRegistry(copy.deepcopy(self))

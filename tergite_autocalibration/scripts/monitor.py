@@ -16,8 +16,7 @@ from ipaddress import IPv4Address
 import numpy as np
 import optuna
 
-from tergite_autocalibration.config.env import CLUSTER_IP
-from tergite_autocalibration.config.globals import REDIS_CONNECTION
+from tergite_autocalibration.config.globals import REDIS_CONNECTION, CLUSTER_IP
 from tergite_autocalibration.config.legacy import LEGACY_CONFIG
 from tergite_autocalibration.lib.nodes import (
     characterization_nodes as calibrate_nodes,
