@@ -29,7 +29,6 @@ from sklearn.metrics import confusion_matrix
 from tergite_autocalibration.config.coupler_config import qubit_types
 from tergite_autocalibration.lib.base.analysis import (
     BaseAllQubitsAnalysis,
-    BaseAnalysis,
     BaseQubitAnalysis,
 )
 
