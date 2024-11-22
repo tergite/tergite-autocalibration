@@ -24,9 +24,12 @@ from typing import Union
 
 from tergite_autocalibration.config.base import BaseConfigurationFile
 from tergite_autocalibration.config.utils import from_environment
+from tergite_autocalibration.utils.reflections import ASTParser
 
 
 class EnvironmentConfiguration(BaseConfigurationFile):
+    # This is to generically load attributes
+    _initialized_attributes = None
 
     def __init__(self):
         super().__init__()
@@ -65,8 +68,48 @@ class EnvironmentConfiguration(BaseConfigurationFile):
 
         return return_obj
 
-    # Getter and setter
-    # Write values into the environment and into the file
+    def _check_and_update_initialized_attributes(self):
+        # Use __dict__ to avoid triggering custom __getattribute__ or __setattr__
+        if "_initialized_attributes" not in self.__dict__:
+            self.__dict__["_initialized_attributes"] = (
+                ASTParser.get_init_attribute_names(EnvironmentConfiguration)
+            )
+
+    def __setattr__(self, key_, value_):
+        # Handle _initialized_attributes directly to avoid recursion
+        if key_ == "_initialized_attributes":
+            self.__dict__["_initialized_attributes"] = value_
+            return
+
+        # Ensure _initialized_attributes is initialized before handling other attributes
+        self._check_and_update_initialized_attributes()
+
+        # Custom logic for attributes in _initialized_attributes
+        if key_ in self.__dict__.get("_initialized_attributes", set()):
+            if key_ in self.__dict__:
+                # Perform specific logic for already-initialized attributes
+                pass
+
+        # Delegate to the base class for all other cases
+        super().__setattr__(key_, value_)
+
+    def __getattribute__(self, item_):
+        # Bypass custom logic for _initialized_attributes to prevent recursion
+        if item_ == "_initialized_attributes":
+            return self.__dict__.get("_initialized_attributes", None)
+
+        # Ensure _initialized_attributes is initialized before accessing other attributes
+        self._check_and_update_initialized_attributes()
+
+        # Custom logic for attributes in _initialized_attributes
+        if item_ in object.__getattribute__(self, "_initialized_attributes"):
+            value = object.__getattribute__(self, item_)
+            print(f"Accessing '{item_}': {value}")
+            return value
+
+        # Default behavior for other attributes
+        return object.__getattribute__(self, item_)
+
     # We need a template file for the .env file
 
 
