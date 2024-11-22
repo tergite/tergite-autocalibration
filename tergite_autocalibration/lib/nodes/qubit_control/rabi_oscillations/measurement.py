@@ -28,15 +28,15 @@ from tergite_autocalibration.utils.extended_transmon_element import ExtendedTran
 
 
 class Rabi_Oscillations(BaseMeasurement):
-    def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
+    def __init__(self, transmons: dict[str, ExtendedTransmon]):
         super().__init__(transmons)
-        self.qubit_state = qubit_state
         self.transmons = transmons
 
     def schedule_function(
         self,
         mw_amplitudes: dict[str, np.ndarray],
         repetitions: int = 1024,
+        qubit_state: int = 0,
     ) -> Schedule:
         """
         Generate a schedule for performing a Rabi oscillation measurement on multiple qubits using a Gaussian pulse.
@@ -56,28 +56,28 @@ class Rabi_Oscillations(BaseMeasurement):
         :
             An experiment schedule.
         """
-        if self.qubit_state == 0:
+        if qubit_state == 0:
             schedule_title = "multiplexed_rabi_01"
             measure_function = Measure
-        elif self.qubit_state == 1:
+        elif qubit_state == 1:
             schedule_title = "multiplexed_rabi_12"
             measure_function = Measure_RO1
         else:
-            raise ValueError(f"Invalid qubit state: {self.qubit_state}")
+            raise ValueError(f"Invalid qubit state: {qubit_state}")
 
         schedule = Schedule(schedule_title, repetitions)
 
         qubits = self.transmons.keys()
 
         # we must first add the clocks
-        if self.qubit_state == 0:
+        if qubit_state == 0:
             for this_qubit, this_transmon in self.transmons.items():
                 mw_frequency_01 = this_transmon.clock_freqs.f01()
                 this_clock = f"{this_qubit}.01"
                 schedule.add_resource(
                     ClockResource(name=this_clock, freq=mw_frequency_01)
                 )
-        elif self.qubit_state == 1:
+        elif qubit_state == 1:
             for this_qubit, this_transmon in self.transmons.items():
                 mw_frequency_12 = this_transmon.clock_freqs.f12()
                 this_clock = f"{this_qubit}.12"
@@ -85,7 +85,7 @@ class Rabi_Oscillations(BaseMeasurement):
                     ClockResource(name=this_clock, freq=mw_frequency_12)
                 )
         else:
-            raise ValueError(f"Invalid qubit state: {self.qubit_state}")
+            raise ValueError(f"Invalid qubit state: {qubit_state}")
 
         # This is the common reference operation so the qubits can be operated in parallel
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
@@ -96,12 +96,12 @@ class Rabi_Oscillations(BaseMeasurement):
             mw_pulse_duration = this_transmon.rxy.duration()
             mw_pulse_port = this_transmon.ports.microwave()
 
-            if self.qubit_state == 0:
+            if qubit_state == 0:
                 this_clock = f"{this_qubit}.01"
-            elif self.qubit_state == 1:
+            elif qubit_state == 1:
                 this_clock = f"{this_qubit}.12"
             else:
-                raise ValueError(f"Invalid qubit state: {self.qubit_state}")
+                raise ValueError(f"Invalid qubit state: {qubit_state}")
 
             schedule.add(
                 Reset(*qubits), ref_op=root_relaxation, ref_pt="end"
@@ -109,7 +109,7 @@ class Rabi_Oscillations(BaseMeasurement):
 
             # The second for loop iterates over all amplitude values in the amplitudes batch:
             for acq_index, mw_amplitude in enumerate(mw_amp_array_val):
-                if self.qubit_state == 1:
+                if qubit_state == 1:
                     schedule.add(X(this_qubit))
                 schedule.add(
                     DRAGPulse(
@@ -134,9 +134,8 @@ class Rabi_Oscillations(BaseMeasurement):
 
 
 class N_Rabi_Oscillations(BaseMeasurement):
-    def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
+    def __init__(self, transmons: dict[str, ExtendedTransmon]):
         super().__init__(transmons)
-        self.qubit_state = qubit_state
         self.transmons = transmons
 
     def schedule_function(
@@ -144,6 +143,7 @@ class N_Rabi_Oscillations(BaseMeasurement):
         mw_amplitudes_sweep: dict[str, np.ndarray],
         X_repetitions: dict[str, np.ndarray],
         repetitions: int = 1024,
+        qubit_state: int = 0,
     ) -> Schedule:
         """
 
@@ -164,14 +164,14 @@ class N_Rabi_Oscillations(BaseMeasurement):
         :
             An experiment schedule.
         """
-        if self.qubit_state == 0:
+        if qubit_state == 0:
             schedule_title = "mltplx_nrabi_01"
             measure_function = Measure
-        elif self.qubit_state == 1:
+        elif qubit_state == 1:
             schedule_title = "mltplx_nrabi_12"
             measure_function = Measure_RO1
         else:
-            raise ValueError(f"Invalid qubit state: {self.qubit_state}")
+            raise ValueError(f"Invalid qubit state: {qubit_state}")
         schedule = Schedule(schedule_title, repetitions)
 
         qubits = self.transmons.keys()
@@ -181,7 +181,7 @@ class N_Rabi_Oscillations(BaseMeasurement):
             schedule.add_resource(
                 ClockResource(name=f"{this_qubit}.01", freq=mw_frequency)
             )
-            if self.qubit_state == 1:
+            if qubit_state == 1:
                 mw_frequency_12 = this_transmon.clock_freqs.f12()
                 this_clock = f"{this_qubit}.12"
                 schedule.add_resource(
@@ -201,16 +201,16 @@ class N_Rabi_Oscillations(BaseMeasurement):
 
             this_clock = f"{this_qubit}.01"
 
-            if self.qubit_state == 1:
+            if qubit_state == 1:
                 mw_amplitude = this_transmon.r12.ef_amp180()
                 mw_motzoi = this_transmon.r12.ef_motzoi()
                 this_clock = f"{this_qubit}.12"
                 measure_function = Measure_RO1
-            elif self.qubit_state == 0:
+            elif qubit_state == 0:
                 measure_function = Measure
                 this_clock = f"{this_qubit}.01"
             else:
-                raise ValueError(f"Invalid qubit state: {self.qubit_state}")
+                raise ValueError(f"Invalid qubit state: {qubit_state}")
 
             mw_amplitudes_values = mw_amplitudes_sweep[this_qubit]
             number_of_amplitudes = len(mw_amplitudes_values)
@@ -226,7 +226,7 @@ class N_Rabi_Oscillations(BaseMeasurement):
                     mw_amplitudes_values
                 ):
                     this_index = x_index * number_of_amplitudes + mw_amplitude_index
-                    if self.qubit_state == 1:
+                    if qubit_state == 1:
                         schedule.add(X(this_qubit))
                     for _ in range(this_x):
                         schedule.add(
@@ -249,7 +249,7 @@ class N_Rabi_Oscillations(BaseMeasurement):
                                 phase=0,
                             ),
                         )
-                        if self.qubit_state == 0:
+                        if qubit_state == 0:
                             schedule.add(
                                 DRAGPulse(
                                     duration=mw_pulse_duration,

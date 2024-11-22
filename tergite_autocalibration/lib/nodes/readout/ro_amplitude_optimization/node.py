@@ -13,14 +13,14 @@
 
 import numpy as np
 
+from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
+from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.analysis import (
+    OptimalROThreeStateAmplitudeNodeAnalysis,
+    OptimalROTwoStateAmplitudeNodeAnalysis,
+)
 from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.measurement import (
     RO_amplitude_optimization,
 )
-from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.analysis import (
-    OptimalROTwoStateAmplitudeNodeAnalysis,
-    OptimalROThreeStateAmplitudeNodeAnalysis,
-)
-from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 
 
 class RO_amplitude_two_state_optimization_Node(ScheduleNode):
@@ -40,14 +40,14 @@ class RO_amplitude_two_state_optimization_Node(ScheduleNode):
         # FIXME: This is a sort of hack to ignore the couplers
         self.schedule_keywords = {}
         self.schedule_keywords["loop_repetitions"] = 1000
+        self.schedule_keywords["qubit_state"] = self.qubit_state
         self.plots_per_qubit = 3  #  fidelity plot, IQ shots, confusion matrix
 
         self.loops = self.schedule_keywords["loop_repetitions"]
 
         self.schedule_samplespace = {
             "qubit_states": {
-                qubit: np.tile(np.array([0, 1], dtype=np.int16), self.loops)
-                for qubit in self.all_qubits
+                qubit: np.array([0, 1], dtype=np.int16) for qubit in self.all_qubits
             },
             "ro_amplitudes": {
                 qubit: np.linspace(0.001, 0.01, 11) for qubit in self.all_qubits
@@ -74,14 +74,14 @@ class RO_amplitude_three_state_optimization_Node(ScheduleNode):
         self.all_qubits = all_qubits
         self.qubit_state = 2
         self.schedule_keywords = {}
-        self.schedule_keywords["loop_repetitions"] = 1000
+        self.schedule_keywords["loop_repetitions"] = 100
+        self.schedule_keywords["qubit_state"] = self.qubit_state
         self.plots_per_qubit = 3  #  fidelity plot, IQ shots, confusion matrix
         self.loops = self.schedule_keywords["loop_repetitions"]
 
         self.schedule_samplespace = {
             "qubit_states": {
-                qubit: np.tile(np.array([0, 1, 2], dtype=np.int16), self.loops)
-                for qubit in self.all_qubits
+                qubit: np.array([0, 1, 2], dtype=np.int16) for qubit in self.all_qubits
             },
             "ro_amplitudes": {
                 qubit: np.append(

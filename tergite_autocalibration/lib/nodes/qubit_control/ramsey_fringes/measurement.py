@@ -15,7 +15,7 @@
 import numpy as np
 from quantify_scheduler import Schedule
 from quantify_scheduler.enums import BinMode
-from quantify_scheduler.operations.gate_library import Measure, Reset, X90, Rxy, X
+from quantify_scheduler.operations.gate_library import X90, Measure, Reset, Rxy, X
 from quantify_scheduler.operations.pulse_library import DRAGPulse
 from quantify_scheduler.resources import ClockResource
 
@@ -25,15 +25,15 @@ from tergite_autocalibration.utils.extended_transmon_element import ExtendedTran
 
 
 class Ramsey_detunings(BaseMeasurement):
-    def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
+    def __init__(self, transmons: dict[str, ExtendedTransmon]):
         super().__init__(transmons)
-        self.qubit_state = qubit_state
 
     def schedule_function(
         self,
         artificial_detunings: dict[str, np.ndarray],
         ramsey_delays: dict[str, np.ndarray],
         repetitions: int = 1024,
+        qubit_state: int = 0,
     ) -> Schedule:
         """
         Generate a schedule for performing a Ramsey fringe measurement on multiple qubits.
@@ -58,20 +58,20 @@ class Ramsey_detunings(BaseMeasurement):
             An experiment schedule.
         """
 
-        if self.qubit_state == 0:
+        if qubit_state == 0:
             schedule_title = "multiplexed_ramsey_01"
             measure_function = Measure
-        elif self.qubit_state == 1:
+        elif qubit_state == 1:
             schedule_title = "multiplexed_ramsey_12"
             measure_function = Measure_RO1
         else:
-            raise ValueError(f"Invalid qubit state: {self.qubit_state}")
+            raise ValueError(f"Invalid qubit state: {qubit_state}")
 
         schedule = Schedule(schedule_title, repetitions)
 
         qubits = self.transmons.keys()
 
-        if self.qubit_state == 1:
+        if qubit_state == 1:
             for this_qubit, this_transmon in self.transmons.items():
                 mw_frequency_12 = this_transmon.clock_freqs.f12()
                 this_clock = f"{this_qubit}.12"
@@ -89,14 +89,14 @@ class Ramsey_detunings(BaseMeasurement):
             mw_pulse_port = this_transmon.ports.microwave()
             mw_ef_amp180 = this_transmon.r12.ef_amp180()
 
-            if self.qubit_state == 1:
+            if qubit_state == 1:
                 this_clock = f"{this_qubit}.12"
                 measure_function = Measure_RO1
-            elif self.qubit_state == 0:
+            elif qubit_state == 0:
                 measure_function = Measure
                 this_clock = f"{this_qubit}.01"
             else:
-                raise ValueError(f"Invalid qubit state: {self.qubit_state}")
+                raise ValueError(f"Invalid qubit state: {qubit_state}")
 
             schedule.add(
                 Reset(*qubits), ref_op=root_relaxation, ref_pt_new="end"
@@ -113,7 +113,7 @@ class Ramsey_detunings(BaseMeasurement):
 
                     recovery_phase = np.rad2deg(2 * np.pi * detuning * ramsey_delay)
 
-                    if self.qubit_state == 1:
+                    if qubit_state == 1:
                         schedule.add(X(this_qubit))
                         f12_amp = mw_ef_amp180
                         schedule.add(
@@ -139,7 +139,7 @@ class Ramsey_detunings(BaseMeasurement):
                             rel_time=ramsey_delay,
                         )
 
-                    if self.qubit_state == 0:
+                    if qubit_state == 0:
                         schedule.add(X90(this_qubit))
 
                         schedule.add(

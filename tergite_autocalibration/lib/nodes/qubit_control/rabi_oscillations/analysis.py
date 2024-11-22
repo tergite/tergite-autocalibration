@@ -111,8 +111,7 @@ class RabiQubitAnalysis(BaseQubitAnalysis):
         self.fit_y = model.eval(
             fit_result.params, **{model.independent_vars[0]: self.fit_amplitudes}
         )
-        # return [self.ampl]
-        return [0.1]
+        return [self.ampl]
 
     def plotter(self, ax):
         ax.plot(
