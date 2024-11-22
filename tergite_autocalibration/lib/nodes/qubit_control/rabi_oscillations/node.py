@@ -32,8 +32,8 @@ class Rabi_Oscillations_Node(ScheduleNode):
     analysis_obj = RabiNodeAnalysis
     qubit_qois = ["rxy:amp180"]
 
-    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
+    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
         self.schedule_samplespace = {
             "mw_amplitudes": {
                 qubit: np.linspace(0.002, 0.90, 61) for qubit in self.all_qubits
@@ -46,9 +46,10 @@ class Rabi_Oscillations_12_Node(ScheduleNode):
     analysis_obj = RabiNodeAnalysis
     qubit_qois = ["r12:ef_amp180"]
 
-    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
+    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
         self.qubit_state = 1
+        self.schedule_keywords["qubit_state"] = self.qubit_state
 
         self.schedule_samplespace = {
             "mw_amplitudes": {
@@ -62,10 +63,10 @@ class N_Rabi_Oscillations_Node(ScheduleNode):
     analysis_obj = NRabiNodeAnalysis
     qubit_qois = ["rxy:amp180"]
 
-    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
-        self.backup = False
+    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
         self.qubit_state = 0
+        self.schedule_keywords["qubit_state"] = self.qubit_state
 
         self.schedule_samplespace = {
             "mw_amplitudes_sweep": {
@@ -80,10 +81,10 @@ class N_Rabi_Oscillations_12_Node(ScheduleNode):
     analysis_obj = NRabiNodeAnalysis
     qubit_qois = ["r12:ef_amp180"]
 
-    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
-        self.backup = False
+    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
         self.qubit_state = 1
+        self.schedule_keywords["qubit_state"] = self.qubit_state
 
         self.schedule_samplespace = {
             "mw_amplitudes_sweep": {

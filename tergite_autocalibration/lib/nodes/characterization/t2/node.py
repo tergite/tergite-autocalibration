@@ -18,14 +18,14 @@ from time import sleep
 
 import numpy as np
 
-from tergite_autocalibration.lib.nodes.characterization.t2.analysis import (
-    T2NodeAnalysis,
-    T2EchoNodeAnalysis,
-)
-from tergite_autocalibration.lib.nodes.characterization.t2.measurement import T2, T2Echo
 from tergite_autocalibration.lib.base.external_parameter_node import (
     ExternalParameterNode,
 )
+from tergite_autocalibration.lib.nodes.characterization.t2.analysis import (
+    T2EchoNodeAnalysis,
+    T2NodeAnalysis,
+)
+from tergite_autocalibration.lib.nodes.characterization.t2.measurement import T2, T2Echo
 
 
 class T2_Node(ExternalParameterNode):
@@ -35,13 +35,11 @@ class T2_Node(ExternalParameterNode):
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
-        self.all_qubits = all_qubits
-        self.backup = False
+        self.all_qubits = all_qubits  # Is this needed
 
         self.number_or_repeated_T2s = 1
 
         self.sleep_time = 3
-        # self.operations_args = []
 
         self.schedule_samplespace = {
             "delays": {

@@ -15,7 +15,7 @@
 
 import numpy as np
 
-from tergite_autocalibration.lib.base.node import BaseNode
+from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.nodes.qubit_control.ramsey_fringes.analysis import (
     RamseyDetunings01NodeAnalysis,
     RamseyDetunings12NodeAnalysis,
@@ -25,15 +25,15 @@ from tergite_autocalibration.lib.nodes.qubit_control.ramsey_fringes.measurement 
 )
 
 
-class Ramsey_Fringes_12_Node(BaseNode):
+class Ramsey_Fringes_12_Node(ScheduleNode):
     measurement_obj = Ramsey_detunings
     analysis_obj = RamseyDetunings12NodeAnalysis
     qubit_qois = ["clock_freqs:f12"]
 
-    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
+    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
         self.qubit_state = 1
-        self.backup = False
+        self.schedule_keywords["qubit_state"] = self.qubit_state
         self.schedule_samplespace = {
             "ramsey_delays": {
                 qubit: np.arange(4e-9, 2048e-9, 8 * 8e-9) for qubit in self.all_qubits
@@ -44,14 +44,13 @@ class Ramsey_Fringes_12_Node(BaseNode):
         }
 
 
-class Ramsey_Fringes_Node(BaseNode):
+class Ramsey_Fringes_Node(ScheduleNode):
     measurement_obj = Ramsey_detunings
     analysis_obj = RamseyDetunings01NodeAnalysis
     qubit_qois = ["clock_freqs:f01"]
 
-    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
-        self.backup = False
+    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
         self.schedule_samplespace = {
             "ramsey_delays": {
                 qubit: np.arange(4e-9, 2048e-9, 8 * 8e-9) for qubit in self.all_qubits
