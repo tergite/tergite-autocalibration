@@ -13,9 +13,9 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+import pathlib
 from collections.abc import Iterable
 from datetime import datetime
-import pathlib
 from uuid import uuid4
 
 import numpy as np
@@ -142,8 +142,6 @@ def configure_dataset(
         dataset.attrs["elements"].append(element)
 
     return dataset
-
-
 
 
 def to_real_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:

@@ -28,6 +28,7 @@ from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement_ar
 )
 from tergite_autocalibration.utils.user_input import qubit_samples
 
+
 def interleave_zeros(arr: np.ndarray):
     # interleave dummy active reset aqcuisitions, the value=0 desn't matter
     new_array = np.zeros(2 * len(arr), dtype=arr.dtype)
