@@ -65,20 +65,17 @@ class CalibrationConfig:
     cluster_mode: "MeasurementMode" = MeasurementMode.real
     cluster_ip: Union[str, "IPv4Address", "IPv6Address"] = CLUSTER_IP
     cluster_timeout: int = 222
-    node_name: str = ""
     data_path: Path = Path("")
-
     qubits: List[str] = field(
         default_factory=lambda: user_requested_calibration["all_qubits"]
     )
     couplers: List[str] = field(
         default_factory=lambda: user_requested_calibration["couplers"]
     )
-    target_node: str = user_requested_calibration["target_node"]
+    target_node_name: str = user_requested_calibration["target_node"]
     user_samplespace: dict = field(
         default_factory=lambda: user_requested_calibration["user_samplespace"]
     )
-
     transmon_configuration: dict = field(
         default_factory=lambda: toml.load(settings.DEVICE_CONFIG)
     )
@@ -134,9 +131,6 @@ class HardwareManager:
             dummy_setup["16"] = ClusterType.CLUSTER_QRM_RF
             dummy_setup["17"] = ClusterType.CLUSTER_QRM_RF
             cluster = Cluster(CLUSTER_NAME, dummy_cfg=dummy_setup)
-            # raise ClusterNotFoundError(
-            #     f"Cannot create cluster object from {self.cluster_ip}"
-            # )
             return cluster
 
     def _create_instrument_coordinator(
@@ -187,7 +181,6 @@ class NodeManager:
         self, lab_ic: "InstrumentCoordinator", config: "CalibrationConfig"
     ) -> None:
         self.config = config
-        # self.node = node
         self.node_factory = NodeFactory()
         self.lab_ic = lab_ic
         self.transmon_configuration = config.transmon_configuration
@@ -197,11 +190,7 @@ class NodeManager:
         return filtered_topological_order(target_node)
 
     def inspect_node(self, node_name: str):
-        # TODO: this function must be split
         logger.info(f"Inspecting node {node_name}")
-
-        # Initialize node and update samplespace
-        node = self._initialize_node(node_name)
 
         # Populate initial parameters
         populate_initial_parameters(
@@ -210,41 +199,20 @@ class NodeManager:
             self.config.couplers,
             REDIS_CONNECTION,
         )
-
-        # Check calibration status and populate parameters
-        is_node_calibrated = self._check_calibration_status(node_name)
+        
+        # Check Redis if node is calibrated
+        status: "DataStatus" = self._check_calibration_status_redis(node_name)
 
         populate_node_parameters(
             node_name,
-            is_node_calibrated,
+            status == DataStatus.in_spec,
             self.config.transmon_configuration,
             self.config.qubits,
             self.config.couplers,
             REDIS_CONNECTION,
         )
 
-        # Check Redis if node is calibrated
-        status = self._check_calibration_status_redis(node_name)
-
-        if self.config.cluster_mode == MeasurementMode.re_analyse:
-            print(status)
-            if node_name == self.config.node_name or status != DataStatus.in_spec:
-                path = self.config.data_path
-
-                print(
-                    "\u2691\u2691\u2691 "
-                    + f"{Fore.RED}{Style.BRIGHT}Calibration required for Node {node_name}{Style.RESET_ALL}"
-                )
-                logger.info(f"Calibrating node {node.name}")
-
-                node.calibrate(path, self.config.cluster_mode)
-
-            else:
-                print(
-                    f" \u2714  {Fore.GREEN}{Style.BRIGHT}Node {node_name} in spec{Style.RESET_ALL}"
-                )
-
-        elif status == DataStatus:
+        if status == DataStatus.in_spec:
             print(
                 f" \u2714  {Fore.GREEN}{Style.BRIGHT}Node {node_name} in spec{Style.RESET_ALL}"
             )
@@ -256,28 +224,17 @@ class NodeManager:
                 + f"{Fore.RED}{Style.BRIGHT}Calibration required for Node {node_name}{Style.RESET_ALL}"
             )
 
-            node = self.node_factory.create_node(
-                node_name,
-                self.config.qubits,
-                couplers=self.config.couplers,
-                measurement_mode=self.config.cluster_mode,
-            )
-            if node.name in self.config.user_samplespace:
-                self.update_to_user_samplespace(node, self.config.user_samplespace)
-
-            # it's maybe useful to give access to the ic
-            node.lab_instr_coordinator = self.lab_ic
+            # Initialize node and update samplespace
+            node = self._initialize_node(node_name)
 
             logger.info(f"Calibrating node {node.name}")
-            # TODO: This could be in the node initializer
+            
             if self.config.cluster_mode == MeasurementMode.re_analyse:
                 data_path = self.config.data_path
             else:
                 data_path = create_node_data_path(node)
 
             node.calibrate(data_path, self.config.cluster_mode)
-
-            measurement_result = node.calibrate(data_path, self.config.cluster_mode)
 
             # TODO:  develop failure strategies ->
             # if node_calibration_status == DataStatus.out_of_spec:
@@ -306,44 +263,13 @@ class NodeManager:
         )
         return node
 
-    def _check_calibration_status(self, node_name: str) -> bool:
-        """Checks if the node is calibrated by evaluating the status in Redis."""
-        if node_name in [
-            "coupler_spectroscopy",
-            "cz_chevron",
-            "cz_chevron_amplitude",
-            "cz_calibration",
-            "cz_calibration_ssro",
-            "cz_calibration_swap_ssro",
-            "cz_dynamic_phase",
-            "cz_dynamic_phase_swap",
-            "reset_chevron",
-            "process_tomography_ssro",
-            "tqg_randomized_benchmarking",
-            "tqg_randomized_benchmarking_interleaved",
-        ]:
-            statuses = [
-                REDIS_CONNECTION.hget(f"cs:{coupler}", node_name) == "calibrated"
-                for coupler in self.config.couplers
-            ]
-        else:
-            statuses = [
-                REDIS_CONNECTION.hget(f"cs:{qubit}", node_name) == "calibrated"
-                for qubit in self.config.qubits
-            ]
-        return all(statuses)
-
     def _check_calibration_status_redis(self, node_name: str) -> DataStatus:
         """Queries Redis for the calibration status of each qubit or coupler associated with the node,
         determining if the node is within or out of specification."""
         if node_name in [
             "coupler_spectroscopy",
             "cz_chevron",
-            "cz_chevron_duration_single_shots_experimental",
-            "cz_calibration_single_shots_experimental",
-            "cz_chevron_experimental",
             "cz_optimize_chevron",
-            "cz_chevron_amplitude",
             "cz_calibration_ssro",
             "cz_calibration_swap_ssro",
             "cz_dynamic_phase_ssro",
@@ -375,25 +301,6 @@ class NodeManager:
                     raise ValueError(f"REDIS error: cannot find cs:{qubit}", node_name)
             return DataStatus.in_spec
 
-    def _requires_calibration(self, node_name: str, is_node_calibrated: bool) -> bool:
-        """Determines if the node requires calibration based on its status."""
-        if (
-            not is_node_calibrated
-            or self.config.cluster_mode == MeasurementMode.re_analyse
-        ):
-            print(
-                "\u2691\u2691\u2691 "
-                + f"{Fore.RED}{Style.BRIGHT}Calibration required for Node {node_name}{Style.RESET_ALL}"
-            )
-            return True
-        return False
-
-    def _calibrate_node(self, node: BaseNode, node_name: str) -> None:
-        """Performs calibration on the node and saves data to a specified path."""
-        data_path = create_node_data_path(node)
-        logger.info(f"Calibrating node {node.name}")
-        node.calibrate(data_path, self.config.cluster_mode)
-
     @staticmethod
     def update_to_user_samplespace(node: BaseNode, user_samplespace: dict) -> None:
         node_user_samplespace = user_samplespace[node.name]
@@ -413,10 +320,9 @@ class CalibrationSupervisor:
         self.hardware_manager = HardwareManager(config=config)
         self.lab_ic = self.hardware_manager.get_instrument_coordinator()
         self.node_manager = NodeManager(self.lab_ic, config=config)
-        self.topo_order = self.node_manager.topo_order(self.config.target_node)
+        self.topo_order = self.node_manager.topo_order(self.config.target_node_name)
 
     def calibrate_system(self):
-        # TODO: everything which is not in the inspect or calibrate function should go here
         logger.info("Starting System Calibration")
         number_of_qubits = len(self.config.qubits)
         draw_arrow_chart(f"Qubits: {number_of_qubits}", self.topo_order)

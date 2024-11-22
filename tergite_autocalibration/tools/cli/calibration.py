@@ -73,10 +73,11 @@ def start(
         CalibrationConfig,
     )
     from tergite_autocalibration.scripts.db_backend_update import update_mss
+    from tergite_autocalibration.utils.user_input import user_requested_calibration
 
     cluster_mode: "MeasurementMode" = MeasurementMode.real
     parsed_cluster_ip: "IPv4Address" = CLUSTER_IP
-    node_name = ""
+    target_node_name = user_requested_calibration["target_node"]
     data_path = ""
 
     if r:
@@ -96,7 +97,7 @@ def start(
 
         cluster_mode = MeasurementMode.re_analyse
         data_path = folder_path
-        node_name = name
+        target_node_name = name
 
     # Check whether the ip address of the cluster is set correctly
     if c:
@@ -118,7 +119,7 @@ def start(
     config = CalibrationConfig(
         cluster_mode=cluster_mode,
         cluster_ip=parsed_cluster_ip,
-        node_name=node_name,
+        target_node_name=target_node_name,
         data_path=Path(data_path),
     )
     supervisor = CalibrationSupervisor(config)
