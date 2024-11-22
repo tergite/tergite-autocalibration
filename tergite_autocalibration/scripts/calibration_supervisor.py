@@ -287,7 +287,9 @@ class NodeManager:
         """Queries Redis for the calibration status of each qubit or coupler associated with the node,
         determining if the node is within or out of specification."""
         elements = (
-            self.config.couplers if node_name in self.COUPLER_NODE_NAMES else self.config.qubits
+            self.config.couplers
+            if node_name in self.COUPLER_NODE_NAMES
+            else self.config.qubits
         )
         for element in elements:
             status = REDIS_CONNECTION.hget(f"cs:{element}", node_name)
