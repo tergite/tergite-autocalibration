@@ -20,7 +20,6 @@ import numpy as np
 from tergite_autocalibration.lib.base.external_parameter_node import (
     ExternalParameterNode,
 )
-
 from tergite_autocalibration.lib.nodes.characterization.t1.analysis import (
     T1NodeAnalysis,
 )
@@ -34,8 +33,7 @@ class T1_Node(ExternalParameterNode):
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
-        self.all_qubits = all_qubits
-        self.backup = False
+        self.all_qubits = all_qubits  # Is this needed?
 
         self.schedule_keywords = {
             "multiplexing": "parallel"
