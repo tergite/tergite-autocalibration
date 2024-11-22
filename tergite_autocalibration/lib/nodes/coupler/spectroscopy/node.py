@@ -13,6 +13,9 @@
 
 import numpy as np
 
+from tergite_autocalibration.lib.base.external_parameter_node import (
+    ExternalParameterNode,
+)
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
     CouplerSpectroscopyNodeAnalysis,
 )
@@ -28,10 +31,6 @@ from tergite_autocalibration.utils.hardware.spi import SpiDAC
 # TODO: check location
 from tergite_autocalibration.utils.user_input import qubit_samples
 
-from tergite_autocalibration.lib.base.external_parameter_node import (
-    ExternalParameterNode,
-)
-
 
 class Coupler_Spectroscopy_Node(ExternalParameterNode):
     measurement_obj = Two_Tones_Multidim
@@ -43,18 +42,16 @@ class Coupler_Spectroscopy_Node(ExternalParameterNode):
     ):
         super().__init__(name, all_qubits, **schedule_keywords)
         self.name = name
-        self.all_qubits = all_qubits  # this is a Base attr, delete it here
         self.couplers = couplers
         self.qubit_state = 0
-        self.type = "spi_and_cluster_simple_sweep"
-        # perform 2 tones while biasing the current
+        self.schedule_keywords["qubit_state"] = self.qubit_state
         self.coupled_qubits = self.get_coupled_qubits()
         self.coupler = self.couplers[0]
 
         # This should go in node or in measurement
-        # self.mode = MeasurementMode.real
-        # self.spi_dac = SpiDAC(self.mode)
-        # self.dac = self.spi_dac.create_spi_dac(self.coupler)
+        self.mode = MeasurementMode.real
+        self.spi_dac = SpiDAC(self.mode)
+        self.dac = self.spi_dac.create_spi_dac(self.coupler)
 
         self.all_qubits = self.coupled_qubits
 
@@ -65,7 +62,7 @@ class Coupler_Spectroscopy_Node(ExternalParameterNode):
         }
 
         self.external_samplespace = {
-            "dc_currents": {self.coupler: np.arange(-2.5e-3, 2.5e-3, 150e-6)},
+            "dc_currents": {self.coupler: np.arange(-2.5e-3, 2.5e-4, 280e-6)},
         }
         # self.validate()
 
@@ -84,6 +81,10 @@ class Coupler_Spectroscopy_Node(ExternalParameterNode):
         this_iteration_value = list(iteration_dict.values())[0]
         print(f"{ this_iteration_value = }")
         self.spi_dac.set_dac_current(self.dac, this_iteration_value)
+
+    def final_operation(self):
+        print("Final Operation")
+        self.spi_dac.set_dac_current(self.dac, 0)
 
 
 class Coupler_Resonator_Spectroscopy_Node(ExternalParameterNode):

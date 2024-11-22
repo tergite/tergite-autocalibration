@@ -18,9 +18,9 @@ from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.acquisition_library import SSBIntegrationComplex
 from quantify_scheduler.operations.gate_library import Reset, X
 from quantify_scheduler.operations.pulse_library import (
-    SquarePulse,
-    SetClockFrequency,
     DRAGPulse,
+    SetClockFrequency,
+    SquarePulse,
 )
 from quantify_scheduler.resources import ClockResource
 from quantify_scheduler.schedules.schedule import Schedule
@@ -30,15 +30,15 @@ from tergite_autocalibration.utils.extended_transmon_element import ExtendedTran
 
 
 class Resonator_Spectroscopy(BaseMeasurement):
-    def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
+    def __init__(self, transmons: dict[str, ExtendedTransmon]):
         super().__init__(transmons)
-        self.qubit_state = qubit_state
         self.transmons = transmons
 
     def schedule_function(
         self,
         ro_frequencies: dict[str, np.ndarray],
         repetitions: int = 1024,
+        qubit_state: int = 0,
     ) -> Schedule:
         """
         Generate a schedule for performing resonator spectroscopy to locate the resonators resonance frequency for multiple qubits.
@@ -64,11 +64,11 @@ class Resonator_Spectroscopy(BaseMeasurement):
         qubits = self.transmons.keys()
 
         # Initialize the clock for each qubit
-        if self.qubit_state == 0:
+        if qubit_state == 0:
             ro_str = "ro"
-        elif self.qubit_state == 1:
+        elif qubit_state == 1:
             ro_str = "ro1"
-        elif self.qubit_state == 2:
+        elif qubit_state == 2:
             ro_str = "ro2"
         else:
             raise ValueError("error state")
@@ -80,7 +80,7 @@ class Resonator_Spectroscopy(BaseMeasurement):
                 ClockResource(name=this_ro_clock, freq=ro_array_val[0])
             )
 
-        if self.qubit_state == 2:
+        if qubit_state == 2:
             for this_qubit, this_transmon in self.transmons.items():
                 this_clock = f"{this_qubit}.12"
                 mw_frequency_12 = this_transmon.clock_freqs.f12()
@@ -116,11 +116,11 @@ class Resonator_Spectroscopy(BaseMeasurement):
                     SetClockFrequency(clock=this_ro_clock, clock_freq_new=ro_frequency),
                 )
 
-                if self.qubit_state == 0:
+                if qubit_state == 0:
                     pass
-                elif self.qubit_state == 1:
+                elif qubit_state == 1:
                     schedule.add(X(this_qubit))
-                elif self.qubit_state == 2:
+                elif qubit_state == 2:
                     schedule.add(X(this_qubit))
                     schedule.add(
                         DRAGPulse(

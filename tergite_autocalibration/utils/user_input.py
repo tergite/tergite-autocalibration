@@ -19,7 +19,6 @@ node reference
   resonator_spectroscopy
   qubit_01_spectroscopy
   qubit_01_spectroscopy_pulsed
-  qubit_01_cw_spectroscopy
   rabi_oscillations
   ramsey_correction
   resonator_spectroscopy_1
@@ -44,7 +43,6 @@ node reference
   T2_echo
   randomized_benchmarking_ssro
   all_XY
-  check_cliffords
   cz_chevron
   cz_chevron_test
   cz_chevron_amplitude
@@ -82,8 +80,8 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 
 def qubit_samples(qubit: str, transition: str = "01") -> np.ndarray:
-    qub_spec_samples = 101
-    sweep_range = 20e6
+    qub_spec_samples = 51
+    sweep_range = 8e6
     if transition == "01":
         VNA_frequency = VNA_qubit_frequencies[qubit]
     elif transition == "12":
@@ -109,22 +107,15 @@ user_samplespace = {
 }
 """
 ####################################################################
-target_node = "randomized_benchmarking_ssro"
-qubits = [
-    "q14",
-    "q15",
-]  # ["q06", "q07", "q08", "q09", "q10", "q11", "q12", "q13", "q14", "q15"]
-couplers = ["q14_q15"]
+target_node = "coupler_spectroscopy"
+qubits = ["q06", "q07", "q08", "q09", "q10"]
+couplers = ["q06_q07"]
 user_samplespace = {
     "resonator_spectroscopy": {
         "ro_frequencies": {qubit: resonator_samples(qubit) for qubit in qubits}
     },
 }
-# attenuation_setting = {'qubit':30, 'coupler':30, 'readout':50}
-# attenuation_setting = {'qubit':16, 'coupler':20, 'readout':40}
-# attenuation_setting = {'qubit':16, 'coupler':20, 'readout':30}
-attenuation_setting = {"qubit": 16, "coupler": 20, "readout": 10}
-# attenuation_setting = {'qubit':60, 'coupler':60, 'readout':10}
+attenuation_setting = {"qubit": 12, "coupler": 30, "readout": 10}
 
 
 ####################################################################
