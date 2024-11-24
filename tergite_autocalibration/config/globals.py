@@ -44,11 +44,16 @@ REDIS_CONNECTION = redis.Redis(decode_responses=True, port=ENV.redis_port)
 # This will be set in matplotlib
 PLOTTING_BACKEND = "tkagg" if ENV.plotting else "agg"
 
-CONFIG = ConfigurationHandler.from_configuration_package(
-    ConfigurationPackage.from_toml(
-        os.path.join(ENV.config_dir, "configuration.meta.toml")
+try:
+    CONFIG = ConfigurationHandler.from_configuration_package(
+        ConfigurationPackage.from_toml(
+            os.path.join(ENV.config_dir, "configuration.meta.toml")
+        )
     )
-)
+except FileNotFoundError:
+    CONFIG = ConfigurationPackage()
+    logging.warning("Default configuration is not yet loaded."
+                    "Please copy configuration files to the root_directory or run `acli config load`.")
 
 # TODO: To be factored out
 CLUSTER_IP = ENV.cluster_ip
