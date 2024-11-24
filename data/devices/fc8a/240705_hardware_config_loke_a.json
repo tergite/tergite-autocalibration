@@ -471,7 +471,7 @@
                {
                   "port": "q06:res",
                   "clock": "q06.ro2",
-                  "mixer_amp_ratq15io": 0.9986,
+                  "mixer_amp_ratio": 0.9986,
                   "mixer_phase_error_deg": 11.20603
                },
                {
