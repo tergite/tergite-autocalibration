@@ -1,0 +1,223 @@
+# Device configuration file
+#
+# This file is meant to serve as examples to illustrate how to write
+# these configuration files, as well as for testing purposes. It can
+# be used as a template for configuring properties of the actual
+# device at hand.
+#
+# Note: This device configuration follows a standard, such that
+# it can be read by other backend components as well
+
+[device]
+# The items of this section describe general device properties known
+# after fabrication and first manual characterization steps. The general
+# section should contain relevant metadata
+name = "fc8a"
+
+# -------------------- Resonator definitions --------------------
+# This section contains all resonator-specific properties
+
+# Values for specific resonators
+[device.resonator.all]
+attenuation = 10
+
+[device.resonator]
+q01 = { VNA_frequency = 6433000000.0 }
+q02 = { VNA_frequency = 6290000000.0 }
+q03 = { VNA_frequency = 6163000000.0 }
+q04 = { VNA_frequency = 5988000000.0 }
+q05 = { VNA_frequency = 6733000000.0 }
+q06 = { VNA_frequency = 6832073301.189378 }
+q07 = { VNA_frequency = 7080671753.192583 }
+q08 = { VNA_frequency = 6397230987.533971 }
+q09 = { VNA_frequency = 7276184309.188224 }
+q010 = { VNA_frequency = 7252681537.885626 }
+q011 = { VNA_frequency = 6987637290.0307665 }
+q012 = { VNA_frequency = 6437489163.849617 }
+q013 = { VNA_frequency = 7120238629.69015 }
+q014 = { VNA_frequency = 6595934827.688907 }
+q015 = { VNA_frequency = 7237225704.721459 }
+q016 = { VNA_frequency = 6519442198.545502 }
+q017 = { VNA_frequency = 7155389181.1783085 }
+q018 = { VNA_frequency = 6686269971.5706215 }
+q019 = { VNA_frequency = 6928061441.046441 }
+q020 = { VNA_frequency = 6678809965.051084 }
+q021 = { VNA_frequency = 7157387303.605059 }
+q022 = { VNA_frequency = 6704571103.922032 }
+q023 = { VNA_frequency = 6751899706.659649 }
+q024 = { VNA_frequency = 6307983462.978716 }
+q025 = { VNA_frequency = 7098349517.491133 }
+
+
+# -------------------- Qubit definitions --------------------
+# This section contains all qubit-specific properties
+
+[device.qubit.all]
+attenuation = 12
+measure.acq_delay = 220e-9
+measure_1.acq_delay = 220e-9
+measure_2.acq_delay = 220e-9
+measure.pulse_duration = 3e-6
+measure_1.pulse_duration = 3e-6
+measure_2.pulse_duration = 3e-6
+measure.integration_time = 2.5e-6
+measure_1.integration_time = 2.5e-6
+measure_2.integration_time = 2.5e-6
+rxy.duration = 28e-9
+
+[device.qubit.q01]
+VNA_f01_frequency = 4323000000.0
+VNA_f12_frequency = 4118000000.0
+
+[device.qubit.q02]
+VNA_f01_frequency = 4279000000.0
+VNA_f12_frequency = 3988000000.0
+
+[device.qubit.q03]
+VNA_f01_frequency = 4166000000.0
+VNA_f12_frequency = 3858000000.0
+
+[device.qubit.q04]
+VNA_f01_frequency = 3950000000.0
+VNA_f12_frequency = 3738000000.0
+
+[device.qubit.q05]
+VNA_f01_frequency = 4000000000.0
+VNA_f12_frequency = 3788000000.0
+
+[device.qubit.q06]
+VNA_f01_frequency = 4635600000.0
+VNA_f12_frequency = 4.507e9
+measure.pulse_amp = 0.03
+measure_1.pulse_amp = 0.03
+measure_2.pulse_amp = 0.03
+
+[device.qubit.q07]
+VNA_f01_frequency = 5066200000.0
+VNA_f12_frequency = 4.819e9
+measure.pulse_amp = 0.045
+measure_1.pulse_amp = 0.045
+measure_2.pulse_amp = 0.045
+
+[device.qubit.q08]
+VNA_f01_frequency = 4387100000.0
+VNA_f12_frequency = 4.233e9
+measure.pulse_amp = 0.1
+measure_1.pulse_amp = 0.1
+measure_2.pulse_amp = 0.1
+
+[device.qubit.q09]
+VNA_f01_frequency = 5309700000.0
+VNA_f12_frequency = 5.066e9
+measure.pulse_amp = 0.09
+measure_1.pulse_amp = 0.09
+measure_2.pulse_amp = 0.09
+
+[device.qubit.q10]
+VNA_f01_frequency = 4501500000.0
+VNA_f12_frequency = 4.362e9
+measure.pulse_amp = 0.1
+measure_1.pulse_amp = 0.1
+measure_2.pulse_amp = 0.1
+
+[device.qubit.q11]
+VNA_f01_frequency = 4985268258.455894
+VNA_f12_frequency = 3.542e9
+
+[device.qubit.q12]
+VNA_f01_frequency = 4558515425.436909
+VNA_f12_frequency = 3.131e9
+
+[device.qubit.q13]
+VNA_f01_frequency = 5206662762.312904
+VNA_f12_frequency = 3.674e9
+
+[device.qubit.q14]
+VNA_f01_frequency = 4543309577.122678
+VNA_f12_frequency = 3.072e9
+
+[device.qubit.q15]
+VNA_f01_frequency = 4945370914.388228
+VNA_f12_frequency = 3.770e9
+
+[device.qubit.q16]
+VNA_f01_frequency = 4151165410.7850113
+VNA_f12_frequency = 4003865410.7850113
+measure.pulse_amp = 10e-3
+
+[device.qubit.q17]
+VNA_f01_frequency = 5354188046.497341
+VNA_f12_frequency = 5107188046.0
+measure.pulse_amp = 21e-3
+
+[device.qubit.q18]
+VNA_f01_frequency = 4737488859.01434
+VNA_f12_frequency = 4583688859.01434
+measure.pulse_amp = 9e-3
+
+[device.qubit.q19]
+VNA_f01_frequency = 5046324003.596706
+VNA_f12_frequency = 4788324003.596706
+measure.pulse_amp = 9e-3
+
+[device.qubit.q20]
+VNA_f01_frequency = 4301608013.095059
+VNA_f12_frequency = 4147308013.0950594
+measure.pulse_amp = 20e-3
+
+[device.qubit.q21]
+VNA_f01_frequency = 5114901610.63447
+VNA_f12_frequency = 4872201610.63447
+measure.pulse_amp = 8e-3
+
+[device.qubit.q22]
+VNA_f01_frequency = 4622873932.0934305
+VNA_f12_frequency = 4471673932.0934305
+measure.pulse_amp = 15e-3
+
+[device.qubit.q23]
+VNA_f01_frequency = 5177397866.969511
+VNA_f12_frequency = 4920597866.969511
+measure.pulse_amp = 20e-3
+
+[device.qubit.q24]
+VNA_f01_frequency = 4533804319.238517
+VNA_f12_frequency = 4376704319.238517
+measure.pulse_amp = 13e-3
+
+[device.qubit.q25]
+VNA_f01_frequency = 5212827240.853312
+VNA_f12_frequency = 4957127240.853312
+measure.pulse_amp = 9e-3
+
+# -------------------- Coupler definitions --------------------
+# This section contains all coupler-specific properties
+
+[device.coupler.all]
+attenuation = 30
+cz_pulse_amplitude = 0.3
+cz_pulse_width = 4e-9
+
+[device.coupler.q06_q07]
+parking_current = 0
+
+# --------------------------------------------------------------------------------
+# Device layout configuration section
+
+[layout]
+# The items of this section correspond to component types and their
+# sub-items correspond to their indices/identities. This also works as
+# a way to declare what components are supported/present in the
+# device.
+
+[layout.resonator.q01]
+position = { column = 0, row = 0 }
+
+[layout.resonator.q02]
+position = { column = 2, row = 0 }
+
+[layout.qubit.q01]
+position = { column = 0, row = 1 }
+
+[layout.qubit.q02]
+position = { column = 2, row = 1 }
