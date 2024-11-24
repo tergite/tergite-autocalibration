@@ -47,8 +47,8 @@ class EnvironmentConfiguration(BaseConfigurationFile):
             Path(__file__).parent / "backend_config_default.toml"
         )
 
-        self.cluster_ip: str
-        self.spi_serial_port: str
+        self.cluster_ip: str = "0.0.0.0"
+        self.spi_serial_port: str = "/dev/ttyACM0"
 
         self.redis_port: int = 6379
         self.plotting: bool = True

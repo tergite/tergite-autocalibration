@@ -197,7 +197,7 @@ def load(
         )
 
     # Copy the meta configuration to the root directory
-    configuration_package.copy(ROOT_DIR)
+    configuration_package.copy(ENV.root_dir)
 
     # Check whether there is anything to clean
     if clean_temp_folder is not None:
