@@ -88,7 +88,7 @@ class CalibrationSupervisor:
         if self.measurement_mode == MeasurementMode.re_analyse:
             self.target_node = self.node_name_to_re_analyse
         self.user_samplespace = LEGACY_CONFIG.user_samplespace
-        self.measurement_mode = self.cluster_mode
+        self.measurement_mode = measurement_mode
 
         # Initialize the node structure
         self.topo_order = filtered_topological_order(LEGACY_CONFIG.target_node)

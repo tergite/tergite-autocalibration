@@ -16,7 +16,7 @@ from tergite_autocalibration.lib.base.node import BaseNode
 from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.measurement import (
     RO_frequency_optimization,
 )
-from ....utils.samplespace import resonator_samples
+from tergite_autocalibration.lib.utils.samplespace import resonator_samples
 from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.analysis import (
     OptimalRO01FrequencyNodeAnalysis,
     OptimalRO012FrequencyNodeAnalysis,

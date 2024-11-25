@@ -82,9 +82,10 @@ def populate_initial_parameters(qubits: list, couplers: list, redis_connection):
                 structured_redis_storage(module_key, qubit.strip("q"), module_value)
 
     for coupler in couplers:
-        for module_key, module_value in initial_coupler_parameters["all"].items():
-            redis_connection.hset(f"couplers:{coupler}", module_key, module_value)
-            structured_redis_storage(module_key, coupler, module_value)
+        if "all" in initial_coupler_parameters.keys():
+            for module_key, module_value in initial_coupler_parameters["all"].items():
+                redis_connection.hset(f"couplers:{coupler}", module_key, module_value)
+                structured_redis_storage(module_key, coupler, module_value)
 
         if coupler in initial_coupler_parameters:
             for module_key, module_value in initial_coupler_parameters[coupler].items():

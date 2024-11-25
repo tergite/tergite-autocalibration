@@ -93,8 +93,8 @@ class EnvironmentConfiguration(BaseConfigurationFile):
         for variable_name_ in ASTParser.get_init_attribute_names(
             EnvironmentConfiguration
         ):
-            if variable_name_ in os.environ:
-                return_obj.__setattr__(variable_name_, os.environ[variable_name_])
+            if variable_name_.upper() in os.environ:
+                return_obj.__setattr__(variable_name_, os.environ[variable_name_.upper()])
 
         return return_obj
 
