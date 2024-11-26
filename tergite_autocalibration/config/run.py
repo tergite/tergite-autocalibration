@@ -9,11 +9,24 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
+from typing import List
 
 from tergite_autocalibration.config.base import TOMLConfigurationFile
 
 
 class RunConfiguration(TOMLConfigurationFile):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    @property
+    def target_node(self) -> str:
+        return self._dict["target_node"]
+
+    @property
+    def qubits(self) -> List[str]:
+        return self._dict["qubits"]
+
+    @property
+    def couplers(self) -> List[str]:
+        return self._dict["couplers"]

@@ -25,13 +25,13 @@ from tergite_autocalibration.config.spi import SpiConfiguration
 class ConfigurationHandler:
 
     def __init__(self):
-        self.run: "RunConfiguration" = RunConfiguration()
+        self.run: "RunConfiguration"
         # TODO: This configuration has to be replaced with the actual device definition
-        self.device: "DeviceConfiguration" = DeviceConfiguration()
-        self.node: "NodeConfiguration" = NodeConfiguration()
+        self.device: "DeviceConfiguration"
+        self.node: "NodeConfiguration"
         self.samplespace: "SamplespaceConfiguration" = SamplespaceConfiguration()
         self.cluster: "QbloxHardwareCompilationConfig"
-        self.spi: "SpiConfiguration" = SpiConfiguration()
+        self.spi: "SpiConfiguration"
 
     @staticmethod
     def from_configuration_package(
@@ -41,7 +41,9 @@ class ConfigurationHandler:
 
         # TODO: As a temporary solution, we are loading only the filepath.
         #       This should be replaced with proper objects when restructuring the configuration backend.
-        return_obj.run = configuration_package.config_files["run_config"]
+        return_obj.run = RunConfiguration(
+            configuration_package.config_files["run_config"]
+        )
         return_obj.device = configuration_package.config_files["device_config"]
         return_obj.spi = configuration_package.config_files["spi_config"]
         return_obj.node = configuration_package.config_files["node_config"]

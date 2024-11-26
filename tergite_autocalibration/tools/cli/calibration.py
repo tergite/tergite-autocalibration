@@ -72,12 +72,12 @@ def start(
         CalibrationConfig,
     )
     from tergite_autocalibration.scripts.db_backend_update import update_mss
-    from tergite_autocalibration.config.legacy import LEGACY_CONFIG
+    from tergite_autocalibration.config.globals import CONFIG
     from tergite_autocalibration.utils.dto.enums import MeasurementMode
 
     cluster_mode: "MeasurementMode" = MeasurementMode.real
     parsed_cluster_ip: "IPv4Address" = CLUSTER_IP
-    target_node_name = LEGACY_CONFIG.target_node
+    target_node_name = CONFIG.run.target_node
     data_path = ""
 
     if r:

@@ -15,8 +15,7 @@
 import itertools
 from typing import TYPE_CHECKING, ClassVar
 
-from tergite_autocalibration.config.globals import REDIS_CONNECTION
-from tergite_autocalibration.config.legacy import LEGACY_CONFIG
+from tergite_autocalibration.config.globals import REDIS_CONNECTION, CONFIG
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 
@@ -31,8 +30,8 @@ class ResetRedisNode:
     factory_dict = None
 
     def __init__(self):
-        self.qubits = LEGACY_CONFIG.qubits
-        self.couplers = LEGACY_CONFIG.couplers
+        self.qubits = CONFIG.run.qubits
+        self.couplers = CONFIG.run.couplers
 
         self.factory_dict: ClassVar[str, type["BaseNode"]] = {
             node_name: self.node_factory.get_node_class(node_name)

@@ -14,11 +14,12 @@ from tergite_autocalibration.tests.utils.env import setup_test_env
 
 setup_test_env()
 
+from tergite_autocalibration.config.globals import CONFIG
 from tergite_autocalibration.config.legacy import LEGACY_CONFIG
 
 
 def test_calibration_config():
-    assert len(LEGACY_CONFIG.qubits) == 5
-    assert len(LEGACY_CONFIG.couplers) == 1
-    assert LEGACY_CONFIG.target_node == "readout_amplitude_two_state_optimization"
+    assert len(CONFIG.run.qubits) == 5
+    assert len(CONFIG.run.couplers) == 1
+    assert CONFIG.run.target_node == "ro_amplitude_two_state_optimization"
     assert "resonator_spectroscopy" in LEGACY_CONFIG.user_samplespace.keys()

@@ -29,7 +29,7 @@ from qblox_instruments.types import ClusterType
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 
-from tergite_autocalibration.config.globals import REDIS_CONNECTION, CLUSTER_IP
+from tergite_autocalibration.config.globals import REDIS_CONNECTION, CLUSTER_IP, CONFIG
 from tergite_autocalibration.config.legacy import LEGACY_CONFIG, dh
 from tergite_autocalibration.lib.base.node import BaseNode
 from tergite_autocalibration.lib.utils.graph import filtered_topological_order
@@ -57,9 +57,9 @@ class CalibrationConfig:
     cluster_ip: "IPv4Address" = CLUSTER_IP
     cluster_timeout: int = 222
     data_path: Path = Path("")
-    qubits: List[str] = field(default_factory=lambda: LEGACY_CONFIG.qubits)
-    couplers: List[str] = field(default_factory=lambda: LEGACY_CONFIG.couplers)
-    target_node_name: str = LEGACY_CONFIG.target_node
+    qubits: List[str] = field(default_factory=lambda: CONFIG.run.qubits)
+    couplers: List[str] = field(default_factory=lambda: CONFIG.run.couplers)
+    target_node_name: str = CONFIG.run.target_node
     user_samplespace: dict = field(
         default_factory=lambda: LEGACY_CONFIG.user_samplespace
     )

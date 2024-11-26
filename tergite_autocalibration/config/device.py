@@ -15,5 +15,5 @@ from tergite_autocalibration.config.base import TOMLConfigurationFile
 
 class DeviceConfiguration(TOMLConfigurationFile):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)

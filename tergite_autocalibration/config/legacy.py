@@ -13,7 +13,6 @@
 import importlib.util
 import logging
 import sys
-from typing import List
 
 import toml
 
@@ -27,11 +26,6 @@ class LegacyCalibrationConfig:
         if cls._instance is None:
             cls._instance = super(LegacyCalibrationConfig, cls).__new__(cls)
 
-            run_config = toml.load(CONFIG.run)
-            cls._target_node = run_config["general"]["target_node"]
-            cls._qubits = run_config["general"]["qubits"]
-            cls._couplers = run_config["general"]["couplers"]
-
             if CONFIG.samplespace is not None:
                 us_spec_ = importlib.util.spec_from_file_location(
                     "user_samplespace", CONFIG.samplespace
@@ -44,18 +38,6 @@ class LegacyCalibrationConfig:
                 cls._user_samplespace = {}
 
         return cls._instance
-
-    @property
-    def target_node(self) -> str:
-        return self._target_node
-
-    @property
-    def qubits(self) -> List[str]:
-        return self._qubits
-
-    @property
-    def couplers(self) -> List[str]:
-        return self._couplers
 
     @property
     def user_samplespace(self):

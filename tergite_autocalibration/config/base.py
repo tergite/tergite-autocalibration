@@ -11,6 +11,10 @@
 # that they have been altered from the originals.
 
 from abc import ABC
+from pathlib import Path
+from typing import Union
+
+import toml
 
 
 class BaseConfigurationFile(ABC):
@@ -29,5 +33,7 @@ class BaseConfigurationFile(ABC):
 
 class TOMLConfigurationFile(BaseConfigurationFile):
 
-    def __init__(self):
+    def __init__(self, filepath: Union[str, Path]):
         super().__init__()
+        self.filepath = filepath
+        self._dict = toml.load(filepath)
