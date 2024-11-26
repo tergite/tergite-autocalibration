@@ -107,7 +107,10 @@ class EnvironmentConfiguration(BaseConfigurationFile):
 
     def __setattr__(self, key_, value_):
         # Write the changes to the .env file directly
-        if key_ in ASTParser.get_init_attribute_names(EnvironmentConfiguration) and self._write_env:
+        if (
+            key_ in ASTParser.get_init_attribute_names(EnvironmentConfiguration)
+            and self._write_env
+        ):
             if self.filepath is not None:
                 set_key(self.filepath, key_.upper(), str(value_))
 
