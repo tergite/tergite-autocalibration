@@ -19,11 +19,10 @@ import optuna
 from tergite_autocalibration.config.globals import REDIS_CONNECTION, CLUSTER_IP
 from tergite_autocalibration.config.legacy import LEGACY_CONFIG
 from tergite_autocalibration.lib.nodes import (
-    characterization_nodes as calibrate_nodes,
+    characterization as calibrate_nodes,
 )
 from tergite_autocalibration.lib.utils import graph as cg
 from tergite_autocalibration.scripts.calibration_supervisor import (
-    CalibrationSupervisor,
     CalibrationConfig,
 )
 from tergite_autocalibration.scripts.calibration_supervisor import CalibrationSupervisor

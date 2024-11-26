@@ -58,17 +58,14 @@ class CalibrationConfig:
     cluster_timeout: int = 222
     data_path: Path = Path("")
     qubits: List[str] = field(
-        default_factory=lambda: user_requested_calibration["all_qubits"]
+        default_factory=lambda: LEGACY_CONFIG.qubits
     )
     couplers: List[str] = field(
-        default_factory=lambda: user_requested_calibration["couplers"]
+        default_factory=lambda: LEGACY_CONFIG.couplers
     )
-    target_node_name: str = user_requested_calibration["target_node"]
+    target_node_name: str = LEGACY_CONFIG.target_node
     user_samplespace: dict = field(
-        default_factory=lambda: user_requested_calibration["user_samplespace"]
-    )
-    transmon_configuration: dict = field(
-        default_factory=lambda: toml.load(settings.DEVICE_CONFIG)
+        default_factory=lambda: LEGACY_CONFIG.user_samplespace
     )
 
 
@@ -143,8 +140,6 @@ class HardwareManager:
         # Configure each cluster in the list and add it to the instrument coordinator
         for cluster in clusters:
             # TODO: Setting the attenuation might not be needed any longer if we decide to use the new hw config
-            # Set the attenuation values for the modules
-            # TODO: Move module configuration into a helper function to reduce redundancy
             for module in self.cluster.modules:
                 try:
                     if module.is_qcm_type and module.is_rf_type:
@@ -197,7 +192,6 @@ class NodeManager:
         self.config = config
         self.node_factory = NodeFactory()
         self.lab_ic = lab_ic
-        self.transmon_configuration = config.transmon_configuration
 
     @staticmethod
     def topo_order(target_node: str):
@@ -208,7 +202,6 @@ class NodeManager:
 
         # Populate initial parameters
         populate_initial_parameters(
-            self.transmon_configuration,
             self.config.qubits,
             self.config.couplers,
             REDIS_CONNECTION,
@@ -220,7 +213,6 @@ class NodeManager:
         populate_node_parameters(
             node_name,
             status == DataStatus.in_spec,
-            self.config.transmon_configuration,
             self.config.qubits,
             self.config.couplers,
             REDIS_CONNECTION,
