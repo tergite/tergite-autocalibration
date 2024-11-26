@@ -60,9 +60,7 @@ class CalibrationConfig:
     qubits: List[str] = field(default_factory=lambda: CONFIG.run.qubits)
     couplers: List[str] = field(default_factory=lambda: CONFIG.run.couplers)
     target_node_name: str = CONFIG.run.target_node
-    user_samplespace: dict = field(
-        default_factory=lambda: CONFIG.samplespace()
-    )
+    user_samplespace: dict = field(default_factory=lambda: CONFIG.samplespace())
 
 
 class HardwareManager:
