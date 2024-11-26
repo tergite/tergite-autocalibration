@@ -41,6 +41,7 @@ jokeapi = "1.0.5"
 optuna = "4.0.0"
 netcdf4 = "1.7.1.post2"
 quantifiles = { path = "./tergite_autocalibration/tools/dataset_browser", develop = true }
+tomlkit = "^0.13.2"
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"

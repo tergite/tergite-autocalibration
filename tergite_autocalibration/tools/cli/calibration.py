@@ -18,8 +18,6 @@ from typing import Annotated
 
 import typer
 
-from tergite_autocalibration.utils.dto.enums import MeasurementMode
-
 calibration_cli = typer.Typer()
 
 
@@ -74,11 +72,12 @@ def start(
         CalibrationConfig,
     )
     from tergite_autocalibration.scripts.db_backend_update import update_mss
-    from tergite_autocalibration.utils.user_input import user_requested_calibration
+    from tergite_autocalibration.config.legacy import LEGACY_CONFIG
+    from tergite_autocalibration.utils.dto.enums import MeasurementMode
 
     cluster_mode: "MeasurementMode" = MeasurementMode.real
     parsed_cluster_ip: "IPv4Address" = CLUSTER_IP
-    target_node_name = user_requested_calibration["target_node"]
+    target_node_name = LEGACY_CONFIG.target_node
     data_path = ""
 
     if r:
