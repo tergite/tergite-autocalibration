@@ -194,6 +194,7 @@ class NodeManager:
         "cz_dynamic_phase_ssro",
         "cz_dynamic_phase_swap_ssro",
         "reset_chevron",
+        "reset_calibration_ssro",
         "process_tomography_ssro",
         "tqg_randomized_benchmarking_ssro",
         "tqg_randomized_benchmarking_interleaved_ssro",
