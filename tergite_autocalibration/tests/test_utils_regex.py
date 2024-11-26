@@ -108,6 +108,6 @@ def test_str_to_bool_valid(input_str, expected):
 )
 def test_str_to_bool_invalid(input_str):
     with pytest.raises(
-        TypeError, match=f"String {input_str.strip()} cannot be casted to bool."
+        TypeError, match=f"String {input_str} cannot be casted to bool."
     ):
         str_to_bool(input_str)
