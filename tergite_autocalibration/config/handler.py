@@ -29,7 +29,7 @@ class ConfigurationHandler:
         # TODO: This configuration has to be replaced with the actual device definition
         self.device: "DeviceConfiguration"
         self.node: "NodeConfiguration"
-        self.samplespace: "SamplespaceConfiguration" = SamplespaceConfiguration()
+        self.samplespace: "SamplespaceConfiguration"
         self.cluster: "QbloxHardwareCompilationConfig"
         self.spi: "SpiConfiguration"
 
@@ -39,15 +39,17 @@ class ConfigurationHandler:
     ) -> "ConfigurationHandler":
         return_obj = ConfigurationHandler()
 
-        # TODO: As a temporary solution, we are loading only the filepath.
-        #       This should be replaced with proper objects when restructuring the configuration backend.
         return_obj.run = RunConfiguration(
             configuration_package.config_files["run_config"]
         )
+        # TODO: As a temporary solution, we are loading only the filepath.
+        #       This should be replaced with proper objects when restructuring the configuration backend.
         return_obj.device = configuration_package.config_files["device_config"]
         return_obj.spi = configuration_package.config_files["spi_config"]
         return_obj.node = configuration_package.config_files["node_config"]
-        return_obj.samplespace = configuration_package.config_files["user_samplespace"]
+        return_obj.samplespace = SamplespaceConfiguration(
+            configuration_package.config_files["user_samplespace"]
+        )
 
         with open(configuration_package.config_files["cluster_config"], "r") as f_:
             cluster_config_json = json.load(f_)

@@ -19,8 +19,9 @@ import toml
 
 class BaseConfigurationFile(ABC):
 
-    def __init__(self):
+    def __init__(self, filepath: Union[str, Path]):
         self._filepath = None
+        self.filepath = filepath
 
     @property
     def filepath(self):
@@ -33,7 +34,6 @@ class BaseConfigurationFile(ABC):
 
 class TOMLConfigurationFile(BaseConfigurationFile):
 
-    def __init__(self, filepath: Union[str, Path]):
-        super().__init__()
-        self.filepath = filepath
-        self._dict = toml.load(filepath)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._dict = toml.load(self.filepath)

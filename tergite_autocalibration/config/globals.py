@@ -46,11 +46,25 @@ PLOTTING_BACKEND = "tkagg" if ENV.plotting else "agg"
 
 # If there is no configuration package loaded, this would throw an error
 try:
-    CONFIG = ConfigurationHandler.from_configuration_package(
-        ConfigurationPackage.from_toml(
-            os.path.join(ENV.config_dir, "configuration.meta.toml")
+    if is_pytest():
+        CONFIG = ConfigurationHandler.from_configuration_package(
+            ConfigurationPackage.from_toml(
+                os.path.join(
+                    str(Path(__file__).parent.parent),
+                    "tests",
+                    "fixtures",
+                    "templates",
+                    "default_device_under_test",
+                    "configuration.meta.toml",
+                )
+            )
         )
-    )
+    else:
+        CONFIG = ConfigurationHandler.from_configuration_package(
+            ConfigurationPackage.from_toml(
+                os.path.join(ENV.config_dir, "configuration.meta.toml")
+            )
+        )
 # In the exception we create an empty configuration package
 except FileNotFoundError:
     CONFIG = ConfigurationPackage()

@@ -10,41 +10,11 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import importlib.util
 import logging
-import sys
 
 import toml
 
 from .globals import CONFIG
-
-
-class LegacyCalibrationConfig:
-    _instance = None
-
-    def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super(LegacyCalibrationConfig, cls).__new__(cls)
-
-            if CONFIG.samplespace is not None:
-                us_spec_ = importlib.util.spec_from_file_location(
-                    "user_samplespace", CONFIG.samplespace
-                )
-                user_samplespace_ = importlib.util.module_from_spec(us_spec_)
-                sys.modules["user_samplespace"] = user_samplespace_
-                us_spec_.loader.exec_module(user_samplespace_)
-                cls._user_samplespace = user_samplespace_.user_samplespace
-            else:
-                cls._user_samplespace = {}
-
-        return cls._instance
-
-    @property
-    def user_samplespace(self):
-        return self._user_samplespace
-
-
-LEGACY_CONFIG = LegacyCalibrationConfig()
 
 
 def update_nested(target, updates):

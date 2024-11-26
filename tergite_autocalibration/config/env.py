@@ -16,6 +16,7 @@
 # clear that these variables are sort of global configuration environment variables
 
 import getpass
+import logging
 import os
 from pathlib import Path
 from typing import Union
@@ -31,7 +32,7 @@ class EnvironmentConfiguration(BaseConfigurationFile):
     _write_env: bool = False
 
     def __init__(self):
-        super().__init__()
+        super().__init__("")
 
         # NOTE: For all the variables set here, it is important that they are the lower case version
         # of the respective variable in the .env file. E.g.:
@@ -81,16 +82,15 @@ class EnvironmentConfiguration(BaseConfigurationFile):
         return_obj = EnvironmentConfiguration()
         return_obj._write_env = write_env
 
-        print(filepath)
         # Check whether the .env file exists
         if not os.path.exists(filepath):
             raise EnvironmentError("The .env file configuration cannot be found.")
 
-        print(filepath)
         # Then write the filepath also to the return object, so, it can be used later on
         return_obj.filepath = filepath
 
         # Load the .env file and propagate the values into the environment
+        logging.info(f"Loading .env values from {filepath}")
         env_values_ = dotenv_values(filepath)
         for env_key_, env_value_ in env_values_.items():
             os.environ[env_key_] = env_value_
