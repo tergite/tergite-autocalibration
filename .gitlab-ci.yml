@@ -15,6 +15,7 @@ include:
 
 stages:
   - tests
+  - application_run
   - post_merge_actions
 
 variables:
@@ -41,6 +42,41 @@ tests:
     # Run unit tests
     - pytest tergite_autocalibration
     - pylint tergite_autocalibration --fail-under=6.0
+  cache:
+    paths:
+      - .cache/pip
+
+application_run:
+  stage: application_run
+  image: python:${PYTHON_VERSION}
+  script:
+    # Install redis
+    - apt-get update
+    - apt-get install redis ffmpeg libsm6 libxext6  -y
+    # Run the redis server
+    - redis-server --daemonize yes --port "$REDIS_PORT"
+
+    # Install project dependencies
+    - pip install .
+
+    # Reset redis
+    - echo " | acli node reset -a
+
+    # Load configuration
+    - acli config load -t fc8a
+
+    - acli calibration start -r "$CI_PROJECT_DIR/datasets/fc8_unit_tests_6-15" -n T2_echo
+
+    # Verify output
+    - |
+      OUTPUT_FILE="$CI_PROJECT_DIR/datasets/fc8_unit_tests_6-15/T2_echo.png"
+      if [ -f "$OUTPUT_FILE" ]; then
+        echo "Output file $OUTPUT_FILE exists. Application ran successfully."
+      else
+        echo "Error: Output file $OUTPUT_FILE not found."
+        exit 1
+      fi
+
   cache:
     paths:
       - .cache/pip
