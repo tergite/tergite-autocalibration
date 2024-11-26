@@ -36,7 +36,6 @@ graph_dependencies = [
     ("rabi_oscillations", "ramsey_correction"),
     ("rabi_oscillations", "T1"),
     ("ramsey_correction", "motzoi_parameter"),
-    ("adaptive_ramsey_correction", "adaptive_motzoi_parameter"),
     ("motzoi_parameter", "n_rabi_oscillations"),
     ("n_rabi_oscillations", "resonator_spectroscopy_1"),
     ("resonator_spectroscopy_1", "ro_frequency_two_state_optimization"),
@@ -80,6 +79,7 @@ graph.add_edges_from(graph_dependencies)
 # are given a refine attr so they can be skipped if desired
 graph.add_node("tof", type="refine")
 graph.add_node("punchout")
+graph.add_node("resonator_relaxation")
 # graph.add_node('qubit_01_spectroscopy_pulsed')
 graph.add_node("qubit_01_spectroscopy")
 # graph.add_node('T1', type='refine')
@@ -148,6 +148,9 @@ def range_topological_order(from_node: str, target_node: str):
     coupler_path = []
     if target_node == "punchout":
         topo_order = ["punchout"]
+
+    if target_node == "resonator_relaxation":
+        topo_order = ["resonator_relaxation"]
     else:
         topo_order = nx.shortest_path(graph, from_node, target_node, weight="weight")
 
