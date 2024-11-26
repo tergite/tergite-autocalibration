@@ -52,7 +52,7 @@ class EnvironmentConfiguration(BaseConfigurationFile):
         self.spi_serial_port: str = "/dev/ttyACM0"
 
         self.redis_port: int = 6379
-        self.plotting: bool = True
+        self.plotting: bool = False
 
         self.mss_machine_root_url: str = "http://localhost:8002"
 

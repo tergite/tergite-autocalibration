@@ -17,10 +17,10 @@ setup_test_env()
 
 import pytest
 
-from ...cz_parametrisation.analysis import (
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis import (
     CZParametrizationFixDurationNodeAnalysis,
 )
-from ...cz_parametrisation.measurement import (
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.measurement import (
     CZParametrizationFixDuration,
 )
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.node import (
