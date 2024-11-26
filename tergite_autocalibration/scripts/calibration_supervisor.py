@@ -57,12 +57,8 @@ class CalibrationConfig:
     cluster_ip: "IPv4Address" = CLUSTER_IP
     cluster_timeout: int = 222
     data_path: Path = Path("")
-    qubits: List[str] = field(
-        default_factory=lambda: LEGACY_CONFIG.qubits
-    )
-    couplers: List[str] = field(
-        default_factory=lambda: LEGACY_CONFIG.couplers
-    )
+    qubits: List[str] = field(default_factory=lambda: LEGACY_CONFIG.qubits)
+    couplers: List[str] = field(default_factory=lambda: LEGACY_CONFIG.couplers)
     target_node_name: str = LEGACY_CONFIG.target_node
     user_samplespace: dict = field(
         default_factory=lambda: LEGACY_CONFIG.user_samplespace
