@@ -9,6 +9,7 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
+from datetime import datetime
 from typing import List
 
 from tergite_autocalibration.config.base import TOMLConfigurationFile
@@ -18,6 +19,12 @@ class RunConfiguration(TOMLConfigurationFile):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        timestamp_ = datetime.now()
+        self._run_id = f"{timestamp_.strftime('%Y-%m-%d--%H-%M-%S')}--tac-run-id"
+
+    @property
+    def id(self):
+        return self._run_id
 
     @property
     def target_node(self) -> str:
