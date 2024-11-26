@@ -27,6 +27,7 @@ from tergite_autocalibration.utils.reflections import ASTParser
 
 
 class EnvironmentConfiguration(BaseConfigurationFile):
+    _write_env: bool = False
 
     def __init__(self):
         super().__init__()
@@ -59,7 +60,8 @@ class EnvironmentConfiguration(BaseConfigurationFile):
     def from_dot_env(
         filepath: Union[str, Path] = Path(__file__).parent.parent.parent.joinpath(
             ".env"
-        )
+        ),
+        write_env: bool = False,
     ):
         """
         Load the values from the .env file actually into the os environment.
@@ -68,12 +70,15 @@ class EnvironmentConfiguration(BaseConfigurationFile):
             filepath: Path to the .env file. Can be overwritten by setting an environment variable
                       called `TAC_TEST_ENV_FILEPATH`. Then the environment will be loaded from that
                       location instead.
+            write_env: If write_env is set to true, then values that are written to this configuration
+                      will be written to the .env file. Can be also set in the .env file itself.
 
         Returns:
             An instance of `EnvironmentConfiguration` which has all values from the environment set.
 
         """
         return_obj = EnvironmentConfiguration()
+        return_obj._write_env = write_env
 
         print(filepath)
         # Check whether the .env file exists
@@ -94,13 +99,15 @@ class EnvironmentConfiguration(BaseConfigurationFile):
             EnvironmentConfiguration
         ):
             if variable_name_.upper() in os.environ:
-                return_obj.__setattr__(variable_name_, os.environ[variable_name_.upper()])
+                return_obj.__setattr__(
+                    variable_name_, os.environ[variable_name_.upper()]
+                )
 
         return return_obj
 
     def __setattr__(self, key_, value_):
         # Write the changes to the .env file directly
-        if key_ in ASTParser.get_init_attribute_names(EnvironmentConfiguration):
+        if key_ in ASTParser.get_init_attribute_names(EnvironmentConfiguration) and self._write_env:
             if self.filepath is not None:
                 set_key(self.filepath, key_.upper(), str(value_))
 
