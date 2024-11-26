@@ -25,7 +25,6 @@ from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.measure
 from tergite_autocalibration.lib.utils.samplespace import resonator_samples
 
 
-
 class RO_frequency_two_state_optimization_Node(ScheduleNode):
     measurement_obj = RO_frequency_optimization
     analysis_obj = OptimalRO01FrequencyNodeAnalysis
