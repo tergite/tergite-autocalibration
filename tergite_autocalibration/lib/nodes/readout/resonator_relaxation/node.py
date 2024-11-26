@@ -20,7 +20,7 @@ from tergite_autocalibration.lib.nodes.readout.resonator_relaxation.analysis imp
 from tergite_autocalibration.lib.nodes.readout.resonator_relaxation.measurement import (
     Resonator_Relaxation,
 )
-from tergite_autocalibration.utils.user_input import resonator_samples
+from tergite_autocalibration.lib.utils.samplespace import resonator_samples
 
 
 class Resonator_Relaxation_Node(ScheduleNode):
