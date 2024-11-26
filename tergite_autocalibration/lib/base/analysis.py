@@ -135,7 +135,8 @@ class BaseNodeAnalysis(ABC):
         pass
 
     @abstractmethod
-    def open_dataset(self):
+    def open_dataset(self, index: int = None) -> xr.Dataset:
+        """Abstract method to be implemented by subclasses to open a dataset."""
         pass
 
     def manage_plots(self, column_grid: int, plots_per_qubit: int):
@@ -246,9 +247,10 @@ class BaseAllQubitsRepeatAnalysis(BaseAllQubitsAnalysis, ABC):
         super().__init__(name, redis_fields)
         self.repeat_coordinate_name = ""
 
-    def open_dataset(self) -> xr.Dataset:
+    def open_dataset(self, index: int = None) -> xr.Dataset:
         # Infer number of repeats by counting the number of dataset files
-        data_files = sorted(self.data_path.glob("*.hdf5"))
+        dataset_name = f"dataset_{self.name}_*.hdf5"
+        data_files = sorted(self.data_path.glob(dataset_name))
         if not data_files:
             raise FileNotFoundError(f"No dataset files found in {self.data_path}")
 
@@ -265,9 +267,10 @@ class BaseAllQubitsRepeatAnalysis(BaseAllQubitsAnalysis, ABC):
         for qubit in self.all_qubits:
             qubit_datasets = []
             for repeat_idx, file_path in enumerate(data_files):
-                file_path = self.data_path / f"dataset_{repeat_idx}.hdf5"
+                dataset_name = f"dataset_{self.name}_{repeat_idx}.hdf5"
+                file_path = self.data_path / dataset_name
 
-                ds = xr.open_dataset(file_path)
+                ds = xr.open_dataset(file_path, engine="scipy")
 
                 qubit_data = ds[[qubit]]
 
@@ -455,20 +458,13 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
             ds.attrs["coupler"] = this_coupler
             ds.attrs["node"] = self.name
 
-            matching_coords = [coord for coord in ds.coords if this_coupler in coord]
-            print(matching_coords)
-            if matching_coords:
-                selected_coord_name = matching_coords[0]
-                ds = ds.sel(
-                    {selected_coord_name: slice(None)}
-                )  # Select all data along this coordinate
-
-                coupler_analysis = self.single_coupler_analysis_obj(
-                    self.name, self.redis_fields
-                )
-                coupler_analysis.data_path = self.data_path
-                coupler_analysis.process_coupler(ds, this_coupler)
-                self.coupler_analyses.append(coupler_analysis)
+            # matching_coords = [coord for coord in ds.coords if this_coupler in coord]
+            coupler_analysis = self.single_coupler_analysis_obj(
+                self.name, self.redis_fields
+            )
+            coupler_analysis.data_path = self.data_path
+            coupler_analysis.process_coupler(ds, this_coupler)
+            self.coupler_analyses.append(coupler_analysis)
 
             index = index + 1
 
@@ -477,13 +473,9 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
     def _group_by_coupler(self):
         coupler_data_dict = collections.defaultdict(set)
         for var in self.dataset.data_vars:
-            # Find the relevant coordinate associated with the data variable
-            for coord in self.dataset[var].coords:
-                if "coupler" in self.dataset[coord].attrs:
-                    # Extract the coupler name from the coordinate's attribute
-                    this_coupler = self.dataset[coord].attrs["coupler"]
-                    coupler_data_dict[this_coupler].add(var)
-                    break  # Break if coupler found, move to the next variable
+            if "_" in self.dataset[var].element:
+                this_coupler = self.dataset[var].element
+                coupler_data_dict[this_coupler].add(var)
 
         return coupler_data_dict
 

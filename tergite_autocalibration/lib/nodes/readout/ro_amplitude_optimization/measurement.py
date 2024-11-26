@@ -15,9 +15,12 @@ from quantify_scheduler import Schedule
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.acquisition_library import SSBIntegrationComplex
 from quantify_scheduler.operations.control_flow_library import Loop
-from quantify_scheduler.operations.gate_library import X, Reset
-from quantify_scheduler.operations.pulse_library import DRAGPulse
-from quantify_scheduler.operations.pulse_library import IdlePulse, SquarePulse
+from quantify_scheduler.operations.gate_library import Reset, X
+from quantify_scheduler.operations.pulse_library import (
+    DRAGPulse,
+    IdlePulse,
+    SquarePulse,
+)
 from quantify_scheduler.resources import ClockResource
 
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
@@ -25,33 +28,32 @@ from tergite_autocalibration.utils.dto.extended_transmon_element import Extended
 
 
 class RO_amplitude_optimization(BaseMeasurement):
-    def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
+    def __init__(self, transmons: dict[str, ExtendedTransmon]):
         super().__init__(transmons)
 
         self.transmons = transmons
-        self.qubit_state = qubit_state
 
     def ro_shot(
         self,
         ro_amplitudes: dict[str, np.ndarray],
         qubit_states: dict[str, np.ndarray],
+        qubit_state: int = 1,
     ):
         shot = Schedule("ro_amplitude_optimization_shots", repetitions=1)
 
         qubits = self.transmons.keys()
 
         # Initialize ClockResource with the first frequency value
-        # TODO the qubit_state attr needs reworking
         ro_str = "ro_2st_opt"
-        if self.qubit_state == 2:
+        if qubit_state == 2:
             ro_str = "ro_3st_opt"
 
         for this_qubit, this_transmon in self.transmons.items():
             this_ro_clock = f"{this_qubit}." + ro_str
             mw_frequency_01 = this_transmon.clock_freqs.f01()
-            if self.qubit_state == 1:
+            if qubit_state == 1:
                 ro_frequency = this_transmon.extended_clock_freqs.readout_2state_opt()
-            if self.qubit_state == 2:
+            if qubit_state == 2:
                 ro_frequency = this_transmon.extended_clock_freqs.readout_3state_opt()
                 mw_frequency_12 = this_transmon.clock_freqs.f12()
                 this_clock = f"{this_qubit}.12"
@@ -151,9 +153,10 @@ class RO_amplitude_optimization(BaseMeasurement):
         ro_amplitudes: dict[str, np.ndarray],
         qubit_states: dict[str, np.ndarray],
         loop_repetitions: int,
+        qubit_state: int = 1,
     ) -> Schedule:
         schedule = Schedule("RO_amplitude_optimization", repetitions=1)
-        ro_shot_schedule = self.ro_shot(ro_amplitudes, qubit_states)
+        ro_shot_schedule = self.ro_shot(ro_amplitudes, qubit_states, qubit_state)
 
         schedule.add(ro_shot_schedule, control_flow=Loop(loop_repetitions))
         schedule.add(IdlePulse(20e-9))

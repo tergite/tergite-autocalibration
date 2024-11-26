@@ -30,8 +30,8 @@ class Qubit_01_Spectroscopy_Multidim_Node(ScheduleNode):
     analysis_obj = QubitSpectroscopyNodeMultidim
     qubit_qois = ["clock_freqs:f01", "spec:spec_ampl_optimal"]
 
-    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
+    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
 
         self.schedule_samplespace = {
             "spec_pulse_amplitudes": {
@@ -48,9 +48,10 @@ class Qubit_12_Spectroscopy_Pulsed_Node(ScheduleNode):
     analysis_obj = QubitSpectroscopyNodeAnalysis
     qubit_qois = ["clock_freqs:f12"]
 
-    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
+    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
         self.qubit_state = 1
+        self.schedule_keywords["qubit_state"] = self.qubit_state
 
         self.schedule_samplespace = {
             "spec_frequencies": {
@@ -64,9 +65,10 @@ class Qubit_12_Spectroscopy_Multidim_Node(ScheduleNode):
     analysis_obj = QubitSpectroscopyNodeMultidim
     qubit_qois = ["clock_freqs:f12", "spec:spec_ampl_12_optimal"]
 
-    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
-        super().__init__(name, all_qubits, **node_dictionary)
+    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
         self.qubit_state = 1
+        self.schedule_keywords["qubit_state"] = self.qubit_state
 
         self.schedule_samplespace = {
             "spec_pulse_amplitudes": {

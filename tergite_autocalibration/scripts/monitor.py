@@ -22,6 +22,10 @@ from tergite_autocalibration.lib.nodes import (
     characterization_nodes as calibrate_nodes,
 )
 from tergite_autocalibration.lib.utils import graph as cg
+from tergite_autocalibration.scripts.calibration_supervisor import (
+    CalibrationSupervisor,
+    CalibrationConfig,
+)
 from tergite_autocalibration.scripts.calibration_supervisor import CalibrationSupervisor
 from tergite_autocalibration.utils.backend.reset_redis_node import ResetRedisNode
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
@@ -66,9 +70,10 @@ class Monitor:
         ]
         cluster_mode: "MeasurementMode" = MeasurementMode.real
         parsed_cluster_ip: "IPv4Address" = CLUSTER_IP
-        self.supervisor = CalibrationSupervisor(
+        config = CalibrationConfig(
             measurement_mode=cluster_mode, cluster_ip=parsed_cluster_ip
         )
+        self.supervisor = CalibrationSupervisor(config)
         self.cxn = REDIS_CONNECTION
         self.node_park = self.supervisor.node_factory.create_node.create_node(
             "resonator_spectroscopy", self.qubits, couplers=self.couplers

@@ -145,10 +145,13 @@ class RO_frequency_optimization(BaseMeasurement):
                 ClockResource(name=this_ro_clock, freq=ro_array_val[0])
             )
 
-        for this_qubit, this_transmon in self.transmons.items():
-            mw_frequency_12 = this_transmon.clock_freqs.f12()
-            this_clock = f"{this_qubit}.12"
-            schedule.add_resource(ClockResource(name=this_clock, freq=mw_frequency_12))
+        if len(qubit_states[list(qubits)[0]]) == 3:
+            for this_qubit, this_transmon in self.transmons.items():
+                mw_frequency_12 = this_transmon.clock_freqs.f12()
+                this_clock = f"{this_qubit}.12"
+                schedule.add_resource(
+                    ClockResource(name=this_clock, freq=mw_frequency_12)
+                )
 
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
@@ -163,7 +166,8 @@ class RO_frequency_optimization(BaseMeasurement):
 
             this_ro_clock = f"{this_qubit}." + ro_str
 
-            this_mw_clock = f"{this_qubit}.12"
+            if len(qubit_states[list(qubits)[0]]) == 3:
+                this_mw_clock = f"{this_qubit}.12"
 
             this_qubit_states = qubit_states[this_qubit]
 

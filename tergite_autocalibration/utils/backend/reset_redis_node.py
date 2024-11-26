@@ -13,7 +13,7 @@
 # that they have been altered from the originals.
 
 import itertools
-from typing import ClassVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.config.legacy import LEGACY_CONFIG
@@ -89,7 +89,7 @@ class ResetRedisNode:
                     if "motzoi" in field:
                         REDIS_CONNECTION.hset(key, field, "0")
                         structured_redis_storage(key, qubit.strip("q"), 0)
-                    if "measure_3state_opt.pulse_amp" in field:
+                    if "measure_3state_opt:pulse_amp" in field:
                         REDIS_CONNECTION.hset(key, field, "0")
                         structured_redis_storage(key, qubit.strip("q"), 0)
                 REDIS_CONNECTION.hset(cs_key, remove_node, "not_calibrated")

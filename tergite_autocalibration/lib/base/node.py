@@ -160,8 +160,8 @@ class BaseNode(abc.ABC):
             result_dataset = self.measure_node(cluster_status)
             self.device_manager.save_serial_device(self.name, self.device, data_path)
             # After the measurement free the device resources
-            self.device_manager.close_device()
             save_dataset(result_dataset, self.name, data_path)
+        self.device_manager.close_device()
         self.post_process(data_path)
         logger.info("analysis completed")
 
@@ -171,9 +171,6 @@ class BaseNode(abc.ABC):
         # TODO: put 'tof' out of its misery
         if self.name == "tof":
             return None, 1
-
-        device = QuantumDevice(f"Loki_{self.name}")
-        device.hardware_config(CONFIG.cluster)
 
         transmons = self.device_manager.transmons
 
