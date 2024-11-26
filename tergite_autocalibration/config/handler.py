@@ -39,6 +39,8 @@ class ConfigurationHandler:
     ) -> "ConfigurationHandler":
         return_obj = ConfigurationHandler()
 
+        # TODO: As a temporary solution, we are loading only the filepath.
+        #       This should be replaced with proper objects when restructuring the configuration backend.
         return_obj.run = configuration_package.config_files["run_config"]
         return_obj.device = configuration_package.config_files["device_config"]
         return_obj.spi = configuration_package.config_files["spi_config"]

@@ -16,10 +16,9 @@ from pathlib import Path
 from colorama import Fore, Style
 from qblox_instruments import SpiRack
 from qcodes import validators
-# TODO MERGE: Where does this one come from?
-from tergite_autocalibration.config.coupler_config import coupler_spi_map
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
+from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 
 
@@ -55,8 +54,8 @@ class SpiDAC:
             return
         dc_current_step = 1e-6
         spi_mod_number, dac_name = (
-            coupler_spi_map[coupler]["spi_module_number"],
-            coupler_spi_map[coupler]["dac_name"],
+            dh.get_legacy("coupler_spi_mapping")[coupler]["spi_module_number"],
+            dh.get_legacy("coupler_spi_mapping")[coupler]["dac_name"],
         )
 
         spi_mod_name = f"module{spi_mod_number}"

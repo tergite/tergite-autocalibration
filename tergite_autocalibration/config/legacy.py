@@ -160,6 +160,7 @@ class DataHandler:
                 for i_, keys_ in self._device["qubit"].items()
             }
         if variable_name == "attenuation_setting":
+            # TODO: attenuation setting could maybe also work with the qblox hardware configuration
             # FIXME: These are just some values, so that we do not have 0 in there
             qubit_attenuation = 10
             coupler_attenuation = 34
