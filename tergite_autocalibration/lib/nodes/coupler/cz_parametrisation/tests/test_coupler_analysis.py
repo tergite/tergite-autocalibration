@@ -10,15 +10,11 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from tergite_autocalibration.tests.utils.env import setup_test_env
-
-setup_test_env()
-
 from pathlib import Path
 
-from numpy import ndarray
 import pytest
 import xarray as xr
+from numpy import ndarray
 
 from tergite_autocalibration.lib.base.analysis import (
     BaseAnalysis,

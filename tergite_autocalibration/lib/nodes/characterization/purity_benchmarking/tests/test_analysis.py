@@ -11,17 +11,13 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from tergite_autocalibration.tests.utils.env import setup_test_env
-
-setup_test_env()
-
-from pathlib import Path
 import unittest
+from pathlib import Path
 
-from lmfit.model import ModelResult
-from matplotlib.figure import Figure
 import numpy as np
 import xarray as xr
+from lmfit.model import ModelResult
+from matplotlib.figure import Figure
 
 from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.analysis import (
     PurityBenchmarkingQubitAnalysis,
