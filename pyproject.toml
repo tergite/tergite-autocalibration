@@ -43,6 +43,13 @@ netcdf4 = "1.7.1.post2"
 quantifiles = { path = "./tergite_autocalibration/tools/dataset_browser", develop = true }
 tomlkit = "^0.13.2"
 
+# NOTE: This is pinned because of the following error:
+# `SerialCompilationConfig` is not fully defined; you should define `SimpleNodeConfig`,
+# then call `SerialCompilationConfig.model_rebuild()`.
+# The pydantic version can be more loosely defined as soon as quantify-scheduler has a fixed the error
+pydantic = "2.9.2"
+
+
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
 black = "^24.10.0"
