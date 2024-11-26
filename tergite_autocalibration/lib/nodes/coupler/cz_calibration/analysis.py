@@ -29,7 +29,6 @@ from sklearn.metrics import confusion_matrix
 from tergite_autocalibration.config.coupler_config import qubit_types
 from tergite_autocalibration.lib.base.analysis import (
     BaseAllQubitsAnalysis,
-    BaseAnalysis,
     BaseQubitAnalysis,
 )
 
@@ -340,7 +339,7 @@ class ResetCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
             y = np.repeat(self.calibs, self.shots)
             IQ_complex = np.array([])
             for state, _ in enumerate(self.calibs):
-                IQ_complex_0 = self.S21[self.data_var].isel(
+                IQ_complex_0 = self.magnitudes[self.data_var].isel(
                     {self.sweep_coord: indx, self.state_coord: -3 + state}
                 )
                 IQ_complex = np.append(IQ_complex, IQ_complex_0)
@@ -358,7 +357,9 @@ class ResetCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
             assignment = np.trace(cm_norm) / len(self.calibs)
 
             # Classify data shots
-            raw_data = self.S21[self.data_var].isel({self.sweep_coord: indx}).values
+            raw_data = (
+                self.magnitudes[self.data_var].isel({self.sweep_coord: indx}).values
+            )
             raw_shape = raw_data.shape
             I = raw_data.real.flatten()
             Q = raw_data.imag.flatten()
