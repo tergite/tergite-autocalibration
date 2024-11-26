@@ -20,3 +20,16 @@ def camel_to_snake(camel_str):
     # Insert underscores before digits
     snake_str = re.sub(r"(\D)(\d)", r"\1_\2", snake_str)
     return snake_str.lower()
+
+
+def is_bool(s: str) -> bool:
+    return s.lower() in {"true", "false"}
+
+
+def str_to_bool(s: str) -> bool:
+    if s.lower() == "true":
+        return True
+    elif s.lower() == "false":
+        return False
+    else:
+        raise TypeError(f"String {s} cannot be casted to bool.")

@@ -23,6 +23,7 @@ from typing import Union
 from dotenv import dotenv_values, set_key
 
 from tergite_autocalibration.config.base import BaseConfigurationFile
+from tergite_autocalibration.utils.misc.regex import is_bool, str_to_bool
 from tergite_autocalibration.utils.reflections import ASTParser
 
 
@@ -99,9 +100,13 @@ class EnvironmentConfiguration(BaseConfigurationFile):
             EnvironmentConfiguration
         ):
             if variable_name_.upper() in os.environ:
-                return_obj.__setattr__(
-                    variable_name_, os.environ[variable_name_.upper()]
-                )
+                variable_value_ = os.environ[variable_name_.upper()]
+                # Convert boolean string to actual boolean
+                # Note: This could be elaborated and use generic typing from the annotations in __init__
+                if is_bool(variable_value_):
+                    return_obj.__setattr__(variable_name_, str_to_bool(variable_value_))
+                else:
+                    return_obj.__setattr__(variable_name_, variable_value_)
 
         return return_obj
 
