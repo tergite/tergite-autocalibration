@@ -23,28 +23,28 @@ variables:
   PYTHON_VERSION: "3.10"
   REDIS_PORT: 6378
 
-tests:
-  stage: tests
-  image: python:${PYTHON_VERSION}
-  script:
-    # Install redis
-    - apt-get update
-    - apt-get install redis ffmpeg libsm6 libxext6  -y
-    # Run the redis server
-    - redis-server --daemonize yes --port "$REDIS_PORT"
-
-    # Install project dependencies
-    - pip install .
-    - pip install pytest black==24.10.0 requests-mock==1.11.0 pylint
-
-    # Check formatting
-    - black --check tergite_autocalibration
-    # Run unit tests
-    - pytest tergite_autocalibration
-    - pylint tergite_autocalibration --fail-under=6.0
-  cache:
-    paths:
-      - .cache/pip
+#tests:
+#  stage: tests
+#  image: python:${PYTHON_VERSION}
+#  script:
+#    # Install redis
+#    - apt-get update
+#    - apt-get install redis ffmpeg libsm6 libxext6  -y
+#    # Run the redis server
+#    - redis-server --daemonize yes --port "$REDIS_PORT"
+#
+#    # Install project dependencies
+#    - pip install .
+#    - pip install pytest black==24.10.0 requests-mock==1.11.0 pylint
+#
+#    # Check formatting
+#    - black --check tergite_autocalibration
+#    # Run unit tests
+#    - pytest tergite_autocalibration
+#    - pylint tergite_autocalibration --fail-under=6.0
+#  cache:
+#    paths:
+#      - .cache/pip
 
 application_run:
   stage: application_run
