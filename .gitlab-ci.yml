@@ -71,7 +71,7 @@ application_run:
     - echo "y" | acli node reset -a
 
     # Run the calibration chain in reanalyse mode to T2_echo
-    - acli calibration start -r "$CI_PROJECT_DIR/datasets/fc8_unit_tests_6-15" -n T2_echo
+    - acli calibration start -r "$CI_PROJECT_DIR/datasets/fc8_unit_tests_6-15" -n rabi_oscillations
 
     # Verify output
     - |

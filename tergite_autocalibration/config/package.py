@@ -36,8 +36,6 @@ class ConfigurationPackage:
         # Create a MetaConfiguration instance to be returned
         return_obj = ConfigurationPackage()
 
-        print(meta_config_path)
-
         # Check whether the .toml file exists
         if os.path.isfile(meta_config_path):
             return_obj.meta_path = meta_config_path
@@ -60,6 +58,7 @@ class ConfigurationPackage:
                     return_obj.config_files[file_key_] = os.path.join(
                         config_path_prefix, meta_config["files"][file_key_]
                     )
+            logging.info(f"Loaded configuration package from {meta_config_path}")
             return return_obj
 
         else:

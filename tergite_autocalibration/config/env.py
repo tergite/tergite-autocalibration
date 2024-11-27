@@ -32,7 +32,6 @@ def _get_default_env_path() -> Union[str, Path]:
     default_env_path_ = Path(__file__).parent.parent.parent.joinpath(".env")
     if not os.path.exists(default_env_path_):
         default_env_path_ = os.path.join(os.getcwd(), ".env")
-    print(default_env_path_)
     return default_env_path_
 
 
@@ -114,6 +113,7 @@ class EnvironmentConfiguration(BaseConfigurationFile):
                 else:
                     return_obj.__setattr__(variable_name_, variable_value_)
 
+        logging.info(f"Loaded environmental variables from {filepath}")
         return return_obj
 
     def __setattr__(self, key_, value_):
