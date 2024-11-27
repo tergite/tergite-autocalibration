@@ -10,22 +10,24 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+from tergite_autocalibration.tests.utils.env import setup_test_env
+
+setup_test_env()
+
 from pathlib import Path
+import os
 import pytest
 import unittest
 import numpy as np
 import xarray as xr
 import matplotlib.pyplot as plt
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis import QubitSpectroscopyAnalysis
-from tergite_autocalibration.tests.utils.env import setup_test_env
-
-setup_test_env()
 
 class TestResonatorFrequencyAnalysis(unittest.TestCase):
 
     def test_setup(self):
         test_dir = Path(__file__).parent
-        file_path = test_dir / "data_01" / "ddataset_qubit_01_spectroscopy_0.hdf5"
+        file_path = test_dir / "data_01" / "dataset_qubit_01_spectroscopy_0.hdf5"
         dataset = xr.open_dataset(file_path)
         analysis = QubitSpectroscopyAnalysis("name", ["redis_field"])
         dataset = analysis.process_qubit(dataset, "yq06")
@@ -37,7 +39,7 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
 
     def test_run_fitting(self):
         test_dir = Path(__file__).parent
-        file_path = test_dir / "data_01" / "ddataset_qubit_01_spectroscopy_0.hdf5"
+        file_path = test_dir / "data_01" / "dataset_qubit_01_spectroscopy_0.hdf5"
         dataset = xr.open_dataset(file_path)
         analysis = QubitSpectroscopyAnalysis("name", ["redis_field"])
         dataset = analysis.process_qubit(dataset, "yq06")
@@ -48,11 +50,16 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
         assert min_freq_data == pytest.approx(minimum_freq, rel=1e3), f"The both frequencies should be close to each other {minimum_freq} {min_freq_data}"
 
     def test_plotting(self):
+        os.environ["DATA_DIR"] = str(Path(__file__).parent / "results")
         test_dir = Path(__file__).parent
-        file_path = test_dir / "data_01" / "ddataset_qubit_01_spectroscopy_0.hdf5"
+        file_path = test_dir / "data_01" / "dataset_qubit_01_spectroscopy_0.hdf5"
         dataset = xr.open_dataset(file_path)
         analysis = QubitSpectroscopyAnalysis("name", ["redis_field"])
         dataset = analysis.process_qubit(dataset, "yq06")
+        figure_path = os.environ["DATA_DIR"] + "/Resonator_spectroscopy_q06.png"
+        if os.path.exists(figure_path):
+            os.remove(figure_path)
         fig, ax = plt.subplots()
         analysis.plotter(ax)
+        fig.savefig(figure_path)
         plt.close(fig)
