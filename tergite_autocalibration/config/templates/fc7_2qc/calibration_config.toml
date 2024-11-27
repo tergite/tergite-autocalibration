@@ -90,10 +90,10 @@ q06_q07.parking_current = 0
 # -------------------- Node configurations --------------------
 # The follow sections contain initial values for specific nodes
 [resonator_spectroscopy.all]
-reset.duration =  60e-6
+reset.duration = 60e-6
 
 [punchout.all]
-reset.duration =  60e-6
+reset.duration = 60e-6
 
 [resonator_spectroscopy_1.all]
 reset.duration = 240e-6

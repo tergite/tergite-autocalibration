@@ -20,7 +20,7 @@ import typer
 config_cli = typer.Typer()
 
 config_templates_path = os.path.join(
-    Path(__file__).parent.parent.parent.parent.parent, "templates"
+    Path(__file__).parent.parent.parent.parent, "config", "templates"
 )
 template_names = [
     entry_.name for entry_ in os.scandir(config_templates_path) if entry_.is_dir()
