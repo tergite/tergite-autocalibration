@@ -11,16 +11,19 @@
 # that they have been altered from the originals.
 
 from tergite_autocalibration.tests.utils.env import setup_test_env
+
 setup_test_env()
 
 import os
-from pathlib import Path
 import unittest
 import pytest
 import numpy as np
 import xarray as xr
 import matplotlib.pyplot as plt
-from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.analysis import ResonatorSpectroscopyQubitAnalysis
+from pathlib import Path
+from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.analysis import (
+    ResonatorSpectroscopyQubitAnalysis,
+)
 
 
 class TestResonatorFrequencyAnalysis(unittest.TestCase):
@@ -35,7 +38,9 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
         self.assertIsInstance(dataset, list)
         for i in dataset:
             self.assertIsInstance(i, np.float64)
-        assert len(dataset) == 3, f"The dataset should contain three elements {len(dataset)}"
+        assert (
+            len(dataset) == 3
+        ), f"The dataset should contain three elements {len(dataset)}"
 
     def test_run_fitting(self):
         test_dir = Path(__file__).parent
@@ -45,9 +50,13 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
         dataset = analysis.process_qubit(dataset, "yq06")
         minimum_freq, fit_Ql, min_freq_data = dataset
 
-        assert 6e9 < minimum_freq < 8e9, f"Minimum frequency should be between 6 GHz and 8 GHz, got {minimum_freq}"
+        assert (
+            6e9 < minimum_freq < 8e9
+        ), f"Minimum frequency should be between 6 GHz and 8 GHz, got {minimum_freq}"
         assert fit_Ql > 0, f"Fit Ql should be a positive value, got {fit_Ql}"
-        assert min_freq_data == pytest.approx(minimum_freq, rel=1e3), f"The both frequencies should be close to each other {minimum_freq} {min_freq_data}"
+        assert min_freq_data == pytest.approx(
+            minimum_freq, rel=1e3
+        ), f"The both frequencies should be close to each other {minimum_freq} {min_freq_data}"
 
     def test_plotting(self):
         os.environ["DATA_DIR"] = str(Path(__file__).parent / "results")
