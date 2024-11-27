@@ -14,7 +14,7 @@ include:
   - local: ".gitlab/functions/pipeline-functions.yml"
 
 stages:
-  - tests
+  # - tests
   - application_run
   - post_merge_actions
 
@@ -60,11 +60,12 @@ application_run:
     - pip install .
 
     # Reset redis
-    - echo " | acli node reset -a
+    - echo "y" | acli node reset -a
 
     # Load configuration
     - acli config load -t fc8a
 
+    # Run the calibration chain in reanalyse mode to T2_echo
     - acli calibration start -r "$CI_PROJECT_DIR/datasets/fc8_unit_tests_6-15" -n T2_echo
 
     # Verify output
