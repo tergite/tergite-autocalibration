@@ -15,11 +15,11 @@ from typing import Annotated
 
 import typer
 
-from .calibration import calibration_cli
-from .cluster import cluster_cli
-from .config import config_cli
-from .graph import graph_cli
-from .node import node_cli
+from tergite_autocalibration.tools.cli.calibration import calibration_cli
+from tergite_autocalibration.tools.cli.cluster import cluster_cli
+from tergite_autocalibration.tools.cli.config import config_cli
+from tergite_autocalibration.tools.cli.graph import graph_cli
+from tergite_autocalibration.tools.cli.node import node_cli
 
 cli = typer.Typer(no_args_is_help=True)
 

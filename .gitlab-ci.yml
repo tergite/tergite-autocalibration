@@ -52,11 +52,12 @@ application_run:
   script:
     # Install redis
     - apt-get update
-    - apt-get install redis ffmpeg libsm6 libxext6  -y
+    - apt-get install redis ffmpeg libsm6 libxext6 -y
     # Run the redis server
     - redis-server --daemonize yes --port "$REDIS_PORT"
 
     # Install project dependencies
+    - pip install --upgrade pip
     - pip install .
 
     # Reset redis
