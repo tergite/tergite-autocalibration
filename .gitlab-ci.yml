@@ -64,11 +64,11 @@ application_run:
     # Create empty .env file to make the system believe there is a file
     - touch .env
 
-    # Reset redis
-    - echo "y" | acli node reset -a
-
     # Load configuration
     - acli config load -t fc8a
+
+    # Reset redis
+    - echo "y" | acli node reset -a
 
     # Run the calibration chain in reanalyse mode to T2_echo
     - acli calibration start -r "$CI_PROJECT_DIR/datasets/fc8_unit_tests_6-15" -n T2_echo
