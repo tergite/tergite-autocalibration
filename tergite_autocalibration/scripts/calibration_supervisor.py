@@ -80,6 +80,9 @@ class CalibrationConfig:
     transmon_configuration: dict = field(
         default_factory=lambda: toml.load(settings.DEVICE_CONFIG)
     )
+    active_reset_configuration: dict = field(
+        default_factory=lambda: toml.load(settings.ACTIVE_RESET_CONFIG)
+    )
 
 
 class HardwareManager:
@@ -207,7 +210,18 @@ class NodeManager:
         self.config = config
         self.node_factory = NodeFactory()
         self.lab_ic = lab_ic
-        self.transmon_configuration = config.transmon_configuration
+        self.active_reset_configuration = config.active_reset_configuration
+
+        populate_active_reset_parameters(
+            self.active_reset_configuration, self.config.qubits, REDIS_CONNECTION
+        )
+
+        populate_initial_parameters(
+            self.config.transmon_configuration,
+            self.config.qubits,
+            self.config.couplers,
+            REDIS_CONNECTION,
+        )
 
     @staticmethod
     def topo_order(target_node: str):
@@ -215,14 +229,6 @@ class NodeManager:
 
     def inspect_node(self, node_name: str):
         logger.info(f"Inspecting node {node_name}")
-
-        # Populate initial parameters
-        populate_initial_parameters(
-            self.transmon_configuration,
-            self.config.qubits,
-            self.config.couplers,
-            REDIS_CONNECTION,
-        )
 
         # Check Redis if node is calibrated
         status: "DataStatus" = self._check_calibration_status_redis(node_name)

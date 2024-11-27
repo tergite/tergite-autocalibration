@@ -35,7 +35,6 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
         self.state_coord = self._get_coord("state")
         self.loop_coord = self._get_coord("loops")
 
-        breakpoint()
         self.S21 = self.S21.stack(shots=[self.loop_coord, self.state_coord])
         self.qubit_states = self.S21[self.state_coord].values
         self.amplitudes = self.S21.coords[self.amplitude_coord]
@@ -247,6 +246,8 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
 
         threshold_direction = theta_rad - np.pi / 2
         center_rotated_I_0 = np.mean(rotated_IQ0[:, 0])
+
+        # probably there is a more elegant solution
         if center_rotated_I_0 > 0:
             rotation_angle = rotation_angle + np.pi
             threshold_direction = threshold_direction + np.pi
@@ -257,13 +258,13 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         self.threshold_point = self.threshold * np.array(
             [np.cos(threshold_direction), np.sin(threshold_direction)]
         )
-        self.rotated_IQ0_tp = rotated_IQ0[tp0]  # True Positive when sending 0
+        self.rotated_IQ0_tp = rotated_IQ0[tp0] # True Positive when sending 0
         self.rotated_IQ0_fp = rotated_IQ0[~tp0]
-        self.rotated_IQ1_tp = rotated_IQ1[tp1]  # True Positive when sending 1
+        self.rotated_IQ1_tp = rotated_IQ1[tp1] # True Positive when sending 1
         self.rotated_IQ1_fp = rotated_IQ1[~tp1]
-        self.IQ0_tp = IQ0[tp0]  # True Positive when sending 0
+        self.IQ0_tp = IQ0[tp0] # True Positive when sending 0
         self.IQ0_fp = IQ0[~tp0]
-        self.IQ1_tp = IQ1[tp1]  # True Positive when sending 1
+        self.IQ1_tp = IQ1[tp1] # True Positive when sending 1
         self.IQ1_fp = IQ1[~tp1]
 
         self.rotated_y_limits = (rotated_IQ[:, 1].min(), rotated_IQ[:, 1].max())
@@ -271,6 +272,8 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
 
         self.rotation_angle = rotation_angle
         self.rotation_angle_degrees = np.rad2deg(rotation_angle)
+        print(f'{self.qubit}.measure.acq_rotation = {self.rotation_angle_degrees}')
+        print(f'{self.qubit}.measure.acq_threshold = {self.threshold}')
 
         return [self.optimal_amplitude, self.rotation_angle_degrees, self.threshold]
 

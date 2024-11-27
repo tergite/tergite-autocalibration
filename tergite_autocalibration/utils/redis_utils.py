@@ -87,9 +87,9 @@ def populate_initial_parameters(
 
 
 def populate_active_reset_parameters(
-    transmon_configuration: dict, qubits: list, redis_connection
+    active_reset_configuration: dict, qubits: list, redis_connection
 ):
-    active_reset_device_config = transmon_configuration["active_reset"]
+    active_reset_device_config = active_reset_configuration["active_reset"]
 
     ar_qubit_parameters = active_reset_device_config["qubits"]
 

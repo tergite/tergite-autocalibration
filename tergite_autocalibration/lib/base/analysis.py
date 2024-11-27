@@ -223,7 +223,8 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
                 qubit_analysis = self.single_qubit_analysis_obj(
                     self.name, self.redis_fields
                 )
-                qubit_analysis.process_qubit(ds, this_qubit)  # this_qubit shoulq be qXX
+                result = qubit_analysis.process_qubit(ds, this_qubit)  # this_qubit shoulq be qXX
+                analysis_results[this_qubit] = dict(zip(self.redis_fields, result))
                 self.qubit_analyses.append(qubit_analysis)
 
             index = index + 1

@@ -22,7 +22,6 @@ import numpy as np
 import xarray
 
 from tergite_autocalibration.config.settings import DATA_DIR
-from tergite_autocalibration.utils.logger.tac_logger import logger
 
 
 def configure_dataset(
@@ -157,6 +156,28 @@ def create_node_data_path(node) -> pathlib.Path:
     measurement_id = time_id + "-" + str(uuid4())[:6] + f"-{node.name}"
     data_path = pathlib.Path(DATA_DIR / measurements_today / measurement_id)
     return data_path
+
+
+def save_qoi_dataset(
+    qois_dataset: xarray.Dataset, node_name: str, data_path: pathlib.Path
+) -> None:
+    """
+    Save the qois dataset to the saame file as the measurements dataset.
+
+    Args:
+        qois_dataset (xarray.Dataset): The dataset to save.
+        node_name (str): Name of the node being measured.
+        data_path (pathlib.Path): Path where the dataset will be saved.
+    """
+    data_path.mkdir(parents=True, exist_ok=True)
+    measurement_id = data_path.stem[0:19]
+
+    qois_dataset = qois_dataset.assign_attrs(
+        {"name": node_name, "tuid": measurement_id}
+    )
+
+    dataset_name = f"dataset_{node_name}_qois.hdf5"
+    qois_dataset.to_netcdf(data_path / dataset_name)
 
 
 def save_dataset(

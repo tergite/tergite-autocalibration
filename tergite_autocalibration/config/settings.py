@@ -104,6 +104,7 @@ CONFIG_DIR = _from_config(
 # Section with configuration files
 HARDWARE_CONFIG = CONFIG_DIR.joinpath(_from_config("HARDWARE_CONFIG", cast_=Path))
 DEVICE_CONFIG = CONFIG_DIR.joinpath(_from_config("DEVICE_CONFIG", cast_=Path))
+ACTIVE_RESET_CONFIG = CONFIG_DIR.joinpath(_from_config("ACTIVE_RESET_CONFIG", cast_=Path))
 BACKEND_CONFIG = Path(__file__).parent / "backend_config_default.toml"
 
 # ---

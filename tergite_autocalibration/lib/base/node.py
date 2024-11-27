@@ -35,7 +35,11 @@ from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.lib.utils.device import DeviceConfiguration
 from tergite_autocalibration.lib.utils.schedule_execution import execute_schedule
-from tergite_autocalibration.utils.dataset_utils import configure_dataset, save_dataset
+from tergite_autocalibration.utils.dataset_utils import (
+    configure_dataset,
+    save_dataset,
+    save_qoi_dataset,
+)
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.logger.tac_logger import logger
 
@@ -165,7 +169,8 @@ class BaseNode(abc.ABC):
             # After the measurement free the device resources
             save_dataset(result_dataset, self.name, data_path)
         self.device_manager.close_device()
-        self.post_process(data_path)
+        qois_dataset = self.post_process(data_path)
+        save_qoi_dataset(qois_dataset, self.name, data_path)
         logger.info("analysis completed")
 
     def precompile(self, schedule_samplespace: dict) -> CompiledSchedule:
@@ -269,7 +274,15 @@ class BaseNode(abc.ABC):
             self.name, self.redis_fields, **analysis_kwargs
         )
         analysis_results = node_analysis.analyze_node(data_path)
-        return analysis_results
+        data_vars = {
+            key: [analysis_results[key][dim] for dim in self.redis_fields]
+            for key in analysis_results
+        }
+        qoi_dataset = xarray.Dataset(
+            {key: (["dim"], values) for key, values in data_vars.items()},
+            coords={"dim": self.redis_fields},
+        )
+        return qoi_dataset
 
     def __str__(self):
         return f"Node representation for {self.name} on qubits {self.all_qubits}"
