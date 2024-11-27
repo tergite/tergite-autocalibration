@@ -62,13 +62,13 @@ application_run:
     - pip install -e .
 
     # Reset redis
-    - echo "y" | acli node reset -a
+    - echo "y" | PYTHONPATH=$(pwd) python -m acli node reset -a
 
     # Load configuration
-    - acli config load -t fc8a
+    - PYTHONPATH=$(pwd) python -m acli config load -t fc8a
 
     # Run the calibration chain in reanalyse mode to T2_echo
-    - acli calibration start -r "$CI_PROJECT_DIR/datasets/fc8_unit_tests_6-15" -n T2_echo
+    - PYTHONPATH=$(pwd) python -m acli calibration start -r "$CI_PROJECT_DIR/datasets/fc8_unit_tests_6-15" -n T2_echo
 
     # Verify output
     - |
