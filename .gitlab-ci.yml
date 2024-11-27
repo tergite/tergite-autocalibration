@@ -59,9 +59,10 @@ application_run:
     # Install project dependencies
     - python -c "import sys; print(sys.path)"
     - pip install --upgrade pip
-    - pip install -e .
+    - pip install .
 
-    - export PYTHONPATH="$CI_PROJECT_DIR:$PYTHONPATH"
+    # Create empty .env file to make the system believe there is a file
+    - touch .env
 
     # Reset redis
     - echo "y" | acli node reset -a

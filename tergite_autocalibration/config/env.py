@@ -28,6 +28,14 @@ from tergite_autocalibration.utils.misc.regex import is_bool, str_to_bool
 from tergite_autocalibration.utils.reflections import ASTParser
 
 
+def _get_default_env_path() -> Union[str, Path]:
+    default_env_path_ = Path(__file__).parent.parent.parent.joinpath(".env")
+    if not os.path.exists(default_env_path_):
+        default_env_path_ = os.path.join(os.getcwd(), ".env")
+    print(default_env_path_)
+    return default_env_path_
+
+
 class EnvironmentConfiguration(BaseConfigurationFile):
     _write_env: bool = False
 
@@ -60,9 +68,7 @@ class EnvironmentConfiguration(BaseConfigurationFile):
 
     @staticmethod
     def from_dot_env(
-        filepath: Union[str, Path] = Path(__file__).parent.parent.parent.joinpath(
-            ".env"
-        ),
+        filepath: Union[str, Path] = _get_default_env_path(),
         write_env: bool = False,
     ):
         """
