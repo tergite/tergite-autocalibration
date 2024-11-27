@@ -23,6 +23,38 @@ class ASTParser:
     """
 
     @staticmethod
+    def _get_source_tree_for_cls(cls) -> tuple:
+        """
+        Helper function to parse the source code of a class
+
+        Args:
+            cls: Class to be parsed as AST
+
+        Returns:
+            source
+
+        """
+        try:
+            # Try to get the source code of the class
+            source = inspect.getsource(cls)
+            # Dedent the source to handle indented classes
+            source = textwrap.dedent(source)
+        except (TypeError, OSError, IndentationError) as e:
+            # Handle errors in retrieving the source
+            print(f"Error retrieving source for {cls.__name__}: {e}")
+            source = None
+
+        try:
+            # Parse the source code into an AST
+            tree = ast.parse(source)
+        except SyntaxError as e:
+            # Handle parsing errors
+            print(f"Syntax error when parsing source of {cls.__name__}: {e}")
+            tree = None
+
+        return source, tree
+
+    @staticmethod
     def get_init_attribute_names(cls) -> Set[str]:
         """
         Returns all the attributes from the __init__ function of a class
@@ -46,23 +78,8 @@ class ASTParser:
 
         """
 
-        try:
-            # Try to get the source code of the class
-            source = inspect.getsource(cls)
-            # Dedent the source to handle indented classes
-            source = textwrap.dedent(source)
-        except (TypeError, OSError, IndentationError) as e:
-            # Handle errors in retrieving the source
-            print(f"Error retrieving source for {cls.__name__}: {e}")
-            return set()
-
-        try:
-            # Parse the source code into an AST
-            tree = ast.parse(source)
-        except SyntaxError as e:
-            # Handle parsing errors
-            print(f"Syntax error when parsing source of {cls.__name__}: {e}")
-            return set()
+        # Parse source and tree for class definition
+        source, tree = ASTParser._get_source_tree_for_cls(cls)
 
         # Find the class definition
         for node in tree.body:
