@@ -9,29 +9,51 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
+
+import os
 from functools import wraps
 from typing import Dict, Any
 
 
-GLOBAL_VARIABLES = {"ABC": 123, "CDE": 345}
+def with_os_env(variables: Dict[str, Any]):
+    """
+    This is a decorator to - during a test - change the environmental variable configuration.
+    This is more safe than setting the variables in the code directly, because it will also
+    try to restore the original configuration after the function has been called.
 
+    Args:
+        variables: A dictionary of the environmental variables to be set
 
-def set_global_var(variables: Dict[str, Any]):
+    Returns:
+
+    """
+
     def inner_decorator_fn_(fn_):
         @wraps(fn_)
         def wrapper(*args, **kwargs):
             # Temporarily store all variables in a cache
             temp_variable_storage_ = {}
             for variable_name, variable_value in variables.items():
-                # TODO: This now has to be injected into the module instead
-                temp_variable_storage_[variable_name] = GLOBAL_VARIABLES[variable_name]
-                GLOBAL_VARIABLES[variable_name] = variable_value
+                # Store the actual value or None in the temporary dict
+                temp_variable_storage_[variable_name] = os.getenv(variable_name, None)
+                os.environ[variable_name] = str(variable_value)
 
-            result = fn_(*args, **kwargs)
+            # This is in a try finally block to ensure that environmental variables are restored even
+            # if the function raises an exception.
+            try:
+                result = fn_(*args, **kwargs)
 
-            # Reset all variables
-            for variable_name, variable_value in temp_variable_storage_.items():
-                GLOBAL_VARIABLES[variable_name] = temp_variable_storage_[variable_name]
+            finally:
+                # Reset all variables
+                for variable_name, variable_value in temp_variable_storage_.items():
+                    # If the variable did not exist in the environmental variables, delete it
+                    if variable_value is None:
+                        del os.environ[variable_name]
+                    # Otherwise set it to the previous value
+                    else:
+                        os.environ[variable_name] = temp_variable_storage_[
+                            variable_name
+                        ]
 
             # Return the result of the function
             return result
@@ -39,8 +61,3 @@ def set_global_var(variables: Dict[str, Any]):
         return wrapper
 
     return inner_decorator_fn_
-
-
-@set_global_var({"ABC": 345})
-def test_setting_env_variables():
-    print(GLOBAL_VARIABLES)
