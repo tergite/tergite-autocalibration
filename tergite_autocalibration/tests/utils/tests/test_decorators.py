@@ -21,6 +21,7 @@ def test_with_os_env_sets_variables():
     """
     Test that the decorator sets the environment variables during the function call.
     """
+
     @with_os_env({"TEST_VAR1": "value1", "TEST_VAR2": "value2"})
     def sample_function():
         assert os.getenv("TEST_VAR1") == "value1"
