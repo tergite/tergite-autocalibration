@@ -59,7 +59,7 @@ application_run:
     # Install project dependencies
     - python -c "import sys; print(sys.path)"
     - pip install --upgrade pip
-    - pip install .
+    - pip install -e .
 
     # Reset redis
     - echo "y" | acli node reset -a
