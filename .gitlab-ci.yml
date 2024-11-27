@@ -57,6 +57,7 @@ application_run:
     - redis-server --daemonize yes --port "$REDIS_PORT"
 
     # Install project dependencies
+    - python -c "import sys; print(sys.path)"
     - pip install --upgrade pip
     - pip install .
 
