@@ -12,6 +12,7 @@
 
 import importlib.util
 import sys
+from typing import Any, Dict
 
 from tergite_autocalibration.config.base import BaseConfigurationFile
 
@@ -21,6 +22,12 @@ class SamplespaceConfiguration(BaseConfigurationFile):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # Dynamically load the module from the user_samplespace.py file
+        # If you are experiencing circular imports, please check that you are not importing
+        # anything from tergite_autocalibration inside the user_samplespace.py file.
+        # If you are experiencing any errors that the module cannot be loaded, please make
+        # sure that the user_samplespace.py file from your configuration contains a variable
+        # with the name "user_samplespace".
         if self.filepath is not None:
             us_spec_ = importlib.util.spec_from_file_location(
                 "user_samplespace", self.filepath
@@ -32,5 +39,15 @@ class SamplespaceConfiguration(BaseConfigurationFile):
         else:
             self._samplespace = {}
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs) -> Dict[str, Any]:
+        """
+        Returns:
+            This is just for convenience.
+            In case there is an instance of `SamplespaceConfiguration`, you can just call it
+            >>> samplespace = SamplespaceConfiguration('path/to/user_samplespace.py')
+            >>> user_samplespace: dict = samplespace()
+            Alternatively, the `SamplespaceConfiguration` could inherit from dict as suggested in:
+            https://gitlab.quantum.chalmersnextlabs.se/chalmersnextlabs-quantum/autocalibration/tergite-autocalibration/-/issues/42
+
+        """
         return self._samplespace

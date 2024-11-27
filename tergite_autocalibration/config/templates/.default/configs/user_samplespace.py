@@ -14,7 +14,6 @@
 # that they have been altered from the originals.
 
 # This is an example file on how to create a custom samplespace for your node.
-import numpy as np
 
 """
 user_samplespace schema:
@@ -32,21 +31,5 @@ user_samplespace = {
 }
 """
 ####################################################################
-qubits = {"q00": 4.5e9, "q01": 4.9e9}
-
-
-def resonator_samples(qubit: str) -> np.ndarray:
-    res_spec_samples = 101
-    sweep_range = 4.0e6
-    vna_frequency = qubits[qubit]
-    min_freq = vna_frequency - sweep_range / 2
-    max_freq = vna_frequency + sweep_range / 2
-    return np.linspace(min_freq, max_freq, res_spec_samples)
-
-
-user_samplespace = {
-    "resonator_spectroscopy": {
-        "ro_frequencies": {qubit: resonator_samples(qubit) for qubit in qubits.keys()}
-    },
-}
+user_samplespace = {}
 ####################################################################

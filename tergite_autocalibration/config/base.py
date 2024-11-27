@@ -18,6 +18,9 @@ import toml
 
 
 class BaseConfigurationFile(ABC):
+    """
+    Base class for all file-based configurations
+    """
 
     def __init__(self, filepath: Union[str, Path]):
         self._filepath = None
@@ -33,7 +36,11 @@ class BaseConfigurationFile(ABC):
 
 
 class TOMLConfigurationFile(BaseConfigurationFile):
+    """
+    Class to handle .toml configuration files
+    """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Load all parameters from the .toml file to an internal dictionary
         self._dict = toml.load(self.filepath)

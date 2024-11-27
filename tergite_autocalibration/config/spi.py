@@ -14,6 +14,9 @@ from tergite_autocalibration.config.base import TOMLConfigurationFile
 
 
 class SpiConfiguration(TOMLConfigurationFile):
+    """
+    Class to handle the configuration from the SPI rack
+    """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

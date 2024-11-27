@@ -25,6 +25,7 @@ from tergite_autocalibration.utils.misc.tests import is_pytest
 # If there is a test going on, load the standard environment configuration
 # TODO: Add note about changing the configuration for a pytest with decorator
 if is_pytest():
+    # Take the .env file from the folder for fixtures in the tests
     ENV = EnvironmentConfiguration.from_dot_env(
         filepath=os.path.join(
             str(Path(__file__).parent.parent),
@@ -36,6 +37,7 @@ if is_pytest():
         )
     )
 else:
+    # Try to load the .env file from the default locations
     ENV = EnvironmentConfiguration.from_dot_env()
 
 # Creates a redis instance
@@ -47,6 +49,7 @@ PLOTTING_BACKEND = "tkagg" if ENV.plotting else "agg"
 # If there is no configuration package loaded, this would throw an error
 try:
     if is_pytest():
+        # Create the ConfigurationHandler from the default_device_under_test template in the fixtures
         CONFIG = ConfigurationHandler.from_configuration_package(
             ConfigurationPackage.from_toml(
                 os.path.join(
@@ -60,12 +63,14 @@ try:
             )
         )
     else:
+        # Create the ConfigurationHandler from the meta configuration in the root directory
         CONFIG = ConfigurationHandler.from_configuration_package(
             ConfigurationPackage.from_toml(
                 os.path.join(ENV.config_dir, "configuration.meta.toml")
             )
         )
-# In the exception we create an empty configuration package
+
+# In the exception case we create an empty configuration package
 except FileNotFoundError:
     CONFIG = ConfigurationPackage()
     logging.warning(
@@ -73,9 +78,13 @@ except FileNotFoundError:
         "Please copy configuration files to the root_directory or run `acli config load`."
     )
 
-# TODO: To be factored out
+# NOTE: The cluster IP right now is passed only as a single value. For bigger setups with more than
+#       one cluster it might make sense to store the cluster ip somewhere else. As of now, there is no
+#       field in the hardware options of the QBLOX hardware configuration that would handle the ip.
 CLUSTER_IP = ENV.cluster_ip
 
+# The data directory where plots and results are saved
+# Default is a folder called 'out' on the root level of the repository
 DATA_DIR = ENV.data_dir
 
 # If the data directory does not exist, it will be created automatically

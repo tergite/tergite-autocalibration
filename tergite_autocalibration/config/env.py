@@ -24,18 +24,38 @@ from typing import Union
 from dotenv import dotenv_values, set_key
 
 from tergite_autocalibration.config.base import BaseConfigurationFile
+from tergite_autocalibration.utils.misc.reflections import ASTParser
 from tergite_autocalibration.utils.misc.regex import is_bool, str_to_bool
-from tergite_autocalibration.utils.reflections import ASTParser
 
 
 def _get_default_env_path() -> Union[str, Path]:
+    """
+    This is a helper function to find the .env file
+
+    Returns:
+        Path to the default .env file
+
+    """
+
+    # Assume that the .env file is located in the root directory of the repository
     default_env_path_ = Path(__file__).parent.parent.parent.joinpath(".env")
+
+    # If not, take it from the current working directory
     if not os.path.exists(default_env_path_):
         default_env_path_ = os.path.join(os.getcwd(), ".env")
+
+    # If it still does not exist there, an error would be thrown later in the code when it is loaded
     return default_env_path_
 
 
 class EnvironmentConfiguration(BaseConfigurationFile):
+    """
+    A class to .env file or create environment configurations from within the framework
+    """
+
+    # This variable is there to indicate whether the environment configuration should write values
+    # that are set, directly to the .env file if one is specified. The use cases here would be e.g.
+    # when you want to implement a function that changes the redis instance programmatically.
     _write_env: bool = False
 
     def __init__(self):
@@ -121,9 +141,9 @@ class EnvironmentConfiguration(BaseConfigurationFile):
         if (
             key_ in ASTParser.get_init_attribute_names(EnvironmentConfiguration)
             and self._write_env
+            and self.filepath is not None
         ):
-            if self.filepath is not None:
-                set_key(self.filepath, key_.upper(), str(value_))
+            set_key(self.filepath, key_.upper(), str(value_))
 
         # Delegate to the base class for all other cases
         super().__setattr__(key_, value_)

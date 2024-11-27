@@ -11,13 +11,30 @@
 # that they have been altered from the originals.
 
 import logging
+from typing import Dict
 
 import toml
 
 from .globals import CONFIG
 
 
-def update_nested(target, updates):
+###
+# NOTE: A global instance of DataHandler (dh) can be found below and be imported in the code
+###
+
+
+def update_nested(target: Dict, updates: Dict):
+    """
+    Update a nested data structure (usually a dict).
+
+    Args:
+        target: The original data structure
+        updates: The updates that are going to be merged into the data structure
+
+    Returns:
+        Does not return anything, but works on the given objects
+
+    """
     for key, value in updates.items():
         if key in target:
             # If the key exists in target, check if both values are dicts
@@ -33,17 +50,25 @@ def update_nested(target, updates):
 
 
 class DataHandler:
+    """
+    A temporary class to handle the transition from the old configuration files to the
+    new configuration packages
+    """
+
+    # We are using a singleton pattern, so, this holds the `DataHandler` instance
     _instance = None
 
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(DataHandler, cls).__new__(cls)
 
+            # TODO: Both layout and device should be fed into a Device object.
+            #       Right now we are not using the device configuration.
             device_config = toml.load(CONFIG.device)
-            # FIXME: Both layout and device should be fed into a Device object
-            # Right now we are not using the device configuration
             cls._layout = device_config["layout"]
 
+            # Iterate over the values for the device configuration to detect whether there are values
+            # to be set for all qubits/couplers
             device_raw = device_config["device"]
             for device_subsection in ["resonator", "qubit", "coupler"]:
                 if device_subsection in device_raw.keys():
@@ -61,7 +86,8 @@ class DataHandler:
                     device_raw[device_subsection].pop("all")
             cls._device = device_raw
 
-            # FIXME: Here, we are creating a temporary variable for the qubit type
+            # This is creating a variable for the qubit type, whether it is control or target qubit
+            # in a coupler
             _qubit_types = {}
             for qubit in cls._device["qubit"]:
                 if int(qubit[1:]) % 2 == 0:
@@ -76,6 +102,7 @@ class DataHandler:
             if CONFIG.cluster is not None:
                 cls.cluster_config = CONFIG.cluster
 
+            # The configuration for the SPI rack
             if CONFIG.spi is not None:
                 cls.spi = toml.load(CONFIG.spi)
 
@@ -95,7 +122,22 @@ class DataHandler:
         return str(list(self.cluster_config.hardware_description.keys())[0])
 
     def get_legacy(self, variable_name: str):
-        # This method is temporary and to be deprecated as soon as possible
+        """
+        Temporary endpoint to provide data structures in the necessary shape as they are used in the code
+        right now.
+
+        Args:
+            variable_name: Old name of the variable that has to be called
+                           Can be: "VNA_resonator_frequencies", "VNA_qubit_frequencies",
+                                   "VNA_f12_frequencies" for the values of the old VNA file
+                                   "attenuation_setting" and "qubit_types" for the values from
+                                   the old user_input.py file and "coupler_spi_mapping" to receive
+                                   values in the format as it was in coupler_values.py
+
+        Returns:
+
+        """
+        # TODO: This method is temporary and to be deprecated as soon as possible
         if variable_name == "VNA_resonator_frequencies":
             return {
                 i_: keys_["VNA_frequency"]
@@ -151,4 +193,5 @@ class DataHandler:
             )
 
 
+# An instance of the DataHandler to be imported elsewhere in the code
 dh = DataHandler()

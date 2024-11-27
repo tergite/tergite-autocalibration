@@ -17,8 +17,35 @@ from typing import Set
 
 
 class ASTParser:
+    """
+    Parser for the abstract syntax tree. This is to allow inferring more information from
+    the sourcecode itself.
+    """
+
     @staticmethod
     def get_init_attribute_names(cls) -> Set[str]:
+        """
+        Returns all the attributes from the __init__ function of a class
+
+        Examples:
+            >>> class MyClass:
+            >>>
+            >>>     def __init__(self):
+            >>>         self.attr1 = 1
+            >>>         self.attr2: str = "hello"
+            >>>
+            >>> init_attributes = ASTParser.get_init_attribute_names(MyClass)
+            >>> print(init_attributes)
+            {'attr1', 'attr2'}
+
+        Args:
+            cls: Class to be analysed
+
+        Returns:
+            The names of the attributes in __init__ as set
+
+        """
+
         try:
             # Try to get the source code of the class
             source = inspect.getsource(cls)

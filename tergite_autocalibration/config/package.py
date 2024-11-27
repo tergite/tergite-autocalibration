@@ -19,9 +19,16 @@ from tomlkit import parse
 
 
 class ConfigurationPackage:
+    """
+    A package to bundle configuration files.
+    When developing the package itself, please think of the functionality as similar as possible to a .zip archive.
+    """
 
     def __init__(self):
+        # Path to the standardised configuration.meta.toml file
         self.meta_path = None
+        # The configuration files are not stored in here directly, but just passed as strings of the path
+        # This allows the file to be more lightweight and having a behaviour similar to pointers in C.
         self.config_files: Dict[str, Union[str, None]] = {
             "run_config": None,
             "cluster_config": None,
@@ -33,6 +40,16 @@ class ConfigurationPackage:
 
     @staticmethod
     def from_toml(meta_config_path: str) -> "ConfigurationPackage":
+        """
+        Initialize a configuration package from its configuration.meta.toml file
+
+        Args:
+            meta_config_path: Path to the configuration.meta.toml file
+
+        Returns:
+
+        """
+
         # Create a MetaConfiguration instance to be returned
         return_obj = ConfigurationPackage()
 
@@ -68,6 +85,17 @@ class ConfigurationPackage:
 
     @staticmethod
     def from_zip(meta_config_zip_path: str):
+        """
+        Create a configuration package from a .zip archive.
+        This will unzip the archive and read the configuration.meta.toml file
+
+        Args:
+            meta_config_zip_path: Path to the .zip archive
+
+        Returns:
+
+        """
+
         # Unzip the archive in the way it works on macOS such that it creates a folder with the same name
         meta_config_folder_path = os.path.splitext(meta_config_zip_path)[0]
         shutil.unpack_archive(meta_config_zip_path, meta_config_folder_path)
@@ -78,6 +106,15 @@ class ConfigurationPackage:
         )
 
     def move(self, to: str) -> "ConfigurationPackage":
+        """
+        Move a configuration package to another location.
+
+        Args:
+            to: Location to move the configuration package to
+
+        Returns:
+
+        """
         # Copy the configuration to the new location
         moved_configuration = self.copy(to)
         # Cleanup the old location
@@ -89,6 +126,16 @@ class ConfigurationPackage:
         return self
 
     def copy(self, to: str) -> "ConfigurationPackage":
+        """
+        Copy a configuration package to another location.
+
+        Args:
+            to: Location to copy the configuration package to
+
+        Returns:
+            An instance of the new copy of `ConfigurationPackage`
+
+        """
 
         # Get the absolute path to where to copy and create the destination directory
         abs_path_to = os.path.abspath(to)
@@ -116,6 +163,15 @@ class ConfigurationPackage:
         return ConfigurationPackage.from_toml(new_path_to_meta)
 
     def _delete_config_files(self, include_meta: bool = True):
+        """
+        Helper function to delete the configuration files within a configuration package.
+
+        Args:
+            include_meta: Whether the configuration.meta.toml should be deleted as well
+
+        Returns:
+
+        """
 
         file_paths = list(self.config_files.values())
         if include_meta:
@@ -134,5 +190,11 @@ class ConfigurationPackage:
                 logging.error(f"An error occurred: {e}")
 
     def delete(self):
+        """
+        Delete a configuration package.
+
+        Returns:
+
+        """
         self._delete_config_files()
         del self

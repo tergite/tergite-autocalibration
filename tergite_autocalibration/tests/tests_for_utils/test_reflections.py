@@ -10,7 +10,7 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from tergite_autocalibration.utils.reflections import ASTParser
+from tergite_autocalibration.utils.misc.reflections import ASTParser
 
 
 def test_ast_parser_basic_init_attributes():

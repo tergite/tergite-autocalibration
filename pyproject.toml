@@ -46,7 +46,7 @@ tomlkit = "^0.13.2"
 # NOTE: This is pinned because of the following error:
 # `SerialCompilationConfig` is not fully defined; you should define `SimpleNodeConfig`,
 # then call `SerialCompilationConfig.model_rebuild()`.
-# The pydantic version can be more loosely defined as soon as quantify-scheduler has a fixed the error
+# The pydantic version can be more loosely defined as soon as quantify-scheduler has fixed the error
 pydantic = "2.9.2"
 
 
