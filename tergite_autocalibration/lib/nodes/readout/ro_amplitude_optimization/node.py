@@ -46,7 +46,7 @@ class RO_amplitude_two_state_optimization_Node(ScheduleNode):
 
         self.schedule_samplespace = {
             "ro_amplitudes": {
-                qubit: np.linspace(0.01, 0.1, 11) for qubit in self.all_qubits
+                qubit: np.linspace(0.01, 0.1, 41) for qubit in self.all_qubits
             },
             "qubit_states": {
                 qubit: np.array([0, 1], dtype=np.int16) for qubit in self.all_qubits

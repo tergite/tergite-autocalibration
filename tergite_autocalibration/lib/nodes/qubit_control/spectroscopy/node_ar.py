@@ -11,17 +11,14 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from lmfit.models import LorentzianModel
 import numpy as np
 import xarray
+from lmfit.models import LorentzianModel
 
-from tergite_autocalibration.config.VNA_values import (
-    VNA_f12_frequencies,
-    VNA_qubit_frequencies,
-)
+from tergite_autocalibration.config.VNA_values import VNA_qubit_frequencies
 from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis import (
-    QubitSpectroscopyNodeAnalysis,
+    QubitSpectroscopyNodeMultidim,
 )
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement_ar import (
     Two_Tones_Multidim_AR,
@@ -38,7 +35,7 @@ def interleave_zeros(arr: np.ndarray):
 
 class Qubit_01_Spectroscopy_Multidim_AR_Node(ScheduleNode):
     measurement_obj = Two_Tones_Multidim_AR
-    analysis_obj = QubitSpectroscopyNodeAnalysis
+    analysis_obj = QubitSpectroscopyNodeMultidim
     qubit_qois = ["clock_freqs:f01", "spec:spec_ampl_optimal"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_kwargs):

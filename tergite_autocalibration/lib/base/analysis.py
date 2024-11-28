@@ -25,7 +25,6 @@ import numpy as np
 import xarray as xr
 
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
-from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 from tergite_autocalibration.utils.dto.qoi import QOI
 from tergite_autocalibration.utils.logger.tac_logger import logger
 
@@ -73,13 +72,14 @@ class BaseAnalysis(ABC):
             else:
                 name = "transmons"
             # Setting the value in the tergite-autocalibration-lite format
-            REDIS_CONNECTION.hset(
-                f"{name}:{this_element}", transmon_parameter, self._qoi[i]
-            )
+            print('WARNING SKIPING REDIS UPDATING')
+            # REDIS_CONNECTION.hset(
+            #     f"{name}:{this_element}", transmon_parameter, self._qoi[i]
+            # )
             # Setting the value in the standard redis storage
-            structured_redis_storage(
-                transmon_parameter, this_element.strip("q"), self._qoi[i]
-            )
+            # structured_redis_storage(
+            #     transmon_parameter, this_element.strip("q"), self._qoi[i]
+            # )
             REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
 
     def rotate_to_probability_axis(self, complex_measurement_data):
@@ -162,7 +162,7 @@ class BaseNodeAnalysis(ABC):
         self.fig.savefig(preview_path, bbox_inches="tight", dpi=100)
         self.fig.savefig(full_path, bbox_inches="tight", dpi=400)
         plt.show(block=True)
-        plt.pause(5)
+        plt.pause(9)
         plt.close()
         logger.info(f"Plots saved to {preview_path} and {full_path}")
 
@@ -224,7 +224,8 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
                     self.name, self.redis_fields
                 )
                 result = qubit_analysis.process_qubit(ds, this_qubit)  # this_qubit shoulq be qXX
-                analysis_results[this_qubit] = dict(zip(self.redis_fields, result))
+                print('WARNING SKIPING REDIS UPDATING')
+                # analysis_results[this_qubit] = dict(zip(self.redis_fields, result))
                 self.qubit_analyses.append(qubit_analysis)
 
             index = index + 1

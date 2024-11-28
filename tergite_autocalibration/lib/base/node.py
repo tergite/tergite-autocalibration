@@ -275,12 +275,12 @@ class BaseNode(abc.ABC):
         )
         analysis_results = node_analysis.analyze_node(data_path)
         data_vars = {
-            key: [analysis_results[key][dim] for dim in self.redis_fields]
-            for key in analysis_results
+            element: ("qois", np.array(list(analysis_results[element].values())))
+            for element in analysis_results
         }
         qoi_dataset = xarray.Dataset(
-            {key: (["dim"], values) for key, values in data_vars.items()},
-            coords={"dim": self.redis_fields},
+            data_vars=data_vars,
+            coords={"qois": self.redis_fields},
         )
         return qoi_dataset
 

@@ -107,8 +107,8 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
 
         self.frequencies_value = self.dataset[self.frequencies].values
 
-        if not self.has_peak():
-            return [np.mean(self.frequencies_value)]
+        # if not self.has_peak():
+        #     return [np.mean(self.frequencies_value)]
 
         self.fit_freqs = np.linspace(
             self.frequencies_value[0], self.frequencies_value[-1], 500
@@ -164,7 +164,9 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
 
     def plotter(self, ax):
         # Plots the data and the fitted model of a qubit spectroscopy experiment
-        if self.hasPeak:
+        print("WARNING SKIPING PEAK ANALYSIS")
+        # if self.hasPeak:
+        if True:
             ax.plot(self.fit_freqs, self.fit_y, "r-", lw=3.0)
             min = np.min(self.magnitudes)
             # ax.vlines(self.freq, min, self.prominence + min, lw=4, color='teal')
@@ -174,11 +176,12 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
                 self.fit_y,
                 "r-",
                 lw=3.0,
-                label=f"freq = {self.freq:.6E} ± {self.uncertainty:.1E} (Hz)",
+                label=f"freq = {self.freq:.6E} (Hz)",
+                # label=f"freq = {self.freq:.6E} ± {self.uncertainty:.1E} (Hz)",
             )
 
         x_dataarray = self.magnitudes.to_dataarray()
-        x = x_dataarray.values[0]
+        x = x_dataarray.values[0].flatten
         ax.plot(self.frequencies_value, x, "bo-", ms=3.0)
         ax.set_title(f"Qubit Spectroscopy for {self.qubit}")
         ax.set_xlabel("frequency (Hz)")
@@ -233,9 +236,9 @@ class QubitSpectroscopyMultidim(BaseQubitAnalysis):
                     self.qubit_freq = qubit_freq
                     self.spec_ampl = a
 
-        else:
-            if self.has_peak(self.magnitudes):
-                self.qubit_freq = self.frequencies[self.magnitudes.argmax()]
+        # else:
+        #     if self.has_peak(self.magnitudes):
+        #         self.qubit_freq = self.frequencies[self.magnitudes.argmax()]
 
         return [self.qubit_freq, self.spec_ampl]
 
@@ -270,7 +273,7 @@ class QubitSpectroscopyMultidim(BaseQubitAnalysis):
         self.magnitudes[self.data_var].plot(
             ax=ax, x=self.frequency_coords
         )  # Here, `self.frequency_coords` is the coordinate name
-        ax.scatter(self.qubit_freq, self.spec_ampl, s=52, c="red")
+        # ax.scatter(self.qubit_freq, self.spec_ampl, s=52, c="red")
 
 
 class QubitSpectroscopyNodeAnalysis(BaseAllQubitsAnalysis):
