@@ -18,6 +18,7 @@ import pytest
 from dotenv import dotenv_values
 
 from tergite_autocalibration.config.env import EnvironmentConfiguration
+from tergite_autocalibration.tests.utils.decorators import preserve_os_env
 
 
 @pytest.fixture
@@ -30,12 +31,14 @@ def mock_env_file():
     os.unlink(temp_env.name)  # Cleanup after test
 
 
+@preserve_os_env
 @pytest.fixture
 def env_config_instance():
     """Fixture for creating an instance of EnvironmentConfiguration."""
     return EnvironmentConfiguration()
 
 
+@preserve_os_env
 def test_initialization(env_config_instance):
     """Test that the EnvironmentConfiguration instance is initialized correctly."""
     assert isinstance(env_config_instance.root_dir, Path)
@@ -45,6 +48,7 @@ def test_initialization(env_config_instance):
     assert env_config_instance.plotting is False
 
 
+@preserve_os_env
 def test_from_dot_env_loads_environment(mock_env_file):
     """Test that values from the .env file are loaded into the environment."""
     config = EnvironmentConfiguration.from_dot_env(
@@ -60,12 +64,14 @@ def test_from_dot_env_loads_environment(mock_env_file):
     assert config.plotting is True
 
 
+@preserve_os_env
 def test_from_dot_env_raises_if_file_not_found():
     """Test that an error is raised when the .env file does not exist."""
     with pytest.raises(EnvironmentError):
         EnvironmentConfiguration.from_dot_env(filepath="/non/existent/path.env")
 
 
+@preserve_os_env
 def test_write_env_updates_file(mock_env_file):
     """Test that updating an attribute writes to the .env file when _write_env is enabled."""
     config = EnvironmentConfiguration.from_dot_env(
@@ -80,6 +86,7 @@ def test_write_env_updates_file(mock_env_file):
     assert env_values["PLOTTING"] == "False"
 
 
+@preserve_os_env
 def test_setattr_without_write_env(mock_env_file):
     """Test that updating an attribute does not write to the .env file when _write_env is disabled."""
     config = EnvironmentConfiguration.from_dot_env(
@@ -92,6 +99,7 @@ def test_setattr_without_write_env(mock_env_file):
     assert env_values["REDIS_PORT"] == "1234"  # Original value
 
 
+@preserve_os_env
 def test_invalid_attribute_does_not_write(mock_env_file):
     """Test that updating an attribute not in __init__ does not write to the .env file."""
     config = EnvironmentConfiguration.from_dot_env(
@@ -106,6 +114,7 @@ def test_invalid_attribute_does_not_write(mock_env_file):
     assert "NEW_ATTRIBUTE" not in env_values
 
 
+@preserve_os_env
 def test_logging(mock_env_file, caplog):
     """Test that loading from .env logs appropriate messages."""
     with caplog.at_level("INFO"):

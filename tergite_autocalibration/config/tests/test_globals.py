@@ -14,9 +14,11 @@ from tergite_autocalibration.config.env import EnvironmentConfiguration
 from tergite_autocalibration.config.globals import ENV, CONFIG
 from tergite_autocalibration.config.handler import ConfigurationHandler
 from tergite_autocalibration.config.package import ConfigurationPackage
+from tergite_autocalibration.tests.utils.decorators import preserve_os_env
 from tergite_autocalibration.tests.utils.fixtures import get_fixture_path
 
 
+@preserve_os_env
 def test_global_env_configuration():
 
     env_configuration = EnvironmentConfiguration.from_dot_env(

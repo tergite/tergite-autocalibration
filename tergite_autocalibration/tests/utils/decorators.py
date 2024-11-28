@@ -61,3 +61,29 @@ def with_os_env(variables: Dict[str, Any]):
         return wrapper
 
     return inner_decorator_fn_
+
+
+def preserve_os_env(fn_):
+    """
+    This is a decorator to preserve the environmental variable configuration.
+    """
+
+    @wraps(fn_)
+    def wrapper(*args, **kwargs):
+        # Temporarily store os variables in a cache
+        original_env = os.environ.copy()
+
+        # This is in a try finally block to ensure that environmental variables are restored even
+        # if the function raises an exception.
+        try:
+            result = fn_(*args, **kwargs)
+
+        # Restore from above
+        finally:
+            os.environ.clear()
+            os.environ.update(original_env)
+
+        # Return the result of the function
+        return result
+
+    return wrapper
