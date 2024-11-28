@@ -13,7 +13,9 @@
 from typing import Union
 
 
-def safe_str_to_bool_int_float(expected_type: Union[bool, int, float, str], value: str) -> Union[bool, int, float, str]:
+def safe_str_to_bool_int_float(
+    expected_type: Union[bool, int, float, str], value: str
+) -> Union[bool, int, float, str]:
     """
     Converts a string to the given type
 
