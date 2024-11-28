@@ -14,9 +14,8 @@ import pytest
 
 from tergite_autocalibration.utils.misc.regex import (
     camel_to_snake,
-    is_bool,
-    str_to_bool,
 )
+from tergite_autocalibration.utils.misc.types import is_bool, str_to_bool
 
 
 def test_camel_basic_conversion():

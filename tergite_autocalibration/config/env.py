@@ -25,7 +25,7 @@ from dotenv import dotenv_values, set_key
 
 from tergite_autocalibration.config.base import BaseConfigurationFile
 from tergite_autocalibration.utils.misc.reflections import ASTParser
-from tergite_autocalibration.utils.misc.regex import is_bool, str_to_bool
+from tergite_autocalibration.utils.misc.types import safe_str_to_bool_int_float
 
 
 def _get_default_env_path() -> Union[str, Path]:
@@ -94,8 +94,7 @@ class EnvironmentConfiguration(BaseConfigurationFile):
         Load the values from the .env file actually into the os environment.
 
         Args:
-            filepath: Path to the .env file. Can be overwritten by setting an environment variable
-                      called `TAC_TEST_ENV_FILEPATH`. Then the environment will be loaded from that
+            filepath: Path to the .env file. Then the environment will be loaded from that
                       location instead.
             write_env: If write_env is set to true, then values that are written to this configuration
                       will be written to the .env file. Can be also set in the .env file itself.
@@ -125,13 +124,19 @@ class EnvironmentConfiguration(BaseConfigurationFile):
             EnvironmentConfiguration
         ):
             if variable_name_.upper() in os.environ:
+
+                # Get the variable value from the environment
                 variable_value_ = os.environ[variable_name_.upper()]
-                # Convert boolean string to actual boolean
-                # Note: This could be elaborated and use generic typing from the annotations in __init__
-                if is_bool(variable_value_):
-                    return_obj.__setattr__(variable_name_, str_to_bool(variable_value_))
-                else:
-                    return_obj.__setattr__(variable_name_, variable_value_)
+
+                # Check which type the value should be
+                expected_type_ = type(getattr(return_obj, variable_name_))
+
+                # Cast the string value from the .env file to the expected type
+                typed_variable_value_ = safe_str_to_bool_int_float(
+                    expected_type_, variable_value_
+                )
+
+                return_obj.__setattr__(variable_name_, typed_variable_value_)
 
         logging.info(f"Loaded environmental variables from {filepath}")
         return return_obj
