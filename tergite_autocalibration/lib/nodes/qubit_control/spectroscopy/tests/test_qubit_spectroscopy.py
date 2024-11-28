@@ -28,38 +28,38 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
     def test_setup(self):
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_01" / "dataset_qubit_01_spectroscopy_0.hdf5"
-        dataset = xr.open_dataset(file_path)
+        file = xr.open_dataset(file_path)
         analysis = QubitSpectroscopyAnalysis("name", ["redis_field"])
-        dataset = analysis.process_qubit(dataset, "yq06")
+        dataset = analysis.process_qubit(file, "yq06")
 
-        self.assertIsInstance(dataset, list)
+        self.assertIsInstance(dataset, np.float64)
         for i in dataset:
             self.assertIsInstance(i, np.float64)
-        assert len(dataset) == 3, f"The dataset should contain three elements {len(dataset)}"
+        assert len(dataset) == 2, f"The dataset should contain two elements {len(dataset)}"
 
     def test_run_fitting(self):
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_01" / "dataset_qubit_01_spectroscopy_0.hdf5"
-        dataset = xr.open_dataset(file_path)
+        file = xr.open_dataset(file_path)
         analysis = QubitSpectroscopyAnalysis("name", ["redis_field"])
-        dataset = analysis.process_qubit(dataset, "yq06")
-        minimum_freq, fit_Ql, min_freq_data = dataset
+        dataset = analysis.process_qubit(file, "yq06")
+        frequency = dataset
 
-        assert 6e9 < minimum_freq < 8e9, f"Minimum frequency should be between 6 GHz and 8 GHz, got {minimum_freq}"
-        assert fit_Ql > 0, f"Fit Ql should be a positive value, got {fit_Ql}"
-        assert min_freq_data == pytest.approx(minimum_freq, rel=1e3), f"The both frequencies should be close to each other {minimum_freq} {min_freq_data}"
+        assert 4e9 < frequency < 6e9, f"Frequency should be between 4 GHz and 6 GHz, got {frequency}"
 
     def test_plotting(self):
         os.environ["DATA_DIR"] = str(Path(__file__).parent / "results")
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_01" / "dataset_qubit_01_spectroscopy_0.hdf5"
-        dataset = xr.open_dataset(file_path)
+        file = xr.open_dataset(file_path)
         analysis = QubitSpectroscopyAnalysis("name", ["redis_field"])
-        dataset = analysis.process_qubit(dataset, "yq06")
-        figure_path = os.environ["DATA_DIR"] + "/Resonator_spectroscopy_q06.png"
+        dataset = analysis.process_qubit(file, "yq06")
+        figure_path = os.environ["DATA_DIR"] + "/Qubit_spectroscopy_q06.png"
         if os.path.exists(figure_path):
             os.remove(figure_path)
         fig, ax = plt.subplots()
         analysis.plotter(ax)
         fig.savefig(figure_path)
         plt.close(fig)
+        assert os.path.exists(figure_path), f"Expected plot file to be created at {figure_path}"
+        
