@@ -32,7 +32,16 @@ class BaseConfigurationFile(ABC):
 
     @filepath.setter
     def filepath(self, value):
-        self._filepath = value
+        # Do the type check
+        if not isinstance(value, (str, Path)):
+            raise TypeError(
+                f"Filepath must be a string or Path object, not {type(value).__name__}"
+            )
+        # Do some additional checks whether the path has a valid parent directory
+        path = Path(value)
+        if not path.is_absolute() and not path.parent:
+            raise ValueError(f"'{value}' is not a valid path")
+        self._filepath = path
 
 
 class TOMLConfigurationFile(BaseConfigurationFile):
