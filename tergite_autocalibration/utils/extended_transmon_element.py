@@ -27,8 +27,8 @@ from quantify_scheduler.device_under_test.transmon_element import (
 
 from tergite_autocalibration.utils.extended_gates import (
     R12,
-    Spec,
     ExtendedClocksFrequencies,
+    Spec,
 )
 
 
@@ -37,6 +37,7 @@ class ExtendedTransmon(BasicTransmonElement):
         submodules_to_add = {
             "measure_1": DispersiveMeasurement,
             "measure_2": DispersiveMeasurement,
+            "measure_2state_opt": DispersiveMeasurement,
             "measure_3state_opt": DispersiveMeasurement,
             "r12": R12,
             "spec": Spec,
@@ -131,6 +132,41 @@ class ExtendedTransmon(BasicTransmonElement):
                 "bin_mode",
                 "acq_protocol",
             ],
+        )
+        cfg_dict["elements"][f"{self.name}"]["measure_2state_opt"] = (
+            OperationCompilationConfig(
+                factory_func=measurement_factories.dispersive_measurement_transmon,
+                factory_kwargs={
+                    "port": self.ports.readout(),
+                    # use different clock: ####
+                    "clock": f"{self.name}.ro_2st_opt",
+                    ############################
+                    "pulse_type": self.measure_2state_opt.pulse_type(),
+                    "pulse_amp": self.measure_2state_opt.pulse_amp(),
+                    "pulse_duration": self.measure_2state_opt.pulse_duration(),
+                    "acq_delay": self.measure_2state_opt.acq_delay(),
+                    "acq_duration": self.measure_2state_opt.integration_time(),
+                    "acq_channel": self.measure_2state_opt.acq_channel(),
+                    # 'acq_channel_override': None,
+                    "acq_protocol_default": "SSBIntegrationComplex",
+                    "reset_clock_phase": self.measure_2state_opt.reset_clock_phase(),
+                    "reference_magnitude": pulse_library.ReferenceMagnitude.from_parameter(
+                        self.measure_2state_opt.reference_magnitude
+                    ),
+                    "acq_weights_a": self.measure_2state_opt.acq_weights_a(),
+                    "acq_weights_b": self.measure_2state_opt.acq_weights_b(),
+                    "acq_weights_sampling_rate": self.measure_2state_opt.acq_weights_sampling_rate(),
+                    "acq_rotation": self.measure_2state_opt.acq_rotation(),
+                    "acq_threshold": self.measure_2state_opt.acq_threshold(),
+                },
+                gate_info_factory_kwargs=[
+                    "acq_channel_override",
+                    "acq_index",
+                    "bin_mode",
+                    "acq_protocol",
+                    "feedback_trigger_label",
+                ],
+            )
         )
         cfg_dict["elements"][f"{self.name}"]["measure_3state_opt"] = (
             OperationCompilationConfig(

@@ -269,3 +269,43 @@ class Measure_RO_3state_Opt(Measure):
             }
         )
         self._update()
+
+
+class Measure_RO_2state_Opt(Measure):
+    def __init__(
+        self,
+        *qubits: str,
+        acq_index: int | None = None,
+        acq_protocol: Optional[
+            Literal[
+                "SSBIntegrationComplex",
+                "Trace",
+                "TriggerCount",
+                "NumericalWeightedIntegrationComplex",
+                "ThresholdedAcquisition",
+            ]
+        ] = None,
+        bin_mode: BinMode | None = None,
+        feedback_trigger_label: Optional[str] = None,
+        # **kwargs: Any,
+    ):
+        super().__init__(qubits[0], acq_index=acq_index, bin_mode=bin_mode)
+        plot_func = "quantify_scheduler.calibration_schedules._visualization.circuit_diagram.meter"
+        self.data.update(
+            {
+                "name": f"Measure_RO_2state_Opt {', '.join(qubits)}",
+                "gate_info": {
+                    "unitary": None,
+                    "plot_func": plot_func,
+                    "tex": r"$\langle opt|$",
+                    "qubits": list(qubits),
+                    "acq_index": acq_index,
+                    "acq_protocol": acq_protocol,
+                    "bin_mode": bin_mode,
+                    "operation_type": "measure_2state_opt",
+                    "acq_channel_override": None,
+                    "feedback_trigger_label": feedback_trigger_label,
+                },
+            }
+        )
+        self._update()
