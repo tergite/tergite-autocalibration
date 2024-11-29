@@ -15,7 +15,7 @@ import os
 import shutil
 from typing import Dict, Union
 
-from tomlkit import parse
+from tomlkit import parse, TOMLDocument
 
 
 class ConfigurationPackage:
@@ -37,6 +37,29 @@ class ConfigurationPackage:
             "node_config": None,
             "user_samplespace": None,
         }
+        self.misc_filepaths = {}
+
+    @staticmethod
+    def _validate_toml_file_content(file_content: TOMLDocument) -> bool:
+        """
+        Check whether the .toml file is valid
+
+        Args:
+            file_content: The loaded content from the .toml file
+
+        Returns:
+            True if the configuration file is having all the mandatory paramters
+
+        """
+        if "path_prefix" not in file_content.keys():
+            raise KeyError(
+                "The 'path_prefix' key is missing in the provided configuration.meta.toml file."
+            )
+        if "files" not in file_content.keys():
+            raise KeyError(
+                "The 'path_prefix' key is missing in the provided configuration.meta.toml file."
+            )
+        return True
 
     @staticmethod
     def from_toml(meta_config_path: str) -> "ConfigurationPackage":
@@ -47,6 +70,7 @@ class ConfigurationPackage:
             meta_config_path: Path to the configuration.meta.toml file
 
         Returns:
+            The initialized `ConfigurationPackage`
 
         """
 
@@ -60,6 +84,9 @@ class ConfigurationPackage:
             # Parse the .toml file as dict
             with open(meta_config_path, "r") as f:
                 meta_config = parse(f.read())
+
+            # Validate the file structure of the .toml file
+            assert ConfigurationPackage._validate_toml_file_content(meta_config)
 
             # Get the correct path to the configuration package to reconstruct relative paths
             meta_config_directory, _ = os.path.split(meta_config_path)
@@ -75,6 +102,14 @@ class ConfigurationPackage:
                     return_obj.config_files[file_key_] = os.path.join(
                         config_path_prefix, meta_config["files"][file_key_]
                     )
+
+            # Add the misc filepaths to the package
+            if "misc" in meta_config.keys():
+                for misc_key_, misc_path_ in meta_config["misc"].items():
+                    return_obj.misc_filepaths[misc_key_] = os.path.join(
+                        meta_config_directory, misc_path_
+                    )
+
             logging.info(f"Loaded configuration package from {meta_config_path}")
             return return_obj
 
@@ -84,7 +119,7 @@ class ConfigurationPackage:
             )
 
     @staticmethod
-    def from_zip(meta_config_zip_path: str):
+    def from_zip(meta_config_zip_path: str) -> "ConfigurationPackage":
         """
         Create a configuration package from a .zip archive.
         This will unzip the archive and read the configuration.meta.toml file
@@ -160,6 +195,15 @@ class ConfigurationPackage:
             # Copy the file to the new directory
             shutil.copy(file_path, new_file_path)
 
+        # Iterate over all misc folders and copy them
+        for misc_filepath in self.misc_filepaths.values():
+            # Get the relative path from the current meta configuration to the misc folder
+            rel_path = os.path.relpath(misc_filepath, old_path_to_meta)
+            # Then create the new path to the location
+            new_filepath = os.path.join(abs_path_to, rel_path)
+            # Copy the whole folder to the new location
+            shutil.copytree(misc_filepath, new_filepath, dirs_exist_ok=True)
+
         return ConfigurationPackage.from_toml(new_path_to_meta)
 
     def _delete_config_files(self, include_meta: bool = True):
@@ -189,6 +233,23 @@ class ConfigurationPackage:
             except Exception as e:
                 logging.error(f"An error occurred: {e}")
 
+    def _delete_misc_files(self):
+        """
+        Helper function to delete the configuration files within a configuration package.
+        """
+
+        file_paths = list(self.misc_filepaths.values())
+
+        for file_path in file_paths:
+            try:
+                shutil.rmtree(file_path)
+            except FileNotFoundError:
+                logging.error(f"Folder '{file_path}' not found.")
+            except PermissionError:
+                logging.error(f"Permission denied to delete the folder '{file_path}'.")
+            except Exception as e:
+                logging.error(f"An error occurred: {e}")
+
     def delete(self):
         """
         Delete a configuration package.
@@ -196,5 +257,6 @@ class ConfigurationPackage:
         Returns:
 
         """
+        self._delete_misc_files()
         self._delete_config_files()
         del self

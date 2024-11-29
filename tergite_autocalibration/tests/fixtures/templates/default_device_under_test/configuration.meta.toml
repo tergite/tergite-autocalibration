@@ -55,3 +55,21 @@ node_config = 'node_config.toml'
 
 # USER_SAMPLESPACE gives the possibility to define custom samplespaces.
 user_samplespace = 'user_samplespace.py'
+
+
+# This section is to add additional configuration files that are not as defined as the ones above
+[misc]
+
+# ---
+# Folders with additional files that belong to the calibration package
+# ---
+# Please add the folders as a relative path from the configuration.meta.toml
+# Folders have to be on a lower level in the file system i.e. do not use paths like ../../my_files
+#
+# The key is the name of the additional files. For example:
+# miscellaneous_files = "misc"
+#
+# The reason to have these files is to add unstructured data such as mixer corrections or wiring diagrams
+# to the configuration package as additional information.
+
+miscellaneous_files = "misc"
