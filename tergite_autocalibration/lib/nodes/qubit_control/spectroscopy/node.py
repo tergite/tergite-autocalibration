@@ -15,20 +15,13 @@ import numpy as np
 import xarray
 from lmfit.models import LorentzianModel
 
-from tergite_autocalibration.config.VNA_values import (
-    VNA_f12_frequencies,
-    VNA_qubit_frequencies,
-)
+from tergite_autocalibration.config.VNA_values import VNA_qubit_frequencies
 from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis import (
-    QubitSpectroscopyNodeAnalysis,
     QubitSpectroscopyNodeMultidim,
-)
+)  # QubitSpectroscopyNodeAnalysis,
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement import (
     Two_Tones_Multidim,
-)
-from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement_ar import (
-    Two_Tones_Multidim_AR,
 )
 
 # TODO: check input
@@ -83,21 +76,21 @@ class Qubit_01_Spectroscopy_Multidim_Node(ScheduleNode):
         return dataset
 
 
-class Qubit_12_Spectroscopy_Pulsed_Node(ScheduleNode):
-    measurement_obj = Two_Tones_Multidim
-    analysis_obj = QubitSpectroscopyNodeAnalysis
-    qubit_qois = ["clock_freqs:f12"]
-
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
-        self.qubit_state = 1
-        self.schedule_keywords["qubit_state"] = self.qubit_state
-
-        self.schedule_samplespace = {
-            "spec_frequencies": {
-                qubit: qubit_samples(qubit, "12") for qubit in self.all_qubits
-            }
-        }
+# class Qubit_12_Spectroscopy_Pulsed_Node(ScheduleNode):
+#     measurement_obj = Two_Tones_Multidim
+#     analysis_obj = QubitSpectroscopyNodeAnalysis
+#     qubit_qois = ["clock_freqs:f12"]
+#
+#     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
+#         super().__init__(name, all_qubits, **schedule_keywords)
+#         self.qubit_state = 1
+#         self.schedule_keywords["qubit_state"] = self.qubit_state
+#
+#         self.schedule_samplespace = {
+#             "spec_frequencies": {
+#                 qubit: qubit_samples(qubit, "12") for qubit in self.all_qubits
+#             }
+#         }
 
 
 class Qubit_12_Spectroscopy_Multidim_Node(ScheduleNode):

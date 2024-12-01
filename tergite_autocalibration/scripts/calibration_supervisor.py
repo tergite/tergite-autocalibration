@@ -44,7 +44,6 @@ from tergite_autocalibration.utils.dto.enums import DataStatus, MeasurementMode
 from tergite_autocalibration.utils.logger.tac_logger import logger
 from tergite_autocalibration.utils.logger.visuals import draw_arrow_chart
 from tergite_autocalibration.utils.redis_utils import (
-    populate_active_reset_parameters,
     populate_initial_parameters,
     populate_node_parameters,
     populate_quantities_of_interest,
@@ -212,9 +211,9 @@ class NodeManager:
         self.lab_ic = lab_ic
         self.active_reset_configuration = config.active_reset_configuration
 
-        populate_active_reset_parameters(
-            self.active_reset_configuration, self.config.qubits, REDIS_CONNECTION
-        )
+        # populate_active_reset_parameters(
+        #     self.active_reset_configuration, self.config.qubits, REDIS_CONNECTION
+        # )
 
         populate_initial_parameters(
             self.config.transmon_configuration,

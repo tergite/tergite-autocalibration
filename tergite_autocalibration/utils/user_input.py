@@ -81,7 +81,7 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 
 def qubit_samples(qubit: str, transition: str = "01") -> np.ndarray:
-    qub_spec_samples = 51
+    qub_spec_samples = 71
     sweep_range = 8e6
     if transition == "01":
         VNA_frequency = VNA_qubit_frequencies[qubit]
@@ -117,7 +117,7 @@ user_samplespace = {
         "ro_frequencies": {qubit: resonator_samples(qubit) for qubit in qubits}
     },
 }
-attenuation_setting = {"qubit": 12, "coupler": 30, "readout": 10}
+attenuation_setting = {"qubit": 10, "coupler": 30, "readout": 16}
 
 
 ####################################################################

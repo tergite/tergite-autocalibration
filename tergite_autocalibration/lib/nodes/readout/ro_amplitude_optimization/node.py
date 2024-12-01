@@ -27,9 +27,9 @@ class RO_amplitude_two_state_optimization_Node(ScheduleNode):
     measurement_obj = RO_amplitude_optimization
     analysis_obj = OptimalROTwoStateAmplitudeNodeAnalysis
     qubit_qois = [
-        "measure_2state_opt:ro_ampl_2st_opt",
-        "measure_2state_opt:rotation",
-        "measure_2state_opt:threshold",
+        "measure_2state_opt:pulse_amp",
+        "measure_2state_opt:acq_rotation",
+        "measure_2state_opt:acq_threshold",
     ]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
@@ -46,7 +46,7 @@ class RO_amplitude_two_state_optimization_Node(ScheduleNode):
 
         self.schedule_samplespace = {
             "ro_amplitudes": {
-                qubit: np.linspace(0.01, 0.1, 41) for qubit in self.all_qubits
+                qubit: np.linspace(0.04, 0.12, 41) for qubit in self.all_qubits
             },
             "qubit_states": {
                 qubit: np.array([0, 1], dtype=np.int16) for qubit in self.all_qubits

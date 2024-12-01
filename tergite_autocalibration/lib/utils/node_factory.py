@@ -15,10 +15,10 @@
 # that they have been altered from the originals.
 
 from pathlib import Path
-from typing import Dict, List, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict, List, Union
 
-from .reflections import find_inheriting_classes_ast_recursive, import_class_from_file
 from ...utils.regex import camel_to_snake
+from .reflections import find_inheriting_classes_ast_recursive, import_class_from_file
 
 if TYPE_CHECKING:
     from ..base.node import BaseNode
@@ -43,7 +43,7 @@ class NodeFactory:
             "rabi_oscillations": "Rabi_Oscillations_Node",
             "ramsey_correction": "Ramsey_Fringes_Node",
             "resonator_spectroscopy_1": "Resonator_Spectroscopy_1_Node",
-            "qubit_12_spectroscopy_pulsed": "Qubit_12_Spectroscopy_Pulsed_Node",
+            # "qubit_12_spectroscopy_pulsed": "Qubit_12_Spectroscopy_Pulsed_Node",
             "qubit_12_spectroscopy": "Qubit_12_Spectroscopy_Multidim_Node",
             "rabi_oscillations_12": "Rabi_Oscillations_12_Node",
             "ramsey_correction_12": "Ramsey_Fringes_12_Node",

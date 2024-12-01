@@ -1,6 +1,7 @@
 import numpy as np
 from quantify_scheduler.backends.qblox.operations.gate_library import ConditionalReset
 from quantify_scheduler.enums import BinMode
+from quantify_scheduler.operations.control_flow_library import ConditionalOperation
 from quantify_scheduler.operations.gate_library import Measure, Reset, X
 from quantify_scheduler.operations.pulse_factories import long_square_pulse
 from quantify_scheduler.operations.pulse_library import (
@@ -12,7 +13,7 @@ from quantify_scheduler.resources import ClockResource
 from quantify_scheduler.schedules.schedule import Schedule
 
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
-from tergite_autocalibration.utils.extended_gates import Measure_RO1
+from tergite_autocalibration.utils.extended_gates import Measure_RO_2state_Opt
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 
 
@@ -30,6 +31,10 @@ class Two_Tones_Multidim_AR(BaseMeasurement):
     ) -> Schedule:
 
         schedule = Schedule("multiplexed_qubit_spec_AR", repetitions=1024)
+        m1 = Measure_RO_2state_Opt
+        o1 = ConditionalOperation
+        m2 = Measure
+        o2 = ConditionalReset
 
         # Initialize the clock for each qubit
         # Initialize ClockResource with the first frequency value
@@ -46,13 +51,6 @@ class Two_Tones_Multidim_AR(BaseMeasurement):
                 raise ValueError(f"Invalid qubit state: {self.qubit_state}")
 
         qubits = self.transmons.keys()
-
-        if self.qubit_state == 0:
-            measure_function = Measure
-        elif self.qubit_state == 1:
-            measure_function = Measure_RO1
-        else:
-            raise ValueError(f"Invalid qubit state: {self.qubit_state}")
 
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
@@ -72,10 +70,12 @@ class Two_Tones_Multidim_AR(BaseMeasurement):
             cr_duration = 364e-9 + ro_duration + rxy_duration + 4e-9
             ar_stagger_time = acq_channel * cr_duration
             ar_buffer_time = len(qubits) * cr_duration
+            print(f"{ ar_buffer_time = }")
             # TODO: this can be refined:
             spectroscopy_time = ro_duration + spec_pulse_duration
             measurement_stagger_time = acq_channel * (ro_duration + 252e-9)
             measurement_buffer_time = len(qubits) * (spectroscopy_time + 252e-9)
+            print(f"{ measurement_stagger_time = }")
 
             # long pulses require more efficient memory management
             if spec_pulse_duration > 6.5e-6:
@@ -131,7 +131,20 @@ class Two_Tones_Multidim_AR(BaseMeasurement):
                     # ACTIVE RESET BLOCK, the buffer and stagger times ensure that
                     # the conditional operations do not overlap  #################
                     schedule.add(IdlePulse(ar_stagger_time))
-                    schedule.add(ConditionalReset(this_qubit, acq_index=2 * this_index))
+                    # schedule.add(ConditionalReset(this_qubit, acq_index=2 * this_index))
+                    schedule.add(
+                        Measure_RO_2state_Opt(
+                            this_qubit,
+                            acq_protocol="ThresholdedAcquisition",
+                            feedback_trigger_label=this_qubit,
+                            acq_index=2 * this_index,
+                        )
+                    )
+                    schedule.add(
+                        ConditionalOperation(body=X(this_qubit), qubit_name=this_qubit),
+                        rel_time=364e-9,
+                    )
+
                     schedule.add(
                         IdlePulse(ar_buffer_time - ar_stagger_time - cr_duration)
                     )
@@ -142,6 +155,7 @@ class Two_Tones_Multidim_AR(BaseMeasurement):
                     schedule.add(
                         SpectroscopyPulse(
                             duration=spec_pulse_duration,
+                            # amp=1e-6,
                             amp=spec_pulse_amplitude,
                             port=mw_pulse_port,
                             clock=this_clock,
@@ -149,9 +163,9 @@ class Two_Tones_Multidim_AR(BaseMeasurement):
                     )
 
                     schedule.add(
-                        measure_function(
+                        Measure_RO_2state_Opt(
+                            # Measure(
                             this_qubit,
-                            # acq_index=this_index,
                             acq_index=2 * this_index + 1,
                             bin_mode=BinMode.AVERAGE,
                             acq_protocol="ThresholdedAcquisition",

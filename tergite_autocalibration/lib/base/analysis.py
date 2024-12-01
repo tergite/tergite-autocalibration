@@ -72,10 +72,10 @@ class BaseAnalysis(ABC):
             else:
                 name = "transmons"
             # Setting the value in the tergite-autocalibration-lite format
-            print('WARNING SKIPING REDIS UPDATING')
-            # REDIS_CONNECTION.hset(
-            #     f"{name}:{this_element}", transmon_parameter, self._qoi[i]
-            # )
+            # print('WARNING SKIPING REDIS UPDATING')
+            REDIS_CONNECTION.hset(
+                f"{name}:{this_element}", transmon_parameter, self._qoi[i]
+            )
             # Setting the value in the standard redis storage
             # structured_redis_storage(
             #     transmon_parameter, this_element.strip("q"), self._qoi[i]
@@ -159,12 +159,13 @@ class BaseNodeAnalysis(ABC):
         self.fig.tight_layout()
         preview_path = self.data_path / f"{self.name}_preview.png"
         full_path = self.data_path / f"{self.name}.png"
+        logger.info("Saving Plots")
         self.fig.savefig(preview_path, bbox_inches="tight", dpi=100)
-        self.fig.savefig(full_path, bbox_inches="tight", dpi=400)
-        plt.show(block=True)
-        plt.pause(9)
-        plt.close()
         logger.info(f"Plots saved to {preview_path} and {full_path}")
+        # self.fig.savefig(full_path, bbox_inches="tight", dpi=400)
+        plt.show(block=True)
+        # plt.pause(9)
+        plt.close()
 
 
 class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
@@ -223,9 +224,11 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
                 qubit_analysis = self.single_qubit_analysis_obj(
                     self.name, self.redis_fields
                 )
-                result = qubit_analysis.process_qubit(ds, this_qubit)  # this_qubit shoulq be qXX
-                print('WARNING SKIPING REDIS UPDATING')
-                # analysis_results[this_qubit] = dict(zip(self.redis_fields, result))
+                result = qubit_analysis.process_qubit(
+                    ds, this_qubit
+                )  # this_qubit shoulq be qXX
+                # print('WARNING SKIPING REDIS UPDATING')
+                analysis_results[this_qubit] = dict(zip(self.redis_fields, result))
                 self.qubit_analyses.append(qubit_analysis)
 
             index = index + 1
