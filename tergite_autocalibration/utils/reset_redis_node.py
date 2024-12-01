@@ -92,6 +92,9 @@ class ResetRedisNode:
                     if "measure_3state_opt:pulse_amp" in field:
                         REDIS_CONNECTION.hset(key, field, "0")
                         structured_redis_storage(key, qubit.strip("q"), 0)
+                    if "measure_2state_opt:pulse_amp" in field:
+                        REDIS_CONNECTION.hset(key, field, "0")
+                        structured_redis_storage(key, qubit.strip("q"), 0)
                 REDIS_CONNECTION.hset(cs_key, remove_node, "not_calibrated")
             else:
                 raise ValueError("Invalid Field")
