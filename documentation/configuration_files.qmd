@@ -1,9 +1,87 @@
 # Configuration
 
 To run the autocalibration you will need to configure it with a couple of different configuration files.
-Doing the configuration with a pre-built configuration package will take about 5-10 minutes.
+Doing the configuration with a pre-built configuration package will take just some minutes.
 On an unknown experimental device without pre-built files, it probably takes slightly longer.
 
+- Here, we need a figure of the setup to describe what instruments
+
+- Then an overview of the configuration files -> what are the endpoints in the API
+
+## Quickstart
+
+- Explain the locations where are configuration files:
+    - root level
+    - templates
+    - fixtures (for tests)
+
+A template for a full configuration package can be found in `data/_template/_device_name`.
+Some more pre-built configuration package can be found in `data/devices` under the respective device names.
+
+## Configuration packages
+
+### Why configuration packages?
+
+All the configuration files above are stored in one place.
+This is how an example configuration package looks like:
+
+![Configuration folder structure](assets/images/configuration_files_folder_structure.png)
+
+### The configuration.meta.toml file
+
+One file that always has to be part of the configuration package is the `configuration.meta.toml` file.
+It tells the machine where all other configuration files are located, which is crucial to make the automatic loading and
+saving work.
+A very simple version of the `configuration.meta.toml` belonging to the screenshot above would look like this:
+
+```toml
+path_prefix = 'configs'
+
+[files]
+cluster_config = 'cluster_config.json'
+device_config = 'device_config.toml'
+node_config = 'node_config.toml'
+run_config = 'run_config.toml'
+spi_config = 'spi_config.toml'
+user_samplespace = 'user_samplespace.py'
+
+[misc]
+miscellaneous_files = "misc"
+```
+
+The main sections in that `.toml` file are:
+
+- `path_prefix`: This refers to the folder name into which you would put the other configuration files.
+  If you leaved it empty, this would mean that all configuration files would be inside the same folder with
+  the `configuration.meta.toml` file.
+- The `files` section: Here, you put the paths to the configuration files.
+  It can be one or more of the six above.
+  For example, you could also just define `cluster_config` and `device_config` and it would be still a valid
+  configuration package.
+  However, maybe during runtime, it would break the code.
+  E.g. if you run without a cluster configuration, it could work fine if you are running a dummy measurement without
+  real hardware, but if you want to measure on real hardware, you would need the cluster configuration.
+  More about the configuration files is described in the sections below for each of the files individually.
+- The `misc` section: You can add as many folder as you want to that section.
+  Here, we are adding one more folder to the configuration package with additional files.
+  This section is meant to add files like mixer corrections or a wiring diagram, which do not follow a well-defined
+  standard, but might be useful information to be transferred with the configuration package.
+
+Since the `configuration.meta.toml` file always should reflect how the configuration package looks like, please update
+it as soon as you add or delete any configuration files from your package.
+
+Now, in the folder, there are these six configuration files:
+
+- Cluster configuration
+- Device configuration
+- Node configuration
+- Run configuration
+- SPI configuration (optional, only required for two-qubit calibration)
+- Custom user samplespace configuration (optional, only required if you are sweeping on a very specific range of
+  parameters)
+
+In the following, there are some more detailed descriptions of what these files mean and contain.
+More information can also be found in the templates and example configuration files.
 
 ## Environment variables
 Computer systems generally use `CAPITALIZED_GLOBAL_KEYS` on a system level e.g. to store global variables.
@@ -16,22 +94,6 @@ Copy the template and update values according to the instructions. The template 
 cp .example.env .env
 ```
 Values that can be set in the environment are e.g. `PLOTTING` and this variable determines whether plots should be shown.
-
-
-## Configuration package
-All other configuration files go into the folder that you have specified in the environmental variable `CONFIG_DIR`.
-A template for a full configuration package can be found in `data/_template/_device_name`.
-Some more pre-built configuration package can be found in `data/devices` under the respective device names.
-
-A configuration package consists of the following five files:
-
-- Cluster configuration
-- SPI configuration (optional, only required for two-qubit calibration)
-- Device configuration
-- Calibration configuration
-- Custom user samplespace configuration (optional, only required if you are sweeping on a very specific range of parameters)
-
-All example configuration files should come with comments about usage and reasonable initial values.
 
 ### Cluster configuration (.json):
 A QBLOX cluster consists of a couple of modules of which each can have multiple input/output options for SMI cables.
@@ -70,6 +132,17 @@ FIXME: This is to be changed after with the integration of the automatic mixer c
 The cluster configuration relies on some values that come from a mixer calibration.
 Given a `.csv` file after a mixer calibration the function `utils/hw_generator.py` can create instantly the corresponding `JSON` file.
 
+#### Migrating old hardware configurations to match quantify-scheduler>=0.18.0
+
+With quantify-scheduler 0.18.0 there has been introduced a new way on how to structure the hardware configuration file.
+If you are having a hardware configuration file, that is structured using the old way, you can use the following script
+to migrate it to the new structure.
+
+```
+python tergite_autocalibration/scripts/migrate_blox_hardware_configuration.py <PATH_TO_HW_CONFIG>
+```
+
+
 ### SPI configuration (.toml | optional):
 When working with two-qubit gates, there has to be a current source for the coupler and in the QBLOX stack this is coming from the so called SPI rack.
 The SPI configuration is mapping the qubits to their respective modules in the SPI rack and can be further used to assign the couplers to groups.
@@ -100,6 +173,21 @@ or for all qubits:
 attenuation = 12
 ```
 
+- TODO: This has to be a bit more explained in detail, also, the part below was init values previously.
+
+This is followed by the `[initials]` section where you can set the initial values for certain calibration nodes.
+Here, similarly to the device configuration, you can either address a single qubit or all qubits, by using either the
+qubit identifier e.g. `[q06]` or the `[all]` keyword.
+
+Example: Setting initial values.
+
+```
+[initials.qubits.all]
+measure.acq_delay = 220e-9
+[initials.qubits]
+q06.measure.pulse_amp = 0.03
+```
+
 In the `[layout]` section the positions of the qubits can be set.
 This is useful if one would like to e.g. plot the device.
 Qubits have an x (column) and a y (row) position:
@@ -108,36 +196,16 @@ Qubits have an x (column) and a y (row) position:
 position = { column = 0, row = 0 }
 ```
 
-### Migrating old hardware configurations to match quantify-scheduler>=0.18.0
-With quantify-scheduler 0.18.0 there is been introduced a new way on how to structure the hardware configuration file.
-If you are having a hardware configuration file, that is structured using the old way, you can use the following script to migrate it to the new structure.
-```
-python tergite_autocalibration/scripts/migrate_blox_hardware_configuration.py <PATH_TO_HW_CONFIG>
-```
-
-## Device Configuration file (toml):
-
 ### Run configuration (.toml):
 In this file there are some settings such as the target node, the qubits and the couplers to calibrate.
 
 Example: Calibrate qubits `q01` and `q02` with coupler `q01_q02` up until the node `cz_calibration`.
 ```
-[general]
 target_node = "cz_calibration"
 qubits = ["q01", "q02"]
 couplers = ["q01_q02"]
 ```
 
-This is followed by the `[initials]` section where you can set the initial values for certain calibration nodes.
-Here, similarly to the device configuration, you can either address a single qubit or all qubits, by using either the qubit identifier e.g. `[q06]` or the `[all]` keyword.
-
-Example: Setting initial values.
-```
-[initials.qubits.all]
-measure.acq_delay = 220e-9
-[initials.qubits]
-q06.measure.pulse_amp = 0.03
-```
 
 ### Node configuration (.toml):
 Below, you can define node-specific parameters setting `[node_name.scope.property]` where scope are the qubits/couplers and the the property is a property known to the node.
