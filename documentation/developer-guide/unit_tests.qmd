@@ -8,7 +8,8 @@ Please organise the file using these sub-folders:
 
 - data: place here any data file that is needed to create test cases, while it is possible to mock the data. Feel free to add a text file explaing how the data was produced. Mocking data is also possible but it may be not practical for complex datasets.
 - results: create this folder to store your results, i.e. files that would be created by your analysis such as the plots. It should be empty, do not commit your results. To assure this is the case, add a file name .gitinore in the folder with this code:
-```python
+
+```gitignore
 # Ignore everything in this directory
 *
 

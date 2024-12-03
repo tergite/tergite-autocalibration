@@ -163,3 +163,132 @@ just copy and pasting console commands.
 
 - Whenever your guide is finished, share it with others and discuss. It is probably not perfect (yet) and other people
   might have valuable feedback from their own experiences with the problem you are describing.
+
+## Writing documentation for the automatic calibration
+
+In this section, we will go through the specific processes that are important when writing documentation:
+
+1. Installing quarto
+2. Structure of the files
+3. Adding a navigation entry
+4. Advanced features of quarto
+
+### Installation of quarto
+
+In the tergite-autocalibration repository we are using [Quarto](https://quarto.org/) to render documentation.
+Quarto is very versatile and can - among other document types - render markdown and Jupyter notebooks.
+If you have been following the steps in the [developer guide introduction](../developer_guide.qmd), you should have
+quarto already installed.
+Otherwise, you can do it by running:
+
+```bash
+pip install quarto
+```
+
+To render a simple preview of your documentation, please open a terminal inside the `documentation` folder and run:
+
+```bash
+cd documentation
+quarto preview
+```
+
+This will open a browser window with the rendered quarto documentation pages.
+
+### Structure of the documentation
+
+Maybe you noticed that on the top-level of the repository there are two folders, one called `docs` and another one
+called `documentation`.
+This is because they have two different purposes:
+
+- `documentation`: Contains the markdown files and Jupyter notebooks to create the documentation from.
+  These are the files that you edit.
+- `docs`: Is the output HTML after running `quarto render`, which is displayed on the website.
+  You do not edit these files.
+  They will always be generated from the files in the `documentation` folder.
+
+Now, let us have a look at the `documentation` folder, because this is the one we are working with the most.
+It is structured:
+
+- `.assets`: There you put images and style/formatting material.
+- `.quarto`: Do not touch this folder and do not commit it to git, because it contains temporary files during the
+  rendering process.
+- `developer-guide`, `nodes` and `user-guide`: Contains the respective content for the pages.
+- Then there are a couple of pages from the top-level of the documentation.
+- And a file called `_quarto.yml`. This file is important, because it defines how things are rendered.
+
+### Adding a navigation entry in the `_quarto.yml` file
+
+In here, the most relevant to be touched during adding documentation is the sidebar section.
+Imagine you are adding a new page e.g. about a calibration node, and you want to add it to the navigation.
+Then, you would add an entry at the correct position in the `_quarto.yml` file for the sidebar.
+
+```yaml
+  sidebar:
+    style: "docked"
+    search: true
+    contents:
+      - section: "Node Library"
+        contents:
+          - text: "Overview"
+            href: available_nodes.qmd
+          - text: "Resonator spectroscopy"
+            href: nodes/resonator_spectroscopy_node.qmd
+          - text: "My new node"
+            href: nodes/my_new_node.qmd
+```
+
+It is pretty self-explaining where to put the node when you see the rendered version in your browser.
+
+### Useful features of quarto
+
+As you noticed, quarto does not render from normal `.md` markdown files, but from `.qmd` quarto markdown files.
+These are extending the markdown functionality with some special features.
+Here, we will show them along with some normal useful feature from markdown.
+
+**Code highlighting**
+
+Imagine you want to have a block to show code.
+What you write inside your markdown file would be:
+
+````markdown
+```python
+variable = 123
+print("Hello world")
+```
+````
+
+And the output would look like:
+
+```python
+variable = 123
+print("Hello world")
+```
+
+**Graphs**
+
+For the calibration nodes, we are using a graph to chain them.
+This graph is rendered with [mermaid](https://quarto.org/docs/authoring/diagrams.html).
+
+````markdown
+```{mermaid}
+graph TD
+    A[Resonator Spectroscopy] --> B(Qubit Spectroscopy)
+    B --> C[Rabi Oscillations]
+        
+    click A href "nodes/resonator_spectroscopy_node.html"
+
+    style A fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style B fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style C fill:#ffe6cc,stroke:#333,stroke-width:2px
+```
+````
+
+With the `style` attribute, you can define the colour of the node.
+With the `click` attribute, add a link on a node inside the graph.
+
+## Next steps:
+
+When you reached the point that you are already writing the perfect documentation, you are probably also done reading
+the documentation.
+So, no next steps to read up upon.
+You can now write even more documentation or just code and explore quantum physics :)

@@ -11,9 +11,9 @@ graph TD
     F --> F1(Qubit 12 Spectroscopy) --> G(Rabi 12 Oscillations)
     F --> H1(2 States Discrimination)
     G --> H2(3 States Discrimination)
-    
+        
     click A href "nodes/resonator_spectroscopy_node.html"
-    
+
     style A fill:#ffe6cc,stroke:#333,stroke-width:2px
     style B fill:#ffe6cc,stroke:#333,stroke-width:2px
     style C fill:#ffe6cc,stroke:#333,stroke-width:2px
