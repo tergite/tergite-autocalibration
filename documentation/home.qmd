@@ -21,7 +21,8 @@ you can use to find the qubit properties you are looking to calibrate.
 
 ### [Developer Guide](developer_guide.qmd)
 
-This repository is an actively developed open-source project and also part of a full-stack to operate a quantum
+This repository is an actively developed open-source project and also part of the [Tergite](https://tergite.github.io)
+full-stack software ecosystem to operate a quantum
 computer.
 Hence, you are more than welcome to contribute to the project with your own ideas that fit into the framework.
 To familiarize yourself with the existing classes and the architecture of the automatic calibration, please take a look

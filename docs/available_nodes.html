@@ -71,6 +71,9 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+    <script src="site_libs/quarto-diagram/mermaid.min.js"></script>
+    <script src="site_libs/quarto-diagram/mermaid-init.js"></script>
+    <link href="site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
 
 </head>
@@ -251,6 +254,13 @@ ul.task-list li input[type="checkbox"] {
                                     <span class="menu-text">Unit tests</span></a>
                             </div>
                         </li>
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="./developer-guide/writing_documentation.html"
+                                   class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Writing documentation</span></a>
+                            </div>
+                        </li>
                     </ul>
                 </li>
             </ul>
@@ -282,6 +292,45 @@ ul.task-list li input[type="checkbox"] {
 
 <section id="available-nodes" class="level1">
 <h1>Available Nodes</h1>
+    <div class="cell" data-layout-align="default">
+        <div class="cell-output-display">
+            <div>
+                <p></p>
+                <figure class="figure"><p></p>
+                    <div>
+<pre class="mermaid mermaid-js">graph TD
+    A[Resonator Spectroscopy] --&gt; B(Qubit Spectroscopy)
+    B --&gt; C[Rabi Oscillations]
+    C --&gt; D[Ramsey Correction]
+    D --&gt; E[Motzoi Parameter]
+    E --&gt; F[Resonator Spectroscopy 1]
+    F --&gt; C1[T1] --&gt; C2[T2] --&gt; C3[Randomized Benchmarking]
+    F --&gt; F1(Qubit 12 Spectroscopy) --&gt; G(Rabi 12 Oscillations)
+    F --&gt; H1(2 States Discrimination)
+    G --&gt; H2(3 States Discrimination)
+    
+    click A href "nodes/resonator_spectroscopy_node.html"
+    
+    style A fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style B fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style C fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style D fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style E fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style F fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style C1 fill:#ffffcc,stroke:#333,stroke-width:2px
+    style C2 fill:#ffffcc,stroke:#333,stroke-width:2px
+    style C3 fill:#ffffcc,stroke:#333,stroke-width:2px
+    style F1 fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style G fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style H1 fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style H2 fill:#ffe6cc,stroke:#333,stroke-width:2px
+</pre>
+                    </div>
+                    <p></p></figure>
+                <p></p>
+            </div>
+        </div>
+    </div>
 <section id="readout-nodes" class="level2">
 <h2 class="anchored" data-anchor-id="readout-nodes">Readout Nodes</h2>
 <ul>

@@ -1,0 +1,165 @@
+# Writing documentation
+
+Writing good documentation is very important for new people to understand how to use things. Often, we do not have time
+to write good
+guides, because we are having deadlines or other things to do that are more interesting and less boring than writing
+down what we already seem to know so well.
+
+This guide is a small guide on how to write a good guide. It does not aim to provide an explanation on how to write the
+perfect
+documentation, because these resources already exist on the internet. However, it should make at least curious on how to
+write documentation with some short general rules:
+
+1. Think like the reader
+2. Go step by step
+3. Be precise
+4. Follow standards
+5. Discuss
+
+In the second part of the tutorial, we will focus on how to write documentation especially for this project.
+
+So, scroll down if you want to start reading there.
+
+## Example on writing documentation in general
+
+When you explain how things work, it is often better to take it step by step. Also, do not hesitate to make small steps.
+Tiny ones.
+
+Keep in mind to think like the reader:
+
+- What is the previous knowledge about a topic
+  - Most of the people reading our docs are probably students, so maybe they are not familiar with all git commands
+    and Linux tricks.
+- Provide a structure/agenda for your guide
+
+Let us say you want to write a guide about the installation of Miniconda, which contains a lot of steps and the
+installation process looks like this example.
+
+### Example 1: Not so good
+
+```bash
+cd ~
+mkdir tmp
+cd tmp
+wget SomeInstallationFileForMiniconda
+
+chmod u+x SomeInstallationFileForMiniconda
+./SomeInstallationFileForMiniconda
+
+conda init bash
+export PATH=/home/<YOUR\_USERNAME>/miniconda3/bin:$PATH
+
+conda create -n new-environment python=3.9
+conda activate new-environment
+
+cd ~
+mkdir repos
+cd repos
+git clone git@my-repo-url
+cd my-repo
+pip install -e .
+```
+
+How can this guide for an installation look better? Well, while writing think of yourself explaining the same
+installation procedure to a colleague. You would probably tell some of the commands, but in between you would also
+briefly discuss what they are doing. Maybe you are experiencing an error at some point. Maybe you want to give some more
+background knowledge in case the reader does not have it. In the case of our team it very important to give these kind
+of hints, because we are working in an interdisciplinary environment and followed different educational paths.
+
+Now, let’s see how the installation could look like. Let us assume we already wrote an introduction, the prerequisites
+are clear, and we are just explaining the installation itself.
+
+### Example 2: Better
+
+Now this is the better version, because it breaks down the process into:
+
+1. Downloading the installation file
+2. Installing conda
+3. Troubleshooting some common problems that can happen during the installation
+4. Showing what would be the next step after the installation
+
+```bash
+cd ~
+mkdir tmp
+cd tmp
+wget SomeInstallationFileForMiniconda
+```
+
+First, we are navigating to our home directory and create a temporary directory where we store the Miniconda
+installation file. With the `wget` command, we download the file. Note that there are different versions of the
+installer, depending on which operating system you use. A full list of installers can be found on
+the [Miniconda webpage](https://docs.conda.io/projects/miniconda/en/latest/)
+. The reason why we are using Miniconda and not Anaconda is because it takes less disk space. As soon as we have
+downloaded the installer file, we can continue with the installation.
+
+```bash
+chmod u+x SomeInstallationFileForMiniconda
+./SomeInstallationFileForMiniconda
+```
+
+We have to make the installer executable and run it. During the installation process itself, just follow the standard
+recommendations and paths that the installer selects during the installation. After the installation it can be possible
+that you have to do some tiny adjustments. With
+
+```bash
+conda init bash
+```
+
+you can modify your shell to show the conda path. And with
+
+```bash
+export PATH=/home/<YOUR\_USERNAME>/miniconda3/bin:$PATH
+```
+
+you are adding conda to the PATH variable. That should be done automatically during the installation, but sometimes it
+does not work properly. You can verify the installation by typing:
+
+```bash
+conda --version
+```
+
+After the installation is complete, we can create our conda environment.
+
+```bash
+conda create -n new-environment python=3.9
+conda activate new-environment
+```
+
+Note that we are using Python 3.9 in our environment. This is because we are having some dependencies with another
+library, which will be explained in more detail in the remarks section. If you are running the installation on macOS,
+please find additional resources in the respective guide how to use conda environments on macOS. We can now start to
+clone our repository and install the dependencies for the project.
+
+```bash
+cd ~
+cd repos
+git clone git@my-repo-url
+```
+
+If you have not done yet, you can create the repos directory using `mkdir repos`. Please read this other guide that
+explains how to use Git. After you cloned the repository, we can navigate in there and install our dependencies.
+
+```bash
+cd my-repo
+pip install -e .
+```
+
+This can take up to three minutes. If you are running into any problems during the installation please contact one of
+the other team members and verify whether it works for them or try to find a fix if you know how to approach it. If you
+have fixed errors that happened during the installation, please put a note into this installation guide, so, other
+people with the same issue have an easier time to solve it.
+
+What is now better in this second example are the explanations for every step. For your brain it is way easier to come
+back to one of these steps, and you learn way more about what you are doing when there are small explanations than when
+just copy and pasting console commands.
+
+- Try to group commands or tiny steps that belong together, otherwise it looks a bit scattered. But also do not have to
+  many loose blocks flying around.
+
+- Do not write too much, but take some time to explain some of the backgrounds even if you think it is clear.
+  If there is a lot of background, you can also link to some page in the internet which already has done the work and
+  provides a tutorial.
+  Finally, make sure that you are writing in a consistent style and provide enough examples.
+
+- Whenever your guide is finished, share it with others and discuss. It is probably not perfect (yet) and other people
+  might have valuable feedback from their own experiences with the problem you are describing.

@@ -47,6 +47,8 @@ website:
             href: developer-guide/new_node_creation.qmd
           - text: "Unit tests"
             href: developer-guide/unit_tests.qmd
+          - text: "Writing documentation"
+            href: developer-guide/writing_documentation.qmd
   search:
     location: sidebar
     type: textbox
@@ -57,5 +59,8 @@ format:
       light: cosmo
       dark: darkly
     toggle: true
-    # css: styles.css - This is in case we were interested in having some custom modifications
+    # css: ./assets/styles/styles.css - This is in case we wanted to add custom styles.
+    # Note: Usually, it is safer to not use custom styles if not absolutely necessary.
+    #       It is easier for maintenance to stay with default configuration values.
     toc: true
+    copy-code: true

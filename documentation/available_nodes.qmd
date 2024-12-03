@@ -1,5 +1,34 @@
 # Available Nodes
 
+```{mermaid}
+graph TD
+    A[Resonator Spectroscopy] --> B(Qubit Spectroscopy)
+    B --> C[Rabi Oscillations]
+    C --> D[Ramsey Correction]
+    D --> E[Motzoi Parameter]
+    E --> F[Resonator Spectroscopy 1]
+    F --> C1[T1] --> C2[T2] --> C3[Randomized Benchmarking]
+    F --> F1(Qubit 12 Spectroscopy) --> G(Rabi 12 Oscillations)
+    F --> H1(2 States Discrimination)
+    G --> H2(3 States Discrimination)
+    
+    click A href "nodes/resonator_spectroscopy_node.html"
+    
+    style A fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style B fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style C fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style D fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style E fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style F fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style C1 fill:#ffffcc,stroke:#333,stroke-width:2px
+    style C2 fill:#ffffcc,stroke:#333,stroke-width:2px
+    style C3 fill:#ffffcc,stroke:#333,stroke-width:2px
+    style F1 fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style G fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style H1 fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style H2 fill:#ffe6cc,stroke:#333,stroke-width:2px
+```
+
 ## Readout Nodes
 -  punchout
 - [resonator_spectroscopy](nodes/resonator_spectroscopy_node.qmd)
