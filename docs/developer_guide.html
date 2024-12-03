@@ -134,12 +134,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <span class="menu-text">User Guide</span></a>
   </li>  
   <li class="nav-item">
-      <a class="nav-link" href="./developer-guide.qmd">
-      <span class="menu-text">Developer Guide</span></a>
+      <a class="nav-link" href="./available_nodes.html">
+          <span class="menu-text">Node Library</span></a>
   </li>  
   <li class="nav-item">
-      <a class="nav-link" href="./architecture-guide.qmd">
-          <span class="menu-text">Architecture Guide</span></a>
+      <a class="nav-link" href="./developer_guide.html">
+          <span class="menu-text">Developer Guide</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -225,7 +225,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
                     <div class="sidebar-item-container">
                         <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse"
                            data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
-                            <span class="menu-text">Developer Guide</span></a>
+                            <span class="menu-text">Node Library</span></a>
                         <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse"
                            data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true"
                            aria-label="Toggle section">
@@ -235,8 +235,41 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
                     <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
+                                <a href="./available_nodes.html" class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Overview</span></a>
+                            </div>
+                        </li>
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="./nodes/resonator_spectroscopy_node.html"
+                                   class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Resonator spectroscopy</span></a>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+                <li class="sidebar-item sidebar-item-section">
+                    <div class="sidebar-item-container">
+                        <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse"
+                           data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+                            <span class="menu-text">Developer Guide</span></a>
+                        <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse"
+                           data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true"
+                           aria-label="Toggle section">
+                            <i class="bi bi-chevron-right ms-2"></i>
+                        </a>
+                    </div>
+                    <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
                                 <a href="./developer_guide.html" class="sidebar-item-text sidebar-link active">
                                     <span class="menu-text">Introduction</span></a>
+                            </div>
+                        </li>
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="./developer-guide/node_classes.html" class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Node Classes</span></a>
                             </div>
                         </li>
                         <li class="sidebar-item">
@@ -380,7 +413,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       toggleBodyColorMode(bsSheetEl);
     }
   }
-  toggleBodyColorPrimary();
+    toggleBodyColorPrimary();
     const disableStylesheet = (stylesheets) => {
         for (let i = 0; i < stylesheets.length; i++) {
             const stylesheet = stylesheets[i];

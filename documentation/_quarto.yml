@@ -15,7 +15,7 @@ website:
       - text: "Node Library"
         href: available_nodes.qmd
       - text: "Developer Guide"
-        href: developer-guide.qmd
+        href: developer_guide.qmd
     tools:
       - icon: github
         href: https://github.com/tergite/tergite-autocalibration

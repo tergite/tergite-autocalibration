@@ -1,9 +1,8 @@
 # Getting started
 
-## Installation
-This project contains an orchistration manager, a collection of callibration schedules and a collection of post-processing & analysis routines.
-It is tailored for the tune-up of the 25 qubits QPU at Chalmers, QTL.
 This repository utilizes **`redis`** for on memory data storage.
+
+## Prerequisites
 As redis operates only on Linux systems, this repo can only work
 
 * either on Linux distributions
@@ -12,9 +11,11 @@ As redis operates only on Linux systems, this repo can only work
 
 To install WSL, it is required **Windows 10** of version at least **1903**.
 
-## Repository installation: ##
-#### After setting up your ssh key, clone the repo:  ####
-```git clone git@github.com:chalmersnextlabs-quantum/tergite-autocalibration.git```
+## Installation
+
+```shell
+git clone git@github.com:chalmersnextlabs-quantum/tergite-autocalibration.git
+```
 
 #### Install Redis: ####
 ```https://redis.io/docs/getting-started/installation/install-redis-on-linux/```
