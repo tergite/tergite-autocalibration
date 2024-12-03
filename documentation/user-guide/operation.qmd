@@ -1,4 +1,4 @@
-## Operation
+# Operation
 
 The package ships with a command line interface to solve some common tasks that appear quite often.
 

@@ -54,7 +54,7 @@ Nodes are divided in two distict categories:
 
 - `parameterized_sweep`: where the node requires multiple iterations and each iteration requires a new recompilation.
 
-Furthermore each node can expect two types of samplespaces:
+Furthermore, each node can expect two types of samplespaces:
 
 - `schedule_samplespace`: parameter values to be input to the schedule function
 
@@ -62,7 +62,7 @@ Furthermore each node can expect two types of samplespaces:
 
 ### Folder structure
 
-Please create a new node in a separate folder, so that is is clearer what the new node is meant to do
+Please create a new node in a separate folder, so that it is clearer what the new node is meant to do.
 Add an empty __init__.py file to the folder, this is needed to mark the folder as part of the packege and allow imports from these folders
 
 To keep the code clean, please create sub-folders following this scheme:
@@ -76,5 +76,4 @@ Please add your node to the list of available nodes in this Documentation.
 
 Add ny relevant information on how to use your node, dependencies and reference to publication as needed for allowing other to use the code you developed.
 
-
-[Details on the implementation on the Node types section](node_types.qmd).
+[Details on the implementation on the Node types section](node_classes.qmd).

@@ -1,4 +1,4 @@
-## Resonator Spectroscopy in Qubit-Resonator Interaction Analysis
+# Resonator Spectroscopy in Qubit-Resonator Interaction Analysis
 
 Resonator spectroscopy is a powerful tool for studying the interaction between qubits and resonators. By probing the resonator’s response across various frequencies, we can extract critical parameters, such as the **resonant frequency** and **Q-factor**, which are essential for optimizing qubit-resonator interactions.
 
