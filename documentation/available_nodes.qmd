@@ -1,4 +1,4 @@
-# Available Nodes
+# Node Library
 
 ```{mermaid}
 graph TD

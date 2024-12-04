@@ -305,7 +305,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a>
+      <li><a href="#developer-guide" id="toc-developer-guide" class="nav-link active"
+             data-scroll-target="#developer-guide">Developer Guide</a>
   <ul class="collapse">
   <li><a href="#additional-installations" id="toc-additional-installations" class="nav-link" data-scroll-target="#additional-installations">Additional installations</a></li>
   <li><a href="#naming-convention-and-style" id="toc-naming-convention-and-style" class="nav-link" data-scroll-target="#naming-convention-and-style">Naming convention and style</a></li>
@@ -315,6 +316,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#things-to-do-before-a-commit" id="toc-things-to-do-before-a-commit" class="nav-link" data-scroll-target="#things-to-do-before-a-commit">Things to do before a commit</a>
   <ul class="collapse">
+      <li><a href="#commit-message" id="toc-commit-message" class="nav-link" data-scroll-target="#commit-message">Commit
+          message</a></li>
   <li><a href="#copyright-statement" id="toc-copyright-statement" class="nav-link" data-scroll-target="#copyright-statement">Copyright statement</a></li>
   <li><a href="#changelog" id="toc-changelog" class="nav-link" data-scroll-target="#changelog">Changelog</a></li>
   <li><a href="#static-code-analyzer" id="toc-static-code-analyzer" class="nav-link" data-scroll-target="#static-code-analyzer">Static code analyzer</a></li>
@@ -329,10 +332,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <main class="content" id="quarto-document-content">
 
 
-
-
-<section id="introduction" class="level1">
-<h1>Introduction</h1>
+    <section id="developer-guide" class="level1">
+        <h1>Developer Guide</h1>
 <p>This and the following sections provide information on how to develop code in tergite-autocalibration.</p>
 <section id="additional-installations" class="level2">
 <h2 class="anchored" data-anchor-id="additional-installations">Additional installations</h2>
@@ -380,6 +381,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="things-to-do-before-a-commit">Things to do before a commit</h2>
     <p>Please read carefully below, what should be done before doing a commit to a merge request. Most of the points are
         going to be checked automatically in GitLab, so, you would receive an error when running the pipeline.</p>
+    <section id="commit-message" class="level3">
+        <h3 class="anchored" data-anchor-id="commit-message">Commit message</h3>
+        <p>When submitting contributions, please prepend your commit messages with:</p>
+        <ul>
+            <li><code>fix:</code> for bug fixes</li>
+            <li><code>feat:</code> for introducing and working on a new feature (e.g.&nbsp;a new measurement node or a
+                new analysis class)
+            </li>
+            <li><code>chore:</code> for refactoring changes or any change that doesn’t affect the functionality of the
+                code
+            </li>
+            <li><code>docs:</code> for changes in the README, docstrings etc</li>
+            <li><code>test:</code> or <code>dev:</code> for testing or development changes (e.g.&nbsp;profiling scripts)
+            </li>
+        </ul>
+    </section>
 <section id="copyright-statement" class="level3">
 <h3 class="anchored" data-anchor-id="copyright-statement">Copyright statement</h3>
     <p>When you create or modify a file, make sure that add the following copyright text is present at the top of the
@@ -400,7 +417,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="changelog" class="level3">
 <h3 class="anchored" data-anchor-id="changelog">Changelog</h3>
     <p>Update the changelog in the section called [Unreleased]. Please note that there are several sections titled
-        “Added”, “Change” and “Fixed”; place your text in the correct category.</p>
+        “Added”, ” Change” and “Fixed”; place your text in the correct category.</p>
 </section>
 <section id="static-code-analyzer" class="level3">
 <h3 class="anchored" data-anchor-id="static-code-analyzer">Static code analyzer</h3>
@@ -414,27 +431,62 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </div>
     <p>Please make sure to run it before committing to a merge request.</p>
 <p>If your pipeline is still showing an error when you are running black, please make sure that you have installed the right version of black. You can check that by running</p>
-<pre><code>black --version</code></pre>
+    <div class="sourceCode" id="cb5">
+        <pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1"
+                                                                                                      aria-hidden="true"
+                                                                                                      tabindex="-1"></a><span
+                class="ex">black</span> <span class="at">--version</span></span></code><button title="Copy to Clipboard"
+                                                                                               class="code-copy-button"><i
+                class="bi"></i></button></pre>
+    </div>
 <p>If your black version differs, it might be possible that you have had installed a version of black either in your base environment or via apt. To remove these versions, please deactivate your conda environment with <code>conda deactivate</code> and then run:</p>
-<pre><code>sudo apt remote black</code></pre>
+    <div class="sourceCode" id="cb6">
+        <pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1"
+                                                                                                      aria-hidden="true"
+                                                                                                      tabindex="-1"></a><span
+                class="fu">sudo</span> apt remote black</span></code><button title="Copy to Clipboard"
+                                                                             class="code-copy-button"><i class="bi"></i></button></pre>
+    </div>
 <p>or</p>
-<pre><code>pip uninstall black</code></pre>
+    <div class="sourceCode" id="cb7">
+        <pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1"
+                                                                                                      aria-hidden="true"
+                                                                                                      tabindex="-1"></a><span
+                class="ex">pip</span> uninstall black</span></code><button title="Copy to Clipboard"
+                                                                           class="code-copy-button"><i
+                class="bi"></i></button></pre>
+    </div>
 <p>Next, please activate again your Python environment and install the correct version black as defined in the <code>pyproject.toml</code> file.</p>
-<pre><code>pip install black==VERSION_FROM_PYPROJECT_TOML</code></pre>
+    <div class="sourceCode" id="cb8">
+        <pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1"
+                                                                                                      aria-hidden="true"
+                                                                                                      tabindex="-1"></a><span
+                class="ex">pip</span> install black==VERSION_FROM_PYPROJECT_TOML</span></code><button
+                title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre>
+    </div>
 </section>
 </section>
-    <section id="next-steps" class="level2">
-        <h2 class="anchored" data-anchor-id="next-steps">Next steps:</h2>
-        <p>As you noticed, most of the above advice contains the formatting and other formal steps during development.
-            Consider reading about: - <a href="./developer-guide/unit_tests.html">Unit testing</a> to find out more
-            about how to write test cases for the code. - <a href="./developer-guide/new_node_creation.html">Nodes</a>
-            on how to create a new calibration node. - <a href="./developer-guide/node_classes.html">Node Classes</a> to
-            learn about the different types of nodes that the framework supports.</p>
-        <p>If you are having any feedback about the documentation or want to work on documentation, please continue with
-            this developer guide about <a href="">how to contribute with documentation</a>.</p>
+        <section id="next-steps" class="level2">
+            <h2 class="anchored" data-anchor-id="next-steps">Next steps:</h2>
+            <p>As you noticed, most of the above advice contains the formatting and other formal steps during
+                development. Consider reading about:</p>
+            <ul>
+                <li><a href="./developer-guide/unit_tests.html">Unit testing</a> to find out more about how to write
+                    test cases for the code.
+                </li>
+                <li><a href="./developer-guide/new_node_creation.html">Nodes</a> on how to create a new calibration
+                    node.
+                </li>
+                <li><a href="./developer-guide/node_classes.html">Node Classes</a> to learn about the different types of
+                    nodes that the framework supports.
+                </li>
+            </ul>
+            <p>If you are having any feedback about the documentation or want to work on documentation, please continue
+                with this developer guide about <a href="./developer-guide/writing_documentation.html">how to contribute
+                    with documentation</a>.</p>
 
 
-    </section>
+        </section>
 </section>
 
 </main> <!-- /main -->

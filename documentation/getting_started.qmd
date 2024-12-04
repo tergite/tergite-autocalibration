@@ -35,13 +35,6 @@ If you are developing code, most likely, you have to replace it with the link to
 git clone git@github.com:tergite/tergite-autocalibration.git
 ```
 
-After you cloned the repository, there should be a new folder containing the code.
-Enter this directory.
-
-```bash
-cd tergite-autocalibration
-```
-
 To manage Python packages, we are using the package manager `conda`.
 It is recommended to create an environment for your project - alternatively, you can also just use Python 3.10
 
@@ -62,7 +55,11 @@ If you are not using conda, activate the environment with:
 source activate tac
 ```
 
-**From now on, it is assumed that all commands are executed from the project root directory.**
+Now, you should enter the repository folder, because the following commands have to be executed in there.
+
+```bash
+cd tergite-autocalibration
+```
 
 To install the repository in editable mode.
 In Python the editable mode is triggerd by the parameter `-e`.

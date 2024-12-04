@@ -95,11 +95,11 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-      <a class="nav-link" href="./home.html">
+      <a class="nav-link active" href="./home.html" aria-current="page">
           <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-      <a class="nav-link active" href="./getting_started.html" aria-current="page">
+      <a class="nav-link" href="./getting_started.html">
           <span class="menu-text">User Guide</span></a>
   </li>  
   <li class="nav-item">
@@ -158,6 +158,12 @@ ul.task-list li input[type="checkbox"] {
         </div>
         <div class="sidebar-menu-container">
             <ul class="list-unstyled mt-1">
+                <li class="sidebar-item">
+                    <div class="sidebar-item-container">
+                        <a href="./home.html" class="sidebar-item-text sidebar-link">
+                            <span class="menu-text">Home</span></a>
+                    </div>
+                </li>
                 <li class="sidebar-item sidebar-item-section">
                     <div class="sidebar-item-container">
                         <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse"
@@ -274,7 +280,8 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#available-nodes" id="toc-available-nodes" class="nav-link active" data-scroll-target="#available-nodes">Available Nodes</a>
+      <li><a href="#node-library" id="toc-node-library" class="nav-link active" data-scroll-target="#node-library">Node
+          Library</a>
   <ul class="collapse">
   <li><a href="#readout-nodes" id="toc-readout-nodes" class="nav-link" data-scroll-target="#readout-nodes">Readout Nodes</a></li>
   <li><a href="#qubit-control-nodes" id="toc-qubit-control-nodes" class="nav-link" data-scroll-target="#qubit-control-nodes">Qubit Control Nodes</a></li>
@@ -288,16 +295,14 @@ ul.task-list li input[type="checkbox"] {
 <main class="content" id="quarto-document-content">
 
 
-
-
-<section id="available-nodes" class="level1">
-<h1>Available Nodes</h1>
-    <div class="cell" data-layout-align="default">
-        <div class="cell-output-display">
-            <div>
-                <p></p>
-                <figure class="figure"><p></p>
-                    <div>
+    <section id="node-library" class="level1">
+        <h1>Node Library</h1>
+        <div class="cell" data-layout-align="default">
+            <div class="cell-output-display">
+                <div>
+                    <p></p>
+                    <figure class="figure"><p></p>
+                        <div>
 <pre class="mermaid mermaid-js">graph TD
     A[Resonator Spectroscopy] --&gt; B(Qubit Spectroscopy)
     B --&gt; C[Rabi Oscillations]
@@ -325,12 +330,12 @@ ul.task-list li input[type="checkbox"] {
     style H1 fill:#ffe6cc,stroke:#333,stroke-width:2px
     style H2 fill:#ffe6cc,stroke:#333,stroke-width:2px
 </pre>
-                    </div>
-                    <p></p></figure>
-                <p></p>
+                        </div>
+                        <p></p></figure>
+                    <p></p>
+                </div>
             </div>
         </div>
-    </div>
 <section id="readout-nodes" class="level2">
 <h2 class="anchored" data-anchor-id="readout-nodes">Readout Nodes</h2>
 <ul>

@@ -1,4 +1,4 @@
-# Introduction
+# Developer Guide
 
 This and the following sections provide information on how to develop code in tergite-autocalibration.
 
@@ -51,6 +51,16 @@ Please read carefully below, what should be done before doing a commit to a merg
 Most of the points are going to be checked automatically in GitLab, so, you would receive an error when running the
 pipeline.
 
+### Commit message
+
+When submitting contributions, please prepend your commit messages with:
+
+- `fix:` for bug fixes
+- `feat:` for introducing and working on a new feature (e.g. a new measurement node or a new analysis class)
+- `chore:` for refactoring changes or any change that doesn't affect the functionality of the code
+- `docs:` for changes in the README, docstrings etc
+- `test:` or `dev:` for testing or development changes (e.g. profiling scripts)
+
 ### Copyright statement
 
 When you create or modify a file, make sure that add the following copyright text is present at the top of the file.
@@ -91,7 +101,7 @@ If your pipeline is still showing an error when you are running black, please ma
 right version of black.
 You can check that by running
 
-```
+```bash
 black --version
 ```
 
@@ -99,20 +109,20 @@ If your black version differs, it might be possible that you have had installed 
 environment or via apt.
 To remove these versions, please deactivate your conda environment with `conda deactivate` and then run:
 
-```
+```bash
 sudo apt remote black
 ```
 
 or
 
-```
+```bash
 pip uninstall black
 ```
 
 Next, please activate again your Python environment and install the correct version black as defined in
 the `pyproject.toml` file.
 
-```
+```bash
 pip install black==VERSION_FROM_PYPROJECT_TOML
 ```
 

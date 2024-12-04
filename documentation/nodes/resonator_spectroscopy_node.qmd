@@ -24,7 +24,8 @@ The `ResonatorSpectroscopyQubitAnalysis` class is used for analyzing resonator s
 
 #### Method: `analyse_qubit`
 
-The `analyse_qubit` method processes and fits the data to determine the resonator’s **resonant frequency** and **loaded Q-factor**. The `analyse_qubit`fit should resamble a negative Gaussian distribution.
+The `analyse_qubit` method processes and fits the data to determine the resonator’s **resonant frequency** and **loaded
+Q-factor**. The `analyse_qubit`fit should resemble a negative Gaussian distribution.
 
 ### Output: `xarray.Dataset`
 

@@ -8,7 +8,7 @@ Centre for Quantum Technology ([WACQT](https://wacqt.se)) for research, developm
 
 ### [User Guide](getting_started.qmd)
 
-A section with a tutorial on how to get started with the automatic calibration.
+A tutorial on how to get started with the automatic calibration.
 This tutorial contains a guide on how to use the commandline interface with quick commands.
 Further, there is an introduction into configuration files.
 

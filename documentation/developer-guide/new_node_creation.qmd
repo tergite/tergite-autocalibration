@@ -13,7 +13,9 @@ The key should be a string of the node name and the value should be the object t
 
 ## Node implementation object
 
-Each node implementation object should contain a reference to the measurement object, the analysis object, the list of redis fields that the analysis updates and the samplespace of the measurement. For example on the Rabi Rabi Oscillations Node:
+Each node implementation object should contain a reference to the measurement object, the analysis object, the list of
+redis fields that the analysis updates and the samplespace of the measurement. For example on the Rabi Oscillations
+Node:
 
 ```python
 class Rabi_Oscillations_Node(BaseNode):
@@ -34,7 +36,7 @@ class Rabi_Oscillations_Node(BaseNode):
 ### Creating a `measurement_obj`
 
 The `measurement_obj` is imported from `tergite_autocalibration/lib/calibration_schedules/` and contains the class that generates the appropriate measurement schedule.
-To initialize we require a dicttionary of the extended transmons:
+To initialize we require a dictionary of the extended transmons:
 
 `transmons: dict[str, ExtendedTransmon]`
 
@@ -48,7 +50,7 @@ It must contain a `run_fitting` method and a `plotter` method
 
 ### Node types and samplespaces
 
-Nodes are divided in two distict categories:
+Nodes are divided in two distinct categories:
 
 - `simple_sweep`: where the Quantify Schedule is compiled only once
 

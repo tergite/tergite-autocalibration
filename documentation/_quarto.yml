@@ -23,6 +23,8 @@ website:
     style: "docked"
     search: true
     contents:
+      - text: "Home"
+        href: home.qmd
       - section: "User Guide"
         contents:
           - text: "Getting started"
