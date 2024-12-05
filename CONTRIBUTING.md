@@ -121,7 +121,7 @@ acli browser --datadir PATH_TO_DATA_DIRECTORY
 
 ### Documentation
 
-Documentation is rendered with [quarto](https://quarto.org/).
+Documentation is rendered with [Quarto](https://quarto.org/).
 If you had quarto installed in the previous step you can enter the `docs_editable` folder and edit the markdown files.
 
 ```bash
@@ -134,9 +134,9 @@ Render the documentation and show a preview in the browser
 quarto preview
 ```
 
-Now you can edit the files in `docs_ediable` and the contents in the browser window would update automatically.
-If you just want to see the documentation, please check it out in [`docs/index.html`](./docs/index.html).
-One of the documentation is also
+Now you can edit the files in `docs_editable` and the contents in the browser window would update automatically.
+If you just want to see the documentation, please open [`docs/index.html`](./docs/index.html) with your browser.
+One of the documentation pages is also
 about [how to write better documentation](./docs/developer-guide/writing_documentation.html).
 
 ### Installation of proprietary resources (optional, not recommended)
