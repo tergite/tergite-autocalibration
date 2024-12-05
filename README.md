@@ -72,13 +72,20 @@ acli --help
 
 ## Official documentation
 
-The documentation is mantained in using [Quarto](https://quarto.org/). The documentation for the public version of the code is available [here](https://tergite.github.io/tergite-autocalibration/getting_started.html). 
-To visualise the lates version of the documentation, install Quarto locally and build the website to browse the documentation. Make sure to have quarto in your PATH before you crate the conda environment to simplify its use in VSCode. You can install the Quarto extension 
+The documentation is maintained in using [Quarto](https://quarto.org/). The documentation for the public version of the
+code is available [here](https://tergite.github.io/tergite-autocalibration/getting_started.html).
 
+To see the documentation for the branch that you are currently working on, please go to the [`docs`](./docs) folder and
+open the [`index.html`](./docs/index.html) file.
+There is also a page in the documentation to help you
+with [writing better documentation](./docs/developer-guide/writing_documentation.html).
+
+If you are interested to edit the documentation, please check out the documentation section in
+the [contribution guidelines](CONTRIBUTING.md).
 
 ## Contribution Guidelines
 
-If you would like to contribute to tergite-webgui, please have a look at our
+If you would like to contribute to tergite-autocalibration, please have a look at our
 [contribution guidelines](./CONTRIBUTING.md)
 
 ## Authors
@@ -88,7 +95,7 @@ This project is a work of
 
 Special credit goes to the authors of this project as seen in the [CREDITS](./CREDITS.md) file.
 
-## ChangeLog
+## Change log
 
 To view the changelog for each version, have a look at
 the [CHANGELOG.md](./CHANGELOG.md) file.
@@ -101,7 +108,9 @@ the [CHANGELOG.md](./CHANGELOG.md) file.
 
 This project was sponsored by:
 
--   [Knut and Alice Wallenburg Foundation](https://kaw.wallenberg.org/en) under the [Wallenberg Center for Quantum Technology (WAQCT)](https://www.chalmers.se/en/centres/wacqt/) project at [Chalmers University of Technology](https://www.chalmers.se)
+- [Knut and Alice Wallenberg Foundation](https://kaw.wallenberg.org/en) under
+  the [Wallenberg Center for Quantum Technology (WACQT)](https://www.chalmers.se/en/centres/wacqt/) project
+  at [Chalmers University of Technology](https://www.chalmers.se)
 -   [Nordic e-Infrastructure Collaboration (NeIC)](https://neic.no) and [NordForsk](https://www.nordforsk.org/sv) under the [NordIQuEst](https://neic.no/nordiquest/) project
 -   [European Union's Horizon Europe](https://research-and-innovation.ec.europa.eu/funding/funding-opportunities/funding-programmes-and-open-calls/horizon-europe_en) under the [OpenSuperQ](https://cordis.europa.eu/project/id/820363) project
 -   [European Union's Horizon Europe](https://research-and-innovation.ec.europa.eu/funding/funding-opportunities/funding-programmes-and-open-calls/horizon-europe_en) under the [OpenSuperQPlus](https://opensuperqplus.eu/) project
