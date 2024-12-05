@@ -1,18 +1,22 @@
 # Node types
-The execution of most of the nodes consists of a single schedule compilation, a single measurement and a single post-processing.
-Although for most of the nodes this workflow suffices, there are exceptions while this workflow can become limiting in more advanced implementations.
+
+The execution of most of the nodes consists of a single schedule compilation, a single measurement and a single
+post-processing.
+Although for most of the nodes this workflow suffices, there are exceptions while this workflow can become limiting in
+more advanced implementations.
 
 To allow greater flexibility in the node implementations the nodes are categorized:
 
 - According to whether they compile once or multiple times:
-  - `node.type = simple_sweep`: if it compiles once
-  - `node.type = parameterized_sweep`: if it compiles multiple times
+    - `node.type = simple_sweep`: if it compiles once
+    - `node.type = parameterized_sweep`: if it compiles multiple times
 
 - According to whether the sweeping parameters are swept within the schedule or not:
-  - There is only `node.schedule_samplespace` if the sweeping takes place within the schedule
-  - There are both `node.schedule_samplespace`  and `node.external_samplespace` if there are sweeping parameters outside
-    the schedule. For example
-  the `coupler_spectroscopy` node sweeps the `dc_current` outside of the schedule:
+    - There is only `node.schedule_samplespace` if the sweeping takes place within the schedule
+    - There are both `node.schedule_samplespace`  and `node.external_samplespace` if there are sweeping parameters
+      outside
+      the schedule. For example
+      the `coupler_spectroscopy` node sweeps the `dc_current` outside of the schedule:
 
 ```python
   class Coupler_Spectroscopy_Node(BaseNode):
@@ -59,4 +63,5 @@ The `tergite_acl/scripts/node_supervisor.py` is responsible to distinguish betwe
 
 - `coupler_spectroscopy` sweeps the `dc_current` which is set by the SPI rack not the cluster
 - `T1` sweeps a repetition index to repeat the measurement many times
-- `randomized_benchmarking` sweeps different seeds. Although the seed is a schedule parameter, sweeping outside the schedule improves memory utilization.
+- `randomized_benchmarking` sweeps different seeds. Although the seed is a schedule parameter, sweeping outside the
+  schedule improves memory utilization.

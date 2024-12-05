@@ -37,6 +37,7 @@ If you are more a person that learns from the code rather than from a tutorial, 
 resonator spectroscopy and try to run and understand the test cases.
 
 ### Folder structure
+
 The test should be created in a sub-folder of the node called tests.
 
 Please organise the file using these sub-folders:
@@ -58,7 +59,8 @@ Please organise the file using these sub-folders:
 
 ### General information about testing nodes
 
-A good starting point, especially starting from scratch, it is to test for the class type, then that the inputs have the right formats and then move to some simple operation or trivial case.
+A good starting point, especially starting from scratch, it is to test for the class type, then that the inputs have the
+right formats and then move to some simple operation or trivial case.
 Build more complex cases from the simpler ones and exploits your tests to refactor the code as needed.
 Try to test as many reasonable cases as possible, both successfully and not.
 Remember to test for exceptions.
@@ -78,9 +80,10 @@ and tests from the lowest level and then compose those objects to handle the mor
 ### Example Tests
 
 **Test class type**
+
 ```python
 def test_canCreateCorrectType():
-    c = CZ_Parametrization_Fix_Duration_Node("cz_char_fixCurrent", couplers = ["q14_q15"])
+  c = CZ_Parametrization_Fix_Duration_Node("cz_char_fixCurrent", couplers=["q14_q15"])
     assert isinstance(c, CZ_Parametrization_Fix_Duration_Node)
     assert isinstance(c, ScheduleNode)
 ```
@@ -89,23 +92,32 @@ The suggested very first test is to instantiate the class and make sure it has t
 inheritance.
 
 **Test input parameters**
+
 ```python
 def test_CanGetQubitsFromCouplers():
-    c = CZ_Parametrization_Fix_Duration_Node("cz_char_fixCurrent", couplers = ["q14_q15"])
+  c = CZ_Parametrization_Fix_Duration_Node("cz_char_fixCurrent", couplers=["q14_q15"])
     assert c.all_qubits == ["q14", "q15"]
     assert c.couplers == ['q14_q15']
 ```
-Make sure all inputs and their manipulations are correctly initialised in the constructor, in this case the qubits are taken from the coupler pair
+
+Make sure all inputs and their manipulations are correctly initialised in the constructor, in this case the qubits are
+taken from the coupler pair
 
 **Test exception**
+
 ```python
 def test_ValidationReturnErrorWithSameQubitCoupler():
     with pytest.raises(ValueError):
-       CZ_Parametrization_Fix_Duration_Node("cz_char_fixCurrent", couplers = ["q14_q14"])
+      CZ_Parametrization_Fix_Duration_Node("cz_char_fixCurrent", couplers=["q14_q14"])
 ```
-Inputs can be incorrect and should always be tested to avoid unexpected behaviour down the line which can be difficult to trace back to the origin. There are infinite number of possible errors, so it is impossible to cover them all, but at least the obvious ones should be considered. In this case a typical typing error with the couple have the same qubit twice.
+
+Inputs can be incorrect and should always be tested to avoid unexpected behaviour down the line which can be difficult
+to trace back to the origin. There are infinite number of possible errors, so it is impossible to cover them all, but at
+least the obvious ones should be considered. In this case a typical typing error with the couple have the same qubit
+twice.
 
 **Test with data**
+
 ```python
 @pytest.fixture(autouse=True)
 def setup_good_data():
@@ -122,9 +134,12 @@ def setup_good_data():
     amps = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
     return d14, d15, freqs, amps
 ```
-This is an example of how to load data for testing the analysis of a node, please note that the specifics may change as we are about to change the dataset format at the time of writing this; however, the principle will be the same.
+
+This is an example of how to load data for testing the analysis of a node, please note that the specifics may change as
+we are about to change the dataset format at the time of writing this; however, the principle will be the same.
 
 This data can then be used in multiple tests, for example:
+
 ```python
 def test_canGetMaxFromQ1(setup_good_data):
     d14, d15, freqs, amps = setup_good_data
@@ -145,9 +160,11 @@ def test_canGetMinFromQ2(setup_good_data):
     assert indexBestFreq[0] == 10
     assert indexBestAmp[0] == 12
 ```
+
 These two tests make sure that the return values are correct for the two qubits that are connected by the coupler.
 
 **Test creating of images from plotter**
+
 ```python
 def test_canPlotBad(setup_bad_data):
     matplotlib.use("Agg")
@@ -192,9 +209,13 @@ def test_canPlotBad(setup_bad_data):
     with Image.open(figure_path) as img:
         assert img.format == "PNG", "File should be a PNG image"
 ```
-This is an example on how to save files in the "results" sub-folder within the "tests" folder. The code make sure the expected file exists and has the correct format. The created files can be inspected by the developer. A possible extension would be to upload the images in the data folder and check the those produced by the test are identical.
+
+This is an example on how to save files in the "results" sub-folder within the "tests" folder. The code make sure the
+expected file exists and has the correct format. The created files can be inspected by the developer. A possible
+extension would be to upload the images in the data folder and check the those produced by the test are identical.
 
 **Complex dataset for comparing results**
+
 ```python
 @pytest.fixture(autouse=True)
 def setup_bad_data():
@@ -225,10 +246,14 @@ def test_combineBadResultsReturnNoValidPoint(setup_bad_data):
     r = c.are_two_qubits_compatible()
     assert r == False
 ```
-In this example, the data produced is loaded from a file that has data that is not a good working point. Note that there two analyses are run in the setup; the combination is run in the test, so that, if needed in other tests, the data could be modified for specific cases.
+
+In this example, the data produced is loaded from a file that has data that is not a good working point. Note that there
+two analyses are run in the setup; the combination is run in the test, so that, if needed in other tests, the data could
+be modified for specific cases.
 This is a failure test, making sure that bad inputs are not recognised as good working points.
 
 **Even more complex setup**
+
 ```python
 def setup_data():
     # It should be a single dataset, but we do not have one yet, so we loop over existing files
@@ -269,7 +294,7 @@ def setup_data():
     c2 = CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis(q14Res, q15Res)
 
     dataset_path = (
-        Path(__file__).parent / "data" / "dataset_good_quality_freq_amp_2.hdf5"
+            Path(__file__).parent / "data" / "dataset_good_quality_freq_amp_2.hdf5"
     )
     print(dataset_path)
     ds = xr.open_dataset(dataset_path)
@@ -290,4 +315,5 @@ def setup_data():
     return list_of_results, freqs, amps, freqs_2, amps_2
 ```
 
-In this case, three points are loaded and the analysis is run on each of them. The results are returned for each point and can be used in different tests, for example by removing elements in the list_results array. 
+In this case, three points are loaded and the analysis is run on each of them. The results are returned for each point
+and can be used in different tests, for example by removing elements in the list_results array. 

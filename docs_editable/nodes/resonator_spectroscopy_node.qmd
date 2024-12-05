@@ -1,10 +1,13 @@
 # Resonator Spectroscopy in Qubit-Resonator Interaction Analysis
 
-Resonator spectroscopy is a powerful tool for studying the interaction between qubits and resonators. By probing the resonator’s response across various frequencies, we can extract critical parameters, such as the **resonant frequency** and **Q-factor**, which are essential for optimizing qubit-resonator interactions.
+Resonator spectroscopy is a powerful tool for studying the interaction between qubits and resonators. By probing the
+resonator’s response across various frequencies, we can extract critical parameters, such as the **resonant frequency**
+and **Q-factor**, which are essential for optimizing qubit-resonator interactions.
 
 ### Class: `Resonator_Spectroscopy`
 
-The `Resonator_Spectroscopy` class is designed to conduct resonator spectroscopy for transmon qubits. It takes as input a dictionary of transmon qubits and their respective states.
+The `Resonator_Spectroscopy` class is designed to conduct resonator spectroscopy for transmon qubits. It takes as input
+a dictionary of transmon qubits and their respective states.
 
 #### Method: `schedule`
 
@@ -17,7 +20,8 @@ The `schedule` method generates a schedule to perform resonator spectroscopy. Th
 
 ### Class: `ResonatorSpectroscopyQubitAnalysis`
 
-The `ResonatorSpectroscopyQubitAnalysis` class is used for analyzing resonator spectroscopy data, enabling the extraction of the resonant frequency and Q-factor. This class takes as parameters:
+The `ResonatorSpectroscopyQubitAnalysis` class is used for analyzing resonator spectroscopy data, enabling the
+extraction of the resonant frequency and Q-factor. This class takes as parameters:
 
 - `qubit_name`: A string representing the qubit under measurement.
 - `redis_fields`: The directory for data storage.
@@ -30,7 +34,9 @@ Q-factor**. The `analyse_qubit`fit should resemble a negative Gaussian distribut
 ### Output: `xarray.Dataset`
 
 The dataset returned by this analysis is an `xarray.Dataset`, which includes:
+
 - **Frequency Sweep Data**: The set of frequencies used during the sweep.
 - **Transmission Response**: The measured response of the resonator at each frequency.
 
-This dataset provides essential insights into the resonator’s properties, allowing for precise tuning of qubit-resonator interactions.
+This dataset provides essential insights into the resonator’s properties, allowing for precise tuning of qubit-resonator
+interactions.
