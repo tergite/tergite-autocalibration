@@ -14,7 +14,6 @@
 
 import numpy as np
 
-from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.nodes.qubit_control.motzoi_parameter.analysis import (
     Motzoi01NodeAnalysis,
     Motzoi12NodeAnalysis,
@@ -22,6 +21,7 @@ from tergite_autocalibration.lib.nodes.qubit_control.motzoi_parameter.analysis i
 from tergite_autocalibration.lib.nodes.qubit_control.motzoi_parameter.measurement import (
     Motzoi_parameter,
 )
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 
 
 class Motzoi_Parameter_Node(ScheduleNode):

@@ -20,7 +20,6 @@ import numpy as np
 import optuna
 
 from tergite_autocalibration.config.coupler_config import qubit_types
-from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.analysis import (
     RandomizedBenchmarkingSSRONodeAnalysis,
 )
@@ -34,6 +33,7 @@ from tergite_autocalibration.lib.nodes.coupler.cz_dynamic_phase.node import (
 from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.measurement import (
     TQGRandomizedBenchmarkingSSRO,
 )
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.utils import redis
 
 RB_REPEATS = 10

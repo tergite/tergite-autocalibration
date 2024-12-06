@@ -18,7 +18,7 @@ from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.anal
 from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.measurement import (
     PurityBenchmarking,
 )
-from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 
 
 class PurityBenchmarkingNode(ScheduleNode):

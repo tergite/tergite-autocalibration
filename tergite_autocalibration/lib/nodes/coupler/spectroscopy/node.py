@@ -13,11 +13,11 @@
 
 import numpy as np
 
-from tergite_autocalibration.lib.base.external_parameter_node import (
-    ExternalParameterNode,
-)
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
     CouplerSpectroscopyNodeAnalysis,
+)
+from tergite_autocalibration.lib.nodes.external_parameter_node import (
+    ExternalParameterNode,
 )
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement import (
     Two_Tones_Multidim,
@@ -27,7 +27,6 @@ from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.measuremen
 )
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
-
 # TODO: check location
 from tergite_autocalibration.utils.user_input import qubit_samples
 

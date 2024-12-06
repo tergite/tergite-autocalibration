@@ -9,7 +9,7 @@ website:
     logo-href: /
     left:
       - text: Home
-        href: home.qmd
+        href: index.qmd
       - text: "User Guide"
         href: getting_started.qmd
       - text: "Node Library"
@@ -24,7 +24,7 @@ website:
     search: true
     contents:
       - text: "Home"
-        href: home.qmd
+        href: index.qmd
       - section: "User Guide"
         contents:
           - text: "Getting started"

@@ -3,7 +3,7 @@
 The tergite-autocalibration is a toolkit to ease calibrating quantum devices for superconducting platforms.
 The project contains an orchestration manager, a collection of calibration schedules and a collection of post-processing
 and analysis routines.
-It is tailored for the tune-up of the 25 qubits QPU at Chalmers, which is receiving generous funding by the Wallenberg
+It is tailored to tune-up the 25 qubits QPU at Chalmers, which is receiving generous funding by the Wallenberg
 Centre for Quantum Technology ([WACQT](https://wacqt.se)) for research, development and operation.
 
 ### [User Guide](getting_started.qmd)
@@ -11,6 +11,10 @@ Centre for Quantum Technology ([WACQT](https://wacqt.se)) for research, developm
 A tutorial on how to get started with the automatic calibration.
 This tutorial contains a guide on how to use the commandline interface with quick commands.
 Further, there is an introduction into configuration files.
+
+- [Getting started](getting_started.qmd)
+- [Operation](user-guide/operation.qmd)
+- [Configuration Files](user-guide/configuration_files.qmd)
 
 ### [Node Library](available_nodes.qmd)
 
@@ -28,3 +32,7 @@ Hence, you are more than welcome to contribute to the project with your own idea
 To familiarize yourself with the existing classes and the architecture of the automatic calibration, please take a look
 into the development guide.
 Here, you can also find best practices and information about our design philosophy.
+
+- [Create node classes](developer-guide/new_node_creation.qmd)
+- [Write unit tests](developer-guide/unit_tests.qmd)
+- [Documentation guidelines](developer-guide/writing_documentation.qmd)

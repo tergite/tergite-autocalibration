@@ -15,7 +15,6 @@
 
 import numpy as np
 
-from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.nodes.qubit_control.ramsey_fringes.analysis import (
     RamseyDetunings01NodeAnalysis,
     RamseyDetunings12NodeAnalysis,
@@ -23,6 +22,7 @@ from tergite_autocalibration.lib.nodes.qubit_control.ramsey_fringes.analysis imp
 from tergite_autocalibration.lib.nodes.qubit_control.ramsey_fringes.measurement import (
     Ramsey_detunings,
 )
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 
 
 class Ramsey_Fringes_12_Node(ScheduleNode):
