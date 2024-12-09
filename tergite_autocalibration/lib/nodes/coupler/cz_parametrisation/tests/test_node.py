@@ -12,7 +12,7 @@
 
 import pytest
 
-from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis import (
     CZParametrizationFixDurationNodeAnalysis,
 )

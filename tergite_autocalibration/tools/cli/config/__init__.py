@@ -210,9 +210,3 @@ def show():
     # What should the inputs be?
     raise NotImplementedError()
 
-
-@config_cli.command(help="Run the configuration wizard.")
-def wizard():
-    from .controller import main
-
-    main()

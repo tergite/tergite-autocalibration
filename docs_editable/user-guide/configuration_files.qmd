@@ -25,7 +25,7 @@ Some more pre-built configuration package can be found in `data/devices` under t
 All the configuration files above are stored in one place.
 This is how an example configuration package looks like:
 
-![Configuration folder structure](assets/images/configuration_files_folder_structure.png)
+![Configuration folder structure](../.assets/images/configuration_files_folder_structure.png)
 
 ### The configuration.meta.toml file
 
