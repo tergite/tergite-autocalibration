@@ -209,4 +209,3 @@ def show():
     # Show all configuration values
     # What should the inputs be?
     raise NotImplementedError()
-
