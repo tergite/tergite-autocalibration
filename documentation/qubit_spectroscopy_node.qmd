@@ -28,7 +28,7 @@ The `schedule_function` generates an experimental schedule for performing qubit 
 
 ### Analysis class: `QubitSpectroscopyMultidim`
 
-The `QubitSpectroscopyMultidim` class analyzes the results of qubit spectroscopy experiments. It fits a Lorentzian function to the collected data, enabling the determination of resonance frequencies.
+The `QubitSpectroscopyMultidim` class analyzes the results of qubit spectroscopy experiments. The resonance peak is identified, enabling the determination of resonance frequencies.
 
 #### Method: `analyse_qubit`
 
@@ -40,7 +40,7 @@ The `analyse_qubit` method processes the spectroscopy data to extract key parame
 **Steps**:
 
 1. Extract the relevant coordinates (frequencies and amplitudes) from the dataset.
-2. Fit a Lorentzian function to identify the resonance peak.
+2. Identify the resonance peak.
 3. Validate the peak based on prominence and width criteria.
 
 **Returns**:
