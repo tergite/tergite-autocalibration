@@ -46,7 +46,8 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
         frequency = dataset[0]
         ampl = dataset[1]
 
-        assert 4e9 < frequency < 6e9, f"Frequency should be between 4 GHz and 6 GHz, got {frequency}"
+        assert (4e9 < frequency < 6e9
+                ), f"Frequency should be between 4 GHz and 6 GHz, got {frequency}"
         assert ampl > 0, f"Amplitude has to be higher than 0"
 
     def test_plotting(self):
