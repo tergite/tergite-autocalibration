@@ -21,7 +21,7 @@ import unittest
 import numpy as np
 import xarray as xr
 import matplotlib.pyplot as plt
-from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis import QubitSpectroscopyAnalysis
+from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis import QubitSpectroscopyMultidim
 
 class TestResonatorFrequencyAnalysis(unittest.TestCase):
 
@@ -29,10 +29,10 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_01" / "dataset_qubit_01_spectroscopy_0.hdf5"
         file = xr.open_dataset(file_path)
-        analysis = QubitSpectroscopyAnalysis("name", ["redis_field"])
+        analysis = QubitSpectroscopyMultidim("name", ["redis_field"])
         dataset = analysis.process_qubit(file, "yq06")
 
-        self.assertIsInstance(dataset, np.float64)
+        self.assertIsInstance(dataset, list)
         for i in dataset:
             self.assertIsInstance(i, np.float64)
         assert len(dataset) == 2, f"The dataset should contain two elements {len(dataset)}"
@@ -41,18 +41,20 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_01" / "dataset_qubit_01_spectroscopy_0.hdf5"
         file = xr.open_dataset(file_path)
-        analysis = QubitSpectroscopyAnalysis("name", ["redis_field"])
+        analysis = QubitSpectroscopyMultidim("name", ["redis_field"])
         dataset = analysis.process_qubit(file, "yq06")
-        frequency = dataset
+        frequency = dataset[0]
+        ampl = dataset[1]
 
         assert 4e9 < frequency < 6e9, f"Frequency should be between 4 GHz and 6 GHz, got {frequency}"
+        assert ampl > 0, f"Amplitude has to be higher than 0"
 
     def test_plotting(self):
         os.environ["DATA_DIR"] = str(Path(__file__).parent / "results")
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_01" / "dataset_qubit_01_spectroscopy_0.hdf5"
         file = xr.open_dataset(file_path)
-        analysis = QubitSpectroscopyAnalysis("name", ["redis_field"])
+        analysis = QubitSpectroscopyMultidim("name", ["redis_field"])
         dataset = analysis.process_qubit(file, "yq06")
         figure_path = os.environ["DATA_DIR"] + "/Qubit_spectroscopy_q06.png"
         if os.path.exists(figure_path):
