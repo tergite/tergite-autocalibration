@@ -14,7 +14,6 @@
 
 import numpy as np
 
-from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.analysis import (
     OptimalRO01FrequencyNodeAnalysis,
     OptimalRO012FrequencyNodeAnalysis,
@@ -22,6 +21,7 @@ from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.analysi
 from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.measurement import (
     RO_frequency_optimization,
 )
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.utils.samplespace import resonator_samples
 
 

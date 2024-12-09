@@ -9,6 +9,7 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
+
 import threading
 import time
 
@@ -20,8 +21,8 @@ from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
     InstrumentCoordinator,
 )
 
-from tergite_autocalibration.utils.logger.tac_logger import logger
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
+from tergite_autocalibration.utils.logger.tac_logger import logger
 
 
 def execute_schedule(

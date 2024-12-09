@@ -1,0 +1,68 @@
+project:
+  type: website
+  output-dir: ../docs
+
+
+website:
+  title: 'Tergite Automatic Calibration'
+  navbar:
+    logo-href: /
+    left:
+      - text: Home
+        href: index.qmd
+      - text: "User Guide"
+        href: getting_started.qmd
+      - text: "Node Library"
+        href: available_nodes.qmd
+      - text: "Developer Guide"
+        href: developer_guide.qmd
+    tools:
+      - icon: github
+        href: https://github.com/tergite/tergite-autocalibration
+  sidebar:
+    style: "docked"
+    search: true
+    contents:
+      - text: "Home"
+        href: index.qmd
+      - section: "User Guide"
+        contents:
+          - text: "Getting started"
+            href: getting_started.qmd
+          - text: "Operation"
+            href: user-guide/operation.qmd
+          - text: "Configuration Files"
+            href: user-guide/configuration_files.qmd
+      - section: "Node Library"
+        contents:
+          - text: "Overview"
+            href: available_nodes.qmd
+          - text: "Resonator spectroscopy"
+            href: nodes/resonator_spectroscopy_node.qmd
+      - section: "Developer Guide"
+        contents:
+          - text: "Introduction"
+            href: developer_guide.qmd
+          - text: "Node Classes"
+            href: developer-guide/node_classes.qmd
+          - text: "Create a new node"
+            href: developer-guide/new_node_creation.qmd
+          - text: "Unit tests"
+            href: developer-guide/unit_tests.qmd
+          - text: "Writing documentation"
+            href: developer-guide/writing_documentation.qmd
+  search:
+    location: sidebar
+    type: textbox
+
+format:
+  html:
+    theme:
+      light: cosmo
+      dark: darkly
+    toggle: true
+    # css: ./assets/styles/styles.css - This is in case we wanted to add custom styles.
+    # Note: Usually, it is safer to not use custom styles if not absolutely necessary.
+    #       It is easier for maintenance to stay with default configuration values.
+    toc: true
+    copy-code: true

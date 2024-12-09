@@ -1,31 +1,23 @@
-## Operation
+# Operation
 
-The package ships with a command line interface to solve some common tasks that appear quite often.
+The package ships with a CLI called `acli` (autocalibration command line interface) to solve some common tasks that
+appear quite often.
+In the following there are a number of useful commands, but if you want to find out information about commands in your
+shell use `acli --help`.
 
-In the following there are a number of useful commands, but if you want to find out all commands use:
-```acli --help```
+Since some of the commands below are using autocompleting in most cases you would have to enable that feature in your
+shell by running:
 
-To delete all redis entries:
-```acli node reset -a```
+```bash
+acli --install-completion
+```
 
-To reset a particular node:
-```acli node reset -n <nodename>```
-
-For example to reset the node `rabi_oscillations` run the command:
-
-```acli node reset -n rabi_oscillations```
-
-**To start a new calibration sequence according to the configuration files:**
-
-**```python tergite_acl/scripts/calibration_supervisor.py```**
-
-or
-
-**```acli calibration start```**
+Usually the shell would just suggest you file paths when pressing the tabulator, but with autocompletion enabled, you
+would be even get suggestions for node names or other inputs depending on your configuration.
 
 ## CLI ##
 
-This document provides an overview of the Command Line Interface (CLI) options and their functionalities.
+This section provides an overview of the Command Line Interface (CLI) options and their functionalities.
 
 ### Main Commands ###
 
@@ -44,6 +36,7 @@ The autocalibration CLI is organized into several main command groups:
 Reboots the cluster.
 
 **Usage:**
+
 ```
 acli cluster reboot
 ```
@@ -57,6 +50,7 @@ This command will prompt for confirmation before rebooting the cluster, as it ca
 Resets all parameters in Redis for the specified node(s).
 
 **Usage:**
+
 ```
 acli node reset [OPTIONS]
 ```
@@ -74,6 +68,7 @@ acli node reset [OPTIONS]
 Plots the calibration graph to the user-specified target node in topological order.
 
 **Usage:**
+
 ```
 acli graph plot
 ```
@@ -87,6 +82,7 @@ This command visualizes the calibration graph using an arrow chart.
 Starts the calibration supervisor.
 
 **Usage:**
+
 ```
 acli calibration start [OPTIONS]
 ```
@@ -106,6 +102,7 @@ acli calibration start [OPTIONS]
 Starts the dataset browser.
 
 **Usage:**
+
 ```
 acli browser --datadir [OPTIONS]
 ```
@@ -123,6 +120,7 @@ acli browser --datadir [OPTIONS]
 Prints a random joke to lighten the mood.
 
 **Usage:**
+
 ```
 acli joke
 ```
@@ -131,25 +129,9 @@ This command fetches and displays a random joke, excluding potentially offensive
 
 ### Notes ###
 
-- The CLI uses the Click library for command-line interface creation.
+- The CLI uses the Python library `typer` for command-line interface creation.
 - Some commands may require additional configuration or environment variables to be set.
 - When using the `-r` option for rerunning analysis, make sure to also specify the node name using `-n`.
 
 For more detailed information about each command, use the `--help` option with any command or subcommand.
 
-
-## Structure ##
-For each calibration node:
-compilation -> execution -> post-processing -> redis updating
-
-## Data browsing ##
-Datasets are stored in `data_directory`
-Can be browsed with the dataset browser (coming soon)
-
-## Development ##
-When submitting  contributions, please prepend your commit messages with:
-`fix:` for bug fixes
-`feat:` for introducing a new feature (e.g. a new measurement node or a new analysis class)
-`chore:` for refactoring changes or any change that doesn't affect the functionality of the code
-`docs:` for changes in the README, docstrings etc
-`test:` or `dev:` for testing or development changes (e.g. profiling scripts)

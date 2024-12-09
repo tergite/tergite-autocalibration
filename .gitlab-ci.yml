@@ -10,13 +10,10 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-include:
-  - local: ".gitlab/functions/pipeline-functions.yml"
 
 stages:
   - tests
   - application_run
-  - post_merge_actions
 
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
@@ -85,14 +82,4 @@ application_run:
   cache:
     paths:
       - .cache/pip
-
-
-post_merge_actions:
-  stage: post_merge_actions
-  image: ubuntu:latest
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-  script:
-    # Run a wiki update
-    - !reference [.update_wiki, script]
 

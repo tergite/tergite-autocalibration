@@ -13,11 +13,11 @@
 
 import numpy as np
 
-from tergite_autocalibration.lib.base.external_parameter_node import (
-    ExternalParameterNode,
-)
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
     CouplerSpectroscopyNodeAnalysis,
+)
+from tergite_autocalibration.lib.nodes.external_parameter_node import (
+    ExternalParameterNode,
 )
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement import (
     Two_Tones_Multidim,

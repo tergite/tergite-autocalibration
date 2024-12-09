@@ -20,6 +20,7 @@ from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis impor
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.measurement import (
     CZParametrizationFixDuration,
 )
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 
 
 class CZParametrizationFixDurationNode(ScheduleNode):

@@ -1,0 +1,146 @@
+# Getting started
+
+This guide contains some information on how to get started with the automatic calibration.
+Please consider also reading the `README.md` file in the git repository for more information.
+
+## Prerequisites
+
+The automatic calibration requires `redis` for on-memory data storage.
+As redis operates only on Linux systems, the calibration has to run either on one of:
+
+- Linux distributions
+- WSL (Windows Subsystem for Linux) environments, installed on a Windows system.
+  WSL requires **Windows 10** and a version of at least **1903**.
+
+Installation instructions for redis can be found
+here: https://redis.io/docs/getting-started/installation/install-redis-on-linux/
+
+The link for the redis installation also contains instructions on how to start a redis instance.
+However, if you already have redis installed, you can run it using:
+
+```bash
+redis-server --port YOUR_REDIS_PORT
+```
+
+Usually, redis will run automatically on port `6379`, but in a shared environment please check with others to get your
+redis port, since you would overwrite each other's memory.
+
+## Installation
+
+The first step during the installation is to clone the repository.
+Please note that the link below is the link to the public mirror of the repository on GitHub.
+If you are developing code, most likely, you have to replace it with the link to the development server.
+
+```bash
+git clone git@github.com:tergite/tergite-autocalibration.git
+```
+
+To manage Python packages, we are using the package manager `conda`.
+It is recommended to create an environment for your project - alternatively, you can also just use Python 3.10
+
+```bash
+conda create -n tac python=3.10 -y
+```
+
+Here, `tac` stands for tergite-autocalibration.
+We can activate and use the environment like this:
+
+```bash
+conda activate tac
+```
+
+If you are not using conda, activate the environment with:
+
+```bash
+source activate tac
+```
+
+Now, you should enter the repository folder, because the following commands have to be executed in there.
+
+```bash
+cd tergite-autocalibration
+```
+
+To install the repository in editable mode.
+In Python the editable mode is triggerd by the parameter `-e`.
+This means that when you changed and saved your code files, they will be automatically loaded into the environment
+without re-installation.
+
+```bash
+pip install -e .
+```
+
+Here `.` is the root directory (i.e. the directory that contains the `pyproject.toml` file)
+
+### Next steps:
+
+### Setting Up system & Configuration Files:
+
+Before the first run of the calibration suite a number of configuration files need to be set up.
+These files describe our initial knowledge on the system as well as the connectivity with the measurement hardware.
+
+### The `.env` file.
+
+All the settings and paths are contained in the `.env` file. Since this file contains user specific settings, it is
+git-ignored, it must be created by the user. For convenience a template file `dot-env-template.txt` already exists.
+
+First copy the template file to the `.env` (this creates the `.env` file if it doesn't exist):
+
+```cp dot-env-template .env```
+
+Then edit the newly created `.env` file according to your system. For example here's how the user
+`lab-user` may complete the `.env` file:
+
+```python
+# Copy this file to a .env file in the tergite-autocalibration folder on the root level.
+# The .env file is a simple list of keys and values. It is also known as the INI file on MS Windows.
+# Fill in the necessary values.
+
+# DEFAULT_PREFIX is added to logfiles, redis entries and in the data directory
+# Default: cal
+DEFAULT_PREFIX = 'calibration'
+
+# Directory settings
+# ROOT_DIR defines the top-level folder of the tergite-autocalibration-lite folder
+# Default: two levels up from the config
+ROOT_DIR = '/home/lab-user/github/tergite-acl/'
+
+# DATA_DIR defines where plots are stored
+DATA_DIR = '/home/lab-user/github/tergite-acl/data_directory/'
+
+# CONFIG_DIR defines where the configuration is stored
+CONFIG_DIR = '/home/lab-user/github/tergite-acl/config_dir/'
+
+# Configuration settings
+# It is assumed that all these paths are relative to CONFIG_DIR
+# HARDWARE_CONFIG is what Q-BLOX needs to compile schedules on the hardware
+# It should be a file in json format, there is no default file
+HARDWARE_CONFIG = 'HARDWARE_CONFIGURATION.json'
+
+# DEVICE_CONFIG contains the initial values for the device configuration
+DEVICE_CONFIG = 'device_config.toml'
+
+# Configuration variables
+# CLUSTER_IP is the IP address of the instrument cluster to connect with
+CLUSTER_IP = '162.0.2.162'
+# SPI_SERIAL_PORT is the port on which the spi rack is connected
+SPI_SERIAL_PORT = '/dev/ttyACM0'
+
+# APP_SETTINGS reflect which environment the calibration is to run in.
+# Options
+#  - development
+#  - production
+#  - staging
+#  - test
+# Default: production
+# TODO: currently we are only using the calibration in the development mode
+RUN_MODE = 'development'
+
+# REDIS_PORT is the port which to use when connecting to redis
+REDIS_PORT = 6379
+# REDIS_CONNECTION will be automatically created in settings.py
+
+# PLOTTING is a boolean to indicate whether plots should be shown or whether plots should be silent in the background
+# Default: True
+PLOTTING = True
+```
