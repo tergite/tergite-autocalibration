@@ -37,7 +37,6 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
         self.state_coord = self._get_coord("state")
         self.loop_coord = self._get_coord("loops")
 
-        breakpoint()
         self.S21 = self.S21.stack(shots=[self.loop_coord, self.state_coord])
         self.qubit_states = self.S21[self.state_coord].values
         self.amplitudes = self.S21.coords[self.amplitude_coord]
