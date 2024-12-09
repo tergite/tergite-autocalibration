@@ -21,7 +21,10 @@ import unittest
 import numpy as np
 import xarray as xr
 import matplotlib.pyplot as plt
-from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis import QubitSpectroscopyMultidim
+from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis import (
+    QubitSpectroscopyMultidim,
+)
+
 
 class TestResonatorFrequencyAnalysis(unittest.TestCase):
 
@@ -35,7 +38,9 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
         self.assertIsInstance(dataset, list)
         for i in dataset:
             self.assertIsInstance(i, np.float64)
-        assert len(dataset) == 2, f"The dataset should contain two elements {len(dataset)}"
+        assert (
+            len(dataset) == 2
+        ), f"The dataset should contain two elements {len(dataset)}"
 
     def test_run_fitting(self):
         test_dir = Path(__file__).parent
@@ -46,8 +51,9 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
         frequency = dataset[0]
         ampl = dataset[1]
 
-        assert (4e9 < frequency < 6e9
-                ), f"Frequency should be between 4 GHz and 6 GHz, got {frequency}"
+        assert (
+            4e9 < frequency < 6e9
+        ), f"Frequency should be between 4 GHz and 6 GHz, got {frequency}"
         assert ampl > 0, f"Amplitude has to be higher than 0"
 
     def test_plotting(self):
@@ -64,5 +70,6 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
         analysis.plotter(ax)
         fig.savefig(figure_path)
         plt.close(fig)
-        assert os.path.exists(figure_path), f"Expected plot file to be created at {figure_path}"
-        
+        assert os.path.exists(
+            figure_path
+        ), f"Expected plot file to be created at {figure_path}"
