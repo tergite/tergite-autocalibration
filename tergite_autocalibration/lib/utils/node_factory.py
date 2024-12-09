@@ -40,6 +40,7 @@ class NodeFactory:
             "resonator_relaxation": "Resonator_Relaxation_Node",
             "qubit_01_spectroscopy": "Qubit_01_Spectroscopy_Multidim_Node",
             "qubit_01_spectroscopy_AR": "Qubit_01_Spectroscopy_Multidim_AR_Node",
+            "rabi_oscillations_AR": "Rabi_Oscillations_Node_AR",
             "rabi_oscillations": "Rabi_Oscillations_Node",
             "ramsey_correction": "Ramsey_Fringes_Node",
             "resonator_spectroscopy_1": "Resonator_Spectroscopy_1_Node",

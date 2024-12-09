@@ -240,9 +240,9 @@ class QubitSpectroscopyMultidim(BaseQubitAnalysis):
                     self.qubit_freq = qubit_freq
                     self.spec_ampl = a
 
-        # else:
-        #     if self.has_peak(self.magnitudes):
-        #         self.qubit_freq = self.frequencies[self.magnitudes.argmax()]
+        else:
+            if self.has_peak(self.magnitudes):
+                self.qubit_freq = self.frequencies[self.magnitudes.argmax()]
 
         return [self.qubit_freq, self.spec_ampl]
 
@@ -277,7 +277,7 @@ class QubitSpectroscopyMultidim(BaseQubitAnalysis):
         self.magnitudes[self.data_var].plot(
             ax=ax, x=self.frequency_coords
         )  # Here, `self.frequency_coords` is the coordinate name
-        # ax.scatter(self.qubit_freq, self.spec_ampl, s=52, c="red")
+        ax.scatter(self.qubit_freq, self.spec_ampl, s=52, c="red")
 
 
 # class QubitSpectroscopyNodeAnalysis(BaseAllQubitsAnalysis):

@@ -21,6 +21,7 @@ node reference
   qubit_01_spectroscopy
   qubit_01_spectroscopy_AR
   rabi_oscillations
+  rabi_oscillations_AR
   ramsey_correction
   resonator_spectroscopy_1
   qubit_12_spectroscopy_pulsed
@@ -72,7 +73,7 @@ from tergite_autocalibration.config.VNA_values import (
 
 
 def resonator_samples(qubit: str) -> np.ndarray:
-    res_spec_samples = 81
+    res_spec_samples = 71
     sweep_range = 3.0e6
     VNA_frequency = VNA_resonator_frequencies[qubit]
     min_freq = VNA_frequency - sweep_range / 2 - 0.5e6
@@ -108,7 +109,7 @@ user_samplespace = {
 }
 """
 ####################################################################
-target_node = "qubit_01_spectroscopy_AR"
+target_node = "coupler_spectroscopy"
 qubits = ["q06", "q07", "q08", "q09", "q10"]
 # qubits =   ["q06", "q07", "q08", "q09", "q10", "q11", "q12", "q13", "q14", "q15"]
 couplers = ["q06_q07"]
