@@ -1,8 +1,8 @@
 ## Qubit Spectroscopy Calibration and Analysis
 
-Qubit spectroscopy is a vital technique for identifying qubit resonance frequencies. By applying a probing signal to a qubit at various frequencies and measuring the response, we can accurately locate resonance frequencies and optimize qubit operation.
+Qubit spectroscopy is a vital technique for identifying qubit resonance frequencies. By applying a probing signal to a qubit at various frequencies and measuring the response, we can accurately locate resonance frequencies and optimize qubit operation. In this node, both qubit frequecies for both 01 and 12 attained. 
 
-### Class: `Two_Tones_Multidim`
+### Measurement class: `Two_Tones_Multidim`
 
 The `Two_Tones_Multidim` class facilitates the creation of schedules for qubit spectroscopy experiments. It supports multi-qubit spectroscopy, enabling parallel probing and measurement.
 
@@ -11,20 +11,22 @@ The `Two_Tones_Multidim` class facilitates the creation of schedules for qubit s
 The `schedule_function` generates an experimental schedule for performing qubit spectroscopy. The sequence involves:
 
 1. **Reset**: Resets all qubits to a known state.
-2. **Frequency Sweeping**: Iteratively adjusts the probing frequency and amplitude.
-3. **Measurement**: Captures the qubit response at each probing point.
+2. **Initialize Qubit**: Initialize the qubit to state 0 or 1, depending what qubit frequency you want to attain.
+3. **Frequency Sweeping**: Iteratively adjusts the probing frequency and amplitude.
+4. **Measurement**: Captures the qubit response at each probing point.
 
 **Parameters**:
 
 - `spec_frequencies` (`dict[str, np.ndarray]`): Frequencies to probe for each qubit.
 - `spec_pulse_amplitudes` (`dict[str, np.ndarray]`, optional): Amplitudes of the probing pulses.
 - `repetitions` (`int`): Number of times the schedule will repeat.
+- `qubit_state` (`int`): The state for the qubit.
 
 **Returns**:
 
 - A `Schedule` object representing the experimental procedure.
 
-### Class: `QubitSpectroscopyMultidim`
+### Analysis class: `QubitSpectroscopyMultidim`
 
 The `QubitSpectroscopyMultidim` class analyzes the results of qubit spectroscopy experiments. It fits a Lorentzian function to the collected data, enabling the determination of resonance frequencies.
 
