@@ -13,22 +13,20 @@
 # that they have been altered from the originals.
 
 import lmfit
+import numpy as np
+from matplotlib import pyplot as plt
+from matplotlib.axes import Axes
+from numpy.linalg import inv
 from scipy.linalg import norm
 from scipy.optimize import minimize
-from numpy.linalg import inv
-from matplotlib import pyplot as plt
-import numpy as np
-from matplotlib.axes import Axes
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import confusion_matrix
 
 from tergite_autocalibration.lib.base.analysis import (
+    BaseAllQubitsAnalysis,
     BaseQubitAnalysis,
-    BaseAllQubitsRepeatAnalysis,
 )
-from tergite_autocalibration.lib.utils.functions import (
-    exponential_decay_function,
-)
+from tergite_autocalibration.lib.utils.functions import exponential_decay_function
 
 
 def mitigate(v, cm_inv):
@@ -244,7 +242,7 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
                     magnitude[:-3, 2],
                     f"{marker[1]}",
                     c="b",
-                    label=f"2>",
+                    label="2>",
                     markerfacecolor="none",
                 )
                 ax.plot(
@@ -252,7 +250,7 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
                     magnitude[:-3, 0],
                     f"{marker[0]}",
                     c="b",
-                    label=f"0>",
+                    label="0>",
                     markerfacecolor="none",
                 )
                 ax.plot(
@@ -260,7 +258,7 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
                     magnitude[:-3, 1],
                     f"{marker[2]}",
                     c="b",
-                    label=f"1>",
+                    label="1>",
                     markerfacecolor="none",
                 )
             else:
@@ -311,9 +309,8 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
         ax.grid()
 
 
-class RandomizedBenchmarkingSSRONodeAnalysis(BaseAllQubitsRepeatAnalysis):
+class RandomizedBenchmarkingSSRONodeAnalysis(BaseAllQubitsAnalysis):
     single_qubit_analysis_obj = RandomizedBenchmarkingSSROQubitAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-        self.repeat_coordinate_name = "seeds"
