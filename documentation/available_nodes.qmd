@@ -11,12 +11,12 @@
 -  ro_amplitude_three_state_optimization
 
 ## Qubit Control Nodes
--  qubit_01_spectroscopy
+-  [qubit_01_spectroscopy](qubit_spectroscopy_node.qmd)
 -  qubit_01_spectroscopy_pulsed
 -  rabi_oscillations
 -  ramsey_correction
 -  qubit_12_spectroscopy_pulsed
--  qubit_12_spectroscopy_multidim
+-  [qubit_12_spectroscopy_multidim](qubit_spectroscopy_node.qmd)
 -  rabi_oscillations_12
 -  ramsey_correction_12
 -  adaptive_motzoi_parameter
