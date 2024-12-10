@@ -42,8 +42,8 @@ class HW_Config_Generator:
         QRM_config = {}
         for module, qrm_qubits in self.module_to_ro_line_qubit_map.items():
             qrm_module_config = self.mixer_calibrations[module]
-            breakpoint()
-            qrm_config = self.qrm_hw(qrm_qubits, **qrm_module_config)
+            qubits = self.module_to_ro_line_qubit_map[module]
+            qrm_config = self.qrm_hw(qubits, qrm_module_config)
             QRM_config[f"{self.cluster_name}_{module}"] = qrm_config
         return QRM_config
 
@@ -58,14 +58,18 @@ class HW_Config_Generator:
             QCM_config[f"{self.cluster_name}_{module}"] = qcm_config
         return QCM_config
 
-    def qrm_hw(self, qubits, module_config):
+    def qrm_hw(self, qubits: list[str], module_config: dict[str, list]):
         ro = []  # readout when qubit at |0>
         ro1 = []  # readout when qubit at |1>
         ro2 = []  # readout when qubit at |2>
         ro_2st_opt = []  # readout for optimum 2 state discrimination
         ro_3st_opt = []  # readout for optimum 3 state discrimination
 
-        def standard_ro_config(amp_ratio, phase, ro_clock: str) -> dict:
+        lo_freq = module_config["lo_freq"]
+        off_I = module_config["off_I"]
+        off_Q = module_config["off_Q"]
+
+        def standard_ro_config(qubit, amp_ratio, phase, ro_clock: str) -> dict:
             ro_config = {
                 "port": f"{qubit}:res",
                 "clock": f"{qubit}.{ro_clock}",
@@ -76,29 +80,29 @@ class HW_Config_Generator:
 
         for qubit in qubits:
             qubit_config = module_config[qubit]
-            lo_freq, off_I, off_Q, amp_ratio, phase = qubit_config
+            interm_freq, amp_ratio, phase = qubit_config
             ro_config = standard_ro_config(
-                amp_ratio=amp_ratio, phase=phase, ro_clock="ro"
+                qubit, amp_ratio=amp_ratio, phase=phase, ro_clock="ro"
             )
             ro.append(ro_config)
 
             ro1_config = standard_ro_config(
-                amp_ratio=amp_ratio, phase=phase, ro_clock="ro1"
+                qubit, amp_ratio=amp_ratio, phase=phase, ro_clock="ro1"
             )
             ro1.append(ro1_config)
 
             ro2_config = standard_ro_config(
-                amp_ratio=amp_ratio, phase=phase, ro_clock="ro2"
+                qubit, amp_ratio=amp_ratio, phase=phase, ro_clock="ro2"
             )
             ro2.append(ro2_config)
 
             ro_2st_opt_config = standard_ro_config(
-                amp_ratio=amp_ratio, phase=phase, ro_clock="ro_2st_opt"
+                qubit, amp_ratio=amp_ratio, phase=phase, ro_clock="ro_2st_opt"
             )
             ro_2st_opt.append(ro_2st_opt_config)
 
             ro_3st_opt_config = standard_ro_config(
-                amp_ratio=amp_ratio, phase=phase, ro_clock="ro_3st_opt"
+                qubit, amp_ratio=amp_ratio, phase=phase, ro_clock="ro_3st_opt"
             )
             ro_3st_opt.append(ro_3st_opt_config)
 
@@ -162,16 +166,20 @@ if __name__ == "__main__":
     # mixer_file = CONFIG_DIR / "initial.csv"
     mixer_file = {
         "module16": {
-            "q06": [6.867768e09, -3.569508e07, -3.0245, -5.3719, 1.0125, 11.68040],
-            "q07": [6.867768e09, 2.129034e08, -3.0245, -5.3719, 0.9787, 11.88353],
-            "q08": [6.867768e09, -4.705374e08, -3.0245, -5.3719, 0.9990, 13.00079],
-            "q09": [6.867768e09, 4.084159e08, -3.0245, -5.3719, 1.0193, 9.54746],
-            "q010": [6.867768e09, 3.849132e08, -3.0245, -5.3719, 1.0159, 9.14118],
+            "lo_freq": 6.867768e09,
+            "off_I": -3.0245,
+            "off_Q": -5.3719,
+            "q06": [-3.569508e07, 1.0125, 11.68040],
+            "q07": [2.129034e08, 0.9787, 11.88353],
+            "q08": [-4.705374e08, 0.9990, 13.00079],
+            "q09": [4.084159e08, 1.0193, 9.54746],
+            "q10": [3.849132e08, 1.0159, 9.14118],
         }
     }
 
     json_config_file = CONFIG_DIR / "HARDWARE_CONFIGURATION_LOKIA_20241204.json"
     CLUSTER_NAME = "clusterA"
+
     # HW_CONFIG = {}
     # HW_CONFIG["backend"] = "quantify_scheduler.backends.qblox_backend.hardware_compile"
     # HW_CONFIG[f"{CLUSTER_NAME}"] = {
