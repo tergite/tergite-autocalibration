@@ -109,7 +109,7 @@ user_samplespace = {
 }
 """
 ####################################################################
-target_node = "coupler_spectroscopy"
+target_node = "randomized_benchmarking_ssro"
 qubits = ["q06", "q07", "q08", "q09", "q10"]
 # qubits =   ["q06", "q07", "q08", "q09", "q10", "q11", "q12", "q13", "q14", "q15"]
 couplers = ["q06_q07"]

@@ -241,7 +241,6 @@ class BaseNode(abc.ABC):
             raw_dataset = self.generate_dummy_dataset()
 
         result_dataset = configure_dataset(raw_dataset, self)
-        breakpoint()
 
         logger.info("Finished measurement")
         return result_dataset
