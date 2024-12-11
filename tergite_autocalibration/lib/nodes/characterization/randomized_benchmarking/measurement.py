@@ -30,16 +30,16 @@ from tergite_autocalibration.utils.extended_transmon_element import ExtendedTran
 
 
 class Randomized_Benchmarking_SSRO(BaseMeasurement):
-    def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
+    def __init__(self, transmons: dict[str, ExtendedTransmon]):
         super().__init__(transmons)
         self.transmons = transmons
-        self.qubit_state = qubit_state
 
     def schedule_function(
         self,
         seeds: int,
         number_of_cliffords: dict[str, np.ndarray],
-        repetitions: int = 1024,
+        loop_repetitions: int,
+        qubit_state: int = 1,
     ) -> Schedule:
         """
         Generate a schedule for performing a randomized benchmarking test using Clifford gates.
@@ -63,7 +63,7 @@ class Randomized_Benchmarking_SSRO(BaseMeasurement):
         """
         schedule = Schedule("multiplexed_randomized_benchmarking")
 
-        shot = Schedule(f"shot")
+        shot = Schedule("shot")
         shot.add(IdlePulse(16e-9))
 
         # Initialize ClockResource with the first frequency value
@@ -140,7 +140,7 @@ class Randomized_Benchmarking_SSRO(BaseMeasurement):
         root_relaxation = shot.add(Reset(*qubits))
 
         for this_qubit in qubits:
-            qubit_levels = range(self.qubit_state + 1)
+            qubit_levels = range(qubit_state + 1)
             number_of_levels = len(qubit_levels)
 
             shot.add(
@@ -178,7 +178,7 @@ class Randomized_Benchmarking_SSRO(BaseMeasurement):
                 shot.add(Reset(this_qubit))
 
         schedule.add(IdlePulse(16e-9))
-        print(schedule.add(shot, control_flow=Loop(repetitions)))
+        print(schedule.add(shot, control_flow=Loop(loop_repetitions)))
         schedule.add(IdlePulse(16e-9))
 
         return schedule
