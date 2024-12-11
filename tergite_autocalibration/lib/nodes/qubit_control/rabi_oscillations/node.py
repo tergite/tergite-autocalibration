@@ -15,8 +15,6 @@
 
 import numpy as np
 
-from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
-
 from tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.analysis import (
     NRabiNodeAnalysis,
     RabiNodeAnalysis,
@@ -25,6 +23,7 @@ from tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.measureme
     N_Rabi_Oscillations,
     Rabi_Oscillations,
 )
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 
 
 class Rabi_Oscillations_Node(ScheduleNode):

@@ -69,23 +69,28 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+    <link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme"
+          id="quarto-text-highlighting-styles">
+    <link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch"
+          class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+    <link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme"
+          id="quarto-bootstrap" data-mode="light">
+    <link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch"
+          class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
-  "location": "navbar",
+    "location": "sidebar",
   "copy-button": false,
   "collapse-after": 3,
-  "panel-placement": "end",
-  "type": "overlay",
+    "panel-placement": "start",
+    "type": "textbox",
   "limit": 50,
   "keyboard-shortcut": [
     "f",
     "/",
     "s"
   ],
-  "show-item-context": false,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -102,68 +107,214 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
 
-<link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="nav-fixed">
+<body class="nav-sidebar docked nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./getting_started.html">
+          <a class="navbar-brand" href="./">
     <span class="navbar-title">Tergite Automatic Calibration</span>
     </a>
   </div>
-            <div id="quarto-search" class="" title="Search"></div>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./getting_started.html" aria-current="page"> 
-<span class="menu-text">Getting started</span></a>
+      <a class="nav-link active" href="./index.html" aria-current="page">
+          <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./operation.html"> 
-<span class="menu-text">Operation</span></a>
+      <a class="nav-link" href="./getting_started.html">
+          <span class="menu-text">User Guide</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./configuration_files.html"> 
-<span class="menu-text">Configuration Files</span></a>
+      <a class="nav-link" href="./available_nodes.html">
+          <span class="menu-text">Node Library</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./available_nodes.html"> 
-<span class="menu-text">Available Nodes</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./developer_guide.html"> 
-<span class="menu-text">Developer Guide</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./new_node_creation.html"> 
-<span class="menu-text">Creating New Nodes</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./node_types.html"> 
-<span class="menu-text">Node types</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./unit_tests.html"> 
-<span class="menu-text">How to add unit tests</span></a>
+      <a class="nav-link" href="./developer_guide.html">
+          <span class="menu-text">Developer Guide</span></a>
+  </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="./troubleshooting.html">
+                        <span class="menu-text">Troubleshooting</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
+                <a href="https://github.com/tergite/tergite-autocalibration" title=""
+                   class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-github"></i></a>
+                <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1"
+                   onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
 </div>
       </div> <!-- /container-fluid -->
     </nav>
+      <nav class="quarto-secondary-nav">
+          <div class="container-fluid d-flex">
+              <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button"
+                      data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar"
+                      aria-expanded="false" aria-label="Toggle sidebar navigation"
+                      onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+                  <i class="bi bi-layout-text-sidebar-reverse"></i>
+              </button>
+              <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb">
+                  <ol class="breadcrumb">
+                      <li class="breadcrumb-item"><a href="./getting_started.html">User Guide</a></li>
+                      <li class="breadcrumb-item"><a href="./getting_started.html">Getting started</a></li>
+                  </ol>
+              </nav>
+              <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse"
+                 data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false"
+                 aria-label="Toggle sidebar navigation"
+                 onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+              </a>
+              <button type="button" class="btn quarto-search-button" aria-label="Search"
+                      onclick="window.quartoOpenSearch();">
+                  <i class="bi bi-search"></i>
+              </button>
+          </div>
+      </nav>
 </header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
+    <nav id="quarto-sidebar"
+         class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+            <div class="sidebar-search">
+                <div id="quarto-search" class="" title="Search"></div>
+            </div>
+        </div>
+        <div class="sidebar-menu-container">
+            <ul class="list-unstyled mt-1">
+                <li class="sidebar-item">
+                    <div class="sidebar-item-container">
+                        <a href="./index.html" class="sidebar-item-text sidebar-link">
+                            <span class="menu-text">Home</span></a>
+                    </div>
+                </li>
+                <li class="sidebar-item sidebar-item-section">
+                    <div class="sidebar-item-container">
+                        <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse"
+                           data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+                            <span class="menu-text">User Guide</span></a>
+                        <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse"
+                           data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true"
+                           aria-label="Toggle section">
+                            <i class="bi bi-chevron-right ms-2"></i>
+                        </a>
+                    </div>
+                    <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="./getting_started.html" class="sidebar-item-text sidebar-link active">
+                                    <span class="menu-text">Getting started</span></a>
+                            </div>
+                        </li>
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="./user-guide/operation.html" class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Operation</span></a>
+                            </div>
+                        </li>
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="./user-guide/configuration_files.html" class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Configuration Files</span></a>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+                <li class="sidebar-item sidebar-item-section">
+                    <div class="sidebar-item-container">
+                        <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse"
+                           data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+                            <span class="menu-text">Node Library</span></a>
+                        <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse"
+                           data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true"
+                           aria-label="Toggle section">
+                            <i class="bi bi-chevron-right ms-2"></i>
+                        </a>
+                    </div>
+                    <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="./available_nodes.html" class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Overview</span></a>
+                            </div>
+                        </li>
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="./nodes/resonator_spectroscopy_node.html"
+                                   class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Resonator spectroscopy</span></a>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+                <li class="sidebar-item sidebar-item-section">
+                    <div class="sidebar-item-container">
+                        <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse"
+                           data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+                            <span class="menu-text">Developer Guide</span></a>
+                        <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse"
+                           data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true"
+                           aria-label="Toggle section">
+                            <i class="bi bi-chevron-right ms-2"></i>
+                        </a>
+                    </div>
+                    <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="./developer_guide.html" class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Introduction</span></a>
+                            </div>
+                        </li>
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="./developer-guide/node_classes.html" class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Node Classes</span></a>
+                            </div>
+                        </li>
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="./developer-guide/new_node_creation.html"
+                                   class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Create a new node</span></a>
+                            </div>
+                        </li>
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="./developer-guide/unit_tests.html" class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Unit tests</span></a>
+                            </div>
+                        </li>
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="./developer-guide/writing_documentation.html"
+                                   class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Writing documentation</span></a>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+                <li class="sidebar-item">
+                    <div class="sidebar-item-container">
+                        <a href="./troubleshooting.html" class="sidebar-item-text sidebar-link">
+                            <span class="menu-text">Troubleshooting</span></a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse"
+         data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
@@ -172,10 +323,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#getting-started" id="toc-getting-started" class="nav-link active" data-scroll-target="#getting-started">Getting started</a>
   <ul class="collapse">
-  <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation">Installation</a></li>
-  <li><a href="#repository-installation" id="toc-repository-installation" class="nav-link" data-scroll-target="#repository-installation">Repository installation:</a></li>
-  <li><a href="#setting-up-system-configuration-files" id="toc-setting-up-system-configuration-files" class="nav-link" data-scroll-target="#setting-up-system-configuration-files">Setting Up system &amp; Configuration Files:</a>
+      <li><a href="#prerequisites" id="toc-prerequisites" class="nav-link" data-scroll-target="#prerequisites">Prerequisites</a>
+      </li>
+      <li><a href="#installation" id="toc-installation" class="nav-link"
+             data-scroll-target="#installation">Installation</a>
   <ul class="collapse">
+      <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps">Next steps:</a>
+      </li>
+      <li><a href="#setting-up-system-configuration-files" id="toc-setting-up-system-configuration-files"
+             class="nav-link" data-scroll-target="#setting-up-system-configuration-files">Setting Up system &amp;
+          Configuration Files:</a></li>
   <li><a href="#the-.env-file." id="toc-the-.env-file." class="nav-link" data-scroll-target="#the-.env-file.">The <code>.env</code> file.</a></li>
   </ul></li>
   </ul></li>
@@ -190,114 +347,182 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="getting-started" class="level1">
 <h1>Getting started</h1>
-<section id="installation" class="level2">
-<h2 class="anchored" data-anchor-id="installation">Installation</h2>
-<p>This project contains an orchistration manager, a collection of callibration schedules and a collection of post-processing &amp; analysis routines. It is tailored for the tune-up of the 25 qubits QPU at Chalmers, QTL. This repository utilizes <strong><code>redis</code></strong> for on memory data storage. As redis operates only on Linux systems, this repo can only work</p>
+    <p>This guide contains some information on how to get started with the automatic calibration. Please consider also
+        reading the <code>README.md</code> file in the git repository for more information.</p>
+    <section id="prerequisites" class="level2">
+        <h2 class="anchored" data-anchor-id="prerequisites">Prerequisites</h2>
+        <p>The automatic calibration requires <code>redis</code> for on-memory data storage. As redis operates only on
+            Linux systems, the calibration has to run either on one of:</p>
 <ul>
-<li><p>either on Linux distributions</p></li>
-<li><p>or WSL (Windows Subsystem for Linux) environments, installed on a Windows system.</p></li>
+    <li>Linux distributions</li>
+    <li>WSL (Windows Subsystem for Linux) environments, installed on a Windows system. WSL requires <strong>Windows
+        10</strong> and a version of at least <strong>1903</strong>.
+    </li>
 </ul>
-<p>To install WSL, it is required <strong>Windows 10</strong> of version at least <strong>1903</strong>.</p>
+        <p>Installation instructions for redis can be found here:
+            https://redis.io/docs/getting-started/installation/install-redis-on-linux/</p>
+        <p>The link for the redis installation also contains instructions on how to start a redis instance. However, if
+            you already have redis installed, you can run it using:</p>
+        <div class="sourceCode" id="cb1">
+            <pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"
+                                                                                                          aria-hidden="true"
+                                                                                                          tabindex="-1"></a><span
+                    class="ex">redis-server</span> <span class="at">--port</span> YOUR_REDIS_PORT</span></code><button
+                    title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre>
+        </div>
+        <p>Usually, redis will run automatically on port <code>6379</code>, but in a shared environment please check
+            with others to get your redis port, since you would overwrite each other’s memory.</p>
 </section>
-<section id="repository-installation" class="level2">
-<h2 class="anchored" data-anchor-id="repository-installation">Repository installation:</h2>
-<section id="after-setting-up-your-ssh-key-clone-the-repo" class="level4">
-<h4 class="anchored" data-anchor-id="after-setting-up-your-ssh-key-clone-the-repo">After setting up your ssh key, clone the repo:</h4>
-<p><code>git clone git@github.com:chalmersnextlabs-quantum/tergite-autocalibration.git</code></p>
-</section>
-<section id="install-redis" class="level4">
-<h4 class="anchored" data-anchor-id="install-redis">Install Redis:</h4>
-<p><code>https://redis.io/docs/getting-started/installation/install-redis-on-linux/</code></p>
-</section>
-<section id="after-installing-redis-start-the-service-type-from-terminal" class="level4">
-<h4 class="anchored" data-anchor-id="after-installing-redis-start-the-service-type-from-terminal">After installing redis, start the service, type from terminal:</h4>
-<p><code>redis-server</code></p>
-</section>
-<section id="create-your-local-environment." class="level4">
-<h4 class="anchored" data-anchor-id="create-your-local-environment.">Create your local environment.</h4>
-<p>If for example you want to name your environment <code>tac</code>, you create it as</p>
-<p><code>conda create --name tac python=3.9</code></p>
-</section>
-<section id="activate-your-local-environment." class="level4">
-<h4 class="anchored" data-anchor-id="activate-your-local-environment.">Activate your local environment.</h4>
-<p><code>conda activate tac</code></p>
-</section>
-<section id="if-you-are-not-using-conda-activate-the-environment-with" class="level4">
-<h4 class="anchored" data-anchor-id="if-you-are-not-using-conda-activate-the-environment-with">If you are not using conda, activate the environment with:</h4>
-<p><code>source activate tac</code></p>
-</section>
-<section id="enter-the-project-root-directory" class="level4">
-<h4 class="anchored" data-anchor-id="enter-the-project-root-directory">Enter the project root directory:</h4>
-<p><code>cd tergite-autocalibration-lite/</code></p>
-<p><strong>From now on, it is assumed that all commands are executed from the project root directory.</strong></p>
-</section>
-<section id="install-the-repository-in-editable-mode-so-all-your-changes-are-applied-whithout-the-need-of-reinstall" class="level4">
-<h4 class="anchored" data-anchor-id="install-the-repository-in-editable-mode-so-all-your-changes-are-applied-whithout-the-need-of-reinstall">Install the repository in editable mode so all your changes are applied whithout the need of reinstall</h4>
-<p><code>pip install -e .</code></p>
+    <section id="installation" class="level2">
+        <h2 class="anchored" data-anchor-id="installation">Installation</h2>
+        <p>The first step during the installation is to clone the repository. Please note that the link below is the
+            link to the public mirror of the repository on GitHub. If you are developing code, most likely, you have to
+            replace it with the link to the development server.</p>
+        <div class="sourceCode" id="cb2">
+            <pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"
+                                                                                                          aria-hidden="true"
+                                                                                                          tabindex="-1"></a><span
+                    class="fu">git</span> clone git@github.com:tergite/tergite-autocalibration.git</span></code><button
+                    title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre>
+        </div>
+        <p>To manage Python packages, we are using the package manager <code>conda</code>. It is recommended to create
+            an environment for your project - alternatively, you can also just use Python 3.10</p>
+        <div class="sourceCode" id="cb3">
+            <pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"
+                                                                                                          aria-hidden="true"
+                                                                                                          tabindex="-1"></a><span
+                    class="ex">conda</span> create <span class="at">-n</span> tac python=3.10 <span class="at">-y</span></span></code><button
+                    title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre>
+        </div>
+        <p>Here, <code>tac</code> stands for tergite-autocalibration. We can activate and use the environment like this:
+        </p>
+        <div class="sourceCode" id="cb4">
+            <pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"
+                                                                                                          aria-hidden="true"
+                                                                                                          tabindex="-1"></a><span
+                    class="ex">conda</span> activate tac</span></code><button title="Copy to Clipboard"
+                                                                              class="code-copy-button"><i
+                    class="bi"></i></button></pre>
+        </div>
+        <p>If you are not using conda, activate the environment with:</p>
+        <div class="sourceCode" id="cb5">
+            <pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1"
+                                                                                                          aria-hidden="true"
+                                                                                                          tabindex="-1"></a><span
+                    class="bu">source</span> activate tac</span></code><button title="Copy to Clipboard"
+                                                                               class="code-copy-button"><i
+                    class="bi"></i></button></pre>
+        </div>
+        <p>Now, you should enter the repository folder, because the following commands have to be executed in there.</p>
+        <div class="sourceCode" id="cb6">
+            <pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1"
+                                                                                                          aria-hidden="true"
+                                                                                                          tabindex="-1"></a><span
+                    class="bu">cd</span> tergite-autocalibration</span></code><button title="Copy to Clipboard"
+                                                                                      class="code-copy-button"><i
+                    class="bi"></i></button></pre>
+        </div>
+        <p>To install the repository in editable mode. In Python the editable mode is triggerd by the parameter
+            <code>-e</code>. This means that when you changed and saved your code files, they will be automatically
+            loaded into the environment without re-installation.</p>
+        <div class="sourceCode" id="cb7">
+            <pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1"
+                                                                                                          aria-hidden="true"
+                                                                                                          tabindex="-1"></a><span
+                    class="ex">pip</span> install <span class="at">-e</span> .</span></code><button
+                    title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre>
+        </div>
 <p>Here <code>.</code> is the root directory (i.e.&nbsp;the directory that contains the <code>pyproject.toml</code> file)</p>
+        <section id="next-steps" class="level3">
+            <h3 class="anchored" data-anchor-id="next-steps">Next steps:</h3>
 </section>
+        <section id="setting-up-system-configuration-files" class="level3">
+            <h3 class="anchored" data-anchor-id="setting-up-system-configuration-files">Setting Up system &amp;
+                Configuration Files:</h3>
+            <p>Before the first run of the calibration suite a number of configuration files need to be set up. These
+                files describe our initial knowledge on the system as well as the connectivity with the measurement
+                hardware.</p>
 </section>
-<section id="setting-up-system-configuration-files" class="level2">
-<h2 class="anchored" data-anchor-id="setting-up-system-configuration-files">Setting Up system &amp; Configuration Files:</h2>
-<p>Before the first run of the callibration suite a number of configuration files need to be set up. These files describe our initial knowledge on the system as well as the connectivity with the measurement hardware.</p>
 <section id="the-.env-file." class="level3">
 <h3 class="anchored" data-anchor-id="the-.env-file.">The <code>.env</code> file.</h3>
-<p>All the settings and paths are contained in the <code>.env</code> file. Since this file contains user specific settings, it is git-ignored, it must be created by the user. For convinience a template file <code>dot-env-template.txt</code> already exists.</p>
+    <p>All the settings and paths are contained in the <code>.env</code> file. Since this file contains user specific
+        settings, it is git-ignored, it must be created by the user. For convenience a template file <code>dot-env-template.txt</code>
+        already exists.</p>
 <p>First copy the template file to the <code>.env</code> (this creates the <code>.env</code> file if it doesn’t exist):</p>
 <p><code>cp dot-env-template .env</code></p>
 <p>Then edit the newly created <code>.env</code> file according to your system. For example here’s how the user <code>lab-user</code> may complete the <code>.env</code> file:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Copy this file to a .env file in the tergite-autocalibration folder on the root level.</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># The .env file is a simple list of keys and values. It is also known as the INI file on MS Windows.</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Fill in the necessary values.</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># DEFAULT_PREFIX is added to logfiles, redis entries and in the data directory</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Default: cal</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>DEFAULT_PREFIX<span class="op">=</span>calibration</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Directory settings</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># ROOT_DIR defines the top-level folder of the tergite-autocalibration-lite folder</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Default: two levels up from the config</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>ROOT_DIR<span class="op">=</span><span class="st">'/home/lab-user/github/tergite-acl/'</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># DATA_DIR defines where plots are stored</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>DATA_DIR<span class="op">=</span><span class="st">'/home/lab-user/github/tergite-acl/data_directory/'</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># CONFIG_DIR defines where the configuration is stored</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>CONFIG_DIR<span class="op">=</span><span class="st">'/home/lab-user/github/tergite-acl/config_dir/'</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Configuration settings</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co"># It is assumed that all these paths are relative to CONFIG_DIR</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co"># HARDWARE_CONFIG is what Q-BLOX needs to compile schedules on the hardware</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co"># It should be a file in json format, there is no default file</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>HARDWARE_CONFIG<span class="op">=</span><span class="st">'HARDWARE_CONFIGURATION.json'</span></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="co"># DEVICE_CONFIG contains the initial values for the device configuration</span></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>DEVICE_CONFIG<span class="op">=</span><span class="st">'device_config.toml'</span></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Configuration variables</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="co"># CLUSTER_IP is the IP address of the instrument cluster to connect with</span></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>CLUSTER_IP<span class="op">=</span><span class="st">'162.0.2.162'</span></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="co"># SPI_SERIAL_PORT is the port on which the spi rack is connected</span></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>SPI_SERIAL_PORT<span class="op">=</span><span class="st">'/dev/ttyACM0'</span></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="co"># APP_SETTINGS reflect which environment the calibration is to run in.</span></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="co"># Options</span></span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="co">#  - development</span></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="co">#  - production</span></span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="co">#  - staging</span></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="co">#  - test</span></span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="co"># Default: production</span></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: currently we are only using the calibration in the development mode</span></span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>RUN_MODE<span class="op">=</span>development</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="co"># REDIS_PORT is the port which to use when connecting to redis</span></span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>REDIS_PORT<span class="op">=</span><span class="dv">6379</span></span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="co"># REDIS_CONNECTION will be automatically created in settings.py</span></span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="co"># PLOTTING is a boolean to indicate whether plots should be shown or whether plots should be silent in the background</span></span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="co"># Default: True</span></span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>PLOTTING<span class="op">=</span><span class="va">True</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+    <div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span
+            id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Copy this file to a .env file in the tergite-autocalibration folder on the root level.</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># The .env file is a simple list of keys and values. It is also known as the INI file on MS Windows.</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span
+        class="co"># Fill in the necessary values.</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># DEFAULT_PREFIX is added to logfiles, redis entries and in the data directory</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Default: cal</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>DEFAULT_PREFIX <span class="op">=</span> <span
+        class="st">'calibration'</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span
+        class="co"># Directory settings</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co"># ROOT_DIR defines the top-level folder of the tergite-autocalibration-lite folder</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Default: two levels up from the config</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>ROOT_DIR <span class="op">=</span> <span
+        class="st">'/home/lab-user/github/tergite-acl/'</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co"># DATA_DIR defines where plots are stored</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>DATA_DIR <span class="op">=</span> <span
+        class="st">'/home/lab-user/github/tergite-acl/data_directory/'</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co"># CONFIG_DIR defines where the configuration is stored</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>CONFIG_DIR <span class="op">=</span> <span
+        class="st">'/home/lab-user/github/tergite-acl/config_dir/'</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span
+        class="co"># Configuration settings</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co"># It is assumed that all these paths are relative to CONFIG_DIR</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="co"># HARDWARE_CONFIG is what Q-BLOX needs to compile schedules on the hardware</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="co"># It should be a file in json format, there is no default file</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>HARDWARE_CONFIG <span class="op">=</span> <span
+        class="st">'HARDWARE_CONFIGURATION.json'</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="co"># DEVICE_CONFIG contains the initial values for the device configuration</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>DEVICE_CONFIG <span class="op">=</span> <span
+        class="st">'device_config.toml'</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span
+        class="co"># Configuration variables</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="co"># CLUSTER_IP is the IP address of the instrument cluster to connect with</span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>CLUSTER_IP <span class="op">=</span> <span
+        class="st">'162.0.2.162'</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="co"># SPI_SERIAL_PORT is the port on which the spi rack is connected</span></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>SPI_SERIAL_PORT <span class="op">=</span> <span
+        class="st">'/dev/ttyACM0'</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="co"># APP_SETTINGS reflect which environment the calibration is to run in.</span></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Options</span></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="co">#  - development</span></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a><span class="co">#  - production</span></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a><span class="co">#  - staging</span></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a><span class="co">#  - test</span></span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a><span
+        class="co"># Default: production</span></span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span
+        class="al">TODO</span><span
+        class="co">: currently we are only using the calibration in the development mode</span></span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>RUN_MODE <span class="op">=</span> <span
+        class="st">'development'</span></span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a><span class="co"># REDIS_PORT is the port which to use when connecting to redis</span></span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>REDIS_PORT <span class="op">=</span> <span
+        class="dv">6379</span></span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a><span class="co"># REDIS_CONNECTION will be automatically created in settings.py</span></span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a><span class="co"># PLOTTING is a boolean to indicate whether plots should be shown or whether plots should be silent in the background</span></span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a><span class="co"># Default: True</span></span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>PLOTTING <span class="op">=</span> <span
+        class="va">True</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i
+            class="bi"></i></button></pre>
+    </div>
 
 
 </section>
@@ -324,7 +549,157 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       toggleBodyColorMode(bsSheetEl);
     }
   }
-  toggleBodyColorPrimary();  
+    toggleBodyColorPrimary();
+    const disableStylesheet = (stylesheets) => {
+        for (let i = 0; i < stylesheets.length; i++) {
+            const stylesheet = stylesheets[i];
+            stylesheet.rel = 'prefetch';
+        }
+    }
+    const enableStylesheet = (stylesheets) => {
+        for (let i = 0; i < stylesheets.length; i++) {
+            const stylesheet = stylesheets[i];
+            stylesheet.rel = 'stylesheet';
+        }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+        const els = window.document.querySelectorAll(selector);
+        for (let i = 0; i < els.length; i++) {
+            const el = els[i];
+            if (allowTransitions) {
+                el.classList.remove('notransition');
+            } else {
+                el.classList.add('notransition');
+            }
+        }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+        const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+        const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+        let newTheme = '';
+        if (darkModeDefault) {
+            newTheme = isAlternate ? baseTheme : alternateTheme;
+        } else {
+            newTheme = isAlternate ? alternateTheme : baseTheme;
+        }
+        const changeGiscusTheme = () => {
+            // From: https://github.com/giscus/giscus/issues/336
+            const sendMessage = (message) => {
+                const iframe = document.querySelector('iframe.giscus-frame');
+                if (!iframe) return;
+                iframe.contentWindow.postMessage({giscus: message}, 'https://giscus.app');
+            }
+            sendMessage({
+                setConfig: {
+                    theme: newTheme
+                }
+            });
+        }
+        const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+        if (isGiscussLoaded) {
+            changeGiscusTheme();
+        }
+    }
+    const toggleColorMode = (alternate) => {
+        // Switch the stylesheets
+        const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+        manageTransitions('#quarto-margin-sidebar .nav-link', false);
+        if (alternate) {
+            enableStylesheet(alternateStylesheets);
+            for (const sheetNode of alternateStylesheets) {
+                if (sheetNode.id === "quarto-bootstrap") {
+                    toggleBodyColorMode(sheetNode);
+                }
+            }
+        } else {
+            disableStylesheet(alternateStylesheets);
+            toggleBodyColorPrimary();
+        }
+        manageTransitions('#quarto-margin-sidebar .nav-link', true);
+        // Switch the toggles
+        const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+        for (let i = 0; i < toggles.length; i++) {
+            const toggle = toggles[i];
+            if (toggle) {
+                if (alternate) {
+                    toggle.classList.add("alternate");
+                } else {
+                    toggle.classList.remove("alternate");
+                }
+            }
+        }
+        // Hack to workaround the fact that safari doesn't
+        // properly recolor the scrollbar when toggling (#1455)
+        if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+            manageTransitions("body", false);
+            window.scrollTo(0, 1);
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+                manageTransitions("body", true);
+            }, 40);
+        }
+    }
+    const isFileUrl = () => {
+        return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+        let styleSentinel = getColorSchemeSentinel();
+        if (styleSentinel !== null) {
+            return styleSentinel === "alternate";
+        } else {
+            return false;
+        }
+    }
+    const setStyleSentinel = (alternate) => {
+        const value = alternate ? "alternate" : "default";
+        if (!isFileUrl()) {
+            window.localStorage.setItem("quarto-color-scheme", value);
+        } else {
+            localAlternateSentinel = value;
+        }
+    }
+    const getColorSchemeSentinel = () => {
+        if (!isFileUrl()) {
+            const storageValue = window.localStorage.getItem("quarto-color-scheme");
+            return storageValue != null ? storageValue : localAlternateSentinel;
+        } else {
+            return localAlternateSentinel;
+        }
+    }
+    const darkModeDefault = false;
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+        // Read the current dark / light value
+        let toAlternate = !hasAlternateSentinel();
+        toggleColorMode(toAlternate);
+        setStyleSentinel(toAlternate);
+        toggleGiscusIfUsed(toAlternate, darkModeDefault);
+    };
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+        const a = window.document.createElement('a');
+        a.classList.add('top-right');
+        a.classList.add('quarto-color-scheme-toggle');
+        a.href = "";
+        a.onclick = function () {
+            try {
+                window.quartoToggleColorScheme();
+            } catch {
+            }
+            return false;
+        };
+        const i = window.document.createElement("i");
+        i.classList.add('bi');
+        a.appendChild(i);
+        window.document.body.appendChild(a);
+    }
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+        toggleColorMode(true);
+    } else {
+        toggleColorMode(false);
+    }
   const icon = "";
   const anchorJS = new window.AnchorJS();
   anchorJS.options = {
