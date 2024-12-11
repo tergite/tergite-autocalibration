@@ -15,9 +15,6 @@
 
 # This is an example file on how to create a custom samplespace for your node.
 
-
-from tergite_autocalibration.lib.utils.samplespace import resonator_samples
-
 """
 user_samplespace schema:
 user_samplespace = {
@@ -34,10 +31,5 @@ user_samplespace = {
 }
 """
 ####################################################################
-qubits = ["q00"]
-user_samplespace = {
-    "resonator_spectroscopy": {
-        "ro_frequencies": {qubit: resonator_samples(qubit) for qubit in qubits}
-    },
-}
+user_samplespace = {}
 ####################################################################
