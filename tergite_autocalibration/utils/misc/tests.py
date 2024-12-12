@@ -15,7 +15,11 @@ import os
 
 def is_pytest() -> bool:
     """
-    Check whether it is running a pytest
+    Check whether it is running a pytest.
+
+    Notes:
+        Please use this function carefully, because it can be dangerous to modify the code and change the behaviour
+        for testing issues.
 
     Returns: True if the application is running as a pytest
 
