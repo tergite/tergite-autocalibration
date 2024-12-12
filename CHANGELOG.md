@@ -7,6 +7,8 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 
 ## [Unreleased]
 
+## [2024.12.0] - 2024-12-12
+
 ### Added
 - Dataset browser
 - ScheduleNode and ExternalParameterSweepNode as subclasses of BaseNode
@@ -17,8 +19,6 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 - Switch to quantify-scheduler version 0.21.2
 - Switch to qblox-instruments version 0.14.1 (qblox-firmware should be 9.0.1)
 - Upgrade to Python version 3.10
-
-### Fixed
 
 ## [2024.09.0] - 2024-09-16
 
