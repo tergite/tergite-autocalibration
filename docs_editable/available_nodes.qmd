@@ -13,6 +13,7 @@ graph TD
     G --> H2(3 States Discrimination)
         
     click A href "nodes/resonator_spectroscopy_node.html"
+    click B href "nodes/qubit_spectroscopy_node.html"
 
     style A fill:#ffe6cc,stroke:#333,stroke-width:2px
     style B fill:#ffe6cc,stroke:#333,stroke-width:2px
@@ -42,7 +43,7 @@ graph TD
 
 ## Qubit Control Nodes
 
-- qubit_01_spectroscopy
+- [qubit_01_spectroscopy](nodes/qubit_spectroscopy_node.qmd)
 - qubit_01_spectroscopy_pulsed
 - rabi_oscillations
 - ramsey_correction

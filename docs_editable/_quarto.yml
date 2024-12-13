@@ -16,6 +16,8 @@ website:
         href: available_nodes.qmd
       - text: "Developer Guide"
         href: developer_guide.qmd
+      - text: "Troubleshooting"
+        href: troubleshooting.qmd
     tools:
       - icon: github
         href: https://github.com/tergite/tergite-autocalibration
@@ -51,6 +53,8 @@ website:
             href: developer-guide/unit_tests.qmd
           - text: "Writing documentation"
             href: developer-guide/writing_documentation.qmd
+      - text: "Troubleshooting"
+        href: troubleshooting.qmd
   search:
     location: sidebar
     type: textbox
