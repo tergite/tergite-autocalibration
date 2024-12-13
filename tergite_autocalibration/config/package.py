@@ -99,7 +99,9 @@ class ConfigurationPackage:
                 # Check whether the files exist in the meta configuration file
                 if file_key_ in meta_config["files"].keys():
                     # Set the filepaths in the attribute
-                    logging.info(f"Loading {file_key_}: {meta_config['files'][file_key_]}")
+                    logging.info(
+                        f"Loading {file_key_}: {meta_config['files'][file_key_]}"
+                    )
                     return_obj.config_files[file_key_] = os.path.join(
                         config_path_prefix, meta_config["files"][file_key_]
                     )
@@ -134,7 +136,9 @@ class ConfigurationPackage:
 
         # Unzip the archive in the way it works on macOS such that it creates a folder with the same name
         meta_config_folder_path = os.path.splitext(meta_config_zip_path)[0]
-        logging.info(f"Unpacking configuration package from {meta_config_zip_path} to {meta_config_folder_path}")
+        logging.info(
+            f"Unpacking configuration package from {meta_config_zip_path} to {meta_config_folder_path}"
+        )
         shutil.unpack_archive(meta_config_zip_path, meta_config_folder_path)
 
         # Load the configuration from the .toml file inside
@@ -195,11 +199,7 @@ class ConfigurationPackage:
             # Ensure that the parent directory exists
             os.makedirs(os.path.split(new_file_path)[0], exist_ok=True)
             # Copy the file to the new directory
-            logging.info(
-                f"Copying: \n"
-                f"{file_path} \n"
-                f"-> {new_file_path}"
-            )
+            logging.info(f"Copying: \n" f"{file_path} \n" f"-> {new_file_path}")
             shutil.copy(file_path, new_file_path)
 
         # Iterate over all misc folders and copy them
@@ -210,15 +210,13 @@ class ConfigurationPackage:
             new_filepath = os.path.join(str(abs_path_to), str(rel_path))
             # Copy the whole folder to the new location
             if os.path.exists(new_filepath):
-                logging.warning(f"Location {new_filepath} already exists for the configuration package to copy. "
-                                f"The files will not be copied to avoid conflicts. "
-                                f"Please rename {misc_filepath} if you want to have the folder copied.")
-            else:
-                logging.info(
-                    f"Copying: \n"
-                    f"{misc_filepath} \n"
-                    f"-> {new_filepath}"
+                logging.warning(
+                    f"Location {new_filepath} already exists for the configuration package to copy. "
+                    f"The files will not be copied to avoid conflicts. "
+                    f"Please rename {misc_filepath} if you want to have the folder copied."
                 )
+            else:
+                logging.info(f"Copying: \n" f"{misc_filepath} \n" f"-> {new_filepath}")
                 shutil.copytree(misc_filepath, new_filepath, dirs_exist_ok=True)
 
         return ConfigurationPackage.from_toml(new_path_to_meta)

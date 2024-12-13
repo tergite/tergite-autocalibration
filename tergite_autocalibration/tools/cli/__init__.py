@@ -22,7 +22,7 @@ from tergite_autocalibration.tools.cli.config import config_cli
 from tergite_autocalibration.tools.cli.graph import graph_cli
 from tergite_autocalibration.tools.cli.node import node_cli
 
-logging.basicConfig(level=logging.INFO, format='%(name)s.%(levelname)s: %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(name)s.%(levelname)s: %(message)s")
 
 cli = typer.Typer(no_args_is_help=True)
 

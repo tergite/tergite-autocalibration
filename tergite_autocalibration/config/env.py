@@ -136,7 +136,9 @@ class EnvironmentConfiguration(BaseConfigurationFile):
                     expected_type_, variable_value_
                 )
 
-                logging.info(f"Loading {variable_name_.upper()}: {typed_variable_value_}")
+                logging.info(
+                    f"Loading {variable_name_.upper()}: {typed_variable_value_}"
+                )
                 return_obj.__setattr__(variable_name_, typed_variable_value_)
 
         logging.info(f"Loaded environmental variables from {filepath}")
