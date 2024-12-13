@@ -26,6 +26,7 @@ The autocalibration CLI is organized into several main command groups:
 - `cluster`: Handle operations related to the cluster
 - `node`: Handle operations related to the node
 - `graph`: Handle operations related to the calibration graph
+- `config`: Load and save the configuration files
 - `calibration`: Handle operations related to the calibration supervisor
 - `joke`: Handle operations related to the well-being of the user
 
@@ -74,6 +75,42 @@ acli graph plot
 ```
 
 This command visualizes the calibration graph using an arrow chart.
+
+### Configuration Commands ###
+
+Save and load the configuration.
+
+**Usage:**
+
+```bash
+acli config load [OPTIONS]
+```
+
+**Options:**
+
+- `-f/--filepath`: Path to the configuration package to load. It can be either to the `configuration.meta.toml`
+  file or to a zip file containing the whole configuration.
+- `-t/--template`: Path to the template package to load. The templates are located in
+  `tergite_autocalibration.config.templates`. If the autocompletion is installed for `acli`, then the templates should
+  be shown as suggestions automatically.
+
+**Notes:**
+
+To run this command, please navigate to the root directory of the repository.
+The configuration package will be placed into the root directory, which is the default location for the application to
+detect the configuration package.
+
+**Usage:**
+
+```bash
+acli config save [OPTIONS]
+```
+
+**Options:**
+
+- `-f/--filepath`: Path to the configuration package to save. If the path name is ending with `.zip`, it will
+  automatically create a zip file and treat it as if you are running with `-z`.
+- `-z/--as-zip`: Will make the configuration file be a zip archive.
 
 ### Calibration Commands ###
 
