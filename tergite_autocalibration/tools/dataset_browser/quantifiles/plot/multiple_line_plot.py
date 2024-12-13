@@ -1,12 +1,10 @@
 from __future__ import annotations
+
 from itertools import cycle
-from typing import List, Sequence
+from typing import Sequence
 
-from PyQt5 import QtCore
 import numpy as np
-import pyqtgraph
 import xarray as xr
-
 from quantifiles import units
 from quantifiles.plot.baseplot import BasePlot
 from quantifiles.plot.lineplot import _OPTIONS

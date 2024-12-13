@@ -63,15 +63,15 @@ Below, for example, you have the rabi oscillations node:
 
 ```python
 class RabiOscillations(ScheduleNode):
-   measurement_obj = RabiOscillationsMeasurement
-   analysis_obj = RabiOscillationsAnalysis
-   qubit_qois = ["rxy:amp180"]
+  measurement_obj = RabiOscillationsMeasurement
+  analysis_obj = RabiOscillationsAnalysis
+  qubit_qois = ["rxy:amp180"]
 
-   def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-      super().__init__(name, all_qubits, **schedule_keywords)
+  def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
+    super().__init__(name, all_qubits, **schedule_keywords)
         self.schedule_samplespace = {
-           "mw_amplitudes": {
-              qubit: np.linspace(0.002, 0.90, 61) for qubit in self.all_qubits
+          "mw_amplitudes": {
+            qubit: np.linspace(0.002, 0.90, 61) for qubit in self.all_qubits
             }
         }
 ```
@@ -117,8 +117,9 @@ This is one option for the node behaviour:
   which is the part of the generating function within the schedule.
 
 When you are implementing a node, you can choose which of the two abstract node classes fit better with the behaviour of
-your new node.
-Also, if you want to implement a more sophisticated measurement procedure, you can override the procedures in the
+your new node. Also, if you want to implement a more sophisticated measurement procedure, you can override the
+procedures in the measurement function or in other places. Check out the article about [node classes](node_classes.qmd)
+for more details.
 
 ## Register the node in the framework
 

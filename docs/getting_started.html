@@ -219,14 +219,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
                         </li>
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
-                                <a href="./user-guide/operation.html" class="sidebar-item-text sidebar-link">
-                                    <span class="menu-text">Operation</span></a>
+                                <a href="./user-guide/configuration_files.html" class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Configuration Files</span></a>
                             </div>
                         </li>
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
-                                <a href="./user-guide/configuration_files.html" class="sidebar-item-text sidebar-link">
-                                    <span class="menu-text">Configuration Files</span></a>
+                                <a href="./user-guide/operation.html" class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Operation</span></a>
                             </div>
                         </li>
                     </ul>
@@ -254,6 +254,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
                                 <a href="./nodes/resonator_spectroscopy_node.html"
                                    class="sidebar-item-text sidebar-link">
                                     <span class="menu-text">Resonator spectroscopy</span></a>
+                            </div>
+                        </li>
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="./nodes/qubit_spectroscopy_node.html" class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Qubit spectroscopy</span></a>
                             </div>
                         </li>
                     </ul>
@@ -330,10 +336,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
       <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps">Next steps:</a>
       </li>
-      <li><a href="#setting-up-system-configuration-files" id="toc-setting-up-system-configuration-files"
-             class="nav-link" data-scroll-target="#setting-up-system-configuration-files">Setting Up system &amp;
-          Configuration Files:</a></li>
-  <li><a href="#the-.env-file." id="toc-the-.env-file." class="nav-link" data-scroll-target="#the-.env-file.">The <code>.env</code> file.</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -435,94 +437,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Here <code>.</code> is the root directory (i.e.&nbsp;the directory that contains the <code>pyproject.toml</code> file)</p>
         <section id="next-steps" class="level3">
             <h3 class="anchored" data-anchor-id="next-steps">Next steps:</h3>
-</section>
-        <section id="setting-up-system-configuration-files" class="level3">
-            <h3 class="anchored" data-anchor-id="setting-up-system-configuration-files">Setting Up system &amp;
-                Configuration Files:</h3>
-            <p>Before the first run of the calibration suite a number of configuration files need to be set up. These
-                files describe our initial knowledge on the system as well as the connectivity with the measurement
-                hardware.</p>
-</section>
-<section id="the-.env-file." class="level3">
-<h3 class="anchored" data-anchor-id="the-.env-file.">The <code>.env</code> file.</h3>
-    <p>All the settings and paths are contained in the <code>.env</code> file. Since this file contains user specific
-        settings, it is git-ignored, it must be created by the user. For convenience a template file <code>dot-env-template.txt</code>
-        already exists.</p>
-<p>First copy the template file to the <code>.env</code> (this creates the <code>.env</code> file if it doesn’t exist):</p>
-<p><code>cp dot-env-template .env</code></p>
-<p>Then edit the newly created <code>.env</code> file according to your system. For example here’s how the user <code>lab-user</code> may complete the <code>.env</code> file:</p>
-    <div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span
-            id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Copy this file to a .env file in the tergite-autocalibration folder on the root level.</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># The .env file is a simple list of keys and values. It is also known as the INI file on MS Windows.</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span
-        class="co"># Fill in the necessary values.</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># DEFAULT_PREFIX is added to logfiles, redis entries and in the data directory</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Default: cal</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>DEFAULT_PREFIX <span class="op">=</span> <span
-        class="st">'calibration'</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span
-        class="co"># Directory settings</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co"># ROOT_DIR defines the top-level folder of the tergite-autocalibration-lite folder</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Default: two levels up from the config</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>ROOT_DIR <span class="op">=</span> <span
-        class="st">'/home/lab-user/github/tergite-acl/'</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co"># DATA_DIR defines where plots are stored</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>DATA_DIR <span class="op">=</span> <span
-        class="st">'/home/lab-user/github/tergite-acl/data_directory/'</span></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co"># CONFIG_DIR defines where the configuration is stored</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>CONFIG_DIR <span class="op">=</span> <span
-        class="st">'/home/lab-user/github/tergite-acl/config_dir/'</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span
-        class="co"># Configuration settings</span></span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co"># It is assumed that all these paths are relative to CONFIG_DIR</span></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="co"># HARDWARE_CONFIG is what Q-BLOX needs to compile schedules on the hardware</span></span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="co"># It should be a file in json format, there is no default file</span></span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>HARDWARE_CONFIG <span class="op">=</span> <span
-        class="st">'HARDWARE_CONFIGURATION.json'</span></span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="co"># DEVICE_CONFIG contains the initial values for the device configuration</span></span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>DEVICE_CONFIG <span class="op">=</span> <span
-        class="st">'device_config.toml'</span></span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span
-        class="co"># Configuration variables</span></span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="co"># CLUSTER_IP is the IP address of the instrument cluster to connect with</span></span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>CLUSTER_IP <span class="op">=</span> <span
-        class="st">'162.0.2.162'</span></span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="co"># SPI_SERIAL_PORT is the port on which the spi rack is connected</span></span>
-<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>SPI_SERIAL_PORT <span class="op">=</span> <span
-        class="st">'/dev/ttyACM0'</span></span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="co"># APP_SETTINGS reflect which environment the calibration is to run in.</span></span>
-<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Options</span></span>
-<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="co">#  - development</span></span>
-<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a><span class="co">#  - production</span></span>
-<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a><span class="co">#  - staging</span></span>
-<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a><span class="co">#  - test</span></span>
-<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a><span
-        class="co"># Default: production</span></span>
-<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span
-        class="al">TODO</span><span
-        class="co">: currently we are only using the calibration in the development mode</span></span>
-<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>RUN_MODE <span class="op">=</span> <span
-        class="st">'development'</span></span>
-<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a><span class="co"># REDIS_PORT is the port which to use when connecting to redis</span></span>
-<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>REDIS_PORT <span class="op">=</span> <span
-        class="dv">6379</span></span>
-<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a><span class="co"># REDIS_CONNECTION will be automatically created in settings.py</span></span>
-<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a><span class="co"># PLOTTING is a boolean to indicate whether plots should be shown or whether plots should be silent in the background</span></span>
-<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a><span class="co"># Default: True</span></span>
-<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>PLOTTING <span class="op">=</span> <span
-        class="va">True</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i
-            class="bi"></i></button></pre>
-    </div>
+            <ul>
+                <li><a href="./user-guide/configuration_files.html">Configuration files</a> in case you are interested
+                    on how to configure the application and run the first experiments.
+                </li>
+                <li><a href="./developer_guide.html">Developer guide</a> in case you would like to start developing
+                    features for the automatic calibration.
+                </li>
+            </ul>
 
 
 </section>

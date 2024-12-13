@@ -13,14 +13,9 @@
 from pathlib import Path
 
 import pytest
-import xarray as xr
-from numpy import ndarray
 
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis import (
     CZParametrizationFixDurationNodeAnalysis,
-)
-from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.utils.no_valid_combination_exception import (
-    NoValidCombinationException,
 )
 
 

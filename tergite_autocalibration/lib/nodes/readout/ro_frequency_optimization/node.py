@@ -22,7 +22,7 @@ from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.measure
     RO_frequency_optimization,
 )
 from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
-from tergite_autocalibration.utils.user_input import resonator_samples
+from tergite_autocalibration.lib.utils.samplespace import resonator_samples
 
 
 class RO_frequency_two_state_optimization_Node(ScheduleNode):

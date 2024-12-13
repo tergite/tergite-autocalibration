@@ -10,15 +10,19 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
+
 import logging
-from typing import Annotated, Union
+from typing import Annotated
 
 import typer
 
-from .calibration import calibration_cli
-from .cluster import cluster_cli
-from .graph import graph_cli
-from .node import node_cli
+from tergite_autocalibration.tools.cli.calibration import calibration_cli
+from tergite_autocalibration.tools.cli.cluster import cluster_cli
+from tergite_autocalibration.tools.cli.config import config_cli
+from tergite_autocalibration.tools.cli.graph import graph_cli
+from tergite_autocalibration.tools.cli.node import node_cli
+
+logging.basicConfig(level=logging.INFO, format="%(name)s.%(levelname)s: %(message)s")
 
 cli = typer.Typer(no_args_is_help=True)
 
@@ -46,6 +50,26 @@ cli.add_typer(
     help="Handle operations related to the calibration graph.",
     no_args_is_help=True,
 )
+cli.add_typer(
+    config_cli,
+    name="config",
+    help="Functions related to the configuration.",
+    no_args_is_help=True,
+)
+
+
+@cli.command(help="Quickly runs to set reasonable defaults for the configuration.")
+def quickstart():
+    """
+    Runs the quickstart and set up the autocalibration with reasonable default values.
+    This is to some extent similar to `acli config load -t .default`, but additionally sets up the .env file.
+
+    Returns:
+
+    """
+    from .config import load
+
+    load(template=".default")
 
 
 @cli.command(help="Open the dataset browser (quantifiles).")
@@ -62,17 +86,29 @@ def browser(
         typer.Option(
             "--liveplotting",
             is_flag=True,
-            help="Path to the data directory with your measurement results.",
+            help="Whether plots should be updated live during measurements.",
         ),
     ] = False,
     log_level: Annotated[
         int,
         typer.Option(
             "--log-level",
-            help="Path to the data directory with your measurement results.",
+            help="Sets the log level of the application.",
         ),
     ] = 30,
 ):
+    """
+    This is to open the quantifiles databrowser.
+    This endpoint is essentially just a wrapper for the `quantifiles` endpoint.
+
+    Args:
+        datadir: Path to the data directory with your measurement results.
+        liveplotting: Whether plots should be updated live during measurements.
+        log_level: Sets the log level of the application. This is implemented with Python `logging`.
+
+    Returns:
+
+    """
     from quantifiles import quantifiles
 
     quantifiles(datadir, liveplotting, log_level)

@@ -14,8 +14,6 @@
 
 from quantify_scheduler.enums import BinMode
 
-from tergite_autocalibration.config.settings import REDIS_CONNECTION
-
 
 class BaseMeasurement:
     def __init__(self, transmons: dict, couplers: dict = {}):

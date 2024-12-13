@@ -12,13 +12,13 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import numpy as np
 import matplotlib.patches as mpatches
+import numpy as np
 from numpy.linalg import inv
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
-from tergite_autocalibration.config.settings import REDIS_CONNECTION
+from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.lib.base.analysis import (
     BaseQubitAnalysis,
     BaseAllQubitsAnalysis,

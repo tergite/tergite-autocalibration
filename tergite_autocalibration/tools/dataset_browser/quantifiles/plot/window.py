@@ -5,10 +5,8 @@ from functools import partial
 from typing import cast
 
 import xarray as xr
-
-from PyQt5 import QtGui, QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import QSignalMapper
-
 from quantifiles.data import get_snapshot_as_dict
 from quantifiles.plot.baseplot import BasePlot
 from quantifiles.plot.lineplot import LinePlot

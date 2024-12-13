@@ -15,10 +15,9 @@
 from enum import Enum
 from functools import singledispatchmethod
 
-import numpy as np
-import xarray as xr
-from scipy.optimize import leastsq
 import matplotlib.patches as mpatches
+import numpy as np
+from scipy.optimize import leastsq
 
 from ....base.analysis import (
     BaseAllCouplersAnalysis,
