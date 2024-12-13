@@ -10,7 +10,7 @@ After reading this guide, you will know:
 - What is a configuration package and how is it structured
 
 Take a look into the operation manual to
-see [how to load and save configuration packages](operation.qmd#configuration-commands)
+see [how to load and save configuration packages](operation.qmd#configuration-commands).
 
 ## Environment variables
 
@@ -26,7 +26,7 @@ should be located there.
 Copy the template and update values according to the instructions. The template file itself provides instructions on how
 to update the values.
 
-```shell
+```bash
 cp .example.env .env
 ```
 
@@ -129,7 +129,7 @@ and couplers of the QPU.
 
 Example: Part of a cluster definition
 
-```
+```json
 {
   "config_type": "quantify_scheduler.backends.qblox_backend.QbloxHardwareCompilationConfig",
   "hardware_description": {
@@ -192,13 +192,13 @@ The file in the template package is `cluster_configuration.json`.
 You can find more information about the hardware configuration in
 the [documentation of quantify-scheduler](https://quantify-os.org/docs/quantify-scheduler/tutorials/Compiling%20to%20Hardware.html)
 
-#### Migrating old hardware configurations to match quantify-scheduler>=0.18.0
+**Migrating old hardware configurations to match quantify-scheduler>=0.18.0**
 
 With quantify-scheduler 0.18.0 there has been introduced a new way on how to structure the hardware configuration file.
 If you are having a hardware configuration file, that is structured using the old way, you can use the following script
 to migrate it to the new structure.
 
-```
+```bash
 python tergite_autocalibration/scripts/migrate_blox_hardware_configuration.py <PATH_TO_HW_CONFIG>
 ```
 
@@ -213,14 +213,14 @@ coupler.
 
 It is possible to either address a qubit individually, e.g. the following would set the VNA frequency for qubit `q06`:
 
-```
+```toml
 [device.resonator.q06]
 VNA_frequency = 6832973301.189378
 ```
 
 or for all qubits:
 
-```
+```toml
 [device.resonator.all]
 attenuation = 12
 
@@ -235,7 +235,7 @@ In the `[layout]` section the positions of the qubits can be set.
 This is useful if one would like to e.g. plot the device.
 Qubits have an x (column) and a y (row) position:
 
-```
+```toml
 [layout.resonator.q06]
 position = { column = 0, row = 0 }
 ```
@@ -246,7 +246,7 @@ In this file there are some settings such as the target node, the qubits and the
 
 Example: Calibrate qubits `q01` and `q02` with coupler `q01_q02` up until the node `cz_calibration`.
 
-```
+```toml
 target_node = "cz_calibration"
 qubits = ["q01", "q02"]
 couplers = ["q01_q02"]
@@ -260,7 +260,7 @@ This would load and overwrite the configurations made in the device configuratio
 
 Example: Setting the reset duration for the resonator spectroscopy node.
 
-```
+```toml
 [resonator_spectroscopy.all]
 reset.duration =  60e-6
 ```
@@ -276,7 +276,7 @@ assign the couplers to groups.
 
 Example: Definition of a coupler
 
-```
+```toml
 [couplers.q11_q12]
 spi_module_no = 1
 dac_name = "dac0"
@@ -291,7 +291,7 @@ If you want to generate samplespaces with your own custom Python scripts, you ca
 configuration.
 The file must contain the definition of your samplespace according to the following schema:
 
-```
+```python
 user_samplespace = {
     node1_name : {
             "settable_of_node1_1": { 'q01': np.ndarray, 'q02': np.ndarray },

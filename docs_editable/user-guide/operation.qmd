@@ -111,15 +111,29 @@ detect the configuration package.
 acli config save [OPTIONS]
 ```
 
+Save the configuration.
+
 **Options:**
 
 - `-f/--filepath`: Path to the configuration package to save. If the path name is ending with `.zip`, it will
   automatically create a zip file and treat it as if you are running with `-z`.
 - `-z/--as-zip`: Will make the configuration file be a zip archive.
 
-### Calibration Commands ###
+#### `quickstart`
 
-#### `calibration start` ####
+**Usage:**
+
+```bash
+acli quickstart
+```
+
+Loads the default configuration package. This configuration package is not supposed to run on any setup, but it will
+just copy configuration files into the application, so, that the application does not crash because configuration files
+are missing.
+
+### Calibration Commands
+
+#### `calibration start`
 
 Starts the calibration supervisor.
 
