@@ -1,4 +1,4 @@
-# Node types
+# Node classes
 
 The execution of most of the nodes consists of a single schedule compilation, a single measurement and a single
 post-processing.
@@ -7,59 +7,89 @@ more advanced implementations.
 
 To allow greater flexibility in the node implementations the nodes are categorized:
 
-- According to whether they compile once or multiple times:
-    - `node.type = simple_sweep`: if it compiles once
-    - `node.type = parameterized_sweep`: if it compiles multiple times
-
-- According to whether the sweeping parameters are swept within the schedule or not:
-    - There is only `node.schedule_samplespace` if the sweeping takes place within the schedule
+- `ScheduleNode`: The simple way of doing the measurement and having an analysis afterward. This node compiles one time
+    - There is only `node.schedule_samplespace` if the sweeping takes place within the schedule.
+- `ExternalParameterNode`: A looping over an external parameter during the sweep. This node compiles several times.
     - There are both `node.schedule_samplespace`  and `node.external_samplespace` if there are sweeping parameters
-      outside
-      the schedule. For example
-      the `coupler_spectroscopy` node sweeps the `dc_current` outside of the schedule:
+      outside the schedule. For example the `coupler_spectroscopy` node sweeps the `dc_current` outside of the schedule:
+
+Below, there is an example for an `ExternalParameterNode` implementation.
 
 ```python
-  class Coupler_Spectroscopy_Node(BaseNode):
-    measurement_obj = Two_Tones_Multidim
-    analysis_obj = CouplerSpectroscopyAnalysis
+import numpy as np
 
-    def __init__(self, name: str, all_qubits: list[str], couplers, **schedule_keywords):
+from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
+    CouplerSpectroscopyNodeAnalysis,
+)
+
+from tergite_autocalibration.lib.nodes.external_parameter_node import (
+    ExternalParameterNode,
+)
+
+from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement import (
+    Two_Tones_Multidim,
+)
+
+from tergite_autocalibration.lib.utils.samplespace import qubit_samples
+from tergite_autocalibration.utils.dto.enums import MeasurementMode
+from tergite_autocalibration.utils.hardware.spi import SpiDAC
+
+
+class CouplerSpectroscopyNode(ExternalParameterNode):
+    measurement_obj = Two_Tones_Multidim
+    analysis_obj = CouplerSpectroscopyNodeAnalysis
+    coupler_qois = ["parking_current", "current_range"]
+
+    def __init__(
+            self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
+    ):
         super().__init__(name, all_qubits, **schedule_keywords)
+        self.name = name
         self.couplers = couplers
-        self.redis_field = ['parking_current']
+        self.qubit_state = 0
+        self.schedule_keywords["qubit_state"] = self.qubit_state
+        self.coupled_qubits = self.get_coupled_qubits()
+        self.coupler = self.couplers[0]
+
+        self.mode = MeasurementMode.real
+        self.spi_dac = SpiDAC(self.mode)
+        self.dac = self.spi_dac.create_spi_dac(self.coupler)
+
         self.all_qubits = self.coupled_qubits
 
         self.schedule_samplespace = {
-            'spec_frequencies': {
+            "spec_frequencies": {
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
             }
         }
 
         self.external_samplespace = {
-            'dc_currents': {
-                self.coupler: np.arange(-2.5e-3, 2.5e-3, 500e-6)
-            },
+            "dc_currents": {self.coupler: np.arange(-2.5e-3, 2.5e-4, 280e-6)},
         }
 
-    def pre_measurement_operation(self, reduced_ext_space):
-        iteration_dict = reduced_ext_space['dc_currents']
+    def get_coupled_qubits(self) -> list:
+        if len(self.couplers) > 1:
+            print("Multiple couplers, lets work with only one")
+        coupled_qubits = self.couplers[0].split(sep="_")
+        self.coupler = self.couplers[0]
+        return coupled_qubits
 
+    def pre_measurement_operation(self, reduced_ext_space):
+        iteration_dict = reduced_ext_space["dc_currents"]
         this_iteration_value = list(iteration_dict.values())[0]
-        print(f'{ this_iteration_value = }')
+        print(f"{ this_iteration_value = }")
         self.spi_dac.set_dac_current(self.dac, this_iteration_value)
+
+    def final_operation(self):
+        print("Final Operation")
+        self.spi_dac.set_dac_current(self.dac, 0)
+
 ```
 
-By default, every node is assigned a `node.type` attribute at the `BaseNode` class:
+Please read the guide about [how to create a new node](new_node_creation.qmd) to learn more about nodes.
+This guide also contains an example for a `ScheduleNode`.
 
-`self.type = simple_sweep`
-
-This attribute can be overwritten at the implementation of the class of each node. An example of a `parameterized_sweep`
-node type is `Randomized_Benchmarking` as each new iteration requires the schedule to be recompiled with a different
-random seed.
-
-The `tergite_acl/scripts/node_supervisor.py` is responsible to distinguish between each node variation.
-
-#### Examples of nodes requiring an external samplespace:
+**Examples of nodes requiring an external samplespace**
 
 - `coupler_spectroscopy` sweeps the `dc_current` which is set by the SPI rack not the cluster
 - `T1` sweeps a repetition index to repeat the measurement many times
