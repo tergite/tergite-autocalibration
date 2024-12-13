@@ -19,8 +19,10 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
 
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
-from tergite_autocalibration.lib.base.analysis import (BaseAllQubitsAnalysis,
-                                                       BaseQubitAnalysis)
+from tergite_autocalibration.lib.base.analysis import (
+    BaseAllQubitsAnalysis,
+    BaseQubitAnalysis,
+)
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 
 
@@ -67,6 +69,7 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
 
         for index, ro_amplitude in enumerate(self.amplitudes):
             iq = self.IQ(index)
+            breakpoint()
             y_pred = self.lda.fit(iq, y).predict(iq)
 
             cm_norm = confusion_matrix(y, y_pred, normalize="true")
@@ -258,13 +261,13 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         self.threshold_point = self.threshold * np.array(
             [np.cos(threshold_direction), np.sin(threshold_direction)]
         )
-        self.rotated_IQ0_tp = rotated_IQ0[tp0] # True Positive when sending 0
+        self.rotated_IQ0_tp = rotated_IQ0[tp0]  # True Positive when sending 0
         self.rotated_IQ0_fp = rotated_IQ0[~tp0]
-        self.rotated_IQ1_tp = rotated_IQ1[tp1] # True Positive when sending 1
+        self.rotated_IQ1_tp = rotated_IQ1[tp1]  # True Positive when sending 1
         self.rotated_IQ1_fp = rotated_IQ1[~tp1]
-        self.IQ0_tp = IQ0[tp0] # True Positive when sending 0
+        self.IQ0_tp = IQ0[tp0]  # True Positive when sending 0
         self.IQ0_fp = IQ0[~tp0]
-        self.IQ1_tp = IQ1[tp1] # True Positive when sending 1
+        self.IQ1_tp = IQ1[tp1]  # True Positive when sending 1
         self.IQ1_fp = IQ1[~tp1]
 
         self.rotated_y_limits = (rotated_IQ[:, 1].min(), rotated_IQ[:, 1].max())
@@ -272,8 +275,8 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
 
         self.rotation_angle = rotation_angle
         self.rotation_angle_degrees = np.rad2deg(rotation_angle)
-        print(f'{self.qubit}.measure.acq_rotation = {self.rotation_angle_degrees}')
-        print(f'{self.qubit}.measure.acq_threshold = {self.threshold}')
+        print(f"{self.qubit}.measure.acq_rotation = {self.rotation_angle_degrees}")
+        print(f"{self.qubit}.measure.acq_threshold = {self.threshold}")
 
         return [self.optimal_amplitude, self.rotation_angle_degrees, self.threshold]
 

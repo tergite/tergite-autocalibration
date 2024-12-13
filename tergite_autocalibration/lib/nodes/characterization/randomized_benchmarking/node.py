@@ -32,11 +32,9 @@ class RandomizedBenchmarkingSSRONode(ScheduleNode):
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
         self.schedule_keywords = schedule_keywords
-        self.qubit_state = 2
         self.schedule_keywords = {}
         self.loops = 500
         self.schedule_keywords["loop_repetitions"] = self.loops
-        self.schedule_keywords["qubit_state"] = self.qubit_state
 
         RB_REPEATS = 2
         self.outer_schedule_samplespace = {
@@ -48,9 +46,7 @@ class RandomizedBenchmarkingSSRONode(ScheduleNode):
 
         self.schedule_samplespace = {
             "number_of_cliffords": {
-                qubit: np.append(
-                    np.array([0, 8, 16, 32, 64, 128, 256, 512, 1024]), [0, 1, 2]
-                )
+                qubit: np.array([0, 8, 16, 32, 64, 128, 256, 512, 1024])
                 for qubit in self.all_qubits
             },
         }
