@@ -18,14 +18,50 @@ On an unknown experimental device without pre-built files, it probably takes sli
 A template for a full configuration package can be found in `data/_template/_device_name`.
 Some more pre-built configuration package can be found in `data/devices` under the respective device names.
 
+## Environment variables
+
+Computer systems generally use variables on a system level e.g. to store global variables.
+These variables usually have a name with `UPPER_CASE_LETTERS`.
+Also, there is a convention to store those variables in a `.env` file on the root-level of your project and load the
+variables before running a program.
+The template for the environmental variables of the tergite-autocalibration can be found in the `.example.env` file on
+root-level of the repository.
+E.g. if you have cloned the repository into `/home/user/repos/tergite-autocalibration`, then your example template
+should be located there.
+
+Copy the template and update values according to the instructions. The template file itself provides instructions on how
+to update the values.
+
+```shell
+cp .example.env .env
+```
+
+Values that can be set in the environment are e.g. `PLOTTING` and this variable determines whether plots should be
+shown.
+Most of the values have reasonable defaults, but of course the `CLUSTER_IP` is required when you measure on a cluster
+and do not want to run only on dummy data.
+
 ## Configuration packages
 
-### Why configuration packages?
+For all other configuration, there is a so-called configuration package.
+The reason to have a configuration package is to have all configuration files in one place.
 
-All the configuration files above are stored in one place.
 This is how an example configuration package looks like:
 
-![Configuration folder structure](../.assets/images/configuration_files_folder_structure.png)
+- `configs/`: A folder with the configuration files
+  - `cluster_config.json`: The configuration for the cluster
+  - `device_config.toml`: The configuration with values related to the device/chip
+  - `node_config.toml`: Some device configuration that is overwritten when a certain node is executed
+  - `run_config.toml`: Run-specific parameters such as the qubits and the target node to calibrate
+  - `spi_config.toml`: Defines the spi and groups of couplers
+  - `user_samplespace.py`: Define custom sweeps for the nodes
+- `additional_files/`: A folder with other additional files
+  - `mixer_calibration.csv`: E.g. the mixer calibration values
+- `wiring_diagrams/`: A folder with even more additional files
+  - `wiring_diagram.png`: E.g. a wiring diagram
+- `configuration.meta.toml`: The configuration file that describes the structure of the configuration package
+
+Now, we will go through all the details of these configuration files.
 
 ### The configuration.meta.toml file
 
@@ -46,7 +82,8 @@ spi_config = 'spi_config.toml'
 user_samplespace = 'user_samplespace.py'
 
 [misc]
-miscellaneous_files = "misc"
+mixer_calibrations = "additional_files"
+wiring_diagrams = "wiring_diagrams"
 ```
 
 The main sections in that `.toml` file are:
@@ -83,23 +120,14 @@ Now, in the folder, there are these six configuration files:
 In the following, there are some more detailed descriptions of what these files mean and contain.
 More information can also be found in the templates and example configuration files.
 
-## Environment variables
-Computer systems generally use `CAPITALIZED_GLOBAL_KEYS` on a system level e.g. to store global variables.
-There is a convention to store those variables in a `.env` file on the root-level of your project and load the variables before running a program.
-The template for the environmental variables of the tergite-autocalibration can be found in the `.example.env` file on root-level of the repository.
-E.g. if you have cloned the repository into `/home/user/repos/tergite-autocalibration`, then your example template should be located there.
-
-Copy the template and update values according to the instructions. The template file itself provides instructions on how to update the values.
-```shell
-cp .example.env .env
-```
-Values that can be set in the environment are e.g. `PLOTTING` and this variable determines whether plots should be shown.
-
 ### Cluster configuration (.json):
+
 A QBLOX cluster consists of a couple of modules of which each can have multiple input/output options for SMI cables.
-In the cluster configuration the connection is made between these QBLOX cluster physical ports and clocks to the qubits and couplers of the QPU.
+In the cluster configuration the connection is made between these QBLOX cluster physical ports and clocks to the qubits
+and couplers of the QPU.
 
 Example: Definition of a qubit drive for |0> to |1> state)
+
 ```
 {
    "backend": "quantify_scheduler.backends.qblox_backend.hardware_compile",
@@ -130,7 +158,8 @@ The file in the template package is `cluster_configuration.json`.
 
 FIXME: This is to be changed after with the integration of the automatic mixer calibration
 The cluster configuration relies on some values that come from a mixer calibration.
-Given a `.csv` file after a mixer calibration the function `utils/hw_generator.py` can create instantly the corresponding `JSON` file.
+Given a `.csv` file after a mixer calibration the function `utils/hw_generator.py` can create instantly the
+corresponding `JSON` file.
 
 #### Migrating old hardware configurations to match quantify-scheduler>=0.18.0
 
@@ -142,12 +171,15 @@ to migrate it to the new structure.
 python tergite_autocalibration/scripts/migrate_blox_hardware_configuration.py <PATH_TO_HW_CONFIG>
 ```
 
-
 ### SPI configuration (.toml | optional):
-When working with two-qubit gates, there has to be a current source for the coupler and in the QBLOX stack this is coming from the so called SPI rack.
-The SPI configuration is mapping the qubits to their respective modules in the SPI rack and can be further used to assign the couplers to groups.
+
+When working with two-qubit gates, there has to be a current source for the coupler and in the QBLOX stack this is
+coming from the so called SPI rack.
+The SPI configuration is mapping the qubits to their respective modules in the SPI rack and can be further used to
+assign the couplers to groups.
 
 Example: Definition of a coupler
+
 ```
 [couplers.q11_q12]
 spi_module_no = 1
@@ -158,16 +190,22 @@ edge_group = 1
 The file in the template package is `spi_config.toml`.
 
 ### Device Configuration file (.toml):
-While the previous two configuration files have been used to configure the room temperature instruments, the device configuration defines the initial parameters and characteristics of chip itself.
+
+While the previous two configuration files have been used to configure the room temperature instruments, the device
+configuration defines the initial parameters and characteristics of chip itself.
 The device configuration is having two main sections -- the `[device]` and the `[layout]` section.
-In the `[device]` section prior knowledge about the device from the VNA are set for the resonator, qubit (drive) and the coupler.
+In the `[device]` section prior knowledge about the device from the VNA are set for the resonator, qubit (drive) and the
+coupler.
 
 It is possible to either address a qubit individually, e.g. the following would set the VNA frequency for qubit `q06`:
+
 ```
 [device.resonator.q06]
 VNA_frequency = 6832973301.189378
 ```
+
 or for all qubits:
+
 ```
 [device.resonator.all]
 attenuation = 12
@@ -191,26 +229,31 @@ q06.measure.pulse_amp = 0.03
 In the `[layout]` section the positions of the qubits can be set.
 This is useful if one would like to e.g. plot the device.
 Qubits have an x (column) and a y (row) position:
+
 ```
 [layout.resonator.q06]
 position = { column = 0, row = 0 }
 ```
 
 ### Run configuration (.toml):
+
 In this file there are some settings such as the target node, the qubits and the couplers to calibrate.
 
 Example: Calibrate qubits `q01` and `q02` with coupler `q01_q02` up until the node `cz_calibration`.
+
 ```
 target_node = "cz_calibration"
 qubits = ["q01", "q02"]
 couplers = ["q01_q02"]
 ```
 
-
 ### Node configuration (.toml):
-Below, you can define node-specific parameters setting `[node_name.scope.property]` where scope are the qubits/couplers and the the property is a property known to the node.
+
+Below, you can define node-specific parameters setting `[node_name.scope.property]` where scope are the qubits/couplers
+and the the property is a property known to the node.
 
 Example: Setting the reset duration for the resonator spectroscopy node.
+
 ```
 [resonator_spectroscopy.all]
 reset.duration =  60e-6
@@ -219,8 +262,11 @@ reset.duration =  60e-6
 The file in the template package is `node_config.toml`.
 
 ### Custom user samplespace configuration (.py | optional):
-If you want to generate samplespaces with your own custom Python scripts, you can add a custom user samplespace configuration.
+
+If you want to generate samplespaces with your own custom Python scripts, you can add a custom user samplespace
+configuration.
 The file must contain the definition of your samplespace according to the following schema:
+
 ```
 user_samplespace = {
     node1_name : {
@@ -235,6 +281,7 @@ user_samplespace = {
         }
 }
 ```
+
 Please note: Do not rename the variable `user_samplespace`, because it cannot be imported otherwise.
 
 The file in the template package is `user_samplespace.py`.
