@@ -25,11 +25,12 @@ from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement im
 from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.measurement import (
     Resonator_Spectroscopy,
 )
+from tergite_autocalibration.lib.utils.samplespace import (
+    resonator_samples,
+    qubit_samples,
+)
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
-
-# TODO: check location
-from tergite_autocalibration.utils.user_input import qubit_samples
 
 
 class Coupler_Spectroscopy_Node(ExternalParameterNode):

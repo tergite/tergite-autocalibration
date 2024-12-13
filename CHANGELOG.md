@@ -13,6 +13,8 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 - Dataset browser
 - ScheduleNode and ExternalParameterSweepNode as subclasses of BaseNode
 - DeviceManager class
+- Configuration packages
+- Advanced decorators for pytest
 
 ### Changed
 - Migrated cli from click to typer

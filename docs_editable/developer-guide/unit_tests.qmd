@@ -316,4 +316,68 @@ def setup_data():
 ```
 
 In this case, three points are loaded and the analysis is run on each of them. The results are returned for each point
-and can be used in different tests, for example by removing elements in the list_results array. 
+and can be used in different tests, for example by removing elements in the list_results array.
+
+## Advanced topics on unit tests
+
+When running unit tests, the test framework itself and the way tests are executed can cause problems that make the unit
+tests fail.
+Hence, it is important to understand how `pytest` works to get a grip on how to debug failing tests efficiently.
+
+In the beginning of each test run, `pytest` will try to import all necessary modules.
+If there are any "Unresolved reference" errors, the tests will even not start to run.
+
+### Dealing with global variables
+
+Tests might even indirectly affect the outcome of another test.
+As an example, there might be a test, which changes some global state in the application.
+Let us say the default value for the global variable `VAR_1` is 0, but one of the test changes sets the global variable
+`VAR_1` to 1.
+Now, all following tests will read 1 when they get `VAR_1` from the environment.
+
+Sometimes though, it might be necessary to change to global variable of one test.
+To handle these situations, the test framework has implemented some decorators, which intend to freeze the environment
+variables.
+The most simple way to freeze the state of the environment and then e.g. set variables inside the test function is with
+the `@preserve_os_env` decorator.
+
+```python
+import os
+from tergite_autocalibration.tests.utils.decorators import preserve_os_env
+
+
+@preserve_os_env
+def test_my_function_that_sets_os_variables():
+  var1 = os.environ["VAR_1"]  # VAR_1 = "0"
+  os.environ["VAR_1"] = "1"
+  new_var1 = os.environ["VAR_1"]
+  assert int(var1) + 1 == int(new_var1)
+
+
+def test_my_function_that_only_gets_os_variables():
+  var1 = os.environ["VAR_1"]  # VAR_1 = "0"
+  assert int(var1) == 0
+```
+
+Here, if we had run the first test without the `@preserve_os_env` decorator, the second test would fail, because the
+variable would be set to 1 in the first test and does not have the default value 0.
+
+Another decorator in that regard is the `@with_os_env` decorator, which takes as an input the dictionary of values that
+environment should hold.
+It is just a way that - similarly to a fixture - simplifies the way things are set up without having too many
+`os.environ` calls inside the code.
+For example, you want to change the value of an environmental variable in exactly one test function, you can add:
+
+```python
+import os
+from tergite_autocalibration.tests.utils.decorators import with_os_env
+
+
+@with_os_env({"VAR_1": "1"})
+def test_my_function_that_needs_the_os_variables_changed():
+  var1 = os.environ["VAR_1"]
+  assert var1 == "ABC"
+```
+
+This will freeze the current state of the environment, replace the variable `VAR_1` with "ABC" and after the test will
+cleanup the environment and load the previous values.

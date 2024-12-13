@@ -15,18 +15,15 @@ import json
 from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
 from quantify_scheduler.json_utils import SchedulerJSONEncoder
 
-from tergite_autocalibration.config.settings import HARDWARE_CONFIG
+from tergite_autocalibration.config.globals import CONFIG
 from tergite_autocalibration.lib.utils.redis import (
     load_redis_config,
     load_redis_config_coupler,
 )
-from tergite_autocalibration.utils.extended_coupler_edge import (
+from tergite_autocalibration.utils.dto.extended_coupler_edge import (
     ExtendedCompositeSquareEdge,
 )
-from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
-
-with open(HARDWARE_CONFIG) as hw:
-    hw_config = json.load(hw)
+from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
 class DeviceConfiguration:
@@ -53,7 +50,7 @@ class DeviceConfiguration:
                 device.add_edge(edge)
                 self.edges[coupler] = edge
 
-        device.hardware_config(hw_config)
+        device.hardware_config(CONFIG.cluster)
         self.device = device
         return device
 

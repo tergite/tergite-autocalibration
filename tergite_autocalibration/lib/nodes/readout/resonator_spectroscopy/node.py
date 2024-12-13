@@ -22,7 +22,7 @@ from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.measuremen
 from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 
 # TODO: check location
-from tergite_autocalibration.utils.user_input import resonator_samples
+from tergite_autocalibration.lib.utils.samplespace import resonator_samples
 
 
 class Resonator_Spectroscopy_Node(ScheduleNode):

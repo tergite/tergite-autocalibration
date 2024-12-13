@@ -30,11 +30,11 @@ from quantify_scheduler.operations.pulse_library import (
 from quantify_scheduler.resources import ClockResource
 
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
-from tergite_autocalibration.utils.extended_coupler_edge import (
+from tergite_autocalibration.utils.dto.extended_coupler_edge import (
     ExtendedCompositeSquareEdge,
 )
 
-from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
+from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
 class CZ_Chevron(BaseMeasurement):
@@ -54,7 +54,7 @@ class CZ_Chevron(BaseMeasurement):
         cz_pulse_frequencies: dict[str, np.ndarray],
         cz_pulse_amplitudes: dict[str, np.ndarray],
         repetitions: int = 1024,
-    ) -> Schedule:
+    ) -> "Schedule":
         """
         Generate a schedule for performing a Ramsey fringe measurement on multiple qubits.
         Can be used both to finetune the qubit frequency and to measure the qubit dephasing time T_2. (1D parameter sweep)

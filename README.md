@@ -23,6 +23,7 @@ If you are reading this on GitHub, then you are looking at a mirror.
 - Ensure you have [conda](https://docs.anaconda.com/free/miniconda/index.html) installed.
   (_You could simply have python +3.10 installed instead._)
 - Ensure you have [redis server](https://redis.io/) running
+- The standard port for a redis server is `6379`, so, this is going to be filled in the `.env` configuration later.
 
 ```shell
 redis-server
@@ -51,11 +52,12 @@ cd tergite-autocalibration
 pip install -e .
 ```
 
-- Copy the `dot-env-template.txt` file to `.env` and 
+- Copy the `.example.env` file to `.env` and 
   update the environment variables there appropriately.
+- Check out the section about configuration about which other configuration files have to be edited.
 
 ```shell
-cp dot-env-template.txt .env
+cp .example.env .env
 ```
 
 - Start the automatic calibration

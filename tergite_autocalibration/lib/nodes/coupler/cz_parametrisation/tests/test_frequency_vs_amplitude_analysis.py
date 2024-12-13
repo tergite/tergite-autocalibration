@@ -10,10 +10,6 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from tergite_autocalibration.tests.utils.env import setup_test_env
-
-setup_test_env()
-
 import os
 from pathlib import Path
 
@@ -30,11 +26,11 @@ from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis impor
     FrequencyVsAmplitudeQ1Analysis,
     FrequencyVsAmplitudeQ2Analysis,
 )
+from tergite_autocalibration.tests.utils.decorators import with_os_env
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture()
 def setup_good_data():
-    os.environ["DATA_DIR"] = str(Path(__file__).parent / "results")
     dataset_path = Path(__file__).parent / "data" / "dataset_good_quality_freq_amp.hdf5"
     ds = xr.open_dataset(dataset_path)
     d14 = ds["yq14"].to_dataset()
@@ -108,6 +104,7 @@ def test_canGetMinFromQ2(setup_good_data):
     assert indexBestAmp[0] == 12
 
 
+@with_os_env({"DATA_DIR": str(Path(__file__).parent / "results")})
 def test_canPlot(setup_good_data):
     matplotlib.use("Agg")
     d14, d15, freqs, amps = setup_good_data
@@ -152,9 +149,8 @@ def test_canPlot(setup_good_data):
         assert img.format == "PNG", "File should be a PNG image"
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture()
 def setup_good_data_2():
-    os.environ["DATA_DIR"] = str(Path(__file__).parent / "results")
     dataset_path = (
         Path(__file__).parent / "data" / "dataset_good_quality_freq_amp_2.hdf5"
     )
@@ -168,6 +164,7 @@ def setup_good_data_2():
     return d14, d15, freqs, amps
 
 
+@with_os_env({"DATA_DIR": str(Path(__file__).parent / "results")})
 def test_canPlot_2(setup_good_data_2):
     matplotlib.use("Agg")
     d14, d15, freqs, amps = setup_good_data_2
@@ -212,9 +209,8 @@ def test_canPlot_2(setup_good_data_2):
         assert img.format == "PNG", "File should be a PNG image"
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture()
 def setup_bad_data():
-    os.environ["DATA_DIR"] = str(Path(__file__).parent / "results")
     dataset_path = Path(__file__).parent / "data" / "dataset_bad_quality_freq_amp.hdf5"
     ds = xr.open_dataset(dataset_path)
     d14 = ds["yq14"].to_dataset()
@@ -226,6 +222,7 @@ def setup_bad_data():
     return d14, d15, freqs, amps
 
 
+@with_os_env({"DATA_DIR": str(Path(__file__).parent / "results")})
 def test_canPlotBad(setup_bad_data):
     matplotlib.use("Agg")
     d14, d15, freqs, amps = setup_bad_data

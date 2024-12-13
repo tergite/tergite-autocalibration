@@ -2,6 +2,7 @@
 #
 # (C) Copyright Liangyu Chen 2024
 # (C) Copyright Amr Osman 2024
+# (C) Copyright Chalmers Next Labs AB 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -23,13 +24,13 @@ from quantify_scheduler.operations.pulse_library import (
 )
 from quantify_scheduler.resources import ClockResource
 
-from tergite_autocalibration.config.coupler_config import qubit_types
+from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
-from tergite_autocalibration.utils.extended_coupler_edge import (
+from tergite_autocalibration.utils.dto.extended_coupler_edge import (
     ExtendedCompositeSquareEdge,
 )
-from tergite_autocalibration.utils.extended_gates import Rxy_12
-from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
+from tergite_autocalibration.utils.dto.extended_gates import Rxy_12
+from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
 class Reset_Chevron_DC(BaseMeasurement):
@@ -177,7 +178,7 @@ class Reset_Chevron_DC(BaseMeasurement):
                 relaxation = schedule.add(Reset(*qubits))
 
                 for this_qubit in qubits:
-                    if qubit_types[this_qubit] == "Target":
+                    if dh.get_legacy("qubit_types")[this_qubit] == "Target":
                         # schedule.add(Rxy(0,0,this_qubit), ref_op=relaxation, ref_pt='end')
                         # schedule.add(X(this_qubit))
                         schedule.add(X(this_qubit), ref_op=relaxation, ref_pt="end")
@@ -222,7 +223,7 @@ class Reset_Chevron_DC(BaseMeasurement):
                     )
 
                     # for this_qubit in qubits:
-                    #     if qubit_types[this_qubit] == 'Target':
+                    #     if dh.get_legacy("qubit_types")[this_qubit] == 'Target':
                     #         schedule.add(Rxy(0,0,this_qubit), ref_op=buffer, ref_pt='end')
                     #     else:
                     #         schedule.add(X(this_qubit), ref_op=buffer, ref_pt='end')

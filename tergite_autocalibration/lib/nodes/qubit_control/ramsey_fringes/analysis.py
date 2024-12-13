@@ -20,7 +20,7 @@ from quantify_core.analysis.fitting_models import (
     fft_freq_phase_guess,
 )
 
-from tergite_autocalibration.config.settings import REDIS_CONNECTION
+from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.lib.base.analysis import (
     BaseAllQubitsAnalysis,
     BaseQubitAnalysis,
