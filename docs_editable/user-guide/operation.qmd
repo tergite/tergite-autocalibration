@@ -28,6 +28,7 @@ The autocalibration CLI is organized into several main command groups:
 - `graph`: Handle operations related to the calibration graph
 - `config`: Load and save the configuration files
 - `calibration`: Handle operations related to the calibration supervisor
+- `browser`: Will open the dataset browser, which makes you view the datasets from measurements
 - `joke`: Handle operations related to the well-being of the user
 
 ### Cluster Commands ###
@@ -76,9 +77,11 @@ acli graph plot
 
 This command visualizes the calibration graph using an arrow chart.
 
-### Configuration Commands ###
+### Configuration Commands
 
-Save and load the configuration.
+#### `config load`
+
+Load the configuration.
 
 **Usage:**
 
@@ -99,6 +102,8 @@ acli config load [OPTIONS]
 To run this command, please navigate to the root directory of the repository.
 The configuration package will be placed into the root directory, which is the default location for the application to
 detect the configuration package.
+
+#### `config save`
 
 **Usage:**
 

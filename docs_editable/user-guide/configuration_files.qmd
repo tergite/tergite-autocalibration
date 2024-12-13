@@ -4,19 +4,13 @@ To run the autocalibration you will need to configure it with a couple of differ
 Doing the configuration with a pre-built configuration package will take just some minutes.
 On an unknown experimental device without pre-built files, it probably takes slightly longer.
 
-- Here, we need a figure of the setup to describe what instruments
+After reading this guide, you will know:
 
-- Then an overview of the configuration files -> what are the endpoints in the API
+- How to set basic environment variables
+- What is a configuration package and how is it structured
 
-## Quickstart
-
-- Explain the locations where are configuration files:
-    - root level
-    - templates
-    - fixtures (for tests)
-
-A template for a full configuration package can be found in `data/_template/_device_name`.
-Some more pre-built configuration package can be found in `data/devices` under the respective device names.
+Take a look into the operation manual to
+see [how to load and save configuration packages](operation.qmd#configuration-commands)
 
 ## Environment variables
 
@@ -61,11 +55,18 @@ This is how an example configuration package looks like:
   - `wiring_diagram.png`: E.g. a wiring diagram
 - `configuration.meta.toml`: The configuration file that describes the structure of the configuration package
 
+The templates for a full configuration package can be found in `tergite_autocalibration/config/templates`.
+There is a `.default` template to illustrate the general structure of a configuration package.
+Furthermore, there are some pre-build configuration packages for different kind of setups.
+
+For a configuration to be detected by the application, the `configuration.meta.toml` file should be placed in the root
+folder of the tergite-autocalibration repository.
+All filepaths relative to the configuration files have to be able to be resolved.
 Now, we will go through all the details of these configuration files.
 
 ### The configuration.meta.toml file
 
-One file that always has to be part of the configuration package is the `configuration.meta.toml` file.
+This is the file that always has to be part of the configuration package.
 It tells the machine where all other configuration files are located, which is crucial to make the automatic loading and
 saving work.
 A very simple version of the `configuration.meta.toml` belonging to the screenshot above would look like this:
@@ -126,40 +127,70 @@ A QBLOX cluster consists of a couple of modules of which each can have multiple 
 In the cluster configuration the connection is made between these QBLOX cluster physical ports and clocks to the qubits
 and couplers of the QPU.
 
-Example: Definition of a qubit drive for |0> to |1> state)
+Example: Part of a cluster definition
 
 ```
 {
-   "backend": "quantify_scheduler.backends.qblox_backend.hardware_compile",
-   "clusterA": {
-      "ref": "internal",
+  "config_type": "quantify_scheduler.backends.qblox_backend.QbloxHardwareCompilationConfig",
+  "hardware_description": {
+    "clusterA": {
       "instrument_type": "Cluster",
-      "clusterA_module2": {
-         "instrument_type": "QCM_RF",
-         "complex_output_0": {
-            "lo_freq": 3.946e9,
-            "dc_mixer_offset_I": 0,
-            "dc_mixer_offset_Q": 0,
-            "portclock_configs": [
-               {
-                  "port": "q00:mw",
-                  "clock": "q00.01",
-                  "mixer_amp_ratio": 1,
-                  "mixer_phase_error_deg": 0
-               }
-            ]
-         }
+      "ref": "internal",
+      "modules": {
+        "2": {
+          "instrument_type": "QCM_RF"
+        },
+        "10": {
+          "instrument_type": "QRM_RF"
+        }
       }
-   }
+    }
+  },
+  "hardware_options": {
+    "modulation_frequencies": {
+      "q00:mw-q00.01": {
+        "lo_freq": 3946000000.0
+      },
+      ...
+    },
+    "mixer_corrections": {
+      "q00:mw-q00.01": {
+        "dc_offset_i": 0.0,
+        "dc_offset_q": 0.0,
+        "amp_ratio": 1.0,
+        "phase_error": 0.0
+      },
+      ...
+    }
+    },
+  "connectivity": {
+    "graph": {
+      "directed": false,
+      "multigraph": false,
+      "graph": {},
+      "nodes": [
+        {
+          "instrument_name": "clusterA",
+          "id": "clusterA.module2.complex_output_0"
+        },
+        ...
+      ],
+      "links": [
+        {
+          "source": "clusterA.module2.complex_output_0",
+          "target": "q00:mw"
+        },
+        ...
+      ]
+    }
+    }
 }
 ```
 
 The file in the template package is `cluster_configuration.json`.
 
-FIXME: This is to be changed after with the integration of the automatic mixer calibration
-The cluster configuration relies on some values that come from a mixer calibration.
-Given a `.csv` file after a mixer calibration the function `utils/hw_generator.py` can create instantly the
-corresponding `JSON` file.
+You can find more information about the hardware configuration in
+the [documentation of quantify-scheduler](https://quantify-os.org/docs/quantify-scheduler/tutorials/Compiling%20to%20Hardware.html)
 
 #### Migrating old hardware configurations to match quantify-scheduler>=0.18.0
 
@@ -171,23 +202,6 @@ to migrate it to the new structure.
 python tergite_autocalibration/scripts/migrate_blox_hardware_configuration.py <PATH_TO_HW_CONFIG>
 ```
 
-### SPI configuration (.toml | optional):
-
-When working with two-qubit gates, there has to be a current source for the coupler and in the QBLOX stack this is
-coming from the so called SPI rack.
-The SPI configuration is mapping the qubits to their respective modules in the SPI rack and can be further used to
-assign the couplers to groups.
-
-Example: Definition of a coupler
-
-```
-[couplers.q11_q12]
-spi_module_no = 1
-dac_name = "dac0"
-edge_group = 1
-```
-
-The file in the template package is `spi_config.toml`.
 
 ### Device Configuration file (.toml):
 
@@ -209,21 +223,12 @@ or for all qubits:
 ```
 [device.resonator.all]
 attenuation = 12
-```
 
-- TODO: This has to be a bit more explained in detail, also, the part below was init values previously.
-
-This is followed by the `[initials]` section where you can set the initial values for certain calibration nodes.
-Here, similarly to the device configuration, you can either address a single qubit or all qubits, by using either the
-qubit identifier e.g. `[q06]` or the `[all]` keyword.
-
-Example: Setting initial values.
-
-```
-[initials.qubits.all]
-measure.acq_delay = 220e-9
-[initials.qubits]
-q06.measure.pulse_amp = 0.03
+[device.qubit.all]
+measure.integration_time = 2.5e-6
+measure_1.integration_time = 2.5e-6
+measure_2.integration_time = 2.5e-6
+rxy.duration = 28e-9
 ```
 
 In the `[layout]` section the positions of the qubits can be set.
@@ -250,7 +255,8 @@ couplers = ["q01_q02"]
 ### Node configuration (.toml):
 
 Below, you can define node-specific parameters setting `[node_name.scope.property]` where scope are the qubits/couplers
-and the the property is a property known to the node.
+and the property is a property known to the node.
+This would load and overwrite the configurations made in the device configuration.
 
 Example: Setting the reset duration for the resonator spectroscopy node.
 
@@ -261,7 +267,25 @@ reset.duration =  60e-6
 
 The file in the template package is `node_config.toml`.
 
-### Custom user samplespace configuration (.py | optional):
+### SPI configuration (.toml):
+
+When working with two-qubit gates, there has to be a current source for the coupler and in the QBLOX stack this is
+coming from the so called SPI rack.
+The SPI configuration is mapping the qubits to their respective modules in the SPI rack and can be further used to
+assign the couplers to groups.
+
+Example: Definition of a coupler
+
+```
+[couplers.q11_q12]
+spi_module_no = 1
+dac_name = "dac0"
+edge_group = 1
+```
+
+The file in the template package is `spi_config.toml`.
+
+### Custom user samplespace configuration (.py):
 
 If you want to generate samplespaces with your own custom Python scripts, you can add a custom user samplespace
 configuration.
@@ -285,3 +309,8 @@ user_samplespace = {
 Please note: Do not rename the variable `user_samplespace`, because it cannot be imported otherwise.
 
 The file in the template package is `user_samplespace.py`.
+
+## Next steps:
+
+Read about the commandline interface, which contains a chapter
+about [how to load and save configuration packages](operation.qmd#configuration-commands).
