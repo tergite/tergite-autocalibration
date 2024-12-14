@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>operation – Tergite Automatic Calibration</title>
+    <title>troubleshooting – Tergite Automatic Calibration</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,6 +19,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -82,7 +116,7 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./getting_started.html">
+          <a class="navbar-brand" href="./">
     <span class="navbar-title">Tergite Automatic Calibration</span>
     </a>
   </div>
@@ -92,44 +126,24 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-      <a class="nav-link active" href="./getting_started.html" aria-current="page">
-      <span class="menu-text">Getting started</span></a>
+      <a class="nav-link active" href="./index.html" aria-current="page">
+          <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-      <a class="nav-link" href="./operation.html">
-      <span class="menu-text">Operation</span></a>
+      <a class="nav-link" href="./getting_started.html">
+          <span class="menu-text">User Guide</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./configuration_files.html"> 
-<span class="menu-text">Configuration</span></a>
+    <a class="nav-link" href="./available_nodes.html">
+        <span class="menu-text">Node Library</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./available_nodes.html"> 
-<span class="menu-text">Available Nodes</span></a>
-  </li>
-                <li class="nav-item dropdown ">
-                    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-developer-guide" role="link"
-                       data-bs-toggle="dropdown" aria-expanded="false">
-                        <span class="menu-text">Developer Guide</span>
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="nav-menu-developer-guide">
-                        <li>
-                            <a class="dropdown-item" href="./new_node_creation.html">
-                                <span class="dropdown-text">Creating New Nodes</span></a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="./developer_guide.html">
-                                <span class="dropdown-text">Introduction</span></a>
-  </li>
-                    </ul>
-                </li>
-  <li class="nav-item">
-    <a class="nav-link" href="./node_types.html"> 
-<span class="menu-text">Node types</span></a>
+    <a class="nav-link" href="./developer_guide.html"> 
+<span class="menu-text">Developer Guide</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./unit_tests.html"> 
-<span class="menu-text">How to add unit tests</span></a>
+      <a class="nav-link" href="./troubleshooting.html">
+          <span class="menu-text">Troubleshooting</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -151,8 +165,7 @@ ul.task-list li input[type="checkbox"] {
               </button>
               <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb">
                   <ol class="breadcrumb">
-                      <li class="breadcrumb-item"><a href="./getting_started.html">Getting started</a></li>
-                      <li class="breadcrumb-item"><a href="./operation.html">Operation</a></li>
+                      <li class="breadcrumb-item"><a href="./troubleshooting.html">Troubleshooting</a></li>
                   </ol>
               </nav>
               <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse"
@@ -179,11 +192,17 @@ ul.task-list li input[type="checkbox"] {
         </div>
         <div class="sidebar-menu-container">
             <ul class="list-unstyled mt-1">
+                <li class="sidebar-item">
+                    <div class="sidebar-item-container">
+                        <a href="./index.html" class="sidebar-item-text sidebar-link">
+                            <span class="menu-text">Home</span></a>
+                    </div>
+                </li>
                 <li class="sidebar-item sidebar-item-section">
                     <div class="sidebar-item-container">
                         <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse"
                            data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
-                            <span class="menu-text">Getting started</span></a>
+                            <span class="menu-text">User Guide</span></a>
                         <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse"
                            data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true"
                            aria-label="Toggle section">
@@ -199,7 +218,13 @@ ul.task-list li input[type="checkbox"] {
                         </li>
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
-                                <a href="./operation.html" class="sidebar-item-text sidebar-link active">
+                                <a href="./user-guide/configuration_files.html" class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Configuration Files</span></a>
+                            </div>
+                        </li>
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="./user-guide/operation.html" class="sidebar-item-text sidebar-link">
                                     <span class="menu-text">Operation</span></a>
                             </div>
                         </li>
@@ -209,7 +234,7 @@ ul.task-list li input[type="checkbox"] {
                     <div class="sidebar-item-container">
                         <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse"
                            data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
-                            <span class="menu-text">Developer Guide</span></a>
+                            <span class="menu-text">Node Library</span></a>
                         <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse"
                            data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true"
                            aria-label="Toggle section">
@@ -219,22 +244,75 @@ ul.task-list li input[type="checkbox"] {
                     <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
-                                <a href="./new_node_creation.html" class="sidebar-item-text sidebar-link">
-                                    <span class="menu-text">To create a new node:</span></a>
+                                <a href="./available_nodes.html" class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Overview</span></a>
                             </div>
                         </li>
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="./nodes/resonator_spectroscopy_node.html"
+                                   class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Resonator spectroscopy</span></a>
+                            </div>
+                        </li>
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="./nodes/qubit_spectroscopy_node.html" class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Qubit spectroscopy</span></a>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+                <li class="sidebar-item sidebar-item-section">
+                    <div class="sidebar-item-container">
+                        <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse"
+                           data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+                            <span class="menu-text">Developer Guide</span></a>
+                        <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse"
+                           data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true"
+                           aria-label="Toggle section">
+                            <i class="bi bi-chevron-right ms-2"></i>
+                        </a>
+                    </div>
+                    <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
                                 <a href="./developer_guide.html" class="sidebar-item-text sidebar-link">
                                     <span class="menu-text">Introduction</span></a>
                             </div>
                         </li>
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="./developer-guide/node_classes.html" class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Node Classes</span></a>
+                            </div>
+                        </li>
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="./developer-guide/new_node_creation.html"
+                                   class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Create a new node</span></a>
+                            </div>
+                        </li>
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="./developer-guide/unit_tests.html" class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Unit tests</span></a>
+                            </div>
+                        </li>
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="./developer-guide/writing_documentation.html"
+                                   class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Writing documentation</span></a>
+                            </div>
+                        </li>
                     </ul>
                 </li>
                 <li class="sidebar-item">
                     <div class="sidebar-item-container">
-                        <a href="./unit_tests.html" class="sidebar-item-text sidebar-link">
-                            <span class="menu-text">Unit tests for nodes</span></a>
+                        <a href="./troubleshooting.html" class="sidebar-item-text sidebar-link active">
+                            <span class="menu-text">Troubleshooting</span></a>
                     </div>
                 </li>
             </ul>
@@ -248,21 +326,13 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#operation" id="toc-operation" class="nav-link active" data-scroll-target="#operation">Operation</a></li>
-  <li><a href="#cli" id="toc-cli" class="nav-link" data-scroll-target="#cli">CLI</a>
-  <ul class="collapse">
-  <li><a href="#main-commands" id="toc-main-commands" class="nav-link" data-scroll-target="#main-commands">Main Commands</a></li>
-  <li><a href="#cluster-commands" id="toc-cluster-commands" class="nav-link" data-scroll-target="#cluster-commands">Cluster Commands</a></li>
-  <li><a href="#node-commands" id="toc-node-commands" class="nav-link" data-scroll-target="#node-commands">Node Commands</a></li>
-  <li><a href="#graph-commands" id="toc-graph-commands" class="nav-link" data-scroll-target="#graph-commands">Graph Commands</a></li>
-  <li><a href="#calibration-commands" id="toc-calibration-commands" class="nav-link" data-scroll-target="#calibration-commands">Calibration Commands</a></li>
-  <li><a href="#dataset-browser" id="toc-dataset-browser" class="nav-link" data-scroll-target="#dataset-browser">Dataset browser</a></li>
-  <li><a href="#joke-command" id="toc-joke-command" class="nav-link" data-scroll-target="#joke-command">Joke Command</a></li>
-  <li><a href="#notes" id="toc-notes" class="nav-link" data-scroll-target="#notes">Notes</a></li>
-  </ul></li>
-  <li><a href="#structure" id="toc-structure" class="nav-link" data-scroll-target="#structure">Structure</a></li>
-  <li><a href="#data-browsing" id="toc-data-browsing" class="nav-link" data-scroll-target="#data-browsing">Data browsing</a></li>
-  <li><a href="#development" id="toc-development" class="nav-link" data-scroll-target="#development">Development</a></li>
+      <li><a href="#troubleshooting" id="toc-troubleshooting" class="nav-link active"
+             data-scroll-target="#troubleshooting">Troubleshooting</a>
+          <ul class="collapse">
+              <li><a href="#redis" id="toc-redis" class="nav-link" data-scroll-target="#redis">Redis</a></li>
+              <li><a href="#spi" id="toc-spi" class="nav-link" data-scroll-target="#spi">SPI</a></li>
+          </ul>
+      </li>
   </ul>
 </nav>
     </div>
@@ -270,135 +340,69 @@ ul.task-list li input[type="checkbox"] {
 <main class="content" id="quarto-document-content">
 
 
+    <section id="troubleshooting" class="level1">
+        <h1>Troubleshooting</h1>
+        <p>Some errors occur on more often than others. If you are experiencing an error for which you find a simple
+            hack that you want to share, please add it to this troubleshooting guide.</p>
+        <p>As soon as the description for the hack is getting too long, we are going to add either a proper
+            documentation page about the topic or we just implement it as a feature.</p>
+        <section id="redis" class="level3">
+            <h3 class="anchored" data-anchor-id="redis">Redis</h3>
+            <p>On a Linux machine, if REDIS does not accept a connection, you can do this:</p>
+            <div class="sourceCode" id="cb1">
+                <pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a
+                        href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">redis-server</span> <span
+                        class="at">--port</span> {your redis port} <span class="at">--daemonize</span> yes</span></code><button
+                        title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre>
+            </div>
+            <p>The <code>--daenonize yes</code> parameter will enable the machine to run REDIS always in the background.
+                If you do not use that parameter, the REDIS instance will stop as soon as you close the terminal where
+                you started it.</p>
+            <p>If you are getting an error saying:</p>
+            <div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code
+                    class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span
+                    class="ex">15350:M</span> 10 Dec 2024 23:24:17.172 <span class="co"># Warning: Could not create server TCP listening socket *:6379: bind: Address already in use</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">15350:M</span> 10 Dec 2024 23:24:17.172 <span
+        class="co"># Failed listening on port 6379 (tcp), aborting.</span></span></code><button
+                    title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre>
+            </div>
+            <p>Then there might be already running a REDIS instance on that port.</p>
+            <p>You can verify that by typing:</p>
+            <div class="sourceCode" id="cb3">
+                <pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a
+                        href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">redis-cli</span> <span
+                        class="at">-p</span> {the redis port you had the error with}</span></code><button
+                        title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre>
+            </div>
+            <p>If it opens the REDIS CLI, then you have an instance already running.</p>
+            <p>To check whether there are already keys in the REDIS server - assuming you have opened the REDIS CLI -
+                you can type:</p>
+            <div class="sourceCode" id="cb4">
+                <pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a
+                        href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">keys</span> <span
+                        class="pp">*</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i
+                        class="bi"></i></button></pre>
+            </div>
+            <p>This will give you all the keys that are stored in the REDIS instance. If you are on a shared machine,
+                you should always double-check whether no one else is using the same REDIS instance. Otherwise, it could
+                easily happen that you overwrite someone else’s memory and data will be lost.</p>
+            <p>On Windows REDIS is run on WSL. Kill the session and restart it and run REDIS (if you have not set it to
+                run automatically). Sometimes you may get in the situation that WSL will not open at all, in this case
+                you need to restart the service called “Hyper-V Host Compute Service”</p>
+        </section>
+        <section id="spi" class="level3">
+            <h3 class="anchored" data-anchor-id="spi">SPI</h3>
+            <p>You can get an error saying that the default path was not correct or that you get denied permission.
+                Likely there was a connection implemented before and now when trying to start a new one it hangs itself
+                up and refuses communication, you can force this communication channel by running</p>
+            <div class="sourceCode" id="cb5">
+                <pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a
+                        href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> chmod 666 /dev/ttyACM0</span></code><button
+                        title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre>
+            </div>
 
 
-<section id="operation" class="level2">
-<h2 class="anchored" data-anchor-id="operation">Operation</h2>
-<p>The package ships with a command line interface to solve some common tasks that appear quite often.</p>
-<p>In the following there are a number of useful commands, but if you want to find out all commands use: <code>acli --help</code></p>
-<p>To delete all redis entries: <code>acli node reset -a</code></p>
-<p>To reset a particular node: <code>acli node reset -n &lt;nodename&gt;</code></p>
-<p>For example to reset the node <code>rabi_oscillations</code> run the command:</p>
-<p><code>acli node reset -n rabi_oscillations</code></p>
-<p><strong>To start a new calibration sequence according to the configuration files:</strong></p>
-<p><strong><code>python tergite_acl/scripts/calibration_supervisor.py</code></strong></p>
-<p>or</p>
-<p><strong><code>acli calibration start</code></strong></p>
 </section>
-<section id="cli" class="level2">
-<h2 class="anchored" data-anchor-id="cli">CLI</h2>
-<p>This document provides an overview of the Command Line Interface (CLI) options and their functionalities.</p>
-<section id="main-commands" class="level3">
-<h3 class="anchored" data-anchor-id="main-commands">Main Commands</h3>
-<p>The autocalibration CLI is organized into several main command groups:</p>
-<ul>
-<li><code>cluster</code>: Handle operations related to the cluster</li>
-<li><code>node</code>: Handle operations related to the node</li>
-<li><code>graph</code>: Handle operations related to the calibration graph</li>
-<li><code>calibration</code>: Handle operations related to the calibration supervisor</li>
-<li><code>joke</code>: Handle operations related to the well-being of the user</li>
-</ul>
-</section>
-<section id="cluster-commands" class="level3">
-<h3 class="anchored" data-anchor-id="cluster-commands">Cluster Commands</h3>
-<section id="cluster-reboot" class="level4">
-<h4 class="anchored" data-anchor-id="cluster-reboot"><code>cluster reboot</code></h4>
-<p>Reboots the cluster.</p>
-<p><strong>Usage:</strong></p>
-<pre><code>acli cluster reboot</code></pre>
-<p>This command will prompt for confirmation before rebooting the cluster, as it can interrupt ongoing measurements.</p>
-</section>
-</section>
-<section id="node-commands" class="level3">
-<h3 class="anchored" data-anchor-id="node-commands">Node Commands</h3>
-<section id="node-reset" class="level4">
-<h4 class="anchored" data-anchor-id="node-reset"><code>node reset</code></h4>
-<p>Resets all parameters in Redis for the specified node(s).</p>
-<p><strong>Usage:</strong></p>
-<pre><code>acli node reset [OPTIONS]</code></pre>
-<p><strong>Options:</strong></p>
-<ul>
-<li><code>-n, --name TEXT</code>: Name of the node to be reset in Redis (e.g., resonator_spectroscopy)</li>
-<li><code>-a, --all</code>: Reset all nodes</li>
-<li><code>-f, --from_node TEXT</code>: Reset all nodes from the specified node in the chain</li>
-</ul>
-</section>
-</section>
-<section id="graph-commands" class="level3">
-<h3 class="anchored" data-anchor-id="graph-commands">Graph Commands</h3>
-<section id="graph-plot" class="level4">
-<h4 class="anchored" data-anchor-id="graph-plot"><code>graph plot</code></h4>
-<p>Plots the calibration graph to the user-specified target node in topological order.</p>
-<p><strong>Usage:</strong></p>
-<pre><code>acli graph plot</code></pre>
-<p>This command visualizes the calibration graph using an arrow chart.</p>
-</section>
-</section>
-<section id="calibration-commands" class="level3">
-<h3 class="anchored" data-anchor-id="calibration-commands">Calibration Commands</h3>
-<section id="calibration-start" class="level4">
-<h4 class="anchored" data-anchor-id="calibration-start"><code>calibration start</code></h4>
-<p>Starts the calibration supervisor.</p>
-<p><strong>Usage:</strong></p>
-<pre><code>acli calibration start [OPTIONS]</code></pre>
-<p><strong>Options:</strong></p>
-<ul>
-<li><code>-c TEXT</code>: Cluster IP address (if not set, it will use CLUSTER_IP from the .env file)</li>
-<li><code>-r TEXT</code>: Rerun an analysis (specify the path to the dataset folder)</li>
-<li><code>-n, --name TEXT</code>: Specify the node type to rerun (works only with -r option)</li>
-<li><code>--push</code>: Push a backend to an MSS specified in MSS_MACHINE_ROOT_URL in the .env file</li>
-<li><code>--browser</code>: Will open the dataset browser in the background and plot the measurement results live</li>
-</ul>
-</section>
-</section>
-<section id="dataset-browser" class="level3">
-<h3 class="anchored" data-anchor-id="dataset-browser">Dataset browser</h3>
-<section id="browser" class="level4">
-<h4 class="anchored" data-anchor-id="browser"><code>browser</code></h4>
-<p>Starts the dataset browser.</p>
-<p><strong>Usage:</strong></p>
-<pre><code>acli browser --datadir [OPTIONS]</code></pre>
-<p><strong>Options:</strong></p>
-<ul>
-<li><code>--datadir PATH</code>: Folder to take the plot data from</li>
-<li><code>--liveplotting</code>: Whether plots should be updated in real time (default: False)</li>
-<li><code>--log-level INT</code>: Log-level as in the Python <code>logging</code> package to be used in the logs (default: 30)</li>
-</ul>
-</section>
-</section>
-<section id="joke-command" class="level3">
-<h3 class="anchored" data-anchor-id="joke-command">Joke Command</h3>
-<section id="joke" class="level4">
-<h4 class="anchored" data-anchor-id="joke"><code>joke</code></h4>
-<p>Prints a random joke to lighten the mood.</p>
-<p><strong>Usage:</strong></p>
-<pre><code>acli joke</code></pre>
-<p>This command fetches and displays a random joke, excluding potentially offensive content.</p>
-</section>
-</section>
-<section id="notes" class="level3">
-<h3 class="anchored" data-anchor-id="notes">Notes</h3>
-<ul>
-<li>The CLI uses the Click library for command-line interface creation.</li>
-<li>Some commands may require additional configuration or environment variables to be set.</li>
-<li>When using the <code>-r</code> option for rerunning analysis, make sure to also specify the node name using <code>-n</code>.</li>
-</ul>
-<p>For more detailed information about each command, use the <code>--help</code> option with any command or subcommand.</p>
-</section>
-</section>
-<section id="structure" class="level2">
-<h2 class="anchored" data-anchor-id="structure">Structure</h2>
-<p>For each calibration node: compilation -&gt; execution -&gt; post-processing -&gt; redis updating</p>
-</section>
-<section id="data-browsing" class="level2">
-<h2 class="anchored" data-anchor-id="data-browsing">Data browsing</h2>
-<p>Datasets are stored in <code>data_directory</code> Can be browsed with the dataset browser (coming soon)</p>
-</section>
-<section id="development" class="level2">
-<h2 class="anchored" data-anchor-id="development">Development</h2>
-<p>When submitting contributions, please prepend your commit messages with: <code>fix:</code> for bug fixes <code>feat:</code> for introducing a new feature (e.g.&nbsp;a new measurement node or a new analysis class) <code>chore:</code> for refactoring changes or any change that doesn’t affect the functionality of the code <code>docs:</code> for changes in the README, docstrings etc <code>test:</code> or <code>dev:</code> for testing or development changes (e.g.&nbsp;profiling scripts)</p>
-
-
 </section>
 
 </main> <!-- /main -->

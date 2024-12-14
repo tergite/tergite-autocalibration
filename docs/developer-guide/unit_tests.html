@@ -57,35 +57,40 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+    <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+    <script src="../site_libs/quarto-nav/headroom.min.js"></script>
+    <script src="../site_libs/clipboard/clipboard.min.js"></script>
+    <script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+    <script src="../site_libs/quarto-search/fuse.min.js"></script>
+    <script src="../site_libs/quarto-search/quarto-search.js"></script>
+    <meta name="quarto:offset" content="../">
+    <script src="../site_libs/quarto-html/quarto.js"></script>
+    <script src="../site_libs/quarto-html/popper.min.js"></script>
+    <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+    <script src="../site_libs/quarto-html/anchor.min.js"></script>
+    <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+    <link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme"
+          id="quarto-text-highlighting-styles">
+    <link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch"
+          class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+    <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+    <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+    <link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme"
+          id="quarto-bootstrap" data-mode="light">
+    <link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch"
+          class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
-  "location": "navbar",
+    "location": "sidebar",
   "copy-button": false,
   "collapse-after": 3,
-  "panel-placement": "end",
-  "type": "overlay",
+    "panel-placement": "start",
+    "type": "textbox",
   "limit": 50,
   "keyboard-shortcut": [
     "f",
     "/",
     "s"
   ],
-  "show-item-context": false,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -102,90 +107,248 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
 
-<link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="nav-fixed">
+<body class="nav-sidebar docked nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./getting_started.html">
+          <a class="navbar-brand" href="../">
     <span class="navbar-title">Tergite Automatic Calibration</span>
     </a>
   </div>
-            <div id="quarto-search" class="" title="Search"></div>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./getting_started.html"> 
-<span class="menu-text">Getting started</span></a>
+      <a class="nav-link active" href="../index.html" aria-current="page">
+          <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./operation.html"> 
-<span class="menu-text">Operation</span></a>
+      <a class="nav-link" href="../getting_started.html">
+          <span class="menu-text">User Guide</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./configuration_files.html"> 
-<span class="menu-text">Configuration</span></a>
+      <a class="nav-link" href="../available_nodes.html">
+          <span class="menu-text">Node Library</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./available_nodes.html"> 
-<span class="menu-text">Available Nodes</span></a>
+      <a class="nav-link" href="../developer_guide.html">
+      <span class="menu-text">Developer Guide</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./developer_guide.html"> 
-<span class="menu-text">Developer Guide</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./new_node_creation.html"> 
-<span class="menu-text">Creating New Nodes</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./node_types.html"> 
-<span class="menu-text">Node types</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link active" href="./unit_tests.html" aria-current="page"> 
-<span class="menu-text">How to add unit tests</span></a>
+      <a class="nav-link" href="../troubleshooting.html">
+          <span class="menu-text">Troubleshooting</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
+                <a href="https://github.com/tergite/tergite-autocalibration" title=""
+                   class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-github"></i></a>
+                <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1"
+                   onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
 </div>
       </div> <!-- /container-fluid -->
     </nav>
+      <nav class="quarto-secondary-nav">
+          <div class="container-fluid d-flex">
+              <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button"
+                      data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar"
+                      aria-expanded="false" aria-label="Toggle sidebar navigation"
+                      onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+                  <i class="bi bi-layout-text-sidebar-reverse"></i>
+              </button>
+              <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb">
+                  <ol class="breadcrumb">
+                      <li class="breadcrumb-item"><a href="../developer_guide.html">Developer Guide</a></li>
+                      <li class="breadcrumb-item"><a href="../developer-guide/unit_tests.html">Unit tests</a></li>
+                  </ol>
+              </nav>
+              <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse"
+                 data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false"
+                 aria-label="Toggle sidebar navigation"
+                 onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+              </a>
+              <button type="button" class="btn quarto-search-button" aria-label="Search"
+                      onclick="window.quartoOpenSearch();">
+                  <i class="bi bi-search"></i>
+              </button>
+          </div>
+      </nav>
 </header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
+    <nav id="quarto-sidebar"
+         class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+            <div class="sidebar-search">
+                <div id="quarto-search" class="" title="Search"></div>
+            </div>
+        </div>
+        <div class="sidebar-menu-container">
+            <ul class="list-unstyled mt-1">
+                <li class="sidebar-item">
+                    <div class="sidebar-item-container">
+                        <a href="../index.html" class="sidebar-item-text sidebar-link">
+                            <span class="menu-text">Home</span></a>
+                    </div>
+                </li>
+                <li class="sidebar-item sidebar-item-section">
+                    <div class="sidebar-item-container">
+                        <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse"
+                           data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+                            <span class="menu-text">User Guide</span></a>
+                        <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse"
+                           data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true"
+                           aria-label="Toggle section">
+                            <i class="bi bi-chevron-right ms-2"></i>
+                        </a>
+                    </div>
+                    <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="../getting_started.html" class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Getting started</span></a>
+                            </div>
+                        </li>
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="../user-guide/configuration_files.html" class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Configuration Files</span></a>
+                            </div>
+                        </li>
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="../user-guide/operation.html" class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Operation</span></a>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+                <li class="sidebar-item sidebar-item-section">
+                    <div class="sidebar-item-container">
+                        <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse"
+                           data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+                            <span class="menu-text">Node Library</span></a>
+                        <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse"
+                           data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true"
+                           aria-label="Toggle section">
+                            <i class="bi bi-chevron-right ms-2"></i>
+                        </a>
+                    </div>
+                    <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="../available_nodes.html" class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Overview</span></a>
+                            </div>
+                        </li>
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="../nodes/resonator_spectroscopy_node.html"
+                                   class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Resonator spectroscopy</span></a>
+                            </div>
+                        </li>
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="../nodes/qubit_spectroscopy_node.html" class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Qubit spectroscopy</span></a>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+                <li class="sidebar-item sidebar-item-section">
+                    <div class="sidebar-item-container">
+                        <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse"
+                           data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+                            <span class="menu-text">Developer Guide</span></a>
+                        <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse"
+                           data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true"
+                           aria-label="Toggle section">
+                            <i class="bi bi-chevron-right ms-2"></i>
+                        </a>
+                    </div>
+                    <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="../developer_guide.html" class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Introduction</span></a>
+                            </div>
+                        </li>
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="../developer-guide/node_classes.html" class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Node Classes</span></a>
+                            </div>
+                        </li>
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="../developer-guide/new_node_creation.html"
+                                   class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Create a new node</span></a>
+                            </div>
+                        </li>
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="../developer-guide/unit_tests.html"
+                                   class="sidebar-item-text sidebar-link active">
+                                    <span class="menu-text">Unit tests</span></a>
+                            </div>
+                        </li>
+                        <li class="sidebar-item">
+                            <div class="sidebar-item-container">
+                                <a href="../developer-guide/writing_documentation.html"
+                                   class="sidebar-item-text sidebar-link">
+                                    <span class="menu-text">Writing documentation</span></a>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+                <li class="sidebar-item">
+                    <div class="sidebar-item-container">
+                        <a href="../troubleshooting.html" class="sidebar-item-text sidebar-link">
+                            <span class="menu-text">Troubleshooting</span></a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse"
+         data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#unit-tests-for-nodes" id="toc-unit-tests-for-nodes" class="nav-link active" data-scroll-target="#unit-tests-for-nodes">Unit tests for nodes</a>
+      <li><a href="#unit-tests" id="toc-unit-tests" class="nav-link active" data-scroll-target="#unit-tests">Unit
+          tests</a>
+          <ul class="collapse">
+              <li><a href="#unit-tests-for-a-node" id="toc-unit-tests-for-a-node" class="nav-link"
+                     data-scroll-target="#unit-tests-for-a-node">Unit tests for a node</a>
   <ul class="collapse">
   <li><a href="#folder-structure" id="toc-folder-structure" class="nav-link" data-scroll-target="#folder-structure">Folder structure</a></li>
-  <li><a href="#general-guideline-and-information" id="toc-general-guideline-and-information" class="nav-link" data-scroll-target="#general-guideline-and-information">General guideline and information</a></li>
-  <li><a href="#example-tests" id="toc-example-tests" class="nav-link" data-scroll-target="#example-tests">Example Tests</a>
+      <li><a href="#general-information-about-testing-nodes" id="toc-general-information-about-testing-nodes"
+             class="nav-link" data-scroll-target="#general-information-about-testing-nodes">General information about
+          testing nodes</a></li>
+      <li><a href="#example-tests" id="toc-example-tests" class="nav-link" data-scroll-target="#example-tests">Example
+          Tests</a></li>
+  </ul>
+              </li>
+              <li><a href="#advanced-topics-on-unit-tests" id="toc-advanced-topics-on-unit-tests" class="nav-link"
+                     data-scroll-target="#advanced-topics-on-unit-tests">Advanced topics on unit tests</a>
   <ul class="collapse">
-  <li><a href="#test-class-type" id="toc-test-class-type" class="nav-link" data-scroll-target="#test-class-type">Test class type</a></li>
-  <li><a href="#test-input-parameters" id="toc-test-input-parameters" class="nav-link" data-scroll-target="#test-input-parameters">Test input parameters</a></li>
-  <li><a href="#test-exception" id="toc-test-exception" class="nav-link" data-scroll-target="#test-exception">Test exception</a></li>
-  <li><a href="#test-with-data" id="toc-test-with-data" class="nav-link" data-scroll-target="#test-with-data">Test with data</a></li>
-  <li><a href="#test-creationg-of-images-from-plotter" id="toc-test-creationg-of-images-from-plotter" class="nav-link" data-scroll-target="#test-creationg-of-images-from-plotter">Test creationg of images from plotter</a></li>
-  <li><a href="#complex-dataset-for-comparing-results" id="toc-complex-dataset-for-comparing-results" class="nav-link" data-scroll-target="#complex-dataset-for-comparing-results">Complex dataset for comparing results</a></li>
-  <li><a href="#even-more-complex-setup" id="toc-even-more-complex-setup" class="nav-link" data-scroll-target="#even-more-complex-setup">Even more complex setup</a></li>
+      <li><a href="#dealing-with-global-variables" id="toc-dealing-with-global-variables" class="nav-link"
+             data-scroll-target="#dealing-with-global-variables">Dealing with global variables</a></li>
   </ul></li>
   </ul></li>
-  <li><a href="#unit-tests-for-infrastructure" id="toc-unit-tests-for-infrastructure" class="nav-link" data-scroll-target="#unit-tests-for-infrastructure">Unit tests for infrastructure</a></li>
   </ul>
 </nav>
     </div>
@@ -193,58 +356,120 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <main class="content" id="quarto-document-content">
 
 
-
-
-<section id="unit-tests-for-nodes" class="level1">
-<h1>Unit tests for nodes</h1>
-<section id="folder-structure" class="level2">
-<h2 class="anchored" data-anchor-id="folder-structure">Folder structure</h2>
+    <section id="unit-tests" class="level1">
+        <h1>Unit tests</h1>
+        <p>When testing software, there are several ways to test whether it is working. Amongst others such as system
+            integration tests or usability scores, there are unit tests. A unit test is meant to confirm whether a small
+            unit of the code is working such as a function or a class. The idea behind unit tests though, is to create
+            tiny little tests for each function, that checks how it handles:</p>
+        <ul>
+            <li><strong>Normal case</strong>: The things that you would expect a function to do e.g.&nbsp;if you have
+                addition, and you add natural numbers.
+            </li>
+            <li><strong>Edge cases</strong>: In the example with the addition this would be e.g.&nbsp;whether it
+                correctly adds zero or would subtract if there is a negative number.
+            </li>
+            <li><strong>Fail cases</strong>: Let us say you have addition, and you are adding a number such as 20 with
+                the string “hello”. This should fail.
+            </li>
+        </ul>
+        <p>Having thought about the test cases and possible scenarios will help to get a better understanding what the
+            code does, also, it will make the code more robust. In our code base we are having a pipeline that will
+            automatically run all tests as soon as someone wants to merge to the common branches. There are two
+            locations where tests are stored:</p>
+        <ul>
+            <li><strong>In the folder for tests</strong>: This is a folder on the main level of the repository where
+                more general tests for the whole framework go.
+            </li>
+            <li><strong>In the folder of each node</strong>: This is to test only the node itself. The tests are added
+                directly to the node module.
+            </li>
+        </ul>
+        <p>Since it happens more often that one will write tests for the node itself, in the following, there will be a
+            section explaining how to do it on an example node.</p>
+        <section id="unit-tests-for-a-node" class="level2">
+            <h2 class="anchored" data-anchor-id="unit-tests-for-a-node">Unit tests for a node</h2>
+            <p>These instructions will go step-by-step through how to create meaningful test cases for a node.</p>
+            <ol type="1">
+                <li>Overview about the folder structure</li>
+                <li>Specific advices on how to test nodes</li>
+                <li>Examples on how to test the analysis function of a node</li>
+            </ol>
+            <p>If you are more a person that learns from the code rather than from a tutorial, please take a look at an
+                easy node e.g. resonator spectroscopy and try to run and understand the test cases.</p>
+            <section id="folder-structure" class="level3">
+                <h3 class="anchored" data-anchor-id="folder-structure">Folder structure</h3>
 <p>The test should be created in a sub-folder of the node called tests.</p>
 <p>Please organise the file using these sub-folders:</p>
 <ul>
-<li>data: place here any data file that is needed to create test cases, while it is possible to mock the data. Feel free to add a text file explaing how the data was produced. Mocking data is also possible but it may be not practical for complex datasets.</li>
-<li>results: create this folder to store your results, i.e.&nbsp;files that would be created by your analysis such as the plots. It should be empty, do not commit your results. To assure this is the case, add a file name .gitinore in the folder with this code:</li>
+    <li><strong>data</strong>: place here any data file that is needed to create test cases, while it is possible to
+        mock the data. Feel free to add a text file explaining how the data was produced.Mocking data is also possible,
+        but it may be not practical for complex datasets.
+    </li>
+    <li><strong>results</strong>: create this folder to store your results, i.e.&nbsp;files that would be created by
+        your analysis such as the plots. It should be empty, do not commit your results. To assure this is the case, add
+        a file name .gitignore in the folder with this code:
+    </li>
 </ul>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ignore everything in this directory</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="op">*</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># But do not ignore this file</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>.gitignore     </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+                <pre class="gitignore"><code># Ignore everything in this directory
+*
+
+# But do not ignore this file
+!.gitignore     </code></pre>
 </section>
-<section id="general-guideline-and-information" class="level2">
-<h2 class="anchored" data-anchor-id="general-guideline-and-information">General guideline and information</h2>
-<p>A good starting point, especially starting from scratch, it is to test for the class type, then that the inputs have the right formats and then move to some simple operation or trivial case. Build more complex cases from the simpler ones and exploits your tests to refector the code as needed. Try to test as many reasonable cases as possible, both successfull and not. Remeber to test for exceptions. We also suggest to develop using test drive development tecniques that will ensure a high test coverage and a good code structure. Yes, do not forget to keep refactoring to improve the code.</p>
+            <section id="general-information-about-testing-nodes" class="level3">
+                <h3 class="anchored" data-anchor-id="general-information-about-testing-nodes">General information about
+                    testing nodes</h3>
+                <p>A good starting point, especially starting from scratch, it is to test for the class type, then that
+                    the inputs have the right formats and then move to some simple operation or trivial case. Build more
+                    complex cases from the simpler ones and exploits your tests to refactor the code as needed. Try to
+                    test as many reasonable cases as possible, both successfully and not. Remember to test for
+                    exceptions. We also suggest to develop using test drive development techniques that will ensure a
+                    high test coverage and a good code structure. Yes, do not forget to keep refactoring to improve the
+                    code.</p>
 <p>You can find some samples below taken from the cz_parametrisation node, where all objects are tested</p>
-<p>Currently there is no way to differentiate from tests that require a QPU (i.e.&nbsp;measurments) and those that do not (i.e.&nbsp;analyses). Since the latter are simpler to write, start with those that, in general, are more likely to benefit from unit tests as there is much more logic in the analysis than in the measurment.</p>
-<p>If you need to test some complex scenario, such as those involving sweep, it is probably easier to start writing code and tests from the lowest level and then compose those objects to hendle the more complex scenario considered.</p>
+                <p>Currently, there is no way to differentiate from tests that require a QPU (i.e.&nbsp;measurements)
+                    and those that do not ( i.e.&nbsp;analyses). Since the latter are simpler to write, start with those
+                    that, in general, are more likely to benefit from unit tests as there is much more logic in the
+                    analysis than in the measurement.</p>
+                <p>If you need to test some complex scenario, such as those involving sweep, it is probably easier to
+                    start writing code and tests from the lowest level and then compose those objects to handle the more
+                    complex scenario considered.</p>
 </section>
-<section id="example-tests" class="level2">
-<h2 class="anchored" data-anchor-id="example-tests">Example Tests</h2>
-<section id="test-class-type" class="level3">
-<h3 class="anchored" data-anchor-id="test-class-type">Test class type</h3>
+            <section id="example-tests" class="level3">
+                <h3 class="anchored" data-anchor-id="example-tests">Example Tests</h3>
+                <p><strong>Test class type</strong></p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_canCreateCorrectType():</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    c <span class="op">=</span> CZ_Parametrisation_Fix_Duration_Node(<span class="st">"cz_char_fixCurrent"</span>, couplers <span class="op">=</span> [<span class="st">"q14_q15"</span>])</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">isinstance</span>(c, CZ_Parametrisation_Fix_Duration_Node)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">isinstance</span>(c, ParametrizedSweepNode)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>The suggested very first test is to istantiate the class and make sure it has the correct type(s) following any inheritance.</p>
-</section>
-<section id="test-input-parameters" class="level3">
-<h3 class="anchored" data-anchor-id="test-input-parameters">Test input parameters</h3>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  c <span class="op">=</span> CZ_Parametrization_Fix_Duration_Node(<span
+        class="st">"cz_char_fixCurrent"</span>, couplers<span class="op">=</span>[<span
+        class="st">"q14_q15"</span>])</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span
+        class="bu">isinstance</span>(c, CZ_Parametrization_Fix_Duration_Node)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span
+        class="bu">isinstance</span>(c, ScheduleNode)</span></code><button title="Copy to Clipboard"
+                                                                           class="code-copy-button"><i
+        class="bi"></i></button></pre>
+</div>
+                <p>The suggested very first test is to instantiate the class and make sure it has the correct type(s)
+                    following any inheritance.</p>
+                <p><strong>Test input parameters</strong></p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_CanGetQubitsFromCouplers():</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    c <span class="op">=</span> CZ_Parametrisation_Fix_Duration_Node(<span class="st">"cz_char_fixCurrent"</span>, couplers <span class="op">=</span> [<span class="st">"q14_q15"</span>])</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  c <span class="op">=</span> CZ_Parametrization_Fix_Duration_Node(<span
+        class="st">"cz_char_fixCurrent"</span>, couplers<span class="op">=</span>[<span
+        class="st">"q14_q15"</span>])</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> c.all_qubits <span class="op">==</span> [<span class="st">"q14"</span>, <span class="st">"q15"</span>]</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> c.couplers <span class="op">==</span> [<span class="st">'q14_q15'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Make sure all inputs and their manipulations are correctly initialised in the constructor, in this case the qubits are taken from the coupler pair</p>
-</section>
-<section id="test-exception" class="level3">
-<h3 class="anchored" data-anchor-id="test-exception">Test exception</h3>
+                <p><strong>Test exception</strong></p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_ValidationReturnErrorWithSameQubitCoupler():</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> pytest.raises(<span class="pp">ValueError</span>):</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>       CZ_Parametrisation_Fix_Duration_Node(<span class="st">"cz_char_fixCurrent"</span>, couplers <span class="op">=</span> [<span class="st">"q14_q14"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>      CZ_Parametrization_Fix_Duration_Node(<span
+        class="st">"cz_char_fixCurrent"</span>, couplers<span class="op">=</span>[<span
+        class="st">"q14_q14"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i
+        class="bi"></i></button></pre>
+</div>
 <p>Inputs can be incorrect and should always be tested to avoid unexpected behaviour down the line which can be difficult to trace back to the origin. There are infinite number of possible errors, so it is impossible to cover them all, but at least the obvious ones should be considered. In this case a typical typing error with the couple have the same qubit twice.</p>
-</section>
-<section id="test-with-data" class="level3">
-<h3 class="anchored" data-anchor-id="test-with-data">Test with data</h3>
+                <p><strong>Test with data</strong></p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="at">@pytest.fixture</span>(autouse<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> setup_good_data():</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    os.environ[<span class="st">"DATA_DIR"</span>] <span class="op">=</span> <span class="bu">str</span>(Path(<span class="va">__file__</span>).parent <span class="op">/</span> <span class="st">"results"</span>)</span>
@@ -280,9 +505,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> indexBestFreq[<span class="dv">0</span>] <span class="op">==</span> <span class="dv">10</span></span>
 <span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> indexBestAmp[<span class="dv">0</span>] <span class="op">==</span> <span class="dv">12</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>These two tests make sure that the return values are correct for the two qubits that are connected by the coupler.</p>
-</section>
-<section id="test-creationg-of-images-from-plotter" class="level3">
-<h3 class="anchored" data-anchor-id="test-creationg-of-images-from-plotter">Test creationg of images from plotter</h3>
+                <p><strong>Test creating of images from plotter</strong></p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_canPlotBad(setup_bad_data):</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    matplotlib.use(<span class="st">"Agg"</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    d14, d15, freqs, amps <span class="op">=</span> setup_bad_data</span>
@@ -326,9 +549,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> Image.<span class="bu">open</span>(figure_path) <span class="im">as</span> img:</span>
 <span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> img.<span class="bu">format</span> <span class="op">==</span> <span class="st">"PNG"</span>, <span class="st">"File should be a PNG image"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>This is an example on how to save files in the “results” sub-folder within the “tests” folder. The code make sure the expected file exists and has the correct format. The created files can be inspected by the developer. A possible extension would be to upload the images in the data folder and check the those produced by the test are identical.</p>
-</section>
-<section id="complex-dataset-for-comparing-results" class="level3">
-<h3 class="anchored" data-anchor-id="complex-dataset-for-comparing-results">Complex dataset for comparing results</h3>
+                <p><strong>Complex dataset for comparing results</strong></p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="at">@pytest.fixture</span>(autouse<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> setup_bad_data():</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    dataset_path <span class="op">=</span> Path(<span class="va">__file__</span>).parent <span class="op">/</span> <span class="st">"data"</span> <span class="op">/</span> <span class="st">"dataset_bad_quality_freq_amp.hdf5"</span></span>
@@ -358,9 +579,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> c.are_two_qubits_compatible()</span>
 <span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> r <span class="op">==</span> <span class="va">False</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>In this example, the data produced is loaded from a file that has data that is not a good working point. Note that there two analyses are run in the setup; the combination is run in the test, so that, if needed in other tests, the data could be modified for specific cases. This is a failure test, making sure that bad inputs are not recognised as good working points.</p>
-</section>
-<section id="even-more-complex-setup" class="level3">
-<h3 class="anchored" data-anchor-id="even-more-complex-setup">Even more complex setup</h3>
+                <p><strong>Even more complex setup</strong></p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> setup_data():</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># It should be a single dataset, but we do not have one yet, so we loop over existing files</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    dataset_path <span class="op">=</span> Path(<span class="va">__file__</span>).parent <span class="op">/</span> <span class="st">"data"</span> <span class="op">/</span> <span class="st">"dataset_good_quality_freq_amp.hdf5"</span></span>
@@ -400,7 +619,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>    c2 <span class="op">=</span> CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis(q14Res, q15Res)</span>
 <span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>    dataset_path <span class="op">=</span> (</span>
-<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>        Path(<span class="va">__file__</span>).parent <span class="op">/</span> <span class="st">"data"</span> <span class="op">/</span> <span class="st">"dataset_good_quality_freq_amp_2.hdf5"</span></span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>            Path(<span
+        class="va">__file__</span>).parent <span class="op">/</span> <span class="st">"data"</span> <span
+        class="op">/</span> <span class="st">"dataset_good_quality_freq_amp_2.hdf5"</span></span>
 <span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(dataset_path)</span>
 <span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>    ds <span class="op">=</span> xr.open_dataset(dataset_path)</span>
@@ -421,13 +642,83 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> list_of_results, freqs, amps, freqs_2, amps_2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>In this case, three points are loaded and the analysis is run on each of them. The results are returned for each point and can be used in different tests, for example by removing elements in the list_results array.</p>
 </section>
-</section>
-</section>
-<section id="unit-tests-for-infrastructure" class="level1">
-<h1>Unit tests for infrastructure</h1>
-<p>Coming soon</p>
+        </section>
+        <section id="advanced-topics-on-unit-tests" class="level2">
+            <h2 class="anchored" data-anchor-id="advanced-topics-on-unit-tests">Advanced topics on unit tests</h2>
+            <p>When running unit tests, the test framework itself and the way tests are executed can cause problems that
+                make the unit tests fail. Hence, it is important to understand how <code>pytest</code> works to get a
+                grip on how to debug failing tests efficiently.</p>
+            <p>In the beginning of each test run, <code>pytest</code> will try to import all necessary modules. If there
+                are any “Unresolved reference” errors, the tests will even not start to run.</p>
+            <section id="dealing-with-global-variables" class="level3">
+                <h3 class="anchored" data-anchor-id="dealing-with-global-variables">Dealing with global variables</h3>
+                <p>Tests might even indirectly affect the outcome of another test. As an example, there might be a test,
+                    which changes some global state in the application. Let us say the default value for the global
+                    variable <code>VAR_1</code> is 0, but one of the test changes sets the global variable
+                    <code>VAR_1</code> to 1. Now, all following tests will read 1 when they get <code>VAR_1</code> from
+                    the environment.</p>
+                <p>Sometimes though, it might be necessary to change to global variable of one test. To handle these
+                    situations, the test framework has implemented some decorators, which intend to freeze the
+                    environment variables. The most simple way to freeze the state of the environment and then e.g.&nbsp;set
+                    variables inside the test function is with the <code>@preserve_os_env</code> decorator.</p>
+                <div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code
+                        class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"
+                                                                       tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tergite_autocalibration.tests.utils.decorators <span
+        class="im">import</span> preserve_os_env</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="at">@preserve_os_env</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_my_function_that_sets_os_variables():</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  var1 <span
+        class="op">=</span> os.environ[<span class="st">"VAR_1"</span>]  <span class="co"># VAR_1 = "0"</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  os.environ[<span
+        class="st">"VAR_1"</span>] <span class="op">=</span> <span class="st">"1"</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  new_var1 <span class="op">=</span> os.environ[<span
+        class="st">"VAR_1"</span>]</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">assert</span> <span
+        class="bu">int</span>(var1) <span class="op">+</span> <span class="dv">1</span> <span class="op">==</span> <span
+        class="bu">int</span>(new_var1)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_my_function_that_only_gets_os_variables():</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  var1 <span
+        class="op">=</span> os.environ[<span class="st">"VAR_1"</span>]  <span class="co"># VAR_1 = "0"</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="cf">assert</span> <span
+        class="bu">int</span>(var1) <span class="op">==</span> <span class="dv">0</span></span></code><button
+                        title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre>
+                </div>
+                <p>Here, if we had run the first test without the <code>@preserve_os_env</code> decorator, the second
+                    test would fail, because the variable would be set to 1 in the first test and does not have the
+                    default value 0.</p>
+                <p>Another decorator in that regard is the <code>@with_os_env</code> decorator, which takes as an input
+                    the dictionary of values that environment should hold. It is just a way that - similarly to a
+                    fixture - simplifies the way things are set up without having too many <code>os.environ</code> calls
+                    inside the code. For example, you want to change the value of an environmental variable in exactly
+                    one test function, you can add:</p>
+                <div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code
+                        class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"
+                                                                       tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tergite_autocalibration.tests.utils.decorators <span
+        class="im">import</span> with_os_env</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="at">@with_os_env</span>({<span
+        class="st">"VAR_1"</span>: <span class="st">"1"</span>})</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_my_function_that_needs_the_os_variables_changed():</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  var1 <span
+        class="op">=</span> os.environ[<span class="st">"VAR_1"</span>]</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">assert</span> var1 <span
+        class="op">==</span> <span class="st">"ABC"</span></span></code><button title="Copy to Clipboard"
+                                                                                class="code-copy-button"><i
+                        class="bi"></i></button></pre>
+                </div>
+                <p>This will freeze the current state of the environment, replace the variable <code>VAR_1</code> with
+                    “ABC” and after the test will cleanup the environment and load the previous values.</p>
 
 
+            </section>
+</section>
 </section>
 
 </main> <!-- /main -->
@@ -450,7 +741,157 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       toggleBodyColorMode(bsSheetEl);
     }
   }
-  toggleBodyColorPrimary();  
+  toggleBodyColorPrimary();
+    const disableStylesheet = (stylesheets) => {
+        for (let i = 0; i < stylesheets.length; i++) {
+            const stylesheet = stylesheets[i];
+            stylesheet.rel = 'prefetch';
+        }
+    }
+    const enableStylesheet = (stylesheets) => {
+        for (let i = 0; i < stylesheets.length; i++) {
+            const stylesheet = stylesheets[i];
+            stylesheet.rel = 'stylesheet';
+        }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+        const els = window.document.querySelectorAll(selector);
+        for (let i = 0; i < els.length; i++) {
+            const el = els[i];
+            if (allowTransitions) {
+                el.classList.remove('notransition');
+            } else {
+                el.classList.add('notransition');
+            }
+        }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+        const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+        const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+        let newTheme = '';
+        if (darkModeDefault) {
+            newTheme = isAlternate ? baseTheme : alternateTheme;
+        } else {
+            newTheme = isAlternate ? alternateTheme : baseTheme;
+        }
+        const changeGiscusTheme = () => {
+            // From: https://github.com/giscus/giscus/issues/336
+            const sendMessage = (message) => {
+                const iframe = document.querySelector('iframe.giscus-frame');
+                if (!iframe) return;
+                iframe.contentWindow.postMessage({giscus: message}, 'https://giscus.app');
+            }
+            sendMessage({
+                setConfig: {
+                    theme: newTheme
+                }
+            });
+        }
+        const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+        if (isGiscussLoaded) {
+            changeGiscusTheme();
+        }
+    }
+    const toggleColorMode = (alternate) => {
+        // Switch the stylesheets
+        const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+        manageTransitions('#quarto-margin-sidebar .nav-link', false);
+        if (alternate) {
+            enableStylesheet(alternateStylesheets);
+            for (const sheetNode of alternateStylesheets) {
+                if (sheetNode.id === "quarto-bootstrap") {
+                    toggleBodyColorMode(sheetNode);
+                }
+            }
+        } else {
+            disableStylesheet(alternateStylesheets);
+            toggleBodyColorPrimary();
+        }
+        manageTransitions('#quarto-margin-sidebar .nav-link', true);
+        // Switch the toggles
+        const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+        for (let i = 0; i < toggles.length; i++) {
+            const toggle = toggles[i];
+            if (toggle) {
+                if (alternate) {
+                    toggle.classList.add("alternate");
+                } else {
+                    toggle.classList.remove("alternate");
+                }
+            }
+        }
+        // Hack to workaround the fact that safari doesn't
+        // properly recolor the scrollbar when toggling (#1455)
+        if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+            manageTransitions("body", false);
+            window.scrollTo(0, 1);
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+                manageTransitions("body", true);
+            }, 40);
+        }
+    }
+    const isFileUrl = () => {
+        return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+        let styleSentinel = getColorSchemeSentinel();
+        if (styleSentinel !== null) {
+            return styleSentinel === "alternate";
+        } else {
+            return false;
+        }
+    }
+    const setStyleSentinel = (alternate) => {
+        const value = alternate ? "alternate" : "default";
+        if (!isFileUrl()) {
+            window.localStorage.setItem("quarto-color-scheme", value);
+        } else {
+            localAlternateSentinel = value;
+        }
+    }
+    const getColorSchemeSentinel = () => {
+        if (!isFileUrl()) {
+            const storageValue = window.localStorage.getItem("quarto-color-scheme");
+            return storageValue != null ? storageValue : localAlternateSentinel;
+        } else {
+            return localAlternateSentinel;
+        }
+    }
+    const darkModeDefault = false;
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+        // Read the current dark / light value
+        let toAlternate = !hasAlternateSentinel();
+        toggleColorMode(toAlternate);
+        setStyleSentinel(toAlternate);
+        toggleGiscusIfUsed(toAlternate, darkModeDefault);
+    };
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+        const a = window.document.createElement('a');
+        a.classList.add('top-right');
+        a.classList.add('quarto-color-scheme-toggle');
+        a.href = "";
+        a.onclick = function () {
+            try {
+                window.quartoToggleColorScheme();
+            } catch {
+            }
+            return false;
+        };
+        const i = window.document.createElement("i");
+        i.classList.add('bi');
+        a.appendChild(i);
+        window.document.body.appendChild(a);
+    }
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+        toggleColorMode(true);
+    } else {
+        toggleColorMode(false);
+    }
   const icon = "";
   const anchorJS = new window.AnchorJS();
   anchorJS.options = {

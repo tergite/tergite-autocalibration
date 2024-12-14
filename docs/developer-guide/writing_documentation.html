@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-    <title>Tergite Automatic Calibration</title>
+    <title>writing_documentation – Tergite Automatic Calibration</title>
     <style>
         code {
             white-space: pre-wrap;
@@ -42,30 +42,121 @@
             margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */
             vertical-align: middle;
         }
+
+        /* CSS for syntax highlighting */
+        pre > code.sourceCode {
+            white-space: pre;
+            position: relative;
+        }
+
+        pre > code.sourceCode > span {
+            line-height: 1.25;
+        }
+
+        pre > code.sourceCode > span:empty {
+            height: 1.2em;
+        }
+
+        .sourceCode {
+            overflow: visible;
+        }
+
+        code.sourceCode > span {
+            color: inherit;
+            text-decoration: inherit;
+        }
+
+        div.sourceCode {
+            margin: 1em 0;
+        }
+
+        pre.sourceCode {
+            margin: 0;
+        }
+
+        @media screen {
+            div.sourceCode {
+                overflow: auto;
+            }
+        }
+
+        @media print {
+            pre > code.sourceCode {
+                white-space: pre-wrap;
+            }
+
+            pre > code.sourceCode > span {
+                display: inline-block;
+                text-indent: -5em;
+                padding-left: 5em;
+            }
+        }
+
+        pre.numberSource code {
+            counter-reset: source-line 0;
+        }
+
+        pre.numberSource code > span {
+            position: relative;
+            left: -4em;
+            counter-increment: source-line;
+        }
+
+        pre.numberSource code > span > a:first-child::before {
+            content: counter(source-line);
+            position: relative;
+            left: -1em;
+            text-align: right;
+            vertical-align: baseline;
+            border: none;
+            display: inline-block;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            padding: 0 4px;
+            width: 4em;
+        }
+
+        pre.numberSource {
+            margin-left: 3em;
+            padding-left: 4px;
+        }
+
+        div.sourceCode {
+        }
+
+        @media screen {
+            pre > code.sourceCode > span > a:first-child::before {
+                text-decoration: underline;
+            }
+        }
     </style>
 
 
-    <script src="site_libs/quarto-nav/quarto-nav.js"></script>
-    <script src="site_libs/quarto-nav/headroom.min.js"></script>
-    <script src="site_libs/clipboard/clipboard.min.js"></script>
-    <script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-    <script src="site_libs/quarto-search/fuse.min.js"></script>
-    <script src="site_libs/quarto-search/quarto-search.js"></script>
-    <meta name="quarto:offset" content="./">
-    <script src="site_libs/quarto-html/quarto.js"></script>
-    <script src="site_libs/quarto-html/popper.min.js"></script>
-    <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-    <script src="site_libs/quarto-html/anchor.min.js"></script>
-    <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-    <link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme"
+    <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+    <script src="../site_libs/quarto-nav/headroom.min.js"></script>
+    <script src="../site_libs/clipboard/clipboard.min.js"></script>
+    <script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+    <script src="../site_libs/quarto-search/fuse.min.js"></script>
+    <script src="../site_libs/quarto-search/quarto-search.js"></script>
+    <meta name="quarto:offset" content="../">
+    <script src="../site_libs/quarto-html/quarto.js"></script>
+    <script src="../site_libs/quarto-html/popper.min.js"></script>
+    <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+    <script src="../site_libs/quarto-html/anchor.min.js"></script>
+    <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+    <link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme"
           id="quarto-text-highlighting-styles">
-    <link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch"
+    <link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch"
           class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-    <script src="site_libs/bootstrap/bootstrap.min.js"></script>
-    <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-    <link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme"
+    <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+    <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+    <link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme"
           id="quarto-bootstrap" data-mode="light">
-    <link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch"
+    <link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch"
           class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
     <script id="quarto-search-options" type="application/json">{
         "location": "sidebar",
@@ -104,7 +195,7 @@
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
         <div class="navbar-container container-fluid">
             <div class="navbar-brand-container mx-auto">
-                <a class="navbar-brand" href="./">
+                <a class="navbar-brand" href="../">
                     <span class="navbar-title">Tergite Automatic Calibration</span>
                 </a>
             </div>
@@ -116,23 +207,23 @@
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <ul class="navbar-nav navbar-nav-scroll me-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="./index.html" aria-current="page">
+                        <a class="nav-link active" href="../index.html" aria-current="page">
                             <span class="menu-text">Home</span></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="./getting_started.html">
+                        <a class="nav-link" href="../getting_started.html">
                             <span class="menu-text">User Guide</span></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="./available_nodes.html">
+                        <a class="nav-link" href="../available_nodes.html">
                             <span class="menu-text">Node Library</span></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="./developer_guide.html">
+                        <a class="nav-link" href="../developer_guide.html">
                             <span class="menu-text">Developer Guide</span></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="./troubleshooting.html">
+                        <a class="nav-link" href="../troubleshooting.html">
                             <span class="menu-text">Troubleshooting</span></a>
                     </li>
                 </ul>
@@ -155,7 +246,9 @@
             </button>
             <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="./index.html">Home</a></li>
+                    <li class="breadcrumb-item"><a href="../developer_guide.html">Developer Guide</a></li>
+                    <li class="breadcrumb-item"><a href="../developer-guide/writing_documentation.html">Writing
+                        documentation</a></li>
                 </ol>
             </nav>
             <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse"
@@ -184,7 +277,7 @@
             <ul class="list-unstyled mt-1">
                 <li class="sidebar-item">
                     <div class="sidebar-item-container">
-                        <a href="./index.html" class="sidebar-item-text sidebar-link active">
+                        <a href="../index.html" class="sidebar-item-text sidebar-link">
                             <span class="menu-text">Home</span></a>
                     </div>
                 </li>
@@ -202,19 +295,19 @@
                     <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
-                                <a href="./getting_started.html" class="sidebar-item-text sidebar-link">
+                                <a href="../getting_started.html" class="sidebar-item-text sidebar-link">
                                     <span class="menu-text">Getting started</span></a>
                             </div>
                         </li>
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
-                                <a href="./user-guide/configuration_files.html" class="sidebar-item-text sidebar-link">
+                                <a href="../user-guide/configuration_files.html" class="sidebar-item-text sidebar-link">
                                     <span class="menu-text">Configuration Files</span></a>
                             </div>
                         </li>
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
-                                <a href="./user-guide/operation.html" class="sidebar-item-text sidebar-link">
+                                <a href="../user-guide/operation.html" class="sidebar-item-text sidebar-link">
                                     <span class="menu-text">Operation</span></a>
                             </div>
                         </li>
@@ -234,20 +327,20 @@
                     <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
-                                <a href="./available_nodes.html" class="sidebar-item-text sidebar-link">
+                                <a href="../available_nodes.html" class="sidebar-item-text sidebar-link">
                                     <span class="menu-text">Overview</span></a>
                             </div>
                         </li>
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
-                                <a href="./nodes/resonator_spectroscopy_node.html"
+                                <a href="../nodes/resonator_spectroscopy_node.html"
                                    class="sidebar-item-text sidebar-link">
                                     <span class="menu-text">Resonator spectroscopy</span></a>
                             </div>
                         </li>
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
-                                <a href="./nodes/qubit_spectroscopy_node.html" class="sidebar-item-text sidebar-link">
+                                <a href="../nodes/qubit_spectroscopy_node.html" class="sidebar-item-text sidebar-link">
                                     <span class="menu-text">Qubit spectroscopy</span></a>
                             </div>
                         </li>
@@ -267,33 +360,33 @@
                     <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
-                                <a href="./developer_guide.html" class="sidebar-item-text sidebar-link">
+                                <a href="../developer_guide.html" class="sidebar-item-text sidebar-link">
                                     <span class="menu-text">Introduction</span></a>
                             </div>
                         </li>
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
-                                <a href="./developer-guide/node_classes.html" class="sidebar-item-text sidebar-link">
+                                <a href="../developer-guide/node_classes.html" class="sidebar-item-text sidebar-link">
                                     <span class="menu-text">Node Classes</span></a>
                             </div>
                         </li>
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
-                                <a href="./developer-guide/new_node_creation.html"
+                                <a href="../developer-guide/new_node_creation.html"
                                    class="sidebar-item-text sidebar-link">
                                     <span class="menu-text">Create a new node</span></a>
                             </div>
                         </li>
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
-                                <a href="./developer-guide/unit_tests.html" class="sidebar-item-text sidebar-link">
+                                <a href="../developer-guide/unit_tests.html" class="sidebar-item-text sidebar-link">
                                     <span class="menu-text">Unit tests</span></a>
                             </div>
                         </li>
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
-                                <a href="./developer-guide/writing_documentation.html"
-                                   class="sidebar-item-text sidebar-link">
+                                <a href="../developer-guide/writing_documentation.html"
+                                   class="sidebar-item-text sidebar-link active">
                                     <span class="menu-text">Writing documentation</span></a>
                             </div>
                         </li>
@@ -301,7 +394,7 @@
                 </li>
                 <li class="sidebar-item">
                     <div class="sidebar-item-container">
-                        <a href="./troubleshooting.html" class="sidebar-item-text sidebar-link">
+                        <a href="../troubleshooting.html" class="sidebar-item-text sidebar-link">
                             <span class="menu-text">Troubleshooting</span></a>
                     </div>
                 </li>
@@ -316,17 +409,41 @@
             <h2 id="toc-title">On this page</h2>
 
             <ul>
-                <li><a href="#documentation-of-the-tergite-automatic-calibration"
-                       id="toc-documentation-of-the-tergite-automatic-calibration" class="nav-link active"
-                       data-scroll-target="#documentation-of-the-tergite-automatic-calibration">Documentation of the
-                    Tergite Automatic Calibration</a>
+                <li><a href="#writing-documentation" id="toc-writing-documentation" class="nav-link active"
+                       data-scroll-target="#writing-documentation">Writing documentation</a>
                     <ul class="collapse">
-                        <li><a href="#user-guide" id="toc-user-guide" class="nav-link" data-scroll-target="#user-guide">User
-                            Guide</a></li>
-                        <li><a href="#node-library" id="toc-node-library" class="nav-link"
-                               data-scroll-target="#node-library">Node Library</a></li>
-                        <li><a href="#developer-guide" id="toc-developer-guide" class="nav-link"
-                               data-scroll-target="#developer-guide">Developer Guide</a></li>
+                        <li><a href="#example-on-writing-documentation-in-general"
+                               id="toc-example-on-writing-documentation-in-general" class="nav-link"
+                               data-scroll-target="#example-on-writing-documentation-in-general">Example on writing
+                            documentation in general</a>
+                            <ul class="collapse">
+                                <li><a href="#example-1-not-so-good" id="toc-example-1-not-so-good" class="nav-link"
+                                       data-scroll-target="#example-1-not-so-good">Example 1: Not so good</a></li>
+                                <li><a href="#example-2-better" id="toc-example-2-better" class="nav-link"
+                                       data-scroll-target="#example-2-better">Example 2: Better</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#writing-documentation-for-the-automatic-calibration"
+                               id="toc-writing-documentation-for-the-automatic-calibration" class="nav-link"
+                               data-scroll-target="#writing-documentation-for-the-automatic-calibration">Writing
+                            documentation for the automatic calibration</a>
+                            <ul class="collapse">
+                                <li><a href="#installation-of-quarto" id="toc-installation-of-quarto" class="nav-link"
+                                       data-scroll-target="#installation-of-quarto">Installation of quarto</a></li>
+                                <li><a href="#structure-of-the-documentation" id="toc-structure-of-the-documentation"
+                                       class="nav-link" data-scroll-target="#structure-of-the-documentation">Structure
+                                    of the documentation</a></li>
+                                <li><a href="#adding-a-navigation-entry-in-the-_quarto.yml-file"
+                                       id="toc-adding-a-navigation-entry-in-the-_quarto.yml-file" class="nav-link"
+                                       data-scroll-target="#adding-a-navigation-entry-in-the-_quarto.yml-file">Adding a
+                                    navigation entry in the <code>_quarto.yml</code> file</a></li>
+                                <li><a href="#useful-features-of-quarto" id="toc-useful-features-of-quarto"
+                                       class="nav-link" data-scroll-target="#useful-features-of-quarto">Useful features
+                                    of quarto</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps">Next
+                            steps:</a></li>
                     </ul>
                 </li>
             </ul>
@@ -336,47 +453,355 @@
     <main class="content" id="quarto-document-content">
 
 
-        <section id="documentation-of-the-tergite-automatic-calibration" class="level1">
-            <h1>Documentation of the Tergite Automatic Calibration</h1>
-            <p>The tergite-autocalibration is a toolkit to ease calibrating quantum devices for superconducting
-                platforms. The project contains an orchestration manager, a collection of calibration schedules and a
-                collection of post-processing and analysis routines. It is tailored to tune-up the 25 qubits QPU at
-                Chalmers, which is receiving generous funding by the Wallenberg Centre for Quantum Technology (<a
-                        href="https://wacqt.se">WACQT</a>) for research, development and operation.</p>
-            <section id="user-guide" class="level3">
-                <h3 class="anchored" data-anchor-id="user-guide"><a href="./getting_started.html">User Guide</a></h3>
-                <p>A tutorial on how to get started with the automatic calibration. This tutorial contains a guide on
-                    how to use the commandline interface with quick commands. Further, there is an introduction into
-                    configuration files.</p>
+        <section id="writing-documentation" class="level1">
+            <h1>Writing documentation</h1>
+            <p>Writing good documentation is very important for new people to understand how to use things. Often, we do
+                not have time to write good guides, because we are having deadlines or other things to do that are more
+                interesting and less boring than writing down what we already seem to know so well.</p>
+            <p>This guide is a small guide on how to write a good guide. It does not aim to provide an explanation on
+                how to write the perfect documentation, because these resources already exist on the internet. However,
+                it should make at least curious on how to write documentation with some short general rules:</p>
+            <ol type="1">
+                <li>Think like the reader</li>
+                <li>Go step by step</li>
+                <li>Be precise</li>
+                <li>Follow standards</li>
+                <li>Discuss</li>
+            </ol>
+            <p>In the second part of the tutorial, we will focus on how to write documentation especially for this
+                project.</p>
+            <p>So, scroll down if you want to start reading there.</p>
+            <section id="example-on-writing-documentation-in-general" class="level2">
+                <h2 class="anchored" data-anchor-id="example-on-writing-documentation-in-general">Example on writing
+                    documentation in general</h2>
+                <p>When you explain how things work, it is often better to take it step by step. Also, do not hesitate
+                    to make small steps. Tiny ones.</p>
+                <p>Keep in mind to think like the reader:</p>
                 <ul>
-                    <li><a href="./getting_started.html">Getting started</a></li>
-                    <li><a href="./user-guide/operation.html">Operation</a></li>
-                    <li><a href="./user-guide/configuration_files.html">Configuration Files</a></li>
+                    <li>What is the previous knowledge about a topic
+                        <ul>
+                            <li>Most of the people reading our docs are probably students, so maybe they are not
+                                familiar with all git commands and Linux tricks.
+                            </li>
+                        </ul>
+                    </li>
+                    <li>Provide a structure/agenda for your guide</li>
                 </ul>
+                <p>Let us say you want to write a guide about the installation of Miniconda, which contains a lot of
+                    steps and the installation process looks like this example.</p>
+                <section id="example-1-not-so-good" class="level3">
+                    <h3 class="anchored" data-anchor-id="example-1-not-so-good">Example 1: Not so good</h3>
+                    <div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code
+                            class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"
+                                                                        tabindex="-1"></a><span
+                            class="bu">cd</span> ~</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> tmp</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> tmp</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> SomeInstallationFileForMiniconda</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> u+x SomeInstallationFileForMiniconda</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">./SomeInstallationFileForMiniconda</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> init bash</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span
+        class="va">PATH</span><span class="op">=</span>/home/<span class="op">&lt;</span>YOUR\_USERNAME<span class="op">&gt;</span>/miniconda3/bin:<span
+        class="va">$PATH</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> create <span
+        class="at">-n</span> new-environment python=3.9</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> activate new-environment</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> repos</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> repos</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@my-repo-url</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> my-repo</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span
+        class="at">-e</span> .</span></code><button title="Copy to Clipboard" class="code-copy-button"><i
+                            class="bi"></i></button></pre>
+                    </div>
+                    <p>How can this guide for an installation look better? Well, while writing think of yourself
+                        explaining the same installation procedure to a colleague. You would probably tell some of the
+                        commands, but in between you would also briefly discuss what they are doing. Maybe you are
+                        experiencing an error at some point. Maybe you want to give some more background knowledge in
+                        case the reader does not have it. In the case of our team it very important to give these kind
+                        of hints, because we are working in an interdisciplinary environment and followed different
+                        educational paths.</p>
+                    <p>Now, let’s see how the installation could look like. Let us assume we already wrote an
+                        introduction, the prerequisites are clear, and we are just explaining the installation
+                        itself.</p>
+                </section>
+                <section id="example-2-better" class="level3">
+                    <h3 class="anchored" data-anchor-id="example-2-better">Example 2: Better</h3>
+                    <p>Now this is the better version, because it breaks down the process into:</p>
+                    <ol type="1">
+                        <li>Downloading the installation file</li>
+                        <li>Installing conda</li>
+                        <li>Troubleshooting some common problems that can happen during the installation</li>
+                        <li>Showing what would be the next step after the installation</li>
+                    </ol>
+                    <div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code
+                            class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"
+                                                                        tabindex="-1"></a><span
+                            class="bu">cd</span> ~</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> tmp</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> tmp</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> SomeInstallationFileForMiniconda</span></code><button
+                            title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre>
+                    </div>
+                    <p>First, we are navigating to our home directory and create a temporary directory where we store
+                        the Miniconda installation file. With the <code>wget</code> command, we download the file. Note
+                        that there are different versions of the installer, depending on which operating system you use.
+                        A full list of installers can be found on the <a
+                                href="https://docs.conda.io/projects/miniconda/en/latest/">Miniconda webpage</a> . The
+                        reason why we are using Miniconda and not Anaconda is because it takes less disk space. As soon
+                        as we have downloaded the installer file, we can continue with the installation.</p>
+                    <div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code
+                            class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"
+                                                                        tabindex="-1"></a><span class="fu">chmod</span> u+x SomeInstallationFileForMiniconda</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./SomeInstallationFileForMiniconda</span></span></code><button
+                            title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre>
+                    </div>
+                    <p>We have to make the installer executable and run it. During the installation process itself, just
+                        follow the standard recommendations and paths that the installer selects during the
+                        installation. After the installation it can be possible that you have to do some tiny
+                        adjustments. With</p>
+                    <div class="sourceCode" id="cb4">
+                        <pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a
+                                href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> init bash</span></code><button
+                                title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre>
+                    </div>
+                    <p>you can modify your shell to show the conda path. And with</p>
+                    <div class="sourceCode" id="cb5">
+                        <pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a
+                                href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span
+                                class="va">PATH</span><span class="op">=</span>/home/<span class="op">&lt;</span>YOUR\_USERNAME<span
+                                class="op">&gt;</span>/miniconda3/bin:<span class="va">$PATH</span></span></code><button
+                                title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre>
+                    </div>
+                    <p>you are adding conda to the PATH variable. That should be done automatically during the
+                        installation, but sometimes it does not work properly. You can verify the installation by
+                        typing:</p>
+                    <div class="sourceCode" id="cb6">
+                        <pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a
+                                href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> <span
+                                class="at">--version</span></span></code><button title="Copy to Clipboard"
+                                                                                 class="code-copy-button"><i
+                                class="bi"></i></button></pre>
+                    </div>
+                    <p>After the installation is complete, we can create our conda environment.</p>
+                    <div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code
+                            class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"
+                                                                        tabindex="-1"></a><span class="ex">conda</span> create <span
+                            class="at">-n</span> new-environment python=3.9</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> activate new-environment</span></code><button
+                            title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre>
+                    </div>
+                    <p>Note that we are using Python 3.9 in our environment. This is because we are having some
+                        dependencies with another library, which will be explained in more detail in the remarks
+                        section. If you are running the installation on macOS, please find additional resources in the
+                        respective guide how to use conda environments on macOS. We can now start to clone our
+                        repository and install the dependencies for the project.</p>
+                    <div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code
+                            class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"
+                                                                        tabindex="-1"></a><span
+                            class="bu">cd</span> ~</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> repos</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@my-repo-url</span></code><button
+                            title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre>
+                    </div>
+                    <p>If you have not done yet, you can create the repos directory using <code>mkdir repos</code>.
+                        Please read this other guide that explains how to use Git. After you cloned the repository, we
+                        can navigate in there and install our dependencies.</p>
+                    <div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code
+                            class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"
+                                                                        tabindex="-1"></a><span class="bu">cd</span> my-repo</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span
+        class="at">-e</span> .</span></code><button title="Copy to Clipboard" class="code-copy-button"><i
+                            class="bi"></i></button></pre>
+                    </div>
+                    <p>This can take up to three minutes. If you are running into any problems during the installation
+                        please contact one of the other team members and verify whether it works for them or try to find
+                        a fix if you know how to approach it. If you have fixed errors that happened during the
+                        installation, please put a note into this installation guide, so, other people with the same
+                        issue have an easier time to solve it.</p>
+                    <p>What is now better in this second example are the explanations for every step. For your brain it
+                        is way easier to come back to one of these steps, and you learn way more about what you are
+                        doing when there are small explanations than when just copy and pasting console commands.</p>
+                    <ul>
+                        <li><p>Try to group commands or tiny steps that belong together, otherwise it looks a bit
+                            scattered. But also do not have to many loose blocks flying around.</p></li>
+                        <li><p>Do not write too much, but take some time to explain some of the backgrounds even if you
+                            think it is clear. If there is a lot of background, you can also link to some page in the
+                            internet which already has done the work and provides a tutorial. Finally, make sure that
+                            you are writing in a consistent style and provide enough examples.</p></li>
+                        <li><p>Whenever your guide is finished, share it with others and discuss. It is probably not
+                            perfect (yet) and other people might have valuable feedback from their own experiences with
+                            the problem you are describing.</p></li>
+                    </ul>
+                </section>
             </section>
-            <section id="node-library" class="level3">
-                <h3 class="anchored" data-anchor-id="node-library"><a href="./available_nodes.html">Node Library</a>
-                </h3>
-                <p>The main principle behind the automatic calibration is based on calibrating nodes in a graph
-                    structure. A node contains all the measurement and analysis classes to find the quantity of interest
-                    - for qubits and couplers. If you are interested in implementing a new node, it might be worth it to
-                    check whether there are existing nodes that you can use to find the qubit properties you are looking
-                    to calibrate.</p>
+            <section id="writing-documentation-for-the-automatic-calibration" class="level2">
+                <h2 class="anchored" data-anchor-id="writing-documentation-for-the-automatic-calibration">Writing
+                    documentation for the automatic calibration</h2>
+                <p>In this section, we will go through the specific processes that are important when writing
+                    documentation:</p>
+                <ol type="1">
+                    <li>Installing quarto</li>
+                    <li>Structure of the files</li>
+                    <li>Adding a navigation entry</li>
+                    <li>Advanced features of quarto</li>
+                </ol>
+                <section id="installation-of-quarto" class="level3">
+                    <h3 class="anchored" data-anchor-id="installation-of-quarto">Installation of quarto</h3>
+                    <p>In the tergite-autocalibration repository we are using <a href="https://quarto.org/">Quarto</a>
+                        to render documentation. Quarto is very versatile and can - among other document types - render
+                        markdown and Jupyter notebooks. If you have been following the steps in the <a
+                                href="../developer_guide.html">developer guide introduction</a>, you should have quarto
+                        already installed. Otherwise, you can do it by running:</p>
+                    <div class="sourceCode" id="cb10">
+                        <pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a
+                                href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install quarto</span></code><button
+                                title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre>
+                    </div>
+                    <p>To render a simple preview of your documentation, please open a terminal inside the <code>documentation</code>
+                        folder and run:</p>
+                    <div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code
+                            class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"
+                                                                         tabindex="-1"></a><span class="bu">cd</span> documentation</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span
+        class="ex">quarto</span> preview</span></code><button title="Copy to Clipboard" class="code-copy-button"><i
+                            class="bi"></i></button></pre>
+                    </div>
+                    <p>This will open a browser window with the rendered quarto documentation pages.</p>
+                </section>
+                <section id="structure-of-the-documentation" class="level3">
+                    <h3 class="anchored" data-anchor-id="structure-of-the-documentation">Structure of the
+                        documentation</h3>
+                    <p>Maybe you noticed that on the top-level of the repository there are two folders, one called
+                        <code>docs</code> and another one called <code>documentation</code>. This is because they have
+                        two different purposes:</p>
+                    <ul>
+                        <li><code>documentation</code>: Contains the markdown files and Jupyter notebooks to create the
+                            documentation from. These are the files that you edit.
+                        </li>
+                        <li><code>docs</code>: Is the output HTML after running <code>quarto render</code>, which is
+                            displayed on the website. You do not edit these files. They will always be generated from
+                            the files in the <code>documentation</code> folder.
+                        </li>
+                    </ul>
+                    <p>Now, let us have a look at the <code>documentation</code> folder, because this is the one we are
+                        working with the most. It is structured:</p>
+                    <ul>
+                        <li><code>.assets</code>: There you put images and style/formatting material.</li>
+                        <li><code>.quarto</code>: Do not touch this folder and do not commit it to git, because it
+                            contains temporary files during the rendering process.
+                        </li>
+                        <li><code>developer-guide</code>, <code>nodes</code> and <code>user-guide</code>: Contains the
+                            respective content for the pages.
+                        </li>
+                        <li>Then there are a couple of pages from the top-level of the documentation.</li>
+                        <li>And a file called <code>_quarto.yml</code>. This file is important, because it defines how
+                            things are rendered.
+                        </li>
+                    </ul>
+                </section>
+                <section id="adding-a-navigation-entry-in-the-_quarto.yml-file" class="level3">
+                    <h3 class="anchored" data-anchor-id="adding-a-navigation-entry-in-the-_quarto.yml-file">Adding a
+                        navigation entry in the <code>_quarto.yml</code> file</h3>
+                    <p>In here, the most relevant to be touched during adding documentation is the sidebar section.
+                        Imagine you are adding a new page e.g.&nbsp;about a calibration node, and you want to add it to
+                        the navigation. Then, you would add an entry at the correct position in the
+                        <code>_quarto.yml</code> file for the sidebar.</p>
+                    <div class="sourceCode" id="cb12"><pre class="sourceCode yaml code-with-copy"><code
+                            class="sourceCode yaml"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"
+                                                                         tabindex="-1"></a><span
+                            class="at">  </span><span class="fu">sidebar</span><span class="kw">:</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">style</span><span
+        class="kw">:</span><span class="at"> </span><span class="st">"docked"</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">search</span><span
+        class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">contents</span><span
+        class="kw">:</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span
+        class="at"> </span><span class="fu">section</span><span class="kw">:</span><span class="at"> </span><span
+        class="st">"Node Library"</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span
+        class="fu">contents</span><span class="kw">:</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span
+        class="kw">-</span><span class="at"> </span><span class="fu">text</span><span class="kw">:</span><span
+        class="at"> </span><span class="st">"Overview"</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span
+        class="fu">href</span><span class="kw">:</span><span class="at"> available_nodes.qmd</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span
+        class="kw">-</span><span class="at"> </span><span class="fu">text</span><span class="kw">:</span><span
+        class="at"> </span><span class="st">"Resonator spectroscopy"</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span
+        class="fu">href</span><span class="kw">:</span><span
+        class="at"> nodes/resonator_spectroscopy_node.qmd</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span
+        class="kw">-</span><span class="at"> </span><span class="fu">text</span><span class="kw">:</span><span
+        class="at"> </span><span class="st">"My new node"</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span
+        class="fu">href</span><span class="kw">:</span><span class="at"> nodes/my_new_node.qmd</span></span></code><button
+                            title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre>
+                    </div>
+                    <p>It is pretty self-explaining where to put the node when you see the rendered version in your
+                        browser.</p>
+                </section>
+                <section id="useful-features-of-quarto" class="level3">
+                    <h3 class="anchored" data-anchor-id="useful-features-of-quarto">Useful features of quarto</h3>
+                    <p>As you noticed, quarto does not render from normal <code>.md</code> markdown files, but from
+                        <code>.qmd</code> quarto markdown files. These are extending the markdown functionality with
+                        some special features. Here, we will show them along with some normal useful feature from
+                        markdown.</p>
+                    <p><strong>Code highlighting</strong></p>
+                    <p>Imagine you want to have a block to show code. What you write inside your markdown file would
+                        be:</p>
+                    <div class="sourceCode" id="cb13"><pre class="sourceCode markdown code-with-copy"><code
+                            class="sourceCode markdown"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"
+                                                                             tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>variable <span class="op">=</span> <span
+        class="dv">123</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Hello world"</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button
+                            title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre>
+                    </div>
+                    <p>And the output would look like:</p>
+                    <div class="sourceCode" id="cb14"><pre class="sourceCode python code-with-copy"><code
+                            class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"
+                                                                           tabindex="-1"></a>variable <span
+                            class="op">=</span> <span class="dv">123</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Hello world"</span>)</span></code><button
+                            title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre>
+                    </div>
+                    <p><strong>Graphs</strong></p>
+                    <p>For the calibration nodes, we are using a graph to chain them. This graph is rendered with <a
+                            href="https://quarto.org/docs/authoring/diagrams.html">mermaid</a>.</p>
+                    <div class="sourceCode" id="cb15"><pre class="sourceCode markdown code-with-copy"><code
+                            class="sourceCode markdown"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"
+                                                                             tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="in">graph TD</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="in">    A[Resonator Spectroscopy] --&gt; B(Qubit Spectroscopy)</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="in">    B --&gt; C[Rabi Oscillations]</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="in">        </span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="in">    click A href "nodes/resonator_spectroscopy_node.html"</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="in">    style A fill:#ffe6cc,stroke:#333,stroke-width:2px</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="in">    style B fill:#ffe6cc,stroke:#333,stroke-width:2px</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="in">    style C fill:#ffe6cc,stroke:#333,stroke-width:2px</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button
+                            title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre>
+                    </div>
+                    <p>With the <code>style</code> attribute, you can define the colour of the node. With the <code>click</code>
+                        attribute, add a link on a node inside the graph.</p>
+                </section>
             </section>
-            <section id="developer-guide" class="level3">
-                <h3 class="anchored" data-anchor-id="developer-guide"><a href="./developer_guide.html">Developer
-                    Guide</a></h3>
-                <p>This repository is an actively developed open-source project and also part of the <a
-                        href="https://tergite.github.io">Tergite</a> full-stack software ecosystem to operate a quantum
-                    computer. Hence, you are more than welcome to contribute to the project with your own ideas that fit
-                    into the framework. To familiarize yourself with the existing classes and the architecture of the
-                    automatic calibration, please take a look into the development guide. Here, you can also find best
-                    practices and information about our design philosophy.</p>
-                <ul>
-                    <li><a href="./developer-guide/new_node_creation.html">Create node classes</a></li>
-                    <li><a href="./developer-guide/unit_tests.html">Write unit tests</a></li>
-                    <li><a href="./developer-guide/writing_documentation.html">Documentation guidelines</a></li>
-                </ul>
+            <section id="next-steps" class="level2">
+                <h2 class="anchored" data-anchor-id="next-steps">Next steps:</h2>
+                <p>When you reached the point that you are already writing the perfect documentation, you are probably
+                    also done reading the documentation. So, no next steps to read up upon. You can now write even more
+                    documentation or just code and explore quantum physics :)</p>
 
 
             </section>
