@@ -1,3 +1,8 @@
+# BSD 2-Clause License
+#
+# Copyright (c) 2023, Damien Crielaard
+# All rights reserved.
+
 from __future__ import annotations
 
 import logging
@@ -7,10 +12,10 @@ from typing import cast
 import xarray as xr
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import QSignalMapper
-from quantifiles.data import get_snapshot_as_dict
-from quantifiles.plot.baseplot import BasePlot
-from quantifiles.plot.lineplot import LinePlot
-from quantifiles.plot.snapshot import SnapshotTab
+from tergite_autocalibration.tools.quantifiles.data import get_snapshot_as_dict
+from tergite_autocalibration.tools.quantifiles.plot.baseplot import BasePlot
+from tergite_autocalibration.tools.quantifiles.plot.lineplot import LinePlot
+from tergite_autocalibration.tools.quantifiles.plot.snapshot import SnapshotTab
 
 logger = logging.getLogger(__name__)
 

@@ -1,3 +1,8 @@
+# BSD 2-Clause License
+#
+# Copyright (c) 2023, Damien Crielaard
+# All rights reserved.
+
 from __future__ import annotations
 
 from functools import partial
@@ -6,7 +11,7 @@ from typing import Any
 import xarray as xr
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import QSignalMapper
-from quantifiles.plot.baseplot import BasePlot
+from tergite_autocalibration.tools.quantifiles.plot.baseplot import BasePlot
 
 
 class QubitSelector(QtWidgets.QWidget):

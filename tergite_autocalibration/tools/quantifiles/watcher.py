@@ -1,3 +1,8 @@
+# BSD 2-Clause License
+#
+# Copyright (c) 2023, Damien Crielaard
+# All rights reserved.
+
 from __future__ import annotations
 
 import logging
@@ -14,7 +19,7 @@ from PyQt5.QtCore import (
     QTime,
 )
 
-from quantifiles.data import safe_load_dataset
+from tergite_autocalibration.tools.quantifiles.data import safe_load_dataset
 
 logger = logging.getLogger(__name__)
 

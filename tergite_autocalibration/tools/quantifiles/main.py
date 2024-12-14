@@ -1,3 +1,8 @@
+# BSD 2-Clause License
+#
+# Copyright (c) 2023, Damien Crielaard
+# All rights reserved.
+
 from __future__ import annotations
 
 import dataclasses
@@ -16,15 +21,14 @@ from PyQt5.QtCore import QSize, Qt
 from quantify_core.data.handling import set_datadir
 from quantify_core.data.types import TUID
 
-
-from quantifiles.path import load_icon
-from quantifiles.data import (
+from tergite_autocalibration.tools.quantifiles.path import load_icon
+from tergite_autocalibration.tools.quantifiles.data import (
     get_results_for_date,
     safe_load_dataset,
     get_all_dates_with_measurements,
 )
-from quantifiles.plot.autoplot import autoplot
-from quantifiles.watcher import TodayFolderMonitor
+from tergite_autocalibration.tools.quantifiles.plot.autoplot import autoplot
+from tergite_autocalibration.tools.quantifiles.watcher import TodayFolderMonitor
 
 logger = logging.getLogger(__name__)
 

@@ -1,3 +1,8 @@
+# BSD 2-Clause License
+#
+# Copyright (c) 2023, Damien Crielaard
+# All rights reserved.
+
 from __future__ import annotations
 
 from typing import Sequence
@@ -6,9 +11,9 @@ import numpy as np
 import pyqtgraph
 import xarray as xr
 from PyQt5 import QtCore
-from quantifiles import units
-from quantifiles.plot.baseplot import BasePlot
-from quantifiles.plot.utils import set_label
+from tergite_autocalibration.tools.quantifiles import units
+from tergite_autocalibration.tools.quantifiles.plot.baseplot import BasePlot
+from tergite_autocalibration.tools.quantifiles.plot.utils import set_label
 
 
 class ColorPlot(BasePlot):

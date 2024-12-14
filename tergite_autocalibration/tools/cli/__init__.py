@@ -109,7 +109,7 @@ def browser(
     Returns:
 
     """
-    from quantifiles import quantifiles
+    from tergite_autocalibration.tools.quantifiles import quantifiles
 
     quantifiles(datadir, liveplotting, log_level)
 

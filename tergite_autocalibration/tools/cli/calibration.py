@@ -63,7 +63,7 @@ def start(
     ] = False,
 ):
     from ipaddress import ip_address, IPv4Address
-    from quantifiles import quantifiles
+    from tergite_autocalibration.tools.quantifiles import quantifiles
 
     from tergite_autocalibration.config.globals import DATA_DIR
     from tergite_autocalibration.config.globals import CLUSTER_IP

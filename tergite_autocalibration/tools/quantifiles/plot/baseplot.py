@@ -1,3 +1,8 @@
+# BSD 2-Clause License
+#
+# Copyright (c) 2023, Damien Crielaard
+# All rights reserved.
+
 from abc import abstractmethod
 from functools import partial
 
@@ -8,9 +13,12 @@ from pyqtgraph.Qt import QtGui
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
 
-from quantifiles.data import safe_load_dataset
-from quantifiles.plot.header import PlotHeader
-from quantifiles.plot.utils import get_file_monitor_for_dataset, copy_to_clipboard
+from tergite_autocalibration.tools.quantifiles.data import safe_load_dataset
+from tergite_autocalibration.tools.quantifiles.plot.header import PlotHeader
+from tergite_autocalibration.tools.quantifiles.plot.utils import (
+    get_file_monitor_for_dataset,
+    copy_to_clipboard,
+)
 
 
 class BasePlot(QtWidgets.QFrame):

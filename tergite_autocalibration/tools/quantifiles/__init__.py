@@ -4,7 +4,7 @@ import argparse
 import logging
 from pathlib import Path
 
-from quantifiles.main import main
+from tergite_autocalibration.tools.quantifiles.main import main
 
 __all__ = ["quantifiles", "__version__"]
 

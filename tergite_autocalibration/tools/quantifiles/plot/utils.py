@@ -1,3 +1,8 @@
+# BSD 2-Clause License
+#
+# Copyright (c) 2023, Damien Crielaard
+# All rights reserved.
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -6,7 +11,7 @@ import xarray as xr
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication
 from pyqtgraph.widgets import PlotWidget
-from quantifiles.watcher import FileMonitor
+from tergite_autocalibration.tools.quantifiles.watcher import FileMonitor
 from quantify_core.data.handling import locate_experiment_container, DATASET_NAME
 
 

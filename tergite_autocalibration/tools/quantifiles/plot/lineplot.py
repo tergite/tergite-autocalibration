@@ -1,3 +1,8 @@
+# BSD 2-Clause License
+#
+# Copyright (c) 2023, Damien Crielaard
+# All rights reserved.
+
 from __future__ import annotations
 
 from itertools import cycle
@@ -6,8 +11,8 @@ from typing import Sequence
 import numpy as np
 import xarray as xr
 from PyQt5 import QtWidgets
-from quantifiles.plot.baseplot import BasePlot
-from quantifiles.units import get_si_unit_and_scaling
+from tergite_autocalibration.tools.quantifiles.plot.baseplot import BasePlot
+from tergite_autocalibration.tools.quantifiles.units import get_si_unit_and_scaling
 
 _OPTIONS = [
     {
