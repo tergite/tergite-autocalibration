@@ -1,0 +1,6 @@
+# This file is a configuration template for the initial values on each calibration run
+
+[general]
+target_node = "readout_amplitude_two_state_optimization"
+qubits = ["q06", "q07", "q08", "q09", "q10"]
+couplers = ["q06_q07"]

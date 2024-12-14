@@ -16,19 +16,17 @@ from ipaddress import IPv4Address
 import numpy as np
 import optuna
 
-import tergite_autocalibration.utils.user_input as ui
-from tergite_autocalibration.config.settings import CLUSTER_IP, REDIS_CONNECTION
+from tergite_autocalibration.config.globals import REDIS_CONNECTION, CLUSTER_IP, CONFIG
 from tergite_autocalibration.lib.nodes import (
-    characterization_nodes as calibrate_nodes,
+    characterization as calibrate_nodes,
 )
 from tergite_autocalibration.lib.utils import graph as cg
 from tergite_autocalibration.scripts.calibration_supervisor import (
-    CalibrationSupervisor,
     CalibrationConfig,
 )
+from tergite_autocalibration.scripts.calibration_supervisor import CalibrationSupervisor
+from tergite_autocalibration.utils.backend.reset_redis_node import ResetRedisNode
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
-from tergite_autocalibration.utils.reset_redis_node import ResetRedisNode
-from tergite_autocalibration.utils.user_input import qubits, couplers
 
 qubits_10 = [f"q{i}" for i in range(16, 26)]
 
@@ -61,8 +59,8 @@ class Monitor:
     couplers = UserInputObject()
 
     def __init__(self):
-        self.qubits = ui.qubits
-        self.couplers = ui.couplers
+        self.qubits = CONFIG.run.qubits
+        self.couplers = CONFIG.run.couplers
         self.nodes = [
             (f.split("_Node")[0]).lower()
             for f in dir(calibrate_nodes)
@@ -71,7 +69,7 @@ class Monitor:
         cluster_mode: "MeasurementMode" = MeasurementMode.real
         parsed_cluster_ip: "IPv4Address" = CLUSTER_IP
         config = CalibrationConfig(
-            cluster_mode=cluster_mode, cluster_ip=parsed_cluster_ip
+            measurement_mode=cluster_mode, cluster_ip=parsed_cluster_ip
         )
         self.supervisor = CalibrationSupervisor(config)
         self.cxn = REDIS_CONNECTION
@@ -127,8 +125,8 @@ class OptimizeNode:
         self.monitor = Monitor()
         self.reset_redis = ResetRedisNode()
         self.node = node
-        self.qubits = qubits
-        self.couplers = couplers
+        self.qubits = CONFIG.run.qubits
+        self.couplers = CONFIG.run.couplers
         sampler = optuna.samplers.CmaEsSampler(with_margin=True)
         self.study = optuna.create_study(sampler=sampler)
         self.trails = trails
@@ -145,7 +143,7 @@ class OptimizeNode:
                     )
                     * 1e6
                 )
-                freqs_dict = dict(zip(couplers, freqs))
+                freqs_dict = dict(zip(self.couplers, freqs))
             elif param == "cz_pulse_duration":
                 times = (
                     np.array(
@@ -153,7 +151,7 @@ class OptimizeNode:
                     )
                     * 1e-9
                 )
-                times_dict = dict(zip(couplers, times))
+                times_dict = dict(zip(self.couplers, times))
             elif param == "cz_pulse_amplitude":
                 amps = np.array(
                     [
@@ -162,7 +160,7 @@ class OptimizeNode:
                         )
                     ]
                 )
-                amps_dict = dict(zip(couplers, amps))
+                amps_dict = dict(zip(self.couplers, amps))
         print(f"Optimizing {self.node} with {freqs_dict}, {times_dict}, {amps_dict}")
         self.monitor.calibrate_node(
             "cz_calibration_ssro",
@@ -253,13 +251,13 @@ class OptimizeNode:
         for param in self.params:
             if param == "cz_pulse_frequency":
                 freqs = np.array([best_params["cz_pulse_frequency"]]) * 1e6
-                freqs_dict = dict(zip(couplers, freqs))
+                freqs_dict = dict(zip(self.couplers, freqs))
             elif param == "cz_pulse_duration":
                 times = np.array([best_params["cz_pulse_duration"]]) * 1e-9
-                times_dict = dict(zip(couplers, times))
+                times_dict = dict(zip(self.couplers, times))
             elif param == "cz_pulse_amplitude":
                 amps = np.array([best_params["cz_pulse_amplitude"]])
-                amps_dict = dict(zip(couplers, amps))
+                amps_dict = dict(zip(self.couplers, amps))
 
         self.monitor.calibrate_node(
             "cz_calibrate_ssro",

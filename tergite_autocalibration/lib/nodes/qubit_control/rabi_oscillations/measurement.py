@@ -23,8 +23,8 @@ from quantify_scheduler.operations.pulse_library import DRAGPulse
 from quantify_scheduler.resources import ClockResource
 
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
-from tergite_autocalibration.utils.extended_gates import Measure_RO1
-from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
+from tergite_autocalibration.utils.dto.extended_gates import Measure_RO1
+from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
 class Rabi_Oscillations(BaseMeasurement):

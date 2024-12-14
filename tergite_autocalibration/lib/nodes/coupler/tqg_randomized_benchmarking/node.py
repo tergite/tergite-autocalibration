@@ -19,8 +19,7 @@ from pathlib import Path
 import numpy as np
 import optuna
 
-from tergite_autocalibration.config.coupler_config import qubit_types
-from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
+from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.analysis import (
     RandomizedBenchmarkingSSRONodeAnalysis,
 )
@@ -34,6 +33,7 @@ from tergite_autocalibration.lib.nodes.coupler.cz_dynamic_phase.node import (
 from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.measurement import (
     TQGRandomizedBenchmarkingSSRO,
 )
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.utils import redis
 
 RB_REPEATS = 10
@@ -260,7 +260,10 @@ class CZRBOptimizeSSRONode(ScheduleNode):
 
         coupler_append = "c" + self.couplers[0].replace("_", "")
 
-        if qubit_types[self.coupled_qubits[0]] == self.qubit_type_list[0]:
+        if (
+            dh.get_legacy("qubit_types")[self.coupled_qubits[0]]
+            == self.qubit_type_list[0]
+        ):
             cz_param["cz_dynamic_target"] = (
                 -1
                 * dynamic_phase[self.coupled_qubits[1] + coupler_append][
@@ -432,7 +435,10 @@ class CZRBOptimizeSSRONode(ScheduleNode):
 
         coupler_append = "c" + self.couplers[0].replace("_", "")
 
-        if qubit_types[self.coupled_qubits[0]] == self.qubit_type_list[0]:
+        if (
+            dh.get_legacy("qubit_types")[self.coupled_qubits[0]]
+            == self.qubit_type_list[0]
+        ):
             cz_param["cz_dynamic_target"] = (
                 -1
                 * dynamic_phase[self.coupled_qubits[1] + coupler_append][

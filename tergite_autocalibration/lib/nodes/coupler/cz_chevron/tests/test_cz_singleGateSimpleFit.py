@@ -10,17 +10,14 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import os.path
-
-from tergite_autocalibration.tests.utils.env import setup_test_env
-
-setup_test_env()
+import os
+from pathlib import Path
 
 import matplotlib
-import pytest
-from pathlib import Path
-import xarray as xr
 import numpy as np
+import pytest
+import xarray as xr
+
 from ..utils.cz_singleGateSimpleFit import (
     CZSingleGateSimpleFit,
 )

@@ -138,7 +138,15 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#configuration-files" id="toc-configuration-files" class="nav-link active" data-scroll-target="#configuration-files">Configuration Files</a>
   <ul class="collapse">
-  <li><a href="#hardware-configuration-file-json" id="toc-hardware-configuration-file-json" class="nav-link" data-scroll-target="#hardware-configuration-file-json">Hardware Configuration file (json):</a></li>
+      <li><a href="#hardware-configuration-file-json" id="toc-hardware-configuration-file-json" class="nav-link"
+             data-scroll-target="#hardware-configuration-file-json">Hardware Configuration file (json):</a>
+          <ul class="collapse">
+              <li><a href="#migrating-old-hardware-configurations-to-match-quantify-scheduler0.18.0"
+                     id="toc-migrating-old-hardware-configurations-to-match-quantify-scheduler0.18.0" class="nav-link"
+                     data-scroll-target="#migrating-old-hardware-configurations-to-match-quantify-scheduler0.18.0">Migrating
+                  old hardware configurations to match quantify-scheduler&gt;=0.18.0</a></li>
+          </ul>
+      </li>
   <li><a href="#device-configuration-file-toml" id="toc-device-configuration-file-toml" class="nav-link" data-scroll-target="#device-configuration-file-toml">Device Configuration file (toml):</a></li>
   <li><a href="#vna-resonator-qubit-frequencies" id="toc-vna-resonator-qubit-frequencies" class="nav-link" data-scroll-target="#vna-resonator-qubit-frequencies">VNA resonator &amp; qubit frequencies</a></li>
   <li><a href="#coupler-to-spi-mapping" id="toc-coupler-to-spi-mapping" class="nav-link" data-scroll-target="#coupler-to-spi-mapping">Coupler to SPI mapping</a></li>
@@ -159,6 +167,14 @@ ul.task-list li input[type="checkbox"] {
 <p>Here the connection is made between the Qblox cluster physical ports and clocks to the qubits and couplers of the QPU.</p>
 <p>The file must be placed at the directory <code>configs/</code></p>
 <p>Given a <code>.csv</code> file after a mixer calibration the function <code>...</code> can create instantly the corresponding <code>JSON</code> file.</p>
+    <section id="migrating-old-hardware-configurations-to-match-quantify-scheduler0.18.0" class="level3">
+        <h3 class="anchored" data-anchor-id="migrating-old-hardware-configurations-to-match-quantify-scheduler0.18.0">
+            Migrating old hardware configurations to match quantify-scheduler&gt;=0.18.0</h3>
+        <p>With quantify-scheduler 0.18.0 there is been introduced a new way on how to structure the hardware
+            configuration file. If you are having a hardware configuration file, that is structured using the old way,
+            you can use the following script to migrate it to the new structure.</p>
+        <pre><code>python tergite_autocalibration/scripts/migrate_blox_hardware_configuration.py &lt;PATH_TO_HW_CONFIG&gt;</code></pre>
+    </section>
 </section>
 <section id="device-configuration-file-toml" class="level2">
 <h2 class="anchored" data-anchor-id="device-configuration-file-toml">Device Configuration file (toml):</h2>

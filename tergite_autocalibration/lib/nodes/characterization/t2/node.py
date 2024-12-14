@@ -18,14 +18,14 @@ from time import sleep
 
 import numpy as np
 
-from tergite_autocalibration.lib.base.external_parameter_node import (
-    ExternalParameterNode,
-)
 from tergite_autocalibration.lib.nodes.characterization.t2.analysis import (
     T2EchoNodeAnalysis,
     T2NodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.characterization.t2.measurement import T2, T2Echo
+from tergite_autocalibration.lib.nodes.external_parameter_node import (
+    ExternalParameterNode,
+)
 
 
 class T2_Node(ExternalParameterNode):

@@ -3,15 +3,11 @@ from __future__ import annotations
 from itertools import cycle
 from typing import Sequence
 
-from PyQt5 import QtWidgets
-
 import numpy as np
 import xarray as xr
-
-from quantifiles.plot import utils
+from PyQt5 import QtWidgets
 from quantifiles.plot.baseplot import BasePlot
 from quantifiles.units import get_si_unit_and_scaling
-
 
 _OPTIONS = [
     {
