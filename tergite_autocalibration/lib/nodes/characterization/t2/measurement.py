@@ -18,7 +18,7 @@ from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.gate_library import Reset, X90, Measure, X
 
 from ....base.measurement import BaseMeasurement
-from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
+from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
 class T2(BaseMeasurement):

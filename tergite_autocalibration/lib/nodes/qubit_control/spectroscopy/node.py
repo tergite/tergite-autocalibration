@@ -20,10 +20,9 @@ from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis impor
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement import (
     Two_Tones_Multidim,
 )
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 
-# TODO: check input
-from tergite_autocalibration.utils.user_input import qubit_samples
-from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
+from tergite_autocalibration.lib.utils.samplespace import qubit_samples
 
 
 class Qubit_01_Spectroscopy_Multidim_Node(ScheduleNode):

@@ -1,16 +1,12 @@
 from __future__ import annotations
+
 from functools import partial
-import logging
-from typing import Any, cast
+from typing import Any
 
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QSignalMapper
 import xarray as xr
-
-from quantifiles.data import get_snapshot_as_dict
+from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtCore import QSignalMapper
 from quantifiles.plot.baseplot import BasePlot
-from quantifiles.plot.lineplot import LinePlot
-from quantifiles.plot.snapshot import SnapshotTab
 
 
 class QubitSelector(QtWidgets.QWidget):

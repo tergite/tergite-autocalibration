@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
 
-from tergite_autocalibration.config.settings import REDIS_CONNECTION
+from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 from tergite_autocalibration.utils.dto.qoi import QOI
 from tergite_autocalibration.utils.logger.tac_logger import logger
@@ -406,7 +406,7 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
         # secondary_axis.legend(handles=handles, fontsize="small")
 
     @abstractmethod
-    def analyze_coupler():
+    def analyze_coupler(self):
         pass
 
 

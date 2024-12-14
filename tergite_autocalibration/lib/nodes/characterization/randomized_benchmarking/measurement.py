@@ -25,8 +25,11 @@ from quantify_scheduler.schedules.schedule import Schedule
 
 import tergite_autocalibration.utils.clifford_elements_decomposition as cliffords
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
-from tergite_autocalibration.utils.extended_gates import Measure_RO_3state_Opt, Rxy_12
-from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
+from tergite_autocalibration.utils.dto.extended_gates import (
+    Measure_RO_3state_Opt,
+    Rxy_12,
+)
+from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
 class Randomized_Benchmarking_SSRO(BaseMeasurement):

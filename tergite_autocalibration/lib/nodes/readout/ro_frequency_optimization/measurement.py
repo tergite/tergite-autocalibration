@@ -24,7 +24,7 @@ from quantify_scheduler.resources import ClockResource
 from quantify_scheduler.schedules.schedule import Schedule
 
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
-from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
+from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
 class RO_frequency_optimization(BaseMeasurement):

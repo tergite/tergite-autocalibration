@@ -13,7 +13,6 @@
 
 import numpy as np
 
-from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.analysis import (
     OptimalROThreeStateAmplitudeNodeAnalysis,
     OptimalROTwoStateAmplitudeNodeAnalysis,
@@ -21,6 +20,7 @@ from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.analysi
 from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.measurement import (
     RO_amplitude_optimization,
 )
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 
 
 class RO_amplitude_two_state_optimization_Node(ScheduleNode):
@@ -52,6 +52,9 @@ class RO_amplitude_two_state_optimization_Node(ScheduleNode):
             },
             "qubit_states": {
                 qubit: np.array([0, 1], dtype=np.int16) for qubit in self.all_qubits
+            },
+            "ro_amplitudes": {
+                qubit: np.linspace(0.001, 0.1, 11) for qubit in self.all_qubits
             },
         }
 

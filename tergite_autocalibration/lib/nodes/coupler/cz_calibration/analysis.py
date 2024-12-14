@@ -4,6 +4,7 @@
 # (C) Copyright Liangyu Chen 2024
 # (C) Copyright Amr Osman 2024
 # (C) Copyright Michele Faucci Giannelli 2024
+# (C) Copyright Chalmers Next Labs AB 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -26,10 +27,9 @@ from scipy.optimize import minimize
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import confusion_matrix
 
-from tergite_autocalibration.config.coupler_config import qubit_types
+from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.base.analysis import (
     BaseAllQubitsAnalysis,
-    BaseAnalysis,
     BaseQubitAnalysis,
 )
 
@@ -187,7 +187,7 @@ class CZCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
         self.fit_results, self.fit_ys = [], []
         try:
             for magnitude in self.magnitudes:
-                if qubit_types[self.qubit] == qubit_type_list[1]:
+                if dh.get_legacy("qubit_types")[self.qubit] == qubit_type_list[1]:
                     # Odd qubits are target qubits
                     fit = True
                     model = CZModel()
@@ -308,7 +308,7 @@ class CZCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
         axis.set_xlabel("Phase (deg)")
         axis.set_ylabel("Population")
         axis.set_title(
-            f"{name} Calibration - {qubit_types[self.qubit]} Qubit {self.qubit[1:]}"
+            f"{name} Calibration - {dh.get_legacy('qubit_types')[self.qubit]} Qubit {self.qubit[1:]}"
         )
 
 
@@ -340,7 +340,7 @@ class ResetCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
             y = np.repeat(self.calibs, self.shots)
             IQ_complex = np.array([])
             for state, _ in enumerate(self.calibs):
-                IQ_complex_0 = self.S21[self.data_var].isel(
+                IQ_complex_0 = self.magnitudes[self.data_var].isel(
                     {self.sweep_coord: indx, self.state_coord: -3 + state}
                 )
                 IQ_complex = np.append(IQ_complex, IQ_complex_0)
@@ -358,7 +358,9 @@ class ResetCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
             assignment = np.trace(cm_norm) / len(self.calibs)
 
             # Classify data shots
-            raw_data = self.S21[self.data_var].isel({self.sweep_coord: indx}).values
+            raw_data = (
+                self.magnitudes[self.data_var].isel({self.sweep_coord: indx}).values
+            )
             raw_shape = raw_data.shape
             I = raw_data.real.flatten()
             Q = raw_data.imag.flatten()
@@ -389,7 +391,7 @@ class ResetCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
         self.fit_ys = []
 
         for n, magnitude in enumerate(self.magnitudes):
-            if qubit_types[self.qubit] == "Target":
+            if dh.get_legacy("qubit_types")[self.qubit] == "Target":
                 if n == 0:
                     self.fit_ys.append(
                         [0, 0, 0, 1, 1, 1, 0, 0, 0]
@@ -463,7 +465,7 @@ class ResetCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
         axis.set_ylabel("Population")
         axis.set_xticklabels(states)
         axis.set_title(
-            f"{name} Calibration - {qubit_types[self.qubit]} Qubit {self.qubit[1:]}"
+            f"{name} Calibration - {dh.get_legacy('qubit_types')[self.qubit]} Qubit {self.qubit[1:]}"
         )
 
 

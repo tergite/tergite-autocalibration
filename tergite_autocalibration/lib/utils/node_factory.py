@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Dict, List, Union, TYPE_CHECKING
 
 from .reflections import find_inheriting_classes_ast_recursive, import_class_from_file
-from ...utils.regex import camel_to_snake
+from tergite_autocalibration.utils.misc.regex import camel_to_snake
 
 if TYPE_CHECKING:
     from ..base.node import BaseNode
@@ -37,6 +37,7 @@ class NodeFactory:
         self.node_name_mapping: Dict[str, str] = {
             "punchout": "Punchout_Node",
             "resonator_spectroscopy": "Resonator_Spectroscopy_Node",
+            "resonator_relaxation": "Resonator_Relaxation_Node",
             "qubit_01_spectroscopy": "Qubit_01_Spectroscopy_Multidim_Node",
             "rabi_oscillations": "Rabi_Oscillations_Node",
             "ramsey_correction": "Ramsey_Fringes_Node",
