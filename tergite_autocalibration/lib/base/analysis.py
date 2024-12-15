@@ -183,10 +183,8 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         self.plots_per_qubit = 1
 
     def analyze_node(self, data_path: Path, index: int = 0):
-        logger.info("opening dataset")
         self.data_path = Path(data_path)
         self.dataset = self.open_dataset(index)
-        logger.info("after opening dataset")
         self.coords = self.dataset.coords
         self.data_vars = self.dataset.data_vars
         self.fig, self.axs = self.manage_plots(self.column_grid, self.plots_per_qubit)
