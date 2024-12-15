@@ -37,9 +37,9 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
         self.state_coord = self._get_coord("state")
         self.loop_coord = self._get_coord("loops")
 
-        self.S21 = self.S21.stack(shots=[self.loop_coord, self.state_coord])
-        self.qubit_states = self.S21[self.state_coord].values
-        self.amplitudes = self.S21.coords[self.amplitude_coord]
+        self.S21_stacked = self.S21.stack(shots=[self.loop_coord, self.state_coord])
+        self.qubit_states = self.S21_stacked[self.state_coord].values
+        self.amplitudes = self.S21_stacked.coords[self.amplitude_coord]
         self.fit_results = {}
 
     def _get_coord(self, keyword):
@@ -51,7 +51,7 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
 
     def IQ(self, index: int):
         """Extracts I/Q components from the dataset at a given index."""
-        IQ_complex = self.S21[self.data_var].isel(
+        IQ_complex = self.S21_stacked[self.data_var].isel(
             {self.amplitude_coord: [index]}
         )  # Use `.isel()` to index correctly
         I = IQ_complex.real.values.flatten()
