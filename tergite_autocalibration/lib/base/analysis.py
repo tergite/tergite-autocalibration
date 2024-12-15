@@ -161,7 +161,7 @@ class BaseNodeAnalysis(ABC):
         full_path = self.data_path / f"{self.name}.png"
         self.fig.savefig(preview_path, bbox_inches="tight", dpi=100)
         self.fig.savefig(full_path, bbox_inches="tight", dpi=400)
-        plt.show(block=False)
+        plt.show(block=True)
         plt.pause(5)
         plt.close()
         logger.info(f"Plots saved to {preview_path} and {full_path}")
@@ -183,8 +183,10 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         self.plots_per_qubit = 1
 
     def analyze_node(self, data_path: Path, index: int = 0):
+        logger.info("opening dataset")
         self.data_path = Path(data_path)
         self.dataset = self.open_dataset(index)
+        logger.info("after opening dataset")
         self.coords = self.dataset.coords
         self.data_vars = self.dataset.data_vars
         self.fig, self.axs = self.manage_plots(self.column_grid, self.plots_per_qubit)
