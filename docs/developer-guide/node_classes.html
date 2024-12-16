@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-    <title>Tergite Automatic Calibration</title>
+    <title>node_classes – Tergite Automatic Calibration</title>
     <style>
         code {
             white-space: pre-wrap;
@@ -42,30 +42,121 @@
             margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */
             vertical-align: middle;
         }
+
+        /* CSS for syntax highlighting */
+        pre > code.sourceCode {
+            white-space: pre;
+            position: relative;
+        }
+
+        pre > code.sourceCode > span {
+            line-height: 1.25;
+        }
+
+        pre > code.sourceCode > span:empty {
+            height: 1.2em;
+        }
+
+        .sourceCode {
+            overflow: visible;
+        }
+
+        code.sourceCode > span {
+            color: inherit;
+            text-decoration: inherit;
+        }
+
+        div.sourceCode {
+            margin: 1em 0;
+        }
+
+        pre.sourceCode {
+            margin: 0;
+        }
+
+        @media screen {
+            div.sourceCode {
+                overflow: auto;
+            }
+        }
+
+        @media print {
+            pre > code.sourceCode {
+                white-space: pre-wrap;
+            }
+
+            pre > code.sourceCode > span {
+                display: inline-block;
+                text-indent: -5em;
+                padding-left: 5em;
+            }
+        }
+
+        pre.numberSource code {
+            counter-reset: source-line 0;
+        }
+
+        pre.numberSource code > span {
+            position: relative;
+            left: -4em;
+            counter-increment: source-line;
+        }
+
+        pre.numberSource code > span > a:first-child::before {
+            content: counter(source-line);
+            position: relative;
+            left: -1em;
+            text-align: right;
+            vertical-align: baseline;
+            border: none;
+            display: inline-block;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            padding: 0 4px;
+            width: 4em;
+        }
+
+        pre.numberSource {
+            margin-left: 3em;
+            padding-left: 4px;
+        }
+
+        div.sourceCode {
+        }
+
+        @media screen {
+            pre > code.sourceCode > span > a:first-child::before {
+                text-decoration: underline;
+            }
+        }
     </style>
 
 
-    <script src="site_libs/quarto-nav/quarto-nav.js"></script>
-    <script src="site_libs/quarto-nav/headroom.min.js"></script>
-    <script src="site_libs/clipboard/clipboard.min.js"></script>
-    <script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-    <script src="site_libs/quarto-search/fuse.min.js"></script>
-    <script src="site_libs/quarto-search/quarto-search.js"></script>
-    <meta name="quarto:offset" content="./">
-    <script src="site_libs/quarto-html/quarto.js"></script>
-    <script src="site_libs/quarto-html/popper.min.js"></script>
-    <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-    <script src="site_libs/quarto-html/anchor.min.js"></script>
-    <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-    <link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme"
+    <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+    <script src="../site_libs/quarto-nav/headroom.min.js"></script>
+    <script src="../site_libs/clipboard/clipboard.min.js"></script>
+    <script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+    <script src="../site_libs/quarto-search/fuse.min.js"></script>
+    <script src="../site_libs/quarto-search/quarto-search.js"></script>
+    <meta name="quarto:offset" content="../">
+    <script src="../site_libs/quarto-html/quarto.js"></script>
+    <script src="../site_libs/quarto-html/popper.min.js"></script>
+    <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+    <script src="../site_libs/quarto-html/anchor.min.js"></script>
+    <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+    <link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme"
           id="quarto-text-highlighting-styles">
-    <link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch"
+    <link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch"
           class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-    <script src="site_libs/bootstrap/bootstrap.min.js"></script>
-    <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-    <link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme"
+    <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+    <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+    <link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme"
           id="quarto-bootstrap" data-mode="light">
-    <link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch"
+    <link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch"
           class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
     <script id="quarto-search-options" type="application/json">{
         "location": "sidebar",
@@ -104,7 +195,7 @@
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
         <div class="navbar-container container-fluid">
             <div class="navbar-brand-container mx-auto">
-                <a class="navbar-brand" href="./">
+                <a class="navbar-brand" href="../">
                     <span class="navbar-title">Tergite Automatic Calibration</span>
                 </a>
             </div>
@@ -116,23 +207,23 @@
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <ul class="navbar-nav navbar-nav-scroll me-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="./index.html" aria-current="page">
+                        <a class="nav-link active" href="../index.html" aria-current="page">
                             <span class="menu-text">Home</span></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="./getting_started.html">
+                        <a class="nav-link" href="../getting_started.html">
                             <span class="menu-text">User Guide</span></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="./available_nodes.html">
+                        <a class="nav-link" href="../available_nodes.html">
                             <span class="menu-text">Node Library</span></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="./developer_guide.html">
+                        <a class="nav-link" href="../developer_guide.html">
                             <span class="menu-text">Developer Guide</span></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="./troubleshooting.html">
+                        <a class="nav-link" href="../troubleshooting.html">
                             <span class="menu-text">Troubleshooting</span></a>
                     </li>
                 </ul>
@@ -155,7 +246,8 @@
             </button>
             <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="./index.html">Home</a></li>
+                    <li class="breadcrumb-item"><a href="../developer_guide.html">Developer Guide</a></li>
+                    <li class="breadcrumb-item"><a href="../developer-guide/node_classes.html">Node Classes</a></li>
                 </ol>
             </nav>
             <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse"
@@ -184,7 +276,7 @@
             <ul class="list-unstyled mt-1">
                 <li class="sidebar-item">
                     <div class="sidebar-item-container">
-                        <a href="./index.html" class="sidebar-item-text sidebar-link active">
+                        <a href="../index.html" class="sidebar-item-text sidebar-link">
                             <span class="menu-text">Home</span></a>
                     </div>
                 </li>
@@ -202,19 +294,19 @@
                     <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
-                                <a href="./getting_started.html" class="sidebar-item-text sidebar-link">
+                                <a href="../getting_started.html" class="sidebar-item-text sidebar-link">
                                     <span class="menu-text">Getting started</span></a>
                             </div>
                         </li>
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
-                                <a href="./user-guide/configuration_files.html" class="sidebar-item-text sidebar-link">
+                                <a href="../user-guide/configuration_files.html" class="sidebar-item-text sidebar-link">
                                     <span class="menu-text">Configuration Files</span></a>
                             </div>
                         </li>
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
-                                <a href="./user-guide/operation.html" class="sidebar-item-text sidebar-link">
+                                <a href="../user-guide/operation.html" class="sidebar-item-text sidebar-link">
                                     <span class="menu-text">Operation</span></a>
                             </div>
                         </li>
@@ -234,20 +326,20 @@
                     <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
-                                <a href="./available_nodes.html" class="sidebar-item-text sidebar-link">
+                                <a href="../available_nodes.html" class="sidebar-item-text sidebar-link">
                                     <span class="menu-text">Overview</span></a>
                             </div>
                         </li>
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
-                                <a href="./nodes/resonator_spectroscopy_node.html"
+                                <a href="../nodes/resonator_spectroscopy_node.html"
                                    class="sidebar-item-text sidebar-link">
                                     <span class="menu-text">Resonator spectroscopy</span></a>
                             </div>
                         </li>
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
-                                <a href="./nodes/qubit_spectroscopy_node.html" class="sidebar-item-text sidebar-link">
+                                <a href="../nodes/qubit_spectroscopy_node.html" class="sidebar-item-text sidebar-link">
                                     <span class="menu-text">Qubit spectroscopy</span></a>
                             </div>
                         </li>
@@ -267,32 +359,33 @@
                     <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
-                                <a href="./developer_guide.html" class="sidebar-item-text sidebar-link">
+                                <a href="../developer_guide.html" class="sidebar-item-text sidebar-link">
                                     <span class="menu-text">Introduction</span></a>
                             </div>
                         </li>
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
-                                <a href="./developer-guide/node_classes.html" class="sidebar-item-text sidebar-link">
+                                <a href="../developer-guide/node_classes.html"
+                                   class="sidebar-item-text sidebar-link active">
                                     <span class="menu-text">Node Classes</span></a>
                             </div>
                         </li>
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
-                                <a href="./developer-guide/new_node_creation.html"
+                                <a href="../developer-guide/new_node_creation.html"
                                    class="sidebar-item-text sidebar-link">
                                     <span class="menu-text">Create a new node</span></a>
                             </div>
                         </li>
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
-                                <a href="./developer-guide/unit_tests.html" class="sidebar-item-text sidebar-link">
+                                <a href="../developer-guide/unit_tests.html" class="sidebar-item-text sidebar-link">
                                     <span class="menu-text">Unit tests</span></a>
                             </div>
                         </li>
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
-                                <a href="./developer-guide/writing_documentation.html"
+                                <a href="../developer-guide/writing_documentation.html"
                                    class="sidebar-item-text sidebar-link">
                                     <span class="menu-text">Writing documentation</span></a>
                             </div>
@@ -301,7 +394,7 @@
                 </li>
                 <li class="sidebar-item">
                     <div class="sidebar-item-container">
-                        <a href="./troubleshooting.html" class="sidebar-item-text sidebar-link">
+                        <a href="../troubleshooting.html" class="sidebar-item-text sidebar-link">
                             <span class="menu-text">Troubleshooting</span></a>
                     </div>
                 </li>
@@ -316,19 +409,8 @@
             <h2 id="toc-title">On this page</h2>
 
             <ul>
-                <li><a href="#documentation-of-the-tergite-automatic-calibration"
-                       id="toc-documentation-of-the-tergite-automatic-calibration" class="nav-link active"
-                       data-scroll-target="#documentation-of-the-tergite-automatic-calibration">Documentation of the
-                    Tergite Automatic Calibration</a>
-                    <ul class="collapse">
-                        <li><a href="#user-guide" id="toc-user-guide" class="nav-link" data-scroll-target="#user-guide">User
-                            Guide</a></li>
-                        <li><a href="#node-library" id="toc-node-library" class="nav-link"
-                               data-scroll-target="#node-library">Node Library</a></li>
-                        <li><a href="#developer-guide" id="toc-developer-guide" class="nav-link"
-                               data-scroll-target="#developer-guide">Developer Guide</a></li>
-                    </ul>
-                </li>
+                <li><a href="#node-classes" id="toc-node-classes" class="nav-link active"
+                       data-scroll-target="#node-classes">Node classes</a></li>
             </ul>
         </nav>
     </div>
@@ -336,50 +418,166 @@
     <main class="content" id="quarto-document-content">
 
 
-        <section id="documentation-of-the-tergite-automatic-calibration" class="level1">
-            <h1>Documentation of the Tergite Automatic Calibration</h1>
-            <p>The tergite-autocalibration is a toolkit to ease calibrating quantum devices for superconducting
-                platforms. The project contains an orchestration manager, a collection of calibration schedules and a
-                collection of post-processing and analysis routines. It is tailored to tune-up the 25 qubits QPU at
-                Chalmers, which is receiving generous funding by the Wallenberg Centre for Quantum Technology (<a
-                        href="https://wacqt.se">WACQT</a>) for research, development and operation.</p>
-            <section id="user-guide" class="level3">
-                <h3 class="anchored" data-anchor-id="user-guide"><a href="./getting_started.html">User Guide</a></h3>
-                <p>A tutorial on how to get started with the automatic calibration. This tutorial contains a guide on
-                    how to use the commandline interface with quick commands. Further, there is an introduction into
-                    configuration files.</p>
-                <ul>
-                    <li><a href="./getting_started.html">Getting started</a></li>
-                    <li><a href="./user-guide/operation.html">Operation</a></li>
-                    <li><a href="./user-guide/configuration_files.html">Configuration Files</a></li>
-                </ul>
-            </section>
-            <section id="node-library" class="level3">
-                <h3 class="anchored" data-anchor-id="node-library"><a href="./available_nodes.html">Node Library</a>
-                </h3>
-                <p>The main principle behind the automatic calibration is based on calibrating nodes in a graph
-                    structure. A node contains all the measurement and analysis classes to find the quantity of interest
-                    - for qubits and couplers. If you are interested in implementing a new node, it might be worth it to
-                    check whether there are existing nodes that you can use to find the qubit properties you are looking
-                    to calibrate.</p>
-            </section>
-            <section id="developer-guide" class="level3">
-                <h3 class="anchored" data-anchor-id="developer-guide"><a href="./developer_guide.html">Developer
-                    Guide</a></h3>
-                <p>This repository is an actively developed open-source project and also part of the <a
-                        href="https://tergite.github.io">Tergite</a> full-stack software ecosystem to operate a quantum
-                    computer. Hence, you are more than welcome to contribute to the project with your own ideas that fit
-                    into the framework. To familiarize yourself with the existing classes and the architecture of the
-                    automatic calibration, please take a look into the development guide. Here, you can also find best
-                    practices and information about our design philosophy.</p>
-                <ul>
-                    <li><a href="./developer-guide/new_node_creation.html">Create node classes</a></li>
-                    <li><a href="./developer-guide/unit_tests.html">Write unit tests</a></li>
-                    <li><a href="./developer-guide/writing_documentation.html">Documentation guidelines</a></li>
-                </ul>
+        <section id="node-classes" class="level1">
+            <h1>Node classes</h1>
+            <p>The execution of most of the nodes consists of a single schedule compilation, a single measurement and a
+                single post-processing. Although for most of the nodes this workflow suffices, there are exceptions
+                while this workflow can become limiting in more advanced implementations.</p>
+            <p>To allow greater flexibility in the node implementations the nodes are categorized:</p>
+            <ul>
+                <li><code>ScheduleNode</code>: The simple way of doing the measurement and having an analysis afterward.
+                    This node compiles one time
+                    <ul>
+                        <li>There is only <code>node.schedule_samplespace</code> if the sweeping takes place within the
+                            schedule.
+                        </li>
+                    </ul>
+                </li>
+                <li><code>ExternalParameterNode</code>: A looping over an external parameter during the sweep. This node
+                    compiles several times.
+                    <ul>
+                        <li>There are both <code>node.schedule_samplespace</code> and
+                            <code>node.external_samplespace</code> if there are sweeping parameters outside the
+                            schedule. For example the <code>coupler_spectroscopy</code> node sweeps the
+                            <code>dc_current</code> outside of the schedule:
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <p>Below, there is an example for an <code>ExternalParameterNode</code> implementation.</p>
+            <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code
+                    class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"
+                                                                  tabindex="-1"></a><span class="im">import</span> numpy <span
+                    class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis <span
+        class="im">import</span> (</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    CouplerSpectroscopyNodeAnalysis,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tergite_autocalibration.lib.nodes.external_parameter_node <span
+        class="im">import</span> (</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    ExternalParameterNode,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement <span
+        class="im">import</span> (</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    Two_Tones_Multidim,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tergite_autocalibration.lib.utils.samplespace <span
+        class="im">import</span> qubit_samples</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tergite_autocalibration.utils.dto.enums <span
+        class="im">import</span> MeasurementMode</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tergite_autocalibration.utils.hardware.spi <span
+        class="im">import</span> SpiDAC</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> CouplerSpectroscopyNode(ExternalParameterNode):</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    measurement_obj <span class="op">=</span> Two_Tones_Multidim</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    analysis_obj <span class="op">=</span> CouplerSpectroscopyNodeAnalysis</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    coupler_qois <span
+        class="op">=</span> [<span class="st">"parking_current"</span>, <span class="st">"current_range"</span>]</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span
+        class="fu">__init__</span>(</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>, name: <span
+        class="bu">str</span>, all_qubits: <span class="bu">list</span>[<span class="bu">str</span>], couplers: <span
+        class="bu">list</span>[<span class="bu">str</span>], <span class="op">**</span>schedule_keywords</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    ):</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span
+        class="fu">__init__</span>(name, all_qubits, <span class="op">**</span>schedule_keywords)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.name <span
+        class="op">=</span> name</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        <span
+        class="va">self</span>.couplers <span class="op">=</span> couplers</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.qubit_state <span
+        class="op">=</span> <span class="dv">0</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.schedule_keywords[<span
+        class="st">"qubit_state"</span>] <span class="op">=</span> <span class="va">self</span>.qubit_state</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.coupled_qubits <span
+        class="op">=</span> <span class="va">self</span>.get_coupled_qubits()</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>        <span
+        class="va">self</span>.coupler <span class="op">=</span> <span class="va">self</span>.couplers[<span class="dv">0</span>]</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.mode <span
+        class="op">=</span> MeasurementMode.real</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>        <span
+        class="va">self</span>.spi_dac <span class="op">=</span> SpiDAC(<span class="va">self</span>.mode)</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.dac <span
+        class="op">=</span> <span class="va">self</span>.spi_dac.create_spi_dac(<span
+        class="va">self</span>.coupler)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.all_qubits <span
+        class="op">=</span> <span class="va">self</span>.coupled_qubits</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.schedule_samplespace <span
+        class="op">=</span> {</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>            <span
+        class="st">"spec_frequencies"</span>: {</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true"
+                     tabindex="-1"></a>                qubit: qubit_samples(qubit) <span
+        class="cf">for</span> qubit <span class="kw">in</span> <span class="va">self</span>.all_qubits</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>            }</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.external_samplespace <span
+        class="op">=</span> {</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>            <span
+        class="st">"dc_currents"</span>: {<span class="va">self</span>.coupler: np.arange(<span class="op">-</span><span
+        class="fl">2.5e-3</span>, <span class="fl">2.5e-4</span>, <span class="fl">280e-6</span>)},</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_coupled_qubits(<span
+        class="va">self</span>) <span class="op">-&gt;</span> <span class="bu">list</span>:</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span
+        class="bu">len</span>(<span class="va">self</span>.couplers) <span class="op">&gt;</span> <span
+        class="dv">1</span>:</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span
+        class="st">"Multiple couplers, lets work with only one"</span>)</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>        coupled_qubits <span
+        class="op">=</span> <span class="va">self</span>.couplers[<span class="dv">0</span>].split(sep<span
+        class="op">=</span><span class="st">"_"</span>)</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>        <span
+        class="va">self</span>.coupler <span class="op">=</span> <span class="va">self</span>.couplers[<span class="dv">0</span>]</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> coupled_qubits</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> pre_measurement_operation(<span
+        class="va">self</span>, reduced_ext_space):</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>        iteration_dict <span
+        class="op">=</span> reduced_ext_space[<span class="st">"dc_currents"</span>]</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>        this_iteration_value <span
+        class="op">=</span> <span class="bu">list</span>(iteration_dict.values())[<span class="dv">0</span>]</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span
+        class="ss">f"</span><span class="sc">{</span> this_iteration_value <span class="op">=</span> <span
+        class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.spi_dac.set_dac_current(<span
+        class="va">self</span>.dac, this_iteration_value)</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> final_operation(<span
+        class="va">self</span>):</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span
+        class="st">"Final Operation"</span>)</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.spi_dac.set_dac_current(<span
+        class="va">self</span>.dac, <span class="dv">0</span>)</span></code><button title="Copy to Clipboard"
+                                                                                    class="code-copy-button"><i
+                    class="bi"></i></button></pre>
+            </div>
+            <p>Please read the guide about <a href="../developer-guide/new_node_creation.html">how to create a new
+                node</a> to learn more about nodes. This guide also contains an example for a <code>ScheduleNode</code>.
+            </p>
+            <p><strong>Examples of nodes requiring an external samplespace</strong></p>
+            <ul>
+                <li><code>coupler_spectroscopy</code> sweeps the <code>dc_current</code> which is set by the SPI rack
+                    not the cluster
+                </li>
+                <li><code>T1</code> sweeps a repetition index to repeat the measurement many times</li>
+                <li><code>randomized_benchmarking</code> sweeps different seeds. Although the seed is a schedule
+                    parameter, sweeping outside the schedule improves memory utilization.
+                </li>
+            </ul>
 
 
-            </section>
         </section>
 
     </main> <!-- /main -->

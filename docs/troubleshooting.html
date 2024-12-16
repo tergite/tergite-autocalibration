@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>available_nodes – Tergite Automatic Calibration</title>
+    <title>troubleshooting – Tergite Automatic Calibration</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,6 +19,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -71,9 +105,6 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-    <script src="site_libs/quarto-diagram/mermaid.min.js"></script>
-    <script src="site_libs/quarto-diagram/mermaid-init.js"></script>
-    <link href="site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
 
 </head>
@@ -103,16 +134,16 @@ ul.task-list li input[type="checkbox"] {
           <span class="menu-text">User Guide</span></a>
   </li>  
   <li class="nav-item">
-      <a class="nav-link" href="./available_nodes.html">
-          <span class="menu-text">Node Library</span></a>
+    <a class="nav-link" href="./available_nodes.html">
+        <span class="menu-text">Node Library</span></a>
   </li>  
   <li class="nav-item">
-      <a class="nav-link" href="./developer_guide.html">
-          <span class="menu-text">Developer Guide</span></a>
-  </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="./troubleshooting.html">
-                        <span class="menu-text">Troubleshooting</span></a>
+    <a class="nav-link" href="./developer_guide.html"> 
+<span class="menu-text">Developer Guide</span></a>
+  </li>  
+  <li class="nav-item">
+      <a class="nav-link" href="./troubleshooting.html">
+          <span class="menu-text">Troubleshooting</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -134,8 +165,7 @@ ul.task-list li input[type="checkbox"] {
               </button>
               <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb">
                   <ol class="breadcrumb">
-                      <li class="breadcrumb-item"><a href="./available_nodes.html">Node Library</a></li>
-                      <li class="breadcrumb-item"><a href="./available_nodes.html">Overview</a></li>
+                      <li class="breadcrumb-item"><a href="./troubleshooting.html">Troubleshooting</a></li>
                   </ol>
               </nav>
               <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse"
@@ -214,7 +244,7 @@ ul.task-list li input[type="checkbox"] {
                     <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">
                         <li class="sidebar-item">
                             <div class="sidebar-item-container">
-                                <a href="./available_nodes.html" class="sidebar-item-text sidebar-link active">
+                                <a href="./available_nodes.html" class="sidebar-item-text sidebar-link">
                                     <span class="menu-text">Overview</span></a>
                             </div>
                         </li>
@@ -281,7 +311,7 @@ ul.task-list li input[type="checkbox"] {
                 </li>
                 <li class="sidebar-item">
                     <div class="sidebar-item-container">
-                        <a href="./troubleshooting.html" class="sidebar-item-text sidebar-link">
+                        <a href="./troubleshooting.html" class="sidebar-item-text sidebar-link active">
                             <span class="menu-text">Troubleshooting</span></a>
                     </div>
                 </li>
@@ -296,14 +326,13 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-      <li><a href="#node-library" id="toc-node-library" class="nav-link active" data-scroll-target="#node-library">Node
-          Library</a>
-  <ul class="collapse">
-  <li><a href="#readout-nodes" id="toc-readout-nodes" class="nav-link" data-scroll-target="#readout-nodes">Readout Nodes</a></li>
-  <li><a href="#qubit-control-nodes" id="toc-qubit-control-nodes" class="nav-link" data-scroll-target="#qubit-control-nodes">Qubit Control Nodes</a></li>
-  <li><a href="#coupler-nodes" id="toc-coupler-nodes" class="nav-link" data-scroll-target="#coupler-nodes">Coupler Nodes</a></li>
-  <li><a href="#characterization-nodes" id="toc-characterization-nodes" class="nav-link" data-scroll-target="#characterization-nodes">Characterization Nodes</a></li>
-  </ul></li>
+      <li><a href="#troubleshooting" id="toc-troubleshooting" class="nav-link active"
+             data-scroll-target="#troubleshooting">Troubleshooting</a>
+          <ul class="collapse">
+              <li><a href="#redis" id="toc-redis" class="nav-link" data-scroll-target="#redis">Redis</a></li>
+              <li><a href="#spi" id="toc-spi" class="nav-link" data-scroll-target="#spi">SPI</a></li>
+          </ul>
+      </li>
   </ul>
 </nav>
     </div>
@@ -311,93 +340,66 @@ ul.task-list li input[type="checkbox"] {
 <main class="content" id="quarto-document-content">
 
 
-    <section id="node-library" class="level1">
-        <h1>Node Library</h1>
-        <div class="cell" data-layout-align="default">
-            <div class="cell-output-display">
-                <div>
-                    <p></p>
-                    <figure class="figure"><p></p>
-                        <div>
-<pre class="mermaid mermaid-js">graph TD
-    A[Resonator Spectroscopy] --&gt; B(Qubit Spectroscopy)
-    B --&gt; C[Rabi Oscillations]
-    C --&gt; D[Ramsey Correction]
-    D --&gt; E[Motzoi Parameter]
-    E --&gt; F[Resonator Spectroscopy 1]
-    F --&gt; C1[T1] --&gt; C2[T2] --&gt; C3[Randomized Benchmarking]
-    F --&gt; F1(Qubit 12 Spectroscopy) --&gt; G(Rabi 12 Oscillations)
-    F --&gt; H1(2 States Discrimination)
-    G --&gt; H2(3 States Discrimination)
-        
-    click A href "nodes/resonator_spectroscopy_node.html"
-    click B href "nodes/qubit_spectroscopy_node.html"
-
-    style A fill:#ffe6cc,stroke:#333,stroke-width:2px
-    style B fill:#ffe6cc,stroke:#333,stroke-width:2px
-    style C fill:#ffe6cc,stroke:#333,stroke-width:2px
-    style D fill:#ffe6cc,stroke:#333,stroke-width:2px
-    style E fill:#ffe6cc,stroke:#333,stroke-width:2px
-    style F fill:#ffe6cc,stroke:#333,stroke-width:2px
-    style C1 fill:#ffffcc,stroke:#333,stroke-width:2px
-    style C2 fill:#ffffcc,stroke:#333,stroke-width:2px
-    style C3 fill:#ffffcc,stroke:#333,stroke-width:2px
-    style F1 fill:#ffe6cc,stroke:#333,stroke-width:2px
-    style G fill:#ffe6cc,stroke:#333,stroke-width:2px
-    style H1 fill:#ffe6cc,stroke:#333,stroke-width:2px
-    style H2 fill:#ffe6cc,stroke:#333,stroke-width:2px
-</pre>
-                        </div>
-                        <p></p></figure>
-                    <p></p>
-                </div>
+    <section id="troubleshooting" class="level1">
+        <h1>Troubleshooting</h1>
+        <p>Some errors occur on more often than others. If you are experiencing an error for which you find a simple
+            hack that you want to share, please add it to this troubleshooting guide.</p>
+        <p>As soon as the description for the hack is getting too long, we are going to add either a proper
+            documentation page about the topic or we just implement it as a feature.</p>
+        <section id="redis" class="level3">
+            <h3 class="anchored" data-anchor-id="redis">Redis</h3>
+            <p>On a Linux machine, if REDIS does not accept a connection, you can do this:</p>
+            <div class="sourceCode" id="cb1">
+                <pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a
+                        href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">redis-server</span> <span
+                        class="at">--port</span> {your redis port} <span class="at">--daemonize</span> yes</span></code><button
+                        title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre>
             </div>
-        </div>
-<section id="readout-nodes" class="level2">
-<h2 class="anchored" data-anchor-id="readout-nodes">Readout Nodes</h2>
-<ul>
-<li>punchout</li>
-    <li><a href="./nodes/resonator_spectroscopy_node.html">resonator_spectroscopy</a></li>
-<li>resonator_spectroscopy_1</li>
-<li>resonator_spectroscopy_2</li>
-<li>ro_frequency_two_state_optimization</li>
-<li>ro_frequency_three_state_optimization</li>
-<li>ro_amplitude_two_state_optimization</li>
-<li>ro_amplitude_three_state_optimization</li>
-</ul>
-</section>
-<section id="qubit-control-nodes" class="level2">
-<h2 class="anchored" data-anchor-id="qubit-control-nodes">Qubit Control Nodes</h2>
-<ul>
-    <li><a href="./nodes/qubit_spectroscopy_node.html">qubit_01_spectroscopy</a></li>
-<li>qubit_01_spectroscopy_pulsed</li>
-<li>rabi_oscillations</li>
-<li>ramsey_correction</li>
-<li>qubit_12_spectroscopy_pulsed</li>
-<li>qubit_12_spectroscopy_multidim</li>
-<li>rabi_oscillations_12</li>
-<li>ramsey_correction_12</li>
-<li>adaptive_motzoi_parameter</li>
-<li>n_rabi_oscillations</li>
-<li>state_discrimination</li>
-</ul>
-</section>
-<section id="coupler-nodes" class="level2">
-<h2 class="anchored" data-anchor-id="coupler-nodes">Coupler Nodes</h2>
-<ul>
-<li>coupler_spectroscopy</li>
-<li>coupler_resonator_spectroscopy</li>
-</ul>
-</section>
-<section id="characterization-nodes" class="level2">
-<h2 class="anchored" data-anchor-id="characterization-nodes">Characterization Nodes</h2>
-<ul>
-<li>T1</li>
-<li>T2</li>
-<li>T2_echo</li>
-<li>randomized_benchmarking</li>
-<li>all_XY</li>
-</ul>
+            <p>The <code>--daenonize yes</code> parameter will enable the machine to run REDIS always in the background.
+                If you do not use that parameter, the REDIS instance will stop as soon as you close the terminal where
+                you started it.</p>
+            <p>If you are getting an error saying:</p>
+            <div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code
+                    class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span
+                    class="ex">15350:M</span> 10 Dec 2024 23:24:17.172 <span class="co"># Warning: Could not create server TCP listening socket *:6379: bind: Address already in use</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">15350:M</span> 10 Dec 2024 23:24:17.172 <span
+        class="co"># Failed listening on port 6379 (tcp), aborting.</span></span></code><button
+                    title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre>
+            </div>
+            <p>Then there might be already running a REDIS instance on that port.</p>
+            <p>You can verify that by typing:</p>
+            <div class="sourceCode" id="cb3">
+                <pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a
+                        href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">redis-cli</span> <span
+                        class="at">-p</span> {the redis port you had the error with}</span></code><button
+                        title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre>
+            </div>
+            <p>If it opens the REDIS CLI, then you have an instance already running.</p>
+            <p>To check whether there are already keys in the REDIS server - assuming you have opened the REDIS CLI -
+                you can type:</p>
+            <div class="sourceCode" id="cb4">
+                <pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a
+                        href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">keys</span> <span
+                        class="pp">*</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i
+                        class="bi"></i></button></pre>
+            </div>
+            <p>This will give you all the keys that are stored in the REDIS instance. If you are on a shared machine,
+                you should always double-check whether no one else is using the same REDIS instance. Otherwise, it could
+                easily happen that you overwrite someone else’s memory and data will be lost.</p>
+            <p>On Windows REDIS is run on WSL. Kill the session and restart it and run REDIS (if you have not set it to
+                run automatically). Sometimes you may get in the situation that WSL will not open at all, in this case
+                you need to restart the service called “Hyper-V Host Compute Service”</p>
+        </section>
+        <section id="spi" class="level3">
+            <h3 class="anchored" data-anchor-id="spi">SPI</h3>
+            <p>You can get an error saying that the default path was not correct or that you get denied permission.
+                Likely there was a connection implemented before and now when trying to start a new one it hangs itself
+                up and refuses communication, you can force this communication channel by running</p>
+            <div class="sourceCode" id="cb5">
+                <pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a
+                        href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> chmod 666 /dev/ttyACM0</span></code><button
+                        title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre>
+            </div>
 
 
 </section>
@@ -423,7 +425,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       toggleBodyColorMode(bsSheetEl);
     }
   }
-    toggleBodyColorPrimary();
+  toggleBodyColorPrimary();
     const disableStylesheet = (stylesheets) => {
         for (let i = 0; i < stylesheets.length; i++) {
             const stylesheet = stylesheets[i];
