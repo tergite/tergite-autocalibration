@@ -99,6 +99,7 @@ def populate_active_reset_parameters(
     active_reset_device_config = transmon_configuration["active_reset"]
 
     ar_qubit_parameters = active_reset_device_config["qubits"]
+    print("Populating Active Reset")
 
     # Populate the Redis database with the initial active reset
     # parameter values from the toml file
@@ -177,6 +178,8 @@ def populate_quantities_of_interest(
                     if not redis_connection.hexists(redis_key, qoi):
                         redis_connection.hset(f"transmons:{qubit}", qoi, "nan")
                         if qoi == "measure_3state_opt:pulse_amp":
+                            redis_connection.hset(f"transmons:{qubit}", qoi, "0")
+                        elif qoi == "measure_2state_opt:pulse_amp":
                             redis_connection.hset(f"transmons:{qubit}", qoi, "0")
                         elif qoi == "rxy:motzoi":
                             redis_connection.hset(f"transmons:{qubit}", qoi, "0")
