@@ -11,6 +11,7 @@
 # that they have been altered from the originals.
 
 import numpy as np
+import pytest
 import redis
 import xarray
 from numpy import exp, pi
