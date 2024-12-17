@@ -122,9 +122,13 @@ and tests from the lowest level and then compose those objects to handle the mor
 **Test class type**
 
 ```python
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.node import CZParametrizationFixDurationNode
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
+
+
 def test_canCreateCorrectType():
-  c = CZ_Parametrization_Fix_Duration_Node("cz_char_fixCurrent", couplers=["q14_q15"])
-    assert isinstance(c, CZ_Parametrization_Fix_Duration_Node)
+  c = CZParametrizationFixDurationNode("cz_char_fixCurrent", couplers=["q14_q15"])
+  assert isinstance(c, CZParametrizationFixDurationNode)
     assert isinstance(c, ScheduleNode)
 ```
 
@@ -134,10 +138,14 @@ inheritance.
 **Test input parameters**
 
 ```python
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.node import CZParametrizationFixDurationNode
+
+
 def test_CanGetQubitsFromCouplers():
-  c = CZ_Parametrization_Fix_Duration_Node("cz_char_fixCurrent", couplers=["q14_q15"])
+  c = CZParametrizationFixDurationNode("cz_char_fixCurrent", couplers=["q14_q15"])
     assert c.all_qubits == ["q14", "q15"]
-    assert c.couplers == ['q14_q15']
+  assert c.couplers == ["q14_q15"]
+
 ```
 
 Make sure all inputs and their manipulations are correctly initialised in the constructor, in this case the qubits are
@@ -146,9 +154,14 @@ taken from the coupler pair
 **Test exception**
 
 ```python
+
+import pytest
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.node import CZParametrizationFixDurationNode
+
+
 def test_ValidationReturnErrorWithSameQubitCoupler():
     with pytest.raises(ValueError):
-      CZ_Parametrization_Fix_Duration_Node("cz_char_fixCurrent", couplers=["q14_q14"])
+      CZParametrizationFixDurationNode("cz_char_fixCurrent", couplers=["q14_q14"])
 ```
 
 Inputs can be incorrect and should always be tested to avoid unexpected behaviour down the line which can be difficult
@@ -159,6 +172,12 @@ twice.
 **Test with data**
 
 ```python
+import os
+import pytest
+from pathlib import Path
+import xarray as xr
+
+
 @pytest.fixture(autouse=True)
 def setup_good_data():
     os.environ["DATA_DIR"] = str(Path(__file__).parent / "results")
@@ -181,9 +200,15 @@ we are about to change the dataset format at the time of writing this; however, 
 This data can then be used in multiple tests, for example:
 
 ```python
+import numpy as np
+
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis import (
+  FrequencyVsAmplitudeQ1Analysis,
+  FrequencyVsAmplitudeQ2Analysis
+)
 def test_canGetMaxFromQ1(setup_good_data):
     d14, d15, freqs, amps = setup_good_data
-    c = CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis(d14, freqs, amps)
+    c = FrequencyVsAmplitudeQ1Analysis(d14, freqs, amps)
     result = c.run_fitting()
     indexBestFreq = np.where(freqs == result[0])[0]
     indexBestAmp = np.where(amps == result[1])[0]
@@ -193,7 +218,7 @@ def test_canGetMaxFromQ1(setup_good_data):
 
 def test_canGetMinFromQ2(setup_good_data):
     d14, d15, freqs, amps = setup_good_data
-    c = CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis(d15, freqs, amps)
+    c = FrequencyVsAmplitudeQ2Analysis(d15, freqs, amps)
     result = c.run_fitting()
     indexBestFreq = np.where(freqs == result[0])[0]
     indexBestAmp = np.where(amps == result[1])[0]
@@ -206,10 +231,20 @@ These two tests make sure that the return values are correct for the two qubits 
 **Test creating of images from plotter**
 
 ```python
+import os
+import matplotlib
+from matplotlib import pyplot as plt
+
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis import (
+  FrequencyVsAmplitudeQ1Analysis,
+  FrequencyVsAmplitudeQ2Analysis
+)
+
+
 def test_canPlotBad(setup_bad_data):
     matplotlib.use("Agg")
     d14, d15, freqs, amps = setup_bad_data
-    c14 = CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis(d14, freqs, amps)
+    c14 = FrequencyVsAmplitudeQ1Analysis(d14, freqs, amps)
     result = c14.run_fitting()
 
     figure_path = os.environ["DATA_DIR"] + "/Frequency_Amplitude_bad_q14.png"
@@ -229,7 +264,7 @@ def test_canPlotBad(setup_bad_data):
     with Image.open(figure_path) as img:
         assert img.format == "PNG", "File should be a PNG image"
 
-    c15 = CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis(d15, freqs, amps)
+    c15 = FrequencyVsAmplitudeQ2Analysis(d15, freqs, amps)
     result = c15.run_fitting()
 
     figure_path = os.environ["DATA_DIR"] + "/Frequency_Amplitude_bad_q15.png"
@@ -257,6 +292,17 @@ extension would be to upload the images in the data folder and check the those p
 **Complex dataset for comparing results**
 
 ```python
+import pytest
+from pathlib import Path
+import xarray as xr
+
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis import (
+  FrequencyVsAmplitudeQ1Analysis,
+  FrequencyVsAmplitudeQ2Analysis,
+  CombinedFrequencyVsAmplitudeAnalysis
+)
+
+
 @pytest.fixture(autouse=True)
 def setup_bad_data():
     dataset_path = Path(__file__).parent / "data" / "dataset_bad_quality_freq_amp.hdf5"
@@ -269,16 +315,16 @@ def setup_bad_data():
     d15.yq15.attrs["qubit"] = "q15"
     freqs = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
     amps = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
-    q14Ana = CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis(d14, freqs, amps)
+    q14Ana = FrequencyVsAmplitudeQ1Analysis(d14, freqs, amps)
     q14Res = q14Ana.run_fitting()
-    q15Ana = CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis(d15, freqs, amps)
+    q15Ana = FrequencyVsAmplitudeQ2Analysis(d15, freqs, amps)
     q15Res = q15Ana.run_fitting()
     return q14Res, q15Res
 
 
 def test_combineBadResultsReturnNoValidPoint(setup_bad_data):
     q14Res, q15Res = setup_bad_data
-    c = CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis(q14Res, q15Res)
+    c = CombinedFrequencyVsAmplitudeAnalysis(q14Res, q15Res)
     r = c.are_frequencies_compatible()
     assert r == False
     r = c.are_amplitudes_compatible()
@@ -295,6 +341,16 @@ This is a failure test, making sure that bad inputs are not recognised as good w
 **Even more complex setup**
 
 ```python
+from pathlib import Path
+import xarray as xr
+
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis import (
+  FrequencyVsAmplitudeQ1Analysis,
+  FrequencyVsAmplitudeQ2Analysis,
+  CombinedFrequencyVsAmplitudeAnalysis
+)
+
+
 def setup_data():
     # It should be a single dataset, but we do not have one yet, so we loop over existing files
     dataset_path = Path(__file__).parent / "data" / "dataset_good_quality_freq_amp.hdf5"
@@ -307,11 +363,11 @@ def setup_data():
     d15.yq15.attrs["qubit"] = "q15"
     freqs = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
     amps = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
-    q14Ana = CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis(d14, freqs, amps)
+    q14Ana = FrequencyVsAmplitudeQ1Analysis(d14, freqs, amps)
     q14Res = q14Ana.run_fitting()
-    q15Ana = CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis(d15, freqs, amps)
+    q15Ana = FrequencyVsAmplitudeQ2Analysis(d15, freqs, amps)
     q15Res = q15Ana.run_fitting()
-    c1 = CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis(q14Res, q15Res)
+    c1 = CombinedFrequencyVsAmplitudeAnalysis(q14Res, q15Res)
 
     dataset_path = Path(__file__).parent / "data" / "dataset_bad_quality_freq_amp.hdf5"
     print(dataset_path)
@@ -323,15 +379,15 @@ def setup_data():
     d15.yq15.attrs["qubit"] = "q15"
     freqs_bad = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
     amps_bad = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
-    q14Ana = CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis(
+    q14Ana = FrequencyVsAmplitudeQ1Analysis(
         d14, freqs_bad, amps_bad
     )
     q14Res = q14Ana.run_fitting()
-    q15Ana = CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis(
+    q15Ana = FrequencyVsAmplitudeQ2Analysis(
         d15, freqs_bad, amps_bad
     )
     q15Res = q15Ana.run_fitting()
-    c2 = CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis(q14Res, q15Res)
+    c2 = CombinedFrequencyVsAmplitudeAnalysis(q14Res, q15Res)
 
     dataset_path = (
             Path(__file__).parent / "data" / "dataset_good_quality_freq_amp_2.hdf5"
@@ -345,11 +401,11 @@ def setup_data():
     d15.yq15.attrs["qubit"] = "q15"
     freqs_2 = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
     amps_2 = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
-    q14Ana = CZ_Parametrisation_Frequency_vs_Amplitude_Q1_Analysis(d14, freqs_2, amps_2)
+    q14Ana = FrequencyVsAmplitudeQ1Analysis(d14, freqs_2, amps_2)
     q14Res = q14Ana.run_fitting()
-    q15Ana = CZ_Parametrisation_Frequency_vs_Amplitude_Q2_Analysis(d15, freqs_2, amps_2)
+    q15Ana = FrequencyVsAmplitudeQ2Analysis(d15, freqs_2, amps_2)
     q15Res = q15Ana.run_fitting()
-    c3 = CZ_Parametrisation_Combined_Frequency_vs_Amplitude_Analysis(q14Res, q15Res)
+    c3 = CombinedFrequencyVsAmplitudeAnalysis(q14Res, q15Res)
 
     list_of_results = [(c1, 0.1), (c2, 0.2), (c3, 0.3)]
     return list_of_results, freqs, amps, freqs_2, amps_2

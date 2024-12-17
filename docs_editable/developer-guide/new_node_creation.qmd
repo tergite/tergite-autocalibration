@@ -62,9 +62,15 @@ All node classes are supposed follow the same interface as described in the `Bas
 Below, for example, you have the rabi oscillations node:
 
 ```python
-class RabiOscillations(ScheduleNode):
+import numpy as np
+
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
+from tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.measurement import RabiOscillationsMeasurement
+from tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.analysis import RabiQubitAnalysis
+
+class RabiOscillationsNode(ScheduleNode):
   measurement_obj = RabiOscillationsMeasurement
-  analysis_obj = RabiOscillationsAnalysis
+  analysis_obj = RabiQubitAnalysis
   qubit_qois = ["rxy:amp180"]
 
   def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):

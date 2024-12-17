@@ -2,9 +2,10 @@
 
 Qubit spectroscopy is a vital technique for identifying qubit resonance frequencies. By applying a probing signal to a qubit at various frequencies and measuring the response, we can accurately locate resonance frequencies and optimize qubit operation. In this node, both qubit frequecies for both 01 and 12 can be attained depending on the initial qubit state. 
 
-### Measurement class: `Two_Tones_Multidim`
+### Measurement class: `TwoTonesMultidimMeasurement`
 
-The `Two_Tones_Multidim` class facilitates the creation of schedules for qubit spectroscopy experiments. It supports multi-qubit spectroscopy, enabling parallel probing and measurement.
+The `TwoTonesMultidimMeasurement` class facilitates the creation of schedules for qubit spectroscopy experiments. It
+supports multi-qubit spectroscopy, enabling parallel probing and measurement.
 
 #### Method: `schedule_function`
 
@@ -26,9 +27,10 @@ The `schedule_function` generates an experimental schedule for performing qubit 
 
 - A `Schedule` object representing the experimental procedure.
 
-### Analysis class: `QubitSpectroscopyMultidim`
+### Analysis class: `QubitSpectroscopyMultidimAnalysis`
 
-The `QubitSpectroscopyMultidim` class analyzes the results of qubit spectroscopy experiments. The resonance peak is identified, enabling the determination of resonance frequencies.
+The `QubitSpectroscopyMultidimAnalysis` class analyzes the results of qubit spectroscopy experiments. The resonance peak
+is identified, enabling the determination of resonance frequencies.
 
 #### Method: `analyse_qubit`
 
