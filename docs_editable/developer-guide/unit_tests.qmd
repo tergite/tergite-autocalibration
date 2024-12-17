@@ -41,6 +41,7 @@ redis-server --port 6378 {--daemonize yes}
 
 Optionally, you can add the `--daemonize yes` parameter.
 This will make the redis instance run in the background.
+If it does not run on your user, try running it with `sudo` rights.
 
 Assuming you open a terminal in the root directory of the repository, you can run the pytests for the whole
 autocalibration package.
@@ -88,7 +89,7 @@ Please organise the file using these sub-folders:
   plots. It should be empty, do not commit your results. To assure this is the case, add a file name .gitignore in the
   folder with this code:
 
-```gitignore
+```bash
 # Ignore everything in this directory
 *
 

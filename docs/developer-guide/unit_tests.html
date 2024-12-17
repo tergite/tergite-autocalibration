@@ -405,7 +405,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
                         class="bi"></i></button></pre>
             </div>
             <p>Optionally, you can add the <code>--daemonize yes</code> parameter. This will make the redis instance run
-                in the background.</p>
+                in the background. If it does not run on your user, try running it with <code>sudo</code> rights.</p>
             <p>Assuming you open a terminal in the root directory of the repository, you can run the pytests for the
                 whole autocalibration package.</p>
             <div class="sourceCode" id="cb2">
@@ -452,11 +452,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         a file name .gitignore in the folder with this code:
     </li>
 </ul>
-                <pre class="gitignore"><code># Ignore everything in this directory
-*
-
-# But do not ignore this file
-!.gitignore     </code></pre>
+                <div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code
+                        class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"
+                                                                    tabindex="-1"></a><span class="co"># Ignore everything in this directory</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span
+        class="co"># But do not ignore this file</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span
+        class="ex">!.gitignore</span>     </span></code><button title="Copy to Clipboard" class="code-copy-button"><i
+                        class="bi"></i></button></pre>
+                </div>
 </section>
             <section id="general-information-about-testing-nodes" class="level3">
                 <h3 class="anchored" data-anchor-id="general-information-about-testing-nodes">General information about

@@ -97,10 +97,11 @@ You can find more information about the configuration files in the documentation
 Tests require a redis instance running on port 6378.
 
 ```bash
-redis-server --port 6378 {--damonize yes}
+redis-server --port 6378 {--daemonize yes}
 ```
 
 Optionally, add `--daemonize yes` to run the redis instance in the background.
+If it does not run on your user, try running it again with `sudo` rights.
 
 Run the pytests for the whole application.
 
