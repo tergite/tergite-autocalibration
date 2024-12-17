@@ -4,7 +4,7 @@ import xarray as xr
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
 
 
-def assign_state(qubit: str, iq_values: xr.ndarray) -> xr.DataArray:
+def assign_state(qubit: str, iq_values: np.ndarray) -> xr.DataArray:
     """
     takes as input the array of iq points. Loads the three boundaries from
     redis and classifies each iq point to the corresponding state
