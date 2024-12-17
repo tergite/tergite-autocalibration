@@ -84,15 +84,31 @@ pip install poetry
 poetry install --with dev,test
 ```
 
-Run the CLI help command
+Run the CLI help command to see whether the application is running.
 
 ```bash
 acli --help
 ```
 
-### Configuration
+You can find more information about the configuration files in the documentation.
 
-Please read the respective section in the [README.md](./README.md)
+### Testing
+
+Tests require a redis instance running on port 6378.
+
+```bash
+redis-server --port 6378 {--damonize yes}
+```
+
+Optionally, add `--daemonize yes` to run the redis instance in the background.
+
+Run the pytests for the whole application.
+
+```bash
+pytest tergite_autocalibration
+```
+
+You can find more information about unit tests in the documentation.
 
 ### Calibration Pipeline
 
