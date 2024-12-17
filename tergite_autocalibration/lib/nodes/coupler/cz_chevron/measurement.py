@@ -37,7 +37,7 @@ from tergite_autocalibration.utils.dto.extended_coupler_edge import (
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
-class CZ_Chevron(BaseMeasurement):
+class CZChevron(BaseMeasurement):
     def __init__(
         self,
         transmons: dict[str, ExtendedTransmon],
