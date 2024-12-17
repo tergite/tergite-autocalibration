@@ -20,7 +20,9 @@ import numpy as np
 from tergite_autocalibration.lib.nodes.characterization.t1.analysis import (
     T1NodeAnalysis,
 )
-from tergite_autocalibration.lib.nodes.characterization.t1.measurement import T1Measurement
+from tergite_autocalibration.lib.nodes.characterization.t1.measurement import (
+    T1Measurement,
+)
 from tergite_autocalibration.lib.nodes.external_parameter_node import (
     ExternalParameterNode,
 )

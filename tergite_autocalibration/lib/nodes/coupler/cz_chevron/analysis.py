@@ -554,6 +554,7 @@ class CZChevronAnalysisReset(BaseAnalysis):
                 period = 1 / np.array(cs)
                 period_fit = []
                 for i, prob in enumerate(magnitudes):
+
                     def fitfunc(p):
                         return (
                                 p[0]

@@ -22,7 +22,10 @@ from tergite_autocalibration.lib.nodes.characterization.t2.analysis import (
     T2EchoNodeAnalysis,
     T2NodeAnalysis,
 )
-from tergite_autocalibration.lib.nodes.characterization.t2.measurement import T2Measurement, T2EchoMeasurement
+from tergite_autocalibration.lib.nodes.characterization.t2.measurement import (
+    T2Measurement,
+    T2EchoMeasurement,
+)
 from tergite_autocalibration.lib.nodes.external_parameter_node import (
     ExternalParameterNode,
 )
