@@ -56,7 +56,7 @@ class ROAmplitudeTwoStateOptimizationNode(ScheduleNode):
         }
 
 
-class RO_amplitude_three_state_optimization_Node(ScheduleNode):
+class ROAmplitudeThreeStateOptimizationNode(ScheduleNode):
     measurement_obj = ROAmplitudeOptimizationMeasurement
     analysis_obj = OptimalROThreeStateAmplitudeNodeAnalysis
     qubit_qois = [
