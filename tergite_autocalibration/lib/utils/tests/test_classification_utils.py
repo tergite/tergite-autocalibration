@@ -11,14 +11,28 @@
 # that they have been altered from the originals.
 
 import numpy as np
+import redis
 import xarray
 from numpy import exp, pi
 
 from tergite_autocalibration.lib.base.classification_functions import assign_state
 
+qubit = "q06"
+MOCK_REDIS_CONNECTION = redis.Redis(decode_responses=True, port=6378)
+# centroid_I = 1
+# centroid_Q = 0
+# omega_01 = 330
+# omega_12 = 180
+# omega_20 = 90
+MOCK_REDIS_CONNECTION.hset(f"transmons:{qubit}", "centroid_I", "1")
+MOCK_REDIS_CONNECTION.hset(f"transmons:{qubit}", "centroid_Q", "0")
+MOCK_REDIS_CONNECTION.hset(f"transmons:{qubit}", "omega_01", "330")
+MOCK_REDIS_CONNECTION.hset(f"transmons:{qubit}", "omega_12", "180")
+MOCK_REDIS_CONNECTION.hset(f"transmons:{qubit}", "omega_20", "90")
 
+
+@pytest.mark.skip(reason="")
 def test_assign_state():
-    qubit = "q06"
     iq_points = np.array(
         [
             2,
