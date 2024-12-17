@@ -22,8 +22,8 @@ from tergite_autocalibration.lib.base.analysis import (
     BaseAllQubitsRepeatAnalysis,
     BaseQubitAnalysis,
 )
-from tergite_autocalibration.lib.base.analysis_models import ExpDecayModel
-from tergite_autocalibration.lib.base.classification_functions import assign_state
+from tergite_autocalibration.lib.utils.analysis_models import ExpDecayModel
+from tergite_autocalibration.lib.utils.classification_functions import assign_state
 
 
 def mitigate(v, cm_inv):

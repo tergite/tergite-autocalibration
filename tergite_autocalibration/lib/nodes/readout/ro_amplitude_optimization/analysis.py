@@ -69,7 +69,6 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
 
         for index, ro_amplitude in enumerate(self.amplitudes):
             iq = self.IQ(index)
-            breakpoint()
             y_pred = self.lda.fit(iq, y).predict(iq)
 
             cm_norm = confusion_matrix(y, y_pred, normalize="true")
