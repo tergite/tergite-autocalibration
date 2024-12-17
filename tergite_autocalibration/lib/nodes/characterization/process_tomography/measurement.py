@@ -38,7 +38,7 @@ from tergite_autocalibration.utils.dto.extended_gates import (
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
-class Process_Tomography(BaseMeasurement):
+class ProcessTomographyMeasurement(BaseMeasurement):
     def __init__(
         self,
         transmons: dict[str, ExtendedTransmon],

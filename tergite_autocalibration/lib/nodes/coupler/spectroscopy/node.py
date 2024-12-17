@@ -33,7 +33,7 @@ from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
 
 
-class Coupler_Spectroscopy_Node(ExternalParameterNode):
+class CouplerSpectroscopyNode(ExternalParameterNode):
     measurement_obj = Two_Tones_Multidim
     analysis_obj = CouplerSpectroscopyNodeAnalysis
     coupler_qois = ["parking_current", "current_range"]
@@ -88,7 +88,7 @@ class Coupler_Spectroscopy_Node(ExternalParameterNode):
         self.spi_dac.set_dac_current(self.dac, 0)
 
 
-class Coupler_Resonator_Spectroscopy_Node(ExternalParameterNode):
+class CouplerResonatorSpectroscopyNode(ExternalParameterNode):
     measurement_obj = Resonator_Spectroscopy
     analysis_obj = CouplerSpectroscopyNodeAnalysis
     coupler_qois = ["resonator_flux_quantum"]

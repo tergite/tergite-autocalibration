@@ -17,13 +17,13 @@ from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis impor
     CZParametrizationFixDurationNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.measurement import (
-    CZParametrizationFixDuration,
+    CZParametrizationFixDurationMeasurement,
 )
 from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 
 
 class CZParametrizationFixDurationNode(ScheduleNode):
-    measurement_obj = CZParametrizationFixDuration
+    measurement_obj = CZParametrizationFixDurationMeasurement
     analysis_obj = CZParametrizationFixDurationNodeAnalysis
     coupler_qois = [
         "cz_pulse_frequency",

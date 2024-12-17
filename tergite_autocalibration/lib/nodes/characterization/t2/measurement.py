@@ -21,7 +21,7 @@ from ....base.measurement import BaseMeasurement
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
-class T2(BaseMeasurement):
+class T2Measurement(BaseMeasurement):
     def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
         super().__init__(transmons)
         self.qubit_state = qubit_state
@@ -82,7 +82,7 @@ class T2(BaseMeasurement):
         return schedule
 
 
-class T2Echo(BaseMeasurement):
+class T2EchoMeasurement(BaseMeasurement):
     def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
         super().__init__(transmons)
         self.qubit_state = qubit_state

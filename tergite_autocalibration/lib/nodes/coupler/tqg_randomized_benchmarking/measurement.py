@@ -48,7 +48,7 @@ except ImportError:
     )
 
 
-class TQGRandomizedBenchmarkingSSRO(BaseMeasurement):
+class TQGRandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
     def __init__(
         self,
         transmons: dict[str, ExtendedTransmon],

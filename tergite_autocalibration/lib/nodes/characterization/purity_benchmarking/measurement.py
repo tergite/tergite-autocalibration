@@ -23,7 +23,7 @@ from tergite_autocalibration.utils.dto.extended_transmon_element import Extended
 import tergite_autocalibration.utils.clifford_elements_decomposition as cliffords
 
 
-class PurityBenchmarking(BaseMeasurement):
+class PurityBenchmarkingMeasurement(BaseMeasurement):
     """Class that contains measurement scheduele for purity benchmarking"""
 
     def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):

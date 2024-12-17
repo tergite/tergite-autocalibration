@@ -14,14 +14,14 @@ import numpy as np
 
 from tergite_autocalibration.lib.base.node import BaseNode
 from tergite_autocalibration.lib.nodes.characterization.all_xy.analysis import (
-    All_XY_Analysis,
+    AllXYAnalysis,
 )
-from tergite_autocalibration.lib.nodes.characterization.all_xy.measurement import All_XY
+from tergite_autocalibration.lib.nodes.characterization.all_xy.measurement import AllXYMeasurement
 
 
-class All_XY_Node(BaseNode):
-    measurement_obj = All_XY
-    analysis_obj = All_XY_Analysis
+class AllXYNode(BaseNode):
+    measurement_obj = AllXYMeasurement
+    analysis_obj = AllXYAnalysis
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
