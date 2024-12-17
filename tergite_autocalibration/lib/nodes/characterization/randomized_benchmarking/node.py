@@ -34,14 +34,9 @@ class RandomizedBenchmarkingSSRONode(ScheduleNode):
         self.name = name
         self.all_qubits = all_qubits
         self.schedule_keywords = schedule_keywords
-        self.backup = False
-        self.redis_field = ["fidelity", "fidelity_error", "leakage", "leakage_error"]
-        self.measurement_obj = Randomized_Benchmarking_SSRO
-        self.analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
-        self.qubit_state = 2
         self.schedule_keywords = {}
-        # TODO change it a dictionary like samplespace
-        self.schedule_keywords["qubit_state"] = self.qubit_state
+        self.loops = 500
+        self.schedule_keywords["loop_repetitions"] = self.loops
 
         RB_REPEATS = 10
         self.external_samplespace = {
@@ -53,25 +48,7 @@ class RandomizedBenchmarkingSSRONode(ScheduleNode):
 
         self.initial_schedule_samplespace = {
             "number_of_cliffords": {
-                qubit: np.append(
-                    np.array([0, 8, 16, 32, 64, 128, 256, 512, 1024]), [0, 1, 2]
-                )
+                qubit: np.array([0, 8, 16, 32, 64, 128, 256, 512, 1024])
                 for qubit in self.all_qubits
             },
         }
-
-    def pre_measurement_operation(self, reduced_ext_space: dict):
-        self.schedule_samplespace = (
-            self.initial_schedule_samplespace | reduced_ext_space
-        )
-
-    @property
-    def dimensions(self):
-        return [
-            len(
-                self.initial_schedule_samplespace["number_of_cliffords"][
-                    self.all_qubits[0]
-                ]
-            ),
-            1,
-        ]

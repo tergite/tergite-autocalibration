@@ -53,9 +53,6 @@ class RO_amplitude_two_state_optimization_Node(ScheduleNode):
             "qubit_states": {
                 qubit: np.array([0, 1], dtype=np.int16) for qubit in self.all_qubits
             },
-            "ro_amplitudes": {
-                qubit: np.linspace(0.001, 0.1, 11) for qubit in self.all_qubits
-            },
         }
 
 
