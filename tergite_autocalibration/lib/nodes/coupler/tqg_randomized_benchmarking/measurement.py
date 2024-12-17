@@ -24,18 +24,18 @@ from tergite_autocalibration.utils.dto.extended_coupler_edge import (
     ExtendedCompositeSquareEdge,
 )
 from tergite_autocalibration.utils.dto.extended_gates import (
-    Rxy_12,
     Measure_RO_3state_Opt,
+    Rxy_12,
 )
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 from tergite_autocalibration.utils.logger.tac_logger import logger
 
 try:
-    from superconducting_qubit_tools.clifford_module.randomized_benchmarking import (
-        randomized_benchmarking_sequence,
-    )
     from superconducting_qubit_tools.clifford_module.cliffords_decomposition import (
         decompose_clifford_seq,
+    )
+    from superconducting_qubit_tools.clifford_module.randomized_benchmarking import (
+        randomized_benchmarking_sequence,
     )
     from superconducting_qubit_tools.utils.clifford_module.from_list import (
         add_two_qubit_gates_to_schedule,
@@ -94,7 +94,7 @@ class TQGRandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
             name = "tqg_randomized_benchmarking_interleaved_ssro"
         schedule = Schedule(f"{name}")
         print("interleaved or not", name)
-        shot = Schedule(f"shot")
+        shot = Schedule("shot")
         shot.add(IdlePulse(16e-9))
 
         # Initialize ClockResource with the first frequency value

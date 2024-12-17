@@ -220,12 +220,63 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         IQ0 = optimal_IQ[y == 0]  # IQ when sending 0
         IQ1 = optimal_IQ[y == 1]  # IQ when sending 1
 
+        rotation_angle = np.pi / 2 - theta_rad
+        rotation_matrix = np.array(
+            [
+                [np.cos(rotation_angle), -np.sin(rotation_angle)],
+                [np.sin(rotation_angle), np.cos(rotation_angle)],
+            ]
+        )
+        mirror_rotation = np.array(
+            [
+                [np.cos(np.pi), -np.sin(np.pi)],
+                [np.sin(np.pi), np.cos(np.pi)],
+            ]
+        )
+
+        translated_IQ = optimal_IQ - np.array([0, self.y_intecept[0]])
+        rotated_IQ = translated_IQ @ rotation_matrix.T
+        # self.y_limits = (optimal_IQ[:, 1].min(), optimal_IQ[:, 1].max())
+
+        # translate point so the y_intecept becomes the origin
+        translated_IQ0 = translated_IQ[y == 0]
+        translated_IQ1 = translated_IQ[y == 1]
+        # @ is the matrix multiplication operator
+        rotated_IQ0 = translated_IQ0 @ rotation_matrix.T
+        rotated_IQ1 = translated_IQ1 @ rotation_matrix.T
+
+        threshold_direction = theta_rad - np.pi / 2
+        center_rotated_I_0 = np.mean(rotated_IQ0[:, 0])
+
+        # probably there is a more elegant solution
+        if center_rotated_I_0 > 0:
+            rotation_angle = rotation_angle + np.pi
+            threshold_direction = threshold_direction + np.pi
+            rotated_IQ0 = rotated_IQ0 @ mirror_rotation.T
+            rotated_IQ1 = rotated_IQ1 @ mirror_rotation.T
+            rotated_IQ = rotated_IQ @ mirror_rotation.T
+
+        self.threshold_point = self.threshold * np.array(
+            [np.cos(threshold_direction), np.sin(threshold_direction)]
+        )
+        self.rotated_IQ0_tp = rotated_IQ0[tp0]  # True Positive when sending 0
+        self.rotated_IQ0_fp = rotated_IQ0[~tp0]
+        self.rotated_IQ1_tp = rotated_IQ1[tp1]  # True Positive when sending 1
+        self.rotated_IQ1_fp = rotated_IQ1[~tp1]
         self.IQ0_tp = IQ0[tp0]  # True Positive when sending 0
         self.IQ0_fp = IQ0[~tp0]
         self.IQ1_tp = IQ1[tp1]  # True Positive when sending 1
         self.IQ1_fp = IQ1[~tp1]
 
-        return [self.optimal_amplitude, theta, threshold]
+        self.rotated_y_limits = (rotated_IQ[:, 1].min(), rotated_IQ[:, 1].max())
+        self.y_limits = (optimal_IQ[:, 1].min(), optimal_IQ[:, 1].max())
+
+        self.rotation_angle = rotation_angle
+        self.rotation_angle_degrees = np.rad2deg(rotation_angle)
+        print(f"{self.qubit}.measure.acq_rotation = {self.rotation_angle_degrees}")
+        print(f"{self.qubit}.measure.acq_threshold = {self.threshold}")
+
+        return [self.optimal_amplitude, self.rotation_angle_degrees, self.threshold]
 
     def plotter(self, ax, secondary_axes):
         self.primary_plotter(ax)
