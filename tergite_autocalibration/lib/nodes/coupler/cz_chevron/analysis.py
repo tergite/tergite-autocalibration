@@ -151,10 +151,10 @@ class CZChevronAnalysis(BaseAnalysis):
             # p[0]: amp, p[1]: period, p[2]: time_offset, p[4]: decay rate
             def fitfunc(p):
                 return (
-                        p[0]
-                        * np.exp(-p[4] * times)
-                        * np.cos(2 * np.pi / p[1] * (times - p[2]))
-                        + p[3]
+                    p[0]
+                    * np.exp(-p[4] * times)
+                    * np.cos(2 * np.pi / p[1] * (times - p[2]))
+                    + p[3]
                 )
 
             def errfunc(p):
@@ -197,9 +197,9 @@ class CZChevronAnalysis(BaseAnalysis):
             # p[3]: the minimal coupling strength, c
             def fitfunc(p, xs):
                 return (
-                        np.heaviside(p[2] - xs, 0) * p[0] * (xs - p[2]) ** 2
-                        + p[3]
-                        + np.heaviside(xs - p[2], 0) * p[1] * (xs - p[2]) ** 2
+                    np.heaviside(p[2] - xs, 0) * p[0] * (xs - p[2]) ** 2
+                    + p[3]
+                    + np.heaviside(xs - p[2], 0) * p[1] * (xs - p[2]) ** 2
                 )
 
             def errfunc(p):
@@ -255,7 +255,7 @@ class CZChevronAnalysis(BaseAnalysis):
                 # Compare the experiment data with the fitting data.
                 # The minimal experiment data must be valided. It should also lie in the new region.
                 if np.min(data_fit) > np.min(coupling_strength) and (
-                        id_left <= id_min + id_left <= id_right
+                    id_left <= id_min + id_left <= id_right
                 ):
                     f_opt = freq[id_min + id_left]
                     c_opt = np.min(coupling_strength)
@@ -303,10 +303,10 @@ class CZChevronAnalysis(BaseAnalysis):
             # p[0]: amp, p[1]: period, p[2]: time_offset, p[4]: decay rate
             def fitfunc(p):
                 return (
-                        p[0]
-                        * np.exp(-p[4] * times)
-                        * np.cos(2 * np.pi / p[1] * (times - p[2]))
-                        + p[3]
+                    p[0]
+                    * np.exp(-p[4] * times)
+                    * np.cos(2 * np.pi / p[1] * (times - p[2]))
+                    + p[3]
                 )
 
             def errfunc(p):
@@ -332,10 +332,10 @@ class CZChevronAnalysis(BaseAnalysis):
 
             def fitfunc(p):
                 return (
-                        p[0]
-                        * np.exp(-p[4] * times_cut)
-                        * np.cos(2 * np.pi / p[1] * (times_cut - p[2]))
-                        + p[3]
+                    p[0]
+                    * np.exp(-p[4] * times_cut)
+                    * np.cos(2 * np.pi / p[1] * (times_cut - p[2]))
+                    + p[3]
                 )
 
             def errfunc(p):
@@ -385,9 +385,9 @@ class CZChevronAnalysis(BaseAnalysis):
                 # p[2]: the symmetric axis, b
                 # p[3]: the maximal coupling strength, c
                 return (
-                        np.heaviside(p[2] - xs, 0) * p[0] * (xs - p[2]) ** 2
-                        + p[3]
-                        + np.heaviside(xs - p[2], 0) * p[1] * (xs - p[2]) ** 2
+                    np.heaviside(p[2] - xs, 0) * p[0] * (xs - p[2]) ** 2
+                    + p[3]
+                    + np.heaviside(xs - p[2], 0) * p[1] * (xs - p[2]) ** 2
                 )
 
             def errfunc(p):
@@ -444,7 +444,7 @@ class CZChevronAnalysis(BaseAnalysis):
                         return period_fit[id_left:id_right] - fitfunc(p, freq_fit)
 
                     p0_guess = (period_fit[id_left] - period_fit[id_opt]) / (
-                            freq[id_left] - freq[id_opt]
+                        freq[id_left] - freq[id_opt]
                     ) ** 2
                     p_guess = [p0_guess, freq[id_opt], period_fit[id_opt]]
                     out = leastsq(errfunc, p_guess)
@@ -557,10 +557,10 @@ class CZChevronAnalysisReset(BaseAnalysis):
 
                     def fitfunc(p):
                         return (
-                                p[0]
-                                * np.exp(-p[4] * times)
-                                * np.cos(2 * np.pi / p[1] * (times - p[2]))
-                                + p[3]
+                            p[0]
+                            * np.exp(-p[4] * times)
+                            * np.cos(2 * np.pi / p[1] * (times - p[2]))
+                            + p[3]
                         )
 
                     def errfunc(p):
@@ -594,10 +594,10 @@ class CZChevronAnalysisReset(BaseAnalysis):
 
                     def fitfunc(p):
                         return (
-                                p[0]
-                                * np.exp(-p[4] * times_cut)
-                                * np.cos(2 * np.pi / p[1] * (times_cut - p[2]))
-                                + p[3]
+                            p[0]
+                            * np.exp(-p[4] * times_cut)
+                            * np.cos(2 * np.pi / p[1] * (times_cut - p[2]))
+                            + p[3]
                         )
 
                     def errfunc(p):
@@ -642,9 +642,9 @@ class CZChevronAnalysisReset(BaseAnalysis):
 
                     def fitfunc(p, xs):
                         return (
-                                np.heaviside(p[2] - xs, 0) * p[0] * (xs - p[2]) ** 2
-                                + p[3]
-                                + np.heaviside(xs - p[2], 0) * p[1] * (xs - p[2]) ** 2
+                            np.heaviside(p[2] - xs, 0) * p[0] * (xs - p[2]) ** 2
+                            + p[3]
+                            + np.heaviside(xs - p[2], 0) * p[1] * (xs - p[2]) ** 2
                         )
 
                     def errfunc(p):
@@ -690,7 +690,7 @@ class CZChevronAnalysisReset(BaseAnalysis):
                             return period_fit[id_left:id_right] - fitfunc(p, xs)
 
                         p0_guess = (period_fit[id_left] - period_fit[id_opt]) / (
-                                freq[id_left] - freq[id_opt]
+                            freq[id_left] - freq[id_opt]
                         ) ** 2
                         p_guess = [p0_guess, freq[id_opt], period_fit[id_opt]]
                         out = leastsq(errfunc, p_guess)
@@ -848,7 +848,7 @@ class CZChevronAnalysisAmplitude:
 
 class CZFirstStepAnalysis(BaseAnalysis):
     def __init__(
-            self, baseFolder: Type[Path], date, dataFolder: Type[Path], qubit1, qubit2
+        self, baseFolder: Type[Path], date, dataFolder: Type[Path], qubit1, qubit2
     ):
         self.baseFolder = baseFolder
         self.date = date
@@ -916,9 +916,9 @@ class CZFirstStepAnalysis(BaseAnalysis):
                 if r.status == FitResultStatus.FOUND:
                     r.Print()
                     if (
-                            r.pvalue_1 + r.pvalue_2 > current_pv
-                            and r.fittedParam_1[0] > 0.21
-                            and r.fittedParam_2[0] > 0.21
+                        r.pvalue_1 + r.pvalue_2 > current_pv
+                        and r.fittedParam_1[0] > 0.21
+                        and r.fittedParam_2[0] > 0.21
                     ):
                         current_pv = r.pvalue_1 + r.pvalue_2
                         bestPoint = r
