@@ -547,15 +547,14 @@
         class="bu">str</span>], <span class="op">**</span>schedule_keywords):</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">super</span>().<span
         class="fu">__init__</span>(name, all_qubits, <span class="op">**</span>schedule_keywords)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.schedule_samplespace <span
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.schedule_samplespace <span
         class="op">=</span> {</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>          <span
-        class="st">"mw_amplitudes"</span>: {</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>            qubit: np.linspace(<span
-        class="fl">0.002</span>, <span class="fl">0.90</span>, <span class="dv">61</span>) <span class="cf">for</span> qubit <span
-        class="kw">in</span> <span class="va">self</span>.all_qubits</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>            }</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        }</span></code><button
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>      <span class="st">"mw_amplitudes"</span>: {</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        qubit: np.linspace(<span class="fl">0.002</span>, <span
+        class="fl">0.90</span>, <span class="dv">61</span>) <span class="cf">for</span> qubit <span class="kw">in</span> <span
+        class="va">self</span>.all_qubits</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    }</span></code><button
                         title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre>
                 </div>
                 <p>As you can see, it inherits from the <code>ScheduleNode</code> class, which contains a very simple

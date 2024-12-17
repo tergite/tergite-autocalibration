@@ -75,11 +75,11 @@ class RabiOscillationsNode(ScheduleNode):
 
   def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
     super().__init__(name, all_qubits, **schedule_keywords)
-        self.schedule_samplespace = {
-          "mw_amplitudes": {
-            qubit: np.linspace(0.002, 0.90, 61) for qubit in self.all_qubits
-            }
-        }
+    self.schedule_samplespace = {
+      "mw_amplitudes": {
+        qubit: np.linspace(0.002, 0.90, 61) for qubit in self.all_qubits
+      }
+    }
 ```
 
 As you can see, it inherits from the `ScheduleNode` class, which contains a very simple definition of a node that runs a
