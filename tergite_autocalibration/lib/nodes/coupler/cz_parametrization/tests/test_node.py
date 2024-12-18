@@ -12,16 +12,16 @@
 
 import pytest
 
-from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
-from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis import (
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.analysis import (
     CZParametrizationFixDurationNodeAnalysis,
 )
-from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.measurement import (
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.measurement import (
     CZParametrizationFixDurationMeasurement,
 )
-from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.node import (
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.node import (
     CZParametrizationFixDurationNode,
 )
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 
 
 @pytest.mark.skip
