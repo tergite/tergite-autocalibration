@@ -18,12 +18,12 @@ from tergite_autocalibration.lib.nodes.coupler.reset_chevron.analysis import (
     ResetChevronNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.coupler.reset_chevron.measurement import (
-    Reset_Chevron_DC,
+    ResetChevronDCMeasurement,
 )
 
 
-class Reset_Chevron_Node(BaseNode):
-    measurement_obj = Reset_Chevron_DC
+class ResetChevronNode(BaseNode):
+    measurement_obj = ResetChevronDCMeasurement
     analysis_obj = ResetChevronNodeAnalysis
     coupler_qois = ["reset_amplitude_qc", "reset_duration_qc"]
 

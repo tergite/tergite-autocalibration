@@ -19,7 +19,7 @@ from tergite_autocalibration.lib.nodes.characterization.all_xy.measurement impor
 )
 
 
-class All_XY_Analysis(BaseAnalysis):
+class AllXYAnalysis(BaseAnalysis):
     def __init__(self, dataset: xr.Dataset):
         super().__init__()
         data_var = list(dataset.data_vars.keys())[0]

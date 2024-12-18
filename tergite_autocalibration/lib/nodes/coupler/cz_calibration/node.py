@@ -21,13 +21,13 @@ from tergite_autocalibration.lib.nodes.coupler.cz_calibration.analysis import (
     ResetCalibrationSSRONodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.coupler.cz_calibration.measurement import (
-    CZ_calibration_SSRO,
-    Reset_calibration_SSRO,
+    CZCalibrationSSROMeasurement,
+    ResetCalibrationSSROMeasurement,
 )
 
 
 class CZCalibrationSSRONode(BaseNode):
-    measurement_obj = CZ_calibration_SSRO
+    measurement_obj = CZCalibrationSSROMeasurement
     analysis_obj = CZCalibrationSSRONodeAnalysis
     coupler_qois = ["cz_phase", "cz_pop_loss"]
 
@@ -57,7 +57,7 @@ class CZCalibrationSSRONode(BaseNode):
 
 
 class CZCalibrationSwapSSRONode(BaseNode):
-    measurement_obj = CZ_calibration_SSRO
+    measurement_obj = CZCalibrationSSROMeasurement
     analysis_obj = CZCalibrationSSRONodeAnalysis
     coupler_qois = ["cz_phase", "cz_pop_loss"]
 
@@ -86,7 +86,7 @@ class CZCalibrationSwapSSRONode(BaseNode):
 
 
 class ResetCalibrationSSRONode(BaseNode):
-    measurement_obj = Reset_calibration_SSRO
+    measurement_obj = ResetCalibrationSSROMeasurement
     analysis_obj = ResetCalibrationSSRONodeAnalysis
     coupler_qois = [
         "reset_fidelity",

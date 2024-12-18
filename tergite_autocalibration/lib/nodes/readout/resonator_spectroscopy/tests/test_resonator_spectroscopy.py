@@ -10,17 +10,15 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from tergite_autocalibration.tests.utils.env import setup_test_env
-
-setup_test_env()
-
 import os
 import unittest
-import pytest
-import numpy as np
-import xarray as xr
-import matplotlib.pyplot as plt
 from pathlib import Path
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pytest
+import xarray as xr
+
 from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.analysis import (
     ResonatorSpectroscopyQubitAnalysis,
 )

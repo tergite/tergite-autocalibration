@@ -19,12 +19,12 @@ from tergite_autocalibration.lib.nodes.coupler.cz_calibration.analysis import (
     CZCalibrationSSRONodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.coupler.cz_calibration.measurement import (
-    CZ_calibration_SSRO,
+    CZCalibrationSSROMeasurement,
 )
 
 
 class CZDynamicPhaseSSRONode(BaseNode):
-    measurement_obj = CZ_calibration_SSRO
+    measurement_obj = CZCalibrationSSROMeasurement
     analysis_obj = CZCalibrationSSRONodeAnalysis
 
     def __init__(
@@ -53,7 +53,7 @@ class CZDynamicPhaseSSRONode(BaseNode):
 
 
 class CZDynamicPhaseSwapSSRONode(BaseNode):
-    measurement_obj = CZ_calibration_SSRO
+    measurement_obj = CZCalibrationSSROMeasurement
     analysis_obj = CZCalibrationSSRONodeAnalysis
 
     def __init__(

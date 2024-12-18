@@ -19,7 +19,7 @@ cluster_cli = typer.Typer()
 @cluster_cli.command(help="Reboot the cluster.")
 def reboot():
     from qblox_instruments import Cluster
-    from tergite_autocalibration.config.settings import CLUSTER_IP
+    from tergite_autocalibration.config.globals import CLUSTER_IP
 
     if typer.confirm(
         "Do you really want to reboot the cluster? This operation can interrupt ongoing measurements."
@@ -29,3 +29,11 @@ def reboot():
         cluster_.reboot()
     else:
         typer.echo("Rebooting cluster aborted by user.")
+
+
+@cluster_cli.command(help="Prints a list of available clusters.")
+def find():
+    from qblox_instruments import PlugAndPlay
+
+    with PlugAndPlay() as pnp:
+        pnp.print_devices()

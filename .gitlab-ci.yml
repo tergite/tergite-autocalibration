@@ -10,12 +10,10 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-include:
-  - local: ".gitlab/functions/pipeline-functions.yml"
 
 stages:
   - tests
-  - post_merge_actions
+  - application_run
 
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
@@ -45,13 +43,43 @@ tests:
     paths:
       - .cache/pip
 
-
-post_merge_actions:
-  stage: post_merge_actions
-  image: ubuntu:latest
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+application_run:
+  stage: application_run
+  image: python:${PYTHON_VERSION}
   script:
-    # Run a wiki update
-    - !reference [.update_wiki, script]
+    # Install redis
+    - apt-get update
+    - apt-get install redis ffmpeg libsm6 libxext6 -y
+    # Run the redis server
+    - redis-server --daemonize yes --port "$REDIS_PORT"
+
+    # Install project dependencies
+    - pip install --upgrade pip
+    - pip install .
+
+    # Create empty .env file to make the system believe there is a file
+    - touch .env
+
+    # Load configuration
+    - acli config load -t fc8a
+
+    # Reset redis
+    - echo "y" | acli node reset -a
+
+    # Run the calibration chain in reanalyse mode to T2_echo
+    - acli calibration start -r "$CI_PROJECT_DIR/datasets/fc8_unit_tests_6-15" -n rabi_oscillations
+
+    # Verify output
+    - |
+      OUTPUT_FILE="$CI_PROJECT_DIR/datasets/fc8_unit_tests_6-15/rabi_oscillations.png"
+      if [ -f "$OUTPUT_FILE" ]; then
+        echo "Output file $OUTPUT_FILE exists. Application ran successfully."
+      else
+        echo "Error: Output file $OUTPUT_FILE not found."
+        exit 1
+      fi
+
+  cache:
+    paths:
+      - .cache/pip
 

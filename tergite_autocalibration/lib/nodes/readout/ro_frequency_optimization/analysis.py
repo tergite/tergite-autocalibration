@@ -18,7 +18,7 @@ Module containing a class that fits data from a resonator spectroscopy experimen
 import numpy as np
 from quantify_core.analysis import fitting_models as fm
 
-from tergite_autocalibration.config.settings import REDIS_CONNECTION
+from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.lib.base.analysis import (
     BaseAllQubitsAnalysis,
     BaseQubitAnalysis,

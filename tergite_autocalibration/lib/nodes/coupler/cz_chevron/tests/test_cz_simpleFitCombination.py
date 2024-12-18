@@ -10,18 +10,14 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from tergite_autocalibration.tests.utils.env import setup_test_env
-
-setup_test_env()
-
 from ..utils.cz_FitResultStatus import (
     FitResultStatus,
 )
-from ..utils.cz_singleGateSimpleFitResult import (
-    CZSingleGateSimpleFitResult,
-)
 from ..utils.cz_firstStepCombination import (
     CZFirstStepCombination,
+)
+from ..utils.cz_singleGateSimpleFitResult import (
+    CZSingleGateSimpleFitResult,
 )
 
 

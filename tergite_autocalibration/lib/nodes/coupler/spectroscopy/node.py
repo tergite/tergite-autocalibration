@@ -13,27 +13,28 @@
 
 import numpy as np
 
-from tergite_autocalibration.lib.base.external_parameter_node import (
-    ExternalParameterNode,
-)
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
     CouplerSpectroscopyNodeAnalysis,
 )
+from tergite_autocalibration.lib.nodes.external_parameter_node import (
+    ExternalParameterNode,
+)
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement import (
-    Two_Tones_Multidim,
+    TwoTonesMultidimMeasurement,
 )
 from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.measurement import (
-    Resonator_Spectroscopy,
+    ResonatorSpectroscopyMeasurement,
+)
+from tergite_autocalibration.lib.utils.samplespace import (
+    resonator_samples,
+    qubit_samples,
 )
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
 
-# TODO: check location
-from tergite_autocalibration.utils.user_input import qubit_samples
 
-
-class Coupler_Spectroscopy_Node(ExternalParameterNode):
-    measurement_obj = Two_Tones_Multidim
+class CouplerSpectroscopyNode(ExternalParameterNode):
+    measurement_obj = TwoTonesMultidimMeasurement
     analysis_obj = CouplerSpectroscopyNodeAnalysis
     coupler_qois = ["parking_current", "current_range"]
 
@@ -87,8 +88,8 @@ class Coupler_Spectroscopy_Node(ExternalParameterNode):
         self.spi_dac.set_dac_current(self.dac, 0)
 
 
-class Coupler_Resonator_Spectroscopy_Node(ExternalParameterNode):
-    measurement_obj = Resonator_Spectroscopy
+class CouplerResonatorSpectroscopyNode(ExternalParameterNode):
+    measurement_obj = ResonatorSpectroscopyMeasurement
     analysis_obj = CouplerSpectroscopyNodeAnalysis
     coupler_qois = ["resonator_flux_quantum"]
 

@@ -10,16 +10,12 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from tergite_autocalibration.tests.utils.env import setup_test_env
-
-setup_test_env()
-
 import os.path
 
-from tergite_autocalibration.tests.utils.fixtures import load_fixture, _FIXTURES_PATH
 from tergite_autocalibration.scripts.migrate_qblox_hardware_configuration import (
     migrate_qblox_hardware_configuration,
 )
+from tergite_autocalibration.tests.utils.fixtures import load_fixture, _FIXTURES_PATH
 
 
 def test_qblox_hardware_migration():

@@ -18,10 +18,10 @@ from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.gate_library import Reset, X90, Measure, X
 
 from ....base.measurement import BaseMeasurement
-from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
+from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
-class T2(BaseMeasurement):
+class T2Measurement(BaseMeasurement):
     def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
         super().__init__(transmons)
         self.qubit_state = qubit_state
@@ -82,7 +82,7 @@ class T2(BaseMeasurement):
         return schedule
 
 
-class T2Echo(BaseMeasurement):
+class T2EchoMeasurement(BaseMeasurement):
     def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
         super().__init__(transmons)
         self.qubit_state = qubit_state

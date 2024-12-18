@@ -1,0 +1,481 @@
+# Unit tests
+
+When testing software, there are several ways to test whether it is working.
+Amongst others such as system integration tests or usability scores, there are unit tests.
+A unit test is meant to confirm whether a small unit of the code is working such as a function or a class.
+The idea behind unit tests though, is to create tiny little tests for each function, that checks how it handles:
+
+- **Normal case**: The things that you would expect a function to do e.g. if you have addition, and you add natural
+  numbers.
+- **Edge cases**: In the example with the addition this would be e.g. whether it correctly adds zero or would subtract
+  if there is a negative number.
+- **Fail cases**: Let us say you have addition, and you are adding a number such as 20 with the string "hello". This
+  should fail.
+
+Having thought about the test cases and possible scenarios will help to get a better understanding what the code does,
+also, it will make the code more robust.
+In our code base we are having a pipeline that will automatically run all tests as soon as someone wants to merge to the
+common branches.
+There are two locations where tests are stored:
+
+- **In the folder for tests**: This is a folder on the main level of the repository where more general tests for the
+  whole framework go.
+- **In the folder of each node**: This is to test only the node itself. The tests are added directly to the node module.
+
+Since it happens more often that one will write tests for the node itself, in the following, there will be a section
+explaining how to do it on an example node.
+
+## Running unit tests
+
+To run the unit tests, we are using the test framework [pytest](https://docs.pytest.org/en/stable/).
+If you prefer writing your tests with the Python built-in
+framework [unittest](https://docs.python.org/3/library/unittest.html), you are free to do so.
+Your tests will be also recognized by pytest, but to keep a standard, we recommend using pytest.
+
+Before running your tests, please make sure that there is a redis instance running on port 6378.
+You can start a redis instance with:
+
+```bash
+redis-server --port 6378 {--daemonize yes}
+```
+
+Optionally, you can add the `--daemonize yes` parameter.
+This will make the redis instance run in the background.
+If it does not run on your user, try running it with `sudo` rights.
+
+Assuming you open a terminal in the root directory of the repository, you can run the pytests for the whole
+autocalibration package.
+
+```bash
+pytest tergite_autocalibration
+```
+
+If you want to test only a subset of tests in a specific folder you can it as well by running:
+
+```bash
+pytest tergite_autocalibration/lib/nodes/readout/resonator_spectroscopy
+```
+
+This would only run the tests for resonator spectroscopy.
+You can even run the tests only for a single function, by using:
+
+```bash
+pytest tergite_autocalibration/tests/test_formatting.py::test_license_headers
+```
+
+This would only run the function that checks whether all files have a license header.
+
+## Unit tests for a node
+
+These instructions will go step-by-step through how to create meaningful test cases for a node.
+
+1. Overview about the folder structure
+2. Specific advices on how to test nodes
+3. Examples on how to test the analysis function of a node
+
+If you are more a person that learns from the code rather than from a tutorial, please take a look at an easy node e.g.
+resonator spectroscopy and try to run and understand the test cases.
+
+### Folder structure
+
+The test should be created in a sub-folder of the node called tests.
+
+Please organise the file using these sub-folders:
+
+- **data**: place here any data file that is needed to create test cases, while it is possible to mock the data. Feel
+  free to add a text file explaining how the data was produced.Mocking data is also possible, but it may be not
+  practical for complex datasets.
+- **results**: create this folder to store your results, i.e. files that would be created by your analysis such as the
+  plots. It should be empty, do not commit your results. To assure this is the case, add a file name .gitignore in the
+  folder with this code:
+
+```bash
+# Ignore everything in this directory
+*
+
+# But do not ignore this file
+!.gitignore     
+```
+
+### General information about testing nodes
+
+A good starting point, especially starting from scratch, it is to test for the class type, then that the inputs have the
+right formats and then move to some simple operation or trivial case.
+Build more complex cases from the simpler ones and exploits your tests to refactor the code as needed.
+Try to test as many reasonable cases as possible, both successfully and not.
+Remember to test for exceptions.
+We also suggest to develop using test drive development techniques that will ensure a high test coverage and a good code
+structure. Yes, do not forget to keep refactoring to improve the code.
+
+You can find some samples below taken from the cz_parametrisation node, where all objects are tested
+
+Currently, there is no way to differentiate from tests that require a QPU (i.e. measurements) and those that do not (
+i.e. analyses).
+Since the latter are simpler to write, start with those that, in general, are more likely to benefit from unit tests as
+there is much more logic in the analysis than in the measurement.
+
+If you need to test some complex scenario, such as those involving sweep, it is probably easier to start writing code
+and tests from the lowest level and then compose those objects to handle the more complex scenario considered.
+
+### Example Tests
+
+**Test class type**
+
+```python
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.node import CZParametrizationFixDurationNode
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
+
+
+def test_canCreateCorrectType():
+  c = CZParametrizationFixDurationNode("cz_char_fixCurrent", couplers=["q14_q15"])
+  assert isinstance(c, CZParametrizationFixDurationNode)
+  assert isinstance(c, ScheduleNode)
+```
+
+The suggested very first test is to instantiate the class and make sure it has the correct type(s) following any
+inheritance.
+
+**Test input parameters**
+
+```python
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.node import CZParametrizationFixDurationNode
+
+
+def test_CanGetQubitsFromCouplers():
+  c = CZParametrizationFixDurationNode("cz_char_fixCurrent", couplers=["q14_q15"])
+    assert c.all_qubits == ["q14", "q15"]
+  assert c.couplers == ["q14_q15"]
+
+```
+
+Make sure all inputs and their manipulations are correctly initialised in the constructor, in this case the qubits are
+taken from the coupler pair
+
+**Test exception**
+
+```python
+
+import pytest
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.node import CZParametrizationFixDurationNode
+
+
+def test_ValidationReturnErrorWithSameQubitCoupler():
+  with pytest.raises(ValueError):
+    CZParametrizationFixDurationNode("cz_char_fixCurrent", couplers=["q14_q14"])
+```
+
+Inputs can be incorrect and should always be tested to avoid unexpected behaviour down the line which can be difficult
+to trace back to the origin. There are infinite number of possible errors, so it is impossible to cover them all, but at
+least the obvious ones should be considered. In this case a typical typing error with the couple have the same qubit
+twice.
+
+**Test with data**
+
+```python
+import os
+import pytest
+from pathlib import Path
+import xarray as xr
+
+
+@pytest.fixture(autouse=True)
+def setup_good_data():
+    os.environ["DATA_DIR"] = str(Path(__file__).parent / "results")
+    dataset_path = Path(__file__).parent / "data" / "dataset_good_quality_freq_amp.hdf5"
+    print(dataset_path)
+    ds = xr.open_dataset(dataset_path)
+    ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
+    d14 = ds.yq14.to_dataset()
+    d15 = ds.yq15.to_dataset()
+    d14.yq14.attrs["qubit"] = "q14"
+    d15.yq15.attrs["qubit"] = "q15"
+    freqs = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
+    amps = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
+    return d14, d15, freqs, amps
+```
+
+This is an example of how to load data for testing the analysis of a node, please note that the specifics may change as
+we are about to change the dataset format at the time of writing this; however, the principle will be the same.
+
+This data can then be used in multiple tests, for example:
+
+```python
+import numpy as np
+
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.analysis import (
+  FrequencyVsAmplitudeQ1Analysis,
+  FrequencyVsAmplitudeQ2Analysis
+)
+
+
+def test_canGetMaxFromQ1(setup_good_data):
+  d14, d15, freqs, amps = setup_good_data
+  c = FrequencyVsAmplitudeQ1Analysis(d14, freqs, amps)
+  result = c.run_fitting()
+  indexBestFreq = np.where(freqs == result[0])[0]
+  indexBestAmp = np.where(amps == result[1])[0]
+  assert indexBestFreq[0] == 9
+  assert indexBestAmp[0] == 13
+
+
+def test_canGetMinFromQ2(setup_good_data):
+  d14, d15, freqs, amps = setup_good_data
+  c = FrequencyVsAmplitudeQ2Analysis(d15, freqs, amps)
+  result = c.run_fitting()
+  indexBestFreq = np.where(freqs == result[0])[0]
+  indexBestAmp = np.where(amps == result[1])[0]
+  assert indexBestFreq[0] == 10
+  assert indexBestAmp[0] == 12
+```
+
+These two tests make sure that the return values are correct for the two qubits that are connected by the coupler.
+
+**Test creating of images from plotter**
+
+```python
+import os
+import matplotlib
+from matplotlib import pyplot as plt
+
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.analysis import (
+  FrequencyVsAmplitudeQ1Analysis,
+  FrequencyVsAmplitudeQ2Analysis
+)
+
+
+def test_canPlotBad(setup_bad_data):
+  matplotlib.use("Agg")
+  d14, d15, freqs, amps = setup_bad_data
+  c14 = FrequencyVsAmplitudeQ1Analysis(d14, freqs, amps)
+  result = c14.run_fitting()
+
+  figure_path = os.environ["DATA_DIR"] + "/Frequency_Amplitude_bad_q14.png"
+  # Remove the file if it already exists
+  if os.path.exists(figure_path):
+    os.remove(figure_path)
+
+  fig, ax = plt.subplots(figsize=(15, 7), num=1)
+  plt.Axes
+  c14.plotter(ax)
+  fig.savefig(figure_path)
+  plt.close()
+
+  assert os.path.exists(figure_path)
+  from PIL import Image
+
+  with Image.open(figure_path) as img:
+    assert img.format == "PNG", "File should be a PNG image"
+
+  c15 = FrequencyVsAmplitudeQ2Analysis(d15, freqs, amps)
+  result = c15.run_fitting()
+
+  figure_path = os.environ["DATA_DIR"] + "/Frequency_Amplitude_bad_q15.png"
+  # Remove the file if it already exists
+  if os.path.exists(figure_path):
+    os.remove(figure_path)
+
+  fig, ax = plt.subplots(figsize=(15, 7), num=1)
+  plt.Axes
+  c15.plotter(ax)
+  fig.savefig(figure_path)
+  plt.close()
+
+  assert os.path.exists(figure_path)
+  from PIL import Image
+
+  with Image.open(figure_path) as img:
+    assert img.format == "PNG", "File should be a PNG image"
+```
+
+This is an example on how to save files in the "results" sub-folder within the "tests" folder. The code make sure the
+expected file exists and has the correct format. The created files can be inspected by the developer. A possible
+extension would be to upload the images in the data folder and check the those produced by the test are identical.
+
+**Complex dataset for comparing results**
+
+```python
+import pytest
+from pathlib import Path
+import xarray as xr
+
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.analysis import (
+  FrequencyVsAmplitudeQ1Analysis,
+  FrequencyVsAmplitudeQ2Analysis,
+  CombinedFrequencyVsAmplitudeAnalysis
+)
+
+
+@pytest.fixture(autouse=True)
+def setup_bad_data():
+  dataset_path = Path(__file__).parent / "data" / "dataset_bad_quality_freq_amp.hdf5"
+  print(dataset_path)
+  ds = xr.open_dataset(dataset_path)
+  ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
+  d14 = ds.yq14.to_dataset()
+  d15 = ds.yq15.to_dataset()
+  d14.yq14.attrs["qubit"] = "q14"
+  d15.yq15.attrs["qubit"] = "q15"
+  freqs = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
+  amps = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
+  q14Ana = FrequencyVsAmplitudeQ1Analysis(d14, freqs, amps)
+  q14Res = q14Ana.run_fitting()
+  q15Ana = FrequencyVsAmplitudeQ2Analysis(d15, freqs, amps)
+  q15Res = q15Ana.run_fitting()
+  return q14Res, q15Res
+
+
+def test_combineBadResultsReturnNoValidPoint(setup_bad_data):
+  q14Res, q15Res = setup_bad_data
+  c = CombinedFrequencyVsAmplitudeAnalysis(q14Res, q15Res)
+  r = c.are_frequencies_compatible()
+  assert r == False
+  r = c.are_amplitudes_compatible()
+  assert r == False
+  r = c.are_two_qubits_compatible()
+  assert r == False
+```
+
+In this example, the data produced is loaded from a file that has data that is not a good working point. Note that there
+two analyses are run in the setup; the combination is run in the test, so that, if needed in other tests, the data could
+be modified for specific cases.
+This is a failure test, making sure that bad inputs are not recognised as good working points.
+
+**Even more complex setup**
+
+```python
+from pathlib import Path
+import xarray as xr
+
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.analysis import (
+  FrequencyVsAmplitudeQ1Analysis,
+  FrequencyVsAmplitudeQ2Analysis,
+  CombinedFrequencyVsAmplitudeAnalysis
+)
+
+
+def setup_data():
+  # It should be a single dataset, but we do not have one yet, so we loop over existing files
+  dataset_path = Path(__file__).parent / "data" / "dataset_good_quality_freq_amp.hdf5"
+  print(dataset_path)
+  ds = xr.open_dataset(dataset_path)
+  ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
+  d14 = ds.yq14.to_dataset()
+  d15 = ds.yq15.to_dataset()
+  d14.yq14.attrs["qubit"] = "q14"
+  d15.yq15.attrs["qubit"] = "q15"
+  freqs = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
+  amps = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
+  q14Ana = FrequencyVsAmplitudeQ1Analysis(d14, freqs, amps)
+  q14Res = q14Ana.run_fitting()
+  q15Ana = FrequencyVsAmplitudeQ2Analysis(d15, freqs, amps)
+  q15Res = q15Ana.run_fitting()
+  c1 = CombinedFrequencyVsAmplitudeAnalysis(q14Res, q15Res)
+
+  dataset_path = Path(__file__).parent / "data" / "dataset_bad_quality_freq_amp.hdf5"
+  print(dataset_path)
+  ds = xr.open_dataset(dataset_path)
+  ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
+  d14 = ds.yq14.to_dataset()
+  d15 = ds.yq15.to_dataset()
+  d14.yq14.attrs["qubit"] = "q14"
+  d15.yq15.attrs["qubit"] = "q15"
+  freqs_bad = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
+  amps_bad = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
+  q14Ana = FrequencyVsAmplitudeQ1Analysis(
+    d14, freqs_bad, amps_bad
+  )
+  q14Res = q14Ana.run_fitting()
+  q15Ana = FrequencyVsAmplitudeQ2Analysis(
+    d15, freqs_bad, amps_bad
+  )
+  q15Res = q15Ana.run_fitting()
+  c2 = CombinedFrequencyVsAmplitudeAnalysis(q14Res, q15Res)
+
+  dataset_path = (
+          Path(__file__).parent / "data" / "dataset_good_quality_freq_amp_2.hdf5"
+  )
+  print(dataset_path)
+  ds = xr.open_dataset(dataset_path)
+  ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
+  d14 = ds.yq14.to_dataset()
+  d15 = ds.yq15.to_dataset()
+  d14.yq14.attrs["qubit"] = "q14"
+  d15.yq15.attrs["qubit"] = "q15"
+  freqs_2 = ds[f"cz_pulse_frequenciesq14_q15"].values  # MHz
+  amps_2 = ds[f"cz_pulse_amplitudesq14_q15"].values  # uA
+  q14Ana = FrequencyVsAmplitudeQ1Analysis(d14, freqs_2, amps_2)
+  q14Res = q14Ana.run_fitting()
+  q15Ana = FrequencyVsAmplitudeQ2Analysis(d15, freqs_2, amps_2)
+  q15Res = q15Ana.run_fitting()
+  c3 = CombinedFrequencyVsAmplitudeAnalysis(q14Res, q15Res)
+
+  list_of_results = [(c1, 0.1), (c2, 0.2), (c3, 0.3)]
+  return list_of_results, freqs, amps, freqs_2, amps_2
+```
+
+In this case, three points are loaded and the analysis is run on each of them. The results are returned for each point
+and can be used in different tests, for example by removing elements in the list_results array.
+
+## Advanced topics on unit tests
+
+When running unit tests, the test framework itself and the way tests are executed can cause problems that make the unit
+tests fail.
+Hence, it is important to understand how `pytest` works to get a grip on how to debug failing tests efficiently.
+
+In the beginning of each test run, `pytest` will try to import all necessary modules.
+If there are any "Unresolved reference" errors, the tests will even not start to run.
+
+### Dealing with global variables
+
+Tests might even indirectly affect the outcome of another test.
+As an example, there might be a test, which changes some global state in the application.
+Let us say the default value for the global variable `VAR_1` is 0, but one of the test changes sets the global variable
+`VAR_1` to 1.
+Now, all following tests will read 1 when they get `VAR_1` from the environment.
+
+Sometimes though, it might be necessary to change to global variable of one test.
+To handle these situations, the test framework has implemented some decorators, which intend to freeze the environment
+variables.
+The most simple way to freeze the state of the environment and then e.g. set variables inside the test function is with
+the `@preserve_os_env` decorator.
+
+```python
+import os
+from tergite_autocalibration.tests.utils.decorators import preserve_os_env
+
+
+@preserve_os_env
+def test_my_function_that_sets_os_variables():
+  var1 = os.environ["VAR_1"]  # VAR_1 = "0"
+  os.environ["VAR_1"] = "1"
+  new_var1 = os.environ["VAR_1"]
+  assert int(var1) + 1 == int(new_var1)
+
+
+def test_my_function_that_only_gets_os_variables():
+  var1 = os.environ["VAR_1"]  # VAR_1 = "0"
+  assert int(var1) == 0
+```
+
+Here, if we had run the first test without the `@preserve_os_env` decorator, the second test would fail, because the
+variable would be set to 1 in the first test and does not have the default value 0.
+
+Another decorator in that regard is the `@with_os_env` decorator, which takes as an input the dictionary of values that
+environment should hold.
+It is just a way that - similarly to a fixture - simplifies the way things are set up without having too many
+`os.environ` calls inside the code.
+For example, you want to change the value of an environmental variable in exactly one test function, you can add:
+
+```python
+import os
+from tergite_autocalibration.tests.utils.decorators import with_os_env
+
+
+@with_os_env({"VAR_1": "1"})
+def test_my_function_that_needs_the_os_variables_changed():
+  var1 = os.environ["VAR_1"]
+  assert var1 == "ABC"
+```
+
+This will freeze the current state of the environment, replace the variable `VAR_1` with "ABC" and after the test will
+cleanup the environment and load the previous values.

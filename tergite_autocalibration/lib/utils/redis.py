@@ -2,6 +2,7 @@
 #
 # (C) Copyright Eleftherios Moschandreou 2023, 2024
 # (C) Copyright Liangyu Chen 2023, 2024
+# (C) Copyright Chalmers Next Labs AB 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -12,18 +13,17 @@
 # that they have been altered from the originals.
 
 import json
-import numpy as np
 
 import numpy as np
 from quantify_scheduler.json_utils import SchedulerJSONDecoder, SchedulerJSONEncoder
 
-from tergite_autocalibration.config.coupler_config import qubit_types
-from tergite_autocalibration.config.settings import REDIS_CONNECTION
-from tergite_autocalibration.utils import extended_transmon_element
-from tergite_autocalibration.utils.extended_coupler_edge import (
+from tergite_autocalibration.config.globals import REDIS_CONNECTION
+from tergite_autocalibration.config.legacy import dh
+from tergite_autocalibration.utils.dto import extended_transmon_element
+from tergite_autocalibration.utils.dto.extended_coupler_edge import (
     ExtendedCompositeSquareEdge,
 )
-from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
+from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 np.set_printoptions(legacy="1.25")
 
@@ -79,7 +79,7 @@ def load_redis_config_coupler(coupler: ExtendedCompositeSquareEdge):
         coupler.cz.square_amp(float(redis_config["cz_pulse_amplitude"]))
         coupler.cz.square_duration(float(redis_config["cz_pulse_duration"]))
         coupler.cz.cz_width(float(redis_config["cz_pulse_width"]))
-        if qubit_types[bus_qubits[0]] == "Target":
+        if dh.get_legacy("qubit_types")[bus_qubits[0]] == "Target":
             coupler.cz.parent_phase_correction(float(redis_config["cz_dynamic_target"]))
             coupler.cz.child_phase_correction(float(redis_config["cz_dynamic_control"]))
         else:

@@ -13,18 +13,18 @@
 
 import numpy as np
 
-from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.nodes.readout.resonator_relaxation.analysis import (
     ResonatorRelaxationNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.readout.resonator_relaxation.measurement import (
-    Resonator_Relaxation,
+    ResonatorRelaxation,
 )
-from tergite_autocalibration.utils.user_input import resonator_samples
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
+from tergite_autocalibration.lib.utils.samplespace import resonator_samples
 
 
-class Resonator_Relaxation_Node(ScheduleNode):
-    measurement_obj = Resonator_Relaxation
+class ResonatorRelaxationNode(ScheduleNode):
+    measurement_obj = ResonatorRelaxation
     analysis_obj = ResonatorRelaxationNodeAnalysis
     qubit_qois = ["minimum_resonator_relaxation"]
 

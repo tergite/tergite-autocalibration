@@ -210,7 +210,7 @@ def is_sequence_identity(rng_sequence: np.ndarray) -> bool:
     return np.allclose(matrix, np.identity(2)) or np.allclose(matrix, -np.identity(2))
 
 
-def reversing_XY_matrix(rng_sequence):
+def reversing_XY_matrix(rng_sequence) -> tuple[int, dict]:
     product_matrix = np.identity(4, dtype=np.int64)
     for rng in rng_sequence:
         physical_decomp = XY_decompositions[rng]

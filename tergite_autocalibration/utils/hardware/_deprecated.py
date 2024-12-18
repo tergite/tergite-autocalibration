@@ -14,13 +14,10 @@
 import json
 from typing import Dict
 
+from colorama import init as colorama_init
 from qblox_instruments import Cluster
 
-from tergite_autocalibration.config.settings import HARDWARE_CONFIG
-
-from colorama import Fore
-from colorama import Style
-from colorama import init as colorama_init
+from tergite_autocalibration.config.env import CLUSTER_CONFIG
 
 colorama_init()
 
@@ -30,7 +27,7 @@ def extract_cluster_port_mapping(qubit: str) -> Dict[str, str]:
     TODO this is not a good implementation.
     Look into cashing.
     """
-    with open(HARDWARE_CONFIG) as hw:
+    with open(CLUSTER_CONFIG) as hw:
         hw_config = json.load(hw)
 
     # TODO: The cluster configuration here only seems to load the keys

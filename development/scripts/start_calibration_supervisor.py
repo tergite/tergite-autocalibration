@@ -1,6 +1,6 @@
 from ipaddress import IPv4Address
 
-from tergite_autocalibration.config.settings import CLUSTER_IP
+from tergite_autocalibration.config.globals import CLUSTER_IP
 from tergite_autocalibration.scripts.calibration_supervisor import (
     CalibrationSupervisor,
     CalibrationConfig,

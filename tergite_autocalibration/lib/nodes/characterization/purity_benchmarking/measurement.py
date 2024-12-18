@@ -18,12 +18,12 @@ from quantify_scheduler.operations.gate_library import Measure, Reset, X90, H, X
 from quantify_scheduler.schedules.schedule import Schedule
 
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
-from tergite_autocalibration.utils.extended_gates import Rxy_12
-from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
+from tergite_autocalibration.utils.dto.extended_gates import Rxy_12
+from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 import tergite_autocalibration.utils.clifford_elements_decomposition as cliffords
 
 
-class PurityBenchmarking(BaseMeasurement):
+class PurityBenchmarkingMeasurement(BaseMeasurement):
     """Class that contains measurement scheduele for purity benchmarking"""
 
     def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):

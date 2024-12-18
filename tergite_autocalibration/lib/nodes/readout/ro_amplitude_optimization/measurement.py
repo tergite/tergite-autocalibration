@@ -24,10 +24,10 @@ from quantify_scheduler.operations.pulse_library import (
 from quantify_scheduler.resources import ClockResource
 
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
-from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
+from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
-class RO_amplitude_optimization(BaseMeasurement):
+class ROAmplitudeOptimizationMeasurement(BaseMeasurement):
     def __init__(self, transmons: dict[str, ExtendedTransmon]):
         super().__init__(transmons)
 

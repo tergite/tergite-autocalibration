@@ -24,7 +24,7 @@ from tergite_autocalibration.lib.base.analysis import (
     BaseAllQubitsAnalysis,
     BaseQubitAnalysis,
 )
-from tergite_autocalibration.utils.redis_utils import fetch_redis_params
+from tergite_autocalibration.utils.backend.redis_utils import fetch_redis_params
 
 
 # Cosine function that is fit to Rabi oscillations

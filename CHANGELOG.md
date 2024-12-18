@@ -8,17 +8,27 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+- Rename all node class names to camel case
+
+### Fixed
+
+## [2024.12.0] - 2024-12-12
+
+### Added
 - Dataset browser
 - ScheduleNode and ExternalParameterSweepNode as subclasses of BaseNode
 - DeviceManager class
+- Configuration packages
+- Advanced decorators for pytest
 
 ### Changed
 - Migrated cli from click to typer
 - Switch to quantify-scheduler version 0.21.2
 - Switch to qblox-instruments version 0.14.1 (qblox-firmware should be 9.0.1)
 - Upgrade to Python version 3.10
-
-### Fixed
 
 ## [2024.09.0] - 2024-09-16
 

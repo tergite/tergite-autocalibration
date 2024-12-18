@@ -2,6 +2,7 @@
 #
 # (C) Copyright Liangyu Chen 2024
 # (C) Copyright Michele Faucci Giannelli 2024
+# (C) Copyright Chalmers Next Labs AB 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -14,7 +15,6 @@
 import itertools
 
 import numpy as np
-import xarray as xr
 from matplotlib import pyplot as plt
 from numpy.linalg import inv
 from scipy.linalg import norm
@@ -22,7 +22,7 @@ from scipy.optimize import minimize
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import confusion_matrix
 
-from tergite_autocalibration.config.coupler_config import qubit_types
+from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.base.analysis import (
     BaseAllQubitsAnalysis,
     BaseQubitAnalysis,
@@ -176,7 +176,7 @@ class ProcessTomographyQubitAnalysis(BaseQubitAnalysis):
         axis.set_ylabel("Population")
         axis.set_xticklabels(states)
         axis.set_title(
-            f"{name} Calibration - {qubit_types[self.qubit]} Qubit {self.qubit[1:]}"
+            f"{name} Calibration - {dh.get_legacy('qubit_types')[self.qubit]} Qubit {self.qubit[1:]}"
         )
 
     def save_plot(self):

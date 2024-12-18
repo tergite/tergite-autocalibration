@@ -18,7 +18,7 @@ import numpy as np
 import xarray as xr
 from quantify_core.analysis import fitting_models as fm
 
-from tergite_autocalibration.config.settings import REDIS_CONNECTION
+from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.lib.base.analysis import (
     BaseAllQubitsAnalysis,
     BaseQubitAnalysis,

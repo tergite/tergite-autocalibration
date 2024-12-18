@@ -21,7 +21,7 @@ def test_license_headers():
         + "tergite_autocalibration"
     )
 
-    excluded_files = ["dataset_browser"]
+    excluded_files = ["quantifiles"]
 
     # Iterate over all files in the whole package
     for dir_path, _, filenames in os.walk(library_folder):
