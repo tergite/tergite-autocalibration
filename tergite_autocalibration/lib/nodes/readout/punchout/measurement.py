@@ -24,7 +24,7 @@ from quantify_scheduler.resources import ClockResource
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 
 
-class Punchout(BaseMeasurement):
+class PunchoutMeasurement(BaseMeasurement):
     def __init__(self, transmons, qubit_state: int = 0):
         super().__init__(transmons)
         self.qubit_state = qubit_state

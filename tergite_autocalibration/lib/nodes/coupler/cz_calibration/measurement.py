@@ -45,7 +45,7 @@ from tergite_autocalibration.utils.dto.extended_gates import (
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
-class CZ_calibration(BaseMeasurement):
+class CZCalibrationMeasurement(BaseMeasurement):
     def __init__(
         self,
         transmons: dict[str, ExtendedTransmon],
@@ -295,7 +295,7 @@ class CZ_calibration(BaseMeasurement):
         return schedule
 
 
-class CZ_calibration_SSRO(BaseMeasurement):
+class CZCalibrationSSROMeasurement(BaseMeasurement):
     def __init__(
         self,
         transmons: dict[str, ExtendedTransmon],
@@ -556,7 +556,7 @@ class CZ_calibration_SSRO(BaseMeasurement):
         return schedule
 
 
-class CZ_calibration_duration(BaseMeasurement):
+class CZCalibrationDurationMeasurement(BaseMeasurement):
     def __init__(self, transmons, coupler, qubit_state: int = 0):
         super().__init__(transmons)
         self.qubit_state = qubit_state
@@ -749,7 +749,7 @@ class CZ_calibration_duration(BaseMeasurement):
         return schedule
 
 
-class Reset_calibration_SSRO(BaseMeasurement):
+class ResetCalibrationSSROMeasurement(BaseMeasurement):
     def __init__(
         self,
         transmons: dict[str, ExtendedTransmon],

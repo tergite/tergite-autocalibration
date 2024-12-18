@@ -17,7 +17,7 @@ import numpy as np
 import xarray as xr
 import matplotlib.pyplot as plt
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis import (
-    QubitSpectroscopyMultidim,
+    QubitSpectroscopyMultidimAnalysis,
 )
 
 
@@ -27,7 +27,7 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_01" / "dataset_qubit_01_spectroscopy_0.hdf5"
         file = xr.open_dataset(file_path)
-        analysis = QubitSpectroscopyMultidim("name", ["redis_field"])
+        analysis = QubitSpectroscopyMultidimAnalysis("name", ["redis_field"])
         dataset = analysis.process_qubit(file, "yq06")
 
         self.assertIsInstance(dataset, list)
@@ -41,7 +41,7 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_12" / "dataset_qubit_12_spectroscopy_0.hdf5"
         file = xr.open_dataset(file_path)
-        analysis = QubitSpectroscopyMultidim("name", ["redis_field"])
+        analysis = QubitSpectroscopyMultidimAnalysis("name", ["redis_field"])
         dataset = analysis.process_qubit(file, "yq06")
 
         self.assertIsInstance(dataset, list)
@@ -55,7 +55,7 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_01" / "dataset_qubit_01_spectroscopy_0.hdf5"
         file = xr.open_dataset(file_path)
-        analysis = QubitSpectroscopyMultidim("name", ["redis_field"])
+        analysis = QubitSpectroscopyMultidimAnalysis("name", ["redis_field"])
         dataset = analysis.process_qubit(file, "yq06")
         frequency = dataset[0]
         ampl = dataset[1]
@@ -69,7 +69,7 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_12" / "dataset_qubit_12_spectroscopy_0.hdf5"
         file = xr.open_dataset(file_path)
-        analysis = QubitSpectroscopyMultidim("name", ["redis_field"])
+        analysis = QubitSpectroscopyMultidimAnalysis("name", ["redis_field"])
         dataset = analysis.process_qubit(file, "yq06")
         frequency = dataset[0]
         ampl = dataset[1]
@@ -84,7 +84,7 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_01" / "dataset_qubit_01_spectroscopy_0.hdf5"
         file = xr.open_dataset(file_path)
-        analysis = QubitSpectroscopyMultidim("name", ["redis_field"])
+        analysis = QubitSpectroscopyMultidimAnalysis("name", ["redis_field"])
         dataset = analysis.process_qubit(file, "yq06")
         figure_path = os.environ["DATA_DIR"] + "/Qubit_spectroscopy_01_q06.png"
         if os.path.exists(figure_path):
@@ -102,7 +102,7 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_12" / "dataset_qubit_12_spectroscopy_0.hdf5"
         file = xr.open_dataset(file_path)
-        analysis = QubitSpectroscopyMultidim("name", ["redis_field"])
+        analysis = QubitSpectroscopyMultidimAnalysis("name", ["redis_field"])
         dataset = analysis.process_qubit(file, "yq06")
         figure_path = os.environ["DATA_DIR"] + "/Qubit_spectroscopy_12_q06.png"
         if os.path.exists(figure_path):

@@ -31,7 +31,7 @@ from tergite_autocalibration.lib.nodes.coupler.cz_dynamic_phase.node import (
     CZDynamicPhaseSwapSSRONode,
 )
 from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.measurement import (
-    TQGRandomizedBenchmarkingSSRO,
+    TQGRandomizedBenchmarkingSSROMeasurement,
 )
 from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.utils import redis
@@ -40,7 +40,7 @@ RB_REPEATS = 10
 
 
 class TQGRandomizedBenchmarkingSSRONode(ScheduleNode):
-    measurement_obj = TQGRandomizedBenchmarkingSSRO
+    measurement_obj = TQGRandomizedBenchmarkingSSROMeasurement
     analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
 
     def __init__(
@@ -95,7 +95,7 @@ class TQGRandomizedBenchmarkingSSRONode(ScheduleNode):
 
 class TQGRandomizedBenchmarkingInterleavedSSRONode(ScheduleNode):
     coupler_qois = ["tqg_fidelity_interleaved"]
-    measurement_obj = TQGRandomizedBenchmarkingSSRO
+    measurement_obj = TQGRandomizedBenchmarkingSSROMeasurement
     analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
 
     def __init__(
@@ -150,7 +150,7 @@ class TQGRandomizedBenchmarkingInterleavedSSRONode(ScheduleNode):
 
 
 class CZRBOptimizeSSRONode(ScheduleNode):
-    measurement_obj = TQGRandomizedBenchmarkingSSRO
+    measurement_obj = TQGRandomizedBenchmarkingSSROMeasurement
     analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
 
     def __init__(

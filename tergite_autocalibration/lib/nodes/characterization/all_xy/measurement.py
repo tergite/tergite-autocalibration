@@ -42,7 +42,7 @@ all_XY_angles = {
 }
 
 
-class All_XY(BaseMeasurement):
+class AllXYMeasurement(BaseMeasurement):
     def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
         super().__init__(transmons)
         self.qubit_state = qubit_state

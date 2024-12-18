@@ -7,6 +7,14 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 
 ## [Unreleased]
 
+### Added
+
+### Changed
+
+- Rename all node class names to camel case
+
+### Fixed
+
 ## [2024.12.0] - 2024-12-12
 
 ### Added

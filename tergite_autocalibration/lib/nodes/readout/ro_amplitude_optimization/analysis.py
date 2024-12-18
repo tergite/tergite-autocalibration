@@ -101,7 +101,7 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
         primary_axis.legend(handles=handles, fontsize="small")
 
 
-class Three_Class_Boundary:
+class ThreeClassBoundary:
     def __init__(self, lda: LinearDiscriminantAnalysis):
         if len(lda.classes_) != 3:
             raise ValueError("The Classifcation classes are not 3.")
@@ -365,7 +365,7 @@ class OptimalROThreeStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis)
         optimal_IQ = self.IQ(self.optimal_index)
         optimal_y = self.lda.fit(optimal_IQ, y).predict(optimal_IQ)
 
-        self.boundary = Three_Class_Boundary(self.lda)
+        self.boundary = ThreeClassBoundary(self.lda)
         self.centroid_I = self.boundary.centroid[0]
         self.centroid_Q = self.boundary.centroid[1]
         self.omega_01 = self.boundary.omega_01

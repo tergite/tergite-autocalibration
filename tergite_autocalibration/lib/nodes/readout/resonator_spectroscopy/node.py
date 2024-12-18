@@ -17,7 +17,7 @@ from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.analysis i
     ResonatorSpectroscopyNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.measurement import (
-    Resonator_Spectroscopy,
+    ResonatorSpectroscopyMeasurement,
 )
 from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 
@@ -25,8 +25,8 @@ from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.utils.samplespace import resonator_samples
 
 
-class Resonator_Spectroscopy_Node(ScheduleNode):
-    measurement_obj = Resonator_Spectroscopy
+class ResonatorSpectroscopyNode(ScheduleNode):
+    measurement_obj = ResonatorSpectroscopyMeasurement
     analysis_obj = ResonatorSpectroscopyNodeAnalysis
     qubit_qois = ["clock_freqs:readout", "Ql", "resonator_minimum"]
 
@@ -40,8 +40,8 @@ class Resonator_Spectroscopy_Node(ScheduleNode):
         }
 
 
-class Resonator_Spectroscopy_1_Node(ScheduleNode):
-    measurement_obj = Resonator_Spectroscopy
+class ResonatorSpectroscopy1Node(ScheduleNode):
+    measurement_obj = ResonatorSpectroscopyMeasurement
     analysis_obj = ResonatorSpectroscopy1NodeAnalysis
     qubit_qois = [
         "extended_clock_freqs:readout_1",
@@ -61,8 +61,8 @@ class Resonator_Spectroscopy_1_Node(ScheduleNode):
         }
 
 
-class Resonator_Spectroscopy_2_Node(ScheduleNode):
-    measurement_obj = Resonator_Spectroscopy
+class ResonatorSpectroscopy2Node(ScheduleNode):
+    measurement_obj = ResonatorSpectroscopyMeasurement
     analysis_obj = ResonatorSpectroscopy2NodeAnalysis
     qubit_qois = ["extended_clock_freqs:readout_2"]
 

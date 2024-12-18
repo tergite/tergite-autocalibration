@@ -29,7 +29,7 @@ from tergite_autocalibration.utils.dto.extended_gates import Measure_RO_3state_O
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
-class Randomized_Benchmarking_SSRO(BaseMeasurement):
+class RandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
     def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
         super().__init__(transmons)
         self.transmons = transmons

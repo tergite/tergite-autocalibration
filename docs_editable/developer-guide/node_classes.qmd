@@ -27,7 +27,7 @@ from tergite_autocalibration.lib.nodes.external_parameter_node import (
 )
 
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement import (
-    Two_Tones_Multidim,
+    TwoTonesMultidimMeasurement,
 )
 
 from tergite_autocalibration.lib.utils.samplespace import qubit_samples
@@ -36,7 +36,7 @@ from tergite_autocalibration.utils.hardware.spi import SpiDAC
 
 
 class CouplerSpectroscopyNode(ExternalParameterNode):
-    measurement_obj = Two_Tones_Multidim
+    measurement_obj = TwoTonesMultidimMeasurement
     analysis_obj = CouplerSpectroscopyNodeAnalysis
     coupler_qois = ["parking_current", "current_range"]
 

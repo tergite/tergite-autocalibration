@@ -4,7 +4,7 @@ Resonator spectroscopy is a powerful tool for studying the interaction between q
 resonator’s response across various frequencies, we can extract critical parameters, such as the **resonant frequency**
 and **Q-factor**, which are essential for optimizing qubit-resonator interactions.
 
-### Class: `Resonator_Spectroscopy`
+### Class: `ResonatorSpectroscopyNode`
 
 The `Resonator_Spectroscopy` class is designed to conduct resonator spectroscopy for transmon qubits. It takes as input
 a dictionary of transmon qubits and their respective states.

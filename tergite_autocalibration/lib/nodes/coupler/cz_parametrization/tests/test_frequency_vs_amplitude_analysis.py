@@ -21,7 +21,7 @@ import xarray as xr
 from matplotlib import pyplot as plt
 
 from tergite_autocalibration.lib.base.analysis import BaseAnalysis
-from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis import (
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.analysis import (
     FrequencyVsAmplitudeQubitAnalysis,
     FrequencyVsAmplitudeQ1Analysis,
     FrequencyVsAmplitudeQ2Analysis,
