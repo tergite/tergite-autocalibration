@@ -24,7 +24,11 @@ from tergite_autocalibration.tools.cli.node import node_cli
 
 logging.basicConfig(level=logging.INFO, format="%(name)s.%(levelname)s: %(message)s")
 
-cli = typer.Typer(no_args_is_help=True)
+cli_kwargs = {
+    "no_args_is_help": True
+}
+
+cli = typer.Typer(**cli_kwargs, pretty_exceptions_enable=False)
 
 cli.add_typer(
     calibration_cli,
