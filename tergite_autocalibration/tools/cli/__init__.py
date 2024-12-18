@@ -11,7 +11,6 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import logging
 from typing import Annotated
 
 import typer
@@ -22,43 +21,39 @@ from tergite_autocalibration.tools.cli.config import config_cli
 from tergite_autocalibration.tools.cli.graph import graph_cli
 from tergite_autocalibration.tools.cli.node import node_cli
 
-logging.basicConfig(level=logging.INFO, format="%(name)s.%(levelname)s: %(message)s")
-
-cli_kwargs = {
-    "no_args_is_help": True
-}
+cli_kwargs = {"no_args_is_help": True}
 
 cli = typer.Typer(**cli_kwargs, pretty_exceptions_enable=False)
 
 cli.add_typer(
     calibration_cli,
+    **cli_kwargs,
     name="calibration",
     help="Start the calibration supervisor.",
-    no_args_is_help=True,
 )
 cli.add_typer(
     node_cli,
+    **cli_kwargs,
     name="node",
     help="Handle operations related to the node.",
-    no_args_is_help=True,
 )
 cli.add_typer(
     cluster_cli,
+    **cli_kwargs,
     name="cluster",
     help="Handle operations related to the cluster.",
-    no_args_is_help=True,
 )
 cli.add_typer(
     graph_cli,
+    **cli_kwargs,
     name="graph",
     help="Handle operations related to the calibration graph.",
-    no_args_is_help=True,
 )
 cli.add_typer(
     config_cli,
+    **cli_kwargs,
     name="config",
     help="Functions related to the configuration.",
-    no_args_is_help=True,
 )
 
 

@@ -22,8 +22,10 @@ from tergite_autocalibration.config.package import ConfigurationPackage
 from tergite_autocalibration.utils.misc.tests import is_pytest
 
 # Loads the environmental configuration
-# If there is a test going on, load the standard environment configuration
-# TODO: Add note about changing the configuration for a pytest with decorator
+#
+# If there is a test going on, load the standard environment configuration.
+# If you intentionally want to change environmental variables in a test, please take a look at the
+# decorators implemented in tergite_autocalibration.tests.utils.decorators
 if is_pytest():
     # Take the .env file from the folder for fixtures in the tests
     ENV = EnvironmentConfiguration.from_dot_env(

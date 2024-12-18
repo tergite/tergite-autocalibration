@@ -41,7 +41,7 @@ from tergite_autocalibration.utils.backend.redis_utils import (
 )
 from tergite_autocalibration.utils.dto.enums import DataStatus, MeasurementMode
 from tergite_autocalibration.utils.io.dataset_utils import create_node_data_path
-from tergite_autocalibration.utils.logger.tac_logger import logger
+from tergite_autocalibration.utils.logger import logger
 from tergite_autocalibration.utils.logger.visuals import draw_arrow_chart
 
 colorama_init()
@@ -107,7 +107,7 @@ class HardwareManager:
                 quit()
 
             print(
-                f" \n\u26A0 {Fore.MAGENTA}{Style.BRIGHT}Reseting Cluster at IP *{str(self.config.cluster_ip)[-3:]}{Style.RESET_ALL}\n"
+                f" \n\u26A0 {Fore.MAGENTA}{Style.BRIGHT}Resetting Cluster at IP *{str(self.config.cluster_ip)[-3:]}{Style.RESET_ALL}\n"
             )
             cluster.reset()  # Reset the cluster to a default state for consistency
             return cluster
@@ -163,7 +163,7 @@ class HardwareManager:
 
 class NodeManager:
     """
-    Manages the initilazation and inspection of node.
+    Manages the initialization and inspection of node.
     """
 
     COUPLER_NODE_NAMES = [
