@@ -12,6 +12,7 @@
 # that they have been altered from the originals.
 
 import numpy as np
+from numpy.typing import NDArray
 from quantify_scheduler import Schedule
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.control_flow_library import Loop
@@ -27,10 +28,13 @@ from tergite_autocalibration.utils.extended_gates import Rxy_12, Measure_RO_3sta
 from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
 from tergite_autocalibration.utils.logger.tac_logger import logger
 
+
+
+# TODO: REMOVE THE DEPENDENCY OF THIS PACKAGE.
 try:
-    from superconducting_qubit_tools.clifford_module.randomized_benchmarking import (
-        randomized_benchmarking_sequence,
-    )
+    #from superconducting_qubit_tools.clifford_module.randomized_benchmarking import (
+    #    randomized_benchmarking_sequence,
+    #)
     from superconducting_qubit_tools.clifford_module.cliffords_decomposition import (
         decompose_clifford_seq,
     )
@@ -43,6 +47,7 @@ except ImportError:
         "This is a proprietary licenced software.",
         "Please make sure that you are having a correct licence and install the dependency",
     )
+    
 
 
 class TQGRandomizedBenchmarkingSSRO(BaseMeasurement):
@@ -54,8 +59,187 @@ class TQGRandomizedBenchmarkingSSRO(BaseMeasurement):
     ):
         super().__init__(transmons)
         self.transmons = transmons
-        self.qubit_state = qubit_state
         self.couplers = couplers
+        self.qubit_state = qubit_state
+    
+    def calculate_net_clifford(
+        self,
+        rb_clifford_indices: NDArray[np.uint32],
+        Clifford: type[CliffordBase] = SingleQubitCliffords,
+    ) -> CliffordBase:
+        """
+        Calculate the net-clifford from a list of cliffords indices.
+
+        Parameters
+        ----------
+        rb_clifford_indices
+        list or array of integers specifying the cliffords.
+        Clifford
+        Clifford object used to determine what inversion technique
+        to use and what indices are valid.
+        Valid choices are `SingleQubitCliffords` and `TwoQubitCliffords`.
+
+        Returns
+        -------
+        :
+            A `Clifford` object containing the net-clifford.
+            The Clifford index is contained in the Clifford.idx attribute.
+
+        Notes
+        -----
+        The order corresponds to the order in a pulse sequence but is the reverse of
+        what it would be in a chained dot product.
+        In order to benchmark specific gates (and not cliffords), e.g. CZ but not as a
+        member of the CNOT-like set of gates, or an identity with
+        the same duration as the CZ we use, by convention, when specifying
+        the interleaved gate, the index of the corresponding clifford + 100000.
+        This is to keep it readable and bigger than the 11520 elements of the
+        Two-qubit Clifford group corresponding clifford.
+
+        """
+
+        # Calculate the net clifford
+        net_clifford = Clifford(np.uint32(0))  # assumes element 0 is the Identity
+        for idx in rb_clifford_indices:
+            assert idx > -1, f"Specify the index as {100_000 + abs(idx)}"
+            cliff = Clifford(idx % 100_000)
+            # order of operators applied in is right to left, therefore
+            # the new operator is applied on the left side.
+            net_clifford = cliff * net_clifford
+        return net_clifford
+    
+    def calculate_recovery_clifford(
+        self,
+        cl_in: np.uint32,
+        desired_cl: np.uint32,
+        Clifford: type[CliffordBase] = SingleQubitCliffords,
+    ) -> np.uint32:
+        """
+        Extracts the clifford that has to be applied to cl_in to make the net
+        operation correspond to desired_cl from the clifford hashtable.
+
+        This operation should perform the inverse of :code:`calculate_net_clifford`.
+
+        Parameters
+        ----------
+        cl_in
+        An integer value depicting the index of the input Clifford.
+        desired_cl
+        An integer value depicting the index of the desired Clifford.
+        The desired Cliffords are specific Clifford gates of I,X,Y,Z,H.
+        These five gates have their respective indices as 0,3,6,9,12.
+        The desired_cl value is always a value within the above 5 integers.
+        Clifford
+        Clifford object used to determine what inversion technique to use
+        and what indices are valid.
+        Valid choices are `SingleQubitCliffords` and `TwoQubitCliffords`.
+
+        Returns
+        -------
+        :
+            The index of the Clifford to be added to get the desired Clifford.
+
+        """
+
+        clifford_in = Clifford(cl_in)
+        desired_clifford = Clifford(desired_cl)
+        output_index = (desired_clifford * clifford_in.get_inverse()).idx
+
+        return output_index
+
+    def randomized_benchmarking_sequence(
+        self,
+        n_cl: np.uint32,
+        meas_basis_index: np.uint32 | int = 0,
+        number_of_qubits: int = 1,
+        max_clifford_idx: int = 11520,
+        interleaving_clifford_id: int | None = None,
+        apply_inverse_gate: bool = True,
+        seed: np.uint32 | None = None,
+    ) -> NDArray[np.uint32]:
+        """
+        Generates a randomized benchmarking sequence for the one or two qubit
+        clifford group.
+
+        Parameters
+        ----------
+        n_cl
+        A integer specifying the number of Cliffords
+        meas_basis_index
+            An integer specifying the idx of the clifford that performs the
+            rotation to the desired measurement basis
+            By default, the measurement is done in the Z basis
+        number_of_qubits
+            Integer value used to determine if Cliffords are drawn from the
+            single qubit or two qubit clifford group
+        max_clifford_idx
+            Integer value used to set the index of the highest random
+            clifford generated. Useful to generate e.g., simultaneous
+            two qubit RB sequences.
+        interleaving_clifford_id
+            Integer value specifying the clifford ID that interleaves the
+            sequence if desired
+        apply_inverse_gate
+            Flag for adding the inverse gate of the total clifford
+            sequence before the :code:`meas_basis_index` gate.
+        seed
+            Integer value used as the seed to initialize the random
+            number generator
+
+        Returns
+        -------
+        :
+            An integer list of clifford indices
+
+        """
+
+        if number_of_qubits == 1:
+            Cl = SingleQubitCliffords
+            group_size = np.min([24, max_clifford_idx])
+        elif number_of_qubits == 2:
+            Cl = TwoQubitCliffords
+            group_size = np.min([11520, max_clifford_idx])
+        else:
+            raise NotImplementedError(
+                "Randomized Benchmarking sequence generator is"
+                "only implemented for one or two qubits",
+            )
+
+        # Generate a random sequence of Cliffords
+        rng_seed = np.random.default_rng(seed)
+        # creates the indices of the gate in each part of the sequence
+        # (between 0 and group number) for the entireity of the sequence
+        # length specified by n_cl.
+        rb_clifford_indices = rng_seed.integers(0, group_size, n_cl).astype(np.uint32)
+
+        # Add interleaving cliffords if applicable
+        if interleaving_clifford_id is not None:
+            rb_clif_ind_intl = np.empty(
+                rb_clifford_indices.size * 2, dtype=np.uint32
+            )  # 1D vector elongated to add in the interleaving
+            # gates after every sequence
+            rb_clif_ind_intl[0::2] = rb_clifford_indices
+            rb_clif_ind_intl[1::2] = interleaving_clifford_id
+            rb_clifford_indices = rb_clif_ind_intl
+
+        # Add inverse gate if applicable
+        # and measurement basis gate
+        if apply_inverse_gate:
+            # Calculate the net clifford
+            net_clifford = self.calculate_net_clifford(rb_clifford_indices, Cl)
+            rb_clifford_indices = np.append(
+                rb_clifford_indices,
+                self.calculate_recovery_clifford(
+                    cl_in=net_clifford.idx,
+                    desired_cl=np.uint32(meas_basis_index),
+                    Clifford=Cl,
+                ),
+            )
+
+        # ensure that the datatype is int
+        rb_clifford_indices = rb_clifford_indices.astype(np.uint32)
+
+        return rb_clifford_indices
 
     def schedule_function(
         self,
@@ -157,8 +341,9 @@ class TQGRandomizedBenchmarkingSSRO(BaseMeasurement):
             # for clifford_index, sequence_index in enumerate(random_sequence):
             # n_cl = 1
             index = 0
-
-            clifford_seq = randomized_benchmarking_sequence(
+            
+            # TODO: THIS FUNCTION NEEDS TO BE REPLACED
+            clifford_seq = self.randomized_benchmarking_sequence(
                 n_cl=this_number_of_cliffords,
                 meas_basis_index=index,
                 seed=seeds[next(iter(seeds))],
@@ -166,15 +351,17 @@ class TQGRandomizedBenchmarkingSSRO(BaseMeasurement):
                 apply_inverse_gate=apply_inverse_gate,
                 number_of_qubits=2,
             )
-            # print('clifford sequence is: ', clifford_seq)
+            
+            # TODO: THIS FUNCTION NEEDS TO BE REPLACED
             physical_gates = decompose_clifford_seq(
                 clifford_seq, [qubits[0], qubits[1]]
             )
-            # print('physical gates are: ', physical_gates)
+            
             separation_time = 300e-9
-            # schedule = Schedule('rb_sequence_generation')
+            
             reset = shot.add(Reset(*qubits))
 
+            # TODO: THIS FUNCTION NEEDS TO BE REPLACED
             add_two_qubit_gates_to_schedule(
                 shot, physical_gates, ref_op=reset, separation_time=separation_time
             )
