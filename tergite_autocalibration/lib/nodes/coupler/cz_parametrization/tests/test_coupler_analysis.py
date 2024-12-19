@@ -20,13 +20,13 @@ from tergite_autocalibration.lib.base.analysis import (
     BaseAnalysis,
     BaseCouplerAnalysis,
 )
-from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.analysis import (
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.analysis import (
     CZParametrisationFixDurationCouplerAnalysis,
     CombinedFrequencyVsAmplitudeAnalysis,
     FrequencyVsAmplitudeQ1Analysis,
     FrequencyVsAmplitudeQ2Analysis,
 )
-from tergite_autocalibration.lib.nodes.coupler.cz_parametrisation.utils.no_valid_combination_exception import (
+from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.utils.no_valid_combination_exception import (
     NoValidCombinationException,
 )
 

@@ -19,12 +19,12 @@ from tergite_autocalibration.lib.nodes.characterization.process_tomography.analy
     ProcessTomographyNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.characterization.process_tomography.measurement import (
-    Process_Tomography,
+    ProcessTomographyMeasurement,
 )
 
 
 class ProcessTomographySSRONode(BaseNode):
-    measurement_obj = Process_Tomography
+    measurement_obj = ProcessTomographyMeasurement
     analysis_obj = ProcessTomographyNodeAnalysis
     coupler_qois = [
         "pop_g",

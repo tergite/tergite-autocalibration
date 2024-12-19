@@ -17,17 +17,15 @@ import numpy as np
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.lib.base.node import BaseNode
-from tergite_autocalibration.lib.nodes.coupler.cz_chevron.cz_chevron_analysis import (
+from tergite_autocalibration.lib.nodes.coupler.cz_chevron.analysis import (
     CZChevronAnalysis,
-)
-from tergite_autocalibration.lib.nodes.coupler.cz_chevron.cz_firstStep_analysis import (
     CZFirstStepAnalysis,
 )
-from tergite_autocalibration.lib.nodes.coupler.cz_chevron.measurement import CZ_Chevron
+from tergite_autocalibration.lib.nodes.coupler.cz_chevron.measurement import CZChevron
 
 
-class CZ_Chevron_Node(BaseNode):
-    measurement_obj = CZ_Chevron
+class CZChevronNode(BaseNode):
+    measurement_obj = CZChevron
     analysis_obj = CZChevronAnalysis
     coupler_qois = ["cz_pulse_frequency", "cz_pulse_duration"]
 
@@ -107,8 +105,8 @@ class CZ_Chevron_Node(BaseNode):
         return ac_freq
 
 
-class CZ_Characterisation_Chevron_Node(BaseNode):
-    measurement_obj = CZ_Chevron
+class CZCharacterisationChevronNode(BaseNode):
+    measurement_obj = CZChevron
     analysis_obj = CZFirstStepAnalysis
     coupler_qois = [
         "cz_parking_current",
@@ -187,8 +185,8 @@ class CZ_Characterisation_Chevron_Node(BaseNode):
         return ac_freq
 
 
-class CZ_Optimize_Chevron_Node(BaseNode):
-    measurement_obj = CZ_Chevron
+class CZOptimizeChevronNode(BaseNode):
+    measurement_obj = CZChevron
     analysis_obj = CZChevronAnalysis
     coupler_qois = ["cz_pulse_frequency", "cz_pulse_duration"]
 
@@ -247,8 +245,8 @@ class CZ_Optimize_Chevron_Node(BaseNode):
         return ac_freq
 
 
-class CZ_Chevron_Sweep_Node(BaseNode):
-    measurement_obj = CZ_Chevron
+class CZChevronSweepNode(BaseNode):
+    measurement_obj = CZChevron
     analysis_obj = CZChevronAnalysis
     coupler_qois = ["cz_pulse_frequency", "cz_pulse_duration"]
 

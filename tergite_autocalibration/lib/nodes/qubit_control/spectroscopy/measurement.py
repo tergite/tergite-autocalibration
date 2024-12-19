@@ -30,7 +30,7 @@ from tergite_autocalibration.utils.dto.extended_gates import Measure_RO1
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
-class Two_Tones_Multidim(BaseMeasurement):
+class TwoTonesMultidimMeasurement(BaseMeasurement):
     def __init__(self, transmons: dict[str, ExtendedTransmon]):
         super().__init__(transmons)
 

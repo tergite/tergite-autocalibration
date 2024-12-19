@@ -28,7 +28,7 @@ from tergite_autocalibration.utils.dto.extended_gates import Measure_RO1
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
-class Motzoi_parameter(BaseMeasurement):
+class MotzoiParameterMeasurement(BaseMeasurement):
     def __init__(self, transmons: dict[str, ExtendedTransmon]):
         super().__init__(transmons)
         self.transmons = transmons

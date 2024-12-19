@@ -19,14 +19,14 @@ from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.analysi
     OptimalRO012FrequencyNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.measurement import (
-    RO_frequency_optimization,
+    ROFrequencyOptimizationMeasurement,
 )
 from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.utils.samplespace import resonator_samples
 
 
-class RO_frequency_two_state_optimization_Node(ScheduleNode):
-    measurement_obj = RO_frequency_optimization
+class ROFrequencyTwoStateOptimizationNode(ScheduleNode):
+    measurement_obj = ROFrequencyOptimizationMeasurement
     analysis_obj = OptimalRO01FrequencyNodeAnalysis
     qubit_qois = ["extended_clock_freqs:readout_2state_opt"]
 
@@ -43,8 +43,8 @@ class RO_frequency_two_state_optimization_Node(ScheduleNode):
         }
 
 
-class RO_frequency_three_state_optimization_Node(ScheduleNode):
-    measurement_obj = RO_frequency_optimization
+class ROFrequencyThreeStateOptimizationNode(ScheduleNode):
+    measurement_obj = ROFrequencyOptimizationMeasurement
     analysis_obj = OptimalRO012FrequencyNodeAnalysis
     qubit_qois = ["extended_clock_freqs:readout_3state_opt"]
 

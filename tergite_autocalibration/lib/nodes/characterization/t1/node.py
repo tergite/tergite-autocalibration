@@ -20,14 +20,16 @@ import numpy as np
 from tergite_autocalibration.lib.nodes.characterization.t1.analysis import (
     T1NodeAnalysis,
 )
-from tergite_autocalibration.lib.nodes.characterization.t1.measurement import T1
+from tergite_autocalibration.lib.nodes.characterization.t1.measurement import (
+    T1Measurement,
+)
 from tergite_autocalibration.lib.nodes.external_parameter_node import (
     ExternalParameterNode,
 )
 
 
-class T1_Node(ExternalParameterNode):
-    measurement_obj = T1
+class T1Node(ExternalParameterNode):
+    measurement_obj = T1Measurement
     analysis_obj = T1NodeAnalysis
     qubit_qois = ["t1_time"]
 

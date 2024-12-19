@@ -33,7 +33,7 @@ from tergite_autocalibration.utils.dto.extended_gates import Rxy_12
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
-class Reset_Chevron_DC(BaseMeasurement):
+class ResetChevronDCMeasurement(BaseMeasurement):
     # for testing dc reset
 
     def __init__(

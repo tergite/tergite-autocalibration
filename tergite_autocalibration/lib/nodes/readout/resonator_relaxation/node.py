@@ -17,14 +17,14 @@ from tergite_autocalibration.lib.nodes.readout.resonator_relaxation.analysis imp
     ResonatorRelaxationNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.readout.resonator_relaxation.measurement import (
-    Resonator_Relaxation,
+    ResonatorRelaxation,
 )
 from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.utils.samplespace import resonator_samples
 
 
-class Resonator_Relaxation_Node(ScheduleNode):
-    measurement_obj = Resonator_Relaxation
+class ResonatorRelaxationNode(ScheduleNode):
+    measurement_obj = ResonatorRelaxation
     analysis_obj = ResonatorRelaxationNodeAnalysis
     qubit_qois = ["minimum_resonator_relaxation"]
 

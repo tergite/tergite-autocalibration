@@ -27,7 +27,7 @@ from tergite_autocalibration.utils.dto.extended_gates import Measure_RO1
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
-class Rabi_Oscillations(BaseMeasurement):
+class RabiOscillationsMeasurement(BaseMeasurement):
     def __init__(self, transmons: dict[str, ExtendedTransmon]):
         super().__init__(transmons)
         self.transmons = transmons
@@ -133,7 +133,7 @@ class Rabi_Oscillations(BaseMeasurement):
         return schedule
 
 
-class N_Rabi_Oscillations(BaseMeasurement):
+class NRabiOscillationsMeasurement(BaseMeasurement):
     def __init__(self, transmons: dict[str, ExtendedTransmon]):
         super().__init__(transmons)
         self.transmons = transmons
