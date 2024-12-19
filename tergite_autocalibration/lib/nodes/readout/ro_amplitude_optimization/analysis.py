@@ -33,30 +33,30 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
         self.fit_results = {}
 
     def analyse_qubit(self):
-        self.amplitude_coord = self._get_coord("amplitudes")
-        self.state_coord = self._get_coord("state")
-        self.loop_coord = self._get_coord("loops")
+        for coord in self.S21[self.data_var].coords:
+            if "amplitudes" in coord:
+                self.amplitude_coord = coord
+                self.amplitudes = self.S21.coords[coord]
+            elif "state" in coord:
+                self.state_coord = coord
+                self.unique_qubit_states = self.S21[coord].values
+            elif "loops" in coord:
+                self.loop_coord = coord
+            else:
+                raise ValueError("Coordinate not found in dataset")
 
-        self.unique_qubit_states = self.S21[self.state_coord].values
         self.S21 = self.S21.stack(shots=[self.loop_coord, self.state_coord])
         self.qubit_states = self.S21[self.state_coord].values
-        self.amplitudes = self.S21.coords[self.amplitude_coord]
         self.fit_results = {}
-
-    def _get_coord(self, keyword):
-        """Helper method to get coordinate matching the keyword."""
-        for coord in self.dataset.coords:
-            if keyword in str(coord):
-                return coord
-        raise ValueError(f"Coordinate for {keyword} not found in dataset")
 
     def IQ(self, index: int):
         """Extracts I/Q components from the dataset at a given index."""
+
         IQ_complex = self.S21[self.data_var].isel(
-            {self.amplitude_coord: [index]}
+            {self.amplitude_coord: index}
         )  # Use `.isel()` to index correctly
-        I = IQ_complex.real.values.flatten()
-        Q = IQ_complex.imag.values.flatten()
+        I = IQ_complex.real.values
+        Q = IQ_complex.imag.values
         return np.array([I, Q]).T
 
     def run_initial_fitting(self):
@@ -106,89 +106,6 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
         primary_axis.legend(handles=handles, fontsize="small")
 
 
-class ThreeClassBoundary:
-    def __init__(self, lda: LinearDiscriminantAnalysis):
-        if len(lda.classes_) != 3:
-            raise ValueError("The Classifcation classes are not 3.")
-        A0 = lda.coef_[0][0]
-        B0 = lda.coef_[0][1]
-        A1 = lda.coef_[1][0]
-        B1 = lda.coef_[1][1]
-        A2 = lda.coef_[2][0]
-        B2 = lda.coef_[2][1]
-        slope0 = -A0 / B0
-        slope1 = -A1 / B1
-        slope2 = -A2 / B2
-        intercept0 = lda.intercept_[0]
-        intercept1 = lda.intercept_[1]
-        intercept2 = lda.intercept_[2]
-        y_intercept0 = intercept0 / B0
-        y_intercept1 = intercept1 / B1
-        y_intercept2 = intercept2 / B2
-        self.slopes = (slope0, slope1, slope2)
-        self.y_intercepts = (y_intercept0, y_intercept1, y_intercept2)
-
-    def intersection_I(self, index_a: int, index_b: int):
-        numerator = self.y_intercepts[index_a] - self.y_intercepts[index_b]
-        denominator = self.slopes[index_a] - self.slopes[index_b]
-        return numerator / denominator
-
-    def intersection_Q(self, index_a: int, index_b: int):
-        numerator = self.y_intercepts[index_a] - self.y_intercepts[index_b]
-        denominator = self.slopes[index_a] - self.slopes[index_b]
-        return (
-            self.slopes[index_a] * numerator / denominator - self.y_intercepts[index_a]
-        )
-
-    def omega(self, index_a: int, index_b: int):
-        """
-        Be careful: angle defined in the [0,360) range
-        """
-        i_point = self.intersection_I(index_a, index_b)
-        q_point = self.intersection_Q(index_a, index_b)
-        omega_in_rad = np.arctan2(
-            [q_point - self.centroid[1]], [i_point - self.centroid[0]]
-        )
-        omega = (np.rad2deg(omega_in_rad) + 360) % 360
-        return omega[0]
-
-    @property
-    def centroid(self):
-        centroid_I = (
-            self.intersection_I(0, 1)
-            + self.intersection_I(1, 2)
-            + self.intersection_I(2, 0)
-        )
-        centroid_Q = (
-            self.intersection_Q(0, 1)
-            + self.intersection_Q(1, 2)
-            + self.intersection_Q(2, 0)
-        )
-        return (centroid_I / 3, centroid_Q / 3)
-
-    @property
-    def omega_01(self):
-        return self.omega(0, 1)
-
-    @property
-    def omega_12(self):
-        return self.omega(1, 2)
-
-    @property
-    def omega_20(self):
-        return self.omega(2, 0)
-
-    def boundary_line(self, class_a, class_b) -> tuple[np.ndarray, np.ndarray]:
-        i_point = self.intersection_I(class_a, class_b)
-        q_point = self.intersection_Q(class_a, class_b)
-        i_values = np.linspace(self.centroid[0], i_point, 100)
-        boundary_slope = (q_point - self.centroid[1]) / (i_point - self.centroid[0])
-        return (
-            i_values,
-            boundary_slope * (i_values - self.centroid[0]) + self.centroid[1],
-        )
-
-
 class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
@@ -210,6 +127,7 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         B = self.lda.coef_[0][1]
         intercept = self.lda.intercept_
         self.lamda = -A / B
+        theta_rad = np.arctan(self.lamda)
         theta = np.rad2deg(np.arctan(self.lamda))
         threshold = np.abs(intercept) / np.sqrt(A**2 + B**2)
         threshold = threshold[0]
@@ -261,9 +179,9 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
             rotated_IQ1 = rotated_IQ1 @ mirror_rotation.T
             rotated_IQ = rotated_IQ @ mirror_rotation.T
 
-        self.threshold_point = self.threshold * np.array(
-            [np.cos(threshold_direction), np.sin(threshold_direction)]
-        )
+        # self.threshold_point = self.threshold * np.array(
+        #     [np.cos(threshold_direction), np.sin(threshold_direction)]
+        # )
         self.rotated_IQ0_tp = rotated_IQ0[tp0]  # True Positive when sending 0
         self.rotated_IQ0_fp = rotated_IQ0[~tp0]
         self.rotated_IQ1_tp = rotated_IQ1[tp1]  # True Positive when sending 1
@@ -279,9 +197,10 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         self.rotation_angle = rotation_angle
         self.rotation_angle_degrees = np.rad2deg(rotation_angle)
         print(f"{self.qubit}.measure.acq_rotation = {self.rotation_angle_degrees}")
-        print(f"{self.qubit}.measure.acq_threshold = {self.threshold}")
+        # print(f"{self.qubit}.measure.acq_threshold = {self.threshold}")
 
-        return [self.optimal_amplitude, self.rotation_angle_degrees, self.threshold]
+        print("WARNING 0 threshold on return")
+        return [self.optimal_amplitude, self.rotation_angle_degrees, 0]
 
     def plotter(self, ax, secondary_axes):
         self.primary_plotter(ax)
