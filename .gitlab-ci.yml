@@ -38,7 +38,7 @@ tests:
     - black --check tergite_autocalibration
     # Run unit tests
     - pytest tergite_autocalibration
-    - pylint tergite_autocalibration --fail-under=6.0
+    - pylint tergite_autocalibration --fail-under=7.0
   cache:
     paths:
       - .cache/pip
