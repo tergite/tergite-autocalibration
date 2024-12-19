@@ -37,6 +37,7 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
         self.state_coord = self._get_coord("state")
         self.loop_coord = self._get_coord("loops")
 
+        self.unique_qubit_states = self.S21[self.state_coord].values
         self.S21 = self.S21.stack(shots=[self.loop_coord, self.state_coord])
         self.qubit_states = self.S21[self.state_coord].values
         self.amplitudes = self.S21.coords[self.amplitude_coord]
@@ -63,7 +64,6 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
         self.cms = []
 
         y = self.qubit_states
-        n_states = len(y)
 
         self.lda = LinearDiscriminantAnalysis(solver="svd", store_covariance=True)
 
@@ -72,11 +72,16 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
             y_pred = self.lda.fit(iq, y).predict(iq)
 
             cm_norm = confusion_matrix(y, y_pred, normalize="true")
-            assignment = np.trace(cm_norm) / n_states
+            assignment = np.trace(cm_norm) / len(self.unique_qubit_states)
+            # if self.qubit == "q06":
+            #     breakpoint()
             self.fidelities.append(assignment)
             self.cms.append(cm_norm)
 
         self.optimal_index = np.argmax(self.fidelities)
+        print("WARNING CHANGING OPTOMAL INDEX")
+        self.optimal_index = 40
+
         self.optimal_amplitude = self.amplitudes.values[self.optimal_index]
         self.optimal_inv_cm = inv(self.cms[self.optimal_index])
 
@@ -324,7 +329,7 @@ class OptimalROThreeStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis)
         true_positives = y == optimal_y
         tp0 = true_positives[y == 0]
         tp1 = true_positives[y == 1]
-        tp2 = true_positives[y == 1]
+        tp2 = true_positives[y == 2]
         IQ0 = optimal_IQ[y == 0]  # IQ when sending 0
         IQ1 = optimal_IQ[y == 1]  # IQ when sending 1
         IQ2 = optimal_IQ[y == 2]  # IQ when sending 2

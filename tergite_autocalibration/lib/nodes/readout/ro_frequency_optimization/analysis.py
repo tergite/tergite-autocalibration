@@ -82,7 +82,7 @@ class OptimalRO01FrequencyQubitAnalysis(BaseQubitAnalysis):
 
         return [self.optimal_frequency]
 
-    def plotter(self, ax):
+    def plotter(self, ax, secondary_axes):
         ax.set_xlabel("I quadrature (V)")
         ax.set_ylabel("Q quadrature (V)")
         ax.plot(self.fit_IQ_0.real, self.fit_IQ_0.imag)
@@ -101,7 +101,7 @@ class OptimalRO01FrequencyQubitAnalysis(BaseQubitAnalysis):
 
         label_text = f"opt_ro: {int(self.optimal_frequency)}\n"
         label_text += f"|0>_ro: {int(ro_freq)}\n"
-        label_text += f"|1>_ro: {int(ro_freq_1)}"
+        # label_text += f"|1>_ro: {int(ro_freq_1)}"
 
         ax.scatter(
             [f0.real, f1.real],
@@ -112,6 +112,21 @@ class OptimalRO01FrequencyQubitAnalysis(BaseQubitAnalysis):
             label=label_text,
         )
         ax.grid()
+
+        magnitude_axis = secondary_axes[0]
+        phase_axis = secondary_axes[1]
+        mags_0 = np.abs(self.S21[self.data_var].sel({self.qubit_state_coord: 0}))
+        mags_1 = np.abs(self.S21[self.data_var].sel({self.qubit_state_coord: 1}))
+        phase_0 = np.angle(self.S21[self.data_var].sel({self.qubit_state_coord: 0}))
+        phase_1 = np.angle(self.S21[self.data_var].sel({self.qubit_state_coord: 1}))
+        magnitude_axis.plot(self.frequencies, mags_0, "o", ms=2, color="blue")
+        magnitude_axis.plot(self.frequencies, mags_1, "o", ms=2, color="red")
+        magnitude_axis.axvline(self.optimal_frequency, color="black")
+        phase_axis.plot(self.frequencies, phase_0, "o", ms=2, color="blue")
+        phase_axis.plot(self.frequencies, phase_1, "o", ms=2, color="red")
+        phase_axis.axvline(self.optimal_frequency, color="black")
+
+        # phase_axis = secondary_axes[0]
 
 
 class OptimalRO012FrequencyQubitAnalysis(OptimalRO01FrequencyQubitAnalysis):
@@ -175,6 +190,22 @@ class OptimalRO01FrequencyNodeAnalysis(BaseAllQubitsAnalysis):
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
+        self.plots_per_qubit = 3
+        print(f"{ self.plots_per_qubit = }")
+
+    def _fill_plots(self):
+        for index, analysis in enumerate(self.qubit_analyses):
+            primary_plot_row = self.plots_per_qubit * (index // self.column_grid)
+            primary_axis = self.axs[primary_plot_row, index % self.column_grid]
+
+            list_of_secondary_axes = []
+            for plot_indx in range(1, self.plots_per_qubit):
+                secondary_plot_row = primary_plot_row + plot_indx
+                list_of_secondary_axes.append(
+                    self.axs[secondary_plot_row, index % self.column_grid]
+                )
+
+            analysis.plotter(primary_axis, list_of_secondary_axes)
 
 
 class OptimalRO012FrequencyNodeAnalysis(BaseAllQubitsAnalysis):

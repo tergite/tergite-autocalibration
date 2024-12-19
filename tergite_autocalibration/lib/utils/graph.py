@@ -38,8 +38,8 @@ graph_dependencies = [
     ("ramsey_correction", "motzoi_parameter"),
     ("motzoi_parameter", "n_rabi_oscillations"),
     ("n_rabi_oscillations", "resonator_spectroscopy_1"),
-    ("resonator_spectroscopy_1", "ro_frequency_two_state_optimization"),
-    ("ro_frequency_two_state_optimization", "ro_amplitude_two_state_optimization"),
+    # ("resonator_spectroscopy_1", "ro_frequency_two_state_optimization"),
+    # ("ro_frequency_two_state_optimization", "ro_amplitude_two_state_optimization"),
     ("n_rabi_oscillations", "all_XY"),
     ("resonator_spectroscopy_1", "qubit_12_spectroscopy"),
     ("qubit_12_spectroscopy", "rabi_oscillations_12"),
@@ -48,7 +48,10 @@ graph_dependencies = [
     ("motzoi_parameter_12", "n_rabi_oscillations_12"),
     ("n_rabi_oscillations_12", "resonator_spectroscopy_2"),
     ("resonator_spectroscopy_2", "ro_frequency_three_state_optimization"),
-    ("ro_frequency_three_state_optimization", "ro_amplitude_three_state_optimization"),
+    # ("ro_frequency_three_state_optimization", "ro_amplitude_three_state_optimization"),
+    ("resonator_spectroscopy", "ro_amplitude_three_state_optimization"),
+    ("resonator_spectroscopy", "ro_amplitude_two_state_optimization"),
+    ("resonator_spectroscopy", "ro_frequency_two_state_optimization"),
     ("T1", "T2"),
     ("T2", "T2_echo"),
     ("T2_echo", "randomized_benchmarking_ssro"),
@@ -89,8 +92,6 @@ graph.add_node("qubit_01_spectroscopy")
 # graph.add_node('adaptive_motzoi_parameter', type='refine')
 # graph.add_node('n_rabi_oscillations', type='refine')
 # graph.add_node('ramsey_correction_12', type='refine')
-# graph.add_node('ro_frequency_optimization_gef', type='refine')
-# graph.add_node('ro_amplitude_optimization_gef', type='refine')
 # graph.add_node('resonator_spectroscopy_2', type='refine')
 
 # for nodes that perform the same measurement,

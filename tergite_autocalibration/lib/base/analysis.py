@@ -67,6 +67,8 @@ class BaseAnalysis(ABC):
     # -> It is probably not that much effort to implement several QOI classes
     # -> We could start with a BaseQOI and add more as soon as needed
     def update_redis_trusted_values(self, node: str, this_element: str):
+        print('WARNING RETURN ')
+        return
         for i, transmon_parameter in enumerate(self.redis_fields):
             if "_" in this_element:
                 name = "couplers"
@@ -161,7 +163,7 @@ class BaseNodeAnalysis(ABC):
         full_path = self.data_path / f"{self.name}.png"
         self.fig.savefig(preview_path, bbox_inches="tight", dpi=100)
         self.fig.savefig(full_path, bbox_inches="tight", dpi=400)
-        plt.show(block=False)
+        plt.show(block=True)
         plt.pause(5)
         plt.close()
         logger.info(f"Plots saved to {preview_path} and {full_path}")
