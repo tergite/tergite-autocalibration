@@ -10,7 +10,7 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from tergite_autocalibration.utils.logger import logger
+from tergite_autocalibration.utils.logging import logger
 
 
 def draw_arrow_chart(header: str, node_list: list[str]):

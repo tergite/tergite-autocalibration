@@ -24,9 +24,7 @@ from typing import List, Any
 
 import tergite_autocalibration.tools.mss.storage as store
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
-from tergite_autocalibration.tools.mss.bcc_logger import get_logger
-
-logger = get_logger()
+from tergite_autocalibration.utils.logging import logger
 
 param_map = {
     "clock_freqs:readout": ("readout_resonator", "frequency", "Hz", float),
@@ -141,7 +139,7 @@ def structured_redis_storage(field_key: str, comp_index: str, field_value, **kwa
     else:
         logger.debug(
             f"'{field_key}' is not in mapped parameter list in utilities/standard_redis_storage.py. "
-            f"Please add appropriate parameter atributes in the map"
+            f"Please add appropriate parameter attributes in the map"
         )
 
 
@@ -157,7 +155,7 @@ def convert_all_redis_values(component_ids: List[str] = None):
 
     # We are reading the redis keys with the 'cs:' prefix
     # They contain information about whether a node is calibrated or not
-    # Note: If the redis datastructure changes in the auto-calibration, we would have to adjust here
+    # Note: If the redis data structure changes in the auto-calibration, we would have to adjust here
     components: List[str] = list(
         map(lambda x_: x_.strip("cs:"), REDIS_CONNECTION.keys("cs:*"))
     )

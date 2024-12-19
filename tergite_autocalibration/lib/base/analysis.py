@@ -27,7 +27,7 @@ import xarray as xr
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 from tergite_autocalibration.utils.dto.qoi import QOI
-from tergite_autocalibration.utils.logger import logger
+from tergite_autocalibration.utils.logging import logger
 
 
 class BaseAnalysis(ABC):

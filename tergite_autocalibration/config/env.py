@@ -106,7 +106,7 @@ class EnvironmentConfiguration(BaseConfigurationFile):
         """
         # Note: The logger is imported locally to prevent circular dependencies.
         #       The circular dependency is introduced, because the log level can be set in the environmental variables.
-        from tergite_autocalibration.utils.logger import logger
+        from tergite_autocalibration.utils.logging import logger
 
         return_obj = EnvironmentConfiguration()
         return_obj._write_env = write_env

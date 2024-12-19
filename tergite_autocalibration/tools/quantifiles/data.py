@@ -11,8 +11,6 @@ import json
 import os
 from datetime import datetime
 
-import logging
-
 import xarray
 from filelock import FileLock
 from quantify_core.data.handling import (
@@ -24,7 +22,7 @@ from quantify_core.data.handling import (
 from quantify_core.data.types import TUID
 from quantify_core.measurement.control import _DATASET_LOCKS_DIR
 
-logger = logging.getLogger(__name__)
+from tergite_autocalibration.utils.logging import logger
 
 
 class SplitTuid:

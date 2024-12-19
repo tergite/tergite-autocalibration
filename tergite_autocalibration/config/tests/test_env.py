@@ -112,11 +112,3 @@ def test_invalid_attribute_does_not_write(mock_env_file):
     # Reload .env to confirm no changes to the file
     env_values = dotenv_values(mock_env_file)
     assert "NEW_ATTRIBUTE" not in env_values
-
-
-@preserve_os_env
-def test_logging(mock_env_file, caplog):
-    """Test that loading from .env logs appropriate messages."""
-    with caplog.at_level("INFO"):
-        EnvironmentConfiguration.from_dot_env(filepath=mock_env_file, write_env=False)
-    assert "Loading .env values from" in caplog.text

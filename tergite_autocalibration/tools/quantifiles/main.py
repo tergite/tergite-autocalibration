@@ -6,31 +6,31 @@
 from __future__ import annotations
 
 import dataclasses
+import json
 import logging
 import os
 import sys
-import json
 from datetime import datetime
 from pathlib import Path
 from typing import Sequence, Mapping
 
 from PyQt5 import QtCore, QtWidgets, QtGui
-from PyQt5.QtWidgets import QDesktopWidget, QMessageBox
-from PyQt5.QtGui import QImageReader, QPixmap
 from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtGui import QImageReader, QPixmap
+from PyQt5.QtWidgets import QDesktopWidget, QMessageBox
 from quantify_core.data.handling import set_datadir
 from quantify_core.data.types import TUID
 
-from tergite_autocalibration.tools.quantifiles.path import load_icon
+from tergite_autocalibration.config.globals import ENV
 from tergite_autocalibration.tools.quantifiles.data import (
     get_results_for_date,
     safe_load_dataset,
     get_all_dates_with_measurements,
 )
+from tergite_autocalibration.tools.quantifiles.path import load_icon
 from tergite_autocalibration.tools.quantifiles.plot.autoplot import autoplot
 from tergite_autocalibration.tools.quantifiles.watcher import TodayFolderMonitor
-
-logger = logging.getLogger(__name__)
+from tergite_autocalibration.utils.logging import logger
 
 
 class DateList(QtWidgets.QListWidget):
@@ -664,7 +664,7 @@ def main(
         None.
     """
     app = QtWidgets.QApplication([])
-    logging.basicConfig(level=log_level)
+    logging.basicConfig(level=ENV.log_level)
     app.setApplicationName("Quantifiles")
     app.setWindowIcon(load_icon("icon.png"))
 

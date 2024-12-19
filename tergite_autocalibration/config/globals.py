@@ -10,7 +10,6 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import logging
 import os
 from pathlib import Path
 
@@ -19,6 +18,7 @@ import redis
 from tergite_autocalibration.config.env import EnvironmentConfiguration
 from tergite_autocalibration.config.handler import ConfigurationHandler
 from tergite_autocalibration.config.package import ConfigurationPackage
+from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.utils.misc.tests import is_pytest
 
 # Loads the environmental configuration
@@ -75,7 +75,7 @@ try:
 # In the exception case we create an empty configuration package
 except FileNotFoundError:
     CONFIG = ConfigurationPackage()
-    logging.warning(
+    logger.warning(
         "Default configuration is not yet loaded. "
         "Please copy configuration files to the root_directory or run `acli config load`."
     )
@@ -92,4 +92,4 @@ DATA_DIR = ENV.data_dir
 # If the data directory does not exist, it will be created automatically
 if not os.path.exists(DATA_DIR):
     os.makedirs(DATA_DIR)
-    logging.info(f"Initialised DATA_DIR -> {DATA_DIR}")
+    logger.info(f"Initialised DATA_DIR -> {DATA_DIR}")

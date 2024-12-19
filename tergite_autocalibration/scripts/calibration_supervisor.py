@@ -40,9 +40,9 @@ from tergite_autocalibration.utils.backend.redis_utils import (
     populate_quantities_of_interest,
 )
 from tergite_autocalibration.utils.dto.enums import DataStatus, MeasurementMode
-from tergite_autocalibration.utils.io.dataset_utils import create_node_data_path
-from tergite_autocalibration.utils.logger import logger
-from tergite_autocalibration.utils.logger.visuals import draw_arrow_chart
+from tergite_autocalibration.utils.io.dataset import create_node_data_path
+from tergite_autocalibration.utils.logging import logger
+from tergite_autocalibration.utils.logging.visuals import draw_arrow_chart
 
 colorama_init()
 

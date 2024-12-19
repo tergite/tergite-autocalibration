@@ -22,7 +22,7 @@ from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
 )
 
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
-from tergite_autocalibration.utils.logger import logger
+from tergite_autocalibration.utils.logging import logger
 
 
 def execute_schedule(

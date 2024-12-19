@@ -10,12 +10,13 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import logging
 import os
 import shutil
 from typing import Dict, Union
 
 from tomlkit import parse, TOMLDocument
+
+from tergite_autocalibration.utils.logging import logger
 
 
 class ConfigurationPackage:
@@ -99,7 +100,7 @@ class ConfigurationPackage:
                 # Check whether the files exist in the meta configuration file
                 if file_key_ in meta_config["files"].keys():
                     # Set the filepaths in the attribute
-                    logging.info(
+                    logger.info(
                         f"Loading {file_key_}: {meta_config['files'][file_key_]}"
                     )
                     return_obj.config_files[file_key_] = os.path.join(
@@ -113,7 +114,7 @@ class ConfigurationPackage:
                         meta_config_directory, misc_path_
                     )
 
-            logging.info(f"Loaded configuration package from {meta_config_path}")
+            logger.info(f"Loaded configuration package from {meta_config_path}")
             return return_obj
 
         else:
@@ -136,7 +137,7 @@ class ConfigurationPackage:
 
         # Unzip the archive in the way it works on macOS such that it creates a folder with the same name
         meta_config_folder_path = os.path.splitext(meta_config_zip_path)[0]
-        logging.info(
+        logger.info(
             f"Unpacking configuration package from {meta_config_zip_path} to {meta_config_folder_path}"
         )
         shutil.unpack_archive(meta_config_zip_path, meta_config_folder_path)
@@ -199,7 +200,7 @@ class ConfigurationPackage:
             # Ensure that the parent directory exists
             os.makedirs(os.path.split(new_file_path)[0], exist_ok=True)
             # Copy the file to the new directory
-            logging.info(f"Copying: \n" f"{file_path} \n" f"-> {new_file_path}")
+            logger.info(f"Copying: \n" f"{file_path} \n" f"-> {new_file_path}")
             shutil.copy(file_path, new_file_path)
 
         # Iterate over all misc folders and copy them
@@ -210,13 +211,13 @@ class ConfigurationPackage:
             new_filepath = os.path.join(str(abs_path_to), str(rel_path))
             # Copy the whole folder to the new location
             if os.path.exists(new_filepath):
-                logging.warning(
+                logger.warning(
                     f"Location {new_filepath} already exists for the configuration package to copy. "
                     f"The files will not be copied to avoid conflicts. "
                     f"Please rename {misc_filepath} if you want to have the folder copied."
                 )
             else:
-                logging.info(f"Copying: \n" f"{misc_filepath} \n" f"-> {new_filepath}")
+                logger.info(f"Copying: \n" f"{misc_filepath} \n" f"-> {new_filepath}")
                 shutil.copytree(misc_filepath, new_filepath, dirs_exist_ok=True)
 
         return ConfigurationPackage.from_toml(new_path_to_meta)
@@ -238,16 +239,16 @@ class ConfigurationPackage:
 
         for file_path in file_paths:
             try:
-                logging.info(f"Deleting {file_path}")
+                logger.info(f"Deleting {file_path}")
                 os.remove(file_path)
             except FileNotFoundError:
-                logging.error(f"Config file '{file_path}' not found.")
+                logger.error(f"Config file '{file_path}' not found.")
             except PermissionError:
-                logging.error(
+                logger.error(
                     f"Permission denied to delete the config file '{file_path}'."
                 )
             except Exception as e:
-                logging.error(f"An error occurred: {e}")
+                logger.error(f"An error occurred: {e}")
 
     def _delete_misc_files(self):
         """
@@ -258,14 +259,14 @@ class ConfigurationPackage:
 
         for file_path in file_paths:
             try:
-                logging.info(f"Deleting {file_path}")
+                logger.info(f"Deleting {file_path}")
                 shutil.rmtree(file_path)
             except FileNotFoundError:
-                logging.error(f"Folder '{file_path}' not found.")
+                logger.error(f"Folder '{file_path}' not found.")
             except PermissionError:
-                logging.error(f"Permission denied to delete the folder '{file_path}'.")
+                logger.error(f"Permission denied to delete the folder '{file_path}'.")
             except Exception as e:
-                logging.error(f"An error occurred: {e}")
+                logger.error(f"An error occurred: {e}")
 
     def delete(self):
         """
