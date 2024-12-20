@@ -29,6 +29,7 @@ from tergite_autocalibration.lib.nodes.characterization.t2.measurement import (
 from tergite_autocalibration.lib.nodes.external_parameter_node import (
     ExternalParameterNode,
 )
+from tergite_autocalibration.utils.logging import logger
 
 
 class T2Node(ExternalParameterNode):

@@ -13,6 +13,8 @@
 
 import numpy as np
 
+from tergite_autocalibration.utils.logging import logger
+
 # TODO
 # ******************************************************
 # This not a good implementation. better create a  *****

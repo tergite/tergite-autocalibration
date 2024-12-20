@@ -22,6 +22,7 @@ from tergite_autocalibration.lib.nodes.coupler.cz_chevron.utils.cz_singleGateSim
     CZSingleGateSimpleFitResult,
     FitResultStatus,
 )
+from tergite_autocalibration.utils.logging import logger
 
 
 class CZSingleGateSimpleFit(BaseAnalysis):
