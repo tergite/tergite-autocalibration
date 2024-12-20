@@ -29,6 +29,7 @@ from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.analysis impor
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.utils.no_valid_combination_exception import (
     NoValidCombinationException,
 )
+from tergite_autocalibration.utils.logging import logger
 
 
 def test_CanCreate():
