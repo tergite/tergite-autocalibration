@@ -98,7 +98,7 @@ def utc_to_iso(t: datetime, precision=6) -> str:
     elif precision in range(1, 6):  # [1..5]
         s = s[: -(6 - precision)]  # note that s[:-0] == ""
     elif precision != 6:
-        print(f"invalid precision {precision}: defaulting to 6 (microseconds)")
+        logger.info(f"invalid precision {precision}: defaulting to 6 (microseconds)")
 
     return s + "Z"
 

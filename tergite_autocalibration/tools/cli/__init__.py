@@ -124,9 +124,9 @@ def joke():
             blacklist=["racist", "religious", "political", "nsfw", "sexist"]
         )  # Retrieve a random joke
         if joke_["type"] == "single":  # Print the joke
-            print(joke_["joke"])
+            typer.echo(joke_["joke"])
         else:
-            print(joke_["setup"])
-            print(joke_["delivery"])
+            typer.echo(joke_["setup"])
+            typer.echo(joke_["delivery"])
 
     asyncio.run(print_joke())

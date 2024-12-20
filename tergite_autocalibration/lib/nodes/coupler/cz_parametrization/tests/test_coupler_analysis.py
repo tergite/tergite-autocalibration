@@ -121,7 +121,7 @@ def test_PickLowestCurrentWithoutBest(
     ]
 ):
     ds, list_of_results, freqs, amps, freqs_2, amps_2 = setup_data
-    print(list_of_results[2][0])
+    logger.info(list_of_results[2][0])
     list_of_results.pop(0)
     a = CZParametrisationFixDurationCouplerAnalysis("name", ["redis_fields"])
     a.run_analysis_on_freq_amp_results(list_of_results)
@@ -145,7 +145,7 @@ def test_ReturnErrorIfNoGoodPoint(
     ]
 ):
     ds, list_of_results, freqs, amps, freqs_2, amps_2 = setup_data
-    print(len(list_of_results))
+    logger.info(len(list_of_results))
     list_of_results.pop(2)
     list_of_results.pop(0)
     a = CZParametrisationFixDurationCouplerAnalysis("name", ["redis_fields"])
@@ -165,7 +165,7 @@ def test_PickGoodValueIfSmallestInAbsolute(
     ]
 ):
     ds, list_of_results, freqs, amps, freqs_2, amps_2 = setup_data
-    print(len(list_of_results))
+    logger.info(len(list_of_results))
     new_element = (list_of_results[2][0], -0.3)
     list_of_results[2] = new_element
     a = CZParametrisationFixDurationCouplerAnalysis("name", ["redis_fields"])
@@ -198,7 +198,7 @@ def setup_data_mutliple_files():
     freqs = ds[f"cz_pulse_frequenciesq06_q07"].values  # MHz
     amps = ds[f"cz_pulse_amplitudesq06_q07"].values  # uA
     currents = combined_dataset[f"cz_parking_currentsq06_q07"].values
-    print(combined_dataset)
+    logger.info(combined_dataset)
 
     return combined_dataset, freqs, amps
 

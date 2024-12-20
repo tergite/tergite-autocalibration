@@ -239,7 +239,7 @@ class BaseNode(abc.ABC):
         )
         # Format the message with duration and the measurement message
         message = f"{duration:.2f} sec{measurement_message}"
-        print(
+        logger.status(
             f"schedule_duration = {Fore.CYAN}{Style.BRIGHT}{message}{Style.RESET_ALL}"
         )
 

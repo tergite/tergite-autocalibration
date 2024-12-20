@@ -24,6 +24,7 @@ from tergite_autocalibration.lib.base.analysis import (
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis import (
     QubitSpectroscopyAnalysis,
 )
+from tergite_autocalibration.utils.logging import logger
 
 
 class QubitAnalysisForCouplerSpectroscopy(BaseQubitAnalysis):
@@ -38,7 +39,7 @@ class QubitAnalysisForCouplerSpectroscopy(BaseQubitAnalysis):
         return np.array(s > m)
 
     def analyse_qubit(self) -> list[float, float]:
-        print("Running QubitAnalysisForCouplerSpectroscopy")
+        logger.info("Running QubitAnalysisForCouplerSpectroscopy")
 
         for coord in self.dataset[self.data_var].coords:
             if "frequencies" in coord:
@@ -81,7 +82,7 @@ class QubitAnalysisForCouplerSpectroscopy(BaseQubitAnalysis):
                 roots.append(root)
                 root_frequencies.append(coupler_fit(root))
         if len(roots) == 0:
-            print("No Roots Found, returning zero current")
+            logger.info("No Roots Found, returning zero current")
             return [0]
         I0 = roots[np.argmin(np.abs(roots))]
         I1 = roots[np.argmax(np.abs(roots))]

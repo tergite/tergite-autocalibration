@@ -16,6 +16,7 @@ import toml
 from tergite_autocalibration.config.globals import REDIS_CONNECTION, CONFIG
 from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
+from tergite_autocalibration.utils.logging import logger
 
 
 def populate_parking_currents(
@@ -99,7 +100,7 @@ def populate_active_reset_parameters(
     active_reset_device_config = transmon_configuration["active_reset"]
 
     ar_qubit_parameters = active_reset_device_config["qubits"]
-    print("Populating Active Reset")
+    logger.info("Populating Active Reset")
 
     # Populate the Redis database with the initial active reset
     # parameter values from the toml file

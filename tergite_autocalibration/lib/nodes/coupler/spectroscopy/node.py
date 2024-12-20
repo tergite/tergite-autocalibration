@@ -31,6 +31,7 @@ from tergite_autocalibration.lib.utils.samplespace import (
 )
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
+from tergite_autocalibration.utils.logging import logger
 
 
 class CouplerSpectroscopyNode(ExternalParameterNode):
@@ -69,7 +70,7 @@ class CouplerSpectroscopyNode(ExternalParameterNode):
 
     def get_coupled_qubits(self) -> list:
         if len(self.couplers) > 1:
-            print("Multiple couplers, lets work with only one")
+            logger.info("Multiple couplers, lets work with only one")
         coupled_qubits = self.couplers[0].split(sep="_")
         self.coupler = self.couplers[0]
         return coupled_qubits
@@ -80,11 +81,11 @@ class CouplerSpectroscopyNode(ExternalParameterNode):
         # iteration index, that's why we keep the first value->
 
         this_iteration_value = list(iteration_dict.values())[0]
-        print(f"{ this_iteration_value = }")
+        logger.info(f"{ this_iteration_value = }")
         self.spi_dac.set_dac_current(self.dac, this_iteration_value)
 
     def final_operation(self):
-        print("Final Operation")
+        logger.info("Final Operation")
         self.spi_dac.set_dac_current(self.dac, 0)
 
 
@@ -119,7 +120,7 @@ class CouplerResonatorSpectroscopyNode(ExternalParameterNode):
 
     def get_coupled_qubits(self) -> list:
         if len(self.couplers) > 1:
-            print("Multiple couplers, lets work with only one")
+            logger.info("Multiple couplers, lets work with only one")
         coupled_qubits = self.couplers[0].split(sep="_")
         self.coupler = self.couplers[0]
         return coupled_qubits
@@ -130,5 +131,5 @@ class CouplerResonatorSpectroscopyNode(ExternalParameterNode):
         # iteration index, that's why we keep the first value->
 
         this_iteration_value = list(iteration_dict.values())[0]
-        print(f"{ this_iteration_value = }")
+        logger.info(f"{ this_iteration_value = }")
         self.spi_dac.set_dac_current(self.dac, this_iteration_value)

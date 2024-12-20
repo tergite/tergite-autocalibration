@@ -27,6 +27,7 @@ from tergite_autocalibration.scripts.calibration_supervisor import (
 from tergite_autocalibration.scripts.calibration_supervisor import CalibrationSupervisor
 from tergite_autocalibration.utils.backend.reset_redis_node import ResetRedisNode
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
+from tergite_autocalibration.utils.logging import logger
 
 qubits_10 = [f"q{i}" for i in range(16, 26)]
 
@@ -86,13 +87,13 @@ class Monitor:
     def node_status(self, node: str = None):
         if node is None:
             node = self.node_park
-        print("Qubits:")
+        logger.info("Qubits:")
         for qubit in self.qubits:
-            print(f"    {qubit}: {node}:", self.cxn.hget(f"cs:{qubit}", node))
-        print("-----------------------")
-        print("Couplers:")
+            logger.info(f"    {qubit}: {node}:", self.cxn.hget(f"cs:{qubit}", node))
+        logger.info("-----------------------")
+        logger.info("Couplers:")
         for coupler in self.couplers:
-            print(f"    {coupler}: {node}:", self.cxn.hget(f"cs:{coupler}", node))
+            logger.info(f"    {coupler}: {node}:", self.cxn.hget(f"cs:{coupler}", node))
 
     def calibrate_node(self, node: str = None, **kwargs):
         self.node = node
@@ -105,7 +106,7 @@ class Monitor:
         # TODO: How and when is this method called?
         if node is None:
             node = self.node_park
-        print(cg[node])
+        logger.info(cg[node])
 
     def get_name(self):
         return self.all_results[0].split("/")[-1]
@@ -161,7 +162,9 @@ class OptimizeNode:
                     ]
                 )
                 amps_dict = dict(zip(self.couplers, amps))
-        print(f"Optimizing {self.node} with {freqs_dict}, {times_dict}, {amps_dict}")
+        logger.info(
+            f"Optimizing {self.node} with {freqs_dict}, {times_dict}, {amps_dict}"
+        )
         self.monitor.calibrate_node(
             "cz_calibration_ssro",
             opt_cz_pulse_frequency=freqs_dict,
@@ -226,15 +229,15 @@ class OptimizeNode:
         return sum(all_costs)
 
     def optimize_node(self):
-        print(f"Optimizing {self.node} with {self.trails} trails")
+        logger.info(f"Optimizing {self.node} with {self.trails} trails")
         self.study.optimize(self.objective_cz, n_trials=self.trails)
         self.best_params = self.study.best_params
-        print(
+        logger.info(
             f"Validating trail {self.study.best_trial.number} with params {self.best_params}"
         )
         self.validate_cz()
 
-        print(f"Optimization finished for {self.node}")
+        logger.info(f"Optimization finished for {self.node}")
         return self.study
 
     def plot_optimization(self):
@@ -272,8 +275,5 @@ class OptimizeNode:
             opt_cz_pulse_amplitude=amps_dict,
         )
         results = self.monitor.get_results()
-        print(results)
+        logger.info(results)
         return results
-
-
-# monitor = Monitor()

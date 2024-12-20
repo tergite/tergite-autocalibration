@@ -18,6 +18,7 @@ from typing import TYPE_CHECKING, ClassVar
 from tergite_autocalibration.config.globals import REDIS_CONNECTION, CONFIG
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
+from tergite_autocalibration.utils.logging import logger
 
 if TYPE_CHECKING:
     from tergite_autocalibration.lib.base.node import BaseNode
@@ -52,7 +53,7 @@ class ResetRedisNode:
         )
 
     def reset_node(self, remove_node):
-        print(f"{ remove_node = }")
+        logger.status(f"{ remove_node = }")
         if not remove_node == "all":
             remove_fields = self.factory_dict[remove_node].qubit_qois
             if remove_fields is None:

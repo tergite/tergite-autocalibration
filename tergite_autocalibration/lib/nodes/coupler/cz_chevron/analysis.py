@@ -36,6 +36,7 @@ from tergite_autocalibration.lib.nodes.coupler.cz_chevron.utils.cz_simpleFitAnal
 from tergite_autocalibration.lib.nodes.coupler.cz_chevron.utils.cz_singleGateSimpleFit import (
     CZSingleGateSimpleFit,
 )
+from tergite_autocalibration.utils.logging import logger
 
 
 class SweepResultStatus(Enum):
@@ -108,8 +109,7 @@ class CZChevronAnalysis(BaseAnalysis):
         # I recommend using it initially.
         # You can perform a more refined fitting by using run_fitting_max_swap_amp.
 
-        print("WARNING TESTING CZ ANALYSIS")
-        # return [300e-9, 0.1]
+        logger.debug("WARNING TESTING CZ ANALYSIS")
 
         return self.run_fitting_min_coupling_strength()
 
@@ -178,7 +178,7 @@ class CZChevronAnalysis(BaseAnalysis):
         coupling_strength = coupling_strength[coupling_strength > 1e-3]
         if len(coupling_strength) < 4:
             self.opt_freq, self.opt_cz = 0, 0
-            print(
+            logger.info(
                 f"No enough available points. Please resweep once again or enlarge sweep range."
             )
         else:
@@ -211,7 +211,7 @@ class CZChevronAnalysis(BaseAnalysis):
             # Two as must be both less than zero indiciating a minimum.
             if p[2] > freq[-1] or p[2] < freq[0] or p[0] < 0 or p[1] < 0:
                 # The freq range is too small or the swapping period exceeds 1 us, which is also unacceptable.
-                print(
+                logger.info(
                     "You should probably enlarge your sweep range. The optimial point is not in the current range."
                 )
                 self.opt_freq, self.opt_cz = 0, 0
@@ -250,8 +250,8 @@ class CZChevronAnalysis(BaseAnalysis):
                 id_min = np.argmin(
                     coupling_strength[id_left:id_right]
                 )  # The experiment data lying the new region
-                print("np.min(coupling_strength):", np.min(coupling_strength))
-                print("np.min(data_fit):", np.min(data_fit))
+                logger.info("np.min(coupling_strength):", np.min(coupling_strength))
+                logger.info("np.min(data_fit):", np.min(data_fit))
                 # Compare the experiment data with the fitting data.
                 # The minimal experiment data must be valided. It should also lie in the new region.
                 if np.min(data_fit) > np.min(coupling_strength) and (
@@ -259,7 +259,7 @@ class CZChevronAnalysis(BaseAnalysis):
                 ):
                     f_opt = freq[id_min + id_left]
                     c_opt = np.min(coupling_strength)
-                    print("We use the raw measured data.")
+                    logger.info("We use the raw measured data.")
                 else:  # Otherwise, we use the fitting data.
                     id_opt = np.argmin(data_fit)
                     c_opt = data_fit[id_opt]
@@ -312,7 +312,6 @@ class CZChevronAnalysis(BaseAnalysis):
             def errfunc(p):
                 return prob - fitfunc(p)
 
-            # print(prob)
             out = leastsq(
                 errfunc,
                 np.array(
@@ -365,7 +364,7 @@ class CZChevronAnalysis(BaseAnalysis):
         period_fit = period_fit[period_fit < 1000]
         if len(period_fit) < 4:
             # All swapping periods are too long or there are no swappings at all.
-            print(
+            logger.info(
                 f"No enough available points. Please resweep once again or enlarge sweep range."
             )
             self.opt_freq, self.opt_cz = 0, 0
@@ -398,7 +397,7 @@ class CZChevronAnalysis(BaseAnalysis):
             # The symmetric axis must lie in the range of freq.
             # Two as must be both greater than zero indiciating a maximum.
             if p[2] > freq[-1] or p[2] < freq[0] or p[0] > 0 or p[1] > 0:
-                print(
+                logger.info(
                     "You should probably enlarge your sweep range. The optimial point is not in the current range."
                 )
                 self.opt_freq, self.opt_cz = 0, 0
@@ -437,7 +436,7 @@ class CZChevronAnalysis(BaseAnalysis):
                 if np.max(data_fit) < np.max(amps) and (id_left <= id_max <= id_right):
                     f_opt = freq[id_max]
                     gate_time = period_fit[id_max]
-                    print("We use the raw measured data.")
+                    logger.info("We use the raw measured data.")
                 else:
                     # ---------- fit gate time ----------------#
                     def errfunc(p):
@@ -450,7 +449,7 @@ class CZChevronAnalysis(BaseAnalysis):
                     out = leastsq(errfunc, p_guess)
                     gate_time = fitfunc(out[0], f_opt)
                 # ---------- show final result ------------#
-                print(f_opt, gate_time)
+                logger.info(f_opt, gate_time)
                 self.opt_freq = f_opt * 1e6
                 self.opt_cz = gate_time / 1e9
         return [self.opt_freq, self.opt_cz]
@@ -532,7 +531,7 @@ class CZChevronAnalysisReset(BaseAnalysis):
             min_index = np.unravel_index(min_index, magnitudes.shape)
             self.opt_freq = self.freq[min_index[0]]
             self.opt_cz = self.amp[min_index[1]]
-            print(self.opt_freq, self.opt_cz)
+            logger.info(self.opt_freq, self.opt_cz)
         else:
             # fig, axes = self.fig, self.axes
             # sc = axes[0].imshow(magnitudes, aspect='auto', cmap='jet', extent=[times[0], times[-1], freq[-1], freq[0]])
@@ -566,7 +565,6 @@ class CZChevronAnalysisReset(BaseAnalysis):
                     def errfunc(p):
                         return prob - fitfunc(p)
 
-                    # print(prob)
                     out = leastsq(
                         errfunc,
                         np.array(
@@ -627,7 +625,7 @@ class CZChevronAnalysisReset(BaseAnalysis):
                 period_fit = period_fit[period_fit < 500]
                 if len(period_fit) < 4:
                     # axes[2].set_title("No enough available points.")
-                    print(
+                    logger.info(
                         f"No enough available points. Please resweep once again or enlarge sweep range."
                     )
                     self.opt_freq, self.opt_cz = 0, 0
@@ -655,7 +653,7 @@ class CZChevronAnalysisReset(BaseAnalysis):
                     # axes[2].plot(freq, fitfunc(p, freq), 'k-', label="fit")
                     # axes[2].legend()
                     if p[2] > freq[-1] or p[2] < freq[0] or p[0] > 0 or p[1] > 0:
-                        print(
+                        logger.info(
                             "You should probably enlarge your sweep range. The optimial point is not in the current range."
                         )
                         # axes[2].set_title(f"Optimal point not found ")
@@ -699,13 +697,12 @@ class CZChevronAnalysisReset(BaseAnalysis):
                         # axes[2].vlines(f_opt, np.min(amps), np.max(amps), 'g', linestyle='--', linewidth=1.5)
                         # axes[2].set_title(f"The optimal frequency is {f_opt}.")
                         # self.result.set_result((f_opt, gate_time))
-                        # print(self.result.get_result())
                         # result, result_add = self.result.get_result()
-                        print(f_opt, gate_time)
+                        logger.info(f_opt, gate_time)
                         self.opt_freq = f_opt * 1e6
                         self.opt_cz = gate_time / 1e9
             except:
-                print("Something wrong with the fitting process.")
+                logger.info("Something wrong with the fitting process.")
                 self.opt_freq, self.opt_cz = 0, 0
         return [self.opt_freq, self.opt_cz]
 
@@ -793,11 +790,11 @@ class CZChevronAnalysisAmplitude:
             )
             stds.append(this_std)
         max_index = np.argmax(stds)
-        print(max_index)
+        logger.info(max_index)
         max_magnitude = magnitudes[max_index]
         self.opt_freq = self.freq[max_index]
         self.opt_cz = self.amp[np.argmax(max_magnitude)]
-        print(self.opt_freq, self.opt_cz)
+        logger.info(self.opt_freq, self.opt_cz)
         return [self.opt_freq, self.opt_cz]
 
     def plotter(self, axis):
@@ -859,7 +856,6 @@ class CZFirstStepAnalysis(BaseAnalysis):
 
     def AnalyseGridPoint(self, folder) -> CZSimpleFitAnalysisResult:
         dataset_path = f"{self.baseFolder}/{self.dataFolder}/{folder}/dataset.hdf5"
-        # print(dataset_path)
         ds = xr.open_dataset(dataset_path)
         ds_complex = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
         d1 = ds_complex[f"yq{self.q1}"]
@@ -874,7 +870,7 @@ class CZFirstStepAnalysis(BaseAnalysis):
         g2 = CZSingleGateSimpleFit(d2, self.freq, self.times)
         r1 = g1.analyse_qubit()
         r2 = g2.analyse_qubit()
-        # print("here")
+        # logger.info("here")
         comb = CZFirstStepCombination(r1, r2, self.freq)
         return comb.Analyze()
 
@@ -889,7 +885,7 @@ class CZFirstStepAnalysis(BaseAnalysis):
         # Check if you found exactly one file
         if len(files) == 1:
             file_path = files[0]
-            print(f"Found file: {file_path}")
+            logger.info(f"Found file: {file_path}")
 
             # Open and read the file
             with open(file_path, "r") as file:
@@ -910,11 +906,10 @@ class CZFirstStepAnalysis(BaseAnalysis):
             # Loop through each folder
             for element in all_results:
                 folder = element["name"]
-                print(folder)
 
                 r = self.AnalyseGridPoint(folder)
                 if r.status == FitResultStatus.FOUND:
-                    r.Print()
+                    r.print_results()
                     if (
                         r.pvalue_1 + r.pvalue_2 > current_pv
                         and r.fittedParam_1[0] > 0.21
@@ -926,13 +921,13 @@ class CZFirstStepAnalysis(BaseAnalysis):
                         best_amplitude = element["amp"]
                         best_folderName = folder
 
-            print(best_folderName)
-            print(current_pv)
-            print(best_current)
-            print(best_amplitude)
-            print(self.freq[bestPoint.indexBestFrequency])
-            print(bestPoint.fittedParam_1[1])
-            print(bestPoint.fittedParam_2[1])
+            logger.info(best_folderName)
+            logger.info(current_pv)
+            logger.info(best_current)
+            logger.info(best_amplitude)
+            logger.info(self.freq[bestPoint.indexBestFrequency])
+            logger.info(bestPoint.fittedParam_1[1])
+            logger.info(bestPoint.fittedParam_2[1])
             return (
                 best_current,
                 best_amplitude,
@@ -941,12 +936,12 @@ class CZFirstStepAnalysis(BaseAnalysis):
             )
 
         elif len(files) > 1:
-            print("Error: More than one file matched the pattern.")
+            logger.info("Error: More than one file matched the pattern.")
         else:
-            print("Error: No file matched the pattern.")
-            print(file_pattern)
+            logger.info("Error: No file matched the pattern.")
+            logger.info(file_pattern)
 
         return None
 
     def plotter(self):
-        print("Plot best curves")
+        logger.info("Plot best curves")

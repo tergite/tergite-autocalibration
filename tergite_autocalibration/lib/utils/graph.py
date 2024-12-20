@@ -17,6 +17,8 @@
 import matplotlib.pyplot as plt
 import networkx as nx
 
+from tergite_autocalibration.utils.logging import logger
+
 graph = nx.DiGraph()
 
 # dependencies: n1 -> n2. For example
@@ -132,15 +134,9 @@ initial_pos = {
 }
 
 
-# all_nodes = list(nx.topological_sort(graph))
-# print(f'{ list(graph.predecessors("cz_chevron")) = }')
-# graph.remove_node('coupler_spectroscopy')
-# print(f'{ list(graph.predecessors("cz_chevron")) = }')
-
-
 # TODO add condition argument and explanation
 def filtered_topological_order(target_node: str):
-    print("Targeting node: " + target_node)
+    logger.info("Targeting node: " + target_node)
     return range_topological_order("resonator_spectroscopy", target_node)
 
 

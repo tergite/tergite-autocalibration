@@ -61,7 +61,7 @@ class T2Node(ExternalParameterNode):
         # iteration index, that's why we keep the first value->
         this_iteration = list(iteration_dict.values())[0]
         if this_iteration > 0:
-            print(f"sleeping for {self.sleep_time} seconds")
+            logger.info(f"sleeping for {self.sleep_time} seconds")
             sleep(self.sleep_time)
 
 
@@ -97,5 +97,5 @@ class T2EchoNode(ExternalParameterNode):
         # iteration index, that's why we keep the first value->
         this_iteration = list(iteration_dict.values())[0]
         if this_iteration > 0:
-            print(f"sleeping for {self.sleep_time} seconds")
+            logger.info(f"sleeping for {self.sleep_time} seconds")
             sleep(self.sleep_time)

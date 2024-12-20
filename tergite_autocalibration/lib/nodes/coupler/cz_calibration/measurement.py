@@ -43,6 +43,7 @@ from tergite_autocalibration.utils.dto.extended_gates import (
     Measure_RO_3state_Opt,
 )
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
+from tergite_autocalibration.utils.logging import logger
 
 
 class CZCalibrationMeasurement(BaseMeasurement):
@@ -123,7 +124,7 @@ class CZCalibrationMeasurement(BaseMeasurement):
         qubit_type_list = ["Control", "Target"]
         if swap_type:
             qubit_type_list.reverse()
-            print("swapping")
+            logger.info("swapping")
             name += "_swap"
 
         schedule = Schedule(f"{name}", repetitions)
@@ -132,14 +133,12 @@ class CZCalibrationMeasurement(BaseMeasurement):
         all_qubits = sum(all_qubits, [])
         # target,control = np.transpose(qubits)[0],np.transpose(qubits)[1]
 
-        # print(f'{all_qubits = }')
-
         # find cz parameters from redis
 
         cz_pulse_frequency, cz_pulse_duration, cz_pulse_amplitude = {}, {}, {}
-        print(f"{opt_cz_pulse_amplitude = }")
-        print(f"{opt_cz_pulse_frequency = }")
-        print(f"{opt_cz_pulse_duration = }")
+        logger.info(f"{opt_cz_pulse_amplitude = }")
+        logger.info(f"{opt_cz_pulse_frequency = }")
+        logger.info(f"{opt_cz_pulse_duration = }")
         for coupler in all_couplers:
             qubits = coupler.split(sep="_")
             for this_coupler in all_couplers:
@@ -166,9 +165,9 @@ class CZCalibrationMeasurement(BaseMeasurement):
                         this_coupler
                     ]
 
-        print(f"{cz_pulse_frequency = }")
-        print(f"{cz_pulse_duration = }")
-        print(f"{cz_pulse_amplitude = }")
+        logger.info(f"{cz_pulse_frequency = }")
+        logger.info(f"{cz_pulse_duration = }")
+        logger.info(f"{cz_pulse_amplitude = }")
 
         for index, this_coupler in enumerate(all_couplers):
             if this_coupler in ["q21_q22", "q22_q23", "q23_q24", "q24_q25"]:
@@ -226,10 +225,8 @@ class CZCalibrationMeasurement(BaseMeasurement):
                     )
                     for i in range(number_of_cz):
                         if use_edge:
-                            # print(qubits[0],qubits[1])
                             cz = schedule.add(CZ(qubits[0], qubits[1]))
                         else:
-                            # print(this_coupler,cz_pulse_port,cz_clock)
                             cz = schedule.add(
                                 SoftSquarePulse(
                                     duration=cz_pulse_duration[this_coupler],
@@ -249,7 +246,6 @@ class CZCalibrationMeasurement(BaseMeasurement):
                                 dh.get_legacy("qubit_types")[this_qubit]
                                 == qubit_type_list[0]
                             ):
-                                # print(this_qubit, dh.get_legacy("qubit_types")[this_qubit])
                                 x_end = schedule.add(
                                     X(this_qubit), ref_op=buffer_end, ref_pt="end"
                                 )
@@ -330,13 +326,13 @@ class CZCalibrationSSROMeasurement(BaseMeasurement):
         qubit_type_list = ["Control", "Target"]
         if swap_type:
             qubit_type_list.reverse()
-            print("swapping")
+            logger.info("swapping")
             name += "_swap"
 
         all_couplers = list(self.couplers.keys())
         all_qubits = [coupler.split(sep="_") for coupler in all_couplers]
-        print("these are all couplers: ", all_couplers)
-        print("these are all qubits: ", all_qubits)
+        logger.info("these are all couplers: ", all_couplers)
+        logger.info("these are all qubits: ", all_qubits)
         all_qubits = sum(all_qubits, [])
 
         # The outer for-loop iterates over all qubits:
@@ -391,9 +387,9 @@ class CZCalibrationSSROMeasurement(BaseMeasurement):
                         this_coupler
                     ]
 
-        print(f"{cz_pulse_frequency = }")
-        print(f"{cz_pulse_duration = }")
-        print(f"{cz_pulse_amplitude = }")
+        logger.info(f"{cz_pulse_frequency = }")
+        logger.info(f"{cz_pulse_duration = }")
+        logger.info(f"{cz_pulse_amplitude = }")
 
         for index, this_coupler in enumerate(all_couplers):
             schedule.add_resource(
@@ -408,7 +404,6 @@ class CZCalibrationSSROMeasurement(BaseMeasurement):
                     freq=-cz_pulse_frequency[this_coupler] + downconvert,
                 )
             )
-        # print(ramsey_phases,qubits)
 
         ramsey_phases_values = ramsey_phases[all_couplers[0]]
         number_of_phases = len(ramsey_phases_values)
@@ -524,7 +519,6 @@ class CZCalibrationSSROMeasurement(BaseMeasurement):
                 # The inner for-loop iterates over all qubit levels:
                 for level_index, state_level in enumerate(qubit_levels):
                     calib_index = this_index + level_index + 1
-                    # print(f'{calib_index = }')
                     if state_level == 0:
                         prep = shot.add(IdlePulse(40e-9))
                     elif state_level == 1:
@@ -551,7 +545,7 @@ class CZCalibrationSSROMeasurement(BaseMeasurement):
         shot.add(IdlePulse(16e-9))
 
         schedule.add(IdlePulse(16e-9))
-        print(schedule.add(shot, control_flow=Loop(repetitions), validate=False))
+        logger.info(schedule.add(shot, control_flow=Loop(repetitions), validate=False))
         schedule.add(IdlePulse(16e-9))
         return schedule
 
@@ -649,9 +643,9 @@ class CZCalibrationDurationMeasurement(BaseMeasurement):
         all_couplers = [coupler]
         qubits = [coupler.split(sep="_") for coupler in all_couplers]
         target, control = np.transpose(qubits)[0], np.transpose(qubits)[1]
-        print(f"{qubits = }")
-        print(f"{target = }")
-        print(f"{control = }")
+        logger.info(f"{qubits = }")
+        logger.info(f"{target = }")
+        logger.info(f"{control = }")
 
         # find cz parameters from redis
 
@@ -667,8 +661,8 @@ class CZCalibrationDurationMeasurement(BaseMeasurement):
             cz_pulse_frequency[coupler] = cz_frequency_values[0]
             cz_pulse_duration[coupler] = cz_duration_values[0]
             cz_pulse_amplitude[coupler] = cz_amplitude_values[0]
-        print(f"{cz_pulse_frequency = }")
-        print(f"{cz_pulse_amplitude = }")
+        logger.info(f"{cz_pulse_frequency = }")
+        logger.info(f"{cz_pulse_amplitude = }")
 
         # Add the clocks to the schedule
         # for this_qubit, mw_f_val in mw_frequencies.items():
@@ -804,8 +798,6 @@ class ResetCalibrationSSROMeasurement(BaseMeasurement):
         all_couplers = self.couplers
         all_qubits = [coupler.split(sep="_") for coupler in all_couplers]
         all_qubits = sum(all_qubits, [])
-        # print(f'{target = }')
-        # print(f'{control = }')
 
         # The outer for-loop iterates over all qubits:
         shot = Schedule(f"shot")
@@ -844,9 +836,6 @@ class ResetCalibrationSSROMeasurement(BaseMeasurement):
             if opt_reset_duration_qc is not None:
                 reset_duration_qc += opt_reset_duration_qc[this_coupler]
 
-        # print(f'{reset_duration_qc = }')
-        # print(f'{reset_amplitude_qc = }')
-
         ramsey_phases_values = ramsey_phases[all_qubits[0]]
         number_of_phases = len(ramsey_phases_values) + 3  # +3 for calibration points
         control_on_values = control_ons[all_qubits[0]]
@@ -864,7 +853,6 @@ class ResetCalibrationSSROMeasurement(BaseMeasurement):
                 )
 
                 test_state = test_states[int(ramsey_phase)]
-                # print(f'{test_state = }')
                 for this_qubit in all_qubits:
                     if test_state[this_qubit] == "g":
                         shot.add(IdlePulse(80e-9), ref_op=relaxation, ref_pt="end")
@@ -920,7 +908,6 @@ class ResetCalibrationSSROMeasurement(BaseMeasurement):
 
                 for this_qubit in all_qubits:
                     this_index = cz_index * number_of_phases + ramsey_index
-                    # print(f'{this_index = }')
                     shot.add(
                         Measure_RO_3state_Opt(
                             this_qubit, acq_index=this_index, bin_mode=BinMode.APPEND
@@ -949,7 +936,6 @@ class ResetCalibrationSSROMeasurement(BaseMeasurement):
                 # The inner for-loop iterates over all qubit levels:
                 for level_index, state_level in enumerate(qubit_levels):
                     calib_index = this_index + level_index + 1
-                    # print(f'{calib_index = }')
                     if state_level == 0:
                         prep = shot.add(IdlePulse(40e-9))
                     elif state_level == 1:

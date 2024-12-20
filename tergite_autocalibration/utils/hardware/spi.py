@@ -9,7 +9,7 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
-
+import sys
 import time
 from pathlib import Path
 
@@ -20,6 +20,7 @@ from qcodes import validators
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
+from tergite_autocalibration.utils.logging import logger
 
 
 def find_serial_port():
@@ -29,7 +30,7 @@ def find_serial_port():
             port = str(file.absolute())
             break
     else:
-        print("Couldn't find the serial port. Please check the connection.")
+        logger.info("Couldn't find the serial port. Please check the connection.")
         port = None
     return port
 
@@ -39,7 +40,7 @@ class DummyDAC:
         pass
 
     def set_dac_current(self, dac, target_current) -> None:
-        print(f"Dummy DAC to current {target_current}")
+        logger.info(f"Dummy DAC to current {target_current}")
 
 
 class SpiDAC:
@@ -92,13 +93,13 @@ class SpiDAC:
 
         # dac.current(parking_current)
         self.ramp_current(dac, parking_current)
-        print("Finished ramping")
-        print(f"Current is now: { dac.current() * 1000:.4f} mA")
+        logger.status("Finished ramping")
+        logger.status(f"Current is now: { dac.current() * 1000:.4f} mA")
         return
 
     def set_dac_current(self, dac, target_current) -> None:
         if self.is_dummy:
-            print(
+            logger.info(
                 f"Dummy DAC to current {target_current}. NO REAL CURRENT is generated"
             )
             return
@@ -107,13 +108,14 @@ class SpiDAC:
     def ramp_current(self, dac, target_current):
         dac.current(target_current)
         ramp_counter = 0
-        print(f"{Fore.YELLOW}{Style.DIM}{'Ramping current (mA)'}")
+        logger.status(f"{Fore.YELLOW}{Style.DIM}{'Ramping current (mA)'}")
         while dac.is_ramping():
             ramp_counter += 1
             print_termination = " -> "
             if ramp_counter % 8 == 0:
                 print_termination = "\n"
-            print(f"{dac.current() * 1000:3.4f}", end=print_termination, flush=True)
+            sys.stdout.write(f"{dac.current() * 1000:3.4f}{print_termination}")
+            sys.stdout.flush()
             time.sleep(1)
-        print(f"{Style.RESET_ALL}")
-        print(end="\n")
+        logger.status(f"{Style.RESET_ALL}")
+        logger.status(end="\n")

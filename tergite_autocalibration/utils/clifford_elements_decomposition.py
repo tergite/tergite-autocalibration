@@ -155,7 +155,6 @@ def x_PTM(theta: float):
 
 def y_PTM(theta: float):
     theta = np.deg2rad(theta)
-    # print(phi)
     if np.abs(np.abs(theta) - np.pi) < 1e-6 or np.abs(np.abs(theta) - np.pi / 2) < 1e-6:
         cos = round(np.cos(theta))
         sin = round(np.sin(theta))
@@ -182,7 +181,6 @@ def RXY(theta: float, phi: float):
 def from_physical_decomp_to_PTM(physical_decomp: dict):
     matrix = np.identity(4, dtype=np.int64)
     for operation in physical_decomp.values():
-        # print(operation)
         theta = operation["theta"]
         phi = operation["phi"]
         if theta == 0 and phi == 0:
@@ -205,8 +203,8 @@ def is_sequence_identity(rng_sequence: np.ndarray) -> bool:
             phi = operation["phi"]
             matrix = np.matmul(RXY(theta, phi), matrix)
     # check if the total operation produces I or -I
-    print(f"{ np.allclose(matrix,  np.identity(2)) = }")
-    print(f"{ np.allclose(matrix, -np.identity(2)) = }")
+    logger.info(f"{ np.allclose(matrix,  np.identity(2)) = }")
+    logger.info(f"{ np.allclose(matrix, -np.identity(2)) = }")
     return np.allclose(matrix, np.identity(2)) or np.allclose(matrix, -np.identity(2))
 
 
@@ -221,7 +219,6 @@ def reversing_XY_matrix(rng_sequence) -> tuple[int, dict]:
         ptm = from_physical_decomp_to_PTM(decomp)
         if np.array_equal(product_matrix, ptm):
             equivalent_ptm = ptm
-            # print(f'{ equivalent_ptm = }')
             reversing_matrix = np.linalg.inv(equivalent_ptm).astype(np.int64)
 
     for i, decomp in enumerate(XY_decompositions):
@@ -237,8 +234,8 @@ def reversing_XY_matrix(rng_sequence) -> tuple[int, dict]:
 if __name__ == "__main__":
     test_sequence = np.array(np.random.randint(0, 24, 10), dtype=np.int32)
     reversing_index, _ = reversing_XY_matrix(test_sequence)
-    print(f"{ test_sequence = }")
-    print(f"{ reversing_index = }")
+    logger.info(f"{ test_sequence = }")
+    logger.info(f"{ reversing_index = }")
     sequence = np.append(test_sequence, reversing_index)
 
     is_sequence_identity(sequence)

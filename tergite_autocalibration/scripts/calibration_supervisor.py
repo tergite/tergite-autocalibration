@@ -101,12 +101,12 @@ class HardwareManager:
                 cluster = Cluster(dh.cluster_name, str(self.config.cluster_ip))
             except ConnectionRefusedError:
                 msg = "Cluster is disconnected. Maybe it has crushed? Try flick it off and on"
-                print("-" * len(msg))
-                print(f"{Fore.LIGHTRED_EX}{Style.BRIGHT}{msg}{Style.RESET_ALL}")
-                print("-" * len(msg))
+                logger.status("-" * len(msg))
+                logger.status(f"{Fore.LIGHTRED_EX}{Style.BRIGHT}{msg}{Style.RESET_ALL}")
+                logger.status("-" * len(msg))
                 quit()
 
-            print(
+            logger.status(
                 f" \n\u26A0 {Fore.MAGENTA}{Style.BRIGHT}Resetting Cluster at IP *{str(self.config.cluster_ip)[-3:]}{Style.RESET_ALL}\n"
             )
             cluster.reset()  # Reset the cluster to a default state for consistency

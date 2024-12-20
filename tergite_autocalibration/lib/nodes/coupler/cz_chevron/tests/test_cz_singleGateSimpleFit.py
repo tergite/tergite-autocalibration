@@ -29,7 +29,6 @@ from ..utils.cz_singleGateSimpleFitResult import (
 @pytest.fixture(autouse=True)
 def setup_good_data():
     dataset_path = Path(__file__).parent / "data" / "dataset_goodQuality.hdf5"
-    print(dataset_path)
     ds = xr.open_dataset(dataset_path)
     ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
     d17 = ds.yq17.to_dataset()
@@ -82,7 +81,6 @@ def test_canGetBestFrequencyFromGoodChevronQ22(setup_good_data):
 @pytest.fixture(autouse=True)
 def setup_good_data_2():
     dataset_path = Path(__file__).parent / "data" / "dataset_goodQuality_2.hdf5"
-    print(dataset_path)
     ds = xr.open_dataset(dataset_path)
     ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
     d19 = ds.yq19.to_dataset()
@@ -187,7 +185,6 @@ def test_canGetBestFrequencyFromPoorChevronQ22(setup_poor_data):
 @pytest.fixture(autouse=True)
 def setup_bad_data():
     dataset_path = Path(__file__).parent / "data" / "dataset_badQuality.hdf5"
-    print(dataset_path)
     ds = xr.open_dataset(dataset_path)
     ds = ds.isel(ReIm=0) + 1j * ds.isel(ReIm=1)
     d17 = ds.yq17.to_dataset()

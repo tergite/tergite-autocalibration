@@ -24,6 +24,7 @@ from tergite_autocalibration.lib.base.analysis import (
     BaseQubitAnalysis,
 )
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
+from tergite_autocalibration.utils.logging import logger
 
 
 class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
@@ -273,8 +274,10 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
 
         self.rotation_angle = rotation_angle
         self.rotation_angle_degrees = np.rad2deg(rotation_angle)
-        print(f"{self.qubit}.measure.acq_rotation = {self.rotation_angle_degrees}")
-        print(f"{self.qubit}.measure.acq_threshold = {self.threshold}")
+        logger.info(
+            f"{self.qubit}.measure.acq_rotation = {self.rotation_angle_degrees}"
+        )
+        logger.info(f"{self.qubit}.measure.acq_threshold = {self.threshold}")
 
         return [self.optimal_amplitude, self.rotation_angle_degrees, self.threshold]
 

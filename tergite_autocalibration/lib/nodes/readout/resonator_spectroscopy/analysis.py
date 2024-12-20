@@ -23,6 +23,7 @@ from tergite_autocalibration.lib.base.analysis import (
     BaseAllQubitsAnalysis,
     BaseQubitAnalysis,
 )
+from tergite_autocalibration.utils.logging import logger
 
 model = fm.ResonatorModel()
 
@@ -56,12 +57,12 @@ class ResonatorSpectroscopyQubitAnalysis(BaseQubitAnalysis):
                 self.s21_values, params=guess, f=self.frequencies
             )
             if not self.fitting_model.success:
-                print("Fit was unsuccessful.")
-                print("Reason:", self.fitting_model.message)
+                logger.info("Fit was unsuccessful.")
+                logger.info("Reason:", self.fitting_model.message)
 
         except Exception as e:
-            print("Could not fit the resonator data")
-            print(e)
+            logger.info("Could not fit the resonator data")
+            logger.info(e)
 
         finally:
             # if the return params are not returned the later stages complains

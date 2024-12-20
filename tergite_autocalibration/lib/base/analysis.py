@@ -383,7 +383,7 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
                     this_element = self.dataset[settable].attrs[element_type]
                     return this_element
             except KeyError:
-                print(f"No element_type for {settable}")
+                logger.info(f"No element_type for {settable}")
         return None
 
     def _run_coupler_analysis(self, this_element: str):
@@ -451,9 +451,9 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
         index = 0
         if len(coupler_data_dict) == 0:
             logger.error("Dataset does not have valid coordinates")
-        print(coupler_data_dict)
+        logger.info(coupler_data_dict)
         for this_coupler, coupler_data_vars in coupler_data_dict.items():
-            print(this_coupler)
+            logger.info(this_coupler)
             ds = xr.merge([self.dataset[var] for var in coupler_data_vars])
             ds.attrs["coupler"] = this_coupler
             ds.attrs["node"] = self.name
@@ -532,7 +532,7 @@ class BaseAllCouplersRepeatAnalysis(BaseAllCouplersAnalysis, ABC):
             if coupler:
                 self.coupler_data_dict[coupler].add(coord)
 
-        print(f"Identified coupler data: {self.coupler_data_dict}")
+        logger.info(f"Identified coupler data: {self.coupler_data_dict}")
 
         # You can now proceed to the rest of the merging process
         merged_dataset = self.open_and_merge_datasets(data_files)
@@ -542,25 +542,27 @@ class BaseAllCouplersRepeatAnalysis(BaseAllCouplersAnalysis, ABC):
         merged_coupler_datasets = []
 
         for file_idx, file_path in enumerate(data_files):
-            print(f"Opening dataset {file_idx + 1}/{len(data_files)}: {file_path}")
+            logger.status(
+                f"Opening dataset {file_idx + 1}/{len(data_files)}: {file_path}"
+            )
             ds = xr.open_dataset(file_path, engine="scipy")
 
             # Step 3: Extract qubit-related data and identify couplers
             for coupler, coords in self.coupler_data_dict.items():
                 qubits = coupler.split("_")
-                print(f"Processing coupler: {coupler}")
+                logger.info(f"Processing coupler: {coupler}")
 
                 qubit_data = [
                     ds[var]
                     for var in self.all_qubits
                     if any(f"q{qubit[-2:]}" in var for qubit in qubits)
                 ]
-                print(
+                logger.info(
                     f"Qubit data found for {coupler}: {[var.name for var in qubit_data]}"
                 )
 
                 if not qubit_data:
-                    print(f"No qubit data found for {coupler}")
+                    logger.info(f"No qubit data found for {coupler}")
                     continue
 
                 # Instead of merging, keep each qubit data separate
@@ -570,13 +572,15 @@ class BaseAllCouplersRepeatAnalysis(BaseAllCouplersAnalysis, ABC):
 
         # Step 5: After all files are processed, merge everything into the final dataset
         if merged_coupler_datasets:
-            print(
+            logger.status(
                 f"Merging {len(merged_coupler_datasets)} datasets into final dataset."
             )
             final_merged_dataset = xr.merge(merged_coupler_datasets)
         else:
             final_merged_dataset = xr.Dataset()
 
-        print(f"Final merged dataset variables: {list(final_merged_dataset.data_vars)}")
+        logger.status(
+            f"Final merged dataset variables: {list(final_merged_dataset.data_vars)}"
+        )
 
         return final_merged_dataset

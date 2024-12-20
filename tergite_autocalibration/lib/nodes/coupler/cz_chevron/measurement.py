@@ -115,8 +115,6 @@ class CZChevron(BaseMeasurement):
                 )
             )
 
-        print(f"{cz_pulse_amplitude = }")
-
         number_of_durations = len(cz_duration_values)
 
         # The outer loop, iterates over all cz_frequencies

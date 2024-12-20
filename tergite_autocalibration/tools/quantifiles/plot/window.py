@@ -187,8 +187,6 @@ class CustomSelector(QtWidgets.QWidget):
         self.set_combo_box.addItems(settables + gettables)
         self.get_combo_box.addItems(settables + gettables)
 
-        # self.set_combo_box.activated[str].connect(lambda x: print(dataset[x]))
-        # self.get_combo_box.activated[str].connect(lambda x: print(dataset[x]))
         self.set_combo_box.activated[str].connect(self.combo_option_selected)
         self.get_combo_box.activated[str].connect(self.combo_option_selected)
 
@@ -224,9 +222,6 @@ class CustomSelector(QtWidgets.QWidget):
         set_selected = self.set_combo_box.currentText()
         get_selected = self.get_combo_box.currentText()
         self.combo_selected.emit(set_selected, get_selected)
-        # self.gettable_toggled.emit(name, enabled)
-        # # set_combo_box.activated[str].connect(lambda x: print(dataset[x]))
-        # # get_combo_box.activated[str].connect(lambda x: print(dataset[x]))
 
 
 class GettableSelectBox(QtWidgets.QFrame):

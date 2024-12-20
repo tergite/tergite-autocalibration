@@ -16,6 +16,8 @@ import sys
 
 from quantify_scheduler.backends.qblox_backend import QbloxHardwareCompilationConfig
 
+from tergite_autocalibration.utils.logging import logger
+
 
 def migrate_qblox_hardware_configuration(file_path_):
     # Load the hardware configuration
@@ -40,12 +42,14 @@ def migrate_qblox_hardware_configuration(file_path_):
     with open(new_file_path, "w") as file_:
         json.dump(json.loads(serialized_config), file_, indent=4)
 
-    print(f"File saved as: {new_file_path}")
+    logger.status(f"File saved as: {new_file_path}")
 
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python migrate_qblox_hardware_configuration.py <file_path>")
+        logger.status(
+            "Usage: python migrate_qblox_hardware_configuration.py <file_path>"
+        )
     else:
         file_path = sys.argv[1]
         migrate_qblox_hardware_configuration(file_path)

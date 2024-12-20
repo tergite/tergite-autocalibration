@@ -36,6 +36,7 @@ from tergite_autocalibration.utils.dto.extended_gates import (
     Measure_RO_3state_Opt,
 )
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
+from tergite_autocalibration.utils.logging import logger
 
 
 class ProcessTomographyMeasurement(BaseMeasurement):
@@ -66,8 +67,8 @@ class ProcessTomographyMeasurement(BaseMeasurement):
 
         all_couplers = list(self.couplers.keys())
         all_qubits = [coupler.split(sep="_") for coupler in all_couplers]
-        print("these are all couplers: ", all_couplers)
-        print("these are all qubits: ", all_qubits)
+        logger.info("these are all couplers: ", all_couplers)
+        logger.info("these are all qubits: ", all_qubits)
         all_qubits = sum(all_qubits, [])
 
         # The outer for-loop iterates over all qubits:
@@ -122,9 +123,9 @@ class ProcessTomographyMeasurement(BaseMeasurement):
                         this_coupler
                     ]
 
-        print(f"{cz_pulse_frequency = }")
-        print(f"{cz_pulse_duration = }")
-        print(f"{cz_pulse_amplitude = }")
+        logger.info(f"{cz_pulse_frequency = }")
+        logger.info(f"{cz_pulse_duration = }")
+        logger.info(f"{cz_pulse_amplitude = }")
 
         for index, this_coupler in enumerate(all_couplers):
             schedule.add_resource(
@@ -139,7 +140,6 @@ class ProcessTomographyMeasurement(BaseMeasurement):
                     freq=-cz_pulse_frequency[this_coupler] + downconvert,
                 )
             )
-        # print(ramsey_phases,qubits)
 
         ramsey_phases_values = ramsey_phases[all_couplers[0]]
         number_of_phases = len(ramsey_phases_values)
@@ -160,7 +160,6 @@ class ProcessTomographyMeasurement(BaseMeasurement):
                 )
 
                 test_state = test_states[int(ramsey_phase)]
-                # print(f'{test_state = }')
                 for this_qubit in all_qubits:
                     if test_state[this_qubit] == "g":
                         end = shot.add(
@@ -206,7 +205,6 @@ class ProcessTomographyMeasurement(BaseMeasurement):
                 )
 
                 test_rotation = test_rotations[int(control_on)]
-                # print(f'{test_state = }')
                 for this_qubit in all_qubits:
                     if test_rotation[this_qubit] == "I":
                         end = shot.add(
@@ -251,7 +249,6 @@ class ProcessTomographyMeasurement(BaseMeasurement):
                 # The inner for-loop iterates over all qubit levels:
                 for level_index, state_level in enumerate(qubit_levels):
                     calib_index = this_index + level_index + 1
-                    # print(f'{calib_index = }')
                     shot.add(Reset(this_qubit))
                     if state_level == 0:
                         prep = shot.add(IdlePulse(40e-9))
@@ -279,6 +276,6 @@ class ProcessTomographyMeasurement(BaseMeasurement):
         shot.add(IdlePulse(16e-9))
 
         schedule.add(IdlePulse(16e-9))
-        print(schedule.add(shot, control_flow=Loop(repetitions), validate=False))
+        logger.info(schedule.add(shot, control_flow=Loop(repetitions), validate=False))
         schedule.add(IdlePulse(16e-9))
         return schedule

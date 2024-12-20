@@ -27,6 +27,7 @@ import toml
 from tergite_autocalibration.config.globals import ENV
 from tergite_autocalibration.tools.mss.convert import store_manual_parameters
 from tergite_autocalibration.tools.mss.storage import get_component_value
+from tergite_autocalibration.utils.logging import logger
 
 BACKEND_CONFIG = Path(__file__).parent / "backend_config_default.toml"
 
@@ -117,11 +118,11 @@ def update_mss(collection: str = None):
         response = requests.put(mss_url + "/backends", backend_snapshot_json)
 
     if response:
-        print(
+        logger.status(
             f"'{current_backend_snapshot['name']}' backend configuration is sent to mss"
         )
     else:
-        print(
+        logger.status(
             f"Could not send '{current_backend_snapshot['name']} 'backend configuration to mss"
         )
 
