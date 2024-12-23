@@ -68,8 +68,8 @@ class EnvironmentConfiguration(BaseConfigurationFile):
 
         self.default_prefix: str = getpass.getuser().replace(" ", "")
 
-        self.file_log_level: int = 25
-        self.stdout_log_level: int = 10
+        self.file_log_level: int = 10
+        self.stdout_log_level: int = 25
 
         self.root_dir: "Path" = Path(__file__).parent.parent.parent
         self.data_dir: "Path" = self.root_dir.joinpath("out")
