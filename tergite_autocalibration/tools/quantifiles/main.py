@@ -22,6 +22,7 @@ from quantify_core.data.handling import set_datadir
 from quantify_core.data.types import TUID
 
 from tergite_autocalibration.config.globals import ENV
+from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.tools.quantifiles.data import (
     get_results_for_date,
     safe_load_dataset,
@@ -30,7 +31,6 @@ from tergite_autocalibration.tools.quantifiles.data import (
 from tergite_autocalibration.tools.quantifiles.path import load_icon
 from tergite_autocalibration.tools.quantifiles.plot.autoplot import autoplot
 from tergite_autocalibration.tools.quantifiles.watcher import TodayFolderMonitor
-from tergite_autocalibration.utils.logging import logger
 
 
 class DateList(QtWidgets.QListWidget):

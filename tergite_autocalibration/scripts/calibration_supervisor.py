@@ -30,6 +30,7 @@ from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION, CLUSTER_IP, CONFIG
+from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.base.node import BaseNode
 from tergite_autocalibration.lib.utils.graph import filtered_topological_order
@@ -41,7 +42,6 @@ from tergite_autocalibration.utils.backend.redis_utils import (
 )
 from tergite_autocalibration.utils.dto.enums import DataStatus, MeasurementMode
 from tergite_autocalibration.utils.io.dataset import create_node_data_path
-from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.utils.logging.visuals import draw_arrow_chart
 
 colorama_init()

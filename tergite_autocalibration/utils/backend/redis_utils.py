@@ -14,9 +14,9 @@
 import toml
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION, CONFIG
+from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
-from tergite_autocalibration.utils.logging import logger
 
 
 def populate_parking_currents(

@@ -10,6 +10,7 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+import atexit
 import os
 from pathlib import Path
 
@@ -18,6 +19,7 @@ import redis
 from tergite_autocalibration.config.env import EnvironmentConfiguration
 from tergite_autocalibration.config.handler import ConfigurationHandler
 from tergite_autocalibration.config.package import ConfigurationPackage
+from tergite_autocalibration.utils.handlers.exit import exit_handler
 from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.utils.misc.tests import is_pytest
 
@@ -47,6 +49,7 @@ REDIS_CONNECTION = redis.Redis(decode_responses=True, port=ENV.redis_port)
 
 # This will be set in matplotlib
 PLOTTING_BACKEND = "tkagg" if ENV.plotting else "agg"
+
 
 # If there is no configuration package loaded, this would throw an error
 try:
@@ -80,6 +83,16 @@ except FileNotFoundError:
         "Please copy configuration files to the root_directory or run `acli config load`."
     )
 
+# Adding handlers to the logger
+# Everything logged above will be captured by the default handlers
+# Adding the handlers at that stage is necessary, because the run id is not defined earlier
+logger.add_console_handler(log_level=ENV.stdout_log_level)
+_log_file_path = os.path.join(ENV.data_dir, CONFIG.run.log_dir)
+if not os.path.exists(_log_file_path):
+    os.makedirs(_log_file_path, exist_ok=True)
+logger.add_file_handler(log_file=CONFIG.run.log_dir, log_level=ENV.file_log_level)
+
+
 # NOTE: The cluster IP right now is passed only as a single value. For bigger setups with more than
 #       one cluster it might make sense to store the cluster ip somewhere else. As of now, there is no
 #       field in the hardware options of the QBLOX hardware configuration that would handle the ip.
@@ -93,3 +106,8 @@ DATA_DIR = ENV.data_dir
 if not os.path.exists(DATA_DIR):
     os.makedirs(DATA_DIR)
     logger.info(f"Initialised DATA_DIR -> {DATA_DIR}")
+
+
+# Register exit handler
+# The exit handler is executed on shutdown of the application
+atexit.register(exit_handler)

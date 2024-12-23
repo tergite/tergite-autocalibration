@@ -17,6 +17,7 @@ import numpy as np
 import optuna
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION, CLUSTER_IP, CONFIG
+from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.lib.nodes import (
     characterization as calibrate_nodes,
 )
@@ -27,7 +28,6 @@ from tergite_autocalibration.scripts.calibration_supervisor import (
 from tergite_autocalibration.scripts.calibration_supervisor import CalibrationSupervisor
 from tergite_autocalibration.utils.backend.reset_redis_node import ResetRedisNode
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
-from tergite_autocalibration.utils.logging import logger
 
 qubits_10 = [f"q{i}" for i in range(16, 26)]
 

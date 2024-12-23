@@ -17,12 +17,12 @@ from scipy.optimize import curve_fit
 from scipy.stats import chi2 as chi2dist
 
 from tergite_autocalibration.config.globals import ENV
+from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.lib.base.analysis import BaseAnalysis
 from tergite_autocalibration.lib.nodes.coupler.cz_chevron.utils.cz_singleGateSimpleFitResult import (
     CZSingleGateSimpleFitResult,
     FitResultStatus,
 )
-from tergite_autocalibration.utils.logging import logger
 
 
 class CZSingleGateSimpleFit(BaseAnalysis):

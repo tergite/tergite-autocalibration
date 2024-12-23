@@ -31,6 +31,7 @@ from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
 )
 
 from tergite_autocalibration.config.globals import PLOTTING_BACKEND
+from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.lib.utils.device import DeviceConfiguration
@@ -40,7 +41,6 @@ from tergite_autocalibration.utils.io.dataset import (
     configure_dataset,
     save_dataset,
 )
-from tergite_autocalibration.utils.logging import logger
 
 colorama_init()
 

@@ -25,9 +25,9 @@ import requests
 import toml
 
 from tergite_autocalibration.config.globals import ENV
+from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.tools.mss.convert import store_manual_parameters
 from tergite_autocalibration.tools.mss.storage import get_component_value
-from tergite_autocalibration.utils.logging import logger
 
 BACKEND_CONFIG = Path(__file__).parent / "backend_config_default.toml"
 

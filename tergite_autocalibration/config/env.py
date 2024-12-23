@@ -68,7 +68,8 @@ class EnvironmentConfiguration(BaseConfigurationFile):
 
         self.default_prefix: str = getpass.getuser().replace(" ", "")
 
-        self.log_level: int = 25
+        self.file_log_level: int = 25
+        self.stdout_log_level: int = 10
 
         self.root_dir: "Path" = Path(__file__).parent.parent.parent
         self.data_dir: "Path" = self.root_dir.joinpath("out")
@@ -106,7 +107,7 @@ class EnvironmentConfiguration(BaseConfigurationFile):
         """
         # Note: The logger is imported locally to prevent circular dependencies.
         #       The circular dependency is introduced, because the log level can be set in the environmental variables.
-        from tergite_autocalibration.utils.logging import logger
+        from tergite_autocalibration.config.globals import logger
 
         return_obj = EnvironmentConfiguration()
         return_obj._write_env = write_env

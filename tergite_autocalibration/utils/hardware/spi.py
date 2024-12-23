@@ -18,9 +18,9 @@ from qblox_instruments import SpiRack
 from qcodes import validators
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
+from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
-from tergite_autocalibration.utils.logging import logger
 
 
 def find_serial_port():

@@ -17,6 +17,7 @@ import toml
 from tergite_autocalibration.config.globals import CONFIG
 from tergite_autocalibration.utils.logging import logger
 
+
 ###
 # NOTE: A global instance of DataHandler (dh) can be found below and be imported in the code
 ###

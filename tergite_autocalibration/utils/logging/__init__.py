@@ -11,9 +11,9 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import atexit
 import logging.handlers
-import sys
+
+# from tergite_autocalibration.config.globals import ENV
 
 
 class ExtendedLogger(logging.Logger):
@@ -78,35 +78,7 @@ class ExtendedLogger(logging.Logger):
         self.addHandler(file_handler)
 
 
-# Create a logger with console and file handler
+# Create a logger
+# This is right now an empty logger without handlers
+# To use the logger, you have to add the handlers e.g. in tergite_autocalibration.config.globals
 logger = ExtendedLogger(__name__)
-logger.add_console_handler()
-logger.add_file_handler()
-
-
-def exit_handler():
-    """
-    Cleanup actions on exit of the autocalibration
-    """
-
-    # Retrieve whether the program is crashing or terminated normally
-    exc_type, exc_value, _ = sys.exc_info()
-
-    # This is the normal case when the program just terminates
-    if exc_type is None:
-        logger.status("Autocalibration terminated successfully. Goodbye.")
-
-    # This is the case where the program got interrupted by the user
-    elif exc_type is KeyboardInterrupt:
-        logger.status("Autocalibration exited due to user interruption (Ctrl+C).")
-
-    # This is the case whenever the program crashed
-    else:
-        logger.error(
-            f"Autocalibration exited due to an exception: {exc_type.__name__}: {exc_value}"
-        )
-
-
-# Register a handler for the cleanup actions.
-# It is safe to register the cleanup here in the logger file, since the logger is loaded throughout the whole package.
-atexit.register(exit_handler)
