@@ -25,13 +25,12 @@ import xarray
 from colorama import Fore, Style
 from colorama import init as colorama_init
 from quantify_scheduler.backends import SerialCompiler
-from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
 from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
     CompiledSchedule,
     InstrumentCoordinator,
 )
 
-from tergite_autocalibration.config.globals import CONFIG, PLOTTING_BACKEND
+from tergite_autocalibration.config.globals import PLOTTING_BACKEND
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.lib.utils.device import DeviceConfiguration
@@ -189,6 +188,16 @@ class BaseNode(abc.ABC):
         compiled_schedule = compiler.compile(
             schedule=schedule, config=compilation_config
         )
+
+        # with open(f"timing_instructions_table_{self.name}.html", "w") as f:
+        #     f.write(
+        #         compiled_schedule.timing_table.hide(
+        #             subset=["waveform_op_id", "operation_hash"], axis=1
+        #         ).to_html()
+        #     )
+
+        # fig = compiled_schedule.plot_pulse_diagram(plot_backend="plotly")
+        # fig.write_html(f"{self.name}_plotly.html")
 
         return compiled_schedule
 

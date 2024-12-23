@@ -14,6 +14,7 @@
 
 import matplotlib.patches as mpatches
 import numpy as np
+import xarray as xr
 from numpy.linalg import inv
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
@@ -23,6 +24,7 @@ from tergite_autocalibration.lib.base.analysis import (
     BaseAllQubitsAnalysis,
     BaseQubitAnalysis,
 )
+from tergite_autocalibration.lib.utils.analysis_models import ThreeClassBoundary
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 
 
@@ -45,14 +47,14 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
             else:
                 raise ValueError("Coordinate not found in dataset")
 
-        self.S21 = self.S21.stack(shots=[self.loop_coord, self.state_coord])
-        self.qubit_states = self.S21[self.state_coord].values
+        self.S21_stacked = self.S21.stack(shots=[self.loop_coord, self.state_coord])
+        self.qubit_states = self.S21_stacked[self.state_coord].values
         self.fit_results = {}
 
     def IQ(self, index: int):
         """Extracts I/Q components from the dataset at a given index."""
 
-        IQ_complex = self.S21[self.data_var].isel(
+        IQ_complex = self.S21_stacked[self.data_var].isel(
             {self.amplitude_coord: index}
         )  # Use `.isel()` to index correctly
         I = IQ_complex.real.values
@@ -63,25 +65,70 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
         self.fidelities = []
         self.cms = []
 
-        y = self.qubit_states
+        states_sent = self.qubit_states
 
         self.lda = LinearDiscriminantAnalysis(solver="svd", store_covariance=True)
 
+        array_iq0_tp = xr.DataArray().expand_dims({self.amplitude_coord: []})
+        array_iq0_fp = xr.DataArray().expand_dims({self.amplitude_coord: []})
+        array_iq1_tp = xr.DataArray().expand_dims({self.amplitude_coord: []})
+        array_iq1_fp = xr.DataArray().expand_dims({self.amplitude_coord: []})
         for index, ro_amplitude in enumerate(self.amplitudes):
             iq = self.IQ(index)
-            y_pred = self.lda.fit(iq, y).predict(iq)
+            classified_states = self.lda.fit(iq, states_sent).predict(iq)
 
-            cm_norm = confusion_matrix(y, y_pred, normalize="true")
+            true_positives = states_sent == classified_states
+            tp0 = true_positives[states_sent == 0]
+            tp1 = true_positives[states_sent == 1]
+            IQ0 = iq[states_sent == 0]  # IQ when sending 0
+            IQ1 = iq[states_sent == 1]  # IQ when sending 1
+
+            IQ0_tp = xr.DataArray(
+                IQ0[tp0],
+                name="IQ0_tp",
+                dims=["shots", "re_im"],
+                coords={"re_im": ["re", "im"], "shots": np.arange(len(IQ0[tp0]))},
+            ).expand_dims(
+                {self.amplitude_coord: [ro_amplitude]}
+            )  # True Positive when sending 0
+
+            IQ0_fp = xr.DataArray(
+                IQ0[~tp0],
+                name="IQ0_fp",
+                dims=["shots", "re_im"],
+                coords={"re_im": ["re", "im"], "shots": np.arange(len(IQ0[~tp0]))},
+            ).expand_dims({self.amplitude_coord: [ro_amplitude]})
+
+            IQ1_tp = xr.DataArray(
+                IQ1[tp1],
+                name="IQ1_tp",
+                dims=["shots", "re_im"],
+                coords={"re_im": ["re", "im"], "shots": np.arange(len(IQ1[tp1]))},
+            ).expand_dims(
+                {self.amplitude_coord: [ro_amplitude]}
+            )  # True Positive when sending 1
+
+            IQ1_fp = xr.DataArray(
+                IQ1[~tp1],
+                name="IQ1_fp",
+                dims=["shots", "re_im"],
+                coords={"re_im": ["re", "im"], "shots": np.arange(len(IQ1[~tp1]))},
+            ).expand_dims({self.amplitude_coord: [ro_amplitude]})
+            array_iq0_tp = xr.concat([IQ0_tp, array_iq0_tp], dim=self.amplitude_coord)
+            array_iq0_fp = xr.concat([IQ0_fp, array_iq0_fp], dim=self.amplitude_coord)
+            array_iq1_tp = xr.concat([IQ1_tp, array_iq1_tp], dim=self.amplitude_coord)
+            array_iq1_fp = xr.concat([IQ1_fp, array_iq1_fp], dim=self.amplitude_coord)
+
+            cm_norm = confusion_matrix(states_sent, classified_states, normalize="true")
             assignment = np.trace(cm_norm) / len(self.unique_qubit_states)
-            # if self.qubit == "q06":
-            #     breakpoint()
             self.fidelities.append(assignment)
             self.cms.append(cm_norm)
 
+        self.iq0_tp = array_iq0_tp
+        self.iq0_fp = array_iq0_fp
+        self.iq1_tp = array_iq1_tp
+        self.iq1_fp = array_iq1_fp
         self.optimal_index = np.argmax(self.fidelities)
-        print("WARNING CHANGING OPTOMAL INDEX")
-        self.optimal_index = 40
-
         self.optimal_amplitude = self.amplitudes.values[self.optimal_index]
         self.optimal_inv_cm = inv(self.cms[self.optimal_index])
 
@@ -106,6 +153,22 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
         primary_axis.legend(handles=handles, fontsize="small")
 
 
+class TwoClassBoundary:
+    def __init__(self, lda: LinearDiscriminantAnalysis):
+        if len(lda.classes_) != 2:
+            raise ValueError("The Classifcation classes are not 2.")
+        # determining the discriminant line from the canonical form Ax + By + intercept = 0
+        A = self.lda.coef_[0][0]
+        B = self.lda.coef_[0][1]
+        self.centers = self.lda.means_
+        intercept = self.lda.intercept_
+        self.lamda = -A / B
+        self.theta_rad = np.arctan(self.lamda)
+        threshold = np.abs(intercept) / np.sqrt(A**2 + B**2)
+        self.threshold = threshold[0]
+        self.y_intecept = -intercept / B
+
+
 class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
@@ -117,133 +180,202 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
             str(element) for element in list(self.optimal_inv_cm.flatten())
         )
 
-        y = self.qubit_states
+        states = self.qubit_states
 
         optimal_IQ = self.IQ(self.optimal_index)
-        optimal_y = self.lda.fit(optimal_IQ, y).predict(optimal_IQ)
-
-        # determining the discriminant line from the canonical form Ax + By + intercept = 0
-        A = self.lda.coef_[0][0]
-        B = self.lda.coef_[0][1]
-        intercept = self.lda.intercept_
-        self.lamda = -A / B
-        theta_rad = np.arctan(self.lamda)
-        theta = np.rad2deg(np.arctan(self.lamda))
-        threshold = np.abs(intercept) / np.sqrt(A**2 + B**2)
-        threshold = threshold[0]
-
-        self.y_intecept = +intercept / B
+        classified_states = self.lda.fit(optimal_IQ, states).predict(optimal_IQ)
 
         self.x_space = np.linspace(optimal_IQ[:, 0].min(), optimal_IQ[:, 0].max(), 100)
-        self.y_limits = (optimal_IQ[:, 1].min(), optimal_IQ[:, 1].max())
 
-        true_positives = y == optimal_y
-        tp0 = true_positives[y == 0]
-        tp1 = true_positives[y == 1]
-        IQ0 = optimal_IQ[y == 0]  # IQ when sending 0
-        IQ1 = optimal_IQ[y == 1]  # IQ when sending 1
+        true_positives = states == classified_states
+        tp0 = true_positives[states == 0]
+        tp1 = true_positives[states == 1]
+        IQ0 = optimal_IQ[states == 0]  # IQ when sending 0
+        IQ1 = optimal_IQ[states == 1]  # IQ when sending 1
 
-        rotation_angle = np.pi / 2 - theta_rad
-        rotation_matrix = np.array(
-            [
-                [np.cos(rotation_angle), -np.sin(rotation_angle)],
-                [np.sin(rotation_angle), np.cos(rotation_angle)],
-            ]
-        )
-        mirror_rotation = np.array(
-            [
-                [np.cos(np.pi), -np.sin(np.pi)],
-                [np.sin(np.pi), np.cos(np.pi)],
-            ]
-        )
-
-        translated_IQ = optimal_IQ - np.array([0, self.y_intecept[0]])
-        rotated_IQ = translated_IQ @ rotation_matrix.T
-        # self.y_limits = (optimal_IQ[:, 1].min(), optimal_IQ[:, 1].max())
-
-        # translate point so the y_intecept becomes the origin
-        translated_IQ0 = translated_IQ[y == 0]
-        translated_IQ1 = translated_IQ[y == 1]
-        # @ is the matrix multiplication operator
-        rotated_IQ0 = translated_IQ0 @ rotation_matrix.T
-        rotated_IQ1 = translated_IQ1 @ rotation_matrix.T
-
-        threshold_direction = theta_rad - np.pi / 2
-        center_rotated_I_0 = np.mean(rotated_IQ0[:, 0])
-
-        # probably there is a more elegant solution
-        if center_rotated_I_0 > 0:
-            rotation_angle = rotation_angle + np.pi
-            threshold_direction = threshold_direction + np.pi
-            rotated_IQ0 = rotated_IQ0 @ mirror_rotation.T
-            rotated_IQ1 = rotated_IQ1 @ mirror_rotation.T
-            rotated_IQ = rotated_IQ @ mirror_rotation.T
-
+        # rotation_angle = np.pi / 2 - theta_rad
+        # rotation_matrix = np.array(
+        #     [
+        #         [np.cos(rotation_angle), -np.sin(rotation_angle)],
+        #         [np.sin(rotation_angle), np.cos(rotation_angle)],
+        #     ]
+        # )
+        # mirror_rotation = np.array(
+        #     [
+        #         [np.cos(np.pi), -np.sin(np.pi)],
+        #         [np.sin(np.pi), np.cos(np.pi)],
+        #     ]
+        # )
+        #
+        # translated_IQ = optimal_IQ - np.array([0, self.y_intecept[0]])
+        # rotated_IQ = translated_IQ @ rotation_matrix.T
+        # # self.y_limits = (optimal_IQ[:, 1].min(), optimal_IQ[:, 1].max())
+        #
+        # # translate point so the y_intecept becomes the origin
+        # translated_IQ0 = translated_IQ[states == 0]
+        # translated_IQ1 = translated_IQ[states == 1]
+        # # @ is the matrix multiplication operator
+        # rotated_IQ0 = translated_IQ0 @ rotation_matrix.T
+        # rotated_IQ1 = translated_IQ1 @ rotation_matrix.T
+        #
+        # threshold_direction = theta_rad - np.pi / 2
+        # center_rotated_I_0 = np.mean(rotated_IQ0[:, 0])
+        # if center_rotated_I_0 > 0:
+        #     rotation_angle = rotation_angle + np.pi
+        #     threshold_direction = threshold_direction + np.pi
+        #     rotated_IQ0 = rotated_IQ0 @ mirror_rotation.T
+        #     rotated_IQ1 = rotated_IQ1 @ mirror_rotation.T
+        #     rotated_IQ = rotated_IQ @ mirror_rotation.T
+        #
         # self.threshold_point = self.threshold * np.array(
         #     [np.cos(threshold_direction), np.sin(threshold_direction)]
         # )
-        self.rotated_IQ0_tp = rotated_IQ0[tp0]  # True Positive when sending 0
-        self.rotated_IQ0_fp = rotated_IQ0[~tp0]
-        self.rotated_IQ1_tp = rotated_IQ1[tp1]  # True Positive when sending 1
-        self.rotated_IQ1_fp = rotated_IQ1[~tp1]
+        # self.rotated_IQ0_tp = rotated_IQ0[tp0]  # True Positive when sending 0
+        # self.rotated_IQ0_fp = rotated_IQ0[~tp0]
+        # self.rotated_IQ1_tp = rotated_IQ1[tp1]  # True Positive when sending 1
+        # self.rotated_IQ1_fp = rotated_IQ1[~tp1]
         self.IQ0_tp = IQ0[tp0]  # True Positive when sending 0
         self.IQ0_fp = IQ0[~tp0]
         self.IQ1_tp = IQ1[tp1]  # True Positive when sending 1
         self.IQ1_fp = IQ1[~tp1]
 
-        self.rotated_y_limits = (rotated_IQ[:, 1].min(), rotated_IQ[:, 1].max())
+        # self.rotated_y_limits = (rotated_IQ[:, 1].min(), rotated_IQ[:, 1].max())
         self.y_limits = (optimal_IQ[:, 1].min(), optimal_IQ[:, 1].max())
 
-        self.rotation_angle = rotation_angle
-        self.rotation_angle_degrees = np.rad2deg(rotation_angle)
-        print(f"{self.qubit}.measure.acq_rotation = {self.rotation_angle_degrees}")
-        # print(f"{self.qubit}.measure.acq_threshold = {self.threshold}")
+        # self.rotation_angle = rotation_angle
+        # self.rotation_angle_degrees = np.rad2deg(rotation_angle)
 
-        print("WARNING 0 threshold on return")
-        return [self.optimal_amplitude, self.rotation_angle_degrees, 0]
+        print("WARNING RETURN")
+        return
+
+        return [self.optimal_amplitude, self.rotation_angle_degrees, self.threshold]
 
     def plotter(self, ax, secondary_axes):
         self.primary_plotter(ax)
 
-        iq_axis = secondary_axes[0]
         mark_size = 40
-        iq_axis.plot(self.x_space, self.lamda * self.x_space - self.y_intecept, lw=2)
-        iq_axis.scatter(
-            self.IQ0_tp[:, 0],
-            self.IQ0_tp[:, 1],
-            marker=".",
-            s=mark_size,
-            color="red",
-            label="send 0 and read 0",
-        )
-        iq_axis.scatter(
-            self.IQ0_fp[:, 0],
-            self.IQ0_fp[:, 1],
-            marker="x",
-            s=mark_size,
-            color="orange",
-        )
-        iq_axis.scatter(
-            self.IQ1_tp[:, 0],
-            self.IQ1_tp[:, 1],
-            marker=".",
-            s=mark_size,
-            color="blue",
-            label="send 1 and read 1",
-        )
-        iq_axis.scatter(
-            self.IQ1_fp[:, 0],
-            self.IQ1_fp[:, 1],
-            marker="x",
-            s=mark_size,
-            color="dodgerblue",
-        )
-        iq_axis.set_ylim(*self.y_limits)
+        for i_ax in range(6):
+            IQ0_tp = self.iq0_tp.isel({self.amplitude_coord: i_ax + 10})
+            IQ0_fp = self.iq0_fp.isel({self.amplitude_coord: i_ax + 10})
+            IQ1_tp = self.iq1_tp.isel({self.amplitude_coord: i_ax + 10})
+            IQ1_fp = self.iq1_fp.isel({self.amplitude_coord: i_ax + 10})
+            iq_axis = secondary_axes[i_ax]
 
-        cm_axis = secondary_axes[1]
-        optimal_confusion_matrix = self.cms[self.optimal_index]
-        disp = ConfusionMatrixDisplay(confusion_matrix=optimal_confusion_matrix)
-        disp.plot(ax=cm_axis)
+            iq_axis.axis("equal")
+            iq_axis.scatter(
+                IQ0_tp.sel({"re_im": "re"}),
+                IQ0_tp.sel({"re_im": "im"}),
+                # self.IQ0_tp[:, 0],
+                # self.IQ0_tp[:, 1],
+                marker=".",
+                s=mark_size,
+                color="blue",
+                label="send 0 and read 0",
+            )
+            iq_axis.scatter(
+                IQ0_fp.sel({"re_im": "re"}),
+                IQ0_fp.sel({"re_im": "im"}),
+                # self.IQ0_fp[:, 0],
+                # self.IQ0_fp[:, 1],
+                marker="x",
+                s=mark_size,
+                color="dodgerblue",
+            )
+            iq_axis.scatter(
+                IQ1_tp.sel({"re_im": "re"}),
+                IQ1_tp.sel({"re_im": "im"}),
+                # self.IQ1_tp[:, 0],
+                # self.IQ1_tp[:, 1],
+                marker=".",
+                s=mark_size,
+                color="red",
+                label="send 1 and read 1",
+            )
+            iq_axis.scatter(
+                IQ1_fp.sel({"re_im": "re"}),
+                IQ1_fp.sel({"re_im": "im"}),
+                # self.IQ1_fp[:, 0],
+                # self.IQ1_fp[:, 1],
+                marker="x",
+                s=mark_size,
+                color="orange",
+            )
+            iq_axis.set_ylim(*self.y_limits)
+            iq_axis.legend()
+            iq_axis.axhline(0, color="black")
+            iq_axis.axvline(0, color="black")
+
+        # iq_axis.scatter(
+        #     self.centers[:, 0],
+        #     self.centers[:, 1],
+        #     s=2 * mark_size,
+        #     color="orange",
+        #     zorder=10,
+        # )
+        # iq_axis.scatter(
+        #     0,
+        #     self.y_intecept,
+        #     s=2 * mark_size,
+        #     marker="P",
+        #     color="black",
+        #     zorder=11,
+        # )
+
+        # iq_axis.plot(
+        #     self.x_space,
+        #     self.lamda * self.x_space + self.y_intecept,
+        #     lw=2,
+        #     label=f"angle: {self.rotation_angle_degrees:0.1f}",
+        # )
+
+        # iq_axis.plot(
+        #     [0, self.threshold_point[0]],
+        #     [0, self.threshold_point[1]],
+        #     lw=3,
+        #     color="magenta",
+        #     label=f"threshold: {self.threshold:0.4f}",
+        # )
+        # rotated_iq_axis = secondary_axes[1]
+        # rotated_iq_axis.axis("equal")
+        # rotated_iq_axis.scatter(
+        #     self.rotated_IQ0_tp[:, 0],
+        #     self.rotated_IQ0_tp[:, 1],
+        #     marker=".",
+        #     s=mark_size,
+        #     color="blue",
+        #     label="send 0 and read 0",
+        # )
+        # rotated_iq_axis.scatter(
+        #     self.rotated_IQ0_fp[:, 0],
+        #     self.rotated_IQ0_fp[:, 1],
+        #     marker="x",
+        #     s=mark_size,
+        #     color="dodgerblue",
+        # )
+        # rotated_iq_axis.scatter(
+        #     self.rotated_IQ1_tp[:, 0],
+        #     self.rotated_IQ1_tp[:, 1],
+        #     marker=".",
+        #     s=mark_size,
+        #     color="red",
+        #     label="send 1 and read 1",
+        # )
+        # rotated_iq_axis.scatter(
+        #     self.rotated_IQ1_fp[:, 0],
+        #     self.rotated_IQ1_fp[:, 1],
+        #     marker="x",
+        #     s=mark_size,
+        #     color="orange",
+        # )
+        # rotated_iq_axis.set_ylim(*self.rotated_y_limits)
+        # rotated_iq_axis.legend()
+        # rotated_iq_axis.axhline(0, color="black")
+        # rotated_iq_axis.axvline(0, color="black")
+
+        # cm_axis = secondary_axes[1]
+        # optimal_confusion_matrix = self.cms[self.optimal_index]
+        # disp = ConfusionMatrixDisplay(confusion_matrix=optimal_confusion_matrix)
+        # disp.plot(ax=cm_axis)
 
     def update_redis_trusted_values(self, node: str, this_element: str):
         """
@@ -403,7 +535,7 @@ class OptimalROTwoStateAmplitudeNodeAnalysis(BaseAllQubitsAnalysis):
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-        self.plots_per_qubit = 3
+        self.plots_per_qubit = 7
 
     def _fill_plots(self):
         for index, analysis in enumerate(self.qubit_analyses):

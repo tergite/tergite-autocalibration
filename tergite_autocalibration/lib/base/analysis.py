@@ -67,8 +67,6 @@ class BaseAnalysis(ABC):
     # -> It is probably not that much effort to implement several QOI classes
     # -> We could start with a BaseQOI and add more as soon as needed
     def update_redis_trusted_values(self, node: str, this_element: str):
-        print('WARNING RETURN ')
-        return
         for i, transmon_parameter in enumerate(self.redis_fields):
             if "_" in this_element:
                 name = "couplers"

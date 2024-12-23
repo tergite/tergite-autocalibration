@@ -19,7 +19,7 @@ from tergite_autocalibration.config.legacy import dh
 
 
 def resonator_samples(qubit: str) -> np.ndarray:
-    res_spec_samples = 101
+    res_spec_samples = 91
     sweep_range = 4.0e6
     print(dh.get_legacy("VNA_resonator_frequencies")[qubit])
     VNA_frequency = dh.get_legacy("VNA_resonator_frequencies")[qubit]

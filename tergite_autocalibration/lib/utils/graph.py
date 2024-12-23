@@ -52,6 +52,7 @@ graph_dependencies = [
     ("resonator_spectroscopy", "ro_amplitude_three_state_optimization"),
     ("resonator_spectroscopy", "ro_amplitude_two_state_optimization"),
     ("resonator_spectroscopy", "ro_frequency_two_state_optimization"),
+    ("resonator_spectroscopy", "punchout"),
     ("T1", "T2"),
     ("T2", "T2_echo"),
     ("T2_echo", "randomized_benchmarking_ssro"),
@@ -149,8 +150,7 @@ def range_topological_order(from_node: str, target_node: str):
     coupler_path = []
     if target_node == "punchout":
         topo_order = ["punchout"]
-
-    if target_node == "resonator_relaxation":
+    elif target_node == "resonator_relaxation":
         topo_order = ["resonator_relaxation"]
     else:
         topo_order = nx.shortest_path(graph, from_node, target_node, weight="weight")

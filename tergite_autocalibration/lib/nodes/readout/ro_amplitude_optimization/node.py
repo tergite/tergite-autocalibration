@@ -78,7 +78,6 @@ class ROAmplitudeThreeStateOptimizationNode(ScheduleNode):
         self.loops = 100
         self.schedule_keywords["loop_repetitions"] = self.loops
         self.schedule_keywords["qubit_state"] = self.qubit_state
-        self.plots_per_qubit = 3  #  fidelity plot, IQ shots, confusion matrix
 
         self.schedule_samplespace = {
             "qubit_states": {
