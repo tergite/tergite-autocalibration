@@ -245,8 +245,11 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         # self.rotation_angle = rotation_angle
         # self.rotation_angle_degrees = np.rad2deg(rotation_angle)
 
-        print("WARNING RETURN")
-        return
+        print("WARNING ZERO ROTATION")
+        print("*" * 55)
+        self.rotation_angle = 0
+        self.rotation_angle_degrees = 0
+        self.threshold = 0
 
         return [self.optimal_amplitude, self.rotation_angle_degrees, self.threshold]
 
@@ -255,10 +258,10 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
 
         mark_size = 40
         for i_ax in range(6):
-            IQ0_tp = self.iq0_tp.isel({self.amplitude_coord: i_ax + 10})
-            IQ0_fp = self.iq0_fp.isel({self.amplitude_coord: i_ax + 10})
-            IQ1_tp = self.iq1_tp.isel({self.amplitude_coord: i_ax + 10})
-            IQ1_fp = self.iq1_fp.isel({self.amplitude_coord: i_ax + 10})
+            IQ0_tp = self.iq0_tp.isel({self.amplitude_coord: i_ax})
+            IQ0_fp = self.iq0_fp.isel({self.amplitude_coord: i_ax})
+            IQ1_tp = self.iq1_tp.isel({self.amplitude_coord: i_ax})
+            IQ1_fp = self.iq1_fp.isel({self.amplitude_coord: i_ax})
             iq_axis = secondary_axes[i_ax]
 
             iq_axis.axis("equal")

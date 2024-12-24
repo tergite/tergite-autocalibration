@@ -47,9 +47,10 @@ class ROAmplitudeTwoStateOptimizationNode(ScheduleNode):
         self.loops = self.schedule_keywords["loop_repetitions"]
 
         self.schedule_samplespace = {
-            "ro_amplitudes": {
-                qubit: np.linspace(0.01, 0.1, 11) for qubit in self.all_qubits
-            },
+            "ro_amplitudes": {qubit: np.repeat(0.01, 21) for qubit in self.all_qubits},
+            # "ro_amplitudes": {
+            #     qubit: np.linspace(0.001, 0.015, 21) for qubit in self.all_qubits
+            # },
             "qubit_states": {
                 qubit: np.array([0, 1], dtype=np.int16) for qubit in self.all_qubits
             },
