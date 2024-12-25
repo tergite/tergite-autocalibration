@@ -67,6 +67,8 @@ class BaseAnalysis(ABC):
     # -> It is probably not that much effort to implement several QOI classes
     # -> We could start with a BaseQOI and add more as soon as needed
     def update_redis_trusted_values(self, node: str, this_element: str):
+        print("WARNING RETURN BASE ANALYSIS")
+        return
         for i, transmon_parameter in enumerate(self.redis_fields):
             if "_" in this_element:
                 name = "couplers"
@@ -307,10 +309,10 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
     def __init__(self, name, redis_fields):
         self.name = name
         self.redis_fields = redis_fields
-        self.dataset = None
-        self.S21 = None
+        self.dataset = xr.Dataset
+        self.S21: xr.DataArray
         self.data_var = None
-        self.qubit = None
+        self.qubit: str
         self.coord = None
 
     def process_qubit(self, dataset, qubit_element):

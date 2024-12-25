@@ -13,6 +13,7 @@
 
 import numpy as np
 
+from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.analysis import (
     OptimalROThreeStateAmplitudeNodeAnalysis,
     OptimalROTwoStateAmplitudeNodeAnalysis,
@@ -34,11 +35,7 @@ class ROAmplitudeTwoStateOptimizationNode(ScheduleNode):
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
-        self.name = name
-        self.all_qubits = all_qubits
         self.qubit_state = 1
-        # FIXME: This is a sort of hack to ignore the couplers
-        self.schedule_keywords = {}
         self.loops = 1000
         self.schedule_keywords["loop_repetitions"] = self.loops
         self.schedule_keywords["qubit_state"] = self.qubit_state
@@ -47,14 +44,21 @@ class ROAmplitudeTwoStateOptimizationNode(ScheduleNode):
         self.loops = self.schedule_keywords["loop_repetitions"]
 
         self.schedule_samplespace = {
-            "ro_amplitudes": {qubit: np.repeat(0.01, 21) for qubit in self.all_qubits},
-            # "ro_amplitudes": {
-            #     qubit: np.linspace(0.001, 0.015, 21) for qubit in self.all_qubits
-            # },
             "qubit_states": {
                 qubit: np.array([0, 1], dtype=np.int16) for qubit in self.all_qubits
             },
+            "ro_amplitudes": {
+                qubit: np.linspace(
+                    self.punchout_amplitude(qubit) / 4,
+                    self.punchout_amplitude(qubit) * 2,
+                    45,
+                )
+                for qubit in self.all_qubits
+            },
         }
+
+    def punchout_amplitude(self, qubit: str):
+        return float(REDIS_CONNECTION.hget(f"transmons:{qubit}", "measure:pulse_amp"))
 
 
 class ROAmplitudeThreeStateOptimizationNode(ScheduleNode):
@@ -72,10 +76,7 @@ class ROAmplitudeThreeStateOptimizationNode(ScheduleNode):
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
-        self.name = name
-        self.all_qubits = all_qubits
         self.qubit_state = 2
-        self.schedule_keywords = {}  # this is probably not needed
         self.loops = 100
         self.schedule_keywords["loop_repetitions"] = self.loops
         self.schedule_keywords["qubit_state"] = self.qubit_state

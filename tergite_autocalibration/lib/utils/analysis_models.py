@@ -14,7 +14,25 @@
 import lmfit
 import numpy as np
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+
 from tergite_autocalibration.lib.utils.functions import exponential_decay_function
+
+
+class TwoClassBoundary:
+    def __init__(self, lda: LinearDiscriminantAnalysis):
+        if len(lda.classes_) != 2:
+            raise ValueError("The Classifcation classes are not 2.")
+        # determining the discriminant line from the canonical form Ax + By + intercept = 0
+        A = lda.coef_[0][0]
+        B = lda.coef_[0][1]
+        self.centers = lda.means_
+        intercept = lda.intercept_
+        self.lamda = -A / B
+        self.theta_rad = np.arctan(self.lamda)
+        threshold = np.abs(intercept) / np.sqrt(A**2 + B**2)
+        self.threshold = threshold[0]
+        self.y_intecept = -intercept / B
+
 
 class ThreeClassBoundary:
     def __init__(self, lda: LinearDiscriminantAnalysis):
@@ -97,6 +115,7 @@ class ThreeClassBoundary:
             i_values,
             boundary_slope * (i_values - self.centroid[0]) + self.centroid[1],
         )
+
 
 class ExpDecayModel(lmfit.model.Model):
     """

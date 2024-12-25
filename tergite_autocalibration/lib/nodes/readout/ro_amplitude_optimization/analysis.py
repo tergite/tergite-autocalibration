@@ -24,7 +24,10 @@ from tergite_autocalibration.lib.base.analysis import (
     BaseAllQubitsAnalysis,
     BaseQubitAnalysis,
 )
-from tergite_autocalibration.lib.utils.analysis_models import ThreeClassBoundary
+from tergite_autocalibration.lib.utils.analysis_models import (
+    ThreeClassBoundary,
+    TwoClassBoundary,
+)
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 
 
@@ -39,6 +42,7 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
             if "amplitudes" in coord:
                 self.amplitude_coord = coord
                 self.amplitudes = self.S21.coords[coord]
+                self.number_of_amplitudes = self.amplitudes.size
             elif "state" in coord:
                 self.state_coord = coord
                 self.unique_qubit_states = self.S21[coord].values
@@ -135,6 +139,10 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
         return
 
     def primary_plotter(self, ax):
+        punchout_amplitude = float(
+            REDIS_CONNECTION.hget(f"transmons:{self.qubit}", "measure:pulse_amp")
+        )
+        ax.axvline(punchout_amplitude, color="black", label="punchout value")
         ax.set_xlabel("RO amplitude")
         ax.set_ylabel("assignment fidelity")
         ax.plot(self.amplitudes, self.fidelities)
@@ -153,22 +161,6 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
         primary_axis.legend(handles=handles, fontsize="small")
 
 
-class TwoClassBoundary:
-    def __init__(self, lda: LinearDiscriminantAnalysis):
-        if len(lda.classes_) != 2:
-            raise ValueError("The Classifcation classes are not 2.")
-        # determining the discriminant line from the canonical form Ax + By + intercept = 0
-        A = self.lda.coef_[0][0]
-        B = self.lda.coef_[0][1]
-        self.centers = self.lda.means_
-        intercept = self.lda.intercept_
-        self.lamda = -A / B
-        self.theta_rad = np.arctan(self.lamda)
-        threshold = np.abs(intercept) / np.sqrt(A**2 + B**2)
-        self.threshold = threshold[0]
-        self.y_intecept = -intercept / B
-
-
 class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
@@ -185,195 +177,232 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         optimal_IQ = self.IQ(self.optimal_index)
         classified_states = self.lda.fit(optimal_IQ, states).predict(optimal_IQ)
 
-        self.x_space = np.linspace(optimal_IQ[:, 0].min(), optimal_IQ[:, 0].max(), 100)
-
         true_positives = states == classified_states
         tp0 = true_positives[states == 0]
         tp1 = true_positives[states == 1]
         IQ0 = optimal_IQ[states == 0]  # IQ when sending 0
         IQ1 = optimal_IQ[states == 1]  # IQ when sending 1
 
-        # rotation_angle = np.pi / 2 - theta_rad
-        # rotation_matrix = np.array(
-        #     [
-        #         [np.cos(rotation_angle), -np.sin(rotation_angle)],
-        #         [np.sin(rotation_angle), np.cos(rotation_angle)],
-        #     ]
-        # )
-        # mirror_rotation = np.array(
-        #     [
-        #         [np.cos(np.pi), -np.sin(np.pi)],
-        #         [np.sin(np.pi), np.cos(np.pi)],
-        #     ]
-        # )
-        #
-        # translated_IQ = optimal_IQ - np.array([0, self.y_intecept[0]])
-        # rotated_IQ = translated_IQ @ rotation_matrix.T
-        # # self.y_limits = (optimal_IQ[:, 1].min(), optimal_IQ[:, 1].max())
-        #
-        # # translate point so the y_intecept becomes the origin
-        # translated_IQ0 = translated_IQ[states == 0]
-        # translated_IQ1 = translated_IQ[states == 1]
-        # # @ is the matrix multiplication operator
-        # rotated_IQ0 = translated_IQ0 @ rotation_matrix.T
-        # rotated_IQ1 = translated_IQ1 @ rotation_matrix.T
-        #
-        # threshold_direction = theta_rad - np.pi / 2
-        # center_rotated_I_0 = np.mean(rotated_IQ0[:, 0])
-        # if center_rotated_I_0 > 0:
-        #     rotation_angle = rotation_angle + np.pi
-        #     threshold_direction = threshold_direction + np.pi
-        #     rotated_IQ0 = rotated_IQ0 @ mirror_rotation.T
-        #     rotated_IQ1 = rotated_IQ1 @ mirror_rotation.T
-        #     rotated_IQ = rotated_IQ @ mirror_rotation.T
-        #
-        # self.threshold_point = self.threshold * np.array(
-        #     [np.cos(threshold_direction), np.sin(threshold_direction)]
-        # )
-        # self.rotated_IQ0_tp = rotated_IQ0[tp0]  # True Positive when sending 0
-        # self.rotated_IQ0_fp = rotated_IQ0[~tp0]
-        # self.rotated_IQ1_tp = rotated_IQ1[tp1]  # True Positive when sending 1
-        # self.rotated_IQ1_fp = rotated_IQ1[~tp1]
+        boundary = TwoClassBoundary(self.lda)
+        self.theta_rad = boundary.theta_rad
+        self.y_intecept = boundary.y_intecept
+        self.threshold = boundary.threshold
+        self.centers = boundary.centers
+        self.lamda = boundary.lamda
+
+        rotation_angle = np.pi / 2 - self.theta_rad
+        rotation_matrix = np.array(
+            [
+                [np.cos(rotation_angle), -np.sin(rotation_angle)],
+                [np.sin(rotation_angle), np.cos(rotation_angle)],
+            ]
+        )
+        mirror_rotation = np.array(
+            [
+                [np.cos(np.pi), -np.sin(np.pi)],
+                [np.sin(np.pi), np.cos(np.pi)],
+            ]
+        )
+
+        translated_IQ = optimal_IQ - np.array([0, self.y_intecept[0]])
+        rotated_IQ = translated_IQ @ rotation_matrix.T
+
+        # translate point so the y_intecept becomes the origin
+        translated_IQ0 = translated_IQ[states == 0]
+        translated_IQ1 = translated_IQ[states == 1]
+        # @ is the matrix multiplication operator
+        rotated_IQ0 = translated_IQ0 @ rotation_matrix.T
+        rotated_IQ1 = translated_IQ1 @ rotation_matrix.T
+
+        threshold_direction = self.theta_rad - np.pi / 2
+        center_rotated_I_0 = np.mean(rotated_IQ0[:, 0])
+        if center_rotated_I_0 > 0:
+            rotation_angle = rotation_angle + np.pi
+            threshold_direction = threshold_direction + np.pi
+            rotated_IQ0 = rotated_IQ0 @ mirror_rotation.T
+            rotated_IQ1 = rotated_IQ1 @ mirror_rotation.T
+            rotated_IQ = rotated_IQ @ mirror_rotation.T
+
+        self.threshold_point = self.threshold * np.array(
+            [np.cos(threshold_direction), np.sin(threshold_direction)]
+        )
+        self.rotated_IQ0_tp = rotated_IQ0[tp0]  # True Positive when sending 0
+        self.rotated_IQ0_fp = rotated_IQ0[~tp0]
+        self.rotated_IQ1_tp = rotated_IQ1[tp1]  # True Positive when sending 1
+        self.rotated_IQ1_fp = rotated_IQ1[~tp1]
+
         self.IQ0_tp = IQ0[tp0]  # True Positive when sending 0
         self.IQ0_fp = IQ0[~tp0]
         self.IQ1_tp = IQ1[tp1]  # True Positive when sending 1
         self.IQ1_fp = IQ1[~tp1]
 
-        # self.rotated_y_limits = (rotated_IQ[:, 1].min(), rotated_IQ[:, 1].max())
+        self.rotated_y_limits = (rotated_IQ[:, 1].min(), rotated_IQ[:, 1].max())
         self.y_limits = (optimal_IQ[:, 1].min(), optimal_IQ[:, 1].max())
+        self.x_space = np.linspace(optimal_IQ[:, 0].min(), optimal_IQ[:, 0].max(), 100)
 
-        # self.rotation_angle = rotation_angle
-        # self.rotation_angle_degrees = np.rad2deg(rotation_angle)
-
-        print("WARNING ZERO ROTATION")
-        print("*" * 55)
-        self.rotation_angle = 0
-        self.rotation_angle_degrees = 0
-        self.threshold = 0
+        self.rotation_angle = rotation_angle
+        self.rotation_angle_degrees = np.rad2deg(rotation_angle)
 
         return [self.optimal_amplitude, self.rotation_angle_degrees, self.threshold]
 
     def plotter(self, ax, secondary_axes):
         self.primary_plotter(ax)
+        iq_axis = secondary_axes[0]
+        # iq_axis.axis("equal")
 
         mark_size = 40
-        for i_ax in range(6):
-            IQ0_tp = self.iq0_tp.isel({self.amplitude_coord: i_ax})
-            IQ0_fp = self.iq0_fp.isel({self.amplitude_coord: i_ax})
-            IQ1_tp = self.iq1_tp.isel({self.amplitude_coord: i_ax})
-            IQ1_fp = self.iq1_fp.isel({self.amplitude_coord: i_ax})
-            iq_axis = secondary_axes[i_ax]
+        # for i_ax in range(min(6, self.number_of_amplitudes)):
+        #     IQ0_tp = self.iq0_tp.isel({self.amplitude_coord: i_ax})
+        #     IQ0_fp = self.iq0_fp.isel({self.amplitude_coord: i_ax})
+        #     IQ1_tp = self.iq1_tp.isel({self.amplitude_coord: i_ax})
+        #     IQ1_fp = self.iq1_fp.isel({self.amplitude_coord: i_ax})
+        #     iq_axis = secondary_axes[i_ax]
+        #
+        #     iq_axis.axis("equal")
+        #     iq_axis.scatter(
+        #         IQ0_tp.sel({"re_im": "re"}),
+        #         IQ0_tp.sel({"re_im": "im"}),
+        #         # self.IQ0_tp[:, 0],
+        #         # self.IQ0_tp[:, 1],
+        #         marker=".",
+        #         s=mark_size,
+        #         color="blue",
+        #         label="send 0 and read 0",
+        #     )
+        #     iq_axis.scatter(
+        #         IQ0_fp.sel({"re_im": "re"}),
+        #         IQ0_fp.sel({"re_im": "im"}),
+        #         # self.IQ0_fp[:, 0],
+        #         # self.IQ0_fp[:, 1],
+        #         marker="x",
+        #         s=mark_size,
+        #         color="dodgerblue",
+        #     )
+        #     iq_axis.scatter(
+        #         IQ1_tp.sel({"re_im": "re"}),
+        #         IQ1_tp.sel({"re_im": "im"}),
+        #         # self.IQ1_tp[:, 0],
+        #         # self.IQ1_tp[:, 1],
+        #         marker=".",
+        #         s=mark_size,
+        #         color="red",
+        #         label="send 1 and read 1",
+        #     )
+        #     iq_axis.scatter(
+        #         IQ1_fp.sel({"re_im": "re"}),
+        #         IQ1_fp.sel({"re_im": "im"}),
+        #         # self.IQ1_fp[:, 0],
+        #         # self.IQ1_fp[:, 1],
+        #         marker="x",
+        #         s=mark_size,
+        #         color="orange",
+        #     )
+        #     iq_axis.set_ylim(*self.y_limits)
+        #     iq_axis.legend()
+        #     iq_axis.axhline(0, color="black")
+        #     iq_axis.axvline(0, color="black")
+        #
+        iq_axis.scatter(
+            self.IQ0_tp[:, 0],
+            self.IQ0_tp[:, 1],
+            marker=".",
+            s=mark_size,
+            color="blue",
+            label="send 0 and read 0",
+        )
+        iq_axis.scatter(
+            self.IQ0_fp[:, 0],
+            self.IQ0_fp[:, 1],
+            marker="x",
+            s=mark_size,
+            color="dodgerblue",
+        )
+        iq_axis.scatter(
+            self.IQ1_tp[:, 0],
+            self.IQ1_tp[:, 1],
+            marker=".",
+            s=mark_size,
+            color="red",
+            label="send 1 and read 1",
+        )
+        iq_axis.scatter(
+            self.IQ1_fp[:, 0],
+            self.IQ1_fp[:, 1],
+            marker="x",
+            s=mark_size,
+            color="orange",
+        )
+        iq_axis.scatter(
+            self.centers[:, 0],
+            self.centers[:, 1],
+            s=2 * mark_size,
+            color="orange",
+            zorder=10,
+        )
+        iq_axis.scatter(
+            0,
+            self.y_intecept,
+            s=2 * mark_size,
+            marker="P",
+            color="black",
+            zorder=11,
+        )
 
-            iq_axis.axis("equal")
-            iq_axis.scatter(
-                IQ0_tp.sel({"re_im": "re"}),
-                IQ0_tp.sel({"re_im": "im"}),
-                # self.IQ0_tp[:, 0],
-                # self.IQ0_tp[:, 1],
-                marker=".",
-                s=mark_size,
-                color="blue",
-                label="send 0 and read 0",
-            )
-            iq_axis.scatter(
-                IQ0_fp.sel({"re_im": "re"}),
-                IQ0_fp.sel({"re_im": "im"}),
-                # self.IQ0_fp[:, 0],
-                # self.IQ0_fp[:, 1],
-                marker="x",
-                s=mark_size,
-                color="dodgerblue",
-            )
-            iq_axis.scatter(
-                IQ1_tp.sel({"re_im": "re"}),
-                IQ1_tp.sel({"re_im": "im"}),
-                # self.IQ1_tp[:, 0],
-                # self.IQ1_tp[:, 1],
-                marker=".",
-                s=mark_size,
-                color="red",
-                label="send 1 and read 1",
-            )
-            iq_axis.scatter(
-                IQ1_fp.sel({"re_im": "re"}),
-                IQ1_fp.sel({"re_im": "im"}),
-                # self.IQ1_fp[:, 0],
-                # self.IQ1_fp[:, 1],
-                marker="x",
-                s=mark_size,
-                color="orange",
-            )
-            iq_axis.set_ylim(*self.y_limits)
-            iq_axis.legend()
-            iq_axis.axhline(0, color="black")
-            iq_axis.axvline(0, color="black")
+        iq_axis.plot(
+            self.x_space,
+            self.lamda * self.x_space + self.y_intecept,
+            lw=2,
+            label=f"angle: {self.rotation_angle_degrees:0.1f} $\deg$",
+        )
 
-        # iq_axis.scatter(
-        #     self.centers[:, 0],
-        #     self.centers[:, 1],
-        #     s=2 * mark_size,
-        #     color="orange",
-        #     zorder=10,
-        # )
-        # iq_axis.scatter(
-        #     0,
-        #     self.y_intecept,
-        #     s=2 * mark_size,
-        #     marker="P",
-        #     color="black",
-        #     zorder=11,
-        # )
+        iq_axis.plot(
+            [0, self.threshold_point[0]],
+            [0, self.threshold_point[1]],
+            lw=3,
+            color="magenta",
+            label=f"threshold: {self.threshold:0.4f}",
+        )
+        iq_axis.legend()
+        iq_axis.axhline(0, color="black")
+        iq_axis.axvline(0, color="black")
+        iq_axis.set_ylim(*self.y_limits)
 
-        # iq_axis.plot(
-        #     self.x_space,
-        #     self.lamda * self.x_space + self.y_intecept,
-        #     lw=2,
-        #     label=f"angle: {self.rotation_angle_degrees:0.1f}",
-        # )
-
-        # iq_axis.plot(
-        #     [0, self.threshold_point[0]],
-        #     [0, self.threshold_point[1]],
-        #     lw=3,
-        #     color="magenta",
-        #     label=f"threshold: {self.threshold:0.4f}",
-        # )
-        # rotated_iq_axis = secondary_axes[1]
+        rotated_iq_axis = secondary_axes[1]
         # rotated_iq_axis.axis("equal")
-        # rotated_iq_axis.scatter(
-        #     self.rotated_IQ0_tp[:, 0],
-        #     self.rotated_IQ0_tp[:, 1],
-        #     marker=".",
-        #     s=mark_size,
-        #     color="blue",
-        #     label="send 0 and read 0",
-        # )
-        # rotated_iq_axis.scatter(
-        #     self.rotated_IQ0_fp[:, 0],
-        #     self.rotated_IQ0_fp[:, 1],
-        #     marker="x",
-        #     s=mark_size,
-        #     color="dodgerblue",
-        # )
-        # rotated_iq_axis.scatter(
-        #     self.rotated_IQ1_tp[:, 0],
-        #     self.rotated_IQ1_tp[:, 1],
-        #     marker=".",
-        #     s=mark_size,
-        #     color="red",
-        #     label="send 1 and read 1",
-        # )
-        # rotated_iq_axis.scatter(
-        #     self.rotated_IQ1_fp[:, 0],
-        #     self.rotated_IQ1_fp[:, 1],
-        #     marker="x",
-        #     s=mark_size,
-        #     color="orange",
-        # )
-        # rotated_iq_axis.set_ylim(*self.rotated_y_limits)
-        # rotated_iq_axis.legend()
-        # rotated_iq_axis.axhline(0, color="black")
-        # rotated_iq_axis.axvline(0, color="black")
+        rotated_iq_axis.scatter(
+            self.rotated_IQ0_tp[:, 0],
+            self.rotated_IQ0_tp[:, 1],
+            marker=".",
+            s=mark_size,
+            color="blue",
+            label="send 0 and read 0",
+        )
+        rotated_iq_axis.scatter(
+            self.rotated_IQ0_fp[:, 0],
+            self.rotated_IQ0_fp[:, 1],
+            marker="x",
+            s=mark_size,
+            color="dodgerblue",
+        )
+        rotated_iq_axis.scatter(
+            self.rotated_IQ1_tp[:, 0],
+            self.rotated_IQ1_tp[:, 1],
+            marker=".",
+            s=mark_size,
+            color="red",
+            label="send 1 and read 1",
+        )
+        rotated_iq_axis.scatter(
+            self.rotated_IQ1_fp[:, 0],
+            self.rotated_IQ1_fp[:, 1],
+            marker="x",
+            s=mark_size,
+            color="orange",
+        )
+        rotated_iq_axis.set_ylim(*self.rotated_y_limits)
+        rotated_iq_axis.legend()
+        rotated_iq_axis.axhline(0, color="black")
+        rotated_iq_axis.axvline(0, color="black")
 
         # cm_axis = secondary_axes[1]
         # optimal_confusion_matrix = self.cms[self.optimal_index]
@@ -538,7 +567,7 @@ class OptimalROTwoStateAmplitudeNodeAnalysis(BaseAllQubitsAnalysis):
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-        self.plots_per_qubit = 7
+        self.plots_per_qubit = 3
 
     def _fill_plots(self):
         for index, analysis in enumerate(self.qubit_analyses):
