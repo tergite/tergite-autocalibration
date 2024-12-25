@@ -189,16 +189,6 @@ class BaseNode(abc.ABC):
             schedule=schedule, config=compilation_config
         )
 
-        # with open(f"timing_instructions_table_{self.name}.html", "w") as f:
-        #     f.write(
-        #         compiled_schedule.timing_table.hide(
-        #             subset=["waveform_op_id", "operation_hash"], axis=1
-        #         ).to_html()
-        #     )
-
-        # fig = compiled_schedule.plot_pulse_diagram(plot_backend="plotly")
-        # fig.write_html(f"{self.name}_plotly.html")
-
         return compiled_schedule
 
     def measure_compiled_schedule(
