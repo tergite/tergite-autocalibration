@@ -50,7 +50,7 @@ class ROAmplitudeTwoStateOptimizationNode(ScheduleNode):
             "ro_amplitudes": {
                 qubit: np.linspace(
                     self.punchout_amplitude(qubit) / 4,
-                    self.punchout_amplitude(qubit) * 2,
+                    self.punchout_amplitude(qubit) * 1.75,
                     45,
                 )
                 for qubit in self.all_qubits
