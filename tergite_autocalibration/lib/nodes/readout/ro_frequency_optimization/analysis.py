@@ -49,8 +49,8 @@ class OptimalRO01FrequencyQubitAnalysis(BaseQubitAnalysis):
                 self.qubit_states = self.dataset[coord].values
                 self.qubit_state_coord = coord
 
-        s21_0 = self.S21[self.data_var].sel({self.qubit_state_coord: 0})
-        s21_1 = self.S21[self.data_var].sel({self.qubit_state_coord: 1})
+        self.s21_0 = self.S21[self.data_var].sel({self.qubit_state_coord: 0})
+        self.s21_1 = self.S21[self.data_var].sel({self.qubit_state_coord: 1})
         # self.magnitudes_0 = (
         #     self.magnitudes[self.data_var]
         #     .isel({self.qubit_state_coord: [0]})
@@ -80,21 +80,16 @@ class OptimalRO01FrequencyQubitAnalysis(BaseQubitAnalysis):
 
         # distances = self.fit_IQ_1 - self.fit_IQ_0
 
-        distances = s21_1 - s21_0
+        distances = self.s21_1 - self.s21_0
 
-        self.index_of_max_distance = np.argmax(np.abs(distances))
+        # self.index_of_max_distance = np.argmax(np.abs(distances))
         # self.optimal_frequency = fit_frequencies[self.index_of_max_distance]
-        self.optimal_frequency = self.S21.coords[self.index_of_max_distance]
+        self.optimal_frequency = float(np.abs(distances).idxmax().values)
+        self.index_of_max_distance = np.abs(distances).argmax()
 
         return [self.optimal_frequency]
 
     def plotter(self, ax, secondary_axes):
-        ax.set_xlabel("I quadrature (V)")
-        ax.set_ylabel("Q quadrature (V)")
-        ax.plot(self.fit_IQ_0.real, self.fit_IQ_0.imag)
-        ax.plot(self.fit_IQ_1.real, self.fit_IQ_1.imag)
-        f0 = self.fit_IQ_0[self.index_of_max_distance]
-        f1 = self.fit_IQ_1[self.index_of_max_distance]
 
         ro_freq = float(
             REDIS_CONNECTION.hget(f"transmons:{self.qubit}", "clock_freqs:readout")
@@ -104,27 +99,36 @@ class OptimalRO01FrequencyQubitAnalysis(BaseQubitAnalysis):
                 f"transmons:{self.qubit}", "extended_clock_freqs:readout_1"
             )
         )
+        ax.set_xlabel("I quadrature (V)")
+        ax.set_ylabel("Q quadrature (V)")
 
+        f0 = self.s21_0[self.index_of_max_distance]
+        f1 = self.s21_1[self.index_of_max_distance]
         label_text = f"opt_ro: {int(self.optimal_frequency)}\n"
         label_text += f"|0>_ro: {int(ro_freq)}\n"
-        # label_text += f"|1>_ro: {int(ro_freq_1)}"
-
+        label_text += f"|1>_ro: {int(ro_freq_1)}"
         ax.scatter(
             [f0.real, f1.real],
             [f0.imag, f1.imag],
             marker="*",
-            c="red",
-            s=64,
+            c="black",
+            s=124,
             label=label_text,
+            zorder=5,
         )
+
+        ax.plot(self.s21_0.real, self.s21_0.imag, "bo-", lw=2, ms=4)
+        ax.plot(self.s21_1.real, self.s21_1.imag, "ro-", lw=2, ms=4)
+
+        ax.legend()
         ax.grid()
 
         magnitude_axis = secondary_axes[0]
         phase_axis = secondary_axes[1]
-        mags_0 = np.abs(self.S21[self.data_var].sel({self.qubit_state_coord: 0}))
-        mags_1 = np.abs(self.S21[self.data_var].sel({self.qubit_state_coord: 1}))
-        phase_0 = np.angle(self.S21[self.data_var].sel({self.qubit_state_coord: 0}))
-        phase_1 = np.angle(self.S21[self.data_var].sel({self.qubit_state_coord: 1}))
+        mags_0 = np.abs(self.s21_0)
+        mags_1 = np.abs(self.s21_1)
+        phase_0 = np.angle(self.s21_0)
+        phase_1 = np.angle(self.s21_1)
         magnitude_axis.plot(self.frequencies, mags_0, "o-", ms=2, color="blue")
         magnitude_axis.plot(self.frequencies, mags_1, "o-", ms=2, color="red")
         magnitude_axis.axvline(self.optimal_frequency, color="black")
