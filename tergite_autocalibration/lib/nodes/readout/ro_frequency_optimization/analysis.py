@@ -49,36 +49,42 @@ class OptimalRO01FrequencyQubitAnalysis(BaseQubitAnalysis):
                 self.qubit_states = self.dataset[coord].values
                 self.qubit_state_coord = coord
 
-        self.magnitudes_0 = (
-            self.magnitudes[self.data_var]
-            .isel({self.qubit_state_coord: [0]})
-            .values.flatten()
-        )  # S21 when qubit at |0>
-        self.magnitudes_1 = (
-            self.magnitudes[self.data_var]
-            .isel({self.qubit_state_coord: [1]})
-            .values.flatten()
-        )  # S21 when qubit at |1>
+        s21_0 = self.S21[self.data_var].sel({self.qubit_state_coord: 0})
+        s21_1 = self.S21[self.data_var].sel({self.qubit_state_coord: 1})
+        # self.magnitudes_0 = (
+        #     self.magnitudes[self.data_var]
+        #     .isel({self.qubit_state_coord: [0]})
+        #     .values.flatten()
+        # )  # S21 when qubit at |0>
+        # self.magnitudes_1 = (
+        #     self.magnitudes[self.data_var]
+        #     .isel({self.qubit_state_coord: [1]})
+        #     .values.flatten()
+        # )  # S21 when qubit at |1>
 
         # Gives an initial guess for the model parameters and then fits the model to the data.
-        guess_0 = model.guess(self.magnitudes_0, f=self.frequencies)
-        guess_1 = model.guess(self.magnitudes_1, f=self.frequencies)
-        fit_frequencies = np.linspace(self.frequencies[0], self.frequencies[-1], 400)
-        self.fit_result_0 = model.fit(
-            self.magnitudes_0, params=guess_0, f=self.frequencies
-        )
-        self.fit_result_1 = model.fit(
-            self.magnitudes_1, params=guess_1, f=self.frequencies
-        )
-        self.fit_IQ_0 = model.eval(self.fit_result_0.params, f=fit_frequencies)
-        self.fit_IQ_1 = model.eval(self.fit_result_1.params, f=fit_frequencies)
+        # guess_0 = model.guess(self.magnitudes_0, f=self.frequencies)
+        # guess_1 = model.guess(self.magnitudes_1, f=self.frequencies)
+        # fit_frequencies = np.linspace(self.frequencies[0], self.frequencies[-1], 400)
+        # self.fit_result_0 = model.fit(
+        #     self.magnitudes_0, params=guess_0, f=self.frequencies
+        # )
+        # self.fit_result_1 = model.fit(
+        #     self.magnitudes_1, params=guess_1, f=self.frequencies
+        # )
+        # self.fit_IQ_0 = model.eval(self.fit_result_0.params, f=fit_frequencies)
+        # self.fit_IQ_1 = model.eval(self.fit_result_1.params, f=fit_frequencies)
 
-        fit_values_0 = self.fit_result_0.values
-        fit_values_1 = self.fit_result_1.values
+        # fit_values_0 = self.fit_result_0.values
+        # fit_values_1 = self.fit_result_1.values
 
-        distances = self.fit_IQ_1 - self.fit_IQ_0
+        # distances = self.fit_IQ_1 - self.fit_IQ_0
+
+        distances = s21_1 - s21_0
+
         self.index_of_max_distance = np.argmax(np.abs(distances))
-        self.optimal_frequency = fit_frequencies[self.index_of_max_distance]
+        # self.optimal_frequency = fit_frequencies[self.index_of_max_distance]
+        self.optimal_frequency = self.S21.coords[self.index_of_max_distance]
 
         return [self.optimal_frequency]
 
