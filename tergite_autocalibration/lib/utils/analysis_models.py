@@ -19,6 +19,25 @@ from tergite_autocalibration.lib.utils.functions import exponential_decay_functi
 
 
 class TwoClassBoundary:
+    """
+    Converts the boundary encoded in the LDA discriminator.
+    The LDA boundary (also called threshold) has the form Ax + By + y_intercept = 0.
+    This boundary is coverted:
+    i. To the form y = lamda * x + y_intercept, used in plotting
+    ii. To the form (theta, threshold) used by the Quantify Scheduler for Thresholded Aqcuisitions
+
+    Attributes
+    ----------
+    lamda: float
+        the slope coefficient of form (i)
+    y_intercept: float
+        the y axis intercept of form (i)
+    theta_rad: float
+        the angle of the boundary, used for form (ii)
+    threshold: float
+        the distance from the IQ origin to the boundary line
+    """
+
     def __init__(self, lda: LinearDiscriminantAnalysis):
         if len(lda.classes_) != 2:
             raise ValueError("The Classifcation classes are not 2.")
@@ -31,7 +50,7 @@ class TwoClassBoundary:
         self.theta_rad = np.arctan(self.lamda)
         threshold = np.abs(intercept) / np.sqrt(A**2 + B**2)
         self.threshold = threshold[0]
-        self.y_intecept = -intercept / B
+        self.y_intercept = -intercept / B
 
 
 class ThreeClassBoundary:

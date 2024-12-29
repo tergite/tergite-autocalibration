@@ -228,7 +228,7 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
 
         boundary = TwoClassBoundary(self.lda)
         self.theta_rad = boundary.theta_rad
-        self.y_intercept = boundary.y_intecept
+        self.y_intercept = boundary.y_intercept
         self.threshold = boundary.threshold
         self.centers = boundary.centers
         self.lamda = boundary.lamda
