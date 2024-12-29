@@ -59,3 +59,12 @@ communication, you can force this communication channel by running
 ```bash
 sudo chmod 666 /dev/ttyACM0
 ```
+
+### Concurrent operations
+If two users access the same cluster at the same time, this message could be displayed
+
+```bash
+KeyError: 'The acquisition data retrieved from the hardware does not contain data for acquisition channel 0 (referred to by Qblox acquisition index 0).\n hardware_retrieved_acquisitions={}'
+```
+
+Contact the other users to avoid conflicts.
