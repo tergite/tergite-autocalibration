@@ -119,11 +119,11 @@ class OptimalRO01FrequencyQubitAnalysis(BaseQubitAnalysis):
         mags_1 = np.abs(self.S21[self.data_var].sel({self.qubit_state_coord: 1}))
         phase_0 = np.angle(self.S21[self.data_var].sel({self.qubit_state_coord: 0}))
         phase_1 = np.angle(self.S21[self.data_var].sel({self.qubit_state_coord: 1}))
-        magnitude_axis.plot(self.frequencies, mags_0, "o", ms=2, color="blue")
-        magnitude_axis.plot(self.frequencies, mags_1, "o", ms=2, color="red")
+        magnitude_axis.plot(self.frequencies, mags_0, "o-", ms=2, color="blue")
+        magnitude_axis.plot(self.frequencies, mags_1, "o-", ms=2, color="red")
         magnitude_axis.axvline(self.optimal_frequency, color="black")
-        phase_axis.plot(self.frequencies, phase_0, "o", ms=2, color="blue")
-        phase_axis.plot(self.frequencies, phase_1, "o", ms=2, color="red")
+        phase_axis.plot(self.frequencies, phase_0, "o-", ms=2, color="blue")
+        phase_axis.plot(self.frequencies, phase_1, "o-", ms=2, color="red")
         phase_axis.axvline(self.optimal_frequency, color="black")
 
         # phase_axis = secondary_axes[0]
