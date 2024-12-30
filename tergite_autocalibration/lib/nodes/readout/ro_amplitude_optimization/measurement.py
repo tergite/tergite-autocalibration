@@ -50,14 +50,6 @@ class ROAmplitudeOptimizationMeasurement(BaseMeasurement):
 
         for this_qubit, this_transmon in self.transmons.items():
             this_ro_clock = f"{this_qubit}." + ro_str
-<<<<<<< HEAD
-            if qubit_state == 2:
-                mw_frequency_12 = this_transmon.clock_freqs.f12()
-                this_12_clock = f"{this_qubit}.12"
-                shot.add_resource(
-                    ClockResource(name=this_12_clock, freq=mw_frequency_12)
-                )
-=======
             if qubit_state == 1:
                 ro_frequency = this_transmon.extended_clock_freqs.readout_2state_opt()
             elif qubit_state == 2:
@@ -69,7 +61,6 @@ class ROAmplitudeOptimizationMeasurement(BaseMeasurement):
                 raise ValueError(f"Invalid state {qubit_state}")
 
             shot.add_resource(ClockResource(name=this_ro_clock, freq=ro_frequency))
->>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
 
         # The outer for-loop iterates over all qubits:
         root_relaxation = shot.add(Reset(*qubits), label="Reset")

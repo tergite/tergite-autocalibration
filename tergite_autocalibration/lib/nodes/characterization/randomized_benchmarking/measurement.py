@@ -25,21 +25,12 @@ from quantify_scheduler.schedules.schedule import Schedule
 
 import tergite_autocalibration.utils.clifford_elements_decomposition as cliffords
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
-<<<<<<< HEAD
-from tergite_autocalibration.utils.extended_gates import Measure_RO_3state_Opt
-from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
-
-
-class Randomized_Benchmarking_SSRO(BaseMeasurement):
-    def __init__(self, transmons: dict[str, ExtendedTransmon]):
-=======
 from tergite_autocalibration.utils.dto.extended_gates import Measure_RO_3state_Opt
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
 class RandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
-    def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
->>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
+    def __init__(self, transmons: dict[str, ExtendedTransmon]):
         super().__init__(transmons)
         self.transmons = transmons
 

@@ -10,11 +10,6 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-<<<<<<< HEAD
-import json
-
-=======
->>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
 
 class HW_Config_Generator:
     def __init__(
@@ -161,25 +156,6 @@ class HW_Config_Generator:
         return self.hardware_config
 
 
-<<<<<<< HEAD
-if __name__ == "__main__":
-    from tergite_autocalibration.config.settings import CONFIG_DIR
-
-    print("GENERATING")
-
-    # mixer_file = CONFIG_DIR / "initial.csv"
-    mixer_file = {
-        "module16": {
-            "lo_freq": 6.867768e09,
-            "off_I": -3.0245,
-            "off_Q": -5.3719,
-            "q06": [-3.569508e07, 1.0125, 11.68040],
-            "q07": [2.129034e08, 0.9787, 11.88353],
-            "q08": [-4.705374e08, 0.9990, 13.00079],
-            "q09": [4.084159e08, 1.0193, 9.54746],
-            "q10": [3.849132e08, 1.0159, 9.14118],
-        }
-=======
 if __name__ == "main":
     from tergite_autocalibration.config.globals import ENV
 
@@ -191,7 +167,6 @@ if __name__ == "main":
     HW_CONFIG[f"{CLUSTER_NAME}"] = {
         "ref": "internal",
         "instrument_type": "Cluster",
->>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
     }
 
     json_config_file = CONFIG_DIR / "HARDWARE_CONFIGURATION_LOKIA_20241204.json"

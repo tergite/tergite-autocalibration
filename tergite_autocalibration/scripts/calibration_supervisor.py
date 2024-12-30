@@ -29,7 +29,7 @@ from qblox_instruments.types import ClusterType
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 
-from tergite_autocalibration.config.globals import REDIS_CONNECTION, CLUSTER_IP, CONFIG
+from tergite_autocalibration.config.globals import CLUSTER_IP, CONFIG, REDIS_CONNECTION
 from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.base.node import BaseNode
 from tergite_autocalibration.lib.utils.graph import filtered_topological_order
@@ -57,29 +57,10 @@ class CalibrationConfig:
     cluster_ip: "IPv4Address" = CLUSTER_IP
     cluster_timeout: int = 222
     data_path: Path = Path("")
-<<<<<<< HEAD
-    qubits: List[str] = field(
-        default_factory=lambda: user_requested_calibration["all_qubits"]
-    )
-    couplers: List[str] = field(
-        default_factory=lambda: user_requested_calibration["couplers"]
-    )
-    target_node_name: str = user_requested_calibration["target_node"]
-    user_samplespace: dict = field(
-        default_factory=lambda: user_requested_calibration["user_samplespace"]
-    )
-    transmon_configuration: dict = field(
-        default_factory=lambda: toml.load(settings.DEVICE_CONFIG)
-    )
-    active_reset_configuration: dict = field(
-        default_factory=lambda: toml.load(settings.ACTIVE_RESET_CONFIG)
-    )
-=======
     qubits: List[str] = field(default_factory=lambda: CONFIG.run.qubits)
     couplers: List[str] = field(default_factory=lambda: CONFIG.run.couplers)
     target_node_name: str = CONFIG.run.target_node
     user_samplespace: dict = field(default_factory=lambda: CONFIG.samplespace())
->>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
 
 
 class HardwareManager:
@@ -206,21 +187,6 @@ class NodeManager:
         self.config = config
         self.node_factory = NodeFactory()
         self.lab_ic = lab_ic
-<<<<<<< HEAD
-        self.active_reset_configuration = config.active_reset_configuration
-
-        # populate_active_reset_parameters(
-        #     self.active_reset_configuration, self.config.qubits, REDIS_CONNECTION
-        # )
-
-        populate_initial_parameters(
-            self.config.transmon_configuration,
-            self.config.qubits,
-            self.config.couplers,
-            REDIS_CONNECTION,
-        )
-=======
->>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
 
     @staticmethod
     def topo_order(target_node: str):
@@ -229,8 +195,6 @@ class NodeManager:
     def inspect_node(self, node_name: str):
         logger.info(f"Inspecting node {node_name}")
 
-<<<<<<< HEAD
-=======
         # Populate initial parameters
         populate_initial_parameters(
             self.config.qubits,
@@ -238,7 +202,6 @@ class NodeManager:
             REDIS_CONNECTION,
         )
 
->>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
         # Check Redis if node is calibrated
         status: "DataStatus" = self._check_calibration_status_redis(node_name)
 

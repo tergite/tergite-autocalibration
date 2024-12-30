@@ -14,18 +14,12 @@ import numpy as np
 import xarray
 from numpy import exp, pi
 
-<<<<<<< HEAD
-from tergite_autocalibration.lib.base.classification_functions import assign_state
-=======
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.lib.utils.classification_functions import assign_state
->>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
 
 
 def test_assign_state():
     qubit = "q06"
-<<<<<<< HEAD
-=======
     # centroid_I = 1
     # centroid_Q = 0
     # omega_01 = 330
@@ -37,7 +31,6 @@ def test_assign_state():
     REDIS_CONNECTION.hset(f"transmons:{qubit}", "omega_12", "180")
     REDIS_CONNECTION.hset(f"transmons:{qubit}", "omega_20", "90")
 
->>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
     iq_points = np.array(
         [
             2,
@@ -47,10 +40,6 @@ def test_assign_state():
             2 * exp(-1j * 3 * pi / 4),
         ]
     )
-<<<<<<< HEAD
-    assert assign_state(qubit, iq_points) == xarray.DataArray([0, 1, 0, 2, 1])
-=======
     assert xarray.DataArray([0, 1, 0, 2, 1]).equals(
         xarray.DataArray(assign_state(qubit, iq_points))
     )
->>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations

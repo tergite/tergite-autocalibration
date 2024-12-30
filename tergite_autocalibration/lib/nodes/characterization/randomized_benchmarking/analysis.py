@@ -19,19 +19,11 @@ from scipy.linalg import norm
 from scipy.optimize import minimize
 
 from tergite_autocalibration.lib.base.analysis import (
-<<<<<<< HEAD
     BaseAllQubitsAnalysis,
     BaseQubitAnalysis,
 )
 from tergite_autocalibration.lib.base.analysis_models import ExpDecayModel
 from tergite_autocalibration.lib.base.classification_functions import assign_state
-=======
-    BaseAllQubitsRepeatAnalysis,
-    BaseQubitAnalysis,
-)
-from tergite_autocalibration.lib.utils.analysis_models import ExpDecayModel
-from tergite_autocalibration.lib.utils.classification_functions import assign_state
->>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
 
 
 def mitigate(v, cm_inv):

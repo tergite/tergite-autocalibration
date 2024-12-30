@@ -17,13 +17,9 @@
 from pathlib import Path
 from typing import TYPE_CHECKING, Dict, List, Union
 
-<<<<<<< HEAD
-from ...utils.regex import camel_to_snake
-from .reflections import find_inheriting_classes_ast_recursive, import_class_from_file
-=======
-from .reflections import find_inheriting_classes_ast_recursive, import_class_from_file
 from tergite_autocalibration.utils.misc.regex import camel_to_snake
->>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
+
+from .reflections import find_inheriting_classes_ast_recursive, import_class_from_file
 
 if TYPE_CHECKING:
     from ..base.node import BaseNode
@@ -40,34 +36,6 @@ class NodeFactory:
 
     def __init__(self):
         self.node_name_mapping: Dict[str, str] = {
-<<<<<<< HEAD
-            "punchout": "Punchout_Node",
-            "resonator_spectroscopy": "Resonator_Spectroscopy_Node",
-            "resonator_relaxation": "Resonator_Relaxation_Node",
-            "qubit_01_spectroscopy": "Qubit_01_Spectroscopy_Multidim_Node",
-            "qubit_01_spectroscopy_AR": "Qubit_01_Spectroscopy_Multidim_AR_Node",
-            "rabi_oscillations_AR": "Rabi_Oscillations_Node_AR",
-            "rabi_oscillations": "Rabi_Oscillations_Node",
-            "ramsey_correction": "Ramsey_Fringes_Node",
-            "resonator_spectroscopy_1": "Resonator_Spectroscopy_1_Node",
-            # "qubit_12_spectroscopy_pulsed": "Qubit_12_Spectroscopy_Pulsed_Node",
-            "qubit_12_spectroscopy": "Qubit_12_Spectroscopy_Multidim_Node",
-            "rabi_oscillations_12": "Rabi_Oscillations_12_Node",
-            "ramsey_correction_12": "Ramsey_Fringes_12_Node",
-            "resonator_spectroscopy_2": "Resonator_Spectroscopy_2_Node",
-            "motzoi_parameter": "Motzoi_Parameter_Node",
-            "n_rabi_oscillations": "N_Rabi_Oscillations_Node",
-            "motzoi_parameter_12": "Motzoi_Parameter_12_Node",
-            "n_rabi_oscillations_12": "N_Rabi_Oscillations_12_Node",
-            "coupler_spectroscopy": "Coupler_Spectroscopy_Node",
-            "coupler_resonator_spectroscopy": "Coupler_Resonator_Spectroscopy_Node",
-            "T1": "T1_Node",
-            "T2": "T2_Node",
-            "T2_echo": "T2_Echo_Node",
-            "all_XY": "All_XY_Node",
-            "reset_chevron": "Reset_Chevron_Node",
-            "cz_characterisation_chevron": "CZ_Characterisation_Chevron_Node",
-=======
             "punchout": "PunchoutNode",
             "resonator_spectroscopy": "ResonatorSpectroscopyNode",
             "resonator_relaxation": "ResonatorRelaxationNode",
@@ -92,7 +60,6 @@ class NodeFactory:
             "all_XY": "AllXYNode",
             "reset_chevron": "ResetChevronNode",
             "cz_characterisation_chevron": "CZCharacterisationChevronNode",
->>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
             "reset_calibration_ssro": "ResetCalibrationSSRONode",
             "cz_parametrisation_fix_duration": "CZParametrizationFixDurationNode",
             "process_tomography_ssro": "ProcessTomographySSRONode",

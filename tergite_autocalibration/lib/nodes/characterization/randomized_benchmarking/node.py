@@ -32,14 +32,6 @@ class RandomizedBenchmarkingSSRONode(ScheduleNode):
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
         self.schedule_keywords = schedule_keywords
-<<<<<<< HEAD
-=======
-        self.backup = False
-        self.redis_field = ["fidelity", "fidelity_error", "leakage", "leakage_error"]
-        self.measurement_obj = RandomizedBenchmarkingSSROMeasurement
-        self.analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
-        self.qubit_state = 2
->>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
         self.schedule_keywords = {}
         self.loops = 500
         self.schedule_keywords["loop_repetitions"] = self.loops

@@ -21,11 +21,7 @@ from uuid import uuid4
 import numpy as np
 import xarray
 
-<<<<<<< HEAD:tergite_autocalibration/utils/dataset_utils.py
-from tergite_autocalibration.config.settings import DATA_DIR
-=======
 from tergite_autocalibration.config.globals import DATA_DIR
->>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations:tergite_autocalibration/utils/io/dataset_utils.py
 
 
 def configure_dataset(

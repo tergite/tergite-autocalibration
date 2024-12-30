@@ -35,10 +35,6 @@ class PunchoutNode(ScheduleNode):
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             },
             "ro_amplitudes": {
-<<<<<<< HEAD
-                qubit: np.linspace(0.008, 0.16, 11) for qubit in self.all_qubits
-=======
                 qubit: np.linspace(0.008, 0.04, 12) for qubit in self.all_qubits
->>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
             },
         }

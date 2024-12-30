@@ -14,34 +14,20 @@
 
 import matplotlib.patches as mpatches
 import numpy as np
-<<<<<<< HEAD
-=======
 import xarray as xr
->>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
 from numpy.linalg import inv
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
-from tergite_autocalibration.lib.base.analysis import (
-    BaseAllQubitsAnalysis,
-    BaseQubitAnalysis,
-<<<<<<< HEAD
-=======
-)
+from tergite_autocalibration.lib.base.analysis import (BaseAllQubitsAnalysis,
+                                                       BaseQubitAnalysis)
 from tergite_autocalibration.lib.utils.analysis_models import (
-    ThreeClassBoundary,
-    TwoClassBoundary,
->>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
-)
+    ThreeClassBoundary, TwoClassBoundary)
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 
 
 class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
-<<<<<<< HEAD
-
-=======
->>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
         self.fit_results = {}
@@ -60,14 +46,8 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
             else:
                 raise ValueError("Coordinate not found in dataset")
 
-<<<<<<< HEAD
-        self.S21 = self.S21.stack(shots=[self.loop_coord, self.state_coord])
-        self.qubit_states = self.S21[self.state_coord].values
-        self.amplitudes = self.S21.coords[self.amplitude_coord]
-=======
         self.S21_stacked = self.S21.stack(shots=[self.loop_coord, self.state_coord])
         self.qubit_states = self.S21_stacked[self.state_coord].values
->>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
         self.fit_results = {}
 
     def IQ(self, index: int) -> np.ndarray:
@@ -99,12 +79,7 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
         array_iq1_fp = xr.DataArray().expand_dims({self.amplitude_coord: []})
         for index, ro_amplitude in enumerate(self.amplitudes):
             iq = self.IQ(index)
-<<<<<<< HEAD
-            breakpoint()
-            y_pred = self.lda.fit(iq, y).predict(iq)
-=======
             classified_states = self.lda.fit(iq, states_sent).predict(iq)
->>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
 
             true_positives = states_sent == classified_states
             tp0 = true_positives[states_sent == 0]
@@ -236,22 +211,6 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         optimal_IQ = self.IQ(self.optimal_index)
         classified_states = self.lda.fit(optimal_IQ, states).predict(optimal_IQ)
 
-<<<<<<< HEAD
-        # determining the discriminant line from the canonical form Ax + By + intercept = 0
-        A = self.lda.coef_[0][0]
-        B = self.lda.coef_[0][1]
-        self.centers = self.lda.means_
-        intercept = self.lda.intercept_
-        self.lamda = -A / B
-        theta_rad = np.arctan(self.lamda)
-        theta = np.rad2deg(np.arctan(self.lamda))
-        threshold = np.abs(intercept) / np.sqrt(A**2 + B**2)
-        self.threshold = threshold[0]
-
-        self.y_intecept = -intercept / B
-
-        self.x_space = np.linspace(optimal_IQ[:, 0].min(), optimal_IQ[:, 0].max(), 100)
-=======
         true_positives = states == classified_states
         tp0 = true_positives[states == 0]
         tp1 = true_positives[states == 1]
@@ -270,7 +229,6 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         alligned_IQ, rotation_angle_rad, threshold_direction = self.align_on_y_axis(
             optimal_IQ, classified_states, boundary_angle_rad, y_intersept
         )
->>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
 
         self.threshold_point = self.threshold * np.array(
             [np.cos(threshold_direction), np.sin(threshold_direction)]
@@ -330,22 +288,12 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         self.IQ1_tp = IQ1[tp1]  # True Positive when sending 1
         self.IQ1_fp = IQ1[~tp1]
 
-<<<<<<< HEAD
-        self.rotated_y_limits = (rotated_IQ[:, 1].min(), rotated_IQ[:, 1].max())
-        self.y_limits = (optimal_IQ[:, 1].min(), optimal_IQ[:, 1].max())
-
-        self.rotation_angle = rotation_angle
-        self.rotation_angle_degrees = np.rad2deg(rotation_angle)
-        print(f"{self.qubit}.measure.acq_rotation = {self.rotation_angle_degrees}")
-        print(f"{self.qubit}.measure.acq_threshold = {self.threshold}")
-=======
         self.rotated_y_limits = (alligned_IQ[:, 1].min(), alligned_IQ[:, 1].max())
 
         self.x_space = np.linspace(optimal_IQ[:, 0].min(), optimal_IQ[:, 0].max(), 100)
 
         self.rotation_angle = rotation_angle_rad
         self.rotation_angle_degrees = np.rad2deg(rotation_angle_rad)
->>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
 
         return [self.optimal_amplitude, self.rotation_angle_degrees, self.threshold]
 
@@ -353,42 +301,9 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         self.primary_plotter(ax)
         iq_axis = secondary_axes[0]
         iq_axis.axis("equal")
-<<<<<<< HEAD
-        mark_size = 40
-        iq_axis.scatter(
-            self.centers[:, 0],
-            self.centers[:, 1],
-            s=2 * mark_size,
-            color="orange",
-            zorder=10,
-        )
-        iq_axis.scatter(
-            0,
-            self.y_intecept,
-            s=2 * mark_size,
-            marker="P",
-            color="black",
-            zorder=11,
-        )
-
-        iq_axis.plot(
-            self.x_space,
-            self.lamda * self.x_space + self.y_intecept,
-            lw=2,
-            label=f"angle: {self.rotation_angle_degrees:0.1f}",
-        )
-        iq_axis.plot(
-            [0, self.threshold_point[0]],
-            [0, self.threshold_point[1]],
-            lw=3,
-            color="magenta",
-            label=f"threshold: {self.threshold:0.4f}",
-        )
-=======
 
         mark_size = 40
 
->>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
         iq_axis.scatter(
             self.IQ0_tp[:, 0],
             self.IQ0_tp[:, 1],
@@ -418,30 +333,6 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
             marker="x",
             s=mark_size,
             color="orange",
-<<<<<<< HEAD
-        )
-        iq_axis.set_ylim(*self.y_limits)
-        iq_axis.legend()
-        iq_axis.axhline(0, color="black")
-        iq_axis.axvline(0, color="black")
-        rotated_iq_axis = secondary_axes[1]
-        rotated_iq_axis.axis("equal")
-        rotated_iq_axis.scatter(
-            self.rotated_IQ0_tp[:, 0],
-            self.rotated_IQ0_tp[:, 1],
-            marker=".",
-            s=mark_size,
-            color="blue",
-            label="send 0 and read 0",
-        )
-        rotated_iq_axis.scatter(
-            self.rotated_IQ0_fp[:, 0],
-            self.rotated_IQ0_fp[:, 1],
-            marker="x",
-            s=mark_size,
-            color="dodgerblue",
-        )
-=======
         )
         iq_axis.scatter(
             self.centers[:, 0],
@@ -494,7 +385,6 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
             s=mark_size,
             color="dodgerblue",
         )
->>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
         rotated_iq_axis.scatter(
             self.rotated_IQ1_tp[:, 0],
             self.rotated_IQ1_tp[:, 1],
@@ -510,22 +400,10 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
             s=mark_size,
             color="orange",
         )
-<<<<<<< HEAD
-        rotated_iq_axis.set_ylim(*self.rotated_y_limits)
-        rotated_iq_axis.legend()
-        rotated_iq_axis.axhline(0, color="black")
-        rotated_iq_axis.axvline(0, color="black")
-
-        # cm_axis = secondary_axes[1]
-        # optimal_confusion_matrix = self.cms[self.optimal_index]
-        # disp = ConfusionMatrixDisplay(confusion_matrix=optimal_confusion_matrix)
-        # disp.plot(ax=cm_axis)
-=======
 
         rotated_iq_axis.legend()
         rotated_iq_axis.axhline(0, color="black")
         rotated_iq_axis.axvline(0, color="black")
->>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
 
     def update_redis_trusted_values(self, node: str, this_element: str):
         """
