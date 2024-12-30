@@ -60,6 +60,14 @@ class OptimalRO01FrequencyQubitAnalysis(BaseQubitAnalysis):
         return [self.optimal_frequency]
 
     def plotter(self, ax, secondary_axes):
+        """
+        primary axis: the |0> and |1> resonator traces on the IQ plane.
+            The points for which the distance between the traces is maximized is denoted.
+        magnitude_axis: s21 magnitudes in terms of the frequency for both
+            the |0> and |1> resonator traces. Optimal frequency is denoted.
+        phase_axis: s21 phases in terms of the frequency for both
+            the |0> and |1> resonator traces. Optimal frequency is denoted.
+        """
 
         ro_freq = float(
             REDIS_CONNECTION.hget(f"transmons:{self.qubit}", "clock_freqs:readout")
@@ -169,7 +177,6 @@ class OptimalRO01FrequencyNodeAnalysis(BaseAllQubitsAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
         self.plots_per_qubit = 3
-        print(f"{ self.plots_per_qubit = }")
 
     def _fill_plots(self):
         for index, analysis in enumerate(self.qubit_analyses):
