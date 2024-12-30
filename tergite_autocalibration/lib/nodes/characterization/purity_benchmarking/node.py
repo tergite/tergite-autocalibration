@@ -12,17 +12,13 @@
 
 import numpy as np
 
-from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.analysis import (
     PurityBenchmarkingNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.measurement import (
     PurityBenchmarkingMeasurement,
 )
-<<<<<<< HEAD
-=======
 from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
->>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
 
 
 class PurityBenchmarkingNode(ScheduleNode):
@@ -32,10 +28,14 @@ class PurityBenchmarkingNode(ScheduleNode):
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
+        self.name = name
+        self.type = "parameterized_sweep"
+        self.all_qubits = all_qubits
         self.schedule_keywords = schedule_keywords
+        self.backup = False
         self.schedule_keywords = {}
 
-        self.schedule_samplespace = {
+        self.initial_schedule_samplespace = {
             "number_of_cliffords": {
                 # qubit: all_numbers for qubit in self.all_qubits
                 # qubit: np.array([2, 16, 128, 256,512, 768, 1024, 0, 1]) for qubit in self.all_qubits
@@ -44,13 +44,14 @@ class PurityBenchmarkingNode(ScheduleNode):
             },
         }
 
-        RB_REPEATS = 2
-        self.outer_schedule_samplespace = {
-            "seeds": {
-                qubit: np.arange(RB_REPEATS, dtype=np.int32)
-                for qubit in self.all_qubits
-            }
+        self.external_samplespace = {
+            "seeds": {qubit: np.arange(10, dtype=np.int32) for qubit in self.all_qubits}
         }
+
+    def pre_measurement_operation(self, reduced_ext_space: dict):
+        self.schedule_samplespace = (
+            self.initial_schedule_samplespace | reduced_ext_space
+        )
 
     def stack_number_of_cliffords(self, number_of_cliffords):
         return np.array(list(number_of_cliffords) * 3 + [0, 1, 2])
