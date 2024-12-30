@@ -20,15 +20,18 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
-from tergite_autocalibration.lib.base.analysis import (BaseAllQubitsAnalysis,
-                                                       BaseQubitAnalysis)
+from tergite_autocalibration.lib.base.analysis import (
+    BaseAllQubitsAnalysis,
+    BaseQubitAnalysis,
+)
 from tergite_autocalibration.lib.utils.analysis_models import (
-    ThreeClassBoundary, TwoClassBoundary)
+    ThreeClassBoundary,
+    TwoClassBoundary,
+)
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 
 
 class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
-
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
         self.fit_results = {}

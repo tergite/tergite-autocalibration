@@ -44,9 +44,9 @@ class CZParametrizationFixDurationNode(ScheduleNode):
         self.schedule_keywords = schedule_keywords
         self.backup = False
 
-        self.node_dictionary["cz_pulse_duration"] = (
-            120e-9  # Need to make it configurable
-        )
+        self.node_dictionary[
+            "cz_pulse_duration"
+        ] = 120e-9  # Need to make it configurable
 
         # Should these sample space move to user defined inputs?
         self.initial_schedule_samplespace = {
