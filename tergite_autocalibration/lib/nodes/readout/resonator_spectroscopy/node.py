@@ -11,25 +11,30 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+<<<<<<< HEAD
 import numpy as np
 import xarray
 from quantify_core.analysis import fitting_models as fm
 
 from tergite_autocalibration.config.VNA_values import VNA_resonator_frequencies
 from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
+=======
+>>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
 from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.analysis import (
     ResonatorSpectroscopy1NodeAnalysis,
     ResonatorSpectroscopy2NodeAnalysis,
     ResonatorSpectroscopyNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.measurement import (
-    Resonator_Spectroscopy,
+    ResonatorSpectroscopyMeasurement,
 )
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 
 # TODO: check location
-from tergite_autocalibration.utils.user_input import resonator_samples
+from tergite_autocalibration.lib.utils.samplespace import resonator_samples
 
 
+<<<<<<< HEAD
 class Resonator_Spectroscopy_Base(ScheduleNode):
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
@@ -43,6 +48,10 @@ class Resonator_Spectroscopy_Base(ScheduleNode):
 
 class Resonator_Spectroscopy_Node(ScheduleNode):
     measurement_obj = Resonator_Spectroscopy
+=======
+class ResonatorSpectroscopyNode(ScheduleNode):
+    measurement_obj = ResonatorSpectroscopyMeasurement
+>>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
     analysis_obj = ResonatorSpectroscopyNodeAnalysis
     qubit_qois = ["clock_freqs:readout", "Ql", "resonator_minimum"]
 
@@ -87,8 +96,8 @@ class Resonator_Spectroscopy_Node(ScheduleNode):
         return dataset
 
 
-class Resonator_Spectroscopy_1_Node(ScheduleNode):
-    measurement_obj = Resonator_Spectroscopy
+class ResonatorSpectroscopy1Node(ScheduleNode):
+    measurement_obj = ResonatorSpectroscopyMeasurement
     analysis_obj = ResonatorSpectroscopy1NodeAnalysis
     qubit_qois = [
         "extended_clock_freqs:readout_1",
@@ -108,8 +117,8 @@ class Resonator_Spectroscopy_1_Node(ScheduleNode):
         }
 
 
-class Resonator_Spectroscopy_2_Node(ScheduleNode):
-    measurement_obj = Resonator_Spectroscopy
+class ResonatorSpectroscopy2Node(ScheduleNode):
+    measurement_obj = ResonatorSpectroscopyMeasurement
     analysis_obj = ResonatorSpectroscopy2NodeAnalysis
     qubit_qois = ["extended_clock_freqs:readout_2"]
 

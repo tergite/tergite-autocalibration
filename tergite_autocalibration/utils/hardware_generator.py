@@ -10,8 +10,11 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+<<<<<<< HEAD
 import json
 
+=======
+>>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
 
 class HW_Config_Generator:
     def __init__(
@@ -158,6 +161,7 @@ class HW_Config_Generator:
         return self.hardware_config
 
 
+<<<<<<< HEAD
 if __name__ == "__main__":
     from tergite_autocalibration.config.settings import CONFIG_DIR
 
@@ -175,6 +179,19 @@ if __name__ == "__main__":
             "q09": [4.084159e08, 1.0193, 9.54746],
             "q10": [3.849132e08, 1.0159, 9.14118],
         }
+=======
+if __name__ == "main":
+    from tergite_autocalibration.config.globals import ENV
+
+    mixer_file = ENV.config_dir / "initial.csv"
+    json_config_file = ENV.config_dir / "HARDWARE_CONFIGURATION_LOKIA_20240504.json"
+    CLUSTER_NAME = "clusterA"
+    HW_CONFIG = {}
+    HW_CONFIG["backend"] = "quantify_scheduler.backends.qblox_backend.hardware_compile"
+    HW_CONFIG[f"{CLUSTER_NAME}"] = {
+        "ref": "internal",
+        "instrument_type": "Cluster",
+>>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
     }
 
     json_config_file = CONFIG_DIR / "HARDWARE_CONFIGURATION_LOKIA_20241204.json"

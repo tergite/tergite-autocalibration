@@ -193,7 +193,7 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
 #         ax.grid()
 
 
-class QubitSpectroscopyMultidim(BaseQubitAnalysis):
+class QubitSpectroscopyMultidimAnalysis(BaseQubitAnalysis):
     """
     Analysis that fits a Lorentzian function to qubit spectroscopy data.
     The resulting fit can be analyzed to determine if a peak was found or not.
@@ -288,7 +288,7 @@ class QubitSpectroscopyMultidim(BaseQubitAnalysis):
 
 
 class QubitSpectroscopyNodeMultidim(BaseAllQubitsAnalysis):
-    single_qubit_analysis_obj = QubitSpectroscopyMultidim
+    single_qubit_analysis_obj = QubitSpectroscopyMultidimAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)

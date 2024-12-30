@@ -18,18 +18,21 @@ from time import sleep
 
 import numpy as np
 
-from tergite_autocalibration.lib.base.external_parameter_node import (
-    ExternalParameterNode,
-)
 from tergite_autocalibration.lib.nodes.characterization.t2.analysis import (
     T2EchoNodeAnalysis,
     T2NodeAnalysis,
 )
-from tergite_autocalibration.lib.nodes.characterization.t2.measurement import T2, T2Echo
+from tergite_autocalibration.lib.nodes.characterization.t2.measurement import (
+    T2Measurement,
+    T2EchoMeasurement,
+)
+from tergite_autocalibration.lib.nodes.external_parameter_node import (
+    ExternalParameterNode,
+)
 
 
-class T2_Node(ExternalParameterNode):
-    measurement_obj = T2
+class T2Node(ExternalParameterNode):
+    measurement_obj = T2Measurement
     analysis_obj = T2NodeAnalysis
     qubit_qois = ["t2_time"]
 
@@ -62,8 +65,8 @@ class T2_Node(ExternalParameterNode):
             sleep(self.sleep_time)
 
 
-class T2_Echo_Node(ExternalParameterNode):
-    measurement_obj = T2Echo
+class T2EchoNode(ExternalParameterNode):
+    measurement_obj = T2EchoMeasurement
     analysis_obj = T2EchoNodeAnalysis
     qubit_qois = ["t2_echo_time"]
 

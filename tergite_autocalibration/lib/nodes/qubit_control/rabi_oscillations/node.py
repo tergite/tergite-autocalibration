@@ -16,21 +16,23 @@
 import numpy as np
 import xarray
 
-from tergite_autocalibration.lib.base.schedule_node import ScheduleNode
-
 from tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.analysis import (
     NRabiNodeAnalysis,
     RabiNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.measurement import (
-    N_Rabi_Oscillations,
-    Rabi_Oscillations,
+    NRabiOscillationsMeasurement,
+    RabiOscillationsMeasurement,
 )
+<<<<<<< HEAD
 from lmfit.models import SineModel
+=======
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
+>>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
 
 
-class Rabi_Oscillations_Node(ScheduleNode):
-    measurement_obj = Rabi_Oscillations
+class RabiOscillationsNode(ScheduleNode):
+    measurement_obj = RabiOscillationsMeasurement
     analysis_obj = RabiNodeAnalysis
     qubit_qois = ["rxy:amp180"]
 
@@ -61,8 +63,8 @@ class Rabi_Oscillations_Node(ScheduleNode):
         return dataset
 
 
-class Rabi_Oscillations_12_Node(ScheduleNode):
-    measurement_obj = Rabi_Oscillations
+class RabiOscillations12Node(ScheduleNode):
+    measurement_obj = RabiOscillationsMeasurement
     analysis_obj = RabiNodeAnalysis
     qubit_qois = ["r12:ef_amp180"]
 
@@ -78,8 +80,8 @@ class Rabi_Oscillations_12_Node(ScheduleNode):
         }
 
 
-class N_Rabi_Oscillations_Node(ScheduleNode):
-    measurement_obj = N_Rabi_Oscillations
+class NRabiOscillationsNode(ScheduleNode):
+    measurement_obj = NRabiOscillationsMeasurement
     analysis_obj = NRabiNodeAnalysis
     qubit_qois = ["rxy:amp180"]
 
@@ -96,8 +98,8 @@ class N_Rabi_Oscillations_Node(ScheduleNode):
         }
 
 
-class N_Rabi_Oscillations_12_Node(ScheduleNode):
-    measurement_obj = N_Rabi_Oscillations
+class NRabiOscillations12Node(ScheduleNode):
+    measurement_obj = NRabiOscillationsMeasurement
     analysis_obj = NRabiNodeAnalysis
     qubit_qois = ["r12:ef_amp180"]
 

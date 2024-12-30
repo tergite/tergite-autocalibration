@@ -11,14 +11,12 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
+
 import multiprocessing
-import threading
 from pathlib import Path
 from typing import Annotated
 
 import typer
-
-from tergite_autocalibration.utils.dto.enums import MeasurementMode
 
 calibration_cli = typer.Typer()
 
@@ -72,19 +70,21 @@ def start(
     ] = False,
 ):
     from ipaddress import ip_address, IPv4Address
-    from quantifiles import quantifiles
+    from tergite_autocalibration.tools.quantifiles import quantifiles
 
-    from tergite_autocalibration.config.settings import CLUSTER_IP, DATA_DIR
+    from tergite_autocalibration.config.globals import DATA_DIR
+    from tergite_autocalibration.config.globals import CLUSTER_IP
     from tergite_autocalibration.scripts.calibration_supervisor import (
         CalibrationSupervisor,
         CalibrationConfig,
     )
     from tergite_autocalibration.scripts.db_backend_update import update_mss
-    from tergite_autocalibration.utils.user_input import user_requested_calibration
+    from tergite_autocalibration.config.globals import CONFIG
+    from tergite_autocalibration.utils.dto.enums import MeasurementMode
 
     cluster_mode: "MeasurementMode" = MeasurementMode.real
     parsed_cluster_ip: "IPv4Address" = CLUSTER_IP
-    target_node_name = user_requested_calibration["target_node"]
+    target_node_name = CONFIG.run.target_node
     data_path = ""
 
     if r:

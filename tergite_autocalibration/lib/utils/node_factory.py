@@ -17,8 +17,13 @@
 from pathlib import Path
 from typing import TYPE_CHECKING, Dict, List, Union
 
+<<<<<<< HEAD
 from ...utils.regex import camel_to_snake
 from .reflections import find_inheriting_classes_ast_recursive, import_class_from_file
+=======
+from .reflections import find_inheriting_classes_ast_recursive, import_class_from_file
+from tergite_autocalibration.utils.misc.regex import camel_to_snake
+>>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
 
 if TYPE_CHECKING:
     from ..base.node import BaseNode
@@ -35,6 +40,7 @@ class NodeFactory:
 
     def __init__(self):
         self.node_name_mapping: Dict[str, str] = {
+<<<<<<< HEAD
             "punchout": "Punchout_Node",
             "resonator_spectroscopy": "Resonator_Spectroscopy_Node",
             "resonator_relaxation": "Resonator_Relaxation_Node",
@@ -61,19 +67,45 @@ class NodeFactory:
             "all_XY": "All_XY_Node",
             "reset_chevron": "Reset_Chevron_Node",
             "cz_characterisation_chevron": "CZ_Characterisation_Chevron_Node",
+=======
+            "punchout": "PunchoutNode",
+            "resonator_spectroscopy": "ResonatorSpectroscopyNode",
+            "resonator_relaxation": "ResonatorRelaxationNode",
+            "qubit_01_spectroscopy": "Qubit01SpectroscopyMultidimNode",
+            "rabi_oscillations": "RabiOscillationsNode",
+            "ramsey_correction": "RamseyFringesNode",
+            "resonator_spectroscopy_1": "ResonatorSpectroscopy1Node",
+            "qubit_12_spectroscopy_pulsed": "Qubit12SpectroscopyPulsedNode",
+            "qubit_12_spectroscopy": "Qubit12SpectroscopyMultidimNode",
+            "rabi_oscillations_12": "RabiOscillations12Node",
+            "ramsey_correction_12": "RamseyFringes12Node",
+            "resonator_spectroscopy_2": "ResonatorSpectroscopy2Node",
+            "motzoi_parameter": "MotzoiParameterNode",
+            "n_rabi_oscillations": "NRabiOscillationsNode",
+            "motzoi_parameter_12": "MotzoiParameter12Node",
+            "n_rabi_oscillations_12": "NRabiOscillations12Node",
+            "coupler_spectroscopy": "CouplerSpectroscopyNode",
+            "coupler_resonator_spectroscopy": "CouplerResonatorSpectroscopyNode",
+            "T1": "T1Node",
+            "T2": "T2Node",
+            "T2_echo": "T2EchoNode",
+            "all_XY": "AllXYNode",
+            "reset_chevron": "ResetChevronNode",
+            "cz_characterisation_chevron": "CZCharacterisationChevronNode",
+>>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
             "reset_calibration_ssro": "ResetCalibrationSSRONode",
             "cz_parametrisation_fix_duration": "CZParametrizationFixDurationNode",
             "process_tomography_ssro": "ProcessTomographySSRONode",
-            "cz_chevron": "CZ_Chevron_Node",
-            "cz_optimize_chevron": "CZ_Optimize_Chevron_Node",
+            "cz_chevron": "CZChevronNode",
+            "cz_optimize_chevron": "CZOptimizeChevronNode",
             "cz_calibration_ssro": "CZCalibrationSSRONode",
             "cz_calibration_swap_ssro": "CZCalibrationSwapSSRONode",
             "cz_dynamic_phase_ssro": "CZDynamicPhaseSSRONode",
             "cz_dynamic_phase_swap_ssro": "CZDynamicPhaseSwapSSRONode",
-            "ro_frequency_two_state_optimization": "RO_frequency_two_state_optimization_Node",
-            "ro_frequency_three_state_optimization": "RO_frequency_three_state_optimization_Node",
-            "ro_amplitude_two_state_optimization": "RO_amplitude_two_state_optimization_Node",
-            "ro_amplitude_three_state_optimization": "RO_amplitude_three_state_optimization_Node",
+            "ro_frequency_two_state_optimization": "ROFrequencyTwoStateOptimizationNode",
+            "ro_frequency_three_state_optimization": "ROFrequencyThreeStateOptimizationNode",
+            "ro_amplitude_two_state_optimization": "ROAmplitudeTwoStateOptimizationNode",
+            "ro_amplitude_three_state_optimization": "ROAmplitudeThreeStateOptimizationNode",
             "randomized_benchmarking_ssro": "RandomizedBenchmarkingSSRONode",
             "tqg_randomized_benchmarking_ssro": "TQGRandomizedBenchmarkingSSRONode",
             "tqg_randomized_benchmarking_interleaved_ssro": "TQGRandomizedBenchmarkingInterleavedSSRONode",

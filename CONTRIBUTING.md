@@ -4,128 +4,114 @@
 
 **It is currently being developed by the core developers only.**
 
-## Government Model
-
 [Chalmers Next Labs AB (CNL)](https://chalmersnextlabs.se) manages and maintains this project on behalf of all contributors.
 
-## Version Control
+## General information about contributions
 
 Tergite is developed on a separate version control system and mirrored on GitHub.
 If you are reading this on GitHub, then you are looking at a mirror. 
 
-## Versioning
+The following subsections are only relevant for people that are onboarded on the internal version control system.
 
-When versioning we follow the format `{year}.{month}.{patch_number}` e.g. `2023.12.0`.
+### Contribute by using merge requests
 
-## Contacting the Tergite Developers
-
-Since the GitHub repositories are only mirrors, no GitHub pull requests or GitHub issue/bug reports 
-are looked at. Please get in touch via email <quantum-nextlabs@chalmers.se> instead. 
-
-Take note that the maintainers may not answer every email.
-
-## But We Use [GitHub Flow](https://docs.github.com/en/get-started/quickstart/github-flow), So All Code Changes Happen Through Pull Requests
-
-Pull requests are the best way to propose changes to the codebase (we
-use [GitHub Flow](https://docs.github.com/en/get-started/quickstart/github-flow)). We actively welcome your pull
-requests:
+Merge requests are the best way to propose changes to the codebase. We use a pattern similar to the
+[GitHub Flow](https://docs.github.com/en/get-started/quickstart/github-flow) and actively welcome your merge
+requests.
 
 1. Clone the repo and create your branch from `main`.
 2. If you've added code that should be tested, add tests.
-3. If you've changed APIs, update the documentation.
-4. Ensure the test suite passes.
-5. Make sure your code lints. This can be done by running:
-```
-black tergite_autocalibration --check
-```
-6. Issue that pull request!
+3. If you've changed APIs, update the documentation. Read the section below on documentation.
+4. Ensure the test suite passes. Run: `pytest tergite_autocalibration`
+5. Make sure your code lints. This can be done by running: `black tergite_autocalibration --check`
+6. Create the merge request!
 
-## Any contributions you make will be under the Apache 2.0 Software Licenses
+### Issues and bug reports
 
-In short, when you submit code changes, your submissions are understood to be under the
-same [Apache 2.0 License](./LICENSE.txt) that covers the project. Feel free to contact the maintainers if that's a concern.
+Good bug reports can make it way easier for a developer to solve the issue.
+A good bug report tends to contain:
 
-## Write bug reports with detail, background, and sample code
+- A quick summary and/or background
+- Provide steps to reproduce the error
+    - Be specific!
+    - Give sample code if you can.
+- What you expected would happen
+- What actually happens
+- Notes (possibly including why you think this might be happening, or stuff you tried that didn't work)
 
-[This is an example](http://stackoverflow.com/q/12488905/180626).
-Here's [another example from Craig Hockenberry](http://www.openradar.me/11905408).
+Here is [one example](http://stackoverflow.com/q/12488905/180626)
+and [another example](http://www.openradar.me/11905408) on how to write a good bug report.
 
-**Great Bug Reports** tend to have:
+### Versioning
 
--   A quick summary and/or background
--   Steps to reproduce
-    -   Be specific!
-    -   Give sample code if you can.
--   What you expected would happen
--   What actually happens
--   Notes (possibly including why you think this might be happening, or stuff you tried that didn't work)
+When versioning we follow the format `{year}.{month}.{patch_number}` e.g. `2023.12.0`.
+Please find out more about versioning in the [change log](./CHANGELOG.md).
 
-People _love_ thorough bug reports. I'm not even kidding.
+### Contact information
 
-## License
+Since the GitHub repositories are only mirrors, no GitHub pull requests or GitHub issue/bug reports
+are looked at. Please get in touch via
+email [contact@quantum.chalmersnextlabs.se](mailto://contact@quantum.chalmersnextlabs.se) instead.
 
-By contributing, you agree that your contributions will be licensed under its Apache 2.0 License.
+## How to develop
 
-## Contributor Licensing Agreement
+Make sure you have [conda](https://docs.anaconda.com/free/miniconda/index.html) installed.
+Alternatively, you could also simply have [Python 3.10](https://www.python.org/downloads/) installed.
+Clone the repo and enter its root folder:
 
-Before you can submit any code, all contributors must sign a
-contributor license agreement (CLA). By signing a CLA, you're attesting
-that you are the author of the contribution, and that you're freely
-contributing it under the terms of the Apache-2.0 license.
-
-The [individual CLA](https://tergite.github.io/contributing/icla.pdf) document is available for review as a PDF.
-
-Please note that if your contribution is part of your employment or 
-your contribution is the property of your employer, 
-you will also most likely need to sign a [corporate CLA](https://tergite.github.io/contributing/ccla.pdf).
-
-All signed CLAs are emails to us at <quantum-nextlabs@chalmers.se>.
-
-## How to Use
-
--   Make sure you have [conda](https://docs.anaconda.com/free/miniconda/index.html) installed.
--   Clone the repo and enter its root folder
-
-```shell
+```bash
 git clone git@github.com:tergite/tergite-autocalibration.git
 cd tergite-autocalibration
 ```
 
-- Create the conda environment
+Create the conda environment
 
-```shell
-conda create -n tac python=3.8
+```bash
+conda create -n tac python=3.10 -y
 ```
 
--   Install dependencies
+Install dependencies
 
-```shell
+```bash
 conda activate tac
 pip install -e .
 ```
 
--   Run the CLI help command
+Install the development and test dependencies
 
-```shell
+```bash
+pip install poetry
+poetry install --with dev,test
+```
+
+Run the CLI help command to see whether the application is running.
+
+```bash
 acli --help
 ```
 
-## Configuration
+You can find more information about the configuration files in the documentation.
 
-A number of configurations can be added to the tergite-autocalibration.
-These include:
+### Testing
 
-- [`tergite_autocalibration/utils/user_input.py`](tergite_autocalibration/utils/user_input.py) The sample-space for each node. The target node is also declared here.
+Tests require a redis instance running on port 6378.
 
-- [`tergite_autocalibration/config/device_config.toml`](tergite_autocalibration/config/device_config.toml) A collection of reasonable initial values for the given device
+```bash
+redis-server --port 6378 {--daemonize yes}
+```
 
-- [`tergite_autocalibration/config/hardware_config.toml`](tergite_autocalibration/config/hardware_config.json) The hardware configuration for the QBlox cluster.
+Optionally, add `--daemonize yes` to run the redis instance in the background.
+If it does not run on your user, try running it again with `sudo` rights.
 
-- [`dot-env-template.txt`](dot-env-template.txt) Other parameters like the path to the Qblox Cluster configuration file (including IP address).
+Run the pytests for the whole application.
 
-The initial configurations for a specific device can be found under `data/devices`.
+```bash
+pytest tergite_autocalibration
+```
 
-## Calibration Pipeline
+You can find more information about unit tests in the documentation.
+
+### Calibration Pipeline
 
 Each calibration node goes through the following phases in order:
 
@@ -134,15 +120,35 @@ Each calibration node goes through the following phases in order:
 - post-processing
 - redis updating
 
-## Datasets
+### Datasets
 
-Datasets are stored in [`data_directory`](./data_directory)
+Datasets are stored in [`out`](./out).
 They can be browsed with the dataset browser:
 ```
 acli browser --datadir PATH_TO_DATA_DIRECTORY
 ```
 
-## Installation of proprietary resources (optional, not recommended)
+### Documentation
+
+Documentation is rendered with [Quarto](https://quarto.org/).
+If you had quarto installed in the previous step you can enter the `docs_editable` folder and edit the markdown files.
+
+```bash
+cd docs_editable
+```
+
+Render the documentation and show a preview in the browser
+
+```bash
+quarto preview
+```
+
+Now you can edit the files in `docs_editable` and the contents in the browser window would update automatically.
+If you just want to see the documentation, please open [`docs/index.html`](./docs/index.html) with your browser.
+One of the documentation pages is also
+about [how to write better documentation](./docs/developer-guide/writing_documentation.html).
+
+### Installation of proprietary resources (optional, not recommended)
 We do not recommend to make your code having dependencies to proprietary software.
 If you still need to install proprietary dependencies, please do so by running:
 ```
@@ -163,6 +169,29 @@ except ImportError:
 ```
 Please try to use proprietary resources only on experimental features and do not integrate them into the default workflows.
 The scope of the Tergite project is to be as open-source as possible.
+
+## License
+
+When you submit code changes, your submissions are understood to be under the
+same [Apache 2.0 License](./LICENSE.txt) that covers the project. Feel free to contact the maintainers if that's a
+concern.
+
+### Contributor License Agreement
+
+Before you can submit any code, all contributors must sign a
+contributor license agreement (CLA). By signing a CLA, you're attesting
+that you are the author of the contribution, and that you're freely
+contributing it under the terms of the Apache-2.0 license.
+
+The [individual CLA](https://tergite.github.io/contributing/icla.pdf) document is available for review as a PDF.
+
+Please note that if your contribution is part of your employment or
+your contribution is the property of your employer,
+you will also most likely need to sign a [corporate CLA](https://tergite.github.io/contributing/ccla.pdf).
+
+All signed CLAs are send by email
+to [contact@quantum.chalmersnextlabs.se](mailto://contact@quantum.chalmersnextlabs.se).
+
 
 ## References
 

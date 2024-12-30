@@ -3,6 +3,7 @@
 # (C) Copyright Eleftherios Moschandreou 2024
 # (C) Copyright Liangyu Chen 2024
 # (C) Copyright Amr Osman 2024
+# (C) Copyright Chalmers Next Labs AB 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -15,6 +16,7 @@
 """
 Module containing a schedule class for Ramsey calibration. (1D parameter sweep, for 2D see ramsey_detunings.py)
 """
+
 import itertools
 
 import numpy as np
@@ -30,17 +32,20 @@ from quantify_scheduler.operations.pulse_library import (
 )
 from quantify_scheduler.resources import ClockResource
 
-from tergite_autocalibration.config.coupler_config import qubit_types
-from tergite_autocalibration.config.settings import REDIS_CONNECTION
+from tergite_autocalibration.config.globals import REDIS_CONNECTION
+from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
-from tergite_autocalibration.utils.extended_coupler_edge import (
+from tergite_autocalibration.utils.dto.extended_coupler_edge import (
     ExtendedCompositeSquareEdge,
 )
-from tergite_autocalibration.utils.extended_gates import Measure_RO_3state_Opt, Rxy_12
-from tergite_autocalibration.utils.extended_transmon_element import ExtendedTransmon
+from tergite_autocalibration.utils.dto.extended_gates import (
+    Rxy_12,
+    Measure_RO_3state_Opt,
+)
+from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
-class CZ_calibration(BaseMeasurement):
+class CZCalibrationMeasurement(BaseMeasurement):
     def __init__(
         self,
         transmons: dict[str, ExtendedTransmon],
@@ -197,12 +202,15 @@ class CZ_calibration(BaseMeasurement):
                 else:
                     if control_on:
                         for this_qubit in all_qubits:
-                            if qubit_types[this_qubit] == qubit_type_list[0]:
+                            if (
+                                dh.get_legacy("qubit_types")[this_qubit]
+                                == qubit_type_list[0]
+                            ):
                                 x = schedule.add(
                                     X(this_qubit), ref_op=relaxation, ref_pt="end"
                                 )
                 for this_qubit in all_qubits:
-                    if qubit_types[this_qubit] == qubit_type_list[1]:
+                    if dh.get_legacy("qubit_types")[this_qubit] == qubit_type_list[1]:
                         x90 = schedule.add(
                             X90(this_qubit), ref_op=relaxation, ref_pt="end"
                         )
@@ -237,15 +245,18 @@ class CZ_calibration(BaseMeasurement):
                 if not dynamic:
                     if control_on:
                         for this_qubit in all_qubits:
-                            if qubit_types[this_qubit] == qubit_type_list[0]:
-                                # print(this_qubit, qubit_types[this_qubit])
+                            if (
+                                dh.get_legacy("qubit_types")[this_qubit]
+                                == qubit_type_list[0]
+                            ):
+                                # print(this_qubit, dh.get_legacy("qubit_types")[this_qubit])
                                 x_end = schedule.add(
                                     X(this_qubit), ref_op=buffer_end, ref_pt="end"
                                 )
                                 # pass
 
                 for this_qubit in all_qubits:
-                    if qubit_types[this_qubit] == qubit_type_list[1]:
+                    if dh.get_legacy("qubit_types")[this_qubit] == qubit_type_list[1]:
                         x90_end = schedule.add(
                             Rxy(theta=90, phi=ramsey_phase, qubit=this_qubit),
                             ref_op=buffer_end,
@@ -284,7 +295,7 @@ class CZ_calibration(BaseMeasurement):
         return schedule
 
 
-class CZ_calibration_SSRO(BaseMeasurement):
+class CZCalibrationSSROMeasurement(BaseMeasurement):
     def __init__(
         self,
         transmons: dict[str, ExtendedTransmon],
@@ -417,14 +428,17 @@ class CZ_calibration_SSRO(BaseMeasurement):
                 else:
                     if control_on:
                         for this_qubit in all_qubits:
-                            if qubit_types[this_qubit] == qubit_type_list[0]:
+                            if (
+                                dh.get_legacy("qubit_types")[this_qubit]
+                                == qubit_type_list[0]
+                            ):
                                 # pass
                                 x = shot.add(
                                     X(this_qubit), ref_op=relaxation, ref_pt="end"
                                 )
 
                 for this_qubit in all_qubits:
-                    if qubit_types[this_qubit] == qubit_type_list[1]:
+                    if dh.get_legacy("qubit_types")[this_qubit] == qubit_type_list[1]:
                         # x = shot.add(X(this_qubit), ref_op=relaxation, ref_pt='end')
                         # pass
                         x90 = shot.add(X90(this_qubit), ref_op=relaxation, ref_pt="end")
@@ -461,14 +475,17 @@ class CZ_calibration_SSRO(BaseMeasurement):
                 if not dynamic:
                     if control_on:
                         for this_qubit in all_qubits:
-                            if qubit_types[this_qubit] == qubit_type_list[0]:
+                            if (
+                                dh.get_legacy("qubit_types")[this_qubit]
+                                == qubit_type_list[0]
+                            ):
                                 # pass
                                 x_end = shot.add(
                                     X(this_qubit), ref_op=buffer_end, ref_pt="end"
                                 )
 
                 for this_qubit in all_qubits:
-                    if qubit_types[this_qubit] == qubit_type_list[1]:
+                    if dh.get_legacy("qubit_types")[this_qubit] == qubit_type_list[1]:
                         # x_end = shot.add(X(this_qubit), ref_op=buffer_end, ref_pt='end')
                         # pass
                         x90_end = shot.add(
@@ -539,7 +556,7 @@ class CZ_calibration_SSRO(BaseMeasurement):
         return schedule
 
 
-class CZ_calibration_duration(BaseMeasurement):
+class CZCalibrationDurationMeasurement(BaseMeasurement):
     def __init__(self, transmons, coupler, qubit_state: int = 0):
         super().__init__(transmons)
         self.qubit_state = qubit_state
@@ -732,7 +749,7 @@ class CZ_calibration_duration(BaseMeasurement):
         return schedule
 
 
-class Reset_calibration_SSRO(BaseMeasurement):
+class ResetCalibrationSSROMeasurement(BaseMeasurement):
     def __init__(
         self,
         transmons: dict[str, ExtendedTransmon],
@@ -837,7 +854,7 @@ class Reset_calibration_SSRO(BaseMeasurement):
         # all_qubits = ['q16','q21']
         state = ["g", "e", "f"]
         states = list(itertools.product(state, state))
-        if qubit_types[all_qubits[0]] == "Control":
+        if dh.get_legacy("qubit_types")[all_qubits[0]] == "Control":
             all_qubits.reverse()
         test_states = [dict(zip(all_qubits, s)) for s in states]
         for cz_index, control_on in enumerate(control_on_values):

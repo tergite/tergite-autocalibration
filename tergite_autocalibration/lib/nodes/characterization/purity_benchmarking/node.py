@@ -17,12 +17,16 @@ from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.anal
     PurityBenchmarkingNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.measurement import (
-    PurityBenchmarking,
+    PurityBenchmarkingMeasurement,
 )
+<<<<<<< HEAD
+=======
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
+>>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
 
 
 class PurityBenchmarkingNode(ScheduleNode):
-    measurement_obj = PurityBenchmarking
+    measurement_obj = PurityBenchmarkingMeasurement
     analysis_obj = PurityBenchmarkingNodeAnalysis
     qubit_qois = ["purity_fidelity"]
 

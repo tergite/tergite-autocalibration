@@ -22,7 +22,6 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from typing import List, Union
 
-import toml
 from colorama import Fore, Style
 from colorama import init as colorama_init
 from qblox_instruments import Cluster
@@ -30,28 +29,20 @@ from qblox_instruments.types import ClusterType
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 
-from tergite_autocalibration.config import settings
-from tergite_autocalibration.config.settings import (
-    CLUSTER_IP,
-    CLUSTER_NAME,
-    REDIS_CONNECTION,
-)
+from tergite_autocalibration.config.globals import REDIS_CONNECTION, CLUSTER_IP, CONFIG
+from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.base.node import BaseNode
 from tergite_autocalibration.lib.utils.graph import filtered_topological_order
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
-from tergite_autocalibration.utils.dataset_utils import create_node_data_path
-from tergite_autocalibration.utils.dto.enums import DataStatus, MeasurementMode
-from tergite_autocalibration.utils.logger.tac_logger import logger
-from tergite_autocalibration.utils.logger.visuals import draw_arrow_chart
-from tergite_autocalibration.utils.redis_utils import (
+from tergite_autocalibration.utils.backend.redis_utils import (
     populate_initial_parameters,
     populate_node_parameters,
     populate_quantities_of_interest,
 )
-from tergite_autocalibration.utils.user_input import (
-    attenuation_setting,
-    user_requested_calibration,
-)
+from tergite_autocalibration.utils.dto.enums import DataStatus, MeasurementMode
+from tergite_autocalibration.utils.io.dataset_utils import create_node_data_path
+from tergite_autocalibration.utils.logger.tac_logger import logger
+from tergite_autocalibration.utils.logger.visuals import draw_arrow_chart
 
 colorama_init()
 
@@ -66,6 +57,7 @@ class CalibrationConfig:
     cluster_ip: "IPv4Address" = CLUSTER_IP
     cluster_timeout: int = 222
     data_path: Path = Path("")
+<<<<<<< HEAD
     qubits: List[str] = field(
         default_factory=lambda: user_requested_calibration["all_qubits"]
     )
@@ -82,6 +74,12 @@ class CalibrationConfig:
     active_reset_configuration: dict = field(
         default_factory=lambda: toml.load(settings.ACTIVE_RESET_CONFIG)
     )
+=======
+    qubits: List[str] = field(default_factory=lambda: CONFIG.run.qubits)
+    couplers: List[str] = field(default_factory=lambda: CONFIG.run.couplers)
+    target_node_name: str = CONFIG.run.target_node
+    user_samplespace: dict = field(default_factory=lambda: CONFIG.samplespace())
+>>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
 
 
 class HardwareManager:
@@ -119,7 +117,7 @@ class HardwareManager:
 
             try:
                 # Create a new cluster instance using the specified cluster name and IP address
-                cluster = Cluster(CLUSTER_NAME, str(self.config.cluster_ip))
+                cluster = Cluster(dh.cluster_name, str(self.config.cluster_ip))
             except ConnectionRefusedError:
                 msg = "Cluster is disconnected. Maybe it has crushed? Try flick it off and on"
                 print("-" * len(msg))
@@ -137,7 +135,7 @@ class HardwareManager:
             dummy_setup = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1, 16)}
             dummy_setup["16"] = ClusterType.CLUSTER_QRM_RF
             dummy_setup["17"] = ClusterType.CLUSTER_QRM_RF
-            cluster = Cluster(CLUSTER_NAME, dummy_cfg=dummy_setup)
+            cluster = Cluster(dh.cluster_name, dummy_cfg=dummy_setup)
             return cluster
 
     def _create_instrument_coordinator(
@@ -154,20 +152,19 @@ class HardwareManager:
 
         # Configure each cluster in the list and add it to the instrument coordinator
         for cluster in clusters:
-            # Set the attenuation values for the modules
-            # TODO: Move module configuration into a helper function to reduce redundancy
+            # TODO: Setting the attenuation might not be needed any longer if we decide to use the new hw config
             for module in self.cluster.modules:
                 try:
                     if module.is_qcm_type and module.is_rf_type:
                         module.out0_att(
-                            attenuation_setting["qubit"]
+                            dh.get_legacy("attenuation_setting")["qubit"]
                         )  # For control lines
                         module.out1_att(
-                            attenuation_setting["coupler"]
+                            dh.get_legacy("attenuation_setting")["coupler"]
                         )  # For flux lines
                     elif module.is_qrm_type and module.is_rf_type:
                         module.out0_att(
-                            attenuation_setting["readout"]
+                            dh.get_legacy("attenuation_setting")["readout"]
                         )  # For readout lines
                 except:
                     pass
@@ -209,6 +206,7 @@ class NodeManager:
         self.config = config
         self.node_factory = NodeFactory()
         self.lab_ic = lab_ic
+<<<<<<< HEAD
         self.active_reset_configuration = config.active_reset_configuration
 
         # populate_active_reset_parameters(
@@ -221,6 +219,8 @@ class NodeManager:
             self.config.couplers,
             REDIS_CONNECTION,
         )
+=======
+>>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
 
     @staticmethod
     def topo_order(target_node: str):
@@ -229,13 +229,22 @@ class NodeManager:
     def inspect_node(self, node_name: str):
         logger.info(f"Inspecting node {node_name}")
 
+<<<<<<< HEAD
+=======
+        # Populate initial parameters
+        populate_initial_parameters(
+            self.config.qubits,
+            self.config.couplers,
+            REDIS_CONNECTION,
+        )
+
+>>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
         # Check Redis if node is calibrated
         status: "DataStatus" = self._check_calibration_status_redis(node_name)
 
         populate_node_parameters(
             node_name,
             status == DataStatus.in_spec,
-            self.config.transmon_configuration,
             self.config.qubits,
             self.config.couplers,
             REDIS_CONNECTION,

@@ -23,7 +23,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
 
+<<<<<<< HEAD
 from tergite_autocalibration.config.settings import REDIS_CONNECTION
+=======
+from tergite_autocalibration.config.globals import REDIS_CONNECTION
+from tergite_autocalibration.tools.mss.convert import structured_redis_storage
+>>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
 from tergite_autocalibration.utils.dto.qoi import QOI
 from tergite_autocalibration.utils.logger.tac_logger import logger
 
@@ -160,6 +165,13 @@ class BaseNodeAnalysis(ABC):
         full_path = self.data_path / f"{self.name}.png"
         logger.info("Saving Plots")
         self.fig.savefig(preview_path, bbox_inches="tight", dpi=100)
+<<<<<<< HEAD
+=======
+        self.fig.savefig(full_path, bbox_inches="tight", dpi=400)
+        plt.show(block=True)
+        plt.pause(5)
+        plt.close()
+>>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
         logger.info(f"Plots saved to {preview_path} and {full_path}")
         # self.fig.savefig(full_path, bbox_inches="tight", dpi=400)
         plt.show(block=True)
@@ -265,10 +277,10 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
     def __init__(self, name, redis_fields):
         self.name = name
         self.redis_fields = redis_fields
-        self.dataset = None
-        self.S21 = None
+        self.dataset = xr.Dataset
+        self.S21: xr.DataArray
         self.data_var = None
-        self.qubit = None
+        self.qubit: str
         self.coord = None
 
     def process_qubit(self, dataset, qubit_element):
@@ -364,7 +376,7 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
         # secondary_axis.legend(handles=handles, fontsize="small")
 
     @abstractmethod
-    def analyze_coupler():
+    def analyze_coupler(self):
         pass
 
 

@@ -21,15 +21,20 @@ from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis impor
     QubitSpectroscopyNodeMultidim,
 )  # QubitSpectroscopyNodeAnalysis,
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement import (
-    Two_Tones_Multidim,
+    TwoTonesMultidimMeasurement,
 )
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 
+<<<<<<< HEAD
 # TODO: check input
 from tergite_autocalibration.utils.user_input import qubit_samples
+=======
+from tergite_autocalibration.lib.utils.samplespace import qubit_samples
+>>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
 
 
-class Qubit_01_Spectroscopy_Multidim_Node(ScheduleNode):
-    measurement_obj = Two_Tones_Multidim
+class Qubit01SpectroscopyMultidimNode(ScheduleNode):
+    measurement_obj = TwoTonesMultidimMeasurement
     analysis_obj = QubitSpectroscopyNodeMultidim
     qubit_qois = ["clock_freqs:f01", "spec:spec_ampl_optimal"]
 
@@ -63,6 +68,7 @@ class Qubit_01_Spectroscopy_Multidim_Node(ScheduleNode):
             true_s21 = peak.eval(params=true_params, x=frequncies)
             noise_scale = 0.001
 
+<<<<<<< HEAD
             np.random.seed(123)
             measured_s21 = true_s21 + 0 * noise_scale * (
                 np.random.randn(number_of_samples)
@@ -70,6 +76,12 @@ class Qubit_01_Spectroscopy_Multidim_Node(ScheduleNode):
             )
             measured_s21 = np.repeat(measured_s21, number_of_amplitudes)
             data_array = xarray.DataArray(measured_s21)
+=======
+class Qubit12SpectroscopyPulsedNode(ScheduleNode):
+    measurement_obj = TwoTonesMultidimMeasurement
+    analysis_obj = QubitSpectroscopyNodeAnalysis
+    qubit_qois = ["clock_freqs:f12"]
+>>>>>>> eleftherios/fix/fix-ro-amplitude-optimizations
 
             # Add the DataArray to the Dataset with an integer name (converted to string)
             dataset[index] = data_array
@@ -93,8 +105,8 @@ class Qubit_01_Spectroscopy_Multidim_Node(ScheduleNode):
 #         }
 
 
-class Qubit_12_Spectroscopy_Multidim_Node(ScheduleNode):
-    measurement_obj = Two_Tones_Multidim
+class Qubit12SpectroscopyMultidimNode(ScheduleNode):
+    measurement_obj = TwoTonesMultidimMeasurement
     analysis_obj = QubitSpectroscopyNodeMultidim
     qubit_qois = ["clock_freqs:f12", "spec:spec_ampl_12_optimal"]
 
