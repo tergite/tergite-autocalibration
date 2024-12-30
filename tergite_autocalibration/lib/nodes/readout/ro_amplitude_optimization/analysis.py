@@ -20,14 +20,10 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
-from tergite_autocalibration.lib.base.analysis import (
-    BaseAllQubitsAnalysis,
-    BaseQubitAnalysis,
-)
+from tergite_autocalibration.lib.base.analysis import (BaseAllQubitsAnalysis,
+                                                       BaseQubitAnalysis)
 from tergite_autocalibration.lib.utils.analysis_models import (
-    ThreeClassBoundary,
-    TwoClassBoundary,
-)
+    ThreeClassBoundary, TwoClassBoundary)
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 
 
@@ -95,7 +91,6 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
             IQ0_tp = xr.DataArray(
                 IQ0[tp0],
                 name="IQ0_tp",
-                # dims=["shots", "re_im"],
                 coords={"shots": np.arange(len(IQ0[tp0])), "re_im": ["re", "im"]},
             ).expand_dims(
                 {self.amplitude_coord: [ro_amplitude]}
@@ -104,14 +99,12 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
             IQ0_fp = xr.DataArray(
                 IQ0[~tp0],
                 name="IQ0_fp",
-                # dims=["shots", "re_im"],
                 coords={"shots": np.arange(len(IQ0[~tp0])), "re_im": ["re", "im"]},
             ).expand_dims({self.amplitude_coord: [ro_amplitude]})
 
             IQ1_tp = xr.DataArray(
                 IQ1[tp1],
                 name="IQ1_tp",
-                # dims=["shots", "re_im"],
                 coords={"shots": np.arange(len(IQ1[tp1])), "re_im": ["re", "im"]},
             ).expand_dims(
                 {self.amplitude_coord: [ro_amplitude]}
@@ -120,7 +113,6 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
             IQ1_fp = xr.DataArray(
                 IQ1[~tp1],
                 name="IQ1_fp",
-                # dims=["shots", "re_im"],
                 coords={"shots": np.arange(len(IQ1[~tp1])), "re_im": ["re", "im"]},
             ).expand_dims({self.amplitude_coord: [ro_amplitude]})
             array_iq0_tp = xr.concat([IQ0_tp, array_iq0_tp], dim=self.amplitude_coord)
@@ -170,7 +162,7 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
 
-    def allign_on_y_axis(
+    def align_on_y_axis(
         self,
         iq_points: np.ndarray,
         classified_states: np.ndarray,
@@ -235,7 +227,7 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         y_intersept = self.y_intercept[0]
         boundary_angle_rad = self.theta_rad
 
-        alligned_IQ, rotation_angle_rad, threshold_direction = self.allign_on_y_axis(
+        alligned_IQ, rotation_angle_rad, threshold_direction = self.align_on_y_axis(
             optimal_IQ, classified_states, boundary_angle_rad, y_intersept
         )
 
@@ -255,10 +247,6 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         self.IQ1_fp = IQ1[~tp1]
 
         self.rotated_y_limits = (alligned_IQ[:, 1].min(), alligned_IQ[:, 1].max())
-        # min_limit = np.min(alligned_IQ, axis=0)
-        # max_limit = np.max(alligned_IQ, axis=0)
-        # self.y_limits = (optimal_IQ[:, 1].min(), optimal_IQ[:, 1].max())
-        # self.y_limits = (min_limit, max_limit)
 
         self.x_space = np.linspace(optimal_IQ[:, 0].min(), optimal_IQ[:, 0].max(), 100)
 
@@ -337,7 +325,6 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         iq_axis.legend()
         iq_axis.axhline(0, color="black")
         iq_axis.axvline(0, color="black")
-        # iq_axis.set_ylim(*self.y_limits)
 
         rotated_iq_axis = secondary_axes[1]
         rotated_iq_axis.axis("equal")
@@ -371,15 +358,10 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
             s=mark_size,
             color="orange",
         )
-        # rotated_iq_axis.set_ylim(*self.rotated_y_limits)
+
         rotated_iq_axis.legend()
         rotated_iq_axis.axhline(0, color="black")
         rotated_iq_axis.axvline(0, color="black")
-
-        # cm_axis = secondary_axes[1]
-        # optimal_confusion_matrix = self.cms[self.optimal_index]
-        # disp = ConfusionMatrixDisplay(confusion_matrix=optimal_confusion_matrix)
-        # disp.plot(ax=cm_axis)
 
     def update_redis_trusted_values(self, node: str, this_element: str):
         """

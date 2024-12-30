@@ -35,7 +35,7 @@ class TwoClassBoundary:
     theta_rad: float
         the angle of the boundary, used for form (ii)
     threshold: float
-        the distance from the IQ origin to the boundary line
+        the distance from the IQ origin to the boundary line, used for form (ii)
     """
 
     def __init__(self, lda: LinearDiscriminantAnalysis):
@@ -54,6 +54,34 @@ class TwoClassBoundary:
 
 
 class ThreeClassBoundary:
+    """
+    Defines the classification boundaries when discriminating between
+    the |0>, |1>, |2> qubit states.
+    Such definition requires 5 parameters:
+    the (I,Q) coordinates of the point where the three lines meet (centroid)
+    the angles omega_ij that define the direction of each line with respect to the I axis
+
+    Attributes
+    ----------
+    centroid_I: float
+        the I coordinate of the point where the three classification lines meet
+    centroid_Q: float
+        the Q coordinate of the point where the three classification lines meet
+    omega_01: float
+        the angle in degrees in the range [0,360) of the boundary between |0> and |1>
+    omega_12: float
+        the angle in degrees in the range [0,360) of the boundary between |1> and |2>
+    omega_20: float
+        the angle in degrees in the range [0,360) of the boundary between |2> and |0>
+
+    Methods
+    ----------
+    boundary_line (int: class_a, class_a) -> (np.ndarray, np.ndarray):
+        used for plotting,
+        returns the x and y points needed to plot
+        the line between the classes class_a and class_b. The line starts at the centroid.
+    """
+
     def __init__(self, lda: LinearDiscriminantAnalysis):
         if len(lda.classes_) != 3:
             raise ValueError("The Classifcation classes are not 3.")
@@ -125,7 +153,9 @@ class ThreeClassBoundary:
     def omega_20(self):
         return self.omega(2, 0)
 
-    def boundary_line(self, class_a, class_b) -> tuple[np.ndarray, np.ndarray]:
+    def boundary_line(
+        self, class_a: int, class_b: int
+    ) -> tuple[np.ndarray, np.ndarray]:
         i_point = self.intersection_I(class_a, class_b)
         q_point = self.intersection_Q(class_a, class_b)
         i_values = np.linspace(self.centroid[0], i_point, 100)
