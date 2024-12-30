@@ -27,9 +27,9 @@ class HW_Config_Generator:
 
     def generate_initial_hw_config(self):
         HW_CONFIG = {}
-        HW_CONFIG[
-            "backend"
-        ] = "quantify_scheduler.backends.qblox_backend.hardware_compile"
+        HW_CONFIG["backend"] = (
+            "quantify_scheduler.backends.qblox_backend.hardware_compile"
+        )
         HW_CONFIG[f"{self.cluster_name}"] = {
             "ref": "internal",
             "instrument_type": "Cluster",
