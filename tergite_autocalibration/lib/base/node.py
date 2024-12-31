@@ -100,13 +100,6 @@ class BaseNode(abc.ABC):
         """
         return result_dataset
 
-    def generate_dummy_dataset(self) -> xarray.Dataset:
-        result_dataset = xarray.Dataset()
-        """
-        To be implemented by the Node Implementation Classes.
-        """
-        return result_dataset
-
     def pre_measurement_operation(self):
         """
         To be implemented by the child measurement nodes
@@ -194,16 +187,6 @@ class BaseNode(abc.ABC):
         compiled_schedule = compiler.compile(
             schedule=schedule, config=compilation_config
         )
-
-        # with open(f"timing_instructions_table_{self.name}.html", "w") as f:
-        #     f.write(
-        #         compiled_schedule.timing_table.hide(
-        #             subset=["waveform_op_id", "operation_hash"], axis=1
-        #         ).to_html()
-        #     )
-
-        # fig = compiled_schedule.plot_pulse_diagram(plot_backend="plotly")
-        # fig.write_html(f"{self.name}_plotly.html")
 
         return compiled_schedule
 
