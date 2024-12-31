@@ -170,12 +170,12 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         iq_points: np.ndarray,
         classified_states: np.ndarray,
         boundary_angle_rad: float,
-        y_intersept: float,
+        y_intercept: float,
     ) -> tuple[np.ndarray, float, float]:
         """
         Translate and rotate the IQ samples so that all the |0> are on the I<0 semi-plane
         and all the |1> states are on the I>0 semi plane in accordance to Quantify Scheduler
-        convention for Thresholded Aqcuisitions
+        convention for Thresholded Acquisitions
         """
         rotation_angle_rad = np.pi / 2 - boundary_angle_rad
         rotation_matrix = np.array(
@@ -190,7 +190,7 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
                 [np.sin(np.pi), np.cos(np.pi)],
             ]
         )
-        translated_IQ = iq_points - np.array([0, y_intersept])
+        translated_IQ = iq_points - np.array([0, y_intercept])
         rotated_IQ = translated_IQ @ rotation_matrix.T
 
         rotated_IQ0 = rotated_IQ[classified_states == 0]
@@ -227,29 +227,29 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         self.threshold = boundary.threshold
         self.centers = boundary.centers
         self.lamda = boundary.lamda
-        y_intersept = self.y_intercept[0]
+        y_intercept = self.y_intercept[0]
         boundary_angle_rad = self.theta_rad
 
-        alligned_IQ, rotation_angle_rad, threshold_direction = self.align_on_y_axis(
-            optimal_IQ, classified_states, boundary_angle_rad, y_intersept
+        aligned_IQ, rotation_angle_rad, threshold_direction = self.align_on_y_axis(
+            optimal_IQ, classified_states, boundary_angle_rad, y_intercept
         )
 
         self.threshold_point = self.threshold * np.array(
             [np.cos(threshold_direction), np.sin(threshold_direction)]
         )
-        alligned_IQ0 = alligned_IQ[states == 0]
-        alligned_IQ1 = alligned_IQ[states == 1]
-        self.rotated_IQ0_tp = alligned_IQ0[tp0]  # True Positive when sending 0
-        self.rotated_IQ0_fp = alligned_IQ0[~tp0]
-        self.rotated_IQ1_tp = alligned_IQ1[tp1]  # True Positive when sending 1
-        self.rotated_IQ1_fp = alligned_IQ1[~tp1]
+        aligned_IQ0 = aligned_IQ[states == 0]
+        aligned_IQ1 = aligned_IQ[states == 1]
+        self.rotated_IQ0_tp = aligned_IQ0[tp0]  # True Positive when sending 0
+        self.rotated_IQ0_fp = aligned_IQ0[~tp0]
+        self.rotated_IQ1_tp = aligned_IQ1[tp1]  # True Positive when sending 1
+        self.rotated_IQ1_fp = aligned_IQ1[~tp1]
 
         self.IQ0_tp = IQ0[tp0]  # True Positive when sending 0
         self.IQ0_fp = IQ0[~tp0]
         self.IQ1_tp = IQ1[tp1]  # True Positive when sending 1
         self.IQ1_fp = IQ1[~tp1]
 
-        self.rotated_y_limits = (alligned_IQ[:, 1].min(), alligned_IQ[:, 1].max())
+        self.rotated_y_limits = (aligned_IQ[:, 1].min(), aligned_IQ[:, 1].max())
 
         self.x_space = np.linspace(optimal_IQ[:, 0].min(), optimal_IQ[:, 0].max(), 100)
 
