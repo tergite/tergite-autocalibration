@@ -49,8 +49,8 @@ def configure_dataset(
         measured_qubit = measurement_qubits[key_indx]
         dimensions = node.dimensions
 
-        # TODO: this is flagged for removal. Excluding explicitly RB_ssro to test its behavior 
-        if "ssro" in node.name and node.name != "randomized_benchmarking_ssro":  
+        # TODO: this is flagged for removal. Excluding explicitly RB_ssro to test its behavior
+        if "ssro" in node.name and node.name != "randomized_benchmarking_ssro":
             shots = int(len(raw_ds[key].values[0]) / (np.product(dimensions)))
             coords_dict["shot"] = (
                 "shot",

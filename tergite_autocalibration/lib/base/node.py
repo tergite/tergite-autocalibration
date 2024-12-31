@@ -209,11 +209,11 @@ class BaseNode(abc.ABC):
         self._print_measurement_info(schedule_duration, measurement)
 
         raw_dataset = execute_schedule(
-                compiled_schedule,
-                schedule_duration,
-                self.lab_instr_coordinator,
-                cluster_status,
-            )
+            compiled_schedule,
+            schedule_duration,
+            self.lab_instr_coordinator,
+            cluster_status,
+        )
 
         result_dataset = configure_dataset(raw_dataset, self)
 
