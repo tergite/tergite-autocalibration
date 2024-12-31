@@ -249,15 +249,7 @@ class BaseNode(abc.ABC):
             self.name, self.redis_fields, **analysis_kwargs
         )
         analysis_results = node_analysis.analyze_node(data_path)
-        data_vars = {
-            element: ("qois", np.array(list(analysis_results[element].values())))
-            for element in analysis_results
-        }
-        qoi_dataset = xarray.Dataset(
-            data_vars=data_vars,
-            coords={"qois": self.redis_fields},
-        )
-        return qoi_dataset
+        return analysis_results
 
     def __str__(self):
         return f"Node representation for {self.name} on qubits {self.all_qubits}"
