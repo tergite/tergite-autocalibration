@@ -41,8 +41,6 @@ def configure_dataset(
     sweep_quantities = samplespace.keys()
 
     n_qubits = len(measurement_qubits)
-    # if "ssro" in node.name:
-    #     qubit_states = ["c0", "c1", "c2"]  # for calibration points
 
     for key in raw_ds_keys:
         key_indx = key % n_qubits  # this is to handle ro_opt_frequencies node where
@@ -51,9 +49,8 @@ def configure_dataset(
         measured_qubit = measurement_qubits[key_indx]
         dimensions = node.dimensions
 
-        if "ssro" in node.name and node.name != "randomized_benchmarking_ssro":
-            # TODO: We are not sure about this one
-            # dimensions[0] += len(qubit_states)  # for calibration points
+        # TODO: this is flagged for removal. Excluding explicitly RB_ssro to test its behavior 
+        if "ssro" in node.name and node.name != "randomized_benchmarking_ssro":  
             shots = int(len(raw_ds[key].values[0]) / (np.product(dimensions)))
             coords_dict["shot"] = (
                 "shot",
@@ -106,12 +103,9 @@ def configure_dataset(
 
         data_values = raw_ds[key].values
 
-        if node.is_ar:
-            # In AR the even indices capture the controled reset
-            # aqcuisitions and should be discarded
-            data_values = data_values[1::2]
-
         reshaping = reversed(node.dimensions)
+
+        # TODO: flagged for removal
         if "ssro" in node.name and node.name != "randomized_benchmarking_ssro":
             reshaping = np.array([shots])
             reshaping = np.append(reshaping, dimensions)
@@ -156,28 +150,6 @@ def create_node_data_path(node) -> pathlib.Path:
     measurement_id = time_id + "-" + str(uuid4())[:6] + f"-{node.name}"
     data_path = pathlib.Path(DATA_DIR / measurements_today / measurement_id)
     return data_path
-
-
-def save_qoi_dataset(
-    qois_dataset: xarray.Dataset, node_name: str, data_path: pathlib.Path
-) -> None:
-    """
-    Save the qois dataset to the saame file as the measurements dataset.
-
-    Args:
-        qois_dataset (xarray.Dataset): The dataset to save.
-        node_name (str): Name of the node being measured.
-        data_path (pathlib.Path): Path where the dataset will be saved.
-    """
-    data_path.mkdir(parents=True, exist_ok=True)
-    measurement_id = data_path.stem[0:19]
-
-    qois_dataset = qois_dataset.assign_attrs(
-        {"name": node_name, "tuid": measurement_id}
-    )
-
-    dataset_name = f"dataset_{node_name}_qois.hdf5"
-    qois_dataset.to_netcdf(data_path / dataset_name)
 
 
 def save_dataset(
