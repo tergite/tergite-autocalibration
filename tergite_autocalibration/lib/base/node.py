@@ -208,15 +208,12 @@ class BaseNode(abc.ABC):
         schedule_duration = self._calculate_schedule_duration(compiled_schedule)
         self._print_measurement_info(schedule_duration, measurement)
 
-        if cluster_status == MeasurementMode.real:
-            raw_dataset = execute_schedule(
+        raw_dataset = execute_schedule(
                 compiled_schedule,
                 schedule_duration,
                 self.lab_instr_coordinator,
                 cluster_status,
             )
-        elif cluster_status == MeasurementMode.dummy:
-            raw_dataset = self.generate_dummy_dataset()
 
         result_dataset = configure_dataset(raw_dataset, self)
 
