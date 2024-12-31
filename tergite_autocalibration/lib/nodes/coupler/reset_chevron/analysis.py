@@ -81,7 +81,6 @@ class OptimalResult:
 
 
 class ResetChevronQubitAnalysis(BaseQubitAnalysis):
-
     def analyse_qubit(self):
 
         self.fit_results = {}

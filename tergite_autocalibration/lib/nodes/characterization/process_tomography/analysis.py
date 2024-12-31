@@ -52,7 +52,6 @@ def mitigate(v, cm_inv):
 
 
 class ProcessTomographyQubitAnalysis(BaseQubitAnalysis):
-
     def analyse_qubit(self):
         for coord in self.dataset.coords:
             if f"control_ons" in str(coord):
