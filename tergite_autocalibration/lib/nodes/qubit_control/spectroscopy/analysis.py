@@ -165,15 +165,13 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
         if self.hasPeak:
             ax.plot(self.fit_freqs, self.fit_y, "r-", lw=3.0)
             min = np.min(self.magnitudes)
-            # ax.vlines(self.freq, min, self.prominence + min, lw=4, color='teal')
-            # ax.vlines(self.freq-1e6, min, self.filtered_std + min, lw=4, color='orange')
+
             ax.plot(
                 self.fit_freqs,
                 self.fit_y,
                 "r-",
                 lw=3.0,
                 label=f"freq = {self.freq:.6E} (Hz)",
-                # label=f"freq = {self.freq:.6E} ± {self.uncertainty:.1E} (Hz)",
             )
 
         x_dataarray = self.magnitudes.to_dataarray()
