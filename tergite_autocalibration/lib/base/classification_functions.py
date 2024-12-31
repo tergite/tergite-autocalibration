@@ -1,7 +1,7 @@
 import numpy as np
 import xarray as xr
 
-from tergite_autocalibration.config.settings import REDIS_CONNECTION
+from tergite_autocalibration.config.globals import REDIS_CONNECTION
 
 
 def assign_state(qubit: str, iq_values: np.ndarray) -> xr.DataArray:

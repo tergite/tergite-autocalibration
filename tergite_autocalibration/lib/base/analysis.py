@@ -187,13 +187,13 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         self.plots_per_qubit = 1
 
     def analyze_node(self, data_path: Path, index: int = 0):
-        logger.info("opening dataset")
         self.data_path = Path(data_path)
         self.dataset = self.open_dataset(index)
-        logger.info("after opening dataset")
         self.coords = self.dataset.coords
         self.data_vars = self.dataset.data_vars
+        logger.info("starting plot manager")
         self.fig, self.axs = self.manage_plots(self.column_grid, self.plots_per_qubit)
+        logger.info("plot manager is setup")
         analysis_results = self._analyze_all_qubits()
         self._fill_plots()
         self.save_plots()
@@ -227,6 +227,10 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
                 qubit_analysis = self.single_qubit_analysis_obj(
                     self.name, self.redis_fields
                 )
+                # NOTE: coord initialization cannot be done in the __init__ because
+                # the dataset is loaded by the process_qubit method.
+                # in other words the __init__ of the analysis class is not aware of the
+                # dataset to be analyzed
                 result = qubit_analysis.process_qubit(
                     ds, this_qubit
                 )  # this_qubit shoulq be qXX
@@ -269,7 +273,7 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
     def __init__(self, name, redis_fields):
         self.name = name
         self.redis_fields = redis_fields
-        self.dataset = xr.Dataset
+        self.dataset: xr.Dataset
         self.S21: xr.DataArray
         self.data_var = None
         self.qubit: str
@@ -278,7 +282,7 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
     def process_qubit(self, dataset, qubit_element):
         self.dataset = dataset
         self.qubit = qubit_element
-        self.coord = dataset.coords
+        self.coord = dataset.coords  # What is this doing?
         self.data_var = list(dataset.data_vars.keys())[
             0
         ]  # Assume the first data_var is relevant

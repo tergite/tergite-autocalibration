@@ -29,7 +29,7 @@ def resonator_samples(qubit: str) -> np.ndarray:
 
 
 def qubit_samples(qubit: str, transition: str = "01") -> np.ndarray:
-    qub_spec_samples = 51
+    qub_spec_samples = 91
     sweep_range = 10e6
     if transition == "01":
         VNA_frequency = dh.get_legacy("VNA_qubit_frequencies")[qubit]

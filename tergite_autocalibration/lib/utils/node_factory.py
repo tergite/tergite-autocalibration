@@ -43,7 +43,6 @@ class NodeFactory:
             "rabi_oscillations": "RabiOscillationsNode",
             "ramsey_correction": "RamseyFringesNode",
             "resonator_spectroscopy_1": "ResonatorSpectroscopy1Node",
-            "qubit_12_spectroscopy_pulsed": "Qubit12SpectroscopyPulsedNode",
             "qubit_12_spectroscopy": "Qubit12SpectroscopyMultidimNode",
             "rabi_oscillations_12": "RabiOscillations12Node",
             "ramsey_correction_12": "RamseyFringes12Node",

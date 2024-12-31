@@ -36,7 +36,7 @@ class RandomizedBenchmarkingSSRONode(ScheduleNode):
         self.loops = 500
         self.schedule_keywords["loop_repetitions"] = self.loops
 
-        RB_REPEATS = 2
+        RB_REPEATS = 4
         self.outer_schedule_samplespace = {
             "seeds": {
                 qubit: np.arange(RB_REPEATS, dtype=np.int32)

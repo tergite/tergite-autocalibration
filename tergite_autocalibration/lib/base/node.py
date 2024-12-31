@@ -167,8 +167,7 @@ class BaseNode(abc.ABC):
             # After the measurement free the device resources
             save_dataset(result_dataset, self.name, data_path)
         self.device_manager.close_device()
-        qois_dataset = self.post_process(data_path)
-        save_qoi_dataset(qois_dataset, self.name, data_path)
+        self.post_process(data_path)
         logger.info("analysis completed")
 
     def precompile(self, schedule_samplespace: dict) -> CompiledSchedule:

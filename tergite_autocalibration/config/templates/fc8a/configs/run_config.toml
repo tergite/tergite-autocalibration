@@ -11,13 +11,11 @@ couplers = ["q06_q07"]
 #   punchout
 #   resonator_spectroscopy
 #   qubit_01_spectroscopy
-#   qubit_01_spectroscopy_pulsed
-#   qubit_01_cw_spectroscopy
 #   rabi_oscillations
 #   ramsey_correction
 #   resonator_spectroscopy_1
-#   qubit_12_spectroscopy_pulsed
-#   qubit_12_spectroscopy_multidim
+#   qubit_12_spectroscopy
+#   qubit_12_spectroscopy
 #   rabi_oscillations_12
 #   ramsey_correction_12
 #   resonator_spectroscopy_2
@@ -34,7 +32,7 @@ couplers = ["q06_q07"]
 #   T1
 #   T2
 #   T2_echo
-#   randomized_benchmarking
+#   randomized_benchmarking_ssro
 #   all_XY
 #   check_cliffords
 #   cz_chevron

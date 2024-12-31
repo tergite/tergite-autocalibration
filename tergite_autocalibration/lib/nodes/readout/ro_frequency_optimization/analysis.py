@@ -35,10 +35,6 @@ class OptimalRO01FrequencyQubitAnalysis(BaseQubitAnalysis):
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-        self.fit_results = {}
-        self.magnitudes_0 = []
-        self.magnitudes_1 = []
-        self.qubit_state_coord = ""
 
     def analyse_qubit(self):
         for coord in self.dataset.coords:
@@ -51,10 +47,14 @@ class OptimalRO01FrequencyQubitAnalysis(BaseQubitAnalysis):
 
         self.s21_0 = self.S21[self.data_var].sel({self.qubit_state_coord: 0})
         self.s21_1 = self.S21[self.data_var].sel({self.qubit_state_coord: 1})
+        self.magnitudes_0 = np.abs(self.s21_0)
+        self.magnitudes_1 = np.abs(self.s21_1)
+        self.phase_0 = np.angle(self.s21_0)
+        self.phase_1 = np.angle(self.s21_1)
 
         distances = self.s21_1 - self.s21_0
 
-        self.optimal_frequency = float(np.abs(distances).idxmax().values)
+        self.optimal_frequency = np.abs(distances).idxmax().item()
         self.index_of_max_distance = np.abs(distances).argmax()
 
         return [self.optimal_frequency]
@@ -103,52 +103,34 @@ class OptimalRO01FrequencyQubitAnalysis(BaseQubitAnalysis):
 
         magnitude_axis = secondary_axes[0]
         phase_axis = secondary_axes[1]
-        magnitudes_0 = np.abs(self.s21_0)
-        magnitudes_1 = np.abs(self.s21_1)
-        phase_0 = np.angle(self.s21_0)
-        phase_1 = np.angle(self.s21_1)
-        magnitude_axis.plot(self.frequencies, magnitudes_0, "o-", ms=2, color="blue")
-        magnitude_axis.plot(self.frequencies, magnitudes_1, "o-", ms=2, color="red")
+        magnitude_axis.plot(
+            self.frequencies, self.magnitudes_0, "o-", ms=2, color="blue"
+        )
+        magnitude_axis.plot(
+            self.frequencies, self.magnitudes_1, "o-", ms=2, color="red"
+        )
         magnitude_axis.axvline(self.optimal_frequency, color="black")
-        phase_axis.plot(self.frequencies, phase_0, "o-", ms=2, color="blue")
-        phase_axis.plot(self.frequencies, phase_1, "o-", ms=2, color="red")
+        phase_axis.plot(self.frequencies, self.phase_0, "o-", ms=2, color="blue")
+        phase_axis.plot(self.frequencies, self.phase_1, "o-", ms=2, color="red")
         phase_axis.axvline(self.optimal_frequency, color="black")
 
 
 class OptimalRO012FrequencyQubitAnalysis(OptimalRO01FrequencyQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-        self.fit_results = {}
-        self.magnitudes_1 = []
 
     def analyse_qubit(self):
         super().analyse_qubit()
-        self.magnitudes_2 = (
-            self.magnitudes[self.data_var]
-            .isel({self.qubit_state_coord: [2]})
-            .values.flatten()
-        )  # S21 when qubit at |2>
+        self.s21_2 = self.S21[self.data_var].sel({self.qubit_state_coord: 2})
+        self.magnitudes_2 = np.abs(self.s21_2)
 
-        guess_2 = model.guess(self.magnitudes_2, f=self.frequencies)
-        self.fit_frequencies = np.linspace(
-            self.frequencies[0], self.frequencies[-1], 400
-        )
+        distances_01 = np.abs(self.magnitudes_0 - self.magnitudes_1)
+        distances_12 = np.abs(self.magnitudes_1 - self.magnitudes_2)
+        distances_20 = np.abs(self.magnitudes_2 - self.magnitudes_0)
+        self.total_distance = (distances_01 + distances_12 + distances_20) / 3
 
-        self.fit_result_2 = model.fit(
-            self.magnitudes_2, params=guess_2, f=self.frequencies
-        )
-        self.fit_IQ_2 = model.eval(self.fit_result_2.params, f=self.fit_frequencies)
-
-        fit_values_2 = self.fit_result_2.values
-
-        self.distances_01 = np.abs(self.magnitudes_0 - self.magnitudes_1)
-        self.distances_12 = np.abs(self.magnitudes_1 - self.magnitudes_2)
-        self.distances_20 = np.abs(self.magnitudes_2 - self.magnitudes_0)
-        self.total_distance = (
-            self.distances_01 + self.distances_12 + self.distances_20
-        ) / 3
-        self.index_of_max_distance = np.argmax(self.total_distance)
-        self.optimal_frequency = self.frequencies[self.index_of_max_distance]
+        self.optimal_frequency = self.total_distance.idxmax().item()
+        self.optimal_distance = self.total_distance.max().item()
 
         return [self.optimal_frequency]
 
@@ -159,11 +141,10 @@ class OptimalRO012FrequencyQubitAnalysis(OptimalRO01FrequencyQubitAnalysis):
         ax.plot(self.frequencies, np.abs(self.magnitudes_1), label="1")
         ax.plot(self.frequencies, np.abs(self.magnitudes_2), label="2")
         ax.plot(self.frequencies, self.total_distance, "--", label="distance")
-        optimal_distance = self.total_distance[self.index_of_max_distance]
 
         ax.scatter(
             self.optimal_frequency,
-            optimal_distance,
+            self.optimal_distance,
             marker="*",
             c="red",
             s=64,
