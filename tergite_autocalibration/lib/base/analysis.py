@@ -24,6 +24,7 @@ import numpy as np
 import xarray as xr
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
+from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 from tergite_autocalibration.utils.dto.qoi import QOI
 from tergite_autocalibration.utils.logger.tac_logger import logger
 
@@ -71,14 +72,13 @@ class BaseAnalysis(ABC):
             else:
                 name = "transmons"
             # Setting the value in the tergite-autocalibration-lite format
-            # print('WARNING SKIPING REDIS UPDATING')
             REDIS_CONNECTION.hset(
                 f"{name}:{this_element}", transmon_parameter, self._qoi[i]
             )
             # Setting the value in the standard redis storage
-            # structured_redis_storage(
-            #     transmon_parameter, this_element.strip("q"), self._qoi[i]
-            # )
+            structured_redis_storage(
+                transmon_parameter, this_element.strip("q"), self._qoi[i]
+            )
             REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
 
     def rotate_to_probability_axis(self, complex_measurement_data):
@@ -162,12 +162,7 @@ class BaseNodeAnalysis(ABC):
         self.fig.savefig(preview_path, bbox_inches="tight", dpi=100)
         self.fig.savefig(full_path, bbox_inches="tight", dpi=400)
         plt.show(block=True)
-        plt.pause(5)
-        plt.close()
         logger.info(f"Plots saved to {preview_path} and {full_path}")
-        # self.fig.savefig(full_path, bbox_inches="tight", dpi=400)
-        plt.show(block=True)
-        # plt.pause(9)
         plt.close()
 
 
@@ -191,9 +186,7 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         self.dataset = self.open_dataset(index)
         self.coords = self.dataset.coords
         self.data_vars = self.dataset.data_vars
-        logger.info("starting plot manager")
         self.fig, self.axs = self.manage_plots(self.column_grid, self.plots_per_qubit)
-        logger.info("plot manager is setup")
         analysis_results = self._analyze_all_qubits()
         self._fill_plots()
         self.save_plots()
