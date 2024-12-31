@@ -172,57 +172,25 @@ if __name__ == "main":
     json_config_file = CONFIG_DIR / "HARDWARE_CONFIGURATION_LOKIA_20241204.json"
     CLUSTER_NAME = "clusterA"
 
-    # HW_CONFIG = {}
-    # HW_CONFIG["backend"] = "quantify_scheduler.backends.qblox_backend.hardware_compile"
-    # HW_CONFIG[f"{CLUSTER_NAME}"] = {
-    #     "ref": "internal",
-    #     "instrument_type": "Cluster",
-    # }
-
     module_to_qubit_map = {
         "module1": "q06",
         "module2": "q07",
         "module3": "q08",
         "module4": "q09",
         "module5": "q10",
-        # "module6": "q11",
-        # "module7": "q12",
-        # "module8": "q13",
-        # "module9": "q14",
-        # "module10": "q15",
+        "module6": "q11",
+        "module7": "q12",
+        "module8": "q13",
+        "module9": "q14",
+        "module10": "q15",
     }
     module_to_ro_line_qubit_map = {
         "module16": ["q06", "q07", "q08", "q09", "q10"],
-        # "module17": ["q11", "q12", "q13", "q14", "q15"],
+        "module17": ["q11", "q12", "q13", "q14", "q15"],
     }
     qrm_modules = list(module_to_ro_line_qubit_map.keys())
 
     qubits = module_to_qubit_map.values()
-    # with open(mixer_file) as csvfile:
-    #     reader = csv.reader(csvfile)
-    #     # skip first row
-    #     next(reader)
-    #     for row in reader:
-    #         if all(row):
-    #             label = row[0]
-    #             module = row[1]
-    #             complex_out = row[2]
-    #             lo_freq = float(row[3])
-    #
-    #             if module in qrm_modules:
-    #                 qrm_qubits = module_to_ro_line_qubit_map[module]
-    #                 qrm_config = qrm_hw(
-    #                     qrm_qubits,
-    #                     lo=lo_freq,
-    #                 )
-    #                 HW_CONFIG[f"{CLUSTER_NAME}"][f"{CLUSTER_NAME}_{module}"] = qrm_config
-    #             else:
-    #                 qcm_config = qcm_hw(
-    #                     module=module,
-    #                     lo=lo_freq,
-    #                 )
-    #                 HW_CONFIG[f"{CLUSTER_NAME}"][f"{CLUSTER_NAME}_{module}"] = qcm_config
-    #
 
     HW_generator = HW_Config_Generator(
         CLUSTER_NAME, module_to_ro_line_qubit_map, module_to_qubit_map, mixer_file
