@@ -78,7 +78,7 @@ class ROAmplitudeThreeStateOptimizationNode(ScheduleNode):
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
         self.qubit_state = 2
-        self.loops = 100
+        self.loops = 1000
         self.schedule_keywords["loop_repetitions"] = self.loops
         self.schedule_keywords["qubit_state"] = self.qubit_state
 
@@ -88,7 +88,7 @@ class ROAmplitudeThreeStateOptimizationNode(ScheduleNode):
             },
             "ro_amplitudes": {
                 qubit: np.append(
-                    np.linspace(0.001, 0.025, 5), np.linspace(0.026, 0.2, 5)
+                    np.linspace(0.005, 0.025, 5), np.linspace(0.026, 0.2, 5)
                 )
                 for qubit in self.all_qubits
             },
