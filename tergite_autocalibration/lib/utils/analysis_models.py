@@ -1,7 +1,7 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2024
-# (C) Chalmers Next Labs 2024
+# (c) Copyright Eleftherios Moschandreou 2024
+# (c) Chalmers Next Labs 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -13,9 +13,51 @@
 
 import lmfit
 import numpy as np
+from quantify_core.analysis.fitting_models import (
+    exp_damp_osc_func,
+    fft_freq_phase_guess,
+)
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
 from tergite_autocalibration.lib.utils.functions import exponential_decay_function
+
+
+class RamseyModel(lmfit.model.Model):
+    def __init__(self, *args, **kwargs):
+        # pass in the defining equation so the user doesn't have to later.
+        super().__init__(exp_damp_osc_func, *args, **kwargs)
+
+        # Enforce oscillation frequency is positive
+        self.set_param_hint("frequency", min=0)
+        # Enforce amplitude is positive
+        self.set_param_hint("amplitude", min=0)
+        # Enforce decay time is positive
+        self.set_param_hint("tau", min=0)
+
+        # Fix the n_factor at 1
+        self.set_param_hint("n_factor", expr="1", vary=False)
+
+    def guess(self, data, **kws) -> lmfit.parameter.Parameters:
+        t = kws.get("t", None)
+        if t is None:
+            raise ValueError(
+                'Time variable "t" must be specified in order to guess parameters'
+            )
+
+        amp_guess = abs(max(data) - min(data)) / 2  # amp is positive by convention
+        exp_offs_guess = np.mean(data)
+        tau_guess = 2 / 3 * np.max(t)
+
+        (freq_guess, phase_guess) = fft_freq_phase_guess(data, t)
+
+        self.set_param_hint("frequency", value=freq_guess, min=0)
+        self.set_param_hint("amplitude", value=amp_guess, min=0)
+        self.set_param_hint("offset", value=exp_offs_guess)
+        self.set_param_hint("phase", value=phase_guess)
+        self.set_param_hint("tau", value=tau_guess, min=0)
+
+        params = self.make_params()
+        return lmfit.models.update_param_vals(params, self.prefix, **kws)
 
 
 class TwoClassBoundary:
