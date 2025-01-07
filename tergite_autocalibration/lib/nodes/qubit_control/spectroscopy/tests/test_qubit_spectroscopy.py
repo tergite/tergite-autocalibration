@@ -22,7 +22,6 @@ from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis impor
 
 
 class TestResonatorFrequencyAnalysis(unittest.TestCase):
-
     def test_setup_01(self):
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_01" / "dataset_qubit_01_spectroscopy_0.hdf5"

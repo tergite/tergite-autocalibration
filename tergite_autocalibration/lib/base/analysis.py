@@ -161,7 +161,7 @@ class BaseNodeAnalysis(ABC):
         full_path = self.data_path / f"{self.name}.png"
         self.fig.savefig(preview_path, bbox_inches="tight", dpi=100)
         self.fig.savefig(full_path, bbox_inches="tight", dpi=400)
-        plt.show(block=False)
+        plt.show(block=True)
         plt.pause(5)
         plt.close()
         logger.info(f"Plots saved to {preview_path} and {full_path}")
@@ -307,10 +307,10 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
     def __init__(self, name, redis_fields):
         self.name = name
         self.redis_fields = redis_fields
-        self.dataset = None
-        self.S21 = None
+        self.dataset = xr.Dataset
+        self.S21: xr.DataArray
         self.data_var = None
-        self.qubit = None
+        self.qubit: str
         self.coord = None
 
     def process_qubit(self, dataset, qubit_element):

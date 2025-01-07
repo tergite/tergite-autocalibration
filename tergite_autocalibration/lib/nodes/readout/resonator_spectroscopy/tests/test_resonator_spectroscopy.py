@@ -25,7 +25,6 @@ from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.analysis i
 
 
 class TestResonatorFrequencyAnalysis(unittest.TestCase):
-
     def test_setup(self):
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_0" / "dataset_resonator_spectroscopy_0.hdf5"

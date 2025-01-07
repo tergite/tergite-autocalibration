@@ -50,19 +50,17 @@ class ROAmplitudeOptimizationMeasurement(BaseMeasurement):
 
         for this_qubit, this_transmon in self.transmons.items():
             this_ro_clock = f"{this_qubit}." + ro_str
-            mw_frequency_01 = this_transmon.clock_freqs.f01()
             if qubit_state == 1:
                 ro_frequency = this_transmon.extended_clock_freqs.readout_2state_opt()
-            if qubit_state == 2:
+            elif qubit_state == 2:
                 ro_frequency = this_transmon.extended_clock_freqs.readout_3state_opt()
                 mw_frequency_12 = this_transmon.clock_freqs.f12()
                 this_clock = f"{this_qubit}.12"
                 shot.add_resource(ClockResource(name=this_clock, freq=mw_frequency_12))
+            else:
+                raise ValueError(f"Invalid state {qubit_state}")
 
             shot.add_resource(ClockResource(name=this_ro_clock, freq=ro_frequency))
-            shot.add_resource(
-                ClockResource(name=f"{this_qubit}.01", freq=mw_frequency_01)
-            )
 
         # The outer for-loop iterates over all qubits:
         root_relaxation = shot.add(Reset(*qubits), label="Reset")
@@ -81,7 +79,6 @@ class ROAmplitudeOptimizationMeasurement(BaseMeasurement):
             ro_port = this_transmon.ports.readout()
 
             this_ro_clock = f"{this_qubit}." + ro_str
-            this_clock = f"{this_qubit}.01"
             this_12_clock = f"{this_qubit}.12"
 
             qubit_levels = qubit_states[this_qubit]
