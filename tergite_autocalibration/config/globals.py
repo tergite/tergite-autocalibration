@@ -89,11 +89,14 @@ except FileNotFoundError:
 # Adding the handlers at that stage is necessary, because the run id is not defined earlier
 
 # To determine the log dir, first there is a check whether the configuration is already defined
-if hasattr(CONFIG, "run"):
-    # If the configuration is defined the log dir can be read
+# If it is running a pytest, the logs will be in out/pytest
+if is_pytest():
+    _log_dir = "pytest"
+# If the configuration is defined the log dir can be read, this is the normal case
+elif hasattr(CONFIG, "run"):
     _log_dir = CONFIG.run.log_dir
+# If there is no configuration, the logs have to go into a default directory
 else:
-    # If there is no configuration, the logs have to go into a default directory
     _log_dir = "default"
 
 logger.add_console_handler(log_level=ENV.stdout_log_level)
@@ -113,6 +116,9 @@ CLUSTER_IP = ENV.cluster_ip
 
 # The data directory where plots and results are saved
 # Default is a folder called 'out' on the root level of the repository
+# NOTE: Please only import DATA_DIR when you are implementing something on the very high level
+#       that directly modifies paths. For files e.g. logs, data or plots that relate to an
+#       active calibration run, please use CONFIG.run.log_dir, which is located inside DATA_DIR.
 DATA_DIR = ENV.data_dir
 
 # If the data directory does not exist, it will be created automatically
@@ -121,7 +127,7 @@ if not os.path.exists(DATA_DIR):
     logger.info(f"Initialised DATA_DIR -> {DATA_DIR}")
 
 # Register exception handler
-# This is triggered as soon as there is an exception happening
+# This is triggered as soon as there is an uncaught exception
 sys.excepthook = exception_handler
 
 # Register exit handler

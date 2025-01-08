@@ -16,8 +16,8 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from .logging import logger
-from ..config.legacy import dh
+from tergite_autocalibration.utils.logging import logger
+from tergite_autocalibration.config.legacy import dh
 
 
 @dataclass
