@@ -12,6 +12,7 @@
 
 import atexit
 import os
+import sys
 from pathlib import Path
 
 import redis
@@ -19,7 +20,7 @@ import redis
 from tergite_autocalibration.config.env import EnvironmentConfiguration
 from tergite_autocalibration.config.handler import ConfigurationHandler
 from tergite_autocalibration.config.package import ConfigurationPackage
-from tergite_autocalibration.utils.handlers.exit import exit_handler
+from tergite_autocalibration.utils.handlers.exit import exit_handler, exception_handler
 from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.utils.misc.tests import is_pytest
 
@@ -86,11 +87,23 @@ except FileNotFoundError:
 # Adding handlers to the logger
 # Everything logged above will be captured by the default handlers
 # Adding the handlers at that stage is necessary, because the run id is not defined earlier
+
+# To determine the log dir, first there is a check whether the configuration is already defined
+if hasattr(CONFIG, "run"):
+    # If the configuration is defined the log dir can be read
+    _log_dir = CONFIG.run.log_dir
+else:
+    # If there is no configuration, the logs have to go into a default directory
+    _log_dir = "default"
+
 logger.add_console_handler(log_level=ENV.stdout_log_level)
-_log_file_path = os.path.join(ENV.data_dir, CONFIG.run.log_dir)
+_log_file_path = os.path.join(ENV.data_dir, _log_dir)
 if not os.path.exists(_log_file_path):
     os.makedirs(_log_file_path, exist_ok=True)
-logger.add_file_handler(log_file=CONFIG.run.log_dir, log_level=ENV.file_log_level)
+logger.add_file_handler(
+    log_file=os.path.join(str(_log_file_path), "autocalibration.log"),
+    log_level=ENV.file_log_level,
+)
 
 
 # NOTE: The cluster IP right now is passed only as a single value. For bigger setups with more than
@@ -107,6 +120,9 @@ if not os.path.exists(DATA_DIR):
     os.makedirs(DATA_DIR)
     logger.info(f"Initialised DATA_DIR -> {DATA_DIR}")
 
+# Register exception handler
+# This is triggered as soon as there is an exception happening
+sys.excepthook = exception_handler
 
 # Register exit handler
 # The exit handler is executed on shutdown of the application

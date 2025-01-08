@@ -12,8 +12,7 @@
 # that they have been altered from the originals.
 
 import logging.handlers
-
-# from tergite_autocalibration.config.globals import ENV
+import os.path
 
 
 class ExtendedLogger(logging.Logger):
@@ -29,6 +28,11 @@ class ExtendedLogger(logging.Logger):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         logging.addLevelName(self.STATUS_LEVEL, "STATUS")
+        self._log_file = "autocalibration.log"
+
+    @property
+    def log_dir(self):
+        return os.path.dirname(self._log_file)
 
     def status(self, message, *args, **kwargs):
         """
@@ -69,6 +73,9 @@ class ExtendedLogger(logging.Logger):
             log_file: Path to log file. Defaults to "autocalibration.log"
 
         """
+        # Set the log file, so, we have an easier time later to find it, if we need it somewhere in the code
+        self._log_file = os.path.abspath(log_file)
+
         file_handler = logging.FileHandler(log_file)
         file_handler.setLevel(log_level)
 

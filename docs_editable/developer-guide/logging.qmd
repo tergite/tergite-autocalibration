@@ -1,0 +1,13 @@
+# Logging
+
+It is good to have logs
+
+Questions to be answered:
+
+- Where are logs stored?
+- What log levels are there?
+  - The log level for status logging
+- What about the logging to file and to console?
+- How to use the logger internally?
+
+- Application status for the logdir

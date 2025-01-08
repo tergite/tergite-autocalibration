@@ -9,11 +9,13 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
+
 import os.path
 from datetime import datetime
 from typing import List
 
 from tergite_autocalibration.config.base import TOMLConfigurationFile
+from tergite_autocalibration.utils.dto.enums import ApplicationStatus
 
 
 class RunConfiguration(TOMLConfigurationFile):
@@ -31,11 +33,10 @@ class RunConfiguration(TOMLConfigurationFile):
         self._run_id = f"{timestamp_.strftime('%Y-%m-%d--%H-%M-%S')}--tac-run-id"
 
         # Create a file path in the form of YYYY-MM-DD/"ACTIVE"_HH-MM-SS--target_node
-        # "ACTIVE" is meant as the run status of the application
-        # This could be in future also implemented as an enum
+
         self._log_dir = os.path.join(
             timestamp_.strftime("%Y-%m-%d"),
-            f"ACTIVE_{timestamp_.strftime('%H-%M-%S')}--{self.target_node}",
+            f"{timestamp_.strftime('%H-%M-%S')}_{str(ApplicationStatus.ACTIVE.value)}-{self.target_node}",
         )
 
     @property
