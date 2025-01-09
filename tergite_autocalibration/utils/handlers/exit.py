@@ -11,7 +11,6 @@
 # that they have been altered from the originals.
 
 import os
-import sys
 
 from tergite_autocalibration.utils.dto.enums import ApplicationStatus
 from tergite_autocalibration.utils.logging import logger

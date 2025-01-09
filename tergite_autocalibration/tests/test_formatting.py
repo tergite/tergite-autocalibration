@@ -10,7 +10,6 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import os
 from pathlib import Path
 
 from tergite_autocalibration.tests.utils.reflections import iter_module_files

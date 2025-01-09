@@ -49,7 +49,7 @@ class ConfigurationPackage:
             file_content: The loaded content from the .toml file
 
         Returns:
-            True if the configuration file is having all the mandatory paramters
+            True if the configuration file is having all the mandatory parameters
 
         """
         if "path_prefix" not in file_content.keys():
