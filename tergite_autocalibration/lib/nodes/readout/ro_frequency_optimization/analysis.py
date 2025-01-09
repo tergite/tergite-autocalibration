@@ -52,6 +52,9 @@ class OptimalRO01FrequencyQubitAnalysis(BaseQubitAnalysis):
         self.s21_0 = self.S21[self.data_var].sel({self.qubit_state_coord: 0})
         self.s21_1 = self.S21[self.data_var].sel({self.qubit_state_coord: 1})
 
+        self.magnitudes_0 = np.abs(self.s21_0.values.flatten())
+        self.magnitudes_1 = np.abs(self.s21_1.values.flatten())
+
         distances = self.s21_1 - self.s21_0
 
         self.optimal_frequency = float(np.abs(distances).idxmax().values)
@@ -119,7 +122,6 @@ class OptimalRO012FrequencyQubitAnalysis(OptimalRO01FrequencyQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
         self.fit_results = {}
-        self.magnitudes_1 = []
 
     def analyse_qubit(self):
         super().analyse_qubit()

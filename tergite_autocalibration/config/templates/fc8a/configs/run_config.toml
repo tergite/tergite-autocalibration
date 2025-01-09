@@ -30,7 +30,6 @@ couplers = ["q06_q07"]
 #   motzoi_parameter
 #   n_rabi_oscillations
 #   randomized_benchmarking
-#   state_discrimination
 #   T1
 #   T2
 #   T2_echo
