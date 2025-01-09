@@ -105,7 +105,8 @@ if not os.path.exists(_log_file_path):
     os.makedirs(_log_file_path, exist_ok=True)
 
 # We set the absolute path in the run configuration to make it usable later
-CONFIG.run.log_dir = _log_file_path
+if hasattr(CONFIG, "run"):
+    CONFIG.run.log_dir = _log_file_path
 
 logger.add_console_handler(log_level=ENV.stdout_log_level)
 logger.add_file_handler(
