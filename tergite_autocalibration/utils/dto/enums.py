@@ -19,6 +19,7 @@ class DataStatus(Enum):
     """
     Used by check_data to indicate outcome
     """
+
     in_spec = 1
     out_of_spec = 2
     bad_data = 3
@@ -33,6 +34,7 @@ class MeasurementMode(Enum):
     real = 0
     dummy = 1
     re_analyse = 2
+
 
 class ApplicationStatus(Enum):
     """

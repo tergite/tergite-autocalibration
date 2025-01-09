@@ -157,7 +157,9 @@ def create_node_data_path(node) -> pathlib.Path:
 
     """
     now_ = datetime.now()
-    measurement_id = f"{now_.strftime('%Y%m%d-%H%M%S-%f')[:19]}-{str(uuid4())[:6]}-{node.name}"
+    measurement_id = (
+        f"{now_.strftime('%Y%m%d-%H%M%S-%f')[:19]}-{str(uuid4())[:6]}-{node.name}"
+    )
     data_path = pathlib.Path(os.path.join(CONFIG.run.log_dir, measurement_id))
     return data_path
 

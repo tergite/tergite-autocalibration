@@ -37,15 +37,17 @@ def set_log_dir_exit_status(status_code: "ApplicationStatus"):
     # Rename the directory for the logs
     os.rename(log_dir, new_log_dir)
 
+
 def exception_handler(exc_type, exc_value, exc_traceback):
     """
     Handle uncaught exceptions
     """
     logger.error(
         f"Autocalibration exited due to an exception: {exc_type.__name__}: {exc_value}",
-        exc_info=(exc_type, exc_value, exc_traceback)
+        exc_info=(exc_type, exc_value, exc_traceback),
     )
     set_log_dir_exit_status(ApplicationStatus.FAILED)
+
 
 def exit_handler():
     """
