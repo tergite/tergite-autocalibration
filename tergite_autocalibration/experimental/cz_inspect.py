@@ -158,7 +158,7 @@ def inspect(data, q0, q1, savefig=None, fig_suffix="png"):
     if len(cs) < 5:
         axes[2].set_title("No enough available points.")
         logger.info(
-            f"No enough available points for {data.tuid}. Please resweep once again or enlarge sweep range."
+            f"No enough available points for {data.tuid}. Please re-sweep once again or enlarge sweep range."
         )
     else:
         # ----------- Third round fit ------------#
