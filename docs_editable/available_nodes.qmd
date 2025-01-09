@@ -53,7 +53,6 @@ graph TD
 - ramsey_correction_12
 - adaptive_motzoi_parameter
 - n_rabi_oscillations
-- state_discrimination
 
 ## Coupler Nodes
 
