@@ -99,10 +99,15 @@ elif hasattr(CONFIG, "run"):
 else:
     _log_dir = "default"
 
-logger.add_console_handler(log_level=ENV.stdout_log_level)
+# Here, there is the absolute path to the log directory
 _log_file_path = os.path.join(ENV.data_dir, _log_dir)
 if not os.path.exists(_log_file_path):
     os.makedirs(_log_file_path, exist_ok=True)
+
+# We set the absolute path in the run configuration to make it usable later
+CONFIG.run.log_dir = _log_file_path
+
+logger.add_console_handler(log_level=ENV.stdout_log_level)
 logger.add_file_handler(
     log_file=os.path.join(str(_log_file_path), "autocalibration.log"),
     log_level=ENV.file_log_level,

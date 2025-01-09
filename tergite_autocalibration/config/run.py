@@ -57,6 +57,10 @@ class RunConfiguration(TOMLConfigurationFile):
         """
         return self._log_dir
 
+    @log_dir.setter
+    def log_dir(self, value):
+        self._log_dir = value
+
     @property
     def target_node(self) -> str:
         """
