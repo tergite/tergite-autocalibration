@@ -664,7 +664,7 @@ def main(
         None.
     """
     app = QtWidgets.QApplication([])
-    logging.basicConfig(level=ENV.log_level)
+    logging.basicConfig(level=ENV.stdout_log_level)
     app.setApplicationName("Quantifiles")
     app.setWindowIcon(load_icon("icon.png"))
 
