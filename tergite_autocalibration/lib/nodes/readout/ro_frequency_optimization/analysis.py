@@ -52,6 +52,9 @@ class OptimalRO01FrequencyQubitAnalysis(BaseQubitAnalysis):
         self.phase_0 = np.angle(self.s21_0)
         self.phase_1 = np.angle(self.s21_1)
 
+        self.magnitudes_0 = np.abs(self.s21_0.values.flatten())
+        self.magnitudes_1 = np.abs(self.s21_1.values.flatten())
+
         distances = self.s21_1 - self.s21_0
 
         self.optimal_frequency = np.abs(distances).idxmax().item()

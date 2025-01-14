@@ -126,7 +126,7 @@ initial_pos = {
     "T1": (0.25, 0.55),
     "T2": (0.35, 0.55),
     "T2_echo": (0.5, 0.55),
-    "state_discrimination": (0.5, 0.3),
+    "randomized_benchmarking": (0.45, 0.4),
     "coupler_spectroscopy": (0.3, 0.7),
     "punchout": (0.3, 0.9),
 }
