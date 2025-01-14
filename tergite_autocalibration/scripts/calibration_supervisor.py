@@ -16,7 +16,7 @@
 # Modified:
 #
 # - Martin Ahindura, 2023
-
+import os
 from dataclasses import dataclass, field
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -29,7 +29,8 @@ from qblox_instruments.types import ClusterType
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 
-from tergite_autocalibration.config.globals import REDIS_CONNECTION, CLUSTER_IP, CONFIG
+from tergite_autocalibration.config.globals import REDIS_CONNECTION, CLUSTER_IP, CONFIG, ENV
+from tergite_autocalibration.config.package import ConfigurationPackage
 from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.base.node import BaseNode
@@ -233,6 +234,11 @@ class NodeManager:
                 if self.config.cluster_mode == MeasurementMode.re_analyse
                 else create_node_data_path(node)
             )
+
+            # Create a copy of the configuration inside the data folder
+            ConfigurationPackage.from_toml(
+                os.path.join(ENV.config_dir, "configuration.meta.toml")
+            ).copy(str(data_path))
 
             # Perform calibration
             node.calibrate(data_path, self.config.cluster_mode)
