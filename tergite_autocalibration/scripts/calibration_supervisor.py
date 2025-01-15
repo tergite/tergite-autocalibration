@@ -20,7 +20,7 @@
 from dataclasses import dataclass, field
 from ipaddress import IPv4Address
 from pathlib import Path
-from typing import Union, List
+from typing import List, Union
 
 from colorama import Fore, Style
 from colorama import init as colorama_init
@@ -29,7 +29,7 @@ from qblox_instruments.types import ClusterType
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 
-from tergite_autocalibration.config.globals import REDIS_CONNECTION, CLUSTER_IP, CONFIG
+from tergite_autocalibration.config.globals import CLUSTER_IP, CONFIG, REDIS_CONNECTION
 from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.base.node import BaseNode
 from tergite_autocalibration.lib.utils.graph import filtered_topological_order

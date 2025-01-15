@@ -87,6 +87,7 @@ class LorentzianModel(lmfit.model.Model):
         return lmfit.models.update_param_vals(params, self.prefix, **kws)
 
 
+# TODO: this is flagged for removal
 class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
     """
     Analysis that fits a Lorentzian function to qubit spectroscopy data.
@@ -106,9 +107,6 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
                 self.currents = coord
 
         self.frequencies_value = self.dataset[self.frequencies].values
-
-        if not self.has_peak():
-            return [np.mean(self.frequencies_value)]
 
         self.fit_freqs = np.linspace(
             self.frequencies_value[0], self.frequencies_value[-1], 500
@@ -167,18 +165,17 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
         if self.hasPeak:
             ax.plot(self.fit_freqs, self.fit_y, "r-", lw=3.0)
             min = np.min(self.magnitudes)
-            # ax.vlines(self.freq, min, self.prominence + min, lw=4, color='teal')
-            # ax.vlines(self.freq-1e6, min, self.filtered_std + min, lw=4, color='orange')
+
             ax.plot(
                 self.fit_freqs,
                 self.fit_y,
                 "r-",
                 lw=3.0,
-                label=f"freq = {self.freq:.6E} ± {self.uncertainty:.1E} (Hz)",
+                label=f"freq = {self.freq:.6E} (Hz)",
             )
 
         x_dataarray = self.magnitudes.to_dataarray()
-        x = x_dataarray.values[0]
+        x = x_dataarray.values[0].flatten
         ax.plot(self.frequencies_value, x, "bo-", ms=3.0)
         ax.set_title(f"Qubit Spectroscopy for {self.qubit}")
         ax.set_xlabel("frequency (Hz)")

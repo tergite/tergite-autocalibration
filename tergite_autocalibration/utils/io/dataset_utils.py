@@ -41,8 +41,6 @@ def configure_dataset(
     sweep_quantities = samplespace.keys()
 
     n_qubits = len(measurement_qubits)
-    if "ssro" in node.name:
-        qubit_states = ["c0", "c1", "c2"]  # for calibration points
 
     for key in raw_ds_keys:
         key_indx = key % n_qubits  # this is to handle ro_opt_frequencies node where
@@ -51,9 +49,8 @@ def configure_dataset(
         measured_qubit = measurement_qubits[key_indx]
         dimensions = node.dimensions
 
-        if "ssro" in node.name:
-            # TODO: We are not sure about this one
-            # dimensions[0] += len(qubit_states)  # for calibration points
+        # TODO: this is flagged for removal.
+        if "ssro" in node.name and node.name != "randomized_benchmarking_ssro":
             shots = int(len(raw_ds[key].values[0]) / (np.product(dimensions)))
             coords_dict["shot"] = (
                 "shot",
@@ -107,7 +104,9 @@ def configure_dataset(
         data_values = raw_ds[key].values
 
         reshaping = reversed(node.dimensions)
-        if "ssro" in node.name:
+
+        # TODO: flagged for removal
+        if "ssro" in node.name and node.name != "randomized_benchmarking_ssro":
             reshaping = np.array([shots])
             reshaping = np.append(reshaping, dimensions)
             data_values = data_values.reshape(*reshaping)

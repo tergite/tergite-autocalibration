@@ -22,7 +22,6 @@ from quantify_core.analysis.fitting_models import ExpDecayModel
 
 from tergite_autocalibration.lib.base.analysis import (
     BaseAllQubitsAnalysis,
-    BaseAllQubitsRepeatAnalysis,
     BaseQubitAnalysis,
 )
 
@@ -104,4 +103,3 @@ class T1NodeAnalysis(BaseAllQubitsAnalysis):
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-        self.repeat_coordinate_name = "repeat"

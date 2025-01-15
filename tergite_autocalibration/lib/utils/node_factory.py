@@ -15,10 +15,11 @@
 # that they have been altered from the originals.
 
 from pathlib import Path
-from typing import Dict, List, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict, List, Union
+
+from tergite_autocalibration.utils.misc.regex import camel_to_snake
 
 from .reflections import find_inheriting_classes_ast_recursive, import_class_from_file
-from tergite_autocalibration.utils.misc.regex import camel_to_snake
 
 if TYPE_CHECKING:
     from ..base.node import BaseNode
@@ -42,7 +43,6 @@ class NodeFactory:
             "rabi_oscillations": "RabiOscillationsNode",
             "ramsey_correction": "RamseyFringesNode",
             "resonator_spectroscopy_1": "ResonatorSpectroscopy1Node",
-            "qubit_12_spectroscopy_pulsed": "Qubit12SpectroscopyPulsedNode",
             "qubit_12_spectroscopy": "Qubit12SpectroscopyMultidimNode",
             "rabi_oscillations_12": "RabiOscillations12Node",
             "ramsey_correction_12": "RamseyFringes12Node",
