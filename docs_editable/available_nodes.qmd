@@ -45,11 +45,11 @@ graph TD
 
 - [qubit_01_spectroscopy](nodes/qubit_spectroscopy_node.qmd)
 - qubit_01_spectroscopy_pulsed
-- rabi_oscillations
+- [rabi_oscillations](nodes/rabi_oscillations_node.qmd)
 - ramsey_correction
 - qubit_12_spectroscopy_pulsed
 - qubit_12_spectroscopy_multidim
-- rabi_oscillations_12
+- [rabi_oscillations_12](nodes/rabi_oscillations_node.qmd)
 - ramsey_correction_12
 - adaptive_motzoi_parameter
 - n_rabi_oscillations

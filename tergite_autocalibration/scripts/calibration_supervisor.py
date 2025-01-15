@@ -20,7 +20,7 @@ import os
 from dataclasses import dataclass, field
 from ipaddress import IPv4Address
 from pathlib import Path
-from typing import Union, List
+from typing import List, Union
 
 from colorama import Fore, Style
 from colorama import init as colorama_init

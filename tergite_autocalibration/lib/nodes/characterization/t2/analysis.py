@@ -15,11 +15,11 @@
 
 import lmfit
 import numpy as np
-from quantify_core.analysis.fitting_models import fft_freq_phase_guess, ExpDecayModel
+from quantify_core.analysis.fitting_models import ExpDecayModel, fft_freq_phase_guess
 
 from tergite_autocalibration.lib.base.analysis import (
+    BaseAllQubitsAnalysis,
     BaseQubitAnalysis,
-    BaseAllQubitsRepeatAnalysis,
 )
 from tergite_autocalibration.lib.nodes.characterization.t1.analysis import cos_func
 
@@ -149,17 +149,15 @@ class T2EchoQubitAnalysis(BaseT2QubitAnalysis):
         return fit_result.params["tau"].value
 
 
-class T2NodeAnalysis(BaseAllQubitsRepeatAnalysis):
+class T2NodeAnalysis(BaseAllQubitsAnalysis):
     single_qubit_analysis_obj = T2QubitAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-        self.repeat_coordinate_name = "repeat"
 
 
-class T2EchoNodeAnalysis(BaseAllQubitsRepeatAnalysis):
+class T2EchoNodeAnalysis(BaseAllQubitsAnalysis):
     single_qubit_analysis_obj = T2EchoQubitAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-        self.repeat_coordinate_name = "repeat"

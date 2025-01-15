@@ -19,7 +19,7 @@ import xarray as xr
 from matplotlib import pyplot as plt
 
 from tergite_autocalibration.lib.base.analysis import (
-    BaseAllCouplersRepeatAnalysis,
+    BaseAllCouplersAnalysis,
     BaseCouplerAnalysis,
     BaseQubitAnalysis,
 )
@@ -339,12 +339,11 @@ class CZParametrisationFixDurationCouplerAnalysis(BaseCouplerAnalysis):
                 pass
 
 
-class CZParametrizationFixDurationNodeAnalysis(BaseAllCouplersRepeatAnalysis):
+class CZParametrizationFixDurationNodeAnalysis(BaseAllCouplersAnalysis):
     single_coupler_analysis_obj = CZParametrisationFixDurationCouplerAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-        self.repeat_coordinate_name = "cz_parking_currents"
 
     def save_plots(self):
         super().save_plots()

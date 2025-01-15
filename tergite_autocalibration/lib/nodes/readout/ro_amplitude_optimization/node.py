@@ -28,9 +28,9 @@ class ROAmplitudeTwoStateOptimizationNode(ScheduleNode):
     measurement_obj = ROAmplitudeOptimizationMeasurement
     analysis_obj = OptimalROTwoStateAmplitudeNodeAnalysis
     qubit_qois = [
-        "measure_2state_opt:ro_ampl_2st_opt",
-        "measure_2state_opt:rotation",
-        "measure_2state_opt:threshold",
+        "measure_2state_opt:pulse_amp",
+        "measure_2state_opt:acq_rotation",
+        "measure_2state_opt:acq_threshold",
     ]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
@@ -41,9 +41,10 @@ class ROAmplitudeTwoStateOptimizationNode(ScheduleNode):
         self.schedule_keywords["qubit_state"] = self.qubit_state
         self.plots_per_qubit = 3  #  fidelity plot, IQ shots, confusion matrix
 
-        self.loops = self.schedule_keywords["loop_repetitions"]
-
         self.schedule_samplespace = {
+            "ro_amplitudes": {
+                qubit: np.linspace(0.04, 0.12, 41) for qubit in self.all_qubits
+            },
             "qubit_states": {
                 qubit: np.array([0, 1], dtype=np.int16) for qubit in self.all_qubits
             },
@@ -77,7 +78,7 @@ class ROAmplitudeThreeStateOptimizationNode(ScheduleNode):
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
         self.qubit_state = 2
-        self.loops = 100
+        self.loops = 1000
         self.schedule_keywords["loop_repetitions"] = self.loops
         self.schedule_keywords["qubit_state"] = self.qubit_state
 
@@ -87,7 +88,7 @@ class ROAmplitudeThreeStateOptimizationNode(ScheduleNode):
             },
             "ro_amplitudes": {
                 qubit: np.append(
-                    np.linspace(0.001, 0.025, 5), np.linspace(0.026, 0.2, 5)
+                    np.linspace(0.005, 0.025, 5), np.linspace(0.026, 0.2, 5)
                 )
                 for qubit in self.all_qubits
             },

@@ -19,7 +19,7 @@ from scipy.linalg import norm
 from scipy.optimize import minimize
 
 from tergite_autocalibration.lib.base.analysis import (
-    BaseAllQubitsRepeatAnalysis,
+    BaseAllQubitsAnalysis,
     BaseQubitAnalysis,
 )
 from tergite_autocalibration.lib.utils.analysis_models import ExpDecayModel
@@ -190,9 +190,8 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
         ax.grid()
 
 
-class RandomizedBenchmarkingSSRONodeAnalysis(BaseAllQubitsRepeatAnalysis):
+class RandomizedBenchmarkingSSRONodeAnalysis(BaseAllQubitsAnalysis):
     single_qubit_analysis_obj = RandomizedBenchmarkingSSROQubitAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-        self.repeat_coordinate_name = "seeds"

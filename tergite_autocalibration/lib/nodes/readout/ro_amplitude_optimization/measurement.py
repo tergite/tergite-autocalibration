@@ -85,7 +85,7 @@ class ROAmplitudeOptimizationMeasurement(BaseMeasurement):
             number_of_levels = len(qubit_levels)
 
             # To enforce parallelism we refer to the root relaxation
-            shot.add(Reset(*qubits), ref_op=root_relaxation, ref_pt_new="end")
+            shot.add(Reset(*qubits), ref_op=root_relaxation, ref_pt="end")
 
             # The intermediate for-loop iterates over all ro_amplitudes:
             for ampl_indx, ro_amplitude in enumerate(ro_amplitude_values):

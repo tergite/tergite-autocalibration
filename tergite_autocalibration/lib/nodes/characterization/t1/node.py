@@ -48,7 +48,7 @@ class T1Node(ExternalParameterNode):
 
         self.schedule_samplespace = {
             "delays": {
-                qubit: 8e-9 + np.arange(0, 30e-6, 6e-6) for qubit in self.all_qubits
+                qubit: 8e-9 + np.arange(0, 80e-6, 4e-6) for qubit in self.all_qubits
             }
         }
         self.external_samplespace = {

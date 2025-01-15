@@ -233,7 +233,7 @@ class TQGRandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
                 shot.add(Reset(this_qubit))
 
         schedule.add(IdlePulse(16e-9))
-        logger.info(schedule.add(shot, control_flow=Loop(repetitions), validate=False))
+        logger.info(schedule.add(shot, control_flow=Loop(repetitions)))
         schedule.add(IdlePulse(16e-9))
 
         return schedule

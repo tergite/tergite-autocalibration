@@ -30,10 +30,9 @@ from tergite_autocalibration.utils.dto.extended_transmon_element import Extended
 
 
 class RandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
-    def __init__(self, transmons: dict[str, ExtendedTransmon], qubit_state: int = 0):
+    def __init__(self, transmons: dict[str, ExtendedTransmon]):
         super().__init__(transmons)
         self.transmons = transmons
-        self.qubit_state = qubit_state
 
         """
         Generate a schedule for performing a randomized benchmarking test using Clifford gates.
