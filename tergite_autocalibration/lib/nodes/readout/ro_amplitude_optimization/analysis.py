@@ -20,10 +20,14 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
-from tergite_autocalibration.lib.base.analysis import (BaseAllQubitsAnalysis,
-                                                       BaseQubitAnalysis)
+from tergite_autocalibration.lib.base.analysis import (
+    BaseAllQubitsAnalysis,
+    BaseQubitAnalysis,
+)
 from tergite_autocalibration.lib.utils.analysis_models import (
-    ThreeClassBoundary, TwoClassBoundary)
+    ThreeClassBoundary,
+    TwoClassBoundary,
+)
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 
 
@@ -258,6 +262,23 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         self.rotated_y_limits = (aligned_IQ[:, 1].min(), aligned_IQ[:, 1].max())
 
         self.x_space = np.linspace(optimal_IQ[:, 0].min(), optimal_IQ[:, 0].max(), 100)
+        x_min = min(optimal_IQ[:, 0].min(), 0)
+        x_max = max(optimal_IQ[:, 0].max(), 0)
+        y_min = min(optimal_IQ[:, 1].min(), 0)
+        y_max = max(optimal_IQ[:, 1].max(), 0)
+        delta_x = x_max - x_min
+        delta_y = y_max - y_min
+
+        delta = max(delta_x, delta_y)
+        center_distance = np.linalg.norm(self.centers[0] - self.centers[1])
+        self.x_limits = (
+            x_min - center_distance / 2,
+            x_min + delta + center_distance / 2,
+        )
+        self.y_limits = (
+            y_min - center_distance / 2,
+            y_min + delta + center_distance / 2,
+        )
 
         self.rotation_angle = rotation_angle_rad
         self.rotation_angle_degrees = np.rad2deg(rotation_angle_rad)
@@ -267,7 +288,6 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
     def plotter(self, ax, secondary_axes):
         self.primary_plotter(ax)
         iq_axis = secondary_axes[0]
-        iq_axis.axis("equal")
 
         mark_size = 40
 
@@ -330,7 +350,6 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         optimal_iq_axis.axhline(0, color="black")
         optimal_iq_axis.axvline(0, color="black")
         rotated_iq_axis = secondary_axes[1]
-        rotated_iq_axis.axis("equal")
         rotated_iq_axis.scatter(
             self.rotated_IQ0_tp[:, 0],
             self.rotated_IQ0_tp[:, 1],
@@ -361,48 +380,11 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
             s=mark_size,
             color="orange",
         )
-        rotated_iq_axis.legend()
-        rotated_iq_axis.axhline(0, color="black")
-        rotated_iq_axis.axvline(0, color="black")
         rotated_iq_axis.axvline(
             self.threshold,
             color="purple",
             lw=3,
             label=f"threshold: {self.threshold:0.4f}",
-        )
-        rotated_iq_axis.legend()
-
-        rotated_iq_axis = secondary_axes[1]
-        rotated_iq_axis.axis("equal")
-        rotated_iq_axis.scatter(
-            self.rotated_IQ0_tp[:, 0],
-            self.rotated_IQ0_tp[:, 1],
-            marker=".",
-            s=mark_size,
-            color="blue",
-            label="send 0 and read 0",
-        )
-        rotated_iq_axis.scatter(
-            self.rotated_IQ0_fp[:, 0],
-            self.rotated_IQ0_fp[:, 1],
-            marker="x",
-            s=mark_size,
-            color="dodgerblue",
-        )
-        rotated_iq_axis.scatter(
-            self.rotated_IQ1_tp[:, 0],
-            self.rotated_IQ1_tp[:, 1],
-            marker=".",
-            s=mark_size,
-            color="red",
-            label="send 1 and read 1",
-        )
-        rotated_iq_axis.scatter(
-            self.rotated_IQ1_fp[:, 0],
-            self.rotated_IQ1_fp[:, 1],
-            marker="x",
-            s=mark_size,
-            color="orange",
         )
 
         rotated_iq_axis.legend()
