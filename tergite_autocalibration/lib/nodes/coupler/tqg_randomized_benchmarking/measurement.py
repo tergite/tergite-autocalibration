@@ -31,10 +31,13 @@ from tergite_autocalibration.utils.dto.extended_gates import (
 )
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 from tergite_autocalibration.utils.logger.tac_logger import logger
+from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.utils.randomized_benchmarking import randomized_benchmarking_sequence
 
 
 
 # TODO: REMOVE THE DEPENDENCY OF THIS PACKAGE.
+
+"""
 try:
     from superconducting_qubit_tools.clifford_module.cliffords_decomposition import (
         decompose_clifford_seq,
@@ -51,14 +54,14 @@ except ImportError:
         "This is a proprietary licenced software.",
         "Please make sure that you are having a correct licence and install the dependency",
     )    
-    
+    """
 # Constants
 DEFAULT_DOWNCONVERT_FREQ = 4.4e9
 SPECIAL_COUPLERS = {"q21_q22", "q22_q23", "q23_q24", "q24_q25"}
 GATE_SEPARATION_TIME = 300e-9  # Time between two-qubit gates
 BUFFER_TIME = 20e-9  # Buffer time after gate execution
 IDLE_TIME = 16e-9
-class TQGRandomizedBenchmarkingSSRO(BaseMeasurement):    
+class TQGRandomizedBenchmarkingSSROMeasurement(BaseMeasurement):    
 
     def __init__(
         self,
@@ -73,8 +76,8 @@ class TQGRandomizedBenchmarkingSSRO(BaseMeasurement):
         
     def add_qubit_clock_resources(self, schedule: Schedule, transmon: ExtendedTransmon, qubit_name: str) -> None:
         """
-        Adds three different clock resources for a given qubit to the schedule.
-        The clock resources are:
+        Adds three clock resources for a given qubit to the schedule.
+        The three clock resources are:
             - Clock resource for readout frequency optimized for 3-state discrimination (|0>, |1>, |2>)
             - Clock resource for f01 transition frequency (from |0> to |1>)
             - Clock resource for f12 transition frequency (from |1> to |2>)
@@ -155,7 +158,7 @@ class TQGRandomizedBenchmarkingSSRO(BaseMeasurement):
     
     def schedule_function(
         self,
-        seeds: int,
+        seed: int,
         number_of_cliffords: dict[str, np.ndarray],
         interleaving_clifford_id: Optional[int] = None,
         apply_inverse_gate: bool = True,
@@ -181,13 +184,14 @@ class TQGRandomizedBenchmarkingSSRO(BaseMeasurement):
         :
             An experiment schedule.
         """
-        # Initialize schedule
         if interleaving_clifford_id is None:
             name = "tqg_randomized_benchmarking_ssro"
         else:
             name = "tqg_randomized_benchmarking_interleaved_ssro"
-        schedule = Schedule(f"{name}")
         print("interleaved or not", name)
+        
+        # Initialize schedule
+        schedule = Schedule(f"{name}")
         
         # Create a single-shot schedule to represent a basic time unit for the experiment.
         shot = Schedule("shot")
