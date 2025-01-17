@@ -32,9 +32,6 @@ setup:
   stage: setup
   image: python:${PYTHON_VERSION}
   script:
-    # Install dependencies
-    - apt-get update
-    - apt-get install redis ffmpeg libsm6 libxext6 -y
     # Create and activate a virtual environment
     - python -m venv .venv
     - source .venv/bin/activate
@@ -46,8 +43,6 @@ setup:
     - key: "cache-default"
       paths:
         - .cache/pip
-        - /var/cache/apt/archives/
-        - /usr/local/lib/python3.*/dist-packages/
     - key: "venv-${CI_COMMIT_REF_NAME}"
       paths:
         - .venv
@@ -58,8 +53,11 @@ tests:
   dependencies:
     - setup  # Reuse setup artifacts
   script:
+    # Install dependencies
+    - apt-get update
+    - apt-get install redis ffmpeg libsm6 libxext6 -y
     # Run Redis server
-    # - redis-server --daemonize yes --port "$REDIS_PORT"
+    - redis-server --daemonize yes --port "$REDIS_PORT"
     # Activate the virtual environment
     - source .venv/bin/activate
     # Run tests
@@ -78,8 +76,11 @@ application_run:
   dependencies:
     - setup  # Reuse setup artifacts
   script:
+    # Install dependencies
+    - apt-get update
+    - apt-get install redis ffmpeg libsm6 libxext6 -y
     # Run Redis server
-    # - redis-server --daemonize yes --port "$REDIS_PORT"
+    - redis-server --daemonize yes --port "$REDIS_PORT"
     # Activate the virtual environment
     - source .venv/bin/activate
     # Create empty .env file
