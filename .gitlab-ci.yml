@@ -101,7 +101,7 @@ application_run:
     # Create empty .env file
     - touch .env
     # Load configuration
-    - acli config load -t fc8a
+    - echo "y" | acli config load -t fc8a
     # Reset Redis
     - echo "y" | acli node reset -a
     # Run the calibration chain
