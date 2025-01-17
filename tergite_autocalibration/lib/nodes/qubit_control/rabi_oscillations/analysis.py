@@ -16,63 +16,15 @@
 """
 Module containing classes that model, fit and plot data from a Rabi experiment.
 """
-import lmfit
 import numpy as np
-from quantify_core.analysis.fitting_models import fft_freq_phase_guess
 
 from tergite_autocalibration.lib.base.analysis import (
     BaseAllQubitsAnalysis,
     BaseQubitAnalysis,
 )
+from tergite_autocalibration.lib.utils.analysis_models import RabiModel
 from tergite_autocalibration.utils.backend.redis_utils import fetch_redis_params
-
-
-# Cosine function that is fit to Rabi oscillations
-def cos_func(
-    drive_amp: float,
-    frequency: float,
-    amplitude: float,
-    offset: float,
-    phase: float,
-) -> float:
-    return amplitude * np.cos(2 * np.pi * frequency * drive_amp + phase) + offset
-
-
-class RabiModel(lmfit.model.Model):
-    """
-    Generate a cosine model that can be fit to Rabi oscillation data.
-    """
-
-    def __init__(self, *args, **kwargs):
-        # Pass in the defining equation so the user doesn't have to later.
-        super().__init__(cos_func, *args, **kwargs)
-
-        # Enforce oscillation frequency is positive
-        self.set_param_hint("frequency", min=0)
-
-        # Fix the phase at pi so that the ouput is at a minimum when drive_amp=0
-        self.set_param_hint("phase", expr="3.141592653589793", vary=True)
-
-        # Pi-pulse amplitude can be derived from the oscillation frequency
-        self.set_param_hint("amp180", expr="1/(2*frequency)", vary=False)
-
-    def guess(self, data, **kws) -> lmfit.parameter.Parameters:
-        drive_amp = kws.get("drive_amp", None)
-        if drive_amp is None:
-            return None
-
-        amp_guess = abs(max(data) - min(data)) / 2  # amp is positive by convention
-        offs_guess = np.mean(data)
-
-        # Frequency guess is obtained using a fast fourier transform (FFT).
-        (freq_guess, _) = fft_freq_phase_guess(data, drive_amp)
-
-        self.set_param_hint("frequency", value=freq_guess, min=0)
-        self.set_param_hint("amplitude", value=amp_guess, min=0)
-        self.set_param_hint("offset", value=offs_guess)
-
-        params = self.make_params()
-        return lmfit.models.update_param_vals(params, self.prefix, **kws)
+from tergite_autocalibration.utils.dto.qoi import QOI
 
 
 class RabiQubitAnalysis(BaseQubitAnalysis):

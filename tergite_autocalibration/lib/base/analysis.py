@@ -235,7 +235,7 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
                     ds, this_qubit
                 )  # this_qubit shoulq be qXX
                 # print('WARNING SKIPING REDIS UPDATING')
-                analysis_results[this_qubit] = dict(zip(self.redis_fields, result))
+                # analysis_results[this_qubit] = dict(zip(self.redis_fields, result))
                 self.qubit_analyses.append(qubit_analysis)
 
             index = index + 1
@@ -290,7 +290,7 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
         self.magnitudes = np.abs(self.S21)
         self._qoi = self.analyse_qubit()
 
-        self.update_redis_trusted_values(self.name, self.qubit)
+        self.update_redis_trusted_values(self.name, self.qubit, self._qoi)
         return self._qoi
 
     def _plot(self, primary_axis):

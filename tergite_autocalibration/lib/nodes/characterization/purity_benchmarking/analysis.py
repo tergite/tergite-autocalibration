@@ -23,6 +23,7 @@ from tergite_autocalibration.lib.base.analysis import (
     BaseQubitAnalysis,
 )
 from tergite_autocalibration.lib.utils.functions import exponential_decay_function
+from tergite_autocalibration.utils.dto.qoi import QOI
 
 
 class ExpDecayModel(lmfit.model.Model):
@@ -177,7 +178,18 @@ class PurityBenchmarkingQubitAnalysis(BaseQubitAnalysis):
         self.fit_report = fit_result.fit_report()
         print(self.fit_report)
 
-        return [self.fidelity]
+        analysis_succesful = True
+
+        analysis_result = {
+            "purity_fidelity": {
+                "value": self.fidelity,
+                "error": np.nan,
+            }
+        }
+
+        qoi = QOI(analysis_result, analysis_succesful)
+
+        return qoi
 
     def plotter(self, ax: Axes):
         """

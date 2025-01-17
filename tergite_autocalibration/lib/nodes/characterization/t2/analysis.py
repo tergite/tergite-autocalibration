@@ -22,6 +22,7 @@ from tergite_autocalibration.lib.base.analysis import (
     BaseQubitAnalysis,
 )
 from tergite_autocalibration.lib.nodes.characterization.t1.analysis import cos_func
+from tergite_autocalibration.utils.dto.qoi import QOI
 
 
 class T2Model(lmfit.model.Model):
@@ -86,8 +87,22 @@ class BaseT2QubitAnalysis(BaseQubitAnalysis, ABC):
 
         self.average_T2 = np.mean(self.T2_times)
         self.error = np.std(self.T2_times)
-        return [self.average_T2]
 
+        analysis_succesful = True
+
+        # TODO: change this for t2_echo
+        analysis_result = {
+            "t2_time": {
+                "value": self.average_T2,
+                "error": self.error,
+            }
+        }
+
+        qoi = QOI(analysis_result, analysis_succesful)
+
+        return qoi
+
+    # what are all these?
     @abstractmethod
     def fit_model(self, magnitudes_flat):
         pass

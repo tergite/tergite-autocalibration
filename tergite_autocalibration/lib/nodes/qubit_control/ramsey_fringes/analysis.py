@@ -91,7 +91,7 @@ class RamseyDetuningsBaseQubitAnalysis(BaseQubitAnalysis):
         qoi = QOI(analysis_result, analysis_succesful)
         return qoi
 
-    def plotter(self, ax, secondary_axes):
+    def plotter(self, ax):
         ax.plot(self.artificial_detunings, self.fitted_detunings, "bo", ms=5.0)
         ax.axvline(
             self.frequency_correction,

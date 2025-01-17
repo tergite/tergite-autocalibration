@@ -24,6 +24,7 @@ from tergite_autocalibration.lib.base.analysis import (BaseAllQubitsAnalysis,
                                                        BaseQubitAnalysis)
 from tergite_autocalibration.lib.utils.analysis_models import (
     ThreeClassBoundary, TwoClassBoundary)
+from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 from tergite_autocalibration.utils.dto.qoi import QOI
 
 
@@ -403,7 +404,7 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         rotated_iq_axis.axhline(0, color="black")
         rotated_iq_axis.axvline(0, color="black")
 
-    def update_redis_trusted_values(self, node: str, this_element: str):
+    def update_redis_trusted_values(self, node: str, this_element: str, qoi: QOI):
         """
         TODO: This method is a temporary solution to store the discriminator until we switch to ThresholdedAcquisition
         Args:
@@ -413,7 +414,7 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         Returns:
 
         """
-        super().update_redis_trusted_values(node, this_element)
+        super().update_redis_trusted_values(node, this_element, qoi)
 
         # We read coefficients and intercept from the lda model
         coef_0_ = str(float(self.lda.coef_[0][0]))

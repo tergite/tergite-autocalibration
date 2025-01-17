@@ -98,7 +98,7 @@ class ResonatorSpectroscopyQubitAnalysis(BaseQubitAnalysis):
                     "error": 0,
                 },
                 "Ql": {
-                    "value": self.minimum_freq,
+                    "value": fit_Ql,
                     "error": 0,
                 },
                 "resonator_minimum": {
