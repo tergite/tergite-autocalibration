@@ -36,7 +36,6 @@ setup:
     - pip install pytest black==24.10.0 requests-mock==1.11.0 pylint
   artifacts:
     paths:
-      - .cache/pip
       - .venv  # Save virtual environment
     exclude:
       - .venv/lib/python*/__pycache__
