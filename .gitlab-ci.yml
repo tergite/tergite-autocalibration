@@ -57,7 +57,7 @@ tests:
     - source .venv/bin/activate
     # Run tests
     - pytest tergite_autocalibration --cov=tergite_autocalibration --cov-report xml --cov-report term-missing --junitxml=report.xml
-  coverage: "/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/"
+  coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
     reports:
       junit: report.xml
