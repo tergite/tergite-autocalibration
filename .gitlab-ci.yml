@@ -60,6 +60,13 @@ lint:
     - source .venv/bin/activate
     # Run linter and make it fail under 7.0
     - pylint tergite_autocalibration --fail-under=7.0
+  cache:
+    - key: "cache-default"
+      paths:
+        - .cache/pip
+    - key: "venv-${CI_COMMIT_REF_NAME}"
+      paths:
+        - .venv
 
 format:
   stage: format
@@ -71,6 +78,13 @@ format:
     - source .venv/bin/activate
     # Run formatter
     - black --check tergite_autocalibration
+  cache:
+    - key: "cache-default"
+      paths:
+        - .cache/pip
+    - key: "venv-${CI_COMMIT_REF_NAME}"
+      paths:
+        - .venv
 
 tests:
   stage: tests
@@ -84,6 +98,13 @@ tests:
     - source .venv/bin/activate
     # Run tests
     - pytest tergite_autocalibration
+  cache:
+    - key: "cache-default"
+      paths:
+        - .cache/pip
+    - key: "venv-${CI_COMMIT_REF_NAME}"
+      paths:
+        - .venv
 
 application_run:
   stage: application_run
@@ -112,3 +133,10 @@ application_run:
         echo "Error: Output file $OUTPUT_FILE not found."
         exit 1
       fi
+  cache:
+    - key: "cache-default"
+      paths:
+        - .cache/pip
+    - key: "venv-${CI_COMMIT_REF_NAME}"
+      paths:
+        - .venv
