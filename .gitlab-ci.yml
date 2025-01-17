@@ -37,7 +37,9 @@ setup:
   artifacts:
     paths:
       - .cache/pip
-      - .venv  # Save virtual environment (optional, depending on your setup)
+      - .venv  # Save virtual environment
+    exclude:
+      - .venv/lib/python*/__pycache__
   cache:
     paths:
       - .cache/pip
