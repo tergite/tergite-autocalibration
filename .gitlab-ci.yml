@@ -42,14 +42,13 @@ setup:
     - pip install --upgrade pip
     - pip install .
     - pip install pytest black==24.10.0 requests-mock==1.11.0 pylint
-  artifacts:
-    paths:
-      - .venv  # Save virtual environment
-    exclude:
-      - .venv/lib/python*/__pycache__
   cache:
-    paths:
-      - .cache/pip
+    - key: "cache-default"
+      paths:
+        - .cache/pip
+    - key: "venv-${CI_COMMIT_REF_NAME}"
+      paths:
+        - .venv
 
 lint:
   stage: lint
