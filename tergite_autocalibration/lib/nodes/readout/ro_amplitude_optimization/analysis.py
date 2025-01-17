@@ -170,7 +170,7 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         iq_points: np.ndarray,
         classified_states: np.ndarray,
         boundary_angle_rad: float,
-        y_intercept: float,
+        absolute_threshold: float,
     ) -> tuple[np.ndarray, float, float]:
         """
         Translate and rotate the IQ samples so that all the |0> are on the I<0 semi-plane
@@ -190,18 +190,31 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
                 [np.sin(np.pi), np.cos(np.pi)],
             ]
         )
-        translated_IQ = iq_points - np.array([0, y_intercept])
+        # translated_IQ = iq_points - np.array([0, y_intercept])
+        translated_IQ = iq_points
         rotated_IQ = translated_IQ @ rotation_matrix.T
 
         rotated_IQ0 = rotated_IQ[classified_states == 0]
-        threshold_direction = boundary_angle_rad - np.pi / 2
+        rotated_IQ1 = rotated_IQ[classified_states == 1]
         center_of_rotated_I_0 = np.mean(rotated_IQ0[:, 0])
-        if center_of_rotated_I_0 > 0:
+        center_of_rotated_I_1 = np.mean(rotated_IQ1[:, 0])
+        if center_of_rotated_I_0 > center_of_rotated_I_1:
             rotation_angle_rad = rotation_angle_rad + np.pi
-            threshold_direction = threshold_direction + np.pi
             rotated_IQ = rotated_IQ @ mirror_rotation.T
 
-        return rotated_IQ, rotation_angle_rad, threshold_direction
+        rotated_IQ0 = rotated_IQ[classified_states == 0]
+        rotated_IQ1 = rotated_IQ[classified_states == 1]
+        center_of_rotated_I_0 = np.mean(rotated_IQ0[:, 0])
+        center_of_rotated_I_1 = np.mean(rotated_IQ1[:, 0])
+        if center_of_rotated_I_0 < absolute_threshold < center_of_rotated_I_1:
+            threshold = absolute_threshold
+        else:
+            threshold = -absolute_threshold
+
+        if not center_of_rotated_I_0 < threshold < center_of_rotated_I_1:
+            raise ValueError("threshold is at an imporoper value")
+
+        return rotated_IQ, rotation_angle_rad, threshold
 
     def analyse_qubit(self):
         super().analyse_qubit()
@@ -224,19 +237,16 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         boundary = TwoClassBoundary(self.lda)
         self.theta_rad = boundary.theta_rad
         self.y_intercept = boundary.y_intercept
-        self.threshold = boundary.threshold
+        self.absolute_threshold = boundary.threshold
         self.centers = boundary.centers
         self.lamda = boundary.lamda
-        y_intercept = self.y_intercept[0]
         boundary_angle_rad = self.theta_rad
 
-        aligned_IQ, rotation_angle_rad, threshold_direction = self.align_on_y_axis(
-            optimal_IQ, classified_states, boundary_angle_rad, y_intercept
+        aligned_IQ, rotation_angle_rad, threshold = self.align_on_y_axis(
+            optimal_IQ, classified_states, boundary_angle_rad, self.absolute_threshold
         )
+        self.threshold = threshold
 
-        self.threshold_point = self.threshold * np.array(
-            [np.cos(threshold_direction), np.sin(threshold_direction)]
-        )
         aligned_IQ0 = aligned_IQ[states == 0]
         aligned_IQ1 = aligned_IQ[states == 1]
         self.rotated_IQ0_tp = aligned_IQ0[tp0]  # True Positive when sending 0
@@ -252,6 +262,23 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         self.rotated_y_limits = (aligned_IQ[:, 1].min(), aligned_IQ[:, 1].max())
 
         self.x_space = np.linspace(optimal_IQ[:, 0].min(), optimal_IQ[:, 0].max(), 100)
+        x_min = min(optimal_IQ[:, 0].min(), 0)
+        x_max = max(optimal_IQ[:, 0].max(), 0)
+        y_min = min(optimal_IQ[:, 1].min(), 0)
+        y_max = max(optimal_IQ[:, 1].max(), 0)
+        delta_x = x_max - x_min
+        delta_y = y_max - y_min
+
+        delta = max(delta_x, delta_y)
+        center_distance = np.linalg.norm(self.centers[0] - self.centers[1])
+        self.x_limits = (
+            x_min - center_distance / 2,
+            x_min + delta + center_distance / 2,
+        )
+        self.y_limits = (
+            y_min - center_distance / 2,
+            y_min + delta + center_distance / 2,
+        )
 
         self.rotation_angle = rotation_angle_rad
         self.rotation_angle_degrees = np.rad2deg(rotation_angle_rad)
@@ -261,11 +288,13 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
     def plotter(self, ax, secondary_axes):
         self.primary_plotter(ax)
         iq_axis = secondary_axes[0]
-        iq_axis.axis("equal")
 
         mark_size = 40
 
-        iq_axis.scatter(
+        optimal_iq_axis = secondary_axes[0]
+        optimal_iq_axis.set_xlim(*self.x_limits)
+        optimal_iq_axis.set_ylim(*self.y_limits)
+        optimal_iq_axis.scatter(
             self.IQ0_tp[:, 0],
             self.IQ0_tp[:, 1],
             marker=".",
@@ -317,20 +346,10 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
             lw=2,
             label=f"angle: {self.rotation_angle_degrees:0.1f}" r"$\degree$",
         )
-
-        iq_axis.plot(
-            [0, self.threshold_point[0]],
-            [0, self.threshold_point[1]],
-            lw=4,
-            color="magenta",
-            label=f"threshold: {self.threshold:0.4f}",
-        )
-        iq_axis.legend()
-        iq_axis.axhline(0, color="black")
-        iq_axis.axvline(0, color="black")
-
+        optimal_iq_axis.legend()
+        optimal_iq_axis.axhline(0, color="black")
+        optimal_iq_axis.axvline(0, color="black")
         rotated_iq_axis = secondary_axes[1]
-        rotated_iq_axis.axis("equal")
         rotated_iq_axis.scatter(
             self.rotated_IQ0_tp[:, 0],
             self.rotated_IQ0_tp[:, 1],
@@ -360,6 +379,12 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
             marker="x",
             s=mark_size,
             color="orange",
+        )
+        rotated_iq_axis.axvline(
+            self.threshold,
+            color="purple",
+            lw=3,
+            label=f"threshold: {self.threshold:0.4f}",
         )
 
         rotated_iq_axis.legend()
