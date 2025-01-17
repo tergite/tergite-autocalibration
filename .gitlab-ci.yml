@@ -37,7 +37,7 @@ setup:
     - apt-get install ffmpeg libsm6 libxext6 -y
     # Create and activate a virtual environment
     - python -m venv .venv
-    - python -m .venv/bin/activate
+    - source .venv/bin/activate
     # Install project dependencies
     - pip install --upgrade pip
     - pip install .
@@ -58,7 +58,7 @@ lint:
     - setup  # Reuse setup artifacts
   script:
     # Activate the virtual environment
-    - python -m .venv/bin/activate
+    - source .venv/bin/activate
     # Run linter and make it fail under 7.0
     - pylint tergite_autocalibration --fail-under=7.0
 
@@ -69,7 +69,7 @@ format:
     - setup  # Reuse setup artifacts
   script:
     # Activate the virtual environment
-    - python -m .venv/bin/activate
+    - source .venv/bin/activate
     # Run formatter
     - black --check tergite_autocalibration
 
@@ -82,7 +82,7 @@ tests:
     # Run Redis server
     # - redis-server --daemonize yes --port "$REDIS_PORT"
     # Activate the virtual environment
-    - python -m .venv/bin/activate
+    - source .venv/bin/activate
     # Run tests
     - pytest tergite_autocalibration
 
@@ -95,7 +95,7 @@ application_run:
     # Run Redis server
     # - redis-server --daemonize yes --port "$REDIS_PORT"
     # Activate the virtual environment
-    - python -m .venv/bin/activate
+    - source .venv/bin/activate
     # Create empty .env file
     - touch .env
     # Load configuration
