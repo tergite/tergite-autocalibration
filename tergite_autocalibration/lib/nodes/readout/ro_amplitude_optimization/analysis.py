@@ -280,7 +280,7 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         self.rotation_angle = rotation_angle_rad
         self.rotation_angle_degrees = np.rad2deg(rotation_angle_rad)
 
-        analysis_succesful = False
+        analysis_succesful = True
         analysis_result = {
             "measure_2state_opt:pulse_amp": {
                 "value": self.optimal_amplitude,
