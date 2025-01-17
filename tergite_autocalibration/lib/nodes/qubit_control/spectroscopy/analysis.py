@@ -16,7 +16,6 @@
 Module containing classes that model, fit and plot data
 from a qubit (two tone) spectroscopy experiment.
 """
-import lmfit
 import numpy as np
 import xarray as xr
 from scipy import signal
@@ -25,66 +24,7 @@ from tergite_autocalibration.lib.base.analysis import (
     BaseAllQubitsAnalysis,
     BaseQubitAnalysis,
 )
-
-
-# Lorentzian function that is fit to qubit spectroscopy peaks
-def lorentzian_function(
-    x: float,
-    x0: float,
-    width: float,
-    A: float,
-    c: float,
-) -> float:
-    return A * width**2 / ((x - x0) ** 2 + width**2) + c
-
-
-class LorentzianModel(lmfit.model.Model):
-    """
-    Generate a Lorentzian model that can be fit to qubit spectroscopy data.
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(lorentzian_function, *args, **kwargs)
-
-        self.set_param_hint("x0", vary=True)
-        self.set_param_hint("A", vary=True)
-        self.set_param_hint("c", vary=True)
-        self.set_param_hint("width", vary=True)
-
-    def guess(self, data, **kws) -> lmfit.parameter.Parameters:
-        x = kws.get("x", None)
-
-        if x is None:
-            return None
-
-        # Guess that the resonance is where the function takes its maximal value
-        x0_guess = x[np.argmax(data)]
-        self.set_param_hint("x0", value=x0_guess)
-
-        # assume the user isn't trying to fit just a small part of a resonance curve.
-        xmin = x.min()
-        xmax = x.max()
-        width_max = xmax - xmin
-
-        delta_x = np.diff(x)  # assume f is sorted
-        min_delta_x = delta_x[delta_x > 0].min()
-        # assume data actually samples the resonance reasonably
-        width_min = min_delta_x
-        # TODO this needs to be checked:
-        # width_guess = np.sqrt(width_min * width_max)  # geometric mean, why not?
-        width_guess = 0.5e6
-        self.set_param_hint("width", value=width_guess)
-
-        # The guess for the vertical offset is the mean absolute value of the data
-        c_guess = np.mean(data)
-        self.set_param_hint("c", value=c_guess)
-
-        # Calculate A_guess from difference between the peak and the backround level
-        A_guess = (np.max(data) - c_guess) / 10
-        self.set_param_hint("A", value=A_guess)
-
-        params = self.make_params()
-        return lmfit.models.update_param_vals(params, self.prefix, **kws)
+from tergite_autocalibration.utils.dto.qoi import QOI
 
 
 # TODO: this is flagged for removal
@@ -191,10 +131,6 @@ class QubitSpectroscopyMultidimAnalysis(BaseQubitAnalysis):
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-        self.fit_results = {}
-        self.frequencies = []
-        self.amplitudes = []
-        self.frequency_coords = ""
 
     def analyse_qubit(self):
         for coord in self.dataset[self.data_var].coords:
@@ -234,7 +170,19 @@ class QubitSpectroscopyMultidimAnalysis(BaseQubitAnalysis):
             if self.has_peak(self.magnitudes):
                 self.qubit_freq = self.frequencies[self.magnitudes.argmax()]
 
-        return [self.qubit_freq, self.spec_ampl]
+        analysis_succesful = True
+        analysis_result = {
+            "clock_freqs:f01": {
+                "value": self.qubit_freq,
+                "error": 0,
+            },
+            "spec:spec_ampl_optimal": {
+                "value": self.spec_ampl,
+                "error": 0,
+            },
+        }
+        qoi = QOI(analysis_result, analysis_succesful)
+        return qoi
 
     def reject_outliers(self, x, m=3.0):
         # Filters out datapoints in x that deviate too far from the median

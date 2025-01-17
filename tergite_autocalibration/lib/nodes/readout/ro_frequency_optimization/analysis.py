@@ -23,6 +23,7 @@ from tergite_autocalibration.lib.base.analysis import (
     BaseAllQubitsAnalysis,
     BaseQubitAnalysis,
 )
+from tergite_autocalibration.utils.dto.qoi import QOI
 
 model = fm.ResonatorModel()
 
@@ -52,15 +53,22 @@ class OptimalRO01FrequencyQubitAnalysis(BaseQubitAnalysis):
         self.phase_0 = np.angle(self.s21_0)
         self.phase_1 = np.angle(self.s21_1)
 
-        self.magnitudes_0 = np.abs(self.s21_0.values.flatten())
-        self.magnitudes_1 = np.abs(self.s21_1.values.flatten())
-
         distances = self.s21_1 - self.s21_0
 
         self.optimal_frequency = np.abs(distances).idxmax().item()
         self.index_of_max_distance = np.abs(distances).argmax()
 
-        return [self.optimal_frequency]
+        analysis_succesful = True
+        analysis_result = {
+            "extended_clock_freqs:readout_2state_opt": {
+                "value": self.optimal_frequency,
+                "error": 0,
+            }
+        }
+
+        qoi = QOI(analysis_result, analysis_succesful)
+
+        return qoi
 
     def plotter(self, ax, secondary_axes):
         """

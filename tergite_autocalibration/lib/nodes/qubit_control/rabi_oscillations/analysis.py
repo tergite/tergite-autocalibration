@@ -82,16 +82,18 @@ class RabiQubitAnalysis(BaseQubitAnalysis):
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-        self.amplitudes = ""
-        self.fit_results = {}
 
     def analyse_qubit(self):
         model = RabiModel()
 
-        coord = list(self.dataset[self.data_var].coords.keys())[0]
-        self.amplitudes = self.dataset[coord].values
+        for coord in self.dataset.coords:
+            if "amplitudes" in coord:
+                self.amplitude_coord = coord
+                self.amplitudes = self.dataset[coord].values
+            else:
+                raise ValueError("Invalid Coordinate")
 
-        self.fit_amplitudes = np.linspace(
+        self.fit_plot_amplitudes = np.linspace(
             self.amplitudes[0], self.amplitudes[-1], 400
         )  # x-values for plotting
 
@@ -105,21 +107,38 @@ class RabiQubitAnalysis(BaseQubitAnalysis):
             drive_amp=self.amplitudes,
         )
 
-        self.ampl = fit_result.params["amp180"].value
+        self.pi_amplitude = fit_result.params["amp180"].value
         self.uncertainty = fit_result.params["amp180"].stderr
+        self.scaled_uncertainty = self.uncertainty / self.pi_amplitude
 
-        self.fit_y = model.eval(
-            fit_result.params, **{model.independent_vars[0]: self.fit_amplitudes}
-        )
-        return [self.ampl]
+        self.fit_y = model.eval(fit_result.params, drive_amp=self.fit_plot_amplitudes)
+
+        if self.scaled_uncertainty < 2e-2 and self.pi_amplitude < 0.95:
+            analysis_succesful = True
+        else:
+            analysis_succesful = False
+
+        analysis_result = {
+            "rxy:amp180": {
+                "value": self.pi_amplitude,
+                "error": self.scaled_uncertainty,
+            }
+        }
+
+        qoi = QOI(analysis_result, analysis_succesful)
+
+        return qoi
 
     def plotter(self, ax):
         ax.plot(
-            self.fit_amplitudes,
+            self.fit_plot_amplitudes,
             self.fit_y,
             "r-",
             lw=3.0,
-            label=f" π_ampl = {self.ampl:.2E} (V)",
+            label=f"π_ampl = {self.pi_amplitude:.2E}"
+            r"$\pm$"
+            f"{self.uncertainty:.2E}(V)\n"
+            f"scaled uncertainty: {self.scaled_uncertainty:.2E}",
         )
 
         ax.plot(self.amplitudes, self.magnitudes[self.data_var].values, "bo-", ms=3.0)
@@ -145,9 +164,7 @@ class NRabiQubitAnalysis(BaseQubitAnalysis):
             if "amplitudes" in coord:
                 self.mw_amplitudes_coord = coord
             elif "repetitions" in coord:
-                self.X_repetitions = coord
-        self.independents = self.dataset[coord].values
-        self.fit_results = {}
+                self.x_repetitions_coord = coord
 
         mw_amplitude_key = self.mw_amplitudes_coord
         mw_amplitudes = self.magnitudes[mw_amplitude_key].size
@@ -165,7 +182,18 @@ class NRabiQubitAnalysis(BaseQubitAnalysis):
         self.index_of_max = index_of_min
         self.shift = self.magnitudes[mw_amplitude_key][index_of_min].values
 
-        return [self.optimal_amp180]
+        analysis_succesful = True
+
+        analysis_result = {
+            "rxy:amp180": {
+                "value": self.optimal_amp180,
+                "error": 0,
+            }
+        }
+
+        qoi = QOI(analysis_result, analysis_succesful)
+
+        return qoi
 
     def plotter(self, axis):
         datarray = self.magnitudes[self.data_var]

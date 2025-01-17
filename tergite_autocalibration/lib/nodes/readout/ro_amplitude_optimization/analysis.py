@@ -20,15 +20,11 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
-from tergite_autocalibration.lib.base.analysis import (
-    BaseAllQubitsAnalysis,
-    BaseQubitAnalysis,
-)
+from tergite_autocalibration.lib.base.analysis import (BaseAllQubitsAnalysis,
+                                                       BaseQubitAnalysis)
 from tergite_autocalibration.lib.utils.analysis_models import (
-    ThreeClassBoundary,
-    TwoClassBoundary,
-)
-from tergite_autocalibration.tools.mss.convert import structured_redis_storage
+    ThreeClassBoundary, TwoClassBoundary)
+from tergite_autocalibration.utils.dto.qoi import QOI
 
 
 class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
@@ -283,7 +279,23 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         self.rotation_angle = rotation_angle_rad
         self.rotation_angle_degrees = np.rad2deg(rotation_angle_rad)
 
-        return [self.optimal_amplitude, self.rotation_angle_degrees, self.threshold]
+        analysis_succesful = False
+        analysis_result = {
+            "measure_2state_opt:pulse_amp": {
+                "value": self.optimal_amplitude,
+                "error": 0,
+            },
+            "measure_2state_opt:acq_rotation": {
+                "value": self.rotation_angle_degrees,
+                "error": 0,
+            },
+            "measure_2state_opt:acq_threshold": {
+                "value": self.threshold,
+                "error": 0,
+            },
+        }
+        qoi = QOI(analysis_result, analysis_succesful)
+        return qoi
 
     def plotter(self, ax, secondary_axes):
         self.primary_plotter(ax)
