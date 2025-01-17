@@ -33,7 +33,7 @@ setup:
     # Install project dependencies
     - pip install --upgrade pip
     - pip install .
-    - pip install pytest black==24.10.0 requests-mock==1.11.0 pylint
+    - pip install pytest black==24.10.0 requests-mock==1.11.0 pylint pytest-cov
   cache:
     - key: "default"
       paths:
@@ -56,7 +56,14 @@ tests:
     # Activate the virtual environment
     - source .venv/bin/activate
     # Run tests
-    - pytest tergite_autocalibration
+    - pytest tergite_autocalibration --cov=tergite_autocalibration --cov-report xml --cov-report term-missing --junitxml=report.xml
+  coverage: "/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/"
+  artifacts:
+    reports:
+      junit: report.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
   cache:
     - key: "default"
       paths:
