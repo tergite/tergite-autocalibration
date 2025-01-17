@@ -23,14 +23,15 @@ from tergite_autocalibration.lib.utils.functions import exponential_decay_functi
 
 
 class RamseyModel(lmfit.model.Model):
-    '''
-    Model for exponentially decaying sinusoidal data of the form 
+    """
+    Model for exponentially decaying sinusoidal data of the form
     amplitude*exp(-tau * t)*sin(frequency * t + phase) + offset
     tau is the characteristic decay constant and omega the frequency of the measured Ramsey Oscillations.
-    The data are collected over a sequence of Ramsey delayes t, i.e. delays between two consecutive 
+    The data are collected over a sequence of Ramsey delayes t, i.e. delays between two consecutive
     Used by measurements that calibrate or characterize the qubit dephasing:
-    Ramsey correction, T2, T2echo 
-    '''
+    Ramsey correction, T2, T2echo
+    """
+
     def __init__(self, *args, **kwargs):
         # pass in the defining equation so the user doesn't have to later.
         super().__init__(exp_damp_osc_func, *args, **kwargs)
