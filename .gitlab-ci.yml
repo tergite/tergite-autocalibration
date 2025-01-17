@@ -12,6 +12,9 @@
 
 
 stages:
+  - setup
+  - lint
+  - format
   - tests
   - application_run
 
@@ -20,25 +23,59 @@ variables:
   PYTHON_VERSION: "3.10"
   REDIS_PORT: 6378
 
+setup:
+  stage: setup
+  image: python:${PYTHON_VERSION}
+  script:
+    # Install redis and dependencies
+    - apt-get update
+    - apt-get install redis ffmpeg libsm6 libxext6 -y
+    # Install project dependencies
+    - pip install --upgrade pip
+    - pip install .
+    - pip install pytest black==24.10.0 requests-mock==1.11.0 pylint
+  artifacts:
+    paths:
+      - .cache/pip
+      - .venv  # Save virtual environment (optional, depending on your setup)
+  cache:
+    paths:
+      - .cache/pip
+
+lint:
+  stage: lint
+  image: python:${PYTHON_VERSION}
+  dependencies:
+    - setup  # Reuse setup artifacts
+  script:
+    # Run linter and make it fail under 7.0
+    - pylint tergite_autocalibration --fail-under=7.0
+  cache:
+    paths:
+      - .cache/pip
+
+format:
+  stage: format
+  image: python:${PYTHON_VERSION}
+  dependencies:
+    - setup  # Reuse setup artifacts
+  script:
+    # Run formatter
+    - black --check tergite_autocalibration
+  cache:
+    paths:
+      - .cache/pip
+
 tests:
   stage: tests
   image: python:${PYTHON_VERSION}
+  dependencies:
+    - setup  # Reuse setup artifacts
   script:
-    # Install redis
-    - apt-get update
-    - apt-get install redis ffmpeg libsm6 libxext6  -y
-    # Run the redis server
+    # Run Redis server
     - redis-server --daemonize yes --port "$REDIS_PORT"
-
-    # Install project dependencies
-    - pip install .
-    - pip install pytest black==24.10.0 requests-mock==1.11.0 pylint
-
-    # Check formatting
-    - black --check tergite_autocalibration
-    # Run unit tests
+    # Run tests
     - pytest tergite_autocalibration
-    - pylint tergite_autocalibration --fail-under=6.0
   cache:
     paths:
       - .cache/pip
@@ -46,29 +83,19 @@ tests:
 application_run:
   stage: application_run
   image: python:${PYTHON_VERSION}
+  dependencies:
+    - setup  # Reuse setup artifacts
   script:
-    # Install redis
-    - apt-get update
-    - apt-get install redis ffmpeg libsm6 libxext6 -y
-    # Run the redis server
+    # Run Redis server
     - redis-server --daemonize yes --port "$REDIS_PORT"
-
-    # Install project dependencies
-    - pip install --upgrade pip
-    - pip install .
-
-    # Create empty .env file to make the system believe there is a file
+    # Create empty .env file
     - touch .env
-
     # Load configuration
     - acli config load -t fc8a
-
-    # Reset redis
+    # Reset Redis
     - echo "y" | acli node reset -a
-
-    # Run the calibration chain in reanalyse mode to T2_echo
+    # Run the calibration chain
     - acli calibration start -r "$CI_PROJECT_DIR/datasets/fc8_unit_tests_6-15" -n rabi_oscillations
-
     # Verify output
     - |
       OUTPUT_FILE="$CI_PROJECT_DIR/datasets/fc8_unit_tests_6-15/rabi_oscillations.png"
@@ -78,8 +105,6 @@ application_run:
         echo "Error: Output file $OUTPUT_FILE not found."
         exit 1
       fi
-
   cache:
     paths:
       - .cache/pip
-
