@@ -45,8 +45,8 @@ setup:
 tests:
   stage: tests
   image: python:${PYTHON_VERSION}
-  dependencies:
-    - setup  # Reuse setup artifacts
+  needs:
+    - setup
   script:
     # Install dependencies
     - apt-get update
@@ -68,8 +68,8 @@ tests:
 lint:
   stage: lint
   image: python:${PYTHON_VERSION}
-  dependencies:
-    - setup  # Reuse setup artifacts
+  needs:
+    - setup
   script:
     # Activate the virtual environment
     - source .venv/bin/activate
@@ -88,8 +88,9 @@ lint:
 application_run:
   stage: application_run
   image: python:${PYTHON_VERSION}
-  dependencies:
-    - setup  # Reuse setup artifacts
+  needs:
+    - setup
+    - tests
   script:
     # Install dependencies
     - apt-get update
