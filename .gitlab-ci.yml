@@ -14,19 +14,14 @@
 stages:
   - setup
   - tests
-  - application_run
   - lint
-  - format
+  - application_run
 
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   PYTHON_VERSION: "3.10"
   REDIS_PORT: 6378
 
-#services:
-#  - name: redis:6.0
-#    alias: redis
-#    command: ["redis-server", "--port", "6378"]  # Start Redis on port 6378
 
 setup:
   stage: setup
@@ -40,7 +35,7 @@ setup:
     - pip install .
     - pip install pytest black==24.10.0 requests-mock==1.11.0 pylint
   cache:
-    - key: "cache-default"
+    - key: "default"
       paths:
         - .cache/pip
     - key: "venv-${CI_COMMIT_REF_NAME}"
@@ -63,7 +58,27 @@ tests:
     # Run tests
     - pytest tergite_autocalibration
   cache:
-    - key: "cache-default"
+    - key: "default"
+      paths:
+        - .cache/pip
+    - key: "venv-${CI_COMMIT_REF_NAME}"
+      paths:
+        - .venv
+
+lint:
+  stage: lint
+  image: python:${PYTHON_VERSION}
+  dependencies:
+    - setup  # Reuse setup artifacts
+  script:
+    # Activate the virtual environment
+    - source .venv/bin/activate
+    # Run linter and make it fail under 7.0
+    - pylint tergite_autocalibration --fail-under=7.0
+    # Run formatter
+    - black --check tergite_autocalibration
+  cache:
+    - key: "default"
       paths:
         - .cache/pip
     - key: "venv-${CI_COMMIT_REF_NAME}"
@@ -101,43 +116,7 @@ application_run:
         exit 1
       fi
   cache:
-    - key: "cache-default"
-      paths:
-        - .cache/pip
-    - key: "venv-${CI_COMMIT_REF_NAME}"
-      paths:
-        - .venv
-
-lint:
-  stage: lint
-  image: python:${PYTHON_VERSION}
-  dependencies:
-    - setup  # Reuse setup artifacts
-  script:
-    # Activate the virtual environment
-    - source .venv/bin/activate
-    # Run linter and make it fail under 7.0
-    - pylint tergite_autocalibration --fail-under=7.0
-  cache:
-    - key: "cache-default"
-      paths:
-        - .cache/pip
-    - key: "venv-${CI_COMMIT_REF_NAME}"
-      paths:
-        - .venv
-
-format:
-  stage: format
-  image: python:${PYTHON_VERSION}
-  dependencies:
-    - setup  # Reuse setup artifacts
-  script:
-    # Activate the virtual environment
-    - source .venv/bin/activate
-    # Run formatter
-    - black --check tergite_autocalibration
-  cache:
-    - key: "cache-default"
+    - key: "default"
       paths:
         - .cache/pip
     - key: "venv-${CI_COMMIT_REF_NAME}"
