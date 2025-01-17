@@ -23,22 +23,26 @@ variables:
   PYTHON_VERSION: "3.10"
   REDIS_PORT: 6378
 
+services:
+  - name: redis:6.0
+    alias: redis
+    command: ["redis-server", "--port", "6378"]  # Start Redis on port 6378
+
 setup:
   stage: setup
   image: python:${PYTHON_VERSION}
   script:
-    # Install redis and dependencies
+    # Install dependencies
     - apt-get update
-    - apt-get install redis ffmpeg libsm6 libxext6 -y
+    - apt-get install ffmpeg libsm6 libxext6 -y
     # Install project dependencies
+    - python -m venv .venv
     - pip install --upgrade pip
     - pip install .
     - pip install pytest black==24.10.0 requests-mock==1.11.0 pylint
   artifacts:
     paths:
       - .venv  # Save virtual environment
-    exclude:
-      - .venv/lib/python*/__pycache__
   cache:
     paths:
       - .cache/pip
@@ -49,11 +53,10 @@ lint:
   dependencies:
     - setup  # Reuse setup artifacts
   script:
+    # Activate the virtual environment
+    - python -m .venv/bin/activate
     # Run linter and make it fail under 7.0
     - pylint tergite_autocalibration --fail-under=7.0
-  cache:
-    paths:
-      - .cache/pip
 
 format:
   stage: format
@@ -61,11 +64,10 @@ format:
   dependencies:
     - setup  # Reuse setup artifacts
   script:
+    # Activate the virtual environment
+    - python -m .venv/bin/activate
     # Run formatter
     - black --check tergite_autocalibration
-  cache:
-    paths:
-      - .cache/pip
 
 tests:
   stage: tests
@@ -74,12 +76,11 @@ tests:
     - setup  # Reuse setup artifacts
   script:
     # Run Redis server
-    - redis-server --daemonize yes --port "$REDIS_PORT"
+    # - redis-server --daemonize yes --port "$REDIS_PORT"
+    # Activate the virtual environment
+    - python -m .venv/bin/activate
     # Run tests
     - pytest tergite_autocalibration
-  cache:
-    paths:
-      - .cache/pip
 
 application_run:
   stage: application_run
@@ -88,7 +89,9 @@ application_run:
     - setup  # Reuse setup artifacts
   script:
     # Run Redis server
-    - redis-server --daemonize yes --port "$REDIS_PORT"
+    # - redis-server --daemonize yes --port "$REDIS_PORT"
+    # Activate the virtual environment
+    - python -m .venv/bin/activate
     # Create empty .env file
     - touch .env
     # Load configuration
@@ -106,6 +109,3 @@ application_run:
         echo "Error: Output file $OUTPUT_FILE not found."
         exit 1
       fi
-  cache:
-    paths:
-      - .cache/pip
