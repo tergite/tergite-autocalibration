@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2023, 2024
+# (C) Copyright Eleftherios Moschandreou 2023, 2024, 2025
 # (C) Copyright Liangyu Chen 2023, 2024
 # (C) Copyright Stefan Hill 2024
 # (C) Copyright Michele Faucci Giannelli 2024
@@ -24,6 +24,7 @@ import numpy as np
 import xarray as xr
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
+from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 from tergite_autocalibration.utils.dto.qoi import QOI
 from tergite_autocalibration.utils.logger.tac_logger import logger
 
@@ -64,28 +65,40 @@ class BaseAnalysis(ABC):
     # Cons: We would have to define and implement several QOI classes
     # -> It is probably not that much effort to implement several QOI classes
     # -> We could start with a BaseQOI and add more as soon as needed
-    def update_redis_trusted_values(self, node: str, this_element: str, qoi: QOI):
+    def update_redis_trusted_values(
+        self, node: str, this_element: str, qoi: QOI = None
+    ):
         if "_" in this_element:
             name = "couplers"
         else:
             name = "transmons"
 
-        analysis_succesful = qoi.analysis_succesful
-        if analysis_succesful:
-            for qoi_name, qoi_result in qoi.analysis_result.items():
-                if qoi_name not in self.redis_fields:
-                    raise ValueError(
-                        f"The qoi {qoi_name} is not in redis fields: {self.redis_fields}"
-                    )
-                value = qoi_result["value"]
-                REDIS_CONNECTION.hset(f"{name}:{this_element}", qoi_name, value)
-                # Setting the value in the standard redis storage
-                # structured_redis_storage(
-                #     transmon_parameter, this_element.strip("q"), self._qoi[i]
-                # )
-            REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
+        if name == "transmons":
+            analysis_succesful = qoi.analysis_succesful
+            if analysis_succesful:
+                for qoi_name, qoi_result in qoi.analysis_result.items():
+                    if qoi_name not in self.redis_fields:
+                        raise ValueError(
+                            f"The qoi {qoi_name} is not in redis fields: {self.redis_fields}"
+                        )
+                    value = qoi_result["value"]
+                    REDIS_CONNECTION.hset(f"{name}:{this_element}", qoi_name, value)
+                    # Setting the value in the standard redis storage
+                    structured_redis_storage(qoi_name, this_element.strip("q"), value)
+                REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
+            else:
+                print(f"Analysis failed for {this_element}")
         else:
-            print(f"Analysis failed for {this_element}")
+            # NOTE: leaving the coupler redis structure as it is
+            for i, transmon_parameter in enumerate(self.redis_fields):
+                REDIS_CONNECTION.hset(
+                    f"{name}:{this_element}", transmon_parameter, self._qoi[i]
+                )
+                # Setting the value in the standard redis storage
+                structured_redis_storage(
+                    transmon_parameter, this_element.strip("q"), self._qoi[i]
+                )
+                REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
 
     def rotate_to_probability_axis(self, complex_measurement_data):
         # TODO: THIS DOESNT BELONG HERE
