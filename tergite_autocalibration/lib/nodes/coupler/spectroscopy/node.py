@@ -26,8 +26,8 @@ from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.measuremen
     ResonatorSpectroscopyMeasurement,
 )
 from tergite_autocalibration.lib.utils.samplespace import (
-    resonator_samples,
     qubit_samples,
+    resonator_samples,
 )
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.hardware.spi import SpiDAC

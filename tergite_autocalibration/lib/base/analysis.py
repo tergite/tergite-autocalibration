@@ -74,6 +74,12 @@ class BaseAnalysis(ABC):
             name = "transmons"
 
         if name == "transmons":
+            # So the analysis has the responsibilty to update redis
+            # open datasets from path and configure the datasets
+            # on top of actually analyzing. how did we end up here?
+            if node == "coupler_spectroscopy":
+                return
+
             analysis_succesful = qoi.analysis_succesful
             if analysis_succesful:
                 for qoi_name, qoi_result in qoi.analysis_result.items():

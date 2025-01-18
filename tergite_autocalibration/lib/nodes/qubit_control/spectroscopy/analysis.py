@@ -18,6 +18,7 @@ from a qubit (two tone) spectroscopy experiment.
 """
 import numpy as np
 import xarray as xr
+from lmfit.models import LorentzianModel
 from scipy import signal
 
 from tergite_autocalibration.lib.base.analysis import (
@@ -57,22 +58,30 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
 
         # Gives an initial guess for the model parameters and then fits the model to the data.
         guess = model.guess(
-            self.magnitudes.to_dataarray().values, x=self.frequencies_value
+            self.magnitudes.to_dataarray().values.flatten(), x=self.frequencies_value
         )
         fit_result = model.fit(
-            self.magnitudes.to_dataarray().values,
+            self.magnitudes.to_dataarray().values.flatten(),
             params=guess,
             x=self.frequencies_value,
         )
 
-        self.freq = fit_result.params["x0"].value
-        self.uncertainty = fit_result.params["x0"].stderr
+        self.freq = fit_result.params["center"].value
+        self.uncertainty = fit_result.params["center"].stderr
 
         self.fit_y = model.eval(
             fit_result.params, **{model.independent_vars[0]: self.fit_freqs}
         )
 
-        return self.freq
+        analysis_succesful = True
+        analysis_result = {
+            "clock_freqs:f01": {
+                "value": self.freq,
+                "error": self.uncertainty,
+            },
+        }
+        qoi = QOI(analysis_result, analysis_succesful)
+        return qoi
 
     def reject_outliers(self, data, m=3.0):
         # Filters out datapoints in data that deviate too far from the median

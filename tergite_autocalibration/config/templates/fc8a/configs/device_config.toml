@@ -57,9 +57,9 @@ attenuation = 12
 measure.acq_delay = 220e-9
 measure_1.acq_delay = 220e-9
 measure_2.acq_delay = 220e-9
-measure.pulse_duration = 3e-6
-measure_1.pulse_duration = 3e-6
-measure_2.pulse_duration = 3e-6
+measure.pulse_duration = 2.5e-6
+measure_1.pulse_duration = 2.5e-6
+measure_2.pulse_duration = 2.5e-6
 measure.integration_time = 2.5e-6
 measure_1.integration_time = 2.5e-6
 measure_2.integration_time = 2.5e-6
@@ -67,6 +67,7 @@ rxy.duration = 28e-9
 measure_3state_opt.pulse_duration = 3e-6
 measure_3state_opt.acq_delay = 220e-9
 measure_3state_opt.integration_time = 2.5e-6
+reset.duration = 450e-6
 
 [device.qubit.q01]
 VNA_f01_frequency = 4323000000.0

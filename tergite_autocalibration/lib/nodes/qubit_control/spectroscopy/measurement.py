@@ -61,7 +61,7 @@ class TwoTonesMultidimMeasurement(BaseMeasurement):
         """
 
         # if port_out is None: port_out = port
-        schedule = Schedule("multiplexed_qubit_spec", repetitions)
+        schedule = Schedule("qubit_spectroscopy", repetitions)
 
         # Initialize the clock for each qubit
         # Initialize ClockResource with the first frequency value
