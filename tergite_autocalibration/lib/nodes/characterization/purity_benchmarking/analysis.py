@@ -23,6 +23,7 @@ from tergite_autocalibration.lib.base.analysis import (
     BaseQubitAnalysis,
 )
 from tergite_autocalibration.lib.utils.functions import exponential_decay_function
+from tergite_autocalibration.utils.logging import logger
 
 
 class ExpDecayModel(lmfit.model.Model):
@@ -156,8 +157,8 @@ class PurityBenchmarkingQubitAnalysis(BaseQubitAnalysis):
         sum = np.sum([arr for arr in self.normalized_data_dict.values()], axis=0)
         self.sum = sum / len(self.normalized_data_dict)
 
-        print(self.sum)
-        print(avg_purity)
+        logger.info(self.sum)
+        logger.info(avg_purity)
 
         # Initialize the exponential decay model
         model = ExpDecayModel()
@@ -175,7 +176,7 @@ class PurityBenchmarkingQubitAnalysis(BaseQubitAnalysis):
         # Store fit results and report
         self.fit_results = fit_result
         self.fit_report = fit_result.fit_report()
-        print(self.fit_report)
+        logger.info(self.fit_report)
 
         return [self.fidelity]
 

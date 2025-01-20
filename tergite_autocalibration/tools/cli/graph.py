@@ -23,7 +23,7 @@ graph_cli = typer.Typer()
 def plot():
     from tergite_autocalibration.lib.utils.graph import filtered_topological_order
     from tergite_autocalibration.config.globals import CONFIG
-    from tergite_autocalibration.utils.logger.visuals import draw_arrow_chart
+    from tergite_autocalibration.utils.logging.visuals import draw_arrow_chart
 
     n_qubits = len(CONFIG.run.qubits)
     topo_order = filtered_topological_order(CONFIG.run.target_node)

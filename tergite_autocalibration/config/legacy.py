@@ -10,12 +10,12 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import logging
 from typing import Dict
 
 import toml
 
-from .globals import CONFIG
+from tergite_autocalibration.config.globals import CONFIG
+from tergite_autocalibration.utils.logging import logger
 
 
 ###
@@ -188,7 +188,7 @@ class DataHandler:
         elif variable_name == "coupler_spi_mapping":
             return self.spi["couplers"]
         else:
-            logging.warning(
+            logger.warning(
                 f"Cannot return data value for legacy variable: {variable_name}"
             )
 

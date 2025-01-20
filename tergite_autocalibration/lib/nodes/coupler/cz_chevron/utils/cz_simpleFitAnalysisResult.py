@@ -13,6 +13,7 @@
 from tergite_autocalibration.lib.nodes.coupler.cz_chevron.utils.cz_FitResultStatus import (
     FitResultStatus,
 )
+from tergite_autocalibration.utils.logging import logger
 
 
 class CZSimpleFitAnalysisResult:
@@ -26,10 +27,10 @@ class CZSimpleFitAnalysisResult:
         self.indexBestFrequency = None
         self.status = s
 
-    def Print(self):
-        print(f"Best freq idx: {self.indexBestFrequency}")
-        print(f"p-value_1: {self.pvalue_1}")
-        print(f"p-value_2: {self.pvalue_2}")
-        print(f"par1: {self.fittedParam_1}")
-        print(f"par2: {self.fittedParam_2}")
-        print(f"")
+    def print_results(self):
+        logger.info(f"Best freq idx: {self.indexBestFrequency}")
+        logger.info(f"p-value_1: {self.pvalue_1}")
+        logger.info(f"p-value_2: {self.pvalue_2}")
+        logger.info(f"par1: {self.fittedParam_1}")
+        logger.info(f"par2: {self.fittedParam_2}")
+        logger.info(f"")

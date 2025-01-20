@@ -9,10 +9,13 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
+
+import os.path
 from datetime import datetime
 from typing import List
 
 from tergite_autocalibration.config.base import TOMLConfigurationFile
+from tergite_autocalibration.utils.dto.enums import ApplicationStatus
 
 
 class RunConfiguration(TOMLConfigurationFile):
@@ -29,14 +32,34 @@ class RunConfiguration(TOMLConfigurationFile):
         timestamp_ = datetime.now()
         self._run_id = f"{timestamp_.strftime('%Y-%m-%d--%H-%M-%S')}--tac-run-id"
 
+        # Create a file path in the form of YYYY-MM-DD/"ACTIVE"_HH-MM-SS--target_node
+
+        self._log_dir = os.path.join(
+            timestamp_.strftime("%Y-%m-%d"),
+            f"{timestamp_.strftime('%H-%M-%S')}_{str(ApplicationStatus.ACTIVE.value)}-{self.target_node}",
+        )
+
     @property
     def id(self):
         """
         Returns:
-            Run ID
+            Run ID in form of YYYY-MM-DD--HH-MM-SS--"tac-run-id"
 
         """
         return self._run_id
+
+    @property
+    def log_dir(self):
+        """
+        Returns:
+            Run directory in form YYYY-MM-DD/"ACTIVE"_HH-MM-SS--target_node
+
+        """
+        return self._log_dir
+
+    @log_dir.setter
+    def log_dir(self, value):
+        self._log_dir = value
 
     @property
     def target_node(self) -> str:

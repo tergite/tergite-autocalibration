@@ -53,6 +53,8 @@ website:
             href: developer-guide/new_node_creation.qmd
           - text: "Unit tests"
             href: developer-guide/unit_tests.qmd
+          - text: "Logging"
+            href: developer-guide/logging.qmd
           - text: "Writing documentation"
             href: developer-guide/writing_documentation.qmd
       - text: "Troubleshooting"

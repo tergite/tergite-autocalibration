@@ -92,7 +92,7 @@ def start(
 
         # Check if the folder exists
         if not folder_path.is_dir():
-            print(f"Error: The specified folder '{folder_path}' does not exist.")
+            typer.echo(f"Error: The specified folder '{folder_path}' does not exist.")
             exit(1)  # Exit with an error code
 
         if not name:

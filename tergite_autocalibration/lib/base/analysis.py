@@ -24,9 +24,9 @@ import numpy as np
 import xarray as xr
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
+from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 from tergite_autocalibration.utils.dto.qoi import QOI
-from tergite_autocalibration.utils.logger.tac_logger import logger
 
 
 class BaseAnalysis(ABC):
@@ -226,8 +226,8 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
                 # dataset to be analyzed
                 result = qubit_analysis.process_qubit(
                     ds, this_qubit
-                )  # this_qubit shoulq be qXX
-                # print('WARNING SKIPING REDIS UPDATING')
+                )  # this_qubit should be qXX
+                # logger.warning('WARNING SKIPING REDIS UPDATING')
                 analysis_results[this_qubit] = dict(zip(self.redis_fields, result))
                 self.qubit_analyses.append(qubit_analysis)
 
@@ -342,7 +342,7 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
                     this_element = self.dataset[settable].attrs[element_type]
                     return this_element
             except KeyError:
-                print(f"No element_type for {settable}")
+                logger.info(f"No element_type for {settable}")
         return None
 
     def _run_coupler_analysis(self, this_element: str):
@@ -410,9 +410,9 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
         index = 0
         if len(coupler_data_dict) == 0:
             logger.error("Dataset does not have valid coordinates")
-        print(coupler_data_dict)
+        logger.info(coupler_data_dict)
         for this_coupler, coupler_data_vars in coupler_data_dict.items():
-            print(this_coupler)
+            logger.info(this_coupler)
             ds = xr.merge([self.dataset[var] for var in coupler_data_vars])
             ds.attrs["coupler"] = this_coupler
             ds.attrs["node"] = self.name

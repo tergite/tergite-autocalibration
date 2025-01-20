@@ -3,68 +3,155 @@
 # Copyright (c) 2023, Damien Crielaard
 # All rights reserved.
 
+# This code is part of Tergite
+#
+# (C) Copyright Chalmers Next Labs 2024
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+
 from __future__ import annotations
 
 import dataclasses
+import json
 import logging
 import os
 import sys
-import json
 from datetime import datetime
 from pathlib import Path
-from typing import Sequence, Mapping
+from typing import Sequence, Mapping, Tuple
 
 from PyQt5 import QtCore, QtWidgets, QtGui
-from PyQt5.QtWidgets import QDesktopWidget, QMessageBox
-from PyQt5.QtGui import QImageReader, QPixmap
 from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtGui import QImageReader, QPixmap
+from PyQt5.QtWidgets import QDesktopWidget, QMessageBox, QAbstractItemView
 from quantify_core.data.handling import set_datadir
 from quantify_core.data.types import TUID
 
-from tergite_autocalibration.tools.quantifiles.path import load_icon
 from tergite_autocalibration.tools.quantifiles.data import (
-    get_results_for_date,
     safe_load_dataset,
     get_all_dates_with_measurements,
+    get_results_by_run,
+    get_runs_by_date,
+    locate_dataset_path,
 )
+from tergite_autocalibration.tools.quantifiles.path import load_icon
 from tergite_autocalibration.tools.quantifiles.plot.autoplot import autoplot
 from tergite_autocalibration.tools.quantifiles.watcher import TodayFolderMonitor
+from tergite_autocalibration.utils.logging import logger
 
-logger = logging.getLogger(__name__)
 
-
-class DateList(QtWidgets.QListWidget):
+class DateList(QtWidgets.QTreeWidget):
     dates_selected = QtCore.pyqtSignal(list)
+
+    cols = ["Date"]
 
     def __init__(self, parent: QtWidgets.QWidget | None = None):
         super().__init__(parent)
 
-        self.setSelectionMode(QtWidgets.QListView.ExtendedSelection)
+        # Set the number of columns and their labels
+        self.setColumnCount(len(self.cols))
+        self.setHeaderLabels(self.cols)
+
+        self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.itemSelectionChanged.connect(self.date_selection_changed)
 
+        self.setSortingEnabled(True)
+
     @QtCore.pyqtSlot(list)
-    def update_date_list(self, dates: Sequence[str]) -> None:
-        # Add new dates to the list
-        for d in dates:
-            if not self.findItems(d, QtCore.Qt.MatchExactly):
-                self.insertItem(0, d)
+    def update_date_list(self, dates: Sequence[datetime]) -> None:
 
-        # Remove dates that are no longer in the list
-        i = self.count() - 1
-        while i >= 0:
-            elem = self.item(i)
-            if elem is not None and elem.text() not in dates:
-                self.takeItem(i)
-                del elem
-            i -= 1
+        # Remove all items that are not in the list any longer
+        existing_dates = []
 
-        # Sort the list in descending order
-        self.sortItems(QtCore.Qt.DescendingOrder)
+        i = self.topLevelItemCount()
+        while i > 0:
+            i = i - 1
+            date_ = self.topLevelItem(i).data(0, Qt.UserRole)
+            existing_dates.append(date_)
+            if date_ not in dates:
+                self.takeTopLevelItem(i)
+
+        for date in dates:
+            if date not in existing_dates:
+                date_str_ = datetime.strftime(date, "%Y-%m-%d")
+                item = QtWidgets.QTreeWidgetItem([date_str_])
+                item.setData(0, Qt.UserRole, date)
+                self.addTopLevelItem(item)
 
     @QtCore.pyqtSlot()
     def date_selection_changed(self) -> None:
-        selection = [item.text() for item in self.selectedItems()]
+        selection = [item.text(0) for item in self.selectedItems()]
         self.dates_selected.emit(selection)
+
+
+class RunList(QtWidgets.QTreeWidget):
+    """
+    A widget to show the calibration run with time and status information.
+    """
+
+    # The table shows time and status information e.g. FAILED, SUCCESS or ACTIVE
+    cols = ["Time", "Status"]
+
+    # Define signals emitted by the widget
+    runs_selected = QtCore.pyqtSignal(list)
+
+    def __init__(self, parent: QtWidgets.QWidget | None = None):
+        super().__init__(parent)
+
+        # Set the number of columns and their labels
+        self.setColumnCount(len(self.cols))
+        self.setHeaderLabels(self.cols)
+
+        self.setSelectionMode(QtWidgets.QListView.ExtendedSelection)
+        self.itemSelectionChanged.connect(self.run_selection_changed)
+
+        self.setSortingEnabled(True)
+
+    @QtCore.pyqtSlot(list)
+    def update_run_list(
+        self, run_time_status_items: Sequence[Tuple[datetime, str]]
+    ) -> None:
+        """
+        Update the tree view with new run time and status items.
+
+        Args:
+            run_time_status_items (Sequence[Tuple[str, str]]): List of tuples containing run time and status.
+        """
+
+        # Remove all items that are not in the list any longer
+
+        run_times = list(map(lambda x_: x_[0], run_time_status_items))
+
+        existing_runs = []
+
+        i = self.topLevelItemCount()
+        while i > 0:
+            i = i - 1
+            date_ = self.topLevelItem(i).data(0, Qt.UserRole)
+            existing_runs.append(date_)
+            if date_ not in run_times:
+                self.takeTopLevelItem(i)
+
+        for run_time, status in run_time_status_items:
+            if run_time not in existing_runs:
+                time_str_ = datetime.strftime(run_time, "%H:%M:%S")
+                item = QtWidgets.QTreeWidgetItem([time_str_, status])
+                item.setData(0, Qt.UserRole, run_time)
+                self.addTopLevelItem(item)
+
+    @QtCore.pyqtSlot()
+    def run_selection_changed(self) -> None:
+        """
+        Triggers the signal when one changes the selected runs
+        """
+        selection = [item.data(0, Qt.UserRole) for item in self.selectedItems()]
+        self.runs_selected.emit(selection)
 
 
 class ExperimentList(QtWidgets.QTreeWidget):
@@ -87,9 +174,9 @@ class ExperimentList(QtWidgets.QTreeWidget):
         self.setHeaderLabels(self.cols)
 
         # Connect signals to corresponding slots
+        self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.itemSelectionChanged.connect(self.select_experiment)
-        self.itemSelectionChanged.connect(self.select_new_experiment)
-        # itemActivated means double clicking or pressing Enter
+        # itemActivated means double-clicking or pressing Enter
         self.itemActivated.connect(self.activate_experiment)
 
         # Set up context menu
@@ -182,19 +269,6 @@ class ExperimentList(QtWidgets.QTreeWidget):
 
         tuid = selection[0].text(0)
         self.experiment_selected.emit(tuid)
-
-    @QtCore.pyqtSlot()
-    def select_new_experiment(self) -> None:
-        selection = self.selectedItems()
-        if len(selection) == 0:
-            return
-
-        tuid = selection[0].text(0)
-        name = selection[0].text(1)
-        date = selection[0].text(2).replace("-", "")
-        subpath = tuid + "-" + name
-        path = f"{date}/{subpath}"
-        self.new_experiment_selected.emit(path)
 
     @QtCore.pyqtSlot(QtWidgets.QTreeWidgetItem, int)
     def activate_experiment(self, item: QtWidgets.QTreeWidgetItem, _: int) -> None:
@@ -391,9 +465,8 @@ class ExperimentPreview(QtWidgets.QLabel):
         self.show()
 
     @QtCore.pyqtSlot(str)
-    def display_datadir_path(self, date: str) -> None:
-        # def update_datadir(self, datadir: str) -> None:
-        folder_path = Path(self.datadir) / date
+    def display_datadir_path(self, tuid: str) -> None:
+        folder_path = locate_dataset_path(tuid)
 
         # if folder_content is None:
         #     self.setText("No data directory selected")
@@ -410,15 +483,11 @@ class ExperimentPreview(QtWidgets.QLabel):
         png_files = [f for f in files if f.lower().endswith(".png")]
 
         if not png_files:
-            self.image_label.setText("No PNG image found in the selected folder")
+            self.setText("No PNG image found in the selected folder")
             return
 
-        for png in png_files:
-            if "_preview" in png:
-                png_file = png
-                break
-            else:
-                png_file = png
+        # Prefer a file with "_preview" in the name; fall back to the first PNG otherwise
+        png_file = next((f for f in png_files if "_preview" in f), png_files[0])
 
         # Assuming one png per file, let's use the first PNG file found in the folder
         image_path = os.path.join(folder_path, png_file)
@@ -450,6 +519,7 @@ class DataDirInspector(QtWidgets.QMainWindow):
         self.datadir = datadir
         self._auto_open_plots = auto_open_plots
         self._selected_dates: tuple[str, ...] = ()
+        self._selected_runs: tuple[str, ...] = ()
         self.plots = []
 
         self.setWindowTitle(self._WINDOW_TITLE)
@@ -457,6 +527,7 @@ class DataDirInspector(QtWidgets.QMainWindow):
         # create widgets
         self.experiment_list = ExperimentList()
         self.date_list = DateList()
+        self.run_list = RunList()
         self.experiment_preview = ExperimentPreview(datadir)
 
         sub_splitter = QtWidgets.QSplitter()
@@ -468,9 +539,9 @@ class DataDirInspector(QtWidgets.QMainWindow):
         # create splitter for widgets
         splitter = QtWidgets.QSplitter()
         splitter.addWidget(self.date_list)
-        # splitter.addWidget(self.experiment_list)
+        splitter.addWidget(self.run_list)
         splitter.addWidget(sub_splitter)
-        splitter.setSizes([85, 915])
+        splitter.setSizes([150, 200, 915])
 
         # create data directory label and toolbar
         self.top_bar = TopBar(datadir, liveplotting=auto_open_plots, parent=self)
@@ -502,6 +573,7 @@ class DataDirInspector(QtWidgets.QMainWindow):
         exit_action.triggered.connect(self.close)
         file_menu.addAction(exit_action)
 
+        # Create the timers to automatically refresh
         self._today_folder_monitor = TodayFolderMonitor(self.datadir)
         self._date_list_timer = QtCore.QTimer()
         self._date_list_timer.timeout.connect(self._update_date_list)
@@ -514,9 +586,9 @@ class DataDirInspector(QtWidgets.QMainWindow):
         # connect signals and slots
         self.experiment_list.experiment_activated.connect(self.open_plots)
         self.date_list.dates_selected.connect(self.set_date_selection)
+        self.run_list.runs_selected.connect(self.set_run_selection)
         self.new_datadir_selected.connect(self.update_datadir)
-        # self.experiment_list.experiment_selected.connect(self.experiment_preview.display_datadir_path)
-        self.experiment_list.new_experiment_selected.connect(
+        self.experiment_list.experiment_selected.connect(
             self.experiment_preview.display_datadir_path
         )
         self._today_folder_monitor.new_measurement_found.connect(
@@ -544,17 +616,6 @@ class DataDirInspector(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot(str, str)
     def open_plots(self, tuid: str, measurement_name: str) -> None:
-        # tuid = SplitTuid(tuid)
-        # lockfile = os.path.join(
-        #     _DATASET_LOCKS_DIR, tuid.tuid + "-" + DATASET_NAME + ".lock"
-        # )
-        # with FileLock(lockfile, 5):
-        #     logger.info(f"Loading dataset {tuid.full_tuid}.")
-        #     ds = load_dataset(TUID(tuid.tuid))
-
-        # Load the dataset and create a plot
-
-        # device_config = load_device_config(tuid)
         device_config_path = f"{self.datadir}{tuid[:8]}/{tuid}-{measurement_name}/{measurement_name}.json"
         with open(device_config_path) as js:
             device_config = json.load(js)
@@ -589,8 +650,7 @@ class DataDirInspector(QtWidgets.QMainWindow):
     @QtCore.pyqtSlot()
     def _update_date_list(self) -> None:
         dates = get_all_dates_with_measurements()
-        date_strings = [date.strftime("%Y-%m-%d") for date in dates]
-        self.date_list.update_date_list(date_strings)
+        self.date_list.update_date_list(dates)
 
     @QtCore.pyqtSlot()
     def configure_datadir(self) -> None:
@@ -610,8 +670,12 @@ class DataDirInspector(QtWidgets.QMainWindow):
 
     def update_datadir(self) -> None:
         self.reload_datadir()
-        self.date_list.setCurrentRow(0)
-        if self.date_list.count() == 0:
+        self.date_list.setCurrentItem(self.date_list.topLevelItem(0))
+        self.run_list.setCurrentItem(self.run_list.topLevelItem(0))
+        if (
+            self.date_list.topLevelItemCount() == 0
+            or self.run_list.topLevelItemCount() == 0
+        ):
             QMessageBox.warning(
                 self,
                 "No measurements found",
@@ -627,18 +691,52 @@ class DataDirInspector(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot(list)
     def set_date_selection(self, dates: Sequence[str]) -> None:
+        """
+        Set the dates in the date widget.
+
+        Args:
+            dates: Dates to set in the widget
+        """
+
+        # If there are any dates to set
         if len(dates) > 0:
-            selection_dict = {}
+            run_selection = []
+            # Iterate over the dates and add all the runs for this date to be set in the run list
             for date in dates:
-                results = get_results_for_date(datetime.strptime(date, "%Y-%m-%d"))
+                run_selection += get_runs_by_date(datetime.strptime(date, "%Y-%m-%d"))
+            # Update the run list widget
+            self.run_list.update_run_list(run_selection)
+            self._selected_dates = tuple(dates)
+        # If there are no dates to set, just clear the widget
+        else:
+            self._selected_dates = ()
+            self.run_list.clear()
+            self.experiment_list.clear()
+
+    @QtCore.pyqtSlot(list)
+    def set_run_selection(self, runs: Sequence[datetime]) -> None:
+        """
+        Set the runs in the run widget.
+
+        Args:
+            runs: The timestamps of runs to be set in the run widget
+        """
+
+        # If there are any runs
+        if len(runs) > 0:
+            selection_dict = {}
+            # Iterate over the dates for the run and fetch the results for the experiments on these runs
+            for date in runs:
+                results = get_results_by_run(date)
                 selection_dict.update(
                     {tuid: dataclasses.asdict(data) for tuid, data in results.items()}
                 )
-
+            # Fill the list with experiments in the respective widget
             self.experiment_list.set_experiments(selection_dict)
-            self._selected_dates = tuple(dates)
+            self._selected_runs = tuple(runs)
+        # If there are no runs, just clear the list of experiments
         else:
-            self._selected_dates = ()
+            self._selected_runs = ()
             self.experiment_list.clear()
 
 
@@ -664,7 +762,6 @@ def main(
         None.
     """
     app = QtWidgets.QApplication([])
-    logging.basicConfig(level=log_level)
     app.setApplicationName("Quantifiles")
     app.setWindowIcon(load_icon("icon.png"))
 
@@ -675,7 +772,3 @@ def main(
         appinstance = QtWidgets.QApplication.instance()
         assert appinstance is not None
         appinstance.exec_()
-
-
-if __name__ == "__main__":
-    main(r"C:\Users\Damie\PycharmProjects\quantifiles\test_data")

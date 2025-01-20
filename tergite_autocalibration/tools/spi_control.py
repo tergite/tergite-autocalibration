@@ -18,6 +18,7 @@ from qblox_instruments import SpiRack
 from qblox_instruments.qcodes_drivers.spi_rack_modules import S4gModule
 
 from tergite_autocalibration.config.globals import ENV
+from tergite_autocalibration.utils.logging import logger
 
 
 def run_existing_spi_control_sequence():
@@ -38,10 +39,10 @@ def run_existing_spi_control_sequence():
     dac2 = spi.instrument_modules[spi_mod_name].instrument_modules["dac2"]
     dac3 = spi.instrument_modules[spi_mod_name].instrument_modules["dac3"]
     # ---
-    print(f"{ dac0.current() = }")
-    print(f"{ dac1.current() = }")
-    print(f"{ dac2.current() = }")
-    print(f"{ dac3.current() = }")
+    logger.info(f"{ dac0.current() = }")
+    logger.info(f"{ dac1.current() = }")
+    logger.info(f"{ dac2.current() = }")
+    logger.info(f"{ dac3.current() = }")
     # ---
     dac0.ramping_enabled(True)
     dac1.ramping_enabled(True)
@@ -68,15 +69,15 @@ def run_existing_spi_control_sequence():
 
     dac2.ramp_max_step(dc_current_step)
     dac3.ramp_max_step(dc_current_step)
-    print(f"{ dac0.current() = }")
-    print(f"{ dac1.current() = }")
-    print(f"{ dac2.current() = }")
-    print(f"{ dac3.current() = }")
+    logger.info(f"{ dac0.current() = }")
+    logger.info(f"{ dac1.current() = }")
+    logger.info(f"{ dac2.current() = }")
+    logger.info(f"{ dac3.current() = }")
     # ---
-    print(f"{ dac0.span() = }")
-    print(f"{ dac1.span() = }")
-    print(f"{ dac2.span() = }")
-    print(f"{ dac3.span() = }")
+    logger.info(f"{ dac0.span() = }")
+    logger.info(f"{ dac1.span() = }")
+    logger.info(f"{ dac2.span() = }")
+    logger.info(f"{ dac3.span() = }")
     # ---
 
     dac0.current(0)
@@ -84,10 +85,10 @@ def run_existing_spi_control_sequence():
     dac2.current(0)
     dac3.current(0)
     while dac1.is_ramping():
-        print(f"ramping {dac1.current()}")
+        logger.info(f"ramping {dac1.current()}")
         time.sleep(1)
 
-    print(f"{ dac1.current() = }")
+    logger.info(f"{ dac1.current() = }")
     # this_dac.ramp_max_step(dc_current_step)
     # this_dac.current.vals = validators.Numbers(min_value=-3e-3, max_value=3e-3)
 
@@ -139,15 +140,15 @@ def run_new_spi_control_sequence():
     m2_dac2.current(0)
     m2_dac3.current(0)
 
-    print(m1_dac0.current())
-    print(m1_dac1.current())
-    print(m1_dac2.current())
-    print(m1_dac3.current())
-    print(m2_dac0.current())
-    print(m2_dac1.current())
-    print(m2_dac2.current())
-    print(m2_dac3.current())
-    print(m3_dac0.current())
-    print(m2_dac1.current())
-    print(m2_dac2.current())
-    print(m2_dac3.current())
+    logger.info(m1_dac0.current())
+    logger.info(m1_dac1.current())
+    logger.info(m1_dac2.current())
+    logger.info(m1_dac3.current())
+    logger.info(m2_dac0.current())
+    logger.info(m2_dac1.current())
+    logger.info(m2_dac2.current())
+    logger.info(m2_dac3.current())
+    logger.info(m3_dac0.current())
+    logger.info(m2_dac1.current())
+    logger.info(m2_dac2.current())
+    logger.info(m2_dac3.current())

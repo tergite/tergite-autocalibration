@@ -28,7 +28,7 @@ from tergite_autocalibration.lib.base.analysis import (
     BaseQubitAnalysis,
     MultipleBaseAllQubitsAnalysis,
 )
-from tergite_autocalibration.utils.logger.tac_logger import logger
+from tergite_autocalibration.utils.logging import logger
 
 
 def mitigate(v, cm_inv):

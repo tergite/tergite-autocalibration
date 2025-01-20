@@ -15,6 +15,7 @@ from collections import abc, UserList, defaultdict
 from functools import singledispatchmethod
 
 from tergite_autocalibration.config.globals import ENV, REDIS_CONNECTION
+from tergite_autocalibration.utils.logging import logger
 
 
 def nested_dd():
@@ -31,7 +32,6 @@ class AttrDict(dict):
     """
 
     def __getattr__(self, attr):
-        # print("getattr method...")
         if attr in self.keys():
             return self.build(self[attr], attr)
         else:
@@ -82,7 +82,7 @@ class AttrDict(dict):
 
     def load(self, **kws):
         """load from file"""
-        print("loading...")
+        logger.info("loading...")
         d = self.readin(**kws)
         self.update(d)
         AttrDict.set_former_instance(self)
@@ -92,7 +92,7 @@ class AttrDict(dict):
 
     def _fresh(self, keys, value):
         """output into file"""
-        print("freshing...")
+        logger.info("freshing...")
 
     def fresh(self, keys: list, value):
         """Go to the root registry to fresh which is not
@@ -102,7 +102,7 @@ class AttrDict(dict):
             keys.insert(0, self._key)
             self._former_instance.fresh(keys, value)
         except AttributeError as e:
-            print(e.args)
+            logger.info(e.args)
             self._fresh(keys, value)
 
     def clear(self):
@@ -130,14 +130,14 @@ class SRegistry(AttrDict):
         super().__init__(dct)
 
     def fresh(self, keys, value):
-        print("SRegistry starts freshing...")
+        logger.info("SRegistry starts freshing...")
         for i, key in enumerate(keys):
             if key in self.device_dict:
                 keys[i] = self.device_dict[key]
         keys.append(value)
         keys = [keys[0], ":".join(keys[1:-1]), str(keys[-1])]
         self.cxn.hset(*keys)
-        print("Sent to redis...")
+        logger.info("Sent to redis...")
 
     @staticmethod
     def _set_recr_dd(dd, key, value):

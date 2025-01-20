@@ -16,7 +16,7 @@
 # Modified:
 #
 # - Martin Ahindura, 2023
-
+import os
 from dataclasses import dataclass, field
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -29,7 +29,14 @@ from qblox_instruments.types import ClusterType
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 
-from tergite_autocalibration.config.globals import CLUSTER_IP, CONFIG, REDIS_CONNECTION
+from tergite_autocalibration.config.globals import (
+    REDIS_CONNECTION,
+    CLUSTER_IP,
+    CONFIG,
+    ENV,
+)
+from tergite_autocalibration.config.package import ConfigurationPackage
+from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.base.node import BaseNode
 from tergite_autocalibration.lib.utils.graph import filtered_topological_order
@@ -40,9 +47,8 @@ from tergite_autocalibration.utils.backend.redis_utils import (
     populate_quantities_of_interest,
 )
 from tergite_autocalibration.utils.dto.enums import DataStatus, MeasurementMode
-from tergite_autocalibration.utils.io.dataset_utils import create_node_data_path
-from tergite_autocalibration.utils.logger.tac_logger import logger
-from tergite_autocalibration.utils.logger.visuals import draw_arrow_chart
+from tergite_autocalibration.utils.io.dataset import create_node_data_path
+from tergite_autocalibration.utils.logging.visuals import draw_arrow_chart
 
 colorama_init()
 
@@ -101,13 +107,13 @@ class HardwareManager:
                 cluster = Cluster(dh.cluster_name, str(self.config.cluster_ip))
             except ConnectionRefusedError:
                 msg = "Cluster is disconnected. Maybe it has crushed? Try flick it off and on"
-                print("-" * len(msg))
-                print(f"{Fore.LIGHTRED_EX}{Style.BRIGHT}{msg}{Style.RESET_ALL}")
-                print("-" * len(msg))
+                logger.status("-" * len(msg))
+                logger.status(f"{Fore.LIGHTRED_EX}{Style.BRIGHT}{msg}{Style.RESET_ALL}")
+                logger.status("-" * len(msg))
                 quit()
 
-            print(
-                f" \n\u26A0 {Fore.MAGENTA}{Style.BRIGHT}Reseting Cluster at IP *{str(self.config.cluster_ip)[-3:]}{Style.RESET_ALL}\n"
+            logger.status(
+                f" \n\u26A0 {Fore.MAGENTA}{Style.BRIGHT}Resetting Cluster at IP *{str(self.config.cluster_ip)[-3:]}{Style.RESET_ALL}\n"
             )
             cluster.reset()  # Reset the cluster to a default state for consistency
             return cluster
@@ -163,7 +169,7 @@ class HardwareManager:
 
 class NodeManager:
     """
-    Manages the initilazation and inspection of node.
+    Manages the initialization and inspection of node.
     """
 
     COUPLER_NODE_NAMES = [
@@ -233,6 +239,11 @@ class NodeManager:
                 if self.config.cluster_mode == MeasurementMode.re_analyse
                 else create_node_data_path(node)
             )
+
+            # Create a copy of the configuration inside the data folder
+            ConfigurationPackage.from_toml(
+                os.path.join(ENV.config_dir, "configuration.meta.toml")
+            ).copy(str(data_path))
 
             # Perform calibration
             node.calibrate(data_path, self.config.cluster_mode)

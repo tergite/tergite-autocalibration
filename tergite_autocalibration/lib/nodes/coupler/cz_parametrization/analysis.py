@@ -26,6 +26,7 @@ from tergite_autocalibration.lib.base.analysis import (
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.utils.no_valid_combination_exception import (
     NoValidCombinationException,
 )
+from tergite_autocalibration.utils.logging import logger
 
 
 class CombinedFrequencyVsAmplitudeAnalysis:
@@ -149,7 +150,7 @@ class FrequencyVsAmplitudeQ1Analysis(FrequencyVsAmplitudeQubitAnalysis):
         super().__init__(name, redis_fields, freqs, amps)
 
     def analyse_qubit(self) -> list[float, float]:
-        print("Running FrequencyVsAmplitudeQ1Analysis")
+        logger.info("Running FrequencyVsAmplitudeQ1Analysis")
         return self.run_fitting_find_max()
 
     def run_fitting_find_max(self):
@@ -164,7 +165,6 @@ class FrequencyVsAmplitudeQ1Analysis(FrequencyVsAmplitudeQubitAnalysis):
         max_index = np.unravel_index(max_index, magnitudes.shape)
         self.opt_freq = self.frequencies[max_index[0]]
         self.opt_amp = self.amplitudes[max_index[1]]
-        # print(self.opt_freq, self.opt_amp)
         return [self.opt_freq, self.opt_amp]
 
 
@@ -173,7 +173,7 @@ class FrequencyVsAmplitudeQ2Analysis(FrequencyVsAmplitudeQubitAnalysis):
         super().__init__(name, redis_fields, freqs, amps)
 
     def analyse_qubit(self) -> list[float, float]:
-        print("Running FrequencyVsAmplitudeQ2Analysis")
+        logger.info("Running FrequencyVsAmplitudeQ2Analysis")
         return self.run_fitting_find_min()
 
     def run_fitting_find_min(self):
@@ -188,7 +188,6 @@ class FrequencyVsAmplitudeQ2Analysis(FrequencyVsAmplitudeQubitAnalysis):
         min_index = np.unravel_index(min_index, magnitudes.shape)
         self.opt_freq = self.frequencies[min_index[0]]
         self.opt_amp = self.amplitudes[min_index[1]]
-        # print(self.opt_freq, self.opt_amp)
         return [self.opt_freq, self.opt_amp]
 
 
@@ -216,7 +215,7 @@ class CZParametrisationFixDurationCouplerAnalysis(BaseCouplerAnalysis):
                 self.amplitude_values = self.dataset[coord].values
 
     def analyze_coupler(self) -> list[float, float, float]:
-        print("Running CZParametrisationFixDurationAnalysis")
+        logger.info("Running CZParametrisationFixDurationAnalysis")
         results = self.run_coupler()
         return self.run_analysis_on_freq_amp_results(results)
 
@@ -228,7 +227,7 @@ class CZParametrisationFixDurationCouplerAnalysis(BaseCouplerAnalysis):
         self.get_coordinates()
 
         for current_index, current in enumerate(self.current_values):
-            print(f"Processing current index: {current_index}, value: {current}")
+            logger.info(f"Processing current index: {current_index}, value: {current}")
 
             q1_data_var = [
                 data_var
@@ -243,12 +242,6 @@ class CZParametrisationFixDurationCouplerAnalysis(BaseCouplerAnalysis):
                 selected_coord_name = matching_coords[0]
                 ds1 = ds1.sel({selected_coord_name: slice(None)})
                 ds1 = ds1.sel({self.current_coord: current})
-            # print(type(sliced_dataset))
-            # print(sliced_dataset.dims)
-            # print(sliced_dataset.coords)
-            # sliced_dataset = sliced_dataset.drop_vars(self.current_coord)
-            # print("Dimensions after slicing:", sliced_dataset.dims)
-            # print("Coordinates after slicing:", sliced_dataset.coords)
 
             q1 = FrequencyVsAmplitudeQ1Analysis(
                 self.name,
@@ -294,13 +287,12 @@ class CZParametrisationFixDurationCouplerAnalysis(BaseCouplerAnalysis):
         minCurrent = 1
         bestIndex = -1
         for index, result in enumerate(results):
-            # print(result)
             if result[0].are_two_qubits_compatible() and abs(result[1]) < minCurrent:
                 minCurrent = result[1]
                 bestIndex = index
 
         if bestIndex == -1:
-            print(
+            logger.info(
                 "Bad data, no combination found, plotting all results to visual inspection. Exiting."
             )
             self.plot_all()
@@ -311,10 +303,10 @@ class CZParametrisationFixDurationCouplerAnalysis(BaseCouplerAnalysis):
         self.opt_amp = results[bestIndex][0].best_parameters()[1]
         self.opt_current = minCurrent
 
-        print("Best values are:")
-        print("  - freq: " + str(self.opt_freq))
-        print("  - amp: " + str(self.opt_amp))
-        print("  - current: " + str(self.opt_current))
+        logger.info("Best values are:")
+        logger.info("  - freq: " + str(self.opt_freq))
+        logger.info("  - amp: " + str(self.opt_amp))
+        logger.info("  - current: " + str(self.opt_current))
         return [self.opt_freq, self.opt_amp, self.opt_current]
 
     def plotter(self, primary_axis, secondary_axis):
