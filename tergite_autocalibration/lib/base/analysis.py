@@ -226,8 +226,8 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
                 # dataset to be analyzed
                 result = qubit_analysis.process_qubit(
                     ds, this_qubit
-                )  # this_qubit shoulq be qXX
-                # print('WARNING SKIPING REDIS UPDATING')
+                )  # this_qubit should be qXX
+                # logger.warning('WARNING SKIPING REDIS UPDATING')
                 analysis_results[this_qubit] = dict(zip(self.redis_fields, result))
                 self.qubit_analyses.append(qubit_analysis)
 
