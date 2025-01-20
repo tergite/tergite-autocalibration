@@ -29,7 +29,6 @@ from typing import Sequence, Tuple, Dict, List
 
 import xarray
 from filelock import FileLock
-from quantifiles.data import DateResults
 from quantify_core.data.handling import (
     get_datadir,
     DATASET_NAME,
@@ -101,15 +100,19 @@ def _update_tuid_map():
 
             # Add the run to the tuid parent tree structure
             if datetime_ not in _TUID_PARENT_TREE.keys():
-                _TUID_PARENT_TREE[datetime_] = Run(status=status, experiments=[experiment_])
+                _TUID_PARENT_TREE[datetime_] = Run(
+                    status=status, experiments=[experiment_]
+                )
             else:
                 _TUID_PARENT_TREE[datetime_].experiments.append(experiment_)
+
 
 @dataclasses.dataclass
 class Run:
     """
     Data structure for a calibration run.
     """
+
     status: ApplicationStatus
     """The status of the calibration run e.g. SUCCESS or FAILED"""
 
@@ -442,9 +445,9 @@ def safe_load_dataset(tuid: str | TUID) -> xarray.Dataset:
         The loaded dataset.
     """
     tuid = SplitTuid(tuid)
-    lockfile = str(os.path.join(
-        _DATASET_LOCKS_DIR, tuid.tuid + "-" + DATASET_NAME + ".lock"
-    ))
+    lockfile = str(
+        os.path.join(_DATASET_LOCKS_DIR, tuid.tuid + "-" + DATASET_NAME + ".lock")
+    )
     with FileLock(lockfile, 5):
         logger.info(f"Loading dataset {tuid.full_tuid}.")
         ds = load_dataset_from_path(locate_dataset_path(TUID(tuid.tuid)))

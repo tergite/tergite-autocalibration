@@ -29,7 +29,12 @@ from qblox_instruments.types import ClusterType
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 
-from tergite_autocalibration.config.globals import REDIS_CONNECTION, CLUSTER_IP, CONFIG, ENV
+from tergite_autocalibration.config.globals import (
+    REDIS_CONNECTION,
+    CLUSTER_IP,
+    CONFIG,
+    ENV,
+)
 from tergite_autocalibration.config.package import ConfigurationPackage
 from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.config.legacy import dh
