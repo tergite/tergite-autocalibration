@@ -62,7 +62,6 @@ class DateList(QtWidgets.QTreeWidget):
         self.itemSelectionChanged.connect(self.date_selection_changed)
 
         self.setSortingEnabled(True)
-        self.setFixedWidth(150)
 
     @QtCore.pyqtSlot(list)
     def update_date_list(self, dates: Sequence[datetime]) -> None:
@@ -113,7 +112,6 @@ class RunList(QtWidgets.QTreeWidget):
         self.itemSelectionChanged.connect(self.run_selection_changed)
 
         self.setSortingEnabled(True)
-        self.setFixedWidth(250)
 
     @QtCore.pyqtSlot(list)
     def update_run_list(
@@ -543,7 +541,7 @@ class DataDirInspector(QtWidgets.QMainWindow):
         splitter.addWidget(self.date_list)
         splitter.addWidget(self.run_list)
         splitter.addWidget(sub_splitter)
-        splitter.setSizes([85, 915])
+        splitter.setSizes([150, 200, 915])
 
         # create data directory label and toolbar
         self.top_bar = TopBar(datadir, liveplotting=auto_open_plots, parent=self)
@@ -580,10 +578,6 @@ class DataDirInspector(QtWidgets.QMainWindow):
         self._date_list_timer = QtCore.QTimer()
         self._date_list_timer.timeout.connect(self._update_date_list)
         self._date_list_timer.start(self._DATE_LIST_REFRESH_INTERVAL)
-
-        self._run_list_timer = QtCore.QTimer()
-        self._run_list_timer.timeout.connect(self._update_run_list)
-        self._run_list_timer.start(self._DATE_LIST_REFRESH_INTERVAL)
 
         # set window size
         screen = QDesktopWidget().screenGeometry()
@@ -659,14 +653,6 @@ class DataDirInspector(QtWidgets.QMainWindow):
         self.date_list.update_date_list(dates)
 
     @QtCore.pyqtSlot()
-    def _update_run_list(self) -> None:
-        # TODO: Implement
-        # dates = get_run_status_items_by_date(date)
-        # date_strings = [date.strftime("%Y-%m-%d") for date in dates]
-        # self.date_list.update_date_list(date_strings)
-        pass
-
-    @QtCore.pyqtSlot()
     def configure_datadir(self) -> None:
         # Open a file dialog to select the data directory
         curdir = self.datadir if self.datadir is not None else os.getcwd()
@@ -705,20 +691,23 @@ class DataDirInspector(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot(list)
     def set_date_selection(self, dates: Sequence[str]) -> None:
+        """
+        Set the dates in the date widget.
+
+        Args:
+            dates: Dates to set in the widget
+        """
+
+        # If there are any dates to set
         if len(dates) > 0:
-            # selection_dict = {}
-            # for date in dates:
-            #     results = get_results_for_date(datetime.strptime(date, "%Y-%m-%d"))
-            #     selection_dict.update(
-            #         {tuid: dataclasses.asdict(data) for tuid, data in results.items()}
-            #     )
-            #
-            # self.experiment_list.set_experiments(selection_dict)
             run_selection = []
+            # Iterate over the dates and add all the runs for this date to be set in the run list
             for date in dates:
                 run_selection += get_runs_by_date(datetime.strptime(date, "%Y-%m-%d"))
+            # Update the run list widget
             self.run_list.update_run_list(run_selection)
             self._selected_dates = tuple(dates)
+        # If there are no dates to set, just clear the widget
         else:
             self._selected_dates = ()
             self.run_list.clear()
@@ -726,16 +715,26 @@ class DataDirInspector(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot(list)
     def set_run_selection(self, runs: Sequence[datetime]) -> None:
+        """
+        Set the runs in the run widget.
+
+        Args:
+            runs: The timestamps of runs to be set in the run widget
+        """
+
+        # If there are any runs
         if len(runs) > 0:
             selection_dict = {}
+            # Iterate over the dates for the run and fetch the results for the experiments on these runs
             for date in runs:
                 results = get_results_by_run(date)
                 selection_dict.update(
                     {tuid: dataclasses.asdict(data) for tuid, data in results.items()}
                 )
-
+            # Fill the list with experiments in the respective widget
             self.experiment_list.set_experiments(selection_dict)
             self._selected_runs = tuple(runs)
+        # If there are no runs, just clear the list of experiments
         else:
             self._selected_runs = ()
             self.experiment_list.clear()

@@ -29,7 +29,7 @@ from typing import Sequence, Tuple, Dict, List
 
 import xarray
 from filelock import FileLock
-from qcodes.dataset.experiment_container import Experiment
+from quantifiles.data import DateResults
 from quantify_core.data.handling import (
     get_datadir,
     DATASET_NAME,
@@ -47,8 +47,12 @@ from tergite_autocalibration.utils.logging import logger
 # we have an alternative function to locate the file path.
 # Implementing it with a map, makes the whole process faster, because we can store
 # already known paths and do not have to crawl for them in the datadir again.
-_TUID_PARENT_TREE: Dict[datetime, Run] = {}
 _TUID_PATH_MAP: Dict[str, Experiment] = {}
+
+# Note: The tree structure is filled at the same time as the path map for the tuid.
+#       Right now, there is no place where the structure is read, but it makes
+#       integration of future components in the dataset browser much easier.
+_TUID_PARENT_TREE: Dict[datetime, Run] = {}
 
 
 def _update_tuid_map():
@@ -104,10 +108,13 @@ def _update_tuid_map():
 @dataclasses.dataclass
 class Run:
     """
-    Wrapper for a calibration run.
+    Data structure for a calibration run.
     """
     status: ApplicationStatus
+    """The status of the calibration run e.g. SUCCESS or FAILED"""
+
     experiments: List[Experiment]
+    """The list of experiments associated with the calibration run."""
 
 
 @dataclasses.dataclass
@@ -117,8 +124,13 @@ class Experiment:
     """
 
     path: str
+    """The path of the experiment folder."""
+
     tuid: SplitTuid
+    """The tuid of the experiment as SplitTuid object."""
+
     datetime: datetime
+    """The datetime of the experiment as datetime object."""
 
 
 class SplitTuid:
@@ -243,10 +255,13 @@ class DateResults:
 
     name: str
     """The name of the dataset."""
+
     date: str
     """The date of the dataset as string."""
+
     time: str
     """The time of the dataset as string."""
+
     keywords_: str
     """The keywords of the dataset as string."""
 
@@ -306,7 +321,7 @@ def get_results_by_run(date: datetime | None) -> dict[str, DateResults]:
         A dictionary of results, where each key is a TUID and each value is a DateResults object.
     """
 
-    def get_kwds(tuid: SplitTuid) -> list[str] | list[tuple[str, str]]:
+    def get_tuid_keywords(tuid: SplitTuid) -> list[str] | list[tuple[str, str]]:
         """
         Retrieves keywords for a given TUID.
 
@@ -368,7 +383,7 @@ def get_results_by_run(date: datetime | None) -> dict[str, DateResults]:
     ]
 
     # Get list of keywords for each TUID
-    keywords = list(map(get_kwds, tuid_names))
+    keywords = list(map(get_tuid_keywords, tuid_names))
 
     # Convert TUID names to datetime objects
     datetimes = []
@@ -427,9 +442,9 @@ def safe_load_dataset(tuid: str | TUID) -> xarray.Dataset:
         The loaded dataset.
     """
     tuid = SplitTuid(tuid)
-    lockfile = os.path.join(
+    lockfile = str(os.path.join(
         _DATASET_LOCKS_DIR, tuid.tuid + "-" + DATASET_NAME + ".lock"
-    )
+    ))
     with FileLock(lockfile, 5):
         logger.info(f"Loading dataset {tuid.full_tuid}.")
         ds = load_dataset_from_path(locate_dataset_path(TUID(tuid.tuid)))
