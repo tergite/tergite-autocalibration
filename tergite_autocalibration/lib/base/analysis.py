@@ -14,6 +14,7 @@
 # that they have been altered from the originals.
 
 import collections
+import os
 from abc import ABC, abstractmethod
 from pathlib import Path
 
@@ -136,8 +137,8 @@ class BaseNodeAnalysis(ABC):
     def open_dataset(self, index: int = 0) -> xr.Dataset:
         """Abstract method to be implemented by subclasses to open a dataset."""
         dataset_name = f"dataset_{self.name}_{index}.hdf5"
-        dataset_path = self.data_path / dataset_name
-        if not dataset_path.exists():
+        dataset_path = os.path.join(self.data_path, dataset_name)
+        if not os.path.exists(dataset_path):
             raise FileNotFoundError(f"Dataset file not found: {dataset_path}")
 
         logger.info("Open dataset " + str(dataset_path))
