@@ -74,9 +74,8 @@ class BaseAnalysis(ABC):
             name = "transmons"
 
         if name == "transmons":
-            # So the analysis has the responsibilty to update redis
-            # open datasets from path and configure the datasets
-            # on top of actually analyzing. how did we end up here?
+            
+            # skiping coupler_spectroscopy because it calls QubitSpectroscopy Analysis that updates the qubit frequency
             if node == "coupler_spectroscopy":
                 return
 
