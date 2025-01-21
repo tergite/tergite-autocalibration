@@ -133,10 +133,15 @@ class BaseNodeAnalysis(ABC):
         """
         pass
 
-    @abstractmethod
-    def open_dataset(self, index: int = None) -> xr.Dataset:
+    def open_dataset(self, index: int = 0) -> xr.Dataset:
         """Abstract method to be implemented by subclasses to open a dataset."""
-        pass
+        dataset_name = f"dataset_{self.name}_{index}.hdf5"
+        dataset_path = self.data_path / dataset_name
+        if not dataset_path.exists():
+            raise FileNotFoundError(f"Dataset file not found: {dataset_path}")
+
+        logger.info("Open dataset " + str(dataset_path))
+        return xr.open_dataset(dataset_path)
 
     def manage_plots(self, column_grid: int, plots_per_qubit: int):
         n_vars = len(self.data_vars)
@@ -183,7 +188,7 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
 
     def analyze_node(self, data_path: Path, index: int = 0):
         self.data_path = Path(data_path)
-        self.dataset = self.open_dataset(index)
+        self.dataset = self.open_dataset(index=index)
         self.coords = self.dataset.coords
         self.data_vars = self.dataset.data_vars
         self.fig, self.axs = self.manage_plots(self.column_grid, self.plots_per_qubit)
@@ -191,15 +196,6 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         self._fill_plots()
         self.save_plots()
         return analysis_results
-
-    def open_dataset(self, index: int) -> xr.Dataset:
-        dataset_name = f"dataset_{self.name}_{index}.hdf5"
-        dataset_path = self.data_path / dataset_name
-        if not dataset_path.exists():
-            raise FileNotFoundError(f"Dataset file not found: {dataset_path}")
-
-        logger.info("Open dataset " + str(dataset_path))
-        return xr.open_dataset(dataset_path)
 
     def _analyze_all_qubits(self):
         analysis_results = {}
@@ -394,15 +390,6 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
         self._fill_plots()
         self.save_plots()
         return analysis_results
-
-    def open_dataset(self):
-        dataset_name = f"dataset_{self.name}_0.hdf5"
-        dataset_path = self.data_path / dataset_name
-        if not dataset_path.exists():
-            raise FileNotFoundError(f"Dataset file not found: {dataset_path}")
-
-        logger.info("Open dataset " + str(dataset_path))
-        return xr.open_dataset(dataset_path)
 
     def _analyze_all_couplers(self):
         analysis_results = {}
