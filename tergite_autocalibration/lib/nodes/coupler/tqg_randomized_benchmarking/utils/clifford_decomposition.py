@@ -36,35 +36,6 @@ primitives decomposition may not be the most useful one.
 
 from copy import deepcopy
 
-
-Five_primitives_decomposition = [[]]*(24)
-# explicitly reversing order because order of operators is order in time
-Five_primitives_decomposition[0] = ['I']
-Five_primitives_decomposition[1] = ['Y90', 'X90']
-Five_primitives_decomposition[2] = ['X90', 'Y90', 'mX180']
-Five_primitives_decomposition[3] = ['mX180']
-Five_primitives_decomposition[4] = ['Y90', 'X90', 'mY180']
-Five_primitives_decomposition[5] = ['X90', 'Y90', 'mY180']
-Five_primitives_decomposition[6] = ['mY180']
-Five_primitives_decomposition[7] = ['Y90', 'X90', 'mX180', 'mY180']
-Five_primitives_decomposition[8] = ['X90', 'Y90']
-Five_primitives_decomposition[9] = ['mX180', 'mY180']
-Five_primitives_decomposition[10] = ['Y90', 'X90', 'mX180']
-Five_primitives_decomposition[11] = ['X90', 'Y90', 'mX180', 'mY180']
-
-Five_primitives_decomposition[12] = ['Y90',  'mX180']
-Five_primitives_decomposition[13] = ['X90', 'mX180']
-Five_primitives_decomposition[14] = ['X90', 'Y90', 'X90', 'mY180']
-Five_primitives_decomposition[15] = ['Y90', 'mY180']
-Five_primitives_decomposition[16] = ['X90']
-Five_primitives_decomposition[17] = ['X90', 'Y90', 'X90']
-Five_primitives_decomposition[18] = ['Y90', 'mX180', 'mY180']
-Five_primitives_decomposition[19] = ['X90',  'mY180']
-Five_primitives_decomposition[20] = ['X90', 'Y90', 'X90', 'mX180', 'mY180']
-Five_primitives_decomposition[21] = ['Y90']
-Five_primitives_decomposition[22] = ['X90', 'mX180', 'mY180']
-Five_primitives_decomposition[23] = ['X90', 'Y90', 'X90', 'mX180']
-
 """
 Gate decomposition decomposition of the clifford group as per
 Epstein et al. Phys. Rev. A 89, 062321 (2014)
@@ -83,7 +54,6 @@ epstein_efficient_decomposition[8] = ['X90', 'Y90']
 epstein_efficient_decomposition[9] = ['X180', 'Y180']
 epstein_efficient_decomposition[10] = ['Y90', 'mX90']
 epstein_efficient_decomposition[11] = ['mX90', 'Y90']
-
 epstein_efficient_decomposition[12] = ['Y90', 'X180']
 epstein_efficient_decomposition[13] = ['mX90']
 epstein_efficient_decomposition[14] = ['X90', 'mY90', 'mX90']

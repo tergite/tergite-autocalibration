@@ -2,6 +2,7 @@
 #
 # (C) Copyright Amr Osman 2024
 # (C) Copyright Michele Faucci Giannelli 2024
+# (C) Copyright Chalmers Next Labs 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -17,9 +18,10 @@ from numpy.typing import NDArray
 from quantify_scheduler import Schedule
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.control_flow_library import Loop
-from quantify_scheduler.operations.gate_library import Reset, X
+from quantify_scheduler.operations.gate_library import Reset, CZ, X90, Y90, Measure, Reset, Rxy, X, Y
 from quantify_scheduler.operations.pulse_library import IdlePulse
 from quantify_scheduler.resources import ClockResource
+from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.utils.two_qubit_clifford_group import TwoQubitClifford
 
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.utils.dto.extended_coupler_edge import (
@@ -153,8 +155,6 @@ class TQGRandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
                     ref_pt="end",
                 )
                 shot.add(Reset(qubit))
-        
-
     
     def schedule_function(
         self,
@@ -165,54 +165,74 @@ class TQGRandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
         repetitions: int = 1024,
     ) -> Schedule:
         """
-        Generate a schedule for performing a randomized benchmarking test using Clifford gates.
-        The goal is to get a measure of the total error of the calibrated qubits.
+        Generates a schedule for performing randomized benchmarking (RB) experiments using Clifford gates
+        to measure qubit error rates. The schedule creates a sequence of operations including state
+        preparation, random Clifford operations, inverse operations, and measurement.
 
-        Schedule sequence
-            Reset -> Apply Clifford operations-> Apply inverse of all Clifford operations -> Measure
+        The basic sequence for each shot is:
+            1. Reset qubits to ground state
+            2. Apply random sequence of Clifford operations
+            3. Apply inverse Clifford operations (optional)
+            4. Measure qubit states
+            5. Reset for next iteration
 
         Parameters
         ----------
-        repetitions
-            The amount of times the Schedule will be repeated.
-        **number_of_cliffords_operations
-            The number of random Clifford operations applied and then inverted on each qubit state.
-            This parameter is swept over.
+        seed : int
+            Random seed for generating Clifford sequences, ensuring reproducibility.
+        number_of_cliffords : dict[str, np.ndarray]
+            Dictionary mapping qubit names to arrays of Clifford operation counts.
+            Each array specifies the number of random Clifford operations to apply
+            in different experimental sequences.
+        interleaving_clifford_id : Optional[int], default=None
+            If provided, specifies the ID of a Clifford gate to interleave between
+            random Clifford operations. Used for interleaved RB experiments to
+            characterize specific gate fidelities.
+        apply_inverse_gate : bool, default=True
+            Whether to apply inverse Clifford operations after the random sequence.
+            The inverse operations should return the qubits to their initial state
+            in the absence of errors.
+        repetitions : int, default=1024
+            Number of times to repeat the entire schedule for statistical averaging.
 
         Returns
         -------
-        :
-            An experiment schedule.
+        Schedule
+            A complete experimental schedule containing all pulses, measurements,
+            and control flow for the RB experiment.
+
+        Notes
+        -----
+        - The schedule includes proper clock resource initialization for both qubits
+        and couplers to ensure correct timing and frequency control.
+        - Measurements use three-state optimized readout for improved fidelity.
+        - The schedule includes buffer times and idle pulses to ensure proper timing
+        alignment between operations.
+        - The last three elements of the Clifford sequence lengths are currently
+        excluded (marked as TODO for investigation).
         """
+        
         if interleaving_clifford_id is None:
             name = "tqg_randomized_benchmarking_ssro"
         else:
             name = "tqg_randomized_benchmarking_interleaved_ssro"
-        print("interleaved or not", name)
+        logger.info("interleaved or not", name)
         
-        # Initialize schedule
-        schedule = Schedule(f"{name}")
-        
-        # Create a single-shot schedule to represent a basic time unit for the experiment.
-        shot = Schedule("shot")
-        
-        # Add an idle pulse to the shot schedule.
-        # This acts as a placeholder or delay to ensure timing alignment.
-        shot.add(IdlePulse(IDLE_TIME))
+        schedule = Schedule(f"{name}") # Initialize schedule
+        shot = Schedule("shot") # Create a single-shot schedule
+        shot.add(IdlePulse(IDLE_TIME)) # Add an idle pulse to the shot schedule.
 
         # Initialize clock resources for each qubit in the system.
-        # Clock resources are used to define and manage the frequencies required for operations.
         for qubit_name, transmon in self.transmons.items():
             self.add_qubit_clock_resources(schedule=schedule, transmon=transmon, qubit_name=qubit_name)
 
-        qubit_names = list(self.transmons.keys())  # Get a list of qubit names from the transmon dict.
-        coupler_names = list(self.couplers.keys())  # Get a list of coupler names from the coupler dict.
+        qubit_names = list(self.transmons.keys())  
+        coupler_names = list(self.couplers.keys())
         
         # Initialize clock resources for each coupler in the system.
         for coupler_name in coupler_names:
             self.add_coupler_clock_resources(schedule=schedule, coupler_name=coupler_name)
             # Similarly, add the same clock resource to the "shot" schedule
-            # Ensures that the "CZ" gate is correctly configured at both levels
             self.add_coupler_clock_resources(schedule=shot, coupler_name=coupler_name)
         
         # This is the common reference operation so the qubits can be operated in parallel
@@ -222,40 +242,46 @@ class TQGRandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
         clifford_sequence_lengths = list(number_of_cliffords.values())[0]
         num_clifford_sequence_lengths = len(clifford_sequence_lengths)
         
+        # ---- PycQED mappings ----#
+        pycqed_qubit_map = {f"q{idx}": name for idx, name in enumerate(qubit_names)}
+        pycqed_operation_map = {
+            "X180": lambda q: X(pycqed_qubit_map[q]),
+            "X90": lambda q: X90(pycqed_qubit_map[q]),
+            "Y180": lambda q: Y(pycqed_qubit_map[q]),
+            "Y90": lambda q: Y90(pycqed_qubit_map[q]),
+            "mX90": lambda q: Rxy(qubit=pycqed_qubit_map[q], phi=0.0, theta=-90.0),
+            "mY90": lambda q: Rxy(qubit=pycqed_qubit_map[q], phi=90.0, theta=-90.0),
+            "CZ": lambda q: CZ(qC=pycqed_qubit_map[q[0]], qT=pycqed_qubit_map[q[1]]),
+        }
+        
         # Loop over random Clifford sequence lengths, excluding the last three elements.
         # TODO: Why do we exclude the last 3 elements?!!
         for acq_index, n_cl in enumerate(clifford_sequence_lengths[:-3]):
-            # Add an idle pulse at the start of the shot to introduce a delay
-            shot.add(IdlePulse(IDLE_TIME))
-            
-            # TODO: THIS FUNCTION NEEDS TO BE REPLACED
+            shot.add(IdlePulse(IDLE_TIME)) # start
+             
             # Generate a randomized benchmarking sequence for two qubits
-            clifford_seq = randomized_benchmarking_sequence(
+            clifford_seq: NDArray[np.int_] = randomized_benchmarking_sequence(
                 n_cl=n_cl,
-                meas_basis_index=0,
-                seed=seeds[next(iter(seeds))],
-                interleaving_clifford_id=interleaving_clifford_id,
                 apply_inverse_gate=apply_inverse_gate,
                 number_of_qubits=2,
+                interleaving_clifford_id=interleaving_clifford_id,
+                seed=seed,
             )
             
-            # TODO: THIS FUNCTION NEEDS TO BE REPLACED
-            # Decompose the Clifford sequence into physical gate operations
-            physical_gates = decompose_clifford_seq(clifford_seq, [qubit_names[0], qubit_names[1]])
-            
-            # Add a reset operation for the qubits
-            reset = shot.add(Reset(*qubit_names))
+            shot.add(Reset(*qubit_names)) # reset
+        
+            # Decompose Clifford sequence into physical gates
+            for clifford_gate_idx in clifford_seq:
+                cl_decomp = TwoQubitClifford(clifford_gate_idx).gate_decomposition
 
-            # TODO: THIS FUNCTION NEEDS TO BE REPLACED
-            # Add the decomposed two-qubit gates to the schedule
-            add_two_qubit_gates_to_schedule(
-                shot, physical_gates, ref_op=reset, separation_time=GATE_SEPARATION_TIME
-            )
+                operations = [
+                    pycqed_operation_map[gate](q) for (gate, q) in cl_decomp if gate != "I"
+                ]
+                for op in operations:
+                    shot.add(op, rel_time=BUFFER_TIME) 
 
-            # Add a buffer idle pulse after gate execution
             buffer = shot.add(IdlePulse(BUFFER_TIME))
-            
-            # Perform measurement in the three-state optimized readout for each qubit
+            # Perform measurement
             for qubit_name in qubit_names:
                 shot.add(
                     Measure_RO_3state_Opt(
@@ -264,16 +290,14 @@ class TQGRandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
                     ref_op=buffer,
                     ref_pt="end",
                 )
-            
             # Add a root relaxation operation after measurements
             root_relaxation = shot.add(Reset(*qubit_names), label=f"Reset_tqgRB_{acq_index}")
         
         # Add state preparation and measurement for all qubits
         self.add_calibration_measurements(shot, qubit_names, num_clifford_sequence_lengths, root_relaxation)
         
-        # Finalize schedule by adding idle pulses before and after the entire shot sequence for timing alignment
         schedule.add(IdlePulse(IDLE_TIME))
-        print(schedule.add(shot, control_flow=Loop(repetitions), validate=False))
+        logger.info(schedule.add(shot, control_flow=Loop(repetitions)))
         schedule.add(IdlePulse(IDLE_TIME))
 
         return schedule

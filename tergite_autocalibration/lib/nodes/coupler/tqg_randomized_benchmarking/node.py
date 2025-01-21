@@ -2,6 +2,7 @@
 #
 # (C) Copyright Amr Osman 2024
 # (C) Copyright Michele Faucci Giannelli 2024
+# (C) Copyright Chalmers Next Labs 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -40,8 +41,8 @@ RB_REPEATS = 10
 
 
 class TQGRandomizedBenchmarkingSSRONode(ScheduleNode):
-    measurement_obj = TQGRandomizedBenchmarkingSSROMeasurement
-    analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
+    measurement_obj: TQGRandomizedBenchmarkingSSROMeasurement
+    analysis_obj: RandomizedBenchmarkingSSRONodeAnalysis
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
@@ -49,7 +50,7 @@ class TQGRandomizedBenchmarkingSSRONode(ScheduleNode):
         super().__init__(name, all_qubits, **schedule_keywords)
         self.name = name
         self.all_qubits = all_qubits  # is this needed?
-        self.couplers = couplers  # is this needed?
+        self.couplers: list[str] = couplers  # is this needed?
         self.edges = couplers
         self.coupler = self.couplers[0]
         self.schedule_keywords = schedule_keywords
@@ -95,8 +96,8 @@ class TQGRandomizedBenchmarkingSSRONode(ScheduleNode):
 
 class TQGRandomizedBenchmarkingInterleavedSSRONode(ScheduleNode):
     coupler_qois = ["tqg_fidelity_interleaved"]
-    measurement_obj = TQGRandomizedBenchmarkingSSROMeasurement
-    analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
+    measurement_obj: TQGRandomizedBenchmarkingSSROMeasurement
+    analysis_obj: RandomizedBenchmarkingSSRONodeAnalysis
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
@@ -105,7 +106,7 @@ class TQGRandomizedBenchmarkingInterleavedSSRONode(ScheduleNode):
         self.name = name
         self.type = "parameterized_sweep"
         self.all_qubits = all_qubits
-        self.couplers = couplers
+        self.couplers: list[str] = couplers
         self.edges = couplers
         self.coupler = self.couplers[0]
         self.coupled_qubits = couplers[0].split(sep="_")
