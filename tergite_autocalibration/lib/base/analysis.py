@@ -77,7 +77,11 @@ class BaseAnalysis(ABC):
         if name == "transmons":
 
             # skiping coupler_spectroscopy because it calls QubitSpectroscopy Analysis that updates the qubit frequency
-            if node == "coupler_spectroscopy":
+            # skiping coupler_resonator_spectroscopy for similar reasons
+            if (
+                node == "coupler_spectroscopy"
+                or node == "coupler_resonator_spectroscopy"
+            ):
                 return
 
             analysis_succesful = qoi.analysis_succesful
