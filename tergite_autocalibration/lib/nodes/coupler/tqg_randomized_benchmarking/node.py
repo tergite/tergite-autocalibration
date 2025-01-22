@@ -41,8 +41,8 @@ RB_REPEATS = 10
 
 
 class TQGRandomizedBenchmarkingSSRONode(ScheduleNode):
-    measurement_obj: TQGRandomizedBenchmarkingSSROMeasurement
-    analysis_obj: RandomizedBenchmarkingSSRONodeAnalysis
+    measurement_obj = TQGRandomizedBenchmarkingSSROMeasurement
+    analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
@@ -96,8 +96,8 @@ class TQGRandomizedBenchmarkingSSRONode(ScheduleNode):
 
 class TQGRandomizedBenchmarkingInterleavedSSRONode(ScheduleNode):
     coupler_qois = ["tqg_fidelity_interleaved"]
-    measurement_obj: TQGRandomizedBenchmarkingSSROMeasurement
-    analysis_obj: RandomizedBenchmarkingSSRONodeAnalysis
+    measurement_obj = TQGRandomizedBenchmarkingSSROMeasurement
+    analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
