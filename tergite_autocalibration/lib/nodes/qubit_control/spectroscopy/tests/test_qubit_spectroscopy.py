@@ -26,7 +26,9 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_01" / "dataset_qubit_01_spectroscopy_0.hdf5"
         file = xr.open_dataset(file_path)
-        analysis = QubitSpectroscopyMultidimAnalysis("name", ["redis_field"])
+        analysis = QubitSpectroscopyMultidimAnalysis(
+            "name", ["clock_freqs:f01", "spec:spec_ampl_optimal"]
+        )
         dataset = analysis.process_qubit(file, "yq06")
 
         self.assertIsInstance(dataset, list)
@@ -40,7 +42,9 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_12" / "dataset_qubit_12_spectroscopy_0.hdf5"
         file = xr.open_dataset(file_path)
-        analysis = QubitSpectroscopyMultidimAnalysis("name", ["redis_field"])
+        analysis = QubitSpectroscopyMultidimAnalysis(
+            "name", ["clock_freqs:f12", "spec:spec_ampl_12_optimal"]
+        )
         dataset = analysis.process_qubit(file, "yq06")
 
         self.assertIsInstance(dataset, list)
@@ -54,7 +58,9 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_01" / "dataset_qubit_01_spectroscopy_0.hdf5"
         file = xr.open_dataset(file_path)
-        analysis = QubitSpectroscopyMultidimAnalysis("name", ["redis_field"])
+        analysis = QubitSpectroscopyMultidimAnalysis(
+            "name", ["clock_freqs:f01", "spec:spec_ampl_optimal"]
+        )
         dataset = analysis.process_qubit(file, "yq06")
         frequency = dataset[0]
         ampl = dataset[1]
@@ -68,7 +74,9 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_12" / "dataset_qubit_12_spectroscopy_0.hdf5"
         file = xr.open_dataset(file_path)
-        analysis = QubitSpectroscopyMultidimAnalysis("name", ["redis_field"])
+        analysis = QubitSpectroscopyMultidimAnalysis(
+            "name", ["clock_freqs:f12", "spec:spec_ampl_12_optimal"]
+        )
         dataset = analysis.process_qubit(file, "yq06")
         frequency = dataset[0]
         ampl = dataset[1]
@@ -83,7 +91,9 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_01" / "dataset_qubit_01_spectroscopy_0.hdf5"
         file = xr.open_dataset(file_path)
-        analysis = QubitSpectroscopyMultidimAnalysis("name", ["redis_field"])
+        analysis = QubitSpectroscopyMultidimAnalysis(
+            "name", ["clock_freqs:f01", "spec:spec_ampl_optimal"]
+        )
         dataset = analysis.process_qubit(file, "yq06")
         figure_path = os.environ["DATA_DIR"] + "/Qubit_spectroscopy_01_q06.png"
         if os.path.exists(figure_path):
@@ -101,7 +111,9 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_12" / "dataset_qubit_12_spectroscopy_0.hdf5"
         file = xr.open_dataset(file_path)
-        analysis = QubitSpectroscopyMultidimAnalysis("name", ["redis_field"])
+        analysis = QubitSpectroscopyMultidimAnalysis(
+            "name", ["clock_freqs:f12", "spec:spec_ampl_12_optimal"]
+        )
         dataset = analysis.process_qubit(file, "yq06")
         figure_path = os.environ["DATA_DIR"] + "/Qubit_spectroscopy_12_q06.png"
         if os.path.exists(figure_path):
