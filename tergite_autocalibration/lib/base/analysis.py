@@ -135,7 +135,16 @@ class BaseNodeAnalysis(ABC):
         pass
 
     def open_dataset(self, index: int = 0) -> xr.Dataset:
-        """Abstract method to be implemented by subclasses to open a dataset."""
+        """
+        Open the dataset for the analysis.
+
+        Args:
+            index: By default 0 for most of the measurements, can be set to load multiple datasets.
+
+        Returns:
+            xarray.Dataset with measurement results
+
+        """
         dataset_name = f"dataset_{self.name}_{index}.hdf5"
         dataset_path = os.path.join(self.data_path, dataset_name)
         if not os.path.exists(dataset_path):
