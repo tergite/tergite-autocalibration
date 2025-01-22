@@ -28,7 +28,7 @@ from tergite_autocalibration.utils.dto.extended_gates import (
     Rxy_12,
 )
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
-from tergite_autocalibration.utils.logger.tac_logger import logger
+from tergite_autocalibration.utils.logging import logger
 
 try:
     from superconducting_qubit_tools.clifford_module.cliffords_decomposition import (
@@ -93,7 +93,7 @@ class TQGRandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
         else:
             name = "tqg_randomized_benchmarking_interleaved_ssro"
         schedule = Schedule(f"{name}")
-        print("interleaved or not", name)
+        logger.info("interleaved or not", name)
         shot = Schedule("shot")
         shot.add(IdlePulse(16e-9))
 
@@ -137,7 +137,9 @@ class TQGRandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
                     )
                 )
 
-        print("coupler frequency is", self.couplers[this_coupler].clock_freqs.cz_freq())
+        logger.info(
+            "coupler frequency is", self.couplers[this_coupler].clock_freqs.cz_freq()
+        )
         # This is the common reference operation so the qubits can be operated in parallel
         root_relaxation = shot.add(Reset(*qubits), label="Start")
 
@@ -169,11 +171,9 @@ class TQGRandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
                 apply_inverse_gate=apply_inverse_gate,
                 number_of_qubits=2,
             )
-            # print('clifford sequence is: ', clifford_seq)
             physical_gates = decompose_clifford_seq(
                 clifford_seq, [qubits[0], qubits[1]]
             )
-            # print('physical gates are: ', physical_gates)
             separation_time = 300e-9
             # schedule = Schedule('rb_sequence_generation')
             reset = shot.add(Reset(*qubits))
@@ -208,7 +208,6 @@ class TQGRandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
             for level_index, state_level in enumerate(qubit_levels):
                 calib_index = this_index + level_index + 1
 
-                # print(f'{calib_index = }')
                 if state_level == 0:
                     prep = shot.add(IdlePulse(40e-9))
                 elif state_level == 1:
@@ -234,7 +233,7 @@ class TQGRandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
                 shot.add(Reset(this_qubit))
 
         schedule.add(IdlePulse(16e-9))
-        print(schedule.add(shot, control_flow=Loop(repetitions)))
+        logger.info(schedule.add(shot, control_flow=Loop(repetitions)))
         schedule.add(IdlePulse(16e-9))
 
         return schedule

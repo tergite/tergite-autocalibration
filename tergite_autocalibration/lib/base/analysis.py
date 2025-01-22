@@ -14,6 +14,7 @@
 # that they have been altered from the originals.
 
 import collections
+import os
 from abc import ABC, abstractmethod
 from pathlib import Path
 
@@ -26,7 +27,7 @@ import xarray as xr
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 from tergite_autocalibration.utils.dto.qoi import QOI
-from tergite_autocalibration.utils.logger.tac_logger import logger
+from tergite_autocalibration.utils.logging import logger
 
 
 class BaseAnalysis(ABC):
@@ -158,10 +159,24 @@ class BaseNodeAnalysis(ABC):
         """
         pass
 
-    @abstractmethod
-    def open_dataset(self, index: int = None) -> xr.Dataset:
-        """Abstract method to be implemented by subclasses to open a dataset."""
-        pass
+    def open_dataset(self, index: int = 0) -> xr.Dataset:
+        """
+        Open the dataset for the analysis.
+
+        Args:
+            index: By default 0 for most of the measurements, can be set to load multiple datasets.
+
+        Returns:
+            xarray.Dataset with measurement results
+
+        """
+        dataset_name = f"dataset_{self.name}_{index}.hdf5"
+        dataset_path = os.path.join(self.data_path, dataset_name)
+        if not os.path.exists(dataset_path):
+            raise FileNotFoundError(f"Dataset file not found: {dataset_path}")
+
+        logger.info("Open dataset " + str(dataset_path))
+        return xr.open_dataset(dataset_path)
 
     def manage_plots(self, column_grid: int, plots_per_qubit: int):
         n_vars = len(self.data_vars)
@@ -208,7 +223,7 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
 
     def analyze_node(self, data_path: Path, index: int = 0):
         self.data_path = Path(data_path)
-        self.dataset = self.open_dataset(index)
+        self.dataset = self.open_dataset(index=index)
         self.coords = self.dataset.coords
         self.data_vars = self.dataset.data_vars
         self.fig, self.axs = self.manage_plots(self.column_grid, self.plots_per_qubit)
@@ -216,15 +231,6 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         self._fill_plots()
         self.save_plots()
         return analysis_results
-
-    def open_dataset(self, index: int) -> xr.Dataset:
-        dataset_name = f"dataset_{self.name}_{index}.hdf5"
-        dataset_path = self.data_path / dataset_name
-        if not dataset_path.exists():
-            raise FileNotFoundError(f"Dataset file not found: {dataset_path}")
-
-        logger.info("Open dataset " + str(dataset_path))
-        return xr.open_dataset(dataset_path)
 
     def _analyze_all_qubits(self):
         analysis_results = {}
@@ -252,7 +258,6 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
                 result = qubit_analysis.process_qubit(
                     ds, this_qubit
                 )  # this_qubit shoulq be qXX
-                # print('WARNING SKIPING REDIS UPDATING')
                 # analysis_results[this_qubit] = dict(zip(self.redis_fields, result))
                 self.qubit_analyses.append(qubit_analysis)
 
@@ -367,7 +372,7 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
                     this_element = self.dataset[settable].attrs[element_type]
                     return this_element
             except KeyError:
-                print(f"No element_type for {settable}")
+                logger.info(f"No element_type for {settable}")
         return None
 
     def _run_coupler_analysis(self, this_element: str):
@@ -420,24 +425,15 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
         self.save_plots()
         return analysis_results
 
-    def open_dataset(self):
-        dataset_name = f"dataset_{self.name}_0.hdf5"
-        dataset_path = self.data_path / dataset_name
-        if not dataset_path.exists():
-            raise FileNotFoundError(f"Dataset file not found: {dataset_path}")
-
-        logger.info("Open dataset " + str(dataset_path))
-        return xr.open_dataset(dataset_path)
-
     def _analyze_all_couplers(self):
         analysis_results = {}
         coupler_data_dict = self._group_by_coupler()
         index = 0
         if len(coupler_data_dict) == 0:
             logger.error("Dataset does not have valid coordinates")
-        print(coupler_data_dict)
+        logger.info(coupler_data_dict)
         for this_coupler, coupler_data_vars in coupler_data_dict.items():
-            print(this_coupler)
+            logger.info(this_coupler)
             ds = xr.merge([self.dataset[var] for var in coupler_data_vars])
             ds.attrs["coupler"] = this_coupler
             ds.attrs["node"] = self.name

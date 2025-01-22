@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>new_node_creation – Tergite Automatic Calibration</title>
+<title>rabi_oscillations_node – Tergite Automatic Calibration</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,40 +19,6 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
-}
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -102,6 +68,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -154,7 +149,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../developer_guide.html">Developer Guide</a></li><li class="breadcrumb-item"><a href="../developer-guide/new_node_creation.html">Create a new node</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -261,7 +256,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../developer-guide/new_node_creation.html" class="sidebar-item-text sidebar-link active">
+  <a href="../developer-guide/new_node_creation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Create a new node</span></a>
   </div>
 </li>
@@ -301,24 +296,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#creating-a-new-node" id="toc-creating-a-new-node" class="nav-link active" data-scroll-target="#creating-a-new-node">Creating a new node</a>
+  <li><a href="#rabi-oscillations-calibration-and-analysis" id="toc-rabi-oscillations-calibration-and-analysis" class="nav-link active" data-scroll-target="#rabi-oscillations-calibration-and-analysis">Rabi oscillations calibration and analysis</a>
   <ul class="collapse">
-  <li><a href="#where-are-the-nodes-located" id="toc-where-are-the-nodes-located" class="nav-link" data-scroll-target="#where-are-the-nodes-located">Where are the nodes located?</a>
-  <ul class="collapse">
-  <li><a href="#naming-conventions" id="toc-naming-conventions" class="nav-link" data-scroll-target="#naming-conventions">Naming conventions</a></li>
-  </ul></li>
-  <li><a href="#node-implementation-details" id="toc-node-implementation-details" class="nav-link" data-scroll-target="#node-implementation-details">Node implementation details</a>
-  <ul class="collapse">
-  <li><a href="#creating-a-measurement_obj" id="toc-creating-a-measurement_obj" class="nav-link" data-scroll-target="#creating-a-measurement_obj">Creating a <code>measurement_obj</code></a></li>
-  <li><a href="#creating-an-analysis_obj" id="toc-creating-an-analysis_obj" class="nav-link" data-scroll-target="#creating-an-analysis_obj">Creating an <code>analysis_obj</code></a></li>
-  <li><a href="#node-types-and-samplespaces" id="toc-node-types-and-samplespaces" class="nav-link" data-scroll-target="#node-types-and-samplespaces">Node types and samplespaces</a></li>
-  </ul></li>
-  <li><a href="#register-the-node-in-the-framework" id="toc-register-the-node-in-the-framework" class="nav-link" data-scroll-target="#register-the-node-in-the-framework">Register the node in the framework</a>
-  <ul class="collapse">
-  <li><a href="#node-factory" id="toc-node-factory" class="nav-link" data-scroll-target="#node-factory">Node factory</a></li>
-  <li><a href="#calibration-graph" id="toc-calibration-graph" class="nav-link" data-scroll-target="#calibration-graph">Calibration graph</a></li>
-  <li><a href="#documentation" id="toc-documentation" class="nav-link" data-scroll-target="#documentation">Documentation</a></li>
-  </ul></li>
+  <li><a href="#measurement-class-rabioscillationsmeasurement" id="toc-measurement-class-rabioscillationsmeasurement" class="nav-link" data-scroll-target="#measurement-class-rabioscillationsmeasurement">Measurement class: <code>RabiOscillationsMeasurement</code></a></li>
+  <li><a href="#analysis-class-rabiqubitanalysis" id="toc-analysis-class-rabiqubitanalysis" class="nav-link" data-scroll-target="#analysis-class-rabiqubitanalysis">Analysis class: <code>RabiQubitAnalysis</code></a></li>
   </ul></li>
   </ul>
 </nav>
@@ -329,114 +310,71 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="creating-a-new-node" class="level1">
-<h1>Creating a new node</h1>
-<p>This tutorial is about how to create a new node class. The word node is an overloaded term, used in many contexts, so, what does a node mean here? If you put all steps to characterize a qubit in a chain, then it could be seen as a directed graph with the calibration steps as nodes. Take a look at the <a href="../available_nodes.html">node overview</a> to get an impression on how it looks like. In this guide, we will cover the topics:</p>
+<section id="rabi-oscillations-calibration-and-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="rabi-oscillations-calibration-and-analysis">Rabi oscillations calibration and analysis</h2>
+<p>The rabi oscillations are essential when determining the amplitude of the signal send to the qubit. The (<span class="math inline">\(\pi\)</span>)-pulses, which amplitudes is varying is a Gaussian pulses. By varying the amplitude a cosine function appears when measuring transmission coefficient (S21) and with that one can determine the optimal amplitude for qubit operations. This can also be done for 12 operations with the only difference being the 1 state being initialized.</p>
+<section id="measurement-class-rabioscillationsmeasurement" class="level3">
+<h3 class="anchored" data-anchor-id="measurement-class-rabioscillationsmeasurement">Measurement class: <code>RabiOscillationsMeasurement</code></h3>
+<p>The <code>RabiOscillationsMeasurement</code> class facilitates the creation of schedules for Rabi oscillations.</p>
+<section id="method-schedule_function" class="level4">
+<h4 class="anchored" data-anchor-id="method-schedule_function">Method: <code>schedule_function</code></h4>
+<p>The <code>schedule_function</code> generates an experimental schedule for performing Rabi oscillations. The sequence involves:</p>
 <ol type="1">
-<li>File locations for nodes within the framework</li>
-<li>How to implement a node</li>
-<li>Register the node in the framework</li>
+<li><strong>Reset</strong>: Resets all qubits to a known state.</li>
+<li><strong>Initialize Qubit</strong>: Initialize the qubit to state 0 or 1, depending what qubit frequency you want to attain.</li>
+<li><strong>Amplitude Sweeping</strong>: Iteratively adjusts the probing amplitude.</li>
+<li><strong>Measurement</strong>: Captures the qubit response at each probing point.</li>
 </ol>
-<p>Following these steps, you can easily contribute to the automatic calibration with your own nodes in a couple of hours.</p>
-<section id="where-are-the-nodes-located" class="level2">
-<h2 class="anchored" data-anchor-id="where-are-the-nodes-located">Where are the nodes located?</h2>
-<p>The nodes are located in <code>tergite_autocalibration/lib/nodes</code>. If you open that module, you will find that there are four submodules for different kind of nodes:</p>
+<p><strong>Parameters</strong>:</p>
 <ul>
-<li><code>characterization</code>: For nodes such as the T1, T2 or the randomized benchmarking.</li>
-<li><code>coupler</code>: For all nodes that are related to a two-qubit setup with a coupler.</li>
-<li><code>qubit_control</code>: All nodes that calibrate a quantity of interest for the qubit.</li>
-<li><code>readout</code>: All nodes that calibrate a quantity of interest for the resonator.</li>
+<li><code>mw_amplitudes</code> (<code>dict[str, np.ndarray]</code>): Amplitudes of the probing (<span class="math inline">\(\pi\)</span>)-pulses.</li>
+<li><code>repetitions</code> (<code>int</code>): Number of times the schedule will repeat.</li>
+<li><code>qubit_state</code> (<code>int</code>): The state for the qubit.</li>
 </ul>
-<p>Please create a new submodule for your node in one of the four submodules listed above. A sort of template on how a node module should be structured can be found in <code>tergite_autocalibration/lib/base</code>. Essentially, a proper package in the end should contain:</p>
+<p><strong>Returns</strong>:</p>
 <ul>
-<li><code>__init__.py</code>: This is an empty file to mark that the folder is a package. Please add this file, because otherwise your classes cannot be found.</li>
-<li><code>node.py</code>: A file where the definition of the node class goes.</li>
-<li><code>analysis.py</code>: A file where the analysis object is defined.</li>
-<li><code>measurement.py</code>: Contains the measurement object with the schedule.</li>
-<li><code>tests</code>: A folder with all test function and test data. Read more about <a href="../developer-guide/unit_tests.html">unit tests</a> to find out on how to structure them.</li>
-<li><code>utils</code>: A folder in case you have defined very specific helper classes.</li>
-</ul>
-<p>Before we are going to a look on how this would be implemented in detail, a quick note on naming conventions.</p>
-<section id="naming-conventions" class="level3">
-<h3 class="anchored" data-anchor-id="naming-conventions">Naming conventions</h3>
-<p>Since we are creating a lot of node, measurement and analysis objects, there are some naming conventions to make it more standardized and understandable to learn the framework. Taking the rabi oscillations as an example, we have:</p>
-<ul>
-<li><code>rabi_oscillations</code>: This is the <strong>node name</strong>, which is used in the commandline interface or for other purposes to pass the node name as a string.</li>
-<li><code>RabiOscillations</code>: This is the name of the <strong>node class</strong>.</li>
-<li><code>RabiOscillationsAnalysis</code>: The name of the respective <strong>analysis class</strong>.</li>
-<li><code>RabiOscillationsMeasurement</code>: And the name of the respective <strong>measurement class</strong>.</li>
-</ul>
-<p>When there are some more complicated nodes for which you do not know how to name it, please just take a look at the already existing nodes and make a guess how it feels to name it correctly. Also, when there is a node that starts with an abbreviation, please have all letter for the abbreviation capitalized e.g.: <code>cz_calibration</code> would be the node name for the <code>CZCalibration</code> node class.</p>
-</section>
-</section>
-<section id="node-implementation-details" class="level2">
-<h2 class="anchored" data-anchor-id="node-implementation-details">Node implementation details</h2>
-<p>All node classes are supposed follow the same interface as described in the <code>BaseNode</code>class. Below, for example, you have the rabi oscillations node:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tergite_autocalibration.lib.nodes.schedule_node <span class="im">import</span> ScheduleNode</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.measurement <span class="im">import</span> RabiOscillationsMeasurement</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.analysis <span class="im">import</span> RabiQubitAnalysis</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> RabiOscillationsNode(ScheduleNode):</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  measurement_obj <span class="op">=</span> RabiOscillationsMeasurement</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  analysis_obj <span class="op">=</span> RabiQubitAnalysis</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  qubit_qois <span class="op">=</span> [<span class="st">"rxy:amp180"</span>]</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, name: <span class="bu">str</span>, all_qubits: <span class="bu">list</span>[<span class="bu">str</span>], <span class="op">**</span>schedule_keywords):</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">super</span>().<span class="fu">__init__</span>(name, all_qubits, <span class="op">**</span>schedule_keywords)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.schedule_samplespace <span class="op">=</span> {</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>      <span class="st">"mw_amplitudes"</span>: {</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        qubit: np.linspace(<span class="fl">0.002</span>, <span class="fl">0.90</span>, <span class="dv">61</span>) <span class="cf">for</span> qubit <span class="kw">in</span> <span class="va">self</span>.all_qubits</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>      }</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>As you can see, it inherits from the <code>ScheduleNode</code> class, which contains a very simple definition of a node that runs a simple sweep over a single quantity. More information about other node classes can be found below. Furthermore, you can see that the node has three class attributes:</p>
-<ul>
-<li><code>measurement_obj</code>: Contains the class of the measurement, that defines the pulse schedule for the instruments</li>
-<li><code>analysis_obj</code>: Contains the class for the analysis to post-process the measurement results. For example, this could be a simple fitting function.</li>
-<li><code>qubit_qois</code>: The quantity of interest (QOI), which is returned by the analysis. In case of the rabi oscillations this is the pulse amplitude.</li>
-</ul>
-<p>Also, you can see in the constructor, there is an attribute called <code>schedule_samplespace</code>. Here, we define in the measurement, what quantity will be swept over.</p>
-<section id="creating-a-measurement_obj" class="level3">
-<h3 class="anchored" data-anchor-id="creating-a-measurement_obj">Creating a <code>measurement_obj</code></h3>
-<p>The <code>measurement_obj</code> is implemented in the <code>measurement.py</code> file of your node submodule. To initialize we require a dictionary of the extended transmons:</p>
-<p><code>transmons: dict[str, ExtendedTransmon]</code></p>
-<p>It must contain a method called <code>schedule_function</code> that expects the node’s samplespace as input and returns the complete schedule.</p>
-</section>
-<section id="creating-an-analysis_obj" class="level3">
-<h3 class="anchored" data-anchor-id="creating-an-analysis_obj">Creating an <code>analysis_obj</code></h3>
-<p>The <code>analysis_obj</code> is implemented in the <code>analysis.py</code> file from your module and contains the class that perform the analysis.</p>
-</section>
-<section id="node-types-and-samplespaces" class="level3">
-<h3 class="anchored" data-anchor-id="node-types-and-samplespaces">Node types and samplespaces</h3>
-<p>In the example above, the node inherits from the class <code>ScheduleNode</code>. This is one option for the node behaviour:</p>
-<ul>
-<li><code>ScheduleNode</code>: A node with a simple sweep over the samplespace. The quantify schedule is only compiled once and the parameter values from the samplespace are the input for the schedule function of the measurement.</li>
-<li><code>ExternalParameterNode</code>: A node with a more complex measurement procedure. It allows to run multiple steps sequentially, where each step might require recompilation of the schedule. There is an external parameter involved, which is the part of the generating function within the schedule.</li>
-</ul>
-<p>When you are implementing a node, you can choose which of the two abstract node classes fit better with the behaviour of your new node. Also, if you want to implement a more sophisticated measurement procedure, you can override the procedures in the measurement function or in other places. Check out the article about <a href="../developer-guide/node_classes.html">node classes</a> for more details.</p>
-</section>
-</section>
-<section id="register-the-node-in-the-framework" class="level2">
-<h2 class="anchored" data-anchor-id="register-the-node-in-the-framework">Register the node in the framework</h2>
-<p>To add the node to the framework, you have to register it in two places - the node factory and the calibration graph. Also, please do not forget to write documentation for your node.</p>
-<section id="node-factory" class="level3">
-<h3 class="anchored" data-anchor-id="node-factory">Node factory</h3>
-<p>A factory is a programming pattern to create complex objects such as our nodes in a bit more clearly interfaced way. The factory contains a register for all nodes, that map their name to the respective class where the node is implemented. When you are adding a node, please register your node name, by adding it to the <code>tergite_autocalibration.lib.utils.node_factory.NodeFactory</code> class under the <code>self.node_name_mapping</code> attribute in the dictionary.</p>
-</section>
-<section id="calibration-graph" class="level3">
-<h3 class="anchored" data-anchor-id="calibration-graph">Calibration graph</h3>
-<p>In the file <code>tergite_autocalibration/lib/utils/graph.py</code> in the list <code>graph_dependencies</code> insert the edges that describe the position of the new node in the Directed Acyclic Graph. There are two entries required (or one entry if the new node is the last on its path):</p>
-<ul>
-<li><code>('previous_node','new_node')</code></li>
-<li><code>('new_node', 'next_node')</code></li>
+<li>A <code>Schedule</code> object representing the experimental procedure.</li>
 </ul>
 </section>
-<section id="documentation" class="level3">
-<h3 class="anchored" data-anchor-id="documentation">Documentation</h3>
-<p>Please add your node to the <a href="../available_nodes.html">list of available nodes</a> in this documentation. If possible, please create a separate page that explains what your node is doing and link it there.</p>
-<p>Add any relevant information on how to use your node, dependencies and reference to publication as needed for allowing other to use the code you developed.</p>
-<p><a href="../developer-guide/node_classes.html">Details on the implementation on the Node types section</a>.</p>
+</section>
+<section id="analysis-class-rabiqubitanalysis" class="level3">
+<h3 class="anchored" data-anchor-id="analysis-class-rabiqubitanalysis">Analysis class: <code>RabiQubitAnalysis</code></h3>
+<p>The <code>RabiQubitAnalysis</code> class analyzes the results of Rabi oscillations experiments. It fits a cosine function to the qubit response for different amplitudes of the (<span class="math inline">\(\pi\)</span>)-pulse, determinaning the Rabi frequencies.</p>
+<section id="method-analyse_qubit" class="level4">
+<h4 class="anchored" data-anchor-id="method-analyse_qubit">Method: <code>analyse_qubit</code></h4>
+<p>The <code>analyse_qubit</code> method processes the Rabi oscillations data to extract key parameters:</p>
+<ul>
+<li><strong>Optimal (<span class="math inline">\(\pi\)</span>)-pulse amplitude</strong>: The optimal amplitude resulting in the qubit getting to the desired state.</li>
+</ul>
+<p><strong>Steps</strong>:</p>
+<ol type="1">
+<li><p><strong>Load Data</strong>:<br>
+Extract the drive amplitude and magnitude values from the dataset for analysis.</p></li>
+<li><p><strong>Parameter Guessing</strong>:</p>
+<ul>
+<li>Compute an initial guess for the cosine model parameters:
+<ul>
+<li><strong>Amplitude</strong>: Based on the difference between maximum and minimum magnitudes.</li>
+<li><strong>Offset</strong>: As the mean of the magnitude values.</li>
+<li><strong>Frequency</strong>: Using a Fast Fourier Transform (FFT) to estimate oscillation frequency.</li>
+</ul></li>
+<li>Update the model parameters with the computed guesses.</li>
+</ul></li>
+<li><p><strong>Fit Model</strong>:<br>
+Fit the cosine function to the Rabi oscillation data using the guessed parameters. The model adjusts to minimize the error.</p></li>
+<li><p><strong>Extract Results</strong>:</p>
+<ul>
+<li>Calculate the (<span class="math inline">\(\pi\)</span>)-pulse amplitude (<code>amp180</code>) from the fit.</li>
+<li>Estimate the uncertainty of the (<span class="math inline">\(\pi\)</span>)-pulse amplitude using the standard error from the fit results.</li>
+</ul></li>
+<li><p><strong>Generate Fit Curve</strong>:<br>
+Evaluate the fitted model over a finer set of amplitude values for smooth plotting.</p></li>
+<li><p><strong>Plot Results</strong>:</p>
+<ul>
+<li>Plot the fitted curve against the original data points.</li>
+<li>Annotate the plot with the (<span class="math inline">\(\pi\)</span>)-pulse amplitude value.</li>
+</ul></li>
+</ol>
 
 
 </section>

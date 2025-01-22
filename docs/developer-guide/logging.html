@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>new_node_creation – Tergite Automatic Calibration</title>
+<title>logging – Tergite Automatic Calibration</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -154,7 +154,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../developer_guide.html">Developer Guide</a></li><li class="breadcrumb-item"><a href="../developer-guide/new_node_creation.html">Create a new node</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../developer_guide.html">Developer Guide</a></li><li class="breadcrumb-item"><a href="../developer-guide/logging.html">Logging</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -261,7 +261,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../developer-guide/new_node_creation.html" class="sidebar-item-text sidebar-link active">
+  <a href="../developer-guide/new_node_creation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Create a new node</span></a>
   </div>
 </li>
@@ -273,7 +273,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../developer-guide/logging.html" class="sidebar-item-text sidebar-link">
+  <a href="../developer-guide/logging.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Logging</span></a>
   </div>
 </li>
@@ -301,23 +301,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#creating-a-new-node" id="toc-creating-a-new-node" class="nav-link active" data-scroll-target="#creating-a-new-node">Creating a new node</a>
+  <li><a href="#logging" id="toc-logging" class="nav-link active" data-scroll-target="#logging">Logging</a>
   <ul class="collapse">
-  <li><a href="#where-are-the-nodes-located" id="toc-where-are-the-nodes-located" class="nav-link" data-scroll-target="#where-are-the-nodes-located">Where are the nodes located?</a>
+  <li><a href="#general-logging-to-console-and-file" id="toc-general-logging-to-console-and-file" class="nav-link" data-scroll-target="#general-logging-to-console-and-file">General logging to console and file</a></li>
+  <li><a href="#logging-levels" id="toc-logging-levels" class="nav-link" data-scroll-target="#logging-levels">Logging levels</a></li>
+  <li><a href="#log-directories" id="toc-log-directories" class="nav-link" data-scroll-target="#log-directories">Log directories</a>
   <ul class="collapse">
-  <li><a href="#naming-conventions" id="toc-naming-conventions" class="nav-link" data-scroll-target="#naming-conventions">Naming conventions</a></li>
-  </ul></li>
-  <li><a href="#node-implementation-details" id="toc-node-implementation-details" class="nav-link" data-scroll-target="#node-implementation-details">Node implementation details</a>
-  <ul class="collapse">
-  <li><a href="#creating-a-measurement_obj" id="toc-creating-a-measurement_obj" class="nav-link" data-scroll-target="#creating-a-measurement_obj">Creating a <code>measurement_obj</code></a></li>
-  <li><a href="#creating-an-analysis_obj" id="toc-creating-an-analysis_obj" class="nav-link" data-scroll-target="#creating-an-analysis_obj">Creating an <code>analysis_obj</code></a></li>
-  <li><a href="#node-types-and-samplespaces" id="toc-node-types-and-samplespaces" class="nav-link" data-scroll-target="#node-types-and-samplespaces">Node types and samplespaces</a></li>
-  </ul></li>
-  <li><a href="#register-the-node-in-the-framework" id="toc-register-the-node-in-the-framework" class="nav-link" data-scroll-target="#register-the-node-in-the-framework">Register the node in the framework</a>
-  <ul class="collapse">
-  <li><a href="#node-factory" id="toc-node-factory" class="nav-link" data-scroll-target="#node-factory">Node factory</a></li>
-  <li><a href="#calibration-graph" id="toc-calibration-graph" class="nav-link" data-scroll-target="#calibration-graph">Calibration graph</a></li>
-  <li><a href="#documentation" id="toc-documentation" class="nav-link" data-scroll-target="#documentation">Documentation</a></li>
+  <li><a href="#special-log-locations" id="toc-special-log-locations" class="nav-link" data-scroll-target="#special-log-locations">Special log locations</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -329,114 +319,56 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="creating-a-new-node" class="level1">
-<h1>Creating a new node</h1>
-<p>This tutorial is about how to create a new node class. The word node is an overloaded term, used in many contexts, so, what does a node mean here? If you put all steps to characterize a qubit in a chain, then it could be seen as a directed graph with the calibration steps as nodes. Take a look at the <a href="../available_nodes.html">node overview</a> to get an impression on how it looks like. In this guide, we will cover the topics:</p>
-<ol type="1">
-<li>File locations for nodes within the framework</li>
-<li>How to implement a node</li>
-<li>Register the node in the framework</li>
-</ol>
-<p>Following these steps, you can easily contribute to the automatic calibration with your own nodes in a couple of hours.</p>
-<section id="where-are-the-nodes-located" class="level2">
-<h2 class="anchored" data-anchor-id="where-are-the-nodes-located">Where are the nodes located?</h2>
-<p>The nodes are located in <code>tergite_autocalibration/lib/nodes</code>. If you open that module, you will find that there are four submodules for different kind of nodes:</p>
+<section id="logging" class="level1">
+<h1>Logging</h1>
+<p>This page is about logging and will guide through a couple of questions such as:</p>
 <ul>
-<li><code>characterization</code>: For nodes such as the T1, T2 or the randomized benchmarking.</li>
-<li><code>coupler</code>: For all nodes that are related to a two-qubit setup with a coupler.</li>
-<li><code>qubit_control</code>: All nodes that calibrate a quantity of interest for the qubit.</li>
-<li><code>readout</code>: All nodes that calibrate a quantity of interest for the resonator.</li>
+<li>How do logs end up in the console and in the log file?</li>
+<li>Where are logs stored?</li>
+<li>How is the logger used inside the code?</li>
+<li>What logging levels are there?</li>
 </ul>
-<p>Please create a new submodule for your node in one of the four submodules listed above. A sort of template on how a node module should be structured can be found in <code>tergite_autocalibration/lib/base</code>. Essentially, a proper package in the end should contain:</p>
-<ul>
-<li><code>__init__.py</code>: This is an empty file to mark that the folder is a package. Please add this file, because otherwise your classes cannot be found.</li>
-<li><code>node.py</code>: A file where the definition of the node class goes.</li>
-<li><code>analysis.py</code>: A file where the analysis object is defined.</li>
-<li><code>measurement.py</code>: Contains the measurement object with the schedule.</li>
-<li><code>tests</code>: A folder with all test function and test data. Read more about <a href="../developer-guide/unit_tests.html">unit tests</a> to find out on how to structure them.</li>
-<li><code>utils</code>: A folder in case you have defined very specific helper classes.</li>
-</ul>
-<p>Before we are going to a look on how this would be implemented in detail, a quick note on naming conventions.</p>
-<section id="naming-conventions" class="level3">
-<h3 class="anchored" data-anchor-id="naming-conventions">Naming conventions</h3>
-<p>Since we are creating a lot of node, measurement and analysis objects, there are some naming conventions to make it more standardized and understandable to learn the framework. Taking the rabi oscillations as an example, we have:</p>
-<ul>
-<li><code>rabi_oscillations</code>: This is the <strong>node name</strong>, which is used in the commandline interface or for other purposes to pass the node name as a string.</li>
-<li><code>RabiOscillations</code>: This is the name of the <strong>node class</strong>.</li>
-<li><code>RabiOscillationsAnalysis</code>: The name of the respective <strong>analysis class</strong>.</li>
-<li><code>RabiOscillationsMeasurement</code>: And the name of the respective <strong>measurement class</strong>.</li>
-</ul>
-<p>When there are some more complicated nodes for which you do not know how to name it, please just take a look at the already existing nodes and make a guess how it feels to name it correctly. Also, when there is a node that starts with an abbreviation, please have all letter for the abbreviation capitalized e.g.: <code>cz_calibration</code> would be the node name for the <code>CZCalibration</code> node class.</p>
-</section>
-</section>
-<section id="node-implementation-details" class="level2">
-<h2 class="anchored" data-anchor-id="node-implementation-details">Node implementation details</h2>
-<p>All node classes are supposed follow the same interface as described in the <code>BaseNode</code>class. Below, for example, you have the rabi oscillations node:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<p>Logging is a minor aspect of the application, but if there is some consistency in the way logs are handled, it can make the debugging much faster.</p>
+<section id="general-logging-to-console-and-file" class="level2">
+<h2 class="anchored" data-anchor-id="general-logging-to-console-and-file">General logging to console and file</h2>
+<p>In Python there are several ways to log messages. The easiest one is probably to put a <code>print()</code> statement into the code and see the outcome in the console. There are a couple of way such as <code>sys.stdout.write()</code> to do logging closer to the system. Finally, a very sophisticated way to do logging is offered with the built-in <a href="https://docs.python.org/3/library/logging.html"><code>logging</code></a> module.</p>
+<p>With the <code>logging</code> package, it is easy to register an own logger class and to implement functionalities such as logging to the console and a file at the same time. Also, the <code>logging</code> package offers levels to prioritize messages in the logging. With these levels it is possible to have a very high verbosity in the logging during development and only show critical errors or warning during production. More about levels below in the <a href="#logging-levels">section about logging levels</a>.</p>
+<p>In the automatic calibration, there is an extended version of the logger in the <code>logging</code> package. It can be found in <code>utils/logging/__init__.py</code>. When you want to use the logger inside the code, you will have to import the logger:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tergite_autocalibration.utils.logging <span class="im">import</span> logger</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tergite_autocalibration.lib.nodes.schedule_node <span class="im">import</span> ScheduleNode</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.measurement <span class="im">import</span> RabiOscillationsMeasurement</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.analysis <span class="im">import</span> RabiQubitAnalysis</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> RabiOscillationsNode(ScheduleNode):</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  measurement_obj <span class="op">=</span> RabiOscillationsMeasurement</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  analysis_obj <span class="op">=</span> RabiQubitAnalysis</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  qubit_qois <span class="op">=</span> [<span class="st">"rxy:amp180"</span>]</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, name: <span class="bu">str</span>, all_qubits: <span class="bu">list</span>[<span class="bu">str</span>], <span class="op">**</span>schedule_keywords):</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">super</span>().<span class="fu">__init__</span>(name, all_qubits, <span class="op">**</span>schedule_keywords)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.schedule_samplespace <span class="op">=</span> {</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>      <span class="st">"mw_amplitudes"</span>: {</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        qubit: np.linspace(<span class="fl">0.002</span>, <span class="fl">0.90</span>, <span class="dv">61</span>) <span class="cf">for</span> qubit <span class="kw">in</span> <span class="va">self</span>.all_qubits</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>      }</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>As you can see, it inherits from the <code>ScheduleNode</code> class, which contains a very simple definition of a node that runs a simple sweep over a single quantity. More information about other node classes can be found below. Furthermore, you can see that the node has three class attributes:</p>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>logger.info(<span class="st">"Hello world"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This will create the logger and print a message on the info level.</p>
+</section>
+<section id="logging-levels" class="level2">
+<h2 class="anchored" data-anchor-id="logging-levels">Logging levels</h2>
+<p>The logging package offers different levels such as <code>notset=0</code> <code>debug=10</code>, <code>info=20</code>, <code>warning=30</code>, <code>error=40</code>, and <code>critical=50</code>. If the level is set to e.g.&nbsp;30, all messages with a lower logging level such as <code>debug</code> or <code>info</code> will be suppressed.</p>
+<p>When you are having a lot of external packages such as <code>qcodes</code>, they might log a lot of messages on the <code>info</code> level, which are still very detailed. This is why the autocalibration has a level itself, which is on 25 and called <code>status</code>. Here, you can see how this looks in practice:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tergite_autocalibration.utils.logging <span class="im">import</span> logger</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>logger.warning(<span class="st">"This is a very important log message"</span>) <span class="co"># level: 30</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>logger.status(<span class="st">"This is an important log message"</span>)      <span class="co"># level: 25</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>logger.info(<span class="st">"This is a less important log message"</span>)    <span class="co"># level: 20</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>As a rule of thumb, use <code>logger.status()</code> for important messages such as there is a node to be calibrated. Use the <code>logger.info()</code> for less important messages such as printing the fit result of an analysis function. In case you want to print very low level messages, such as raw results or indications where you enter a function while debugging, please use <code>logger.debug()</code>. And for warnings and errors, use the respective log levels.</p>
+<p>You can set different log levels for the console and file output by setting the environmental variables in the <code>.env</code> file.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="va">STDOUT_LOG_LEVEL</span><span class="op">=</span><span class="st">'25'</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="va">FILE_LOG_LEVEL</span><span class="op">=</span><span class="st">'10'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>These values above are the default. The effect will be that the application will write a very detailed log to the log file. In the console prints, there will be only status, warning and error messages.</p>
+</section>
+<section id="log-directories" class="level2">
+<h2 class="anchored" data-anchor-id="log-directories">Log directories</h2>
+<p>The logs are stored in a directory that is defined by the data directory in the environment variable <code>DATA_DIR</code>. Usually, there should be no need to define the <code>DATA_DIR</code> variable as the application will automatically create a folder called <code>/out</code> on the root level of the repository. Inside the data directory there will be created a folder for each day in the format <code>YYY-MM-DD</code> when one starts a measurement.</p>
+<p>For each run of the calibration or other command, there is going to be created another subfolder inside the folder of the day. This folder follows the pattern <code>HH-MM-SS_STATUS-node_name</code> meaning that is starts with a timestamp, followed by the application status and the node, which is the target to calibrate. For the status there are the following options:</p>
 <ul>
-<li><code>measurement_obj</code>: Contains the class of the measurement, that defines the pulse schedule for the instruments</li>
-<li><code>analysis_obj</code>: Contains the class for the analysis to post-process the measurement results. For example, this could be a simple fitting function.</li>
-<li><code>qubit_qois</code>: The quantity of interest (QOI), which is returned by the analysis. In case of the rabi oscillations this is the pulse amplitude.</li>
+<li><code>ACTIVE</code>: While your script is running, this indicates that inside the folder, there will be active read and write operations.</li>
+<li><code>SUCCESS</code>: In case the calibration terminated successfully. This does not mean that it has found the right calibration values. It just means that it did not crash at some point in between.</li>
+<li><code>FAILED</code>: In case there was an error.</li>
 </ul>
-<p>Also, you can see in the constructor, there is an attribute called <code>schedule_samplespace</code>. Here, we define in the measurement, what quantity will be swept over.</p>
-<section id="creating-a-measurement_obj" class="level3">
-<h3 class="anchored" data-anchor-id="creating-a-measurement_obj">Creating a <code>measurement_obj</code></h3>
-<p>The <code>measurement_obj</code> is implemented in the <code>measurement.py</code> file of your node submodule. To initialize we require a dictionary of the extended transmons:</p>
-<p><code>transmons: dict[str, ExtendedTransmon]</code></p>
-<p>It must contain a method called <code>schedule_function</code> that expects the node’s samplespace as input and returns the complete schedule.</p>
-</section>
-<section id="creating-an-analysis_obj" class="level3">
-<h3 class="anchored" data-anchor-id="creating-an-analysis_obj">Creating an <code>analysis_obj</code></h3>
-<p>The <code>analysis_obj</code> is implemented in the <code>analysis.py</code> file from your module and contains the class that perform the analysis.</p>
-</section>
-<section id="node-types-and-samplespaces" class="level3">
-<h3 class="anchored" data-anchor-id="node-types-and-samplespaces">Node types and samplespaces</h3>
-<p>In the example above, the node inherits from the class <code>ScheduleNode</code>. This is one option for the node behaviour:</p>
-<ul>
-<li><code>ScheduleNode</code>: A node with a simple sweep over the samplespace. The quantify schedule is only compiled once and the parameter values from the samplespace are the input for the schedule function of the measurement.</li>
-<li><code>ExternalParameterNode</code>: A node with a more complex measurement procedure. It allows to run multiple steps sequentially, where each step might require recompilation of the schedule. There is an external parameter involved, which is the part of the generating function within the schedule.</li>
-</ul>
-<p>When you are implementing a node, you can choose which of the two abstract node classes fit better with the behaviour of your new node. Also, if you want to implement a more sophisticated measurement procedure, you can override the procedures in the measurement function or in other places. Check out the article about <a href="../developer-guide/node_classes.html">node classes</a> for more details.</p>
-</section>
-</section>
-<section id="register-the-node-in-the-framework" class="level2">
-<h2 class="anchored" data-anchor-id="register-the-node-in-the-framework">Register the node in the framework</h2>
-<p>To add the node to the framework, you have to register it in two places - the node factory and the calibration graph. Also, please do not forget to write documentation for your node.</p>
-<section id="node-factory" class="level3">
-<h3 class="anchored" data-anchor-id="node-factory">Node factory</h3>
-<p>A factory is a programming pattern to create complex objects such as our nodes in a bit more clearly interfaced way. The factory contains a register for all nodes, that map their name to the respective class where the node is implemented. When you are adding a node, please register your node name, by adding it to the <code>tergite_autocalibration.lib.utils.node_factory.NodeFactory</code> class under the <code>self.node_name_mapping</code> attribute in the dictionary.</p>
-</section>
-<section id="calibration-graph" class="level3">
-<h3 class="anchored" data-anchor-id="calibration-graph">Calibration graph</h3>
-<p>In the file <code>tergite_autocalibration/lib/utils/graph.py</code> in the list <code>graph_dependencies</code> insert the edges that describe the position of the new node in the Directed Acyclic Graph. There are two entries required (or one entry if the new node is the last on its path):</p>
-<ul>
-<li><code>('previous_node','new_node')</code></li>
-<li><code>('new_node', 'next_node')</code></li>
-</ul>
-</section>
-<section id="documentation" class="level3">
-<h3 class="anchored" data-anchor-id="documentation">Documentation</h3>
-<p>Please add your node to the <a href="../available_nodes.html">list of available nodes</a> in this documentation. If possible, please create a separate page that explains what your node is doing and link it there.</p>
-<p>Add any relevant information on how to use your node, dependencies and reference to publication as needed for allowing other to use the code you developed.</p>
-<p><a href="../developer-guide/node_classes.html">Details on the implementation on the Node types section</a>.</p>
+<p>These folder names are changing automatically while the application is running or shutting down, so, please do not change the folder names manually during a calibration.</p>
+<section id="special-log-locations" class="level3">
+<h3 class="anchored" data-anchor-id="special-log-locations">Special log locations</h3>
+<p>There are two special occasions when logs are taken that do not fall into the categories above.</p>
+<p>The first of them is the <strong>default</strong> folder. This folder is used for all logs where the application is used either the first time or when the application is in a state without any configuration. The default log will just be appended and create one long log file.</p>
+<p>The other special folder to save logs is the <strong>pytest</strong> folder. It contains the logs from running the unit tests.</p>
 
 
 </section>

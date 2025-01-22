@@ -21,13 +21,7 @@ from typing import Hashable, Optional
 import redis
 
 import tergite_autocalibration.config.globals
-from tergite_autocalibration.tools.mss.bcc_logger import get_logger
-
-# ============================================================================
-# Logging initialization
-# ============================================================================
-
-logger = get_logger()
+from tergite_autocalibration.utils.logging import logger
 
 
 def to_string(o: object) -> Optional[str]:
@@ -96,7 +90,7 @@ def utc_to_iso(t: datetime, precision=6) -> str:
     truncated to n decimals.
 
     NOTES: The given time t *MUST* be in UTC. If the timestamp was
-    created by utcfromtimestamp, this function is suitalbe.
+    created by utcfromtimestamp, this function is suitable.
     """
     s = t.isoformat()
     if precision == 0:
@@ -104,7 +98,7 @@ def utc_to_iso(t: datetime, precision=6) -> str:
     elif precision in range(1, 6):  # [1..5]
         s = s[: -(6 - precision)]  # note that s[:-0] == ""
     elif precision != 6:
-        print(f"invalid precision {precision}: defaulting to 6 (microsecods)")
+        logger.info(f"invalid precision {precision}: defaulting to 6 (microseconds)")
 
     return s + "Z"
 
@@ -294,7 +288,7 @@ class BackendProperty:
         )
         # as long as field_entries is non-empty, we can instantiate
         if field_entries:
-            # isolate the non class member fields
+            # isolate the non-class member fields
             timestamp = field_entries.pop("timestamp", None)
             count = field_entries.pop("count", None)
             return (

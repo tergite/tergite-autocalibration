@@ -19,6 +19,7 @@ import xarray as xr
 from quantify_core.analysis import fitting_models as fm
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
+from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.lib.base.analysis import (
     BaseAllQubitsAnalysis,
     BaseQubitAnalysis,
@@ -56,12 +57,12 @@ class ResonatorSpectroscopyQubitAnalysis(BaseQubitAnalysis):
                 self.s21_values, params=guess, f=self.frequencies
             )
             if not self.fitting_model.success:
-                print("Fit was unsuccessful.")
-                print("Reason:", self.fitting_model.message)
+                logger.info("Fit was unsuccessful.")
+                logger.info("Reason:", self.fitting_model.message)
 
         except Exception as e:
-            print("Could not fit the resonator data")
-            print(e)
+            logger.info("Could not fit the resonator data")
+            logger.info(e)
 
         finally:
             # if the return params are not returned the later stages complains

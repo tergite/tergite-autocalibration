@@ -35,6 +35,7 @@ from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.measu
 )
 from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.utils import redis
+from tergite_autocalibration.utils.logging import logger
 
 RB_REPEATS = 10
 
@@ -156,7 +157,7 @@ class CZRBOptimizeSSRONode(ScheduleNode):
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
     ):
-        print("running cz rb ssro optimization node")
+        logger.info("running cz rb ssro optimization node")
         super().__init__(name, all_qubits, **schedule_keywords)
         self.name = name
         self.all_qubits = all_qubits
@@ -216,7 +217,7 @@ class CZRBOptimizeSSRONode(ScheduleNode):
             else:
                 param_dict[param] = None
 
-        print(f"Optimizing {self.name} with {param_dict}")
+        logger.info(f"Optimizing {self.name} with {param_dict}")
 
         cz_param = self.redis_connection.hgetall(f"couplers:{self.coupler}")
 
@@ -236,7 +237,7 @@ class CZRBOptimizeSSRONode(ScheduleNode):
                 + param_dict["cz_amplitude"][self.coupler]
             )
 
-        print("cz_param is:", cz_param)
+        logger.info("cz_param is:", cz_param)
 
         for key, value in cz_param.items():
             self.redis_connection.hset(f"couplers:{self.coupler}", key, value)
@@ -256,7 +257,7 @@ class CZRBOptimizeSSRONode(ScheduleNode):
         dynamic_phase_swap = node_dynamic_phase_swap.calibrate(
             self.data_path, self.lab_ic, self.cluster_status
         )
-        # print('dynamic_pahse_results are: ', dynamic_phase_swap)
+        # logger.info('dynamic_pahse_results are: ', dynamic_phase_swap)
 
         coupler_append = "c" + self.couplers[0].replace("_", "")
 
@@ -307,7 +308,7 @@ class CZRBOptimizeSSRONode(ScheduleNode):
             tqg_rb_results[qubit + coupler_append] for qubit in self.coupled_qubits
         ]
 
-        print(f"Results: {all_results}")
+        logger.info(f"Results: {all_results}")
 
         all_costs = [
             np.sqrt(1 - res["tqg_fidelity_interleaved"]) ** 2 for res in all_results
@@ -333,7 +334,7 @@ class CZRBOptimizeSSRONode(ScheduleNode):
         for key, value in original_cz_param.items():
             self.redis_connection.hset(f"couplers:{self.coupler}", key, value)
 
-        # print(f"Results: {results}")
+        # logger.info(f"Results: {results}")
         self.all_results_list.append(
             {
                 "path": str(self.data_path),
@@ -351,22 +352,22 @@ class CZRBOptimizeSSRONode(ScheduleNode):
         ) as f:
             f.write(f"all_results = {self.all_results_list}\n\n")
 
-        print(f"Costs: {all_costs}")
+        logger.info(f"Costs: {all_costs}")
         # return sum(all_costs)
         return sum(all_costs)
 
     def optimize_node(self):
-        print(f"Optimizing {self.name} with {self.trails} trails")
+        logger.info(f"Optimizing {self.name} with {self.trails} trails")
         # get_current_cz_parameters_from redis
 
         self.study.optimize(self.objective, n_trials=self.trails)
         self.best_params = self.study.best_params
-        print(
+        logger.info(
             f"Validating trail {self.study.best_trial.number} with params {self.best_params}"
         )
         self.validate()
 
-        print(f"Optimization finished for {self.name}")
+        logger.info(f"Optimization finished for {self.name}")
         return self.study
 
     def plot_optimization(self):
@@ -393,10 +394,10 @@ class CZRBOptimizeSSRONode(ScheduleNode):
                 param_dict[param] = None
 
         self.validate_params = param_dict
-        print(f"Validating {self.name} with {param_dict}")
+        logger.info(f"Validating {self.name} with {param_dict}")
 
         cz_param = self.redis_connection.hgetall(f"couplers:{self.coupler}")
-        print("cz_param is:", cz_param)
+        logger.info("cz_param is:", cz_param)
         if param_dict["cz_frequency"] is not None:
             cz_param["cz_pulse_frequency"] = (
                 float(cz_param["cz_pulse_frequency"])
@@ -431,7 +432,6 @@ class CZRBOptimizeSSRONode(ScheduleNode):
         dynamic_phase_swap = node_dynamic_phase_swap.calibrate(
             self.data_path, self.lab_ic, self.cluster_status
         )
-        # print('dynamic_pahse_results are: ', dynamic_phase_swap)
 
         coupler_append = "c" + self.couplers[0].replace("_", "")
 
@@ -499,7 +499,7 @@ class CZRBOptimizeSSRONode(ScheduleNode):
             self.log_path + self.time_id + "_cz_optimization_all_results.py", "w"
         ) as f:
             f.write(f"all_results = {self.all_results_list}\n\n")
-        print(f"Results: {cz_and_rb_results}")
+        logger.info(f"Results: {cz_and_rb_results}")
         return cz_and_rb_results
 
     def calibrate(self, data_path: Path, lab_ic, cluster_status):

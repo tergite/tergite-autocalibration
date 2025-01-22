@@ -28,6 +28,7 @@ from quantify_scheduler.schedules.schedule import Schedule
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.utils.dto.extended_gates import Measure_RO1
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
+from tergite_autocalibration.utils.logging import logger
 
 
 class TwoTonesMultidimMeasurement(BaseMeasurement):
@@ -96,11 +97,9 @@ class TwoTonesMultidimMeasurement(BaseMeasurement):
             spec_pulse_duration = this_transmon.spec.spec_duration()
             mw_pulse_port = this_transmon.ports.microwave()
 
-            # print(f"{ spec_pulse_amplitudes = }")
-
             if spec_pulse_amplitudes is None:
                 spec_amplitude = this_transmon.spec.spec_ampl_optimal()
-                print(
+                logger.info(
                     f"setting optimal spec_amplitude for {this_qubit} {spec_amplitude}"
                 )
                 amplitude_values = [spec_amplitude]

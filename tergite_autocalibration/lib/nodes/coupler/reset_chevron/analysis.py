@@ -19,6 +19,7 @@ import matplotlib.patches as mpatches
 import numpy as np
 from scipy.optimize import leastsq
 
+from tergite_autocalibration.utils.logging import logger
 from ....base.analysis import (
     BaseAllCouplersAnalysis,
     BaseCouplerAnalysis,
@@ -109,7 +110,6 @@ class ResetChevronQubitAnalysis(BaseQubitAnalysis):
             min_index = np.unravel_index(min_index, magnitudes.shape)
             self.opt_freq = self.amps[min_index[0]]
             self.opt_cz = self.times[min_index[1]]
-            # print(self.opt_freq, self.opt_cz)
         else:
             tstep = times[1] - times[0]
             # ----------- First round fit ------------#
@@ -136,7 +136,6 @@ class ResetChevronQubitAnalysis(BaseQubitAnalysis):
                     def errfunc(p):
                         return prob - fitfunc(p)
 
-                    # print(prob)
                     out = leastsq(
                         errfunc,
                         np.array(
@@ -193,8 +192,7 @@ class ResetChevronQubitAnalysis(BaseQubitAnalysis):
                 amps = amps[period_fit < 500]
                 period_fit = period_fit[period_fit < 500]
                 if len(period_fit) < 4:
-                    # axes[2].set_title("No enough available points.")
-                    print(
+                    logger.info(
                         f"No enough available points. Please resweep once again or enlarge sweep range."
                     )
                     self.opt_freq, self.opt_cz = 0, 0
@@ -220,7 +218,7 @@ class ResetChevronQubitAnalysis(BaseQubitAnalysis):
                     p = out[0]
 
                     if p[2] > freq[-1] or p[2] < freq[0] or p[0] > 0 or p[1] > 0:
-                        print(
+                        logger.info(
                             "You should probably enlarge your sweep range. The optimial point is not in the current range."
                         )
                         self.opt_freq, self.opt_cz = 0, 0
@@ -259,11 +257,10 @@ class ResetChevronQubitAnalysis(BaseQubitAnalysis):
                         gate_time = fitfunc(out[0], f_opt)
                         # ---------- show final result ------------#
 
-                        # print(f_opt, gate_time)
                         self.opt_freq = f_opt * 1e6
                         self.opt_cz = gate_time / 1e9
             except:
-                print("Something wrong with the fitting process.")
+                logger.info("Something wrong with the fitting process.")
                 self.opt_freq, self.opt_cz = 0, 0
         return [self.opt_freq, self.opt_cz]
 

@@ -31,16 +31,16 @@ from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
 )
 
 from tergite_autocalibration.config.globals import PLOTTING_BACKEND
+from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.lib.utils.device import DeviceConfiguration
 from tergite_autocalibration.lib.utils.schedule_execution import execute_schedule
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
-from tergite_autocalibration.utils.io.dataset_utils import (
+from tergite_autocalibration.utils.io.dataset import (
     configure_dataset,
     save_dataset,
 )
-from tergite_autocalibration.utils.logger.tac_logger import logger
 
 colorama_init()
 
@@ -239,7 +239,7 @@ class BaseNode(abc.ABC):
         )
         # Format the message with duration and the measurement message
         message = f"{duration:.2f} sec{measurement_message}"
-        print(
+        logger.status(
             f"schedule_duration = {Fore.CYAN}{Style.BRIGHT}{message}{Style.RESET_ALL}"
         )
 

@@ -16,7 +16,6 @@
 # clear that these variables are sort of global configuration environment variables
 
 import getpass
-import logging
 import os
 from pathlib import Path
 from typing import Union
@@ -69,6 +68,9 @@ class EnvironmentConfiguration(BaseConfigurationFile):
 
         self.default_prefix: str = getpass.getuser().replace(" ", "")
 
+        self.file_log_level: int = 10
+        self.stdout_log_level: int = 25
+
         self.root_dir: "Path" = Path(__file__).parent.parent.parent
         self.data_dir: "Path" = self.root_dir.joinpath("out")
         self.config_dir: "Path" = self.root_dir
@@ -103,6 +105,10 @@ class EnvironmentConfiguration(BaseConfigurationFile):
             An instance of `EnvironmentConfiguration` which has all values from the environment set.
 
         """
+        # Note: The logger is imported locally to prevent circular dependencies.
+        #       The circular dependency is introduced, because the log level can be set in the environmental variables.
+        from tergite_autocalibration.config.globals import logger
+
         return_obj = EnvironmentConfiguration()
         return_obj._write_env = write_env
 
@@ -114,7 +120,7 @@ class EnvironmentConfiguration(BaseConfigurationFile):
         return_obj.filepath = filepath
 
         # Load the .env file and propagate the values into the environment
-        logging.info(f"Loading .env values from {filepath}")
+        logger.info(f"Loading .env values from {filepath}")
         env_values_ = dotenv_values(filepath)
         for env_key_, env_value_ in env_values_.items():
             os.environ[env_key_] = env_value_
@@ -136,12 +142,12 @@ class EnvironmentConfiguration(BaseConfigurationFile):
                     expected_type_, variable_value_
                 )
 
-                logging.info(
+                logger.info(
                     f"Loading {variable_name_.upper()}: {typed_variable_value_}"
                 )
                 return_obj.__setattr__(variable_name_, typed_variable_value_)
 
-        logging.info(f"Loaded environmental variables from {filepath}")
+        logger.info(f"Loaded environmental variables from {filepath}")
         return return_obj
 
     def __setattr__(self, key_, value_):
