@@ -93,7 +93,7 @@ class BaseAnalysis(ABC):
                     structured_redis_storage(qoi_name, this_element.strip("q"), value)
                 REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
             else:
-                print(f"Analysis failed for {this_element}")
+                logger.warning(f"Analysis failed for {this_element}")
         else:
             # NOTE: leaving the coupler redis structure as it is
             for i, transmon_parameter in enumerate(self.redis_fields):
