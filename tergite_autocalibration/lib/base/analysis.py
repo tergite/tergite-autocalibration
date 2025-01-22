@@ -74,7 +74,7 @@ class BaseAnalysis(ABC):
             name = "transmons"
 
         if name == "transmons":
-            
+
             # skiping coupler_spectroscopy because it calls QubitSpectroscopy Analysis that updates the qubit frequency
             if node == "coupler_spectroscopy":
                 return

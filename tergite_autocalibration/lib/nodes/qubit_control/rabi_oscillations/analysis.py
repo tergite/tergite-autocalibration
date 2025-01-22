@@ -35,7 +35,7 @@ class RabiQubitAnalysis(BaseQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
 
-    def analyse_qubit(self):
+    def _analyse_rabi(self):
         model = RabiModel()
 
         for coord in self.dataset.coords:
@@ -64,7 +64,10 @@ class RabiQubitAnalysis(BaseQubitAnalysis):
         self.scaled_uncertainty = self.uncertainty / self.pi_amplitude
 
         self.fit_y = model.eval(fit_result.params, drive_amp=self.fit_plot_amplitudes)
+        return
 
+    def analyse_qubit(self):
+        self._analyse_rabi()
         if self.scaled_uncertainty < 2e-2 and self.pi_amplitude < 0.95:
             analysis_succesful = True
         else:
@@ -100,8 +103,38 @@ class RabiQubitAnalysis(BaseQubitAnalysis):
         ax.grid()
 
 
+class Rabi12QubitAnalysis(RabiQubitAnalysis):
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+
+    def analyse_qubit(self):
+        self._analyse_rabi()
+        if self.scaled_uncertainty < 2e-2 and self.pi_amplitude < 0.95:
+            analysis_succesful = True
+        else:
+            analysis_succesful = False
+
+        analysis_result = {
+            "r12:ef_amp180": {
+                "value": self.pi_amplitude,
+                "error": self.scaled_uncertainty,
+            }
+        }
+
+        qoi = QOI(analysis_result, analysis_succesful)
+
+        return qoi
+
+
 class RabiNodeAnalysis(BaseAllQubitsAnalysis):
     single_qubit_analysis_obj = RabiQubitAnalysis
+
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+
+
+class RabiNode12Analysis(BaseAllQubitsAnalysis):
+    single_qubit_analysis_obj = Rabi12QubitAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)

@@ -89,7 +89,20 @@ class PurityBenchmarkingQubitAnalysis(BaseQubitAnalysis):
 
         # Process and normalize the purity data
         self._process_and_normalize_data()
-        return self._fit_data()
+        self._fit_data()
+
+        analysis_succesful = True
+
+        analysis_result = {
+            "purity_fidelity": {
+                "value": self.fidelity,
+                "error": np.nan,
+            }
+        }
+
+        qoi = QOI(analysis_result, analysis_succesful)
+
+        return qoi
 
     def _identify_coords(self):
         """
@@ -176,20 +189,6 @@ class PurityBenchmarkingQubitAnalysis(BaseQubitAnalysis):
         # Store fit results and report
         self.fit_results = fit_result
         self.fit_report = fit_result.fit_report()
-        print(self.fit_report)
-
-        analysis_succesful = True
-
-        analysis_result = {
-            "purity_fidelity": {
-                "value": self.fidelity,
-                "error": np.nan,
-            }
-        }
-
-        qoi = QOI(analysis_result, analysis_succesful)
-
-        return qoi
 
     def plotter(self, ax: Axes):
         """

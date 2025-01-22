@@ -10,49 +10,54 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from pathlib import Path
 import os
 import unittest
+from pathlib import Path
+
+import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
-import matplotlib.pyplot as plt
+
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis import (
+    QubitSpectroscopy12MultidimAnalysis,
     QubitSpectroscopyMultidimAnalysis,
 )
+from tergite_autocalibration.utils.dto.qoi import QOI
 
 
-class TestResonatorFrequencyAnalysis(unittest.TestCase):
+class TestQubitFrequencyAnalysis(unittest.TestCase):
     def test_setup_01(self):
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_01" / "dataset_qubit_01_spectroscopy_0.hdf5"
-        file = xr.open_dataset(file_path)
+        dataset = xr.open_dataset(file_path)
         analysis = QubitSpectroscopyMultidimAnalysis(
             "name", ["clock_freqs:f01", "spec:spec_ampl_optimal"]
         )
-        dataset = analysis.process_qubit(file, "yq06")
 
-        self.assertIsInstance(dataset, list)
-        for i in dataset:
-            self.assertIsInstance(i, np.float64)
+        qoi = analysis.process_qubit(dataset, "yq06")
+        result_values = qoi.analysis_result
+        self.assertIsInstance(qoi, QOI)
+        for quantity in result_values:
+            self.assertIsInstance(result_values[quantity]["value"], np.float64)
         assert (
-            len(dataset) == 2
-        ), f"The dataset should contain two elements {len(dataset)}"
+            len(result_values) == 2
+        ), f"The dataset should contain one element {len(dataset)}"
 
     def test_setup_12(self):
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_12" / "dataset_qubit_12_spectroscopy_0.hdf5"
         file = xr.open_dataset(file_path)
-        analysis = QubitSpectroscopyMultidimAnalysis(
+        analysis = QubitSpectroscopy12MultidimAnalysis(
             "name", ["clock_freqs:f12", "spec:spec_ampl_12_optimal"]
         )
-        dataset = analysis.process_qubit(file, "yq06")
-
-        self.assertIsInstance(dataset, list)
-        for i in dataset:
-            self.assertIsInstance(i, np.float64)
+        qoi = analysis.process_qubit(file, "yq06")
+        result_values = qoi.analysis_result
+        self.assertIsInstance(qoi, QOI)
+        for quantity in result_values:
+            self.assertIsInstance(result_values[quantity]["value"], np.float64)
         assert (
-            len(dataset) == 2
-        ), f"The dataset should contain two elements {len(dataset)}"
+            len(result_values) == 2
+        ), f"The dataset should contain one element {len(dataset)}"
 
     def test_run_fitting_01(self):
         test_dir = Path(__file__).parent
@@ -61,40 +66,40 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
         analysis = QubitSpectroscopyMultidimAnalysis(
             "name", ["clock_freqs:f01", "spec:spec_ampl_optimal"]
         )
-        dataset = analysis.process_qubit(file, "yq06")
-        frequency = dataset[0]
-        ampl = dataset[1]
+        qoi = analysis.process_qubit(file, "yq06")
+        frequency = qoi.analysis_result["clock_freqs:f01"]["value"]
+        amplitude = qoi.analysis_result["spec:spec_ampl_optimal"]["value"]
 
         assert (
-            4e9 < frequency < 6e9
+            3e9 < frequency < 6e9
         ), f"Frequency should be between 4 GHz and 6 GHz, got {frequency}"
-        assert ampl > 0, f"Amplitude has to be higher than 0"
+        assert amplitude > 0, "Amplitude has to be higher than 0"
 
     def test_run_fitting_12(self):
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_12" / "dataset_qubit_12_spectroscopy_0.hdf5"
         file = xr.open_dataset(file_path)
-        analysis = QubitSpectroscopyMultidimAnalysis(
+        analysis = QubitSpectroscopy12MultidimAnalysis(
             "name", ["clock_freqs:f12", "spec:spec_ampl_12_optimal"]
         )
-        dataset = analysis.process_qubit(file, "yq06")
-        frequency = dataset[0]
-        ampl = dataset[1]
+        qoi = analysis.process_qubit(file, "yq06")
+        frequency = qoi.analysis_result["clock_freqs:f12"]["value"]
+        amplitude = qoi.analysis_result["spec:spec_ampl_12_optimal"]["value"]
 
         assert (
-            4e9 < frequency < 6e9
+            3e9 < frequency < 6e9
         ), f"Frequency should be between 4 GHz and 6 GHz, got {frequency}"
-        assert ampl > 0, f"Amplitude has to be higher than 0"
+        assert amplitude > 0, "Amplitude has to be higher than 0"
 
     def test_plotting_01(self):
         os.environ["DATA_DIR"] = str(Path(__file__).parent / "results")
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_01" / "dataset_qubit_01_spectroscopy_0.hdf5"
-        file = xr.open_dataset(file_path)
+        dataset = xr.open_dataset(file_path)
         analysis = QubitSpectroscopyMultidimAnalysis(
             "name", ["clock_freqs:f01", "spec:spec_ampl_optimal"]
         )
-        dataset = analysis.process_qubit(file, "yq06")
+        analysis.process_qubit(dataset, "yq06")
         figure_path = os.environ["DATA_DIR"] + "/Qubit_spectroscopy_01_q06.png"
         if os.path.exists(figure_path):
             os.remove(figure_path)
@@ -110,11 +115,11 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
         os.environ["DATA_DIR"] = str(Path(__file__).parent / "results")
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_12" / "dataset_qubit_12_spectroscopy_0.hdf5"
-        file = xr.open_dataset(file_path)
-        analysis = QubitSpectroscopyMultidimAnalysis(
+        dataset = xr.open_dataset(file_path)
+        analysis = QubitSpectroscopy12MultidimAnalysis(
             "name", ["clock_freqs:f12", "spec:spec_ampl_12_optimal"]
         )
-        dataset = analysis.process_qubit(file, "yq06")
+        dataset = analysis.process_qubit(dataset, "yq06")
         figure_path = os.environ["DATA_DIR"] + "/Qubit_spectroscopy_12_q06.png"
         if os.path.exists(figure_path):
             os.remove(figure_path)

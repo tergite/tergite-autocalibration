@@ -39,7 +39,7 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
         super().__init__(name, redis_fields)
         self.fit_results = {}
 
-    def analyse_qubit(self):
+    def _analyse_spectroscopy(self):
         # Fetch the resulting measurement variables
         for coord in self.dataset[self.data_var].coords:
             if "frequencies" in coord:
@@ -73,6 +73,8 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
             fit_result.params, **{model.independent_vars[0]: self.fit_freqs}
         )
 
+    def analyse_qubit(self):
+        self._analyse_spectroscopy()
         analysis_succesful = True
         analysis_result = {
             "clock_freqs:f01": {
@@ -141,7 +143,7 @@ class QubitSpectroscopyMultidimAnalysis(BaseQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
 
-    def analyse_qubit(self):
+    def _analyse_spectroscopy(self):
         for coord in self.dataset[self.data_var].coords:
             if "frequencies" in coord:
                 self.frequency_coords = coord
@@ -179,6 +181,8 @@ class QubitSpectroscopyMultidimAnalysis(BaseQubitAnalysis):
             if self.has_peak(self.magnitudes):
                 self.qubit_freq = self.frequencies[self.magnitudes.argmax()]
 
+    def analyse_qubit(self):
+        self._analyse_spectroscopy()
         analysis_succesful = True
         analysis_result = {
             "clock_freqs:f01": {
@@ -227,8 +231,36 @@ class QubitSpectroscopyMultidimAnalysis(BaseQubitAnalysis):
         ax.scatter(self.qubit_freq, self.spec_ampl, s=52, c="red")
 
 
+class QubitSpectroscopy12MultidimAnalysis(QubitSpectroscopyMultidimAnalysis):
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+
+    def analyse_qubit(self):
+        self._analyse_spectroscopy()
+        analysis_succesful = True
+        analysis_result = {
+            "clock_freqs:f12": {
+                "value": self.qubit_freq,
+                "error": 0,
+            },
+            "spec:spec_ampl_12_optimal": {
+                "value": self.spec_ampl,
+                "error": 0,
+            },
+        }
+        qoi = QOI(analysis_result, analysis_succesful)
+        return qoi
+
+
 class QubitSpectroscopyNodeAnalysis(BaseAllQubitsAnalysis):
     single_qubit_analysis_obj = QubitSpectroscopyAnalysis
+
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+
+
+class QubitSpectroscopy12NodeMultidim(BaseAllQubitsAnalysis):
+    single_qubit_analysis_obj = QubitSpectroscopy12MultidimAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
