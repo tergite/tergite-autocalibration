@@ -36,33 +36,13 @@ from tergite_autocalibration.utils.logger.tac_logger import logger
 from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.utils.randomized_benchmarking import randomized_benchmarking_sequence
 
 
-
-# TODO: REMOVE THE DEPENDENCY OF THIS PACKAGE.
-
-"""
-try:
-    from superconducting_qubit_tools.clifford_module.cliffords_decomposition import (
-        decompose_clifford_seq,
-    )
-    from superconducting_qubit_tools.clifford_module.randomized_benchmarking import (
-        randomized_benchmarking_sequence,
-    )
-    from superconducting_qubit_tools.utils.clifford_module.from_list import (
-        add_two_qubit_gates_to_schedule,
-    )
-except ImportError:
-    logger.warning(
-        "Could not find package: superconducting-qubit-tools.",
-        "This is a proprietary licenced software.",
-        "Please make sure that you are having a correct licence and install the dependency",
-    )    
-    """
 # Constants
 DEFAULT_DOWNCONVERT_FREQ = 4.4e9
 SPECIAL_COUPLERS = {"q21_q22", "q22_q23", "q23_q24", "q24_q25"}
 GATE_SEPARATION_TIME = 300e-9  # Time between two-qubit gates
 BUFFER_TIME = 20e-9  # Buffer time after gate execution
 IDLE_TIME = 16e-9
+
 class TQGRandomizedBenchmarkingSSROMeasurement(BaseMeasurement):    
 
     def __init__(
