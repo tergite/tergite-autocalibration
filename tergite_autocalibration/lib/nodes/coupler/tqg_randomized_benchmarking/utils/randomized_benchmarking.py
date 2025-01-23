@@ -18,8 +18,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-# 
-# Modifications made by (C) Copyright Chalmers Next Labs 2025 are licensed under 
+#
+# Modifications made by (C) Copyright Chalmers Next Labs 2025 are licensed under
 # the Apache License, Version 2.0.
 #
 # You may obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -34,15 +34,27 @@ from numpy.typing import NDArray
 from typing import Optional, Iterable
 from quantify_scheduler import Schedule
 from quantify_scheduler.backends.qblox.constants import MIN_TIME_BETWEEN_OPERATIONS
-from quantify_scheduler.operations.gate_library import CZ, X90, Y90, Measure, Reset, Rxy, X, Y
-
-from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.utils.two_qubit_clifford_group import (
-    Clifford, SingleQubitClifford, TwoQubitClifford, common_cliffords
+from quantify_scheduler.operations.gate_library import (
+    CZ,
+    X90,
+    Y90,
+    Measure,
+    Reset,
+    Rxy,
+    X,
+    Y,
 )
 
+from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.utils.two_qubit_clifford_group import (
+    Clifford,
+    SingleQubitClifford,
+    TwoQubitClifford,
+    common_cliffords,
+)
+
+
 def calculate_net_clifford(
-        rb_clifford_indices: np.ndarray,
-        Clifford: type[Clifford] = SingleQubitClifford
+    rb_clifford_indices: np.ndarray, Clifford: type[Clifford] = SingleQubitClifford
 ) -> Clifford:
     """
     Calculate the net-clifford from a list of cliffords indices.
@@ -84,6 +96,7 @@ def calculate_net_clifford(
 
     return net_clifford
 
+
 def randomized_benchmarking_sequence(
     n_cl: int,
     apply_inverse_gate: bool = True,
@@ -103,13 +116,13 @@ def randomized_benchmarking_sequence(
         max_clifford_idx (int): used to set the index of the highest random
             clifford generated. Useful to generate e.g., simultaneous two
             qubit RB sequences.
-        interleaving_clifford_id (Optional[int]): Specific Clifford index to interleave 
+        interleaving_clifford_id (Optional[int]): Specific Clifford index to interleave
             throughout the sequence, if provided.
         seed (Optional[int]): Seed for the random number generator.
     Returns:
         np.ndarray: Array of Clifford indices representing the randomized benchmarking sequence.
     """
-    
+
     if n_cl < 0:
         raise ValueError("Number of Cliffords must be non-negative")
 
@@ -120,7 +133,9 @@ def randomized_benchmarking_sequence(
         Cl = TwoQubitClifford
         group_size = np.min([11520, max_clifford_idx])
     else:
-        raise NotImplementedError("Only one- and two-qubit Clifford groups are supported.")
+        raise NotImplementedError(
+            "Only one- and two-qubit Clifford groups are supported."
+        )
 
     # Generate a random sequence of Cliffords
     # Even if no seed is provided make sure we pick a new state such that
@@ -142,7 +157,9 @@ def randomized_benchmarking_sequence(
         net_clifford = calculate_net_clifford(rb_clifford_indices, Cl)
 
         # determine the inverse of the sequence
-        recovery_clifford = Cl(net_clifford.idx).get_inverse() * net_clifford.get_inverse()
+        recovery_clifford = (
+            Cl(net_clifford.idx).get_inverse() * net_clifford.get_inverse()
+        )
         rb_clifford_indices = np.append(rb_clifford_indices, recovery_clifford.idx)
-        
+
     return rb_clifford_indices

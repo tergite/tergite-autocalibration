@@ -30,60 +30,48 @@ Pauli Transfer Matrices
 I = np.eye(4)
 
 # Pauli group
-X = np.array([[1, 0, 0, 0],
-              [0, 1, 0, 0],
-              [0, 0, -1, 0],
-              [0, 0, 0, -1]], dtype=int)
+X = np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [0, 0, 0, -1]], dtype=int)
 
-Y = np.array([[1, 0, 0, 0],
-              [0, -1, 0, 0],
-              [0, 0, 1, 0],
-              [0, 0, 0, -1]], dtype=int)
+Y = np.array([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, 1, 0], [0, 0, 0, -1]], dtype=int)
 
-Z = np.array([[1, 0, 0, 0],
-              [0, -1, 0, 0],
-              [0, 0, -1, 0],
-              [0, 0, 0, 1]], dtype=int)
+Z = np.array([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]], dtype=int)
 
 # Exchange group
-S = np.array([[1, 0, 0, 0],
-              [0, 0, 0, 1],
-              [0, 1, 0, 0],
-              [0, 0, 1, 0]], dtype=int)
+S = np.array([[1, 0, 0, 0], [0, 0, 0, 1], [0, 1, 0, 0], [0, 0, 1, 0]], dtype=int)
 
 S2 = np.dot(S, S)
 
 # Hadamard group
-H = np.array([[1, 0, 0, 0],
-              [0, 0, 0, 1],
-              [0, 0, -1, 0],
-              [0, 1, 0, 0]], dtype=int)
+H = np.array([[1, 0, 0, 0], [0, 0, 0, 1], [0, 0, -1, 0], [0, 1, 0, 0]], dtype=int)
 
-CZ = np.array([
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-    [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
-], dtype=int)
+CZ = np.array(
+    [
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+        [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+        [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    ],
+    dtype=int,
+)
 
 """
 Decomposition of the single qubit clifford group as per
 Epstein et al. Phys. Rev. A 89, 062321 (2014)
 """
 
-clifford_group_single_qubit = [np.empty([4, 4])]*(24)
+clifford_group_single_qubit = [np.empty([4, 4])] * (24)
 # explictly reversing order because order of operators is order in time
 clifford_group_single_qubit[0] = np.linalg.multi_dot([I, I, I][::-1])
 clifford_group_single_qubit[1] = np.linalg.multi_dot([I, I, S][::-1])
@@ -112,9 +100,11 @@ clifford_group_single_qubit[22] = np.linalg.multi_dot([Z, H, S][::-1])
 clifford_group_single_qubit[23] = np.linalg.multi_dot([Z, H, S2][::-1])
 
 # S1 is a subgroup of C1 (single qubit Clifford group) used when generating C2
-S1 = [clifford_group_single_qubit[0],
-      clifford_group_single_qubit[1],
-      clifford_group_single_qubit[2]]
+S1 = [
+    clifford_group_single_qubit[0],
+    clifford_group_single_qubit[1],
+    clifford_group_single_qubit[2],
+]
 
 
 def generate_clifford_lookuptable(clifford_group_single_qubit):
@@ -137,13 +127,15 @@ def generate_clifford_lookuptable(clifford_group_single_qubit):
     for i in range(len_cl_grp):
         for j in range(len_cl_grp):
             # Reversed because column j is applied to row i
-            net_cliff = (np.dot(clifford_group_single_qubit[
-                         j], clifford_group_single_qubit[i]))
-            net_cliff_id = [(net_cliff == cliff).all() for cliff in
-                            clifford_group_single_qubit].index(True)
+            net_cliff = np.dot(
+                clifford_group_single_qubit[j], clifford_group_single_qubit[i]
+            )
+            net_cliff_id = [
+                (net_cliff == cliff).all() for cliff in clifford_group_single_qubit
+            ].index(True)
             clifford_lookuptable[i, j] = net_cliff_id
     return clifford_lookuptable
 
+
 # Lookuptable based on representation of the clifford group used in this file
-clifford_lookuptable = generate_clifford_lookuptable(
-    clifford_group_single_qubit)
+clifford_lookuptable = generate_clifford_lookuptable(clifford_group_single_qubit)
