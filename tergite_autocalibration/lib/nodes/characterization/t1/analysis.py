@@ -24,6 +24,7 @@ from tergite_autocalibration.lib.base.analysis import (
     BaseAllQubitsAnalysis,
     BaseQubitAnalysis,
 )
+from tergite_autocalibration.utils.dto.qoi import QOI
 
 
 def cos_func(
@@ -74,7 +75,19 @@ class T1QubitAnalysis(BaseQubitAnalysis):
             self.T1_times.append(fit_result.params["tau"].value)
         self.average_T1 = np.mean(self.T1_times)
         self.error = np.std(self.T1_times)
-        return [self.average_T1]
+
+        analysis_succesful = True
+
+        analysis_result = {
+            "t1_time": {
+                "value": self.average_T1,
+                "error": self.error,
+            }
+        }
+
+        qoi = QOI(analysis_result, analysis_succesful)
+
+        return qoi
 
     def plotter(self, ax):
         for indx, repeat in enumerate(self.dataset.coords[self.repetitions_coord]):

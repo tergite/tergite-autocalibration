@@ -30,6 +30,7 @@ from tergite_autocalibration.lib.utils.analysis_models import (
     TwoClassBoundary,
 )
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
+from tergite_autocalibration.utils.dto.qoi import QOI
 
 
 class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
@@ -284,7 +285,23 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         self.rotation_angle = rotation_angle_rad
         self.rotation_angle_degrees = np.rad2deg(rotation_angle_rad)
 
-        return [self.optimal_amplitude, self.rotation_angle_degrees, self.threshold]
+        analysis_succesful = True
+        analysis_result = {
+            "measure_2state_opt:pulse_amp": {
+                "value": self.optimal_amplitude,
+                "error": 0,
+            },
+            "measure_2state_opt:acq_rotation": {
+                "value": self.rotation_angle_degrees,
+                "error": 0,
+            },
+            "measure_2state_opt:acq_threshold": {
+                "value": self.threshold,
+                "error": 0,
+            },
+        }
+        qoi = QOI(analysis_result, analysis_succesful)
+        return qoi
 
     def plotter(self, ax, secondary_axes):
         self.primary_plotter(ax)
@@ -392,7 +409,7 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         rotated_iq_axis.axhline(0, color="black")
         rotated_iq_axis.axvline(0, color="black")
 
-    def update_redis_trusted_values(self, node: str, this_element: str):
+    def update_redis_trusted_values(self, node: str, this_element: str, qoi: QOI):
         """
         TODO: This method is a temporary solution to store the discriminator until we switch to ThresholdedAcquisition
         Args:
@@ -402,7 +419,7 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         Returns:
 
         """
-        super().update_redis_trusted_values(node, this_element)
+        super().update_redis_trusted_values(node, this_element, qoi)
 
         # We read coefficients and intercept from the lda model
         coef_0_ = str(float(self.lda.coef_[0][0]))

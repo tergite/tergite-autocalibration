@@ -23,6 +23,7 @@ from tergite_autocalibration.lib.base.analysis import (
     BaseQubitAnalysis,
 )
 from tergite_autocalibration.lib.utils.functions import exponential_decay_function
+from tergite_autocalibration.utils.dto.qoi import QOI
 from tergite_autocalibration.utils.logging import logger
 
 
@@ -89,7 +90,20 @@ class PurityBenchmarkingQubitAnalysis(BaseQubitAnalysis):
 
         # Process and normalize the purity data
         self._process_and_normalize_data()
-        return self._fit_data()
+        self._fit_data()
+
+        analysis_succesful = True
+
+        analysis_result = {
+            "purity_fidelity": {
+                "value": self.fidelity,
+                "error": np.nan,
+            }
+        }
+
+        qoi = QOI(analysis_result, analysis_succesful)
+
+        return qoi
 
     def _identify_coords(self):
         """
@@ -176,9 +190,6 @@ class PurityBenchmarkingQubitAnalysis(BaseQubitAnalysis):
         # Store fit results and report
         self.fit_results = fit_result
         self.fit_report = fit_result.fit_report()
-        logger.info(self.fit_report)
-
-        return [self.fidelity]
 
     def plotter(self, ax: Axes):
         """

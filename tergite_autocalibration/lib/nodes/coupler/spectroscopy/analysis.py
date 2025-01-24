@@ -60,8 +60,8 @@ class QubitAnalysisForCouplerSpectroscopy(BaseQubitAnalysis):
                     ds = ds.drop_vars(coord)
 
             freq_analysis = QubitSpectroscopyAnalysis(self.name, "")
-            qubit_frequency = freq_analysis.process_qubit(ds, self.data_var)
-
+            qoi = freq_analysis.process_qubit(ds, self.data_var)
+            qubit_frequency = qoi.analysis_result["clock_freqs:f01"]["value"]
             if not np.isnan(qubit_frequency):
                 self.detected_frequencies.append(qubit_frequency)
                 self.detected_currents.append(current)
@@ -83,7 +83,7 @@ class QubitAnalysisForCouplerSpectroscopy(BaseQubitAnalysis):
                 root_frequencies.append(coupler_fit(root))
         if len(roots) == 0:
             logger.info("No Roots Found, returning zero current")
-            return [0]
+            return [0, 0]
         I0 = roots[np.argmin(np.abs(roots))]
         I1 = roots[np.argmax(np.abs(roots))]
         DeltaI = I1 - I0
@@ -96,12 +96,13 @@ class QubitAnalysisForCouplerSpectroscopy(BaseQubitAnalysis):
     def plotter(self, ax: plt.Axes):
         self.magnitudes[self.data_var].plot(ax=ax, x=self.frequencies)
         ax.scatter(self.detected_frequencies, self.detected_currents, s=52, c="red")
-        if hasattr(self, "root_frequencies"):
+
+        if self.root_frequencies:
             ax.scatter(
                 self.root_frequencies, self.roots, s=64, c="black", label=r"$\Phi_0$"
             )
-        label = "{:4.5f}".format(self.parking_I)
         if hasattr(self, "parking_I"):
+            label = "{:4.5f}".format(self.parking_I)
             ax.axhline(
                 self.parking_I,
                 lw=5,

@@ -11,12 +11,12 @@
 # that they have been altered from the originals.
 
 import numpy as np
-import xarray as xr
 
 from tergite_autocalibration.lib.base.analysis import (
     BaseAllQubitsAnalysis,
     BaseQubitAnalysis,
 )
+from tergite_autocalibration.utils.dto.qoi import QOI
 
 
 class PunchoutAnalysis(BaseQubitAnalysis):
@@ -35,7 +35,19 @@ class PunchoutAnalysis(BaseQubitAnalysis):
         magnitudes = self.magnitudes[self.data_var].values
         norm_magnitudes = magnitudes / np.max(magnitudes, axis=0)
         self.S21[f"y{self.qubit}"].values = norm_magnitudes
-        return [0]
+
+        analysis_succesful = False
+
+        analysis_result = {
+            "punchout": {
+                "value": np.nan,
+                "error": np.nan,
+            }
+        }
+
+        qoi = QOI(analysis_result, analysis_succesful)
+
+        return qoi
 
     def plotter(self, ax):
         self.S21[self.data_var].plot(ax=ax, x=self.frequencies, yscale="log")

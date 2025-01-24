@@ -36,7 +36,6 @@ class T1Node(ExternalParameterNode):
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
-        self.all_qubits = all_qubits  # Is this needed?
 
         self.schedule_keywords = {
             "multiplexing": "parallel"

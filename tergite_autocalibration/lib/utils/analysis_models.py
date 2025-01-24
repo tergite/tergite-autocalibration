@@ -69,6 +69,103 @@ class RamseyModel(lmfit.model.Model):
         return lmfit.models.update_param_vals(params, self.prefix, **kws)
 
 
+class LorentzianModel(lmfit.model.Model):
+    """
+    Generate a Lorentzian model that can be fit to qubit spectroscopy data.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(lorentzian_function, *args, **kwargs)
+
+        self.set_param_hint("center", vary=True)
+        self.set_param_hint("amplitude", vary=True)
+        self.set_param_hint("offset", vary=True)
+        self.set_param_hint("width", vary=True)
+
+    def guess(self, data, **kws) -> lmfit.parameter.Parameters:
+        x = kws.get("x", None)
+
+        if x is None:
+            return None
+
+        # Guess that the resonance is where the function takes its maximal value
+        x0_guess = x[np.argmax(data)]
+        self.set_param_hint("center", value=x0_guess)
+
+        # assume the user isn't trying to fit just a small part of a resonance curve.
+        xmin = x.min()
+        xmax = x.max()
+        width_max = xmax - xmin
+
+        delta_x = np.diff(x)  # assume f is sorted
+        min_delta_x = delta_x[delta_x > 0].min()
+        # assume data actually samples the resonance reasonably
+        width_min = min_delta_x
+        # TODO this needs to be checked:
+        # width_guess = np.sqrt(width_min * width_max)  # geometric mean, why not?
+        width_guess = 0.5e6
+        self.set_param_hint("width", value=width_guess)
+
+        # The guess for the vertical offset is the mean absolute value of the data
+        c_guess = np.mean(data)
+        self.set_param_hint("offset", value=c_guess)
+
+        # Calculate A_guess from difference between the peak and the backround level
+        A_guess = (np.max(data) - c_guess) / 10
+        self.set_param_hint("amplitude", value=A_guess)
+
+        params = self.make_params()
+        return lmfit.models.update_param_vals(params, self.prefix, **kws)
+
+
+# Cosine function that is fit to Rabi oscillations
+def cos_func(
+    drive_amp: float,
+    frequency: float,
+    amplitude: float,
+    offset: float,
+    phase: float,
+) -> float:
+    return amplitude * np.cos(2 * np.pi * frequency * drive_amp + phase) + offset
+
+
+class RabiModel(lmfit.model.Model):
+    """
+    Generate a cosine model that can be fit to Rabi oscillation data.
+    """
+
+    def __init__(self, *args, **kwargs):
+        # Pass in the defining equation so the user doesn't have to later.
+        super().__init__(cos_func, *args, **kwargs)
+
+        # Enforce oscillation frequency is positive
+        self.set_param_hint("frequency", min=0)
+
+        # Fix the phase at pi so that the ouput is at a minimum when drive_amp=0
+        self.set_param_hint("phase", expr="3.141592653589793", vary=True)
+
+        # Pi-pulse amplitude can be derived from the oscillation frequency
+        self.set_param_hint("amp180", expr="1/(2*frequency)", vary=False)
+
+    def guess(self, data, **kws) -> lmfit.parameter.Parameters:
+        drive_amp = kws.get("drive_amp", None)
+        if drive_amp is None:
+            return None
+
+        amp_guess = abs(max(data) - min(data)) / 2  # amp is positive by convention
+        offs_guess = np.mean(data)
+
+        # Frequency guess is obtained using a fast fourier transform (FFT).
+        (freq_guess, _) = fft_freq_phase_guess(data, drive_amp)
+
+        self.set_param_hint("frequency", value=freq_guess, min=0)
+        self.set_param_hint("amplitude", value=amp_guess, min=0)
+        self.set_param_hint("offset", value=offs_guess)
+
+        params = self.make_params()
+        return lmfit.models.update_param_vals(params, self.prefix, **kws)
+
+
 class TwoClassBoundary:
     """
     Converts the boundary encoded in the LDA discriminator.

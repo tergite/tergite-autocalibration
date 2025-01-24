@@ -42,9 +42,6 @@ class ROAmplitudeTwoStateOptimizationNode(ScheduleNode):
         self.plots_per_qubit = 3  #  fidelity plot, IQ shots, confusion matrix
 
         self.schedule_samplespace = {
-            "ro_amplitudes": {
-                qubit: np.linspace(0.04, 0.12, 41) for qubit in self.all_qubits
-            },
             "qubit_states": {
                 qubit: np.array([0, 1], dtype=np.int16) for qubit in self.all_qubits
             },

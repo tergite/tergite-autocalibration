@@ -12,9 +12,10 @@
 
 
 class QOI:
-    def __init__(self):
+    def __init__(self, analysis_result: dict, analysis_succesful: bool):
         """
         Initialize the QOI
         TODO: This is for now just a mock class, which we use for the type checking
         """
-        pass
+        self.analysis_succesful = analysis_succesful
+        self.analysis_result = analysis_result

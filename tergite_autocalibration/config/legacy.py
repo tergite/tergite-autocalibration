@@ -17,7 +17,6 @@ import toml
 from tergite_autocalibration.config.globals import CONFIG
 from tergite_autocalibration.utils.logging import logger
 
-
 ###
 # NOTE: A global instance of DataHandler (dh) can be found below and be imported in the code
 ###
@@ -186,7 +185,7 @@ class DataHandler:
         elif variable_name == "qubit_types":
             return self._qubit_types
         elif variable_name == "coupler_spi_mapping":
-            return self.spi["couplers"]
+            return self.spi
         else:
             logger.warning(
                 f"Cannot return data value for legacy variable: {variable_name}"

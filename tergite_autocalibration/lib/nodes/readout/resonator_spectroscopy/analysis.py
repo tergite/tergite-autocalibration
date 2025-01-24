@@ -24,6 +24,7 @@ from tergite_autocalibration.lib.base.analysis import (
     BaseAllQubitsAnalysis,
     BaseQubitAnalysis,
 )
+from tergite_autocalibration.utils.dto.qoi import QOI
 
 model = fm.ResonatorModel()
 
@@ -35,7 +36,6 @@ class ResonatorSpectroscopyQubitAnalysis(BaseQubitAnalysis):
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-        self.fit_results = {}
 
     def analyse_qubit(self):
         coord_name = list(self.coord.keys())[0]
@@ -91,7 +91,24 @@ class ResonatorSpectroscopyQubitAnalysis(BaseQubitAnalysis):
             )
             # using the min value driectly
             self.min_freq_data = self.frequencies[np.argmin(np.abs(self.s21_values))]
-            return [self.minimum_freq, fit_Ql, self.min_freq_data]
+
+            analysis_succesful = True
+            analysis_result = {
+                "clock_freqs:readout": {
+                    "value": self.minimum_freq,
+                    "error": 0,
+                },
+                "Ql": {
+                    "value": fit_Ql,
+                    "error": 0,
+                },
+                "resonator_minimum": {
+                    "value": self.min_freq_data,
+                    "error": 0,
+                },
+            }
+            qoi = QOI(analysis_result, analysis_succesful)
+            return qoi
 
     def plotter(self, ax):
         ax.set_xlabel("Frequency (Hz)")
@@ -112,7 +129,26 @@ class ResonatorSpectroscopyQubitAnalysis(BaseQubitAnalysis):
 class ResonatorSpectroscopy1QubitAnalysis(ResonatorSpectroscopyQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-        self.fit_results = {}
+
+    def analyse_qubit(self):
+        super().analyse_qubit()
+        analysis_succesful = True
+        analysis_result = {
+            "extended_clock_freqs:readout_1": {
+                "value": self.minimum_freq,
+                "error": 0,
+            },
+            "Ql_1": {
+                "value": self.minimum_freq,
+                "error": 0,
+            },
+            "resonator_minimum_1": {
+                "value": self.min_freq_data,
+                "error": 0,
+            },
+        }
+        qoi = QOI(analysis_result, analysis_succesful)
+        return qoi
 
     def plotter(self, ax):
         # breakpoint()

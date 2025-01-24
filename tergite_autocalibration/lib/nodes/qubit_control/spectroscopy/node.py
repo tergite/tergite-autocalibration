@@ -14,8 +14,8 @@
 import numpy as np
 
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis import (
+    QubitSpectroscopy12NodeMultidim,
     QubitSpectroscopyNodeMultidim,
-    QubitSpectroscopyNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement import (
     TwoTonesMultidimMeasurement,
@@ -44,7 +44,7 @@ class Qubit01SpectroscopyMultidimNode(ScheduleNode):
 
 class Qubit12SpectroscopyMultidimNode(ScheduleNode):
     measurement_obj = TwoTonesMultidimMeasurement
-    analysis_obj = QubitSpectroscopyNodeMultidim
+    analysis_obj = QubitSpectroscopy12NodeMultidim
     qubit_qois = ["clock_freqs:f12", "spec:spec_ampl_12_optimal"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):

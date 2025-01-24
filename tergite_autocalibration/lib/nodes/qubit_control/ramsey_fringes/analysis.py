@@ -21,6 +21,7 @@ from tergite_autocalibration.lib.base.analysis import (
     BaseQubitAnalysis,
 )
 from tergite_autocalibration.lib.utils.analysis_models import RamseyModel
+from tergite_autocalibration.utils.dto.qoi import QOI
 
 
 class RamseyDetuningsBaseQubitAnalysis(BaseQubitAnalysis):
@@ -77,7 +78,18 @@ class RamseyDetuningsBaseQubitAnalysis(BaseQubitAnalysis):
         self.corrected_qubit_frequency = (
             self.qubit_frequency + self.frequency_correction
         )
-        return [self.corrected_qubit_frequency]
+
+        analysis_succesful = True
+
+        analysis_result = {
+            "clock_freqs:f01": {
+                "value": self.corrected_qubit_frequency,
+                "error": 0,
+            }
+        }
+
+        qoi = QOI(analysis_result, analysis_succesful)
+        return qoi
 
     def plotter(self, ax):
         ax.plot(self.artificial_detunings, self.fitted_detunings, "bo", ms=5.0)
