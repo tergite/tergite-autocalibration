@@ -36,12 +36,12 @@ class PunchoutAnalysis(BaseQubitAnalysis):
         norm_magnitudes = magnitudes / np.max(magnitudes, axis=0)
         self.S21[f"y{self.qubit}"].values = norm_magnitudes
 
-        analysis_succesful = True
+        analysis_succesful = False
 
         analysis_result = {
             "punchout": {
-                "value": 0,
-                "error": 0,
+                "value": np.nan,
+                "error": np.nan,
             }
         }
 
