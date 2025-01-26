@@ -19,12 +19,12 @@ import xarray as xr
 from quantify_core.analysis import fitting_models as fm
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
-from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.lib.base.analysis import (
     BaseAllQubitsAnalysis,
     BaseQubitAnalysis,
 )
 from tergite_autocalibration.utils.dto.qoi import QOI
+from tergite_autocalibration.utils.logging import logger
 
 model = fm.ResonatorModel()
 
@@ -168,6 +168,18 @@ class ResonatorSpectroscopy2QubitAnalysis(ResonatorSpectroscopyQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
         self.fit_results = {}
+
+    def analyse_qubit(self):
+        super().analyse_qubit()
+        analysis_succesful = True
+        analysis_result = {
+            "extended_clock_freqs:readout_2": {
+                "value": self.minimum_freq,
+                "error": 0,
+            },
+        }
+        qoi = QOI(analysis_result, analysis_succesful)
+        return qoi
 
     def plotter(self, ax):
         this_qubit = self.dataset.attrs["qubit"]

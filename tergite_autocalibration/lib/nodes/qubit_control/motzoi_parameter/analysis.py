@@ -62,7 +62,7 @@ class MotzoiBaseQubitAnalysis(BaseQubitAnalysis):
 class Motzoi01QubitAnalysis(MotzoiBaseQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-        self.redis_field = "clock_freqs:f01"
+        self.redis_field = "rxy:motzoi"
 
     def analyse_qubit(self):
         self._analyse_motzoi()
@@ -83,7 +83,7 @@ class Motzoi01QubitAnalysis(MotzoiBaseQubitAnalysis):
 class Motzoi12QubitAnalysis(MotzoiBaseQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-        self.redis_field = "clock_freqs:f12"
+        self.redis_field = "r12:ef_motzoi"
 
     def analyse_qubit(self):
         self._analyse_motzoi()

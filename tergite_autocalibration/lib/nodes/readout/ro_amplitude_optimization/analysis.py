@@ -20,15 +20,10 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
-from tergite_autocalibration.utils.logging import logger
-from tergite_autocalibration.lib.base.analysis import (
-    BaseAllQubitsAnalysis,
-    BaseQubitAnalysis,
-)
+from tergite_autocalibration.lib.base.analysis import (BaseAllQubitsAnalysis,
+                                                       BaseQubitAnalysis)
 from tergite_autocalibration.lib.utils.analysis_models import (
-    ThreeClassBoundary,
-    TwoClassBoundary,
-)
+    ThreeClassBoundary, TwoClassBoundary)
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 from tergite_autocalibration.utils.dto.qoi import QOI
 
@@ -474,15 +469,40 @@ class OptimalROThreeStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis)
         self.IQ1_fp = IQ1[~tp1]
         self.IQ2_tp = IQ2[tp2]  # True Positive when sending 2
         self.IQ2_fp = IQ2[~tp2]
-        return [
-            self.optimal_amplitude,
-            self.centroid_I,
-            self.centroid_Q,
-            self.omega_01,
-            self.omega_12,
-            self.omega_20,
-            inv_cm_str,
-        ]
+
+        analysis_succesful = True
+        analysis_result = {
+            "measure_3state_opt:pulse_amp": {
+                "value": self.optimal_amplitude,
+                "error": 0,
+            },
+            "centroid_I": {
+                "value": self.centroid_I,
+                "error": 0,
+            },
+            "centroid_Q": {
+                "value": self.centroid_Q,
+                "error": 0,
+            },
+            "omega_01": {
+                "value": self.omega_01,
+                "error": 0,
+            },
+            "omega_12": {
+                "value": self.omega_12,
+                "error": 0,
+            },
+            "omega_20": {
+                "value": self.omega_20,
+                "error": 0,
+            },
+            "inv_cm_opt": {
+                "value": inv_cm_str,
+                "error": 0,
+            },
+        }
+        qoi = QOI(analysis_result, analysis_succesful)
+        return qoi
 
     def plotter(self, ax, secondary_axes):
         self.primary_plotter(ax)
