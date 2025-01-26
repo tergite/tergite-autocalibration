@@ -29,7 +29,7 @@ class RamseyDetuningsBaseQubitAnalysis(BaseQubitAnalysis):
         super().__init__(name, redis_fields)
         self.redis_field = ""
 
-    def analyse_qubit(self):
+    def _analyse_ramsey(self):
         for coord in self.dataset.coords:
             if "delay" in coord:
                 self.delay_coord = coord
@@ -79,18 +79,6 @@ class RamseyDetuningsBaseQubitAnalysis(BaseQubitAnalysis):
             self.qubit_frequency + self.frequency_correction
         )
 
-        analysis_succesful = True
-
-        analysis_result = {
-            "clock_freqs:f01": {
-                "value": self.corrected_qubit_frequency,
-                "error": 0,
-            }
-        }
-
-        qoi = QOI(analysis_result, analysis_succesful)
-        return qoi
-
     def plotter(self, ax):
         ax.plot(self.artificial_detunings, self.fitted_detunings, "bo", ms=5.0)
         ax.axvline(
@@ -116,11 +104,41 @@ class RamseyDetunings01QubitAnalysis(RamseyDetuningsBaseQubitAnalysis):
         super().__init__(name, redis_fields)
         self.redis_field = "clock_freqs:f01"
 
+    def analyse_qubit(self):
+        self._analyse_ramsey()
+
+        analysis_succesful = True
+        analysis_result = {
+            self.redis_field: {
+                "value": self.corrected_qubit_frequency,
+                "error": 0,
+            }
+        }
+
+        qoi = QOI(analysis_result, analysis_succesful)
+
+        return qoi
+
 
 class RamseyDetunings12QubitAnalysis(RamseyDetuningsBaseQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
         self.redis_field = "clock_freqs:f12"
+
+    def analyse_qubit(self):
+        self._analyse_ramsey()
+
+        analysis_succesful = True
+        analysis_result = {
+            self.redis_field: {
+                "value": self.corrected_qubit_frequency,
+                "error": 0,
+            }
+        }
+
+        qoi = QOI(analysis_result, analysis_succesful)
+
+        return qoi
 
 
 class RamseyDetunings01NodeAnalysis(BaseAllQubitsAnalysis):
