@@ -17,6 +17,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import leastsq
 
+from tergite_autocalibration.utils.logging import logger
+
 
 # TODO: Is this an analysis and if not, where to move it?
 
@@ -155,8 +157,8 @@ def inspect(data, q0, q1, savefig=None, fig_suffix="png"):
     cs = cs[cs > 1e-3]
     if len(cs) < 5:
         axes[2].set_title("No enough available points.")
-        print(
-            f"No enough available points for {data.tuid}. Please resweep once again or enlarge sweep range."
+        logger.info(
+            f"No enough available points for {data.tuid}. Please re-sweep once again or enlarge sweep range."
         )
     else:
         # ----------- Third round fit ------------#
@@ -181,7 +183,7 @@ def inspect(data, q0, q1, savefig=None, fig_suffix="png"):
         p = out[0]
         axes[2].plot(freq, fitfunc(p, freq), "k-", label="fit")
         if p[2] > freq[-1] or p[2] < freq[0] or p[0] < 0 or p[1] < 0:
-            print(
+            logger.info(
                 "You should probably enlarge your sweep range. The optimial point is not in the current range."
             )
             axes[2].set_title(f"Result for {data.tuid}. Not found optimal point.")
@@ -209,14 +211,14 @@ def inspect(data, q0, q1, savefig=None, fig_suffix="png"):
             freq_fit = np.linspace(xs[0], xs[-1], 100)
             data_fit = fitfunc(p, freq_fit)
             id_min = np.argmin(cs[id_left:id_right])
-            print("np.min(cs):", np.min(cs))
-            print("np.min(data_fit):", np.min(data_fit))
+            logger.info("np.min(cs):", np.min(cs))
+            logger.info("np.min(data_fit):", np.min(data_fit))
             if np.min(data_fit) > np.min(cs) and (
                 id_left <= id_min + id_left <= id_right
             ):
                 f_opt = freq[id_min + id_left]
                 c_opt = np.min(cs)
-                print("We use the raw measured data.")
+                logger.info("We use the raw measured data.")
             else:
                 id_opt = np.argmin(data_fit)
                 c_opt = data_fit[id_opt]
@@ -297,7 +299,6 @@ def inspect_amp(data, q0, q1, savefig=None, fig_suffix="png"):
             def errfunc(p):
                 return prob - fitfunc(p)
 
-            # print(prob)
             out = leastsq(
                 errfunc,
                 np.array(
@@ -359,7 +360,7 @@ def inspect_amp(data, q0, q1, savefig=None, fig_suffix="png"):
         period_fit = period_fit[period_fit < 500]
         if len(period_fit) < 4:
             # axes[2].set_title("No enough available points.")
-            print(
+            logger.info(
                 f"No enough available points. Please resweep once again or enlarge sweep range."
             )
         else:
@@ -386,7 +387,7 @@ def inspect_amp(data, q0, q1, savefig=None, fig_suffix="png"):
             axes[2].plot(freq, fitfunc(p, freq), "k-", label="fit")
             axes[2].legend()
             if p[2] > freq[-1] or p[2] < freq[0] or p[0] > 0 or p[1] > 0:
-                print(
+                logger.info(
                     "You should probably enlarge your sweep range. The optimial point is not in the current range."
                 )
                 # axes[2].set_title(f"Optimal point not found ")
@@ -418,7 +419,7 @@ def inspect_amp(data, q0, q1, savefig=None, fig_suffix="png"):
                 if np.max(data_fit) < np.max(amps) and (id_left <= id_max <= id_right):
                     f_opt = freq[id_max]
                     gate_time = period_fit[id_max]
-                    print("We use the raw measured data.")
+                    logger.info("We use the raw measured data.")
                 else:
                     # ---------- fit gate time ----------------#
                     def errfunc(p):
@@ -441,9 +442,8 @@ def inspect_amp(data, q0, q1, savefig=None, fig_suffix="png"):
                 )
                 axes[2].set_title(f"The optimal frequency is {f_opt}.")
                 res.set_result((f_opt, gate_time))
-                # print(self.result.get_result())
                 result, result_add = res.get_result()
-                print(f_opt, gate_time)
+                logger.info(f_opt, gate_time)
     except Exception as e:
         raise e
     fig.show()

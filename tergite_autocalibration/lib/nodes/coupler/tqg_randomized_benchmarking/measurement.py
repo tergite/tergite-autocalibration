@@ -44,7 +44,7 @@ from tergite_autocalibration.utils.dto.extended_gates import (
     Rxy_12,
 )
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
-from tergite_autocalibration.utils.logger.tac_logger import logger
+from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.utils.randomized_benchmarking import (
     randomized_benchmarking_sequence,
 )

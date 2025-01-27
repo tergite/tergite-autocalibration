@@ -14,9 +14,10 @@
 import numpy as np
 
 from tergite_autocalibration.lib.base.analysis import (
-    BaseQubitAnalysis,
     BaseAllQubitsAnalysis,
+    BaseQubitAnalysis,
 )
+from tergite_autocalibration.utils.dto.qoi import QOI
 
 
 class MotzoiBaseQubitAnalysis(BaseQubitAnalysis):
@@ -43,8 +44,17 @@ class MotzoiBaseQubitAnalysis(BaseQubitAnalysis):
         index_of_min = np.argmin(sums)
         self.optimal_motzoi = float(self.magnitudes[motzoi_key][index_of_min].values)
 
-        # Return the optimal motzoi val
-        return [self.optimal_motzoi]
+        analysis_succesful = True
+        analysis_result = {
+            "rxy:motzoi": {
+                "value": self.optimal_motzoi,
+                "error": 0,
+            }
+        }
+
+        qoi = QOI(analysis_result, analysis_succesful)
+
+        return qoi
 
     def plotter(self, axis):
         datarray = self.magnitudes[self.data_var]

@@ -18,6 +18,8 @@ from enum import Enum
 from sys import platform
 from typing import List, Tuple
 
+import typer
+
 
 class OperatingSystem(Enum):
     LINUX = "LINUX"
@@ -110,7 +112,7 @@ def _get_available_redis_instances_linux() -> List[str]:
         return list(sorted(redis_instances))
 
     except Exception as e:
-        print("Error:", e)
+        typer.echo(f"Error:{e}")
         return []
 
 
@@ -127,7 +129,7 @@ def _get_available_redis_instances_wsl() -> List[str]:
         return _parse_ss_redis_output(result)
 
     except Exception as e:
-        print("Error:", e)
+        typer.echo(f"Error:{e}")
         return []
 
 
@@ -159,7 +161,7 @@ def _get_available_redis_instances_mac() -> List[str]:
         return list(sorted(redis_instances))
 
     except Exception as e:
-        print("Error:", e)
+        typer.echo(f"Error:{e}")
         return []
 
 
@@ -196,4 +198,4 @@ def get_cluster_modules() -> List[Tuple[str, str]]:
 
 
 if __name__ == "__main__":
-    print(get_available_redis_instances())
+    typer.echo(get_available_redis_instances())

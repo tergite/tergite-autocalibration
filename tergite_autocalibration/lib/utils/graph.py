@@ -17,6 +17,8 @@
 import matplotlib.pyplot as plt
 import networkx as nx
 
+from tergite_autocalibration.utils.logging import logger
+
 graph = nx.DiGraph()
 
 # dependencies: n1 -> n2. For example
@@ -30,8 +32,9 @@ graph_dependencies = [
     ("resonator_spectroscopy", "coupler_resonator_spectroscopy"),
     ("qubit_01_spectroscopy", "coupler_resonator_spectroscopy"),
     ("resonator_spectroscopy", "qubit_01_spectroscopy"),
+    ("resonator_spectroscopy", "qubit_01_spectroscopy_AR"),
+    ("qubit_01_spectroscopy_AR", "rabi_oscillations_AR"),
     ("qubit_01_spectroscopy", "coupler_spectroscopy"),
-    ("resonator_spectroscopy", "qubit_01_cw_spectroscopy"),
     ("qubit_01_spectroscopy", "rabi_oscillations"),
     ("rabi_oscillations", "ramsey_correction"),
     ("rabi_oscillations", "T1"),
@@ -49,9 +52,11 @@ graph_dependencies = [
     ("n_rabi_oscillations_12", "resonator_spectroscopy_2"),
     ("resonator_spectroscopy_2", "ro_frequency_three_state_optimization"),
     ("ro_frequency_three_state_optimization", "ro_amplitude_three_state_optimization"),
+    ("resonator_spectroscopy", "punchout"),
     ("T1", "T2"),
     ("T2", "T2_echo"),
-    ("T2_echo", "randomized_benchmarking_ssro"),
+    # ("T2_echo", "randomized_benchmarking_ssro"),
+    ("ro_amplitude_three_state_optimization", "randomized_benchmarking_ssro"),
     ("T2_echo", "purity_benchmarking"),
     ("resonator_spectroscopy_2", "cz_chevron_test"),
     ("ro_amplitude_three_state_optimization", "cz_characterisation_chevron"),
@@ -89,8 +94,6 @@ graph.add_node("qubit_01_spectroscopy")
 # graph.add_node('adaptive_motzoi_parameter', type='refine')
 # graph.add_node('n_rabi_oscillations', type='refine')
 # graph.add_node('ramsey_correction_12', type='refine')
-# graph.add_node('ro_frequency_optimization_gef', type='refine')
-# graph.add_node('ro_amplitude_optimization_gef', type='refine')
 # graph.add_node('resonator_spectroscopy_2', type='refine')
 
 # for nodes that perform the same measurement,
@@ -126,21 +129,14 @@ initial_pos = {
     "T2": (0.35, 0.55),
     "T2_echo": (0.5, 0.55),
     "randomized_benchmarking": (0.45, 0.4),
-    "state_discrimination": (0.5, 0.3),
     "coupler_spectroscopy": (0.3, 0.7),
     "punchout": (0.3, 0.9),
 }
 
 
-# all_nodes = list(nx.topological_sort(graph))
-# print(f'{ list(graph.predecessors("cz_chevron")) = }')
-# graph.remove_node('coupler_spectroscopy')
-# print(f'{ list(graph.predecessors("cz_chevron")) = }')
-
-
 # TODO add condition argument and explanation
 def filtered_topological_order(target_node: str):
-    print("Targeting node: " + target_node)
+    logger.info("Targeting node: " + target_node)
     return range_topological_order("resonator_spectroscopy", target_node)
 
 
@@ -148,8 +144,7 @@ def range_topological_order(from_node: str, target_node: str):
     coupler_path = []
     if target_node == "punchout":
         topo_order = ["punchout"]
-
-    if target_node == "resonator_relaxation":
+    elif target_node == "resonator_relaxation":
         topo_order = ["resonator_relaxation"]
     else:
         topo_order = nx.shortest_path(graph, from_node, target_node, weight="weight")

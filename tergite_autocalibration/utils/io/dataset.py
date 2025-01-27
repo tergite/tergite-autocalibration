@@ -13,6 +13,7 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+import os.path
 import pathlib
 from collections.abc import Iterable
 from datetime import datetime
@@ -21,7 +22,7 @@ from uuid import uuid4
 import numpy as np
 import xarray
 
-from tergite_autocalibration.config.globals import DATA_DIR
+from tergite_autocalibration.config.globals import CONFIG
 
 
 def configure_dataset(
@@ -41,8 +42,6 @@ def configure_dataset(
     sweep_quantities = samplespace.keys()
 
     n_qubits = len(measurement_qubits)
-    if "ssro" in node.name:
-        qubit_states = ["c0", "c1", "c2"]  # for calibration points
 
     for key in raw_ds_keys:
         key_indx = key % n_qubits  # this is to handle ro_opt_frequencies node where
@@ -51,9 +50,8 @@ def configure_dataset(
         measured_qubit = measurement_qubits[key_indx]
         dimensions = node.dimensions
 
-        if "ssro" in node.name:
-            # TODO: We are not sure about this one
-            # dimensions[0] += len(qubit_states)  # for calibration points
+        # TODO: this is flagged for removal.
+        if "ssro" in node.name and node.name != "randomized_benchmarking_ssro":
             shots = int(len(raw_ds[key].values[0]) / (np.product(dimensions)))
             coords_dict["shot"] = (
                 "shot",
@@ -107,7 +105,9 @@ def configure_dataset(
         data_values = raw_ds[key].values
 
         reshaping = reversed(node.dimensions)
-        if "ssro" in node.name:
+
+        # TODO: flagged for removal
+        if "ssro" in node.name and node.name != "randomized_benchmarking_ssro":
             reshaping = np.array([shots])
             reshaping = np.append(reshaping, dimensions)
             data_values = data_values.reshape(*reshaping)
@@ -145,11 +145,21 @@ def to_real_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
 
 
 def create_node_data_path(node) -> pathlib.Path:
-    measurement_date = datetime.now()
-    measurements_today = measurement_date.date().strftime("%Y%m%d")
-    time_id = measurement_date.strftime("%Y%m%d-%H%M%S-%f")[:19]
-    measurement_id = time_id + "-" + str(uuid4())[:6] + f"-{node.name}"
-    data_path = pathlib.Path(DATA_DIR / measurements_today / measurement_id)
+    """
+    Create the folder where measurement results, plots and logs specific to the node are stored.
+
+    Args:
+        node (BaseNode): to create a data path for.
+
+    Returns:
+        Path to the measurement log folder as pathlib.Path.
+
+    """
+    now_ = datetime.now()
+    measurement_id = (
+        f"{now_.strftime('%Y%m%d-%H%M%S-%f')[:19]}-{str(uuid4())[:6]}-{node.name}"
+    )
+    data_path = pathlib.Path(os.path.join(CONFIG.run.log_dir, measurement_id))
     return data_path
 
 

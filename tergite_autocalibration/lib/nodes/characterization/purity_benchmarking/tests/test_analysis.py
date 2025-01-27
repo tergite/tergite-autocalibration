@@ -45,7 +45,7 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
         )
 
     def test_run_fitting(self):
-        analysis = PurityBenchmarkingQubitAnalysis("name", ["redis_field"])
+        analysis = PurityBenchmarkingQubitAnalysis("name", ["purity_fidelity"])
         analysis.process_qubit(self.dataset, "yq06")
         # Verify the average purity result is within the expected range
         self.assertTrue(
@@ -56,16 +56,18 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
         analysis.number_of_cliffords = analysis.number_of_cliffords[:5]
         for key in analysis.purity_results_dict.keys():
             analysis.purity_results_dict[key] = analysis.purity_results_dict[key][:5]
-        fidelity = analysis.analyse_qubit()
+        qoi = analysis.analyse_qubit()
+
+        fidelity = qoi.analysis_result["purity_fidelity"]["value"]
 
         # Verify that the fitting results are valid
-        self.assertIsInstance(fidelity, list)
-        self.assertTrue(len(fidelity) > 0.99)
-        self.assertTrue(0 <= fidelity[0] <= 1.002)
+        self.assertIsInstance(fidelity, float)
+        self.assertTrue(fidelity > 0.99)
+        self.assertTrue(0 <= fidelity <= 1.002)
         self.assertIsInstance(analysis.fit_results, ModelResult)
 
     def test_plotter(self):
-        analysis = PurityBenchmarkingQubitAnalysis("name", ["redis_field"])
+        analysis = PurityBenchmarkingQubitAnalysis("name", ["purity_fidelity"])
         analysis.process_qubit(self.dataset, "yq14")
 
         # Trim the dataset to only 5 Cliffords before plotting, same reason as above

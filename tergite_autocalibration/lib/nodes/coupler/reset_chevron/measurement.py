@@ -131,10 +131,6 @@ class ResetChevronDCMeasurement(BaseMeasurement):
         # cz_frequency_values = np.array(list(cz_pulse_frequencies_sweep.values())[0])
         reset_duration_values = list(reset_pulse_durations.values())[0]
         reset_pulse_amplitude_values = list(reset_pulse_amplitudes.values())[0]
-        # print(f'{ reset_duration_values = }')
-        # print(f'{ reset_pulse_amplitude_values = }')
-
-        # print(f'{ cz_frequency_values[0] = }')
 
         # schedule.add_resource(
         #     ClockResource(name=coupler+'.cz',freq= - cz_frequency_values[0] + 4.4e9)

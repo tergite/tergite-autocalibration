@@ -16,77 +16,19 @@
 Module containing classes that model, fit and plot data
 from a qubit (two tone) spectroscopy experiment.
 """
-import lmfit
 import numpy as np
 import xarray as xr
+from lmfit.models import LorentzianModel
 from scipy import signal
 
 from tergite_autocalibration.lib.base.analysis import (
     BaseAllQubitsAnalysis,
     BaseQubitAnalysis,
 )
+from tergite_autocalibration.utils.dto.qoi import QOI
 
 
-# Lorentzian function that is fit to qubit spectroscopy peaks
-def lorentzian_function(
-    x: float,
-    x0: float,
-    width: float,
-    A: float,
-    c: float,
-) -> float:
-    return A * width**2 / ((x - x0) ** 2 + width**2) + c
-
-
-class LorentzianModel(lmfit.model.Model):
-    """
-    Generate a Lorentzian model that can be fit to qubit spectroscopy data.
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(lorentzian_function, *args, **kwargs)
-
-        self.set_param_hint("x0", vary=True)
-        self.set_param_hint("A", vary=True)
-        self.set_param_hint("c", vary=True)
-        self.set_param_hint("width", vary=True)
-
-    def guess(self, data, **kws) -> lmfit.parameter.Parameters:
-        x = kws.get("x", None)
-
-        if x is None:
-            return None
-
-        # Guess that the resonance is where the function takes its maximal value
-        x0_guess = x[np.argmax(data)]
-        self.set_param_hint("x0", value=x0_guess)
-
-        # assume the user isn't trying to fit just a small part of a resonance curve.
-        xmin = x.min()
-        xmax = x.max()
-        width_max = xmax - xmin
-
-        delta_x = np.diff(x)  # assume f is sorted
-        min_delta_x = delta_x[delta_x > 0].min()
-        # assume data actually samples the resonance reasonably
-        width_min = min_delta_x
-        # TODO this needs to be checked:
-        # width_guess = np.sqrt(width_min * width_max)  # geometric mean, why not?
-        width_guess = 0.5e6
-        self.set_param_hint("width", value=width_guess)
-
-        # The guess for the vertical offset is the mean absolute value of the data
-        c_guess = np.mean(data)
-        self.set_param_hint("c", value=c_guess)
-
-        # Calculate A_guess from difference between the peak and the backround level
-        A_guess = (np.max(data) - c_guess) / 10
-        self.set_param_hint("A", value=A_guess)
-
-        params = self.make_params()
-        return lmfit.models.update_param_vals(params, self.prefix, **kws)
-
-
+# TODO: this is flagged for removal
 class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
     """
     Analysis that fits a Lorentzian function to qubit spectroscopy data.
@@ -97,7 +39,7 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
         super().__init__(name, redis_fields)
         self.fit_results = {}
 
-    def analyse_qubit(self):
+    def _analyse_spectroscopy(self):
         # Fetch the resulting measurement variables
         for coord in self.dataset[self.data_var].coords:
             if "frequencies" in coord:
@@ -106,9 +48,6 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
                 self.currents = coord
 
         self.frequencies_value = self.dataset[self.frequencies].values
-
-        if not self.has_peak():
-            return [np.mean(self.frequencies_value)]
 
         self.fit_freqs = np.linspace(
             self.frequencies_value[0], self.frequencies_value[-1], 500
@@ -119,22 +58,32 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
 
         # Gives an initial guess for the model parameters and then fits the model to the data.
         guess = model.guess(
-            self.magnitudes.to_dataarray().values, x=self.frequencies_value
+            self.magnitudes.to_dataarray().values.flatten(), x=self.frequencies_value
         )
         fit_result = model.fit(
-            self.magnitudes.to_dataarray().values,
+            self.magnitudes.to_dataarray().values.flatten(),
             params=guess,
             x=self.frequencies_value,
         )
 
-        self.freq = fit_result.params["x0"].value
-        self.uncertainty = fit_result.params["x0"].stderr
+        self.freq = fit_result.params["center"].value
+        self.uncertainty = fit_result.params["center"].stderr
 
         self.fit_y = model.eval(
             fit_result.params, **{model.independent_vars[0]: self.fit_freqs}
         )
 
-        return self.freq
+    def analyse_qubit(self):
+        self._analyse_spectroscopy()
+        analysis_succesful = True
+        analysis_result = {
+            "clock_freqs:f01": {
+                "value": self.freq,
+                "error": self.uncertainty,
+            },
+        }
+        qoi = QOI(analysis_result, analysis_succesful)
+        return qoi
 
     def reject_outliers(self, data, m=3.0):
         # Filters out datapoints in data that deviate too far from the median
@@ -167,18 +116,17 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
         if self.hasPeak:
             ax.plot(self.fit_freqs, self.fit_y, "r-", lw=3.0)
             min = np.min(self.magnitudes)
-            # ax.vlines(self.freq, min, self.prominence + min, lw=4, color='teal')
-            # ax.vlines(self.freq-1e6, min, self.filtered_std + min, lw=4, color='orange')
+
             ax.plot(
                 self.fit_freqs,
                 self.fit_y,
                 "r-",
                 lw=3.0,
-                label=f"freq = {self.freq:.6E} ± {self.uncertainty:.1E} (Hz)",
+                label=f"freq = {self.freq:.6E} (Hz)",
             )
 
         x_dataarray = self.magnitudes.to_dataarray()
-        x = x_dataarray.values[0]
+        x = x_dataarray.values[0].flatten
         ax.plot(self.frequencies_value, x, "bo-", ms=3.0)
         ax.set_title(f"Qubit Spectroscopy for {self.qubit}")
         ax.set_xlabel("frequency (Hz)")
@@ -194,12 +142,8 @@ class QubitSpectroscopyMultidimAnalysis(BaseQubitAnalysis):
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-        self.fit_results = {}
-        self.frequencies = []
-        self.amplitudes = []
-        self.frequency_coords = ""
 
-    def analyse_qubit(self):
+    def _analyse_spectroscopy(self):
         for coord in self.dataset[self.data_var].coords:
             if "frequencies" in coord:
                 self.frequency_coords = coord
@@ -237,7 +181,21 @@ class QubitSpectroscopyMultidimAnalysis(BaseQubitAnalysis):
             if self.has_peak(self.magnitudes):
                 self.qubit_freq = self.frequencies[self.magnitudes.argmax()]
 
-        return [self.qubit_freq, self.spec_ampl]
+    def analyse_qubit(self):
+        self._analyse_spectroscopy()
+        analysis_succesful = True
+        analysis_result = {
+            "clock_freqs:f01": {
+                "value": self.qubit_freq,
+                "error": 0,
+            },
+            "spec:spec_ampl_optimal": {
+                "value": self.spec_ampl,
+                "error": 0,
+            },
+        }
+        qoi = QOI(analysis_result, analysis_succesful)
+        return qoi
 
     def reject_outliers(self, x, m=3.0):
         # Filters out datapoints in x that deviate too far from the median
@@ -273,8 +231,36 @@ class QubitSpectroscopyMultidimAnalysis(BaseQubitAnalysis):
         ax.scatter(self.qubit_freq, self.spec_ampl, s=52, c="red")
 
 
+class QubitSpectroscopy12MultidimAnalysis(QubitSpectroscopyMultidimAnalysis):
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+
+    def analyse_qubit(self):
+        self._analyse_spectroscopy()
+        analysis_succesful = True
+        analysis_result = {
+            "clock_freqs:f12": {
+                "value": self.qubit_freq,
+                "error": 0,
+            },
+            "spec:spec_ampl_12_optimal": {
+                "value": self.spec_ampl,
+                "error": 0,
+            },
+        }
+        qoi = QOI(analysis_result, analysis_succesful)
+        return qoi
+
+
 class QubitSpectroscopyNodeAnalysis(BaseAllQubitsAnalysis):
     single_qubit_analysis_obj = QubitSpectroscopyAnalysis
+
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+
+
+class QubitSpectroscopy12NodeMultidim(BaseAllQubitsAnalysis):
+    single_qubit_analysis_obj = QubitSpectroscopy12MultidimAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)

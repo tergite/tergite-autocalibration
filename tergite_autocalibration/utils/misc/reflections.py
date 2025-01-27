@@ -15,6 +15,8 @@ import inspect
 import textwrap
 from typing import Set
 
+from tergite_autocalibration.utils.logging import logger
+
 
 class ASTParser:
     """
@@ -41,7 +43,7 @@ class ASTParser:
             source = textwrap.dedent(source)
         except (TypeError, OSError, IndentationError) as e:
             # Handle errors in retrieving the source
-            print(f"Error retrieving source for {cls.__name__}: {e}")
+            logger.info(f"Error retrieving source for {cls.__name__}: {e}")
             source = None
 
         try:
@@ -49,7 +51,7 @@ class ASTParser:
             tree = ast.parse(source)
         except SyntaxError as e:
             # Handle parsing errors
-            print(f"Syntax error when parsing source of {cls.__name__}: {e}")
+            logger.info(f"Syntax error when parsing source of {cls.__name__}: {e}")
             tree = None
 
         return source, tree
@@ -67,7 +69,7 @@ class ASTParser:
             >>>         self.attr2: str = "hello"
             >>>
             >>> init_attributes = ASTParser.get_init_attribute_names(MyClass)
-            >>> print(init_attributes)
+            >>> logger.info(init_attributes)
             {'attr1', 'attr2'}
 
         Args:

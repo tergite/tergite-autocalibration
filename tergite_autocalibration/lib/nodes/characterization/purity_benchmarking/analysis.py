@@ -19,10 +19,12 @@ import numpy as np
 from matplotlib.axes import Axes
 
 from tergite_autocalibration.lib.base.analysis import (
-    BaseAllQubitsRepeatAnalysis,
+    BaseAllQubitsAnalysis,
     BaseQubitAnalysis,
 )
 from tergite_autocalibration.lib.utils.functions import exponential_decay_function
+from tergite_autocalibration.utils.dto.qoi import QOI
+from tergite_autocalibration.utils.logging import logger
 
 
 class ExpDecayModel(lmfit.model.Model):
@@ -88,7 +90,20 @@ class PurityBenchmarkingQubitAnalysis(BaseQubitAnalysis):
 
         # Process and normalize the purity data
         self._process_and_normalize_data()
-        return self._fit_data()
+        self._fit_data()
+
+        analysis_succesful = True
+
+        analysis_result = {
+            "purity_fidelity": {
+                "value": self.fidelity,
+                "error": np.nan,
+            }
+        }
+
+        qoi = QOI(analysis_result, analysis_succesful)
+
+        return qoi
 
     def _identify_coords(self):
         """
@@ -156,8 +171,8 @@ class PurityBenchmarkingQubitAnalysis(BaseQubitAnalysis):
         sum = np.sum([arr for arr in self.normalized_data_dict.values()], axis=0)
         self.sum = sum / len(self.normalized_data_dict)
 
-        print(self.sum)
-        print(avg_purity)
+        logger.info(self.sum)
+        logger.info(avg_purity)
 
         # Initialize the exponential decay model
         model = ExpDecayModel()
@@ -175,9 +190,6 @@ class PurityBenchmarkingQubitAnalysis(BaseQubitAnalysis):
         # Store fit results and report
         self.fit_results = fit_result
         self.fit_report = fit_result.fit_report()
-        print(self.fit_report)
-
-        return [self.fidelity]
 
     def plotter(self, ax: Axes):
         """
@@ -209,9 +221,8 @@ class PurityBenchmarkingQubitAnalysis(BaseQubitAnalysis):
         ax.grid()
 
 
-class PurityBenchmarkingNodeAnalysis(BaseAllQubitsRepeatAnalysis):
+class PurityBenchmarkingNodeAnalysis(BaseAllQubitsAnalysis):
     single_qubit_analysis_obj = PurityBenchmarkingQubitAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-        self.repeat_coordinate_name = "seeds"

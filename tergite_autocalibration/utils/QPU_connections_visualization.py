@@ -16,7 +16,8 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from ..config.legacy import dh
+from tergite_autocalibration.utils.logging import logger
+from tergite_autocalibration.config.legacy import dh
 
 
 @dataclass
@@ -79,7 +80,6 @@ def hits_neighbors(qubit: str, lo_freq: float):
         filter(lambda element_: distance(element, element_) == 1, QPU)
     )
 
-    # print(f'{ neighbour_qubits = }')
     f01 = dh.get_legacy("VNA_qubit_frequencies")[qubit]
     f12 = dh.get_legacy("VNA_f12_frequencies")[qubit]
     i_freq = f01 - lo_freq
@@ -100,7 +100,7 @@ def hits_neighbors(qubit: str, lo_freq: float):
 
     for harmonic, harmonic_freq in harmonics.items():
         if np.abs(harmonic_freq - f12) < collision_tol:
-            print(
+            logger.info(
                 f"{qubit} harmonic {harmonic} hits f12 at distance {np.abs(harmonic_freq-f12)/1e6}MHz"
             )
 
@@ -110,11 +110,11 @@ def hits_neighbors(qubit: str, lo_freq: float):
         neighbour_f12 = dh.get_legacy("VNA_f12_frequencies")[neighbour_qubit]
         for harmonic, harmonic_freq in harmonics.items():
             if np.abs(harmonic_freq - neighbour_f01) < collision_tol:
-                print(
+                logger.info(
                     f"{qubit} harmonic {harmonic} hits neighbour_f01: {neighbour_f01} of {neighbour_qubit} at distance {(neighbour_f01-harmonic_freq)/1e6}MHz"
                 )
             if np.abs(harmonic_freq - neighbour_f12) < collision_tol:
-                print(
+                logger.info(
                     f"{qubit} harmonic {harmonic} hits neighbour_f12: {neighbour_f12} of {neighbour_qubit} at distance {(neighbour_f12-harmonic_freq)/1e6}MHz"
                 )
 

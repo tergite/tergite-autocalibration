@@ -17,6 +17,7 @@ import numpy as np
 
 from tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.analysis import (
     NRabiNodeAnalysis,
+    RabiNode12Analysis,
     RabiNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.measurement import (
@@ -42,7 +43,7 @@ class RabiOscillationsNode(ScheduleNode):
 
 class RabiOscillations12Node(ScheduleNode):
     measurement_obj = RabiOscillationsMeasurement
-    analysis_obj = RabiNodeAnalysis
+    analysis_obj = RabiNode12Analysis
     qubit_qois = ["r12:ef_amp180"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):

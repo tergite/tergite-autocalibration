@@ -40,34 +40,34 @@ class HW_Config_Generator:
         QRM_config = {}
         for module, qrm_qubits in self.module_to_ro_line_qubit_map.items():
             qrm_module_config = self.mixer_calibrations[module]
-            qrm_config = self.qrm_hw(qrm_qubits, **qrm_module_config)
+            qubits = self.module_to_ro_line_qubit_map[module]
+            qrm_config = self.qrm_hw(qubits, qrm_module_config)
             QRM_config[f"{self.cluster_name}_{module}"] = qrm_config
         return QRM_config
 
     def generate_QCM_config(self):
         QCM_config = {}
         for module, qcm_qubit in self.qcm_module_to_qubit_map.items():
-            qcm_module_config = self.mixer_calibrations[module]
+            if module in self.mixer_calibrations:
+                qcm_module_config = self.mixer_calibrations[module]
+            else:
+                qcm_module_config = {}
             qcm_config = self.qcm_hw(qubit=qcm_qubit, **qcm_module_config)
             QCM_config[f"{self.cluster_name}_{module}"] = qcm_config
         return QCM_config
 
-    def qrm_hw(
-        self,
-        qubits,
-        lo_freq=6e9,
-        off_I=0.0,
-        off_Q=0.0,
-        amp_ratio=1.0,
-        phase=0.0,
-    ):
+    def qrm_hw(self, qubits: list[str], module_config: dict[str, list]):
         ro = []  # readout when qubit at |0>
         ro1 = []  # readout when qubit at |1>
         ro2 = []  # readout when qubit at |2>
         ro_2st_opt = []  # readout for optimum 2 state discrimination
         ro_3st_opt = []  # readout for optimum 3 state discrimination
 
-        def standard_ro_config(ro_clock: str) -> dict:
+        lo_freq = module_config["lo_freq"]
+        off_I = module_config["off_I"]
+        off_Q = module_config["off_Q"]
+
+        def standard_ro_config(qubit, amp_ratio, phase, ro_clock: str) -> dict:
             ro_config = {
                 "port": f"{qubit}:res",
                 "clock": f"{qubit}.{ro_clock}",
@@ -77,19 +77,31 @@ class HW_Config_Generator:
             return ro_config
 
         for qubit in qubits:
-            ro_config = standard_ro_config("ro")
+            qubit_config = module_config[qubit]
+            interm_freq, amp_ratio, phase = qubit_config
+            ro_config = standard_ro_config(
+                qubit, amp_ratio=amp_ratio, phase=phase, ro_clock="ro"
+            )
             ro.append(ro_config)
 
-            ro1_config = standard_ro_config("ro1")
+            ro1_config = standard_ro_config(
+                qubit, amp_ratio=amp_ratio, phase=phase, ro_clock="ro1"
+            )
             ro1.append(ro1_config)
 
-            ro2_config = standard_ro_config("ro2")
+            ro2_config = standard_ro_config(
+                qubit, amp_ratio=amp_ratio, phase=phase, ro_clock="ro2"
+            )
             ro2.append(ro2_config)
 
-            ro_2st_opt_config = standard_ro_config("ro_2st_opt")
+            ro_2st_opt_config = standard_ro_config(
+                qubit, amp_ratio=amp_ratio, phase=phase, ro_clock="ro_2st_opt"
+            )
             ro_2st_opt.append(ro_2st_opt_config)
 
-            ro_3st_opt_config = standard_ro_config("ro_3st_opt")
+            ro_3st_opt_config = standard_ro_config(
+                qubit, amp_ratio=amp_ratio, phase=phase, ro_clock="ro_3st_opt"
+            )
             ro_3st_opt.append(ro_3st_opt_config)
 
         hw = {
@@ -157,6 +169,9 @@ if __name__ == "main":
         "instrument_type": "Cluster",
     }
 
+    json_config_file = CONFIG_DIR / "HARDWARE_CONFIGURATION_LOKIA_20241204.json"
+    CLUSTER_NAME = "clusterA"
+
     module_to_qubit_map = {
         "module1": "q06",
         "module2": "q07",
@@ -176,30 +191,12 @@ if __name__ == "main":
     qrm_modules = list(module_to_ro_line_qubit_map.keys())
 
     qubits = module_to_qubit_map.values()
-# with open(mixer_file) as csvfile:
-#     reader = csv.reader(csvfile)
-#     # skip first row
-#     next(reader)
-#     for row in reader:
-#         if all(row):
-#             label = row[0]
-#             module = row[1]
-#             complex_out = row[2]
-#             lo_freq = float(row[3])
-#
-#             if module in qrm_modules:
-#                 qrm_qubits = module_to_ro_line_qubit_map[module]
-#                 qrm_config = qrm_hw(
-#                     qrm_qubits,
-#                     lo=lo_freq,
-#                 )
-#                 HW_CONFIG[f"{CLUSTER_NAME}"][f"{CLUSTER_NAME}_{module}"] = qrm_config
-#             else:
-#                 qcm_config = qcm_hw(
-#                     module=module,
-#                     lo=lo_freq,
-#                 )
-#                 HW_CONFIG[f"{CLUSTER_NAME}"][f"{CLUSTER_NAME}_{module}"] = qcm_config
-#
-# with open(json_config_file, "w") as f:
-#     json.dump(HW_CONFIG, f, indent=3)
+
+    HW_generator = HW_Config_Generator(
+        CLUSTER_NAME, module_to_ro_line_qubit_map, module_to_qubit_map, mixer_file
+    )
+
+    HW_config = HW_generator.hardware_configuration()
+
+    with open(json_config_file, "w") as f:
+        json.dump(HW_config, f, indent=3)

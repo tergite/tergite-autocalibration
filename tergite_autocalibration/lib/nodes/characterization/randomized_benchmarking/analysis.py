@@ -19,11 +19,12 @@ from scipy.linalg import norm
 from scipy.optimize import minimize
 
 from tergite_autocalibration.lib.base.analysis import (
-    BaseAllQubitsRepeatAnalysis,
+    BaseAllQubitsAnalysis,
     BaseQubitAnalysis,
 )
 from tergite_autocalibration.lib.utils.analysis_models import ExpDecayModel
 from tergite_autocalibration.lib.utils.classification_functions import assign_state
+from tergite_autocalibration.utils.dto.qoi import QOI
 
 
 def mitigate(v, cm_inv):
@@ -140,7 +141,22 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
         )
         self.leakage = 1 - fit_result2.params["p"].value
 
-        return self.fidelity, 0, self.leakage, 0
+        analysis_succesful = True
+
+        analysis_result = {
+            "fidelity": {
+                "value": self.fidelity,
+                "error": np.nan,
+            },
+            "leakage": {
+                "value": self.leakage,
+                "error": np.nan,
+            },
+        }
+
+        qoi = QOI(analysis_result, analysis_succesful)
+
+        return qoi
 
     def plotter(self, ax: Axes):
         for seed in self.seeds:
@@ -190,9 +206,8 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
         ax.grid()
 
 
-class RandomizedBenchmarkingSSRONodeAnalysis(BaseAllQubitsRepeatAnalysis):
+class RandomizedBenchmarkingSSRONodeAnalysis(BaseAllQubitsAnalysis):
     single_qubit_analysis_obj = RandomizedBenchmarkingSSROQubitAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-        self.repeat_coordinate_name = "seeds"

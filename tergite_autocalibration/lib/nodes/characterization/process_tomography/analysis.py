@@ -28,7 +28,7 @@ from tergite_autocalibration.lib.base.analysis import (
     BaseQubitAnalysis,
     MultipleBaseAllQubitsAnalysis,
 )
-from tergite_autocalibration.utils.logger.tac_logger import logger
+from tergite_autocalibration.utils.logging import logger
 
 
 def mitigate(v, cm_inv):
@@ -52,7 +52,6 @@ def mitigate(v, cm_inv):
 
 
 class ProcessTomographyQubitAnalysis(BaseQubitAnalysis):
-
     def analyse_qubit(self):
         for coord in self.dataset.coords:
             if f"control_ons" in str(coord):

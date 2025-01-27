@@ -113,6 +113,9 @@ VNA_frequency = 7098349517.491133
 
 [device.qubit.all]
 attenuation = 10
+measure_3state_opt.pulse_duration = 3e-6
+measure_3state_opt.acq_delay = 220e-9
+measure_3state_opt.integration_time = 2.5e-6
 
 [device.qubit.q06]
 VNA_f01_frequency = 4641051698.389338

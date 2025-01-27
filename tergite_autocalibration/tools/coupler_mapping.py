@@ -14,6 +14,8 @@
 import typing
 
 from tergite_autocalibration.utils.QPU_connections_visualization import QPU, QPU_element
+from tergite_autocalibration.utils.logging import logger
+
 
 # TODO: TO Liangyu
 
@@ -65,4 +67,4 @@ def create_coupler_marking(qpu: typing.List[QPU_element]):
 
 if __name__ == "__main__":
     coupler_marking = create_coupler_marking(QPU)
-    print(coupler_marking)
+    logger.info(coupler_marking)

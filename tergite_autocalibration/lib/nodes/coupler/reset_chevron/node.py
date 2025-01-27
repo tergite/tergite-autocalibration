@@ -20,6 +20,7 @@ from tergite_autocalibration.lib.nodes.coupler.reset_chevron.analysis import (
 from tergite_autocalibration.lib.nodes.coupler.reset_chevron.measurement import (
     ResetChevronDCMeasurement,
 )
+from tergite_autocalibration.utils.logging import logger
 
 
 class ResetChevronNode(BaseNode):
@@ -57,5 +58,5 @@ class ResetChevronNode(BaseNode):
         for coupler in self.couplers:
             all_coupled_qubits += coupler.split("_")
         if len(all_coupled_qubits) > len(set(all_coupled_qubits)):
-            print("Couplers share qubits")
+            logger.info("Couplers share qubits")
             raise ValueError("Improper Couplers")

@@ -26,6 +26,7 @@ from tergite_autocalibration.lib.nodes.characterization.t1.measurement import (
 from tergite_autocalibration.lib.nodes.external_parameter_node import (
     ExternalParameterNode,
 )
+from tergite_autocalibration.utils.logging import logger
 
 
 class T1Node(ExternalParameterNode):
@@ -35,7 +36,6 @@ class T1Node(ExternalParameterNode):
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
-        self.all_qubits = all_qubits  # Is this needed?
 
         self.schedule_keywords = {
             "multiplexing": "parallel"
@@ -47,7 +47,7 @@ class T1Node(ExternalParameterNode):
 
         self.schedule_samplespace = {
             "delays": {
-                qubit: 8e-9 + np.arange(0, 30e-6, 6e-6) for qubit in self.all_qubits
+                qubit: 8e-9 + np.arange(0, 80e-6, 4e-6) for qubit in self.all_qubits
             }
         }
         self.external_samplespace = {
@@ -62,5 +62,5 @@ class T1Node(ExternalParameterNode):
         # iteration index, that's why we keep the first value->
         this_iteration = list(iteration_dict.values())[0]
         if this_iteration > 0:
-            print(f"sleeping for {self.sleep_time} seconds")
+            logger.info(f"sleeping for {self.sleep_time} seconds")
             sleep(self.sleep_time)

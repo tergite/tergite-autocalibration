@@ -17,6 +17,7 @@ from scipy.optimize import curve_fit
 from scipy.stats import chi2 as chi2dist
 
 from tergite_autocalibration.config.globals import ENV
+from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.lib.base.analysis import BaseAnalysis
 from tergite_autocalibration.lib.nodes.coupler.cz_chevron.utils.cz_singleGateSimpleFitResult import (
     CZSingleGateSimpleFitResult,
@@ -28,9 +29,7 @@ class CZSingleGateSimpleFit(BaseAnalysis):
     def __init__(self, dataset: xr.Dataset, frequencies, durations):
         super().__init__()
         self.dataset = dataset
-        # print(dataset)
         self.data_var = list(dataset.data_vars.keys())[0]
-        # print(self.data_var)
         self.qubit = dataset[self.data_var].attrs["qubit"]
         self.result = CZSingleGateSimpleFitResult()
         self.fittefTimes = []
@@ -52,7 +51,7 @@ class CZSingleGateSimpleFit(BaseAnalysis):
 
     def fitfunc(self, x, *p):
         if len(p) < 4:
-            print(p)
+            logger.info(p)
             raise ValueError("Insufficient parameters for fitting")
 
         return p[0] * np.cos(2 * np.pi / p[1] * (x - p[2])) + p[3]
@@ -69,7 +68,7 @@ class CZSingleGateSimpleFit(BaseAnalysis):
         # Here we could reintroduce the fft for better estumate of inital period
         self.errors = self.SetInitialValues()
 
-        # print("First fit")
+        # logger.info("First fit")
         status = self.FirstFit()
 
         # Second fit in limited range
@@ -81,17 +80,14 @@ class CZSingleGateSimpleFit(BaseAnalysis):
 
     def SetInitialValues(self):
         for i, prob in enumerate(self.magnitudes):
-            # print(f'freqIndex: {i}')
             indexMax = np.argmax(prob)
             indexMin = np.argmin(prob)
             startPeriod = abs(self.times[indexMax] - self.times[indexMin]) * 2
             if startPeriod < 30 or startPeriod > 500:
-                # print(f'Per: {startPeriod}')
                 startPeriod = 100
             self.start_periods.append(startPeriod)
             startAmp = (max(prob) - min(prob)) / 2
             self.start_Amps.append(startAmp)
-            # print(f'Amp: {startAmp}')
             error = max(prob) / 20  # 0.05
             errors = np.full(len(prob), error)
         return errors
@@ -119,7 +115,7 @@ class CZSingleGateSimpleFit(BaseAnalysis):
                     p0=initial_parameters,
                 )
             except RuntimeError as e:
-                print("An error occurred during curve fitting:", e)
+                logger.info("An error occurred during curve fitting:", e)
                 return FitResultStatus.NOT_FOUND
 
             params = popt[0]
@@ -141,14 +137,12 @@ class CZSingleGateSimpleFit(BaseAnalysis):
 
     def SecondFit(self):
         for i, prob in enumerate(self.magnitudes):
-            # print(i)
             period_fit = self.paras_fit[i][1]
             times_cut_index = np.argmin(np.abs(self.times - 4 * period_fit))
             times_cut = self.times[:times_cut_index]
             prob_cut = prob[:times_cut_index]
-            # print(times_cut)
             if len(times_cut) < 6:
-                print("Not enough points, using first step")
+                logger.info("Not enough points, using first step")
             else:
                 errors_cut = self.errors[:times_cut_index]
                 amp_step2_init = self.paras_fit[i][0]
@@ -184,7 +178,7 @@ class CZSingleGateSimpleFit(BaseAnalysis):
                         p0=initial_parameters,
                     )
                 except RuntimeError as e:
-                    print("An error occurred during curve fitting:", e)
+                    logger.info("An error occurred during curve fitting:", e)
                     return FitResultStatus.NOT_FOUND
 
                 params = popt[0]
@@ -198,7 +192,6 @@ class CZSingleGateSimpleFit(BaseAnalysis):
 
                 # Calculate the p-value
                 p_value = 1 - chi2dist.cdf(chi_sq, len(prob_cut) - len(params))
-                # print("pvalue: " + str(p_value))
 
                 self.paras_fit[i] = params
                 self.chi2[i] = chi_sq

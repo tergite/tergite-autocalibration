@@ -10,35 +10,59 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import os
 from pathlib import Path
+
+from tergite_autocalibration.tests.utils.reflections import iter_module_files
+from tergite_autocalibration.utils.logging import logger
+
+# Find the path to the root directory of the package
+_library_folder = (
+    str(Path(__file__)).split("tergite_autocalibration")[0] + "tergite_autocalibration"
+)
 
 
 def test_license_headers():
-    # Find the path to the root directory of the package
-    library_folder = (
-        str(Path(__file__)).split("tergite_autocalibration")[0]
-        + "tergite_autocalibration"
-    )
-
     excluded_files = ["quantifiles"]
 
-    # Iterate over all files in the whole package
-    for dir_path, _, filenames in os.walk(library_folder):
-        for filename in filenames:
-            if filename.endswith(".py"):
-                file_path = dir_path + "/" + filename
+    # Iterate over package files
+    for file_path in iter_module_files(_library_folder, excluded_files):
 
-                # Check whether we should exclude the file based on its path e.g. some build files
-                if any(substr_ in file_path for substr_ in excluded_files):
-                    continue
+        # Check whether the file has more than one line of code and contains a license header
+        with open(file_path, "r", encoding="utf-8") as file:
+            lines = file.readlines()
+            line_count = len(lines)
 
-                # Check whether the file has more than one line of code and contains a license header
-                with open(file_path, "r", encoding="utf-8") as file:
-                    lines = file.readlines()
-                    line_count = len(lines)
-                    if line_count > 0:
-                        print(f"Check file: {file_path}")
-                        assert lines[0].startswith("# This code is part of Tergite")
-                    else:
-                        print(f"Empty file: {file_path}")
+            if line_count > 0:
+                logger.info(f"Check file: {file_path}")
+                assert lines[0].startswith("# This code is part of Tergite")
+            else:
+                logger.info(f"Empty file: {file_path}")
+
+
+def test_print_and_logging_statements():
+
+    # Exclude the logging utils and this test file
+    excluded_files = ["logging", "test_formatting"]
+
+    # Iterate over package files
+    for file_path in iter_module_files(_library_folder, excluded_files):
+
+        # Check whether the file has more than one line of code and contains print or logging statements
+        with open(file_path, "r", encoding="utf-8") as file:
+            lines = file.readlines()
+            line_count = len(lines)
+
+            if line_count > 0:
+                logger.info(f"Check file: {file_path}")
+                for line in lines:
+                    # Check for print statements
+                    assert "print(" not in line
+
+                    # Check for all kind of logging statements
+                    assert "logging.debug" not in line
+                    assert "logging.info" not in line
+                    assert "logging.warning" not in line
+                    assert "logging.error" not in line
+                    assert "logging.log" not in line
+            else:
+                logger.info(f"Empty file: {file_path}")

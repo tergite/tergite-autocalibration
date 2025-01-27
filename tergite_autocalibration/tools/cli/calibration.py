@@ -30,6 +30,13 @@ def start(
             help="Takes the cluster ip address as argument. If not set, it will try take CLUSTER_IP in the .env file.",
         ),
     ] = None,
+    d: Annotated[
+        bool,
+        typer.Option(
+            "-d",
+            help="Executes the calibration chain in dummy mode.",
+        ),
+    ] = False,
     r: Annotated[
         str,
         typer.Option(
@@ -85,7 +92,7 @@ def start(
 
         # Check if the folder exists
         if not folder_path.is_dir():
-            print(f"Error: The specified folder '{folder_path}' does not exist.")
+            typer.echo(f"Error: The specified folder '{folder_path}' does not exist.")
             exit(1)  # Exit with an error code
 
         if not name:
@@ -109,6 +116,8 @@ def start(
                 "Cluster argument requires the ip address of the cluster as parameter. "
                 "Trying to start the calibration supervisor with default cluster configuration."
             )
+    elif d:
+        cluster_mode = MeasurementMode.dummy
 
     # Start the quantifiles dataset browser in the background
     if browser:

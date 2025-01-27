@@ -27,31 +27,24 @@ from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 class RandomizedBenchmarkingSSRONode(ScheduleNode):
     measurement_obj = RandomizedBenchmarkingSSROMeasurement
     analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
-    qubit_qois = ["fidelity"]
+    qubit_qois = ["fidelity", "fidelity_error", "leakage", "leakage_error"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
-        self.name = name
-        self.all_qubits = all_qubits
         self.schedule_keywords = schedule_keywords
-        self.backup = False
-        self.redis_field = ["fidelity", "fidelity_error", "leakage", "leakage_error"]
-        self.measurement_obj = RandomizedBenchmarkingSSROMeasurement
-        self.analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
-        self.qubit_state = 2
         self.schedule_keywords = {}
         self.loops = 500
         self.schedule_keywords["loop_repetitions"] = self.loops
 
-        RB_REPEATS = 10
-        self.external_samplespace = {
+        RB_REPEATS = 4
+        self.outer_schedule_samplespace = {
             "seeds": {
                 qubit: np.arange(RB_REPEATS, dtype=np.int32)
                 for qubit in self.all_qubits
             }
         }
 
-        self.initial_schedule_samplespace = {
+        self.schedule_samplespace = {
             "number_of_cliffords": {
                 qubit: np.array([0, 8, 16, 32, 64, 128, 256, 512, 1024])
                 for qubit in self.all_qubits

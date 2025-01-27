@@ -85,7 +85,6 @@ def measure_time_of_flight(cluster):
     readout_module.get_acquisition_state(0, 1)
     readout_module.store_scope_acquisition(0, "single")
     # Print status of sequencer.
-    # print(readout_module.get_sequencer_state(0))
     p0 = np.array(
         readout_module.get_acquisitions(0)["single"]["acquisition"]["scope"]["path0"][
             "data"
@@ -145,5 +144,4 @@ def analyze_tof(p0, p1):
     #
     #
     #
-    #     #print('Time of flight = ', tof, ' ns')
     #     return tof*1e-9

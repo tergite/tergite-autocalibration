@@ -25,7 +25,6 @@ from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.analysis impor
 @pytest.fixture(autouse=True)
 def setup_good_data():
     dataset_path = Path(__file__).parent / "data" / "dataset_good_quality_freq_amp.hdf5"
-    print(dataset_path)
     ds = xr.open_dataset(dataset_path)
     d14 = ds["yq14"].to_dataset()
     d15 = ds["yq15"].to_dataset()
@@ -68,7 +67,6 @@ def test_combineGoodResultsReturnCorrectResults(setup_good_data):
 @pytest.fixture(autouse=True)
 def setup_bad_data():
     dataset_path = Path(__file__).parent / "data" / "dataset_bad_quality_freq_amp.hdf5"
-    print(dataset_path)
     ds = xr.open_dataset(dataset_path)
     d14 = ds["yq14"].to_dataset()
     d15 = ds["yq15"].to_dataset()

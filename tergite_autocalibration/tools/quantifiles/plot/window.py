@@ -2,22 +2,34 @@
 #
 # Copyright (c) 2023, Damien Crielaard
 # All rights reserved.
+#
+# This code is part of Tergite
+#
+# (C) Copyright Chalmers Next Labs 2024
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+
 
 from __future__ import annotations
 
-import logging
 from functools import partial
 from typing import cast
 
 import xarray as xr
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import QSignalMapper
+
 from tergite_autocalibration.tools.quantifiles.data import get_snapshot_as_dict
 from tergite_autocalibration.tools.quantifiles.plot.baseplot import BasePlot
 from tergite_autocalibration.tools.quantifiles.plot.lineplot import LinePlot
 from tergite_autocalibration.tools.quantifiles.plot.snapshot import SnapshotTab
-
-logger = logging.getLogger(__name__)
+from tergite_autocalibration.utils.logging import logger
 
 
 class GettableSelector(QtWidgets.QWidget):
@@ -175,8 +187,6 @@ class CustomSelector(QtWidgets.QWidget):
         self.set_combo_box.addItems(settables + gettables)
         self.get_combo_box.addItems(settables + gettables)
 
-        # self.set_combo_box.activated[str].connect(lambda x: print(dataset[x]))
-        # self.get_combo_box.activated[str].connect(lambda x: print(dataset[x]))
         self.set_combo_box.activated[str].connect(self.combo_option_selected)
         self.get_combo_box.activated[str].connect(self.combo_option_selected)
 
@@ -212,9 +222,6 @@ class CustomSelector(QtWidgets.QWidget):
         set_selected = self.set_combo_box.currentText()
         get_selected = self.get_combo_box.currentText()
         self.combo_selected.emit(set_selected, get_selected)
-        # self.gettable_toggled.emit(name, enabled)
-        # # set_combo_box.activated[str].connect(lambda x: print(dataset[x]))
-        # # get_combo_box.activated[str].connect(lambda x: print(dataset[x]))
 
 
 class GettableSelectBox(QtWidgets.QFrame):

@@ -16,6 +16,7 @@
 import numpy as np
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
+from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.lib.base.node import BaseNode
 from tergite_autocalibration.lib.nodes.coupler.cz_chevron.analysis import (
     CZChevronAnalysis,
@@ -42,15 +43,15 @@ class CZChevronNode(BaseNode):
         self.all_qubits = [q for bus in couplers for q in bus.split("_")]
         self.coupler_samplespace = self.samplespace
         try:
-            print(f'{self.node_dictionary["cz_pulse_amplitude"] = }')
+            logger.info(f'{self.node_dictionary["cz_pulse_amplitude"] = }')
         except:
             amplitude = float(
                 REDIS_CONNECTION.hget(f"couplers:{self.coupler}", "cz_pulse_amplitude")
             )
-            print(f"Amplitude found for coupler {self.coupler} : {amplitude}")
+            logger.info(f"Amplitude found for coupler {self.coupler} : {amplitude}")
             if np.isnan(amplitude):
                 amplitude = 0.375
-                print(
+                logger.info(
                     f"No amplitude found for coupler {self.coupler}. Using default value: {amplitude}"
                 )
             self.node_dictionary["cz_pulse_amplitude"] = amplitude
@@ -74,7 +75,7 @@ class CZChevronNode(BaseNode):
         for coupler in self.couplers:
             all_coupled_qubits += coupler.split("_")
         if len(all_coupled_qubits) > len(set(all_coupled_qubits)):
-            print("Couplers share qubits")
+            logger.info("Couplers share qubits")
             raise ValueError("Improper Couplers")
 
     def transition_frequency(self, coupler: str):
@@ -100,8 +101,8 @@ class CZChevronNode(BaseNode):
         )
         ac_freq = int(ac_freq / 1e4) * 1e4
         # lo = 4.4e9 - (ac_freq - 450e6)
-        # print(f'{ ac_freq/1e6 = } MHz for coupler: {coupler}')
-        # print(f'{ lo/1e9 = } GHz for coupler: {coupler}')
+        # logger.info(f'{ ac_freq/1e6 = } MHz for coupler: {coupler}')
+        # logger.info(f'{ lo/1e9 = } GHz for coupler: {coupler}')
         return ac_freq
 
 
@@ -156,7 +157,7 @@ class CZCharacterisationChevronNode(BaseNode):
         for coupler in self.couplers:
             all_coupled_qubits += coupler.split("_")
         if len(all_coupled_qubits) > len(set(all_coupled_qubits)):
-            print("Couplers share qubits")
+            logger.info("Couplers share qubits")
             raise ValueError("Improper Couplers")
 
     def transition_frequency(self, coupler: str):
@@ -181,7 +182,7 @@ class CZCharacterisationChevronNode(BaseNode):
             ]
         )
         ac_freq = int(ac_freq / 1e4) * 1e4
-        print(f"{ ac_freq/1e6 = } MHz for coupler: {coupler}")
+        logger.info(f"{ ac_freq/1e6 = } MHz for coupler: {coupler}")
         return ac_freq
 
 
@@ -216,7 +217,7 @@ class CZOptimizeChevronNode(BaseNode):
         for coupler in self.couplers:
             all_coupled_qubits += coupler.split("_")
         if len(all_coupled_qubits) > len(set(all_coupled_qubits)):
-            print("Couplers share qubits")
+            logger.info("Couplers share qubits")
             raise ValueError("Improper Couplers")
 
     def transition_frequency(self, coupler: str):
@@ -241,7 +242,7 @@ class CZOptimizeChevronNode(BaseNode):
             ]
         )
         ac_freq = int(ac_freq / 1e4) * 1e4
-        print(f"{ ac_freq/1e6 = } MHz for coupler: {coupler}")
+        logger.info(f"{ ac_freq/1e6 = } MHz for coupler: {coupler}")
         return ac_freq
 
 
@@ -280,7 +281,7 @@ class CZChevronSweepNode(BaseNode):
         for coupler in self.couplers:
             all_coupled_qubits += coupler.split("_")
         if len(all_coupled_qubits) > len(set(all_coupled_qubits)):
-            print("Couplers share qubits")
+            logger.info("Couplers share qubits")
             raise ValueError("Improper Couplers")
 
     def transition_frequency(self, coupler: str):
@@ -305,7 +306,4 @@ class CZChevronSweepNode(BaseNode):
             ]
         )
         ac_freq = int(ac_freq / 1e4) * 1e4
-        # lo = 4.4e9 - (ac_freq - 450e6)
-        # print(f'{ ac_freq/1e6 = } MHz for coupler: {coupler}')
-        # print(f'{ lo/1e9 = } GHz for coupler: {coupler}')
         return ac_freq

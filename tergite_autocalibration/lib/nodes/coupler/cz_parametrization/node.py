@@ -13,6 +13,7 @@
 import numpy as np
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
+from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.analysis import (
     CZParametrizationFixDurationNodeAnalysis,
 )
@@ -39,7 +40,7 @@ class CZParametrizationFixDurationNode(ScheduleNode):
         self.type = "parameterized_sweep"
         self.couplers = couplers
         self.edges = couplers
-        print(couplers)
+        logger.info(couplers)
         self.coupler = couplers[0]
         self.schedule_keywords = schedule_keywords
         self.backup = False
@@ -100,7 +101,7 @@ class CZParametrizationFixDurationNode(ScheduleNode):
             ]
         )
         ac_freq = int(ac_freq / 1e4) * 1e4
-        print(f"{ ac_freq/1e6 = } MHz for coupler: {coupler}")
+        logger.info(f"{ ac_freq/1e6 = } MHz for coupler: {coupler}")
         return ac_freq
 
     def coupler_current(self):
