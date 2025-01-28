@@ -23,7 +23,7 @@ attenuation = 10
 
 {% for qubit in qubits %}
 [device.resonator.{{ qubit }}]
-VNA_frequency = {{ vna_frequency_placeholder }}
+# VNA_frequency =
 {% endfor %}
 
 
@@ -48,8 +48,8 @@ measure_3state_opt.integration_time = 2.5e-6
 
 {% for qubit in qubits %}
 [device.qubit.{{ qubit }}]
-VNA_f01_frequency =
-VNA_f12_frequency =
+# VNA_f01_frequency =
+# VNA_f12_frequency =
 measure.pulse_amp = 0.03
 measure_1.pulse_amp = 0.03
 measure_2.pulse_amp = 0.03
@@ -78,7 +78,6 @@ attenuation = 10
 [layout.resonator.{{ qubit }}]
 position = {}
 {% endfor %}
-
 {% for qubit in qubits %}
 [layout.qubit.{{ qubit }}]
 position = {}

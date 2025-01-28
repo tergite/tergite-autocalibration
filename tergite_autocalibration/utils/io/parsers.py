@@ -14,7 +14,7 @@ import re
 from typing import List
 
 
-def parse_input_qubit(qubit_str: str) -> List[str]:
+def parse_input_qubits(qubit_str: str) -> List[str]:
     """
     This generates a list of qubits from an unstructured input string.
 
@@ -23,17 +23,17 @@ def parse_input_qubit(qubit_str: str) -> List[str]:
 
     Examples:
         Enter qubits in a list format:
-        >>> qubits = parse_input_qubit("q01,q02,q03,q04")
+        >>> qubits = parse_input_qubits("q01,q02,q03,q04")
         >>> print(qubits)
         >>> ["q01", "q02", "q03", "q04"]
 
         Enter qubit ranges:
-        >>> qubits = parse_input_qubit("q01-q03")
+        >>> qubits = parse_input_qubits("q01-q03")
         >>> print(qubits)
         >>> ["q01", "q02", "q03"]
 
         Enter a mix of lists and ranges:
-        >>> qubits = parse_input_qubit("q01-q05, q08, q10, q12-q15")
+        >>> qubits = parse_input_qubits("q01-q05, q08, q10, q12-q15")
         >>> print(qubits)
         >>> ["q01", "q02", "q03", "q04", "q05", "q08", "q10", "q12", "q13", "q14", "q15"]
 

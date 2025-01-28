@@ -11,7 +11,7 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from typing import Annotated
+from typing import Annotated, Union
 
 import typer
 
@@ -58,18 +58,88 @@ cli.add_typer(
 
 
 @cli.command(help="Quickly runs to set reasonable defaults for the configuration.")
-def quickstart():
+def quickstart(
+    qubits: Annotated[
+        str,
+        typer.Option(
+            "--qubits",
+            "-q",
+            help='Qubit input e.g. "q00,q01,q02,q03,q04" or "q01-q05" or "q01-q06, q08".',
+        ),
+    ] = None
+):
     """
-    Runs the quickstart and set up the autocalibration with reasonable default values.
-    This is to some extent similar to `acli config load -t .default`, but additionally sets up the .env file.
+    This is loading the template to the root dir and fills it with the input qubits.
 
-    Returns:
-
+    Args:
+        qubits: Qubit input e.g. "q00,q01,q02,q03,q04" or "q01-q05" or "q01-q06, q08"
     """
-    from .config import load
+    import os
 
+    from jinja2 import Template
+
+    from tergite_autocalibration.config.globals import ENV
+    from tergite_autocalibration.config.package import ConfigurationPackage
+    from tergite_autocalibration.tools.cli.config import load
+    from tergite_autocalibration.utils.io.parsers import parse_input_qubits
+    from tergite_autocalibration.utils.misc.helpers import generate_n_qubit_list
+
+    # This is the case where the qubit input indicates the total number of qubits
+    try:
+        qubits = int(qubits)
+        qubits_ = generate_n_qubit_list(qubits)
+
+    # This is the case where the qubits are specified in a string and then parsed
+    except ValueError:
+        if isinstance(qubits, str):
+            qubits_ = parse_input_qubits(qubits)
+        # Or if it is no string at all, it will raise a failure
+        else:
+            typer.echo(f"Input qubits {qubits} cannot be parsed. Please provide a valid input for --qubits or -q.")
+            raise typer.Abort()
+    except TypeError:
+        typer.echo(f"Input qubits empty. Please provide a valid input for --qubits or -q.")
+        raise typer.Abort()
+
+    # Load the default configuration package
     load(template=".default")
-    print("Hello")
+
+    # Create a configuration package object for easier handling
+    configuration_package = ConfigurationPackage.from_toml(
+        os.path.join(ENV.config_dir, "configuration.meta.toml")
+    )
+
+    # Insert the template values for device configuration
+    configs_to_update = ["device_config", "run_config"]
+
+    # Iterate over the configurations to update
+    # Note: This can be looped at the moment, since there is a very simple logic behind updating
+    #       the configurations. It can also be solved in a more advanced way and more specific for
+    #       each single configuration file, but right now the only necessary parameter is the list
+    #       of qubits.
+    for config_name in configs_to_update:
+
+        # Get the path to the configuration template
+        config_template_path = os.path.join(
+            configuration_package.misc_filepaths["j2_templates"],
+            f"{config_name}.j2",
+        )
+        # Read the template file content
+        with open(config_template_path, "r") as file:
+            template_content = file.read()
+
+        # Create a Template object
+        template = Template(template_content)
+
+        # Insert the template values for run configuration
+        output = template.render(qubits=qubits_)
+
+        # Write the configuration values to the .toml files
+        config_output_file_path = configuration_package.config_files[config_name]
+
+        # Write the output to a TOML file
+        with open(config_output_file_path, "w") as toml_file:
+            toml_file.write(output)
 
 
 @cli.command(help="Open the dataset browser (quantifiles).")
