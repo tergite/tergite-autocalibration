@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2023
+# (C) Copyright Eleftherios Moschandreou 2023, 2025
 # (C) Copyright Michele Faucci Giannelli 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
@@ -26,7 +26,7 @@ class MotzoiBaseQubitAnalysis(BaseQubitAnalysis):
         self.fit_results = {}
         self.optimal_motzoi = None
 
-    def analyse_qubit(self):
+    def _analyse_motzoi(self):
         """
         Analyze the magnitudes to determine the optimal Motzoi parameter.
         """
@@ -43,18 +43,6 @@ class MotzoiBaseQubitAnalysis(BaseQubitAnalysis):
         # Find the index with the minimum sum (optimal motzoi)
         index_of_min = np.argmin(sums)
         self.optimal_motzoi = float(self.magnitudes[motzoi_key][index_of_min].values)
-
-        analysis_succesful = True
-        analysis_result = {
-            "rxy:motzoi": {
-                "value": self.optimal_motzoi,
-                "error": 0,
-            }
-        }
-
-        qoi = QOI(analysis_result, analysis_succesful)
-
-        return qoi
 
     def plotter(self, axis):
         datarray = self.magnitudes[self.data_var]
@@ -74,13 +62,43 @@ class MotzoiBaseQubitAnalysis(BaseQubitAnalysis):
 class Motzoi01QubitAnalysis(MotzoiBaseQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-        self.redis_field = "clock_freqs:f01"
+        self.redis_field = "rxy:motzoi"
+
+    def analyse_qubit(self):
+        self._analyse_motzoi()
+
+        analysis_succesful = True
+        analysis_result = {
+            self.redis_field: {
+                "value": self.optimal_motzoi,
+                "error": 0,
+            }
+        }
+
+        qoi = QOI(analysis_result, analysis_succesful)
+
+        return qoi
 
 
 class Motzoi12QubitAnalysis(MotzoiBaseQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-        self.redis_field = "clock_freqs:f12"
+        self.redis_field = "r12:ef_motzoi"
+
+    def analyse_qubit(self):
+        self._analyse_motzoi()
+
+        analysis_succesful = True
+        analysis_result = {
+            self.redis_field: {
+                "value": self.optimal_motzoi,
+                "error": 0,
+            }
+        }
+
+        qoi = QOI(analysis_result, analysis_succesful)
+
+        return qoi
 
 
 class Motzoi01NodeAnalysis(BaseAllQubitsAnalysis):

@@ -143,7 +143,17 @@ class OptimalRO012FrequencyQubitAnalysis(OptimalRO01FrequencyQubitAnalysis):
         self.optimal_frequency = self.total_distance.idxmax().item()
         self.optimal_distance = self.total_distance.max().item()
 
-        return [self.optimal_frequency]
+        analysis_succesful = True
+        analysis_result = {
+            "extended_clock_freqs:readout_3state_opt": {
+                "value": self.optimal_frequency,
+                "error": 0,
+            }
+        }
+
+        qoi = QOI(analysis_result, analysis_succesful)
+
+        return qoi
 
     def plotter(self, ax):
         ax.set_xlabel("RO frequency")
