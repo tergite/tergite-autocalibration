@@ -14,20 +14,16 @@ from tergite_autocalibration.utils.misc.helpers import generate_n_qubit_list
 
 
 def test_generate_n_qubit_list_default_start():
-    """Test the default starting value of 1."""
     assert generate_n_qubit_list(5) == ["q01", "q02", "q03", "q04", "q05"]
 
 
 def test_generate_n_qubit_list_custom_start():
-    """Test with a custom starting value."""
     assert generate_n_qubit_list(5, 10) == ["q10", "q11", "q12", "q13", "q14"]
 
 
 def test_generate_n_qubit_list_single_qubit():
-    """Test with a single qubit."""
     assert generate_n_qubit_list(1) == ["q01"]
 
 
 def test_generate_n_qubit_list_zero_qubits():
-    """Test when the number of qubits is zero."""
     assert generate_n_qubit_list(0) == []
