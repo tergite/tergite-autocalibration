@@ -23,18 +23,15 @@ def parse_input_qubits(qubit_str: str) -> List[str]:
 
     Examples:
         Enter qubits in a list format:
-        >>> qubits = parse_input_qubits("q01,q02,q03,q04")
-        >>> print(qubits)
+        >>> parse_input_qubits("q01,q02,q03,q04")
         >>> ["q01", "q02", "q03", "q04"]
 
         Enter qubit ranges:
-        >>> qubits = parse_input_qubits("q01-q03")
-        >>> print(qubits)
+        >>> parse_input_qubits("q01-q03")
         >>> ["q01", "q02", "q03"]
 
         Enter a mix of lists and ranges:
-        >>> qubits = parse_input_qubits("q01-q05, q08, q10, q12-q15")
-        >>> print(qubits)
+        >>> parse_input_qubits("q01-q05, q08, q10, q12-q15")
         >>> ["q01", "q02", "q03", "q04", "q05", "q08", "q10", "q12", "q13", "q14", "q15"]
 
     Returns:
