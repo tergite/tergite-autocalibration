@@ -1,0 +1,86 @@
+# Device configuration file
+#
+# This file is meant to serve as examples to illustrate how to write
+# these configuration files, as well as for testing purposes. It can
+# be used as a template for configuring properties of the actual
+# device at hand.
+#
+# Note: This device configuration follows a standard, such that
+# it can be read by other backend components as well
+
+[device]
+# The items of this section describe general device properties known
+# after fabrication and first manual characterization steps. The general
+# section should contain relevant metadata
+name = "device_template"
+
+# -------------------- Resonator definitions --------------------
+# This section contains all resonator-specific properties
+
+# Values for specific resonators
+[device.resonator.all]
+attenuation = 10
+
+{% for qubit in qubits %}
+[device.resonator.{{ qubit }}]
+VNA_frequency = {{ vna_frequency_placeholder }}
+{% endfor %}
+
+
+# -------------------- Qubit definitions --------------------
+# This section contains all qubit-specific properties
+
+[device.qubit.all]
+attenuation = 6
+measure.acq_delay = 220e-9
+measure_1.acq_delay = 220e-9
+measure_2.acq_delay = 220e-9
+measure.pulse_duration = 3e-6
+measure_1.pulse_duration = 3e-6
+measure_2.pulse_duration = 3e-6
+measure.integration_time = 2.5e-6
+measure_1.integration_time = 2.5e-6
+measure_2.integration_time = 2.5e-6
+rxy.duration = 28e-9
+measure_3state_opt.pulse_duration = 3e-6
+measure_3state_opt.acq_delay = 220e-9
+measure_3state_opt.integration_time = 2.5e-6
+
+{% for qubit in qubits %}
+[device.qubit.{{ qubit }}]
+VNA_f01_frequency =
+VNA_f12_frequency =
+measure.pulse_amp = 0.03
+measure_1.pulse_amp = 0.03
+measure_2.pulse_amp = 0.03
+{% endfor %}
+
+# -------------------- Coupler definitions --------------------
+# This section contains all coupler-specific properties
+
+[device.coupler.all]
+attenuation = 10
+
+# Note: Please add the couplers manually for now
+[device.coupler.q00_q01]
+attenuation = 10
+
+# --------------------------------------------------------------------------------
+# Device layout configuration section
+
+[layout]
+# The items of this section correspond to component types and their
+# sub-items correspond to their indices/identities. This also works as
+# a way to declare what components are supported/present in the
+# device.
+
+{% for qubit in qubits %}
+[layout.resonator.{{ qubit }}]
+position = {}
+{% endfor %}
+
+{% for qubit in qubits %}
+[layout.qubit.{{ qubit }}]
+position = {}
+{% endfor %}
+

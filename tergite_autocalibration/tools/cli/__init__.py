@@ -69,6 +69,7 @@ def quickstart():
     from .config import load
 
     load(template=".default")
+    print("Hello")
 
 
 @cli.command(help="Open the dataset browser (quantifiles).")
