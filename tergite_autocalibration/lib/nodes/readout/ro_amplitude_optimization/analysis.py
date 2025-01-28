@@ -444,7 +444,7 @@ class OptimalROThreeStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis)
         '''
         classify the three states for each RO amplitude
         and return the RO amplitude that gives the maximum three state classification fidelity
-
+        as well as the defining parameters for the optimal three state boundary
         returns
         -------
         optimal_amplitude: float 
