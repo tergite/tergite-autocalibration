@@ -441,6 +441,27 @@ class OptimalROThreeStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis)
         super().__init__(name, redis_fields)
 
     def analyse_qubit(self):
+        '''
+        classify the three states for each RO amplitude
+        and return the RO amplitude that gives the maximum three state classification fidelity
+
+        returns
+        -------
+        optimal_amplitude: float 
+            amplitude of the RO pulse that gives optimal fidelity
+        centroid_I: float
+            I coordinate of the centroid defined by the class boundaries
+        centroid_Q: float
+            Q coordinate of the centroid defined by the class boundaries
+        omega_01: float \in [0,360) degrees
+            defining angle for the |0> - |1> boundary
+        omega_12: float \in [0,360) degrees
+            defining angle for the |1> - |2> boundary
+        omega_20 \in [0,360) degrees,
+            defining angle for the |2> - |0> boundary
+        inv_cm_str: str
+            string encoding of the confusion matrix
+        '''
         super().analyse_qubit()
         self.run_initial_fitting()
         inv_cm_str = ",".join(
