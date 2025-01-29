@@ -73,3 +73,4 @@ user_samplespace = 'user_samplespace.py'
 # to the configuration package as additional information.
 
 miscellaneous_files = "misc"
+j2_templates = "j2_templates"
