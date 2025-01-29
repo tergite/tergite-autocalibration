@@ -12,6 +12,7 @@
 
 from typing import List
 
+
 def generate_n_qubit_list(n_qubits: int, starting_from: int = 1) -> List[str]:
     """
     This generates a list of qubits.
@@ -24,4 +25,3 @@ def generate_n_qubit_list(n_qubits: int, starting_from: int = 1) -> List[str]:
         List of qubits ["qXX", ...] starting with "q01" (default, regulated by starting_from parameter).
     """
     return [f"q{i:02}" for i in range(starting_from, starting_from + n_qubits)]
-

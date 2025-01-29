@@ -65,7 +65,7 @@ def quickstart(
             "--qubits",
             "-q",
             help='Qubit input e.g. "q00,q01,q02,q03,q04" or "q01-q05" or "q01-q06, q08".'
-                 'If the input is an integer e.g. 3, it will generate "q01,q02,q03".',
+            'If the input is an integer e.g. 3, it will generate "q01,q02,q03".',
         ),
     ] = None
 ):
