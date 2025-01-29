@@ -64,7 +64,8 @@ def quickstart(
         typer.Option(
             "--qubits",
             "-q",
-            help='Qubit input e.g. "q00,q01,q02,q03,q04" or "q01-q05" or "q01-q06, q08".',
+            help='Qubit input e.g. "q00,q01,q02,q03,q04" or "q01-q05" or "q01-q06, q08".'
+                 'If the input is an integer e.g. 3, it will generate "q01,q02,q03".',
         ),
     ] = None
 ):
@@ -95,10 +96,14 @@ def quickstart(
             qubits_ = parse_input_qubits(qubits)
         # Or if it is no string at all, it will raise a failure
         else:
-            typer.echo(f"Input qubits {qubits} cannot be parsed. Please provide a valid input for --qubits or -q.")
+            typer.echo(
+                f"Input qubits {qubits} cannot be parsed. Please provide a valid input for --qubits or -q."
+            )
             raise typer.Abort()
     except TypeError:
-        typer.echo(f"Input qubits empty. Please provide a valid input for --qubits or -q.")
+        typer.echo(
+            f"Input qubits empty. Please provide a valid input for --qubits or -q."
+        )
         raise typer.Abort()
 
     # Load the default configuration package
