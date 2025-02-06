@@ -25,7 +25,7 @@ from tergite_autocalibration.utils.dto.enums import MeasurementMode
 #       carefully. If you are running into any errors, please compare the code in tools/cli
 #       to ensure that the code is the same as in the original endpoint.
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     # Initialize the configuration
     cluster_mode: "MeasurementMode" = MeasurementMode.real
