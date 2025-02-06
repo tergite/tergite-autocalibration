@@ -55,6 +55,8 @@ website:
             href: developer-guide/unit_tests.qmd
           - text: "Logging"
             href: developer-guide/logging.qmd
+          - text: "Debugging"
+            href: developer-guide/debugging.qmd
           - text: "Writing documentation"
             href: developer-guide/writing_documentation.qmd
       - text: "Troubleshooting"

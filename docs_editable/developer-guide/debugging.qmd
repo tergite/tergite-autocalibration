@@ -33,10 +33,12 @@ logger.debug("A message to be only printed while debugging the application.")
 Consider reading more about the [logger](logging.qmd) before starting.
 
 **Advantages**
+
 - It is very easy to add the print statement.
 - You can easily add print statements even when you are using console based editors.
 
 **Disadvantages**
+
 - If you add too many print statements, the console output can become very verbose
 - You have to know in advance what you want to print. Let us say, in the example above, you wanted to print `y` as well and it would take a long time to compute other things before you reach `y` in the code, you are loosing a long time to wait.
 - You have to define print statements also for more complex variables.
@@ -73,11 +75,13 @@ python pdb my_script.py
 You can find more information about the python debugger in the [official documentation for pdb](https://docs.python.org/3/library/pdb.html) and [this tutorial](https://realpython.com/python-debugging-pdb/).
 
 **Advantages**
+
 - Lets you find out more about the state of the application in an interactive way.
 - Not much more complicated than the print statements.
 - Part of the Python standard library.
 
 **Disadvantages**
+
 - You still have to remove the breakpoints afterward to clean up your code.
 - For very complex objects, it is still complicated to discover their structure.
 
@@ -86,10 +90,11 @@ Modern IDEs nowadays usually feature a built-in debugger by default.
 The debugger often offers a way to evaluate expressions during runtime.
 Breakpoints can be set just for the IDE itself even during runtime, and they are usually not destructive i.e. part of the codebase.
 
-![Graphical debugger](../.assets/images/graphical_debugger.png)
+![Graphical debugger in PyCharm](../.assets/images/graphical_debugger.png)
 
 On the picture above, you can see how the graphical debugger looks like in PyCharm.
 There are five important areas:
+
 - **blue**: This is inside the actual code. The red dot marks the position in the code, where it should halt during execution.
 - **red**: On this panel, you can control the code execution. There are buttons to restart, stop, continue to the next breakpoint, halt, go to the next line and more. The choices might vary for each IDE.
 - **orange**: Since the function you are inside can possibly been called by another function outside, on the orange panel there is a stack trace where you can navigate between the contexts.
@@ -101,11 +106,13 @@ It is a real game changer and will save you a lot of time while trying to figure
 For more information check out these guides for [VSCode](https://code.visualstudio.com/docs/editor/debugging) and [PyCharm](https://www.jetbrains.com/help/pycharm/debugging-your-first-python-application.html).
 
 **Advantages**
+
 - You can easily explore very complex states of your application.
 - No need to remove print statements or breakpoints.
 - Most IDEs include a debugger out of the box.
 
 **Disadvantages**
+
 - The code execution might be a bit slower than usual.
 - Sometimes the debugger introduces errors, or you will end up in a strange state. Especially, when working with multithreaded applications. However, this does not happen very often and will probably not happen for the automatic calibration.
 
