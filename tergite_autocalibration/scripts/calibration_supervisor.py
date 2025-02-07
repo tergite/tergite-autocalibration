@@ -140,21 +140,17 @@ class HardwareManager:
         # Configure each cluster in the list and add it to the instrument coordinator
         for cluster in clusters:
             # TODO: Setting the attenuation might not be needed any longer if we decide to use the new hw config
-            for module in self.cluster.modules:
+            attenuations = dh.get_legacy("attenuation_setting")
+            for i, module in self.cluster.get_connected_modules().items():
                 try:
                     if module.is_qcm_type and module.is_rf_type:
-                        module.out0_att(
-                            dh.get_legacy("attenuation_setting")["qubit"]
-                        )  # For control lines
-                        module.out1_att(
-                            dh.get_legacy("attenuation_setting")["coupler"]
-                        )  # For flux lines
+                        module.out0_att(attenuations["qubit"])  # For control lines
+                        module.out1_att(attenuations["coupler"])  # For flux lines
                     elif module.is_qrm_type and module.is_rf_type:
-                        module.out0_att(
-                            dh.get_legacy("attenuation_setting")["readout"]
-                        )  # For readout lines
-                except:
-                    pass
+                        module.out0_att(attenuations["resonator"])  # For readout lines
+                except Exception as e:
+                    logger.error(f"Could not set attenuations: {attenuations}")
+                    logger.error(e)
 
             # Add the configured cluster to the instrument coordinator and set a timeout
             lab_ic.add_component(ClusterComponent(cluster))
