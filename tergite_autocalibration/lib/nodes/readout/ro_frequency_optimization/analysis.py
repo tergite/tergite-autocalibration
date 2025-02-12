@@ -135,13 +135,22 @@ class OptimalRO012FrequencyQubitAnalysis(OptimalRO01FrequencyQubitAnalysis):
         self.s21_2 = self.S21[self.data_var].sel({self.qubit_state_coord: 2})
         self.magnitudes_2 = np.abs(self.s21_2)
 
-        distances_01 = np.abs(self.magnitudes_0 - self.magnitudes_1)
-        distances_12 = np.abs(self.magnitudes_1 - self.magnitudes_2)
-        distances_20 = np.abs(self.magnitudes_2 - self.magnitudes_0)
-        self.total_distance = (distances_01 + distances_12 + distances_20) / 3
+        re_0 = self.s21_0.real
+        im_0 = self.s21_0.imag
+        re_1 = self.s21_1.real
+        im_1 = self.s21_1.imag
+        re_2 = self.s21_2.real
+        im_2 = self.s21_2.imag
+        distances_01 = np.sqrt( (re_0 - re_1)**2 + (im_0 - im_1)**2)
+        distances_12 = np.sqrt( (re_1 - re_2)**2 + (im_1 - im_2)**2)
+        distances_20 = np.sqrt( (re_2 - re_0)**2 + (im_2 - im_0)**2)
 
-        self.optimal_frequency = self.total_distance.idxmax().item()
-        self.optimal_distance = self.total_distance.max().item()
+        #following Heron's formula for the maximum area of the triangle
+        s = (distances_01 + distances_12 + distances_20) / 2
+        self.area = np.sqrt( s * (s - distances_01) * (s - distances_12) * (s - distances_20))
+        
+        self.optimal_frequency = self.area.idxmax().item()
+        self.optimal_distance = self.area.max().item()
 
         analysis_succesful = True
         analysis_result = {
@@ -161,11 +170,11 @@ class OptimalRO012FrequencyQubitAnalysis(OptimalRO01FrequencyQubitAnalysis):
         ax.plot(self.frequencies, np.abs(self.magnitudes_0), label="0")
         ax.plot(self.frequencies, np.abs(self.magnitudes_1), label="1")
         ax.plot(self.frequencies, np.abs(self.magnitudes_2), label="2")
-        ax.plot(self.frequencies, self.total_distance, "--", label="distance")
+        ax.plot(self.frequencies, self.area*1.5e2, "--", label="area") #*2e2 for visibility in plot
 
         ax.scatter(
             self.optimal_frequency,
-            self.optimal_distance,
+            self.optimal_distance*1.5e2, # factor for visibility in plot
             marker="*",
             c="red",
             s=64,
