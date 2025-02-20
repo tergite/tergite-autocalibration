@@ -35,11 +35,14 @@ def test_license_headers():
             if line_count > 0:
                 first_line = lines[0].strip()  # Remove leading/trailing whitespace
                 logger.info(f"Check file: {file_path}")
-                
-                assert first_line.startswith("# This code is part of Tergite") or "MIT License" in first_line, (
+
+                assert (
+                    first_line.startswith("# This code is part of Tergite")
+                    or "MIT License" in first_line
+                ), (
                     f"Missing valid license header in {file_path}. "
                     "First line must start with '# This code is part of Tergite' or contain a correct license header."
-                    )
+                )
             else:
                 logger.info(f"Empty file: {file_path}")
 
