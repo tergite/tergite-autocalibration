@@ -30,6 +30,7 @@
 # that they have been altered from the originals.
 
 import numpy as np
+import logging
 from typing import List, Optional
 from zlib import crc32
 from os.path import join, dirname, abspath
@@ -551,7 +552,7 @@ try:
     open(join(hash_dir, "single_qubit_hash_lut.txt"), "r")
     # FIXME: also check 'two_qubit_hash_lut.txt'
 except FileNotFoundError:
-    print("Clifford group hash tables not detected.")
+    logging.warning("Clifford group hash tables not detected.")
     from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.utils.generate_clifford_hash_tables import (
         generate_hash_tables,
     )
