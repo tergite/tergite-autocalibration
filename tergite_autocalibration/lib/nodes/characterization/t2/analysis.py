@@ -73,7 +73,7 @@ class BaseT2QubitAnalysis(BaseQubitAnalysis, ABC):
         super().__init__(name, redis_fields)
         self.T2_times = []
 
-    def analyse_qubit(self):
+    def analyse_t2_times(self):
         self._identify_coords()
         self.fit_delays = np.linspace(self.delays[0], self.delays[-1], 400)
         for indx in range(len(self.dataset.coords[self.repeat_coord])):
@@ -87,20 +87,6 @@ class BaseT2QubitAnalysis(BaseQubitAnalysis, ABC):
 
         self.average_T2 = np.mean(self.T2_times)
         self.error = np.std(self.T2_times)
-
-        analysis_succesful = True
-
-        # TODO: change this for t2_echo
-        analysis_result = {
-            "t2_time": {
-                "value": self.average_T2,
-                "error": self.error,
-            }
-        }
-
-        qoi = QOI(analysis_result, analysis_succesful)
-
-        return qoi
 
     # what are all these?
     @abstractmethod
@@ -143,6 +129,18 @@ class T2QubitAnalysis(BaseT2QubitAnalysis):
         super().__init__(name, redis_fields)
         self.model = T2Model()
 
+    def analyse_qubit(self):
+        self.analyse_t2_times()
+        analysis_succesful = True
+        analysis_result = {
+                "t2_time": {
+                    "value": self.average_T2,
+                    "error": self.error,
+                }
+            }
+        qoi = QOI(analysis_result, analysis_succesful)
+        return qoi
+
     def fit_model(self, magnitudes_flat):
         guess = self.model.guess(data=magnitudes_flat, x=self.delays)
         return self.model.fit(magnitudes_flat, params=guess, x=self.delays)
@@ -155,6 +153,18 @@ class T2EchoQubitAnalysis(BaseT2QubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
         self.model = ExpDecayModel()
+
+    def analyse_qubit(self):
+        self.analyse_t2_times()
+        analysis_succesful = True
+        analysis_result = {
+                "t2_echo_time": {
+                    "value": self.average_T2,
+                    "error": self.error,
+                }
+            }
+        qoi = QOI(analysis_result, analysis_succesful)
+        return qoi
 
     def fit_model(self, magnitudes_flat):
         guess = self.model.guess(data=magnitudes_flat, delay=self.delays)
