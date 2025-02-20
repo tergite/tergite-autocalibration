@@ -35,6 +35,7 @@ from typing import List, Optional
 from zlib import crc32
 from os.path import join, dirname, abspath
 from numpy.typing import NDArray
+from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.utils.clifford_group import (
     clifford_group_single_qubit as C1,
     CZ,
@@ -552,7 +553,7 @@ try:
     open(join(hash_dir, "single_qubit_hash_lut.txt"), "r")
     # FIXME: also check 'two_qubit_hash_lut.txt'
 except FileNotFoundError:
-    logging.warning("Clifford group hash tables not detected.")
+    logger.warning("Clifford group hash tables not detected.")
     from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.utils.generate_clifford_hash_tables import (
         generate_hash_tables,
     )
