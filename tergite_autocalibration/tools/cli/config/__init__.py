@@ -17,6 +17,8 @@ from typing import Annotated
 
 import typer
 
+from tergite_autocalibration.utils.logging.decorators import suppress_logging
+
 config_cli = typer.Typer()
 
 config_templates_path = os.path.join(
@@ -34,6 +36,7 @@ def complete_template_name(incomplete: str):
 
 
 @config_cli.command(help="Save the whole configuration snapshot.")
+@suppress_logging
 def save(
     filepath: Annotated[
         str,
@@ -117,6 +120,7 @@ def save(
 
 
 @config_cli.command(help="Restore and load a configuration snapshot.")
+@suppress_logging
 def load(
     filepath: Annotated[
         str,
@@ -205,6 +209,7 @@ def load(
 
 
 @config_cli.command(help="List available configuration values.")
+@suppress_logging
 def show():
     # Show all configuration values
     # What should the inputs be?

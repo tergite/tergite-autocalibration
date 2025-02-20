@@ -11,8 +11,11 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
+import os
 
 import typer
+
+from tergite_autocalibration.utils.logging.decorators import suppress_logging
 
 graph_cli = typer.Typer()
 
@@ -20,11 +23,13 @@ graph_cli = typer.Typer()
 @graph_cli.command(
     help="Plot the calibration graph to the user specified target node in topological order."
 )
+@suppress_logging
 def plot():
     from tergite_autocalibration.lib.utils.graph import filtered_topological_order
     from tergite_autocalibration.config.globals import CONFIG
     from tergite_autocalibration.utils.logging.visuals import draw_arrow_chart
 
+    print(os.environ["SUPPRESS_LOGGING"])
     n_qubits = len(CONFIG.run.qubits)
     topo_order = filtered_topological_order(CONFIG.run.target_node)
     draw_arrow_chart(f"Qubits: {n_qubits}", topo_order)
