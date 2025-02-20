@@ -160,10 +160,10 @@ class TQGRandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
     def schedule_function(
         self,
         seed: int,
+        loop_repetitions: int,
         number_of_cliffords: dict[str, np.ndarray],
         interleaving_clifford_id: Optional[int] = None,
         apply_inverse_gate: bool = True,
-        repetitions: int = 1024,
     ) -> Schedule:
         """
         Generates a schedule for performing randomized benchmarking (RB) experiments using Clifford gates
@@ -181,6 +181,8 @@ class TQGRandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
         ----------
         seed : int
             Random seed for generating Clifford sequences, ensuring reproducibility.
+        loop_repetitions : int
+            Number of times to repeat the entire schedule for statistical averaging.
         number_of_cliffords : dict[str, np.ndarray]
             Dictionary mapping qubit names to arrays of Clifford operation counts.
             Each array specifies the number of random Clifford operations to apply
@@ -193,8 +195,6 @@ class TQGRandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
             Whether to apply inverse Clifford operations after the random sequence.
             The inverse operations should return the qubits to their initial state
             in the absence of errors.
-        repetitions : int, default=1024
-            Number of times to repeat the entire schedule for statistical averaging.
 
         Returns
         -------
@@ -217,7 +217,7 @@ class TQGRandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
             name = "tqg_randomized_benchmarking_ssro"
         else:
             name = "tqg_randomized_benchmarking_interleaved_ssro"
-        logger.info("interleaved or not", name)
+        logger.info(f"interleaved or not: {name}")
 
         schedule = Schedule(f"{name}")  # Initialize schedule
         shot = Schedule("shot")  # Create a single-shot schedule
@@ -308,7 +308,7 @@ class TQGRandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
         )
 
         schedule.add(IdlePulse(IDLE_TIME))
-        logger.info(schedule.add(shot, control_flow=Loop(repetitions)))
+        logger.info(schedule.add(shot, control_flow=Loop(loop_repetitions)))
         schedule.add(IdlePulse(IDLE_TIME))
 
         return schedule

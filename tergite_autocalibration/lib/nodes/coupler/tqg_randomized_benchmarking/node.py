@@ -55,6 +55,8 @@ class TQGRandomizedBenchmarkingSSRONode(ScheduleNode):
         self.edges = couplers
         self.coupler = self.couplers[0]
         self.schedule_keywords = schedule_keywords
+        self.loops = 500
+        self.schedule_keywords["loop_repetitions"] = self.loops
         self.coupled_qubits = couplers[0].split(sep="_")
 
         self.backup = False
