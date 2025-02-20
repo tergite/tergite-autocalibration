@@ -29,7 +29,6 @@ def plot():
     from tergite_autocalibration.config.globals import CONFIG
     from tergite_autocalibration.utils.logging.visuals import draw_arrow_chart
 
-    print(os.environ["SUPPRESS_LOGGING"])
     n_qubits = len(CONFIG.run.qubits)
     topo_order = filtered_topological_order(CONFIG.run.target_node)
     draw_arrow_chart(f"Qubits: {n_qubits}", topo_order)
