@@ -14,12 +14,15 @@
 
 import typer
 
+from tergite_autocalibration.utils.logging.decorators import suppress_logging
+
 graph_cli = typer.Typer()
 
 
 @graph_cli.command(
     help="Plot the calibration graph to the user specified target node in topological order."
 )
+@suppress_logging
 def plot():
     from tergite_autocalibration.lib.utils.graph import filtered_topological_order
     from tergite_autocalibration.config.globals import CONFIG

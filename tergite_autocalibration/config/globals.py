@@ -22,6 +22,7 @@ from tergite_autocalibration.config.handler import ConfigurationHandler
 from tergite_autocalibration.config.package import ConfigurationPackage
 from tergite_autocalibration.utils.handlers.exit import exit_handler, exception_handler
 from tergite_autocalibration.utils.logging import logger
+from tergite_autocalibration.utils.logging.decorators import is_logging_suppressed
 from tergite_autocalibration.utils.misc.tests import is_pytest
 
 # Loads the environmental configuration
@@ -92,6 +93,9 @@ except FileNotFoundError:
 # If it is running a pytest, the logs will be in out/pytest
 if is_pytest():
     _log_dir = "pytest"
+# If logging is suppressed, we store everything to the default directory
+elif is_logging_suppressed():
+    _log_dir = "default"
 # If the configuration is defined the log dir can be read, this is the normal case
 elif hasattr(CONFIG, "run"):
     _log_dir = CONFIG.run.log_dir

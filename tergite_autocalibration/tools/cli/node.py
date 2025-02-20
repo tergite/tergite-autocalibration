@@ -17,6 +17,7 @@ from typing import Annotated
 import typer
 
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
+from tergite_autocalibration.utils.logging.decorators import suppress_logging
 
 node_cli = typer.Typer()
 
@@ -31,6 +32,7 @@ def complete_node_name(incomplete: str):
 
 
 @node_cli.command(help="Reset all parameters in redis for the node specified.")
+@suppress_logging
 def reset(
     name: Annotated[
         str,

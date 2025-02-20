@@ -20,6 +20,7 @@ from tergite_autocalibration.tools.cli.cluster import cluster_cli
 from tergite_autocalibration.tools.cli.config import config_cli
 from tergite_autocalibration.tools.cli.graph import graph_cli
 from tergite_autocalibration.tools.cli.node import node_cli
+from tergite_autocalibration.utils.logging.decorators import suppress_logging
 
 cli_kwargs = {"no_args_is_help": True}
 
@@ -58,6 +59,7 @@ cli.add_typer(
 
 
 @cli.command(help="Quickly runs to set reasonable defaults for the configuration.")
+@suppress_logging
 def quickstart(
     qubits: Annotated[
         str,
@@ -148,6 +150,7 @@ def quickstart(
 
 
 @cli.command(help="Open the dataset browser (quantifiles).")
+@suppress_logging
 def browser(
     datadir: Annotated[
         str,
@@ -190,6 +193,7 @@ def browser(
 
 
 @cli.command(help="Tell a joke.")
+@suppress_logging
 def joke():
     import asyncio
     from jokeapi import Jokes

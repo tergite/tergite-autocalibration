@@ -374,6 +374,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="special-log-locations">Special log locations</h3>
 <p>There are two special occasions when logs are taken that do not fall into the categories above.</p>
 <p>The first of them is the <strong>default</strong> folder. This folder is used for all logs where the application is used either the first time or when the application is in a state without any configuration. The default log will just be appended and create one long log file.</p>
+<p>Logs can also be intentionally routed to the default log directory by adding a <code>suppress_logging</code> decorator to a commandline endpoint. This should be added below the typer command decorator.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> typer</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tergite_autocalibration.utils.logging.decorators <span class="im">import</span> suppress_logging</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>my_typer_cli <span class="op">=</span> typer.Typer()</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="at">@my_typer_cli.command</span>(<span class="bu">help</span><span class="op">=</span><span class="st">"Example command"</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="at">@suppress_logging</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> endpoint():</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Endpoint for the cli"""</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">pass</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Please note that this method is only meant to route logging within typer endpoints. If you want to change the verbosity of your logs, please read the section above.</p>
 <p>The other special folder to save logs is the <strong>pytest</strong> folder. It contains the logs from running the unit tests.</p>
 
 
