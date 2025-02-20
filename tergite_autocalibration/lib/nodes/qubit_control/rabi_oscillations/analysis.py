@@ -144,7 +144,7 @@ class NRabiQubitAnalysis(BaseQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
 
-    def analyse_qubit(self):
+    def _analyse_n_rabi(self):
         for coord in self.dataset[self.data_var].coords:
             if "amplitudes" in coord:
                 self.mw_amplitudes_coord = coord
@@ -167,6 +167,8 @@ class NRabiQubitAnalysis(BaseQubitAnalysis):
         self.index_of_max = index_of_min
         self.shift = self.magnitudes[mw_amplitude_key][index_of_min].values
 
+    def analyse_qubit(self):
+        self._analyse_n_rabi()
         analysis_succesful = True
 
         analysis_result = {
@@ -195,8 +197,36 @@ class NRabiQubitAnalysis(BaseQubitAnalysis):
         )
 
 
+class NRabi_12_QubitAnalysis(NRabiQubitAnalysis):
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+        self.redis_field = "r12:ef_amp180"
+
+    def analyse_qubit(self):
+        self._analyse_n_rabi()
+
+        analysis_succesful = True
+        analysis_result = {
+            self.redis_field: {
+                "value": self.optimal_amp180,
+                "error": 0,
+            }
+        }
+
+        qoi = QOI(analysis_result, analysis_succesful)
+
+        return qoi
+
+
 class NRabiNodeAnalysis(BaseAllQubitsAnalysis):
     single_qubit_analysis_obj = NRabiQubitAnalysis
+
+    def __init__(self, name, redis_fields):
+        super().__init__(name, redis_fields)
+
+
+class NRabi_12_NodeAnalysis(BaseAllQubitsAnalysis):
+    single_qubit_analysis_obj = NRabi_12_QubitAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)

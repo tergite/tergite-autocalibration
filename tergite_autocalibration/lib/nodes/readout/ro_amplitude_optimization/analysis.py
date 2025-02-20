@@ -20,7 +20,6 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
-from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.lib.base.analysis import (
     BaseAllQubitsAnalysis,
     BaseQubitAnalysis,
@@ -442,6 +441,27 @@ class OptimalROThreeStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis)
         super().__init__(name, redis_fields)
 
     def analyse_qubit(self):
+        """
+        classify the three states for each RO amplitude
+        and return the RO amplitude that gives the maximum three state classification fidelity
+        as well as the defining parameters for the optimal three state boundary
+        returns
+        -------
+        optimal_amplitude: float
+            amplitude of the RO pulse that gives optimal fidelity
+        centroid_I: float
+            I coordinate of the centroid defined by the class boundaries
+        centroid_Q: float
+            Q coordinate of the centroid defined by the class boundaries
+        omega_01: float \in [0,360) degrees
+            defining angle for the |0> - |1> boundary
+        omega_12: float \in [0,360) degrees
+            defining angle for the |1> - |2> boundary
+        omega_20 \in [0,360) degrees,
+            defining angle for the |2> - |0> boundary
+        inv_cm_str: str
+            string encoding of the confusion matrix
+        """
         super().analyse_qubit()
         self.run_initial_fitting()
         inv_cm_str = ",".join(
@@ -474,15 +494,40 @@ class OptimalROThreeStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis)
         self.IQ1_fp = IQ1[~tp1]
         self.IQ2_tp = IQ2[tp2]  # True Positive when sending 2
         self.IQ2_fp = IQ2[~tp2]
-        return [
-            self.optimal_amplitude,
-            self.centroid_I,
-            self.centroid_Q,
-            self.omega_01,
-            self.omega_12,
-            self.omega_20,
-            inv_cm_str,
-        ]
+
+        analysis_succesful = True
+        analysis_result = {
+            "measure_3state_opt:pulse_amp": {
+                "value": self.optimal_amplitude,
+                "error": 0,
+            },
+            "centroid_I": {
+                "value": self.centroid_I,
+                "error": 0,
+            },
+            "centroid_Q": {
+                "value": self.centroid_Q,
+                "error": 0,
+            },
+            "omega_01": {
+                "value": self.omega_01,
+                "error": 0,
+            },
+            "omega_12": {
+                "value": self.omega_12,
+                "error": 0,
+            },
+            "omega_20": {
+                "value": self.omega_20,
+                "error": 0,
+            },
+            "inv_cm_opt": {
+                "value": inv_cm_str,
+                "error": 0,
+            },
+        }
+        qoi = QOI(analysis_result, analysis_succesful)
+        return qoi
 
     def plotter(self, ax, secondary_axes):
         self.primary_plotter(ax)

@@ -85,7 +85,7 @@ class ROAmplitudeThreeStateOptimizationNode(ScheduleNode):
             },
             "ro_amplitudes": {
                 qubit: np.append(
-                    np.linspace(0.005, 0.025, 5), np.linspace(0.026, 0.2, 5)
+                    np.linspace(0.005, 0.025, 10), np.linspace(0.026, 0.06, 7)
                 )
                 for qubit in self.all_qubits
             },

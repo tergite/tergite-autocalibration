@@ -118,4 +118,4 @@ class SpiDAC:
             sys.stdout.flush()
             time.sleep(1)
         logger.status(f"{Style.RESET_ALL}")
-        logger.status(end="\n")
+        logger.status("\n")
