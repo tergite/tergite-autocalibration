@@ -35,6 +35,7 @@ graph_dependencies = [
     ("resonator_spectroscopy", "qubit_01_spectroscopy_AR"),
     ("qubit_01_spectroscopy_AR", "rabi_oscillations_AR"),
     ("qubit_01_spectroscopy", "coupler_spectroscopy"),
+    ("T1", "coupler_spectroscopy"),
     ("qubit_01_spectroscopy", "rabi_oscillations"),
     ("rabi_oscillations", "ramsey_correction"),
     ("rabi_oscillations", "T1"),
