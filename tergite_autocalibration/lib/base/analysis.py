@@ -283,19 +283,6 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
             analysis._plot(primary_axis)
 
 
-class MultipleBaseAllQubitsAnalysis(BaseAllQubitsAnalysis, ABC):
-    node_analysis_obj = BaseAllQubitsAnalysis
-
-    def __init__(self, name: str, redis_fields):
-        super().__init__(name, redis_fields)
-        self.loop_range = ""
-
-    def analyze_node(self, data_path: Path):
-        for i in self.loop_range:
-            qubit_analysis = self.node_analysis_obj(self.name, self.redis_fields)
-            qubit_analysis.analyze_node(data_path, i)
-
-
 class BaseQubitAnalysis(BaseAnalysis, ABC):
     def __init__(self, name, redis_fields):
         self.name = name
