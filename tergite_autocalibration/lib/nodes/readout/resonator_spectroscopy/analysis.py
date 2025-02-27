@@ -92,7 +92,7 @@ class ResonatorSpectroscopyQubitAnalysis(BaseQubitAnalysis):
             # using the min value driectly
             self.min_freq_data = self.frequencies[np.argmin(np.abs(self.s21_values))]
 
-            analysis_succesful = True
+            analysis_successful = True
             analysis_result = {
                 "clock_freqs:readout": {
                     "value": self.minimum_freq,
@@ -107,7 +107,7 @@ class ResonatorSpectroscopyQubitAnalysis(BaseQubitAnalysis):
                     "error": 0,
                 },
             }
-            qoi = QOI(analysis_result, analysis_succesful)
+            qoi = QOI(analysis_result, analysis_successful)
             return qoi
 
     def plotter(self, ax):
@@ -132,7 +132,7 @@ class ResonatorSpectroscopy1QubitAnalysis(ResonatorSpectroscopyQubitAnalysis):
 
     def analyse_qubit(self):
         super().analyse_qubit()
-        analysis_succesful = True
+        analysis_successful = True
         analysis_result = {
             "extended_clock_freqs:readout_1": {
                 "value": self.minimum_freq,
@@ -147,7 +147,7 @@ class ResonatorSpectroscopy1QubitAnalysis(ResonatorSpectroscopyQubitAnalysis):
                 "error": 0,
             },
         }
-        qoi = QOI(analysis_result, analysis_succesful)
+        qoi = QOI(analysis_result, analysis_successful)
         return qoi
 
     def plotter(self, ax):
@@ -171,14 +171,14 @@ class ResonatorSpectroscopy2QubitAnalysis(ResonatorSpectroscopyQubitAnalysis):
 
     def analyse_qubit(self):
         super().analyse_qubit()
-        analysis_succesful = True
+        analysis_successful = True
         analysis_result = {
             "extended_clock_freqs:readout_2": {
                 "value": self.minimum_freq,
                 "error": 0,
             },
         }
-        qoi = QOI(analysis_result, analysis_succesful)
+        qoi = QOI(analysis_result, analysis_successful)
         return qoi
 
     def plotter(self, ax):

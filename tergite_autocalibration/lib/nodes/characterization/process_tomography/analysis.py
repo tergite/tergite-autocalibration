@@ -209,3 +209,4 @@ class ProcessTomographyNodeAnalysis(BaseAllQubitsAnalysis, ABC):
         for i in self.loop_range:
             qubit_analysis = self.node_analysis_obj(self.name, self.redis_fields)
             qubit_analysis.analyze_node(data_path, i)
+        # Note: The process tomography analysis neither returns a value nor saves a value to redis

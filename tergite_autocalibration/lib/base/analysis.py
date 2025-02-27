@@ -61,55 +61,6 @@ class BaseAnalysis(ABC):
         """
         pass
 
-    # TODO: Alternative idea would be putting the redis handling into the QOI class
-    # Pros: Would be completely high-level interfaced
-    # Cons: We would have to define and implement several QOI classes
-    # -> It is probably not that much effort to implement several QOI classes
-    # -> We could start with a BaseQOI and add more as soon as needed
-    def update_redis_trusted_values(
-        self, node: str, this_element: str, qoi: QOI = None
-    ):
-        if "_" in this_element:
-            name = "couplers"
-        else:
-            name = "transmons"
-
-        if name == "transmons":
-
-            # skiping coupler_spectroscopy because it calls QubitSpectroscopy Analysis that updates the qubit frequency
-            # skiping coupler_resonator_spectroscopy for similar reasons
-            if (
-                node == "coupler_spectroscopy"
-                or node == "coupler_resonator_spectroscopy"
-            ):
-                return
-
-            analysis_succesful = qoi.analysis_succesful
-            if analysis_succesful:
-                for qoi_name, qoi_result in qoi.analysis_result.items():
-                    if qoi_name not in self.redis_fields:
-                        raise ValueError(
-                            f"The qoi {qoi_name} is not in redis fields: {self.redis_fields}"
-                        )
-                    value = qoi_result["value"]
-                    REDIS_CONNECTION.hset(f"{name}:{this_element}", qoi_name, value)
-                    # Setting the value in the standard redis storage
-                    structured_redis_storage(qoi_name, this_element.strip("q"), value)
-                REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
-            else:
-                logger.warning(f"Analysis failed for {this_element}")
-        else:
-            # NOTE: leaving the coupler redis structure as it is
-            for i, transmon_parameter in enumerate(self.redis_fields):
-                REDIS_CONNECTION.hset(
-                    f"{name}:{this_element}", transmon_parameter, self._qoi[i]
-                )
-                # Setting the value in the standard redis storage
-                structured_redis_storage(
-                    transmon_parameter, this_element.strip("q"), self._qoi[i]
-                )
-                REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
-
     def rotate_to_probability_axis(self, complex_measurement_data):
         # TODO: THIS DOESNT BELONG HERE
         """
@@ -259,9 +210,9 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
                 # the dataset is loaded by the process_qubit method.
                 # in other words the __init__ of the analysis class is not aware of the
                 # dataset to be analyzed
-                result = qubit_analysis.process_qubit(
+                analysis_results[this_qubit] = qubit_analysis.process_qubit(
                     ds, this_qubit
-                )  # this_qubit shoulq be qXX
+                )  # this_qubit should be qXX
                 # analysis_results[this_qubit] = dict(zip(self.redis_fields, result))
                 self.qubit_analyses.append(qubit_analysis)
 
@@ -304,7 +255,6 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
         self.magnitudes = np.abs(self.S21)
         self._qoi = self.analyse_qubit()
 
-        self.update_redis_trusted_values(self.name, self.qubit, self._qoi)
         return self._qoi
 
     def _plot(self, primary_axis):
@@ -351,7 +301,10 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
         self.magnitudes = np.abs(self.S21)
 
         analysis_results = self._run_coupler_analysis(coupler_element)
-        self.update_redis_trusted_values(self.name, coupler_element)
+        # TODO: This function does not have any effect as long as no coupler qois are passed
+        # Note: As soon as anyone creates a merge request or has merge conflicts at
+        #       this very position, we can determine a strategy on how coupler qois are passed
+        # self.update_redis_trusted_values(self.name, coupler_element)
 
         return analysis_results
 

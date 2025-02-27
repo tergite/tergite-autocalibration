@@ -28,7 +28,6 @@ from tergite_autocalibration.lib.utils.analysis_models import (
     ThreeClassBoundary,
     TwoClassBoundary,
 )
-from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 from tergite_autocalibration.utils.dto.qoi import QOI
 
 
@@ -284,22 +283,34 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         self.rotation_angle = rotation_angle_rad
         self.rotation_angle_degrees = np.rad2deg(rotation_angle_rad)
 
-        analysis_succesful = True
+        analysis_successful = True
         analysis_result = {
             "measure_2state_opt:pulse_amp": {
                 "value": self.optimal_amplitude,
-                "error": 0,
+                "error": 0
             },
             "measure_2state_opt:acq_rotation": {
                 "value": self.rotation_angle_degrees,
-                "error": 0,
+                "error": 0
             },
             "measure_2state_opt:acq_threshold": {
                 "value": self.threshold,
-                "error": 0,
+                "error": 0
             },
+            "lda_coef_0": {
+                "value": str(float(self.lda.coef_[0][0])),
+                "error": 0
+            },
+            "lda_coef_1": {
+                "value": str(float(self.lda.coef_[0][1])),
+                "error": 0
+            },
+            "lda_intercept": {
+                "value": str(float(self.lda.intercept_[0])),
+                "error": 0
+            }
         }
-        qoi = QOI(analysis_result, analysis_succesful)
+        qoi = QOI(analysis_result, analysis_successful)
         return qoi
 
     def plotter(self, ax, secondary_axes):
@@ -408,33 +419,6 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         rotated_iq_axis.axhline(0, color="black")
         rotated_iq_axis.axvline(0, color="black")
 
-    def update_redis_trusted_values(self, node: str, this_element: str, qoi: QOI):
-        """
-        TODO: This method is a temporary solution to store the discriminator until we switch to ThresholdedAcquisition
-        Args:
-            node: The parent node
-            this_element: Name of the qubit e.g. 'q12'
-
-        Returns:
-
-        """
-        super().update_redis_trusted_values(node, this_element, qoi)
-
-        # We read coefficients and intercept from the lda model
-        coef_0_ = str(float(self.lda.coef_[0][0]))
-        coef_1_ = str(float(self.lda.coef_[0][1]))
-        intercept_ = str(float(self.lda.intercept_[0]))
-
-        # We update the values in redis
-        REDIS_CONNECTION.hset(f"transmons:{this_element}", "lda_coef_0", coef_0_)
-        REDIS_CONNECTION.hset(f"transmons:{this_element}", "lda_coef_1", coef_1_)
-        REDIS_CONNECTION.hset(f"transmons:{this_element}", "lda_intercept", intercept_)
-
-        # We also update the values in the redis standard storage
-        structured_redis_storage("lda_coef_0", this_element.strip("q"), coef_0_)
-        structured_redis_storage("lda_coef_1", this_element.strip("q"), coef_1_)
-        structured_redis_storage("lda_intercept", this_element.strip("q"), intercept_)
-
 
 class OptimalROThreeStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
     def __init__(self, name, redis_fields):
@@ -495,7 +479,7 @@ class OptimalROThreeStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis)
         self.IQ2_tp = IQ2[tp2]  # True Positive when sending 2
         self.IQ2_fp = IQ2[~tp2]
 
-        analysis_succesful = True
+        analysis_successful = True
         analysis_result = {
             "measure_3state_opt:pulse_amp": {
                 "value": self.optimal_amplitude,
@@ -526,7 +510,7 @@ class OptimalROThreeStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis)
                 "error": 0,
             },
         }
-        qoi = QOI(analysis_result, analysis_succesful)
+        qoi = QOI(analysis_result, analysis_successful)
         return qoi
 
     def plotter(self, ax, secondary_axes):
