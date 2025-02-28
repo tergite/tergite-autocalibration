@@ -236,11 +236,6 @@ class NodeManager:
                 else create_node_data_path(node)
             )
 
-            # Create a copy of the configuration inside the data folder
-            ConfigurationPackage.from_toml(
-                os.path.join(ENV.config_dir, "configuration.meta.toml")
-            ).copy(str(data_path))
-
             # Perform calibration
             node.calibrate(data_path, self.config.cluster_mode)
 
@@ -310,6 +305,12 @@ class CalibrationSupervisor:
         logger.info("Starting System Calibration")
         number_of_qubits = len(self.config.qubits)
         draw_arrow_chart(f"Qubits: {number_of_qubits}", self.topo_order)
+
+        # Create a copy of the configuration inside the log directory
+        # This is to be able to replicate errors caused by configuration
+        ConfigurationPackage.from_toml(
+            os.path.join(ENV.config_dir, "configuration.meta.toml")
+        ).copy(str(CONFIG.run.log_dir))
 
         # TODO: check if coupler node status throws error after REDISFLUSHALL
         populate_quantities_of_interest(
