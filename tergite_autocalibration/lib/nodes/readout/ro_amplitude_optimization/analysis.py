@@ -287,28 +287,16 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         analysis_result = {
             "measure_2state_opt:pulse_amp": {
                 "value": self.optimal_amplitude,
-                "error": 0
+                "error": 0,
             },
             "measure_2state_opt:acq_rotation": {
                 "value": self.rotation_angle_degrees,
-                "error": 0
+                "error": 0,
             },
-            "measure_2state_opt:acq_threshold": {
-                "value": self.threshold,
-                "error": 0
-            },
-            "lda_coef_0": {
-                "value": str(float(self.lda.coef_[0][0])),
-                "error": 0
-            },
-            "lda_coef_1": {
-                "value": str(float(self.lda.coef_[0][1])),
-                "error": 0
-            },
-            "lda_intercept": {
-                "value": str(float(self.lda.intercept_[0])),
-                "error": 0
-            }
+            "measure_2state_opt:acq_threshold": {"value": self.threshold, "error": 0},
+            "lda_coef_0": {"value": str(float(self.lda.coef_[0][0])), "error": 0},
+            "lda_coef_1": {"value": str(float(self.lda.coef_[0][1])), "error": 0},
+            "lda_intercept": {"value": str(float(self.lda.intercept_[0])), "error": 0},
         }
         qoi = QOI(analysis_result, analysis_successful)
         return qoi

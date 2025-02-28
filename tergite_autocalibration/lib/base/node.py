@@ -250,8 +250,8 @@ class BaseNode(abc.ABC):
             self.name, self.redis_fields, **analysis_kwargs
         )
         analysis_results = node_analysis.analyze_node(data_path)
-        for qubit_id_, qois_ in analysis_results.items():
-            update_redis_trusted_values(self.name, qubit_id_, qoi=qois_)
+        for element_id_, qois_ in analysis_results.items():
+            update_redis_trusted_values(self.name, element_id_, qoi=qois_)
         return analysis_results
 
     def __str__(self):
