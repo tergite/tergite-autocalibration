@@ -62,7 +62,6 @@ class CalibrationConfig:
     cluster_mode: "MeasurementMode" = MeasurementMode.real
     cluster_ip: "IPv4Address" = CLUSTER_IP
     cluster_timeout: int = 222
-    data_path: Path = Path("")
     qubits: List[str] = field(default_factory=lambda: CONFIG.run.qubits)
     couplers: List[str] = field(default_factory=lambda: CONFIG.run.couplers)
     target_node_name: str = CONFIG.run.target_node
@@ -231,7 +230,7 @@ class NodeManager:
 
             # Determine the data path for calibration
             data_path = (
-                self.config.data_path
+                CONFIG.run.log_dir
                 if self.config.cluster_mode == MeasurementMode.re_analyse
                 else create_node_data_path(node)
             )
