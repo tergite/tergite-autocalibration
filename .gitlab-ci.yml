@@ -113,7 +113,7 @@ application_run:
     # Reset Redis
     - echo "y" | acli node reset -a
     # Run the calibration chain
-    - acli calibration start -r "$CI_PROJECT_DIR/datasets/fc8_unit_tests_6-15" -n rabi_oscillations
+    - echo "n" | acli calibration start -r "$CI_PROJECT_DIR/datasets/fc8_unit_tests_6-15" -n rabi_oscillations
     # Verify output
     - |
       OUTPUT_FILE="$CI_PROJECT_DIR/datasets/fc8_unit_tests_6-15/rabi_oscillations.png"
