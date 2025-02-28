@@ -94,7 +94,9 @@ def start(
 
         # Check if the folder exists
         if not data_to_reanalyse_folder_path.is_dir():
-            typer.echo(f"Error: The specified folder '{data_to_reanalyse_folder_path}' does not exist.")
+            typer.echo(
+                f"Error: The specified folder '{data_to_reanalyse_folder_path}' does not exist."
+            )
             exit(1)  # Exit with an error code
 
         # Check if there is a name specified for the node to be re-analysed
@@ -136,7 +138,7 @@ def start(
     config = CalibrationConfig(
         cluster_mode=cluster_mode,
         cluster_ip=parsed_cluster_ip,
-        target_node_name=target_node_name
+        target_node_name=target_node_name,
     )
     supervisor = CalibrationSupervisor(config)
     supervisor.calibrate_system()

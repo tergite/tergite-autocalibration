@@ -165,7 +165,10 @@ def create_node_data_path(node) -> Path:
     data_path = Path(os.path.join(CONFIG.run.log_dir, measurement_id))
     return data_path
 
-def scrape_and_copy_hdf5_files(scrape_directory: Union[Path, str], target_directory: Union[Path, str]):
+
+def scrape_and_copy_hdf5_files(
+    scrape_directory: Union[Path, str], target_directory: Union[Path, str]
+):
     """
     Find all measurement result files and copy them to the target directory.
 

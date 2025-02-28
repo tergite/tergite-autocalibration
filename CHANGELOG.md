@@ -8,10 +8,15 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 ## [Unreleased]
 
 ### Added
+- Advanced logging
+- Debugging endpoint
+- Quickstart endpoint to generate templates semi-automatically
 
 ### Changed
 
 - Rename all node class names to camel case
+- Re-analysis is more user-friendly
+- Make pipeline more modular
 
 ### Fixed
 
