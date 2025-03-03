@@ -279,6 +279,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../developer-guide/debugging.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Debugging</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../developer-guide/writing_documentation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Writing documentation</span></a>
   </div>
@@ -411,8 +417,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="quickstart" class="level4">
 <h4 class="anchored" data-anchor-id="quickstart"><code>quickstart</code></h4>
 <p><strong>Usage:</strong></p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">acli</span> quickstart</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">acli</span> quickstart <span class="pp">[</span><span class="ss">OPTIONS</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Loads the default configuration package. This configuration package is not supposed to run on any setup, but it will just copy configuration files into the application, so, that the application does not crash because configuration files are missing.</p>
+<p><strong>Options:</strong></p>
+<ul>
+<li><code>-q, --qubits TEXT</code>: Indicates which qubits should be in the template e.g.&nbsp;<code>"q00,q01"</code> or <code>"q03-q05"</code>, <code>"q01-q03, q07"</code> or an integer e.g.&nbsp;<code>3</code> to generate <code>"q01, q02, q03"</code>.</li>
+</ul>
 </section>
 </section>
 <section id="calibration-commands" class="level3">
@@ -421,7 +431,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h4 class="anchored" data-anchor-id="calibration-start"><code>calibration start</code></h4>
 <p>Starts the calibration supervisor.</p>
 <p><strong>Usage:</strong></p>
-<pre><code>acli calibration start [OPTIONS]</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">acli</span> calibration start <span class="pp">[</span><span class="ss">OPTIONS</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p><strong>Options:</strong></p>
 <ul>
 <li><code>-c TEXT</code>: Cluster IP address (if not set, it will use CLUSTER_IP from the .env file)</li>

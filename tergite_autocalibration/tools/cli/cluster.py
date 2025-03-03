@@ -13,10 +13,13 @@
 
 import typer
 
+from tergite_autocalibration.utils.logging.decorators import suppress_logging
+
 cluster_cli = typer.Typer()
 
 
 @cluster_cli.command(help="Reboot the cluster.")
+@suppress_logging
 def reboot():
     from qblox_instruments import Cluster
     from tergite_autocalibration.config.globals import CLUSTER_IP
@@ -32,6 +35,7 @@ def reboot():
 
 
 @cluster_cli.command(help="Prints a list of available clusters.")
+@suppress_logging
 def find():
     from qblox_instruments import PlugAndPlay
 

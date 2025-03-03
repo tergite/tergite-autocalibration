@@ -82,5 +82,22 @@ The first of them is the **default** folder.
 This folder is used for all logs where the application is used either the first time or when the application is in a state without any configuration.
 The default log will just be appended and create one long log file.
 
+Logs can also be intentionally routed to the default log directory by adding a `suppress_logging` decorator to a commandline endpoint.
+This should be added below the typer command decorator.
+```python
+import typer
+from tergite_autocalibration.utils.logging.decorators import suppress_logging
+
+my_typer_cli = typer.Typer()
+
+@my_typer_cli.command(help="Example command")
+@suppress_logging
+def endpoint():
+    """Endpoint for the cli"""
+    pass
+```
+Please note that this method is only meant to route logging within typer endpoints.
+If you want to change the verbosity of your logs, please read the section above.
+
 The other special folder to save logs is the **pytest** folder.
 It contains the logs from running the unit tests.
