@@ -43,6 +43,8 @@ website:
             href: nodes/resonator_spectroscopy_node.qmd
           - text: "Qubit spectroscopy"
             href: nodes/qubit_spectroscopy_node.qmd
+          - text: "Two Qubit Gate Randomized Benchmarking"
+            href: nodes/tqg_randomized_benchmarking_node.qmd
       - section: "Developer Guide"
         contents:
           - text: "Introduction"

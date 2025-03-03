@@ -58,6 +58,7 @@ graph TD
 
 - coupler_spectroscopy
 - coupler_resonator_spectroscopy
+- [tqg_randomized_benchmarking](nodes/tqg_randomized_benchmarking_node.qmd)
 
 ## Characterization Nodes
 
