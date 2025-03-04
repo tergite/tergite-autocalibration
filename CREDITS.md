@@ -26,12 +26,16 @@ Automated the scan for starting parameters, bias current, amplitude, frequency (
 
 ## Stefan Hill
 
-Added the CLI interface for the tool.
+Added the CLI interface for the tool and infrastructural components.
 
 ## Amr Osman
 
-Improvements on the CZ gate automatic tune-up
+Improvements on the CZ gate automatic tune-up.
 
 ## Damien Crielaard
 
 Created the dataset browser, which was integrated into this library.
+
+## Joel Sandås
+
+Node documentation for first single qubit calibration nodes.
