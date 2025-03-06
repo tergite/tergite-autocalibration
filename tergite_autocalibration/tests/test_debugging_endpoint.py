@@ -12,7 +12,10 @@
 import os.path
 
 from tergite_autocalibration.tests.utils.fixtures import get_fixture_path
-from tergite_autocalibration.tools.debug.start_calibration_supervisor import DebugConfiguration
+from tergite_autocalibration.tools.debug.start_calibration_supervisor import (
+    DebugConfiguration,
+)
+
 
 def test_debugging_endpoint():
 

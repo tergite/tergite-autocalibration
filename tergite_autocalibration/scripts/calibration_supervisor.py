@@ -319,7 +319,7 @@ class CalibrationSupervisor:
             self.node_manager.node_factory,
             REDIS_CONNECTION,
         )
-        
+
         for calibration_node in self.topo_order:
             self.node_manager.inspect_node(calibration_node)
             logger.info(f"{calibration_node} node is completed")
