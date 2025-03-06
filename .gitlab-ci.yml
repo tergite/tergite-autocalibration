@@ -13,8 +13,8 @@
 
 stages:
   - setup
-#  - tests
-#  - lint
+  - tests
+  - lint
   - application_run
 
 variables:
@@ -42,62 +42,62 @@ setup:
       paths:
         - .venv
 
-#tests:
-#  stage: tests
-#  image: python:${PYTHON_VERSION}
-#  needs:
-#    - setup
-#  script:
-#    # Install dependencies
-#    - apt-get update
-#    - apt-get install redis ffmpeg libsm6 libxext6 -y
-#    # Run Redis server
-#    - redis-server --daemonize yes --port "$REDIS_PORT"
-#    # Activate the virtual environment
-#    - source .venv/bin/activate
-#    # Run tests
-#    - pytest tergite_autocalibration --cov=tergite_autocalibration --cov-report xml --cov-report term-missing --junitxml=report.xml
-#  coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
-#  artifacts:
-#    reports:
-#      junit: report.xml
-#      coverage_report:
-#        coverage_format: cobertura
-#        path: coverage.xml
-#  cache:
-#    - key: "default"
-#      paths:
-#        - .cache/pip
-#    - key: "venv-${CI_COMMIT_REF_NAME}"
-#      paths:
-#        - .venv
-#
-#lint:
-#  stage: lint
-#  image: python:${PYTHON_VERSION}
-#  needs:
-#    - setup
-#  script:
-#    # Activate the virtual environment
-#    - source .venv/bin/activate
-#    # Run linter and make it fail under 7.0
-#    - pylint tergite_autocalibration --fail-under=7.0
-#    # Run formatter
-#    - black --check tergite_autocalibration
-#  cache:
-#    - key: "default"
-#      paths:
-#        - .cache/pip
-#    - key: "venv-${CI_COMMIT_REF_NAME}"
-#      paths:
-#        - .venv
+tests:
+  stage: tests
+  image: python:${PYTHON_VERSION}
+  needs:
+    - setup
+  script:
+    # Install dependencies
+    - apt-get update
+    - apt-get install redis ffmpeg libsm6 libxext6 -y
+    # Run Redis server
+    - redis-server --daemonize yes --port "$REDIS_PORT"
+    # Activate the virtual environment
+    - source .venv/bin/activate
+    # Run tests
+    - pytest tergite_autocalibration --cov=tergite_autocalibration --cov-report xml --cov-report term-missing --junitxml=report.xml
+  coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  artifacts:
+    reports:
+      junit: report.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+  cache:
+    - key: "default"
+      paths:
+        - .cache/pip
+    - key: "venv-${CI_COMMIT_REF_NAME}"
+      paths:
+        - .venv
+
+lint:
+  stage: lint
+  image: python:${PYTHON_VERSION}
+  needs:
+    - setup
+  script:
+    # Activate the virtual environment
+    - source .venv/bin/activate
+    # Run linter and make it fail under 7.0
+    - pylint tergite_autocalibration --fail-under=7.0
+    # Run formatter
+    - black --check tergite_autocalibration
+  cache:
+    - key: "default"
+      paths:
+        - .cache/pip
+    - key: "venv-${CI_COMMIT_REF_NAME}"
+      paths:
+        - .venv
 
 application_run:
   stage: application_run
   image: python:${PYTHON_VERSION}
   needs:
     - setup
-    #- tests
+    - tests
   script:
     # Install dependencies
     - apt-get update
