@@ -17,6 +17,7 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 - Rename all node class names to camel case
 - Re-analysis is more user-friendly
 - Make pipeline more modular
+- Improved node documentation
 
 ### Fixed
 
