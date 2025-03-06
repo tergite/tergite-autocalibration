@@ -14,15 +14,18 @@
 # that they have been altered from the originals.
 
 import os.path
-import pathlib
+import shutil
 from collections.abc import Iterable
 from datetime import datetime
+from pathlib import Path
+from typing import Union
 from uuid import uuid4
 
 import numpy as np
 import xarray
 
 from tergite_autocalibration.config.globals import CONFIG
+from tergite_autocalibration.utils.logging import logger
 
 
 def configure_dataset(
@@ -144,7 +147,7 @@ def to_real_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
     return ds
 
 
-def create_node_data_path(node) -> pathlib.Path:
+def create_node_data_path(node) -> Path:
     """
     Create the folder where measurement results, plots and logs specific to the node are stored.
 
@@ -152,19 +155,46 @@ def create_node_data_path(node) -> pathlib.Path:
         node (BaseNode): to create a data path for.
 
     Returns:
-        Path to the measurement log folder as pathlib.Path.
+        Path to the measurement log folder as Path.
 
     """
     now_ = datetime.now()
     measurement_id = (
         f"{now_.strftime('%Y%m%d-%H%M%S-%f')[:19]}-{str(uuid4())[:6]}-{node.name}"
     )
-    data_path = pathlib.Path(os.path.join(CONFIG.run.log_dir, measurement_id))
+    data_path = Path(os.path.join(CONFIG.run.log_dir, measurement_id))
     return data_path
 
 
+def scrape_and_copy_hdf5_files(
+    scrape_directory: Union[Path, str], target_directory: Union[Path, str]
+):
+    """
+    Find all measurement result files and copy them to the target directory.
+
+    Args:
+        scrape_directory: Folder with measurement result files.
+        target_directory: Target directory to copy files to.
+    """
+
+    # Find all data files
+    directory = Path(scrape_directory)
+    hdf5_files = list(directory.rglob("*.h5")) + list(directory.rglob("*.hdf5"))
+
+    # Ensure the target directory exists
+    os.makedirs(target_directory, exist_ok=True)
+
+    # Iterate over files and copy to the new folder
+    # Does not preserve any subfolder structures from the scrape directory
+    for file in hdf5_files:
+        destination_path = os.path.join(target_directory, file.name)
+        shutil.copy2(file, destination_path)
+
+    logger.info(f"Copied {len(hdf5_files)} files to {target_directory}.")
+
+
 def save_dataset(
-    result_dataset: xarray.Dataset, node_name: str, data_path: pathlib.Path
+    result_dataset: xarray.Dataset, node_name: str, data_path: Path
 ) -> None:
     """
     Save the measurement dataset to a file.
@@ -172,7 +202,7 @@ def save_dataset(
     Args:
         result_dataset (xarray.Dataset): The dataset to save.
         node_name (str): Name of the node being measured.
-        data_path (pathlib.Path): Path where the dataset will be saved.
+        data_path (Path): Path where the dataset will be saved.
     """
     data_path.mkdir(parents=True, exist_ok=True)
     measurement_id = data_path.stem[0:19]

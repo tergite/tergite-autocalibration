@@ -112,12 +112,15 @@ application_run:
     - echo "y" | acli config load -t fc8a
     # Reset Redis
     - echo "y" | acli node reset -a
+    # Clear the caches
+    - rm -r .venv/lib/python3.10/site-packages/out
     # Run the calibration chain
-    - acli calibration start -r "$CI_PROJECT_DIR/datasets/fc8_unit_tests_6-15" -n rabi_oscillations
+    - echo "n" | acli calibration start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_two_state_optimization" -n rabi_oscillations
+    # Read
+    - ls .venv/lib/python3.10/site-packages/out
     # Verify output
     - |
-      OUTPUT_FILE="$CI_PROJECT_DIR/datasets/fc8_unit_tests_6-15/rabi_oscillations.png"
-      if [ -f "$OUTPUT_FILE" ]; then
+      if find .venv/lib/python3.10/site-packages/out -type f | grep -q "rabi_oscillations.png"; then
         echo "Output file $OUTPUT_FILE exists. Application ran successfully."
       else
         echo "Error: Output file $OUTPUT_FILE not found."
