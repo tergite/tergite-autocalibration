@@ -97,7 +97,7 @@ application_run:
   image: python:${PYTHON_VERSION}
   needs:
     - setup
-    - tests
+    #- tests
   script:
     # Install dependencies
     - apt-get update
