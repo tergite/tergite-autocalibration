@@ -66,7 +66,9 @@ def reset(
     from tergite_autocalibration.lib.utils.graph import filtered_topological_order
     from tergite_autocalibration.config.globals import CONFIG
 
-    topo_order = filtered_topological_order(CONFIG.run.target_node, from_nodes=[from_node])
+    topo_order = filtered_topological_order(
+        CONFIG.run.target_node, from_nodes=[from_node]
+    )
 
     reset_obj_ = ResetRedisNode()
     if from_node:

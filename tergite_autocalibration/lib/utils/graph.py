@@ -170,7 +170,7 @@ def range_dependencies_in_topological_order(
         target_node: End range node.
 
     Returns:
-        A topologically ordered subset of the all nodes including from_node and target_node.
+        A topologically ordered subset of the all nodes including from_nodes.
 
     """
 
