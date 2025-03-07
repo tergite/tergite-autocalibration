@@ -15,7 +15,7 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from typing import List
+from typing import List, Union
 
 import networkx as nx
 
@@ -158,18 +158,57 @@ def get_dependencies_in_topological_order(
     return topological_order
 
 
-def filtered_topological_order(target_node: str):
+def range_dependencies_in_topological_order(
+    graph: "nx.DiGraph", from_nodes: List[str], target_node: str
+):
+    """
+    Get a subset of the graph in topological order.
+
+    Args:
+        graph: Graph to get dependencies from.
+        from_nodes: Nodes to start from.
+        target_node: End range node.
+
+    Returns:
+        A topologically ordered subset of the all nodes including from_node and target_node.
+
+    """
+
+    # Topological order to target_node
+    topological_order = get_dependencies_in_topological_order(graph, target_node)
+
+    # All predecessors from from_node
+    back_range = set(from_nodes)
+    for from_node in from_nodes:
+        back_range = back_range.union(set(nx.descendants(graph, from_node)))
+
+    # Filter the topologically sorted list by all predecessors
+    return list(filter(lambda node: node in back_range, topological_order))
+
+
+def filtered_topological_order(
+    target_node: str, from_nodes: Union[str, List[str]] = None
+):
     """
     Get the graph in topological order.
 
     Args:
         target_node: Target node to end at.
+        from_nodes: Option to define a range in between.
 
     Returns:
         Topological order of nodes including target node
 
     """
     logger.info("Targeting node: " + target_node)
-    return get_dependencies_in_topological_order(CALIBRATION_GRAPH, target_node) + [
-        target_node
-    ]
+
+    if from_nodes is None:
+        topological_order = get_dependencies_in_topological_order(
+            CALIBRATION_GRAPH, target_node
+        )
+    else:
+        topological_order = range_dependencies_in_topological_order(
+            CALIBRATION_GRAPH, from_nodes, target_node
+        )
+
+    return topological_order + [target_node]
