@@ -51,7 +51,7 @@ def reset(
             is_flag=True,
             help="Reset all nodes.",
         ),
-    ] = False
+    ] = False,
 ):
     from tergite_autocalibration.utils.backend.reset_redis_node import ResetRedisNode
 

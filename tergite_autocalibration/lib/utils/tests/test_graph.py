@@ -14,10 +14,16 @@ from typing import Set
 
 import networkx as nx
 
-from tergite_autocalibration.lib.utils.graph import get_dependencies_in_topological_order
+from tergite_autocalibration.lib.utils.graph import (
+    get_dependencies_in_topological_order,
+)
 
-def _check_no_ancestors_behind(graph: "nx.DiGraph", node: str, behind: Set[str]) -> bool:
+
+def _check_no_ancestors_behind(
+    graph: "nx.DiGraph", node: str, behind: Set[str]
+) -> bool:
     return len(set(nx.ancestors(graph, node)).intersection(behind)) == 0
+
 
 def test_dependencies_simple_graph():
     """
@@ -35,6 +41,7 @@ def test_dependencies_simple_graph():
     topological_order = get_dependencies_in_topological_order(G, "D")
 
     assert topological_order == ["A", "B", "C"]
+
 
 def test_dependencies_complex_graph():
     """
@@ -67,6 +74,7 @@ def test_dependencies_complex_graph():
     for i in range(len(topological_order)):
         behind = topological_order[i:]
         assert _check_no_ancestors_behind(G, topological_order[i], behind)
+
 
 def test_dependencies_single_node():
     """

@@ -93,6 +93,7 @@ CALIBRATION_GRAPH.add_node("resonator_relaxation")
 # These nodes will be excluded by default from the graph as their measurements are standalone
 EXCLUDED_NODES = ["tof", "punchout"]
 
+
 def get_dependencies_in_topological_order(
     graph: "nx.DiGraph", target_node: str, exclude_nodes: List[str] = None
 ):
@@ -169,4 +170,6 @@ def filtered_topological_order(target_node: str):
 
     """
     logger.info("Targeting node: " + target_node)
-    return get_dependencies_in_topological_order(CALIBRATION_GRAPH, target_node) + [target_node]
+    return get_dependencies_in_topological_order(CALIBRATION_GRAPH, target_node) + [
+        target_node
+    ]
