@@ -149,7 +149,7 @@ def get_dependencies_in_topological_order(
 
         # This is to ensure that the loop is not running forever if it is impossible to find the dependencies
         exit_condition -= 1
-        if exit_condition == 0:
+        if exit_condition < 0:
             raise RuntimeError(
                 f"Dependencies for node {target_node} in the given graph cannot be found."
                 f"Please check the dependency graph."
