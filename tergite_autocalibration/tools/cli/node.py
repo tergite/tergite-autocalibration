@@ -51,35 +51,12 @@ def reset(
             is_flag=True,
             help="Reset all nodes.",
         ),
-    ] = False,
-    from_node: Annotated[
-        str,
-        typer.Option(
-            "--from-node",
-            "-f",
-            help="If you want to reset all nodes from specified node in chain.",
-            autocompletion=complete_node_name,
-        ),
-    ] = None,
+    ] = False
 ):
     from tergite_autocalibration.utils.backend.reset_redis_node import ResetRedisNode
-    from tergite_autocalibration.lib.utils.graph import range_topological_order
-    from tergite_autocalibration.config.globals import CONFIG
-
-    topo_order = range_topological_order(from_node, CONFIG.run.target_node)
 
     reset_obj_ = ResetRedisNode()
-    if from_node:
-        if typer.confirm(
-            "Do you really want to reset all nodes from"
-            + from_node
-            + "? It might take some time to recalibrate them."
-        ):
-            for node in topo_order:
-                reset_obj_.reset_node(node)
-        else:
-            typer.echo("Node reset aborted by user.")
-    elif all:
+    if all:
         if typer.confirm(
             "Do you really want to reset all nodes? It might take some time to recalibrate them."
         ):
@@ -89,5 +66,4 @@ def reset(
     elif name is not None:
         reset_obj_.reset_node(name)
     else:
-        typer.echo("Please enter a node name or use the -a option to reset all nodes.")
         typer.echo("Please enter a node name or use the -a option to reset all nodes.")
