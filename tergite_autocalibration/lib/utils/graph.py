@@ -159,7 +159,7 @@ def get_dependencies_in_topological_order(
 
 
 def range_dependencies_in_topological_order(
-    graph: "nx.DiGraph", from_nodes: List[str], target_node: str
+    graph: "nx.DiGraph", from_nodes: List[str], target_node: str, exclude_nodes: List[str] = None
 ):
     """
     Get a subset of the graph in topological order.
@@ -168,14 +168,17 @@ def range_dependencies_in_topological_order(
         graph: Graph to get dependencies from.
         from_nodes: Nodes to start from.
         target_node: End range node.
+        exclude_nodes: Nodes that should be excluded from the dependency search.
 
     Returns:
         A topologically ordered subset of the all nodes including from_nodes.
 
     """
+    if exclude_nodes is None:
+        exclude_nodes = []
 
     # Topological order to target_node
-    topological_order = get_dependencies_in_topological_order(graph, target_node)
+    topological_order = get_dependencies_in_topological_order(graph, target_node, exclude_nodes=exclude_nodes)
 
     # All predecessors from from_node
     back_range = set(from_nodes)
@@ -204,11 +207,11 @@ def filtered_topological_order(
 
     if from_nodes is None:
         topological_order = get_dependencies_in_topological_order(
-            CALIBRATION_GRAPH, target_node
+            CALIBRATION_GRAPH, target_node, exclude_nodes=EXCLUDED_NODES
         )
     else:
         topological_order = range_dependencies_in_topological_order(
-            CALIBRATION_GRAPH, from_nodes, target_node
+            CALIBRATION_GRAPH, from_nodes, target_node, exclude_nodes=EXCLUDED_NODES
         )
 
     return topological_order + [target_node]
