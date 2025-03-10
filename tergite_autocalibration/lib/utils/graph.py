@@ -159,7 +159,10 @@ def get_dependencies_in_topological_order(
 
 
 def range_dependencies_in_topological_order(
-    graph: "nx.DiGraph", from_nodes: List[str], target_node: str, exclude_nodes: List[str] = None
+    graph: "nx.DiGraph",
+    from_nodes: List[str],
+    target_node: str,
+    exclude_nodes: List[str] = None,
 ):
     """
     Get a subset of the graph in topological order.
@@ -178,7 +181,9 @@ def range_dependencies_in_topological_order(
         exclude_nodes = []
 
     # Topological order to target_node
-    topological_order = get_dependencies_in_topological_order(graph, target_node, exclude_nodes=exclude_nodes)
+    topological_order = get_dependencies_in_topological_order(
+        graph, target_node, exclude_nodes=exclude_nodes
+    )
 
     # All predecessors from from_node
     back_range = set(from_nodes)
