@@ -44,10 +44,10 @@ def start(
             help="Use -r if you want to use rerun an analysis, give the path to the dataset folder (plots will be overwritten), you also need to specify the name of the node using -n",
         ),
     ] = None,
-    name: Annotated[
+    node_name: Annotated[
         str,
         typer.Option(
-            "--name",
+            "--node-name",
             "-n",
             help="Use to specify the node type to rerun, only works with -r option",
         ),
@@ -80,31 +80,41 @@ def start(
     )
     from tergite_autocalibration.scripts.db_backend_update import update_mss
     from tergite_autocalibration.config.globals import CONFIG
+    from tergite_autocalibration.utils.backend.reset_redis_node import ResetRedisNode
     from tergite_autocalibration.utils.dto.enums import MeasurementMode
+    from tergite_autocalibration.utils.io.dataset import scrape_and_copy_hdf5_files
 
     cluster_mode: "MeasurementMode" = MeasurementMode.real
     parsed_cluster_ip: "IPv4Address" = CLUSTER_IP
     target_node_name = CONFIG.run.target_node
-    data_path = ""
 
     if r:
-        folder_path = Path(r)
+        cluster_mode = MeasurementMode.re_analyse
+        data_to_reanalyse_folder_path = Path(r)
 
         # Check if the folder exists
-        if not folder_path.is_dir():
-            typer.echo(f"Error: The specified folder '{folder_path}' does not exist.")
+        if not data_to_reanalyse_folder_path.is_dir():
+            typer.echo(
+                f"Error: The specified folder '{data_to_reanalyse_folder_path}' does not exist."
+            )
             exit(1)  # Exit with an error code
 
-        if not name:
+        # Check if there is a name specified for the node to be re-analysed
+        # Otherwise take it from the run configuration
+        if not node_name:
             typer.echo(
                 "You are trying to re-run the analysis on a specific node but you did not specify it."
-                "Please specify the node using -n or --name."
+                f"Taking {target_node_name} from run configuration instead."
             )
-            exit(1)  # Exit with an error exit
+        else:
+            target_node_name = node_name
 
-        cluster_mode = MeasurementMode.re_analyse
-        data_path = folder_path
-        target_node_name = name
+        # Comfort functionality to reset the re-analysis node first
+        if typer.confirm(f"Do you want to reset node {target_node_name}?"):
+            if target_node_name is not None:
+                ResetRedisNode().reset_node(node_name)
+
+        scrape_and_copy_hdf5_files(data_to_reanalyse_folder_path, CONFIG.run.log_dir)
 
     # Check whether the ip address of the cluster is set correctly
     if c:
@@ -129,7 +139,6 @@ def start(
         cluster_mode=cluster_mode,
         cluster_ip=parsed_cluster_ip,
         target_node_name=target_node_name,
-        data_path=Path(data_path),
     )
     supervisor = CalibrationSupervisor(config)
     supervisor.calibrate_system()

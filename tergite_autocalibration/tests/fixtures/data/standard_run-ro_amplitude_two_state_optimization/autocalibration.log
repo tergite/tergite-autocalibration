@@ -1,0 +1,1255 @@
+2025-02-21 13:54:39,400 - STATUS -  
+⚠ [35m[1mResetting Cluster at IP *141[0m
+
+2025-02-21 13:54:43,926 - INFO - Targeting node: ro_amplitude_two_state_optimization
+2025-02-21 13:54:43,927 - INFO - Starting System Calibration
+2025-02-21 13:54:43,927 - STATUS - ╔═════════════════════════════════════════════════════════════════════════════════════════╗
+2025-02-21 13:54:43,928 - STATUS - ║ Qubits: 5                                                                               ║
+2025-02-21 13:54:43,928 - STATUS - ║↪ resonator_spectroscopy                                                                 ║
+2025-02-21 13:54:43,928 - STATUS - ║      ↪ qubit_01_spectroscopy                                                            ║
+2025-02-21 13:54:43,928 - STATUS - ║            ↪ rabi_oscillations                                                          ║
+2025-02-21 13:54:43,928 - STATUS - ║                  ↪ ramsey_correction                                                    ║
+2025-02-21 13:54:43,928 - STATUS - ║                        ↪ motzoi_parameter                                               ║
+2025-02-21 13:54:43,928 - STATUS - ║                              ↪ n_rabi_oscillations                                      ║
+2025-02-21 13:54:43,928 - STATUS - ║                                    ↪ resonator_spectroscopy_1                           ║
+2025-02-21 13:54:43,928 - STATUS - ║                                          ↪ ro_frequency_two_state_optimization          ║
+2025-02-21 13:54:43,928 - STATUS - ║                                                ↪ ro_amplitude_two_state_optimization    ║
+2025-02-21 13:54:43,928 - STATUS - ╚═════════════════════════════════════════════════════════════════════════════════════════╝
+2025-02-21 13:54:44,311 - DEBUG - 'Ql' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,311 - DEBUG - 'resonator_minimum' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,312 - DEBUG - 'Ql' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,312 - DEBUG - 'resonator_minimum' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,312 - DEBUG - 'Ql' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,313 - DEBUG - 'resonator_minimum' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,313 - DEBUG - 'Ql' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,313 - DEBUG - 'resonator_minimum' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,314 - DEBUG - 'Ql' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,314 - DEBUG - 'resonator_minimum' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,319 - DEBUG - 'spec:spec_ampl_optimal' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,320 - DEBUG - 'spec:spec_ampl_optimal' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,322 - DEBUG - 'spec:spec_ampl_optimal' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,324 - DEBUG - 'spec:spec_ampl_optimal' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,326 - DEBUG - 'spec:spec_ampl_optimal' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,417 - DEBUG - 'extended_clock_freqs:readout_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,417 - DEBUG - 'Ql_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,417 - DEBUG - 'resonator_minimum_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,418 - DEBUG - 'extended_clock_freqs:readout_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,418 - DEBUG - 'Ql_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,418 - DEBUG - 'resonator_minimum_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,418 - DEBUG - 'extended_clock_freqs:readout_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,418 - DEBUG - 'Ql_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,418 - DEBUG - 'resonator_minimum_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,418 - DEBUG - 'extended_clock_freqs:readout_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,419 - DEBUG - 'Ql_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,419 - DEBUG - 'resonator_minimum_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,419 - DEBUG - 'extended_clock_freqs:readout_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,419 - DEBUG - 'Ql_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,419 - DEBUG - 'resonator_minimum_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,430 - DEBUG - 'measure_2state_opt:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,431 - DEBUG - 'measure_2state_opt:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,432 - DEBUG - 'measure_2state_opt:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,434 - DEBUG - 'measure_2state_opt:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,437 - DEBUG - 'measure_2state_opt:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,439 - INFO - Inspecting node resonator_spectroscopy
+2025-02-21 13:54:44,440 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,440 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,444 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,444 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,444 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,445 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,445 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,445 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,445 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,446 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,446 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,447 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,447 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,447 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,447 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,447 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,447 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,451 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,451 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,451 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,451 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,451 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,452 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,452 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,452 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,452 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,453 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,453 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,454 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,454 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,454 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,454 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,457 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,457 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,457 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,457 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,457 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,457 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,458 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,458 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,458 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,458 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,458 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,459 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,459 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,459 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,459 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,461 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,461 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,461 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,461 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,461 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,461 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,462 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,462 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,462 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,462 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,463 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,463 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,463 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,463 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,463 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,465 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,465 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,465 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,465 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,466 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,466 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,466 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,466 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,466 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,467 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,467 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,467 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,467 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,467 - DEBUG - 'parking_current' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,467 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,467 - DEBUG - 'cz_pulse_amplitude' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,467 - DEBUG - 'cz_pulse_width' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,468 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,468 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,468 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,468 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,468 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,468 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:44,468 - WARNING - ⚑⚑⚑ [31m[1mCalibration required for Node resonator_spectroscopy[0m
+2025-02-21 13:54:44,530 - INFO - Initializing parameters for qubits: ['q06', 'q07', 'q08', 'q09', 'q10'] and couplers: ['q06_q07']
+2025-02-21 13:54:44,530 - INFO - Calibrating node resonator_spectroscopy
+2025-02-21 13:54:44,535 - INFO - Loading run_config: run_config.toml
+2025-02-21 13:54:44,535 - INFO - Loading cluster_config: cluster_config.json
+2025-02-21 13:54:44,535 - INFO - Loading device_config: device_config.toml
+2025-02-21 13:54:44,535 - INFO - Loading spi_config: spi_config.toml
+2025-02-21 13:54:44,535 - INFO - Loading node_config: node_config.toml
+2025-02-21 13:54:44,535 - INFO - Loading user_samplespace: user_samplespace.py
+2025-02-21 13:54:44,535 - INFO - Loaded configuration package from /home/adilet/tergite-autocalibration/configuration.meta.toml
+2025-02-21 13:54:44,536 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/run_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135444-530-00a957-resonator_spectroscopy/configs/run_config.toml
+2025-02-21 13:54:44,536 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/cluster_config.json 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135444-530-00a957-resonator_spectroscopy/configs/cluster_config.json
+2025-02-21 13:54:44,536 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/device_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135444-530-00a957-resonator_spectroscopy/configs/device_config.toml
+2025-02-21 13:54:44,536 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/spi_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135444-530-00a957-resonator_spectroscopy/configs/spi_config.toml
+2025-02-21 13:54:44,536 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/node_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135444-530-00a957-resonator_spectroscopy/configs/node_config.toml
+2025-02-21 13:54:44,536 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/user_samplespace.py 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135444-530-00a957-resonator_spectroscopy/configs/user_samplespace.py
+2025-02-21 13:54:44,536 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/misc 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135444-530-00a957-resonator_spectroscopy/misc
+2025-02-21 13:54:44,541 - INFO - Loading run_config: run_config.toml
+2025-02-21 13:54:44,541 - INFO - Loading cluster_config: cluster_config.json
+2025-02-21 13:54:44,541 - INFO - Loading device_config: device_config.toml
+2025-02-21 13:54:44,541 - INFO - Loading spi_config: spi_config.toml
+2025-02-21 13:54:44,541 - INFO - Loading node_config: node_config.toml
+2025-02-21 13:54:44,541 - INFO - Loading user_samplespace: user_samplespace.py
+2025-02-21 13:54:44,541 - INFO - Loaded configuration package from /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135444-530-00a957-resonator_spectroscopy/configuration.meta.toml
+2025-02-21 13:54:44,603 - INFO - Starting Compiling
+2025-02-21 13:54:44,903 - STATUS - schedule_duration = [36m[1m5.97 sec[0m
+2025-02-21 13:54:44,903 - INFO - Starting measurement
+2025-02-21 13:54:52,902 - INFO - Finished measurement
+2025-02-21 13:54:52,987 - INFO - Open dataset /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135444-530-00a957-resonator_spectroscopy/dataset_resonator_spectroscopy_0.hdf5
+2025-02-21 13:54:53,042 - DEBUG - 'Ql' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:53,042 - DEBUG - 'resonator_minimum' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:53,060 - DEBUG - 'Ql' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:53,060 - DEBUG - 'resonator_minimum' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:53,079 - DEBUG - 'Ql' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:53,080 - DEBUG - 'resonator_minimum' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:53,100 - DEBUG - 'Ql' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:53,100 - DEBUG - 'resonator_minimum' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:53,123 - DEBUG - 'Ql' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:53,123 - DEBUG - 'resonator_minimum' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:53,281 - INFO - Saving Plots
+2025-02-21 13:54:54,922 - INFO - Plots saved to /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135444-530-00a957-resonator_spectroscopy/resonator_spectroscopy_preview.png and /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135444-530-00a957-resonator_spectroscopy/resonator_spectroscopy.png
+2025-02-21 13:54:54,923 - INFO - analysis completed
+2025-02-21 13:54:54,923 - INFO - resonator_spectroscopy node is completed
+2025-02-21 13:54:54,923 - INFO - Inspecting node qubit_01_spectroscopy
+2025-02-21 13:54:54,924 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,924 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,925 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,925 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,926 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,926 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,926 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,926 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,926 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,926 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,926 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,926 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,927 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,927 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,927 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,927 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,927 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,928 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,928 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,929 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,929 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,929 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,929 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,929 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,929 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,929 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,929 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,930 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,930 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,930 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,930 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,930 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,931 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,931 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,932 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,932 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,932 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,932 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,932 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,932 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,932 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,932 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,933 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,933 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,933 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,933 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,933 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,934 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,934 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,934 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,935 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,935 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,935 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,935 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,935 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,935 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,935 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,935 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,936 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,936 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,936 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,936 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,937 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,937 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,937 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,938 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,938 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,938 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,938 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,938 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,938 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,938 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,938 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,939 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,939 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,939 - DEBUG - 'parking_current' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,939 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,939 - DEBUG - 'cz_pulse_amplitude' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,939 - DEBUG - 'cz_pulse_width' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,939 - DEBUG - 'spec:spec_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,940 - DEBUG - 'spec:spec_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,940 - DEBUG - 'spec:spec_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,940 - DEBUG - 'spec:spec_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,940 - DEBUG - 'spec:spec_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,940 - DEBUG - 'spec:spec_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,940 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,940 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,940 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,940 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,940 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,940 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:54:54,940 - WARNING - ⚑⚑⚑ [31m[1mCalibration required for Node qubit_01_spectroscopy[0m
+2025-02-21 13:54:54,999 - INFO - Initializing parameters for qubits: ['q06', 'q07', 'q08', 'q09', 'q10'] and couplers: ['q06_q07']
+2025-02-21 13:54:54,999 - INFO - Calibrating node qubit_01_spectroscopy
+2025-02-21 13:54:55,004 - INFO - Loading run_config: run_config.toml
+2025-02-21 13:54:55,004 - INFO - Loading cluster_config: cluster_config.json
+2025-02-21 13:54:55,004 - INFO - Loading device_config: device_config.toml
+2025-02-21 13:54:55,004 - INFO - Loading spi_config: spi_config.toml
+2025-02-21 13:54:55,004 - INFO - Loading node_config: node_config.toml
+2025-02-21 13:54:55,005 - INFO - Loading user_samplespace: user_samplespace.py
+2025-02-21 13:54:55,005 - INFO - Loaded configuration package from /home/adilet/tergite-autocalibration/configuration.meta.toml
+2025-02-21 13:54:55,005 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/run_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135454-999-587411-qubit_01_spectroscopy/configs/run_config.toml
+2025-02-21 13:54:55,005 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/cluster_config.json 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135454-999-587411-qubit_01_spectroscopy/configs/cluster_config.json
+2025-02-21 13:54:55,005 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/device_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135454-999-587411-qubit_01_spectroscopy/configs/device_config.toml
+2025-02-21 13:54:55,005 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/spi_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135454-999-587411-qubit_01_spectroscopy/configs/spi_config.toml
+2025-02-21 13:54:55,005 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/node_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135454-999-587411-qubit_01_spectroscopy/configs/node_config.toml
+2025-02-21 13:54:55,005 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/user_samplespace.py 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135454-999-587411-qubit_01_spectroscopy/configs/user_samplespace.py
+2025-02-21 13:54:55,005 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/misc 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135454-999-587411-qubit_01_spectroscopy/misc
+2025-02-21 13:54:55,010 - INFO - Loading run_config: run_config.toml
+2025-02-21 13:54:55,010 - INFO - Loading cluster_config: cluster_config.json
+2025-02-21 13:54:55,010 - INFO - Loading device_config: device_config.toml
+2025-02-21 13:54:55,010 - INFO - Loading spi_config: spi_config.toml
+2025-02-21 13:54:55,010 - INFO - Loading node_config: node_config.toml
+2025-02-21 13:54:55,010 - INFO - Loading user_samplespace: user_samplespace.py
+2025-02-21 13:54:55,010 - INFO - Loaded configuration package from /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135454-999-587411-qubit_01_spectroscopy/configuration.meta.toml
+2025-02-21 13:54:55,097 - INFO - Starting Compiling
+2025-02-21 13:54:57,013 - STATUS - schedule_duration = [36m[1m54.91 sec[0m
+2025-02-21 13:54:57,013 - INFO - Starting measurement
+2025-02-21 13:55:54,699 - INFO - Finished measurement
+2025-02-21 13:55:54,737 - INFO - Open dataset /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135454-999-587411-qubit_01_spectroscopy/dataset_qubit_01_spectroscopy_0.hdf5
+2025-02-21 13:55:54,774 - DEBUG - 'spec:spec_ampl_optimal' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:54,778 - DEBUG - 'spec:spec_ampl_optimal' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:54,781 - DEBUG - 'spec:spec_ampl_optimal' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:54,785 - DEBUG - 'spec:spec_ampl_optimal' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:54,788 - DEBUG - 'spec:spec_ampl_optimal' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:55,201 - INFO - Saving Plots
+2025-02-21 13:55:56,744 - INFO - Plots saved to /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135454-999-587411-qubit_01_spectroscopy/qubit_01_spectroscopy_preview.png and /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135454-999-587411-qubit_01_spectroscopy/qubit_01_spectroscopy.png
+2025-02-21 13:55:56,745 - INFO - analysis completed
+2025-02-21 13:55:56,745 - INFO - qubit_01_spectroscopy node is completed
+2025-02-21 13:55:56,745 - INFO - Inspecting node rabi_oscillations
+2025-02-21 13:55:56,745 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,746 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,750 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,750 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,751 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,751 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,751 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,751 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,752 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,752 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,752 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,753 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,753 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,754 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,754 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,754 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,754 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,758 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,758 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,759 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,759 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,759 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,759 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,759 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,759 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,759 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,760 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,760 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,761 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,761 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,761 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,761 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,764 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,764 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,764 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,764 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,765 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,765 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,765 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,765 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,765 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,766 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,766 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,767 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,767 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,767 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,767 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,772 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,772 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,772 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,772 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,773 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,773 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,773 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,773 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,773 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,775 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,775 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,775 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,775 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,776 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,776 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,779 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,780 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,780 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,780 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,780 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,780 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,780 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,780 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,781 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,781 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,782 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,782 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,782 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,782 - DEBUG - 'parking_current' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,782 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,782 - DEBUG - 'cz_pulse_amplitude' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,782 - DEBUG - 'cz_pulse_width' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:55:56,784 - WARNING - ⚑⚑⚑ [31m[1mCalibration required for Node rabi_oscillations[0m
+2025-02-21 13:55:56,850 - INFO - Initializing parameters for qubits: ['q06', 'q07', 'q08', 'q09', 'q10'] and couplers: ['q06_q07']
+2025-02-21 13:55:56,850 - INFO - Calibrating node rabi_oscillations
+2025-02-21 13:55:56,855 - INFO - Loading run_config: run_config.toml
+2025-02-21 13:55:56,855 - INFO - Loading cluster_config: cluster_config.json
+2025-02-21 13:55:56,855 - INFO - Loading device_config: device_config.toml
+2025-02-21 13:55:56,855 - INFO - Loading spi_config: spi_config.toml
+2025-02-21 13:55:56,855 - INFO - Loading node_config: node_config.toml
+2025-02-21 13:55:56,855 - INFO - Loading user_samplespace: user_samplespace.py
+2025-02-21 13:55:56,856 - INFO - Loaded configuration package from /home/adilet/tergite-autocalibration/configuration.meta.toml
+2025-02-21 13:55:56,856 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/run_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135556-850-e5b20e-rabi_oscillations/configs/run_config.toml
+2025-02-21 13:55:56,856 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/cluster_config.json 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135556-850-e5b20e-rabi_oscillations/configs/cluster_config.json
+2025-02-21 13:55:56,856 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/device_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135556-850-e5b20e-rabi_oscillations/configs/device_config.toml
+2025-02-21 13:55:56,856 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/spi_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135556-850-e5b20e-rabi_oscillations/configs/spi_config.toml
+2025-02-21 13:55:56,856 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/node_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135556-850-e5b20e-rabi_oscillations/configs/node_config.toml
+2025-02-21 13:55:56,856 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/user_samplespace.py 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135556-850-e5b20e-rabi_oscillations/configs/user_samplespace.py
+2025-02-21 13:55:56,856 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/misc 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135556-850-e5b20e-rabi_oscillations/misc
+2025-02-21 13:55:56,861 - INFO - Loading run_config: run_config.toml
+2025-02-21 13:55:56,861 - INFO - Loading cluster_config: cluster_config.json
+2025-02-21 13:55:56,861 - INFO - Loading device_config: device_config.toml
+2025-02-21 13:55:56,861 - INFO - Loading spi_config: spi_config.toml
+2025-02-21 13:55:56,861 - INFO - Loading node_config: node_config.toml
+2025-02-21 13:55:56,861 - INFO - Loading user_samplespace: user_samplespace.py
+2025-02-21 13:55:56,861 - INFO - Loaded configuration package from /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135556-850-e5b20e-rabi_oscillations/configuration.meta.toml
+2025-02-21 13:55:56,887 - INFO - Starting Compiling
+2025-02-21 13:55:57,092 - STATUS - schedule_duration = [36m[1m29.20 sec[0m
+2025-02-21 13:55:57,092 - INFO - Starting measurement
+2025-02-21 13:56:27,635 - INFO - Finished measurement
+2025-02-21 13:56:27,668 - INFO - Open dataset /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135556-850-e5b20e-rabi_oscillations/dataset_rabi_oscillations_0.hdf5
+2025-02-21 13:56:27,936 - INFO - Saving Plots
+2025-02-21 13:56:29,398 - INFO - Plots saved to /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135556-850-e5b20e-rabi_oscillations/rabi_oscillations_preview.png and /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135556-850-e5b20e-rabi_oscillations/rabi_oscillations.png
+2025-02-21 13:56:29,398 - INFO - analysis completed
+2025-02-21 13:56:29,398 - INFO - rabi_oscillations node is completed
+2025-02-21 13:56:29,398 - INFO - Inspecting node ramsey_correction
+2025-02-21 13:56:29,398 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,398 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,400 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,400 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,400 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,401 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,401 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,401 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,401 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,401 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,401 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,401 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,402 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,402 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,402 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,402 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,402 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,403 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,404 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,404 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,404 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,404 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,404 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,404 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,404 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,404 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,405 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,405 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,405 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,405 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,405 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,405 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,407 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,407 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,407 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,407 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,407 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,407 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,407 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,407 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,407 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,408 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,408 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,408 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,408 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,408 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,408 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,409 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,410 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,410 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,410 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,410 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,410 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,410 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,410 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,410 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,411 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,411 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,411 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,411 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,411 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,411 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,412 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,413 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,413 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,413 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,413 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,413 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,413 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,413 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,413 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,414 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,414 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,414 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,414 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,414 - DEBUG - 'parking_current' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,414 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,414 - DEBUG - 'cz_pulse_amplitude' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,414 - DEBUG - 'cz_pulse_width' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:56:29,415 - WARNING - ⚑⚑⚑ [31m[1mCalibration required for Node ramsey_correction[0m
+2025-02-21 13:56:29,474 - INFO - Initializing parameters for qubits: ['q06', 'q07', 'q08', 'q09', 'q10'] and couplers: ['q06_q07']
+2025-02-21 13:56:29,474 - INFO - Calibrating node ramsey_correction
+2025-02-21 13:56:29,478 - INFO - Loading run_config: run_config.toml
+2025-02-21 13:56:29,478 - INFO - Loading cluster_config: cluster_config.json
+2025-02-21 13:56:29,478 - INFO - Loading device_config: device_config.toml
+2025-02-21 13:56:29,478 - INFO - Loading spi_config: spi_config.toml
+2025-02-21 13:56:29,479 - INFO - Loading node_config: node_config.toml
+2025-02-21 13:56:29,479 - INFO - Loading user_samplespace: user_samplespace.py
+2025-02-21 13:56:29,479 - INFO - Loaded configuration package from /home/adilet/tergite-autocalibration/configuration.meta.toml
+2025-02-21 13:56:29,479 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/run_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135629-474-050af9-ramsey_correction/configs/run_config.toml
+2025-02-21 13:56:29,479 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/cluster_config.json 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135629-474-050af9-ramsey_correction/configs/cluster_config.json
+2025-02-21 13:56:29,479 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/device_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135629-474-050af9-ramsey_correction/configs/device_config.toml
+2025-02-21 13:56:29,479 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/spi_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135629-474-050af9-ramsey_correction/configs/spi_config.toml
+2025-02-21 13:56:29,479 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/node_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135629-474-050af9-ramsey_correction/configs/node_config.toml
+2025-02-21 13:56:29,479 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/user_samplespace.py 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135629-474-050af9-ramsey_correction/configs/user_samplespace.py
+2025-02-21 13:56:29,479 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/misc 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135629-474-050af9-ramsey_correction/misc
+2025-02-21 13:56:29,484 - INFO - Loading run_config: run_config.toml
+2025-02-21 13:56:29,484 - INFO - Loading cluster_config: cluster_config.json
+2025-02-21 13:56:29,484 - INFO - Loading device_config: device_config.toml
+2025-02-21 13:56:29,484 - INFO - Loading spi_config: spi_config.toml
+2025-02-21 13:56:29,484 - INFO - Loading node_config: node_config.toml
+2025-02-21 13:56:29,485 - INFO - Loading user_samplespace: user_samplespace.py
+2025-02-21 13:56:29,485 - INFO - Loaded configuration package from /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135629-474-050af9-ramsey_correction/configuration.meta.toml
+2025-02-21 13:56:29,796 - INFO - Starting Compiling
+2025-02-21 13:56:30,572 - STATUS - schedule_duration = [36m[1m89.68 sec[0m
+2025-02-21 13:56:30,572 - INFO - Starting measurement
+2025-02-21 13:58:02,067 - INFO - Finished measurement
+2025-02-21 13:58:02,104 - INFO - Open dataset /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135629-474-050af9-ramsey_correction/dataset_ramsey_correction_0.hdf5
+2025-02-21 13:58:02,702 - INFO - Saving Plots
+2025-02-21 13:58:04,098 - INFO - Plots saved to /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135629-474-050af9-ramsey_correction/ramsey_correction_preview.png and /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135629-474-050af9-ramsey_correction/ramsey_correction.png
+2025-02-21 13:58:04,099 - INFO - analysis completed
+2025-02-21 13:58:04,100 - INFO - ramsey_correction node is completed
+2025-02-21 13:58:04,100 - INFO - Inspecting node motzoi_parameter
+2025-02-21 13:58:04,100 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,100 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,102 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,102 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,102 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,102 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,102 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,102 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,102 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,102 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,102 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,103 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,103 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,103 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,103 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,103 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,103 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,105 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,105 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,105 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,105 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,105 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,105 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,105 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,105 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,106 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,106 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,106 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,106 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,106 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,106 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,106 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,109 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,109 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,110 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,110 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,110 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,110 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,110 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,111 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,111 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,112 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,112 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,112 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,112 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,113 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,113 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,116 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,116 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,117 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,117 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,117 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,117 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,117 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,117 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,118 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,119 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,119 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,119 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,119 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,119 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,120 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,123 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,123 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,123 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,123 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,123 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,124 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,124 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,124 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,124 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,125 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,125 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,125 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,125 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,125 - DEBUG - 'parking_current' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,125 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,125 - DEBUG - 'cz_pulse_amplitude' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,126 - DEBUG - 'cz_pulse_width' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:58:04,126 - WARNING - ⚑⚑⚑ [31m[1mCalibration required for Node motzoi_parameter[0m
+2025-02-21 13:58:04,200 - INFO - Initializing parameters for qubits: ['q06', 'q07', 'q08', 'q09', 'q10'] and couplers: ['q06_q07']
+2025-02-21 13:58:04,200 - INFO - Calibrating node motzoi_parameter
+2025-02-21 13:58:04,205 - INFO - Loading run_config: run_config.toml
+2025-02-21 13:58:04,205 - INFO - Loading cluster_config: cluster_config.json
+2025-02-21 13:58:04,205 - INFO - Loading device_config: device_config.toml
+2025-02-21 13:58:04,205 - INFO - Loading spi_config: spi_config.toml
+2025-02-21 13:58:04,205 - INFO - Loading node_config: node_config.toml
+2025-02-21 13:58:04,205 - INFO - Loading user_samplespace: user_samplespace.py
+2025-02-21 13:58:04,205 - INFO - Loaded configuration package from /home/adilet/tergite-autocalibration/configuration.meta.toml
+2025-02-21 13:58:04,206 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/run_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135804-200-54310a-motzoi_parameter/configs/run_config.toml
+2025-02-21 13:58:04,206 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/cluster_config.json 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135804-200-54310a-motzoi_parameter/configs/cluster_config.json
+2025-02-21 13:58:04,206 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/device_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135804-200-54310a-motzoi_parameter/configs/device_config.toml
+2025-02-21 13:58:04,206 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/spi_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135804-200-54310a-motzoi_parameter/configs/spi_config.toml
+2025-02-21 13:58:04,206 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/node_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135804-200-54310a-motzoi_parameter/configs/node_config.toml
+2025-02-21 13:58:04,206 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/user_samplespace.py 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135804-200-54310a-motzoi_parameter/configs/user_samplespace.py
+2025-02-21 13:58:04,206 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/misc 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135804-200-54310a-motzoi_parameter/misc
+2025-02-21 13:58:04,211 - INFO - Loading run_config: run_config.toml
+2025-02-21 13:58:04,211 - INFO - Loading cluster_config: cluster_config.json
+2025-02-21 13:58:04,211 - INFO - Loading device_config: device_config.toml
+2025-02-21 13:58:04,211 - INFO - Loading spi_config: spi_config.toml
+2025-02-21 13:58:04,211 - INFO - Loading node_config: node_config.toml
+2025-02-21 13:58:04,211 - INFO - Loading user_samplespace: user_samplespace.py
+2025-02-21 13:58:04,211 - INFO - Loaded configuration package from /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135804-200-54310a-motzoi_parameter/configuration.meta.toml
+2025-02-21 13:58:04,871 - INFO - Starting Compiling
+2025-02-21 13:58:08,010 - STATUS - schedule_duration = [36m[1m71.05 sec[0m
+2025-02-21 13:58:08,010 - INFO - Starting measurement
+2025-02-21 13:59:23,213 - INFO - Finished measurement
+2025-02-21 13:59:23,252 - INFO - Open dataset /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135804-200-54310a-motzoi_parameter/dataset_motzoi_parameter_0.hdf5
+2025-02-21 13:59:23,588 - INFO - Saving Plots
+2025-02-21 13:59:25,314 - INFO - Plots saved to /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135804-200-54310a-motzoi_parameter/motzoi_parameter_preview.png and /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135804-200-54310a-motzoi_parameter/motzoi_parameter.png
+2025-02-21 13:59:25,315 - INFO - analysis completed
+2025-02-21 13:59:25,315 - INFO - motzoi_parameter node is completed
+2025-02-21 13:59:25,315 - INFO - Inspecting node n_rabi_oscillations
+2025-02-21 13:59:25,315 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,315 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,319 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,320 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,320 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,320 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,320 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,320 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,321 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,321 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,321 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,322 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,322 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,322 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,323 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,323 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,323 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,327 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,327 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,327 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,328 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,328 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,328 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,328 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,328 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,329 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,330 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,330 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,330 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,330 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,330 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,331 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,334 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,335 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,335 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,335 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,335 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,335 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,336 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,336 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,336 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,337 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,337 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,338 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,338 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,338 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,339 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,343 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,344 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,344 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,344 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,344 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,344 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,345 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,345 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,345 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,346 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,346 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,346 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,346 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,347 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,347 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,350 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,350 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,350 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,351 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,351 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,351 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,351 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,352 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,352 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,353 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,353 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,353 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,353 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,354 - DEBUG - 'parking_current' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,354 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,354 - DEBUG - 'cz_pulse_amplitude' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,354 - DEBUG - 'cz_pulse_width' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 13:59:25,355 - WARNING - ⚑⚑⚑ [31m[1mCalibration required for Node n_rabi_oscillations[0m
+2025-02-21 13:59:25,436 - INFO - Initializing parameters for qubits: ['q06', 'q07', 'q08', 'q09', 'q10'] and couplers: ['q06_q07']
+2025-02-21 13:59:25,436 - INFO - Calibrating node n_rabi_oscillations
+2025-02-21 13:59:25,441 - INFO - Loading run_config: run_config.toml
+2025-02-21 13:59:25,441 - INFO - Loading cluster_config: cluster_config.json
+2025-02-21 13:59:25,442 - INFO - Loading device_config: device_config.toml
+2025-02-21 13:59:25,442 - INFO - Loading spi_config: spi_config.toml
+2025-02-21 13:59:25,442 - INFO - Loading node_config: node_config.toml
+2025-02-21 13:59:25,442 - INFO - Loading user_samplespace: user_samplespace.py
+2025-02-21 13:59:25,442 - INFO - Loaded configuration package from /home/adilet/tergite-autocalibration/configuration.meta.toml
+2025-02-21 13:59:25,442 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/run_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135925-436-60c564-n_rabi_oscillations/configs/run_config.toml
+2025-02-21 13:59:25,442 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/cluster_config.json 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135925-436-60c564-n_rabi_oscillations/configs/cluster_config.json
+2025-02-21 13:59:25,442 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/device_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135925-436-60c564-n_rabi_oscillations/configs/device_config.toml
+2025-02-21 13:59:25,442 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/spi_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135925-436-60c564-n_rabi_oscillations/configs/spi_config.toml
+2025-02-21 13:59:25,442 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/node_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135925-436-60c564-n_rabi_oscillations/configs/node_config.toml
+2025-02-21 13:59:25,442 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/user_samplespace.py 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135925-436-60c564-n_rabi_oscillations/configs/user_samplespace.py
+2025-02-21 13:59:25,443 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/misc 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135925-436-60c564-n_rabi_oscillations/misc
+2025-02-21 13:59:25,448 - INFO - Loading run_config: run_config.toml
+2025-02-21 13:59:25,448 - INFO - Loading cluster_config: cluster_config.json
+2025-02-21 13:59:25,448 - INFO - Loading device_config: device_config.toml
+2025-02-21 13:59:25,448 - INFO - Loading spi_config: spi_config.toml
+2025-02-21 13:59:25,448 - INFO - Loading node_config: node_config.toml
+2025-02-21 13:59:25,448 - INFO - Loading user_samplespace: user_samplespace.py
+2025-02-21 13:59:25,448 - INFO - Loaded configuration package from /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135925-436-60c564-n_rabi_oscillations/configuration.meta.toml
+2025-02-21 13:59:25,905 - INFO - Starting Compiling
+2025-02-21 13:59:28,736 - STATUS - schedule_duration = [36m[1m56.19 sec[0m
+2025-02-21 13:59:28,736 - INFO - Starting measurement
+2025-02-21 14:00:28,230 - INFO - Finished measurement
+2025-02-21 14:00:28,277 - INFO - Open dataset /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135925-436-60c564-n_rabi_oscillations/dataset_n_rabi_oscillations_0.hdf5
+2025-02-21 14:00:28,582 - INFO - Saving Plots
+2025-02-21 14:00:30,089 - INFO - Plots saved to /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135925-436-60c564-n_rabi_oscillations/n_rabi_oscillations_preview.png and /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-135925-436-60c564-n_rabi_oscillations/n_rabi_oscillations.png
+2025-02-21 14:00:30,090 - INFO - analysis completed
+2025-02-21 14:00:30,090 - INFO - n_rabi_oscillations node is completed
+2025-02-21 14:00:30,090 - INFO - Inspecting node resonator_spectroscopy_1
+2025-02-21 14:00:30,090 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,090 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,094 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,094 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,094 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,094 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,095 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,095 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,095 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,095 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,095 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,096 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,097 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,097 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,097 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,097 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,097 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,101 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,101 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,101 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,102 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,102 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,102 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,102 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,102 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,102 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,104 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,104 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,104 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,104 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,104 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,105 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,108 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,108 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,108 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,108 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,108 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,109 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,109 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,109 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,109 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,110 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,110 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,110 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,110 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,110 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,110 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,113 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,113 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,113 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,114 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,114 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,114 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,114 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,115 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,115 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,116 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,116 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,116 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,116 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,117 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,117 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,121 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,121 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,121 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,121 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,122 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,122 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,122 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,122 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,122 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,123 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,123 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,124 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,124 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,124 - DEBUG - 'parking_current' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,124 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,124 - DEBUG - 'cz_pulse_amplitude' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,124 - DEBUG - 'cz_pulse_width' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,126 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,126 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,126 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,126 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,126 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,127 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:30,127 - WARNING - ⚑⚑⚑ [31m[1mCalibration required for Node resonator_spectroscopy_1[0m
+2025-02-21 14:00:30,194 - INFO - Initializing parameters for qubits: ['q06', 'q07', 'q08', 'q09', 'q10'] and couplers: ['q06_q07']
+2025-02-21 14:00:30,194 - INFO - Calibrating node resonator_spectroscopy_1
+2025-02-21 14:00:30,200 - INFO - Loading run_config: run_config.toml
+2025-02-21 14:00:30,200 - INFO - Loading cluster_config: cluster_config.json
+2025-02-21 14:00:30,200 - INFO - Loading device_config: device_config.toml
+2025-02-21 14:00:30,200 - INFO - Loading spi_config: spi_config.toml
+2025-02-21 14:00:30,200 - INFO - Loading node_config: node_config.toml
+2025-02-21 14:00:30,200 - INFO - Loading user_samplespace: user_samplespace.py
+2025-02-21 14:00:30,200 - INFO - Loaded configuration package from /home/adilet/tergite-autocalibration/configuration.meta.toml
+2025-02-21 14:00:30,201 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/run_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140030-194-7cd763-resonator_spectroscopy_1/configs/run_config.toml
+2025-02-21 14:00:30,201 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/cluster_config.json 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140030-194-7cd763-resonator_spectroscopy_1/configs/cluster_config.json
+2025-02-21 14:00:30,201 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/device_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140030-194-7cd763-resonator_spectroscopy_1/configs/device_config.toml
+2025-02-21 14:00:30,201 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/spi_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140030-194-7cd763-resonator_spectroscopy_1/configs/spi_config.toml
+2025-02-21 14:00:30,201 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/node_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140030-194-7cd763-resonator_spectroscopy_1/configs/node_config.toml
+2025-02-21 14:00:30,202 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/user_samplespace.py 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140030-194-7cd763-resonator_spectroscopy_1/configs/user_samplespace.py
+2025-02-21 14:00:30,202 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/misc 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140030-194-7cd763-resonator_spectroscopy_1/misc
+2025-02-21 14:00:30,218 - INFO - Loading run_config: run_config.toml
+2025-02-21 14:00:30,218 - INFO - Loading cluster_config: cluster_config.json
+2025-02-21 14:00:30,218 - INFO - Loading device_config: device_config.toml
+2025-02-21 14:00:30,219 - INFO - Loading spi_config: spi_config.toml
+2025-02-21 14:00:30,219 - INFO - Loading node_config: node_config.toml
+2025-02-21 14:00:30,219 - INFO - Loading user_samplespace: user_samplespace.py
+2025-02-21 14:00:30,219 - INFO - Loaded configuration package from /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140030-194-7cd763-resonator_spectroscopy_1/configuration.meta.toml
+2025-02-21 14:00:30,364 - INFO - Starting Compiling
+2025-02-21 14:00:30,629 - STATUS - schedule_duration = [36m[1m23.11 sec[0m
+2025-02-21 14:00:30,629 - INFO - Starting measurement
+2025-02-21 14:00:55,238 - INFO - Finished measurement
+2025-02-21 14:00:55,276 - INFO - Open dataset /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140030-194-7cd763-resonator_spectroscopy_1/dataset_resonator_spectroscopy_1_0.hdf5
+2025-02-21 14:00:55,326 - DEBUG - 'extended_clock_freqs:readout_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:55,326 - DEBUG - 'Ql_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:55,326 - DEBUG - 'resonator_minimum_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:55,343 - DEBUG - 'extended_clock_freqs:readout_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:55,343 - DEBUG - 'Ql_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:55,343 - DEBUG - 'resonator_minimum_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:55,389 - DEBUG - 'extended_clock_freqs:readout_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:55,389 - DEBUG - 'Ql_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:55,390 - DEBUG - 'resonator_minimum_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:55,434 - DEBUG - 'extended_clock_freqs:readout_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:55,434 - DEBUG - 'Ql_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:55,435 - DEBUG - 'resonator_minimum_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:55,464 - DEBUG - 'extended_clock_freqs:readout_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:55,464 - DEBUG - 'Ql_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:55,464 - DEBUG - 'resonator_minimum_1' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:55,859 - INFO - Saving Plots
+2025-02-21 14:00:57,580 - INFO - Plots saved to /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140030-194-7cd763-resonator_spectroscopy_1/resonator_spectroscopy_1_preview.png and /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140030-194-7cd763-resonator_spectroscopy_1/resonator_spectroscopy_1.png
+2025-02-21 14:00:57,581 - INFO - analysis completed
+2025-02-21 14:00:57,581 - INFO - resonator_spectroscopy_1 node is completed
+2025-02-21 14:00:57,581 - INFO - Inspecting node ro_frequency_two_state_optimization
+2025-02-21 14:00:57,581 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,581 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,583 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,583 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,583 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,583 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,583 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,584 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,584 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,584 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,584 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,584 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,584 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,584 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,584 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,585 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,585 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,586 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,586 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,586 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,586 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,587 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,587 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,587 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,587 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,587 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,587 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,587 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,587 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,588 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,588 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,588 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,589 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,589 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,589 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,589 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,590 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,590 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,590 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,590 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,590 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,590 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,590 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,591 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,591 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,591 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,591 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,592 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,592 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,592 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,593 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,593 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,593 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,593 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,593 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,593 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,593 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,593 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,594 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,594 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,594 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,594 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,595 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,595 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,596 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,596 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,596 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,596 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,596 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,596 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,596 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,597 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,597 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,597 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,597 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,597 - DEBUG - 'parking_current' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,597 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,597 - DEBUG - 'cz_pulse_amplitude' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,597 - DEBUG - 'cz_pulse_width' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:00:57,598 - WARNING - ⚑⚑⚑ [31m[1mCalibration required for Node ro_frequency_two_state_optimization[0m
+2025-02-21 14:00:57,657 - INFO - Initializing parameters for qubits: ['q06', 'q07', 'q08', 'q09', 'q10'] and couplers: ['q06_q07']
+2025-02-21 14:00:57,657 - INFO - Calibrating node ro_frequency_two_state_optimization
+2025-02-21 14:00:57,662 - INFO - Loading run_config: run_config.toml
+2025-02-21 14:00:57,662 - INFO - Loading cluster_config: cluster_config.json
+2025-02-21 14:00:57,662 - INFO - Loading device_config: device_config.toml
+2025-02-21 14:00:57,662 - INFO - Loading spi_config: spi_config.toml
+2025-02-21 14:00:57,662 - INFO - Loading node_config: node_config.toml
+2025-02-21 14:00:57,662 - INFO - Loading user_samplespace: user_samplespace.py
+2025-02-21 14:00:57,662 - INFO - Loaded configuration package from /home/adilet/tergite-autocalibration/configuration.meta.toml
+2025-02-21 14:00:57,662 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/run_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140057-657-06b8c3-ro_frequency_two_state_optimization/configs/run_config.toml
+2025-02-21 14:00:57,663 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/cluster_config.json 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140057-657-06b8c3-ro_frequency_two_state_optimization/configs/cluster_config.json
+2025-02-21 14:00:57,663 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/device_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140057-657-06b8c3-ro_frequency_two_state_optimization/configs/device_config.toml
+2025-02-21 14:00:57,663 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/spi_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140057-657-06b8c3-ro_frequency_two_state_optimization/configs/spi_config.toml
+2025-02-21 14:00:57,663 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/node_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140057-657-06b8c3-ro_frequency_two_state_optimization/configs/node_config.toml
+2025-02-21 14:00:57,663 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/user_samplespace.py 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140057-657-06b8c3-ro_frequency_two_state_optimization/configs/user_samplespace.py
+2025-02-21 14:00:57,663 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/misc 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140057-657-06b8c3-ro_frequency_two_state_optimization/misc
+2025-02-21 14:00:57,668 - INFO - Loading run_config: run_config.toml
+2025-02-21 14:00:57,668 - INFO - Loading cluster_config: cluster_config.json
+2025-02-21 14:00:57,668 - INFO - Loading device_config: device_config.toml
+2025-02-21 14:00:57,668 - INFO - Loading spi_config: spi_config.toml
+2025-02-21 14:00:57,668 - INFO - Loading node_config: node_config.toml
+2025-02-21 14:00:57,668 - INFO - Loading user_samplespace: user_samplespace.py
+2025-02-21 14:00:57,668 - INFO - Loaded configuration package from /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140057-657-06b8c3-ro_frequency_two_state_optimization/configuration.meta.toml
+2025-02-21 14:00:57,865 - INFO - Starting Compiling
+2025-02-21 14:00:58,276 - STATUS - schedule_duration = [36m[1m84.84 sec[0m
+2025-02-21 14:00:58,277 - INFO - Starting measurement
+2025-02-21 14:02:24,730 - INFO - Finished measurement
+2025-02-21 14:02:24,775 - INFO - Open dataset /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140057-657-06b8c3-ro_frequency_two_state_optimization/dataset_ro_frequency_two_state_optimization_0.hdf5
+2025-02-21 14:02:25,451 - INFO - Saving Plots
+2025-02-21 14:02:29,319 - INFO - Plots saved to /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140057-657-06b8c3-ro_frequency_two_state_optimization/ro_frequency_two_state_optimization_preview.png and /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140057-657-06b8c3-ro_frequency_two_state_optimization/ro_frequency_two_state_optimization.png
+2025-02-21 14:02:29,320 - INFO - analysis completed
+2025-02-21 14:02:29,320 - INFO - ro_frequency_two_state_optimization node is completed
+2025-02-21 14:02:29,320 - INFO - Inspecting node ro_amplitude_two_state_optimization
+2025-02-21 14:02:29,321 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,321 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,323 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,323 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,323 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,323 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,323 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,323 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,323 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,323 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,323 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,324 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,324 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,324 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,324 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,324 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,324 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,326 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,326 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,326 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,326 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,326 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,326 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,326 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,326 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,326 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,327 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,327 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,327 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,327 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,327 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,327 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,329 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,329 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,329 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,329 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,329 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,329 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,329 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,329 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,329 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,330 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,330 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,330 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,330 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,330 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,330 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,332 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,332 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,332 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,332 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,332 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,332 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,332 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,332 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,332 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,333 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,333 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,333 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,333 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,333 - DEBUG - 'VNA_f01_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,333 - DEBUG - 'VNA_f12_frequency' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,335 - DEBUG - 'measure_1:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,335 - DEBUG - 'measure_1:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,335 - DEBUG - 'measure_1:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,335 - DEBUG - 'measure_1:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,335 - DEBUG - 'measure_2:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,335 - DEBUG - 'measure_2:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,335 - DEBUG - 'measure_2:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,335 - DEBUG - 'measure_2:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,335 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,336 - DEBUG - 'measure_3state_opt:pulse_duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,336 - DEBUG - 'measure_3state_opt:acq_delay' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,336 - DEBUG - 'measure_3state_opt:integration_time' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,336 - DEBUG - 'reset:duration' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,336 - DEBUG - 'parking_current' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,336 - DEBUG - 'attenuation' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,336 - DEBUG - 'cz_pulse_amplitude' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,336 - DEBUG - 'cz_pulse_width' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:02:29,337 - WARNING - ⚑⚑⚑ [31m[1mCalibration required for Node ro_amplitude_two_state_optimization[0m
+2025-02-21 14:02:29,397 - INFO - Initializing parameters for qubits: ['q06', 'q07', 'q08', 'q09', 'q10'] and couplers: ['q06_q07']
+2025-02-21 14:02:29,397 - INFO - Calibrating node ro_amplitude_two_state_optimization
+2025-02-21 14:02:29,402 - INFO - Loading run_config: run_config.toml
+2025-02-21 14:02:29,402 - INFO - Loading cluster_config: cluster_config.json
+2025-02-21 14:02:29,402 - INFO - Loading device_config: device_config.toml
+2025-02-21 14:02:29,402 - INFO - Loading spi_config: spi_config.toml
+2025-02-21 14:02:29,402 - INFO - Loading node_config: node_config.toml
+2025-02-21 14:02:29,402 - INFO - Loading user_samplespace: user_samplespace.py
+2025-02-21 14:02:29,402 - INFO - Loaded configuration package from /home/adilet/tergite-autocalibration/configuration.meta.toml
+2025-02-21 14:02:29,402 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/run_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140229-397-1741a1-ro_amplitude_two_state_optimization/configs/run_config.toml
+2025-02-21 14:02:29,402 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/cluster_config.json 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140229-397-1741a1-ro_amplitude_two_state_optimization/configs/cluster_config.json
+2025-02-21 14:02:29,403 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/device_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140229-397-1741a1-ro_amplitude_two_state_optimization/configs/device_config.toml
+2025-02-21 14:02:29,403 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/spi_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140229-397-1741a1-ro_amplitude_two_state_optimization/configs/spi_config.toml
+2025-02-21 14:02:29,403 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/node_config.toml 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140229-397-1741a1-ro_amplitude_two_state_optimization/configs/node_config.toml
+2025-02-21 14:02:29,403 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/configs/user_samplespace.py 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140229-397-1741a1-ro_amplitude_two_state_optimization/configs/user_samplespace.py
+2025-02-21 14:02:29,403 - INFO - Copying: 
+/home/adilet/tergite-autocalibration/misc 
+-> /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140229-397-1741a1-ro_amplitude_two_state_optimization/misc
+2025-02-21 14:02:29,408 - INFO - Loading run_config: run_config.toml
+2025-02-21 14:02:29,408 - INFO - Loading cluster_config: cluster_config.json
+2025-02-21 14:02:29,408 - INFO - Loading device_config: device_config.toml
+2025-02-21 14:02:29,408 - INFO - Loading spi_config: spi_config.toml
+2025-02-21 14:02:29,408 - INFO - Loading node_config: node_config.toml
+2025-02-21 14:02:29,408 - INFO - Loading user_samplespace: user_samplespace.py
+2025-02-21 14:02:29,408 - INFO - Loaded configuration package from /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140229-397-1741a1-ro_amplitude_two_state_optimization/configuration.meta.toml
+2025-02-21 14:02:29,510 - INFO - Starting Compiling
+2025-02-21 14:02:32,295 - STATUS - schedule_duration = [36m[1m41.65 sec[0m
+2025-02-21 14:02:32,295 - INFO - Starting measurement
+2025-02-21 14:03:17,484 - INFO - Finished measurement
+2025-02-21 14:03:17,537 - INFO - Open dataset /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140229-397-1741a1-ro_amplitude_two_state_optimization/dataset_ro_amplitude_two_state_optimization_0.hdf5
+2025-02-21 14:03:18,409 - DEBUG - 'measure_2state_opt:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:03:18,916 - DEBUG - 'measure_2state_opt:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:03:19,430 - DEBUG - 'measure_2state_opt:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:03:19,930 - DEBUG - 'measure_2state_opt:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:03:20,433 - DEBUG - 'measure_2state_opt:pulse_amp' is not in mapped parameter list in utilities/standard_redis_storage.py. Please add appropriate parameter attributes in the map
+2025-02-21 14:03:20,928 - INFO - Saving Plots
+2025-02-21 14:03:25,852 - INFO - Plots saved to /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140229-397-1741a1-ro_amplitude_two_state_optimization/ro_amplitude_two_state_optimization_preview.png and /home/adilet/tergite-autocalibration/out/2025-02-21/13-54-37_ACTIVE-ro_amplitude_two_state_optimization/20250221-140229-397-1741a1-ro_amplitude_two_state_optimization/ro_amplitude_two_state_optimization.png
+2025-02-21 14:03:25,852 - INFO - analysis completed
+2025-02-21 14:03:25,852 - INFO - ro_amplitude_two_state_optimization node is completed
+2025-02-21 14:03:25,853 - STATUS - Autocalibration terminated. Goodbye.
