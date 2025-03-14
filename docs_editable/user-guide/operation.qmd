@@ -61,6 +61,8 @@ acli node reset [OPTIONS]
 
 - `-n, --name TEXT`: Name of the node to be reset in Redis (e.g., resonator_spectroscopy)
 - `-a, --all`: Reset all nodes
+- `-f, --from_node TEXT`: Reset all nodes from the specified node in the chain
+
 
 ### Graph Commands ###
 
