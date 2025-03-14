@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project follows versions of format `{year}.{month}.{patch_number}`.
 
-## [Unreleased]
+## [2025.03.0] - 2025-03-16
 
 ### Added
 - Advanced logging
@@ -17,6 +17,7 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 - Rename all node class names to camel case
 - Re-analysis is more user-friendly
 - Make pipeline more modular
+- Improved node documentation
 
 ### Fixed
 
