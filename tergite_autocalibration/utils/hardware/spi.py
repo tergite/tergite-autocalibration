@@ -162,13 +162,13 @@ class SpiDAC:
                         progress.update(
                             task,
                             completed=abs(current_mA - initial_current),
-                            description=f"[cyan]{current_mA:.4f} mA",
+                            description=f"[cyan] Coupler {coupler}: current is {current_mA:.4f} with target {target_mA:.4f} mA",
                         )
 
-                        if abs(current_mA - target_mA) < 0.01:  # Stop when close enough
+                        if abs(current_mA - target_mA) < 0.005:  # Stop when close enough
                             break
 
-                        time.sleep(1)  # Simulate delay
+                        time.sleep(0.5)  # Simulate delay
 
                     except ValueError as e:
                         progress.stop()
@@ -176,10 +176,14 @@ class SpiDAC:
                         break
 
         logger.status(
-            f"{Style.RESET_ALL} Ramping finished at {dac.current() * 1000:.4f} mA"
+            f"{Style.RESET_ALL} Ramping finished"
         )
-
+        
     def print_currents(self):
         for coupler, dac in self.dacs_dictionary.items():
             current = dac.current() * 1000
             logger.info(f"{coupler}: {current:.4f} mA")
+
+    def close_spi_rack(self):
+        self.spi.close()
+        logger.status(f"{Style.RESET_ALL} Closing SPI rack")
