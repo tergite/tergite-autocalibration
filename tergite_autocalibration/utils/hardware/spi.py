@@ -112,7 +112,9 @@ class SpiDAC:
 
     def set_dac_current(self, dac_values: dict[str, float]) -> None:
         if self.is_dummy:
-            logger.status(f"Dummy DAC to current {dac_values}. NO REAL CURRENT is generated")
+            logger.status(
+                f"Dummy DAC to current {dac_values}. NO REAL CURRENT is generated"
+            )
             return
         self.ramp_current_serially(dac_values)
 
@@ -134,20 +136,26 @@ class SpiDAC:
             sys.stdout.write(f"{these_currents * 1000}", end=print_termination)
             sys.stdout.flush()
             time.sleep(1)
-        logger.status(f"{Style.RESET_ALL} Ramping finished at {dac.current() * 1000:.4f} mA")
+        logger.status(
+            f"{Style.RESET_ALL} Ramping finished at {dac.current() * 1000:.4f} mA"
+        )
 
     def ramp_current_serially(self, dac_values: dict[str, float]):
         for coupler, target_current in dac_values.items():
             dac = self.dacs_dictionary[coupler]
             dac.current(target_current)
             with Progress() as progress:
-                task = progress.add_task("[yellow]Ramping current (mA) for coupler {coupler}", total=100)
+                task = progress.add_task(
+                    "[yellow]Ramping current (mA) for coupler {coupler}", total=100
+                )
 
                 while dac.is_ramping():
                     current_mA = dac.current() * 1000
-                    progress.update(task, advance=5, description=f"[cyan]{current_mA:.4f} mA")
+                    progress.update(
+                        task, advance=5, description=f"[cyan]{current_mA:.4f} mA"
+                    )
                     time.sleep(1)  # Simulate delay
 
-
-
-        logger.status(f"{Style.RESET_ALL} Ramping finished at {dac.current() * 1000:.4f} mA")
+        logger.status(
+            f"{Style.RESET_ALL} Ramping finished at {dac.current() * 1000:.4f} mA"
+        )
