@@ -11,6 +11,7 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
+
 import sys
 import time
 from pathlib import Path
@@ -165,7 +166,9 @@ class SpiDAC:
                             description=f"[cyan] Coupler {coupler}: current is {current_mA:.4f} with target {target_mA:.4f} mA",
                         )
 
-                        if abs(current_mA - target_mA) < 0.005:  # Stop when close enough
+                        if (
+                            abs(current_mA - target_mA) < 0.005
+                        ):  # Stop when close enough
                             break
 
                         time.sleep(0.5)  # Simulate delay
@@ -175,10 +178,8 @@ class SpiDAC:
                         logger.error(f"[red]Error reading DAC current: {e}")
                         break
 
-        logger.status(
-            f"{Style.RESET_ALL} Ramping finished"
-        )
-        
+        logger.status(f"{Style.RESET_ALL} Ramping finished")
+
     def print_currents(self):
         for coupler, dac in self.dacs_dictionary.items():
             current = dac.current() * 1000
