@@ -150,18 +150,23 @@ class SpiDAC:
                 continue  # Already at target, no need to ramp
 
             dac.current(target_current)
-            
+
             with Progress() as progress:
-                task = progress.add_task("[yellow]Ramping current...", total=total_range)
+                task = progress.add_task(
+                    "[yellow]Ramping current...", total=total_range
+                )
 
                 while dac.is_ramping():
                     try:
                         current_mA = dac.current() * 1000  # Get current in mA
-                        progress.update(task, completed=abs(current_mA - initial_current),
-                                        description=f"[cyan]{current_mA:.4f} mA")
+                        progress.update(
+                            task,
+                            completed=abs(current_mA - initial_current),
+                            description=f"[cyan]{current_mA:.4f} mA",
+                        )
 
                         if abs(current_mA - target_mA) < 0.01:  # Stop when close enough
-                            break  
+                            break
 
                         time.sleep(1)  # Simulate delay
 
@@ -169,7 +174,6 @@ class SpiDAC:
                         progress.stop()
                         logger.error(f"[red]Error reading DAC current: {e}")
                         break
-
 
         logger.status(
             f"{Style.RESET_ALL} Ramping finished at {dac.current() * 1000:.4f} mA"
