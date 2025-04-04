@@ -112,7 +112,7 @@ class SpiDAC:
 
     def set_dac_current(self, dac_values: dict[str, float]) -> None:
         if self.is_dummy:
-            print(f"Dummy DAC to current {dac_values}. NO REAL CURRENT is generated")
+            logger.status(f"Dummy DAC to current {dac_values}. NO REAL CURRENT is generated")
             return
         self.ramp_current_serially(dac_values)
 
@@ -135,7 +135,6 @@ class SpiDAC:
             sys.stdout.flush()
             time.sleep(1)
         logger.status(f"{Style.RESET_ALL} Ramping finished at {dac.current() * 1000:.4f} mA")
-        print(end="\n")
 
     def ramp_current_serially(self, dac_values: dict[str, float]):
         for coupler, target_current in dac_values.items():
@@ -152,4 +151,3 @@ class SpiDAC:
 
 
         logger.status(f"{Style.RESET_ALL} Ramping finished at {dac.current() * 1000:.4f} mA")
-        print(end="\n")
