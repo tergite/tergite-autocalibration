@@ -143,19 +143,39 @@ class SpiDAC:
     def ramp_current_serially(self, dac_values: dict[str, float]):
         for coupler, target_current in dac_values.items():
             dac = self.dacs_dictionary[coupler]
+            initial_current = dac.current() * 1000  # Convert to mA
+            target_mA = target_current * 1000  # Convert to mA
+            total_range = abs(target_mA - initial_current)  # Compute range for progress
+            if total_range == 0:
+                continue  # Already at target, no need to ramp
+
             dac.current(target_current)
+            
             with Progress() as progress:
-                task = progress.add_task(
-                    "[yellow]Ramping current (mA) for coupler {coupler}", total=100
-                )
+                task = progress.add_task("[yellow]Ramping current...", total=total_range)
 
                 while dac.is_ramping():
-                    current_mA = dac.current() * 1000
-                    progress.update(
-                        task, advance=5, description=f"[cyan]{current_mA:.4f} mA"
-                    )
-                    time.sleep(1)  # Simulate delay
+                    try:
+                        current_mA = dac.current() * 1000  # Get current in mA
+                        progress.update(task, completed=abs(current_mA - initial_current),
+                                        description=f"[cyan]{current_mA:.4f} mA")
+
+                        if abs(current_mA - target_mA) < 0.01:  # Stop when close enough
+                            break  
+
+                        time.sleep(1)  # Simulate delay
+
+                    except ValueError as e:
+                        progress.stop()
+                        logger.error(f"[red]Error reading DAC current: {e}")
+                        break
+
 
         logger.status(
             f"{Style.RESET_ALL} Ramping finished at {dac.current() * 1000:.4f} mA"
         )
+
+    def print_currents(self):
+        for coupler, dac in self.dacs_dictionary.items():
+            current = dac.current() * 1000
+            logger.info(f"{coupler}: {current:.4f} mA")
