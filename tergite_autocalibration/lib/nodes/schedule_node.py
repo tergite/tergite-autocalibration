@@ -10,10 +10,15 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+import abc
 import numpy as np
 from quantify_scheduler.instrument_coordinator.utility import xarray
 
-from tergite_autocalibration.lib.base.node import BaseNode
+from tergite_autocalibration.lib.base.node import (
+    BaseCouplerNode,
+    BaseNode,
+    BaseQubitNode,
+)
 from tergite_autocalibration.lib.utils.validators import (
     MixedSamplespace,
     Samplespace,
@@ -25,9 +30,7 @@ from tergite_autocalibration.lib.utils.validators import (
 from tergite_autocalibration.utils.measurement_utils import reduce_samplespace
 
 
-class ScheduleNode(BaseNode):
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, schedule_keywords=schedule_keywords)
+class ScheduleNode(BaseNode, abc.ABC):
 
     @property
     def outer_schedule_dimensions(self) -> int:
@@ -71,7 +74,6 @@ class ScheduleNode(BaseNode):
         self,
         cluster_status,
     ) -> xarray.Dataset:
-
         if self.outer_schedule_samplespace == {}:
             validated_samplespace = Samplespace(self.schedule_samplespace)
 
@@ -141,3 +143,15 @@ class ScheduleNode(BaseNode):
                 result_dataset = xarray.merge([ds, result_dataset])
 
         return result_dataset
+
+
+class ScheduleQubitNode(ScheduleNode, BaseQubitNode):
+    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
+        super().__init__(
+            name, all_qubits=all_qubits, schedule_keywords=schedule_keywords
+        )
+
+
+class ScheduleCouplerNode(ScheduleNode, BaseCouplerNode):
+    def __init__(self, name: str, couplers: list[str], **schedule_keywords):
+        super().__init__(name, couplers=couplers, schedule_keywords=schedule_keywords)
