@@ -13,15 +13,15 @@
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
 
-if  __name__ == "main":
+if __name__ == "main":
 
-# fmt: off
+    # fmt: off
     couplers = ["q06_q07", "q07_q08", "q08_q09", "q09_q10",
                 "q11_q12", "q12_q13", "q13_q14", "q14_q15",
                 "q06_q11", "q07_q12", "q08_q13", "q09_q14", "q10_q15",
                 "q11_q16", "q12_q17", "q13_q18", "q14_q19", "q15_q20",
                 ]
-# fmt: on
+    # fmt: on
 
     spi = SpiDAC(couplers, measurement_mode=MeasurementMode.real)
     spi.print_currents()
