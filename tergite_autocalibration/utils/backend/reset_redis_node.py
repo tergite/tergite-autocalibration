@@ -3,6 +3,7 @@
 # (C) Copyright Eleftherios Moschandreou 2024
 # (C) Copyright Liangyu Chen 2024
 # (c) Copyright Stefan Hill 2024
+# (C) Copyright Michele Faucci Giannelli 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -16,6 +17,7 @@ import itertools
 from typing import TYPE_CHECKING, ClassVar
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION, CONFIG
+from tergite_autocalibration.lib.base.node import BaseCouplerNode, BaseQubitNode
 from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
@@ -39,11 +41,17 @@ class ResetRedisNode:
             for node_name in self.node_names
         }
 
-        qois = [self.factory_dict[node].qubit_qois for node in self.node_names]
+        qois = [
+            self.factory_dict[node].qubit_qois
+            for node in self.node_names
+            if issubclass(self.factory_dict[node], BaseQubitNode)
+        ]
         qois = [qoi for qoi in qois if qoi is not None]  # filter out Nones
         self.quantities_of_interest = list(itertools.chain.from_iterable(qois))
         coupler_qois = [
-            self.factory_dict[node].coupler_qois for node in self.node_names
+            self.factory_dict[node].coupler_qois
+            for node in self.node_names
+            if issubclass(self.factory_dict[node], BaseCouplerNode)
         ]
         coupler_qois = [
             qoi for qoi in coupler_qois if qoi is not None
@@ -54,65 +62,73 @@ class ResetRedisNode:
 
     def reset_node(self, remove_node):
         logger.status(f"{ remove_node = }")
-        if not remove_node == "all":
-            remove_fields = self.factory_dict[remove_node].qubit_qois
-            if remove_fields is None:
-                remove_fields = self.factory_dict[remove_node].coupler_qois
-            if remove_fields is None:
-                raise ValueError(f"{remove_node} is not present in the list of qois")
+        if issubclass(self.factory_dict[remove_node], BaseQubitNode):
+            self.reset_defined_fields_in_qubit_node(remove_node)
+        if issubclass(self.factory_dict[remove_node], BaseCouplerNode):
+            self.reset_defined_fields_in_coupler_node(remove_node)
 
-        # TODO Why flush?
-        # red.flushdb()
+    def reset_all_nodes(self):
+        self.reset_all_fields_in_qubit_nodes()
+        self.reset_all_fields_in_coupler_nodes()
+
+    def reset_defined_fields_in_qubit_node(self, remove_node):
+        remove_fields = self.factory_dict[remove_node].qubit_qois
         for qubit in self.qubits:
-            fields = REDIS_CONNECTION.hgetall(f"transmons:{qubit}").keys()
             key = f"transmons:{qubit}"
             cs_key = f"cs:{qubit}"
-            if remove_node == "all":
-                for field in fields:
-                    REDIS_CONNECTION.hset(key, field, "nan")
-                    structured_redis_storage(key, qubit.strip("q"), None)
-                    if "motzoi" in field:
-                        REDIS_CONNECTION.hset(key, field, "0")
-                        structured_redis_storage(key, qubit.strip("q"), 0)
-                    if "measure_3state_opt:pulse_amp" in field:
-                        REDIS_CONNECTION.hset(key, field, "0")
-                        structured_redis_storage(key, qubit.strip("q"), 0)
-                    if "measure_2state_opt:pulse_amp" in field:
-                        REDIS_CONNECTION.hset(key, field, "0")
-                        structured_redis_storage(key, qubit.strip("q"), 0)
-                for node in self.node_names:
-                    REDIS_CONNECTION.hset(cs_key, node, "not_calibrated")
-            elif remove_node in self.node_names:
-                for field in remove_fields:
-                    REDIS_CONNECTION.hset(key, field, "nan")
-                    structured_redis_storage(key, qubit.strip("q"), None)
-                    if "motzoi" in field:
-                        REDIS_CONNECTION.hset(key, field, "0")
-                        structured_redis_storage(key, qubit.strip("q"), 0)
-                    if "measure_3state_opt:pulse_amp" in field:
-                        REDIS_CONNECTION.hset(key, field, "0")
-                        structured_redis_storage(key, qubit.strip("q"), 0)
-                    if "measure_2state_opt:pulse_amp" in field:
-                        REDIS_CONNECTION.hset(key, field, "0")
-                        structured_redis_storage(key, qubit.strip("q"), 0)
-                REDIS_CONNECTION.hset(cs_key, remove_node, "not_calibrated")
-            else:
-                raise ValueError("Invalid Field")
+            for field in remove_fields:
+                REDIS_CONNECTION.hset(key, field, "nan")
+                structured_redis_storage(key, qubit.strip("q"), None)
+                if "motzoi" in field:
+                    REDIS_CONNECTION.hset(key, field, "0")
+                    structured_redis_storage(key, qubit.strip("q"), 0)
+                if "measure_3state_opt:pulse_amp" in field:
+                    REDIS_CONNECTION.hset(key, field, "0")
+                    structured_redis_storage(key, qubit.strip("q"), 0)
+                if "measure_2state_opt:pulse_amp" in field:
+                    REDIS_CONNECTION.hset(key, field, "0")
+                    structured_redis_storage(key, qubit.strip("q"), 0)
+            REDIS_CONNECTION.hset(cs_key, remove_node, "not_calibrated")
 
+    def reset_all_fields_in_qubit_nodes(self):
+        for qubit in self.qubits:
+            key = f"transmons:{qubit}"
+            cs_key = f"cs:{qubit}"
+            fields = REDIS_CONNECTION.hgetall(f"transmons:{qubit}").keys()
+            for field in fields:
+                REDIS_CONNECTION.hset(key, field, "nan")
+                structured_redis_storage(key, qubit.strip("q"), None)
+                if "motzoi" in field:
+                    REDIS_CONNECTION.hset(key, field, "0")
+                    structured_redis_storage(key, qubit.strip("q"), 0)
+                if "measure_3state_opt:pulse_amp" in field:
+                    REDIS_CONNECTION.hset(key, field, "0")
+                    structured_redis_storage(key, qubit.strip("q"), 0)
+                if "measure_2state_opt:pulse_amp" in field:
+                    REDIS_CONNECTION.hset(key, field, "0")
+                    structured_redis_storage(key, qubit.strip("q"), 0)
+            for node in self.node_names:
+                if issubclass(self.factory_dict[node], BaseQubitNode):
+                    REDIS_CONNECTION.hset(cs_key, node, "not_calibrated")
+
+    def reset_defined_fields_in_coupler_node(self, remove_node):
+        remove_fields = self.factory_dict[remove_node].coupler_qois
         for coupler in self.couplers:
-            fields = REDIS_CONNECTION.hgetall(f"couplers:{coupler}").keys()
             key = f"couplers:{coupler}"
             cs_key = f"cs:{coupler}"
-            if remove_node == "all":
-                for field in fields:
-                    REDIS_CONNECTION.hset(key, field, "nan")
-                    structured_redis_storage(key, coupler, None)
-                for node in self.node_names:
+            for field in remove_fields:
+                REDIS_CONNECTION.hset(key, field, "nan")
+                structured_redis_storage(key, coupler, None)
+            REDIS_CONNECTION.hset(cs_key, remove_node, "not_calibrated")
+
+    def reset_all_fields_in_coupler_nodes(self):
+        for coupler in self.couplers:
+            key = f"couplers:{coupler}"
+            cs_key = f"cs:{coupler}"
+            fields = REDIS_CONNECTION.hgetall(f"couplers:{coupler}").keys()
+            for field in fields:
+                REDIS_CONNECTION.hset(key, field, "nan")
+                structured_redis_storage(key, coupler, None)
+            for node in self.node_names:
+                if issubclass(self.factory_dict[node], BaseCouplerNode):
                     REDIS_CONNECTION.hset(cs_key, node, "not_calibrated")
-            elif remove_node in self.node_names:
-                for field in remove_fields:
-                    REDIS_CONNECTION.hset(key, field, "nan")
-                    structured_redis_storage(key, coupler, None)
-                REDIS_CONNECTION.hset(cs_key, remove_node, "not_calibrated")
-            else:
-                raise ValueError("Invalid Field")

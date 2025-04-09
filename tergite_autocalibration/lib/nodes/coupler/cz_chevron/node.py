@@ -17,15 +17,14 @@ import numpy as np
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.utils.logging import logger
-from tergite_autocalibration.lib.base.node import BaseNode
+from tergite_autocalibration.lib.base.node import BaseQubitNode
 from tergite_autocalibration.lib.nodes.coupler.cz_chevron.analysis import (
     CZChevronAnalysis,
-    CZFirstStepAnalysis,
 )
 from tergite_autocalibration.lib.nodes.coupler.cz_chevron.measurement import CZChevron
 
 
-class CZChevronNode(BaseNode):
+class CZChevronNode(BaseQubitNode):
     measurement_obj = CZChevron
     analysis_obj = CZChevronAnalysis
     coupler_qois = ["cz_pulse_frequency", "cz_pulse_duration"]
@@ -106,87 +105,7 @@ class CZChevronNode(BaseNode):
         return ac_freq
 
 
-class CZCharacterisationChevronNode(BaseNode):
-    measurement_obj = CZChevron
-    analysis_obj = CZFirstStepAnalysis
-    coupler_qois = [
-        "cz_parking_current",
-        "cz_pulse_amplitude",
-        "cz_pulse_frequency",
-        "cz_pulse_duration",
-    ]
-
-    def __init__(self, name: str, all_qubits: list[str], couplers: list[str]):
-        super().__init__(name, all_qubits)
-        self.type = "characterisation_sweep"
-        self.couplers = couplers
-        self.coupler = self.couplers[0]
-        self.optimization_field = (
-            "cz_parking_current",
-            "cz_pulse_amplitude",
-            "cz_pulse_frequency",
-            "cz_pulse_duration",
-        )
-        self.qubit_state = 0
-        self.measurement_obj = None
-        self.analysis_obj = CZFirstStepAnalysis
-        self.all_qubits = [q for bus in couplers for q in bus.split("_")]
-        self.coupler_samplespace = self.samplespace
-        self.schedule_samplespace = {
-            # For Wide sweep
-            "cz_parking_current": {
-                qubit: np.linspace(0.0008625, 0.0011625, 12)
-                for qubit in self.coupled_qubits
-            },
-            "cz_pulse_amplitude": {
-                qubit: np.linspace(0, 0.2, 3) for qubit in self.coupled_qubits
-            },
-            "cz_pulse_durations": {
-                qubit: 80e-9 + np.arange(0e-9, 400e-9, 20e-9)
-                for qubit in self.coupled_qubits
-            },
-            "cz_pulse_frequencies_sweep": {
-                qubit: np.linspace(-20e6, 20e6, 21) + self.ac_freq
-                for qubit in self.coupled_qubits
-            },
-        }
-        self.validate()
-
-    def validate(self) -> None:
-        all_coupled_qubits = []
-        for coupler in self.couplers:
-            all_coupled_qubits += coupler.split("_")
-        if len(all_coupled_qubits) > len(set(all_coupled_qubits)):
-            logger.info("Couplers share qubits")
-            raise ValueError("Improper Couplers")
-
-    def transition_frequency(self, coupler: str):
-        coupled_qubits = coupler.split(sep="_")
-        q1_f01 = float(
-            REDIS_CONNECTION.hget(f"transmons:{coupled_qubits[0]}", "freq_01")
-        )
-        q2_f01 = float(
-            REDIS_CONNECTION.hget(f"transmons:{coupled_qubits[1]}", "freq_01")
-        )
-        q1_f12 = float(
-            REDIS_CONNECTION.hget(f"transmons:{coupled_qubits[0]}", "freq_12")
-        )
-        q2_f12 = float(
-            REDIS_CONNECTION.hget(f"transmons:{coupled_qubits[1]}", "freq_12")
-        )
-        # ac_freq = np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12))
-        ac_freq = np.min(
-            [
-                np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12)),
-                np.abs(q1_f01 + q2_f01 - (q2_f01 + q2_f12)),
-            ]
-        )
-        ac_freq = int(ac_freq / 1e4) * 1e4
-        logger.info(f"{ ac_freq/1e6 = } MHz for coupler: {coupler}")
-        return ac_freq
-
-
-class CZOptimizeChevronNode(BaseNode):
+class CZOptimizeChevronNode(BaseQubitNode):
     measurement_obj = CZChevron
     analysis_obj = CZChevronAnalysis
     coupler_qois = ["cz_pulse_frequency", "cz_pulse_duration"]
@@ -246,7 +165,7 @@ class CZOptimizeChevronNode(BaseNode):
         return ac_freq
 
 
-class CZChevronSweepNode(BaseNode):
+class CZChevronSweepNode(BaseQubitNode):
     measurement_obj = CZChevron
     analysis_obj = CZChevronAnalysis
     coupler_qois = ["cz_pulse_frequency", "cz_pulse_duration"]
