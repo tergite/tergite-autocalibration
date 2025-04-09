@@ -80,7 +80,7 @@ class BaseNode(abc.ABC):
         return result_dataset
 
     def precompile(self, schedule_samplespace: dict) -> CompiledSchedule:
-        schedule : CompiledSchedule = None
+        schedule: CompiledSchedule = None
         """
         To be implemented by the Classes that define the Node Type:
         ScheduleNode or ExternalParameterNode

@@ -20,11 +20,11 @@ from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis impor
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement import (
     TwoTonesMultidimMeasurement,
 )
-from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleQubitNode
 from tergite_autocalibration.lib.utils.samplespace import qubit_samples
 
 
-class Qubit01SpectroscopyMultidimNode(ScheduleNode):
+class Qubit01SpectroscopyMultidimNode(ScheduleQubitNode):
     measurement_obj = TwoTonesMultidimMeasurement
     analysis_obj = QubitSpectroscopyNodeMultidim
     qubit_qois = ["clock_freqs:f01", "spec:spec_ampl_optimal"]
@@ -42,7 +42,7 @@ class Qubit01SpectroscopyMultidimNode(ScheduleNode):
         }
 
 
-class Qubit12SpectroscopyMultidimNode(ScheduleNode):
+class Qubit12SpectroscopyMultidimNode(ScheduleQubitNode):
     measurement_obj = TwoTonesMultidimMeasurement
     analysis_obj = QubitSpectroscopy12NodeMultidim
     qubit_qois = ["clock_freqs:f12", "spec:spec_ampl_12_optimal"]
