@@ -227,9 +227,7 @@ class ExternalParameterFixedScheduleQubitNode(
     ExternalParameterFixedScheduleNode, BaseQubitNode
 ):
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        BaseQubitNode.__init__(
-            self, name, all_qubits, schedule_keywords=schedule_keywords
-        )
+        super.__init__(self, name, all_qubits, schedule_keywords=schedule_keywords)
 
 
 class ExternalParameterFixedScheduleCouplerNode(
@@ -246,4 +244,3 @@ class ExternalParameterDifferentSchedulesCouplerNode(
 ):
     def __init__(self, name: str, couplers: list[str], **schedule_keywords):
         super().__init__(name, couplers=couplers, **schedule_keywords)
-        

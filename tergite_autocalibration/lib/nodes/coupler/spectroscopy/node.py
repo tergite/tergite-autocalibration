@@ -43,9 +43,7 @@ class CouplerSpectroscopyNode(ExternalParameterFixedScheduleCouplerNode):
     analysis_obj = CouplerSpectroscopyNodeAnalysis
     coupler_qois = ["parking_current", "current_range"]
 
-    def __init__(
-        self, name: str, couplers: list[str], **schedule_keywords
-    ):
+    def __init__(self, name: str, couplers: list[str], **schedule_keywords):
         super().__init__(name, couplers, **schedule_keywords)
         self.name = name
         self.couplers = couplers
@@ -77,6 +75,7 @@ class CouplerSpectroscopyNode(ExternalParameterFixedScheduleCouplerNode):
             self.spi_dac = SpiDAC(cluster_status)
 
         super().calibrate(data_path, cluster_status)
+
     def pre_measurement_operation(self, reduced_ext_space):
         iteration_dict = reduced_ext_space["dc_currents"]
         # there is some redundancy tha all qubits have the same
@@ -121,9 +120,7 @@ class CouplerResonatorSpectroscopyNode(ExternalParameterFixedScheduleCouplerNode
     analysis_obj = CouplerSpectroscopyNodeAnalysis
     coupler_qois = ["resonator_flux_quantum"]
 
-    def __init__(
-        self, name: str, couplers: list[str], **schedule_keywords
-    ):
+    def __init__(self, name: str, couplers: list[str], **schedule_keywords):
         super().__init__(name, couplers, **schedule_keywords)
         self.qubit_state = 0
         self.couplers = couplers

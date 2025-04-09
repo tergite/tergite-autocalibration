@@ -145,7 +145,7 @@ class NodeFactory:
             node_obj = node_cls(node_name, couplers, **kwargs)
         else:
             raise TypeError(
-                "Node class is not a subclass of neither BaseQubitNode or BaseCouplerNode."
+                f"Node class {node_cls} is not a subclass of neither BaseQubitNode or BaseCouplerNode."
             )
 
         return node_obj
