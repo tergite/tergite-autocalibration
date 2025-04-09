@@ -86,11 +86,10 @@ def reset(
         if typer.confirm(
             "Do you really want to reset all nodes? It might take some time to recalibrate them."
         ):
-            reset_obj_.reset_node("all")
+            reset_obj_.reset_all_nodes()
         else:
             typer.echo("Node reset aborted by user.")
     elif name is not None:
         reset_obj_.reset_node(name)
     else:
-        typer.echo("Please enter a node name or use the -a option to reset all nodes.")
         typer.echo("Please enter a node name or use the -a option to reset all nodes.")
