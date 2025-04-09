@@ -14,6 +14,8 @@
 import toml
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION, CONFIG
+from tergite_autocalibration.lib.base.node import BaseCouplerNode, BaseQubitNode
+from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
@@ -160,16 +162,17 @@ def populate_node_parameters(
 
 
 def populate_quantities_of_interest(
-    calibration_nodes: list[str],
+    node_name: str,
+    node_factory: NodeFactory,
     qubits: list[str],
     couplers: list[str],
-    calibration_node_factory,
     redis_connection,
 ):
     # Populate the Redis database with the quantities of interest, at Nan value
     # Only if the key does NOT already exist
-    for node_name in calibration_nodes:
-        node = calibration_node_factory.get_node_class(node_name)
+    # Thuis code should be moved to the specific classes
+    node = node_factory.get_node_class(node_name)
+    if issubclass(node, BaseQubitNode):
         qubit_qois = node.qubit_qois
         if qubit_qois is not None:
             for qubit in qubits:
@@ -191,6 +194,7 @@ def populate_quantities_of_interest(
                 if not redis_connection.hexists(calibration_supervisor_key, node_name):
                     redis_connection.hset(f"cs:{qubit}", node_name, "not_calibrated")
 
+    elif issubclass(node, BaseCouplerNode):
         coupler_qois = node.coupler_qois
         if coupler_qois is not None:
             for coupler in couplers:
@@ -204,6 +208,11 @@ def populate_quantities_of_interest(
                 # flag for the calibration supervisor
                 if not redis_connection.hexists(calibration_supervisor_key, node_name):
                     redis_connection.hset(f"cs:{coupler}", node_name, "not_calibrated")
+
+    else:
+        raise ValueError(
+            f"Node {node_name} with base type {node} is not a valid Qubit or Coupler node. Cannot populate quantities of interest."
+        )
 
 
 def reset_all_nodes(nodes, qubits: list, couplers: list, redis_connection):

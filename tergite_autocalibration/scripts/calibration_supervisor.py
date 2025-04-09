@@ -181,6 +181,13 @@ class NodeManager:
     def inspect_node(self, node_name: str):
         logger.info(f"Inspecting node {node_name}")
 
+        populate_quantities_of_interest(
+            node_name,
+            self.node_factory,
+            self.config.qubits,
+            self.config.couplers,
+            REDIS_CONNECTION,
+        )
         # Populate initial parameters
         populate_initial_parameters(
             self.config.qubits,
@@ -296,15 +303,6 @@ class CalibrationSupervisor:
         ConfigurationPackage.from_toml(
             os.path.join(ENV.config_dir, "configuration.meta.toml")
         ).copy(str(CONFIG.run.log_dir))
-
-        # TODO: check if coupler node status throws error after REDISFLUSHALL
-        populate_quantities_of_interest(
-            self.topo_order,
-            self.config.qubits,
-            self.config.couplers,
-            self.node_manager.node_factory,
-            REDIS_CONNECTION,
-        )
 
         for calibration_node in self.topo_order:
             self.node_manager.inspect_node(calibration_node)
