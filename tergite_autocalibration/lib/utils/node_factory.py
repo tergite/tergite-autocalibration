@@ -141,7 +141,7 @@ class NodeFactory:
         # Create an instance of the node class
         if issubclass(node_cls, BaseQubitNode):
             node_obj = node_cls(node_name, all_qubits, **kwargs)
-        if issubclass(node_cls, BaseCouplerNode):
+        elif issubclass(node_cls, BaseCouplerNode):
             node_obj = node_cls(node_name, couplers, **kwargs)
         else:
             raise TypeError(
