@@ -59,7 +59,6 @@ class NodeFactory:
             "T2_echo": "T2EchoNode",
             "all_XY": "AllXYNode",
             "reset_chevron": "ResetChevronNode",
-            "cz_characterisation_chevron": "CZCharacterisationChevronNode",
             "reset_calibration_ssro": "ResetCalibrationSSRONode",
             "cz_parametrisation_fix_duration": "CZParametrizationFixDurationNode",
             "process_tomography_ssro": "ProcessTomographySSRONode",
@@ -145,7 +144,8 @@ class NodeFactory:
         if issubclass(node_cls, BaseCouplerNode):
             node_obj = node_cls(node_name, couplers, **kwargs)
         else:
-            raise TypeError("Node class is not a subclass of neither BaseQubitNode or BaseCouplerNode.")
-        
+            raise TypeError(
+                "Node class is not a subclass of neither BaseQubitNode or BaseCouplerNode."
+            )
+
         return node_obj
-    

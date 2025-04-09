@@ -166,6 +166,7 @@ class NodeManager:
     """
     Manages the initialization and inspection of node.
     """
+
     def __init__(
         self, lab_ic: "InstrumentCoordinator", config: "CalibrationConfig"
     ) -> None:

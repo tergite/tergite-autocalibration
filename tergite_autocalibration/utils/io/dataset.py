@@ -33,7 +33,7 @@ def to_real_dataset(iq_dataset: xarray.Dataset) -> xarray.Dataset:
     return ds
 
 
-def create_node_data_path(node_name : str) -> Path:
+def create_node_data_path(node_name: str) -> Path:
     """
     Create the folder where measurement results, plots and logs specific to the node are stored.
 
