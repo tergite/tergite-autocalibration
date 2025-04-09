@@ -11,13 +11,17 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+from pathlib import Path
 import numpy as np
+from quantify_scheduler import CompiledSchedule
+import quantify_scheduler.backends.qblox.constants as constants
+from quantify_scheduler.backends import SerialCompiler
 
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
     CouplerSpectroscopyNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.external_parameter_node import (
-    ExternalParameterNode,
+    ExternalParameterFixedScheduleCouplerNode,
 )
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement import (
     TwoTonesMultidimMeasurement,
@@ -34,15 +38,15 @@ from tergite_autocalibration.utils.hardware.spi import SpiDAC
 from tergite_autocalibration.utils.logging import logger
 
 
-class CouplerSpectroscopyNode(ExternalParameterNode):
+class CouplerSpectroscopyNode(ExternalParameterFixedScheduleCouplerNode):
     measurement_obj = TwoTonesMultidimMeasurement
     analysis_obj = CouplerSpectroscopyNodeAnalysis
     coupler_qois = ["parking_current", "current_range"]
 
     def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
+        self, name: str, couplers: list[str], **schedule_keywords
     ):
-        super().__init__(name, all_qubits, **schedule_keywords)
+        super().__init__(name, couplers, **schedule_keywords)
         self.name = name
         self.couplers = couplers
         self.qubit_state = 0
@@ -66,15 +70,13 @@ class CouplerSpectroscopyNode(ExternalParameterNode):
         self.external_samplespace = {
             "dc_currents": {self.coupler: np.arange(-2.5e-4, 2.5e-4, 280e-6)},
         }
-        # self.validate()
+        self.validate()
 
-    def get_coupled_qubits(self) -> list:
-        if len(self.couplers) > 1:
-            logger.info("Multiple couplers, lets work with only one")
-        coupled_qubits = self.couplers[0].split(sep="_")
-        self.coupler = self.couplers[0]
-        return coupled_qubits
+    def calibrate(self, data_path: Path, cluster_status):
+        if cluster_status == MeasurementMode.real:
+            self.spi_dac = SpiDAC(cluster_status)
 
+        super().calibrate(data_path, cluster_status)
     def pre_measurement_operation(self, reduced_ext_space):
         iteration_dict = reduced_ext_space["dc_currents"]
         # there is some redundancy tha all qubits have the same
@@ -84,20 +86,45 @@ class CouplerSpectroscopyNode(ExternalParameterNode):
         logger.info(f"{ this_iteration_value = }")
         self.spi_dac.set_dac_current(self.dac, this_iteration_value)
 
+    def precompile(self, schedule_samplespace: dict) -> CompiledSchedule:
+        constants.GRID_TIME_TOLERANCE_TIME = 5e-2
+
+        # TODO: put 'tof' out of its misery
+        if self.name == "tof":
+            return None, 1
+
+        transmons = self.device_manager.transmons
+
+        measurement_class = self.measurement_obj(transmons)
+        schedule = measurement_class.schedule_function(
+            **schedule_samplespace, **self.schedule_keywords
+        )
+
+        # TODO: Probably the compiler desn't need to be created every time self.precompile() is called.
+        compiler = SerialCompiler(name=f"{self.name}_compiler")
+
+        compilation_config = self.device.generate_compilation_config()
+        logger.info("Starting Compiling")
+        compiled_schedule = compiler.compile(
+            schedule=schedule, config=compilation_config
+        )
+
+        return compiled_schedule
+
     def final_operation(self):
         logger.info("Final Operation")
         self.spi_dac.set_dac_current(self.dac, 0)
 
 
-class CouplerResonatorSpectroscopyNode(ExternalParameterNode):
+class CouplerResonatorSpectroscopyNode(ExternalParameterFixedScheduleCouplerNode):
     measurement_obj = ResonatorSpectroscopyMeasurement
     analysis_obj = CouplerSpectroscopyNodeAnalysis
     coupler_qois = ["resonator_flux_quantum"]
 
     def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
+        self, name: str, couplers: list[str], **schedule_keywords
     ):
-        super().__init__(name, all_qubits, **schedule_keywords)
+        super().__init__(name, couplers, **schedule_keywords)
         self.qubit_state = 0
         self.couplers = couplers
         self.coupler = self.couplers[0]
@@ -117,13 +144,13 @@ class CouplerResonatorSpectroscopyNode(ExternalParameterNode):
         self.external_samplespace = {
             "dc_currents": {self.coupler: np.arange(-2.5e-3, 2.5e-3, 500e-6)},
         }
+        self.validate()
 
-    def get_coupled_qubits(self) -> list:
-        if len(self.couplers) > 1:
-            logger.info("Multiple couplers, lets work with only one")
-        coupled_qubits = self.couplers[0].split(sep="_")
-        self.coupler = self.couplers[0]
-        return coupled_qubits
+    def calibrate(self, data_path: Path, cluster_status):
+        if cluster_status == MeasurementMode.real:
+            self.spi_dac = SpiDAC(cluster_status)
+
+        super().calibrate(data_path, cluster_status)
 
     def pre_measurement_operation(self, reduced_ext_space):
         iteration_dict = reduced_ext_space["dc_currents"]
@@ -133,3 +160,32 @@ class CouplerResonatorSpectroscopyNode(ExternalParameterNode):
         this_iteration_value = list(iteration_dict.values())[0]
         logger.info(f"{ this_iteration_value = }")
         self.spi_dac.set_dac_current(self.dac, this_iteration_value)
+
+    def precompile(self, schedule_samplespace: dict) -> CompiledSchedule:
+        constants.GRID_TIME_TOLERANCE_TIME = 5e-2
+
+        # TODO: put 'tof' out of its misery
+        if self.name == "tof":
+            return None, 1
+
+        transmons = self.device_manager.transmons
+
+        measurement_class = self.measurement_obj(transmons)
+        schedule = measurement_class.schedule_function(
+            **schedule_samplespace, **self.schedule_keywords
+        )
+
+        # TODO: Probably the compiler desn't need to be created every time self.precompile() is called.
+        compiler = SerialCompiler(name=f"{self.name}_compiler")
+
+        compilation_config = self.device.generate_compilation_config()
+        logger.info("Starting Compiling")
+        compiled_schedule = compiler.compile(
+            schedule=schedule, config=compilation_config
+        )
+
+        return compiled_schedule
+
+    def final_operation(self):
+        logger.info("Final Operation")
+        self.spi_dac.set_dac_current(self.dac, 0)
