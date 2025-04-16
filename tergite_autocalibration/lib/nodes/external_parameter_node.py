@@ -234,9 +234,7 @@ class ExternalParameterFixedScheduleCouplerNode(
     ExternalParameterFixedScheduleNode, CouplerNode
 ):
     def __init__(self, name: str, couplers: list[str], **schedule_keywords):
-        CouplerNode.__init__(
-            self, name, couplers, schedule_keywords=schedule_keywords
-        )
+        CouplerNode.__init__(self, name, couplers, schedule_keywords=schedule_keywords)
 
 
 class ExternalParameterDifferentSchedulesCouplerNode(
