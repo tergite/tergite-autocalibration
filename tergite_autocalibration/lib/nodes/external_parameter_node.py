@@ -19,9 +19,9 @@ import xarray as xr
 from quantify_scheduler.instrument_coordinator.utility import xarray
 
 from tergite_autocalibration.lib.base.node import (
-    BaseCouplerNode,
+    CouplerNode,
     BaseNode,
-    BaseQubitNode,
+    QubitNode,
 )
 from tergite_autocalibration.utils.measurement_utils import reduce_samplespace
 from tergite_autocalibration.utils.logging import logger
@@ -224,23 +224,23 @@ class ExternalParameterDifferentSchedulesNode(ExternalParameterNode):
 
 
 class ExternalParameterFixedScheduleQubitNode(
-    ExternalParameterFixedScheduleNode, BaseQubitNode
+    ExternalParameterFixedScheduleNode, QubitNode
 ):
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super.__init__(self, name, all_qubits, schedule_keywords=schedule_keywords)
 
 
 class ExternalParameterFixedScheduleCouplerNode(
-    ExternalParameterFixedScheduleNode, BaseCouplerNode
+    ExternalParameterFixedScheduleNode, CouplerNode
 ):
     def __init__(self, name: str, couplers: list[str], **schedule_keywords):
-        BaseCouplerNode.__init__(
+        CouplerNode.__init__(
             self, name, couplers, schedule_keywords=schedule_keywords
         )
 
 
 class ExternalParameterDifferentSchedulesCouplerNode(
-    ExternalParameterDifferentSchedulesNode, BaseCouplerNode
+    ExternalParameterDifferentSchedulesNode, CouplerNode
 ):
     def __init__(self, name: str, couplers: list[str], **schedule_keywords):
         super().__init__(name, couplers=couplers, **schedule_keywords)

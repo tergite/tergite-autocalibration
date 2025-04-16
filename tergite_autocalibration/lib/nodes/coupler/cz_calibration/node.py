@@ -15,7 +15,7 @@
 
 import numpy as np
 
-from tergite_autocalibration.lib.base.node import BaseQubitNode
+from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.coupler.cz_calibration.analysis import (
     CZCalibrationSSRONodeAnalysis,
     ResetCalibrationSSRONodeAnalysis,
@@ -26,7 +26,7 @@ from tergite_autocalibration.lib.nodes.coupler.cz_calibration.measurement import
 )
 
 
-class CZCalibrationSSRONode(BaseQubitNode):
+class CZCalibrationSSRONode(QubitNode):
     measurement_obj = CZCalibrationSSROMeasurement
     analysis_obj = CZCalibrationSSRONodeAnalysis
     coupler_qois = ["cz_phase", "cz_pop_loss"]
@@ -56,7 +56,7 @@ class CZCalibrationSSRONode(BaseQubitNode):
         }
 
 
-class CZCalibrationSwapSSRONode(BaseQubitNode):
+class CZCalibrationSwapSSRONode(QubitNode):
     measurement_obj = CZCalibrationSSROMeasurement
     analysis_obj = CZCalibrationSSRONodeAnalysis
     coupler_qois = ["cz_phase", "cz_pop_loss"]
@@ -85,7 +85,7 @@ class CZCalibrationSwapSSRONode(BaseQubitNode):
         # self.validate()
 
 
-class ResetCalibrationSSRONode(BaseQubitNode):
+class ResetCalibrationSSRONode(QubitNode):
     measurement_obj = ResetCalibrationSSROMeasurement
     analysis_obj = ResetCalibrationSSRONodeAnalysis
     coupler_qois = [

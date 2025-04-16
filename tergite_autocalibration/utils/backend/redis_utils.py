@@ -15,7 +15,7 @@
 import toml
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION, CONFIG
-from tergite_autocalibration.lib.base.node import BaseCouplerNode, BaseQubitNode
+from tergite_autocalibration.lib.base.node import CouplerNode, QubitNode
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.config.legacy import dh
@@ -173,7 +173,7 @@ def populate_quantities_of_interest(
     # Only if the key does NOT already exist
     # Thuis code should be moved to the specific classes
     node = node_factory.get_node_class(node_name)
-    if issubclass(node, BaseQubitNode):
+    if issubclass(node, QubitNode):
         qubit_qois = node.qubit_qois
         if qubit_qois is not None:
             for qubit in qubits:
@@ -195,7 +195,7 @@ def populate_quantities_of_interest(
                 if not redis_connection.hexists(calibration_supervisor_key, node_name):
                     redis_connection.hset(f"cs:{qubit}", node_name, "not_calibrated")
 
-    elif issubclass(node, BaseCouplerNode):
+    elif issubclass(node, CouplerNode):
         coupler_qois = node.coupler_qois
         if coupler_qois is not None:
             for coupler in couplers:

@@ -16,9 +16,9 @@ import numpy as np
 from quantify_scheduler.instrument_coordinator.utility import xarray
 
 from tergite_autocalibration.lib.base.node import (
-    BaseCouplerNode,
+    CouplerNode,
     BaseNode,
-    BaseQubitNode,
+    QubitNode,
 )
 from tergite_autocalibration.lib.utils.validators import (
     MixedSamplespace,
@@ -146,13 +146,13 @@ class ScheduleNode(BaseNode, abc.ABC):
         return result_dataset
 
 
-class ScheduleQubitNode(ScheduleNode, BaseQubitNode):
+class ScheduleQubitNode(ScheduleNode, QubitNode):
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(
             name, all_qubits=all_qubits, schedule_keywords=schedule_keywords
         )
 
 
-class ScheduleCouplerNode(ScheduleNode, BaseCouplerNode):
+class ScheduleCouplerNode(ScheduleNode, CouplerNode):
     def __init__(self, name: str, couplers: list[str], **schedule_keywords):
         super().__init__(name, couplers=couplers, schedule_keywords=schedule_keywords)

@@ -14,7 +14,7 @@
 
 import numpy as np
 
-from tergite_autocalibration.lib.base.node import BaseQubitNode
+from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.coupler.cz_calibration.analysis import (
     CZCalibrationSSRONodeAnalysis,
 )
@@ -23,7 +23,7 @@ from tergite_autocalibration.lib.nodes.coupler.cz_calibration.measurement import
 )
 
 
-class CZDynamicPhaseSSRONode(BaseQubitNode):
+class CZDynamicPhaseSSRONode(QubitNode):
     measurement_obj = CZCalibrationSSROMeasurement
     analysis_obj = CZCalibrationSSRONodeAnalysis
 
@@ -52,7 +52,7 @@ class CZDynamicPhaseSSRONode(BaseQubitNode):
         }
 
 
-class CZDynamicPhaseSwapSSRONode(BaseQubitNode):
+class CZDynamicPhaseSwapSSRONode(QubitNode):
     measurement_obj = CZCalibrationSSROMeasurement
     analysis_obj = CZCalibrationSSRONodeAnalysis
 

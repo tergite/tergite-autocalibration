@@ -17,7 +17,7 @@ import itertools
 from typing import TYPE_CHECKING, ClassVar
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION, CONFIG
-from tergite_autocalibration.lib.base.node import BaseCouplerNode, BaseQubitNode
+from tergite_autocalibration.lib.base.node import CouplerNode, QubitNode
 from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
@@ -44,14 +44,14 @@ class ResetRedisNode:
         qois = [
             self.factory_dict[node].qubit_qois
             for node in self.node_names
-            if issubclass(self.factory_dict[node], BaseQubitNode)
+            if issubclass(self.factory_dict[node], QubitNode)
         ]
         qois = [qoi for qoi in qois if qoi is not None]  # filter out Nones
         self.quantities_of_interest = list(itertools.chain.from_iterable(qois))
         coupler_qois = [
             self.factory_dict[node].coupler_qois
             for node in self.node_names
-            if issubclass(self.factory_dict[node], BaseCouplerNode)
+            if issubclass(self.factory_dict[node], CouplerNode)
         ]
         coupler_qois = [
             qoi for qoi in coupler_qois if qoi is not None
@@ -62,9 +62,9 @@ class ResetRedisNode:
 
     def reset_node(self, remove_node):
         logger.status(f"{ remove_node = }")
-        if issubclass(self.factory_dict[remove_node], BaseQubitNode):
+        if issubclass(self.factory_dict[remove_node], QubitNode):
             self.reset_defined_fields_in_qubit_node(remove_node)
-        if issubclass(self.factory_dict[remove_node], BaseCouplerNode):
+        if issubclass(self.factory_dict[remove_node], CouplerNode):
             self.reset_defined_fields_in_coupler_node(remove_node)
 
     def reset_all_nodes(self):
@@ -108,7 +108,7 @@ class ResetRedisNode:
                     REDIS_CONNECTION.hset(key, field, "0")
                     structured_redis_storage(key, qubit.strip("q"), 0)
             for node in self.node_names:
-                if issubclass(self.factory_dict[node], BaseQubitNode):
+                if issubclass(self.factory_dict[node], QubitNode):
                     REDIS_CONNECTION.hset(cs_key, node, "not_calibrated")
 
     def reset_defined_fields_in_coupler_node(self, remove_node):
@@ -130,5 +130,5 @@ class ResetRedisNode:
                 REDIS_CONNECTION.hset(key, field, "nan")
                 structured_redis_storage(key, coupler, None)
             for node in self.node_names:
-                if issubclass(self.factory_dict[node], BaseCouplerNode):
+                if issubclass(self.factory_dict[node], CouplerNode):
                     REDIS_CONNECTION.hset(cs_key, node, "not_calibrated")

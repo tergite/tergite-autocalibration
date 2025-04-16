@@ -301,7 +301,7 @@ class BaseNode(abc.ABC):
             # determine if this dataarray examines a qubit or a coupler:
             # TODO: this needs improvement
             element = measured_qubit
-            if issubclass(self.__class__, BaseCouplerNode):
+            if issubclass(self.__class__, CouplerNode):
                 for coupler in self.couplers:
                     if element in coupler:
                         element = coupler
@@ -325,7 +325,7 @@ class BaseNode(abc.ABC):
         return dataset
 
 
-class BaseQubitNode(BaseNode, abc.ABC):
+class QubitNode(BaseNode, abc.ABC):
     qubit_qois: list[str] | None = None
 
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
@@ -378,7 +378,7 @@ class BaseQubitNode(BaseNode, abc.ABC):
         return f"Node({self.name}, {self.all_qubits})"
 
 
-class BaseCouplerNode(BaseNode, abc.ABC):
+class CouplerNode(BaseNode, abc.ABC):
     coupler_qois: list[str]
 
     def __init__(self, name: str, couplers: list[str], **node_dictionary):

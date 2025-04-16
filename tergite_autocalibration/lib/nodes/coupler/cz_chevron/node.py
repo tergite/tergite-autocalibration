@@ -17,14 +17,14 @@ import numpy as np
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.utils.logging import logger
-from tergite_autocalibration.lib.base.node import BaseQubitNode
+from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.coupler.cz_chevron.analysis import (
     CZChevronAnalysis,
 )
 from tergite_autocalibration.lib.nodes.coupler.cz_chevron.measurement import CZChevron
 
 
-class CZChevronNode(BaseQubitNode):
+class CZChevronNode(QubitNode):
     measurement_obj = CZChevron
     analysis_obj = CZChevronAnalysis
     coupler_qois = ["cz_pulse_frequency", "cz_pulse_duration"]
@@ -105,7 +105,7 @@ class CZChevronNode(BaseQubitNode):
         return ac_freq
 
 
-class CZOptimizeChevronNode(BaseQubitNode):
+class CZOptimizeChevronNode(QubitNode):
     measurement_obj = CZChevron
     analysis_obj = CZChevronAnalysis
     coupler_qois = ["cz_pulse_frequency", "cz_pulse_duration"]
@@ -165,7 +165,7 @@ class CZOptimizeChevronNode(BaseQubitNode):
         return ac_freq
 
 
-class CZChevronSweepNode(BaseQubitNode):
+class CZChevronSweepNode(QubitNode):
     measurement_obj = CZChevron
     analysis_obj = CZChevronAnalysis
     coupler_qois = ["cz_pulse_frequency", "cz_pulse_duration"]

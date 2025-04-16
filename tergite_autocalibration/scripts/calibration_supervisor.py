@@ -38,7 +38,7 @@ from tergite_autocalibration.config.globals import (
 from tergite_autocalibration.config.package import ConfigurationPackage
 from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.config.legacy import dh
-from tergite_autocalibration.lib.base.node import BaseCouplerNode, BaseNode
+from tergite_autocalibration.lib.base.node import CouplerNode, BaseNode
 from tergite_autocalibration.lib.utils.graph import filtered_topological_order
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.utils.backend.redis_utils import (
@@ -261,7 +261,7 @@ class NodeManager:
         node = self.node_factory.get_node_class(node_name)
         elements = (
             self.config.couplers
-            if issubclass(node, BaseCouplerNode)
+            if issubclass(node, CouplerNode)
             else self.config.qubits
         )
         for element in elements:

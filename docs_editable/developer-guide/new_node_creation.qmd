@@ -13,6 +13,24 @@ In this guide, we will cover the topics:
 
 Following these steps, you can easily contribute to the automatic calibration with your own nodes in a couple of hours.
 
+## Base classes
+The base classes on which all nodes are built can be found in `tergite_autocalibration/lib/base`.
+There are base classes for all three components of a node, the node itself, the measurement and the analysis.
+
+Nodes can be either `QubitNode` or `CouplerNode`, both inherit from a `BaseNode` class providing common interfaces and functionalities. They will have different quanititis of interest depending on the type (qubit_qoi for QubitNode)
+A Node also need to implement a Schedule; there are two files in `tergite_autocalibration/lib/nodes`
+- `ScheduleNode`: A node with a simple sweep over the samplespace. The quantify schedule is only compiled once and the
+  parameter values from the samplespace are the input for the schedule function of the measurement.
+- `ExternalParameterNode`: A node with a more complex measurement procedure. It allows to run multiple steps sequentially, where each step might require recompilation of the schedule. There is an external parameter involved (the current applied to the coupler using the SPIRack), which is the part of the generating function within the schedule. There can be a fixed schedule or a schedule varying at each iteration (for example when changing value in the schedule when changing current). The latter can also hanlde elements (couplers or qubits) having different number of iterations.
+
+Both files provide classes with multiple inheritance that combine type and schedule, i.e. `ScheduleQubitNode` or `ExternalParameterFixedScheduleCouplerNode`, 
+that can be used in nodes to simplify implementation of new nodes for developers.
+
+Measurements only have a base class providing a common interface.
+
+Analysis classes have a more complex composition and inheritance structure. The entry point is always a `BaseNodeAnalysis` class, implemented in the `BaseAllCouplersAnalysis` or `BaseAllQubitsAnalysis` classes. Each node analysis will loop over all elements (qubits or couplers) defining a relevant analysis class, either QubitAnalysis or CouplerAnalysis. These analyses will have a common structure with a setup phase (where all dataset information is read and processed), an analysis propper that returns a quantity of interest (QOI) object, and then a call to a function updating the REDIS database.
+The analysis will be very node specific. CouplerAnalysis classes combine information from two QubitAnalyses; information can be stored both at the coupler level, for example all CZ gate information, or at the qubit level within the coupler (in REDIS couplers:coupler_name:qubit_name:qubit_information). This allows to handle information for the same qubit when used in different couplers. Plots are also handled in the analysis class, with the Qubit/Coupler analyses hangling plotting according to the information required (i.e. plotting all qubits in a resonator_spectropy, both qubits in all couplers in a coupler_spectroscopy, or a single plot per coupler for two qubit gate randomized benchmarking).
+
 ## Where are the nodes located?
 
 The nodes are located in `tergite_autocalibration/lib/nodes`.
@@ -24,7 +42,6 @@ If you open that module, you will find that there are four submodules for differ
 - `readout`: All nodes that calibrate a quantity of interest for the resonator.
 
 Please create a new submodule for your node in one of the four submodules listed above.
-A sort of template on how a node module should be structured can be found in `tergite_autocalibration/lib/base`.
 Essentially, a proper package in the end should contain:
 
 - `__init__.py`: This is an empty file to mark that the folder is a package. Please add this file, because otherwise
@@ -47,7 +64,7 @@ Taking the rabi oscillations as an example, we have:
 - `rabi_oscillations`: This is the **node name**, which is used in the commandline interface or for other purposes to
   pass the node name as a string.
 - `RabiOscillations`: This is the name of the **node class**.
-- `RabiOscillationsAnalysis`: The name of the respective **analysis class**.
+- `RabiOscillationsNodeAnalysis`: The name of the respective **analysis class for that node**.
 - `RabiOscillationsMeasurement`: And the name of the respective **measurement class**.
 
 When there are some more complicated nodes for which you do not know how to name it, please just take a look at the
@@ -68,7 +85,7 @@ from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.measurement import RabiOscillationsMeasurement
 from tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.analysis import RabiQubitAnalysis
 
-class RabiOscillationsNode(ScheduleNode):
+class RabiOscillationsNode(ScheduleQubitNode):
   measurement_obj = RabiOscillationsMeasurement
   analysis_obj = RabiQubitAnalysis
   qubit_qois = ["rxy:amp180"]
@@ -82,16 +99,14 @@ class RabiOscillationsNode(ScheduleNode):
     }
 ```
 
-As you can see, it inherits from the `ScheduleNode` class, which contains a very simple definition of a node that runs a
-simple sweep over a single quantity.
-More information about other node classes can be found below.
+As you can see, it inherits from the `ScheduleQubitNode` class, which contains a very simple definition of a node that runs a
+simple sweep over a single quantity for all qubits defined in the run_config.
+More information about other node classes can be found in the descrition of the base classes above.
 Furthermore, you can see that the node has three class attributes:
 
 - `measurement_obj`: Contains the class of the measurement, that defines the pulse schedule for the instruments
 - `analysis_obj`: Contains the class for the analysis to post-process the measurement results. For example, this could
   be a simple fitting function.
-- `qubit_qois`: The quantity of interest (QOI), which is returned by the analysis. In case of the rabi oscillations this
-  is the pulse amplitude.
 
 Also, you can see in the constructor, there is an attribute called `schedule_samplespace`.
 Here, we define in the measurement, what quantity will be swept over.
@@ -109,23 +124,7 @@ complete schedule.
 ### Creating an `analysis_obj`
 
 The `analysis_obj` is implemented in the `analysis.py` file from your module and contains the class that perform the
-analysis.
-
-### Node types and samplespaces
-
-In the example above, the node inherits from the class `ScheduleNode`.
-This is one option for the node behaviour:
-
-- `ScheduleNode`: A node with a simple sweep over the samplespace. The quantify schedule is only compiled once and the
-  parameter values from the samplespace are the input for the schedule function of the measurement.
-- `ExternalParameterNode`: A node with a more complex measurement procedure. It allows to run multiple steps
-  sequentially, where each step might require recompilation of the schedule. There is an external parameter involved,
-  which is the part of the generating function within the schedule.
-
-When you are implementing a node, you can choose which of the two abstract node classes fit better with the behaviour of
-your new node. Also, if you want to implement a more sophisticated measurement procedure, you can override the
-procedures in the measurement function or in other places. Check out the article about [node classes](node_classes.qmd)
-for more details.
+analysis. See the description in the Base classes above to understand which classes need to be implemented and which base classes to use.
 
 ## Register the node in the framework
 
@@ -149,6 +148,13 @@ the new node is the last on its path):
 
 - `('previous_node','new_node')`
 - `('new_node', 'next_node')`
+
+It is possible to have multiple dependencies, i.e. a node can be set to run only if two different nodes are run.
+
+- `('previous_node_1','new_node')`
+- `('previous_node_2','new_node')`
+
+This will result in both `previous_node_1` and `previous_node_2` to be run before the `new_node`.
 
 ### Documentation
 
