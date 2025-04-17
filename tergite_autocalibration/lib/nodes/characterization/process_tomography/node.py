@@ -14,7 +14,7 @@
 
 import numpy as np
 
-from tergite_autocalibration.lib.base.node import BaseNode
+from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.characterization.process_tomography.analysis import (
     ProcessTomographyNodeAnalysis,
 )
@@ -23,7 +23,7 @@ from tergite_autocalibration.lib.nodes.characterization.process_tomography.measu
 )
 
 
-class ProcessTomographySSRONode(BaseNode):
+class ProcessTomographySSRONode(QubitNode):
     measurement_obj = ProcessTomographyMeasurement
     analysis_obj = ProcessTomographyNodeAnalysis
     coupler_qois = [

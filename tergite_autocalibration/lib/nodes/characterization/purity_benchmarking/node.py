@@ -18,10 +18,10 @@ from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.anal
 from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.measurement import (
     PurityBenchmarkingMeasurement,
 )
-from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleQubitNode
 
 
-class PurityBenchmarkingNode(ScheduleNode):
+class PurityBenchmarkingNode(ScheduleQubitNode):
     measurement_obj = PurityBenchmarkingMeasurement
     analysis_obj = PurityBenchmarkingNodeAnalysis
     qubit_qois = ["purity_fidelity"]

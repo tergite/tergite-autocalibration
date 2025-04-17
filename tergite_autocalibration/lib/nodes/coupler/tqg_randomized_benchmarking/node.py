@@ -33,28 +33,22 @@ from tergite_autocalibration.lib.nodes.coupler.cz_dynamic_phase.node import (
 from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.measurement import (
     TQGRandomizedBenchmarkingSSROMeasurement,
 )
-from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleCouplerNode
 from tergite_autocalibration.lib.utils import redis
 from tergite_autocalibration.utils.logging import logger
 
 RB_REPEATS = 10
 
 
-class TQGRandomizedBenchmarkingSSRONode(ScheduleNode):
+class TQGRandomizedBenchmarkingSSRONode(ScheduleCouplerNode):
     measurement_obj = TQGRandomizedBenchmarkingSSROMeasurement
     analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
+    coupler_qois = ["tqg_fidelity"]
 
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
-    ):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(self, name: str, couplers: list[str], **schedule_keywords):
+        super().__init__(name, couplers, **schedule_keywords)
         self.name = name
-        self.all_qubits = all_qubits  # is this needed?
-        self.couplers = couplers  # is this needed?
-        self.edges = couplers
-        self.coupler = self.couplers[0]
         self.schedule_keywords = schedule_keywords
-        self.coupled_qubits = couplers[0].split(sep="_")
 
         self.backup = False
         self.qubit_state = 2
@@ -94,22 +88,15 @@ class TQGRandomizedBenchmarkingSSRONode(ScheduleNode):
         ]
 
 
-class TQGRandomizedBenchmarkingInterleavedSSRONode(ScheduleNode):
-    coupler_qois = ["tqg_fidelity_interleaved"]
+class TQGRandomizedBenchmarkingInterleavedSSRONode(ScheduleCouplerNode):
     measurement_obj = TQGRandomizedBenchmarkingSSROMeasurement
     analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
+    coupler_qois = ["tqg_fidelity_interleaved"]
 
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
-    ):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(self, name: str, couplers: list[str], **schedule_keywords):
+        super().__init__(name, couplers, **schedule_keywords)
         self.name = name
         self.type = "parameterized_sweep"
-        self.all_qubits = all_qubits
-        self.couplers = couplers
-        self.edges = couplers
-        self.coupler = self.couplers[0]
-        self.coupled_qubits = couplers[0].split(sep="_")
         self.schedule_keywords = schedule_keywords
         self.backup = False
 
@@ -150,9 +137,10 @@ class TQGRandomizedBenchmarkingInterleavedSSRONode(ScheduleNode):
         ]
 
 
-class CZRBOptimizeSSRONode(ScheduleNode):
+class CZRBOptimizeSSRONode(ScheduleCouplerNode):
     measurement_obj = TQGRandomizedBenchmarkingSSROMeasurement
     analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
+    coupler_qois = ["tqg_fidelity_interleaved"]
 
     def __init__(
         self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
