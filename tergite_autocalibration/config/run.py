@@ -21,7 +21,7 @@ from tergite_autocalibration.utils.dto.enums import ApplicationStatus
 class RunConfiguration(TOMLConfigurationFile):
     """
     A class to handle all run specific configurations.
-    A run is e.g. when you call `acli calibration start` and it is over as soon as the program terminates
+    A run is e.g. when you call `acli start` and it is over as soon as the program terminates
     """
 
     def __init__(self, *args, **kwargs):
