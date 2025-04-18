@@ -287,8 +287,10 @@ class TQGRandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
 
                 cl_decomp = TwoQubitClifford(clifford_idx).gate_decomposition
                 if cl_decomp is None:
-                    raise ValueError(f"Clifford gate {clifford_idx} has no decomposition.")
-                
+                    raise ValueError(
+                        f"Clifford gate {clifford_idx} has no decomposition."
+                    )
+
                 operations = [
                     pycqed_operation_map[gate](q)
                     for (gate, q) in cl_decomp

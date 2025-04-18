@@ -3,22 +3,22 @@
 # Modifications copyright (C) Pontus Vikstål 2025
 # Modifications copyright (C) Chalmers Next Labs 2025
 #
-# This program is derived from the PycQED with the following license: 
-# 
+# This program is derived from the PycQED with the following license:
+#
 # MIT License
-# 
+#
 # Copyright (c) 2016 DiCarlo lab-QuTech-Delft University of Technology
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -67,6 +67,7 @@ CZ = np.array(
     dtype=int,
 )
 
+
 def X_theta(theta: float, unit: Literal["deg", "rad"] = "deg") -> np.ndarray:
     """
     Return the Pauli Transfer Matrix (PTM) of a rotation of angle theta
@@ -83,7 +84,7 @@ def X_theta(theta: float, unit: Literal["deg", "rad"] = "deg") -> np.ndarray:
         theta = np.deg2rad(theta)
     elif unit != "rad":
         raise ValueError(f"Unsupported unit '{unit}'. Use 'deg' or 'rad'.")
-    
+
     cos = np.cos(theta)
     sin = np.sin(theta)
 
@@ -121,10 +122,10 @@ def Y_theta(theta: float, unit: Literal["deg", "rad"] = "deg") -> np.ndarray:
 
     Y = np.array(
         [
-            [1, 0,    0,   0],
-            [0, cos,  0,  sin],
-            [0, 0,    1,   0],
-            [0, -sin, 0,  cos],
+            [1, 0, 0, 0],
+            [0, cos, 0, sin],
+            [0, 0, 1, 0],
+            [0, -sin, 0, cos],
         ],
         dtype=np.float64,
     )

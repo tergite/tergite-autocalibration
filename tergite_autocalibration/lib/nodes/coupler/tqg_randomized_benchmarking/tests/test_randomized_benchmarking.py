@@ -3,14 +3,17 @@ import numpy as np
 
 from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.utils.randomized_benchmarking import (
     randomized_benchmarking_sequence,
-    calculate_net_clifford
+    calculate_net_clifford,
 )
 from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.utils.pauli_transfer_matrices import (
-    CZ, I, X_theta, Y_theta
+    CZ,
+    I,
+    X_theta,
+    Y_theta,
 )
 from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.utils.clifford_group import (
     SingleQubitClifford,
-    TwoQubitClifford
+    TwoQubitClifford,
 )
 
 
@@ -18,10 +21,7 @@ class TestRandomizedBenchmarkingSequence(unittest.TestCase):
 
     def setUp(self) -> None:
         # CliffordClass, clifford_group, interleaved_clifford_idx
-        self.test_cases = [
-            (SingleQubitClifford, 1, 20),
-            (TwoQubitClifford, 2, 10_4368)
-        ]
+        self.test_cases = [(SingleQubitClifford, 1, 20), (TwoQubitClifford, 2, 10_4368)]
 
     def test_recovery_clifford_produces_identity(self):
         """Test that recovery gate in clifford sequence yields identity."""
@@ -31,15 +31,18 @@ class TestRandomizedBenchmarkingSequence(unittest.TestCase):
                     number_of_cliffords=100,
                     apply_inverse=True,
                     clifford_group=clifford_group,
-                    seed=123
+                    seed=123,
                 )
                 # Get the recovery Clifford
-                recovery_clifford = CliffordClass(sequence[-1]) 
+                recovery_clifford = CliffordClass(sequence[-1])
                 # Compute net Clifford from the sequence
                 net_clifford = calculate_net_clifford(sequence[:-1], CliffordClass)
                 # Compute the product of the net clifford and the recovery clifford
-                clifford = net_clifford * recovery_clifford 
-                self.assertTrue(clifford == CliffordClass(0), "The product of a single-qubit sequence and its recovery should be the identity")
+                clifford = net_clifford * recovery_clifford
+                self.assertTrue(
+                    clifford == CliffordClass(0),
+                    "The product of a single-qubit sequence and its recovery should be the identity",
+                )
 
     def test_interleaved_randomized_benchmarking(self):
         """Test that recovery gate in clifford sequence yields identity."""
@@ -50,15 +53,18 @@ class TestRandomizedBenchmarkingSequence(unittest.TestCase):
                     apply_inverse=True,
                     clifford_group=clifford_group,
                     interleaved_clifford_idx=interleaved_clifford_idx,
-                    seed=123
+                    seed=123,
                 )
                 # Get the recovery Clifford
-                recovery_clifford = CliffordClass(sequence[-1]) 
+                recovery_clifford = CliffordClass(sequence[-1])
                 # Compute net Clifford from the sequence
                 net_clifford = calculate_net_clifford(sequence[:-1], CliffordClass)
                 # Compute the product of the net clifford and the recovery clifford
-                clifford = net_clifford * recovery_clifford 
-                self.assertTrue(clifford == CliffordClass(0), "The product of a single-qubit sequence and its recovery should be the identity")
+                clifford = net_clifford * recovery_clifford
+                self.assertTrue(
+                    clifford == CliffordClass(0),
+                    "The product of a single-qubit sequence and its recovery should be the identity",
+                )
 
     def test_interleaved_cz(self):
         """Test that interleaved randomized benchmarking with a CZ gate results in the identity PTM."""
@@ -70,8 +76,8 @@ class TestRandomizedBenchmarkingSequence(unittest.TestCase):
             number_of_cliffords=100,
             apply_inverse=True,
             clifford_group=2,
-            interleaved_clifford_idx=CZ_INDEX, # Clifford index for CZ
-            seed=123
+            interleaved_clifford_idx=CZ_INDEX,  # Clifford index for CZ
+            seed=123,
         )
 
         # Map from gate names to their PTMs
@@ -89,7 +95,7 @@ class TestRandomizedBenchmarkingSequence(unittest.TestCase):
         ptm_q0 = {gate: np.kron(I, ptm) for gate, ptm in ptm_map.items()}
         ptm_q1 = {gate: np.kron(ptm, I) for gate, ptm in ptm_map.items()}
         identity = np.kron(I, I)
-        
+
         # Start with identity matrix
         net_ptm = identity
 
@@ -101,7 +107,7 @@ class TestRandomizedBenchmarkingSequence(unittest.TestCase):
             decomposition = CliffordClass(idx).gate_decomposition
             if decomposition is None:
                 raise ValueError(f"Clifford gate {idx} has no decomposition.")
-            
+
             for gate, q in decomposition:
                 if gate == "I":
                     continue
@@ -117,10 +123,10 @@ class TestRandomizedBenchmarkingSequence(unittest.TestCase):
                         raise ValueError(f"Invalid qubit index {q} in decomposition.")
 
         # Verify result is close to identity
-        phase = np.angle(net_ptm[0,0]) # get global phase
-        net_ptm = np.exp(-1j * phase) * net_ptm # remove possible global phase
+        phase = np.angle(net_ptm[0, 0])  # get global phase
+        net_ptm = np.exp(-1j * phase) * net_ptm  # remove possible global phase
         np.testing.assert_array_almost_equal(net_ptm, identity, decimal=5)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
