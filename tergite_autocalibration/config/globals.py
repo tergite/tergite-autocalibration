@@ -60,7 +60,7 @@ try:
         CONFIG = ConfigurationHandler.from_configuration_package(
             ConfigurationPackage.from_toml(
                 os.path.join(
-                    str(Path(__file__).parent),
+                    str(Path(__file__).parent.parent),
                     "tests",
                     "fixtures",
                     "templates",
