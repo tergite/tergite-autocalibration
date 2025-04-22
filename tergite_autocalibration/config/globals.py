@@ -53,6 +53,9 @@ REDIS_CONNECTION = redis.Redis(decode_responses=True, port=ENV.redis_port)
 PLOTTING_BACKEND = "tkagg" if ENV.plotting else "agg"
 
 
+logger.status("Print configuration directory for debugging:")
+logger.status(ENV.config_dir)
+
 # If there is no configuration package loaded, this would throw an error
 try:
     if is_pytest():
