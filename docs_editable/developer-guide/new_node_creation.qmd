@@ -126,6 +126,20 @@ complete schedule.
 The `analysis_obj` is implemented in the `analysis.py` file from your module and contains the class that perform the
 analysis. See the description in the Base classes above to understand which classes need to be implemented and which base classes to use.
 
+Some useful information:
+- Node analyses will simply loop over Qubit/Coupler analyese and will automatically deal with high level events such as plotting and saving to REDIS. Operations can be overloaded if a node has specific needs. The most common custom operation at this level is the definition of which additional plots are plotted.
+- Coupler/Qubit analyses have three steps, setup (dataset handling), analysis and saving to REDIS. By default a node will perform all three operations on each element (qubit/coupler), but it is possible to skip the redis update, for example when running a qubit analysis inside a coupler (use the `setup_qubit_and_analyze` function).
+- Analyses return an object called Quantity Of Interest (QOI) which is a dictionary with a success boolean variable and a dictionary called  analysis result that can stored any type of information. Normally the QOI have the same names of the redis fields but this is not mandatory. For example in the cz_calibration_analysis the QOIs are different from the redis_fieds defined in the dynamic calibration nodes.
+- In addition to the standard plots that are displayed, there is another function called `save_other_plots` that can be implemented in each analysis to plot additional figures. This can be extremely useful for debugging and for visualizing additional information, for example in coupler nodes dealing with multiple working points. 
+- Information can be stored in REDIS for each qubit in a coupler. This is doneusing this structure in the analysis result of the QOI:
+```python
+        analysis_result = {
+            self.name_qubit_1: (dict(zip(self.redis_fields, q1result))),
+            self.name_qubit_2: (dict(zip(self.redis_fields, q2result))),
+        }
+```
+An exanple can be found in the coupler spectroscopy and in the coupler resonator spectroscopy coupler analyses.
+
 ## Register the node in the framework
 
 To add the node to the framework, you have to register it in two places - the node factory and the calibration graph.
