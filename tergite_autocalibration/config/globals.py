@@ -53,9 +53,6 @@ REDIS_CONNECTION = redis.Redis(decode_responses=True, port=ENV.redis_port)
 PLOTTING_BACKEND = "tkagg" if ENV.plotting else "agg"
 
 
-logger.status("Print configuration directory for debugging:")
-logger.status(ENV.config_dir)
-
 # If there is no configuration package loaded, this would throw an error
 try:
     if is_pytest():
@@ -74,8 +71,6 @@ try:
         )
     else:
         # Create the ConfigurationHandler from the meta configuration in the root directory
-        logger.status("Print configuration directory for debugging:")
-        logger.status(ENV.config_dir)
         CONFIG = ConfigurationHandler.from_configuration_package(
             ConfigurationPackage.from_toml(
                 os.path.join(ENV.config_dir, "configuration.meta.toml")

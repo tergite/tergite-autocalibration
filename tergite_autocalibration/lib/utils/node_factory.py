@@ -132,6 +132,7 @@ class NodeFactory:
     ) -> "BaseNode":
         global CouplerNode, QubitNode
         from tergite_autocalibration.lib.base.node import CouplerNode, QubitNode
+
         # Check whether node class is already inside the dict
         if node_name not in self._node_classes.keys():
             node_cls = self.get_node_class(node_name)
