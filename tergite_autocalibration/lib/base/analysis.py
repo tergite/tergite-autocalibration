@@ -15,8 +15,11 @@
 
 import collections
 import os
+import ast
 from abc import ABC, abstractmethod
 from pathlib import Path
+import re
+from typing import List
 
 # TODO: we should have a conditional import depending on a feature flag here
 import matplotlib.patches as mpatches
@@ -71,11 +74,36 @@ class BaseAnalysis(ABC):
     ):
         if "_" in this_element:
             name = "couplers"
+            self._qoi = dict(qoi.analysis_result.items())
+            if all(re.fullmatch(r"q\d{2}", key) for key in self._qoi):
+                qubits_in_coupler = [this_element[0:3], this_element[4:7]]
+                for i, qubit in enumerate(qubits_in_coupler):
+                    for j, transmon_parameter in enumerate(self.redis_fields):
+                        REDIS_CONNECTION.hset(
+                            f"{name}:{this_element}:{qubit}",
+                            transmon_parameter,
+                            self._qoi[qubit][transmon_parameter],
+                        )
+                REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
+            else:
+                analysis_succesful = qoi.analysis_succesful
+                if analysis_succesful:
+                    for qoi_name, qoi_result in qoi.analysis_result.items():
+                        if qoi_name not in self.redis_fields:
+                            raise ValueError(
+                                f"The qoi {qoi_name} is not in redis fields: {self.redis_fields} for {this_element}"
+                            )
+                        value = qoi_result["value"]
+                        logger.info(
+                            f"Updating redis for {this_element} with {qoi_name}: {value}"
+                        )
+                        REDIS_CONNECTION.hset(f"{name}:{this_element}", qoi_name, value)
+                REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
+
         else:
             name = "transmons"
 
         if name == "transmons":
-
             # skiping coupler_spectroscopy because it calls QubitSpectroscopy Analysis that updates the qubit frequency
             # skiping coupler_resonator_spectroscopy for similar reasons
             if (
@@ -89,7 +117,7 @@ class BaseAnalysis(ABC):
                 for qoi_name, qoi_result in qoi.analysis_result.items():
                     if qoi_name not in self.redis_fields:
                         raise ValueError(
-                            f"The qoi {qoi_name} is not in redis fields: {self.redis_fields}"
+                            f"The qoi {qoi_name} is not in redis fields: {self.redis_fields} for {this_element}"
                         )
                     value = qoi_result["value"]
                     REDIS_CONNECTION.hset(f"{name}:{this_element}", qoi_name, value)
@@ -99,16 +127,7 @@ class BaseAnalysis(ABC):
             else:
                 logger.warning(f"Analysis failed for {this_element}")
         else:
-            # NOTE: leaving the coupler redis structure as it is
-            for i, transmon_parameter in enumerate(self.redis_fields):
-                REDIS_CONNECTION.hset(
-                    f"{name}:{this_element}", transmon_parameter, self._qoi[i]
-                )
-                # Setting the value in the standard redis storage
-                structured_redis_storage(
-                    transmon_parameter, this_element.strip("q"), self._qoi[i]
-                )
-                REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
+            pass
 
     def rotate_to_probability_axis(self, complex_measurement_data):
         # TODO: THIS DOESNT BELONG HERE
@@ -199,7 +218,6 @@ class BaseNodeAnalysis(ABC):
         return fig, axs
 
     def save_plots(self):
-        self.fig.tight_layout()
         preview_path = self.data_path / f"{self.name}_preview.png"
         full_path = self.data_path / f"{self.name}.png"
         logger.info("Saving Plots")
@@ -208,6 +226,9 @@ class BaseNodeAnalysis(ABC):
         plt.show(block=True)
         logger.info(f"Plots saved to {preview_path} and {full_path}")
         plt.close()
+
+    def save_other_plots(self):
+        pass
 
 
 class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
@@ -234,6 +255,7 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         analysis_results = self._analyze_all_qubits()
         self._fill_plots()
         self.save_plots()
+        self.save_other_plots()
         return analysis_results
 
     def _analyze_all_qubits(self):
@@ -262,7 +284,7 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
                 result = qubit_analysis.process_qubit(
                     ds, this_qubit
                 )  # this_qubit shoulq be qXX
-                # analysis_results[this_qubit] = dict(zip(self.redis_fields, result))
+                analysis_results[this_qubit] = result
                 self.qubit_analyses.append(qubit_analysis)
 
             index = index + 1
@@ -307,18 +329,24 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
         self.coord = None
 
     def process_qubit(self, dataset, qubit_element):
-        self.dataset = dataset
-        self.qubit = qubit_element
-        self.coord = dataset.coords  # What is this doing?
-        self.data_var = list(dataset.data_vars.keys())[
-            0
-        ]  # Assume the first data_var is relevant
-        self.S21 = dataset.isel(ReIm=0) + 1j * dataset.isel(ReIm=1)
-        self.magnitudes = np.abs(self.S21)
-        self._qoi = self.analyse_qubit()
-
+        self._qoi = self.setup_qubit_and_analyze(dataset, qubit_element)
         self.update_redis_trusted_values(self.name, self.qubit, self._qoi)
         return self._qoi
+
+    def setup_qubit_and_analyze(self, dataset, qubit_element):
+        self.dataset = dataset
+        self.qubit = qubit_element
+        self._set_data_variables()
+        self._compute_magnitudes()
+        return self.analyse_qubit()
+
+    def _set_data_variables(self):
+        self.coord = self.dataset.coords
+        self.data_var = list(self.dataset.data_vars.keys())[0]
+
+    def _compute_magnitudes(self):
+        self.S21 = self.dataset.isel(ReIm=0) + 1j * self.dataset.isel(ReIm=1)
+        self.magnitudes = np.abs(self.S21)
 
     def _plot(self, primary_axis):
         self.plotter(primary_axis)  # Assuming node_analysis object is available
@@ -351,22 +379,37 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
         self.name_qubit_1 = ""
         self.name_qubit_2 = ""
 
+    def qoi(self) -> "QOI":
+        return self._qoi
+
+    def qoi(self, value: "QOI"):
+        self._qoi = value
+
     def process_coupler(self, dataset, coupler_element):
-        self.name_qubit_1 = coupler_element[0:3]
-        self.name_qubit_2 = coupler_element[4:7]
+        self._qoi = self.setup_coupler_and_analyze(dataset, coupler_element)
+        self.update_redis_trusted_values(self.name, coupler_element, self._qoi)
+
+        return self._qoi
+
+    def setup_coupler_and_analyze(self, dataset, coupler_element):
         self.dataset = dataset
         self.coupler = coupler_element
-        self.coord = dataset.coords
-        self.data_var = list(dataset.data_vars.keys())[
-            0
-        ]  # Assume the first data_var is relevant
-        self.S21 = dataset.isel(ReIm=0) + 1j * dataset.isel(ReIm=1)
+        self._extract_qubit_names()
+        self._set_data_variables()
+        self._compute_magnitudes()
+        return self.analyze_coupler()
+
+    def _extract_qubit_names(self):
+        self.name_qubit_1 = self.coupler[0:3]
+        self.name_qubit_2 = self.coupler[4:7]
+
+    def _set_data_variables(self):
+        self.coord = self.dataset.coords
+        self.data_var = list(self.dataset.data_vars.keys())[0]
+
+    def _compute_magnitudes(self):
+        self.S21 = self.dataset.isel(ReIm=0) + 1j * self.dataset.isel(ReIm=1)
         self.magnitudes = np.abs(self.S21)
-
-        analysis_results = self._run_coupler_analysis(coupler_element)
-        self.update_redis_trusted_values(self.name, coupler_element)
-
-        return analysis_results
 
     def _extract_coupler_info(self):
         for settable in self.dataset.coords:
@@ -378,10 +421,6 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
             except KeyError:
                 logger.info(f"No element_type for {settable}")
         return None
-
-    def _run_coupler_analysis(self, this_element: str):
-        self._qoi = self.analyze_coupler()
-        return {this_element: dict(zip(self.redis_fields, self._qoi))}
 
     def _plot(self, primary_axis, secondary_axis):
         self.plotter(
@@ -399,7 +438,7 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
         # secondary_axis.legend(handles=handles, fontsize="small")
 
     @abstractmethod
-    def analyze_coupler(self):
+    def analyze_coupler(self) -> "QOI":
         pass
 
 
@@ -413,10 +452,11 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
         self.data_vars = None
         self.coords = None
 
-        self.coupler_analyses = []
+        self.coupler_analyses: List[BaseCouplerAnalysis] = []
 
         self.column_grid = 2
         self.plots_per_qubit = 1
+        self.plots_per_coupler = 2
 
     def analyze_node(self, data_path: Path):
         self.data_path = Path(data_path)
@@ -427,6 +467,7 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
         analysis_results = self._analyze_all_couplers()
         self._fill_plots()
         self.save_plots()
+        self.save_other_plots()
         return analysis_results
 
     def _analyze_all_couplers(self):
@@ -435,9 +476,7 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
         index = 0
         if len(coupler_data_dict) == 0:
             logger.error("Dataset does not have valid coordinates")
-        logger.info(coupler_data_dict)
         for this_coupler, coupler_data_vars in coupler_data_dict.items():
-            logger.info(this_coupler)
             ds = xr.merge([self.dataset[var] for var in coupler_data_vars])
             ds.attrs["coupler"] = this_coupler
             ds.attrs["node"] = self.name
@@ -447,7 +486,9 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
                 self.name, self.redis_fields
             )
             coupler_analysis.data_path = self.data_path
-            coupler_analysis.process_coupler(ds, this_coupler)
+            result = coupler_analysis.process_coupler(ds, this_coupler)
+            analysis_results[this_coupler] = result
+
             self.coupler_analyses.append(coupler_analysis)
 
             index = index + 1
@@ -457,15 +498,46 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
     def _group_by_coupler(self):
         coupler_data_dict = collections.defaultdict(set)
         for var in self.dataset.data_vars:
-            if "_" in self.dataset[var].element:
-                this_coupler = self.dataset[var].element
-                coupler_data_dict[this_coupler].add(var)
-
+            if hasattr(self.dataset[var], "element"):
+                if "_" in self.dataset[var].element:
+                    this_coupler = self.dataset[var].element
+                    coupler_data_dict[this_coupler].add(var)
         return coupler_data_dict
 
     def _fill_plots(self):
         for index, analysis in enumerate(self.coupler_analyses):
-            primary_plot_row = self.plots_per_qubit * (index // self.column_grid)
-            primary_axis = self.axs[primary_plot_row, index % self.column_grid]
-            secondary_axis = self.axs[primary_plot_row, (index + 1) % self.column_grid]
+            primary_plot_row = index * (self.column_grid // self.plots_per_coupler)
+            primary_axis = self.axs[
+                primary_plot_row, index % (self.column_grid // self.plots_per_coupler)
+            ]
+            secondary_axis = self.axs[
+                primary_plot_row,
+                index % (self.column_grid // self.plots_per_coupler) + 1,
+            ]
+
             analysis._plot(primary_axis, secondary_axis)
+            self.fig.tight_layout()
+
+            # Get positions of both axes (left and right in the pair)
+            self.fig.canvas.draw()
+            bbox1 = primary_axis.get_position()
+            bbox2 = secondary_axis.get_position()
+
+            # Center horizontally between both plots
+            x_center = (bbox1.x0 + bbox2.x1) / 2
+
+            # Align just above the top of the tallest one
+            y_top = max(bbox1.y1, bbox2.y1) + 0.015  # Slight padding
+
+            # Add clean, aligned label
+            self.fig.text(
+                x_center,
+                y_top,
+                f"Coupler: {analysis.coupler}",
+                ha="center",
+                va="bottom",
+                color="black",
+                fontsize=13,
+                fontweight="bold",
+                transform=self.fig.transFigure,
+            )
