@@ -202,4 +202,3 @@ def setup_data_mutliple_files():
     logger.info(combined_dataset)
 
     return combined_dataset, freqs, amps
-
