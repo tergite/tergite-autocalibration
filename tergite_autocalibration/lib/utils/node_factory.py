@@ -17,13 +17,12 @@
 from pathlib import Path
 from typing import TYPE_CHECKING, Dict, List, Union
 
-from tergite_autocalibration.lib.base.node import CouplerNode, QubitNode
 from tergite_autocalibration.utils.misc.regex import camel_to_snake
 
 from .reflections import find_inheriting_classes_ast_recursive, import_class_from_file
 
 if TYPE_CHECKING:
-    from ..base.node import BaseNode
+    from tergite_autocalibration.lib.base.node import BaseNode, CouplerNode, QubitNode
 
 
 class NodeFactory:
@@ -145,7 +144,7 @@ class NodeFactory:
             node_obj = node_cls(node_name, couplers, **kwargs)
         else:
             raise TypeError(
-                f"Node class {node_cls} is not a subclass of neither BaseQubitNode or BaseCouplerNode."
+                f"Node class {node_cls} is not a subclass of neither QubitNode or CouplerNode."
             )
 
         return node_obj
