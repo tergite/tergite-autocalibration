@@ -15,13 +15,13 @@ from pathlib import Path
 from typing import Union
 
 from tergite_autocalibration.config.base import TOMLConfigurationFile
-from tergite_autocalibration.tools.cli.calibration import start
+from tergite_autocalibration.tools.cli import start
 from tergite_autocalibration.utils.misc.types import (
     safe_str_to_bool_int_float,
     is_none_str,
 )
 
-# Note: This script emulates the cli endpoint `acli calibration start`.
+# Note: This script emulates the cli endpoint `acli start`.
 #
 #       Before using the script, please read the section about debugging in the documentation
 #       carefully. If you are running into any errors, please compare the code in tools/cli

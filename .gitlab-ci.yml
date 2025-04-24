@@ -115,7 +115,7 @@ application_run:
     # Clear the caches
     - rm -r .venv/lib/python3.10/site-packages/out
     # Run the calibration chain
-    - echo "n" | acli calibration start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_two_state_optimization" -n rabi_oscillations
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_two_state_optimization" -n rabi_oscillations
     # Read
     - ls .venv/lib/python3.10/site-packages/out
     # Verify output

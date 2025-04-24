@@ -309,6 +309,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#creating-a-new-node" id="toc-creating-a-new-node" class="nav-link active" data-scroll-target="#creating-a-new-node">Creating a new node</a>
   <ul class="collapse">
+  <li><a href="#base-classes" id="toc-base-classes" class="nav-link" data-scroll-target="#base-classes">Base classes</a></li>
   <li><a href="#where-are-the-nodes-located" id="toc-where-are-the-nodes-located" class="nav-link" data-scroll-target="#where-are-the-nodes-located">Where are the nodes located?</a>
   <ul class="collapse">
   <li><a href="#naming-conventions" id="toc-naming-conventions" class="nav-link" data-scroll-target="#naming-conventions">Naming conventions</a></li>
@@ -317,7 +318,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#creating-a-measurement_obj" id="toc-creating-a-measurement_obj" class="nav-link" data-scroll-target="#creating-a-measurement_obj">Creating a <code>measurement_obj</code></a></li>
   <li><a href="#creating-an-analysis_obj" id="toc-creating-an-analysis_obj" class="nav-link" data-scroll-target="#creating-an-analysis_obj">Creating an <code>analysis_obj</code></a></li>
-  <li><a href="#node-types-and-samplespaces" id="toc-node-types-and-samplespaces" class="nav-link" data-scroll-target="#node-types-and-samplespaces">Node types and samplespaces</a></li>
   </ul></li>
   <li><a href="#register-the-node-in-the-framework" id="toc-register-the-node-in-the-framework" class="nav-link" data-scroll-target="#register-the-node-in-the-framework">Register the node in the framework</a>
   <ul class="collapse">
@@ -344,6 +344,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Register the node in the framework</li>
 </ol>
 <p>Following these steps, you can easily contribute to the automatic calibration with your own nodes in a couple of hours.</p>
+<section id="base-classes" class="level2">
+<h2 class="anchored" data-anchor-id="base-classes">Base classes</h2>
+<p>The base classes on which all nodes are built can be found in <code>tergite_autocalibration/lib/base</code>. There are base classes for all three components of a node, the node itself, the measurement and the analysis.</p>
+<p>Nodes can be either <code>QubitNode</code> or <code>CouplerNode</code>, both inherit from a <code>BaseNode</code> class providing common interfaces and functionalities. They will have different quanititis of interest depending on the type (qubit_qoi for QubitNode) A Node also need to implement a Schedule; there are two files in <code>tergite_autocalibration/lib/nodes</code> - <code>ScheduleNode</code>: A node with a simple sweep over the samplespace. The quantify schedule is only compiled once and the parameter values from the samplespace are the input for the schedule function of the measurement. - <code>ExternalParameterNode</code>: A node with a more complex measurement procedure. It allows to run multiple steps sequentially, where each step might require recompilation of the schedule. There is an external parameter involved (the current applied to the coupler using the SPIRack), which is the part of the generating function within the schedule. There can be a fixed schedule or a schedule varying at each iteration (for example when changing value in the schedule when changing current). The latter can also hanlde elements (couplers or qubits) having different number of iterations.</p>
+<p>Both files provide classes with multiple inheritance that combine type and schedule, i.e.&nbsp;<code>ScheduleQubitNode</code> or <code>ExternalParameterFixedScheduleCouplerNode</code>, that can be used in nodes to simplify implementation of new nodes for developers.</p>
+<p>Measurements only have a base class providing a common interface.</p>
+<p>Analysis classes have a more complex composition and inheritance structure. The entry point is always a <code>BaseNodeAnalysis</code> class, implemented in the <code>BaseAllCouplersAnalysis</code> or <code>BaseAllQubitsAnalysis</code> classes. Each node analysis will loop over all elements (qubits or couplers) defining a relevant analysis class, either QubitAnalysis or CouplerAnalysis. These analyses will have a common structure with a setup phase (where all dataset information is read and processed), an analysis propper that returns a quantity of interest (QOI) object, and then a call to a function updating the REDIS database. The analysis will be very node specific. CouplerAnalysis classes combine information from two QubitAnalyses; information can be stored both at the coupler level, for example all CZ gate information, or at the qubit level within the coupler (in REDIS couplers:coupler_name:qubit_name:qubit_information). This allows to handle information for the same qubit when used in different couplers. Plots are also handled in the analysis class, with the Qubit/Coupler analyses hangling plotting according to the information required (i.e.&nbsp;plotting all qubits in a resonator_spectropy, both qubits in all couplers in a coupler_spectroscopy, or a single plot per coupler for two qubit gate randomized benchmarking).</p>
+</section>
 <section id="where-are-the-nodes-located" class="level2">
 <h2 class="anchored" data-anchor-id="where-are-the-nodes-located">Where are the nodes located?</h2>
 <p>The nodes are located in <code>tergite_autocalibration/lib/nodes</code>. If you open that module, you will find that there are four submodules for different kind of nodes:</p>
@@ -353,7 +361,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><code>qubit_control</code>: All nodes that calibrate a quantity of interest for the qubit.</li>
 <li><code>readout</code>: All nodes that calibrate a quantity of interest for the resonator.</li>
 </ul>
-<p>Please create a new submodule for your node in one of the four submodules listed above. A sort of template on how a node module should be structured can be found in <code>tergite_autocalibration/lib/base</code>. Essentially, a proper package in the end should contain:</p>
+<p>Please create a new submodule for your node in one of the four submodules listed above. Essentially, a proper package in the end should contain:</p>
 <ul>
 <li><code>__init__.py</code>: This is an empty file to mark that the folder is a package. Please add this file, because otherwise your classes cannot be found.</li>
 <li><code>node.py</code>: A file where the definition of the node class goes.</li>
@@ -369,7 +377,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ul>
 <li><code>rabi_oscillations</code>: This is the <strong>node name</strong>, which is used in the commandline interface or for other purposes to pass the node name as a string.</li>
 <li><code>RabiOscillations</code>: This is the name of the <strong>node class</strong>.</li>
-<li><code>RabiOscillationsAnalysis</code>: The name of the respective <strong>analysis class</strong>.</li>
+<li><code>RabiOscillationsNodeAnalysis</code>: The name of the respective <strong>analysis class for that node</strong>.</li>
 <li><code>RabiOscillationsMeasurement</code>: And the name of the respective <strong>measurement class</strong>.</li>
 </ul>
 <p>When there are some more complicated nodes for which you do not know how to name it, please just take a look at the already existing nodes and make a guess how it feels to name it correctly. Also, when there is a node that starts with an abbreviation, please have all letter for the abbreviation capitalized e.g.: <code>cz_calibration</code> would be the node name for the <code>CZCalibration</code> node class.</p>
@@ -384,7 +392,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.measurement <span class="im">import</span> RabiOscillationsMeasurement</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.analysis <span class="im">import</span> RabiQubitAnalysis</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> RabiOscillationsNode(ScheduleNode):</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> RabiOscillationsNode(ScheduleQubitNode):</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  measurement_obj <span class="op">=</span> RabiOscillationsMeasurement</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  analysis_obj <span class="op">=</span> RabiQubitAnalysis</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  qubit_qois <span class="op">=</span> [<span class="st">"rxy:amp180"</span>]</span>
@@ -396,11 +404,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        qubit: np.linspace(<span class="fl">0.002</span>, <span class="fl">0.90</span>, <span class="dv">61</span>) <span class="cf">for</span> qubit <span class="kw">in</span> <span class="va">self</span>.all_qubits</span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>      }</span>
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>As you can see, it inherits from the <code>ScheduleNode</code> class, which contains a very simple definition of a node that runs a simple sweep over a single quantity. More information about other node classes can be found below. Furthermore, you can see that the node has three class attributes:</p>
+<p>As you can see, it inherits from the <code>ScheduleQubitNode</code> class, which contains a very simple definition of a node that runs a simple sweep over a single quantity for all qubits defined in the run_config. More information about other node classes can be found in the descrition of the base classes above. Furthermore, you can see that the node has three class attributes:</p>
 <ul>
 <li><code>measurement_obj</code>: Contains the class of the measurement, that defines the pulse schedule for the instruments</li>
 <li><code>analysis_obj</code>: Contains the class for the analysis to post-process the measurement results. For example, this could be a simple fitting function.</li>
-<li><code>qubit_qois</code>: The quantity of interest (QOI), which is returned by the analysis. In case of the rabi oscillations this is the pulse amplitude.</li>
 </ul>
 <p>Also, you can see in the constructor, there is an attribute called <code>schedule_samplespace</code>. Here, we define in the measurement, what quantity will be swept over.</p>
 <section id="creating-a-measurement_obj" class="level3">
@@ -411,16 +418,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="creating-an-analysis_obj" class="level3">
 <h3 class="anchored" data-anchor-id="creating-an-analysis_obj">Creating an <code>analysis_obj</code></h3>
-<p>The <code>analysis_obj</code> is implemented in the <code>analysis.py</code> file from your module and contains the class that perform the analysis.</p>
-</section>
-<section id="node-types-and-samplespaces" class="level3">
-<h3 class="anchored" data-anchor-id="node-types-and-samplespaces">Node types and samplespaces</h3>
-<p>In the example above, the node inherits from the class <code>ScheduleNode</code>. This is one option for the node behaviour:</p>
-<ul>
-<li><code>ScheduleNode</code>: A node with a simple sweep over the samplespace. The quantify schedule is only compiled once and the parameter values from the samplespace are the input for the schedule function of the measurement.</li>
-<li><code>ExternalParameterNode</code>: A node with a more complex measurement procedure. It allows to run multiple steps sequentially, where each step might require recompilation of the schedule. There is an external parameter involved, which is the part of the generating function within the schedule.</li>
-</ul>
-<p>When you are implementing a node, you can choose which of the two abstract node classes fit better with the behaviour of your new node. Also, if you want to implement a more sophisticated measurement procedure, you can override the procedures in the measurement function or in other places. Check out the article about <a href="../developer-guide/node_classes.html">node classes</a> for more details.</p>
+<p>The <code>analysis_obj</code> is implemented in the <code>analysis.py</code> file from your module and contains the class that perform the analysis. See the description in the Base classes above to understand which classes need to be implemented and which base classes to use.</p>
 </section>
 </section>
 <section id="register-the-node-in-the-framework" class="level2">
@@ -437,6 +435,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><code>('previous_node','new_node')</code></li>
 <li><code>('new_node', 'next_node')</code></li>
 </ul>
+<p>It is possible to have multiple dependencies, i.e.&nbsp;a node can be set to run only if two different nodes are run.</p>
+<ul>
+<li><code>('previous_node_1','new_node')</code></li>
+<li><code>('previous_node_2','new_node')</code></li>
+</ul>
+<p>This will result in both <code>previous_node_1</code> and <code>previous_node_2</code> to be run before the <code>new_node</code>.</p>
 </section>
 <section id="documentation" class="level3">
 <h3 class="anchored" data-anchor-id="documentation">Documentation</h3>
