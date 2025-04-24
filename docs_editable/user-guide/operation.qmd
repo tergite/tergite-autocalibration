@@ -139,14 +139,14 @@ are missing.
 
 ### Calibration Commands
 
-#### `calibration start`
+#### `start`
 
 Starts the calibration supervisor.
 
 **Usage:**
 
 ```bash
-acli calibration start [OPTIONS]
+acli start [OPTIONS]
 ```
 
 **Options:**
