@@ -5,6 +5,7 @@
 # (C) Copyright Amr Osman 2024
 # (C) Copyright Joel Sandås 2024
 # (C) Copyright Michele Faucci Giannelli 2024
+# (C) Copyright Chalmers Next Labs 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -14,20 +15,22 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import matplotlib.pyplot as plt
+from typing import List, Union
+
 import networkx as nx
 
 from tergite_autocalibration.utils.logging import logger
 
-graph = nx.DiGraph()
+# IMPORTANT: If you update the node graph, please make sure to also update the documentation under
+#            docs_editable/available_nodes.qmd
 
-# dependencies: n1 -> n2. For example
+# These are the dependencies to construct the calibration graph from.
+# The graph is a directed acyclic graph (DAG).
+
+# Dependencies: n1 -> n2. For example:
 # ('tof','resonator_spectroscopy')
-# means 'resonator_spectroscopy' depends on 'tof'
-graph_dependencies = [
-    # _____________________________________
-    # these are edges on  a directed graph
-    # _____________________________________
+# means 'resonator_spectroscopy' depends on 'tof'.
+GRAPH_DEPENDENCIES = [
     ("tof", "resonator_spectroscopy"),
     ("resonator_spectroscopy", "coupler_resonator_spectroscopy"),
     ("qubit_01_spectroscopy", "coupler_resonator_spectroscopy"),
@@ -35,6 +38,7 @@ graph_dependencies = [
     ("resonator_spectroscopy", "qubit_01_spectroscopy_AR"),
     ("qubit_01_spectroscopy_AR", "rabi_oscillations_AR"),
     ("qubit_01_spectroscopy", "coupler_spectroscopy"),
+    ("T1", "coupler_spectroscopy"),
     ("qubit_01_spectroscopy", "rabi_oscillations"),
     ("rabi_oscillations", "ramsey_correction"),
     ("rabi_oscillations", "T1"),
@@ -52,10 +56,9 @@ graph_dependencies = [
     ("n_rabi_oscillations_12", "resonator_spectroscopy_2"),
     ("resonator_spectroscopy_2", "ro_frequency_three_state_optimization"),
     ("ro_frequency_three_state_optimization", "ro_amplitude_three_state_optimization"),
-    ("resonator_spectroscopy", "punchout"),
+    ("punchout", "resonator_spectroscopy"),
     ("T1", "T2"),
     ("T2", "T2_echo"),
-    # ("T2_echo", "randomized_benchmarking_ssro"),
     ("ro_amplitude_three_state_optimization", "randomized_benchmarking_ssro"),
     ("T2_echo", "purity_benchmarking"),
     ("resonator_spectroscopy_2", "cz_chevron_test"),
@@ -72,105 +75,148 @@ graph_dependencies = [
     ("cz_calibration_ssro", "cz_dynamic_phase_ssro"),
     ("cz_dynamic_phase_ssro", "cz_dynamic_phase_swap_ssro"),
     ("resonator_spectroscopy_2", "tqg_randomized_benchmarking_ssro"),
-    #    ("cz_dynamic_phase_swap_ssro", "tqg_randomized_benchmarking_ssro"),
     (
         "tqg_randomized_benchmarking_ssro",
         "tqg_randomized_benchmarking_interleaved_ssro",
     ),
 ]
 
-graph.add_edges_from(graph_dependencies)
-# For DEVELOPMENT PURPOSES the nodes that update an existing redis redis_field
-# are given a refine attr so they can be skipped if desired
-graph.add_node("tof", type="refine")
-graph.add_node("punchout")
-graph.add_node("resonator_relaxation")
-# graph.add_node('qubit_01_spectroscopy_pulsed')
-graph.add_node("qubit_01_spectroscopy")
-# graph.add_node('T1', type='refine')
-# graph.add_node('T2', type='refine')
-# graph.add_node('T2_echo', type='refine')
-# graph.add_node('ramsey_correction', type='refine')
-# graph.add_node('adaptive_motzoi_parameter', type='refine')
-# graph.add_node('n_rabi_oscillations', type='refine')
-# graph.add_node('ramsey_correction_12', type='refine')
-# graph.add_node('resonator_spectroscopy_2', type='refine')
+# Construct the calibration graph from its dependencies
+CALIBRATION_GRAPH = nx.DiGraph()
+CALIBRATION_GRAPH.add_edges_from(GRAPH_DEPENDENCIES)
 
-# for nodes that perform the same measurement,
-# assign a weight to the corresponding edge to sort them
-# graph['resonator_spectroscopy']['qubit_01_spectroscopy_pulsed']['weight'] = 2
-# graph['resonator_spectroscopy']['qubit_01_spectroscopy']['weight'] = 1
-graph["resonator_spectroscopy_1"]["qubit_12_spectroscopy"]["weight"] = 2
-graph["resonator_spectroscopy_1"]["qubit_12_spectroscopy"]["weight"] = 1
+# Add nodes that do not have any dependencies
+CALIBRATION_GRAPH.add_node("tof")
+CALIBRATION_GRAPH.add_node("punchout")
+CALIBRATION_GRAPH.add_node("resonator_relaxation")
 
-initial_pos = {
-    "tof": (0, 1),
-    "resonator_spectroscopy": (0, 0.9),
-    "qubit_01_spectroscopy": (0.0, 0.85),
-    # 'qubit_01_spectroscopy_pulsed': (-0.5,0.8),
-    "rabi_oscillations": (0, 0.8),
-    "ramsey_correction": (0, 0.75),
-    "adaptive_motzoi_parameter": (0.0, 0.7),
-    "n_rabi_oscillations": (0.0, 0.65),
-    "resonator_spectroscopy_1": (0, 0.6),
-    "ro_frequency_two_state_optimization": (-0.2, 0.45),
-    "ro_amplitude_two_state_optimization": (-0.2, 0.35),
-    # 'qubit_12_spectroscopy_pulsed': (-0.5,0.4),
-    "qubit_12_spectroscopy": (0.0, 0.55),
-    "rabi_oscillations_12": (0, 0.5),
-    "ramsey_correction_12": (0, 0.45),
-    "resonator_spectroscopy_2": (0, 0.4),
-    "ro_frequency_three_state_optimization": (0.15, 0.35),
-    "ro_amplitude_three_state_optimization": (0.15, 0.25),
-    "cz_characterisation_chevron": (0.0, 0.2),
-    "cz_chevron": (0.1, 0.2),
-    "cz_calibration": (-0.9, 0.0),
-    "T1": (0.25, 0.55),
-    "T2": (0.35, 0.55),
-    "T2_echo": (0.5, 0.55),
-    "randomized_benchmarking": (0.45, 0.4),
-    "coupler_spectroscopy": (0.3, 0.7),
-    "punchout": (0.3, 0.9),
-}
+# These nodes will be excluded by default from the graph as their measurements are standalone
+EXCLUDED_NODES = ["tof", "punchout"]
 
 
-# TODO add condition argument and explanation
-def filtered_topological_order(target_node: str):
-    logger.info("Targeting node: " + target_node)
-    return range_topological_order("resonator_spectroscopy", target_node)
+def get_dependencies_in_topological_order(
+    graph: "nx.DiGraph", target_node: str, exclude_nodes: List[str] = None
+):
+    """
+    Get dependencies of a graph in topological order.
+    This implementation takes into account that there might be parallel dependencies.
+    The dependency information from excluded nodes will be respected.
+
+    Args:
+        graph: Graph to get dependencies from.
+        target_node: Target node to request dependencies from.
+        exclude_nodes: Nodes that should be excluded from the dependency search.
+
+    Returns:
+        A list of nodes in topological order.
+
+    """
+
+    # Helper function to filter ancestors and exclude nodes
+    if exclude_nodes is None:
+        exclude_nodes = EXCLUDED_NODES
+
+    def filter_ancestors(graph_, target_, exclude_):
+        return set(nx.ancestors(graph_, target_)).difference(set(exclude_))
+
+    # These are all nodes in the final result, but not ordered yet
+    nodes_to_visit = filter_ancestors(graph, target_node, exclude_nodes)
+
+    # We collect the dependencies for each node in the list of ancestors for the target
+    ancestors = {}
+    for node_to_visit in nodes_to_visit:
+        ancestors[node_to_visit] = filter_ancestors(graph, node_to_visit, exclude_nodes)
+
+    # The final result is a list in topological order that reflects dependencies
+    topological_order = []
+    exit_condition = len(nodes_to_visit)
+    while len(nodes_to_visit) > 0:
+        # We take a copy of the nodes to visit, because otherwise the loop below would throw an error
+        to_visit_copy = nodes_to_visit.copy()
+
+        # We iterate over all nodes that are not in the final result yet
+        for node_to_visit in nodes_to_visit:
+            # If all ancestors of the node are included in the result, we add it to the list
+            # The base case and first node to be added is a node without any dependencies
+            if ancestors[node_to_visit].issubset(set(topological_order)):
+                # If we found a node, we add it to the result
+                topological_order.append(node_to_visit)
+                # And we remove it from the temporary set of nodes to visit
+                to_visit_copy.remove(node_to_visit)
+
+        # We update the nodes to visit and iterate again in the while loop until it is empty
+        nodes_to_visit = to_visit_copy
+
+        # This is to ensure that the loop is not running forever if it is impossible to find the dependencies
+        exit_condition -= 1
+        if exit_condition < 0:
+            raise RuntimeError(
+                f"Dependencies for node {target_node} in the given graph cannot be found."
+                f"Please check the dependency graph."
+            )
+
+    return topological_order
 
 
-def range_topological_order(from_node: str, target_node: str):
-    coupler_path = []
-    if target_node == "punchout":
-        topo_order = ["punchout"]
-    elif target_node == "resonator_relaxation":
-        topo_order = ["resonator_relaxation"]
-    else:
-        topo_order = nx.shortest_path(graph, from_node, target_node, weight="weight")
+def range_dependencies_in_topological_order(
+    graph: "nx.DiGraph",
+    from_nodes: List[str],
+    target_node: str,
+    exclude_nodes: List[str] = None,
+):
+    """
+    Get a subset of the graph in topological order.
 
-    def graph_condition(node, types):
-        is_without_type = "type" not in graph.nodes[node]
-        if is_without_type:
-            return True
-        has_correct_type = graph.nodes[node]["type"] in types
-        return not is_without_type and has_correct_type
+    Args:
+        graph: Graph to get dependencies from.
+        from_nodes: Nodes to start from.
+        target_node: End range node.
+        exclude_nodes: Nodes that should be excluded from the dependency search.
 
-    filtered_order = [node for node in topo_order if graph_condition(node, "refine")]
-    filtered_order = coupler_path + filtered_order
-    return filtered_order
+    Returns:
+        A topologically ordered subset of the all nodes including from_nodes.
 
+    """
+    if exclude_nodes is None:
+        exclude_nodes = []
 
-if __name__ == "__main__":
-    # nx.draw_spring(graph, with_labels=True, k=1, pos = initial_pos)
-    # pos = nx.spring_layout(graph, k=0.3)
-    nx.draw(
-        graph,
-        with_labels=True,
-        pos=initial_pos,
-        node_color="#FDFD96",
-        node_shape="o",
-        node_size=500,
+    # Topological order to target_node
+    topological_order = get_dependencies_in_topological_order(
+        graph, target_node, exclude_nodes=exclude_nodes
     )
-    # nx.draw(graph, pos=nx.spring_layout(graph, k=0.3), with_labels=True)
-    plt.show()
+
+    # All predecessors from from_node
+    back_range = set(from_nodes)
+    for from_node in from_nodes:
+        back_range = back_range.union(set(nx.descendants(graph, from_node)))
+
+    # Filter the topologically sorted list by all predecessors
+    return list(filter(lambda node: node in back_range, topological_order))
+
+
+def filtered_topological_order(
+    target_node: str, from_nodes: Union[str, List[str]] = None
+):
+    """
+    Get the graph in topological order.
+
+    Args:
+        target_node: Target node to end at.
+        from_nodes: Option to define a range in between.
+
+    Returns:
+        Topological order of nodes including target node
+
+    """
+    logger.info("Targeting node: " + target_node)
+
+    if from_nodes is None:
+        topological_order = get_dependencies_in_topological_order(
+            CALIBRATION_GRAPH, target_node, exclude_nodes=EXCLUDED_NODES
+        )
+    else:
+        topological_order = range_dependencies_in_topological_order(
+            CALIBRATION_GRAPH, from_nodes, target_node, exclude_nodes=EXCLUDED_NODES
+        )
+
+    return topological_order + [target_node]

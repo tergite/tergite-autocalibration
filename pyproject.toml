@@ -1,16 +1,19 @@
 [tool.poetry]
 name = "tergite-autocalibration"
-version = "2024.12.0"
+version = "2025.03.0"
 description = "commandline application to calibrate the WACQT quantum computers automatically"
 authors = [
     "Eleftherios Moschandreou <elemos@chalmers.se>",
     "Liangyu Chen <liangyuc@chalmers.se>",
-    "Tong Liu <liuto@chalmers.se>",
     "Stefan Hill <stefanhi@chalmers.se>",
-    "Michele Faucci Giannelli <faucci@chalmser.se>"
+    "Amr Osman <oarm@chalmers.se>",
+    "Tong Liu <liuto@chalmers.se>",
+    "Joel Sandås <sandas@chalmers.se>",
+    "Pontus Vikstål <pontus.vikstal@chalmersnextlabs.se>",
+    "Michele Faucci Giannelli <faucci@chalmers.se>",
 ]
 maintainers = [
-    "Chalmers Next Labs AB <quantum-nextlabs@chalmers.se>",
+    "Chalmers Next Labs AB <contact@quantum.chalmersnextlabs.se>",
 ]
 readme = "README.md"
 packages = [{include = "tergite_autocalibration"}]
@@ -41,6 +44,7 @@ jokeapi = "1.0.5"
 optuna = "4.0.0"
 netcdf4 = "1.7.1.post2"
 tomlkit = "^0.13.2"
+rich = "^14.0.0"
 
 # The dependencies below come from quantifiles
 matplotlib = "^3.9.3"

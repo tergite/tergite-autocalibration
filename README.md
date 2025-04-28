@@ -63,7 +63,7 @@ cp .example.env .env
 - Start the automatic calibration
 
 ```shell
-acli calibration start
+acli start
 ```
 
 - For more help on other commands, type:

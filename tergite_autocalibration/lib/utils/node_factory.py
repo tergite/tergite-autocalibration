@@ -18,11 +18,10 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Dict, List, Union
 
 from tergite_autocalibration.utils.misc.regex import camel_to_snake
-
 from .reflections import find_inheriting_classes_ast_recursive, import_class_from_file
 
 if TYPE_CHECKING:
-    from ..base.node import BaseNode
+    from tergite_autocalibration.lib.base.node import BaseNode, CouplerNode, QubitNode
 
 
 class NodeFactory:
@@ -58,7 +57,6 @@ class NodeFactory:
             "T2_echo": "T2EchoNode",
             "all_XY": "AllXYNode",
             "reset_chevron": "ResetChevronNode",
-            "cz_characterisation_chevron": "CZCharacterisationChevronNode",
             "reset_calibration_ssro": "ResetCalibrationSSRONode",
             "cz_parametrisation_fix_duration": "CZParametrizationFixDurationNode",
             "process_tomography_ssro": "ProcessTomographySSRONode",
@@ -87,7 +85,7 @@ class NodeFactory:
     def get_node_class(self, node_name: str) -> type["BaseNode"]:
         # This is to avoid importing BaseNode when calling the factory in the cli
         global BaseNode
-        from ..base.node import BaseNode
+        from tergite_autocalibration.lib.base.node import BaseNode
 
         # If the node implementations are not crawled yet, search for them in the nodes module
         if len(self._node_implementation_paths) == 0:
@@ -130,8 +128,11 @@ class NodeFactory:
         return self._node_classes[node_name]
 
     def create_node(
-        self, node_name: str, all_qubits: list[str], **kwargs
+        self, node_name: str, all_qubits: list[str], couplers: list[str], **kwargs
     ) -> "BaseNode":
+        global CouplerNode, QubitNode
+        from tergite_autocalibration.lib.base.node import CouplerNode, QubitNode
+
         # Check whether node class is already inside the dict
         if node_name not in self._node_classes.keys():
             node_cls = self.get_node_class(node_name)
@@ -139,5 +140,13 @@ class NodeFactory:
             node_cls = self._node_classes[node_name]
 
         # Create an instance of the node class
-        node_obj = node_cls(node_name, all_qubits, **kwargs)
+        if issubclass(node_cls, QubitNode):
+            node_obj = node_cls(node_name, all_qubits, **kwargs)
+        elif issubclass(node_cls, CouplerNode):
+            node_obj = node_cls(node_name, couplers, **kwargs)
+        else:
+            raise TypeError(
+                f"Node class {node_cls} is not a subclass of neither QubitNode or CouplerNode."
+            )
+
         return node_obj
