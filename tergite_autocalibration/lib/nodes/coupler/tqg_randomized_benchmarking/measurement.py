@@ -31,7 +31,7 @@ from quantify_scheduler.operations.gate_library import (
 )
 from quantify_scheduler.operations.pulse_library import IdlePulse
 from quantify_scheduler.resources import ClockResource
-from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.utils.two_qubit_clifford_group import (
+from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.utils.clifford_group import (
     TwoQubitClifford,
 )
 
@@ -56,6 +56,7 @@ SPECIAL_COUPLERS = {"q21_q22", "q22_q23", "q23_q24", "q24_q25"}
 GATE_SEPARATION_TIME = 300e-9  # Time between two-qubit gates
 BUFFER_TIME = 20e-9  # Buffer time after gate execution
 IDLE_TIME = 16e-9
+CZ_INDEX = 10_4368  # Index for interleaved CZ gate
 
 
 class TQGRandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
@@ -265,19 +266,30 @@ class TQGRandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
             shot.add(IdlePulse(IDLE_TIME))  # start
 
             # Generate a randomized benchmarking sequence for two qubits
+            # NOTE: Interleaved CZ has index 10_4368
             clifford_seq: NDArray[np.int_] = randomized_benchmarking_sequence(
-                n_cl=n_cl,
-                apply_inverse_gate=apply_inverse_gate,
-                number_of_qubits=2,
-                interleaving_clifford_id=interleaving_clifford_id,
+                number_of_cliffords=n_cl,
+                apply_inverse=apply_inverse_gate,
+                clifford_group=2,
+                interleaved_clifford_idx=interleaving_clifford_id,
                 seed=seed,
             )
 
             shot.add(Reset(*qubit_names))  # reset
 
             # Decompose Clifford sequence into physical gates
-            for clifford_gate_idx in clifford_seq:
-                cl_decomp = TwoQubitClifford(clifford_gate_idx).gate_decomposition
+            for clifford_idx in clifford_seq:
+
+                if clifford_idx == CZ_INDEX:
+                    op = pycqed_operation_map["CZ"](["q0", "q1"])
+                    shot.add(op, rel_time=BUFFER_TIME)
+                    continue
+
+                cl_decomp = TwoQubitClifford(clifford_idx).gate_decomposition
+                if cl_decomp is None:
+                    raise ValueError(
+                        f"Clifford gate {clifford_idx} has no decomposition."
+                    )
 
                 operations = [
                     pycqed_operation_map[gate](q)

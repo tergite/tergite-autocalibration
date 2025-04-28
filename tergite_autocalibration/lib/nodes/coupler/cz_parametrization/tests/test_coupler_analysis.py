@@ -99,7 +99,7 @@ def test_PickLowestCurrent(
         ndarray,
         ndarray,
         ndarray,
-    ]
+    ],
 ):
     ds, list_of_results, freqs, amps, freqs_2, amps_2 = setup_data
     a = CZParametrisationFixDurationCouplerAnalysis("name", ["redis_fields"])
@@ -119,7 +119,7 @@ def test_PickLowestCurrentWithoutBest(
         ndarray,
         ndarray,
         ndarray,
-    ]
+    ],
 ):
     ds, list_of_results, freqs, amps, freqs_2, amps_2 = setup_data
     logger.info(list_of_results[2][0])
@@ -143,7 +143,7 @@ def test_ReturnErrorIfNoGoodPoint(
         ndarray,
         ndarray,
         ndarray,
-    ]
+    ],
 ):
     ds, list_of_results, freqs, amps, freqs_2, amps_2 = setup_data
     logger.info(len(list_of_results))
@@ -163,7 +163,7 @@ def test_PickGoodValueIfSmallestInAbsolute(
         ndarray,
         ndarray,
         ndarray,
-    ]
+    ],
 ):
     ds, list_of_results, freqs, amps, freqs_2, amps_2 = setup_data
     logger.info(len(list_of_results))
@@ -205,7 +205,7 @@ def setup_data_mutliple_files():
 
 
 def test_PickLowestCurrentCompleteAnalysis(
-    setup_data_mutliple_files: tuple[xr.Dataset, ndarray, ndarray]
+    setup_data_mutliple_files: tuple[xr.Dataset, ndarray, ndarray],
 ):
     ds, freqs, amps = setup_data_mutliple_files
     a = CZParametrisationFixDurationCouplerAnalysis("name", ["redis_fields"])
