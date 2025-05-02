@@ -1,0 +1,26 @@
+## Coupler Resonator Spectroscopy 
+
+The coupler resonator spectroscopy is one of the initial steps in characterizing a coupler and preparing for two-qubit gate implementation. This spectroscopy is conducted by varying the current applied to the coupler and measuring the resonator response at each current value.
+The result is a two-dimensional map typically showing regions with a "U" or $\bigcap$ shape when analyzing the minimum values of the resonator spectroscopies. These shapes indicate changes in coupling and are key to identifying crossing points between the resonator and the coupler.
+
+### Measurement class: `ResonatorSpectroscopyMeasurement`
+
+Desctibed in [resonator spectroscopy](nodes/resonator_spectroscopy_node.qmd).
+
+### Analysis classes: 
+
+The `CouplerResonatorSpectroscopyNodeAnalysis` class handles the analysis of all selected couplers and manages the associated plots. In addition to the preview plot that is displayed at run time, the analysis saves a file for each qubit containing all the resonator spectroscopies for debugging purposes.
+
+The `CouplerResonatorSpectroscopyAnalysis` combines the results of the two qubits in a coupler and the saving of the QOI so that the information of the crossing points is saved per qubit per coupler as described in the [base class](developer-quide/new_node_creation.qmd#base-classes) documentation.
+
+The `QubitAnalysisForCouplerResonatorSpectroscopy` performs the analysis of a qubit combining the results of all resonator spectroscopy measurements looking primarely for the crossing points, i.e. the values of the currents at which there is a change of region from U to $\bigcap$; these are the point at which the coupler cross the resonator frequency and can be used to study the properties of the coupler. 
+The main function used is `find_crossing_currents`, which:
+* Cleans the data by removing isolated zeros (representing missing or invalid data) and outliers.
+* Scans the data from left to right, comparing consecutive non-zero values to detect transitions based on a predefined threshold.
+* Groups transitions occurring within a minimum range to mitigate the effect of noise or spurious detections.
+* Determines the crossing point as the average position within each grouped transition region.
+
+In cases where the resonator frequency is high and no "U" shape appears—resulting instead in two connected $\bigcap$ regions—the transition point is inferred from where the two regions meet.
+The current thresholds and interval ranges are optimized for a current step size of 50uA. 
+
+Each individual resonator spectroscopy is performed by the standard `ResonatorSpectroscopyQubitAnalysis` class described in the [resonator spectroscopy node](nodes/resonator_spectroscopy_node.qmd).

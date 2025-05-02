@@ -56,8 +56,8 @@ graph TD
 
 ## Coupler Nodes
 
-- coupler_spectroscopy
-- coupler_resonator_spectroscopy
+- [coupler_spectroscopy](nodes/coupler_spectroscopy_node.qmd)
+- [coupler_resonator_spectroscopy](nodes/coupler_resonator_spectroscopy.qmd)
 
 ## Characterization Nodes
 
