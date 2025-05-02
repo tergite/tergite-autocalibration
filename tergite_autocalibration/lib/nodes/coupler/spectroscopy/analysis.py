@@ -565,7 +565,10 @@ class CouplerResonatorSpectroscopyAnalysis(BaseCouplerAnalysis):
         self.plot_all_fit_q1(axs)
 
         fig.tight_layout()
-        full_path = data_path / f"{self.name}_{self.coupler}_q1_spectroscopies.png"
+        full_path = (
+            data_path
+            / f"{self.name}_{self.coupler}_{self.name_qubit_1}_spectroscopies.png"
+        )
         fig.savefig(full_path, bbox_inches="tight", dpi=200)
 
         fig, axs = plt.subplots(
@@ -577,7 +580,10 @@ class CouplerResonatorSpectroscopyAnalysis(BaseCouplerAnalysis):
         self.plot_all_fit_q2(axs)
 
         fig.tight_layout()
-        full_path = data_path / f"{self.name}_{self.coupler}_q2_spectroscopies.png"
+        full_path = (
+            data_path
+            / f"{self.name}_{self.coupler}_{self.name_qubit_2}_spectroscopies.png"
+        )
         fig.savefig(full_path, bbox_inches="tight", dpi=200)
 
 

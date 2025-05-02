@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Michele Faucci Giannelli 2024
+# (C) Copyright Michele Faucci Giannelli 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -13,8 +13,9 @@
 
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
     CouplerResonatorSpectroscopyNodeAnalysis,
-    CouplerSpectroscopyNodeAnalysis
+    CouplerSpectroscopyNodeAnalysis,
 )
+
 
 def test_CS_node_analysis_can_be_initialized():
     node_analysis = CouplerSpectroscopyNodeAnalysis("name", ["redis_field"])

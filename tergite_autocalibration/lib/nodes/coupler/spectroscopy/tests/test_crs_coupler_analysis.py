@@ -24,15 +24,15 @@ from tergite_autocalibration.lib.base.analysis import (
     BaseCouplerAnalysis,
 )
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
-    CouplerSpectroscopyAnalysis,
+    CouplerResonatorSpectroscopyAnalysis,
 )
 
 from tergite_autocalibration.tests.utils.decorators import with_os_env
 
 
 def test_CanCreate():
-    a = CouplerSpectroscopyAnalysis("name", ["redis_field"])
-    assert isinstance(a, CouplerSpectroscopyAnalysis)
+    a = CouplerResonatorSpectroscopyAnalysis("name", ["redis_field"])
+    assert isinstance(a, CouplerResonatorSpectroscopyAnalysis)
     assert isinstance(a, BaseCouplerAnalysis)
     assert isinstance(a, BaseAnalysis)
 
@@ -53,17 +53,12 @@ def test_get_crossings_for_q06_q07(
     setup_q06_q07_data: tuple[xr.Dataset, str, ndarray, ndarray],
 ):
     ds, coupler = setup_q06_q07_data
-    a = CouplerSpectroscopyAnalysis("name", ["redis_fields"])
+    a = CouplerResonatorSpectroscopyAnalysis("name", ["redis_fields"])
     qoi = a.setup_coupler_and_analyze(ds, coupler)
 
     crossings = qoi["qubit_crossing_points"]
-    assert crossings["q06"] == pytest.approx(
-        [-0.001925, -0.0011, 0.001375, 0.0022], abs=1e-6
-    )
-    assert crossings["q07"] == pytest.approx(
-        [-0.002025, -0.001, 0.00128, 0.0023],
-        abs=1e-6,
-    )
+    assert crossings["q06"] == pytest.approx([-0.000425, 0.000675], abs=1e-6)
+    assert crossings["q07"] == pytest.approx([-0.00025, 0.000525], abs=1e-6)
 
 
 @pytest.fixture(autouse=False)
@@ -82,17 +77,12 @@ def test_get_crossings_for_q08_q09(
     setup_q08_q09_data: tuple[xr.Dataset, str, ndarray, ndarray],
 ):
     ds, coupler = setup_q08_q09_data
-    a = CouplerSpectroscopyAnalysis("name", ["redis_fields"])
+    a = CouplerResonatorSpectroscopyAnalysis("name", ["redis_fields"])
     qoi = a.setup_coupler_and_analyze(ds, coupler)
 
     crossings = qoi["qubit_crossing_points"]
-    assert crossings["q08"] == pytest.approx(
-        [-0.00215, -0.00135, 0.001325, 0.002108], abs=1e-6
-    )
-    assert crossings["q09"] == pytest.approx(
-        [-0.0023357, -0.001165, 0.0011375, 0.002275],
-        abs=1e-6,
-    )
+    assert crossings["q08"] == pytest.approx([-0.0008, 0.00075], abs=1e-6)
+    assert crossings["q09"] == pytest.approx([0], abs=1e-6)
 
 
 @pytest.fixture(autouse=False)
@@ -111,17 +101,12 @@ def test_get_crossings_for_q12_q13(
     setup_q12_q13_data: tuple[xr.Dataset, str, ndarray, ndarray],
 ):
     ds, coupler = setup_q12_q13_data
-    a = CouplerSpectroscopyAnalysis("name", ["redis_fields"])
+    a = CouplerResonatorSpectroscopyAnalysis("name", ["redis_fields"])
     qoi = a.setup_coupler_and_analyze(ds, coupler)
 
     crossings = qoi["qubit_crossing_points"]
-    assert crossings["q12"] == pytest.approx(
-        [-0.00195, -0.00105, 0.001475, 0.002375], abs=1e-6
-    )
-    assert crossings["q13"] == pytest.approx(
-        [-0.002125, 0.001375],
-        abs=1e-6,
-    )
+    assert crossings["q12"] == pytest.approx([-0.000425, 0.000825], abs=1e-6)
+    assert crossings["q13"] == pytest.approx([0.0002], abs=1e-6)
 
 
 @pytest.fixture(autouse=False)
@@ -140,19 +125,19 @@ def test_get_crossings_for_q14_q15(
     setup_q14_q15_data: tuple[xr.Dataset, str, ndarray, ndarray],
 ):
     ds, coupler = setup_q14_q15_data
-    a = CouplerSpectroscopyAnalysis("name", ["redis_fields"])
+    a = CouplerResonatorSpectroscopyAnalysis("name", ["redis_fields"])
     qoi = a.setup_coupler_and_analyze(ds, coupler)
 
     crossings = qoi["qubit_crossing_points"]
-    assert crossings["q14"] == pytest.approx([-0.0018, -0.00095, 0.00165], abs=1e-6)
-    assert crossings["q15"] == pytest.approx([-0.00185, -0.000825, 0.00155], abs=1e-6)
+    assert crossings["q14"] == pytest.approx([-0.00025, 0.000925], abs=1e-6)
+    assert crossings["q15"] == pytest.approx([0.00025], abs=1e-6)
 
 
 @with_os_env({"DATA_DIR": str(Path(__file__).parent / "results")})
 def test_coupler_plot_is_created(setup_q06_q07_data):
     matplotlib.use("Agg")
     ds, coupler = setup_q06_q07_data
-    a = CouplerSpectroscopyAnalysis("name", ["redis_fields"])
+    a = CouplerResonatorSpectroscopyAnalysis("name", ["redis_fields"])
     a.setup_coupler_and_analyze(ds, coupler)
 
     figure_path = os.environ["DATA_DIR"] + "/Coupler_Spectroscopy.png"
@@ -177,14 +162,15 @@ def test_coupler_plot_is_created(setup_q06_q07_data):
 def test_qubit_spectroscopies_for_coupler_are_created(setup_q06_q07_data):
     matplotlib.use("Agg")
     ds, coupler = setup_q06_q07_data
-    a = CouplerSpectroscopyAnalysis("name", ["redis_fields"])
+    a = CouplerResonatorSpectroscopyAnalysis("name", ["redis_fields"])
     a.setup_coupler_and_analyze(ds, coupler)
 
     path = Path(os.environ["DATA_DIR"])
     a.plot_spectroscopies(path)
 
     figure_1_path = (
-        os.environ["DATA_DIR"] + "/coupler_spectroscopy_q06_q07_q06_spectroscopies.png"
+        os.environ["DATA_DIR"]
+        + "/coupler_resonator_spectroscopy_q06_q07_q06_spectroscopies.png"
     )
     assert os.path.exists(figure_1_path)
     from PIL import Image
@@ -193,7 +179,8 @@ def test_qubit_spectroscopies_for_coupler_are_created(setup_q06_q07_data):
         assert img.format == "PNG", "File should be a PNG image"
 
     figure_2_path = (
-        os.environ["DATA_DIR"] + "/coupler_spectroscopy_q06_q07_q07_spectroscopies.png"
+        os.environ["DATA_DIR"]
+        + "/coupler_resonator_spectroscopy_q06_q07_q07_spectroscopies.png"
     )
     assert os.path.exists(figure_2_path)
     from PIL import Image
