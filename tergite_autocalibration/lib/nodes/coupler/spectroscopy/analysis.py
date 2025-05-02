@@ -12,6 +12,7 @@
 # that they have been altered from the originals.
 
 import ast
+from pathlib import Path
 from typing import List
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
@@ -459,7 +460,7 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
         for i, ana in enumerate(self.q2_analysis.spectroscopy_analyses):
             ana.plotter(axs[int(i / self.columns), i % self.columns])
 
-    def plot_spectroscopies(self, data_path):
+    def plot_spectroscopies(self, data_path: Path):
         n_analyses = len(self.q1_analysis.spectroscopy_analyses)
         self.columns = int(np.ceil(np.sqrt(n_analyses)))
         fig_size = 20 * self.columns / 4
@@ -553,7 +554,7 @@ class CouplerResonatorSpectroscopyAnalysis(BaseCouplerAnalysis):
         for i, ana in enumerate(self.q2_analysis.spectroscopy_analyses):
             ana.plotter(axs[int(i / 4), i % 4])
 
-    def plot_spectroscopies(self, data_path):
+    def plot_spectroscopies(self, data_path: Path):
         n_analyses = len(self.q1_analysis.spectroscopy_analyses)
         fig, axs = plt.subplots(
             nrows=int(np.ceil(n_analyses / 4)),
