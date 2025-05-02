@@ -3,6 +3,7 @@
 # (C) Copyright Eleftherios Moschandreou 2023, 2024
 # (C) Copyright Liangyu Chen 2023, 2024
 # (C) Copyright Michele Faucci Giannelli 2024
+# (C) Copyright Joel Sandås 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -26,6 +27,7 @@ from tergite_autocalibration.lib.base.analysis import (
     BaseQubitAnalysis,
 )
 from tergite_autocalibration.utils.dto.qoi import QOI
+from tergite_autocalibration.utils.logging import logger
 
 
 # TODO: this is flagged for removal
@@ -131,6 +133,90 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
         ax.set_title(f"Qubit Spectroscopy for {self.qubit}")
         ax.set_xlabel("frequency (Hz)")
         ax.set_ylabel("|S21| (V)")
+        ax.grid()
+
+
+class QubitSpectroscopyAnalysisForCouplerSpectroscopy(BaseQubitAnalysis):
+    """
+    Analysis that finds the maximum value in qubit spectroscopy data.
+    """
+
+    SIGNIFICANCE_THRESHOLD = 2.7
+
+    def __init__(self, name, redis_fields, current):
+        super().__init__(name, redis_fields)
+        self.analysis_results = {}
+        self.is_bad_value = False
+        self.current = current
+
+    def _analyse_spectroscopy(self):
+        for coord in self.dataset[self.data_var].coords:
+            if "frequencies" in coord:
+                self.frequencies = coord
+
+        self.frequencies_value = self.dataset[self.frequencies].values
+
+        magnitudes = self.magnitudes.to_dataarray().values.flatten()
+        self.max_value = np.max(magnitudes)
+        self.max_index = np.argmax(magnitudes)
+
+        mean_value = np.mean(magnitudes)
+        std_value = np.std(magnitudes)
+
+        self.max_significance = abs((self.max_value - mean_value) / std_value)
+
+        if self.max_significance < self.SIGNIFICANCE_THRESHOLD:
+            self.is_bad_value = True
+            logger.warning(
+                "This spectroscopy doeas not have a proper maximum, it is ok if this is in a transition region in the coupler spectroscopy"
+            )
+            self.freq = 0
+        else:
+            self.freq = self.frequencies_value[self.max_index]
+        self.uncertainty = None
+
+    def analyse_qubit(self):
+        self._analyse_spectroscopy()
+        analysis_successful = True
+        analysis_result = {
+            "clock_freqs:f01": {
+                "value": self.freq,
+                "error": self.uncertainty,
+            },
+        }
+        qoi = QOI(analysis_result, analysis_successful)
+        return qoi
+
+    def plotter(self, ax):
+        x_dataarray = self.magnitudes.to_dataarray()
+        x = x_dataarray.values.flatten()
+
+        ax.plot(self.frequencies_value, x, "bo-", ms=1.5, lw=0.8)
+
+        if not self.is_bad_value:
+            ax.axvline(
+                self.freq,
+                color="r",
+                linestyle="--",
+                label=f"Current: {self.current*1000:.2f}[mA]\nMax @ {self.max_significance:.1f}",
+            )
+
+        if self.is_bad_value:
+            ax.scatter(
+                self.frequencies_value[self.max_index],
+                self.max_value,
+                color="red",
+                marker="x",
+                s=100,
+                linewidth=2,
+                label=f"Current: {self.current*1000:.1f}[mA]\nMax @ {self.max_significance:.1f}",
+            )
+
+        ax.set_title(f"Qubit Spectroscopy for {self.qubit}", fontsize=8)
+        ax.set_xlabel("Frequency (Hz)", fontsize=6)
+        ax.set_ylabel("|S21| (V)", fontsize=6)
+
+        ax.legend(fontsize=6, loc="upper right")
         ax.grid()
 
 

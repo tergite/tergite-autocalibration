@@ -1,7 +1,7 @@
 # This code is part of Tergite
 #
 # (C) Copyright Eleftherios Moschandreou 2023, 2024
-# (C) Copyright Michele Faucci Giannelli 2024
+# (C) Copyright Michele Faucci Giannelli 2024, 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -18,6 +18,7 @@ import quantify_scheduler.backends.qblox.constants as constants
 from quantify_scheduler.backends import SerialCompiler
 
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
+    CouplerResonatorSpectroscopyNodeAnalysis,
     CouplerSpectroscopyNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.external_parameter_node import (
@@ -41,23 +42,14 @@ from tergite_autocalibration.utils.logging import logger
 class CouplerSpectroscopyNode(ExternalParameterFixedScheduleCouplerNode):
     measurement_obj = TwoTonesMultidimMeasurement
     analysis_obj = CouplerSpectroscopyNodeAnalysis
-    coupler_qois = ["parking_current", "current_range"]
+    # coupler_qois = ["parking_current"]
+    coupler_qois = ["qubit_crossing_points"]
 
     def __init__(self, name: str, couplers: list[str], **schedule_keywords):
         super().__init__(name, couplers, **schedule_keywords)
-        self.name = name
-        self.couplers = couplers
         self.qubit_state = 0
+        self.dacs = []
         self.schedule_keywords["qubit_state"] = self.qubit_state
-        self.coupled_qubits = self.get_coupled_qubits()
-        self.coupler = self.couplers[0]
-
-        # This should go in node or in measurement
-        self.mode = MeasurementMode.real
-        self.spi_dac = SpiDAC(self.mode)
-        self.dac = self.spi_dac.create_spi_dac(self.coupler)
-
-        self.all_qubits = self.coupled_qubits
 
         self.schedule_samplespace = {
             "spec_frequencies": {
@@ -66,24 +58,20 @@ class CouplerSpectroscopyNode(ExternalParameterFixedScheduleCouplerNode):
         }
 
         self.external_samplespace = {
-            "dc_currents": {self.coupler: np.arange(-2.5e-4, 2.5e-4, 280e-6)},
+            "dc_currents": {
+                coupler: np.arange(-2.5e-3, 2.5e-3, 50e-6) for coupler in self.couplers
+            },
         }
         self.validate()
 
+    def pre_measurement_operation(self, reduced_ext_space):
+        self.spi_dac.ramp_current_serially(reduced_ext_space["dc_currents"])
+
     def calibrate(self, data_path: Path, cluster_status):
         if cluster_status == MeasurementMode.real:
-            self.spi_dac = SpiDAC(cluster_status)
+            self.spi_dac = SpiDAC(self.couplers, cluster_status)
 
         super().calibrate(data_path, cluster_status)
-
-    def pre_measurement_operation(self, reduced_ext_space):
-        iteration_dict = reduced_ext_space["dc_currents"]
-        # there is some redundancy tha all qubits have the same
-        # iteration index, that's why we keep the first value->
-
-        this_iteration_value = list(iteration_dict.values())[0]
-        logger.info(f"{ this_iteration_value = }")
-        self.spi_dac.set_dac_current(self.dac, this_iteration_value)
 
     def precompile(self, schedule_samplespace: dict) -> CompiledSchedule:
         constants.GRID_TIME_TOLERANCE_TIME = 5e-2
@@ -111,26 +99,20 @@ class CouplerSpectroscopyNode(ExternalParameterFixedScheduleCouplerNode):
         return compiled_schedule
 
     def final_operation(self):
-        logger.info("Final Operation")
-        self.spi_dac.set_dac_current(self.dac, 0)
+        logger.info("Final operation")
+        self.spi_dac.close_spi_rack()
 
 
 class CouplerResonatorSpectroscopyNode(ExternalParameterFixedScheduleCouplerNode):
     measurement_obj = ResonatorSpectroscopyMeasurement
-    analysis_obj = CouplerSpectroscopyNodeAnalysis
-    coupler_qois = ["resonator_flux_quantum"]
+    analysis_obj = CouplerResonatorSpectroscopyNodeAnalysis
+    # coupler_qois = ["resonator_flux_quantum"]
+    coupler_qois = ["resonator_crossing_points"]
 
     def __init__(self, name: str, couplers: list[str], **schedule_keywords):
         super().__init__(name, couplers, **schedule_keywords)
         self.qubit_state = 0
-        self.couplers = couplers
-        self.coupler = self.couplers[0]
-        mode = MeasurementMode.real
-        self.spi_dac = SpiDAC(mode)
-        self.dac = self.spi_dac.create_spi_dac(self.coupler)
-        self.coupled_qubits = self.get_coupled_qubits()
-
-        self.all_qubits = self.coupled_qubits
+        self.dacs = []
 
         self.schedule_samplespace = {
             "ro_frequencies": {
@@ -139,24 +121,20 @@ class CouplerResonatorSpectroscopyNode(ExternalParameterFixedScheduleCouplerNode
         }
 
         self.external_samplespace = {
-            "dc_currents": {self.coupler: np.arange(-2.5e-3, 2.5e-3, 500e-6)},
+            "dc_currents": {
+                coupler: np.arange(-1e-3, 1e-3, 50e-6) for coupler in self.couplers
+            },
         }
         self.validate()
 
+    def pre_measurement_operation(self, reduced_ext_space):
+        self.spi_dac.ramp_current_serially(reduced_ext_space["dc_currents"])
+
     def calibrate(self, data_path: Path, cluster_status):
         if cluster_status == MeasurementMode.real:
-            self.spi_dac = SpiDAC(cluster_status)
+            self.spi_dac = SpiDAC(self.couplers, cluster_status)
 
         super().calibrate(data_path, cluster_status)
-
-    def pre_measurement_operation(self, reduced_ext_space):
-        iteration_dict = reduced_ext_space["dc_currents"]
-        # there is some redundancy tha all qubits have the same
-        # iteration index, that's why we keep the first value->
-
-        this_iteration_value = list(iteration_dict.values())[0]
-        logger.info(f"{ this_iteration_value = }")
-        self.spi_dac.set_dac_current(self.dac, this_iteration_value)
 
     def precompile(self, schedule_samplespace: dict) -> CompiledSchedule:
         constants.GRID_TIME_TOLERANCE_TIME = 5e-2
@@ -184,5 +162,5 @@ class CouplerResonatorSpectroscopyNode(ExternalParameterFixedScheduleCouplerNode
         return compiled_schedule
 
     def final_operation(self):
-        logger.info("Final Operation")
-        self.spi_dac.set_dac_current(self.dac, 0)
+        logger.info("Final operation")
+        self.spi_dac.close_spi_rack()
