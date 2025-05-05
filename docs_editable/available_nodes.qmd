@@ -13,6 +13,7 @@ graph TD
     G --> H2(3 States Discrimination)
     A --> I(Coupler resonator spectroscopy)
     B --> J(Coupler spectroscopy)
+    I --> J
         
     click A href "nodes/resonator_spectroscopy_node.html"
     click B href "nodes/qubit_spectroscopy_node.html"
