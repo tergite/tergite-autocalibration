@@ -76,7 +76,7 @@ class T1QubitAnalysis(BaseQubitAnalysis):
         self.average_T1 = np.mean(self.T1_times)
         self.error = np.std(self.T1_times)
 
-        analysis_succesful = True
+        analysis_successful = True
 
         analysis_result = {
             "t1_time": {
@@ -85,7 +85,7 @@ class T1QubitAnalysis(BaseQubitAnalysis):
             }
         }
 
-        qoi = QOI(analysis_result, analysis_succesful)
+        qoi = QOI(analysis_result, analysis_successful)
 
         return qoi
 

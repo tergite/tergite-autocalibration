@@ -32,6 +32,7 @@ from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
 from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
 
 from tergite_autocalibration.config.globals import PLOTTING_BACKEND
+from tergite_autocalibration.lib.utils.redis import update_redis_trusted_values
 from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
@@ -207,6 +208,9 @@ class BaseNode(abc.ABC):
             self.name, self.redis_fields, **analysis_kwargs
         )
         self._results = node_analysis.analyze_node(data_path)
+        for element_id_, qois_ in self._results.items():
+            update_redis_trusted_values(self.name, element_id_, qoi=qois_)
+        return self._results
 
     def configure_dataset(
         self,
