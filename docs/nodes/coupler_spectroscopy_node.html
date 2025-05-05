@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Tergite Automatic Calibration</title>
+<title>coupler_spectroscopy_node – Tergite Automatic Calibration</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,24 +23,24 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -68,6 +68,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -78,7 +107,7 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./">
+    <a class="navbar-brand" href="../">
     <span class="navbar-title">Tergite Automatic Calibration</span>
     </a>
   </div>
@@ -88,23 +117,23 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./index.html" aria-current="page"> 
+    <a class="nav-link active" href="../index.html" aria-current="page"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./getting_started.html"> 
+    <a class="nav-link" href="../getting_started.html"> 
 <span class="menu-text">User Guide</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./available_nodes.html"> 
+    <a class="nav-link" href="../available_nodes.html"> 
 <span class="menu-text">Node Library</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./developer_guide.html"> 
+    <a class="nav-link" href="../developer_guide.html"> 
 <span class="menu-text">Developer Guide</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./troubleshooting.html"> 
+    <a class="nav-link" href="../troubleshooting.html"> 
 <span class="menu-text">Troubleshooting</span></a>
   </li>  
 </ul>
@@ -120,7 +149,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">Home</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -142,7 +171,7 @@ ul.task-list li input[type="checkbox"] {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link active">
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Home</span></a>
   </div>
 </li>
@@ -157,19 +186,19 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./getting_started.html" class="sidebar-item-text sidebar-link">
+  <a href="../getting_started.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Getting started</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/configuration_files.html" class="sidebar-item-text sidebar-link">
+  <a href="../user-guide/configuration_files.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Configuration Files</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/operation.html" class="sidebar-item-text sidebar-link">
+  <a href="../user-guide/operation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Operation</span></a>
   </div>
 </li>
@@ -186,19 +215,19 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./available_nodes.html" class="sidebar-item-text sidebar-link">
+  <a href="../available_nodes.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Overview</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nodes/resonator_spectroscopy_node.html" class="sidebar-item-text sidebar-link">
+  <a href="../nodes/resonator_spectroscopy_node.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Resonator spectroscopy</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nodes/qubit_spectroscopy_node.html" class="sidebar-item-text sidebar-link">
+  <a href="../nodes/qubit_spectroscopy_node.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Qubit spectroscopy</span></a>
   </div>
 </li>
@@ -215,43 +244,43 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./developer_guide.html" class="sidebar-item-text sidebar-link">
+  <a href="../developer_guide.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Introduction</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./developer-guide/node_classes.html" class="sidebar-item-text sidebar-link">
+  <a href="../developer-guide/node_classes.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Node Classes</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./developer-guide/new_node_creation.html" class="sidebar-item-text sidebar-link">
+  <a href="../developer-guide/new_node_creation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Create a new node</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./developer-guide/unit_tests.html" class="sidebar-item-text sidebar-link">
+  <a href="../developer-guide/unit_tests.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Unit tests</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./developer-guide/logging.html" class="sidebar-item-text sidebar-link">
+  <a href="../developer-guide/logging.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Logging</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./developer-guide/debugging.html" class="sidebar-item-text sidebar-link">
+  <a href="../developer-guide/debugging.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Debugging</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./developer-guide/writing_documentation.html" class="sidebar-item-text sidebar-link">
+  <a href="../developer-guide/writing_documentation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Writing documentation</span></a>
   </div>
 </li>
@@ -259,7 +288,7 @@ ul.task-list li input[type="checkbox"] {
   </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./troubleshooting.html" class="sidebar-item-text sidebar-link">
+  <a href="../troubleshooting.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Troubleshooting</span></a>
   </div>
 </li>
@@ -273,11 +302,10 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#documentation-of-the-tergite-automatic-calibration" id="toc-documentation-of-the-tergite-automatic-calibration" class="nav-link active" data-scroll-target="#documentation-of-the-tergite-automatic-calibration">Documentation of the Tergite Automatic Calibration</a>
+  <li><a href="#coupler-spectroscopy" id="toc-coupler-spectroscopy" class="nav-link active" data-scroll-target="#coupler-spectroscopy">Coupler Spectroscopy</a>
   <ul class="collapse">
-  <li><a href="#user-guide" id="toc-user-guide" class="nav-link" data-scroll-target="#user-guide">User Guide</a></li>
-  <li><a href="#node-library" id="toc-node-library" class="nav-link" data-scroll-target="#node-library">Node Library</a></li>
-  <li><a href="#developer-guide" id="toc-developer-guide" class="nav-link" data-scroll-target="#developer-guide">Developer Guide</a></li>
+  <li><a href="#measurement-class-twotonesmultidimmeasurement" id="toc-measurement-class-twotonesmultidimmeasurement" class="nav-link" data-scroll-target="#measurement-class-twotonesmultidimmeasurement">Measurement class: <code>TwoTonesMultidimMeasurement</code></a></li>
+  <li><a href="#analysis-classes" id="toc-analysis-classes" class="nav-link" data-scroll-target="#analysis-classes">Analysis classes:</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -288,30 +316,19 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<section id="documentation-of-the-tergite-automatic-calibration" class="level1">
-<h1>Documentation of the Tergite Automatic Calibration</h1>
-<p>The tergite-autocalibration is a toolkit to ease calibrating quantum devices for superconducting platforms. The project contains an orchestration manager, a collection of calibration schedules and a collection of post-processing and analysis routines. It is tailored to tune-up the 25 qubits QPU at Chalmers, which is receiving generous funding by the Wallenberg Centre for Quantum Technology (<a href="https://wacqt.se">WACQT</a>) for research, development and operation.</p>
-<section id="user-guide" class="level3">
-<h3 class="anchored" data-anchor-id="user-guide"><a href="./getting_started.html">User Guide</a></h3>
-<p>A tutorial on how to get started with the automatic calibration. This tutorial contains a guide on how to use the commandline interface with quick commands. Further, there is an introduction into configuration files.</p>
-<ul>
-<li><a href="./getting_started.html">Getting started</a></li>
-<li><a href="./user-guide/operation.html">Operation</a></li>
-<li><a href="./user-guide/configuration_files.html">Configuration Files</a></li>
-</ul>
+<section id="coupler-spectroscopy" class="level2">
+<h2 class="anchored" data-anchor-id="coupler-spectroscopy">Coupler Spectroscopy</h2>
+<p>The coupler spectroscopy is one of the initial steps in characterizing a coupler and preparing for two-qubit gate implementation. This spectroscopy is performed by varying the current applied to the coupler and measuring the qubit response at each current. The result is a two-dimensional map typically showing regions with a “U” or <span class="math inline">\(\bigcap\)</span> shape when analyzing the maximum values of the qubit spectroscopies. These shapes indicate changes in coupling and are key to identifying crossing points between the qubit and the coupler.</p>
+<section id="measurement-class-twotonesmultidimmeasurement" class="level3">
+<h3 class="anchored" data-anchor-id="measurement-class-twotonesmultidimmeasurement">Measurement class: <code>TwoTonesMultidimMeasurement</code></h3>
+<p>Desctibed in <a href="nodes/qubit_spectroscopy_node.qmd">qubit spectroscopy</a>.</p>
 </section>
-<section id="node-library" class="level3">
-<h3 class="anchored" data-anchor-id="node-library"><a href="./available_nodes.html">Node Library</a></h3>
-<p>The main principle behind the automatic calibration is based on calibrating nodes in a graph structure. A node contains all the measurement and analysis classes to find the quantity of interest - for qubits and couplers. If you are interested in implementing a new node, it might be worth it to check whether there are existing nodes that you can use to find the qubit properties you are looking to calibrate.</p>
-</section>
-<section id="developer-guide" class="level3">
-<h3 class="anchored" data-anchor-id="developer-guide"><a href="./developer_guide.html">Developer Guide</a></h3>
-<p>This repository is an actively developed open-source project and also part of the <a href="https://tergite.github.io">Tergite</a> full-stack software ecosystem to operate a quantum computer. Hence, you are more than welcome to contribute to the project with your own ideas that fit into the framework. To familiarize yourself with the existing classes and the architecture of the automatic calibration, please take a look into the development guide. Here, you can also find best practices and information about our design philosophy.</p>
-<ul>
-<li><a href="./developer-guide/new_node_creation.html">Create node classes</a></li>
-<li><a href="./developer-guide/unit_tests.html">Write unit tests</a></li>
-<li><a href="./developer-guide/writing_documentation.html">Documentation guidelines</a></li>
-</ul>
+<section id="analysis-classes" class="level3">
+<h3 class="anchored" data-anchor-id="analysis-classes">Analysis classes:</h3>
+<p>The <code>CouplerSpectroscopyNodeAnalysis</code> class handles the analysis of all selected couplers and manages the associated plots. In addition to the preview plot that is displayed at run time, the analysis saves a file for each qubit containing all the resonator spectroscopies for debugging purposes.</p>
+<p>The <code>CouplerSpectroscopyAnalysis</code> combines the results of the two qubits in a coupler and the saving of the QOI so that the information of the crossing points is saved per qubit per coupler as described in the <a href="developer-quide/new_node_creation.qmd#base-classes">base class</a> documentation.</p>
+<p>The <code>QubitAnalysisForCouplerSpectroscopy</code> performs the analysis of a qubit combining the results of all qubit spectroscopy measurements looking primarily for the crossing points, i.e.&nbsp;the values of the currents at which there is a change of region from U to <span class="math inline">\(\bigcap\)</span>; these are the point at which the coupler crosses the qubit frequency and can be used to study the properties of the coupler. The main function used is <code>find_crossing_currents</code>, which: * Cleans the data by removing isolated zeros (representing missing or invalid data) and outliers. * Scans the data from left to right, comparing consecutive non-zero values to detect transitions based on a predefined threshold. * Groups transitions occurring within a minimum range to mitigate the effect of noise or spurious detections. * Determines the crossing point as the average position within each grouped transition region. * If a crossing is within a small distance from the coupler-resonator crossing (determined in the <a href="coupler_resonator_spectroscopy.qmd">coupler reconator spectroscopy</a> node), then is excluded. The current thresholds and interval ranges are optimized for a current step size of 50uA.</p>
+<p>The analysis of each qubit spectroscopy is performed in a dedicated analysis class, the <code>QubitSpectroscopyAnalysisForCouplerSpectroscopy</code> stored in the analysis file of the spectropy folder in the qubit_control folder. This analysis differs from the standard qubit spectroscopy analysis in that it does not attempt to fit the spectrum using a Lorentzian function. This choice is intentional, as the spectral shape near a crossing is often distorted or lacks a clear peak, making fitting unreliable. Instead, the analysis identifies the maximum point in the spectrum and evaluates its significance using a relevance metric defined as (max - mean) / RMS. If the peak is below threshold, zero is returned instead of the maximum value. The current hardcoded threshold (2.7) is rather conservative and was optimized for analysis with poor qubit spectroscopies, i.e.&nbsp;having multiple peaks instead of a clean one. For well calibrated systems this threshold can be raised up to 3.3 or even higher.</p>
 
 
 </section>

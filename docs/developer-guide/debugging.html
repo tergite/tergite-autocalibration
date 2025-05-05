@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Tergite Automatic Calibration</title>
+<title>debugging – Tergite Automatic Calibration</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,27 +20,61 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -78,7 +112,7 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./">
+    <a class="navbar-brand" href="../">
     <span class="navbar-title">Tergite Automatic Calibration</span>
     </a>
   </div>
@@ -88,23 +122,23 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./index.html" aria-current="page"> 
+    <a class="nav-link active" href="../index.html" aria-current="page"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./getting_started.html"> 
+    <a class="nav-link" href="../getting_started.html"> 
 <span class="menu-text">User Guide</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./available_nodes.html"> 
+    <a class="nav-link" href="../available_nodes.html"> 
 <span class="menu-text">Node Library</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./developer_guide.html"> 
+    <a class="nav-link" href="../developer_guide.html"> 
 <span class="menu-text">Developer Guide</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./troubleshooting.html"> 
+    <a class="nav-link" href="../troubleshooting.html"> 
 <span class="menu-text">Troubleshooting</span></a>
   </li>  
 </ul>
@@ -120,7 +154,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">Home</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../developer_guide.html">Developer Guide</a></li><li class="breadcrumb-item"><a href="../developer-guide/debugging.html">Debugging</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -142,7 +176,7 @@ ul.task-list li input[type="checkbox"] {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link active">
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Home</span></a>
   </div>
 </li>
@@ -157,19 +191,19 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./getting_started.html" class="sidebar-item-text sidebar-link">
+  <a href="../getting_started.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Getting started</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/configuration_files.html" class="sidebar-item-text sidebar-link">
+  <a href="../user-guide/configuration_files.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Configuration Files</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/operation.html" class="sidebar-item-text sidebar-link">
+  <a href="../user-guide/operation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Operation</span></a>
   </div>
 </li>
@@ -186,19 +220,19 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./available_nodes.html" class="sidebar-item-text sidebar-link">
+  <a href="../available_nodes.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Overview</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nodes/resonator_spectroscopy_node.html" class="sidebar-item-text sidebar-link">
+  <a href="../nodes/resonator_spectroscopy_node.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Resonator spectroscopy</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nodes/qubit_spectroscopy_node.html" class="sidebar-item-text sidebar-link">
+  <a href="../nodes/qubit_spectroscopy_node.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Qubit spectroscopy</span></a>
   </div>
 </li>
@@ -215,43 +249,43 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./developer_guide.html" class="sidebar-item-text sidebar-link">
+  <a href="../developer_guide.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Introduction</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./developer-guide/node_classes.html" class="sidebar-item-text sidebar-link">
+  <a href="../developer-guide/node_classes.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Node Classes</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./developer-guide/new_node_creation.html" class="sidebar-item-text sidebar-link">
+  <a href="../developer-guide/new_node_creation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Create a new node</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./developer-guide/unit_tests.html" class="sidebar-item-text sidebar-link">
+  <a href="../developer-guide/unit_tests.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Unit tests</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./developer-guide/logging.html" class="sidebar-item-text sidebar-link">
+  <a href="../developer-guide/logging.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Logging</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./developer-guide/debugging.html" class="sidebar-item-text sidebar-link">
+  <a href="../developer-guide/debugging.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Debugging</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./developer-guide/writing_documentation.html" class="sidebar-item-text sidebar-link">
+  <a href="../developer-guide/writing_documentation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Writing documentation</span></a>
   </div>
 </li>
@@ -259,7 +293,7 @@ ul.task-list li input[type="checkbox"] {
   </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./troubleshooting.html" class="sidebar-item-text sidebar-link">
+  <a href="../troubleshooting.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Troubleshooting</span></a>
   </div>
 </li>
@@ -273,11 +307,12 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#documentation-of-the-tergite-automatic-calibration" id="toc-documentation-of-the-tergite-automatic-calibration" class="nav-link active" data-scroll-target="#documentation-of-the-tergite-automatic-calibration">Documentation of the Tergite Automatic Calibration</a>
+  <li><a href="#debugging" id="toc-debugging" class="nav-link active" data-scroll-target="#debugging">Debugging</a>
   <ul class="collapse">
-  <li><a href="#user-guide" id="toc-user-guide" class="nav-link" data-scroll-target="#user-guide">User Guide</a></li>
-  <li><a href="#node-library" id="toc-node-library" class="nav-link" data-scroll-target="#node-library">Node Library</a></li>
-  <li><a href="#developer-guide" id="toc-developer-guide" class="nav-link" data-scroll-target="#developer-guide">Developer Guide</a></li>
+  <li><a href="#print-statements-or-loggers" id="toc-print-statements-or-loggers" class="nav-link" data-scroll-target="#print-statements-or-loggers">Print statements or loggers</a></li>
+  <li><a href="#breakpoints" id="toc-breakpoints" class="nav-link" data-scroll-target="#breakpoints">Breakpoints</a></li>
+  <li><a href="#graphical-debugger" id="toc-graphical-debugger" class="nav-link" data-scroll-target="#graphical-debugger">Graphical debugger</a></li>
+  <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps">Next steps:</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -288,29 +323,107 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<section id="documentation-of-the-tergite-automatic-calibration" class="level1">
-<h1>Documentation of the Tergite Automatic Calibration</h1>
-<p>The tergite-autocalibration is a toolkit to ease calibrating quantum devices for superconducting platforms. The project contains an orchestration manager, a collection of calibration schedules and a collection of post-processing and analysis routines. It is tailored to tune-up the 25 qubits QPU at Chalmers, which is receiving generous funding by the Wallenberg Centre for Quantum Technology (<a href="https://wacqt.se">WACQT</a>) for research, development and operation.</p>
-<section id="user-guide" class="level3">
-<h3 class="anchored" data-anchor-id="user-guide"><a href="./getting_started.html">User Guide</a></h3>
-<p>A tutorial on how to get started with the automatic calibration. This tutorial contains a guide on how to use the commandline interface with quick commands. Further, there is an introduction into configuration files.</p>
+<section id="debugging" class="level1">
+<h1>Debugging</h1>
+<p>Debugging in programming is the process of identifying, analyzing, and fixing errors (bugs) in a computer program. It involves running the code, detecting issues, and correcting them to ensure the program behaves as expected.</p>
+<p>Knowing how to debug can also make you understand a new code base faster and with more ease. In the following, there are a three debugging techniques, explained with advantages and disadvantages.</p>
 <ul>
-<li><a href="./getting_started.html">Getting started</a></li>
-<li><a href="./user-guide/operation.html">Operation</a></li>
-<li><a href="./user-guide/configuration_files.html">Configuration Files</a></li>
+<li>Print statements or loggers</li>
+<li>Breakpoints</li>
+<li>Graphical debugger</li>
+</ul>
+<p>This guide should help you to get a first insight into debugging and can be a starting point before searching the internet for more information about advanced techniques.</p>
+<section id="print-statements-or-loggers" class="level3">
+<h3 class="anchored" data-anchor-id="print-statements-or-loggers">Print statements or loggers</h3>
+<p>The most easy way to find out what an application is doing, is by adding print statements or logging to the code. Let us say we are having the following code:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">'__main__'</span>:</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> x <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Adding the print statement like this is the most intuitive way to find out more about the state of our application. Likewise, the print statement can also be replaced by a logger on a very low verbosity to catch all related debugging messages.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tergite_autocalibration.utils.logging <span class="im">import</span> logger</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>logger.debug(<span class="st">"A message to be only printed while debugging the application."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Consider reading more about the <a href="../developer-guide/logging.html">logger</a> before starting.</p>
+<p><strong>Advantages</strong></p>
+<ul>
+<li>It is very easy to add the print statement.</li>
+<li>You can easily add print statements even when you are using console based editors.</li>
+</ul>
+<p><strong>Disadvantages</strong></p>
+<ul>
+<li>If you add too many print statements, the console output can become very verbose</li>
+<li>You have to know in advance what you want to print. Let us say, in the example above, you wanted to print <code>y</code> as well and it would take a long time to compute other things before you reach <code>y</code> in the code, you are loosing a long time to wait.</li>
+<li>You have to define print statements also for more complex variables.</li>
 </ul>
 </section>
-<section id="node-library" class="level3">
-<h3 class="anchored" data-anchor-id="node-library"><a href="./available_nodes.html">Node Library</a></h3>
-<p>The main principle behind the automatic calibration is based on calibrating nodes in a graph structure. A node contains all the measurement and analysis classes to find the quantity of interest - for qubits and couplers. If you are interested in implementing a new node, it might be worth it to check whether there are existing nodes that you can use to find the qubit properties you are looking to calibrate.</p>
-</section>
-<section id="developer-guide" class="level3">
-<h3 class="anchored" data-anchor-id="developer-guide"><a href="./developer_guide.html">Developer Guide</a></h3>
-<p>This repository is an actively developed open-source project and also part of the <a href="https://tergite.github.io">Tergite</a> full-stack software ecosystem to operate a quantum computer. Hence, you are more than welcome to contribute to the project with your own ideas that fit into the framework. To familiarize yourself with the existing classes and the architecture of the automatic calibration, please take a look into the development guide. Here, you can also find best practices and information about our design philosophy.</p>
+<section id="breakpoints" class="level3">
+<h3 class="anchored" data-anchor-id="breakpoints">Breakpoints</h3>
+<p>To overcome these issues, Python offers built-in support for so-called <code>breakpoints</code>. The idea behind a breakpoint is simple. The code will execute until it reaches the breakpoint. Then it will open an interactive console where you can use the variables defined in this very moment of the execution in an <code>ipython</code> manner. Like that, you can print values and explore variables a bit more flexibly.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> AdvancedObject:</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.var_a <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.var_b <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">'__main__'</span>:</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> x <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    advanced_object <span class="op">=</span> AdvancedObject()</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">breakpoint</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The extended example now uses the <code>breakpoint</code> instead of the <code>print</code> statement. When you run the code with the <code>pydb</code> command, it will open the <code>ipython</code>-like console when it comes to breakpoint.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> pdb my_script.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>You can find more information about the python debugger in the <a href="https://docs.python.org/3/library/pdb.html">official documentation for pdb</a> and <a href="https://realpython.com/python-debugging-pdb/">this tutorial</a>.</p>
+<p><strong>Advantages</strong></p>
 <ul>
-<li><a href="./developer-guide/new_node_creation.html">Create node classes</a></li>
-<li><a href="./developer-guide/unit_tests.html">Write unit tests</a></li>
-<li><a href="./developer-guide/writing_documentation.html">Documentation guidelines</a></li>
+<li>Lets you find out more about the state of the application in an interactive way.</li>
+<li>Not much more complicated than the print statements.</li>
+<li>Part of the Python standard library.</li>
+</ul>
+<p><strong>Disadvantages</strong></p>
+<ul>
+<li>You still have to remove the breakpoints afterward to clean up your code.</li>
+<li>For very complex objects, it is still complicated to discover their structure.</li>
+</ul>
+</section>
+<section id="graphical-debugger" class="level3">
+<h3 class="anchored" data-anchor-id="graphical-debugger">Graphical debugger</h3>
+<p>Modern IDEs nowadays usually feature a built-in debugger by default. The debugger often offers a way to evaluate expressions during runtime. Breakpoints can be set just for the IDE itself even during runtime, and they are usually not destructive i.e.&nbsp;part of the codebase.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../.assets/images/graphical_debugger.png" class="img-fluid figure-img"></p>
+<figcaption>Graphical debugger in PyCharm</figcaption>
+</figure>
+</div>
+<p>On the picture above, you can see how the graphical debugger looks like in PyCharm. There are five important areas:</p>
+<ul>
+<li><strong>blue</strong>: This is inside the actual code. The red dot marks the position in the code, where it should halt during execution.</li>
+<li><strong>red</strong>: On this panel, you can control the code execution. There are buttons to restart, stop, continue to the next breakpoint, halt, go to the next line and more. The choices might vary for each IDE.</li>
+<li><strong>orange</strong>: Since the function you are inside can possibly been called by another function outside, on the orange panel there is a stack trace where you can navigate between the contexts.</li>
+<li><strong>pink</strong>: This section shows the local and global variables active for this current context. You can easily explore objects and nested structures.</li>
+<li><strong>green</strong>: In case you want to evaluate a variable or try some code, you can run it in the evaluation box. This will execute your code on top of the state your application is in at this very moment. This means you can use all defined variables and play around with them.</li>
+</ul>
+<p>Learning how to use such a debugger is super easy. It is a real game changer and will save you a lot of time while trying to figure out why your code is hanging somewhere. For more information check out these guides for <a href="https://code.visualstudio.com/docs/editor/debugging">VSCode</a> and <a href="https://www.jetbrains.com/help/pycharm/debugging-your-first-python-application.html">PyCharm</a>.</p>
+<p><strong>Advantages</strong></p>
+<ul>
+<li>You can easily explore very complex states of your application.</li>
+<li>No need to remove print statements or breakpoints.</li>
+<li>Most IDEs include a debugger out of the box.</li>
+</ul>
+<p><strong>Disadvantages</strong></p>
+<ul>
+<li>The code execution might be a bit slower than usual.</li>
+<li>Sometimes the debugger introduces errors, or you will end up in a strange state. Especially, when working with multithreaded applications. However, this does not happen very often and will probably not happen for the automatic calibration.</li>
+</ul>
+</section>
+<section id="next-steps" class="level2">
+<h2 class="anchored" data-anchor-id="next-steps">Next steps:</h2>
+<p>This article introduced some methods on how to debug applications and deal with errors. If you are interested in more techniques, consider reading about:</p>
+<ul>
+<li><a href="https://rubberduckdebugging.com/">Rubber duck debugging</a></li>
+<li><a href="https://about.gitlab.com/topics/version-control/what-is-code-review/">Code reviews</a></li>
+<li>Or continue with the next article about <a href="../developer-guide/writing_documentation.html">writing documentation</a></li>
 </ul>
 
 

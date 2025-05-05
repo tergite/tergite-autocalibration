@@ -43,6 +43,12 @@ website:
             href: nodes/resonator_spectroscopy_node.qmd
           - text: "Qubit spectroscopy"
             href: nodes/qubit_spectroscopy_node.qmd
+          - text: "Rabi oscillations"
+            href: nodes/rabi_oscillations_node.qmd
+          - text: "Coupler spectroscopy"
+            href: nodes/coupler_spectroscopy_node.qmd
+          - text: "Coupler resonator spectroscopy"
+            href: nodes/coupler_resonator_spectroscopy_node.qmd
       - section: "Developer Guide"
         contents:
           - text: "Introduction"
