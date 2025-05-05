@@ -133,3 +133,46 @@ application_run:
     - key: "venv-${CI_COMMIT_REF_NAME}"
       paths:
         - .venv
+
+application_run_2:
+  stage: application_run_coupler
+  image: python:${PYTHON_VERSION}
+  needs:
+    - setup
+    - tests
+  script:
+    # Install dependencies
+    - apt-get update
+    - apt-get install redis ffmpeg libsm6 libxext6 -y
+    # Run Redis server
+    - redis-server --daemonize yes --port "$REDIS_PORT"
+    # Activate the virtual environment
+    - source .venv/bin/activate
+    # Create empty .env file
+    - touch .env
+    # Load configuration
+    - echo "y" | acli config load -t fc8a
+    # Reset Redis
+    - echo "y" | acli node reset -a
+    # Clear the caches
+    - rm -r .venv/lib/python3.10/site-packages/out
+    # Run the calibration chain
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/simple_coupler_run" -n coupler_spectroscopy
+    # Read
+    - ls .venv/lib/python3.10/site-packages/out
+    # Verify output
+    - |
+      if find .venv/lib/python3.10/site-packages/out -type f | grep -q "coupler_spectroscopy.png" && \
+        find .venv/lib/python3.10/site-packages/out -type f | grep -q "coupler_spectroscopy_q14_q15_q15_spectroscopies.png"; then
+        echo "Both output files exist. Application ran successfully."
+      else
+        echo "Error: One or both output files not found."
+        exit 1
+      fi
+  cache:
+    - key: "default"
+      paths:
+        - .cache/pip
+    - key: "venv-${CI_COMMIT_REF_NAME}"
+      paths:
+        - .venv
