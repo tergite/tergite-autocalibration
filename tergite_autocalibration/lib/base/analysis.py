@@ -86,8 +86,8 @@ class BaseAnalysis(ABC):
                         )
                 REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
             else:
-                analysis_succesful = qoi.analysis_succesful
-                if analysis_succesful:
+                analysis_successful = qoi.analysis_successful
+                if analysis_successful:
                     for qoi_name, qoi_result in qoi.analysis_result.items():
                         if qoi_name not in self.redis_fields:
                             raise ValueError(
@@ -104,8 +104,8 @@ class BaseAnalysis(ABC):
             name = "transmons"
 
         if name == "transmons":
-            analysis_succesful = qoi.analysis_succesful
-            if analysis_succesful:
+            analysis_successful = qoi.analysis_successful
+            if analysis_successful:
                 for qoi_name, qoi_result in qoi.analysis_result.items():
                     if qoi_name not in self.redis_fields:
                         raise ValueError(
