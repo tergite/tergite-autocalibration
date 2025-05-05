@@ -19,11 +19,14 @@ from quantify_scheduler.json_utils import SchedulerJSONDecoder, SchedulerJSONEnc
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.config.legacy import dh
+from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 from tergite_autocalibration.utils.dto import extended_transmon_element
 from tergite_autocalibration.utils.dto.extended_coupler_edge import (
     ExtendedCompositeSquareEdge,
 )
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
+from tergite_autocalibration.utils.dto.qoi import QOI
+from tergite_autocalibration.utils.logging import logger
 
 np.set_printoptions(legacy="1.25")
 
@@ -92,18 +95,35 @@ def load_redis_config_coupler(coupler: ExtendedCompositeSquareEdge):
     return coupler
 
 
-def update_redis_values(node_name: str, qoi_results: dict[str, dict]):
-    for element, redis_fields_values in qoi_results.items():
-        if "_" in element:
-            name = "couplers"
+def update_redis_trusted_values(node: str, this_element: str, qoi: QOI = None):
+    """
+    This stores the analysis results in the redis database.
+
+    Args:
+        node: Name of the node to store the values for. TODO: This could be factored out as well.
+        this_element: The qubit or coupler to save values for.
+        qoi: a dictionary of `QOI` objects with value to store in redis.
+    """
+    if "_" in this_element:
+        name = "couplers"
+    else:
+        name = "transmons"
+
+    if name == "transmons":
+
+        # TODO: This is not elegant and will be replaced with a sync parameter
+        # skipping coupler_spectroscopy because it calls QubitSpectroscopy Analysis that updates the qubit frequency
+        # skipping coupler_resonator_spectroscopy for similar reasons
+        if node == "coupler_spectroscopy" or node == "coupler_resonator_spectroscopy":
+            return
+
+        analysis_successful = qoi.analysis_successful
+        if analysis_successful:
+            for qoi_name, qoi_result in qoi.analysis_result.items():
+                value = qoi_result["value"]
+                REDIS_CONNECTION.hset(f"{name}:{this_element}", qoi_name, value)
+                # Setting the value in the standard redis storage
+                structured_redis_storage(qoi_name, this_element.strip("q"), value)
+            REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
         else:
-            name = "transmons"
-        for field, value in redis_fields_values.items():
-            # Setting the value in the tergite-autocalibration-lite format
-            REDIS_CONNECTION.hset(f"{name}:{element}", field, value)
-            # Setting the value in the standard redis storage
-            # structured_redis_storage(
-            #     transmon_parameter, element.strip("q"), self._qoi[i]
-            # )
-            REDIS_CONNECTION.hset(f"cs:{element}", node_name, "calibrated")
-    pass
+            logger.warning(f"Analysis failed for {this_element}")

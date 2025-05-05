@@ -104,14 +104,6 @@ class BaseAnalysis(ABC):
             name = "transmons"
 
         if name == "transmons":
-            # skiping coupler_spectroscopy because it calls QubitSpectroscopy Analysis that updates the qubit frequency
-            # skiping coupler_resonator_spectroscopy for similar reasons
-            if (
-                node == "coupler_spectroscopy"
-                or node == "coupler_resonator_spectroscopy"
-            ):
-                return
-
             analysis_succesful = qoi.analysis_succesful
             if analysis_succesful:
                 for qoi_name, qoi_result in qoi.analysis_result.items():
@@ -281,10 +273,9 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
                 # the dataset is loaded by the process_qubit method.
                 # in other words the __init__ of the analysis class is not aware of the
                 # dataset to be analyzed
-                result = qubit_analysis.process_qubit(
+                analysis_results[this_qubit] = qubit_analysis.process_qubit(
                     ds, this_qubit
-                )  # this_qubit shoulq be qXX
-                analysis_results[this_qubit] = result
+                )
                 self.qubit_analyses.append(qubit_analysis)
 
             index = index + 1
@@ -303,19 +294,6 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
             primary_plot_row = self.plots_per_qubit * (index // self.column_grid)
             primary_axis = self.axs[primary_plot_row, index % self.column_grid]
             analysis._plot(primary_axis)
-
-
-class MultipleBaseAllQubitsAnalysis(BaseAllQubitsAnalysis, ABC):
-    node_analysis_obj = BaseAllQubitsAnalysis
-
-    def __init__(self, name: str, redis_fields):
-        super().__init__(name, redis_fields)
-        self.loop_range = ""
-
-    def analyze_node(self, data_path: Path):
-        for i in self.loop_range:
-            qubit_analysis = self.node_analysis_obj(self.name, self.redis_fields)
-            qubit_analysis.analyze_node(data_path, i)
 
 
 class BaseQubitAnalysis(BaseAnalysis, ABC):
