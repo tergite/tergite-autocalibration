@@ -487,7 +487,8 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
         coupler_data_dict = collections.defaultdict(set)
         for var in self.dataset.data_vars:
             if hasattr(self.dataset[var], "element"):
-                if "_" in self.dataset[var].element:
+                # couplers will have _ in their name
+                if "_" in self.dataset[var].element: 
                     this_coupler = self.dataset[var].element
                     coupler_data_dict[this_coupler].add(var)
         return coupler_data_dict
