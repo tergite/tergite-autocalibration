@@ -11,15 +11,15 @@ graph TD
     F --> F1(Qubit 12 Spectroscopy) --> G(Rabi 12 Oscillations)
     F --> H1(2 States Discrimination)
     G --> H2(3 States Discrimination)
-    A --> I(Coupler resonator spectroscopy)
-    B --> J(Coupler spectroscopy)
+    A --> I(Resonator spectroscopy vs current)
+    B --> J(Qubit spectroscopy vs current)
     I --> J
         
     click A href "nodes/resonator_spectroscopy_node.html"
     click B href "nodes/qubit_spectroscopy_node.html"
     click C href "nodes/rabi_oscillations_node.html"
-    click I href "nodes/coupler_resonator_spectroscopy_node.html"
-    click J href "nodes/coupler_spectroscopy_node.html"
+    click I href "nodes/resonator_spectroscopy_vs_current_node.html"
+    click J href "nodes/qubit_spectroscopy_vs_current_node.html"
 
     style A fill:#ffe6cc,stroke:#333,stroke-width:2px
     style B fill:#ffe6cc,stroke:#333,stroke-width:2px
@@ -64,8 +64,8 @@ graph TD
 
 ## Coupler Nodes
 
-- [coupler_spectroscopy](nodes/coupler_spectroscopy_node.qmd)
-- [coupler_resonator_spectroscopy](nodes/coupler_resonator_spectroscopy_node.qmd)
+- [coupler_spectroscopy](nodes/qubit_spectroscopy_vs_current_node.qmd)
+- [coupler_resonator_spectroscopy](nodes/resonator_spectroscopy_vs_current_node.qmd)
 
 ## Characterization Nodes
 

@@ -25,7 +25,7 @@ from tergite_autocalibration.lib.base.analysis import (
     BaseQubitAnalysis,
 )
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis import (
-    QubitSpectroscopyAnalysisForCouplerSpectroscopy,
+    QubitSpectroscopyMaxThresholdQubitAnalysis,
 )
 from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.analysis import (
     ResonatorSpectroscopyQubitAnalysis,
@@ -34,7 +34,7 @@ from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.utils.dto.qoi import QOI
 
 
-class QubitAnalysisForCouplerSpectroscopy(BaseQubitAnalysis):
+class QubitSpectroscopyVsCurrentQubitAnalysis(BaseQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
         self.resonator_crossing_points = []
@@ -60,7 +60,7 @@ class QubitAnalysisForCouplerSpectroscopy(BaseQubitAnalysis):
             for coord in self.magnitudes.coords:
                 if "dc_currents" in coord:
                     ds = ds.drop_vars(coord)
-            freq_analysis = QubitSpectroscopyAnalysisForCouplerSpectroscopy(
+            freq_analysis = QubitSpectroscopyMaxThresholdQubitAnalysis(
                 self.name, "", current
             )
             qubit_frequency = freq_analysis.process_qubit(
@@ -199,7 +199,7 @@ class QubitAnalysisForCouplerSpectroscopy(BaseQubitAnalysis):
         ax.set_title(f"Qubit {self.qubit}")
 
 
-class QubitAnalysisForCouplerResonatorSpectroscopy(BaseQubitAnalysis):
+class ResonatorSpectroscopyVsCurrentQubitAnalysis(BaseQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
 
@@ -370,7 +370,7 @@ class QubitAnalysisForCouplerResonatorSpectroscopy(BaseQubitAnalysis):
         ax.xaxis.set_major_locator(MaxNLocator(nbins=5))
 
 
-class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
+class QubitSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
         self.q1_analysis = None
@@ -384,10 +384,10 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
                 self.currents = coord
                 self.current_coord = coord
 
-        self.q1_analysis = QubitAnalysisForCouplerSpectroscopy(
+        self.q1_analysis = QubitSpectroscopyVsCurrentQubitAnalysis(
             self.name, self.redis_fields
         )
-        self.q2_analysis = QubitAnalysisForCouplerSpectroscopy(
+        self.q2_analysis = QubitSpectroscopyVsCurrentQubitAnalysis(
             self.name, self.redis_fields
         )
 
@@ -496,7 +496,7 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
         plt.close()
 
 
-class CouplerResonatorSpectroscopyAnalysis(BaseCouplerAnalysis):
+class ResonatorSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
         self.q1_analysis = None
@@ -510,10 +510,10 @@ class CouplerResonatorSpectroscopyAnalysis(BaseCouplerAnalysis):
                 self.currents = coord
                 self.current_coord = coord
 
-        self.q1_analysis = QubitAnalysisForCouplerResonatorSpectroscopy(
+        self.q1_analysis = ResonatorSpectroscopyVsCurrentQubitAnalysis(
             self.name, self.redis_fields
         )
-        self.q2_analysis = QubitAnalysisForCouplerResonatorSpectroscopy(
+        self.q2_analysis = ResonatorSpectroscopyVsCurrentQubitAnalysis(
             self.name, self.redis_fields
         )
 
@@ -587,8 +587,8 @@ class CouplerResonatorSpectroscopyAnalysis(BaseCouplerAnalysis):
         fig.savefig(full_path, bbox_inches="tight", dpi=200)
 
 
-class CouplerSpectroscopyNodeAnalysis(BaseAllCouplersAnalysis):
-    single_coupler_analysis_obj = CouplerSpectroscopyAnalysis
+class QubitSpectroscopyVsCurrentNodeAnalysis(BaseAllCouplersAnalysis):
+    single_coupler_analysis_obj = QubitSpectroscopyVsCurrentCouplerAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
@@ -598,8 +598,8 @@ class CouplerSpectroscopyNodeAnalysis(BaseAllCouplersAnalysis):
             c_ana.plot_spectroscopies(self.data_path)
 
 
-class CouplerResonatorSpectroscopyNodeAnalysis(BaseAllCouplersAnalysis):
-    single_coupler_analysis_obj = CouplerResonatorSpectroscopyAnalysis
+class ResonatorSpectroscopyVsCurrentNodeAnalysis(BaseAllCouplersAnalysis):
+    single_coupler_analysis_obj = ResonatorSpectroscopyVsCurrentCouplerAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)

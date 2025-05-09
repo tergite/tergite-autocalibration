@@ -18,8 +18,8 @@ import quantify_scheduler.backends.qblox.constants as constants
 from quantify_scheduler.backends import SerialCompiler
 
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
-    CouplerResonatorSpectroscopyNodeAnalysis,
-    CouplerSpectroscopyNodeAnalysis,
+    ResonatorSpectroscopyVsCurrentNodeAnalysis,
+    QubitSpectroscopyVsCurrentNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.external_parameter_node import (
     ExternalParameterFixedScheduleCouplerNode,
@@ -39,9 +39,9 @@ from tergite_autocalibration.utils.hardware.spi import SpiDAC
 from tergite_autocalibration.utils.logging import logger
 
 
-class CouplerSpectroscopyNode(ExternalParameterFixedScheduleCouplerNode):
+class QubitSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNode):
     measurement_obj = TwoTonesMultidimMeasurement
-    analysis_obj = CouplerSpectroscopyNodeAnalysis
+    analysis_obj = QubitSpectroscopyVsCurrentNodeAnalysis
     # coupler_qois = ["parking_current"]
     coupler_qois = ["qubit_crossing_points"]
 
@@ -105,7 +105,7 @@ class CouplerSpectroscopyNode(ExternalParameterFixedScheduleCouplerNode):
 
 class CouplerResonatorSpectroscopyNode(ExternalParameterFixedScheduleCouplerNode):
     measurement_obj = ResonatorSpectroscopyMeasurement
-    analysis_obj = CouplerResonatorSpectroscopyNodeAnalysis
+    analysis_obj = ResonatorSpectroscopyVsCurrentNodeAnalysis
     # coupler_qois = ["resonator_flux_quantum"]
     coupler_qois = ["resonator_crossing_points"]
 

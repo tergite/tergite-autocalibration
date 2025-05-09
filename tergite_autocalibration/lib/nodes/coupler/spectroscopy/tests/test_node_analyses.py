@@ -12,20 +12,20 @@
 
 
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
-    CouplerResonatorSpectroscopyNodeAnalysis,
-    CouplerSpectroscopyNodeAnalysis,
+    ResonatorSpectroscopyVsCurrentNodeAnalysis,
+    QubitSpectroscopyVsCurrentNodeAnalysis,
 )
 
 
 def test_CS_node_analysis_can_be_initialized():
-    node_analysis = CouplerSpectroscopyNodeAnalysis("name", ["redis_field"])
+    node_analysis = QubitSpectroscopyVsCurrentNodeAnalysis("name", ["redis_field"])
 
     assert node_analysis.name == "name"
     assert node_analysis.redis_fields == ["redis_field"]
 
 
 def test_CRS_node_analysis_can_be_initialized():
-    node_analysis = CouplerResonatorSpectroscopyNodeAnalysis("name", ["redis_field"])
+    node_analysis = ResonatorSpectroscopyVsCurrentNodeAnalysis("name", ["redis_field"])
 
     assert node_analysis.name == "name"
     assert node_analysis.redis_fields == ["redis_field"]

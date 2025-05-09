@@ -24,15 +24,15 @@ from tergite_autocalibration.lib.base.analysis import (
     BaseCouplerAnalysis,
 )
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
-    CouplerSpectroscopyAnalysis,
+    QubitSpectroscopyVsCurrentCouplerAnalysis,
 )
 
 from tergite_autocalibration.tests.utils.decorators import with_os_env
 
 
 def test_CanCreate():
-    a = CouplerSpectroscopyAnalysis("name", ["redis_field"])
-    assert isinstance(a, CouplerSpectroscopyAnalysis)
+    a = QubitSpectroscopyVsCurrentCouplerAnalysis("name", ["redis_field"])
+    assert isinstance(a, QubitSpectroscopyVsCurrentCouplerAnalysis)
     assert isinstance(a, BaseCouplerAnalysis)
     assert isinstance(a, BaseAnalysis)
 
@@ -53,7 +53,7 @@ def test_get_crossings_for_q06_q07(
     setup_q06_q07_data: tuple[xr.Dataset, str, ndarray, ndarray],
 ):
     ds, coupler = setup_q06_q07_data
-    a = CouplerSpectroscopyAnalysis("name", ["redis_fields"])
+    a = QubitSpectroscopyVsCurrentCouplerAnalysis("name", ["redis_fields"])
     qoi = a.setup_coupler_and_analyze(ds, coupler)
 
     crossings = qoi["qubit_crossing_points"]
@@ -82,7 +82,7 @@ def test_get_crossings_for_q08_q09(
     setup_q08_q09_data: tuple[xr.Dataset, str, ndarray, ndarray],
 ):
     ds, coupler = setup_q08_q09_data
-    a = CouplerSpectroscopyAnalysis("name", ["redis_fields"])
+    a = QubitSpectroscopyVsCurrentCouplerAnalysis("name", ["redis_fields"])
     qoi = a.setup_coupler_and_analyze(ds, coupler)
 
     crossings = qoi["qubit_crossing_points"]
@@ -111,7 +111,7 @@ def test_get_crossings_for_q12_q13(
     setup_q12_q13_data: tuple[xr.Dataset, str, ndarray, ndarray],
 ):
     ds, coupler = setup_q12_q13_data
-    a = CouplerSpectroscopyAnalysis("name", ["redis_fields"])
+    a = QubitSpectroscopyVsCurrentCouplerAnalysis("name", ["redis_fields"])
     qoi = a.setup_coupler_and_analyze(ds, coupler)
 
     crossings = qoi["qubit_crossing_points"]
@@ -140,7 +140,7 @@ def test_get_crossings_for_q14_q15(
     setup_q14_q15_data: tuple[xr.Dataset, str, ndarray, ndarray],
 ):
     ds, coupler = setup_q14_q15_data
-    a = CouplerSpectroscopyAnalysis("name", ["redis_fields"])
+    a = QubitSpectroscopyVsCurrentCouplerAnalysis("name", ["redis_fields"])
     qoi = a.setup_coupler_and_analyze(ds, coupler)
 
     crossings = qoi["qubit_crossing_points"]
@@ -152,7 +152,7 @@ def test_get_crossings_for_q14_q15(
 def test_coupler_plot_is_created(setup_q06_q07_data):
     matplotlib.use("Agg")
     ds, coupler = setup_q06_q07_data
-    a = CouplerSpectroscopyAnalysis("name", ["redis_fields"])
+    a = QubitSpectroscopyVsCurrentCouplerAnalysis("name", ["redis_fields"])
     a.setup_coupler_and_analyze(ds, coupler)
 
     figure_path = os.environ["DATA_DIR"] + "/Coupler_Spectroscopy.png"
@@ -177,7 +177,7 @@ def test_coupler_plot_is_created(setup_q06_q07_data):
 def test_qubit_spectroscopies_for_coupler_are_created(setup_q06_q07_data):
     matplotlib.use("Agg")
     ds, coupler = setup_q06_q07_data
-    a = CouplerSpectroscopyAnalysis("name", ["redis_fields"])
+    a = QubitSpectroscopyVsCurrentCouplerAnalysis("name", ["redis_fields"])
     a.setup_coupler_and_analyze(ds, coupler)
 
     path = Path(os.environ["DATA_DIR"])

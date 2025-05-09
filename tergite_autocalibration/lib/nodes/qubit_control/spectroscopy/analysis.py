@@ -136,7 +136,7 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
         ax.grid()
 
 
-class QubitSpectroscopyAnalysisForCouplerSpectroscopy(BaseQubitAnalysis):
+class QubitSpectroscopyMaxThresholdQubitAnalysis(BaseQubitAnalysis):
     """
     Analysis that finds the maximum value in qubit spectroscopy data.
     """
