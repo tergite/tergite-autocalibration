@@ -15,7 +15,6 @@
 
 import collections
 import os
-import ast
 from abc import ABC, abstractmethod
 from pathlib import Path
 import re
@@ -75,51 +74,59 @@ class BaseAnalysis(ABC):
         if "_" in this_element:
             name = "couplers"
             self._qoi = dict(qoi.analysis_result.items())
-            if all(re.fullmatch(r"q\d{2}", key) for key in self._qoi):
-                qubits_in_coupler = [this_element[0:3], this_element[4:7]]
-                for i, qubit in enumerate(qubits_in_coupler):
-                    for j, transmon_parameter in enumerate(self.redis_fields):
-                        REDIS_CONNECTION.hset(
-                            f"{name}:{this_element}:{qubit}",
-                            transmon_parameter,
-                            self._qoi[qubit][transmon_parameter],
-                        )
-                REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
+            if self.are_two_qubit_in_qoi():
+                self.save_parameters_in_qubits_in_coupler(node, this_element, name)
             else:
-                analysis_successful = qoi.analysis_successful
-                if analysis_successful:
-                    for qoi_name, qoi_result in qoi.analysis_result.items():
-                        if qoi_name not in self.redis_fields:
-                            raise ValueError(
-                                f"The qoi {qoi_name} is not in redis fields: {self.redis_fields} for {this_element}"
-                            )
-                        value = qoi_result["value"]
-                        logger.info(
-                            f"Updating redis for {this_element} with {qoi_name}: {value}"
-                        )
-                        REDIS_CONNECTION.hset(f"{name}:{this_element}", qoi_name, value)
-                REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
+                self.save_parameters_in_coupler(node, this_element, qoi, name)
 
         else:
             name = "transmons"
+            self.save_parameters_in_trasmon(node, this_element, qoi, name)
 
-        if name == "transmons":
-            analysis_successful = qoi.analysis_successful
-            if analysis_successful:
-                for qoi_name, qoi_result in qoi.analysis_result.items():
-                    if qoi_name not in self.redis_fields:
-                        raise ValueError(
-                            f"The qoi {qoi_name} is not in redis fields: {self.redis_fields} for {this_element}"
-                        )
-                    value = qoi_result["value"]
-                    REDIS_CONNECTION.hset(f"{name}:{this_element}", qoi_name, value)
-                    # Setting the value in the standard redis storage
-                    structured_redis_storage(qoi_name, this_element.strip("q"), value)
-                REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
-            else:
-                logger.warning(f"Analysis failed for {this_element}")
+    def are_two_qubit_in_qoi(self):
+        return all(re.fullmatch(r"q\d{2}", key) for key in self._qoi)
+
+    def save_parameters_in_trasmon(self, node, this_element, qoi, name):
+        analysis_successful = qoi.analysis_successful
+        if analysis_successful:
+            for qoi_name, qoi_result in qoi.analysis_result.items():
+                if qoi_name not in self.redis_fields:
+                    raise ValueError(
+                        f"The qoi {qoi_name} is not in redis fields: {self.redis_fields} for {this_element}"
+                    )
+                value = qoi_result["value"]
+                REDIS_CONNECTION.hset(f"{name}:{this_element}", qoi_name, value)
+                # Setting the value in the standard redis storage
+                structured_redis_storage(qoi_name, this_element.strip("q"), value)
+            REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
         else:
-            pass
+            logger.warning(f"Analysis failed for {this_element}")
+
+    def save_parameters_in_coupler(self, node, this_element, qoi, name):
+        analysis_successful = qoi.analysis_successful
+        if analysis_successful:
+            for qoi_name, qoi_result in qoi.analysis_result.items():
+                if qoi_name not in self.redis_fields:
+                    raise ValueError(
+                        f"The qoi {qoi_name} is not in redis fields: {self.redis_fields} for {this_element}"
+                    )
+                value = qoi_result["value"]
+                logger.info(
+                    f"Updating redis for {this_element} with {qoi_name}: {value}"
+                )
+                REDIS_CONNECTION.hset(f"{name}:{this_element}", qoi_name, value)
+        REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
+
+    def save_parameters_in_qubits_in_coupler(self, node, this_element, name):
+        qubits_in_coupler = [this_element[0:3], this_element[4:7]]
+        for i, qubit in enumerate(qubits_in_coupler):
+            for j, transmon_parameter in enumerate(self.redis_fields):
+                REDIS_CONNECTION.hset(
+                    f"{name}:{this_element}:{qubit}",
+                    transmon_parameter,
+                    self._qoi[qubit][transmon_parameter],
+                )
+        REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
 
     def rotate_to_probability_axis(self, complex_measurement_data):
         # TODO: THIS DOESNT BELONG HERE
@@ -152,8 +159,14 @@ class BaseNodeAnalysis(ABC):
     """
 
     def __init__(self):
+        self.name = ""
         self._qoi = None
         self.redis_fields = ""
+        self.data_path = ""
+        self.dataset = None
+        self.data_vars = None
+        self.coords = None
+        self.fig = None
 
     @property
     def qoi(self) -> "QOI":
@@ -227,7 +240,6 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
     single_qubit_analysis_obj: "BaseQubitAnalysis"
 
     def __init__(self, name: str, redis_fields):
-        self.name = name
         self.redis_fields = redis_fields
         self.dataset = None
         self.data_vars = None
@@ -357,12 +369,6 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
         self.name_qubit_1 = ""
         self.name_qubit_2 = ""
 
-    def qoi(self) -> "QOI":
-        return self._qoi
-
-    def qoi(self, value: "QOI"):
-        self._qoi = value
-
     def process_coupler(self, dataset, coupler_element):
         self._qoi = self.setup_coupler_and_analyze(dataset, coupler_element)
         self.update_redis_trusted_values(self.name, coupler_element, self._qoi)
@@ -399,6 +405,10 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
             except KeyError:
                 logger.info(f"No element_type for {settable}")
         return None
+
+    @abstractmethod
+    def plotter(self, primary_axis, secondary_axis):
+        pass
 
     def _plot(self, primary_axis, secondary_axis):
         self.plotter(
