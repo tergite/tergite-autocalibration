@@ -240,6 +240,7 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
     single_qubit_analysis_obj: "BaseQubitAnalysis"
 
     def __init__(self, name: str, redis_fields):
+        self.name = name
         self.redis_fields = redis_fields
         self.dataset = None
         self.data_vars = None
@@ -488,7 +489,7 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
         for var in self.dataset.data_vars:
             if hasattr(self.dataset[var], "element"):
                 # couplers will have _ in their name
-                if "_" in self.dataset[var].element: 
+                if "_" in self.dataset[var].element:
                     this_coupler = self.dataset[var].element
                     coupler_data_dict[this_coupler].add(var)
         return coupler_data_dict
