@@ -39,6 +39,9 @@ class RunConfiguration(TOMLConfigurationFile):
             f"{timestamp_.strftime('%H-%M-%S')}_{str(ApplicationStatus.ACTIVE.value)}-{self.target_node}",
         )
 
+        # We need to know the data directory to write the original acquisition date
+        self._data_dir = None
+
     @property
     def id(self):
         """
@@ -60,6 +63,19 @@ class RunConfiguration(TOMLConfigurationFile):
     @log_dir.setter
     def log_dir(self, value):
         self._log_dir = value
+
+    @property
+    def data_dir(self):
+        """
+        Returns:
+            Data directory in form YYYY-MM-DD/"ACTIVE"_HH-MM-SS--target_node
+
+        """
+        return self._data_dir
+
+    @data_dir.setter
+    def data_dir(self, value):
+        self._data_dir = value
 
     @property
     def target_node(self) -> str:

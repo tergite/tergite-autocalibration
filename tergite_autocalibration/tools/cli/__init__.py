@@ -113,10 +113,12 @@ def start(
     cluster_mode: "MeasurementMode" = MeasurementMode.real
     parsed_cluster_ip: "IPv4Address" = CLUSTER_IP
     target_node_name = CONFIG.run.target_node
+    CONFIG.run.data_dir = CONFIG.run.log_dir
 
     if r:
         cluster_mode = MeasurementMode.re_analyse
         data_to_reanalyse_folder_path = Path(r)
+        CONFIG.run.data_dir = data_to_reanalyse_folder_path
 
         # Check if the folder exists
         if not data_to_reanalyse_folder_path.is_dir():
@@ -193,7 +195,7 @@ def quickstart(
             help='Qubit input e.g. "q00,q01,q02,q03,q04" or "q01-q05" or "q01-q06, q08".'
             'If the input is an integer e.g. 3, it will generate "q01,q02,q03".',
         ),
-    ] = None
+    ] = None,
 ):
     """
     This is loading the template to the root dir and fills it with the input qubits.

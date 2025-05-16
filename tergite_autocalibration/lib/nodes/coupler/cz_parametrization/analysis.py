@@ -23,6 +23,9 @@ from tergite_autocalibration.lib.base.analysis import (
     BaseCouplerAnalysis,
     BaseQubitAnalysis,
 )
+from tergite_autocalibration.lib.base.utils.figure_utils import (
+    create_figure_with_top_band,
+)
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.utils.no_valid_combination_exception import (
     NoValidCombinationException,
 )
@@ -315,18 +318,12 @@ class CZParametrisationFixDurationCouplerAnalysis(BaseCouplerAnalysis):
 
     def plot_all(self):
         for index, e in enumerate(self.q1_list):
-            fig, axs = plt.subplots(
-                nrows=1,
-                ncols=2,
-                squeeze=False,
-                figsize=(10, 5),
-            )
+            fig, axs = create_figure_with_top_band(1, 2)
 
             self.q1_list[index].plotter(axs[0, 0])
             self.q2_list[index].plotter(axs[0, 1])
 
             fig = plt.gcf()
-            fig.set_tight_layout(True)
             name = "CZParametrisationFixDurationAnalysis_" + str(
                 self.current_values[index]
             )
@@ -347,5 +344,7 @@ class CZParametrizationFixDurationNodeAnalysis(BaseAllCouplersAnalysis):
 
     def save_plots(self):
         super().save_plots()
+
+    def save_other_plots(self):
         for analysis in self.coupler_analyses:
             analysis.plot_all()

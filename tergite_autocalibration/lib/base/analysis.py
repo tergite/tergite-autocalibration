@@ -25,6 +25,9 @@ import numpy as np
 import xarray as xr
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
+from tergite_autocalibration.lib.base.utils.figure_utils import (
+    create_figure_with_top_band,
+)
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 from tergite_autocalibration.utils.dto.qoi import QOI
 from tergite_autocalibration.utils.logging import logger
@@ -135,22 +138,13 @@ class BaseNodeAnalysis(ABC):
 
     def manage_plots(self, column_grid: int, plots_per_qubit: int):
         n_vars = len(self.data_vars)
-        n_coords = len(self.coords)
+        rows = int(np.ceil(n_vars / column_grid)) * plots_per_qubit
 
-        rows = int(np.ceil(n_vars / column_grid))
-        rows = rows * plots_per_qubit
-
-        fig, axs = plt.subplots(
-            nrows=rows,
-            ncols=np.min((n_vars, n_coords, column_grid)),
-            squeeze=False,
-            figsize=(column_grid * 5, rows * 5),
-        )
+        fig, axs = create_figure_with_top_band(rows, column_grid)
 
         return fig, axs
 
     def save_plots(self):
-        self.fig.tight_layout()
         preview_path = self.data_path / f"{self.name}_preview.png"
         full_path = self.data_path / f"{self.name}.png"
         logger.info("Saving Plots")
@@ -159,6 +153,9 @@ class BaseNodeAnalysis(ABC):
         plt.show(block=True)
         logger.info(f"Plots saved to {preview_path} and {full_path}")
         plt.close()
+
+    def save_other_plots(self):
+        pass
 
 
 class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
@@ -185,6 +182,7 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         analysis_results = self._analyze_all_qubits()
         self._fill_plots()
         self.save_plots()
+        self.save_other_plots()
         return analysis_results
 
     def _analyze_all_qubits(self):
@@ -259,12 +257,7 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
 
     def _plot(self, primary_axis):
         self.plotter(primary_axis)  # Assuming node_analysis object is available
-
-        # Customize plot as needed
-        handles, labels = primary_axis.get_legend_handles_labels()
-        patch = mpatches.Patch(color="red", label=f"{self.qubit}")
-        handles.append(patch)
-        primary_axis.legend(handles=handles, fontsize="small")
+        primary_axis.set_title(f"Qubit {self.qubit}")
 
     @abstractmethod
     def analyse_qubit(self) -> "QOI":
@@ -367,6 +360,7 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
         analysis_results = self._analyze_all_couplers()
         self._fill_plots()
         self.save_plots()
+        self.save_other_plots()
         return analysis_results
 
     def _analyze_all_couplers(self):
