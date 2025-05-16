@@ -97,7 +97,7 @@ def add_top_band(
                 logo, extent=[0.1, 0.1 + width * 0.8, 0.1, 0.9], aspect="auto"
             )
         except Exception as e:
-            print(f"Right logo load failed: {e}")
+            logger.error(f"Right logo load failed: {e}")
 
 
 def infer_date_from_path(path: Path) -> str:
