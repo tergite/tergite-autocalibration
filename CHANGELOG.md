@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project follows versions of format `{year}.{month}.{patch_number}`.
 
-## [2025.03.0] - 2025-03-16
+## [2025.03.0] - 2025-05-16
 
 ### Added
 - Advanced logging
