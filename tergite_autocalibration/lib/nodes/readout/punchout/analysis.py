@@ -27,7 +27,7 @@ from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.analysis i
 from tergite_autocalibration.utils.dto.qoi import QOI
 
 
-class PunchoutAnalysis(BaseQubitAnalysis):
+class PunchoutQubitAnalysis(BaseQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
         self.amplitude_coord = None
@@ -94,6 +94,13 @@ class PunchoutAnalysis(BaseQubitAnalysis):
     def plotter(self, axis: plt.Axes):
         cax = self.S21[self.data_var].plot(ax=axis, x=self.amplitude_coord)
         axis.scatter(
+            self.detected_frequencies,
+            self.amplitudes,
+            c="b",
+            label="Fitted resonator freq.",
+            marker="o",
+        )
+        axis.scatter(
             self.best_amplitude,
             self.last_good_freq,
             c="r",
@@ -149,7 +156,7 @@ class PunchoutAnalysis(BaseQubitAnalysis):
 
 
 class PunchoutNodeAnalysis(BaseAllQubitsAnalysis):
-    single_qubit_analysis_obj = PunchoutAnalysis
+    single_qubit_analysis_obj = PunchoutQubitAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
