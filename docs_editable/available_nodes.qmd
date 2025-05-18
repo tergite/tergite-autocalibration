@@ -32,7 +32,7 @@ graph TD
 
 ## Readout Nodes
 
-- punchout
+- [punchout](nodes/punchout_node.qmd)
 - [resonator_spectroscopy](nodes/resonator_spectroscopy_node.qmd)
 - resonator_spectroscopy_1
 - resonator_spectroscopy_2

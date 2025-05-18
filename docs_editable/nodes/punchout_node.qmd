@@ -1,0 +1,30 @@
+## Resonator spectroscopy as a function of the readout amplitude (aka Punchout)
+
+The resonator spectroscopy measured as a function of the readout amplitude can be used to extract the optimal readout amplitude. This is possible as the response of the resonator should be constant until too much energy is sent to it. Looking at the changes in the resonator frequency, it is possible to estimate the last stable point and set the readout amplitude.   
+
+### Measurement class: `PunchoutMeasurement`
+
+The `PunchoutMeasurement` class facilitates the creation of schedules for the punchout experiments. It supports parallel probing and measurement.
+
+#### Method: `schedule_function`
+
+The `schedule_function` generates an experimental schedule for performing qubit spectroscopy. 
+- `spec_frequencies` (`dict[str, np.ndarray]`): Frequencies to probe for eachresonator.
+- `spec_pulse_amplitudes` (`dict[str, np.ndarray]`, optional): Amplitudes of the readout pulses.
+
+**Returns**:
+
+- A `Schedule` object representing the experimental procedure.
+
+### Analysis class: `PunchoutNodeAnalysis`
+
+The `PunchoutNodeAnalysis` class handles all the operations commont to all qubits and produce the figures. The standard figure displays the measurments in each qubit with the result optimal Amplitude shown in each subplot.
+
+Additional figures are produced for debugging purposes; specifically, a plot per qubit is produced with all the individual resonator spectroscopies to visually inspect the optimal selection of the amplitude. The amplitude selected is highlighted with a red square.
+
+#### Analysis class: `PunchoutQubitAnalysis`
+
+This class perform the analysis of the individual qubit. Each resonator spectroscopy is analyzed with the ResonatorSpectroscopyQubitAnalysis class to obtain the fitted resonator frequency.
+These values are analyzed starting from the smallest amplitude and concecutive resontator frequencies are compared; if the difference between two frequencies is larger than a threshold (currently 100kHz), then the lowest amplitude is selected as the best amplitude.
+
+Node on the plot: all resonator spectroscopies are individually normalized in the plot for better visualization. The values are actually quite different and can be seen in the additional figures. 
