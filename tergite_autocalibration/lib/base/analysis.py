@@ -40,6 +40,13 @@ class BaseAnalysis(ABC):
     def __init__(self):
         self._qoi = None
         self.redis_fields = ""
+        self.dataset: xr.Dataset
+        self.S21: xr.DataArray
+        self.magnitudes: xr.DataArray
+        self.data_var = None
+        self.qubit: str
+        self.coord = None
+        self.data_path = ""
 
     @property
     def qoi(self) -> "QOI":
@@ -61,7 +68,6 @@ class BaseAnalysis(ABC):
             None, will just plot the fitted values
 
         """
-        pass
 
     # TODO: Alternative idea would be putting the redis handling into the QOI class
     # Pros: Would be completely high-level interfaced
@@ -71,22 +77,30 @@ class BaseAnalysis(ABC):
     def update_redis_trusted_values(
         self, node: str, this_element: str, qoi: QOI = None
     ):
+        """
+        Update the redis trusted values for the qubit or coupler.
+        Args:
+            node: The node name
+            this_element: The element name (qubit or coupler)
+            qoi: The quantity of interest as QOI wrapped object
+        """
+
         if "_" in this_element:
             name = "couplers"
             self._qoi = dict(qoi.analysis_result.items())
-            if self.are_two_qubit_in_qoi():
-                self.save_parameters_in_qubits_in_coupler(node, this_element, name)
+            if self._are_two_qubit_in_qoi():
+                self._save_parameters_in_qubits_in_coupler(node, this_element, name)
             else:
-                self.save_parameters_in_coupler(node, this_element, qoi, name)
+                self._save_parameters_in_coupler(node, this_element, qoi, name)
 
         else:
             name = "transmons"
-            self.save_parameters_in_trasmon(node, this_element, qoi, name)
+            self._save_parameters_in_trasmon(node, this_element, qoi, name)
 
-    def are_two_qubit_in_qoi(self):
+    def _are_two_qubit_in_qoi(self):
         return all(re.fullmatch(r"q\d{2}", key) for key in self._qoi)
 
-    def save_parameters_in_trasmon(self, node, this_element, qoi, name):
+    def _save_parameters_in_trasmon(self, node, this_element, qoi, name):
         analysis_successful = qoi.analysis_successful
         if analysis_successful:
             for qoi_name, qoi_result in qoi.analysis_result.items():
@@ -102,7 +116,7 @@ class BaseAnalysis(ABC):
         else:
             logger.warning(f"Analysis failed for {this_element}")
 
-    def save_parameters_in_coupler(self, node, this_element, qoi, name):
+    def _save_parameters_in_coupler(self, node, this_element, qoi, name):
         analysis_successful = qoi.analysis_successful
         if analysis_successful:
             for qoi_name, qoi_result in qoi.analysis_result.items():
@@ -117,7 +131,7 @@ class BaseAnalysis(ABC):
                 REDIS_CONNECTION.hset(f"{name}:{this_element}", qoi_name, value)
         REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
 
-    def save_parameters_in_qubits_in_coupler(self, node, this_element, name):
+    def _save_parameters_in_qubits_in_coupler(self, node, this_element, name):
         qubits_in_coupler = [this_element[0:3], this_element[4:7]]
         for i, qubit in enumerate(qubits_in_coupler):
             for j, transmon_parameter in enumerate(self.redis_fields):
@@ -167,6 +181,7 @@ class BaseNodeAnalysis(ABC):
         self.data_vars = None
         self.coords = None
         self.fig = None
+        self.axs = None
 
     @property
     def qoi(self) -> "QOI":
@@ -177,7 +192,7 @@ class BaseNodeAnalysis(ABC):
         self._qoi = value
 
     @abstractmethod
-    def analyze_node(self) -> "QOI":
+    def analyze_node(self, data_path: Path, index: int = 0) -> QOI:
         """
         Run the fitting of the analysis function
 
@@ -185,7 +200,6 @@ class BaseNodeAnalysis(ABC):
             The quantity of interest as QOI wrapped object
 
         """
-        pass
 
     def open_dataset(self, index: int = 0) -> xr.Dataset:
         """
@@ -206,7 +220,7 @@ class BaseNodeAnalysis(ABC):
         logger.info("Open dataset " + str(dataset_path))
         return xr.open_dataset(dataset_path)
 
-    def manage_plots(self, column_grid: int, plots_per_qubit: int):
+    def _manage_plots(self, column_grid: int, plots_per_qubit: int):
         n_vars = len(self.data_vars)
         n_coords = len(self.coords)
 
@@ -222,7 +236,7 @@ class BaseNodeAnalysis(ABC):
 
         return fig, axs
 
-    def save_plots(self):
+    def _save_plots(self):
         preview_path = self.data_path / f"{self.name}_preview.png"
         full_path = self.data_path / f"{self.name}.png"
         logger.info("Saving Plots")
@@ -232,35 +246,50 @@ class BaseNodeAnalysis(ABC):
         logger.info(f"Plots saved to {preview_path} and {full_path}")
         plt.close()
 
-    def save_other_plots(self):
+    def _save_other_plots(self):
         pass
 
 
 class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
+    """
+    Base class for the analysis of all qubits in a node
+    """
+
     single_qubit_analysis_obj: "BaseQubitAnalysis"
 
     def __init__(self, name: str, redis_fields):
+        super().__init__()
         self.name = name
         self.redis_fields = redis_fields
         self.dataset = None
         self.data_vars = None
         self.coords = None
 
-        self.qubit_analyses = []
+        self.qubit_analyses: List[BaseQubitAnalysis] = []
 
         self.column_grid = 5
         self.plots_per_qubit = 1
 
-    def analyze_node(self, data_path: Path, index: int = 0):
+    def analyze_node(self, data_path: Path, index: int = 0) -> QOI:
+        """
+        Analyze the node and save the results to redis.
+        Args:
+            data_path: Path to the dataset
+            index: Index of the dataset to be analyzed
+
+        Returns:
+            analysis_results: Dictionary with the analysis results for each qubit
+        """
+
         self.data_path = Path(data_path)
         self.dataset = self.open_dataset(index=index)
         self.coords = self.dataset.coords
         self.data_vars = self.dataset.data_vars
-        self.fig, self.axs = self.manage_plots(self.column_grid, self.plots_per_qubit)
+        self.fig, self.axs = self._manage_plots(self.column_grid, self.plots_per_qubit)
         analysis_results = self._analyze_all_qubits()
         self._fill_plots()
-        self.save_plots()
-        self.save_other_plots()
+        self._save_plots()
+        self._save_other_plots()
         return analysis_results
 
     def _analyze_all_qubits(self):
@@ -279,7 +308,7 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
                     {selected_coord_name: slice(None)}
                 )  # Select all data along this coordinate
 
-                qubit_analysis = self.single_qubit_analysis_obj(
+                qubit_analysis: BaseQubitAnalysis = self.single_qubit_analysis_obj(
                     self.name, self.redis_fields
                 )
                 # NOTE: coord initialization cannot be done in the __init__ because
@@ -306,25 +335,43 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         for index, analysis in enumerate(self.qubit_analyses):
             primary_plot_row = self.plots_per_qubit * (index // self.column_grid)
             primary_axis = self.axs[primary_plot_row, index % self.column_grid]
-            analysis._plot(primary_axis)
+            analysis.plot(primary_axis)
 
 
 class BaseQubitAnalysis(BaseAnalysis, ABC):
+    """
+    Base class for the analysis of a single qubit
+    """
+
     def __init__(self, name, redis_fields):
+        super().__init__()
         self.name = name
         self.redis_fields = redis_fields
-        self.dataset: xr.Dataset
-        self.S21: xr.DataArray
-        self.data_var = None
-        self.qubit: str
-        self.coord = None
 
-    def process_qubit(self, dataset, qubit_element):
+    def process_qubit(self, dataset, qubit_element) -> QOI:
+        """
+        Process the qubit data and analyze it.
+        Args:
+            dataset: xarray dataset with the qubit data
+            qubit_element: name of the qubit element
+        Returns:
+            QOI: Quantity of interest as QOI wrapped object
+        """
+
         self._qoi = self.setup_qubit_and_analyze(dataset, qubit_element)
         self.update_redis_trusted_values(self.name, self.qubit, self._qoi)
         return self._qoi
 
-    def setup_qubit_and_analyze(self, dataset, qubit_element):
+    def setup_qubit_and_analyze(self, dataset, qubit_element) -> QOI:
+        """
+        Setup the qubit data and analyze it.
+        Args:
+            dataset: xarray dataset with the qubit data
+            qubit_element: name of the qubit element
+        Returns:
+            QOI: Quantity of interest as QOI wrapped object
+        """
+
         self.dataset = dataset
         self.qubit = qubit_element
         self._set_data_variables()
@@ -339,7 +386,15 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
         self.S21 = self.dataset.isel(ReIm=0) + 1j * self.dataset.isel(ReIm=1)
         self.magnitudes = np.abs(self.S21)
 
-    def _plot(self, primary_axis):
+    def plot(self, primary_axis):
+        """
+        Plot the fitted values from the analysis
+        Args:
+            primary_axis: The axis object from matplotlib to be plotted
+        Returns:
+            None, will just plot the fitted values
+        """
+
         self.plotter(primary_axis)  # Assuming node_analysis object is available
 
         # Customize plot as needed
@@ -349,34 +404,57 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
         primary_axis.legend(handles=handles, fontsize="small")
 
     @abstractmethod
-    def analyse_qubit(self) -> "QOI":
+    def analyse_qubit(self) -> QOI:
         """
-        Run the fitting of the analysis function
+        Run the actual analysis function
 
         Returns:
             The quantity of interest as QOI wrapped object
 
         """
-        pass
 
 
 class BaseCouplerAnalysis(BaseAnalysis, ABC):
+    """
+    Base class for the analysis of a single coupler
+    """
+
     def __init__(self, name, redis_fields):
+        super().__init__()
         self.name = name
         self.redis_fields = redis_fields
         self.dataset = None
         self.data_vars = None
         self.coords = None
+        self.coupler = ""
         self.name_qubit_1 = ""
         self.name_qubit_2 = ""
 
-    def process_coupler(self, dataset, coupler_element):
+    def process_coupler(self, dataset, coupler_element) -> QOI:
+        """
+        Process the coupler data and analyze it.
+        Args:
+            dataset: xarray dataset with the coupler data
+            coupler_element: name of the coupler element
+        Returns:
+            QOI: Quantity of interest as QOI wrapped object
+        """
+
         self._qoi = self.setup_coupler_and_analyze(dataset, coupler_element)
         self.update_redis_trusted_values(self.name, coupler_element, self._qoi)
 
         return self._qoi
 
-    def setup_coupler_and_analyze(self, dataset, coupler_element):
+    def setup_coupler_and_analyze(self, dataset, coupler_element) -> QOI:
+        """
+        Setup the coupler data and analyze it.
+        Args:
+            dataset: xarray dataset with the coupler data
+            coupler_element: name of the coupler element
+        Returns:
+            QOI: Quantity of interest as QOI wrapped object
+        """
+
         self.dataset = dataset
         self.coupler = coupler_element
         self._extract_qubit_names()
@@ -409,32 +487,47 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
 
     @abstractmethod
     def plotter(self, primary_axis, secondary_axis):
-        pass
+        """
+        Plot the fitted values from the analysis
+        Args:
+            primary_axis: The axis object from matplotlib to be plotted
+            secondary_axis: The axis object from matplotlib to be plotted
+        Returns:
+            None, will just plot the fitted values
+        """
 
-    def _plot(self, primary_axis, secondary_axis):
+    def plot(self, primary_axis, secondary_axis):
+        """
+        Plot the fitted values from the analysis
+        Args:
+            primary_axis: The axis object from matplotlib to be plotted
+            secondary_axis: The axis object from matplotlib to be plotted
+        Returns:
+            None, will just plot the fitted values
+        """
+
         self.plotter(
             primary_axis, secondary_axis
         )  # Assuming node_analysis object is available
 
-        # Customize plot as needed
-        patch = mpatches.Patch(color="green", label=f"{self.coupler}")
-
-        # handles, labels = primary_axis.get_legend_handles_labels()
-        # handles.append(patch)
-        # primary_axis.legend(handles=handles, fontsize="small")
-        # handles, labels = secondary_axis.get_legend_handles_labels()
-        # handles.append(patch)
-        # secondary_axis.legend(handles=handles, fontsize="small")
-
     @abstractmethod
-    def analyze_coupler(self) -> "QOI":
-        pass
+    def analyze_coupler(self) -> QOI:
+        """
+        Run the actual analysis function
+        Returns:
+            The quantity of interest as QOI wrapped object
+        """
 
 
 class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
+    """
+    Base class for the analysis of all couplers in a node
+    """
+
     single_coupler_analysis_obj: "BaseCouplerAnalysis"
 
     def __init__(self, name, redis_fields):
+        super().__init__()
         self.name = name
         self.redis_fields = redis_fields
         self.dataset = None
@@ -447,16 +540,25 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
         self.plots_per_qubit = 1
         self.plots_per_coupler = 2
 
-    def analyze_node(self, data_path: Path):
+    def analyze_node(self, data_path: Path, index: int = 0) -> QOI:
+        """
+        Analyze the node and save the results to redis.
+        Args:
+            data_path: Path to the dataset
+            index: Index of the dataset to be analyzed
+        Returns:
+            analysis_results: Dictionary with the analysis results for each qubit
+        """
+
         self.data_path = Path(data_path)
         self.dataset = self.open_dataset()
         self.coords = self.dataset.coords
         self.data_vars = self.dataset.data_vars
-        self.fig, self.axs = self.manage_plots(self.column_grid, self.plots_per_qubit)
+        self.fig, self.axs = self._manage_plots(self.column_grid, self.plots_per_qubit)
         analysis_results = self._analyze_all_couplers()
         self._fill_plots()
-        self.save_plots()
-        self.save_other_plots()
+        self._save_plots()
+        self._save_other_plots()
         return analysis_results
 
     def _analyze_all_couplers(self):
@@ -471,7 +573,7 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
             ds.attrs["node"] = self.name
 
             # matching_coords = [coord for coord in ds.coords if this_coupler in coord]
-            coupler_analysis = self.single_coupler_analysis_obj(
+            coupler_analysis: BaseCouplerAnalysis = self.single_coupler_analysis_obj(
                 self.name, self.redis_fields
             )
             coupler_analysis.data_path = self.data_path
@@ -505,7 +607,7 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
                 index % (self.column_grid // self.plots_per_coupler) + 1,
             ]
 
-            analysis._plot(primary_axis, secondary_axis)
+            analysis.plot(primary_axis, secondary_axis)
             self.fig.tight_layout()
 
             # Get positions of both axes (left and right in the pair)

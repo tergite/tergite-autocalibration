@@ -362,5 +362,5 @@ class ResetChevronNodeAnalysis(BaseAllCouplersAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
 
-    def save_plots(self):
-        super().save_plots()
+    def _save_plots(self):
+        super()._save_plots()
