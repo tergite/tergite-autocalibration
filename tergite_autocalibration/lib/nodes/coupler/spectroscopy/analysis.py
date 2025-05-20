@@ -404,7 +404,7 @@ class QubitSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
         ]
         ds1 = self.dataset[q1_data_var]
 
-        q1result = self.q1_analysis.setup_qubit_and_analyze(ds1, self.name_qubit_1)
+        q1result = self.q1_analysis.process_qubit(ds1, self.name_qubit_1)
 
         resonator_crossing_points_q2 = self.get_resonator_crossing_points(
             self.coupler, self.name_qubit_2
@@ -417,7 +417,7 @@ class QubitSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
             if self.name_qubit_2 in data_var
         ]
         ds2 = self.dataset[q2_data_var]
-        q2result = self.q2_analysis.setup_qubit_and_analyze(ds2, self.name_qubit_2)
+        q2result = self.q2_analysis.process_qubit(ds2, self.name_qubit_2)
         analysis_succesful = True
         analysis_result = {
             self.name_qubit_1: (dict(zip(self.redis_fields, q1result))),
@@ -523,7 +523,7 @@ class ResonatorSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
             if self.name_qubit_1 in data_var
         ]
         ds1 = self.dataset[q1_data_var]
-        q1result = self.q1_analysis.setup_qubit_and_analyze(ds1, q1_data_var[0][1:])
+        q1result = self.q1_analysis.process_qubit(ds1, q1_data_var[0][1:])
 
         q2_data_var = [
             data_var
@@ -532,7 +532,7 @@ class ResonatorSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
         ]
         ds2 = self.dataset[q2_data_var]
 
-        q2result = self.q2_analysis.setup_qubit_and_analyze(ds2, q2_data_var[0][1:])
+        q2result = self.q2_analysis.process_qubit(ds2, q2_data_var[0][1:])
         analysis_succesful = True
         analysis_result = {
             self.name_qubit_1: (dict(zip(self.redis_fields, q1result))),
