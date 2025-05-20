@@ -209,7 +209,9 @@ class BaseNode(abc.ABC):
         )
         self._results = node_analysis.analyze_node(data_path)
         for element_id_, qois_ in self._results.items():
-            update_redis_trusted_values(self.name, element_id_, qoi=qois_)
+            update_redis_trusted_values(
+                self.name, element_id_, qoi=qois_, redis_fields=self.redis_fields
+            )
         return self._results
 
     def configure_dataset(

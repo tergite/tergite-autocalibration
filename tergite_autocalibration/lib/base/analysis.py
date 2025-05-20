@@ -275,20 +275,6 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
 
     def process_qubit(self, dataset, qubit_element) -> QOI:
         """
-        Process the qubit data and analyze it.
-        Args:
-            dataset: xarray dataset with the qubit data
-            qubit_element: name of the qubit element
-        Returns:
-            QOI: Quantity of interest as QOI wrapped object
-        """
-
-        self._qoi = self.setup_qubit_and_analyze(dataset, qubit_element)
-        update_redis_trusted_values(self.name, self.qubit, self._qoi, self.redis_fields)
-        return self._qoi
-
-    def setup_qubit_and_analyze(self, dataset, qubit_element) -> QOI:
-        """
         Setup the qubit data and analyze it.
         Args:
             dataset: xarray dataset with the qubit data
@@ -301,7 +287,8 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
         self.qubit = qubit_element
         self._set_data_variables()
         self._compute_magnitudes()
-        return self.analyse_qubit()
+        self._qoi = self.analyse_qubit()
+        return self._qoi
 
     def _set_data_variables(self):
         self.coord = self.dataset.coords
@@ -357,23 +344,6 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
 
     def process_coupler(self, dataset, coupler_element) -> QOI:
         """
-        Process the coupler data and analyze it.
-        Args:
-            dataset: xarray dataset with the coupler data
-            coupler_element: name of the coupler element
-        Returns:
-            QOI: Quantity of interest as QOI wrapped object
-        """
-
-        self._qoi = self.setup_coupler_and_analyze(dataset, coupler_element)
-        update_redis_trusted_values(
-            self.name, coupler_element, self._qoi, self.redis_fields
-        )
-
-        return self._qoi
-
-    def setup_coupler_and_analyze(self, dataset, coupler_element) -> QOI:
-        """
         Setup the coupler data and analyze it.
         Args:
             dataset: xarray dataset with the coupler data
@@ -387,7 +357,8 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
         self._extract_qubit_names()
         self._set_data_variables()
         self._compute_magnitudes()
-        return self.analyze_coupler()
+        self._qoi = self.analyze_coupler()
+        return self._qoi
 
     def _extract_qubit_names(self):
         self.name_qubit_1 = self.coupler[0:3]
