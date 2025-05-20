@@ -45,6 +45,7 @@ optuna = "4.0.0"
 netcdf4 = "1.7.1.post2"
 tomlkit = "^0.13.2"
 rich = "^14.0.0"
+click = "<8.2.0"
 
 # The dependencies below come from quantifiles
 matplotlib = "^3.9.3"
