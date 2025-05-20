@@ -17,7 +17,6 @@ import collections
 import os
 from abc import ABC, abstractmethod
 from pathlib import Path
-import re
 from typing import List
 
 # TODO: we should have a conditional import depending on a feature flag here
@@ -26,8 +25,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
 
-from tergite_autocalibration.config.globals import REDIS_CONNECTION
-from tergite_autocalibration.tools.mss.convert import structured_redis_storage
+from tergite_autocalibration.lib.utils.redis import update_redis_trusted_values
 from tergite_autocalibration.utils.dto.qoi import QOI
 from tergite_autocalibration.utils.logging import logger
 
@@ -68,79 +66,6 @@ class BaseAnalysis(ABC):
             None, will just plot the fitted values
 
         """
-
-    # TODO: Alternative idea would be putting the redis handling into the QOI class
-    # Pros: Would be completely high-level interfaced
-    # Cons: We would have to define and implement several QOI classes
-    # -> It is probably not that much effort to implement several QOI classes
-    # -> We could start with a BaseQOI and add more as soon as needed
-    def update_redis_trusted_values(
-        self, node: str, this_element: str, qoi: QOI = None
-    ):
-        """
-        Update the redis trusted values for the qubit or coupler.
-        Args:
-            node: The node name
-            this_element: The element name (qubit or coupler)
-            qoi: The quantity of interest as QOI wrapped object
-        """
-
-        if "_" in this_element:
-            name = "couplers"
-            self._qoi = dict(qoi.analysis_result.items())
-            if self._are_two_qubit_in_qoi():
-                self._save_parameters_in_qubits_in_coupler(node, this_element, name)
-            else:
-                self._save_parameters_in_coupler(node, this_element, qoi, name)
-
-        else:
-            name = "transmons"
-            self._save_parameters_in_trasmon(node, this_element, qoi, name)
-
-    def _are_two_qubit_in_qoi(self):
-        return all(re.fullmatch(r"q\d{2}", key) for key in self._qoi)
-
-    def _save_parameters_in_trasmon(self, node, this_element, qoi, name):
-        analysis_successful = qoi.analysis_successful
-        if analysis_successful:
-            for qoi_name, qoi_result in qoi.analysis_result.items():
-                if qoi_name not in self.redis_fields:
-                    raise ValueError(
-                        f"The qoi {qoi_name} is not in redis fields: {self.redis_fields} for {this_element}"
-                    )
-                value = qoi_result["value"]
-                REDIS_CONNECTION.hset(f"{name}:{this_element}", qoi_name, value)
-                # Setting the value in the standard redis storage
-                structured_redis_storage(qoi_name, this_element.strip("q"), value)
-            REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
-        else:
-            logger.warning(f"Analysis failed for {this_element}")
-
-    def _save_parameters_in_coupler(self, node, this_element, qoi, name):
-        analysis_successful = qoi.analysis_successful
-        if analysis_successful:
-            for qoi_name, qoi_result in qoi.analysis_result.items():
-                if qoi_name not in self.redis_fields:
-                    raise ValueError(
-                        f"The qoi {qoi_name} is not in redis fields: {self.redis_fields} for {this_element}"
-                    )
-                value = qoi_result["value"]
-                logger.info(
-                    f"Updating redis for {this_element} with {qoi_name}: {value}"
-                )
-                REDIS_CONNECTION.hset(f"{name}:{this_element}", qoi_name, value)
-        REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
-
-    def _save_parameters_in_qubits_in_coupler(self, node, this_element, name):
-        qubits_in_coupler = [this_element[0:3], this_element[4:7]]
-        for i, qubit in enumerate(qubits_in_coupler):
-            for j, transmon_parameter in enumerate(self.redis_fields):
-                REDIS_CONNECTION.hset(
-                    f"{name}:{this_element}:{qubit}",
-                    transmon_parameter,
-                    self._qoi[qubit][transmon_parameter],
-                )
-        REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
 
     def rotate_to_probability_axis(self, complex_measurement_data):
         # TODO: THIS DOESNT BELONG HERE
@@ -359,7 +284,7 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
         """
 
         self._qoi = self.setup_qubit_and_analyze(dataset, qubit_element)
-        self.update_redis_trusted_values(self.name, self.qubit, self._qoi)
+        update_redis_trusted_values(self.name, self.qubit, self._qoi, self.redis_fields)
         return self._qoi
 
     def setup_qubit_and_analyze(self, dataset, qubit_element) -> QOI:
@@ -441,7 +366,9 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
         """
 
         self._qoi = self.setup_coupler_and_analyze(dataset, coupler_element)
-        self.update_redis_trusted_values(self.name, coupler_element, self._qoi)
+        update_redis_trusted_values(
+            self.name, coupler_element, self._qoi, self.redis_fields
+        )
 
         return self._qoi
 

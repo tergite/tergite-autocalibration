@@ -13,6 +13,7 @@
 # that they have been altered from the originals.
 
 import json
+import re
 
 import numpy as np
 from quantify_scheduler.json_utils import SchedulerJSONDecoder, SchedulerJSONEncoder
@@ -95,35 +96,74 @@ def load_redis_config_coupler(coupler: ExtendedCompositeSquareEdge):
     return coupler
 
 
-def update_redis_trusted_values(node: str, this_element: str, qoi: QOI = None):
+def update_redis_trusted_values(
+    node: str, this_element: str, qoi: QOI = None, redis_fields=None
+):
     """
-    This stores the analysis results in the redis database.
-
+    Update the redis trusted values for the qubit or coupler.
     Args:
-        node: Name of the node to store the values for. TODO: This could be factored out as well.
-        this_element: The qubit or coupler to save values for.
-        qoi: a dictionary of `QOI` objects with value to store in redis.
+        node: The node name
+        this_element: The element name (qubit or coupler)
+        qoi: The quantity of interest as QOI wrapped object
     """
+
     if "_" in this_element:
         name = "couplers"
+        _qoi = dict(qoi.analysis_result.items())
+        if _are_two_qubit_in_qoi(_qoi):
+            _save_parameters_in_qubits_in_coupler(
+                node, this_element, name, _qoi, redis_fields
+            )
+        else:
+            _save_parameters_in_coupler(node, this_element, name, qoi, redis_fields)
+
     else:
         name = "transmons"
+        _save_parameters_in_trasmon(node, this_element, name, qoi, redis_fields)
 
-    if name == "transmons":
 
-        # TODO: This is not elegant and will be replaced with a sync parameter
-        # skipping coupler_spectroscopy because it calls QubitSpectroscopy Analysis that updates the qubit frequency
-        # skipping coupler_resonator_spectroscopy for similar reasons
-        if node == "coupler_spectroscopy" or node == "coupler_resonator_spectroscopy":
-            return
+def _are_two_qubit_in_qoi(qoi):
+    return all(re.fullmatch(r"q\d{2}", key) for key in qoi)
 
-        analysis_successful = qoi.analysis_successful
-        if analysis_successful:
-            for qoi_name, qoi_result in qoi.analysis_result.items():
-                value = qoi_result["value"]
-                REDIS_CONNECTION.hset(f"{name}:{this_element}", qoi_name, value)
-                # Setting the value in the standard redis storage
-                structured_redis_storage(qoi_name, this_element.strip("q"), value)
-            REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
-        else:
-            logger.warning(f"Analysis failed for {this_element}")
+
+def _save_parameters_in_trasmon(node, this_element, name, qoi: QOI, redis_fields):
+    analysis_successful = qoi.analysis_successful
+    if analysis_successful:
+        for qoi_name, qoi_result in qoi.analysis_result.items():
+            if qoi_name not in redis_fields:
+                raise ValueError(
+                    f"The qoi {qoi_name} is not in redis fields: {redis_fields} for {this_element}"
+                )
+            value = qoi_result["value"]
+            REDIS_CONNECTION.hset(f"{name}:{this_element}", qoi_name, value)
+            # Setting the value in the standard redis storage
+            structured_redis_storage(qoi_name, this_element.strip("q"), value)
+        REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
+    else:
+        logger.warning(f"Analysis failed for {this_element}")
+
+
+def _save_parameters_in_coupler(node, this_element, name, qoi: QOI, redis_fields):
+    analysis_successful = qoi.analysis_successful
+    if analysis_successful:
+        for qoi_name, qoi_result in qoi.analysis_result.items():
+            if qoi_name not in redis_fields:
+                raise ValueError(
+                    f"The qoi {qoi_name} is not in redis fields: {redis_fields} for {this_element}"
+                )
+            value = qoi_result["value"]
+            logger.info(f"Updating redis for {this_element} with {qoi_name}: {value}")
+            REDIS_CONNECTION.hset(f"{name}:{this_element}", qoi_name, value)
+    REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
+
+
+def _save_parameters_in_qubits_in_coupler(node, this_element, name, qoi, redis_fields):
+    qubits_in_coupler = [this_element[0:3], this_element[4:7]]
+    for qubit in qubits_in_coupler:
+        for transmon_parameter in redis_fields:
+            REDIS_CONNECTION.hset(
+                f"{name}:{this_element}:{qubit}",
+                transmon_parameter,
+                qoi[qubit][transmon_parameter],
+            )
+    REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
