@@ -17,7 +17,7 @@ stages:
   - tests
   - lint
   - application_run
-  - application_run_2
+  - application_run_coupler
 
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
@@ -136,7 +136,7 @@ application_run:
       paths:
         - .venv
 
-application_run_2:
+application_run_coupler:
   stage: application_run_coupler
   image: python:${PYTHON_VERSION}
   needs:
