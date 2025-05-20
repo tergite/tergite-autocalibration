@@ -36,7 +36,7 @@ class PunchoutAnalysis(BaseQubitAnalysis):
         norm_magnitudes = magnitudes / np.max(magnitudes, axis=0)
         self.S21[f"y{self.qubit}"].values = norm_magnitudes
 
-        analysis_succesful = False
+        analysis_successful = False
 
         analysis_result = {
             "punchout": {
@@ -45,7 +45,7 @@ class PunchoutAnalysis(BaseQubitAnalysis):
             }
         }
 
-        qoi = QOI(analysis_result, analysis_succesful)
+        qoi = QOI(analysis_result, analysis_successful)
 
         return qoi
 

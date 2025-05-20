@@ -88,7 +88,7 @@ class BaseT2QubitAnalysis(BaseQubitAnalysis, ABC):
         self.average_T2 = np.mean(self.T2_times)
         self.error = np.std(self.T2_times)
 
-        analysis_succesful = True
+        analysis_successful = True
 
         # TODO: change this for t2_echo
         analysis_result = {
@@ -98,7 +98,7 @@ class BaseT2QubitAnalysis(BaseQubitAnalysis, ABC):
             }
         }
 
-        qoi = QOI(analysis_result, analysis_succesful)
+        qoi = QOI(analysis_result, analysis_successful)
 
         return qoi
 

@@ -92,7 +92,7 @@ class PurityBenchmarkingQubitAnalysis(BaseQubitAnalysis):
         self._process_and_normalize_data()
         self._fit_data()
 
-        analysis_succesful = True
+        analysis_successful = True
 
         analysis_result = {
             "purity_fidelity": {
@@ -101,7 +101,7 @@ class PurityBenchmarkingQubitAnalysis(BaseQubitAnalysis):
             }
         }
 
-        qoi = QOI(analysis_result, analysis_succesful)
+        qoi = QOI(analysis_result, analysis_successful)
 
         return qoi
 

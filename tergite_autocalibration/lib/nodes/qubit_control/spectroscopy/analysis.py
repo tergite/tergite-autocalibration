@@ -77,14 +77,14 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
 
     def analyse_qubit(self):
         self._analyse_spectroscopy()
-        analysis_succesful = True
+        analysis_successful = True
         analysis_result = {
             "clock_freqs:f01": {
                 "value": self.freq,
                 "error": self.uncertainty,
             },
         }
-        qoi = QOI(analysis_result, analysis_succesful)
+        qoi = QOI(analysis_result, analysis_successful)
         return qoi
 
     def reject_outliers(self, data, m=3.0):
@@ -269,7 +269,7 @@ class QubitSpectroscopyMultidimAnalysis(BaseQubitAnalysis):
 
     def analyse_qubit(self):
         self._analyse_spectroscopy()
-        analysis_succesful = True
+        analysis_successful = True
         analysis_result = {
             "clock_freqs:f01": {
                 "value": self.qubit_freq,
@@ -280,7 +280,7 @@ class QubitSpectroscopyMultidimAnalysis(BaseQubitAnalysis):
                 "error": 0,
             },
         }
-        qoi = QOI(analysis_result, analysis_succesful)
+        qoi = QOI(analysis_result, analysis_successful)
         return qoi
 
     def reject_outliers(self, x, m=3.0):
@@ -323,7 +323,7 @@ class QubitSpectroscopy12MultidimAnalysis(QubitSpectroscopyMultidimAnalysis):
 
     def analyse_qubit(self):
         self._analyse_spectroscopy()
-        analysis_succesful = True
+        analysis_successful = True
         analysis_result = {
             "clock_freqs:f12": {
                 "value": self.qubit_freq,
@@ -334,7 +334,7 @@ class QubitSpectroscopy12MultidimAnalysis(QubitSpectroscopyMultidimAnalysis):
                 "error": 0,
             },
         }
-        qoi = QOI(analysis_result, analysis_succesful)
+        qoi = QOI(analysis_result, analysis_successful)
         return qoi
 
 
