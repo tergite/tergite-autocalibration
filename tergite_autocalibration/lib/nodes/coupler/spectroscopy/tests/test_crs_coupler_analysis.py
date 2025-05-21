@@ -54,7 +54,7 @@ def test_get_crossings_for_q06_q07(
 ):
     ds, coupler = setup_q06_q07_data
     a = ResonatorSpectroscopyVsCurrentCouplerAnalysis("name", ["redis_fields"])
-    qoi = a.setup_coupler_and_analyze(ds, coupler)
+    qoi = a.process_coupler(ds, coupler)
 
     crossings = qoi["qubit_crossing_points"]
     assert crossings["q06"] == pytest.approx([-0.000425, 0.000675], abs=1e-6)
@@ -78,7 +78,7 @@ def test_get_crossings_for_q08_q09(
 ):
     ds, coupler = setup_q08_q09_data
     a = ResonatorSpectroscopyVsCurrentCouplerAnalysis("name", ["redis_fields"])
-    qoi = a.setup_coupler_and_analyze(ds, coupler)
+    qoi = a.process_coupler(ds, coupler)
 
     crossings = qoi["qubit_crossing_points"]
     assert crossings["q08"] == pytest.approx([-0.0008, 0.00075], abs=1e-6)
@@ -102,7 +102,7 @@ def test_get_crossings_for_q12_q13(
 ):
     ds, coupler = setup_q12_q13_data
     a = ResonatorSpectroscopyVsCurrentCouplerAnalysis("name", ["redis_fields"])
-    qoi = a.setup_coupler_and_analyze(ds, coupler)
+    qoi = a.process_coupler(ds, coupler)
 
     crossings = qoi["qubit_crossing_points"]
     assert crossings["q12"] == pytest.approx([-0.000425, 0.000825], abs=1e-6)
@@ -126,7 +126,7 @@ def test_get_crossings_for_q14_q15(
 ):
     ds, coupler = setup_q14_q15_data
     a = ResonatorSpectroscopyVsCurrentCouplerAnalysis("name", ["redis_fields"])
-    qoi = a.setup_coupler_and_analyze(ds, coupler)
+    qoi = a.process_coupler(ds, coupler)
 
     crossings = qoi["qubit_crossing_points"]
     assert crossings["q14"] == pytest.approx([-0.00025, 0.000925], abs=1e-6)
@@ -138,7 +138,7 @@ def test_coupler_plot_is_created(setup_q06_q07_data):
     matplotlib.use("Agg")
     ds, coupler = setup_q06_q07_data
     a = ResonatorSpectroscopyVsCurrentCouplerAnalysis("name", ["redis_fields"])
-    a.setup_coupler_and_analyze(ds, coupler)
+    a.process_coupler(ds, coupler)
 
     figure_path = os.environ["DATA_DIR"] + "/Coupler_Spectroscopy.png"
     # Remove the file if it already exists
@@ -163,7 +163,7 @@ def test_qubit_spectroscopies_for_coupler_are_created(setup_q06_q07_data):
     matplotlib.use("Agg")
     ds, coupler = setup_q06_q07_data
     a = ResonatorSpectroscopyVsCurrentCouplerAnalysis("name", ["redis_fields"])
-    a.setup_coupler_and_analyze(ds, coupler)
+    a.process_coupler(ds, coupler)
 
     path = Path(os.environ["DATA_DIR"])
     a.plot_spectroscopies(path)
