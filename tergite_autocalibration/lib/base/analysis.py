@@ -25,7 +25,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
 
-from tergite_autocalibration.lib.utils.redis import update_redis_trusted_values
 from tergite_autocalibration.utils.dto.qoi import QOI
 from tergite_autocalibration.utils.logging import logger
 

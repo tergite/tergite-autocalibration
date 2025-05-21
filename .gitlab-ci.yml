@@ -159,13 +159,13 @@ application_run_coupler:
     # Clear the caches
     - rm -r .venv/lib/python3.10/site-packages/out
     # Run the calibration chain
-    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/simple_coupler_run" -n coupler_spectroscopy
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/simple_coupler_run" -n qubit_spectroscopy_vs_current
     # Read
     - ls .venv/lib/python3.10/site-packages/out
     # Verify output
     - |
-      if find .venv/lib/python3.10/site-packages/out -type f | grep -q "coupler_spectroscopy.png" && \
-        find .venv/lib/python3.10/site-packages/out -type f | grep -q "coupler_spectroscopy_q14_q15_q15_spectroscopies.png"; then
+      if find .venv/lib/python3.10/site-packages/out -type f | grep -q "qubit_spectroscopy_vs_current.png" && \
+        find .venv/lib/python3.10/site-packages/out -type f | grep -q "qubit_spectroscopy_vs_current_q14_q15_q15_spectroscopies.png"; then
         echo "Both output files exist. Application ran successfully."
       else
         echo "Error: One or both output files not found."

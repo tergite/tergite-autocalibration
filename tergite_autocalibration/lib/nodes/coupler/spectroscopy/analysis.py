@@ -141,7 +141,11 @@ class QubitSpectroscopyVsCurrentQubitAnalysis(BaseQubitAnalysis):
                 temp_crossings.append(currents[j])
 
             # Evaluate grouping for minimum interval
-            if temp_crossings and (currents[i] - temp_crossings[0]) > min_interval:
+            if (
+                temp_crossings
+                and (currents[i] - temp_crossings[0]) > min_interval
+                or (len(temp_crossings) > 0 and j == len(freqs) - 1)
+            ):
                 mid_current = np.mean(temp_crossings)
                 too_close = any(
                     abs(mid_current - rc) <= resonator_crossings_interval
@@ -524,15 +528,16 @@ class ResonatorSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
         ]
         ds1 = self.dataset[q1_data_var]
         q1result = self.q1_analysis.process_qubit(ds1, q1_data_var[0][1:])
-
+        print("Q1 done")
         q2_data_var = [
             data_var
             for data_var in self.dataset.data_vars
             if self.name_qubit_2 in data_var
         ]
         ds2 = self.dataset[q2_data_var]
-
         q2result = self.q2_analysis.process_qubit(ds2, q2_data_var[0][1:])
+        print("Q2 done")
+
         analysis_succesful = True
         analysis_result = {
             self.name_qubit_1: (dict(zip(self.redis_fields, q1result))),
