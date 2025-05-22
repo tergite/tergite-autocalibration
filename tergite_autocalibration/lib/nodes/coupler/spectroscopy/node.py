@@ -40,6 +40,11 @@ from tergite_autocalibration.utils.logging import logger
 
 
 class QubitSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNode):
+    """
+    This node performs a qubit spectroscopy measurement while varying the
+    current through the coupler to measure the crossing point of the coupler with the qubit.
+    """
+
     measurement_obj = TwoTonesMultidimMeasurement
     analysis_obj = QubitSpectroscopyVsCurrentNodeAnalysis
     # coupler_qois = ["parking_current"]
@@ -103,7 +108,12 @@ class QubitSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNode):
         self.spi_dac.close_spi_rack()
 
 
-class CouplerResonatorSpectroscopyNode(ExternalParameterFixedScheduleCouplerNode):
+class ResonatorSpectroscopyVsCurrent(ExternalParameterFixedScheduleCouplerNode):
+    """
+    This node performs a resonator spectroscopy measurement while varying the
+    current through the coupler to measure the crossing point of the coupler with the resonator.
+    """
+
     measurement_obj = ResonatorSpectroscopyMeasurement
     analysis_obj = ResonatorSpectroscopyVsCurrentNodeAnalysis
     # coupler_qois = ["resonator_flux_quantum"]
