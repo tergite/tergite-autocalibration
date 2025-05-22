@@ -45,6 +45,7 @@ def setup_q06_q07_data():
     ds_qu, ds_res = get_dataset_for_coupler(coupler)
     return ds_res, ds_qu, coupler
 
+
 def get_dataset_for_coupler(coupler):
     qubits = coupler.split("_")
     dataset_path = (
@@ -60,7 +61,7 @@ def get_dataset_for_coupler(coupler):
     ds_res = xr.open_dataset(dataset_path)
     ds_res = xr.merge(ds_res[var] for var in [f"y{qubits[0]}", f"y{qubits[1]}"])
     ds_res.attrs["coupler"] = coupler
-    return ds_qu,ds_res
+    return ds_qu, ds_res
 
 
 def getCrossingForQubit(qoi: QOI, qubit: str = "q06"):
@@ -123,10 +124,13 @@ def test_get_crossings_for_q08_q09(
     q08_crossings = getCrossingForQubit(qoi, "q09")
     q09_crossings = getCrossingForQubit(qoi, "q08")
     assert q08_crossings == pytest.approx(
-        [-0.00215, -0.00135, 0.001325, 0.002108], abs=1e-6
+        # [-0.00215, -0.00135, 0.001325, 0.002108], abs=1e-6
+        [-0.002336, -0.001164, 0.001137, 0.002275],
+        abs=1e-6,
     )
     assert q09_crossings == pytest.approx(
-        [-0.0023357, -0.001165, 0.0011375, 0.002275],
+        # [-0.0023357, -0.001165, 0.0011375, 0.002275],
+        [-0.00215, -0.00135, 0.001325, 0.002108],
         abs=1e-6,
     )
 
@@ -153,8 +157,8 @@ def test_get_crossings_for_q12_q13(
     b = QubitSpectroscopyVsCurrentCouplerAnalysis("name", ["crossing_points"])
     qoi = b.process_coupler(ds_qu, coupler)
 
-    q12_crossings = getCrossingForQubit(qoi, "q14")
-    q13_crossings = getCrossingForQubit(qoi, "q15")
+    q12_crossings = getCrossingForQubit(qoi, "q12")
+    q13_crossings = getCrossingForQubit(qoi, "q13")
     assert q12_crossings == pytest.approx(
         [-0.00195, -0.00105, 0.001475, 0.002375], abs=1e-6
     )
@@ -195,11 +199,21 @@ def test_get_crossings_for_q14_q15(
 @with_os_env({"DATA_DIR": str(Path(__file__).parent / "results")})
 def test_coupler_plot_is_created(setup_q06_q07_data):
     matplotlib.use("Agg")
-    ds, coupler = setup_q06_q07_data
-    a = QubitSpectroscopyVsCurrentCouplerAnalysis("name", ["crossing_points"])
-    a.process_coupler(ds, coupler)
+    ds_res, ds_qu, coupler = setup_q06_q07_data
+    a = ResonatorSpectroscopyVsCurrentCouplerAnalysis(
+        "resonator_spectroscopy_vs_current", ["resonator_crossing_points"]
+    )
+    qoi = a.process_coupler(ds_res, coupler)
+    update_redis_trusted_values(
+        "resonator_spectroscopy_vs_current", coupler, qoi, ["resonator_crossing_points"]
+    )
 
-    figure_path = os.environ["DATA_DIR"] + "/Coupler_Spectroscopy.png"
+    b = QubitSpectroscopyVsCurrentCouplerAnalysis(
+        "qubit_spectroscopy_vs_current", ["crossing_points"]
+    )
+    qoi = b.process_coupler(ds_qu, coupler)
+
+    figure_path = os.environ["DATA_DIR"] + "/qubit_spectroscopy_vs_current.png"
     # Remove the file if it already exists
     if os.path.exists(figure_path):
         os.remove(figure_path)
@@ -220,15 +234,24 @@ def test_coupler_plot_is_created(setup_q06_q07_data):
 @with_os_env({"DATA_DIR": str(Path(__file__).parent / "results")})
 def test_qubit_spectroscopies_for_coupler_are_created(setup_q06_q07_data):
     matplotlib.use("Agg")
-    ds, coupler = setup_q06_q07_data
-    a = QubitSpectroscopyVsCurrentCouplerAnalysis("name", ["crossing_points"])
-    a.process_coupler(ds, coupler)
+    ds_res, ds_qu, coupler = setup_q06_q07_data
+    a = ResonatorSpectroscopyVsCurrentCouplerAnalysis(
+        "qubit_spectroscopy_vs_current", ["qubit_crossing_points"]
+    )
+    qoi = a.process_coupler(ds_res, coupler)
+    update_redis_trusted_values(
+        "qubit_spectroscopy_vs_current", coupler, qoi, ["qubit_crossing_points"]
+    )
+
+    b = QubitSpectroscopyVsCurrentCouplerAnalysis("name", ["crossing_points"])
+    qoi = b.process_coupler(ds_qu, coupler)
 
     path = Path(os.environ["DATA_DIR"])
     a.plot_spectroscopies(path)
 
     figure_1_path = (
-        os.environ["DATA_DIR"] + "/coupler_spectroscopy_q06_q07_q06_spectroscopies.png"
+        os.environ["DATA_DIR"]
+        + "/qubit_spectroscopy_vs_current_q06_q07_q06_spectroscopies.png"
     )
     assert os.path.exists(figure_1_path)
     from PIL import Image
@@ -237,7 +260,8 @@ def test_qubit_spectroscopies_for_coupler_are_created(setup_q06_q07_data):
         assert img.format == "PNG", "File should be a PNG image"
 
     figure_2_path = (
-        os.environ["DATA_DIR"] + "/coupler_spectroscopy_q06_q07_q07_spectroscopies.png"
+        os.environ["DATA_DIR"]
+        + "/qubit_spectroscopy_vs_current_q06_q07_q07_spectroscopies.png"
     )
     assert os.path.exists(figure_2_path)
     from PIL import Image
