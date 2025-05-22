@@ -89,7 +89,6 @@ def test_get_crossings_for_q06_q07(
 
     q06_crossings = getCrossingForQubit(qoi, "q06")
     q07_crossings = getCrossingForQubit(qoi, "q07")
-    print(q07_crossings)
     assert q06_crossings == pytest.approx(
         [-0.001925, -0.0011, 0.001375, 0.0022], abs=1e-6
     )
