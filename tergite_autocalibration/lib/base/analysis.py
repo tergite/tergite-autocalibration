@@ -348,8 +348,9 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
 
         self.coupler_analyses = []
 
-        self.column_grid = 2
+        self.column_grid = 4
         self.plots_per_qubit = 1
+        self.plots_per_coupler = 2
 
     def analyze_node(self, data_path: Path):
         self.data_path = Path(data_path)
@@ -399,7 +400,14 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
 
     def _fill_plots(self):
         for index, analysis in enumerate(self.coupler_analyses):
-            primary_plot_row = self.plots_per_qubit * (index // self.column_grid)
-            primary_axis = self.axs[primary_plot_row, index % self.column_grid]
-            secondary_axis = self.axs[primary_plot_row, (index + 1) % self.column_grid]
+            primary_plot_row = self.plots_per_qubit * (
+                (index * self.plots_per_coupler) // self.column_grid
+            )
+            primary_axis = self.axs[
+                primary_plot_row, (index * self.plots_per_coupler) % self.column_grid
+            ]
+            secondary_axis = self.axs[
+                primary_plot_row,
+                ((index * self.plots_per_coupler) + 1) % self.column_grid,
+            ]
             analysis._plot(primary_axis, secondary_axis)
