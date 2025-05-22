@@ -35,11 +35,33 @@ from tergite_autocalibration.utils.dto.qoi import QOI
 
 
 class QubitSpectroscopyVsCurrentQubitAnalysis(BaseQubitAnalysis):
+    """
+    This class analyzes the qubit frequencies as obtained from the scpescroscopies to find crossing currents.
+    """
+
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
         self.resonator_crossing_points = []
+        self.crossing_currents = []
+        self.n_crossing = 0
+        self.detected_frequencies = []
+        self.detected_currents = []
+        self.spectroscopy_analyses = []
+        self.frequencies_coord = None
+        self.current_coord = None
+        self.frequencies = None
+        self.dc_currents = None
 
     def analyse_qubit(self) -> list[float, float]:
+        """
+        This function analyzes the qubit spectroscopy data to find crossing currents.
+        It processes the dataset, identifies the frequencies and currents, and
+        applies a threshold to find the crossing points.
+
+        Returns:
+            list: A list of crossing currents.
+        """
+
         logger.debug("Running QubitAnalysisForCouplerSpectroscopy")
 
         for coord in self.dataset[self.data_var].coords:
@@ -50,9 +72,6 @@ class QubitSpectroscopyVsCurrentQubitAnalysis(BaseQubitAnalysis):
 
         self.dc_currents = self.dataset[self.current_coord]
         self.frequencies = self.dataset[self.frequencies_coord]
-        self.detected_frequencies = []
-        self.detected_currents = []
-        self.spectroscopy_analyses = []
 
         for i, current in enumerate(self.dc_currents.values):
             ds = self.dataset.sel({self.current_coord: current})
@@ -80,7 +99,7 @@ class QubitSpectroscopyVsCurrentQubitAnalysis(BaseQubitAnalysis):
         min_interval = 0.0003
         resonator_crossings_interval = 0.00015
 
-        self.crossing_currents = self.find_crossing_currents(
+        self.crossing_currents = self._find_crossing_currents(
             self.detected_currents,
             self.detected_frequencies,
             threshold,
@@ -93,7 +112,7 @@ class QubitSpectroscopyVsCurrentQubitAnalysis(BaseQubitAnalysis):
         self.n_crossing = len(self.crossing_currents)
         return [str(self.crossing_currents)]
 
-    def find_crossing_currents(
+    def _find_crossing_currents(
         self,
         currents,
         frequencies,
@@ -161,6 +180,12 @@ class QubitSpectroscopyVsCurrentQubitAnalysis(BaseQubitAnalysis):
         return crossing_currents
 
     def plotter(self, ax: plt.Axes):
+        """
+        Plot the detected frequencies and currents, along with crossing currents.
+        Args:
+            ax (plt.Axes): The axes to plot on.
+        """
+
         self.magnitudes[self.data_var].plot(ax=ax, x=self.current_coord)
         ax.scatter(self.detected_currents, self.detected_frequencies, s=52, c="blue")
         ax.vlines(
@@ -204,10 +229,32 @@ class QubitSpectroscopyVsCurrentQubitAnalysis(BaseQubitAnalysis):
 
 
 class ResonatorSpectroscopyVsCurrentQubitAnalysis(BaseQubitAnalysis):
+    """
+    This class analyzes the resonator spectroscopy fitted frequencies to find crossing currents.
+    """
+
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
+        self.detected_frequencies = []
+        self.detected_currents = []
+        self.spectroscopy_analyses = []
+        self.crossing_currents = []
+        self.n_crossing = 0
+        self.frequencies_coord = None
+        self.current_coord = None
+        self.frequencies = None
+        self.dc_currents = None
 
     def analyse_qubit(self) -> list[float, float]:
+        """
+        This function analyzes the resonator spectroscopy data to find crossing currents.
+        It processes the dataset, identifies the frequencies and currents, and
+        applies a threshold to find the crossing points.
+
+        Returns:
+            list: A list of crossing currents.
+        """
+
         logger.debug("Running QubitAnalysisForCouplerSpectroscopy")
 
         for coord in self.dataset[self.data_var].coords:
@@ -218,9 +265,7 @@ class ResonatorSpectroscopyVsCurrentQubitAnalysis(BaseQubitAnalysis):
 
         self.dc_currents = self.dataset[self.current_coord]
         self.frequencies = self.dataset[self.frequencies_coord]
-        self.detected_frequencies = []
-        self.detected_currents = []
-        self.spectroscopy_analyses = []
+
         for i, current in enumerate(self.dc_currents.values):
             ds = self.dataset.sel({self.current_coord: current})
 
@@ -246,7 +291,7 @@ class ResonatorSpectroscopyVsCurrentQubitAnalysis(BaseQubitAnalysis):
         spurious_threshold = 4000
         min_interval = 0.0005  # Adjust based on data range
 
-        self.crossing_currents = self.find_crossing_currents(
+        self.crossing_currents = self._find_crossing_currents(
             self.detected_currents,
             self.detected_frequencies,
             threshold,
@@ -265,7 +310,7 @@ class ResonatorSpectroscopyVsCurrentQubitAnalysis(BaseQubitAnalysis):
 
         return [str(self.crossing_currents)]
 
-    def find_crossing_currents(
+    def _find_crossing_currents(
         self,
         currents,
         frequencies,
@@ -331,7 +376,11 @@ class ResonatorSpectroscopyVsCurrentQubitAnalysis(BaseQubitAnalysis):
         return crossing_currents
 
     def plotter(self, ax: plt.Axes):
-        # self.magnitudes[self.data_var].plot(ax=ax, x=self.current_coord)
+        """
+        Plot the detected frequencies and currents, along with crossing currents.
+        Args:
+            ax (plt.Axes): The axes to plot on.
+        """
         ax.scatter(self.detected_currents, self.detected_frequencies, s=52, c="blue")
         if self.n_crossing > 0:
             ax.vlines(
@@ -370,15 +419,21 @@ class ResonatorSpectroscopyVsCurrentQubitAnalysis(BaseQubitAnalysis):
         ax.set_ylim([min(self.detected_frequencies), max(self.detected_frequencies)])
         ax.set_xlabel("Coupler current [A]")
         ax.set_ylabel("Frequency [Hz]")
-        ax.set_title(f"Qubit {self.qubit}")
         ax.xaxis.set_major_locator(MaxNLocator(nbins=5))
 
 
 class QubitSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
+    """
+    This class analyzes the qubit spectroscopy data as a function of the current for a coupler.
+    """
+
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
         self.q1_analysis = None
         self.q2_analysis = None
+        self.frequencies = None
+        self.current_coord = None
+        self.frequencies_coord = None
 
     def analyze_coupler(self):
         for coord in self.dataset[self.data_var].coords:
@@ -453,18 +508,28 @@ class QubitSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
         return crossing_points
 
     def plotter(self, primary_axis, secondary_axis):
+        """
+        Plot the results of the analysis on the provided axes.
+        Args:
+            primary_axis (plt.Axes): The primary axis for the first qubit.
+            secondary_axis (plt.Axes): The secondary axis for the second qubit.
+        """
+
         self.q1_analysis.plotter(primary_axis)
         self.q2_analysis.plotter(secondary_axis)
 
-    def plot_all_fit_q1(self, axs):
+    def _plot_all_fit_q1(self, axs):
         for i, ana in enumerate(self.q1_analysis.spectroscopy_analyses):
             ana.plotter(axs[int(i / self.columns), i % self.columns])
 
-    def plot_all_fit_q2(self, axs):
+    def _plot_all_fit_q2(self, axs):
         for i, ana in enumerate(self.q2_analysis.spectroscopy_analyses):
             ana.plotter(axs[int(i / self.columns), i % self.columns])
 
     def plot_spectroscopies(self, data_path: Path):
+        """
+        Plot all the spectroscopy analyses for both qubits and save the figures.
+        """
         n_analyses = len(self.q1_analysis.spectroscopy_analyses)
         self.columns = int(np.ceil(np.sqrt(n_analyses)))
         fig_size = 20 * self.columns / 4
@@ -474,7 +539,7 @@ class QubitSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
             squeeze=False,
             figsize=(fig_size, fig_size),
         )
-        self.plot_all_fit_q1(axs)
+        self._plot_all_fit_q1(axs)
 
         fig.tight_layout()
         full_path = (
@@ -489,7 +554,7 @@ class QubitSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
             squeeze=False,
             figsize=(fig_size, fig_size),
         )
-        self.plot_all_fit_q2(axs)
+        self._plot_all_fit_q2(axs)
 
         fig.tight_layout()
         full_path = (
@@ -501,12 +566,22 @@ class QubitSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
 
 
 class ResonatorSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
+    """
+    This class analyzes the resonator spectroscopy data as a function of the current for a coupler.
+    """
+
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
         self.q1_analysis = None
         self.q2_analysis = None
+        self.frequencies = None
+        self.current_coord = None
+        self.frequencies_coord = None
 
     def analyze_coupler(self):
+        """
+        This function analyzes the coupler data to find crossing currents for both qubits.
+        """
         for coord in self.dataset[self.data_var].coords:
             if "frequencies" in coord:
                 self.frequencies = coord
@@ -528,7 +603,6 @@ class ResonatorSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
         ]
         ds1 = self.dataset[q1_data_var]
         q1result = self.q1_analysis.process_qubit(ds1, q1_data_var[0][1:])
-        print("Q1 done")
         q2_data_var = [
             data_var
             for data_var in self.dataset.data_vars
@@ -536,7 +610,6 @@ class ResonatorSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
         ]
         ds2 = self.dataset[q2_data_var]
         q2result = self.q2_analysis.process_qubit(ds2, q2_data_var[0][1:])
-        print("Q2 done")
 
         analysis_succesful = True
         analysis_result = {
@@ -551,15 +624,19 @@ class ResonatorSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
         self.q1_analysis.plotter(primary_axis)
         self.q2_analysis.plotter(secondary_axis)
 
-    def plot_all_fit_q1(self, axs):
+    def _plot_all_fit_q1(self, axs):
         for i, ana in enumerate(self.q1_analysis.spectroscopy_analyses):
             ana.plotter(axs[int(i / 4), i % 4])
 
-    def plot_all_fit_q2(self, axs):
+    def _plot_all_fit_q2(self, axs):
         for i, ana in enumerate(self.q2_analysis.spectroscopy_analyses):
             ana.plotter(axs[int(i / 4), i % 4])
 
     def plot_spectroscopies(self, data_path: Path):
+        """
+        Plot all the spectroscopy analyses for both qubits and save the figures.
+        """
+
         n_analyses = len(self.q1_analysis.spectroscopy_analyses)
         fig, axs = plt.subplots(
             nrows=int(np.ceil(n_analyses / 4)),
@@ -567,7 +644,7 @@ class ResonatorSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
             squeeze=False,
             figsize=(20, 20),
         )
-        self.plot_all_fit_q1(axs)
+        self._plot_all_fit_q1(axs)
 
         fig.tight_layout()
         full_path = (
@@ -582,7 +659,7 @@ class ResonatorSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
             squeeze=False,
             figsize=(20, 20),
         )
-        self.plot_all_fit_q2(axs)
+        self._plot_all_fit_q2(axs)
 
         fig.tight_layout()
         full_path = (
@@ -593,6 +670,10 @@ class ResonatorSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
 
 
 class QubitSpectroscopyVsCurrentNodeAnalysis(BaseAllCouplersAnalysis):
+    """
+    This class analyzes the qubit spectroscopy data as a function of the current for all coupler.
+    """
+
     single_coupler_analysis_obj = QubitSpectroscopyVsCurrentCouplerAnalysis
 
     def __init__(self, name, redis_fields):
@@ -604,6 +685,10 @@ class QubitSpectroscopyVsCurrentNodeAnalysis(BaseAllCouplersAnalysis):
 
 
 class ResonatorSpectroscopyVsCurrentNodeAnalysis(BaseAllCouplersAnalysis):
+    """
+    This class analyzes the resonator spectroscopy data as a function of the current for all coupler.
+    """
+
     single_coupler_analysis_obj = ResonatorSpectroscopyVsCurrentCouplerAnalysis
 
     def __init__(self, name, redis_fields):
