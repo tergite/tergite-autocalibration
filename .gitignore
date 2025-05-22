@@ -17,7 +17,7 @@ notebooks/0
 send_to_lefteris.ps1
 
 #dataset folders
-#202[3456789]*/
+202[3456789]*/
 data_directory/
 
 #data files
