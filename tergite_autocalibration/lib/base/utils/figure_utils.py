@@ -101,11 +101,9 @@ def add_top_band(
 
 
 def infer_date_from_path(path: Path) -> str:
-    print(f"Trying to infer date from path: {path}")
     try:
         # Try multiple formats in case of different naming conventions
         for part in path.parts:
-            print(f"Trying part: {part}")
             try:
                 return datetime.strptime(part, "%Y-%m-%d").strftime("%d-%m-%Y")
             except ValueError:

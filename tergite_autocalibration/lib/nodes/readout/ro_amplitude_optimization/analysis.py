@@ -149,7 +149,7 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
         ax.plot(self.optimal_amplitude, self.fidelities[self.optimal_index], "*", ms=14)
         ax.grid()
 
-    def _plot(self, primary_axis, secondary_axes):
+    def plot(self, primary_axis, secondary_axes):
         self.plotter(
             primary_axis, secondary_axes
         )  # Assuming node_analysis object is available
