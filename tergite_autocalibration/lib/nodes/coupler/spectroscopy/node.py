@@ -108,7 +108,7 @@ class QubitSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNode):
         self.spi_dac.close_spi_rack()
 
 
-class ResonatorSpectroscopyVsCurrent(ExternalParameterFixedScheduleCouplerNode):
+class ResonatorSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNode):
     """
     This node performs a resonator spectroscopy measurement while varying the
     current through the coupler to measure the crossing point of the coupler with the resonator.
