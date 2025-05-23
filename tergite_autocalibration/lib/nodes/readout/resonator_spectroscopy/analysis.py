@@ -58,7 +58,7 @@ class ResonatorSpectroscopyQubitAnalysis(BaseQubitAnalysis):
             )
             if not self.fitting_model.success:
                 logger.info("Fit was unsuccessful.")
-                logger.info("Reason:", self.fitting_model.message)
+                logger.info(f"Reason:{self.fitting_model.message}")
 
         except Exception as e:
             logger.info("Could not fit the resonator data")
