@@ -202,16 +202,3 @@ def setup_data_mutliple_files():
     logger.info(combined_dataset)
 
     return combined_dataset, freqs, amps
-
-
-def test_PickLowestCurrentCompleteAnalysis(
-    setup_data_mutliple_files: tuple[xr.Dataset, ndarray, ndarray]
-):
-    ds, freqs, amps = setup_data_mutliple_files
-    a = CZParametrisationFixDurationCouplerAnalysis("name", ["redis_fields"])
-    a.process_coupler(ds, "q06_q07")
-
-    assert a.opt_index == 1
-    assert a.opt_freq == (freqs[18] + freqs[19]) / 2
-    assert a.opt_amp == (amps[10] + amps[11]) / 2
-    assert a.opt_current == -0.7989

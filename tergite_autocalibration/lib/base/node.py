@@ -204,12 +204,14 @@ class BaseNode(abc.ABC):
 
     def post_process(self, data_path: Path):
         analysis_kwargs = getattr(self, "analysis_kwargs", dict())
-        node_analysis = self.analysis_obj(
+        node_analysis: BaseNodeAnalysis = self.analysis_obj(
             self.name, self.redis_fields, **analysis_kwargs
         )
         self._results = node_analysis.analyze_node(data_path)
         for element_id_, qois_ in self._results.items():
-            update_redis_trusted_values(self.name, element_id_, qoi=qois_)
+            update_redis_trusted_values(
+                self.name, element_id_, qoi=qois_, redis_fields=self.redis_fields
+            )
         return self._results
 
     def configure_dataset(

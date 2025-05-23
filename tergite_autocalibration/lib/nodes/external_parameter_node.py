@@ -58,7 +58,7 @@ class ExternalParameterNode(BaseNode, abc.ABC):
 
 class ExternalParameterFixedScheduleNode(ExternalParameterNode):
     def __init__(self, name: str, **schedule_keywords):
-        super().__init__(name, schedule_keywords=schedule_keywords)
+        super().__init__(name, **schedule_keywords)
 
     def measure_node(self, cluster_status) -> xarray.Dataset:
         iterations = self.external_dimensions
@@ -227,14 +227,14 @@ class ExternalParameterFixedScheduleQubitNode(
     ExternalParameterFixedScheduleNode, QubitNode
 ):
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super.__init__(self, name, all_qubits, schedule_keywords=schedule_keywords)
+        super().__init__(name, all_qubits=all_qubits, **schedule_keywords)
 
 
 class ExternalParameterFixedScheduleCouplerNode(
     ExternalParameterFixedScheduleNode, CouplerNode
 ):
     def __init__(self, name: str, couplers: list[str], **schedule_keywords):
-        CouplerNode.__init__(self, name, couplers, schedule_keywords=schedule_keywords)
+        super().__init__(name, couplers=couplers, **schedule_keywords)
 
 
 class ExternalParameterDifferentSchedulesCouplerNode(
