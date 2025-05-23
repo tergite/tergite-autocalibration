@@ -39,10 +39,10 @@ website:
         contents:
           - text: "Overview"
             href: available_nodes.qmd
-          - text: "Punchout"
-            href: nodes/punchout_node.qmd
           - text: "Resonator spectroscopy"
             href: nodes/resonator_spectroscopy_node.qmd
+          - text: "Punchout"
+            href: nodes/punchout_node.qmd
           - text: "Qubit spectroscopy"
             href: nodes/qubit_spectroscopy_node.qmd
       - section: "Developer Guide"
