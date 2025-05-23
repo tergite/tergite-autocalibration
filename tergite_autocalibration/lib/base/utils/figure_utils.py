@@ -62,7 +62,7 @@ def add_top_band(
             logger.error(f"Left logo load failed: {e}")
 
     # Center text block
-    acquisition_date = infer_date_from_path(Path(CONFIG.run.data_dir))
+    acquisition_date = infer_date_from_path(CONFIG.run.data_dir)
     analysis_date = datetime.now().strftime("%d-%m-%Y")
 
     if acquisition_date is None:
@@ -100,8 +100,9 @@ def add_top_band(
             logger.error(f"Right logo load failed: {e}")
 
 
-def infer_date_from_path(path: Path) -> str:
+def infer_date_from_path(path: str) -> str:
     try:
+        path = Path(path)
         # Try multiple formats in case of different naming conventions
         for part in path.parts:
             try:
