@@ -26,11 +26,6 @@ from tergite_autocalibration.utils.logging import logger
 def add_top_band(
     axes_tuple,
     logo_path=None,
-    chip_owner="Unknown",
-    chip_name="ChipX",
-    cooldown="CD-01",
-    label="Internal",
-    right_logo_path=None,
 ):
 
     ax_left, ax_center, ax_right = axes_tuple
@@ -73,6 +68,15 @@ def add_top_band(
         date_info += f" | Analysis: {analysis_date}"
 
     # Add text info (fill the rest of the band)
+    chip_owner = CONFIG.device.owner
+    chip_name = CONFIG.device.name
+    cooldown = CONFIG.run.cooldown
+    right_logo_path = CONFIG.run.runner_logo
+
+    label = None
+    if CONFIG.run.is_internal:
+        label = "Internal"
+
     full_text = f"{chip_owner} {chip_name} | CL: {cooldown} | {date_info}"
     if label is not None:
         full_text += f" | {label}"
@@ -175,10 +179,6 @@ def create_figure_with_top_band(nrows, ncols):
     add_top_band(
         top_band_axes,
         logo_path="resources/logo.png",
-        chip_owner="QC2",
-        chip_name="25-qubit V8a #1",
-        cooldown="03/05/2025",
-        label="Internal",
     )
 
     return fig, axs

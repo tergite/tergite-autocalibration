@@ -1,6 +1,7 @@
 # This code is part of Tergite
 #
 # (C) Copyright Chalmers Next Labs 2024
+# (C) Copyright Michele Faucci Giannelli 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -103,3 +104,30 @@ class RunConfiguration(TOMLConfigurationFile):
 
         """
         return self._dict["couplers"]
+
+    @property
+    def cooldown(self) -> str:
+        """
+        Returns:
+            Date of the last cooldown.
+
+        """
+        return self._dict["cooldown"]
+
+    @property
+    def is_internal(self) -> str:
+        """
+        Returns:
+            flag if the plots are for internal use or not.
+
+        """
+        return self._dict["is_internal"]
+
+    @property
+    def runner_logo(self) -> str:
+        """
+        Returns:
+            Path to the logo to be used in the runner.
+
+        """
+        return self._dict["runner_logo"]
