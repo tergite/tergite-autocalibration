@@ -1,0 +1,25 @@
+## Qubit Spectroscopy as a function of the coupler current 
+
+The qubit spectroscopy as a function of the coupler current is one of the initial steps in characterizing a coupler and preparing for two-qubit gate implementation. This spectroscopy is performed by varying the current applied to the coupler and measuring the qubit response at each current.
+The result is a two-dimensional map typically showing regions with a "U" or $\bigcap$ shape when analyzing the maximum values of the qubit spectroscopies. These shapes indicate changes in coupling and are key to identifying crossing points between the qubit and the coupler.
+
+### Measurement class: `TwoTonesMultidimMeasurement`
+
+Desctibed in [qubit spectroscopy](qubit_spectroscopy_node.qmd).
+
+### Analysis classes: 
+
+The `QubitSpectroscopyVsCurrentNodeAnalysis` class handles the analysis of all selected couplers and manages the associated plots. In addition to the preview plot that is displayed at run time, the analysis saves a file for each qubit containing all the resonator spectroscopies for debugging purposes.
+
+The `QubitSpectroscopyVsCurrentCouplerAnalysis` combines the results of the two qubits in a coupler and the saving of the QOI so that the information of the crossing points is saved per qubit per coupler as described in the [base class](../developer-guide/new_node_creation.qmd#base-classes) documentation.
+
+The `QubitSpectroscopyVsCurrentQubitAnalysis` performs the analysis of a qubit combining the results of all qubit spectroscopy measurements looking primarily for the crossing points, i.e. the values of the currents at which there is a change of region from U to $\bigcap$; these are the point at which the coupler crosses the qubit frequency and can be used to study the properties of the coupler. 
+The main function used is `find_crossing_currents`, which:
+* Cleans the data by removing isolated zeros (representing missing or invalid data) and outliers.
+* Scans the data from left to right, comparing consecutive non-zero values to detect transitions based on a predefined threshold.
+* Groups transitions occurring within a minimum range to mitigate the effect of noise or spurious detections.
+* Determines the crossing point as the average position within each grouped transition region. 
+* If a crossing is within a small distance from the coupler-resonator crossing (determined in the [reconator spectroscopy vs current](resonator_spectroscopy_vs_current_node.qmd) node), then is excluded. 
+The current thresholds and interval ranges are optimized for a current step size of 50uA. 
+
+The analysis of each qubit spectroscopy is performed in a dedicated analysis class, the `QubitSpectroscopyMaxThresholdQubitAnalysis` that is stored in the analysis file of the spectropy folder in the qubit_control folder. This analysis differs from the standard qubit spectroscopy analysis in that it does not attempt to fit the spectrum using a Lorentzian function. This choice is intentional, as the spectral shape near a crossing is often distorted or lacks a clear peak, making fitting unreliable. Instead, the analysis identifies the maximum point in the spectrum and evaluates its significance using a relevance metric defined as (max - mean) / RMS. If the peak is below threshold, zero is returned instead of the maximum value. The current hardcoded threshold (2.7) is rather conservative and was optimized for analysis with poor qubit spectroscopies, i.e. having multiple peaks instead of a clean one. For well calibrated systems this threshold can be raised up to 3.3 or even higher.
