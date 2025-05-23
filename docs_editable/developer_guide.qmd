@@ -17,7 +17,8 @@ pip install -e .
 run
 
 ```bash
-pip install -e ".[all]"
+pip install poetry
+poetry install --with dev,test
 ```
 
 this will install the additional packages for developing code and running tests
