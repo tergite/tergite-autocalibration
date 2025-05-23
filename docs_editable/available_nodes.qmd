@@ -17,8 +17,11 @@ graph TD
     I --> J
         
     click A href "nodes/resonator_spectroscopy_node.html"
+    click F href "nodes/resonator_spectroscopy_node.html"
+    click G1 href "nodes/resonator_spectroscopy_node.html"
     click A1 href "nodes/punchout_node.html"
     click B href "nodes/qubit_spectroscopy_node.html"
+    click F1 href "nodes/qubit_spectroscopy_node.html"
     click C href "nodes/rabi_oscillations_node.html"
     click I href "nodes/resonator_spectroscopy_vs_current_node.html"
     click J href "nodes/qubit_spectroscopy_vs_current_node.html"
