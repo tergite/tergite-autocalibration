@@ -149,9 +149,10 @@ class BaseNodeAnalysis(ABC):
 
     def _manage_plots(self, column_grid: int, plots_per_qubit: int):
         n_vars = len(self.data_vars)
-        rows = int(np.ceil(n_vars / column_grid)) * plots_per_qubit
+        nrows = int(np.ceil(n_vars / column_grid)) * plots_per_qubit
+        ncols = min(column_grid, n_vars)
 
-        fig, axs = create_figure_with_top_band(rows, column_grid)
+        fig, axs = create_figure_with_top_band(nrows, ncols)
 
         return fig, axs
 

@@ -24,6 +24,9 @@ from tergite_autocalibration.lib.base.analysis import (
     BaseCouplerAnalysis,
     BaseQubitAnalysis,
 )
+from tergite_autocalibration.lib.base.utils.figure_utils import (
+    create_figure_with_top_band,
+)
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis import (
     QubitSpectroscopyMaxThresholdQubitAnalysis,
 )
@@ -532,31 +535,19 @@ class QubitSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
         """
         n_analyses = len(self.q1_analysis.spectroscopy_analyses)
         self.columns = int(np.ceil(np.sqrt(n_analyses)))
-        fig_size = 20 * self.columns / 4
-        fig, axs = plt.subplots(
-            nrows=int(np.ceil(n_analyses / self.columns)),
-            ncols=self.columns,
-            squeeze=False,
-            figsize=(fig_size, fig_size),
-        )
+        rows = (int(np.ceil(n_analyses / self.columns)),)
+        fig, axs = create_figure_with_top_band(rows, self.columns)
         self._plot_all_fit_q1(axs)
 
-        fig.tight_layout()
         full_path = (
             data_path
             / f"{self.name}_{self.coupler}_{self.name_qubit_1}_spectroscopies.png"
         )
         fig.savefig(full_path, bbox_inches="tight", dpi=200)
 
-        fig, axs = plt.subplots(
-            nrows=int(np.ceil(n_analyses / self.columns)),
-            ncols=self.columns,
-            squeeze=False,
-            figsize=(fig_size, fig_size),
-        )
+        fig, axs = create_figure_with_top_band(rows, self.columns)
         self._plot_all_fit_q2(axs)
 
-        fig.tight_layout()
         full_path = (
             data_path
             / f"{self.name}_{self.coupler}_{self.name_qubit_2}_spectroscopies.png"
@@ -638,30 +629,20 @@ class ResonatorSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
         """
 
         n_analyses = len(self.q1_analysis.spectroscopy_analyses)
-        fig, axs = plt.subplots(
-            nrows=int(np.ceil(n_analyses / 4)),
-            ncols=4,
-            squeeze=False,
-            figsize=(20, 20),
-        )
+        self.columns = int(np.ceil(np.sqrt(n_analyses)))
+        rows = (int(np.ceil(n_analyses / self.columns)),)
+        fig, axs = create_figure_with_top_band(rows, self.columns)
         self._plot_all_fit_q1(axs)
 
-        fig.tight_layout()
         full_path = (
             data_path
             / f"{self.name}_{self.coupler}_{self.name_qubit_1}_spectroscopies.png"
         )
         fig.savefig(full_path, bbox_inches="tight", dpi=200)
 
-        fig, axs = plt.subplots(
-            nrows=int(np.ceil(n_analyses / 4)),
-            ncols=4,
-            squeeze=False,
-            figsize=(20, 20),
-        )
+        fig, axs = create_figure_with_top_band(rows, self.columns)
         self._plot_all_fit_q2(axs)
 
-        fig.tight_layout()
         full_path = (
             data_path
             / f"{self.name}_{self.coupler}_{self.name_qubit_2}_spectroscopies.png"
