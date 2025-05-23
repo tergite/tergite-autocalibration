@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.53">
+<meta name="generator" content="quarto-1.5.56">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -205,6 +205,24 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Qubit spectroscopy</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nodes/rabi_oscillations_node.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Rabi oscillations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nodes/resonator_spectroscopy_vs_current_node.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Resonator spectroscopy vs current</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nodes/qubit_spectroscopy_vs_current_node.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Qubit spectroscopy vs current</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -309,9 +327,15 @@ ul.task-list li input[type="checkbox"] {
     F --&gt; F1(Qubit 12 Spectroscopy) --&gt; G(Rabi 12 Oscillations)
     F --&gt; H1(2 States Discrimination)
     G --&gt; H2(3 States Discrimination)
+    A --&gt; I(Resonator spectroscopy vs current)
+    B --&gt; J(Qubit spectroscopy vs current)
+    I --&gt; J
         
     click A href "nodes/resonator_spectroscopy_node.html"
     click B href "nodes/qubit_spectroscopy_node.html"
+    click C href "nodes/rabi_oscillations_node.html"
+    click I href "nodes/resonator_spectroscopy_vs_current_node.html"
+    click J href "nodes/qubit_spectroscopy_vs_current_node.html"
 
     style A fill:#ffe6cc,stroke:#333,stroke-width:2px
     style B fill:#ffe6cc,stroke:#333,stroke-width:2px
@@ -326,6 +350,8 @@ ul.task-list li input[type="checkbox"] {
     style G fill:#ffe6cc,stroke:#333,stroke-width:2px
     style H1 fill:#ffe6cc,stroke:#333,stroke-width:2px
     style H2 fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style I fill:#ff9999,stroke:#333,stroke-width:2px
+    style J fill:#ff9999,stroke:#333,stroke-width:2px
 </pre>
 </div>
 <p></p></figure><p></p>
@@ -363,8 +389,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="coupler-nodes" class="level2">
 <h2 class="anchored" data-anchor-id="coupler-nodes">Coupler Nodes</h2>
 <ul>
-<li>coupler_spectroscopy</li>
-<li>coupler_resonator_spectroscopy</li>
+<li><a href="./nodes/qubit_spectroscopy_vs_current_node.html">coupler_spectroscopy</a></li>
+<li><a href="./nodes/resonator_spectroscopy_vs_current_node.html">coupler_resonator_spectroscopy</a></li>
 </ul>
 </section>
 <section id="characterization-nodes" class="level2">
