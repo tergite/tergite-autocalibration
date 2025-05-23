@@ -185,7 +185,3 @@ application_run_coupler:
     - key: "venv-${CI_COMMIT_REF_NAME}"
       paths:
         - .venv
-  artifacts:
-    paths:
-      - .venv/lib/python3.10/site-packages/out/
-    expire_in: 1 hour
