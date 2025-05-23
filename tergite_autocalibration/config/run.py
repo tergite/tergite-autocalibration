@@ -115,7 +115,7 @@ class RunConfiguration(TOMLConfigurationFile):
         return self._dict["cooldown"]
 
     @property
-    def is_internal(self) -> str:
+    def is_internal(self) -> bool:
         """
         Returns:
             flag if the plots are for internal use or not.
