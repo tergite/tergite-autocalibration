@@ -80,8 +80,7 @@ pip install -e .
 Install the development and test dependencies
 
 ```bash
-pip install poetry
-poetry install --with dev,test
+pip install -e ".[all]"
 ```
 
 Run the CLI help command to see whether the application is running.

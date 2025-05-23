@@ -1,14 +1,15 @@
-[tool.poetry]
-name = "oqs-licensing"
-version = "1.0.10"
-description = ""
-authors = ["Stefan Hill <stefanhi@chalmers.se>"]
-readme = "README.md"
-
-[tool.poetry.dependencies]
-python = "^3.9"
-
+# This code is part of Tergite
+#
+# (C) Copyright Chalmers Next Labs 2025
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
