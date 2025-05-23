@@ -679,7 +679,7 @@ class QubitSpectroscopyVsCurrentNodeAnalysis(BaseAllCouplersAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
 
-    def save_other_plots(self):
+    def _save_other_plots(self):
         for c_ana in self.coupler_analyses:
             c_ana.plot_spectroscopies(self.data_path)
 
@@ -694,6 +694,6 @@ class ResonatorSpectroscopyVsCurrentNodeAnalysis(BaseAllCouplersAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
 
-    def save_other_plots(self):
+    def _save_other_plots(self):
         for c_ana in self.coupler_analyses:
             c_ana.plot_spectroscopies(self.data_path)
