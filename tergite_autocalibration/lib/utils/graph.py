@@ -32,11 +32,11 @@ from tergite_autocalibration.utils.logging import logger
 # means 'resonator_spectroscopy' depends on 'tof'.
 GRAPH_DEPENDENCIES = [
     ("tof", "resonator_spectroscopy"),
-    ("resonator_spectroscopy", "coupler_resonator_spectroscopy"),
+    ("resonator_spectroscopy", "resonator_spectroscopy_vs_current"),
     ("resonator_spectroscopy", "qubit_01_spectroscopy"),
     ("resonator_spectroscopy", "qubit_01_spectroscopy_AR"),
     ("qubit_01_spectroscopy_AR", "rabi_oscillations_AR"),
-    ("coupler_resonator_spectroscopy", "coupler_spectroscopy"),
+    ("resonator_spectroscopy_vs_current", "qubit_spectroscopy_vs_current"),
     ("qubit_01_spectroscopy", "rabi_oscillations"),
     ("rabi_oscillations", "ramsey_correction"),
     ("rabi_oscillations", "T1"),
