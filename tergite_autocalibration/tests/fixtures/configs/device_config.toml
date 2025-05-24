@@ -39,6 +39,7 @@ qubits = ["q06", "q07"]
 # after fabrication and first manual characterization steps. The general
 # section should contain relevant metadata
 name = "device_template"
+owner = "someone"
 
 # -------------------- Resonator definitions --------------------
 # This section contains all resonator-specific properties

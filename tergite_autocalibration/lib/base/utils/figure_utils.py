@@ -23,9 +23,8 @@ from tergite_autocalibration.config.globals import (
 from tergite_autocalibration.utils.logging import logger
 
 
-def add_top_band(
+def _add_top_band(
     axes_tuple,
-    logo_path=None,
 ):
 
     ax_left, ax_center, ax_right = axes_tuple
@@ -48,7 +47,9 @@ def add_top_band(
     )
     ax_center.add_line(line)
 
-    # Add left logo
+    # Add left logo, this is hardcoded as it is the Tergite logo.
+    logo_path = ("resources/logo.png",)
+
     if logo_path:
         try:
             logo = mpimg.imread(logo_path)
@@ -57,7 +58,7 @@ def add_top_band(
             logger.error(f"Left logo load failed: {e}")
 
     # Center text block
-    acquisition_date = infer_date_from_path(CONFIG.run.data_dir)
+    acquisition_date = _infer_date_from_path(CONFIG.run.data_dir)
     analysis_date = datetime.now().strftime("%d-%m-%Y")
 
     if acquisition_date is None:
@@ -68,8 +69,8 @@ def add_top_band(
         date_info += f" | Analysis: {analysis_date}"
 
     # Add text info (fill the rest of the band)
-    chip_owner = CONFIG.device.owner
-    chip_name = CONFIG.device.name
+    chip_name = "25-Qubit V8a #1" # CONFIG.device.name
+    chip_owner = "QC2" # CONFIG.device.owner
     cooldown = CONFIG.run.cooldown
     right_logo_path = CONFIG.run.runner_logo
 
@@ -104,7 +105,7 @@ def add_top_band(
             logger.error(f"Right logo load failed: {e}")
 
 
-def infer_date_from_path(path: str) -> str:
+def _infer_date_from_path(path: str) -> str:
     try:
         path = Path(path)
         # Try multiple formats in case of different naming conventions
@@ -120,7 +121,17 @@ def infer_date_from_path(path: str) -> str:
         return "Unknown"
 
 
-def create_figure_with_top_band(nrows, ncols):
+def create_figure_with_top_band(nrows, ncols) -> tuple:
+    """
+    Create a figure with a top band for metadata and a grid of subplots.
+    Args:
+        nrows (int): Number of rows in the subplot grid.
+        ncols (int): Number of columns in the subplot grid.
+    Returns:
+        fig (matplotlib.figure.Figure): The created figure.
+        axs (numpy.ndarray): 2D array of Axes objects for the subplots.
+    """
+    # These values are fixed to ensure uniformity in the plots across the application.
     subplot_size = 5
     logo_size = 0.8
     band_height_inch = 0.8
@@ -176,9 +187,8 @@ def create_figure_with_top_band(nrows, ncols):
 
     top_band_axes = (ax_left, ax_center, ax_right)
 
-    add_top_band(
+    _add_top_band(
         top_band_axes,
-        logo_path="resources/logo.png",
     )
 
     return fig, axs
