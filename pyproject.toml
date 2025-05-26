@@ -1,82 +1,86 @@
-[tool.poetry]
-name = "tergite-autocalibration"
-version = "2025.03.0"
-description = "commandline application to calibrate the WACQT quantum computers automatically"
-authors = [
-    "Eleftherios Moschandreou <elemos@chalmers.se>",
-    "Liangyu Chen <liangyuc@chalmers.se>",
-    "Stefan Hill <stefanhi@chalmers.se>",
-    "Amr Osman <oarm@chalmers.se>",
-    "Tong Liu <liuto@chalmers.se>",
-    "Joel Sandås <sandas@chalmers.se>",
-    "Pontus Vikstål <pontus.vikstal@chalmersnextlabs.se>",
-    "Michele Faucci Giannelli <faucci@chalmers.se>",
-]
-maintainers = [
-    "Chalmers Next Labs AB <contact@quantum.chalmersnextlabs.se>",
-]
-readme = "README.md"
-packages = [{include = "tergite_autocalibration"}]
-
-[tool.poetry.dependencies]
-python = ">= 3.10, < 3.11"
-pyqt5-qt5 = [
-    { version = "5.15.2", platform = "linux" },
-    { version = "5.15.2", platform = "win32" },
-    { version = "^5.15.2", platform = "darwin" }
-]
-colorama = "0.4.6"
-h5netcdf = "1.4.0"
-h5py = "3.7.0"
-Jinja2 = "3.1.2"
-numpy = ">=2.0"
-qblox-instruments = "0.14.2"
-qcodes = "0.49.0"
-quantify-core = "0.7.8"
-quantify-scheduler = "0.21.2"
-redis = "5.0.0"
-scikit-learn = "1.5.2"
-toml = "0.10.2"
-python-dotenv = "1.0.1"
-requests = "^2.32.3"
-typer = "^0.12.5"
-jokeapi = "1.0.5"
-optuna = "4.0.0"
-netcdf4 = "1.7.1.post2"
-tomlkit = "^0.13.2"
-rich = "^14.0.0"
-click = "<8.2.0"
-
-# The dependencies below come from quantifiles
-matplotlib = "^3.9.3"
-scipy = "^1.14.1"
-pandas = "^2.2.3"
-xarray = "^2024.11.0"
-filelock = "^3.16.1"
-pyqtgraph = "^0.13.7"
-pyqt5 = "^5.15.11"
-
-
-
-# NOTE: This is pinned because of the following error:
-# `SerialCompilationConfig` is not fully defined; you should define `SimpleNodeConfig`,
-# then call `SerialCompilationConfig.model_rebuild()`.
-# The pydantic version can be more loosely defined as soon as quantify-scheduler has fixed the error
-pydantic = "2.9.2"
-
-
-[tool.poetry.group.dev.dependencies]
-jupyter = "^1.0.0"
-black = "^24.10.0"
-isort = "^5.12.0"
-
-[tool.poetry.group.test.dependencies]
-pytest = "^8.3.3"
-requests-mock = "^1.11.0"
-
-[tool.poetry.scripts]
-acli = "tergite_autocalibration.tools.cli:cli"
+# This code is part of Tergite
+#
+# (C) Copyright Chalmers Next Labs 2024
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools>=61.0", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tergite-autocalibration"
+version = "2025.03.0"
+description = "Commandline application to calibrate the WACQT quantum computers automatically"
+readme = "README.md"
+authors = [
+  { name = "Eleftherios Moschandreou", email = "elemos@chalmers.se" },
+  { name = "Liangyu Chen", email = "liangyuc@chalmers.se" },
+  { name = "Stefan Hill", email = "stefanhi@chalmers.se" },
+  { name = "Amr Osman", email = "oarm@chalmers.se" },
+  { name = "Tong Liu", email = "liuto@chalmers.se" },
+  { name = "Joel Sandås", email = "sandas@chalmers.se" },
+  { name = "Pontus Vikstål", email = "pontus.vikstal@chalmersnextlabs.se" },
+  { name = "Michele Faucci Giannelli", email = "faucci@chalmers.se" }
+]
+maintainers = [
+  { name = "Chalmers Next Labs AB", email = "contact@quantum.chalmersnextlabs.se" }
+]
+requires-python = ">=3.10, <3.11"
+dependencies = [
+  "pyqt5-qt5==5.15.2; platform_system == 'Linux'",
+  "pyqt5-qt5==5.15.2; platform_system == 'Windows'",
+  "pyqt5-qt5>=5.15.2,<6.0.0; platform_system == 'Darwin'",
+  "colorama==0.4.6",
+  "h5netcdf==1.4.0",
+  "h5py==3.7.0",
+  "Jinja2==3.1.2",
+  "numpy>=2.0",
+  "qblox-instruments==0.14.2",
+  "qcodes==0.49.0",
+  "quantify-core==0.7.8",
+  "quantify-scheduler==0.21.2",
+  "redis==5.0.0",
+  "scikit-learn==1.5.2",
+  "toml==0.10.2",
+  "python-dotenv==1.0.1",
+  "requests>=2.32.3",
+  "typer>=0.12.5",
+  "jokeapi==1.0.5",
+  "optuna==4.0.0",
+  "netcdf4==1.7.1.post2",
+  "tomlkit>=0.13.2",
+  "rich>=14.0.0",
+  "click<8.2.0",
+  "matplotlib>=3.9.3",
+  "scipy>=1.14.1",
+  "pandas>=2.2.3",
+  "xarray>=2024.11.0",
+  "filelock>=3.16.1",
+  "pyqtgraph>=0.13.7",
+  "pyqt5>=5.15.11",
+  "pydantic==2.9.2"
+]
+
+[project.optional-dependencies]
+dev = [
+  "jupyter>=1.0.0",
+  "black>=24.10.0",
+  "isort>=5.12.0"
+]
+test = [
+  "pytest>=8.3.3",
+  "requests-mock>=1.11.0"
+]
+
+[project.scripts]
+acli = "tergite_autocalibration.tools.cli:cli"
+
+[tool.setuptools]
+packages = ["tergite_autocalibration"]

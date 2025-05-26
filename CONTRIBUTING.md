@@ -70,18 +70,11 @@ Create the conda environment
 conda create -n tac python=3.10 -y
 ```
 
-Install dependencies
+Install dependencies with development and test dependencies
 
 ```bash
 conda activate tac
-pip install -e .
-```
-
-Install the development and test dependencies
-
-```bash
-pip install poetry
-poetry install --with dev,test
+pip install -e ".[test,dev]"
 ```
 
 Run the CLI help command to see whether the application is running.

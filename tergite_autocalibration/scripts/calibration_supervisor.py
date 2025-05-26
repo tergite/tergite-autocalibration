@@ -112,7 +112,7 @@ class HardwareManager:
                 quit()
 
             logger.status(
-                f" \n\u26A0 {Fore.MAGENTA}{Style.BRIGHT}Resetting Cluster at IP *{str(self.config.cluster_ip)[-3:]}{Style.RESET_ALL}\n"
+                f" \n\u26a0 {Fore.MAGENTA}{Style.BRIGHT}Resetting Cluster at IP *{str(self.config.cluster_ip)[-3:]}{Style.RESET_ALL}\n"
             )
             cluster.reset()  # Reset the cluster to a default state for consistency
             return cluster
