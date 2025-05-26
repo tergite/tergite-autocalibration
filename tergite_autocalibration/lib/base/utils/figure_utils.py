@@ -69,11 +69,8 @@ def _add_top_band(
         date_info += f" | Analysis: {analysis_date}"
 
     # Add text info (fill the rest of the band)
-    # Chip information should be loaded from the device
-    # config file, like the run info is taken from the run config,
-    # but for now we hardcode it as CONFIG does not load the object correctly
-    chip_name = "25-Qubit V8a #1"  # CONFIG.device.name
-    chip_owner = "QC2"  # CONFIG.device.owner
+    chip_name = CONFIG.device.name
+    chip_owner = CONFIG.device.owner
     cooldown = CONFIG.run.cooldown
     right_logo_path = CONFIG.run.runner_logo
 
