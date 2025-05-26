@@ -67,5 +67,6 @@ In this figure, it is possible to see how the resonator spectroscopy is progress
 Especially in cases with a small granularity in the amplitude, it may be possible that the selected value is sub-optimal, looking at these plots will help fine-tune the value of the readout amplitude.
 
 ### References
-
+- [PRL 105.100505](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.105.100505) 
+- [Rev. Sci. Instrum. 86, 024706 (2015)](https://pubs.aip.org/aip/rsi/article-abstract/86/2/024706/360955/Efficient-and-robust-analysis-of-complex?redirectedFrom=fulltext)
 
