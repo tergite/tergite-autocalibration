@@ -12,6 +12,7 @@
 # that they have been altered from the originals.
 
 from tergite_autocalibration.config.base import TOMLConfigurationFile
+from tergite_autocalibration.utils.logging import logger
 
 
 class DeviceConfiguration(TOMLConfigurationFile):
@@ -22,20 +23,29 @@ class DeviceConfiguration(TOMLConfigurationFile):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # Load the device part of the device configuration file
+        try:
+            self._device = self._dict["device"]
+        except KeyError:
+            logger.warning(
+                "Device configuration empty or not found, please check your device configuration."
+            )
+            self._device = {}
+
     @property
     def name(self) -> str:
         """
         Returns:
-            flag if the plots are for internal use or not.
+            Name of the device
 
         """
-        return self._dict["device"]["name"]
+        return self._device["name"]
 
     @property
     def owner(self) -> str:
         """
         Returns:
-            Path to the logo to be used in the runner.
+            Name of the device
 
         """
-        return self._dict["device"]["owner"]
+        return self._device["owner"]
