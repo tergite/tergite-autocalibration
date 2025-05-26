@@ -53,3 +53,4 @@ def test_global_configuration():
 
     assert configuration_handler.run.filepath == CONFIG.run.filepath
     assert configuration_handler.samplespace.filepath == CONFIG.samplespace.filepath
+    assert configuration_handler.device.filepath == CONFIG.device.filepath
