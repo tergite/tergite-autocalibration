@@ -63,7 +63,7 @@ class DataHandler:
 
             # TODO: Both layout and device should be fed into a Device object.
             #       Right now we are not using the device configuration.
-            device_config = toml.load(CONFIG.device)
+            device_config = toml.load(CONFIG.device.filepath)
             cls._layout = device_config["layout"]
 
             # Iterate over the values for the device configuration to detect whether there are values

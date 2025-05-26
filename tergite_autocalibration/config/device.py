@@ -11,6 +11,7 @@
 # that they have been altered from the originals.
 
 from tergite_autocalibration.config.base import TOMLConfigurationFile
+from tergite_autocalibration.utils.logging import logger
 
 
 class DeviceConfiguration(TOMLConfigurationFile):
@@ -20,3 +21,21 @@ class DeviceConfiguration(TOMLConfigurationFile):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        # Load the device part of the device configuration file
+        try:
+            self._device = self._dict["device"]
+        except KeyError:
+            logger.warning(
+                "Device configuration empty or not found, please check your device configuration."
+            )
+            self._device = {}
+
+    @property
+    def name(self) -> str:
+        """
+        Returns:
+            Name of the device
+
+        """
+        return self._device["name"]
