@@ -201,6 +201,12 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./nodes/punchout_node.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Punchout</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./nodes/qubit_spectroscopy_node.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Qubit spectroscopy</span></a>
   </div>
@@ -318,26 +324,32 @@ ul.task-list li input[type="checkbox"] {
 <p></p><figure class="figure"><p></p>
 <div>
 <pre class="mermaid mermaid-js">graph TD
-    A[Resonator Spectroscopy] --&gt; B(Qubit Spectroscopy)
+    A[Resonator Spectroscopy] --&gt; A1[Punchout]
+    A1 --&gt; B(Qubit Spectroscopy)
     B --&gt; C[Rabi Oscillations]
     C --&gt; D[Ramsey Correction]
     D --&gt; E[Motzoi Parameter]
     E --&gt; F[Resonator Spectroscopy 1]
     F --&gt; C1[T1] --&gt; C2[T2] --&gt; C3[Randomized Benchmarking]
-    F --&gt; F1(Qubit 12 Spectroscopy) --&gt; G(Rabi 12 Oscillations)
+    F --&gt; F1(Qubit 12 Spectroscopy) --&gt; G(Rabi 12 Oscillations) --&gt; G1[Resonator Spectroscopy 2]
     F --&gt; H1(2 States Discrimination)
-    G --&gt; H2(3 States Discrimination)
+    G1 --&gt; H2(3 States Discrimination)
     A --&gt; I(Resonator spectroscopy vs current)
     B --&gt; J(Qubit spectroscopy vs current)
     I --&gt; J
         
     click A href "nodes/resonator_spectroscopy_node.html"
+    click F href "nodes/resonator_spectroscopy_node.html"
+    click G1 href "nodes/resonator_spectroscopy_node.html"
+    click A1 href "nodes/punchout_node.html"
     click B href "nodes/qubit_spectroscopy_node.html"
+    click F1 href "nodes/qubit_spectroscopy_node.html"
     click C href "nodes/rabi_oscillations_node.html"
     click I href "nodes/resonator_spectroscopy_vs_current_node.html"
     click J href "nodes/qubit_spectroscopy_vs_current_node.html"
 
     style A fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style A1 fill:#ffe6cc,stroke:#333,stroke-width:2px
     style B fill:#ffe6cc,stroke:#333,stroke-width:2px
     style C fill:#ffe6cc,stroke:#333,stroke-width:2px
     style D fill:#ffe6cc,stroke:#333,stroke-width:2px
@@ -348,6 +360,7 @@ ul.task-list li input[type="checkbox"] {
     style C3 fill:#ffffcc,stroke:#333,stroke-width:2px
     style F1 fill:#ffe6cc,stroke:#333,stroke-width:2px
     style G fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style G1 fill:#ffe6cc,stroke:#333,stroke-width:2px
     style H1 fill:#ffe6cc,stroke:#333,stroke-width:2px
     style H2 fill:#ffe6cc,stroke:#333,stroke-width:2px
     style I fill:#ff9999,stroke:#333,stroke-width:2px
@@ -361,10 +374,10 @@ ul.task-list li input[type="checkbox"] {
 <section id="readout-nodes" class="level2">
 <h2 class="anchored" data-anchor-id="readout-nodes">Readout Nodes</h2>
 <ul>
-<li>punchout</li>
 <li><a href="./nodes/resonator_spectroscopy_node.html">resonator_spectroscopy</a></li>
-<li>resonator_spectroscopy_1</li>
-<li>resonator_spectroscopy_2</li>
+<li><a href="./nodes/punchout_node.html">punchout</a></li>
+<li><a href="./nodes/resonator_spectroscopy_node.html">resonator_spectroscopy_1</a></li>
+<li><a href="./nodes/resonator_spectroscopy_node.html">resonator_spectroscopy_2</a></li>
 <li>ro_frequency_two_state_optimization</li>
 <li>ro_frequency_three_state_optimization</li>
 <li>ro_amplitude_two_state_optimization</li>
@@ -375,11 +388,9 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="qubit-control-nodes">Qubit Control Nodes</h2>
 <ul>
 <li><a href="./nodes/qubit_spectroscopy_node.html">qubit_01_spectroscopy</a></li>
-<li>qubit_01_spectroscopy_pulsed</li>
 <li><a href="./nodes/rabi_oscillations_node.html">rabi_oscillations</a></li>
 <li>ramsey_correction</li>
-<li>qubit_12_spectroscopy_pulsed</li>
-<li>qubit_12_spectroscopy_multidim</li>
+<li><a href="./nodes/qubit_spectroscopy_node.html">qubit_12_spectroscopy</a></li>
 <li><a href="./nodes/rabi_oscillations_node.html">rabi_oscillations_12</a></li>
 <li>ramsey_correction_12</li>
 <li>adaptive_motzoi_parameter</li>
