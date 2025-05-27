@@ -21,7 +21,7 @@ stages:
 
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-  PYTHON_VERSION: "3.10"
+  PYTHON_VERSION: "3.12"
   REDIS_PORT: 6378
 
 
@@ -115,14 +115,14 @@ application_run:
     # Reset Redis
     - echo "y" | acli node reset -a
     # Clear the caches
-    - rm -r .venv/lib/python3.10/site-packages/out
+    - rm -r .venv/lib/python3.12/site-packages/out
     # Run the calibration chain
     - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_two_state_optimization" -n rabi_oscillations
     # Read
-    - ls .venv/lib/python3.10/site-packages/out
+    - ls .venv/lib/python3.12/site-packages/out
     # Verify output
     - |
-      if find .venv/lib/python3.10/site-packages/out -type f | grep -q "rabi_oscillations.png"; then
+      if find .venv/lib/python3.12/site-packages/out -type f | grep -q "rabi_oscillations.png"; then
         echo "Output file $OUTPUT_FILE exists. Application ran successfully."
       else
         echo "Error: Output file $OUTPUT_FILE not found."
@@ -157,22 +157,22 @@ application_run_coupler:
     # Reset Redis
     - echo "y" | acli node reset -a
     # Clear the caches
-    - rm -r .venv/lib/python3.10/site-packages/out
+    - rm -r .venv/lib/python3.12/site-packages/out
     # Run the calibration chain
     - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/simple_coupler_run" -n qubit_spectroscopy_vs_current
     # Read
-    - ls .venv/lib/python3.10/site-packages/out
+    - ls .venv/lib/python3.12/site-packages/out
     - echo "Listing all files under 'out':"
-    - find .venv/lib/python3.10/site-packages/out -type f -name "*.png"
+    - find .venv/lib/python3.12/site-packages/out -type f -name "*.png"
     # Verify output
     - |
-      if find .venv/lib/python3.10/site-packages/out -type f | grep -q "qubit_spectroscopy_vs_current.png"; then
+      if find .venv/lib/python3.12/site-packages/out -type f | grep -q "qubit_spectroscopy_vs_current.png"; then
         echo "Output file $OUTPUT_FILE exists. Application ran successfully."
       else
         echo "Error: Output file $OUTPUT_FILE not found."
         exit 1
       fi
-      if find .venv/lib/python3.10/site-packages/out -type f | grep -q "qubit_spectroscopy_vs_current_q14_q15_q15_spectroscopies.png"; then
+      if find .venv/lib/python3.12/site-packages/out -type f | grep -q "qubit_spectroscopy_vs_current_q14_q15_q15_spectroscopies.png"; then
         echo "Output file $OUTPUT_FILE exists. Application ran successfully."
       else
         echo "Error: Output file $OUTPUT_FILE not found."
