@@ -36,10 +36,10 @@ git clone git@github.com:tergite/tergite-autocalibration.git
 ```
 
 To manage Python packages, we are using the package manager `conda`.
-It is recommended to create an environment for your project - alternatively, you can also just use Python 3.10
+It is recommended to create an environment for your project - alternatively, you can also just use Python 3.12
 
 ```bash
-conda create -n tac python=3.10 -y
+conda create -n tac python=3.12 -y
 ```
 
 Here, `tac` stands for tergite-autocalibration.

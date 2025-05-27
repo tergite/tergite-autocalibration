@@ -32,14 +32,14 @@ authors = [
 maintainers = [
   { name = "Chalmers Next Labs AB", email = "contact@quantum.chalmersnextlabs.se" }
 ]
-requires-python = ">=3.10, <3.11"
+requires-python = ">=3.12, <3.13"
 dependencies = [
   "pyqt5-qt5==5.15.2; platform_system == 'Linux'",
   "pyqt5-qt5==5.15.2; platform_system == 'Windows'",
   "pyqt5-qt5>=5.15.2,<6.0.0; platform_system == 'Darwin'",
   "colorama==0.4.6",
   "h5netcdf==1.4.0",
-  "h5py==3.7.0",
+  "h5py>=3.12.1",
   "Jinja2==3.1.2",
   "numpy>=2.0",
   "qblox-instruments==0.14.2",

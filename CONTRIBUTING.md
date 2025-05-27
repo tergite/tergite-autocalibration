@@ -56,7 +56,7 @@ email [contact@quantum.chalmersnextlabs.se](mailto://contact@quantum.chalmersnex
 ## How to develop
 
 Make sure you have [conda](https://docs.anaconda.com/free/miniconda/index.html) installed.
-Alternatively, you could also simply have [Python 3.10](https://www.python.org/downloads/) installed.
+Alternatively, you could also simply have [Python 3.12](https://www.python.org/downloads/) installed.
 Clone the repo and enter its root folder:
 
 ```bash
@@ -67,7 +67,7 @@ cd tergite-autocalibration
 Create the conda environment
 
 ```bash
-conda create -n tac python=3.10 -y
+conda create -n tac python=3.12 -y
 ```
 
 Install dependencies with development and test dependencies
