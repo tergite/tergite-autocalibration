@@ -2,7 +2,9 @@
 #
 # (C) Copyright Eleftherios Moschandreou 2023, 2024
 # (C) Copyright Liangyu Chen 2023, 2024
+# (C) Copyright Pontus Vikstahl 2024
 # (C) Copyright Stefan Hill 2024
+# (C) Copyright Martin Ahindura 2023
 # (C) Copyright Michele Faucci Giannelli 2024, 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
@@ -12,14 +14,10 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
-#
-# Modified:
-#
-# - Martin Ahindura, 2023
+
 import os
 from dataclasses import dataclass, field
 from ipaddress import IPv4Address
-from pathlib import Path
 from typing import List, Union
 
 from colorama import Fore, Style
@@ -30,15 +28,14 @@ from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
 
 from tergite_autocalibration.config.globals import (
-    REDIS_CONNECTION,
     CLUSTER_IP,
     CONFIG,
     ENV,
+    REDIS_CONNECTION,
 )
-from tergite_autocalibration.config.package import ConfigurationPackage
-from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.config.legacy import dh
-from tergite_autocalibration.lib.base.node import CouplerNode, BaseNode
+from tergite_autocalibration.config.package import ConfigurationPackage
+from tergite_autocalibration.lib.base.node import BaseNode, CouplerNode
 from tergite_autocalibration.lib.utils.graph import filtered_topological_order
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.utils.backend.redis_utils import (
@@ -46,8 +43,16 @@ from tergite_autocalibration.utils.backend.redis_utils import (
     populate_node_parameters,
     populate_quantities_of_interest,
 )
-from tergite_autocalibration.utils.dto.enums import DataStatus, MeasurementMode
+from tergite_autocalibration.utils.dto.enums import (
+    DataStatus,
+    MeasurementMode,
+    NodeType,
+)
+from tergite_autocalibration.utils.hardware.spi import SpiDAC
 from tergite_autocalibration.utils.io.dataset import create_node_data_path
+from tergite_autocalibration.utils.logging import logger
+
+# from tergite_autocalibration.utils.logger.tac_logger import logger
 from tergite_autocalibration.utils.logging.visuals import draw_arrow_chart
 
 colorama_init()
@@ -76,7 +81,7 @@ class HardwareManager:
     def __init__(self, config: "CalibrationConfig") -> None:
         # Store the configuration settings and initialize the instrument coordinator
         self.config = config
-        self.lab_ic = ""
+        self.lab_ic: InstrumentCoordinator = None
 
         # Check if hardware setup is necessary based on measurement mode
         if self.config.cluster_mode == MeasurementMode.re_analyse:
@@ -87,9 +92,7 @@ class HardwareManager:
         else:
             # In measurement mode, create the cluster and initialize the instrument coordinator
             self.cluster: "Cluster" = self._create_cluster()
-            self.lab_ic: "InstrumentCoordinator" = self._create_instrument_coordinator(
-                self.cluster
-            )
+            self.lab_ic = self._create_instrument_coordinator(self.cluster)
 
     def _create_cluster(self) -> "Cluster":
         """
@@ -157,6 +160,10 @@ class HardwareManager:
 
         return lab_ic
 
+    def create_spi(self, couplers) -> SpiDAC:
+        measurement_mode = self.config.cluster_mode
+        return SpiDAC(couplers, measurement_mode)
+
     def get_instrument_coordinator(self):
         """Access the instrument coordinator for use by other classes."""
         return self.lab_ic
@@ -173,6 +180,13 @@ class NodeManager:
         self.config = config
         self.node_factory = NodeFactory()
         self.lab_ic = lab_ic
+        self.spi_manager: SpiDAC = None
+
+        populate_initial_parameters(
+            self.config.qubits,
+            self.config.couplers,
+            REDIS_CONNECTION,
+        )
 
     @staticmethod
     def topo_order(target_node: str):
@@ -184,12 +198,6 @@ class NodeManager:
         populate_quantities_of_interest(
             node_name,
             self.node_factory,
-            self.config.qubits,
-            self.config.couplers,
-            REDIS_CONNECTION,
-        )
-        # Populate initial parameters
-        populate_initial_parameters(
             self.config.qubits,
             self.config.couplers,
             REDIS_CONNECTION,
@@ -238,15 +246,21 @@ class NodeManager:
     def _initialize_node(self, node_name: str) -> BaseNode:
         """Initializes a node and updates it with user-defined samplespace if available."""
         node = self.node_factory.create_node(
-            node_name, self.config.qubits, couplers=self.config.couplers
+            node_name,
+            self.config.qubits,
+            couplers=self.config.couplers,
         )
 
         # Update node samplespace
         if node.name in self.config.user_samplespace:
             self.update_to_user_samplespace(node, self.config.user_samplespace)
 
-        # Assign the lab instrument coordinator to the node
+        # Since the node is respomsible for compiling its schedule
+        # it needs access to the instrument_coordinator
         node.lab_instr_coordinator = self.lab_ic
+
+        # nodes operating on couplers require access the SPI DACs
+        node.spi_manager = self.spi_manager
 
         # Log initialization details
         logger.info(
@@ -293,10 +307,30 @@ class CalibrationSupervisor:
         self.node_manager = NodeManager(self.lab_ic, config=config)
         self.topo_order = self.node_manager.topo_order(self.config.target_node_name)
 
+    def is_coupler_calibration(self):
+        """
+        if the calibration chain contains coupler nodes flag is as coupler calibration
+        so the background DC currents can be set before the calibration begins
+        """
+        for node_name in self.topo_order:
+            node_type = self.node_manager.node_factory.node_type(node_name)
+            if node_type == NodeType.coupler_node:
+                return True
+        return False
+
     def calibrate_system(self):
         logger.info("Starting System Calibration")
         number_of_qubits = len(self.config.qubits)
         draw_arrow_chart(f"Qubits: {number_of_qubits}", self.topo_order)
+
+        # if the calibration chain involves couplers, provide the corresponding
+        # DACs to the node manager. In turn the node manager provides the DACS
+        # to the node instance
+        if self.is_coupler_calibration():
+            self.node_manager.spi_manager = self.hardware_manager.create_spi(
+                self.config.couplers
+            )
+            self.node_manager.spi_manager.set_parking_currents(self.config.couplers)
 
         # Create a copy of the configuration inside the log directory
         # This is to be able to replicate errors caused by configuration

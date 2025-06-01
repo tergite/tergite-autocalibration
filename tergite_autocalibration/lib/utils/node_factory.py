@@ -17,7 +17,10 @@
 from pathlib import Path
 from typing import TYPE_CHECKING, Dict, List, Union
 
+from tergite_autocalibration.lib.base.node import CouplerNode, QubitNode
+from tergite_autocalibration.utils.dto.enums import NodeType
 from tergite_autocalibration.utils.misc.regex import camel_to_snake
+
 from .reflections import find_inheriting_classes_ast_recursive, import_class_from_file
 
 if TYPE_CHECKING:
@@ -126,6 +129,23 @@ class NodeFactory:
                     f"No class implementation for node {node_name} found."
                 )
         return self._node_classes[node_name]
+
+    def node_type(self, node_name) -> NodeType:
+        if node_name not in self._node_classes.keys():
+            node_cls = self.get_node_class(node_name)
+        else:
+            node_cls = self._node_classes[node_name]
+
+        # Create an instance of the node class
+        if issubclass(node_cls, QubitNode):
+            node_type = NodeType.qubit_node
+        elif issubclass(node_cls, CouplerNode):
+            node_type = NodeType.coupler_node
+        else:
+            raise TypeError(
+                f"Node class {node_cls} is not a subclass of neither BaseQubitNode or BaseCouplerNode."
+            )
+        return node_type
 
     def create_node(
         self, node_name: str, all_qubits: list[str], couplers: list[str], **kwargs

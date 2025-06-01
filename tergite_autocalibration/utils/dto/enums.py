@@ -26,6 +26,15 @@ class DataStatus(Enum):
     undefined = 4
 
 
+class NodeType(Enum):
+    """
+    Qubit or Coupler Node
+    """
+
+    qubit_node = 1
+    coupler_node = 2
+
+
 class MeasurementMode(Enum):
     """
     Used to set the cluster mode e.g.  real cluster or re analyse
