@@ -17,7 +17,6 @@
 from pathlib import Path
 from typing import TYPE_CHECKING, Dict, List, Union
 
-from tergite_autocalibration.lib.base.node import CouplerNode, QubitNode
 from tergite_autocalibration.utils.dto.enums import NodeType
 from tergite_autocalibration.utils.misc.regex import camel_to_snake
 
