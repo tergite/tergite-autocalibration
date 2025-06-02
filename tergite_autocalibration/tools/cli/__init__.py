@@ -113,10 +113,12 @@ def start(
     cluster_mode: "MeasurementMode" = MeasurementMode.real
     parsed_cluster_ip: "IPv4Address" = CLUSTER_IP
     target_node_name = CONFIG.run.target_node
+    CONFIG.run.data_dir = CONFIG.run.log_dir
 
     if r:
         cluster_mode = MeasurementMode.re_analyse
         data_to_reanalyse_folder_path = Path(r)
+        CONFIG.run.data_dir = data_to_reanalyse_folder_path
 
         # Check if the folder exists
         if not data_to_reanalyse_folder_path.is_dir():

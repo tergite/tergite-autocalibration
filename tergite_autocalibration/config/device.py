@@ -1,6 +1,7 @@
 # This code is part of Tergite
 #
 # (C) Copyright Chalmers Next Labs 2024
+# (C) Copyright Michele Faucci Giannelli 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -39,3 +40,12 @@ class DeviceConfiguration(TOMLConfigurationFile):
 
         """
         return self._device["name"]
+
+    @property
+    def owner(self) -> str:
+        """
+        Returns:
+            Name of the device
+
+        """
+        return self._device["owner"]

@@ -263,7 +263,6 @@ def test_qubit_spectroscopies_for_coupler_are_created(setup_q06_q07_data):
         + "/qubit_spectroscopy_vs_current_q06_q07_q07_spectroscopies.png"
     )
     assert os.path.exists(figure_2_path)
-    from PIL import Image
 
     with Image.open(figure_2_path) as img:
         assert img.format == "PNG", "File should be a PNG image"

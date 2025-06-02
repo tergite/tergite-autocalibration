@@ -13,6 +13,7 @@
 # after fabrication and first manual characterization steps. The general
 # section should contain relevant metadata
 name = "device_template"
+owner = "device_owner"
 
 # -------------------- Resonator definitions --------------------
 # This section contains all resonator-specific properties

@@ -25,6 +25,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
 
+from tergite_autocalibration.lib.base.utils.figure_utils import (
+    create_figure_with_top_band,
+)
 from tergite_autocalibration.utils.dto.qoi import QOI
 from tergite_autocalibration.utils.logging import logger
 
@@ -146,17 +149,10 @@ class BaseNodeAnalysis(ABC):
 
     def _manage_plots(self, column_grid: int, plots_per_qubit: int):
         n_vars = len(self.data_vars)
-        n_coords = len(self.coords)
+        nrows = int(np.ceil(n_vars / column_grid)) * plots_per_qubit
+        ncols = min(column_grid, n_vars)
 
-        rows = int(np.ceil(n_vars / column_grid))
-        rows = rows * plots_per_qubit
-
-        fig, axs = plt.subplots(
-            nrows=rows,
-            ncols=np.min((n_vars, n_coords, column_grid)),
-            squeeze=False,
-            figsize=(column_grid * 5, rows * 5),
-        )
+        fig, axs = create_figure_with_top_band(nrows, ncols)
 
         return fig, axs
 
@@ -307,12 +303,7 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
         """
 
         self.plotter(primary_axis)  # Assuming node_analysis object is available
-
-        # Customize plot as needed
-        handles, labels = primary_axis.get_legend_handles_labels()
-        patch = mpatches.Patch(color="red", label=f"{self.qubit}")
-        handles.append(patch)
-        primary_axis.legend(handles=handles, fontsize="small")
+        primary_axis.set_title(f"Qubit {self.qubit}")
 
     @abstractmethod
     def analyse_qubit(self) -> QOI:
@@ -433,7 +424,7 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
 
         self.coupler_analyses: List[BaseCouplerAnalysis] = []
 
-        self.column_grid = 2
+        self.column_grid = 4
         self.plots_per_qubit = 1
         self.plots_per_coupler = 2
 
@@ -495,17 +486,18 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
 
     def _fill_plots(self):
         for index, analysis in enumerate(self.coupler_analyses):
-            primary_plot_row = index * (self.column_grid // self.plots_per_coupler)
+            primary_plot_row = self.plots_per_qubit * (
+                (index * self.plots_per_coupler) // self.column_grid
+            )
             primary_axis = self.axs[
-                primary_plot_row, index % (self.column_grid // self.plots_per_coupler)
+                primary_plot_row, (index * self.plots_per_coupler) % self.column_grid
             ]
             secondary_axis = self.axs[
                 primary_plot_row,
-                index % (self.column_grid // self.plots_per_coupler) + 1,
+                ((index * self.plots_per_coupler) + 1) % self.column_grid,
             ]
 
             analysis.plot(primary_axis, secondary_axis)
-            self.fig.tight_layout()
 
             # Get positions of both axes (left and right in the pair)
             self.fig.canvas.draw()
