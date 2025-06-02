@@ -30,6 +30,8 @@ from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
     CompiledSchedule,
     InstrumentCoordinator,
 )
+from tergite_autocalibration.lib.utils.redis import update_redis_trusted_values
+
 
 from tergite_autocalibration.config.globals import PLOTTING_BACKEND, REDIS_CONNECTION
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
