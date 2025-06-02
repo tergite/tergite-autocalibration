@@ -130,6 +130,9 @@ class NodeFactory:
         return self._node_classes[node_name]
 
     def node_type(self, node_name) -> NodeType:
+        global CouplerNode, QubitNode
+        from tergite_autocalibration.lib.base.node import CouplerNode, QubitNode
+
         if node_name not in self._node_classes.keys():
             node_cls = self.get_node_class(node_name)
         else:
