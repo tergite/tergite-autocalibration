@@ -31,8 +31,8 @@ def mock_env_file():
     os.unlink(temp_env.name)  # Cleanup after test
 
 
-@preserve_os_env
 @pytest.fixture
+@preserve_os_env
 def env_config_instance():
     """Fixture for creating an instance of EnvironmentConfiguration."""
     return EnvironmentConfiguration()
