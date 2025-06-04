@@ -17,7 +17,7 @@ from tergite_autocalibration.lib.nodes.readout.punchout.node import (
 )
 
 
-@pytest.skip(
+@pytest.mark.skip(
     "Skipping test for PunchoutNode as it requires a full Tergite environment."
 )
 def test_punchout_node_analysis_can_be_initialized():
