@@ -19,7 +19,7 @@ from tergite_autocalibration.lib.base.analysis import (
     BaseAllQubitsAnalysis,
     BaseQubitAnalysis,
 )
-from tergite_autocalibration.lib.base.utils.figure_util import (
+from tergite_autocalibration.lib.base.utils.figure_utils import (
     create_figure_with_top_band,
 )
 from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.analysis import (

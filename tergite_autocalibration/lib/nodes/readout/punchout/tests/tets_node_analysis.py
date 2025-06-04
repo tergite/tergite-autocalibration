@@ -10,8 +10,6 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from pathlib import Path
-
 import pytest
 
 from tergite_autocalibration.lib.nodes.readout.punchout.analysis import (
@@ -26,11 +24,8 @@ def setup_data_mutliple_files():
     return node_analysis
 
 
-def test_InitSetDataMember(
-    setup_data_mutliple_files: PunchoutNodeAnalysis,
-):
+def test_InitSetDataMember(setup_data_mutliple_files: PunchoutNodeAnalysis):
     node_analysis = setup_data_mutliple_files
 
     assert node_analysis.name == "name"
     assert node_analysis.redis_fields == ["redis_field"]
-
