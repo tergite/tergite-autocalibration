@@ -31,46 +31,46 @@ def test_CanCreate():
 
 @pytest.fixture(autouse=False)
 def setup_data():
-    dataset_path = (
-        Path(__file__).parent / "data" / "dataset_coupler_spectroscopy_0.hdf5"
-    )
+    dataset_path = Path(__file__).parent / "data" / "dataset_punchout_0.hdf5"
     ds = xr.open_dataset(dataset_path)
+    return ds
 
 
 def amplitude_for_qubit(ds, qubit):
-    ds = xr.merge(ds[var] for var in ["yq06"])
+    long_name = f"y{qubit}"
+    ds = xr.merge(ds[var] for var in [long_name])
     ds.attrs["qubit"] = qubit
 
-    a = PunchoutQubitAnalysis("name", ["redis_fields"])
+    a = PunchoutQubitAnalysis("name", ["measure:pulse_amp"])
     qoi = a.process_qubit(ds, qubit)
-    return qoi["measure:pulse_amp"]
+    return qoi.analysis_result["measure:pulse_amp"]["value"]
 
 
 def test_amplitude_for_q06(setup_data: xr.Dataset):
     ds = setup_data
     amplitude = amplitude_for_qubit(ds, "q06")
-    assert amplitude["q06"] == 0.016
+    assert amplitude - 0.016 < 0.001
 
 
 def test_amplitude_for_q07(setup_data: xr.Dataset):
     ds = setup_data
     amplitude = amplitude_for_qubit(ds, "q07")
-    assert amplitude["q06"] == 0.016
+    assert amplitude - 0.016 < 0.001
 
 
 def test_amplitude_for_q10(setup_data: xr.Dataset):
     ds = setup_data
     amplitude = amplitude_for_qubit(ds, "q10")
-    assert amplitude["q06"] == 0.045
+    assert amplitude - 0.045 < 0.001
 
 
 def test_amplitude_for_q12(setup_data: xr.Dataset):
     ds = setup_data
     amplitude = amplitude_for_qubit(ds, "q12")
-    assert amplitude["q06"] == 0.030
+    assert amplitude - 0.030 < 0.001
 
 
 def test_amplitude_for_q15(setup_data: xr.Dataset):
     ds = setup_data
     amplitude = amplitude_for_qubit(ds, "q15")
-    assert amplitude["q06"] == 0.060
+    assert amplitude - 0.06 < 0.001

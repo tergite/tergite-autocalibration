@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Michele Faucci Giannelli 2024
+# (C) Copyright Michele Faucci Giannelli 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -10,22 +10,12 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import pytest
-
 from tergite_autocalibration.lib.nodes.readout.punchout.analysis import (
     PunchoutNodeAnalysis,
 )
 
 
-@pytest.fixture(autouse=True)
-def setup_data_mutliple_files():
-    # It should be a single dataset, but we do not have one yet, so we loop over existing files
-    node_analysis = PunchoutNodeAnalysis("name", ["redis_field"])
-    return node_analysis
-
-
-def test_InitSetDataMember(setup_data_mutliple_files: PunchoutNodeAnalysis):
-    node_analysis = setup_data_mutliple_files
-
+def test_InitSetDataMember():
+    node_analysis = PunchoutNodeAnalysis("name", ["measure:pulse_amp"])
     assert node_analysis.name == "name"
-    assert node_analysis.redis_fields == ["redis_field"]
+    assert node_analysis.redis_fields == ["measure:pulse_amp"]

@@ -46,7 +46,7 @@ class PunchoutQubitAnalysis(BaseQubitAnalysis):
         self.resonator_spectroscopy_analyses: List[
             ResonatorSpectroscopyQubitAnalysis
         ] = []
-        self.shift_threshold = 0.02e6
+        self.shift_threshold = 0.1e6
 
     def analyse_qubit(self):
         """
