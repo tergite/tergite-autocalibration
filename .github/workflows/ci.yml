@@ -13,7 +13,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ "3.10" ]
+        python-version: [ "3.12" ]
+
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6378:6379 # to map to the testing port host:container
 
     steps:
       - uses: actions/checkout@v3
@@ -21,79 +27,60 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-        with:
-          virtualenvs-create: true
-          virtualenvs-in-project: true
-      - name: Load cached venv
-        id: cached-poetry-dependencies
-        uses: actions/cache@v3
-        with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+      - name: Install OpenBlas for scipy if no wheels
+        run: sudo apt-get install -y libopenblas-dev
       - name: Install dependencies
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: poetry install --no-interaction --no-root
-      - name: Install project
-        run: poetry install --no-interaction
+        run: |
+          python -m pip install --upgrade pip
+          python --version
+          pip install ."[test,dev]"
       - name: Lint
         if: ${{ vars.SHOULD_LINT == 'true' }}
-        run: |
-          source .venv/bin/activate
-          black tergite_autocalibration --check
-      - name: Smoke test
-        run: |
-          source .venv/bin/activate
-          acli --help
+        run: black tergite_autocalibration --check
+      - name: Run tests
+        run: pytest tergite_autocalibration
 
   release:
     name: Release
     runs-on: ubuntu-latest
-    if: "startsWith(github.ref, 'refs/tags/')"
+    if: |
+      startsWith(github.ref, 'refs/tags/') || 
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.job == 'release')
     needs: tests
     steps:
       - name: Checkout the commit
-        uses: actions/checkout@v3
-
-      - name: Set up Python 3.10
+        uses: actions/checkout@v4
+      - name: Set up Python 3.12
         uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-        with:
-          virtualenvs-create: true
-          virtualenvs-in-project: true
-      - name: Load cached venv
-        id: cached-poetry-dependencies
-        uses: actions/cache@v3
-        with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+          python-version: "3.12"
       - name: Install dependencies
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: poetry install --no-interaction --no-root
-      - name: Install project
-        run: poetry install --no-interaction
+        run: |
+          cd $GITHUB_WORKSPACE
+          python -m pip install --upgrade pip
+          python --version
+          pip install .
+          pip install build twine
       - name: Deploy docs
         if: ${{ vars.SHOULD_PUBLISH_DOCS == 'true' }}
         run: |
           source .venv/bin/activate
           mkdocs gh-deploy --force
       - name: Build
-        run: poetry build
+        run: python -m build
       - name: Publish to Test pypi
         if: ${{ vars.SHOULD_PUBLISH_TO_STAGING == 'true' }}
         run: |
-          poetry config repositories.test-pypi https://test.pypi.org/legacy/
-          poetry config pypi-token.test-pypi ${{ secrets.TEST_PYPI_API_TOKEN }}
-          poetry publish -r test-pypi
+          twine upload --skip-existing \
+            -u __token__ \
+            -p ${{ secrets.TEST_PYPI_API_TOKEN }} \
+            -r https://test.pypi.org/legacy/ dist/*;
       - name: Publish to pypi
         if: ${{ vars.SHOULD_PUBLISH_TO_PROD == 'true' }}
         run: |
-          poetry config pypi-token.pypi ${{ secrets.PYPI_API_TOKEN }}
-          poetry publish
+          twine upload --skip-existing \
+            -u __token__ \
+            -p ${{ secrets.PYPI_API_TOKEN }} dist/*;
 
   upstream:
     name: Update upstream

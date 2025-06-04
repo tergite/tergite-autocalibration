@@ -3,6 +3,9 @@
 target_node = "ro_amplitude_two_state_optimization"
 qubits = ["q00"]
 couplers = []
+cooldown = "13/05/2025"
+is_internal = true
+runner_logo = "resources/runner_logo.png"
 
 #   --------------
 #   Node reference

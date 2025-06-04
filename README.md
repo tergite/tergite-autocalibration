@@ -21,7 +21,7 @@ If you are reading this on GitHub, then you are looking at a mirror.
 ### Dependencies
 
 - Ensure you have [conda](https://docs.anaconda.com/free/miniconda/index.html) installed.
-  (_You could simply have python +3.10 installed instead._)
+  (_You could simply have python +3.12 installed instead._)
 - Ensure you have [redis server](https://redis.io/) running
 - The standard port for a redis server is `6379`, so, this is going to be filled in the `.env` configuration later.
 
@@ -41,7 +41,7 @@ git clone git@github.com:tergite/tergite-autocalibration.git
 - Create conda environment
 
 ```shell
-conda create -n tac -y python=3.10 -y
+conda create -n tac -y python=3.12 -y
 conda activate tac
 ```
 

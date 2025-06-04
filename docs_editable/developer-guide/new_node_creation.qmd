@@ -179,3 +179,11 @@ Add any relevant information on how to use your node, dependencies and reference
 other to use the code you developed.
 
 [Details on the implementation on the Node types section](node_classes.qmd).
+
+### Figures
+
+Figure are managed from the figure_util.py file in the util folder of the base node directory. 
+All figure should be created by provided utility function to assure consistent formatting.
+It is possible to create additional figure by implementing the "save_other_plots" function in your analysis node.
+Please create the new figure using this utility function. The typical usage is to display all 1D distributions when performing a 2D scan.
+An example can be found in the punchout node.
