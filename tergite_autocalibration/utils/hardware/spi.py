@@ -104,11 +104,16 @@ class SpiDAC:
                     REDIS_CONNECTION.hget(f"couplers:{coupler}", "parking_current")
                 )
             else:
-                raise ValueError("parking current is not present on redis")
+                raise ValueError(
+                    (
+                        "parking current is not present on redis."
+                        "If you intend to operate at zero DC current, set a zero value at your device_config.toml"
+                    )
+                )
 
             parking_currents[coupler] = parking_current
 
-        self.set_dac_current({coupler: parking_current})
+        self.set_dac_current(parking_currents)
         return
 
     def set_dac_current(self, dac_values: dict[str, float]) -> None:

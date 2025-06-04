@@ -46,7 +46,6 @@ from tergite_autocalibration.utils.backend.redis_utils import (
 from tergite_autocalibration.utils.dto.enums import (
     DataStatus,
     MeasurementMode,
-    NodeType,
 )
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
 from tergite_autocalibration.utils.io.dataset import create_node_data_path
@@ -307,30 +306,16 @@ class CalibrationSupervisor:
         self.node_manager = NodeManager(self.lab_ic, config=config)
         self.topo_order = self.node_manager.topo_order(self.config.target_node_name)
 
-    def is_coupler_calibration(self):
-        """
-        if the calibration chain contains coupler nodes flag is as coupler calibration
-        so the background DC currents can be set before the calibration begins
-        """
-        for node_name in self.topo_order:
-            node_type = self.node_manager.node_factory.node_type(node_name)
-            if node_type == NodeType.coupler_node:
-                return True
-        return False
-
     def calibrate_system(self):
         logger.info("Starting System Calibration")
         number_of_qubits = len(self.config.qubits)
         draw_arrow_chart(f"Qubits: {number_of_qubits}", self.topo_order)
 
-        # if the calibration chain involves couplers, provide the corresponding
-        # DACs to the node manager. In turn the node manager provides the DACS
-        # to the node instance
-        if self.is_coupler_calibration():
-            self.node_manager.spi_manager = self.hardware_manager.create_spi(
-                self.config.couplers
-            )
-            self.node_manager.spi_manager.set_parking_currents(self.config.couplers)
+        # The node manager provides every node with access to the DACS
+        self.node_manager.spi_manager = self.hardware_manager.create_spi(
+            self.config.couplers
+        )
+        self.node_manager.spi_manager.set_parking_currents(self.config.couplers)
 
         # Create a copy of the configuration inside the log directory
         # This is to be able to replicate errors caused by configuration
