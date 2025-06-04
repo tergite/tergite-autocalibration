@@ -104,12 +104,12 @@ class SpiDAC:
                     REDIS_CONNECTION.hget(f"couplers:{coupler}", "parking_current")
                 )
             else:
-                raise ValueError(
-                    (
-                        "parking current is not present on redis."
-                        "If you intend to operate at zero DC current, set a zero value at your device_config.toml"
-                    )
+                message = (
+                    "parking current is not present on redis."
+                    "If you intend to operate at zero DC current, set a zero value at your device_config.toml"
                 )
+                logger.warning(f"{Fore.YELLOW}{Style.DIM}{message}{Style.RESET_ALL}")
+                raise ValueError(message)
 
             parking_currents[coupler] = parking_current
 
