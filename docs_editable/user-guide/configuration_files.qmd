@@ -250,7 +250,15 @@ Example: Calibrate qubits `q01` and `q02` with coupler `q01_q02` up until the no
 target_node = "cz_calibration"
 qubits = ["q01", "q02"]
 couplers = ["q01_q02"]
+cooldown = "13/05/2025"
+name = "my_experiment_with_T2"
+is_internal = true
+runner_logo = "resources/runner_logo.png"
 ```
+With the `name`, you can give your experiment a name that will be utilized e.g. to create an output folder for the plots.
+The `cooldown` parameter is to print a note on which cooldown the experiment happened.
+Likewise, the `runner_logo` will be printed on top of the figures.
+
 
 ### Node configuration (.toml):
 
