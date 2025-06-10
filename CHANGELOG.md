@@ -7,6 +7,9 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 
 ## [2025.06.0] - Unreleased
 
+### Added
+- Analysis for the punchout node
+
 ### Changed
 - Upgrade Python to version 3.12
 
