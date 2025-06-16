@@ -16,7 +16,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tergite-autocalibration"
-version = "2025.03.0"
+version = "2025.06.0"
 description = "Commandline application to calibrate the WACQT quantum computers automatically"
 readme = "README.md"
 authors = [

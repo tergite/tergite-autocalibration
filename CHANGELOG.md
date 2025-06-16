@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project follows versions of format `{year}.{month}.{patch_number}`.
 
-## [2025.06.0] - Unreleased
+## [2025.06.0] - 2025-06-16
 
 ### Changed
 - Upgrade Python to version 3.12
