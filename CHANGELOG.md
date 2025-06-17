@@ -17,6 +17,10 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 - Migration from poetry to setuptools
 - Make external samplespace multidimensional
 
+### Fixed
+
+- Reduced the packaged library size to below pypi's limit by using a `MANIFEST.in` file
+
 ## [2025.03.0] - 2025-05-16
 
 ### Added
