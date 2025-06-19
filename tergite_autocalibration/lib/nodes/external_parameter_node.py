@@ -2,6 +2,7 @@
 #
 # (C) Copyright Eleftherios Moschandreou 2024
 # (C) Copyright Michele Faucci Giannelli 2025
+# (C) Copyright Abdullah Al Amin
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -35,24 +36,23 @@ class ExternalParameterNode(BaseNode, abc.ABC):
         pass
 
     @property
-    def external_dimensions(self) -> int:
+    def external_dimensions(self) -> list:
         """
+        Multidimensional External Samplespace:
         size of external samplespace E.g. in
         self.external_samplespace = {
             'dc_currents': {'q06_q07': np.array([1e-6, 2e-6, 3e-6, 4e-6])}
+            'crosstalk_currents': {'q08_q09': np.array([-3e-3, 0, 3e-3])}
         }
-        the external_dimensions is 4
+        the external_dimensions is [4, 3]
         """
         external_settable_quantities = self.external_samplespace.keys()
+        dimensions = []
 
-        if len(external_settable_quantities) > 1:
-            raise NotImplementedError("Multidimensional External Samplespace")
+        for quantity in external_settable_quantities:
+            settable = list(self.external_samplespace[quantity].keys())[0]
+            dimensions.append(len(self.external_samplespace[quantity][settable]))
 
-        settable = list(external_settable_quantities)[0]
-        measured_elements = self.external_samplespace[settable].keys()
-        first_element = list(measured_elements)[0]
-
-        dimensions = len(self.external_samplespace[settable][first_element])
         return dimensions
 
 
@@ -61,7 +61,7 @@ class ExternalParameterFixedScheduleNode(ExternalParameterNode):
         super().__init__(name, **schedule_keywords)
 
     def measure_node(self, cluster_status) -> xarray.Dataset:
-        iterations = self.external_dimensions
+        iterations = self.external_dimensions[0]
         external_dim = list(self.external_samplespace.keys())[0]
 
         result_dataset = xarray.Dataset()
@@ -102,7 +102,7 @@ class ExternalParameterDifferentSchedulesNode(ExternalParameterNode):
         self.external_keywords = {}
 
     def measure_node(self, cluster_status) -> xarray.Dataset:
-        iterations = self.external_dimensions
+        iterations = self.external_dimensions[0]
         external_dim = list(self.external_samplespace.keys())[0]
 
         result_dataset = xarray.Dataset()

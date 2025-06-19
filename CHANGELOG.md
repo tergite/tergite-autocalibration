@@ -5,17 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project follows versions of format `{year}.{month}.{patch_number}`.
 
-## [2025.06.0] - Unreleased
+## [2025.06.0] - 2025-06-16
+
+### Added
+
+- Better labelling for the analysis output plots
 
 ### Added
 - Analysis for the punchout node
 
 ### Changed
+
 - Upgrade Python to version 3.12
+- Migration from poetry to setuptools
+- Make external samplespace multidimensional
+
+### Fixed
+
+- Reduced the packaged library size to below pypi's limit by using a `MANIFEST.in` file
 
 ## [2025.03.0] - 2025-05-16
 
 ### Added
+
 - Advanced logging
 - Debugging endpoint
 - Quickstart endpoint to generate templates semi-automatically
@@ -32,6 +44,7 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 ## [2024.12.0] - 2024-12-12
 
 ### Added
+
 - Dataset browser
 - ScheduleNode and ExternalParameterSweepNode as subclasses of BaseNode
 - DeviceManager class
@@ -39,6 +52,7 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 - Advanced decorators for pytest
 
 ### Changed
+
 - Migrated cli from click to typer
 - Switch to quantify-scheduler version 0.21.2
 - Switch to qblox-instruments version 0.14.1 (qblox-firmware should be 9.0.1)
@@ -47,25 +61,30 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 ## [2024.09.0] - 2024-09-16
 
 ### Added
+
 - superconducting_qubit_tools as conditional dependency
 - Calibration node for purity benchmarking
 - Redis storage manager
 - GitLab CI/CD
 
 ### Changed
+
 - Refactoring of the node classes to allow hierarchical class structures
 
 ### Fixed
 
 ## [2024.04.0] - 2024-05-29
 
-This is part of the tergite release v2024.04 that updates the full pipeline for state discrimination hardware calibration
+This is part of the tergite release v2024.04 that updates the full pipeline for state discrimination hardware
+calibration
 
 ### Added
+
 - All research-related features regarding the calibration of a CZ gate
 - Updater to push calibration values as a backend to MSS/database
 
 ### Changed
+
 - Improved command line interface
 - Renamed from tergite-acl to tergite-autocalibration
 - Updated the contribution guidelines and government model statements
@@ -87,7 +106,8 @@ No major change except for the versions.
 
 ## [2023.12.0] - 2024-03-14
 
-This is part of the tergite release v2023.12.0 that is the last to support [Labber](https://www.keysight.com/us/en/products/software/application-sw/labber-software.html).
+This is part of the tergite release v2023.12.0 that is the last to
+support [Labber](https://www.keysight.com/us/en/products/software/application-sw/labber-software.html).
 Labber is being deprecated.
 
 ### Added
