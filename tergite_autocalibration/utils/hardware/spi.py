@@ -15,18 +15,20 @@
 import sys
 import time
 from pathlib import Path
-from rich.progress import Progress
-import time
 
 import numpy as np
 from colorama import Fore, Style
+from colorama import init as colorama_init
 from qblox_instruments import SpiRack
 from qcodes import validators
+from rich.progress import Progress
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
-from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
+from tergite_autocalibration.utils.logging import logger
+
+colorama_init()
 
 
 def find_serial_port():
@@ -41,14 +43,6 @@ def find_serial_port():
     return port
 
 
-class DummyDAC:
-    def create_spi_dac(self, coupler: str):
-        pass
-
-    def set_dac_current(self, dac, target_current) -> None:
-        logger.info(f"Dummy DAC to current {target_current}")
-
-
 class SpiDAC:
     def __init__(self, couplers: list[str], measurement_mode: MeasurementMode):
         self.port = find_serial_port()
@@ -57,6 +51,8 @@ class SpiDAC:
             or measurement_mode == MeasurementMode.re_analyse
         )
         if self.port is not None:
+            self.spi = SpiRack("loki_rack", self.port, is_dummy=self.is_dummy)
+        elif measurement_mode == MeasurementMode.re_analyse:
             self.spi = SpiRack("loki_rack", self.port, is_dummy=self.is_dummy)
         else:
             raise ValueError("No serial port for the SPI")
@@ -99,16 +95,25 @@ class SpiDAC:
         self.spi.set_dacs_zero()
         return
 
-    def set_parking_current(self, coupler: str) -> None:
+    def set_parking_currents(self, couplers: list[str]) -> None:
 
-        if REDIS_CONNECTION.hexists(f"transmons:{coupler}", "parking_current"):
-            parking_current = float(
-                REDIS_CONNECTION.hget(f"transmons:{coupler}", "parking_current")
-            )
-        else:
-            raise ValueError("parking current is not present on redis")
+        parking_currents = {}
+        for coupler in couplers:
+            if REDIS_CONNECTION.hexists(f"couplers:{coupler}", "parking_current"):
+                parking_current = float(
+                    REDIS_CONNECTION.hget(f"couplers:{coupler}", "parking_current")
+                )
+            else:
+                message = (
+                    "parking current is not present on redis."
+                    "If you intend to operate at zero DC current, set a zero value at your device_config.toml"
+                )
+                logger.warning(f"{Fore.YELLOW}{Style.DIM}{message}{Style.RESET_ALL}")
+                raise ValueError(message)
 
-        self.ramp_current_serially({coupler: parking_current})
+            parking_currents[coupler] = parking_current
+
+        self.set_dac_current(parking_currents)
         return
 
     def set_dac_current(self, dac_values: dict[str, float]) -> None:
