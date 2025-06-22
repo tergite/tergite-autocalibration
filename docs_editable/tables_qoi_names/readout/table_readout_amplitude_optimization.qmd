@@ -1,0 +1,14 @@
+|Redis QOI name|
+|---------| 
+|measure_2state_opt:pulse_amp      |
+| measure_2state_opt:acq_rotation     |
+| measure_2state_opt:acq_threshold       |
+|measure_3state_opt:pulse_amp      |
+| centroid_I     |
+| centroid_Q       |
+|omega_01   |
+|omega_12   |
+|omega_20   |
+|inv_cm_opt   |
+
+: {.striped}

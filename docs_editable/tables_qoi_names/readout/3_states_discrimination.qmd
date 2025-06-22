@@ -1,0 +1,11 @@
+|Redis QOI name|
+|---------| 
+|clock_freqs:readout      |
+| Ql     |
+| resonator_minimum       |
+|extended_clock_freqs:readout_1      |
+| Ql_1     |
+| resonator_minimum_1       |
+|extended_clock_freqs:readout_2      |
+
+: {.striped}

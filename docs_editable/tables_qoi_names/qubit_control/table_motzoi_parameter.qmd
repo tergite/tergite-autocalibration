@@ -1,0 +1,6 @@
+|Redis QOI name|
+|---------| 
+|rxy:motzoi     |
+| r12:ef_motzoi     |
+
+: {.striped}
