@@ -75,3 +75,4 @@ graph TD
 - randomized_benchmarking
 - all_XY
 
+{{< embed redis_variable_names.qmd >}}

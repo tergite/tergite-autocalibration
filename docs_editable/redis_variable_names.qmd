@@ -1,5 +1,5 @@
 # QOI names in redis
-This page serves to collect the QOI's extracted from each node and the name of the corresponding QOI in redis. 
+This section serves to collect the QOI's extracted from each node and the name of the corresponding QOI in redis. 
 
 ## Punchout
 
