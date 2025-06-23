@@ -348,6 +348,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#node-factory" id="toc-node-factory" class="nav-link" data-scroll-target="#node-factory">Node factory</a></li>
   <li><a href="#calibration-graph" id="toc-calibration-graph" class="nav-link" data-scroll-target="#calibration-graph">Calibration graph</a></li>
   <li><a href="#documentation" id="toc-documentation" class="nav-link" data-scroll-target="#documentation">Documentation</a></li>
+  <li><a href="#figures" id="toc-figures" class="nav-link" data-scroll-target="#figures">Figures</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -477,6 +478,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Please add your node to the <a href="../available_nodes.html">list of available nodes</a> in this documentation. If possible, please create a separate page that explains what your node is doing and link it there.</p>
 <p>Add any relevant information on how to use your node, dependencies and reference to publication as needed for allowing other to use the code you developed.</p>
 <p><a href="../developer-guide/node_classes.html">Details on the implementation on the Node types section</a>.</p>
+</section>
+<section id="figures" class="level3">
+<h3 class="anchored" data-anchor-id="figures">Figures</h3>
+<p>Figure are managed from the figure_util.py file in the util folder of the base node directory. All figure should be created by provided utility function to assure consistent formatting. It is possible to create additional figure by implementing the “save_other_plots” function in your analysis node. Please create the new figure using this utility function. The typical usage is to display all 1D distributions when performing a 2D scan. An example can be found in the punchout node.</p>
 
 
 </section>

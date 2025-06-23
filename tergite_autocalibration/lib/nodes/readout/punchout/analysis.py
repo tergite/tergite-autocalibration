@@ -185,7 +185,7 @@ class PunchoutQubitAnalysis(BaseQubitAnalysis):
         ax.add_patch(rect)
 
         full_path = data_path / f"{self.name}_{self.qubit}_spectroscopies.png"
-        fig.savefig(full_path, bbox_inches="tight", dpi=200)
+        fig.savefig(full_path, bbox_inches="tight", dpi=300)
 
 
 class PunchoutNodeAnalysis(BaseAllQubitsAnalysis):

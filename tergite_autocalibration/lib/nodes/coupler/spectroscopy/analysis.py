@@ -638,7 +638,7 @@ class ResonatorSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
             data_path
             / f"{self.name}_{self.coupler}_{self.name_qubit_1}_spectroscopies.png"
         )
-        fig.savefig(full_path, bbox_inches="tight", dpi=200)
+        fig.savefig(full_path, bbox_inches="tight", dpi=300)
 
         fig, axs = create_figure_with_top_band(rows, columns)
         self._plot_all_fit_q2(axs, columns)
@@ -647,7 +647,7 @@ class ResonatorSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
             data_path
             / f"{self.name}_{self.coupler}_{self.name_qubit_2}_spectroscopies.png"
         )
-        fig.savefig(full_path, bbox_inches="tight", dpi=200)
+        fig.savefig(full_path, bbox_inches="tight", dpi=300)
 
 
 class QubitSpectroscopyVsCurrentNodeAnalysis(BaseAllCouplersAnalysis):
