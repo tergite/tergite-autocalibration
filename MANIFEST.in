@@ -1,0 +1,14 @@
+# MANIFEST.in
+recursive-exclude tergite_autocalibration  **/tests/**
+prune docs
+prune docs_editable
+prune .github
+prune .idea
+prune .gitlab
+prune .vscode
+prune datasets
+prune development
+prune dummy_datasets
+prune libraries
+prune out
+prune resources
