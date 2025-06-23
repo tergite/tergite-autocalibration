@@ -27,25 +27,19 @@ from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.logging import logger
+from tergite_autocalibration.config.env import EnvironmentConfiguration
 
 colorama_init()
 
 
-def find_serial_port():
-    path = Path("/dev/")
-    for file in path.iterdir():
-        if file.name.startswith("ttyA"):
-            port = str(file.absolute())
-            break
-    else:
-        logger.info("Couldn't find the serial port. Please check the connection.")
-        port = None
-    return port
+def _find_serial_port():
+    env_configuration = EnvironmentConfiguration.from_dot_env()
+    return str(env_configuration.spi_serial_port)
 
 
 class SpiDAC:
     def __init__(self, couplers: list[str], measurement_mode: MeasurementMode):
-        self.port = find_serial_port()
+        self.port = _find_serial_port()
         self.is_dummy = (
             measurement_mode == MeasurementMode.dummy
             or measurement_mode == MeasurementMode.re_analyse
