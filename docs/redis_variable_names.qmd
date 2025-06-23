@@ -5,15 +5,15 @@ This section serves to collect the QOI's extracted from each node and the name o
 
 {{< embed tables_qoi_names/readout/table_punchout.qmd >}}
 
-## Resonator Spectroscopy {#respec0}
+## Resonator Spectroscopy
 
 {{< embed tables_qoi_names/readout/table_resonator_spectroscopy.qmd >}}
 
-## Qubit Spectroscopy {#quspec01}
+## Qubit Spectroscopy
 
 {{< embed tables_qoi_names/qubit_control/table_qubit_01_spectroscopy.qmd >}}
 
-## Rabi Oscillations {#rabi01}
+## Rabi Oscillations
 
 {{< embed tables_qoi_names/qubit_control/table_rabi_oscillations_01.qmd >}}
 
@@ -25,15 +25,15 @@ This section serves to collect the QOI's extracted from each node and the name o
 
 {{< embed tables_qoi_names/qubit_control/table_motzoi_parameter_01.qmd >}}
 
-## Resonator Spectroscopy 1 {#respec1}
+## Resonator Spectroscopy 1
 
 {{< embed tables_qoi_names/readout/table_resonator_spectroscopy_1.qmd >}}
 
-## Qubit 12 Spectroscopy {#quspec12}
+## Qubit 12 Spectroscopy
 
 {{< embed tables_qoi_names/qubit_control/table_qubit_12_spectroscopy.qmd >}}
 
-## Rabi 12 Oscillations {#rabi12}
+## Rabi 12 Oscillations
 
 {{< embed tables_qoi_names/qubit_control/table_rabi_oscillations_12.qmd >}}
 
