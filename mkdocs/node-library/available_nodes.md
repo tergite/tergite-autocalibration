@@ -15,11 +15,11 @@ graph TD
     B --> J(Qubit spectroscopy vs current)
     I --> J
         
-    click A href "../resonator_spectroscopy_node.html"
-    click B href "../qubit_spectroscopy_node.html"
-    click C href "../rabi_oscillations_node.html"
-    click I href "../resonator_spectroscopy_vs_current_node.html"
-    click J href "../qubit_spectroscopy_vs_current_node.html"
+    click A href "../resonator_spectroscopy_node"
+    click B href "../qubit_spectroscopy_node"
+    click C href "../rabi_oscillations_node"
+    click I href "../resonator_spectroscopy_vs_current_node"
+    click J href "../qubit_spectroscopy_vs_current_node"
 
     style A fill:#ffe6cc,stroke:#333,stroke-width:2px
     style B fill:#ffe6cc,stroke:#333,stroke-width:2px
