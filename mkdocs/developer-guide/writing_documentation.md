@@ -178,72 +178,55 @@ In this section, we will go through the specific processes that are important wh
 
 In the `tergite-autocalibration` repository, we are now using [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) to build and render the documentation. MkDocs is a static site generator that's easy to use and supports a wide range of features via plugins.
 
-If you have been following the steps in the [developer guide introduction](developer_guide.md), you should have
-quarto already installed.
-Otherwise, you can do it by running:
+To install it, use the following command in your terminal:
 
 ```bash
-pip install quarto
+pip install -e '.[docs]'
 ```
 
-To render a simple preview of your documentation, please open a terminal inside the `documentation` folder and run:
+To render a live preview of the documentation, run:
 
 ```bash
-quarto preview
+mkdocs serve
 ```
 
-This will open a browser window with the rendered quarto documentation pages.
+This will open a browser window with the rendered documentation.
 
 ### Structure of the documentation
 
-Maybe you noticed that on the top-level of the repository there are two folders, one called `docs` and another one
-called `documentation`.
-This is because they have two different purposes:
+At the top level of the repository, you will find a folder called `mkdocs`, which now contains the source markdown files and Jupyter notebooks that make up the documentation. These are the files you edit.
 
-- `documentation`: Contains the markdown files and Jupyter notebooks to create the documentation from.
-  These are the files that you edit.
-- `docs`: Is the output HTML after running `quarto render`, which is displayed on the website.
-  You do not edit these files.
-  They will always be generated from the files in the `documentation` folder.
+The old `docs_editable/` folder and `docs/` output folder from Quarto are no longer used. MkDocs builds the output into the `site/` folder automatically.
 
-Now, let us have a look at the `documentation` folder, because this is the one we are working with the most.
-It is structured:
+The `mkdocs` folder is structured like this:
 
-- `.assets`: There you put images and style/formatting material.
-- `.quarto`: Do not touch this folder and do not commit it to git, because it contains temporary files during the
-  rendering process.
-- `developer-guide`, `nodes` and `user-guide`: Contains the respective content for the pages.
-- Then there are a couple of pages from the top-level of the documentation.
-- And a file called `_quarto.yml`. This file is important, because it defines how things are rendered.
+- `assets`: Contains images
+- `stylesheets`: Contains custom CSS stylesheets
+- `javascripts`: Contains custom JavaScript files
+- `scripts`: Contains custom scripts (e.g. for generating automatic API documentation)
+- `developer-guide`, `node-library`, and `user-guide`: Contain content for the respective pages.
+- Top-level markdown files for general pages (e.g. `index.md`).
+- The `mkdocs.yml` file at the root of the repo controls rendering and navigation.
 
-### Adding a navigation entry in the `_quarto.yml` file
+### Adding a navigation entry in the `mkdocs.yml` file
 
-In here, the most relevant to be touched during adding documentation is the sidebar section.
-Imagine you are adding a new page e.g. about a calibration node, and you want to add it to the navigation.
-Then, you would add an entry at the correct position in the `_quarto.yml` file for the sidebar.
+To add a new page (e.g. a new calibration node) to the sidebar, you modify the `mkdocs.yml` file under the `nav:` section:
 
 ```yaml
-  sidebar:
-    style: "docked"
-    search: true
-    contents:
-      - section: "Node Library"
-        contents:
-          - text: "Overview"
-            href: available_nodes.md
-          - text: "Resonator spectroscopy"
-            href: nodes/resonator_spectroscopy_node.md
-          - text: "My new node"
-            href: nodes/my_new_node.md
+nav:
+- Introduction:
+  - Overview: index.md  # Landing page
+- Node Library:
+  - Overview: available_nodes.md
+  - Resonator spectroscopy: nodes/resonator_spectroscopy_node.md
+  - My new node: nodes/my_new_node.md
 ```
 
-It is pretty self-explaining where to put the node when you see the rendered version in your browser.
+The structure in the sidebar reflects the nesting and order here.
 
-### Useful features of quarto
+### Useful features of MkDocs Material
 
-As you noticed, quarto does not render from normal `.md` markdown files, but from `.md` quarto markdown files.
-These are extending the markdown functionality with some special features.
-Here, we will show them along with some normal useful feature from markdown.
+MkDocs uses regular markdown files (`.md`) and extends functionality through [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/).
 
 **Code highlighting**
 
