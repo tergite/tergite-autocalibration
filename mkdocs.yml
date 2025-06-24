@@ -3,7 +3,7 @@
 
 # Basic site information
 site_name: Tergite Autocalibration
-#site_description: "A package to simulate quantum circuits on transmons."
+site_description: "A commandline application to calibrate the WACQT quantum computers automatically."
 site_url: "https://tergite.github.io/tergite-autocalibration/"
 repo_url: "https://github.com/tergite/tergite-autocalibration"
 repo_name: "tergite/tergite-autocalibration"
@@ -90,6 +90,7 @@ plugins:
   - search  # Enable search functionality
   - mkdocs-jupyter:
       execute: false
+      include: ["*.ipynb"] # Default: ["*.py", "*.ipynb"]
       include_requirejs: true
       custom_mathjax_url: "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML-full,Safe"
 
@@ -161,6 +162,11 @@ markdown_extensions:
 copyright: Copyright &copy; 2025
 
 # Additional site configuration
+extra:
+  social:
+    # Social media links in footer
+    - icon: fontawesome/brands/github
+      link: https://github.com/tergite/tergite-autocalibration
 
 # JavaScript files for enhanced functionality
 extra_javascript:
