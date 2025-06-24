@@ -1,0 +1,24 @@
+<svg width="206" height="206" viewBox="0 0 206 206" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="103" cy="103" r="96.5" fill="white" stroke="black" stroke-width="13"/>
+<circle cx="103" cy="102" r="79.5" stroke="black" stroke-width="7"/>
+<circle cx="103" cy="101" r="66.5" stroke="black" stroke-width="3"/>
+<path d="M103 166V156" stroke="black" stroke-width="9"/>
+<path d="M103 44V34" stroke="black" stroke-width="9"/>
+<line x1="97" y1="154" x2="97" y2="109" stroke="black" stroke-width="4"/>
+<line x1="109" y1="154" x2="109" y2="109" stroke="black" stroke-width="4"/>
+<line x1="96" y1="152" x2="111.033" y2="152" stroke="black" stroke-width="4"/>
+<line x1="152" y1="109.033" x2="107" y2="109.033" stroke="black" stroke-width="4"/>
+<line x1="152" y1="97.0333" x2="107" y2="97.0333" stroke="black" stroke-width="4"/>
+<line x1="150" y1="110.033" x2="150" y2="95" stroke="black" stroke-width="4"/>
+<line x1="54" y1="97" x2="99" y2="97" stroke="black" stroke-width="4"/>
+<line x1="54" y1="109" x2="99" y2="109" stroke="black" stroke-width="4"/>
+<line x1="56" y1="95" x2="56" y2="110.033" stroke="black" stroke-width="4"/>
+<line x1="109.033" y1="54" x2="109.033" y2="99" stroke="black" stroke-width="4"/>
+<line x1="97.0332" y1="54" x2="97.0332" y2="99" stroke="black" stroke-width="4"/>
+<line x1="110.033" y1="56" x2="94.9999" y2="56" stroke="black" stroke-width="4"/>
+<line x1="118.5" y1="43.008" x2="118.5" y2="64.0318" stroke="black" stroke-width="7"/>
+<line x1="87.5" y1="43.008" x2="87.5" y2="64.0318" stroke="black" stroke-width="7"/>
+<line x1="119.516" y1="46" x2="87.5002" y2="46" stroke="black" stroke-width="6"/>
+<rect x="97" y="150" width="95" height="12" transform="rotate(-90 97 150)" fill="black"/>
+<rect x="54" y="97" width="95" height="12" fill="black"/>
+</svg>
