@@ -1,6 +1,0 @@
-|Redis QOI name|
-|---------| 
-|extended_clock_freqs:readout_2state_opt      |
-| extended_clock_freqs:readout_3state_opt     |
-
-: {.striped}
