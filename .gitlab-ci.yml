@@ -16,6 +16,7 @@ stages:
   - setup
   - tests
   - lint
+  - build_documentation
   - application_run
   - application_run_coupler
 
@@ -66,6 +67,26 @@ tests:
       coverage_report:
         coverage_format: cobertura
         path: coverage.xml
+  cache:
+    - key: "default"
+      paths:
+        - .cache/pip
+    - key: "venv-${CI_COMMIT_REF_NAME}"
+      paths:
+        - .venv
+
+build_documentation:
+  stage: build_documentation
+  image: python:${PYTHON_VERSION}
+  needs:
+    - setup
+  script:
+    # Activate the virtual environment
+    - source .venv/bin/activate
+    # Install documentation dependencies
+    - pip install '.[docs]'
+    # Build the documentation with strict mode to catch warnings and errors
+    - mkdocs build --strict
   cache:
     - key: "default"
       paths:
