@@ -22,7 +22,7 @@ from tergite_autocalibration.utils.logging import logger
 ###
 
 
-def update_nested(target: Dict, updates: Dict):
+def update_nested(target: Dict, updates: Dict) -> None:
     """
     Update a nested data structure (usually a dict).
 
@@ -31,7 +31,7 @@ def update_nested(target: Dict, updates: Dict):
         updates: The updates that are going to be merged into the data structure
 
     Returns:
-        Does not return anything, but works on the given objects
+        None: Does not return anything, but works on the given objects
 
     """
     for key, value in updates.items():
