@@ -64,8 +64,8 @@ graph TD
 
 ## Coupler Nodes
 
-- [coupler_spectroscopy](nodes/qubit_spectroscopy_vs_current_node.qmd)
-- [coupler_resonator_spectroscopy](nodes/resonator_spectroscopy_vs_current_node.qmd)
+- [coupler_spectroscopy](qubit_spectroscopy_vs_current_node.md)
+- [coupler_resonator_spectroscopy](resonator_spectroscopy_vs_current_node.md)
 
 ## Characterization Nodes
 
