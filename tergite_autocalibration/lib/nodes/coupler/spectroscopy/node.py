@@ -35,7 +35,6 @@ from tergite_autocalibration.lib.utils.samplespace import (
     resonator_samples,
 )
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
-from tergite_autocalibration.utils.hardware.spi import SpiDAC
 from tergite_autocalibration.utils.logging import logger
 
 
@@ -70,13 +69,7 @@ class QubitSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNode):
         self.validate()
 
     def pre_measurement_operation(self, reduced_ext_space):
-        self.spi_dac.ramp_current_serially(reduced_ext_space["dc_currents"])
-
-    def calibrate(self, data_path: Path, cluster_status):
-        if cluster_status == MeasurementMode.real:
-            self.spi_dac = SpiDAC(self.couplers, cluster_status)
-
-        super().calibrate(data_path, cluster_status)
+        self.spi_manager.ramp_current_serially(reduced_ext_space["dc_currents"])
 
     def precompile(self, schedule_samplespace: dict) -> CompiledSchedule:
         constants.GRID_TIME_TOLERANCE_TIME = 5e-2
@@ -102,10 +95,6 @@ class QubitSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNode):
         )
 
         return compiled_schedule
-
-    def final_operation(self):
-        logger.info("Final operation")
-        self.spi_dac.close_spi_rack()
 
 
 class ResonatorSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNode):
@@ -138,13 +127,7 @@ class ResonatorSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNo
         self.validate()
 
     def pre_measurement_operation(self, reduced_ext_space):
-        self.spi_dac.ramp_current_serially(reduced_ext_space["dc_currents"])
-
-    def calibrate(self, data_path: Path, cluster_status):
-        if cluster_status == MeasurementMode.real:
-            self.spi_dac = SpiDAC(self.couplers, cluster_status)
-
-        super().calibrate(data_path, cluster_status)
+        self.spi_manager.ramp_current_serially(reduced_ext_space["dc_currents"])
 
     def precompile(self, schedule_samplespace: dict) -> CompiledSchedule:
         constants.GRID_TIME_TOLERANCE_TIME = 5e-2
@@ -170,7 +153,3 @@ class ResonatorSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNo
         )
 
         return compiled_schedule
-
-    def final_operation(self):
-        logger.info("Final operation")
-        self.spi_dac.close_spi_rack()
