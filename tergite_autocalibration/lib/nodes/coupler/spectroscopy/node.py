@@ -169,4 +169,3 @@ class ResonatorSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNo
             currents[coupler] = 0
 
         self.spi_manager.set_dac_current(currents)
-        
