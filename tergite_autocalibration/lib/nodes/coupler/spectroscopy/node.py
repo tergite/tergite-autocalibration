@@ -69,7 +69,7 @@ class QubitSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNode):
         self.validate()
 
     def pre_measurement_operation(self, reduced_ext_space):
-        self.spi_manager.ramp_current_serially(reduced_ext_space["dc_currents"])
+        self.spi_manager.set_dac_current(reduced_ext_space["dc_currents"])
 
     def precompile(self, schedule_samplespace: dict) -> CompiledSchedule:
         constants.GRID_TIME_TOLERANCE_TIME = 5e-2
@@ -95,6 +95,14 @@ class QubitSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNode):
         )
 
         return compiled_schedule
+
+    def final_operation(self):
+        logger.info("Final Operation")
+        currents = {}
+        for coupler in self.couplers:
+            currents[coupler] = 0
+
+        self.spi_manager.set_dac_current(currents)
 
 
 class ResonatorSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNode):
@@ -127,7 +135,7 @@ class ResonatorSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNo
         self.validate()
 
     def pre_measurement_operation(self, reduced_ext_space):
-        self.spi_manager.ramp_current_serially(reduced_ext_space["dc_currents"])
+        self.spi_manager.set_dac_current(reduced_ext_space["dc_currents"])
 
     def precompile(self, schedule_samplespace: dict) -> CompiledSchedule:
         constants.GRID_TIME_TOLERANCE_TIME = 5e-2
@@ -153,3 +161,11 @@ class ResonatorSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNo
         )
 
         return compiled_schedule
+
+    def final_operation(self):
+        logger.info("Final Operation")
+        currents = {}
+        for coupler in self.couplers:
+            currents[coupler] = 0
+
+        self.spi_manager.set_dac_current(currents)
