@@ -138,7 +138,9 @@ class T1QubitAnalysis(BaseQubitAnalysis):
             magnitudes = self.magnitudes[self.data_var].isel(
                 {self.repetitions_coord: indx}
             )
-            magnitudes_flat = magnitudes.values.flatten() * 1e6  # Convert to microseconds
+            magnitudes_flat = (
+                magnitudes.values.flatten() * 1e6
+            )  # Convert to microseconds
             ax.plot(self.delays, magnitudes_flat, alpha=0.3)
 
         # Plot ±1σ shaded region

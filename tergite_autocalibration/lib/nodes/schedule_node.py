@@ -32,7 +32,6 @@ from tergite_autocalibration.utils.measurement_utils import reduce_samplespace
 
 
 class ScheduleNode(BaseNode, abc.ABC):
-
     @property
     def outer_schedule_dimensions(self) -> int:
         """
