@@ -766,16 +766,16 @@ class ResetCalibrationSSROMeasurement(BaseMeasurement):
         def local_analytic(t, a, g, c):
             numerator = -8 * g * (a * g * t + c)
             denominator = np.sqrt(
-                abs(1 - 16 * (a * g * t) ** 2 - 32 * a * g * t * c - 16 * c ** 2)
+                abs(1 - 16 * (a * g * t) ** 2 - 32 * a * g * t * c - 16 * c**2)
             )
             y = numerator / denominator
             return y
 
         def generate_local_adiabatic_pulse(g, T, y0, yt, dt=0.1):
-            c = -y0 / np.sqrt(64 * g ** 2 + 16 * y0 ** 2)
+            c = -y0 / np.sqrt(64 * g**2 + 16 * y0**2)
             a = (
-                -4 * c * (4 * g ** 2 + yt ** 2) - yt * np.sqrt(4 * g ** 2 + yt ** 2)
-            ) / (4 * g * T * (4 * g ** 2 + yt ** 2))
+                -4 * c * (4 * g**2 + yt**2) - yt * np.sqrt(4 * g**2 + yt**2)
+            ) / (4 * g * T * (4 * g**2 + yt**2))
             # times = np.arange(0, T, dt)
             times = np.linspace(0, T, int(np.ceil(T / dt)))
             seq = local_analytic(times, a, g, c)
