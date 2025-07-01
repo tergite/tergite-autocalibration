@@ -20,7 +20,6 @@ from pathlib import Path
 from typing import List
 
 # TODO: we should have a conditional import depending on a feature flag here
-import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 import numpy as np
@@ -408,10 +407,6 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
         Returns:
             The quantity of interest as QOI wrapped object
         """
-
-    @abstractmethod
-    def plotter(self, primary_axis, secondary_axis):
-        pass
 
 
 class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
