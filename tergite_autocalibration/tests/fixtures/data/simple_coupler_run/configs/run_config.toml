@@ -4,6 +4,7 @@ target_node = "tqg_randomized_benchmarking_ssro" #"coupler_spectroscopy" qubit_0
 qubits = ["q06", "q07", "q08", "q09", "q12", "q13", "q14", "q15"] #["q08", "q09"] 
 couplers = ["q06_q07", "q08_q09", "q12_q13", "q14_q15"] #["q08_q09"]
 cooldown = "13/05/2025"
+name = "no_name_for_this_run_set"
 is_internal = true
 runner_logo = "resources/runner_logo.png"
 
