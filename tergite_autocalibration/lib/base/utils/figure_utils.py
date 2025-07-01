@@ -48,7 +48,7 @@ def _add_top_band(
     ax_center.add_line(line)
 
     # Add left logo, this is hardcoded as it is the Tergite logo.
-    logo_path = ("resources/logo.png",)
+    logo_path = ("resources/logo.png")
 
     if logo_path:
         try:

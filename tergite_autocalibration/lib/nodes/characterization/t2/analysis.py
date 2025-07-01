@@ -200,9 +200,8 @@ class BaseT2QubitAnalysis(BaseQubitAnalysis, ABC):
             self.fit_delays,
             self.average_t2_y,
             color="red",
-            label=f"Mean {self.label} = {self.average_t2 * 1e6:.1f} ± {self.error * 1e6:.1f} μs",
+            label=f"Mean {self.label} = {self.average_t2:.1f} ± {self.error :.1f} μs",
         )
-        ax.set_title(f"T2 for {self.qubit}")
         ax.set_xlabel("Delay (μs)")
         ax.set_ylabel("|S21| (V)")
         ax.legend()
@@ -289,6 +288,11 @@ class T2EchoQubitAnalysis(BaseT2QubitAnalysis):
             alpha=0.2,
             label="±1σ",
         )
+
+        ax.set_xlabel("Delay (μs)")
+        ax.set_ylabel("|S21| (V)")
+        ax.grid()
+        ax.legend()
 
 
 class T2NodeAnalysis(BaseAllQubitsAnalysis):

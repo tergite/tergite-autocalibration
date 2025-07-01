@@ -76,7 +76,7 @@ class T1QubitAnalysis(BaseQubitAnalysis):
 
         fit_result = None
 
-        for indx in enumerate(self.dataset.coords[self.repetitions_coord]):
+        for indx in range(len(self.dataset.coords[self.repetitions_coord])):
             magnitudes = self.magnitudes[self.data_var].isel(
                 {self.repetitions_coord: indx}
             )
@@ -134,11 +134,11 @@ class T1QubitAnalysis(BaseQubitAnalysis):
             ax: The axes on which to plot the results.
         """
 
-        for indx in enumerate(self.dataset.coords[self.repetitions_coord]):
+        for indx in range(len(self.dataset.coords[self.repetitions_coord])):
             magnitudes = self.magnitudes[self.data_var].isel(
                 {self.repetitions_coord: indx}
             )
-            magnitudes_flat = magnitudes.values.flatten()
+            magnitudes_flat = magnitudes.values.flatten() * 1e6  # Convert to microseconds
             ax.plot(self.delays, magnitudes_flat, alpha=0.3)
 
         # Plot ±1σ shaded region
@@ -157,11 +157,10 @@ class T1QubitAnalysis(BaseQubitAnalysis):
             label="±1σ",
         )
 
-        ax.set_title(f"T1 experiment for {self.qubit}")
         ax.set_xlabel("Delay (μs)")
         ax.set_ylabel("|S21| (V)")
-
         ax.grid()
+        ax.legend()
 
 
 class T1NodeAnalysis(BaseAllQubitsAnalysis):
