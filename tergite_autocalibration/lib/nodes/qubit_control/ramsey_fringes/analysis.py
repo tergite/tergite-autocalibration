@@ -107,7 +107,7 @@ class RamseyDetunings01QubitAnalysis(RamseyDetuningsBaseQubitAnalysis):
     def analyse_qubit(self):
         self._analyse_ramsey()
 
-        analysis_succesful = True
+        analysis_successful = True
         analysis_result = {
             self.redis_field: {
                 "value": self.corrected_qubit_frequency,
@@ -115,7 +115,7 @@ class RamseyDetunings01QubitAnalysis(RamseyDetuningsBaseQubitAnalysis):
             }
         }
 
-        qoi = QOI(analysis_result, analysis_succesful)
+        qoi = QOI(analysis_result, analysis_successful)
 
         return qoi
 
@@ -128,7 +128,7 @@ class RamseyDetunings12QubitAnalysis(RamseyDetuningsBaseQubitAnalysis):
     def analyse_qubit(self):
         self._analyse_ramsey()
 
-        analysis_succesful = True
+        analysis_successful = True
         analysis_result = {
             self.redis_field: {
                 "value": self.corrected_qubit_frequency,
@@ -136,7 +136,7 @@ class RamseyDetunings12QubitAnalysis(RamseyDetuningsBaseQubitAnalysis):
             }
         }
 
-        qoi = QOI(analysis_result, analysis_succesful)
+        qoi = QOI(analysis_result, analysis_successful)
 
         return qoi
 

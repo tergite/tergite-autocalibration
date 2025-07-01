@@ -114,7 +114,7 @@ class T1QubitAnalysis(BaseQubitAnalysis):
         params_lower["tau"].value = self.average_t1 - self.error
         self.average_t1_lower = model.eval(params=params_lower, t=self.fit_delays)
 
-        analysis_succesful = True
+        analysis_successful = True
 
         analysis_result = {
             "t1_time": {
@@ -123,7 +123,7 @@ class T1QubitAnalysis(BaseQubitAnalysis):
             }
         }
 
-        qoi = QOI(analysis_result, analysis_succesful)
+        qoi = QOI(analysis_result, analysis_successful)
 
         return qoi
 

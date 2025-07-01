@@ -27,12 +27,12 @@ from tergite_autocalibration.lib.nodes.characterization.t2.measurement import (
     T2EchoMeasurement,
 )
 from tergite_autocalibration.lib.nodes.external_parameter_node import (
-    ExternalParameterNode,
+    ExternalParameterFixedScheduleQubitNode,
 )
 from tergite_autocalibration.utils.logging import logger
 
 
-class T2Node(ExternalParameterNode):
+class T2Node(ExternalParameterFixedScheduleQubitNode):
     """
     Node for T2 measurement and analysis.
     This node performs T2 measurements on multiple qubits
@@ -73,7 +73,7 @@ class T2Node(ExternalParameterNode):
             sleep(self.sleep_time)
 
 
-class T2EchoNode(ExternalParameterNode):
+class T2EchoNode(ExternalParameterFixedScheduleQubitNode):
     """
     Node for T2 Echo measurement and analysis.
     This node performs T2 Echo measurements on multiple qubits

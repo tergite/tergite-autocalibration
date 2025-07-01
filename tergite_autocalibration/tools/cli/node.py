@@ -17,6 +17,7 @@ from typing import Annotated
 import typer
 
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
+from tergite_autocalibration.utils.logging.decorators import suppress_logging
 
 node_cli = typer.Typer()
 
@@ -31,6 +32,7 @@ def complete_node_name(incomplete: str):
 
 
 @node_cli.command(help="Reset all parameters in redis for the node specified.")
+@suppress_logging
 def reset(
     name: Annotated[
         str,
@@ -61,10 +63,13 @@ def reset(
     ] = None,
 ):
     from tergite_autocalibration.utils.backend.reset_redis_node import ResetRedisNode
-    from tergite_autocalibration.lib.utils.graph import range_topological_order
+    from tergite_autocalibration.lib.utils.graph import filtered_topological_order
     from tergite_autocalibration.config.globals import CONFIG
 
-    topo_order = range_topological_order(from_node, CONFIG.run.target_node)
+    topo_order = filtered_topological_order(
+        CONFIG.run.target_node,
+        from_nodes=[from_node] if from_node is not None else None,
+    )
 
     reset_obj_ = ResetRedisNode()
     if from_node:
@@ -81,11 +86,10 @@ def reset(
         if typer.confirm(
             "Do you really want to reset all nodes? It might take some time to recalibrate them."
         ):
-            reset_obj_.reset_node("all")
+            reset_obj_.reset_all_nodes()
         else:
             typer.echo("Node reset aborted by user.")
     elif name is not None:
         reset_obj_.reset_node(name)
     else:
-        typer.echo("Please enter a node name or use the -a option to reset all nodes.")
         typer.echo("Please enter a node name or use the -a option to reset all nodes.")

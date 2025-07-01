@@ -12,7 +12,8 @@
 # The items of this section describe general device properties known
 # after fabrication and first manual characterization steps. The general
 # section should contain relevant metadata
-name = "fc8a"
+name = "V8a #1"
+owner = "QC2"
 
 # -------------------- Resonator definitions --------------------
 # This section contains all resonator-specific properties

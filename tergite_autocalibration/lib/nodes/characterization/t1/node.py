@@ -24,12 +24,12 @@ from tergite_autocalibration.lib.nodes.characterization.t1.measurement import (
     T1Measurement,
 )
 from tergite_autocalibration.lib.nodes.external_parameter_node import (
-    ExternalParameterNode,
+    ExternalParameterFixedScheduleQubitNode,
 )
 from tergite_autocalibration.utils.logging import logger
 
 
-class T1Node(ExternalParameterNode):
+class T1Node(ExternalParameterFixedScheduleQubitNode):
     """
     Node for T1 measurement and analysis.
     This node performs T1 measurements on multiple qubits

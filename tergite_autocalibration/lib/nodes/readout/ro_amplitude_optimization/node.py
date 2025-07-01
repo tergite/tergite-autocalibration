@@ -21,10 +21,10 @@ from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.analysi
 from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.measurement import (
     ROAmplitudeOptimizationMeasurement,
 )
-from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleQubitNode
 
 
-class ROAmplitudeTwoStateOptimizationNode(ScheduleNode):
+class ROAmplitudeTwoStateOptimizationNode(ScheduleQubitNode):
     measurement_obj = ROAmplitudeOptimizationMeasurement
     analysis_obj = OptimalROTwoStateAmplitudeNodeAnalysis
     qubit_qois = [
@@ -59,7 +59,7 @@ class ROAmplitudeTwoStateOptimizationNode(ScheduleNode):
         return float(REDIS_CONNECTION.hget(f"transmons:{qubit}", "measure:pulse_amp"))
 
 
-class ROAmplitudeThreeStateOptimizationNode(ScheduleNode):
+class ROAmplitudeThreeStateOptimizationNode(ScheduleQubitNode):
     measurement_obj = ROAmplitudeOptimizationMeasurement
     analysis_obj = OptimalROThreeStateAmplitudeNodeAnalysis
     qubit_qois = [

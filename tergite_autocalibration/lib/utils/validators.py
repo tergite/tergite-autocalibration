@@ -50,7 +50,7 @@ class Array(RootModel):
 
 
 def get_number_of_batches(
-    samplespace: Dict[str, Union[Dict[str, NDArray], Dict[str, list[NDArray]]]]
+    samplespace: Dict[str, Union[Dict[str, NDArray], Dict[str, list[NDArray]]]],
 ):
     """
     if the samplespace is a list of NDarrays,
@@ -68,7 +68,7 @@ def get_number_of_batches(
 
 
 def get_batched_dimensions(
-    samplespace: Dict[str, Dict[str, list[NDArray]]]
+    samplespace: Dict[str, Dict[str, list[NDArray]]],
 ) -> list[str]:
     """
     if the samplespace is a list of NDarrays,

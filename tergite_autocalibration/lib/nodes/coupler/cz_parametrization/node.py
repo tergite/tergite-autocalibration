@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Michele Faucci Giannelli 2024
+# (C) Copyright Michele Faucci Giannelli 2024, 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -20,10 +20,10 @@ from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.analysis impor
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.measurement import (
     CZParametrizationFixDurationMeasurement,
 )
-from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleCouplerNode
 
 
-class CZParametrizationFixDurationNode(ScheduleNode):
+class CZParametrizationFixDurationNode(ScheduleCouplerNode):
     measurement_obj = CZParametrizationFixDurationMeasurement
     analysis_obj = CZParametrizationFixDurationNodeAnalysis
     coupler_qois = [

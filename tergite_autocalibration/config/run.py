@@ -1,6 +1,7 @@
 # This code is part of Tergite
 #
 # (C) Copyright Chalmers Next Labs 2024
+# (C) Copyright Michele Faucci Giannelli 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -21,7 +22,7 @@ from tergite_autocalibration.utils.dto.enums import ApplicationStatus
 class RunConfiguration(TOMLConfigurationFile):
     """
     A class to handle all run specific configurations.
-    A run is e.g. when you call `acli calibration start` and it is over as soon as the program terminates
+    A run is e.g. when you call `acli start` and it is over as soon as the program terminates
     """
 
     def __init__(self, *args, **kwargs):
@@ -36,8 +37,11 @@ class RunConfiguration(TOMLConfigurationFile):
 
         self._log_dir = os.path.join(
             timestamp_.strftime("%Y-%m-%d"),
-            f"{timestamp_.strftime('%H-%M-%S')}_{str(ApplicationStatus.ACTIVE.value)}-{self.target_node}",
+            f"{timestamp_.strftime('%H-%M-%S')}_{self.name}-{str(ApplicationStatus.ACTIVE.value)}",
         )
+
+        # We need to know the data directory to write the original acquisition date
+        self._data_dir = None
 
     @property
     def id(self):
@@ -60,6 +64,19 @@ class RunConfiguration(TOMLConfigurationFile):
     @log_dir.setter
     def log_dir(self, value):
         self._log_dir = value
+
+    @property
+    def data_dir(self):
+        """
+        Returns:
+            Data directory in form YYYY-MM-DD/"ACTIVE"_HH-MM-SS--target_node
+
+        """
+        return self._data_dir
+
+    @data_dir.setter
+    def data_dir(self, value):
+        self._data_dir = value
 
     @property
     def target_node(self) -> str:
@@ -87,3 +104,41 @@ class RunConfiguration(TOMLConfigurationFile):
 
         """
         return self._dict["couplers"]
+
+    @property
+    def cooldown(self) -> str:
+        """
+        Returns:
+            Date of the last cooldown.
+
+        """
+        return self._dict["cooldown"]
+
+    @property
+    def name(self) -> str:
+        """
+        Returns:
+            A name given for the run, takes target node as default if not specified
+        """
+        if "name" in self._dict.keys():
+            return self._dict["name"]
+        else:
+            return self._dict["target_node"]
+
+    @property
+    def is_internal(self) -> bool:
+        """
+        Returns:
+            flag if the plots are for internal use or not.
+
+        """
+        return self._dict["is_internal"]
+
+    @property
+    def runner_logo(self) -> str:
+        """
+        Returns:
+            Path to the logo to be used in the runner.
+
+        """
+        return self._dict["runner_logo"]
