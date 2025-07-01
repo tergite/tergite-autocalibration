@@ -4,7 +4,7 @@
 # (C) Copyright Eleftherios Moschandreou 2024
 # (C) Copyright Liangyu Chen 2024
 # (C) Copyright Amr Osman 2024
-# (C) Copyright Michele Faucci Giannelli 2024
+# (C) Copyright Michele Faucci Giannelli 2024, 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -33,6 +33,14 @@ from tergite_autocalibration.utils.logging import logger
 
 
 class T2Node(ExternalParameterNode):
+    """
+    Node for T2 measurement and analysis.
+    This node performs T2 measurements on multiple qubits
+    and analyzes the results to extract T2 times.
+    It uses the T2Measurement class for measurement
+    and T2NodeAnalysis for analysis.
+    """
+
     measurement_obj = T2Measurement
     analysis_obj = T2NodeAnalysis
     qubit_qois = ["t2_time"]
@@ -41,18 +49,17 @@ class T2Node(ExternalParameterNode):
         super().__init__(name, all_qubits, **schedule_keywords)
         self.all_qubits = all_qubits  # Is this needed
 
-        self.number_or_repeated_T2s = 1
-
+        self.number_or_repeated_t2s = 3
         self.sleep_time = 3
 
+        delays = np.arange(0, 150e-6, 5e-6)
+
         self.schedule_samplespace = {
-            "delays": {
-                qubit: 8e-9 + np.arange(0, 70e-6, 1e-6) for qubit in self.all_qubits
-            }
+            "delays": {qubit: 8e-9 + delays for qubit in self.all_qubits}
         }
         self.external_samplespace = {
             "repeat": {
-                qubit: range(self.number_or_repeated_T2s) for qubit in self.all_qubits
+                qubit: range(self.number_or_repeated_t2s) for qubit in self.all_qubits
             }
         }
 
@@ -67,6 +74,14 @@ class T2Node(ExternalParameterNode):
 
 
 class T2EchoNode(ExternalParameterNode):
+    """
+    Node for T2 Echo measurement and analysis.
+    This node performs T2 Echo measurements on multiple qubits
+    and analyzes the results to extract T2 Echo times.
+    It uses the T2EchoMeasurement class for measurement
+    and T2EchoNodeAnalysis for analysis.
+    """
+
     measurement_obj = T2EchoMeasurement
     analysis_obj = T2EchoNodeAnalysis
     qubit_qois = ["t2_echo_time"]
@@ -76,19 +91,25 @@ class T2EchoNode(ExternalParameterNode):
         self.all_qubits = all_qubits
         self.backup = False
 
-        self.number_or_repeated_T2s = 1
-
+        self.number_or_repeated_t2s = 3
         self.sleep_time = 3
-        # self.operations_args = []
+
+        delays = np.concatenate(
+            [
+                np.arange(0, 40e-6, 10e-6),  # 4
+                np.arange(40e-6, 100e-6, 20e-6),  # 3
+                np.arange(100e-6, 400e-6, 50e-6),  # 6
+                np.arange(400e-6, 900e-6, 100e-6),  # 5
+                np.arange(900e-6, 1500e-6, 200e-6),  # 3
+            ]
+        )
 
         self.schedule_samplespace = {
-            "delays": {
-                qubit: 8e-9 + np.arange(0, 300e-6, 6e-6) for qubit in self.all_qubits
-            }
+            "delays": {qubit: 8e-9 + delays for qubit in self.all_qubits}
         }
         self.external_samplespace = {
             "repeat": {
-                qubit: range(self.number_or_repeated_T2s) for qubit in self.all_qubits
+                qubit: range(self.number_or_repeated_t2s) for qubit in self.all_qubits
             }
         }
 

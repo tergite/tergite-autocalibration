@@ -21,6 +21,7 @@ from pathlib import Path
 # TODO: we should have a conditional import depending on a feature flag here
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
 import numpy as np
 import xarray as xr
 
@@ -143,6 +144,12 @@ class BaseNodeAnalysis(ABC):
     def __init__(self):
         self._qoi = None
         self.redis_fields = ""
+        self.name = ""
+        self.data_path = None
+        self.data_vars = None
+        self.coords = None
+        self.fig = None
+        self.axs = None
 
     @property
     def qoi(self) -> "QOI":
@@ -320,14 +327,10 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
         self.update_redis_trusted_values(self.name, self.qubit, self._qoi)
         return self._qoi
 
-    def _plot(self, primary_axis):
+    def _plot(self, primary_axis: Axes):
         self.plotter(primary_axis)  # Assuming node_analysis object is available
-
-        # Customize plot as needed
-        handles, labels = primary_axis.get_legend_handles_labels()
-        patch = mpatches.Patch(color="red", label=f"{self.qubit}")
-        handles.append(patch)
-        primary_axis.legend(handles=handles, fontsize="small")
+        primary_axis.set_title(f"Qubit {self.qubit}")
+        primary_axis.legend()
 
     @abstractmethod
     def analyse_qubit(self) -> "QOI":
@@ -350,6 +353,7 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
         self.coords = None
         self.name_qubit_1 = ""
         self.name_qubit_2 = ""
+        self.coupler = ""
 
     def process_coupler(self, dataset, coupler_element):
         self.name_qubit_1 = coupler_element[0:3]
@@ -400,6 +404,10 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
 
     @abstractmethod
     def analyze_coupler(self):
+        pass
+
+    @abstractmethod
+    def plotter(self, primary_axis, secondary_axis):
         pass
 
 
