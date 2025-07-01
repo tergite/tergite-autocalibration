@@ -6,7 +6,7 @@ couplers = ["q06_q07"]
 cooldown = "13/05/2025"
 name = "no_name_for_this_run_set"
 is_internal = true
-runner_logo = "resources/runner_logo.png"
+runner_logo = ""
 
 #   --------------
 #   Node reference
