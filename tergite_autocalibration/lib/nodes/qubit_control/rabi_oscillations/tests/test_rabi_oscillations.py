@@ -26,7 +26,6 @@ from tergite_autocalibration.utils.dto.qoi import QOI
 
 
 class TestRabiQubitAnalysis(unittest.TestCase):
-
     def test_setup_01(self):
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_rabi_01" / "dataset_rabi_oscillations_0.hdf5"
