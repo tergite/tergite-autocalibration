@@ -11,6 +11,9 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 
 - Better labelling for the analysis output plots
 
+### Added
+- Analysis for the punchout node
+
 ### Changed
 
 - Upgrade Python to version 3.12
