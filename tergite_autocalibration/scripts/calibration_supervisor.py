@@ -326,3 +326,12 @@ class CalibrationSupervisor:
         for calibration_node in self.topo_order:
             self.node_manager.inspect_node(calibration_node)
             logger.info(f"{calibration_node} node is completed")
+
+    def rerun_analysis(self):
+        """
+        Reruns the analysis of the target node.
+        """
+
+        logger.info("Rerun analysis")
+        self.node_manager.inspect_node(self.config.target_node_name)
+        logger.info(f"{self.config.target_node_name} node is completed")

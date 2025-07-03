@@ -169,7 +169,10 @@ def start(
         target_node_name=target_node_name,
     )
     supervisor = CalibrationSupervisor(config)
-    supervisor.calibrate_system()
+    if cluster_mode is MeasurementMode.re_analyse:
+        supervisor.rerun_analysis()
+    else:
+        supervisor.calibrate_system()
 
     # Push the results of the calibration to MSS
     if push:
