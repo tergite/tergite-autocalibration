@@ -25,21 +25,23 @@ import xarray
 from colorama import Fore, Style
 from colorama import init as colorama_init
 from quantify_scheduler.backends import SerialCompiler
+from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
 from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
     CompiledSchedule,
     InstrumentCoordinator,
 )
-from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
-
-from tergite_autocalibration.config.globals import PLOTTING_BACKEND
 from tergite_autocalibration.lib.utils.redis import update_redis_trusted_values
-from tergite_autocalibration.utils.logging import logger
+
+
+from tergite_autocalibration.config.globals import PLOTTING_BACKEND, REDIS_CONNECTION
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.lib.utils.device import DeviceConfiguration
 from tergite_autocalibration.lib.utils.schedule_execution import execute_schedule
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
+from tergite_autocalibration.utils.hardware.spi import SpiDAC
 from tergite_autocalibration.utils.io.dataset import save_dataset
+from tergite_autocalibration.utils.logging import logger
 
 colorama_init()
 
@@ -55,6 +57,7 @@ class BaseNode(abc.ABC):
         self.node_dictionary = node_dictionary
         self.lab_instr_coordinator: InstrumentCoordinator
         self._results = {}
+        self.spi_manager: SpiDAC
         self.schedule_samplespace = {}
         self.external_samplespace = {}
         self.redis_fields = []
@@ -62,7 +65,6 @@ class BaseNode(abc.ABC):
 
         # These may be modified while the node runs
         self.outer_schedule_samplespace = {}
-        self.initial_schedule_samplespace = {}
         self.reduced_external_samplespace = {}
         self.loops = None
         self.schedule_keywords = {}
@@ -123,13 +125,13 @@ class BaseNode(abc.ABC):
         # keeping the first element, ASSUMING that all settable elements
         # have the same dimensions on their samplespace
 
-        first_settable = list(schedule_settable_quantities)[0]
-        measured_elements = self.schedule_samplespace[first_settable].keys()
-        first_element = list(measured_elements)[0]
+        # first_settable = list(schedule_settable_quantities)[0]
+        # measured_elements = self.schedule_samplespace[first_settable].keys()
 
         dimensions = []
 
         for quantity in schedule_settable_quantities:
+            first_element = list(self.schedule_samplespace[quantity].keys())[0]
             settable_values = self.schedule_samplespace[quantity][first_element]
             if not isinstance(settable_values, Iterable):
                 settable_values = np.array([settable_values])
@@ -193,11 +195,10 @@ class BaseNode(abc.ABC):
 
     def calibrate(self, data_path: Path, cluster_status):
         if cluster_status != MeasurementMode.re_analyse:
-            pass
             result_dataset = self.measure_node(cluster_status)
             self.device_manager.save_serial_device(self.name, self.device, data_path)
-            # After the measurement free the device resources
             save_dataset(result_dataset, self.name, data_path)
+        # After the measurement free the device resources
         self.device_manager.close_device()
         self.post_process(data_path)
         logger.info("analysis completed")

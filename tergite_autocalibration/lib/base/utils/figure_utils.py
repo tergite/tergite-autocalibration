@@ -23,9 +23,7 @@ from tergite_autocalibration.config.globals import (
 from tergite_autocalibration.utils.logging import logger
 
 
-def _add_top_band(
-    axes_tuple,
-):
+def _add_top_band(axes_tuple):
 
     ax_left, ax_center, ax_right = axes_tuple
 
@@ -187,8 +185,6 @@ def create_figure_with_top_band(nrows, ncols) -> tuple:
 
     top_band_axes = (ax_left, ax_center, ax_right)
 
-    _add_top_band(
-        top_band_axes,
-    )
+    _add_top_band(top_band_axes)
 
     return fig, axs

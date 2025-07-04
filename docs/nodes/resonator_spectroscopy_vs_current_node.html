@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.56">
+<meta name="generator" content="quarto-1.5.53">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -227,6 +227,12 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../nodes/punchout_node.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Punchout</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../nodes/qubit_spectroscopy_node.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Qubit spectroscopy</span></a>
   </div>
@@ -344,7 +350,7 @@ window.Quarto = {
 <section id="analysis-classes" class="level3">
 <h3 class="anchored" data-anchor-id="analysis-classes">Analysis classes:</h3>
 <p>The <code>ResonatorSpectroscopyVsCurrentNodeAnalysis</code> class handles the analysis of all selected couplers and manages the associated plots. In addition to the preview plot that is displayed at run time, the analysis saves a file for each qubit containing all the resonator spectroscopies for debugging purposes.</p>
-<p>The <code>ResonatorSpectroscopyVsCurrentCouplerAnalysis</code> combines the results of the two qubits in a coupler and the saving of the QOI so that the information of the crossing points is saved per qubit per coupler as described in the <a href="developer-quide/new_node_creation.qmd#base-classes">base class</a> documentation.</p>
+<p>The <code>ResonatorSpectroscopyVsCurrentCouplerAnalysis</code> combines the results of the two qubits in a coupler and the saving of the QOI so that the information of the crossing points is saved per qubit per coupler as described in the <a href="../developer-quide/new_node_creation.qmd#base-classes">base class</a> documentation.</p>
 <p>The <code>ResonatorSpectroscopyVsCurrentQubitAnalysis</code> performs the analysis of a qubit combining the results of all resonator spectroscopy measurements looking primarely for the crossing points, i.e.&nbsp;the values of the currents at which there is a change of region from U to <span class="math inline">\(\bigcap\)</span>; these are the point at which the coupler cross the resonator frequency and can be used to study the properties of the coupler. The main function used is <code>find_crossing_currents</code>, which: * Cleans the data by removing isolated zeros (representing missing or invalid data) and outliers. * Scans the data from left to right, comparing consecutive non-zero values to detect transitions based on a predefined threshold. * Groups transitions occurring within a minimum range to mitigate the effect of noise or spurious detections. * Determines the crossing point as the average position within each grouped transition region.</p>
 <p>In cases where the resonator frequency is high and no “U” shape appears—resulting instead in two connected <span class="math inline">\(\bigcap\)</span> regions—the transition point is inferred from where the two regions meet. The current thresholds and interval ranges are optimized for a current step size of 50uA.</p>
 <p>Each individual resonator spectroscopy is performed by the standard <code>ResonatorSpectroscopyQubitAnalysis</code> class described in the <a href="../nodes/resonator_spectroscopy_node.html">resonator spectroscopy node</a>.</p>

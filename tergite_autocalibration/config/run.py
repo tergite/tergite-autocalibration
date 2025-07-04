@@ -37,7 +37,7 @@ class RunConfiguration(TOMLConfigurationFile):
 
         self._log_dir = os.path.join(
             timestamp_.strftime("%Y-%m-%d"),
-            f"{timestamp_.strftime('%H-%M-%S')}_{str(ApplicationStatus.ACTIVE.value)}-{self.target_node}",
+            f"{timestamp_.strftime('%H-%M-%S')}_{self.name}-{str(ApplicationStatus.ACTIVE.value)}",
         )
 
         # We need to know the data directory to write the original acquisition date
@@ -113,6 +113,17 @@ class RunConfiguration(TOMLConfigurationFile):
 
         """
         return self._dict.get("cooldown", "no_cooldown_configured")
+
+    @property
+    def name(self) -> str:
+        """
+        Returns:
+            A name given for the run, takes target node as default if not specified
+        """
+        if "name" in self._dict.keys():
+            return self._dict["name"]
+        else:
+            return self._dict["target_node"]
 
     @property
     def is_internal(self) -> bool:

@@ -60,3 +60,9 @@ The `analyse_qubit` method processes the Rabi oscillations data to extract key p
 6. **Plot Results**:  
    - Plot the fitted curve against the original data points.
    - Annotate the plot with the ($\pi$)-pulse amplitude value.
+
+
+## Redis QOI tables
+[Rabi oscillations 01](../redis_variable_names.qmd#rabi01)
+
+[Rabi oscillations 12](../redis_variable_names.qmd#rabi12)

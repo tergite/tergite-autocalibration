@@ -1,0 +1,5 @@
+|Redis QOI name|
+|---------| 
+|purity_fidelity      |
+
+: {.striped}

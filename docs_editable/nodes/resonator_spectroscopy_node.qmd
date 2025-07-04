@@ -40,3 +40,8 @@ The dataset returned by this analysis is an `xarray.Dataset`, which includes:
 
 This dataset provides essential insights into the resonator’s properties, allowing for precise tuning of qubit-resonator
 interactions.
+
+## Redis QOI tables
+[Resonator spectroscopy 01](../redis_variable_names.qmd#respec01)
+
+[Resonator spectroscopy 12](../redis_variable_names.qmd#respec12)

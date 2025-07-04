@@ -33,7 +33,8 @@ from tergite_autocalibration.utils.logging import logger
 GRAPH_DEPENDENCIES = [
     ("tof", "resonator_spectroscopy"),
     ("resonator_spectroscopy", "resonator_spectroscopy_vs_current"),
-    ("resonator_spectroscopy", "qubit_01_spectroscopy"),
+    ("resonator_spectroscopy", "punchout"),
+    ("punchout", "qubit_01_spectroscopy"),
     ("resonator_spectroscopy", "qubit_01_spectroscopy_AR"),
     ("qubit_01_spectroscopy_AR", "rabi_oscillations_AR"),
     ("resonator_spectroscopy_vs_current", "qubit_spectroscopy_vs_current"),
