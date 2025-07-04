@@ -51,8 +51,10 @@ def _find_and_validate_spi_port():
             return ENV.spi_serial_port
 
     # For the default base case, return None
-    logger.warning("Couldn't find the serial port of the SPI rack. "
-                   "Please check the connection or update the value for SPI_SERIAL_PORT in the .env file.")
+    logger.warning(
+        "Couldn't find the serial port of the SPI rack. "
+        "Please check the connection or update the value for SPI_SERIAL_PORT in the .env file."
+    )
     return None
 
 
