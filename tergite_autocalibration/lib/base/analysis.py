@@ -20,8 +20,8 @@ from pathlib import Path
 from typing import List
 
 # TODO: we should have a conditional import depending on a feature flag here
-import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
 import numpy as np
 import xarray as xr
 
@@ -103,7 +103,8 @@ class BaseNodeAnalysis(ABC):
         self.name = ""
         self._qoi = None
         self.redis_fields = ""
-        self.data_path = ""
+        self.name = ""
+        self.data_path = None
         self.dataset = None
         self.data_vars = None
         self.coords = None
@@ -331,6 +332,7 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
         self.coupler = ""
         self.name_qubit_1 = ""
         self.name_qubit_2 = ""
+        self.coupler = ""
 
     def process_coupler(self, dataset, coupler_element) -> QOI:
         """

@@ -425,11 +425,11 @@ class OptimalROThreeStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis)
             I coordinate of the centroid defined by the class boundaries
         centroid_Q: float
             Q coordinate of the centroid defined by the class boundaries
-        omega_01: float \in [0,360) degrees
+        omega_01: float in [0,360) degrees
             defining angle for the |0> - |1> boundary
-        omega_12: float \in [0,360) degrees
+        omega_12: float in [0,360) degrees
             defining angle for the |1> - |2> boundary
-        omega_20 \in [0,360) degrees,
+        omega_20 in [0,360) degrees,
             defining angle for the |2> - |0> boundary
         inv_cm_str: str
             string encoding of the confusion matrix

@@ -30,6 +30,14 @@ from tergite_autocalibration.utils.logging import logger
 
 
 class T1Node(ExternalParameterFixedScheduleQubitNode):
+    """
+    Node for T1 measurement and analysis.
+    This node performs T1 measurements on multiple qubits
+    and analyzes the results to extract T1 times.
+    It uses the T1Measurement class for measurement
+    and T1NodeAnalysis for analysis.
+    """
+
     measurement_obj = T1Measurement
     analysis_obj = T1NodeAnalysis
     qubit_qois = ["t1_time"]
@@ -40,19 +48,26 @@ class T1Node(ExternalParameterFixedScheduleQubitNode):
         self.schedule_keywords = {
             "multiplexing": "parallel"
         }  # 'one_by_one' | 'parallel'
-        self.number_or_repeated_T1s = 3
-
+        number_of_repeated_t1s = 3
         self.sleep_time = 3
-        # self.operations_args = []
+
+        delays = np.concatenate(
+            [
+                np.arange(0, 4e-6, 1e-6),  # 4
+                np.arange(4e-6, 10e-6, 2e-6),  # 3
+                np.arange(10e-6, 40e-6, 5e-6),  # 6
+                np.arange(40e-6, 100 - 6, 10e-6),  # 6
+                np.arange(100e-6, 200e-6, 20e-6),  # 5
+                np.arange(200e-6, 400e-6, 40e-6),  # 5
+            ]
+        )
 
         self.schedule_samplespace = {
-            "delays": {
-                qubit: 8e-9 + np.arange(0, 80e-6, 4e-6) for qubit in self.all_qubits
-            }
+            "delays": {qubit: 8e-9 + delays for qubit in self.all_qubits}
         }
         self.external_samplespace = {
             "T1_repetitions": {
-                qubit: range(self.number_or_repeated_T1s) for qubit in self.all_qubits
+                qubit: range(number_of_repeated_t1s) for qubit in self.all_qubits
             }
         }
 
