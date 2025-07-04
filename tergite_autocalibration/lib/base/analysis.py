@@ -146,7 +146,7 @@ class BaseNodeAnalysis(ABC):
             raise FileNotFoundError(f"Dataset file not found: {dataset_path}")
 
         logger.info("Open dataset " + str(dataset_path))
-        return xr.open_dataset(dataset_path)
+        return xr.open_dataset(dataset_path, engine="scipy")
 
     def _manage_plots(self, column_grid: int, plots_per_qubit: int):
         n_vars = len(self.data_vars)
