@@ -28,18 +28,37 @@ from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.config.env import EnvironmentConfiguration
+from tergite_autocalibration.config.globals import ENV
 
 colorama_init()
 
 
-def _find_serial_port():
-    env_configuration = EnvironmentConfiguration.from_dot_env()
-    return str(env_configuration.spi_serial_port)
+def _find_and_validate_spi_port():
+    """
+    Check whether the SPI port given in the .env file exists
+
+    Returns:
+        SPI port as string e.g. /dev/ttyACM0
+
+    """
+
+    # Path to serial devices
+    path = Path("/dev/")
+
+    # Iterate over all devices and return if the address defined in the .env file is found
+    for file in path.iterdir():
+        if str(file.absolute()) == ENV.spi_serial_port:
+            return ENV.spi_serial_port
+
+    # For the default base case, return None
+    logger.warning("Couldn't find the serial port of the SPI rack. "
+                   "Please check the connection or update the value for SPI_SERIAL_PORT in the .env file.")
+    return None
 
 
 class SpiDAC:
     def __init__(self, couplers: list[str], measurement_mode: MeasurementMode):
-        self.port = _find_serial_port()
+        self.port = _find_and_validate_spi_port()
         self.is_dummy = (
             measurement_mode == MeasurementMode.dummy
             or measurement_mode == MeasurementMode.re_analyse
