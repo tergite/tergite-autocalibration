@@ -598,7 +598,7 @@ class OptimalROTwoStateAmplitudeNodeAnalysis(BaseAllQubitsAnalysis):
                     self.axs[secondary_plot_row, index % self.column_grid]
                 )
 
-            analysis._plot(primary_axis, list_of_secondary_axes)
+            analysis.plot(primary_axis, list_of_secondary_axes)
 
 
 class OptimalROThreeStateAmplitudeNodeAnalysis(OptimalROTwoStateAmplitudeNodeAnalysis):
