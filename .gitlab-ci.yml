@@ -117,14 +117,26 @@ application_run:
     # Clear the caches
     - rm -r .venv/lib/python3.12/site-packages/out
     # Run the calibration chain
-    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_two_state_optimization" -n resonator_spectroscopy
-    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_two_state_optimization" -n qubit_01_spectroscopy
-    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_two_state_optimization" -n rabi_oscillations
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n resonator_spectroscopy
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n qubit_01_spectroscopy
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n rabi_oscillations
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n ramsey_correction
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n motzoi_parameter
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n n_rabi_oscillations
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n resonator_spectroscopy_1
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n qubit_12_spectroscopy
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n rabi_oscillations_12
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n ramsey_correction_12
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n motzoi_parameter_12
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n n_rabi_oscillations_12
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n resonator_spectroscopy_2
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n ro_frequency_three_state_optimization
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n ro_amplitude_three_state_optimization
     # Read
     - ls .venv/lib/python3.12/site-packages/out
     # Verify output
     - |
-      if find .venv/lib/python3.12/site-packages/out -type f | grep -q "rabi_oscillations.png"; then
+      if find .venv/lib/python3.12/site-packages/out -type f | grep -q "ro_amplitude_three_state_optimization.png"; then
         echo "Output file $OUTPUT_FILE exists. Application ran successfully."
       else
         echo "Error: Output file $OUTPUT_FILE not found."
