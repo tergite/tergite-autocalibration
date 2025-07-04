@@ -211,7 +211,8 @@ def _save_parameters_in_qubits_in_coupler(
 
     Args:
         node: Name of the node to update
-        this_element: Name of the element to update, this will be e.g. q01_q02, the qubits are extracted inside the function
+        this_element: Name of the element to update, this will be e.g. q01_q02, 
+        the qubits are extracted inside the function
         name: Name of the property to update e.g. the qubit frequency
         qoi: A dictionary that maps from qubit to the respective QOI
         redis_fields: redis fields from the node to be updated, this is for verification
