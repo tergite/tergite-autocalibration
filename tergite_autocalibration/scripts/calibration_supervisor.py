@@ -18,7 +18,7 @@
 import os
 from dataclasses import dataclass, field
 from ipaddress import IPv4Address
-from typing import List, Union
+from typing import List, Union, FrozenSet
 
 from colorama import Fore, Style
 from colorama import init as colorama_init
@@ -26,7 +26,7 @@ from qblox_instruments import Cluster
 from qblox_instruments.types import ClusterType
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
-
+from types import MappingProxyType
 from tergite_autocalibration.config.globals import (
     CLUSTER_IP,
     CONFIG,
@@ -138,20 +138,22 @@ class HardwareManager:
         # Ensure clusters is a list, even if a single cluster
         clusters = [clusters] if isinstance(clusters, Cluster) else clusters
 
+        # Load attenuation settings for entire system (possibly across multiple clusters)
+        output_attenuation_settings = dh.get_output_attenuations()
+        connectivity = MappingProxyType(
+            {
+                str(n): frozenset(neigh.keys())
+                for n, neigh in CONFIG.cluster.connectivity.graph.adj.items()
+            }
+        )
+
         # Configure each cluster in the list and add it to the instrument coordinator
         for cluster in clusters:
-            # TODO: Setting the attenuation might not be needed any longer if we decide to use the new hw config
-            attenuations = dh.get_legacy("attenuation_setting")
-            for i, module in self.cluster.get_connected_modules().items():
-                try:
-                    if module.is_qcm_type and module.is_rf_type:
-                        module.out0_att(attenuations["qubit"])  # For control lines
-                        module.out1_att(attenuations["coupler"])  # For flux lines
-                    elif module.is_qrm_type and module.is_rf_type:
-                        module.out0_att(attenuations["resonator"])  # For readout lines
-                except Exception as e:
-                    logger.error(f"Could not set attenuations: {attenuations}")
-                    logger.error(e)
+            _configure_cluster_settings(
+                cluster,
+                connectivity=connectivity,
+                output_attenuation_settings=output_attenuation_settings,
+            )
 
             # Add the configured cluster to the instrument coordinator and set a timeout
             lab_ic.add_component(ClusterComponent(cluster))
@@ -166,6 +168,48 @@ class HardwareManager:
     def get_instrument_coordinator(self):
         """Access the instrument coordinator for use by other classes."""
         return self.lab_ic
+
+
+# intermediary function in the call stack in case we want to set other cluster settings
+def _configure_cluster_settings(
+    cluster: Cluster,
+    *,
+    connectivity: MappingProxyType[str, FrozenSet[str]],
+    output_attenuation_settings: MappingProxyType[str, MappingProxyType[str, int]],
+):
+    _set_output_attenuations(cluster, connectivity, output_attenuation_settings)
+
+
+def _set_output_attenuations(cluster, connectivity, settings):
+
+    cluster_modules = cluster.get_connected_modules()
+    module_names = frozenset(mod.name for _, mod in cluster_modules.items())
+    for device_type, quantify_port_suffix in zip(
+        ["coupler", "resonator", "qubit"], [":fl", ":res", ":mw"]
+    ):
+        for name, att in settings[device_type].items():
+            ports = connectivity[name + quantify_port_suffix]
+            assert len(ports) == 1
+            port_str = next(iter(ports))
+
+            cl, mod, port = tuple(port_str.split(sep="."))
+            assert "output" in port, (name + quantify_port_suffix, port_str)
+
+            if cl != cluster.name:
+                continue
+            if "_".join((cl, mod)) not in module_names:
+                continue
+
+            module_obj = getattr(cluster, mod)
+
+            if port == "complex_output_0":
+                module_obj.out0_att(att)
+            elif port == "complex_output_1":
+                module_obj.out1_att(att)
+            else:
+                raise KeyError(f"Failed to set attenuation for port: {port_str}")
+
+            logger.debug(f"Applied {att}dB attenuation on {port_str}")
 
 
 class NodeManager:

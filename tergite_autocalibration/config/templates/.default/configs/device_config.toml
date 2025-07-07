@@ -20,7 +20,7 @@ owner = "device_owner"
 
 # Values for specific resonators
 [device.resonator.all]
-attenuation = 10
+output_attenuation = 18
 
 [device.resonator.q00]
 VNA_frequency = 6.48213e9
@@ -33,7 +33,6 @@ VNA_frequency = 6.26093e9
 # This section contains all qubit-specific properties
 
 [device.qubit.all]
-attenuation = 6
 measure.acq_delay = 220e-9
 measure_1.acq_delay = 220e-9
 measure_2.acq_delay = 220e-9
@@ -50,6 +49,7 @@ measure_3state_opt.integration_time = 2.5e-6
 
 
 [device.qubit.q00]
+output_attenuation = 4
 VNA_f01_frequency = 3.848e9
 VNA_f12_frequency = 3.592e9
 measure.pulse_amp = 0.03
@@ -57,6 +57,7 @@ measure_1.pulse_amp = 0.03
 measure_2.pulse_amp = 0.03
 
 [device.qubit.q01]
+output_attenuation = 8
 VNA_f01_frequency = 3.384e9
 VNA_f12_frequency = 3.177e9
 measure.pulse_amp = 0.03
@@ -67,13 +68,12 @@ measure_2.pulse_amp = 0.03
 # This section contains all coupler-specific properties
 
 [device.coupler.all]
-attenuation = 10
 cz_pulse_amplitude = 0.3
 cz_pulse_width = 4e-9
 
 
 [device.coupler.q00_q01]
-attenuation = 10
+output_attenuation = 12
 
 # --------------------------------------------------------------------------------
 # Device layout configuration section
