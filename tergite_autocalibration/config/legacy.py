@@ -138,19 +138,19 @@ class DataHandler:
         # NOTE: In QRM-RF, maximum output attenuation is 60 dB (see: https://docs.qblox.com/en/main/cluster/qrm_rf.html#variable-attenuator)
         xy = MappingProxyType(
             {
-                qubit_name: data.get("output_attenuation", 30)
+                qubit_name: data.get("attenuation", 30)
                 for qubit_name, data in self._device["qubit"].items()
             }
         )
         z = MappingProxyType(
             {
-                qubit_name: data.get("output_attenuation", 30)
+                qubit_name: data.get("attenuation", 30)
                 for qubit_name, data in self._device["coupler"].items()
             }
         )
         ro = MappingProxyType(
             {
-                qubit_name: data.get("output_attenuation", 60)
+                qubit_name: data.get("attenuation", 60)
                 for qubit_name, data in self._device["resonator"].items()
             }
         )
