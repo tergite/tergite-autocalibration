@@ -29,6 +29,7 @@ from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.config.env import EnvironmentConfiguration
 from tergite_autocalibration.config.globals import ENV
+from tergite_autocalibration.tools.cli.config.helpers import get_os, OperatingSystem
 
 colorama_init()
 
@@ -42,13 +43,20 @@ def _find_and_validate_spi_port():
 
     """
 
-    # Path to serial devices
-    path = Path("/dev/")
+    # We validate on unix based systems whether the port is actually taken
+    if get_os() == OperatingSystem.LINUX or get_os() == OperatingSystem.MAC:
 
-    # Iterate over all devices and return if the address defined in the .env file is found
-    for file in path.iterdir():
-        if str(file.absolute()) == ENV.spi_serial_port:
-            return ENV.spi_serial_port
+        # Path to serial devices
+        path = Path("/dev/")
+
+        # Iterate over all devices and return if the address defined in the .env file is found
+        for file in path.iterdir():
+            if str(file.absolute()) == ENV.spi_serial_port:
+                return ENV.spi_serial_port
+
+    # For Windows and any other system, we assume that the user knows that the port exists
+    else:
+        return ENV.spi_serial_port
 
     # For the default base case, return None
     logger.warning(
