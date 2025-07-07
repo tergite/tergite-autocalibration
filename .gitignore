@@ -89,6 +89,7 @@ configs/**
 !tergite_autocalibration/config/env.py
 configuration.meta.toml
 !datasets/**/configuration.meta.toml
+!tergite_autocalibration/tests/fixtures/**/configuration.meta.toml
 
 # dev-generated artefacts
 tergite_acl/utils/**.csv
