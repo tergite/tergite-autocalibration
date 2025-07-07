@@ -36,6 +36,7 @@ setup:
     - pip install --upgrade pip
     - pip install .
     - pip install pytest black==24.10.0 requests-mock==1.11.0 pylint pytest-cov
+    - python -c "import platform; print(platform.system())"
   cache:
     - key: "default"
       paths:
