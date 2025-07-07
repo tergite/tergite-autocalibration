@@ -36,7 +36,6 @@ setup:
     - pip install --upgrade pip
     - pip install .
     - pip install pytest black==24.10.0 requests-mock==1.11.0 pylint pytest-cov
-    - python -c "import platform; print(platform.system())"
   cache:
     - key: "default"
       paths:
@@ -117,8 +116,6 @@ application_run:
     - echo "y" | acli node reset -a
     # Clear the caches
     - rm -r .venv/lib/python3.12/site-packages/out
-    # To debug platform.system()
-    - python -c "import platform; print(platform.system())"
     # Run the calibration chain
     - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_two_state_optimization" -n rabi_oscillations
     # Read

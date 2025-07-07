@@ -31,16 +31,19 @@ class OperatingSystem(Enum):
 
 
 def get_os() -> "OperatingSystem":
-    import sys
+    # Safe way to retrieve a string about the operating system
+    platform_str: str
+    if isinstance(platform, str):
+        platform_str = platform.lower()
+    else:
+        platform_str = platform.system().lower()
 
-    logger.status(f"Python version: {sys.version}")
-    logger.status(f"Python version: {platform}")
-    system = platform.system()
-    if system == "Linux":
+    # Return as enum
+    if platform_str == "linux":
         return OperatingSystem.LINUX
-    elif system == "Darwin":
+    elif platform_str == "darwin":
         return OperatingSystem.MAC
-    elif system == "Windows":
+    elif platform_str == "windows":
         return OperatingSystem.WINDOWS
     else:
         return OperatingSystem.UNDEFINED
