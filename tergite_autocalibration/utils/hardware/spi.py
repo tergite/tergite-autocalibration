@@ -23,29 +23,51 @@ from qblox_instruments import SpiRack
 from qcodes import validators
 from rich.progress import Progress
 
+from tergite_autocalibration.config.globals import ENV
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.config.legacy import dh
+from tergite_autocalibration.tools.cli.config.helpers import get_os, OperatingSystem
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.logging import logger
 
 colorama_init()
 
 
-def find_serial_port():
-    path = Path("/dev/")
-    for file in path.iterdir():
-        if file.name.startswith("ttyA"):
-            port = str(file.absolute())
-            break
+def _find_and_validate_spi_port():
+    """
+    Check whether the SPI port given in the .env file exists
+
+    Returns:
+        SPI port as string e.g. /dev/ttyACM0
+
+    """
+
+    # We validate on unix based systems whether the port is actually taken
+    if get_os() == OperatingSystem.LINUX or get_os() == OperatingSystem.MAC:
+
+        # Path to serial devices
+        path = Path("/dev/")
+
+        # Iterate over all devices and return if the address defined in the .env file is found
+        for file in path.iterdir():
+            if str(file.absolute()) == ENV.spi_serial_port:
+                return ENV.spi_serial_port
+
+    # For Windows and any other system, we assume that the user knows that the port exists
     else:
-        logger.info("Couldn't find the serial port. Please check the connection.")
-        port = None
-    return port
+        return ENV.spi_serial_port
+
+    # For the default base case, return None
+    logger.warning(
+        "Couldn't find the serial port of the SPI rack. "
+        "Please check the connection or update the value for SPI_SERIAL_PORT in the .env file."
+    )
+    return None
 
 
 class SpiDAC:
     def __init__(self, couplers: list[str], measurement_mode: MeasurementMode):
-        self.port = find_serial_port()
+        self.port = _find_and_validate_spi_port()
         self.is_dummy = (
             measurement_mode == MeasurementMode.dummy
             or measurement_mode == MeasurementMode.re_analyse
