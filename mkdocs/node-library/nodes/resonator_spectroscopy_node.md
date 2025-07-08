@@ -1,3 +1,7 @@
+---
+title: Resonator Spectroscopy
+---
+
 # Resonator Spectroscopy in Qubit-Resonator Interaction Analysis
 
 Resonator spectroscopy is a powerful tool for studying the interaction between qubits and resonators. By probing the

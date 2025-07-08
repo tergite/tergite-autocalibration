@@ -1,3 +1,6 @@
+---
+title: Qubit Spectroscopy
+---
 ## Qubit Spectroscopy Calibration and Analysis
 
 Qubit spectroscopy is a vital technique for identifying qubit resonance frequencies. By applying a probing signal to a qubit at various frequencies and measuring the response, we can accurately locate resonance frequencies and optimize qubit operation. In this node, both qubit frequecies for both 01 and 12 can be attained depending on the initial qubit state. 

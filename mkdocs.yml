@@ -21,12 +21,7 @@ nav:
   - Operation: user-guide/operation.md
 - Node Library:
   - Overview: node-library/available_nodes.md 
-  - Nodes:
-    - Rabi Oscillations: node-library/rabi_oscillations_node.md
-    - Resonator Spectroscopy: node-library/resonator_spectroscopy_node.md
-    - Resonator Spectroscopy vs Current: node-library/resonator_spectroscopy_vs_current_node.md
-    - Qubit Spectroscopy: node-library/qubit_spectroscopy_node.md
-    - Qubit Specroscopy vs Current: node-library/qubit_spectroscopy_vs_current_node.md
+  - Nodes: node-library/nodes/
 - Developer Guide:
   - Introduction: developer-guide/developer_guide.md
   - Node Classes: developer-guide/node_classes.md
@@ -121,7 +116,7 @@ plugins:
             preload_modules: [mkdocstrings]  # Preload these modules
             separate_signature: true         # Show method signatures separately
             show_root_heading: true          # Show the main object heading
-            show_root_full_path: true       # Don't show full Python path in headings
+            show_root_full_path: true        # Show full Python path in headings
             show_bases: true                 # Show parent classes for inheritance
             show_source: false               # Don't include source code
             show_signature_annotations: true # Show type annotations in signatures

@@ -1,3 +1,7 @@
+---
+title: Rabi Oscillations
+---
+
 ## Rabi oscillations calibration and analysis
 
 The rabi oscillations are essential when determining the amplitude of the signal send to the qubit. The \($\pi$)-pulses, which amplitudes is varying is a Gaussian pulses. By varying the amplitude a cosine function appears when measuring transmission coefficient (S21) and with that one can determine the optimal amplitude for qubit operations. This can also be done for 12 operations with the only difference being the 1 state being initialized. 

@@ -1,3 +1,7 @@
+---
+title: Resonator Spectroscopy vs Current
+---
+
 ## Resonator Spectroscopy as a function of the coupler current
 
 The qubit spectroscopy as a function of the coupler current is one of the initial steps in characterizing a coupler and preparing for two-qubit gate implementation. This spectroscopy is conducted by varying the current applied to the coupler and measuring the resonator response at each current value.
@@ -11,7 +15,7 @@ Desctibed in [resonator spectroscopy](resonator_spectroscopy_node.md).
 
 The `ResonatorSpectroscopyVsCurrentNodeAnalysis` class handles the analysis of all selected couplers and manages the associated plots. In addition to the preview plot that is displayed at run time, the analysis saves a file for each qubit containing all the resonator spectroscopies for debugging purposes.
 
-The `ResonatorSpectroscopyVsCurrentCouplerAnalysis` combines the results of the two qubits in a coupler and the saving of the QOI so that the information of the crossing points is saved per qubit per coupler as described in the [base class](../developer-guide/new_node_creation.md#base-classes) documentation.
+The `ResonatorSpectroscopyVsCurrentCouplerAnalysis` combines the results of the two qubits in a coupler and the saving of the QOI so that the information of the crossing points is saved per qubit per coupler as described in the [base class](../../developer-guide/new_node_creation.md#base-classes) documentation.
 
 The `ResonatorSpectroscopyVsCurrentQubitAnalysis` performs the analysis of a qubit combining the results of all resonator spectroscopy measurements looking primarely for the crossing points, i.e. the values of the currents at which there is a change of region from U to $\bigcap$; these are the point at which the coupler cross the resonator frequency and can be used to study the properties of the coupler. 
 The main function used is `find_crossing_currents`, which:
