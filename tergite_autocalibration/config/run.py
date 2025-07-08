@@ -85,7 +85,7 @@ class RunConfiguration(TOMLConfigurationFile):
             Node to calibrate to
 
         """
-        return self._dict["target_node"]
+        return self._dict.get("target_node", None)
 
     @property
     def qubits(self) -> List[str]:
@@ -94,7 +94,7 @@ class RunConfiguration(TOMLConfigurationFile):
             Qubits to be calibrated. This should be a subset or equal the qubits in the device_config.toml
 
         """
-        return self._dict["qubits"]
+        return self._dict.get("qubits", [])
 
     @property
     def couplers(self) -> List[str]:
@@ -103,7 +103,7 @@ class RunConfiguration(TOMLConfigurationFile):
             Coupler to be calibrated. This should be a subset or equal the couplers in the device_config.toml
 
         """
-        return self._dict["couplers"]
+        return self._dict.get("couplers", None)
 
     @property
     def cooldown(self) -> str:
@@ -112,7 +112,7 @@ class RunConfiguration(TOMLConfigurationFile):
             Date of the last cooldown.
 
         """
-        return self._dict["cooldown"]
+        return self._dict.get("cooldown", "no_cooldown_configured")
 
     @property
     def name(self) -> str:
@@ -132,7 +132,7 @@ class RunConfiguration(TOMLConfigurationFile):
             flag if the plots are for internal use or not.
 
         """
-        return self._dict["is_internal"]
+        return self._dict.get("is_internal", True)
 
     @property
     def runner_logo(self) -> str:
@@ -141,4 +141,4 @@ class RunConfiguration(TOMLConfigurationFile):
             Path to the logo to be used in the runner.
 
         """
-        return self._dict["runner_logo"]
+        return self._dict.get("runner_logo", None)

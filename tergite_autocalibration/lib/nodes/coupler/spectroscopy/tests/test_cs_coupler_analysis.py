@@ -219,7 +219,7 @@ def test_coupler_plot_is_created(setup_q06_q07_data):
 
     fig, ax = plt.subplots(figsize=(15, 7), ncols=2)
     plt.Axes
-    a.plotter(ax[0], ax[1])
+    b.plotter(ax[0], ax[1])
     fig.savefig(figure_path)
     plt.close()
 
@@ -235,22 +235,21 @@ def test_qubit_spectroscopies_for_coupler_are_created(setup_q06_q07_data):
     matplotlib.use("Agg")
     ds_res, ds_qu, coupler = setup_q06_q07_data
     a = ResonatorSpectroscopyVsCurrentCouplerAnalysis(
-        "qubit_spectroscopy_vs_current", ["qubit_crossing_points"]
+        "resonator_spectroscopy_vs_current", ["qubit_crossing_points"]
     )
     qoi = a.process_coupler(ds_res, coupler)
     update_redis_trusted_values(
-        "qubit_spectroscopy_vs_current", coupler, qoi, ["qubit_crossing_points"]
+        "resonator_spectroscopy_vs_current", coupler, qoi, ["qubit_crossing_points"]
     )
 
-    b = QubitSpectroscopyVsCurrentCouplerAnalysis("name", ["crossing_points"])
+    b = QubitSpectroscopyVsCurrentCouplerAnalysis("qs_vs_current", ["crossing_points"])
     qoi = b.process_coupler(ds_qu, coupler)
 
     path = Path(os.environ["DATA_DIR"])
-    a.plot_spectroscopies(path)
+    b.plot_spectroscopies(path)
 
     figure_1_path = (
-        os.environ["DATA_DIR"]
-        + "/qubit_spectroscopy_vs_current_q06_q07_q06_spectroscopies.png"
+        os.environ["DATA_DIR"] + "/qs_vs_current_q06_q07_q06_spectroscopies.png"
     )
     assert os.path.exists(figure_1_path)
     from PIL import Image
@@ -259,8 +258,7 @@ def test_qubit_spectroscopies_for_coupler_are_created(setup_q06_q07_data):
         assert img.format == "PNG", "File should be a PNG image"
 
     figure_2_path = (
-        os.environ["DATA_DIR"]
-        + "/qubit_spectroscopy_vs_current_q06_q07_q07_spectroscopies.png"
+        os.environ["DATA_DIR"] + "/qs_vs_current_q06_q07_q07_spectroscopies.png"
     )
     assert os.path.exists(figure_2_path)
 

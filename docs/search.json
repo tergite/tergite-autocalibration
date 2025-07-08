@@ -117,11 +117,102 @@
     ]
   },
   {
+    "objectID": "tables_qoi_names/qubit_control/table_qubit_01_spectroscopy.html",
+    "href": "tables_qoi_names/qubit_control/table_qubit_01_spectroscopy.html",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "Redis QOI name\n\n\n\n\nclock_freqs:f01\n\n\nspec:spec_ampl_optimal"
+  },
+  {
+    "objectID": "tables_qoi_names/qubit_control/table_motzoi_parameter_01.html",
+    "href": "tables_qoi_names/qubit_control/table_motzoi_parameter_01.html",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "Redis QOI name\n\n\n\n\nrxy:motzoi"
+  },
+  {
+    "objectID": "tables_qoi_names/qubit_control/table_rabi_oscillations_12.html",
+    "href": "tables_qoi_names/qubit_control/table_rabi_oscillations_12.html",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "Redis QOI name\n\n\n\n\nr12:ef_amp180"
+  },
+  {
+    "objectID": "tables_qoi_names/qubit_control/table_ramsey_12.html",
+    "href": "tables_qoi_names/qubit_control/table_ramsey_12.html",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "Redis QOI name\n\n\n\n\nclock_freqs:f12"
+  },
+  {
+    "objectID": "tables_qoi_names/readout/table_punchout.html",
+    "href": "tables_qoi_names/readout/table_punchout.html",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "Redis QOI name\n\n\n\n\nmeasure:pulse_amp"
+  },
+  {
+    "objectID": "tables_qoi_names/readout/table_resonator_spectroscopy.html",
+    "href": "tables_qoi_names/readout/table_resonator_spectroscopy.html",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "Redis QOI name\n\n\n\n\nclock_freqs:readout\n\n\nQl\n\n\nresonator_minimum\n\n\nminimum_resonator_relaxation"
+  },
+  {
+    "objectID": "tables_qoi_names/readout/table_2_states_opt.html",
+    "href": "tables_qoi_names/readout/table_2_states_opt.html",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "Redis QOI name\n\n\n\n\nmeasure_2state_opt:pulse_amp\n\n\nmeasure_2state_opt:acq_rotation\n\n\nmeasure_2state_opt:acq_threshold\n\n\nextended_clock_freqs:readout_2state_opt"
+  },
+  {
+    "objectID": "tables_qoi_names/characterization/table_process_tomography.html",
+    "href": "tables_qoi_names/characterization/table_process_tomography.html",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "Redis QOI name\n\n\n\n\npop_g\n\n\npop_e\n\n\npop_f"
+  },
+  {
+    "objectID": "tables_qoi_names/characterization/table_t2.html",
+    "href": "tables_qoi_names/characterization/table_t2.html",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "Redis QOI name\n\n\n\n\nt2_time"
+  },
+  {
+    "objectID": "tables_qoi_names/characterization/table_purity_benchmarking.html",
+    "href": "tables_qoi_names/characterization/table_purity_benchmarking.html",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "Redis QOI name\n\n\n\n\npurity_fidelity"
+  },
+  {
+    "objectID": "tables_qoi_names/couplers/table_reset_chevron.html",
+    "href": "tables_qoi_names/couplers/table_reset_chevron.html",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "Redis QOI name\n\n\n\n\nreset_amplitude_qc\n\n\nreset_duration_qc"
+  },
+  {
+    "objectID": "tables_qoi_names/couplers/table_coupler_spectroscopy.html",
+    "href": "tables_qoi_names/couplers/table_coupler_spectroscopy.html",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "Redis QOI name\n\n\n\n\nresonator_crossing_points\n\n\nqubit_crossing_points"
+  },
+  {
+    "objectID": "tables_qoi_names/couplers/table_coupler_spectroscopy.embed.html",
+    "href": "tables_qoi_names/couplers/table_coupler_spectroscopy.embed.html",
+    "title": "",
+    "section": "",
+    "text": "Redis QOI name\n\n\n\n\nresonator_crossing_points\n\n\nqubit_crossing_points\n\n\n\nCoupler spectroscopy"
+  },
+  {
     "objectID": "available_nodes.html",
     "href": "available_nodes.html",
     "title": "Node Library",
     "section": "",
-    "text": "graph TD\n    A[Resonator Spectroscopy] --&gt; B(Qubit Spectroscopy)\n    B --&gt; C[Rabi Oscillations]\n    C --&gt; D[Ramsey Correction]\n    D --&gt; E[Motzoi Parameter]\n    E --&gt; F[Resonator Spectroscopy 1]\n    F --&gt; C1[T1] --&gt; C2[T2] --&gt; C3[Randomized Benchmarking]\n    F --&gt; F1(Qubit 12 Spectroscopy) --&gt; G(Rabi 12 Oscillations)\n    F --&gt; H1(2 States Discrimination)\n    G --&gt; H2(3 States Discrimination)\n    A --&gt; I(Resonator spectroscopy vs current)\n    B --&gt; J(Qubit spectroscopy vs current)\n    I --&gt; J\n        \n    click A href \"nodes/resonator_spectroscopy_node.html\"\n    click B href \"nodes/qubit_spectroscopy_node.html\"\n    click C href \"nodes/rabi_oscillations_node.html\"\n    click I href \"nodes/resonator_spectroscopy_vs_current_node.html\"\n    click J href \"nodes/qubit_spectroscopy_vs_current_node.html\"\n\n    style A fill:#ffe6cc,stroke:#333,stroke-width:2px\n    style B fill:#ffe6cc,stroke:#333,stroke-width:2px\n    style C fill:#ffe6cc,stroke:#333,stroke-width:2px\n    style D fill:#ffe6cc,stroke:#333,stroke-width:2px\n    style E fill:#ffe6cc,stroke:#333,stroke-width:2px\n    style F fill:#ffe6cc,stroke:#333,stroke-width:2px\n    style C1 fill:#ffffcc,stroke:#333,stroke-width:2px\n    style C2 fill:#ffffcc,stroke:#333,stroke-width:2px\n    style C3 fill:#ffffcc,stroke:#333,stroke-width:2px\n    style F1 fill:#ffe6cc,stroke:#333,stroke-width:2px\n    style G fill:#ffe6cc,stroke:#333,stroke-width:2px\n    style H1 fill:#ffe6cc,stroke:#333,stroke-width:2px\n    style H2 fill:#ffe6cc,stroke:#333,stroke-width:2px\n    style I fill:#ff9999,stroke:#333,stroke-width:2px\n    style J fill:#ff9999,stroke:#333,stroke-width:2px\n\n\n\n\n\n\n\n\n\npunchout\nresonator_spectroscopy\nresonator_spectroscopy_1\nresonator_spectroscopy_2\nro_frequency_two_state_optimization\nro_frequency_three_state_optimization\nro_amplitude_two_state_optimization\nro_amplitude_three_state_optimization\n\n\n\n\n\nqubit_01_spectroscopy\nqubit_01_spectroscopy_pulsed\nrabi_oscillations\nramsey_correction\nqubit_12_spectroscopy_pulsed\nqubit_12_spectroscopy_multidim\nrabi_oscillations_12\nramsey_correction_12\nadaptive_motzoi_parameter\nn_rabi_oscillations\n\n\n\n\n\ncoupler_spectroscopy\ncoupler_resonator_spectroscopy\n\n\n\n\n\nT1\nT2\nT2_echo\nrandomized_benchmarking\nall_XY",
+    "text": "graph TD\n    A[Resonator Spectroscopy] --&gt; A1[Punchout]\n    A1 --&gt; B(Qubit Spectroscopy)\n    B --&gt; C[Rabi Oscillations]\n    C --&gt; D[Ramsey Correction]\n    D --&gt; E[Motzoi Parameter]\n    E --&gt; F[Resonator Spectroscopy 1]\n    F --&gt; C1[T1] --&gt; C2[T2] --&gt; C3[Randomized Benchmarking]\n    F --&gt; F1(Qubit 12 Spectroscopy) --&gt; G(Rabi 12 Oscillations) --&gt; G1[Resonator Spectroscopy 2]\n    F --&gt; H1(2 States Discrimination)\n    G1 --&gt; H2(3 States Discrimination)\n    A --&gt; I(Resonator spectroscopy vs current)\n    B --&gt; J(Qubit spectroscopy vs current)\n    I --&gt; J\n        \n    click A href \"nodes/resonator_spectroscopy_node.html\"\n    click F href \"nodes/resonator_spectroscopy_node.html\"\n    click G1 href \"nodes/resonator_spectroscopy_node.html\"\n    click A1 href \"nodes/punchout_node.html\"\n    click B href \"nodes/qubit_spectroscopy_node.html\"\n    click F1 href \"nodes/qubit_spectroscopy_node.html\"\n    click C href \"nodes/rabi_oscillations_node.html\"\n    click I href \"nodes/resonator_spectroscopy_vs_current_node.html\"\n    click J href \"nodes/qubit_spectroscopy_vs_current_node.html\"\n\n    style A fill:#ffe6cc,stroke:#333,stroke-width:2px\n    style A1 fill:#ffe6cc,stroke:#333,stroke-width:2px\n    style B fill:#ffe6cc,stroke:#333,stroke-width:2px\n    style C fill:#ffe6cc,stroke:#333,stroke-width:2px\n    style D fill:#ffe6cc,stroke:#333,stroke-width:2px\n    style E fill:#ffe6cc,stroke:#333,stroke-width:2px\n    style F fill:#ffe6cc,stroke:#333,stroke-width:2px\n    style C1 fill:#ffffcc,stroke:#333,stroke-width:2px\n    style C2 fill:#ffffcc,stroke:#333,stroke-width:2px\n    style C3 fill:#ffffcc,stroke:#333,stroke-width:2px\n    style F1 fill:#ffe6cc,stroke:#333,stroke-width:2px\n    style G fill:#ffe6cc,stroke:#333,stroke-width:2px\n    style G1 fill:#ffe6cc,stroke:#333,stroke-width:2px\n    style H1 fill:#ffe6cc,stroke:#333,stroke-width:2px\n    style H2 fill:#ffe6cc,stroke:#333,stroke-width:2px\n    style I fill:#ff9999,stroke:#333,stroke-width:2px\n    style J fill:#ff9999,stroke:#333,stroke-width:2px\n\n\n\n\n\n\n\n\n\nresonator_spectroscopy\npunchout\nresonator_spectroscopy_1\nresonator_spectroscopy_2\nro_frequency_two_state_optimization\nro_frequency_three_state_optimization\nro_amplitude_two_state_optimization\nro_amplitude_three_state_optimization\n\n\n\n\n\nqubit_01_spectroscopy\nrabi_oscillations\nramsey_correction\nqubit_12_spectroscopy\nrabi_oscillations_12\nramsey_correction_12\nadaptive_motzoi_parameter\nn_rabi_oscillations\n\n\n\n\n\ncoupler_spectroscopy\ncoupler_resonator_spectroscopy\n\n\n\n\n\nT1\nT2\nT2_echo\nrandomized_benchmarking\nall_XY",
     "crumbs": [
       "Home",
       "Node Library",
@@ -133,7 +224,7 @@
     "href": "available_nodes.html#readout-nodes",
     "title": "Node Library",
     "section": "",
-    "text": "punchout\nresonator_spectroscopy\nresonator_spectroscopy_1\nresonator_spectroscopy_2\nro_frequency_two_state_optimization\nro_frequency_three_state_optimization\nro_amplitude_two_state_optimization\nro_amplitude_three_state_optimization",
+    "text": "resonator_spectroscopy\npunchout\nresonator_spectroscopy_1\nresonator_spectroscopy_2\nro_frequency_two_state_optimization\nro_frequency_three_state_optimization\nro_amplitude_two_state_optimization\nro_amplitude_three_state_optimization",
     "crumbs": [
       "Home",
       "Node Library",
@@ -145,7 +236,7 @@
     "href": "available_nodes.html#qubit-control-nodes",
     "title": "Node Library",
     "section": "",
-    "text": "qubit_01_spectroscopy\nqubit_01_spectroscopy_pulsed\nrabi_oscillations\nramsey_correction\nqubit_12_spectroscopy_pulsed\nqubit_12_spectroscopy_multidim\nrabi_oscillations_12\nramsey_correction_12\nadaptive_motzoi_parameter\nn_rabi_oscillations",
+    "text": "qubit_01_spectroscopy\nrabi_oscillations\nramsey_correction\nqubit_12_spectroscopy\nrabi_oscillations_12\nramsey_correction_12\nadaptive_motzoi_parameter\nn_rabi_oscillations",
     "crumbs": [
       "Home",
       "Node Library",
@@ -177,27 +268,255 @@
     ]
   },
   {
-    "objectID": "nodes/rabi_oscillations_node.html",
-    "href": "nodes/rabi_oscillations_node.html",
-    "title": "Tergite Automatic Calibration",
-    "section": "",
-    "text": "The rabi oscillations are essential when determining the amplitude of the signal send to the qubit. The (\\(\\pi\\))-pulses, which amplitudes is varying is a Gaussian pulses. By varying the amplitude a cosine function appears when measuring transmission coefficient (S21) and with that one can determine the optimal amplitude for qubit operations. This can also be done for 12 operations with the only difference being the 1 state being initialized.\n\n\nThe RabiOscillationsMeasurement class facilitates the creation of schedules for Rabi oscillations.\n\n\nThe schedule_function generates an experimental schedule for performing Rabi oscillations. The sequence involves:\n\nReset: Resets all qubits to a known state.\nInitialize Qubit: Initialize the qubit to state 0 or 1, depending what qubit frequency you want to attain.\nAmplitude Sweeping: Iteratively adjusts the probing amplitude.\nMeasurement: Captures the qubit response at each probing point.\n\nParameters:\n\nmw_amplitudes (dict[str, np.ndarray]): Amplitudes of the probing (\\(\\pi\\))-pulses.\nrepetitions (int): Number of times the schedule will repeat.\nqubit_state (int): The state for the qubit.\n\nReturns:\n\nA Schedule object representing the experimental procedure.\n\n\n\n\n\nThe RabiQubitAnalysis class analyzes the results of Rabi oscillations experiments. It fits a cosine function to the qubit response for different amplitudes of the (\\(\\pi\\))-pulse, determinaning the Rabi frequencies.\n\n\nThe analyse_qubit method processes the Rabi oscillations data to extract key parameters:\n\nOptimal (\\(\\pi\\))-pulse amplitude: The optimal amplitude resulting in the qubit getting to the desired state.\n\nSteps:\n\nLoad Data:\nExtract the drive amplitude and magnitude values from the dataset for analysis.\nParameter Guessing:\n\nCompute an initial guess for the cosine model parameters:\n\nAmplitude: Based on the difference between maximum and minimum magnitudes.\nOffset: As the mean of the magnitude values.\nFrequency: Using a Fast Fourier Transform (FFT) to estimate oscillation frequency.\n\nUpdate the model parameters with the computed guesses.\n\nFit Model:\nFit the cosine function to the Rabi oscillation data using the guessed parameters. The model adjusts to minimize the error.\nExtract Results:\n\nCalculate the (\\(\\pi\\))-pulse amplitude (amp180) from the fit.\nEstimate the uncertainty of the (\\(\\pi\\))-pulse amplitude using the standard error from the fit results.\n\nGenerate Fit Curve:\nEvaluate the fitted model over a finer set of amplitude values for smooth plotting.\nPlot Results:\n\nPlot the fitted curve against the original data points.\nAnnotate the plot with the (\\(\\pi\\))-pulse amplitude value.",
+    "objectID": "available_nodes.html#punchout",
+    "href": "available_nodes.html#punchout",
+    "title": "Node Library",
+    "section": "Punchout",
+    "text": "Punchout",
     "crumbs": [
       "Home",
       "Node Library",
-      "Rabi oscillations"
+      "Overview"
     ]
   },
   {
-    "objectID": "nodes/rabi_oscillations_node.html#rabi-oscillations-calibration-and-analysis",
-    "href": "nodes/rabi_oscillations_node.html#rabi-oscillations-calibration-and-analysis",
-    "title": "Tergite Automatic Calibration",
-    "section": "",
-    "text": "The rabi oscillations are essential when determining the amplitude of the signal send to the qubit. The (\\(\\pi\\))-pulses, which amplitudes is varying is a Gaussian pulses. By varying the amplitude a cosine function appears when measuring transmission coefficient (S21) and with that one can determine the optimal amplitude for qubit operations. This can also be done for 12 operations with the only difference being the 1 state being initialized.\n\n\nThe RabiOscillationsMeasurement class facilitates the creation of schedules for Rabi oscillations.\n\n\nThe schedule_function generates an experimental schedule for performing Rabi oscillations. The sequence involves:\n\nReset: Resets all qubits to a known state.\nInitialize Qubit: Initialize the qubit to state 0 or 1, depending what qubit frequency you want to attain.\nAmplitude Sweeping: Iteratively adjusts the probing amplitude.\nMeasurement: Captures the qubit response at each probing point.\n\nParameters:\n\nmw_amplitudes (dict[str, np.ndarray]): Amplitudes of the probing (\\(\\pi\\))-pulses.\nrepetitions (int): Number of times the schedule will repeat.\nqubit_state (int): The state for the qubit.\n\nReturns:\n\nA Schedule object representing the experimental procedure.\n\n\n\n\n\nThe RabiQubitAnalysis class analyzes the results of Rabi oscillations experiments. It fits a cosine function to the qubit response for different amplitudes of the (\\(\\pi\\))-pulse, determinaning the Rabi frequencies.\n\n\nThe analyse_qubit method processes the Rabi oscillations data to extract key parameters:\n\nOptimal (\\(\\pi\\))-pulse amplitude: The optimal amplitude resulting in the qubit getting to the desired state.\n\nSteps:\n\nLoad Data:\nExtract the drive amplitude and magnitude values from the dataset for analysis.\nParameter Guessing:\n\nCompute an initial guess for the cosine model parameters:\n\nAmplitude: Based on the difference between maximum and minimum magnitudes.\nOffset: As the mean of the magnitude values.\nFrequency: Using a Fast Fourier Transform (FFT) to estimate oscillation frequency.\n\nUpdate the model parameters with the computed guesses.\n\nFit Model:\nFit the cosine function to the Rabi oscillation data using the guessed parameters. The model adjusts to minimize the error.\nExtract Results:\n\nCalculate the (\\(\\pi\\))-pulse amplitude (amp180) from the fit.\nEstimate the uncertainty of the (\\(\\pi\\))-pulse amplitude using the standard error from the fit results.\n\nGenerate Fit Curve:\nEvaluate the fitted model over a finer set of amplitude values for smooth plotting.\nPlot Results:\n\nPlot the fitted curve against the original data points.\nAnnotate the plot with the (\\(\\pi\\))-pulse amplitude value.",
+    "objectID": "available_nodes.html#resonator-spectroscopy",
+    "href": "available_nodes.html#resonator-spectroscopy",
+    "title": "Node Library",
+    "section": "Resonator Spectroscopy",
+    "text": "Resonator Spectroscopy",
     "crumbs": [
       "Home",
       "Node Library",
-      "Rabi oscillations"
+      "Overview"
+    ]
+  },
+  {
+    "objectID": "available_nodes.html#qubit-spectroscopy",
+    "href": "available_nodes.html#qubit-spectroscopy",
+    "title": "Node Library",
+    "section": "Qubit Spectroscopy",
+    "text": "Qubit Spectroscopy",
+    "crumbs": [
+      "Home",
+      "Node Library",
+      "Overview"
+    ]
+  },
+  {
+    "objectID": "available_nodes.html#rabi-oscillations",
+    "href": "available_nodes.html#rabi-oscillations",
+    "title": "Node Library",
+    "section": "Rabi Oscillations",
+    "text": "Rabi Oscillations",
+    "crumbs": [
+      "Home",
+      "Node Library",
+      "Overview"
+    ]
+  },
+  {
+    "objectID": "available_nodes.html#ramsey-correction",
+    "href": "available_nodes.html#ramsey-correction",
+    "title": "Node Library",
+    "section": "Ramsey Correction",
+    "text": "Ramsey Correction",
+    "crumbs": [
+      "Home",
+      "Node Library",
+      "Overview"
+    ]
+  },
+  {
+    "objectID": "available_nodes.html#motzoi-parameter",
+    "href": "available_nodes.html#motzoi-parameter",
+    "title": "Node Library",
+    "section": "Motzoi Parameter",
+    "text": "Motzoi Parameter",
+    "crumbs": [
+      "Home",
+      "Node Library",
+      "Overview"
+    ]
+  },
+  {
+    "objectID": "available_nodes.html#resonator-spectroscopy-1",
+    "href": "available_nodes.html#resonator-spectroscopy-1",
+    "title": "Node Library",
+    "section": "Resonator Spectroscopy 1",
+    "text": "Resonator Spectroscopy 1",
+    "crumbs": [
+      "Home",
+      "Node Library",
+      "Overview"
+    ]
+  },
+  {
+    "objectID": "available_nodes.html#qubit-12-spectroscopy",
+    "href": "available_nodes.html#qubit-12-spectroscopy",
+    "title": "Node Library",
+    "section": "Qubit 12 Spectroscopy",
+    "text": "Qubit 12 Spectroscopy",
+    "crumbs": [
+      "Home",
+      "Node Library",
+      "Overview"
+    ]
+  },
+  {
+    "objectID": "available_nodes.html#rabi-12-oscillations",
+    "href": "available_nodes.html#rabi-12-oscillations",
+    "title": "Node Library",
+    "section": "Rabi 12 Oscillations",
+    "text": "Rabi 12 Oscillations",
+    "crumbs": [
+      "Home",
+      "Node Library",
+      "Overview"
+    ]
+  },
+  {
+    "objectID": "available_nodes.html#ramsey-correction-12",
+    "href": "available_nodes.html#ramsey-correction-12",
+    "title": "Node Library",
+    "section": "Ramsey correction 12",
+    "text": "Ramsey correction 12",
+    "crumbs": [
+      "Home",
+      "Node Library",
+      "Overview"
+    ]
+  },
+  {
+    "objectID": "available_nodes.html#motzoi-parameter-12",
+    "href": "available_nodes.html#motzoi-parameter-12",
+    "title": "Node Library",
+    "section": "Motzoi Parameter 12",
+    "text": "Motzoi Parameter 12",
+    "crumbs": [
+      "Home",
+      "Node Library",
+      "Overview"
+    ]
+  },
+  {
+    "objectID": "available_nodes.html#states-discrimination",
+    "href": "available_nodes.html#states-discrimination",
+    "title": "Node Library",
+    "section": "2 States Discrimination",
+    "text": "2 States Discrimination",
+    "crumbs": [
+      "Home",
+      "Node Library",
+      "Overview"
+    ]
+  },
+  {
+    "objectID": "available_nodes.html#states-discrimination-1",
+    "href": "available_nodes.html#states-discrimination-1",
+    "title": "Node Library",
+    "section": "3 States Discrimination",
+    "text": "3 States Discrimination",
+    "crumbs": [
+      "Home",
+      "Node Library",
+      "Overview"
+    ]
+  },
+  {
+    "objectID": "available_nodes.html#t1",
+    "href": "available_nodes.html#t1",
+    "title": "Node Library",
+    "section": "T1",
+    "text": "T1",
+    "crumbs": [
+      "Home",
+      "Node Library",
+      "Overview"
+    ]
+  },
+  {
+    "objectID": "available_nodes.html#t2",
+    "href": "available_nodes.html#t2",
+    "title": "Node Library",
+    "section": "T2",
+    "text": "T2",
+    "crumbs": [
+      "Home",
+      "Node Library",
+      "Overview"
+    ]
+  },
+  {
+    "objectID": "available_nodes.html#randomized-benchmarking",
+    "href": "available_nodes.html#randomized-benchmarking",
+    "title": "Node Library",
+    "section": "Randomized Benchmarking",
+    "text": "Randomized Benchmarking",
+    "crumbs": [
+      "Home",
+      "Node Library",
+      "Overview"
+    ]
+  },
+  {
+    "objectID": "nodes/qubit_spectroscopy_node.html",
+    "href": "nodes/qubit_spectroscopy_node.html",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "Qubit spectroscopy is a vital technique for identifying qubit resonance frequencies. By applying a probing signal to a qubit at various frequencies and measuring the response, we can accurately locate resonance frequencies and optimize qubit operation. In this node, both qubit frequecies for both 01 and 12 can be attained depending on the initial qubit state.\n\n\nThe TwoTonesMultidimMeasurement class facilitates the creation of schedules for qubit spectroscopy experiments. It supports multi-qubit spectroscopy, enabling parallel probing and measurement.\n\n\nThe schedule_function generates an experimental schedule for performing qubit spectroscopy. The sequence involves:\n\nReset: Resets all qubits to a known state.\nInitialize Qubit: Initialize the qubit to state 0 or 1, depending what qubit frequency you want to attain.\nFrequency Sweeping: Iteratively adjusts the probing frequency and amplitude.\nMeasurement: Captures the qubit response at each probing point.\n\nParameters:\n\nspec_frequencies (dict[str, np.ndarray]): Frequencies to probe for each qubit.\nspec_pulse_amplitudes (dict[str, np.ndarray], optional): Amplitudes of the probing pulses.\nrepetitions (int): Number of times the schedule will repeat.\nqubit_state (int): The state for the qubit.\n\nReturns:\n\nA Schedule object representing the experimental procedure.\n\n\n\n\n\nThe QubitSpectroscopyMultidimAnalysis class analyzes the results of qubit spectroscopy experiments. The resonance peak is identified, enabling the determination of resonance frequencies.\n\n\nThe analyse_qubit method processes the spectroscopy data to extract key parameters:\n\nQubit Frequency: The frequency at which the qubit exhibits a resonance peak.\nOptimal Spectroscopy Amplitude: The amplitude yielding the strongest response.\n\nSteps:\n\nExtract the relevant coordinates (frequencies and amplitudes) from the dataset.\nIdentify the resonance peak.\nValidate the peak based on prominence and width criteria.\n\nReturns:\n\nA list containing the qubit frequency and the optimal spectroscopy amplitude.\n\n\n\n\nDetermines if a resonance peak exists in the data using statistical filters and peak detection.\nParameters:\n\nx (array): Data array to evaluate.\nprom_coef (float): Prominence coefficient.\nwid_coef (float): Width coefficient.\noutlier_median (float): Threshold for filtering outliers.\n\nReturns:\n\nA boolean indicating whether a peak is present.",
+    "crumbs": [
+      "Home",
+      "Node Library",
+      "Qubit spectroscopy"
+    ]
+  },
+  {
+    "objectID": "nodes/qubit_spectroscopy_node.html#qubit-spectroscopy-calibration-and-analysis",
+    "href": "nodes/qubit_spectroscopy_node.html#qubit-spectroscopy-calibration-and-analysis",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "Qubit spectroscopy is a vital technique for identifying qubit resonance frequencies. By applying a probing signal to a qubit at various frequencies and measuring the response, we can accurately locate resonance frequencies and optimize qubit operation. In this node, both qubit frequecies for both 01 and 12 can be attained depending on the initial qubit state.\n\n\nThe TwoTonesMultidimMeasurement class facilitates the creation of schedules for qubit spectroscopy experiments. It supports multi-qubit spectroscopy, enabling parallel probing and measurement.\n\n\nThe schedule_function generates an experimental schedule for performing qubit spectroscopy. The sequence involves:\n\nReset: Resets all qubits to a known state.\nInitialize Qubit: Initialize the qubit to state 0 or 1, depending what qubit frequency you want to attain.\nFrequency Sweeping: Iteratively adjusts the probing frequency and amplitude.\nMeasurement: Captures the qubit response at each probing point.\n\nParameters:\n\nspec_frequencies (dict[str, np.ndarray]): Frequencies to probe for each qubit.\nspec_pulse_amplitudes (dict[str, np.ndarray], optional): Amplitudes of the probing pulses.\nrepetitions (int): Number of times the schedule will repeat.\nqubit_state (int): The state for the qubit.\n\nReturns:\n\nA Schedule object representing the experimental procedure.\n\n\n\n\n\nThe QubitSpectroscopyMultidimAnalysis class analyzes the results of qubit spectroscopy experiments. The resonance peak is identified, enabling the determination of resonance frequencies.\n\n\nThe analyse_qubit method processes the spectroscopy data to extract key parameters:\n\nQubit Frequency: The frequency at which the qubit exhibits a resonance peak.\nOptimal Spectroscopy Amplitude: The amplitude yielding the strongest response.\n\nSteps:\n\nExtract the relevant coordinates (frequencies and amplitudes) from the dataset.\nIdentify the resonance peak.\nValidate the peak based on prominence and width criteria.\n\nReturns:\n\nA list containing the qubit frequency and the optimal spectroscopy amplitude.\n\n\n\n\nDetermines if a resonance peak exists in the data using statistical filters and peak detection.\nParameters:\n\nx (array): Data array to evaluate.\nprom_coef (float): Prominence coefficient.\nwid_coef (float): Width coefficient.\noutlier_median (float): Threshold for filtering outliers.\n\nReturns:\n\nA boolean indicating whether a peak is present.",
+    "crumbs": [
+      "Home",
+      "Node Library",
+      "Qubit spectroscopy"
+    ]
+  },
+  {
+    "objectID": "nodes/qubit_spectroscopy_node.html#redis-qoi-tables",
+    "href": "nodes/qubit_spectroscopy_node.html#redis-qoi-tables",
+    "title": "Tergite Automatic Calibration",
+    "section": "Redis QOI tables",
+    "text": "Redis QOI tables\nQubit spectroscopy 01\nQubit spectroscopy 12",
+    "crumbs": [
+      "Home",
+      "Node Library",
+      "Qubit spectroscopy"
+    ]
+  },
+  {
+    "objectID": "nodes/qubit_spectroscopy_vs_current_node.html",
+    "href": "nodes/qubit_spectroscopy_vs_current_node.html",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "The qubit spectroscopy as a function of the coupler current is one of the initial steps in characterizing a coupler and preparing for two-qubit gate implementation. This spectroscopy is performed by varying the current applied to the coupler and measuring the qubit response at each current. The result is a two-dimensional map typically showing regions with a “U” or \\(\\bigcap\\) shape when analyzing the maximum values of the qubit spectroscopies. These shapes indicate changes in coupling and are key to identifying crossing points between the qubit and the coupler.\n\n\nDesctibed in qubit spectroscopy.\n\n\n\nThe QubitSpectroscopyVsCurrentNodeAnalysis class handles the analysis of all selected couplers and manages the associated plots. In addition to the preview plot that is displayed at run time, the analysis saves a file for each qubit containing all the resonator spectroscopies for debugging purposes.\nThe QubitSpectroscopyVsCurrentCouplerAnalysis combines the results of the two qubits in a coupler and the saving of the QOI so that the information of the crossing points is saved per qubit per coupler as described in the base class documentation.\nThe QubitSpectroscopyVsCurrentQubitAnalysis performs the analysis of a qubit combining the results of all qubit spectroscopy measurements looking primarily for the crossing points, i.e. the values of the currents at which there is a change of region from U to \\(\\bigcap\\); these are the point at which the coupler crosses the qubit frequency and can be used to study the properties of the coupler. The main function used is find_crossing_currents, which: * Cleans the data by removing isolated zeros (representing missing or invalid data) and outliers. * Scans the data from left to right, comparing consecutive non-zero values to detect transitions based on a predefined threshold. * Groups transitions occurring within a minimum range to mitigate the effect of noise or spurious detections. * Determines the crossing point as the average position within each grouped transition region. * If a crossing is within a small distance from the coupler-resonator crossing (determined in the reconator spectroscopy vs current node), then is excluded. The current thresholds and interval ranges are optimized for a current step size of 50uA.\nThe analysis of each qubit spectroscopy is performed in a dedicated analysis class, the QubitSpectroscopyMaxThresholdQubitAnalysis that is stored in the analysis file of the spectropy folder in the qubit_control folder. This analysis differs from the standard qubit spectroscopy analysis in that it does not attempt to fit the spectrum using a Lorentzian function. This choice is intentional, as the spectral shape near a crossing is often distorted or lacks a clear peak, making fitting unreliable. Instead, the analysis identifies the maximum point in the spectrum and evaluates its significance using a relevance metric defined as (max - mean) / RMS. If the peak is below threshold, zero is returned instead of the maximum value. The current hardcoded threshold (2.7) is rather conservative and was optimized for analysis with poor qubit spectroscopies, i.e. having multiple peaks instead of a clean one. For well calibrated systems this threshold can be raised up to 3.3 or even higher.",
+    "crumbs": [
+      "Home",
+      "Node Library",
+      "Qubit spectroscopy vs current"
+    ]
+  },
+  {
+    "objectID": "nodes/qubit_spectroscopy_vs_current_node.html#qubit-spectroscopy-as-a-function-of-the-coupler-current",
+    "href": "nodes/qubit_spectroscopy_vs_current_node.html#qubit-spectroscopy-as-a-function-of-the-coupler-current",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "The qubit spectroscopy as a function of the coupler current is one of the initial steps in characterizing a coupler and preparing for two-qubit gate implementation. This spectroscopy is performed by varying the current applied to the coupler and measuring the qubit response at each current. The result is a two-dimensional map typically showing regions with a “U” or \\(\\bigcap\\) shape when analyzing the maximum values of the qubit spectroscopies. These shapes indicate changes in coupling and are key to identifying crossing points between the qubit and the coupler.\n\n\nDesctibed in qubit spectroscopy.\n\n\n\nThe QubitSpectroscopyVsCurrentNodeAnalysis class handles the analysis of all selected couplers and manages the associated plots. In addition to the preview plot that is displayed at run time, the analysis saves a file for each qubit containing all the resonator spectroscopies for debugging purposes.\nThe QubitSpectroscopyVsCurrentCouplerAnalysis combines the results of the two qubits in a coupler and the saving of the QOI so that the information of the crossing points is saved per qubit per coupler as described in the base class documentation.\nThe QubitSpectroscopyVsCurrentQubitAnalysis performs the analysis of a qubit combining the results of all qubit spectroscopy measurements looking primarily for the crossing points, i.e. the values of the currents at which there is a change of region from U to \\(\\bigcap\\); these are the point at which the coupler crosses the qubit frequency and can be used to study the properties of the coupler. The main function used is find_crossing_currents, which: * Cleans the data by removing isolated zeros (representing missing or invalid data) and outliers. * Scans the data from left to right, comparing consecutive non-zero values to detect transitions based on a predefined threshold. * Groups transitions occurring within a minimum range to mitigate the effect of noise or spurious detections. * Determines the crossing point as the average position within each grouped transition region. * If a crossing is within a small distance from the coupler-resonator crossing (determined in the reconator spectroscopy vs current node), then is excluded. The current thresholds and interval ranges are optimized for a current step size of 50uA.\nThe analysis of each qubit spectroscopy is performed in a dedicated analysis class, the QubitSpectroscopyMaxThresholdQubitAnalysis that is stored in the analysis file of the spectropy folder in the qubit_control folder. This analysis differs from the standard qubit spectroscopy analysis in that it does not attempt to fit the spectrum using a Lorentzian function. This choice is intentional, as the spectral shape near a crossing is often distorted or lacks a clear peak, making fitting unreliable. Instead, the analysis identifies the maximum point in the spectrum and evaluates its significance using a relevance metric defined as (max - mean) / RMS. If the peak is below threshold, zero is returned instead of the maximum value. The current hardcoded threshold (2.7) is rather conservative and was optimized for analysis with poor qubit spectroscopies, i.e. having multiple peaks instead of a clean one. For well calibrated systems this threshold can be raised up to 3.3 or even higher.",
+    "crumbs": [
+      "Home",
+      "Node Library",
+      "Qubit spectroscopy vs current"
     ]
   },
   {
@@ -205,7 +524,19 @@
     "href": "nodes/resonator_spectroscopy_node.html",
     "title": "Resonator Spectroscopy in Qubit-Resonator Interaction Analysis",
     "section": "",
-    "text": "Resonator Spectroscopy in Qubit-Resonator Interaction Analysis\nResonator spectroscopy is a powerful tool for studying the interaction between qubits and resonators. By probing the resonator’s response across various frequencies, we can extract critical parameters, such as the resonant frequency and Q-factor, which are essential for optimizing qubit-resonator interactions.\n\nClass: ResonatorSpectroscopyNode\nThe Resonator_Spectroscopy class is designed to conduct resonator spectroscopy for transmon qubits. It takes as input a dictionary of transmon qubits and their respective states.\n\nMethod: schedule\nThe schedule method generates a schedule to perform resonator spectroscopy. This process includes:\n\nClock Initialization: Initializes the clocks for each qubit based on the specified qubit state.\nQubit Reset: Resets the qubit to a known state.\nFrequency Probing: Applies a square pulse at various frequencies.\nSignal Measurement: Measures the response signal, capturing data on the resonator’s behavior.\n\n\n\n\nClass: ResonatorSpectroscopyQubitAnalysis\nThe ResonatorSpectroscopyQubitAnalysis class is used for analyzing resonator spectroscopy data, enabling the extraction of the resonant frequency and Q-factor. This class takes as parameters:\n\nqubit_name: A string representing the qubit under measurement.\nredis_fields: The directory for data storage.\n\n\nMethod: analyse_qubit\nThe analyse_qubit method processes and fits the data to determine the resonator’s resonant frequency and loaded Q-factor. The analyse_qubitfit should resemble a negative Gaussian distribution.\n\n\n\nOutput: xarray.Dataset\nThe dataset returned by this analysis is an xarray.Dataset, which includes:\n\nFrequency Sweep Data: The set of frequencies used during the sweep.\nTransmission Response: The measured response of the resonator at each frequency.\n\nThis dataset provides essential insights into the resonator’s properties, allowing for precise tuning of qubit-resonator interactions.",
+    "text": "Resonator spectroscopy is a powerful tool for studying the interaction between qubits and resonators. By probing the resonator’s response across various frequencies, we can extract critical parameters, such as the resonant frequency and Q-factor, which are essential for optimizing qubit-resonator interactions.\n\n\nThe Resonator_Spectroscopy class is designed to conduct resonator spectroscopy for transmon qubits. It takes as input a dictionary of transmon qubits and their respective states.\n\n\nThe schedule method generates a schedule to perform resonator spectroscopy. This process includes:\n\nClock Initialization: Initializes the clocks for each qubit based on the specified qubit state.\nQubit Reset: Resets the qubit to a known state.\nFrequency Probing: Applies a square pulse at various frequencies.\nSignal Measurement: Measures the response signal, capturing data on the resonator’s behavior.\n\n\n\n\n\nThe ResonatorSpectroscopyQubitAnalysis class is used for analyzing resonator spectroscopy data, enabling the extraction of the resonant frequency and Q-factor. This class takes as parameters:\n\nqubit_name: A string representing the qubit under measurement.\nredis_fields: The directory for data storage.\n\n\n\nThe analyse_qubit method processes and fits the data to determine the resonator’s resonant frequency and loaded Q-factor. The analyse_qubitfit should resemble a negative Gaussian distribution.\n\n\n\n\nThe dataset returned by this analysis is an xarray.Dataset, which includes:\n\nFrequency Sweep Data: The set of frequencies used during the sweep.\nTransmission Response: The measured response of the resonator at each frequency.\n\nThis dataset provides essential insights into the resonator’s properties, allowing for precise tuning of qubit-resonator interactions.\n\n\n\nResonator spectroscopy 01\nResonator spectroscopy 12",
+    "crumbs": [
+      "Home",
+      "Node Library",
+      "Resonator spectroscopy"
+    ]
+  },
+  {
+    "objectID": "nodes/resonator_spectroscopy_node.html#redis-qoi-tables",
+    "href": "nodes/resonator_spectroscopy_node.html#redis-qoi-tables",
+    "title": "Resonator Spectroscopy in Qubit-Resonator Interaction Analysis",
+    "section": "",
+    "text": "Resonator spectroscopy 01\nResonator spectroscopy 12",
     "crumbs": [
       "Home",
       "Node Library",
@@ -309,52 +640,279 @@
     ]
   },
   {
-    "objectID": "nodes/qubit_spectroscopy_vs_current_node.html",
-    "href": "nodes/qubit_spectroscopy_vs_current_node.html",
-    "title": "Tergite Automatic Calibration",
+    "objectID": "nodes/punchout_node.html",
+    "href": "nodes/punchout_node.html",
+    "title": "Resonator spectroscopy as a function of the readout amplitude (aka Punchout)",
     "section": "",
-    "text": "The qubit spectroscopy as a function of the coupler current is one of the initial steps in characterizing a coupler and preparing for two-qubit gate implementation. This spectroscopy is performed by varying the current applied to the coupler and measuring the qubit response at each current. The result is a two-dimensional map typically showing regions with a “U” or \\(\\bigcap\\) shape when analyzing the maximum values of the qubit spectroscopies. These shapes indicate changes in coupling and are key to identifying crossing points between the qubit and the coupler.\n\n\nDesctibed in qubit spectroscopy.\n\n\n\nThe QubitSpectroscopyVsCurrentNodeAnalysis class handles the analysis of all selected couplers and manages the associated plots. In addition to the preview plot that is displayed at run time, the analysis saves a file for each qubit containing all the resonator spectroscopies for debugging purposes.\nThe QubitSpectroscopyVsCurrentCouplerAnalysis combines the results of the two qubits in a coupler and the saving of the QOI so that the information of the crossing points is saved per qubit per coupler as described in the base class documentation.\nThe QubitSpectroscopyVsCurrentQubitAnalysis performs the analysis of a qubit combining the results of all qubit spectroscopy measurements looking primarily for the crossing points, i.e. the values of the currents at which there is a change of region from U to \\(\\bigcap\\); these are the point at which the coupler crosses the qubit frequency and can be used to study the properties of the coupler. The main function used is find_crossing_currents, which: * Cleans the data by removing isolated zeros (representing missing or invalid data) and outliers. * Scans the data from left to right, comparing consecutive non-zero values to detect transitions based on a predefined threshold. * Groups transitions occurring within a minimum range to mitigate the effect of noise or spurious detections. * Determines the crossing point as the average position within each grouped transition region. * If a crossing is within a small distance from the coupler-resonator crossing (determined in the reconator spectroscopy vs current node), then is excluded. The current thresholds and interval ranges are optimized for a current step size of 50uA.\nThe analysis of each qubit spectroscopy is performed in a dedicated analysis class, the QubitSpectroscopyMaxThresholdQubitAnalysis that is stored in the analysis file of the spectropy folder in the qubit_control folder. This analysis differs from the standard qubit spectroscopy analysis in that it does not attempt to fit the spectrum using a Lorentzian function. This choice is intentional, as the spectral shape near a crossing is often distorted or lacks a clear peak, making fitting unreliable. Instead, the analysis identifies the maximum point in the spectrum and evaluates its significance using a relevance metric defined as (max - mean) / RMS. If the peak is below threshold, zero is returned instead of the maximum value. The current hardcoded threshold (2.7) is rather conservative and was optimized for analysis with poor qubit spectroscopies, i.e. having multiple peaks instead of a clean one. For well calibrated systems this threshold can be raised up to 3.3 or even higher.",
+    "text": "The resonator spectroscopy measured as a function of the readout amplitude can be used to extract the optimal readout amplitude. This is possible as the response of the resonator should be constant until too much energy is sent to it. Looking at the changes in the resonator frequency, it is possible to estimate the last stable point and set the readout amplitude.\n\n\nThe qubit and the resonator are coupled. This is one of the fundamentals for the way, the qubit is read out. Being coupled means that when the resonator starts to oscillate, the qubit will do so, as well. Now, by design, we do not want the resonator to affect the qubit too much. Otherwise, the readout would affect the qubit state and that would be bad. This is why when the readout resonator begins to oscillate too much, it will not couple to the qubit anymore. Now in the punchout, the idea is to drive the resonator up to the point until it does not couple to the qubit any longer. As long as it is coupled to the qubit, the frequency is slightly higher. This frequency is called the dressed frequency. By adding energy in form of increasing the amplitude, eventually, the resonator no longe couples significantly to the qubit. In the plot, one can see that the frequency will go down a bit. The new frequency of the resonator is now called the bare frequency.\n\n\n\n\n\nThe PunchoutMeasurement class facilitates the creation of schedules for the punchout experiments. It supports parallel probing and measurement.\n\n\nThe schedule_function generates an experimental schedule for performing qubit spectroscopy. - spec_frequencies (dict[str, np.ndarray]): Frequencies to probe for each resonator. - spec_pulse_amplitudes (dict[str, np.ndarray], optional): Amplitudes of the readout pulses.\nReturns:\n\nA Schedule object representing the experimental procedure.\n\n\n\n\n\nThe PunchoutNodeAnalysis class handles all the operations common to all qubits and produce the figures. The standard figure displays the measurements in each qubit with the selected amplitude shown in each subplot.\nAdditional figures are produced for debugging purposes; specifically, a plot per qubit is produced with all the individual resonator spectroscopies to visually inspect the optimal selection of the amplitude. The amplitude selected is highlighted with a red square.\n\n\n\nThis class perform the analysis of the individual qubit. Each resonator spectroscopy is analyzed with the ResonatorSpectroscopyQubitAnalysis class to obtain the fitted resonator frequency. These values are analyzed starting from the smallest amplitude and consecutive resonator frequencies are compared; if the difference between two frequencies is larger than a threshold (currently 20kHz), then the lowest amplitude is selected as the best amplitude.\n\n\n\n\n\n\nExample punchout for five qubits.\n\n\nOn picture above, one can see the plot for the punchout. The plot shows the resonator frequency as a function of the readout amplitude with the z-axis showing the normalized magnitude in each resonator spectroscopy; the normalization is performed due to the very different range in magnitudes in different spectroscopies. Each plot shows the selected readout amplitude in the figure (red X) and the value in the legend. In this example, the resonator frequency in Q1 (the minimum in each vertical slice representing a resonator spectroscopy at a certain readout amplitude) is flat up to the limit of the explored range, so it probably can be pushed harder but the range would need to be extended. In Q2 it is possible to see that the frequency of the resonator starts to lower with when the amplitude reaches 0.035. This behaviour is even more extreme for the resonators in Q3, Q4 and Q5 that need to be readout with lower amplitudes.\n\n\n\nIn cases like Q1, extending the range is probably necessary to capture the best readout amplitude. However, the problem is usually caused by values of the amplitudes that induce a small distortion in the resonators spectroscopy. For this reason, additional figures, one per qubit, are available displaying each resonator spectroscopy as shown below.\n\n\n\nExample resonator spectroscopies for Q5.\n\n\nIn this figure, it is possible to see how the resonator spectroscopy is progressively distorted and how, already in the second row, the fits are not as good as in the plot for the selected amplitude (subplot circled in red).\nEspecially in cases with a small granularity in the amplitude, it may be possible that the selected value is sub-optimal, looking at these plots will help fine-tune the value of the readout amplitude.\n\n\n\n\nPRL 105.100505\nRev. Sci. Instrum. 86, 024706 (2015)",
     "crumbs": [
       "Home",
       "Node Library",
-      "Qubit spectroscopy vs current"
+      "Punchout"
     ]
   },
   {
-    "objectID": "nodes/qubit_spectroscopy_vs_current_node.html#qubit-spectroscopy-as-a-function-of-the-coupler-current",
-    "href": "nodes/qubit_spectroscopy_vs_current_node.html#qubit-spectroscopy-as-a-function-of-the-coupler-current",
-    "title": "Tergite Automatic Calibration",
+    "objectID": "nodes/punchout_node.html#physical-motivation-for-punchout-node",
+    "href": "nodes/punchout_node.html#physical-motivation-for-punchout-node",
+    "title": "Resonator spectroscopy as a function of the readout amplitude (aka Punchout)",
     "section": "",
-    "text": "The qubit spectroscopy as a function of the coupler current is one of the initial steps in characterizing a coupler and preparing for two-qubit gate implementation. This spectroscopy is performed by varying the current applied to the coupler and measuring the qubit response at each current. The result is a two-dimensional map typically showing regions with a “U” or \\(\\bigcap\\) shape when analyzing the maximum values of the qubit spectroscopies. These shapes indicate changes in coupling and are key to identifying crossing points between the qubit and the coupler.\n\n\nDesctibed in qubit spectroscopy.\n\n\n\nThe QubitSpectroscopyVsCurrentNodeAnalysis class handles the analysis of all selected couplers and manages the associated plots. In addition to the preview plot that is displayed at run time, the analysis saves a file for each qubit containing all the resonator spectroscopies for debugging purposes.\nThe QubitSpectroscopyVsCurrentCouplerAnalysis combines the results of the two qubits in a coupler and the saving of the QOI so that the information of the crossing points is saved per qubit per coupler as described in the base class documentation.\nThe QubitSpectroscopyVsCurrentQubitAnalysis performs the analysis of a qubit combining the results of all qubit spectroscopy measurements looking primarily for the crossing points, i.e. the values of the currents at which there is a change of region from U to \\(\\bigcap\\); these are the point at which the coupler crosses the qubit frequency and can be used to study the properties of the coupler. The main function used is find_crossing_currents, which: * Cleans the data by removing isolated zeros (representing missing or invalid data) and outliers. * Scans the data from left to right, comparing consecutive non-zero values to detect transitions based on a predefined threshold. * Groups transitions occurring within a minimum range to mitigate the effect of noise or spurious detections. * Determines the crossing point as the average position within each grouped transition region. * If a crossing is within a small distance from the coupler-resonator crossing (determined in the reconator spectroscopy vs current node), then is excluded. The current thresholds and interval ranges are optimized for a current step size of 50uA.\nThe analysis of each qubit spectroscopy is performed in a dedicated analysis class, the QubitSpectroscopyMaxThresholdQubitAnalysis that is stored in the analysis file of the spectropy folder in the qubit_control folder. This analysis differs from the standard qubit spectroscopy analysis in that it does not attempt to fit the spectrum using a Lorentzian function. This choice is intentional, as the spectral shape near a crossing is often distorted or lacks a clear peak, making fitting unreliable. Instead, the analysis identifies the maximum point in the spectrum and evaluates its significance using a relevance metric defined as (max - mean) / RMS. If the peak is below threshold, zero is returned instead of the maximum value. The current hardcoded threshold (2.7) is rather conservative and was optimized for analysis with poor qubit spectroscopies, i.e. having multiple peaks instead of a clean one. For well calibrated systems this threshold can be raised up to 3.3 or even higher.",
+    "text": "The qubit and the resonator are coupled. This is one of the fundamentals for the way, the qubit is read out. Being coupled means that when the resonator starts to oscillate, the qubit will do so, as well. Now, by design, we do not want the resonator to affect the qubit too much. Otherwise, the readout would affect the qubit state and that would be bad. This is why when the readout resonator begins to oscillate too much, it will not couple to the qubit anymore. Now in the punchout, the idea is to drive the resonator up to the point until it does not couple to the qubit any longer. As long as it is coupled to the qubit, the frequency is slightly higher. This frequency is called the dressed frequency. By adding energy in form of increasing the amplitude, eventually, the resonator no longe couples significantly to the qubit. In the plot, one can see that the frequency will go down a bit. The new frequency of the resonator is now called the bare frequency.",
     "crumbs": [
       "Home",
       "Node Library",
-      "Qubit spectroscopy vs current"
+      "Punchout"
     ]
   },
   {
-    "objectID": "nodes/qubit_spectroscopy_node.html",
-    "href": "nodes/qubit_spectroscopy_node.html",
-    "title": "Tergite Automatic Calibration",
+    "objectID": "nodes/punchout_node.html#code-structure",
+    "href": "nodes/punchout_node.html#code-structure",
+    "title": "Resonator spectroscopy as a function of the readout amplitude (aka Punchout)",
     "section": "",
-    "text": "Qubit spectroscopy is a vital technique for identifying qubit resonance frequencies. By applying a probing signal to a qubit at various frequencies and measuring the response, we can accurately locate resonance frequencies and optimize qubit operation. In this node, both qubit frequecies for both 01 and 12 can be attained depending on the initial qubit state.\n\n\nThe TwoTonesMultidimMeasurement class facilitates the creation of schedules for qubit spectroscopy experiments. It supports multi-qubit spectroscopy, enabling parallel probing and measurement.\n\n\nThe schedule_function generates an experimental schedule for performing qubit spectroscopy. The sequence involves:\n\nReset: Resets all qubits to a known state.\nInitialize Qubit: Initialize the qubit to state 0 or 1, depending what qubit frequency you want to attain.\nFrequency Sweeping: Iteratively adjusts the probing frequency and amplitude.\nMeasurement: Captures the qubit response at each probing point.\n\nParameters:\n\nspec_frequencies (dict[str, np.ndarray]): Frequencies to probe for each qubit.\nspec_pulse_amplitudes (dict[str, np.ndarray], optional): Amplitudes of the probing pulses.\nrepetitions (int): Number of times the schedule will repeat.\nqubit_state (int): The state for the qubit.\n\nReturns:\n\nA Schedule object representing the experimental procedure.\n\n\n\n\n\nThe QubitSpectroscopyMultidimAnalysis class analyzes the results of qubit spectroscopy experiments. The resonance peak is identified, enabling the determination of resonance frequencies.\n\n\nThe analyse_qubit method processes the spectroscopy data to extract key parameters:\n\nQubit Frequency: The frequency at which the qubit exhibits a resonance peak.\nOptimal Spectroscopy Amplitude: The amplitude yielding the strongest response.\n\nSteps:\n\nExtract the relevant coordinates (frequencies and amplitudes) from the dataset.\nIdentify the resonance peak.\nValidate the peak based on prominence and width criteria.\n\nReturns:\n\nA list containing the qubit frequency and the optimal spectroscopy amplitude.\n\n\n\n\nDetermines if a resonance peak exists in the data using statistical filters and peak detection.\nParameters:\n\nx (array): Data array to evaluate.\nprom_coef (float): Prominence coefficient.\nwid_coef (float): Width coefficient.\noutlier_median (float): Threshold for filtering outliers.\n\nReturns:\n\nA boolean indicating whether a peak is present.",
+    "text": "The PunchoutMeasurement class facilitates the creation of schedules for the punchout experiments. It supports parallel probing and measurement.\n\n\nThe schedule_function generates an experimental schedule for performing qubit spectroscopy. - spec_frequencies (dict[str, np.ndarray]): Frequencies to probe for each resonator. - spec_pulse_amplitudes (dict[str, np.ndarray], optional): Amplitudes of the readout pulses.\nReturns:\n\nA Schedule object representing the experimental procedure.\n\n\n\n\n\nThe PunchoutNodeAnalysis class handles all the operations common to all qubits and produce the figures. The standard figure displays the measurements in each qubit with the selected amplitude shown in each subplot.\nAdditional figures are produced for debugging purposes; specifically, a plot per qubit is produced with all the individual resonator spectroscopies to visually inspect the optimal selection of the amplitude. The amplitude selected is highlighted with a red square.\n\n\n\nThis class perform the analysis of the individual qubit. Each resonator spectroscopy is analyzed with the ResonatorSpectroscopyQubitAnalysis class to obtain the fitted resonator frequency. These values are analyzed starting from the smallest amplitude and consecutive resonator frequencies are compared; if the difference between two frequencies is larger than a threshold (currently 20kHz), then the lowest amplitude is selected as the best amplitude.\n\n\n\n\n\n\nExample punchout for five qubits.\n\n\nOn picture above, one can see the plot for the punchout. The plot shows the resonator frequency as a function of the readout amplitude with the z-axis showing the normalized magnitude in each resonator spectroscopy; the normalization is performed due to the very different range in magnitudes in different spectroscopies. Each plot shows the selected readout amplitude in the figure (red X) and the value in the legend. In this example, the resonator frequency in Q1 (the minimum in each vertical slice representing a resonator spectroscopy at a certain readout amplitude) is flat up to the limit of the explored range, so it probably can be pushed harder but the range would need to be extended. In Q2 it is possible to see that the frequency of the resonator starts to lower with when the amplitude reaches 0.035. This behaviour is even more extreme for the resonators in Q3, Q4 and Q5 that need to be readout with lower amplitudes.\n\n\n\nIn cases like Q1, extending the range is probably necessary to capture the best readout amplitude. However, the problem is usually caused by values of the amplitudes that induce a small distortion in the resonators spectroscopy. For this reason, additional figures, one per qubit, are available displaying each resonator spectroscopy as shown below.\n\n\n\nExample resonator spectroscopies for Q5.\n\n\nIn this figure, it is possible to see how the resonator spectroscopy is progressively distorted and how, already in the second row, the fits are not as good as in the plot for the selected amplitude (subplot circled in red).\nEspecially in cases with a small granularity in the amplitude, it may be possible that the selected value is sub-optimal, looking at these plots will help fine-tune the value of the readout amplitude.\n\n\n\n\nPRL 105.100505\nRev. Sci. Instrum. 86, 024706 (2015)",
     "crumbs": [
       "Home",
       "Node Library",
-      "Qubit spectroscopy"
+      "Punchout"
     ]
   },
   {
-    "objectID": "nodes/qubit_spectroscopy_node.html#qubit-spectroscopy-calibration-and-analysis",
-    "href": "nodes/qubit_spectroscopy_node.html#qubit-spectroscopy-calibration-and-analysis",
+    "objectID": "nodes/rabi_oscillations_node.html",
+    "href": "nodes/rabi_oscillations_node.html",
     "title": "Tergite Automatic Calibration",
     "section": "",
-    "text": "Qubit spectroscopy is a vital technique for identifying qubit resonance frequencies. By applying a probing signal to a qubit at various frequencies and measuring the response, we can accurately locate resonance frequencies and optimize qubit operation. In this node, both qubit frequecies for both 01 and 12 can be attained depending on the initial qubit state.\n\n\nThe TwoTonesMultidimMeasurement class facilitates the creation of schedules for qubit spectroscopy experiments. It supports multi-qubit spectroscopy, enabling parallel probing and measurement.\n\n\nThe schedule_function generates an experimental schedule for performing qubit spectroscopy. The sequence involves:\n\nReset: Resets all qubits to a known state.\nInitialize Qubit: Initialize the qubit to state 0 or 1, depending what qubit frequency you want to attain.\nFrequency Sweeping: Iteratively adjusts the probing frequency and amplitude.\nMeasurement: Captures the qubit response at each probing point.\n\nParameters:\n\nspec_frequencies (dict[str, np.ndarray]): Frequencies to probe for each qubit.\nspec_pulse_amplitudes (dict[str, np.ndarray], optional): Amplitudes of the probing pulses.\nrepetitions (int): Number of times the schedule will repeat.\nqubit_state (int): The state for the qubit.\n\nReturns:\n\nA Schedule object representing the experimental procedure.\n\n\n\n\n\nThe QubitSpectroscopyMultidimAnalysis class analyzes the results of qubit spectroscopy experiments. The resonance peak is identified, enabling the determination of resonance frequencies.\n\n\nThe analyse_qubit method processes the spectroscopy data to extract key parameters:\n\nQubit Frequency: The frequency at which the qubit exhibits a resonance peak.\nOptimal Spectroscopy Amplitude: The amplitude yielding the strongest response.\n\nSteps:\n\nExtract the relevant coordinates (frequencies and amplitudes) from the dataset.\nIdentify the resonance peak.\nValidate the peak based on prominence and width criteria.\n\nReturns:\n\nA list containing the qubit frequency and the optimal spectroscopy amplitude.\n\n\n\n\nDetermines if a resonance peak exists in the data using statistical filters and peak detection.\nParameters:\n\nx (array): Data array to evaluate.\nprom_coef (float): Prominence coefficient.\nwid_coef (float): Width coefficient.\noutlier_median (float): Threshold for filtering outliers.\n\nReturns:\n\nA boolean indicating whether a peak is present.",
+    "text": "The rabi oscillations are essential when determining the amplitude of the signal send to the qubit. The (\\(\\pi\\))-pulses, which amplitudes is varying is a Gaussian pulses. By varying the amplitude a cosine function appears when measuring transmission coefficient (S21) and with that one can determine the optimal amplitude for qubit operations. This can also be done for 12 operations with the only difference being the 1 state being initialized.\n\n\nThe RabiOscillationsMeasurement class facilitates the creation of schedules for Rabi oscillations.\n\n\nThe schedule_function generates an experimental schedule for performing Rabi oscillations. The sequence involves:\n\nReset: Resets all qubits to a known state.\nInitialize Qubit: Initialize the qubit to state 0 or 1, depending what qubit frequency you want to attain.\nAmplitude Sweeping: Iteratively adjusts the probing amplitude.\nMeasurement: Captures the qubit response at each probing point.\n\nParameters:\n\nmw_amplitudes (dict[str, np.ndarray]): Amplitudes of the probing (\\(\\pi\\))-pulses.\nrepetitions (int): Number of times the schedule will repeat.\nqubit_state (int): The state for the qubit.\n\nReturns:\n\nA Schedule object representing the experimental procedure.\n\n\n\n\n\nThe RabiQubitAnalysis class analyzes the results of Rabi oscillations experiments. It fits a cosine function to the qubit response for different amplitudes of the (\\(\\pi\\))-pulse, determinaning the Rabi frequencies.\n\n\nThe analyse_qubit method processes the Rabi oscillations data to extract key parameters:\n\nOptimal (\\(\\pi\\))-pulse amplitude: The optimal amplitude resulting in the qubit getting to the desired state.\n\nSteps:\n\nLoad Data:\nExtract the drive amplitude and magnitude values from the dataset for analysis.\nParameter Guessing:\n\nCompute an initial guess for the cosine model parameters:\n\nAmplitude: Based on the difference between maximum and minimum magnitudes.\nOffset: As the mean of the magnitude values.\nFrequency: Using a Fast Fourier Transform (FFT) to estimate oscillation frequency.\n\nUpdate the model parameters with the computed guesses.\n\nFit Model:\nFit the cosine function to the Rabi oscillation data using the guessed parameters. The model adjusts to minimize the error.\nExtract Results:\n\nCalculate the (\\(\\pi\\))-pulse amplitude (amp180) from the fit.\nEstimate the uncertainty of the (\\(\\pi\\))-pulse amplitude using the standard error from the fit results.\n\nGenerate Fit Curve:\nEvaluate the fitted model over a finer set of amplitude values for smooth plotting.\nPlot Results:\n\nPlot the fitted curve against the original data points.\nAnnotate the plot with the (\\(\\pi\\))-pulse amplitude value.",
     "crumbs": [
       "Home",
       "Node Library",
-      "Qubit spectroscopy"
+      "Rabi oscillations"
     ]
+  },
+  {
+    "objectID": "nodes/rabi_oscillations_node.html#rabi-oscillations-calibration-and-analysis",
+    "href": "nodes/rabi_oscillations_node.html#rabi-oscillations-calibration-and-analysis",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "The rabi oscillations are essential when determining the amplitude of the signal send to the qubit. The (\\(\\pi\\))-pulses, which amplitudes is varying is a Gaussian pulses. By varying the amplitude a cosine function appears when measuring transmission coefficient (S21) and with that one can determine the optimal amplitude for qubit operations. This can also be done for 12 operations with the only difference being the 1 state being initialized.\n\n\nThe RabiOscillationsMeasurement class facilitates the creation of schedules for Rabi oscillations.\n\n\nThe schedule_function generates an experimental schedule for performing Rabi oscillations. The sequence involves:\n\nReset: Resets all qubits to a known state.\nInitialize Qubit: Initialize the qubit to state 0 or 1, depending what qubit frequency you want to attain.\nAmplitude Sweeping: Iteratively adjusts the probing amplitude.\nMeasurement: Captures the qubit response at each probing point.\n\nParameters:\n\nmw_amplitudes (dict[str, np.ndarray]): Amplitudes of the probing (\\(\\pi\\))-pulses.\nrepetitions (int): Number of times the schedule will repeat.\nqubit_state (int): The state for the qubit.\n\nReturns:\n\nA Schedule object representing the experimental procedure.\n\n\n\n\n\nThe RabiQubitAnalysis class analyzes the results of Rabi oscillations experiments. It fits a cosine function to the qubit response for different amplitudes of the (\\(\\pi\\))-pulse, determinaning the Rabi frequencies.\n\n\nThe analyse_qubit method processes the Rabi oscillations data to extract key parameters:\n\nOptimal (\\(\\pi\\))-pulse amplitude: The optimal amplitude resulting in the qubit getting to the desired state.\n\nSteps:\n\nLoad Data:\nExtract the drive amplitude and magnitude values from the dataset for analysis.\nParameter Guessing:\n\nCompute an initial guess for the cosine model parameters:\n\nAmplitude: Based on the difference between maximum and minimum magnitudes.\nOffset: As the mean of the magnitude values.\nFrequency: Using a Fast Fourier Transform (FFT) to estimate oscillation frequency.\n\nUpdate the model parameters with the computed guesses.\n\nFit Model:\nFit the cosine function to the Rabi oscillation data using the guessed parameters. The model adjusts to minimize the error.\nExtract Results:\n\nCalculate the (\\(\\pi\\))-pulse amplitude (amp180) from the fit.\nEstimate the uncertainty of the (\\(\\pi\\))-pulse amplitude using the standard error from the fit results.\n\nGenerate Fit Curve:\nEvaluate the fitted model over a finer set of amplitude values for smooth plotting.\nPlot Results:\n\nPlot the fitted curve against the original data points.\nAnnotate the plot with the (\\(\\pi\\))-pulse amplitude value.",
+    "crumbs": [
+      "Home",
+      "Node Library",
+      "Rabi oscillations"
+    ]
+  },
+  {
+    "objectID": "nodes/rabi_oscillations_node.html#redis-qoi-tables",
+    "href": "nodes/rabi_oscillations_node.html#redis-qoi-tables",
+    "title": "Tergite Automatic Calibration",
+    "section": "Redis QOI tables",
+    "text": "Redis QOI tables\nRabi oscillations 01\nRabi oscillations 12",
+    "crumbs": [
+      "Home",
+      "Node Library",
+      "Rabi oscillations"
+    ]
+  },
+  {
+    "objectID": "redis_variable_names.html",
+    "href": "redis_variable_names.html",
+    "title": "QOI names in redis",
+    "section": "",
+    "text": "This section serves to collect the QOI’s extracted from each node and the name of the corresponding QOI in redis."
+  },
+  {
+    "objectID": "redis_variable_names.html#respec0",
+    "href": "redis_variable_names.html#respec0",
+    "title": "QOI names in redis",
+    "section": "Resonator Spectroscopy",
+    "text": "Resonator Spectroscopy"
+  },
+  {
+    "objectID": "redis_variable_names.html#quspec01",
+    "href": "redis_variable_names.html#quspec01",
+    "title": "QOI names in redis",
+    "section": "Qubit Spectroscopy",
+    "text": "Qubit Spectroscopy"
+  },
+  {
+    "objectID": "redis_variable_names.html#rabi01",
+    "href": "redis_variable_names.html#rabi01",
+    "title": "QOI names in redis",
+    "section": "Rabi Oscillations",
+    "text": "Rabi Oscillations"
+  },
+  {
+    "objectID": "redis_variable_names.html#ramsey-correction",
+    "href": "redis_variable_names.html#ramsey-correction",
+    "title": "QOI names in redis",
+    "section": "Ramsey Correction",
+    "text": "Ramsey Correction"
+  },
+  {
+    "objectID": "redis_variable_names.html#motzoi-parameter",
+    "href": "redis_variable_names.html#motzoi-parameter",
+    "title": "QOI names in redis",
+    "section": "Motzoi Parameter",
+    "text": "Motzoi Parameter"
+  },
+  {
+    "objectID": "redis_variable_names.html#respec1",
+    "href": "redis_variable_names.html#respec1",
+    "title": "QOI names in redis",
+    "section": "Resonator Spectroscopy 1",
+    "text": "Resonator Spectroscopy 1"
+  },
+  {
+    "objectID": "redis_variable_names.html#quspec12",
+    "href": "redis_variable_names.html#quspec12",
+    "title": "QOI names in redis",
+    "section": "Qubit 12 Spectroscopy",
+    "text": "Qubit 12 Spectroscopy"
+  },
+  {
+    "objectID": "redis_variable_names.html#rabi12",
+    "href": "redis_variable_names.html#rabi12",
+    "title": "QOI names in redis",
+    "section": "Rabi 12 Oscillations",
+    "text": "Rabi 12 Oscillations"
+  },
+  {
+    "objectID": "redis_variable_names.html#ramsey-correction-12",
+    "href": "redis_variable_names.html#ramsey-correction-12",
+    "title": "QOI names in redis",
+    "section": "Ramsey correction 12",
+    "text": "Ramsey correction 12"
+  },
+  {
+    "objectID": "redis_variable_names.html#motzoi-parameter-12",
+    "href": "redis_variable_names.html#motzoi-parameter-12",
+    "title": "QOI names in redis",
+    "section": "Motzoi Parameter 12",
+    "text": "Motzoi Parameter 12"
+  },
+  {
+    "objectID": "redis_variable_names.html#states-discrimination",
+    "href": "redis_variable_names.html#states-discrimination",
+    "title": "QOI names in redis",
+    "section": "2 States Discrimination",
+    "text": "2 States Discrimination"
+  },
+  {
+    "objectID": "redis_variable_names.html#states-discrimination-1",
+    "href": "redis_variable_names.html#states-discrimination-1",
+    "title": "QOI names in redis",
+    "section": "3 States Discrimination",
+    "text": "3 States Discrimination"
+  },
+  {
+    "objectID": "redis_variable_names.html#t1",
+    "href": "redis_variable_names.html#t1",
+    "title": "QOI names in redis",
+    "section": "T1",
+    "text": "T1"
+  },
+  {
+    "objectID": "redis_variable_names.html#t2",
+    "href": "redis_variable_names.html#t2",
+    "title": "QOI names in redis",
+    "section": "T2",
+    "text": "T2"
+  },
+  {
+    "objectID": "redis_variable_names.html#randomized-benchmarking",
+    "href": "redis_variable_names.html#randomized-benchmarking",
+    "title": "QOI names in redis",
+    "section": "Randomized Benchmarking",
+    "text": "Randomized Benchmarking"
+  },
+  {
+    "objectID": "tables_qoi_names/couplers/table_cz_chevron.html",
+    "href": "tables_qoi_names/couplers/table_cz_chevron.html",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "Redis QOI name\n\n\n\n\ncz_pulse_frequency\n\n\ncz_pulse_duration"
+  },
+  {
+    "objectID": "tables_qoi_names/couplers/table_cz_calibration.html",
+    "href": "tables_qoi_names/couplers/table_cz_calibration.html",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "Redis QOI name\n\n\n\n\ncz_phase\n\n\ncz_pop_loss\n\n\nreset_fidelity\n\n\nreset_leakage\n\n\nall_fidelity\n\n\nall_fidelity_f"
+  },
+  {
+    "objectID": "tables_qoi_names/couplers/table_cz_parametrization.html",
+    "href": "tables_qoi_names/couplers/table_cz_parametrization.html",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "Redis QOI name\n\n\n\n\ncz_pulse_frequency\n\n\ncz_pulse_amplitude\n\n\ncz_parking_current"
+  },
+  {
+    "objectID": "tables_qoi_names/couplers/table_tqg_randomized_benchmarking.html",
+    "href": "tables_qoi_names/couplers/table_tqg_randomized_benchmarking.html",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "Redis QOI name\n\n\n\n\ntqg_fidelity\n\n\ntqg_fidelity_interleaved"
+  },
+  {
+    "objectID": "tables_qoi_names/characterization/table_t1.html",
+    "href": "tables_qoi_names/characterization/table_t1.html",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "Redis QOI name\n\n\n\n\nt1_time"
+  },
+  {
+    "objectID": "tables_qoi_names/characterization/table_randomized_benchmarking.html",
+    "href": "tables_qoi_names/characterization/table_randomized_benchmarking.html",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "Redis QOI name\n\n\n\n\nfidelity\n\n\nfidelity_error\n\n\nleakage\n\n\nleakage_error"
+  },
+  {
+    "objectID": "tables_qoi_names/readout/table_resonator_spectroscopy_1.html",
+    "href": "tables_qoi_names/readout/table_resonator_spectroscopy_1.html",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "Redis QOI name\n\n\n\n\nextended_clock_freqs:readout_1\n\n\nQl_1\n\n\nresonator_minimum_1"
+  },
+  {
+    "objectID": "tables_qoi_names/readout/table_resonator_spectroscopy_2.html",
+    "href": "tables_qoi_names/readout/table_resonator_spectroscopy_2.html",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "Redis QOI name\n\n\n\n\nextended_clock_freqs:readout_2"
+  },
+  {
+    "objectID": "tables_qoi_names/readout/table_3_states_opt.html",
+    "href": "tables_qoi_names/readout/table_3_states_opt.html",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "Redis QOI name\n\n\n\n\nmeasure_3state_opt:pulse_amp\n\n\ncentroid_I\n\n\ncentroid_Q\n\n\nomega_01\n\n\nomega_12\n\n\nomega_20\n\n\ninv_cm_opt\n\n\nextended_clock_freqs:readout_3state_opt"
+  },
+  {
+    "objectID": "tables_qoi_names/qubit_control/table_ramsey.html",
+    "href": "tables_qoi_names/qubit_control/table_ramsey.html",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "Redis QOI name\n\n\n\n\nclock_freqs:f01"
+  },
+  {
+    "objectID": "tables_qoi_names/qubit_control/table_motzoi_parameter_12.html",
+    "href": "tables_qoi_names/qubit_control/table_motzoi_parameter_12.html",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "Redis QOI name\n\n\n\n\nr12:ef_motzoi"
+  },
+  {
+    "objectID": "tables_qoi_names/qubit_control/table_qubit_12_spectroscopy.html",
+    "href": "tables_qoi_names/qubit_control/table_qubit_12_spectroscopy.html",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "Redis QOI name\n\n\n\n\nclock_freqs:f12\n\n\nspec:spec_ampl_12_optimal"
+  },
+  {
+    "objectID": "tables_qoi_names/qubit_control/table_rabi_oscillations_01.html",
+    "href": "tables_qoi_names/qubit_control/table_rabi_oscillations_01.html",
+    "title": "Tergite Automatic Calibration",
+    "section": "",
+    "text": "Redis QOI name\n\n\n\n\nrxy:amp180"
   },
   {
     "objectID": "getting_started.html",

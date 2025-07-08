@@ -63,3 +63,8 @@ Determines if a resonance peak exists in the data using statistical filters and 
 **Returns**:
 
 - A boolean indicating whether a peak is present.
+
+## Redis QOI tables
+[Qubit spectroscopy 01](../redis_variable_names.qmd#quspec01)
+
+[Qubit spectroscopy 12](../redis_variable_names.qmd#quspec12)

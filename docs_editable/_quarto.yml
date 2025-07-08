@@ -41,6 +41,8 @@ website:
             href: available_nodes.qmd
           - text: "Resonator spectroscopy"
             href: nodes/resonator_spectroscopy_node.qmd
+          - text: "Punchout"
+            href: nodes/punchout_node.qmd
           - text: "Qubit spectroscopy"
             href: nodes/qubit_spectroscopy_node.qmd
           - text: "Rabi oscillations"

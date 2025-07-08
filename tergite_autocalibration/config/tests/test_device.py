@@ -26,4 +26,4 @@ def test_device_configuration():
     )
 
     device_configuration: DeviceConfiguration = configuration_handler.device
-    assert device_configuration.name == "device_template"
+    assert device_configuration.name == "25-qubit FC8a #1"
