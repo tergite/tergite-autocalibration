@@ -133,7 +133,7 @@ application_run:
     - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n ro_frequency_three_state_optimization
     - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n ro_amplitude_three_state_optimization
     # Read
-    - ls .venv/lib/python3.12/site-packages/out/2025-07-07
+    - ls .venv/lib/python3.12/site-packages/out
     # Verify output
     - |
       if find .venv/lib/python3.12/site-packages/out -type f | grep -q "ro_amplitude_three_state_optimization.png"; then
