@@ -181,9 +181,23 @@ def _configure_cluster_settings(
 
 
 def _set_output_attenuations(cluster, connectivity, settings):
+    """
+    Sets the output attenuations for modules in the given cluster based on the provided settings.
 
+    This function iterates over couplers, resonators, and qubits, finds the corresponding output
+    ports from the connectivity map, and applies attenuation settings to the correct output
+    channels (complex_output_0 or complex_output_1) for modules that are part of the cluster.
+
+    Args:
+        cluster: Cluster object to configure
+        connectivity: A mapping that relates device names (with port suffixes) to their physical port paths.
+        settings: A dictionary specifying attenuation values for 'coupler', 'resonator', and 'qubit' devices.
+    """
     cluster_modules = cluster.get_connected_modules()
     module_names = frozenset(mod.name for _, mod in cluster_modules.items())
+    
+    # read the device configuration (device_config.toml) settings for attenuation
+    # entire file, all couplers, all qubits, all resonators
     for device_type, quantify_port_suffix in zip(
         ["coupler", "resonator", "qubit"], [":fl", ":res", ":mw"]
     ):
@@ -192,14 +206,25 @@ def _set_output_attenuations(cluster, connectivity, settings):
             assert len(ports) == 1
             port_str = next(iter(ports))
 
+            # e.g. "cluster.module1.complex_output_0"
             cl, mod, port = tuple(port_str.split(sep="."))
+
+            # inputs can also be specified in the connectivity graph, although such
+            # mappings are seldomly used in transmon systems, so just do a simple
+            # check here that we are actually configuring an output
             assert "output" in port, (name + quantify_port_suffix, port_str)
 
+            # if the cluster that this qubit is mapped to in the connectivity
+            # is not the same as the cluster to be configured, then simply skip
             if cl != cluster.name:
                 continue
+
+            # skip if the module is not connected
             if "_".join((cl, mod)) not in module_names:
                 continue
 
+            # otherwise, use the dedicated QCoDeS function
+            # to set the attenuation
             module_obj = getattr(cluster, mod)
 
             if port == "complex_output_0":
