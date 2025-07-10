@@ -195,7 +195,7 @@ def _set_output_attenuations(cluster, connectivity, settings):
     """
     cluster_modules = cluster.get_connected_modules()
     module_names = frozenset(mod.name for _, mod in cluster_modules.items())
-    
+
     # read the device configuration (device_config.toml) settings for attenuation
     # entire file, all couplers, all qubits, all resonators
     for device_type, quantify_port_suffix in zip(
