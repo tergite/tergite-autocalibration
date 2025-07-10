@@ -20,6 +20,8 @@ from typing import List, Tuple
 
 import typer
 
+from tergite_autocalibration.utils.logging import logger
+
 
 class OperatingSystem(Enum):
     LINUX = "LINUX"
@@ -29,12 +31,19 @@ class OperatingSystem(Enum):
 
 
 def get_os() -> "OperatingSystem":
-    system = platform.system()
-    if system == "Linux":
+    # Safe way to retrieve a string about the operating system
+    platform_str: str
+    if isinstance(platform, str):
+        platform_str = platform.lower()
+    else:
+        platform_str = platform.system().lower()
+
+    # Return as enum
+    if platform_str == "linux":
         return OperatingSystem.LINUX
-    elif system == "Darwin":
+    elif platform_str == "darwin":
         return OperatingSystem.MAC
-    elif system == "Windows":
+    elif platform_str == "windows":
         return OperatingSystem.WINDOWS
     else:
         return OperatingSystem.UNDEFINED

@@ -3,6 +3,7 @@
 # (C) Copyright Eleftherios Moschandreou 2023, 2024
 # (C) Copyright Liangyu Chen 2023, 2024
 # (C) Copyright Chalmers Next Labs AB 2024
+# (C) Copyright Michele Faucci Giannelli 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -159,7 +160,16 @@ def _save_parameters_in_transmon(
             REDIS_CONNECTION.hset(f"{name}:{this_element}", qoi_name, value)
             # Setting the value in the standard redis storage
             structured_redis_storage(qoi_name, this_element.strip("q"), value)
+            # Saving the error to the measured value
+            error = qoi_result["error"]
+            REDIS_CONNECTION.hset(f"{name}:{this_element}", qoi_name + "_error", error)
+            # Setting the value in the standard redis storage
+            structured_redis_storage(
+                qoi_name + "_error", this_element.strip("q"), error
+            )
+
         REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
+
     else:
         logger.warning(f"Analysis failed for {this_element}")
 
@@ -192,6 +202,12 @@ def _save_parameters_in_coupler(
             value = qoi_result["value"]
             logger.info(f"Updating redis for {this_element} with {qoi_name}: {value}")
             REDIS_CONNECTION.hset(f"{name}:{this_element}", qoi_name, value)
+            error = qoi_result["error"]
+            logger.info(
+                f"Updating redis for {this_element} with {qoi_name}_error: {error}"
+            )
+            REDIS_CONNECTION.hset(f"{name}:{this_element}", qoi_name + "_error", error)
+
     REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
 
 
@@ -203,7 +219,8 @@ def _save_parameters_in_qubits_in_coupler(
 
     Args:
         node: Name of the node to update
-        this_element: Name of the element to update, this will be e.g. q01_q02, the qubits are extracted inside the function
+        this_element: Name of the element to update, this will be e.g. q01_q02,
+        the qubits are extracted inside the function
         name: Name of the property to update e.g. the qubit frequency
         qoi: A dictionary that maps from qubit to the respective QOI
         redis_fields: redis fields from the node to be updated, this is for verification
@@ -218,4 +235,5 @@ def _save_parameters_in_qubits_in_coupler(
                 transmon_parameter,
                 qoi[qubit][transmon_parameter],
             )
+
     REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")

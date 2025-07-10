@@ -24,13 +24,11 @@ class DeviceConfiguration(TOMLConfigurationFile):
         super().__init__(*args, **kwargs)
 
         # Load the device part of the device configuration file
-        try:
-            self._device = self._dict["device"]
-        except KeyError:
+        self._device = self._dict.get("device", {})
+        if not self._device:
             logger.warning(
                 "Device configuration empty or not found, please check your device configuration."
             )
-            self._device = {}
 
     @property
     def name(self) -> str:
@@ -39,7 +37,7 @@ class DeviceConfiguration(TOMLConfigurationFile):
             Name of the device
 
         """
-        return self._device["name"]
+        return self._device.get("name", "no_device_name_configured")
 
     @property
     def owner(self) -> str:
@@ -48,4 +46,4 @@ class DeviceConfiguration(TOMLConfigurationFile):
             Name of the device
 
         """
-        return self._device["owner"]
+        return self._device.get("owner", "no_owner_configured")
