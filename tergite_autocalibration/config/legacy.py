@@ -14,6 +14,8 @@ from typing import Dict
 
 import toml
 
+from types import MappingProxyType
+
 from tergite_autocalibration.config.globals import CONFIG
 from tergite_autocalibration.utils.logging import logger
 
@@ -120,6 +122,41 @@ class DataHandler:
         # TODO: This is under the assumption that there is only one cluster defined in the cluster config
         return str(list(self.cluster_config.hardware_description.keys())[0])
 
+    def get_output_attenuations(
+        self,
+    ) -> MappingProxyType[str, MappingProxyType[str, int]]:
+        # This is not "legacy", this should be kept. this is an intentional bypass of the hardware config method of
+        # setting the attenuation. This is because for higher energy levels you almost always want the same attenuation,
+        # but Quantify scheduler requires the clocks to be different (since frequency of transition is statefully stored
+        # in the clock resource). This causes a lot of repetition in the cluster config.
+        #
+        # This method is in this legacy module because of convenience, we want to read the device_config.toml
+        # and this file does so. TODO, FIXME: Move this functionality to a separate file.
+        #
+        # NOTE: In QCM-RF, maximum output attenuation is 60 dB (see: https://docs.qblox.com/en/main/cluster/qcm_rf.html#variable-attenuator)
+        # NOTE: In QCM-RF-II, maximum output attenuation is 30 dB (see: https://docs.qblox.com/en/main/cluster/qcm_rf.html#variable-attenuator)
+        # NOTE: In QRM-RF, maximum output attenuation is 60 dB (see: https://docs.qblox.com/en/main/cluster/qrm_rf.html#variable-attenuator)
+        xy = MappingProxyType(
+            {
+                qubit_name: data.get("attenuation", 30)
+                for qubit_name, data in self._device["qubit"].items()
+            }
+        )
+        z = MappingProxyType(
+            {
+                qubit_name: data.get("attenuation", 30)
+                for qubit_name, data in self._device["coupler"].items()
+            }
+        )
+        ro = MappingProxyType(
+            {
+                qubit_name: data.get("attenuation", 60)
+                for qubit_name, data in self._device["resonator"].items()
+            }
+        )
+
+        return MappingProxyType({"resonator": ro, "coupler": z, "qubit": xy})
+
     def get_legacy(self, variable_name: str):
         """
         Temporary endpoint to provide data structures in the necessary shape as they are used in the code
@@ -153,35 +190,7 @@ class DataHandler:
                 for i_, keys_ in self._device["qubit"].items()
             }
         if variable_name == "attenuation_setting":
-            # TODO: attenuation setting could maybe also work with the qblox hardware configuration
-            # FIXME: These are just some values, so that we do not have 0 in there
-            qubit_attenuation = 10
-            coupler_attenuation = 34
-            resonator_attenuation = 12
-            # TODO: We are now just using the first attenuation value in here,
-            try:
-                qubit_attenuation = list(self._device["qubit"].items())[0][1][
-                    "attenuation"
-                ]
-            except IndexError:
-                pass
-            try:
-                coupler_attenuation = list(self._device["coupler"].items())[0][1][
-                    "attenuation"
-                ]
-            except IndexError:
-                pass
-            try:
-                resonator_attenuation = list(self._device["resonator"].items())[0][1][
-                    "attenuation"
-                ]
-            except IndexError:
-                pass
-            return {
-                "qubit": qubit_attenuation,
-                "coupler": coupler_attenuation,
-                "resonator": resonator_attenuation,
-            }
+            return self.get_output_attenuations()
         elif variable_name == "qubit_types":
             return self._qubit_types
         elif variable_name == "coupler_spi_mapping":
