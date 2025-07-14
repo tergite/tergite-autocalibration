@@ -14,7 +14,7 @@ from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
 
 
-if __name__ == "main":
+if __name__ == "__main__":
     couplers = ["q06_q07", "q08_q09", "q12_q13", "q14_q15"]
     spi = SpiDAC(couplers, measurement_mode=MeasurementMode.real)
     currents = {}

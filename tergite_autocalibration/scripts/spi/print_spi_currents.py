@@ -13,7 +13,7 @@
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
 
-if __name__ == "main":
+if __name__ == "__main__":
 
     # fmt: off
     couplers = ["q06_q07", "q07_q08", "q08_q09", "q09_q10",
