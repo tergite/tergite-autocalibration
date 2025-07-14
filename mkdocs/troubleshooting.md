@@ -15,7 +15,7 @@ On a Linux machine, if REDIS does not accept a connection, you can do this:
 redis-server --port {your redis port} --daemonize yes
 ```
 
-The `--daenonize yes` parameter will enable the machine to run REDIS always in the background.
+The `--daemonize yes` parameter will enable the machine to run REDIS always in the background.
 If you do not use that parameter, the REDIS instance will stop as soon as you close the terminal where you started it.
 
 If you are getting an error saying:

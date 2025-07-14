@@ -11,10 +11,10 @@ This is not necessary, but it can simplify operations later, especially using VS
 After you install tergite-autocalibration with:
 
 ```bash
-pip install -e ".[test,dev]"
+pip install -e ".[test,dev,docs]"
 ```
 
-this will install the additional packages for developing code and running tests
+this will install the additional packages for developing code, running tests, and previewing documentation.
 
 ## Naming convention and style
 
@@ -152,7 +152,7 @@ the `pyproject.toml` file.
 pip install black==VERSION_FROM_PYPROJECT_TOML
 ```
 
-## Next steps:
+## Next steps
 
 As you noticed, most of the above advice contains the formatting and other formal steps during development.
 Consider reading about:
