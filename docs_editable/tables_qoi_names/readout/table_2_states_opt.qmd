@@ -1,8 +1,0 @@
-|Redis QOI name|
-|---------| 
-|measure_2state_opt:pulse_amp      |
-| measure_2state_opt:acq_rotation     |
-| measure_2state_opt:acq_threshold       |
-|extended_clock_freqs:readout_2state_opt      |
-
-: {.striped}

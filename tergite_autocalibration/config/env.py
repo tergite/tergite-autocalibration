@@ -91,7 +91,7 @@ class EnvironmentConfiguration(BaseConfigurationFile):
     def from_dot_env(
         filepath: Union[str, Path] = _get_default_env_path(),
         write_env: bool = False,
-    ):
+    ) -> "EnvironmentConfiguration":
         """
         Load the values from the .env file actually into the os environment.
 

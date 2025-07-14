@@ -74,18 +74,22 @@ acli --help
 
 ### Documentation
 
-The documentation is maintained using [Quarto](https://quarto.org/). Everytime there is a release, you can find the
+The documentation is maintained using [MkDocs Material](https://squidfunk.github.io/mkdocs-material/). Everytime there is a release, you can find the
 documentation from the release
 on [https://tergite.github.io/tergite-autocalibration](https://tergite.github.io/tergite-autocalibration).
 
-To see the documentation for the branch that you are currently working on, please open
-the [`docs/index.html`](./docs/index.html) file in your browser.
-If the rendered documentation does not reflect the state of the documentation of the markdown files in `docs_editable`,
-open a terminal in `docs_editable` and run:
+To preview the documentation for the branch you're currently working on you first need to install the project with documentation dependencies (only needed once):
 
 ```bash
-quarto preview
+pip install -e '.[docs]'
 ```
+Then start the live preview server of the documentation from the root of the repository:
+
+```bash
+mkdocs serve
+```
+
+and open the URL shown in the terminal (typically [http://localhost:8000/](http://localhost:8000/)) in your browser.
 
 If you are interested to edit the documentation, please check out the documentation section in
 the [contribution guidelines](CONTRIBUTING.md#documentation). There is also a page in the documentation to help you

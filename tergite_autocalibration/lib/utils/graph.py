@@ -15,7 +15,7 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from typing import List, Union
+from typing import List, Union, Optional
 
 import networkx as nx
 
@@ -94,8 +94,8 @@ EXCLUDED_NODES = ["tof", "punchout"]
 
 
 def get_dependencies_in_topological_order(
-    graph: "nx.DiGraph", target_node: str, exclude_nodes: List[str] = None
-):
+    graph: "nx.DiGraph", target_node: str, exclude_nodes: Optional[List[str]] = None
+) -> List[str]:
     """
     Get dependencies of a graph in topological order.
     This implementation takes into account that there might be parallel dependencies.
@@ -107,7 +107,7 @@ def get_dependencies_in_topological_order(
         exclude_nodes: Nodes that should be excluded from the dependency search.
 
     Returns:
-        A list of nodes in topological order.
+        List[str]: A list of nodes in topological order.
 
     """
 
@@ -161,8 +161,8 @@ def range_dependencies_in_topological_order(
     graph: "nx.DiGraph",
     from_nodes: List[str],
     target_node: str,
-    exclude_nodes: List[str] = None,
-):
+    exclude_nodes: Optional[List[str]] = None,
+) -> List[str]:
     """
     Get a subset of the graph in topological order.
 
@@ -173,7 +173,7 @@ def range_dependencies_in_topological_order(
         exclude_nodes: Nodes that should be excluded from the dependency search.
 
     Returns:
-        A topologically ordered subset of the all nodes including from_nodes.
+        List[str]: A topologically ordered subset of the all nodes including from_nodes.
 
     """
     if exclude_nodes is None:
@@ -194,8 +194,8 @@ def range_dependencies_in_topological_order(
 
 
 def filtered_topological_order(
-    target_node: str, from_nodes: Union[str, List[str]] = None
-):
+    target_node: str, from_nodes: Optional[Union[str, List[str]]] = None
+) -> List[str]:
     """
     Get the graph in topological order.
 
@@ -204,7 +204,7 @@ def filtered_topological_order(
         from_nodes: Option to define a range in between.
 
     Returns:
-        Topological order of nodes including target node
+        List[str]: Topological order of nodes including target node
 
     """
     logger.info("Targeting node: " + target_node)

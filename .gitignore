@@ -75,7 +75,6 @@ Thumbs.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
-/.quarto/
 
 
 .pytest_cache/
@@ -104,3 +103,6 @@ tergite_autocalibration/lib/nodes/coupler/cz_chevron/tests/results/**
 
 tergite_acl/utils/clifford_module/**
 tergite_autocalibration/lib/nodes/coupler/cz_characterisation/tests/results/**
+
+# documentation
+site/

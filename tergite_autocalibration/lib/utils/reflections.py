@@ -14,10 +14,10 @@ import ast
 import importlib.util
 import os
 from pathlib import Path
-from typing import Union
+from typing import Union, Type
 
 
-def import_class_from_file(class_name: str, file_path: Union[str, Path]):
+def import_class_from_file(class_name: str, file_path: Union[str, Path]) -> Type:
     """
     Imports a class from a given file path.
 
@@ -26,7 +26,7 @@ def import_class_from_file(class_name: str, file_path: Union[str, Path]):
         file_path (str): The path to the file containing the class.
 
     Returns:
-        type: The class type if found, otherwise raises an AttributeError or FileNotFoundError.
+        Type: The class type if found, otherwise raises an AttributeError or FileNotFoundError.
     """
     if not os.path.isfile(file_path):
         raise FileNotFoundError(f"No such file: '{file_path}'")
@@ -45,7 +45,7 @@ def import_class_from_file(class_name: str, file_path: Union[str, Path]):
 
 def find_inheriting_classes_ast_recursive(
     directory: Union[str, Path], base_class_name: str = None
-):
+) -> dict:
     """
     Recursively finds all classes in a directory and its subdirectories that inherit
     from the specified base class using AST parsing.

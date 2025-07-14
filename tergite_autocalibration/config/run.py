@@ -13,7 +13,7 @@
 
 import os.path
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 from tergite_autocalibration.config.base import TOMLConfigurationFile
 from tergite_autocalibration.utils.dto.enums import ApplicationStatus
@@ -44,19 +44,19 @@ class RunConfiguration(TOMLConfigurationFile):
         self._data_dir = None
 
     @property
-    def id(self):
+    def id(self) -> str:
         """
         Returns:
-            Run ID in form of YYYY-MM-DD--HH-MM-SS--"tac-run-id"
+            str: Run ID in form of YYYY-MM-DD--HH-MM-SS--"tac-run-id"
 
         """
         return self._run_id
 
     @property
-    def log_dir(self):
+    def log_dir(self) -> str:
         """
         Returns:
-            Run directory in form YYYY-MM-DD/"ACTIVE"_HH-MM-SS--target_node
+            str: Run directory in form YYYY-MM-DD/"ACTIVE"_HH-MM-SS--target_node
 
         """
         return self._log_dir
@@ -66,7 +66,7 @@ class RunConfiguration(TOMLConfigurationFile):
         self._log_dir = value
 
     @property
-    def data_dir(self):
+    def data_dir(self) -> Optional[str]:
         """
         Returns:
             Data directory in form YYYY-MM-DD/"ACTIVE"_HH-MM-SS--target_node

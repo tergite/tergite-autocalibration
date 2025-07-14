@@ -1,0 +1,4 @@
+|Redis QOI name|
+|---------| 
+| clock_freqs:f12       |
+|spec:spec_ampl_12_optimal      |

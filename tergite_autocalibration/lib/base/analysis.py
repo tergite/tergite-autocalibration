@@ -57,7 +57,7 @@ class BaseAnalysis(ABC):
         self._qoi = value
 
     @abstractmethod
-    def plotter(self, ax: "plt.Axes"):
+    def plotter(self, ax: "plt.Axes") -> None:
         """
         Plot the fitted values from the analysis
 
@@ -65,7 +65,7 @@ class BaseAnalysis(ABC):
             ax: The axis object from matplotlib to be plotted
 
         Returns:
-            None, will just plot the fitted values
+            None: This will just plot the fitted values
 
         """
 

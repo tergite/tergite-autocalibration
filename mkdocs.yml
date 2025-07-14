@@ -1,0 +1,173 @@
+# MkDocs configuration file for Chalmers Qubit Simulator documentation
+# This configuration sets up a Material Design themed documentation site
+
+# Basic site information
+site_name: Tergite Autocalibration
+site_description: "A commandline application to calibrate the WACQT quantum computers automatically."
+site_url: "https://tergite.github.io/tergite-autocalibration/"
+repo_url: "https://github.com/tergite/tergite-autocalibration"
+repo_name: "tergite/tergite-autocalibration"
+
+docs_dir: "docs"  # Source directory for documentation files
+site_dir: "site"  # Output directory for built site
+
+# Navigation structure - defines the sidebar menu and page organization
+nav:
+- Introduction:
+  - Overview: index.md  # Landing page
+- User Guide: 
+  - Getting Started: user-guide/getting_started.md 
+  - Configuration Files: user-guide/configuration_files.md 
+  - Operation: user-guide/operation.md
+- Node Library:
+  - Overview: node-library/available_nodes.md 
+  - Nodes: node-library/nodes/
+- Developer Guide:
+  - Introduction: developer-guide/developer_guide.md
+  - Node Classes: developer-guide/node_classes.md
+  - Create a new node: developer-guide/new_node_creation.md
+  - Unit tests: developer-guide/unit_tests.md
+  - Logging: developer-guide/logging.md
+  - Debugging: developer-guide/debugging.md
+  - Writing documentation: developer-guide/writing_documentation.md
+- API Reference: reference/ # API documentation page
+- Troubleshooting: troubleshooting.md
+
+# Theme configuration using Material Design
+theme:
+  name: material  # Uses mkdocs-material theme
+  language: en
+  logo: assets/logo.svg # Logo for the site
+  palette:
+    # Three-way color scheme toggle (auto/light/dark)
+    # Palette toggle for automatic mode (follows system preference)
+    - media: "(prefers-color-scheme)"
+      primary: grey  # Primary color for headers, links, etc.
+      accent: blue   # Accent color for highlights
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default  # Light color scheme
+      primary: grey
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Palette toggle for dark mode  
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate    # Dark color scheme
+      primary: grey
+      accent: blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+  
+  # Feature flags to enable various UI enhancements
+  features:
+    - content.code.copy          # Add copy button to code blocks
+    - search.suggest             # Show search suggestions
+    - search.highlight           # Highlight search terms in results
+    - content.tabs.link          # Link content tabs across pages
+    - navigation.indexes         # Enable navigation indexes
+    #- navigation.expand         # Expand navigation by default
+    - navigation.path            # Show full paths in navigation
+    #- navigation.sections       # Group navigation into sections
+    - navigation.tabs            # Show top-level navigation as tabs
+    - navigation.tabs.sticky     # Keep navigation tabs visible when scrolling
+    - navigation.top             # Add "back to top" button
+    - toc.follow                 # Highlight current section in table of contents
+    #- toc.integrate             # Integrate table of contents into content
+
+# Plugin configuration
+plugins:
+  - search  # Enable search functionality
+  - mkdocs-jupyter:
+      execute: false
+      include: ["*.ipynb"] # Default: ["*.py", "*.ipynb"]
+      include_requirejs: true
+      custom_mathjax_url: "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML-full,Safe"
+
+  - gen-files:
+      scripts:
+        - docs/scripts/gen_ref_pages.py  # or any other name or path
+
+  - literate-nav:
+      nav_file: SUMMARY.md
+  
+  # API documentation generation from Python docstrings
+  - mkdocstrings:
+      default_handler: python  # Use Python handler for docstring parsing
+      handlers:
+        python:
+          paths: ["tergite_autocalibration"]  # Scan this directory for Python modules
+          # External inventory files for cross-references
+          inventories:
+            - https://docs.python.org/3/objects.inv          # Python standard library
+          
+          # Docstring processing options
+          options:
+            docstring_style: google          # Use Google docstring format
+            filters: ["!^_"]                  # Exclude private members (starting with _)
+            heading_level: 2                 # Start API headings at H2 level
+            inherited_members: true          # Include inherited class members
+            merge_init_into_class: true      # Show __init__ method in class docs
+            preload_modules: [mkdocstrings]  # Preload these modules
+            separate_signature: true         # Show method signatures separately
+            show_root_heading: true          # Show the main object heading
+            show_root_full_path: true        # Show full Python path in headings
+            show_bases: true                 # Show parent classes for inheritance
+            show_source: false               # Don't include source code
+            show_signature_annotations: true # Show type annotations in signatures
+            show_symbol_type_heading: true   # Show if symbol is class/function/etc.
+            show_symbol_type_toc: true       # Include symbol types in TOC
+            signature_crossrefs: true        # Create links in signatures
+            summary: true                    # Show summary line from docstrings
+            unwrap_annotated: true           # Unwrap typing.Annotated types
+
+# Markdown extensions for enhanced functionality
+markdown_extensions:
+  - footnotes  # Enable footnote syntax
+  
+  # MathJax support for mathematical expressions
+  - pymdownx.arithmatex:
+      generic: true  # Use generic math delimiters
+  
+  # Code syntax highlighting
+  - pymdownx.highlight:
+      anchor_linenums: true      # Add anchors to line numbers
+      line_spans: __span         # Wrap lines in spans for styling
+      pygments_lang_class: true  # Add language class to code blocks
+      linenums: true             # Show line numbers by default
+  
+  - pymdownx.inlinehilite  # Inline code highlighting
+  - pymdownx.snippets      # Include external code snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  
+  # Image and HTML enhancements
+  - attr_list   # Add attributes to elements (for image alignment, etc.)
+  - md_in_html  # Allow Markdown inside HTML tags
+
+# Footer copyright notice
+copyright: Copyright &copy; 2025
+
+# Additional site configuration
+extra:
+  social:
+    # Social media links in footer
+    - icon: fontawesome/brands/github
+      link: https://github.com/tergite/tergite-autocalibration
+
+# JavaScript files for enhanced functionality
+extra_javascript:
+  - javascripts/mathjax.js  # Custom MathJax configuration
+  - https://polyfill.io/v3/polyfill.min.js?features=es6  # ES6 polyfills
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js  # MathJax library
+
+extra_css:
+  - stylesheets/extra.css

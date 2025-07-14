@@ -166,8 +166,11 @@ class BaseNode(abc.ABC):
 
         Args:
             compiled_schedule (CompiledSchedule): The compiled schedule to execute.
-            data_path (pathlib.Path): Path where the dataset will be saved.
+            cluster_status (MeasurementMode.real): The status of the measurement mode.
             measurement (tuple): Tuple of (current_measurement, total_measurements).
+
+        Returns:
+            xarray.Dataset: The dataset containing the measurement results.
         """
 
         schedule_duration = self._calculate_schedule_duration(compiled_schedule)
