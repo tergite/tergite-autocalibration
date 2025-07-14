@@ -176,7 +176,7 @@ In this section, we will go through the specific processes that are important wh
 
 ### Installation of MkDocs and dependencies
 
-In the `tergite-autocalibration` repository, we are now using [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) to build and render the documentation. MkDocs is a static site generator that's easy to use and supports a wide range of features via plugins.
+In the `tergite-autocalibration` repository, we are using [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) to build and render the documentation. MkDocs is a static site generator that's easy to use and supports a wide range of features via plugins.
 
 To install it, use the following command in your terminal:
 
@@ -194,11 +194,9 @@ This will open a browser window with the rendered documentation.
 
 ### Structure of the documentation
 
-At the top level of the repository, you will find a folder called `mkdocs`, which now contains the source markdown files and Jupyter notebooks that make up the documentation. These are the files you edit.
+At the top level of the repository, you will find a folder called `docs`, which now contains the source markdown files and Jupyter notebooks that make up the documentation. These are the files you edit.
 
-The old `docs_editable/` folder and `docs/` output folder from Quarto are no longer used. MkDocs builds the output into the `site/` folder automatically.
-
-The `mkdocs` folder is structured like this:
+The `docs` folder is structured like this:
 
 - `assets`: Contains images
 - `stylesheets`: Contains custom CSS stylesheets
