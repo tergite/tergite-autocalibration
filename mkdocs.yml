@@ -8,7 +8,7 @@ site_url: "https://tergite.github.io/tergite-autocalibration/"
 repo_url: "https://github.com/tergite/tergite-autocalibration"
 repo_name: "tergite/tergite-autocalibration"
 
-docs_dir: "mkdocs"  # Source directory for documentation files
+docs_dir: "docs"  # Source directory for documentation files
 site_dir: "site"  # Output directory for built site
 
 # Navigation structure - defines the sidebar menu and page organization
@@ -91,7 +91,7 @@ plugins:
 
   - gen-files:
       scripts:
-        - mkdocs/scripts/gen_ref_pages.py  # or any other name or path
+        - docs/scripts/gen_ref_pages.py  # or any other name or path
 
   - literate-nav:
       nav_file: SUMMARY.md
