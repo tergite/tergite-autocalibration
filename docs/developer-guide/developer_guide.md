@@ -4,7 +4,7 @@ This and the following sections provide information on how to develop code in te
 
 ## Additional installations
 
-Consider installing Quarto and other packages before you create your coda environment to have the path correctly
+Consider installing other packages before you create your coda environment to have the path correctly
 initialised in your environment.
 This is not necessary, but it can simplify operations later, especially using VSCode.
 
