@@ -39,7 +39,8 @@ from tergite_autocalibration.utils.dto.qoi import QOI
 
 class QubitSpectroscopyVsCurrentQubitAnalysis(BaseQubitAnalysis):
     """
-    This class analyzes the qubit frequencies as obtained from the scpescroscopies to find crossing currents.
+    This class analyzes the qubit frequencies as obtained from the scpescroscopies
+    to find crossing currents.
     """
 
     def __init__(self, name, redis_fields):
@@ -76,7 +77,7 @@ class QubitSpectroscopyVsCurrentQubitAnalysis(BaseQubitAnalysis):
         self.dc_currents = self.dataset[self.current_coord]
         self.frequencies = self.dataset[self.frequencies_coord]
 
-        for i, current in enumerate(self.dc_currents.values):
+        for current in self.dc_currents.values:
             ds = self.dataset.sel({self.current_coord: current})
             # Optionally drop the 'dc_currentsq09_q10' if it's not needed
             for coord in self.magnitudes.coords:
@@ -191,15 +192,15 @@ class QubitSpectroscopyVsCurrentQubitAnalysis(BaseQubitAnalysis):
 
         self.magnitudes[self.data_var].plot(ax=ax, x=self.current_coord)
         ax.scatter(self.detected_currents, self.detected_frequencies, s=52, c="blue")
-        ax.vlines(
-            self.crossing_currents[0],
-            min(self.frequencies),
-            max(self.frequencies),
-            color="grey",
-            linestyles="dashed",
-            linewidth=2,
-            alpha=0.8,
-        )
+        if self.n_crossing > 0:
+            ax.vlines(
+                self.crossing_currents[0],
+                min(self.frequencies),
+                max(self.frequencies),
+                color="grey",
+                linestyles="dashed",
+                linewidth=2,
+            )
         if self.n_crossing > 1:
             ax.vlines(
                 self.crossing_currents[1],
@@ -207,6 +208,7 @@ class QubitSpectroscopyVsCurrentQubitAnalysis(BaseQubitAnalysis):
                 max(self.frequencies),
                 color="grey",
                 linestyles="dashed",
+                linewidth=2,
             )
         if self.n_crossing > 2:
             ax.vlines(
@@ -215,6 +217,7 @@ class QubitSpectroscopyVsCurrentQubitAnalysis(BaseQubitAnalysis):
                 max(self.frequencies),
                 color="grey",
                 linestyles="dashed",
+                linewidth=2,
             )
         if self.n_crossing > 3:
             ax.vlines(
@@ -223,6 +226,7 @@ class QubitSpectroscopyVsCurrentQubitAnalysis(BaseQubitAnalysis):
                 max(self.frequencies),
                 color="grey",
                 linestyles="dashed",
+                linewidth=2,
             )
         # ax.ylim([min(self.peak), max(self.peak)])
         ax.xaxis.set_major_locator(MaxNLocator(nbins=5))
@@ -269,7 +273,7 @@ class ResonatorSpectroscopyVsCurrentQubitAnalysis(BaseQubitAnalysis):
         self.dc_currents = self.dataset[self.current_coord]
         self.frequencies = self.dataset[self.frequencies_coord]
 
-        for i, current in enumerate(self.dc_currents.values):
+        for current in self.dc_currents.values:
             ds = self.dataset.sel({self.current_coord: current})
 
             for coord in self.magnitudes.coords:
@@ -402,6 +406,7 @@ class ResonatorSpectroscopyVsCurrentQubitAnalysis(BaseQubitAnalysis):
                 max(self.frequencies),
                 color="grey",
                 linestyles="dashed",
+                linewidth=2,
             )
         if self.n_crossing > 2:
             ax.vlines(
@@ -410,6 +415,7 @@ class ResonatorSpectroscopyVsCurrentQubitAnalysis(BaseQubitAnalysis):
                 max(self.frequencies),
                 color="grey",
                 linestyles="dashed",
+                linewidth=2,
             )
         if self.n_crossing > 3:
             ax.vlines(
@@ -418,6 +424,7 @@ class ResonatorSpectroscopyVsCurrentQubitAnalysis(BaseQubitAnalysis):
                 max(self.frequencies),
                 color="grey",
                 linestyles="dashed",
+                linewidth=2,
             )
         ax.set_ylim([min(self.detected_frequencies), max(self.detected_frequencies)])
         ax.set_xlabel("Coupler current [A]")
@@ -443,7 +450,6 @@ class QubitSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
             if "frequencies" in coord:
                 self.frequencies = coord
             elif "currents" in coord:
-                self.currents = coord
                 self.current_coord = coord
 
         self.q1_analysis = QubitSpectroscopyVsCurrentQubitAnalysis(
@@ -453,7 +459,7 @@ class QubitSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
             self.name, self.redis_fields
         )
 
-        resonator_crossing_points_q1 = self.get_resonator_crossing_points(
+        resonator_crossing_points_q1 = self._get_resonator_crossing_points(
             self.coupler, self.name_qubit_1
         )
 
@@ -468,7 +474,7 @@ class QubitSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
 
         q1result = self.q1_analysis.process_qubit(ds1, self.name_qubit_1)
 
-        resonator_crossing_points_q2 = self.get_resonator_crossing_points(
+        resonator_crossing_points_q2 = self._get_resonator_crossing_points(
             self.coupler, self.name_qubit_2
         )
         self.q2_analysis.resonator_crossing_points = resonator_crossing_points_q2
@@ -489,7 +495,7 @@ class QubitSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
         qoi = QOI(analysis_result, analysis_succesful)
         return qoi
 
-    def get_resonator_crossing_points(self, coupler, qubit) -> List[float]:
+    def _get_resonator_crossing_points(self, coupler, qubit) -> List[float]:
         if REDIS_CONNECTION.hexists(
             f"couplers:{coupler}:{qubit}", "resonator_crossing_points"
         ):
@@ -501,10 +507,10 @@ class QubitSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
                 crossing_points = list(
                     map(float, ast.literal_eval(crossing_points_str))
                 )
-            except (ValueError, SyntaxError):
+            except (ValueError, SyntaxError) as e:
                 raise ValueError(
                     f"Invalid format for crossing points: {crossing_points_str}"
-                )
+                ) from e
         else:
             crossing_points = []
 
@@ -577,7 +583,6 @@ class ResonatorSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
             if "frequencies" in coord:
                 self.frequencies = coord
             elif "currents" in coord:
-                self.currents = coord
                 self.current_coord = coord
 
         self.q1_analysis = ResonatorSpectroscopyVsCurrentQubitAnalysis(

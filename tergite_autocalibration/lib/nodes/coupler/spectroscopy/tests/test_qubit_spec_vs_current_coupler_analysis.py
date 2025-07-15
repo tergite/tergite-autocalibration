@@ -230,6 +230,33 @@ def test_coupler_plot_is_created(setup_q06_q07_data):
         assert img.format == "PNG", "File should be a PNG image"
 
 
+@pytest.fixture(autouse=False)
+def setup_q16_q17_data():
+    dataset_path = (
+        Path(__file__).parent
+        / "data"
+        / "dataset_qubit_spectroscopy_vs_current_no_crossings.hdf5"
+    )
+    ds = xr.open_dataset(dataset_path)
+    coupler = "q16_q17"
+    ds = xr.merge(ds[var] for var in ["yq16", "yq17"])
+    ds.attrs["coupler"] = coupler
+    return ds, coupler
+
+
+def test_no_crossings_for_q16_q17(
+    setup_q16_q17_data: tuple[xr.Dataset, str, ndarray, ndarray],
+):
+    ds, coupler = setup_q16_q17_data
+    a = QubitSpectroscopyVsCurrentCouplerAnalysis("name", ["crossing_points"])
+    qoi = a.process_coupler(ds, coupler)
+
+    q16_crossings = getCrossingForQubit(qoi, "q16")
+    q17_crossings = getCrossingForQubit(qoi, "q17")
+    assert q16_crossings == pytest.approx([0.000975], abs=1e-6)
+    assert len(q17_crossings) == 0
+
+
 @with_os_env({"DATA_DIR": str(Path(__file__).parent / "results")})
 def test_qubit_spectroscopies_for_coupler_are_created(setup_q06_q07_data):
     matplotlib.use("Agg")
@@ -259,6 +286,36 @@ def test_qubit_spectroscopies_for_coupler_are_created(setup_q06_q07_data):
 
     figure_2_path = (
         os.environ["DATA_DIR"] + "/qs_vs_current_q06_q07_q07_spectroscopies.png"
+    )
+    assert os.path.exists(figure_2_path)
+
+    with Image.open(figure_2_path) as img:
+        assert img.format == "PNG", "File should be a PNG image"
+
+
+@with_os_env({"DATA_DIR": str(Path(__file__).parent / "results")})
+def test_qubit_spectroscopies_for_coupler_are_created_when_no_crossings(
+    setup_q16_q17_data,
+):
+    matplotlib.use("Agg")
+    ds, coupler = setup_q16_q17_data
+    a = QubitSpectroscopyVsCurrentCouplerAnalysis("qs_vs_current", ["crossing_points"])
+    qoi = a.process_coupler(ds, coupler)
+
+    path = Path(os.environ["DATA_DIR"])
+    a.plot_spectroscopies(path)
+
+    figure_1_path = (
+        os.environ["DATA_DIR"] + "/qs_vs_current_q16_q17_q16_spectroscopies.png"
+    )
+    assert os.path.exists(figure_1_path)
+    from PIL import Image
+
+    with Image.open(figure_1_path) as img:
+        assert img.format == "PNG", "File should be a PNG image"
+
+    figure_2_path = (
+        os.environ["DATA_DIR"] + "/qs_vs_current_q16_q17_q17_spectroscopies.png"
     )
     assert os.path.exists(figure_2_path)
 
