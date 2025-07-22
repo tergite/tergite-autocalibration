@@ -272,7 +272,11 @@ class NodeManager:
         )
 
         # Check Redis if node is calibrated
-        status: "DataStatus" = self._check_calibration_status_redis(node_name)
+        if ignore_spec:
+            status = DataStatus.out_of_spec
+            logger.info(f"Ignoring calibration status for {node_name}")
+        else:
+            status: "DataStatus" = self._check_calibration_status_redis(node_name)
 
         populate_node_parameters(
             node_name,
@@ -283,7 +287,7 @@ class NodeManager:
         )
 
         # Log status
-        if status == DataStatus.in_spec and not ignore_spec:
+        if status == DataStatus.in_spec:
             logger.info(
                 f" \u2714  {Fore.GREEN}{Style.BRIGHT}Node {node_name} in spec{Style.RESET_ALL}"
             )
@@ -321,6 +325,7 @@ class NodeManager:
 
         # Update node samplespace
         if node.name in self.config.user_samplespace:
+            logger.info(f"Using user_samplespace.py for {node.name}")
             self.update_to_user_samplespace(node, self.config.user_samplespace)
 
         # Since the node is respomsible for compiling its schedule
