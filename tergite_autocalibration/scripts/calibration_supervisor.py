@@ -260,7 +260,7 @@ class NodeManager:
     def topo_order(target_node: str):
         return filtered_topological_order(target_node)
 
-    def inspect_node(self, node_name: str):
+    def inspect_node(self, node_name: str, *, ignore_spec: bool = False):
         logger.info(f"Inspecting node {node_name}")
 
         populate_quantities_of_interest(
@@ -283,7 +283,7 @@ class NodeManager:
         )
 
         # Log status
-        if status == DataStatus.in_spec:
+        if status == DataStatus.in_spec and not ignore_spec:
             logger.info(
                 f" \u2714  {Fore.GREEN}{Style.BRIGHT}Node {node_name} in spec{Style.RESET_ALL}"
             )
@@ -375,10 +375,12 @@ class CalibrationSupervisor:
         self.node_manager = NodeManager(self.lab_ic, config=config)
         self.topo_order = self.node_manager.topo_order(self.config.target_node_name)
 
-    def calibrate_system(self):
+    def calibrate_system(self, node_name: str | None = None, ignore_spec: bool = False):
         logger.info("Starting System Calibration")
         number_of_qubits = len(self.config.qubits)
-        draw_arrow_chart(f"Qubits: {number_of_qubits}", self.topo_order)
+
+        calibration_nodes = self.topo_order if node_name is None else [node_name]
+        draw_arrow_chart(f"Qubits: {number_of_qubits}", calibration_nodes)
 
         # The node manager provides every node with access to the DACS
         self.node_manager.spi_manager = self.hardware_manager.create_spi(
@@ -392,8 +394,8 @@ class CalibrationSupervisor:
             os.path.join(ENV.config_dir, "configuration.meta.toml")
         ).copy(str(CONFIG.run.log_dir))
 
-        for calibration_node in self.topo_order:
-            self.node_manager.inspect_node(calibration_node)
+        for calibration_node in calibration_nodes:
+            self.node_manager.inspect_node(calibration_node, ignore_spec=ignore_spec)
             logger.info(f"{calibration_node} node is completed")
 
     def rerun_analysis(self):
