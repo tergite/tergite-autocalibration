@@ -82,7 +82,7 @@ def start(
         bool,
         typer.Option(
             "--ignore-spec",
-            help="Use to --ignore-spec to force recalibration.",
+            help="Use --ignore-spec to force recalibration.",
         ),
     ] = False,
     push: Annotated[
