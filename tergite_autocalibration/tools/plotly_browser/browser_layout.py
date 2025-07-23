@@ -1,0 +1,119 @@
+from dash import dcc, html
+
+
+def generate_selection_layout(folder_structure, index=""):
+
+    outer_selection_DIV = html.Div(
+        [
+            html.H2("Select Date:"),
+            dcc.Dropdown(
+                id={"type": "outer-selector", "index": index},
+                options=[
+                    {"label": folder, "value": folder}
+                    for folder in folder_structure.keys()
+                ],
+                value=None,
+                clearable=False,
+            ),
+        ],
+        style={"marginBottom": "20px"},
+    )
+
+    intermediate_selection_DIV = html.Div(
+        [
+            html.H2("Select the calibration chain:"),
+            dcc.Dropdown(
+                id={"type": "intermediate-selector", "index": index},
+                value=None,
+                clearable=False,
+            ),
+        ],
+        style={"marginBottom": "20px"},
+    )
+
+    inner_selection_DIV = html.Div(
+        [
+            html.H2("Select a Node Measurement:"),
+            dcc.Dropdown(
+                id={"type": "inner-selector", "index": index},
+                value=None,
+                clearable=False,
+            ),
+        ],
+        style={"marginBottom": "20px"},
+    )
+
+    image_display_DIV = html.Div(
+        [
+            # html.H2("Image Display"),
+            # html.Div(id={"type": "image-container", "index": index}),
+            dcc.Tabs(
+                id={"type": "tabs", "index": index},
+                value="image",
+                children=[
+                    dcc.Tab(
+                        label="Preview Image Display",
+                        value="image",
+                        style={"backgroundColor": "#f0f0f0"},
+                    ),
+                    dcc.Tab(
+                        label="Device JSON Display",
+                        value="json",
+                        style={"backgroundColor": "#c9c9c9"},
+                    ),
+                ],
+            ),
+            html.Div(id={"type": "tab-content", "index": index}),
+        ],
+        style={"marginTop": "20px"},
+    )
+
+    element_selector_DIV = html.Div(
+        [
+            html.H2("Select Elements:"),
+            dcc.Dropdown(
+                id={"type": "element-selector", "index": index},
+                multi=True,
+                clearable=False,
+            ),
+        ],
+        style={"marginTop": "20px"},
+    )
+
+    y_dim_selector_DIV = html.Div(
+        [
+            html.H2("Y Dimension Selector:"),
+            dcc.Dropdown(id={"type": "y-dim-selector", "index": index}, multi=False),
+        ],
+        style={"marginTop": "20px"},
+    )
+    slice_display_DIV = html.Div(
+        [
+            html.H2("Dynamic Plot Display"),
+            html.Div(
+                id={"type": "dataset-container", "index": index},
+                style={"display": "flex", "gap": "20px", "flexWrap": "wrap"},
+            ),
+        ],
+        style={"marginTop": "20px"},
+    )
+
+    selection_layout = html.Div(
+        [
+            dcc.Store(id={"type": "full-dataset", "index": index}),
+            outer_selection_DIV,
+            intermediate_selection_DIV,
+            inner_selection_DIV,
+            image_display_DIV,
+            element_selector_DIV,
+            y_dim_selector_DIV,
+            slice_display_DIV,
+        ],
+        style={
+            "width": "100%" if index == "" else "45%",
+            "display": "inline-block",
+            "verticalAlign": "top",
+            "marginLeft": "20px",
+        },
+    )
+    return selection_layout
