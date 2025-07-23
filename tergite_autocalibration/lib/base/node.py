@@ -429,10 +429,6 @@ class CouplerNode(BaseNode, abc.ABC):
     def precompile(self, schedule_samplespace: dict) -> CompiledSchedule:
         constants.GRID_TIME_TOLERANCE_TIME = 5e-2
 
-        # TODO: put 'tof' out of its misery
-        if self.name == "tof":
-            return None, 1
-
         transmons = self.device_manager.transmons
         edges = self.device_manager.edges
         measurement_class = self.measurement_obj(transmons, edges)
