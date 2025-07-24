@@ -36,7 +36,7 @@ class TestRabiQubitAnalysis(unittest.TestCase):
         result_values = qoi.analysis_result
         self.assertIsInstance(qoi, QOI)
         for quantity in result_values:
-            self.assertIsInstance(result_values[quantity]["value"], np.float64)
+            self.assertIsInstance(result_values[quantity]["value"], float)
         assert (
             len(result_values) == 1
         ), f"The dataset should contain one element {len(dataset)}"
@@ -51,7 +51,7 @@ class TestRabiQubitAnalysis(unittest.TestCase):
         result_values = qoi.analysis_result
         self.assertIsInstance(qoi, QOI)
         for quantity in result_values:
-            self.assertIsInstance(result_values[quantity]["value"], np.float64)
+            self.assertIsInstance(result_values[quantity]["value"], float)
         assert (
             len(result_values) == 1
         ), f"The dataset should contain one element {len(dataset)}"

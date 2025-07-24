@@ -38,7 +38,7 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
 
         self.assertIsInstance(qoi, QOI)
         for quantity in result_values:
-            self.assertIsInstance(result_values[quantity]["value"], np.float64)
+            self.assertIsInstance(result_values[quantity]["value"], float)
         assert (
             len(result_values) == 3
         ), f"The dataset should contain three elements {len(dataset)}"
