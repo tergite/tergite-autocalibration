@@ -15,7 +15,6 @@ import unittest
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import numpy as np
 import xarray as xr
 
 from tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.analysis import (
