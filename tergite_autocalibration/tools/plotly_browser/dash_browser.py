@@ -30,11 +30,12 @@ from browser_utils import scan_folders
 
 from browser_layout import generate_selection_layout
 
-folder_structure = scan_folders()
+from tergite_autocalibration.config.globals import DATA_DIR
+
+folder_structure = scan_folders(DATA_DIR)
 
 app = dash.Dash(__name__)
 
-from tergite_autocalibration.config.globals import DATA_DIR
 
 app.layout = html.Div(
     [
@@ -108,7 +109,7 @@ def update_inner_folders(selected_intermediate, selected_outer, folder_data):
     prevent_initial_call=True,
 )
 def refresh_folder_structure(n_clicks):
-    return scan_folders()
+    return scan_folders(DATA_DIR)
 
 
 # @app.callback(
