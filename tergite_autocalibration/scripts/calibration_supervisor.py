@@ -202,7 +202,16 @@ def _set_output_attenuations(cluster, connectivity, settings):
         ["coupler", "resonator", "qubit"], [":fl", ":res", ":mw"]
     ):
         for name, att in settings[device_type].items():
-            ports = connectivity[name + quantify_port_suffix]
+            quantify_port = name + quantify_port_suffix
+
+            if quantify_port not in connectivity.keys():
+                logger.info(
+                    f"Skipping setting attenuation for '{name}', as it is "
+                    "not in the connectivity graph of the cluster_config.json."
+                )
+                continue
+
+            ports = connectivity[quantify_port]
             assert len(ports) == 1
             port_str = next(iter(ports))
 
