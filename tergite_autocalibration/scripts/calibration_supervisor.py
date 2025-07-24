@@ -206,7 +206,7 @@ def _set_output_attenuations(cluster, connectivity, settings):
 
             if quantify_port not in connectivity.keys():
                 logger.warning(
-                    f"Skipping setting attenuation for '{name}', as it is "
+                    f"Skipping setting attenuation for '{quantify_port}', as it is "
                     "not in the connectivity graph of the cluster_config.json."
                 )
                 continue
