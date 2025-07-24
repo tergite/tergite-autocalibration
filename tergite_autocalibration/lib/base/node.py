@@ -395,7 +395,7 @@ class CouplerNode(BaseNode, abc.ABC):
         super().__init__(name)
         self.couplers = couplers
         self.edges = couplers
-        self.all_qubits = self.get_coupled_qubits()
+        self.all_qubits = sorted(set(self.get_coupled_qubits()))
         self.plots_per_qubit = 1  # can be 0 or 1 or 2
 
         if self.coupler_qois is not None:
@@ -408,7 +408,6 @@ class CouplerNode(BaseNode, abc.ABC):
         self.device_manager = DeviceConfiguration(self.all_qubits, self.couplers)
         self.device = self.device_manager.configure_device(self.name)
 
-        self.validate()
 
     def get_coupled_qubits(self) -> list:
         coupled_qubits = []

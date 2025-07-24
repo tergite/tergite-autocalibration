@@ -71,26 +71,6 @@ class QubitSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNode):
     def pre_measurement_operation(self, reduced_ext_space):
         self.spi_manager.set_dac_current(reduced_ext_space["dc_currents"])
 
-    def precompile(self, schedule_samplespace: dict) -> CompiledSchedule:
-        constants.GRID_TIME_TOLERANCE_TIME = 5e-2
-
-        transmons = self.device_manager.transmons
-
-        measurement_class = self.measurement_obj(transmons)
-        schedule = measurement_class.schedule_function(
-            **schedule_samplespace, **self.schedule_keywords
-        )
-
-        # TODO: Probably the compiler desn't need to be created every time self.precompile() is called.
-        compiler = SerialCompiler(name=f"{self.name}_compiler")
-
-        compilation_config = self.device.generate_compilation_config()
-        logger.info("Starting Compiling")
-        compiled_schedule = compiler.compile(
-            schedule=schedule, config=compilation_config
-        )
-
-        return compiled_schedule
 
     def final_operation(self):
         logger.info("Final Operation")
