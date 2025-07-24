@@ -71,7 +71,6 @@ class QubitSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNode):
     def pre_measurement_operation(self, reduced_ext_space):
         self.spi_manager.set_dac_current(reduced_ext_space["dc_currents"])
 
-
     def final_operation(self):
         logger.info("Final Operation")
         currents = {}

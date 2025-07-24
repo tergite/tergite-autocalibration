@@ -408,7 +408,6 @@ class CouplerNode(BaseNode, abc.ABC):
         self.device_manager = DeviceConfiguration(self.all_qubits, self.couplers)
         self.device = self.device_manager.configure_device(self.name)
 
-
     def get_coupled_qubits(self) -> list:
         coupled_qubits = []
         for coupler in self.couplers:
