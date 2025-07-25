@@ -75,9 +75,16 @@ def start(
         typer.Option(
             "--node-name",
             "-n",
-            help="Use to specify the node type to rerun, only works with -r option",
+            help="Use --node-name (or -n) to specify the node to run calibration for. If -r is specified, only analysis is run.",
         ),
     ] = None,
+    ignore_spec: Annotated[
+        bool,
+        typer.Option(
+            "--ignore-spec",
+            help="Use --ignore-spec to force recalibration.",
+        ),
+    ] = False,
     push: Annotated[
         bool,
         typer.Option(
@@ -172,7 +179,7 @@ def start(
     if cluster_mode is MeasurementMode.re_analyse:
         supervisor.rerun_analysis()
     else:
-        supervisor.calibrate_system()
+        supervisor.calibrate_system(node_name=node_name, ignore_spec=ignore_spec)
 
     # Push the results of the calibration to MSS
     if push:

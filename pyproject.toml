@@ -27,7 +27,8 @@ authors = [
   { name = "Tong Liu", email = "liuto@chalmers.se" },
   { name = "Joel Sandås", email = "sandas@chalmers.se" },
   { name = "Pontus Vikstål", email = "pontus.vikstal@chalmersnextlabs.se" },
-  { name = "Michele Faucci Giannelli", email = "faucci@chalmers.se" }
+  { name = "Michele Faucci Giannelli", email = "faucci@chalmers.se" },
+  { name = "Axel Erik Andersson", email = "axean@chalmers.se" }
 ]
 maintainers = [
   { name = "Chalmers Next Labs AB", email = "contact@quantum.chalmersnextlabs.se" }
