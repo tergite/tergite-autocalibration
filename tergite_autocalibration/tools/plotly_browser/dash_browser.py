@@ -25,10 +25,10 @@ import threading
 from dash.dependencies import MATCH
 from dash_renderjson import DashRenderjson
 
-
-from browser_utils import scan_folders
-
-from browser_layout import generate_selection_layout
+from tergite_autocalibration.tools.plotly_browser.browser_utils import scan_folders
+from tergite_autocalibration.tools.plotly_browser.browser_layout import (
+    generate_selection_layout,
+)
 
 from tergite_autocalibration.config.globals import DATA_DIR
 
@@ -44,16 +44,6 @@ app.layout = html.Div(
         html.Button("Refresh Folder Structure", id="refresh-button", n_clicks=0),
         html.Button("Compare", id="compare-button", n_clicks=0),
         html.Div(id="selection-panel"),
-        # html.Div(
-        #     [
-        #         html.H2("HDF5 File"),
-        #         html.Div(
-        #             id="hdf5-container",
-        #             style={"marginTop": "10px", "fontWeight": "bold"},
-        #         ),
-        #     ],
-        #     style={"marginTop": "20px"},
-        # ),
     ]
 )
 
@@ -189,11 +179,6 @@ def update_tab(tab, outer, inter, inner):
     return "Invalid tab."
 
 
-#
-#
-#
-
-
 @app.callback(
     [
         # Output("hdf5-container", "children"),
@@ -204,7 +189,7 @@ def update_tab(tab, outer, inter, inner):
     Input({"type": "intermediate-selector", "index": MATCH}, "value"),
     Input({"type": "outer-selector", "index": MATCH}, "value"),
 )
-def display_hdf5(selected_inner, selected_intermediate, selected_outer):
+def display_element_selector(selected_inner, selected_intermediate, selected_outer):
     if selected_outer and selected_intermediate and selected_inner:
 
         inner_path = os.path.join(
