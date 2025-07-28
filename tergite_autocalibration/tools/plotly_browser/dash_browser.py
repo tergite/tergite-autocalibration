@@ -102,42 +102,6 @@ def refresh_folder_structure(n_clicks):
     return scan_folders(DATA_DIR)
 
 
-# @app.callback(
-#     Output({"type": "image-container", "index": MATCH}, "children"),
-#     Input({"type": "inner-selector", "index": MATCH}, "value"),
-#     Input({"type": "intermediate-selector", "index": MATCH}, "value"),
-#     Input({"type": "outer-selector", "index": MATCH}, "value"),
-# )
-# def display_preview_images(selected_inner, selected_intermediate, selected_outer):
-#     if selected_outer and selected_intermediate and selected_inner:
-#         inner_path = os.path.join(
-#             ".", selected_outer, selected_intermediate, selected_inner
-#         )
-#         image_paths = [
-#             os.path.join(inner_path, f)
-#             for f in os.listdir(inner_path)
-#             if f.endswith(".png")
-#         ]
-#
-#         image_elements = []
-#         for image_path in image_paths:
-#             encoded_image = base64.b64encode(open(image_path, "rb").read()).decode()
-#             image_elements.append(
-#                 html.Img(
-#                     src=f"data:image/png;base64,{encoded_image}",
-#                     style={"max-width": "100%", "height": "auto", "margin": "10px"},
-#                 )
-#             )
-#
-#         return image_elements if image_elements else "No images found in the folder."
-#     return "Select an inner folder to view its images."
-
-
-#
-#
-#
-
-
 @app.callback(
     Output({"type": "tab-content", "index": MATCH}, "children"),
     Input({"type": "tabs", "index": MATCH}, "value"),
