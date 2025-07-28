@@ -11,24 +11,20 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import dash
-from dash import dcc, html
-from dash.dependencies import Input, Output, State
-import os
 import base64
 import json
-import xarray as xr
-import sys
+import os
+
+import dash
 import plotly.express as px
-import webbrowser
-import threading
+import xarray as xr
+from dash import dcc, html
+from dash.dependencies import Input, Output, State
 from dash.dependencies import MATCH
 from dash_renderjson import DashRenderjson
 
-
-from browser_utils import scan_folders
-
-from browser_layout import generate_selection_layout
+from tergite_autocalibration.tools.browser.layout import generate_selection_layout
+from tergite_autocalibration.tools.browser.utils import scan_folders
 
 folder_structure = scan_folders()
 
@@ -43,16 +39,6 @@ app.layout = html.Div(
         html.Button("Refresh Folder Structure", id="refresh-button", n_clicks=0),
         html.Button("Compare", id="compare-button", n_clicks=0),
         html.Div(id="selection-panel"),
-        # html.Div(
-        #     [
-        #         html.H2("HDF5 File"),
-        #         html.Div(
-        #             id="hdf5-container",
-        #             style={"marginTop": "10px", "fontWeight": "bold"},
-        #         ),
-        #     ],
-        #     style={"marginTop": "20px"},
-        # ),
     ]
 )
 
@@ -111,42 +97,6 @@ def refresh_folder_structure(n_clicks):
     return scan_folders()
 
 
-# @app.callback(
-#     Output({"type": "image-container", "index": MATCH}, "children"),
-#     Input({"type": "inner-selector", "index": MATCH}, "value"),
-#     Input({"type": "intermediate-selector", "index": MATCH}, "value"),
-#     Input({"type": "outer-selector", "index": MATCH}, "value"),
-# )
-# def display_preview_images(selected_inner, selected_intermediate, selected_outer):
-#     if selected_outer and selected_intermediate and selected_inner:
-#         inner_path = os.path.join(
-#             ".", selected_outer, selected_intermediate, selected_inner
-#         )
-#         image_paths = [
-#             os.path.join(inner_path, f)
-#             for f in os.listdir(inner_path)
-#             if f.endswith(".png")
-#         ]
-#
-#         image_elements = []
-#         for image_path in image_paths:
-#             encoded_image = base64.b64encode(open(image_path, "rb").read()).decode()
-#             image_elements.append(
-#                 html.Img(
-#                     src=f"data:image/png;base64,{encoded_image}",
-#                     style={"max-width": "100%", "height": "auto", "margin": "10px"},
-#                 )
-#             )
-#
-#         return image_elements if image_elements else "No images found in the folder."
-#     return "Select an inner folder to view its images."
-
-
-#
-#
-#
-
-
 @app.callback(
     Output({"type": "tab-content", "index": MATCH}, "children"),
     Input({"type": "tabs", "index": MATCH}, "value"),
@@ -186,11 +136,6 @@ def update_tab(tab, outer, inter, inner):
         return "No JSON file found."
 
     return "Invalid tab."
-
-
-#
-#
-#
 
 
 @app.callback(
@@ -329,9 +274,3 @@ def plot_y_slice(y_dim_value, selected_elements, dataset_json):
         return displays
     except Exception as e:
         return [f"Error plotting y slice: {e}"]
-
-
-if __name__ == "__main__":
-    port = int(sys.argv[1]) if len(sys.argv) > 1 else 8050
-    threading.Timer(0.5, lambda: webbrowser.open(f"http://localhost:{port}")).start()
-    app.run(debug=True, port=port, use_reloader=False)

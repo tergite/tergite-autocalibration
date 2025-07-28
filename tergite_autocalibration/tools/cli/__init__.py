@@ -91,21 +91,20 @@ def start(
         typer.Option(
             "--browser",
             is_flag=True,
-            help="Opens the quantifiles data browser in the background with live plotting enabled.",
+            help="Opens the data browser in the background with live plotting enabled.",
         ),
     ] = False,
 ):
     from ipaddress import ip_address, IPv4Address
-    from tergite_autocalibration.tools.quantifiles import quantifiles
 
-    from tergite_autocalibration.config.globals import DATA_DIR
     from tergite_autocalibration.config.globals import CLUSTER_IP
     from tergite_autocalibration.scripts.calibration_supervisor import (
         CalibrationSupervisor,
         CalibrationConfig,
     )
     from tergite_autocalibration.scripts.db_backend_update import update_mss
-    from tergite_autocalibration.config.globals import CONFIG
+    from tergite_autocalibration.config.globals import CONFIG, ENV
+    from tergite_autocalibration.tools.browser import start_browser
     from tergite_autocalibration.utils.backend.reset_redis_node import ResetRedisNode
     from tergite_autocalibration.utils.dto.enums import MeasurementMode
     from tergite_autocalibration.utils.io.dataset import scrape_and_copy_hdf5_files
@@ -157,10 +156,12 @@ def start(
     elif d:
         cluster_mode = MeasurementMode.dummy
 
-    # Start the quantifiles dataset browser in the background
+    # Start the data browser in the background
     if browser:
-        typer.echo("Starting dataset browser...")
-        proc = multiprocessing.Process(target=quantifiles, args=(DATA_DIR, True, 30))
+        typer.echo("Starting data browser...")
+        proc = multiprocessing.Process(
+            target=start_browser, args=(ENV.data_browser_host, ENV.data_browser_port)
+        )
         proc.start()
 
     config = CalibrationConfig(
@@ -278,47 +279,46 @@ def quickstart(
             toml_file.write(output)
 
 
-@cli.command(help="Open the dataset browser (quantifiles).")
+@cli.command(help="Open the data browser.")
 @suppress_logging
 def browser(
-    datadir: Annotated[
+    host: Annotated[
         str,
         typer.Option(
-            "--datadir",
-            help="Path to the data directory with your measurement results.",
+            "--host",
+            "-h",
+            help="Set the host for the browser to run, default is 127.0.0.1",
         ),
     ] = None,
-    liveplotting: Annotated[
-        bool,
+    port: Annotated[
+        str,
         typer.Option(
-            "--liveplotting",
-            is_flag=True,
-            help="Whether plots should be updated live during measurements.",
+            "--port",
+            "-p",
+            help="Set the port for the browser to run, default is 127.0.0.1",
         ),
-    ] = False,
-    log_level: Annotated[
-        int,
-        typer.Option(
-            "--log-level",
-            help="Sets the log level of the application.",
-        ),
-    ] = 30,
+    ] = None,
 ):
     """
-    This is to open the quantifiles databrowser.
-    This endpoint is essentially just a wrapper for the `quantifiles` endpoint.
-
-    Args:
-        datadir: Path to the data directory with your measurement results.
-        liveplotting: Whether plots should be updated live during measurements.
-        log_level: Sets the log level of the application. This is implemented with Python `logging`.
+    This is to open the data browser.
 
     Returns:
 
     """
-    from tergite_autocalibration.tools.quantifiles import quantifiles
+    from tergite_autocalibration.tools.browser import start_browser
+    from tergite_autocalibration.config.globals import ENV
 
-    quantifiles(datadir, liveplotting, log_level)
+    # Parse host and load from environment configuration if unspecified
+    if host is None:
+        host = ENV.data_browser_host
+
+    # Parse port and load from environment configuration if unspecified
+    if port is None:
+        port = ENV.data_browser_port
+    else:
+        port = int(port)
+
+    start_browser(host, port)
 
 
 @cli.command(help="Tell a joke.")

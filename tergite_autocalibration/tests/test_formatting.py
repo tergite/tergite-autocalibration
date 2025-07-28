@@ -22,7 +22,7 @@ _library_folder = (
 
 
 def test_license_headers():
-    excluded_files = ["quantifiles"]
+    excluded_files = []
 
     # Iterate over package files
     for file_path in iter_module_files(_library_folder, excluded_files):
