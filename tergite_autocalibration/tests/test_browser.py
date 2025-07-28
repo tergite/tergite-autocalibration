@@ -11,28 +11,9 @@
 # that they have been altered from the originals.
 
 from pathlib import Path
-
-import pytest
-
-
-# from tergite_autocalibration.tests.utils.reflections import iter_module_files
-from tergite_autocalibration.utils.logging import logger
-
-# Find the path to the root directory of the package
-# _library_folder = (
-#     str(Path(__file__)).split("tergite_autocalibration")[0] + "tergite_autocalibration"
-# )
-
 from tergite_autocalibration.tools.plotly_browser.browser_utils import scan_folders
-from tergite_autocalibration.tools.plotly_browser.dash_browser import app
-
-from tergite_autocalibration.tests.utils.decorators import preserve_os_env, with_os_env
-from tergite_autocalibration.tests.utils.fixtures import get_fixture_path
-from dash.dependencies import MATCH
 
 TEST_DATADIR = Path("tergite_autocalibration/tests/fixtures/data/browser/")
-
-_DATA_DIR = get_fixture_path("data", "browser")
 
 
 def test_folder_scan():
