@@ -8,7 +8,10 @@
         "2": {
           "instrument_type": "QCM_RF"
         },
-        "10": {
+        "3": {
+          "instrument_type": "QCM_RF"
+        },
+        "16": {
           "instrument_type": "QRM_RF"
         }
       }
@@ -168,40 +171,7 @@
       "directed": false,
       "multigraph": false,
       "graph": {},
-      "nodes": [
-        {
-          "instrument_name": "clusterA",
-          "id": "clusterA.module2.complex_output_0"
-        },
-        {
-          "instrument_name": "QuantumDevice",
-          "id": "q00:mw"
-        },
-        {
-          "instrument_name": "clusterA",
-          "id": "clusterA.module2.complex_output_1"
-        },
-        {
-          "instrument_name": "QuantumDevice",
-          "id": "q01:mw"
-        },
-        {
-          "instrument_name": "clusterA",
-          "id": "clusterA.module10.complex_output_0"
-        },
-        {
-          "instrument_name": "QuantumDevice",
-          "id": "q00:res"
-        },
-        {
-          "instrument_name": "QuantumDevice",
-          "id": "q01:res"
-        },
-        {
-          "instrument_name": "QuantumDevice",
-          "id": "q08:res"
-        }
-      ],
+      "nodes": [],
       "links": [
         {
           "source": "clusterA.module2.complex_output_0",
@@ -212,15 +182,19 @@
           "target": "q01:mw"
         },
         {
-          "source": "clusterA.module10.complex_output_0",
+          "source": "clusterA.module3.complex_output_0",
+          "target": "q00_q01:fl"
+        },
+        {
+          "source": "clusterA.module16.complex_output_0",
           "target": "q00:res"
         },
         {
-          "source": "clusterA.module10.complex_output_0",
+          "source": "clusterA.module16.complex_output_0",
           "target": "q01:res"
         },
         {
-          "source": "clusterA.module10.complex_output_0",
+          "source": "clusterA.module16.complex_output_0",
           "target": "q08:res"
         }
       ]
