@@ -23,14 +23,17 @@ from dash.dependencies import Input, Output, State
 from dash.dependencies import MATCH
 from dash_renderjson import DashRenderjson
 
-from tergite_autocalibration.tools.browser.layout import generate_selection_layout
 from tergite_autocalibration.tools.browser.utils import scan_folders
+from tergite_autocalibration.tools.browser.layout import (
+    generate_selection_layout,
+)
 
-folder_structure = scan_folders()
+from tergite_autocalibration.config.globals import DATA_DIR
+
+folder_structure = scan_folders(DATA_DIR)
 
 app = dash.Dash(__name__)
 
-from tergite_autocalibration.config.globals import DATA_DIR
 
 app.layout = html.Div(
     [
@@ -94,7 +97,7 @@ def update_inner_folders(selected_intermediate, selected_outer, folder_data):
     prevent_initial_call=True,
 )
 def refresh_folder_structure(n_clicks):
-    return scan_folders()
+    return scan_folders(DATA_DIR)
 
 
 @app.callback(
@@ -148,7 +151,7 @@ def update_tab(tab, outer, inter, inner):
     Input({"type": "intermediate-selector", "index": MATCH}, "value"),
     Input({"type": "outer-selector", "index": MATCH}, "value"),
 )
-def display_hdf5(selected_inner, selected_intermediate, selected_outer):
+def display_element_selector(selected_inner, selected_intermediate, selected_outer):
     if selected_outer and selected_intermediate and selected_inner:
 
         inner_path = os.path.join(
