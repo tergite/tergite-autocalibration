@@ -21,6 +21,6 @@ def start_browser(host: str, port: int):
     try:
         threading.Timer(0.5, lambda: webbrowser.open(f"http://{host}:{port}")).start()
     except Exception as e:
-        logger.warning(f"Failed to start browser on http://{host}:{port}")
+        logger.warning(f"Failed to open web browser on http://{host}:{port}")
         logger.warning(e)
     app.run(debug=True, host=host, port=port, use_reloader=False)

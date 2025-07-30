@@ -21,6 +21,7 @@ from tergite_autocalibration.tools.cli.cluster import cluster_cli
 from tergite_autocalibration.tools.cli.config import config_cli
 from tergite_autocalibration.tools.cli.graph import graph_cli
 from tergite_autocalibration.tools.cli.node import node_cli
+from tergite_autocalibration.tools.cli.browser import browser_cli
 from tergite_autocalibration.utils.logging.decorators import suppress_logging
 
 cli_kwargs = {"no_args_is_help": True}
@@ -44,6 +45,12 @@ cli.add_typer(
     **cli_kwargs,
     name="graph",
     help="Handle operations related to the calibration graph.",
+)
+cli.add_typer(
+    browser_cli,
+    **cli_kwargs,
+    name="browser",
+    help="Manage the data browser.",
 )
 
 
@@ -284,48 +291,6 @@ def quickstart(
         # Write the output to a TOML file
         with open(config_output_file_path, "w") as toml_file:
             toml_file.write(output)
-
-
-@cli.command(help="Open the data browser.")
-@suppress_logging
-def browser(
-    host: Annotated[
-        str,
-        typer.Option(
-            "--host",
-            "-h",
-            help="Set the host for the browser to run, default is 127.0.0.1",
-        ),
-    ] = None,
-    port: Annotated[
-        str,
-        typer.Option(
-            "--port",
-            "-p",
-            help="Set the port for the browser to run, default is 127.0.0.1",
-        ),
-    ] = None,
-):
-    """
-    This is to open the data browser.
-
-    Returns:
-
-    """
-    from tergite_autocalibration.tools.browser import start_browser
-    from tergite_autocalibration.config.globals import ENV
-
-    # Parse host and load from environment configuration if unspecified
-    if host is None:
-        host = ENV.data_browser_host
-
-    # Parse port and load from environment configuration if unspecified
-    if port is None:
-        port = ENV.data_browser_port
-    else:
-        port = int(port)
-
-    start_browser(host, port)
 
 
 @cli.command(help="Tell a joke.")
