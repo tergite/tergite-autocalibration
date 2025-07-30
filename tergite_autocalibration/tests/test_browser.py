@@ -11,9 +11,11 @@
 # that they have been altered from the originals.
 
 from pathlib import Path
-from tergite_autocalibration.tools.plotly_browser.browser_utils import scan_folders
 
-TEST_DATADIR = Path("tergite_autocalibration/tests/fixtures/data/browser/")
+from tergite_autocalibration.tests.utils.fixtures import get_fixture_path
+from tergite_autocalibration.tools.browser.utils import scan_folders
+
+TEST_DATADIR = Path(get_fixture_path("data", "browser"))
 
 
 def test_folder_scan():
