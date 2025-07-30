@@ -34,6 +34,7 @@ folder_structure = scan_folders(DATA_DIR)
 
 app = dash.Dash(__name__)
 
+app.title = "Tergite autocalibration data browser"
 
 app.layout = html.Div(
     [

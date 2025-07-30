@@ -13,6 +13,7 @@
 # that they have been altered from the originals.
 
 import os.path
+import signal
 import subprocess
 import sys
 from typing import Annotated
@@ -73,7 +74,7 @@ def start(
 
     # Start the process (the detaching works differently on different operating systems
     process = None
-    if get_os() == OperatingSystem.LINUX or OperatingSystem.MAC:
+    if get_os() in [OperatingSystem.LINUX, OperatingSystem.MAC]:
         command = [
             "nohup",
             sys.executable,
@@ -89,8 +90,6 @@ def start(
         )
     elif get_os() == OperatingSystem.WINDOWS:
         command = [
-            "start",
-            "/B",
             sys.executable,
             "-c",
             start_browser_command,
@@ -135,8 +134,7 @@ def stop():
 
     try:
         # Send termination signal, more gracefully way to stop the process
-        process = psutil.Process(pid)
-        process.terminate()
+        os.kill(pid, signal.SIGTERM)
     except psutil.NoSuchProcess:
         logger.error(f"No process found with PID {pid}")
     except psutil.AccessDenied:
