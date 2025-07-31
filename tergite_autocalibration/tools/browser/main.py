@@ -116,7 +116,6 @@ def update_tab(tab, outer, inter, inner):
 
     if tab == "image":
         graph_previews = []
-        print("*" * 100)
         for file in os.listdir(folder_path):
             if file.endswith(".png"):
                 encoded = base64.b64encode(
@@ -126,7 +125,6 @@ def update_tab(tab, outer, inter, inner):
                     src=f"data:image/png;base64,{encoded}", style={"maxWidth": "100%"}
                 )
                 graph_previews.append(html_image_element)
-                breakpoint()
         if graph_previews:
             return html.Div(graph_previews)
         return "No image found."
