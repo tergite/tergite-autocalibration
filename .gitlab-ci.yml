@@ -243,10 +243,10 @@ browser_run:
     - sleep 15
     # Verify output
     - |
-      if curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8178 | grep -q 200; then
-        echo "Data browser is running on port 8178"
+      if curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8179 | grep -q 200; then
+        echo "Data browser is running on port 8179"
       else
-        echo "Data browser is not running on port 8178"
+        echo "Data browser is not running on port 8179"
         exit 1
       fi
     # Stop the browser again
