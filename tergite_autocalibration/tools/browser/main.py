@@ -115,14 +115,20 @@ def update_tab(tab, outer, inter, inner):
     folder_path = os.path.join(DATA_DIR, outer, inter, inner)
 
     if tab == "image":
+        graph_previews = []
+        print("*" * 100)
         for file in os.listdir(folder_path):
             if file.endswith(".png"):
                 encoded = base64.b64encode(
                     open(os.path.join(folder_path, file), "rb").read()
                 ).decode()
-                return html.Img(
+                html_image_element = html.Img(
                     src=f"data:image/png;base64,{encoded}", style={"maxWidth": "100%"}
                 )
+                graph_previews.append(html_image_element)
+                breakpoint()
+        if graph_previews:
+            return html.Div(graph_previews)
         return "No image found."
 
     elif tab == "json":
@@ -200,7 +206,6 @@ def display_element_selector(selected_inner, selected_intermediate, selected_out
 )
 def filter_dataset_by_element(selected_elements, dataset_json):
     if not selected_elements or not dataset_json:
-        # return [[]]
         return ["", []]
     try:
         if isinstance(selected_elements, str):
