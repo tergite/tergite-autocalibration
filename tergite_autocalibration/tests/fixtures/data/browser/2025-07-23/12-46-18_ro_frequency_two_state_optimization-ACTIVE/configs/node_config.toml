@@ -1,0 +1,60 @@
+# -------------------- Node configurations --------------------
+# The follow sections contain initial values for specific nodes
+
+[resonator_spectroscopy.all]
+reset.duration = 60e-6
+
+[repeated_resonator_spectroscopy.all]
+reset.duration = 60e-6
+
+[punchout.all]
+reset.duration = 120e-6
+
+[resonator_spectroscopy_1.all]
+reset.duration = 240e-6
+
+[coupler_resonator_spectroscopy.all]
+reset.duration = 100e-6
+
+[resonator_spectroscopy_2.all]
+reset.duration = 240e-6
+
+[qubit_01_spectroscopy_AR.all]
+spec.spec_duration = 4e-6
+
+[qubit_01_amplitude_spectroscopy_AR.all]
+spec.spec_duration = 4e-6
+
+[qubit_01_spectroscopy.all]
+spec.spec_duration = 4e-6
+reset.duration = 200e-6
+
+[qubit_01_amplitude_spectroscopy.all]
+spec.spec_duration = 4e-6
+reset.duration = 200e-6
+
+[coupler_spectroscopy.all]
+spec.spec_duration = 4e-6
+reset.duration = 200e-6
+
+[qubit_12_spectroscopy_pulsed.all]
+spec.spec_duration = 2.0e-6
+spec.spec_amp = 6e-4
+
+[cz_parametrization_after_3_state_discrimination.all]
+reset.duration = 400e-6
+
+[cz_calibration_after_3_state_discrimination.all]
+reset.duration = 500e-6
+
+[cz_chevron_after_3_state_discrimination.all]
+reset.duration = 500e-6
+
+[ro_amplitude_three_state_optimization.all]
+reset.duration = 500e-6
+
+[ro_amplitude_two_state_optimization.all]
+reset.duration = 500e-6
+
+[cz_chevron.all]
+coupler_spec_amp = 0.3
