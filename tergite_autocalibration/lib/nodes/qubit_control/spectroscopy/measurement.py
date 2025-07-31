@@ -32,7 +32,7 @@ from tergite_autocalibration.utils.logging import logger
 
 
 class TwoTonesMultidimMeasurement(BaseMeasurement):
-    def __init__(self, transmons: dict[str, ExtendedTransmon]):
+    def __init__(self, transmons: dict[str, ExtendedTransmon], *args):
         super().__init__(transmons)
 
         self.transmons = transmons

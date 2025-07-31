@@ -1,0 +1,3 @@
+|Redis QOI name|
+|---------| 
+| clock_freqs:f12       |

@@ -68,9 +68,9 @@ class ConfigurationHandler:
                 cluster_config_json
             )
 
-        # TODO: As a temporary solution, we are loading only the filepath.
-        #       This should be replaced with proper objects when restructuring the configuration backend.
-        return_obj.device = configuration_package.config_files["device_config"]
+        return_obj.device = DeviceConfiguration(
+            configuration_package.config_files["device_config"]
+        )
         return_obj.spi = configuration_package.config_files["spi_config"]
         return_obj.node = configuration_package.config_files["node_config"]
 

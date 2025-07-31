@@ -58,7 +58,7 @@ class OptimalRO01FrequencyQubitAnalysis(BaseQubitAnalysis):
         self.optimal_frequency = np.abs(distances).idxmax().item()
         self.index_of_max_distance = np.abs(distances).argmax()
 
-        analysis_succesful = True
+        analysis_successful = True
         analysis_result = {
             "extended_clock_freqs:readout_2state_opt": {
                 "value": self.optimal_frequency,
@@ -66,7 +66,7 @@ class OptimalRO01FrequencyQubitAnalysis(BaseQubitAnalysis):
             }
         }
 
-        qoi = QOI(analysis_result, analysis_succesful)
+        qoi = QOI(analysis_result, analysis_successful)
 
         return qoi
 
@@ -154,7 +154,7 @@ class OptimalRO012FrequencyQubitAnalysis(OptimalRO01FrequencyQubitAnalysis):
         self.optimal_frequency = self.area.idxmax().item()
         self.optimal_distance = self.area.max().item()
 
-        analysis_succesful = True
+        analysis_successful = True
         analysis_result = {
             "extended_clock_freqs:readout_3state_opt": {
                 "value": self.optimal_frequency,
@@ -162,7 +162,7 @@ class OptimalRO012FrequencyQubitAnalysis(OptimalRO01FrequencyQubitAnalysis):
             }
         }
 
-        qoi = QOI(analysis_result, analysis_succesful)
+        qoi = QOI(analysis_result, analysis_successful)
 
         return qoi
 

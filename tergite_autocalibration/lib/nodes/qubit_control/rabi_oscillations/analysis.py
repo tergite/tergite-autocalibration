@@ -69,9 +69,9 @@ class RabiQubitAnalysis(BaseQubitAnalysis):
     def analyse_qubit(self):
         self._analyse_rabi()
         if self.scaled_uncertainty < 2e-2 and self.pi_amplitude < 0.95:
-            analysis_succesful = True
+            analysis_successful = True
         else:
-            analysis_succesful = False
+            analysis_successful = False
 
         analysis_result = {
             "rxy:amp180": {
@@ -80,7 +80,7 @@ class RabiQubitAnalysis(BaseQubitAnalysis):
             }
         }
 
-        qoi = QOI(analysis_result, analysis_succesful)
+        qoi = QOI(analysis_result, analysis_successful)
 
         return qoi
 
@@ -110,9 +110,9 @@ class Rabi12QubitAnalysis(RabiQubitAnalysis):
     def analyse_qubit(self):
         self._analyse_rabi()
         if self.scaled_uncertainty < 2e-2 and self.pi_amplitude < 0.95:
-            analysis_succesful = True
+            analysis_successful = True
         else:
-            analysis_succesful = False
+            analysis_successful = False
 
         analysis_result = {
             "r12:ef_amp180": {
@@ -121,7 +121,7 @@ class Rabi12QubitAnalysis(RabiQubitAnalysis):
             }
         }
 
-        qoi = QOI(analysis_result, analysis_succesful)
+        qoi = QOI(analysis_result, analysis_successful)
 
         return qoi
 
@@ -169,7 +169,7 @@ class NRabiQubitAnalysis(BaseQubitAnalysis):
 
     def analyse_qubit(self):
         self._analyse_n_rabi()
-        analysis_succesful = True
+        analysis_successful = True
 
         analysis_result = {
             "rxy:amp180": {
@@ -178,7 +178,7 @@ class NRabiQubitAnalysis(BaseQubitAnalysis):
             }
         }
 
-        qoi = QOI(analysis_result, analysis_succesful)
+        qoi = QOI(analysis_result, analysis_successful)
 
         return qoi
 
@@ -205,7 +205,7 @@ class NRabi_12_QubitAnalysis(NRabiQubitAnalysis):
     def analyse_qubit(self):
         self._analyse_n_rabi()
 
-        analysis_succesful = True
+        analysis_successful = True
         analysis_result = {
             self.redis_field: {
                 "value": self.optimal_amp180,
@@ -213,7 +213,7 @@ class NRabi_12_QubitAnalysis(NRabiQubitAnalysis):
             }
         }
 
-        qoi = QOI(analysis_result, analysis_succesful)
+        qoi = QOI(analysis_result, analysis_successful)
 
         return qoi
 

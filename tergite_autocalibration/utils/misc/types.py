@@ -10,11 +10,14 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from typing import Union
+from typing import Union, Type
 
 
 def safe_str_to_bool_int_float(
-    expected_type: Union[bool, int, float, str], value: str
+    expected_type: Union[
+        bool, int, float, str, Type[bool], Type[int], Type[float], Type[str]
+    ],
+    value: str,
 ) -> Union[bool, int, float, str]:
     """
     Converts a string to the given type
@@ -78,3 +81,17 @@ def str_to_bool(s: str) -> bool:
         return False
     else:
         raise TypeError(f"String {s} cannot be casted to bool.")
+
+
+def is_none_str(str_: str) -> bool:
+    """
+    Check whether a given string is None.
+
+    Args:
+        str_: String to check
+
+    Returns:
+        True if the string is "None" or "none".
+
+    """
+    return str_.strip().lower() == "none"

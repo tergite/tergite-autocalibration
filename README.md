@@ -21,7 +21,7 @@ If you are reading this on GitHub, then you are looking at a mirror.
 ### Dependencies
 
 - Ensure you have [conda](https://docs.anaconda.com/free/miniconda/index.html) installed.
-  (_You could simply have python +3.10 installed instead._)
+  (_You could simply have python +3.12 installed instead._)
 - Ensure you have [redis server](https://redis.io/) running
 - The standard port for a redis server is `6379`, so, this is going to be filled in the `.env` configuration later.
 
@@ -41,7 +41,7 @@ git clone git@github.com:tergite/tergite-autocalibration.git
 - Create conda environment
 
 ```shell
-conda create -n tac -y python=3.10 -y
+conda create -n tac -y python=3.12 -y
 conda activate tac
 ```
 
@@ -63,7 +63,7 @@ cp .example.env .env
 - Start the automatic calibration
 
 ```shell
-acli calibration start
+acli start
 ```
 
 - For more help on other commands, type:
@@ -74,18 +74,22 @@ acli --help
 
 ### Documentation
 
-The documentation is maintained using [Quarto](https://quarto.org/). Everytime there is a release, you can find the
+The documentation is maintained using [MkDocs Material](https://squidfunk.github.io/mkdocs-material/). Everytime there is a release, you can find the
 documentation from the release
 on [https://tergite.github.io/tergite-autocalibration](https://tergite.github.io/tergite-autocalibration).
 
-To see the documentation for the branch that you are currently working on, please open
-the [`docs/index.html`](./docs/index.html) file in your browser.
-If the rendered documentation does not reflect the state of the documentation of the markdown files in `docs_editable`,
-open a terminal in `docs_editable` and run:
+To preview the documentation for the branch you're currently working on you first need to install the project with documentation dependencies (only needed once):
 
 ```bash
-quarto preview
+pip install -e '.[docs]'
 ```
+Then start the live preview server of the documentation from the root of the repository:
+
+```bash
+mkdocs serve
+```
+
+and open the URL shown in the terminal (typically [http://localhost:8000/](http://localhost:8000/)) in your browser.
 
 If you are interested to edit the documentation, please check out the documentation section in
 the [contribution guidelines](CONTRIBUTING.md#documentation). There is also a page in the documentation to help you

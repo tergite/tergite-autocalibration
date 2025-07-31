@@ -75,7 +75,6 @@ Thumbs.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
-/.quarto/
 
 
 .pytest_cache/
@@ -88,6 +87,9 @@ configs/**
 !tergite_autocalibration/config/__init__.py
 !tergite_autocalibration/config/env.py
 configuration.meta.toml
+!datasets/**/configuration.meta.toml
+!tergite_autocalibration/tests/fixtures/**/configuration.meta.toml
+misc/**
 
 # dev-generated artefacts
 tergite_acl/utils/**.csv
@@ -102,3 +104,6 @@ tergite_autocalibration/lib/nodes/coupler/cz_chevron/tests/results/**
 
 tergite_acl/utils/clifford_module/**
 tergite_autocalibration/lib/nodes/coupler/cz_characterisation/tests/results/**
+
+# documentation
+site/

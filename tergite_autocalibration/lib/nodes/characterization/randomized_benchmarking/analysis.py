@@ -141,7 +141,7 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
         )
         self.leakage = 1 - fit_result2.params["p"].value
 
-        analysis_succesful = True
+        analysis_successful = True
 
         analysis_result = {
             "fidelity": {
@@ -154,7 +154,7 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
             },
         }
 
-        qoi = QOI(analysis_result, analysis_succesful)
+        qoi = QOI(analysis_result, analysis_successful)
 
         return qoi
 

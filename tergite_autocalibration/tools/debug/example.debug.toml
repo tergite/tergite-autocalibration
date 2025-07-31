@@ -1,0 +1,35 @@
+# This code is part of Tergite
+#
+# (C) Copyright Chalmers Next Labs 2025
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+
+# This file is a template configuration for the debugging endpoint.
+# Please create a copy:
+# `cp example.debug.toml debug.toml`
+# This defines the input parameters for the debugging script.
+
+# IP address for the cluster as string
+cluster_ip = ""
+
+# Boolean as string whether to run on a dummy cluster
+dummy_cluster = "False"
+
+# Path to the folder where to re-analyse from
+# Put "None" if you do not want to re-analyse, but run any other mode
+reanalyse = "None"
+
+# Name of the target node to re-analyse
+node_name = "None"
+
+# Boolean as string whether to push to a data endpoint
+push = "False"
+
+# Boolean as string whether to open to dataset browser
+browser = "False"

@@ -22,6 +22,9 @@ def test_data_handler_legacy():
     assert dh.get_legacy("VNA_qubit_frequencies")["q00"] == 3.848e9
     assert dh.get_legacy("VNA_f12_frequencies")["q00"] == 3.592e9
 
-    assert dh.get_legacy("attenuation_setting")["qubit"] == 6
-    assert dh.get_legacy("attenuation_setting")["coupler"] == 10
-    assert dh.get_legacy("attenuation_setting")["resonator"] == 10
+    out_attenuations = dh.get_output_attenuations()
+    assert out_attenuations["qubit"]["q00"] == 4
+    assert out_attenuations["qubit"]["q01"] == 8
+    assert out_attenuations["coupler"]["q00_q01"] == 12
+    assert out_attenuations["resonator"]["q00"] == 18
+    assert out_attenuations["resonator"]["q01"] == 18

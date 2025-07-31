@@ -15,7 +15,6 @@ import unittest
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import numpy as np
 import xarray as xr
 
 from tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.analysis import (
@@ -26,7 +25,6 @@ from tergite_autocalibration.utils.dto.qoi import QOI
 
 
 class TestRabiQubitAnalysis(unittest.TestCase):
-
     def test_setup_01(self):
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_rabi_01" / "dataset_rabi_oscillations_0.hdf5"
@@ -37,7 +35,7 @@ class TestRabiQubitAnalysis(unittest.TestCase):
         result_values = qoi.analysis_result
         self.assertIsInstance(qoi, QOI)
         for quantity in result_values:
-            self.assertIsInstance(result_values[quantity]["value"], np.float64)
+            self.assertIsInstance(result_values[quantity]["value"], float)
         assert (
             len(result_values) == 1
         ), f"The dataset should contain one element {len(dataset)}"
@@ -52,7 +50,7 @@ class TestRabiQubitAnalysis(unittest.TestCase):
         result_values = qoi.analysis_result
         self.assertIsInstance(qoi, QOI)
         for quantity in result_values:
-            self.assertIsInstance(result_values[quantity]["value"], np.float64)
+            self.assertIsInstance(result_values[quantity]["value"], float)
         assert (
             len(result_values) == 1
         ), f"The dataset should contain one element {len(dataset)}"

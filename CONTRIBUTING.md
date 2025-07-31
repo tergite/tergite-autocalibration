@@ -56,7 +56,7 @@ email [contact@quantum.chalmersnextlabs.se](mailto://contact@quantum.chalmersnex
 ## How to develop
 
 Make sure you have [conda](https://docs.anaconda.com/free/miniconda/index.html) installed.
-Alternatively, you could also simply have [Python 3.10](https://www.python.org/downloads/) installed.
+Alternatively, you could also simply have [Python 3.12](https://www.python.org/downloads/) installed.
 Clone the repo and enter its root folder:
 
 ```bash
@@ -67,21 +67,14 @@ cd tergite-autocalibration
 Create the conda environment
 
 ```bash
-conda create -n tac python=3.10 -y
+conda create -n tac python=3.12 -y
 ```
 
-Install dependencies
+Install dependencies with development and test dependencies
 
 ```bash
 conda activate tac
-pip install -e .
-```
-
-Install the development and test dependencies
-
-```bash
-pip install poetry
-poetry install --with dev,test
+pip install -e ".[test,dev]"
 ```
 
 Run the CLI help command to see whether the application is running.
@@ -130,23 +123,23 @@ acli browser --datadir PATH_TO_DATA_DIRECTORY
 
 ### Documentation
 
-Documentation is rendered with [Quarto](https://quarto.org/).
-If you had quarto installed in the previous step you can enter the `docs_editable` folder and edit the markdown files.
+We are using [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) to build and render documentation. MkDocs is a static site generator that's easy to use and supports a wide range of features via plugins.
+
+To install it, use the following command in your terminal:
 
 ```bash
-cd docs_editable
+pip install -e '.[docs]'
 ```
 
-Render the documentation and show a preview in the browser
+To render a live preview of the documentation, run:
 
 ```bash
-quarto preview
+mkdocs serve
 ```
 
-Now you can edit the files in `docs_editable` and the contents in the browser window would update automatically.
-If you just want to see the documentation, please open [`docs/index.html`](./docs/index.html) with your browser.
-One of the documentation pages is also
-about [how to write better documentation](./docs/developer-guide/writing_documentation.html).
+This will open a browser window with the rendered documentation (typically [http://localhost:8000/](http://localhost:8000/)) in your browser..
+
+Now you can edit the files in `docs` and the contents in the browser window would update automatically. One of the documentation pages is also about how to write better documentation.
 
 ### Installation of proprietary resources (optional, not recommended)
 We do not recommend to make your code having dependencies to proprietary software.

@@ -1,0 +1,46 @@
+---
+title: Resonator Spectroscopy
+---
+
+# Resonator Spectroscopy in Qubit-Resonator Interaction Analysis
+
+Resonator spectroscopy is a powerful tool for studying the interaction between qubits and resonators. By probing the
+resonator’s response across various frequencies, we can extract critical parameters, such as the **resonant frequency**
+and **Q-factor**, which are essential for optimizing qubit-resonator interactions.
+
+### Class: `ResonatorSpectroscopyNode`
+
+The `Resonator_Spectroscopy` class is designed to conduct resonator spectroscopy for transmon qubits. It takes as input
+a dictionary of transmon qubits and their respective states.
+
+#### Method: `schedule`
+
+The `schedule` method generates a schedule to perform resonator spectroscopy. This process includes:
+
+1. **Clock Initialization**: Initializes the clocks for each qubit based on the specified qubit state.
+2. **Qubit Reset**: Resets the qubit to a known state.
+3. **Frequency Probing**: Applies a square pulse at various frequencies.
+4. **Signal Measurement**: Measures the response signal, capturing data on the resonator's behavior.
+
+### Class: `ResonatorSpectroscopyQubitAnalysis`
+
+The `ResonatorSpectroscopyQubitAnalysis` class is used for analyzing resonator spectroscopy data, enabling the
+extraction of the resonant frequency and Q-factor. This class takes as parameters:
+
+- `qubit_name`: A string representing the qubit under measurement.
+- `redis_fields`: The directory for data storage.
+
+#### Method: `analyse_qubit`
+
+The `analyse_qubit` method processes and fits the data to determine the resonator’s **resonant frequency** and **loaded
+Q-factor**. The `analyse_qubit`fit should resemble a negative Gaussian distribution.
+
+### Output: `xarray.Dataset`
+
+The dataset returned by this analysis is an `xarray.Dataset`, which includes:
+
+- **Frequency Sweep Data**: The set of frequencies used during the sweep.
+- **Transmission Response**: The measured response of the resonator at each frequency.
+
+This dataset provides essential insights into the resonator’s properties, allowing for precise tuning of qubit-resonator
+interactions.

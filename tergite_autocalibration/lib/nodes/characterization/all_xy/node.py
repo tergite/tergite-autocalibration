@@ -12,7 +12,7 @@
 
 import numpy as np
 
-from tergite_autocalibration.lib.base.node import BaseNode
+from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.characterization.all_xy.analysis import (
     AllXYAnalysis,
 )
@@ -21,7 +21,7 @@ from tergite_autocalibration.lib.nodes.characterization.all_xy.measurement impor
 )
 
 
-class AllXYNode(BaseNode):
+class AllXYNode(QubitNode):
     measurement_obj = AllXYMeasurement
     analysis_obj = AllXYAnalysis
 

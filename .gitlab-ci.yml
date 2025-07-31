@@ -1,6 +1,7 @@
 # This code is part of Tergite
 #
 # (C) Copyright Chalmers Next Labs 2024
+# (C) Copyright Michele Faucci Giannelli 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -15,11 +16,13 @@ stages:
   - setup
   - tests
   - lint
+  - build_documentation
   - application_run
+  - application_run_coupler
 
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-  PYTHON_VERSION: "3.10"
+  PYTHON_VERSION: "3.12"
   REDIS_PORT: 6378
 
 
@@ -72,6 +75,26 @@ tests:
       paths:
         - .venv
 
+build_documentation:
+  stage: build_documentation
+  image: python:${PYTHON_VERSION}
+  needs:
+    - setup
+  script:
+    # Activate the virtual environment
+    - source .venv/bin/activate
+    # Install documentation dependencies
+    - pip install '.[docs]'
+    # Build the documentation with strict mode to catch warnings and errors
+    - mkdocs build --strict
+  cache:
+    - key: "default"
+      paths:
+        - .cache/pip
+    - key: "venv-${CI_COMMIT_REF_NAME}"
+      paths:
+        - .venv
+
 lint:
   stage: lint
   image: python:${PYTHON_VERSION}
@@ -112,12 +135,82 @@ application_run:
     - echo "y" | acli config load -t fc8a
     # Reset Redis
     - echo "y" | acli node reset -a
+    # Clear the caches
+    - rm -r .venv/lib/python3.12/site-packages/out
     # Run the calibration chain
-    - acli calibration start -r "$CI_PROJECT_DIR/datasets/fc8_unit_tests_6-15" -n rabi_oscillations
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n resonator_spectroscopy
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n qubit_01_spectroscopy
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n rabi_oscillations
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n ramsey_correction
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n motzoi_parameter
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n n_rabi_oscillations
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n resonator_spectroscopy_1
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n qubit_12_spectroscopy
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n rabi_oscillations_12
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n ramsey_correction_12
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n motzoi_parameter_12
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n n_rabi_oscillations_12
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n resonator_spectroscopy_2
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n ro_frequency_three_state_optimization
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n ro_amplitude_three_state_optimization
+    # Read
+    - ls -lR .venv/lib/python3.12/site-packages/out
+    # Delay to encounter for the race condition
+    - sleep 5
     # Verify output
     - |
-      OUTPUT_FILE="$CI_PROJECT_DIR/datasets/fc8_unit_tests_6-15/rabi_oscillations.png"
-      if [ -f "$OUTPUT_FILE" ]; then
+      if find .venv/lib/python3.12/site-packages/out -type f | grep -q "ro_amplitude_three_state_optimization.png"; then
+        echo "Output file $OUTPUT_FILE exists. Application ran successfully."
+      else
+        echo "Error: Output file $OUTPUT_FILE not found."
+        exit 1
+      fi
+  cache:
+    - key: "default"
+      paths:
+        - .cache/pip
+    - key: "venv-${CI_COMMIT_REF_NAME}"
+      paths:
+        - .venv
+
+application_run_coupler:
+  stage: application_run_coupler
+  image: python:${PYTHON_VERSION}
+  needs:
+    - setup
+    - tests
+  script:
+    # Install dependencies
+    - apt-get update
+    - apt-get install redis ffmpeg libsm6 libxext6 -y
+    # Run Redis server
+    - redis-server --daemonize yes --port "$REDIS_PORT"
+    # Activate the virtual environment
+    - source .venv/bin/activate
+    # Create empty .env file
+    - touch .env
+    # Load configuration
+    - echo "y" | acli config load -t fc8a
+    # Reset Redis
+    - echo "y" | acli node reset -a
+    # Clear the caches
+    - rm -r .venv/lib/python3.12/site-packages/out
+    # Run the calibration chain
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/simple_coupler_run" -n resonator_spectroscopy_vs_current
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/simple_coupler_run" -n qubit_spectroscopy_vs_current
+    # Read
+    - ls .venv/lib/python3.12/site-packages/out
+    - echo "Listing all files under 'out':"
+    - find .venv/lib/python3.12/site-packages/out -type f -name "*.png"
+    # Verify output
+    - |
+      if find .venv/lib/python3.12/site-packages/out -type f | grep -q "qubit_spectroscopy_vs_current.png"; then
+        echo "Output file $OUTPUT_FILE exists. Application ran successfully."
+      else
+        echo "Error: Output file $OUTPUT_FILE not found."
+        exit 1
+      fi
+      if find .venv/lib/python3.12/site-packages/out -type f | grep -q "qubit_spectroscopy_vs_current_q14_q15_q15_spectroscopies.png"; then
         echo "Output file $OUTPUT_FILE exists. Application ran successfully."
       else
         echo "Error: Output file $OUTPUT_FILE not found."

@@ -13,7 +13,7 @@
 import ast
 import inspect
 import textwrap
-from typing import Set
+from typing import Set, Type, Any
 
 from tergite_autocalibration.utils.logging import logger
 
@@ -57,7 +57,7 @@ class ASTParser:
         return source, tree
 
     @staticmethod
-    def get_init_attribute_names(cls) -> Set[str]:
+    def get_init_attribute_names(cls: Type[Any]) -> Set[str]:
         """
         Returns all the attributes from the __init__ function of a class
 
@@ -76,7 +76,7 @@ class ASTParser:
             cls: Class to be analysed
 
         Returns:
-            The names of the attributes in __init__ as set
+            Set[str]: The names of the attributes in __init__ as set
 
         """
 

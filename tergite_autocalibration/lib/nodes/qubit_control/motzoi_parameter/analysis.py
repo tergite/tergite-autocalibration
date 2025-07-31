@@ -67,7 +67,7 @@ class Motzoi01QubitAnalysis(MotzoiBaseQubitAnalysis):
     def analyse_qubit(self):
         self._analyse_motzoi()
 
-        analysis_succesful = True
+        analysis_successful = True
         analysis_result = {
             self.redis_field: {
                 "value": self.optimal_motzoi,
@@ -75,7 +75,7 @@ class Motzoi01QubitAnalysis(MotzoiBaseQubitAnalysis):
             }
         }
 
-        qoi = QOI(analysis_result, analysis_succesful)
+        qoi = QOI(analysis_result, analysis_successful)
 
         return qoi
 
@@ -88,7 +88,7 @@ class Motzoi12QubitAnalysis(MotzoiBaseQubitAnalysis):
     def analyse_qubit(self):
         self._analyse_motzoi()
 
-        analysis_succesful = True
+        analysis_successful = True
         analysis_result = {
             self.redis_field: {
                 "value": self.optimal_motzoi,
@@ -96,7 +96,7 @@ class Motzoi12QubitAnalysis(MotzoiBaseQubitAnalysis):
             }
         }
 
-        qoi = QOI(analysis_result, analysis_succesful)
+        qoi = QOI(analysis_result, analysis_successful)
 
         return qoi
 

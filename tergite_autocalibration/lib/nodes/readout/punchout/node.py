@@ -18,11 +18,16 @@ from tergite_autocalibration.lib.nodes.readout.punchout.analysis import (
 from tergite_autocalibration.lib.nodes.readout.punchout.measurement import (
     PunchoutMeasurement,
 )
-from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleQubitNode
 from tergite_autocalibration.lib.utils.samplespace import resonator_samples
 
 
-class PunchoutNode(ScheduleNode):
+class PunchoutNode(ScheduleQubitNode):
+    """
+    This class implements the punchout node, which is used to measure the
+    readout amplitude.
+    """
+
     measurement_obj = PunchoutMeasurement
     analysis_obj = PunchoutNodeAnalysis
     qubit_qois = ["measure:pulse_amp"]
@@ -35,6 +40,6 @@ class PunchoutNode(ScheduleNode):
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             },
             "ro_amplitudes": {
-                qubit: np.linspace(0.008, 0.04, 12) for qubit in self.all_qubits
+                qubit: np.linspace(0.004, 0.04, 20) for qubit in self.all_qubits
             },
         }

@@ -1,0 +1,4 @@
+|Redis QOI name|
+|---------| 
+|clock_freqs:f01      |
+| spec:spec_ampl_optimal     |

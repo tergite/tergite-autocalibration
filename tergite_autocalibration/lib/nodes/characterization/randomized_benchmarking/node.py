@@ -21,10 +21,10 @@ from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.
 from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.measurement import (
     RandomizedBenchmarkingSSROMeasurement,
 )
-from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleQubitNode
 
 
-class RandomizedBenchmarkingSSRONode(ScheduleNode):
+class RandomizedBenchmarkingSSRONode(ScheduleQubitNode):
     measurement_obj = RandomizedBenchmarkingSSROMeasurement
     analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
     qubit_qois = ["fidelity", "fidelity_error", "leakage", "leakage_error"]

@@ -14,6 +14,7 @@ import pytest
 
 from tergite_autocalibration.utils.misc.types import (
     safe_str_to_bool_int_float,
+    is_none_str,
 )  # Adjust the import according to your project structure
 
 
@@ -63,3 +64,17 @@ def test_safe_str_to_type_str():
     # Test default string behavior
     assert safe_str_to_bool_int_float(str, "hello") == "hello"
     assert safe_str_to_bool_int_float(str, "") == ""
+
+
+def test_is_none_str():
+    # Test allowed cases
+    assert is_none_str("None") is True
+    assert is_none_str("none") is True
+    assert is_none_str("NoNe") is True
+    assert is_none_str(" None ") is True
+
+    # Test strings that are not None
+    assert is_none_str("hello") is False
+    assert is_none_str("") is False
+    assert is_none_str(" ") is False
+    assert is_none_str("NoneValue") is False

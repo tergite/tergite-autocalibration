@@ -13,6 +13,8 @@
 # that they have been altered from the originals.
 
 import itertools
+from abc import ABC
+from pathlib import Path
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -26,7 +28,6 @@ from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.base.analysis import (
     BaseAllQubitsAnalysis,
     BaseQubitAnalysis,
-    MultipleBaseAllQubitsAnalysis,
 )
 from tergite_autocalibration.utils.logging import logger
 
@@ -197,9 +198,15 @@ class SingleProcessTomographyNodeAnalysis(BaseAllQubitsAnalysis):
         super().__init__(name, redis_fields)
 
 
-class ProcessTomographyNodeAnalysis(MultipleBaseAllQubitsAnalysis):
+class ProcessTomographyNodeAnalysis(BaseAllQubitsAnalysis, ABC):
     node_analysis_obj = SingleProcessTomographyNodeAnalysis
 
-    def __init__(self, name, redis_fields):
+    def __init__(self, name: str, redis_fields):
         super().__init__(name, redis_fields)
         self.loop_range = range(9)
+
+    def analyze_node(self, data_path: Path):
+        for i in self.loop_range:
+            qubit_analysis = self.node_analysis_obj(self.name, self.redis_fields)
+            qubit_analysis.analyze_node(data_path, i)
+        # Note: The process tomography analysis neither returns a value nor saves a value to redis

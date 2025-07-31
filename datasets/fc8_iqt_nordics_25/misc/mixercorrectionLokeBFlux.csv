@@ -1,0 +1,2 @@
+,module,complex_output,sequencer index,lo_freq (Hz),if (Hz),dc_mixer_offset_I,dc_mixer_offset_Q,mixer_amp_ratio,mixer_phase_error_deg
+0,module4,out1,0,3500000000.0,413000000.0,1.9036000000000008,-6.296399999999998,1.0975000000000001,-35.318200000000004
