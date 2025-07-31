@@ -14,12 +14,12 @@
 
 stages:
   - setup
-  - browser_run
   - tests
   - lint
   - build_documentation
   - application_run
   - application_run_coupler
+  - browser_run
 
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
