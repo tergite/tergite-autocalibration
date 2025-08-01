@@ -12,15 +12,12 @@
 
 import getpass
 import os
-import platform
 import subprocess
 from enum import Enum
 from sys import platform
 from typing import List, Tuple
 
 import typer
-
-from tergite_autocalibration.utils.logging import logger
 
 
 class OperatingSystem(Enum):
@@ -43,7 +40,7 @@ def get_os() -> "OperatingSystem":
         return OperatingSystem.LINUX
     elif platform_str == "darwin":
         return OperatingSystem.MAC
-    elif platform_str == "windows":
+    elif "win" in platform_str:
         return OperatingSystem.WINDOWS
     else:
         return OperatingSystem.UNDEFINED

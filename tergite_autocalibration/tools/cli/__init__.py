@@ -21,6 +21,7 @@ from tergite_autocalibration.tools.cli.cluster import cluster_cli
 from tergite_autocalibration.tools.cli.config import config_cli
 from tergite_autocalibration.tools.cli.graph import graph_cli
 from tergite_autocalibration.tools.cli.node import node_cli
+from tergite_autocalibration.tools.cli.browser import browser_cli
 from tergite_autocalibration.utils.logging.decorators import suppress_logging
 
 cli_kwargs = {"no_args_is_help": True}
@@ -44,6 +45,12 @@ cli.add_typer(
     **cli_kwargs,
     name="graph",
     help="Handle operations related to the calibration graph.",
+)
+cli.add_typer(
+    browser_cli,
+    **cli_kwargs,
+    name="browser",
+    help="Manage the data browser.",
 )
 
 
@@ -75,9 +82,16 @@ def start(
         typer.Option(
             "--node-name",
             "-n",
-            help="Use to specify the node type to rerun, only works with -r option",
+            help="Use --node-name (or -n) to specify the node to run calibration for. If -r is specified, only analysis is run.",
         ),
     ] = None,
+    ignore_spec: Annotated[
+        bool,
+        typer.Option(
+            "--ignore-spec",
+            help="Use --ignore-spec to force recalibration.",
+        ),
+    ] = False,
     push: Annotated[
         bool,
         typer.Option(
@@ -91,21 +105,20 @@ def start(
         typer.Option(
             "--browser",
             is_flag=True,
-            help="Opens the quantifiles data browser in the background with live plotting enabled.",
+            help="Opens the data browser in the background with live plotting enabled.",
         ),
     ] = False,
 ):
     from ipaddress import ip_address, IPv4Address
-    from tergite_autocalibration.tools.quantifiles import quantifiles
 
-    from tergite_autocalibration.config.globals import DATA_DIR
     from tergite_autocalibration.config.globals import CLUSTER_IP
     from tergite_autocalibration.scripts.calibration_supervisor import (
         CalibrationSupervisor,
         CalibrationConfig,
     )
     from tergite_autocalibration.scripts.db_backend_update import update_mss
-    from tergite_autocalibration.config.globals import CONFIG
+    from tergite_autocalibration.config.globals import CONFIG, ENV
+    from tergite_autocalibration.tools.browser import start_browser
     from tergite_autocalibration.utils.backend.reset_redis_node import ResetRedisNode
     from tergite_autocalibration.utils.dto.enums import MeasurementMode
     from tergite_autocalibration.utils.io.dataset import scrape_and_copy_hdf5_files
@@ -157,10 +170,12 @@ def start(
     elif d:
         cluster_mode = MeasurementMode.dummy
 
-    # Start the quantifiles dataset browser in the background
+    # Start the data browser in the background
     if browser:
-        typer.echo("Starting dataset browser...")
-        proc = multiprocessing.Process(target=quantifiles, args=(DATA_DIR, True, 30))
+        typer.echo("Starting data browser...")
+        proc = multiprocessing.Process(
+            target=start_browser, args=(ENV.data_browser_host, ENV.data_browser_port)
+        )
         proc.start()
 
     config = CalibrationConfig(
@@ -172,7 +187,7 @@ def start(
     if cluster_mode is MeasurementMode.re_analyse:
         supervisor.rerun_analysis()
     else:
-        supervisor.calibrate_system()
+        supervisor.calibrate_system(node_name=node_name, ignore_spec=ignore_spec)
 
     # Push the results of the calibration to MSS
     if push:
@@ -276,49 +291,6 @@ def quickstart(
         # Write the output to a TOML file
         with open(config_output_file_path, "w") as toml_file:
             toml_file.write(output)
-
-
-@cli.command(help="Open the dataset browser (quantifiles).")
-@suppress_logging
-def browser(
-    datadir: Annotated[
-        str,
-        typer.Option(
-            "--datadir",
-            help="Path to the data directory with your measurement results.",
-        ),
-    ] = None,
-    liveplotting: Annotated[
-        bool,
-        typer.Option(
-            "--liveplotting",
-            is_flag=True,
-            help="Whether plots should be updated live during measurements.",
-        ),
-    ] = False,
-    log_level: Annotated[
-        int,
-        typer.Option(
-            "--log-level",
-            help="Sets the log level of the application.",
-        ),
-    ] = 30,
-):
-    """
-    This is to open the quantifiles databrowser.
-    This endpoint is essentially just a wrapper for the `quantifiles` endpoint.
-
-    Args:
-        datadir: Path to the data directory with your measurement results.
-        liveplotting: Whether plots should be updated live during measurements.
-        log_level: Sets the log level of the application. This is implemented with Python `logging`.
-
-    Returns:
-
-    """
-    from tergite_autocalibration.tools.quantifiles import quantifiles
-
-    quantifiles(datadir, liveplotting, log_level)
 
 
 @cli.command(help="Tell a joke.")

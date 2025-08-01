@@ -11,22 +11,20 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import dash
-from dash import dcc, html
-from dash.dependencies import Input, Output, State
-import os
 import base64
 import json
-import xarray as xr
-import sys
+import os
+
+import dash
 import plotly.express as px
-import webbrowser
-import threading
+import xarray as xr
+from dash import dcc, html
+from dash.dependencies import Input, Output, State
 from dash.dependencies import MATCH
 from dash_renderjson import DashRenderjson
 
-from tergite_autocalibration.tools.plotly_browser.browser_utils import scan_folders
-from tergite_autocalibration.tools.plotly_browser.browser_layout import (
+from tergite_autocalibration.tools.browser.utils import scan_folders
+from tergite_autocalibration.tools.browser.layout import (
     generate_selection_layout,
 )
 
@@ -36,6 +34,7 @@ folder_structure = scan_folders(DATA_DIR)
 
 app = dash.Dash(__name__)
 
+app.title = "Tergite autocalibration data browser"
 
 app.layout = html.Div(
     [
@@ -116,14 +115,18 @@ def update_tab(tab, outer, inter, inner):
     folder_path = os.path.join(DATA_DIR, outer, inter, inner)
 
     if tab == "image":
+        graph_previews = []
         for file in os.listdir(folder_path):
             if file.endswith(".png"):
                 encoded = base64.b64encode(
                     open(os.path.join(folder_path, file), "rb").read()
                 ).decode()
-                return html.Img(
+                html_image_element = html.Img(
                     src=f"data:image/png;base64,{encoded}", style={"maxWidth": "100%"}
                 )
+                graph_previews.append(html_image_element)
+        if graph_previews:
+            return html.Div(graph_previews)
         return "No image found."
 
     elif tab == "json":
@@ -201,7 +204,6 @@ def display_element_selector(selected_inner, selected_intermediate, selected_out
 )
 def filter_dataset_by_element(selected_elements, dataset_json):
     if not selected_elements or not dataset_json:
-        # return [[]]
         return ["", []]
     try:
         if isinstance(selected_elements, str):
@@ -279,9 +281,3 @@ def plot_y_slice(y_dim_value, selected_elements, dataset_json):
         return displays
     except Exception as e:
         return [f"Error plotting y slice: {e}"]
-
-
-if __name__ == "__main__":
-    port = int(sys.argv[1]) if len(sys.argv) > 1 else 8050
-    threading.Timer(0.5, lambda: webbrowser.open(f"http://localhost:{port}")).start()
-    app.run(debug=True, port=port, use_reloader=False)

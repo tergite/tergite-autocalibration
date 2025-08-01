@@ -19,6 +19,7 @@ stages:
   - build_documentation
   - application_run
   - application_run_coupler
+  - browser_run
 
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
@@ -216,6 +217,58 @@ application_run_coupler:
         echo "Error: Output file $OUTPUT_FILE not found."
         exit 1
       fi
+  cache:
+    - key: "default"
+      paths:
+        - .cache/pip
+    - key: "venv-${CI_COMMIT_REF_NAME}"
+      paths:
+        - .venv
+
+browser_run:
+  stage: browser_run
+  image: python:${PYTHON_VERSION}
+  needs:
+    - setup
+    - tests
+  script:
+    # Activate the virtual environment
+    - source .venv/bin/activate
+    # Copy the .env file
+    - cp .example.env .env
+    # Load configuration
+    - echo "y" | acli config load -t fc8a
+    # Start the data browser
+    - acli browser start
+    # Poll and check whether the data browser is online
+    - |
+      retry_count=0
+      max_retries=5
+      retry_delay=5
+
+      check_data_browser() {
+        curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8179 | grep -q 200
+      }
+
+      sleep 5
+
+      while [ $retry_count -lt $max_retries ]; do
+        if check_data_browser; then
+          echo "Data browser is running on port 8179"
+          exit 0
+        else
+          echo "Data browser is not running on port 8179"
+          retry_count=$((retry_count + 1))
+          if [ $retry_count -lt $max_retries ]; then
+            sleep $retry_delay
+          fi
+        fi
+      done
+
+      echo "Max retries reached. Exiting."
+      exit 1
+    # Stop the browser again
+    - acli browser stop
   cache:
     - key: "default"
       paths:
