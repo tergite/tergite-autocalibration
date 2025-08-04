@@ -139,17 +139,8 @@ def select_measurement_for_analysis(
             f"Filtering away: {_dataless_folders} since these folders do not contain measurement data."
         )
 
-    # NOTE: Assumes that a node is only visited once during a run
-    #       since it returns as soon as it finds the node_name
-    for info in with_data.values():
-        if node_name and node_name == info.node_name:
-            return info
-
-    # If the user did not specify which node to analyse, then prompt them
-    num_folders_with_data = len(with_data)
-    typer.echo(
-        "Detected the following measurements in the specified folder:\n"
-        + "\n".join(
+    existing_measurements_str = (
+        "\n".join(
             [
                 f"{idx}: {info.node_name} (measured: {info.timestamp})"
                 for idx, info in sorted(with_data.items(), key=lambda t: t[1].timestamp)
@@ -157,15 +148,40 @@ def select_measurement_for_analysis(
         )
         + "\n"
     )
+
+    if node_name:
+        try:
+            # NOTE: Assumes that a node is only visited once during a run
+            #       since it returns as soon as it finds the node_name
+            return next(
+                filter(lambda info: info.node_name == node_name, with_data.values())
+            )
+        except StopIteration:
+            raise FileNotFoundError(
+                f"The node name '{node_name}' was specified, but the run folder does not "
+                + "contain a measurement with this node name. Existing measurements:\n"
+                + existing_measurements_str
+            ) from None
+
+    # If the user did not specify which node to analyse, then prompt them
+    num_folders_with_data = len(with_data)
+    typer.echo(
+        "Detected the following measurements in the specified folder:\n"
+        + existing_measurements_str
+    )
     while True:
         number = typer.prompt(
             "Which would you like to reanalyse? "
-            f"Please enter a number between 1 and {num_folders_with_data}",
+            f"Please enter a number between 1 and {num_folders_with_data} to re-analyse. Enter 0 to cancel",
             type=int,
         )
+        if number == 0:
+            raise typer.Abort()
         if 1 <= number <= len(with_data):
             break
-        typer.echo(f"Number must be between 1 and {num_folders_with_data}.")
+        typer.echo(
+            f"Number must be between 1 and {num_folders_with_data} to re-analyse. Enter 0 to cancel"
+        )
 
     return with_data[number]
 
