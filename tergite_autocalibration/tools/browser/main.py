@@ -107,7 +107,7 @@ def update_inner_folders(selected_intermediate, selected_outer, folder_data):
     Input("refresh-button", "n_clicks"),
     prevent_initial_call=True,
 )
-def refresh_folder_structure():
+def refresh_folder_structure(n_clicks):
     return scan_folders(DATA_DIR)
 
 
