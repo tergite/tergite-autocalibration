@@ -129,7 +129,7 @@ def update_tab(tab, outer, inter, inner):
         for file in os.listdir(folder_path):
             if file.endswith(".png"):
                 image_names.append(file)
-        if image_names:
+        if len(image_names) > 1:
             # the regular expression matches the numerical identifier
             # when the folder contains multiple images, eg the identifier 11 here:
             # measurement_11_preview.png
