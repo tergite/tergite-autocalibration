@@ -19,9 +19,6 @@ from tergite_autocalibration.utils.io.dataset import scrape_and_copy_hdf5_files
 import tergite_autocalibration.utils.reanalysis_utils as ra_utils
 from datetime import datetime
 from pathlib import Path
-from typer.testing import CliRunner
-
-typer_runner_for_testing = CliRunner()
 
 
 def test_scrape_and_copy_hdf5_files():
