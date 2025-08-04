@@ -13,6 +13,7 @@
 
 import base64
 import json
+import re
 import os
 
 import dash
@@ -67,6 +68,10 @@ def toggle_compare(n_clicks):
     Input("folder-data", "data"),
 )
 def update_intermediate_folders(selected_outer, folder_data):
+    """
+    update the dropdown menu with all the folders corresponding
+    to all the calibration chains of a s pesific date
+    """
     if selected_outer and selected_outer in folder_data:
         return [{"label": f, "value": f} for f in folder_data[selected_outer].keys()]
     return []
@@ -79,6 +84,11 @@ def update_intermediate_folders(selected_outer, folder_data):
     Input("folder-data", "data"),
 )
 def update_inner_folders(selected_intermediate, selected_outer, folder_data):
+    """
+    update the dropdown menu with all the folders corresponding
+    to all the particular node measurements for a specific date
+    and a specific calibration chain
+    """
     if (
         selected_outer
         and selected_intermediate
@@ -97,7 +107,7 @@ def update_inner_folders(selected_intermediate, selected_outer, folder_data):
     Input("refresh-button", "n_clicks"),
     prevent_initial_call=True,
 )
-def refresh_folder_structure(n_clicks):
+def refresh_folder_structure():
     return scan_folders(DATA_DIR)
 
 
@@ -115,16 +125,27 @@ def update_tab(tab, outer, inter, inner):
     folder_path = os.path.join(DATA_DIR, outer, inter, inner)
 
     if tab == "image":
-        graph_previews = []
+        image_names = []
         for file in os.listdir(folder_path):
             if file.endswith(".png"):
-                encoded = base64.b64encode(
-                    open(os.path.join(folder_path, file), "rb").read()
-                ).decode()
-                html_image_element = html.Img(
-                    src=f"data:image/png;base64,{encoded}", style={"maxWidth": "100%"}
-                )
-                graph_previews.append(html_image_element)
+                image_names.append(file)
+        if image_names:
+            # the regular expression matches the numerical identifier
+            # when the folder contains multiple images, eg the identifier 11 here:
+            # measurement_11_preview.png
+            # this identifier is used to sort the image names list
+            image_names.sort(
+                key=lambda s: int(re.match(r".*_(\d+)_preview.png", s).group(1))
+            )
+        graph_previews = []
+        for image in image_names:
+            encoded = base64.b64encode(
+                open(os.path.join(folder_path, image), "rb").read()
+            ).decode()
+            html_image_element = html.Img(
+                src=f"data:image/png;base64,{encoded}", style={"maxWidth": "100%"}
+            )
+            graph_previews.append(html_image_element)
         if graph_previews:
             return html.Div(graph_previews)
         return "No image found."
@@ -134,7 +155,6 @@ def update_tab(tab, outer, inter, inner):
             if file.endswith(".json"):
                 with open(os.path.join(folder_path, file)) as f:
                     data = json.load(f)
-                # return html.Pre(json.dumps(data, indent=2))
                 return DashRenderjson(
                     data=data,
                     max_depth=-1,
