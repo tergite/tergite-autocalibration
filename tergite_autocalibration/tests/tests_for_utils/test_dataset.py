@@ -22,10 +22,14 @@ def test_scrape_and_copy_hdf5_files():
     Base case, copies all measurement files and counts whether they are in the target directory
     """
     scrape_directory = os.path.join(
-        get_fixture_path(), "data", "standard_run-ro_amplitude_three_state_optimization"
+        get_fixture_path(),
+        "data",
+        "16-51-33_standard_run_ro_amplitude_three_state_optimization-SUCCESS",
     )
     target_directory = os.path.join(
-        get_fixture_path(), "tmp", "standard_run-ro_amplitude_three_state_optimization"
+        get_fixture_path(),
+        "tmp",
+        "16-51-33_standard_run_ro_amplitude_three_state_optimization-SUCCESS",
     )
 
     scrape_and_copy_hdf5_files(scrape_directory, target_directory)
