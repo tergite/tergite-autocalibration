@@ -156,6 +156,8 @@ def select_measurement_for_analysis(
             return next(
                 filter(lambda info: info.node_name == node_name, with_data.values())
             )
+
+        # StopIteration can happen during e.g. node_name misspelling
         except StopIteration:
             raise FileNotFoundError(
                 f"The node name '{node_name}' was specified, but the run folder does not "
