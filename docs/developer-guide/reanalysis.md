@@ -38,7 +38,7 @@ The `-r` argument is also compatibile with the `--node-name` argument (shorthand
 acli start --re-analyse "out/2025-07-28/16-51-33_ro_amplitude_three_state_optimization-SUCCESS" -n qubit_01_spectroscopy
 ```
 
-Will do the same thing.
+Will do the same thing. The data will be copied to a new folder together with a new `autocalibration.log` together with the re-analysis output.
 
 It is also possible to directly specify the name of the measurement folder, like so:
 ```
