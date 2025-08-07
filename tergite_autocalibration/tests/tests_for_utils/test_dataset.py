@@ -46,6 +46,7 @@ def test_scrape_and_copy_hdf5_files():
 
 
 def test_is_run_folder():
+    """Check that the standard run test fixture is a run folder"""
     run_dir = os.path.join(
         get_fixture_path(),
         "data",
@@ -55,6 +56,7 @@ def test_is_run_folder():
 
 
 def test_is_measurement_folder():
+    """Check that the standard run test fixture contains the correct measurement folders"""
     run_dir = Path(
         os.path.join(
             get_fixture_path(),
@@ -88,6 +90,7 @@ def test_is_measurement_folder():
 
 
 def test_select_measurement_for_analysis_error_handling():
+    """Test that the error handling for the reanalysis utils is working"""
     with pytest.raises(FileNotFoundError, match=r"^'apple' is not a run folder.$"):
         ra_utils.select_measurement_for_analysis("apple")
 
@@ -107,6 +110,7 @@ def test_select_measurement_for_analysis_error_handling():
 
 
 def test_select_measurement_for_analysis_can_find_measurement():
+    """Test that we can create the measurement info for one of the measurement folder fixtures"""
     run_dir = Path(
         os.path.join(
             get_fixture_path(),
