@@ -13,6 +13,7 @@
 
 import base64
 import json
+import re
 import os
 
 import dash
@@ -168,16 +169,27 @@ def update_tab(tab, outer, inter, inner):
     folder_path = os.path.join(DATA_DIR, outer, inter, inner)
 
     if tab == "image":
-        graph_previews = []
+        image_names = []
         for file in os.listdir(folder_path):
             if file.endswith(".png"):
-                encoded = base64.b64encode(
-                    open(os.path.join(folder_path, file), "rb").read()
-                ).decode()
-                html_image_element = html.Img(
-                    src=f"data:image/png;base64,{encoded}", style={"maxWidth": "100%"}
-                )
-                graph_previews.append(html_image_element)
+                image_names.append(file)
+        if len(image_names) > 1:
+            # the regular expression matches the numerical identifier
+            # when the folder contains multiple images, eg the identifier 11 here:
+            # measurement_11_preview.png
+            # this identifier is used to sort the image names list
+            image_names.sort(
+                key=lambda s: int(re.match(r".*_(\d+)_preview.png", s).group(1))
+            )
+        graph_previews = []
+        for image in image_names:
+            encoded = base64.b64encode(
+                open(os.path.join(folder_path, image), "rb").read()
+            ).decode()
+            html_image_element = html.Img(
+                src=f"data:image/png;base64,{encoded}", style={"maxWidth": "100%"}
+            )
+            graph_previews.append(html_image_element)
         if graph_previews:
             return html.Div(graph_previews)
         return "No image found."
@@ -187,7 +199,6 @@ def update_tab(tab, outer, inter, inner):
             if file.endswith(".json"):
                 with open(os.path.join(folder_path, file)) as f:
                     data = json.load(f)
-                # return html.Pre(json.dumps(data, indent=2))
                 return DashRenderjson(
                     data=data,
                     max_depth=-1,
