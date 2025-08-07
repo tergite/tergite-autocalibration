@@ -26,22 +26,50 @@ REGEX_DAY_FOLDER = re.compile(r"^(\d{4}-\d{2}-\d{2})$")
 
 
 def is_day_folder(path_to_something: Path | str):
+    """
+    Determine whether the path argument is a day folder.
+
+    The folder has to exist and has to match the regex:
+        ^(\d{4}-\d{2}-\d{2})$
+    """
     f = Path(path_to_something).resolve()
     return f.exists() and f.is_dir() and REGEX_DAY_FOLDER.match(f.name)
 
 
 def is_run_folder(path_to_something: Path | str):
+    """
+    Determine whether the path argument is a run folder.
+
+    The folder has to exist and has to match the regex:
+        ^(\d{2}-\d{2}-\d{2})_[\w]+-[\w]+$
+    """
     f = Path(path_to_something).resolve()
     return f.exists() and f.is_dir() and REGEX_RUN_FOLDER.match(f.name)
 
 
 def is_measurement_folder(path_to_something: Path | str):
+    """
+    Determine whether the path argument is a measurement folder.
+
+    The folder has to exist and has to match the regex:
+        ^(\d{8}-\d{6})-\d{3}-[0-9a-f]{6}-[\w]+$
+    """
     f = Path(path_to_something).resolve()
     return f.exists() and f.is_dir() and REGEX_MSMT_FOLDER.match(f.name)
 
 
 @dataclass(frozen=True)
 class MeasurementInfo:
+    """
+    Dataclass for info on a measurement folder.
+
+    timestamp: when the folder was created.
+    tuid: hex identifier for the measurement, without label.
+    msmt_idx: first measurement of the run has index 1, second 2, etc.
+    measurement_folder_path: the os path to the measurement folder.
+    run_folder_path: the os path to the run folder (containing the measurement).
+    dataset_path: the os path to the dataset .hdf5 file.
+    """
 
     timestamp: datetime
     tuid: str
@@ -54,6 +82,14 @@ class MeasurementInfo:
 
 @dataclass(frozen=True)
 class RunInfo:
+    """
+    Dataclass for info a run folder.
+
+    timestamp: when the run folder was created (the HH-MM-SS time it was created).
+    run_idx: the first run of the day has index 1, second 2, etc.
+    measurements: list of measurement info instances for the measurement folders in the run folder.
+    """
+
     timestamp: time
     run_idx: int
     measurements: list[MeasurementInfo]
@@ -61,6 +97,14 @@ class RunInfo:
 
 @dataclass(frozen=True)
 class DayInfo:
+    """
+    Dataclass for a day folder.
+
+    timestamp: when the day folder was created (the day it was created).
+    day_idx: the first day folder has index 1, the second 2, etc.
+    runs: list of run info instances for the run folders in the day folder.
+    """
+
     timestamp: date
     day_idx: int
     runs: list[RunInfo]
@@ -119,6 +163,27 @@ def _classify_subfolders_by_hdf5(
 def select_measurement_for_analysis(
     path_to_run_folder: Path | str, node_name: str | None = None
 ) -> MeasurementInfo:
+    """
+    Selects a measurement info from a run folder for re-analysis.
+
+    If `node_name` is provided, it attempts to find and return the corresponding
+    measurement directly. If not provided, the user will be prompted via CLI to
+    select a measurement from the available ones.
+
+    The prompt can be cancelled with by inputting '0' during selection.
+
+    Parameters:
+        path_to_run_folder (Path | str): Path to the run folder containing measurement subfolders.
+        node_name (str | None, optional): Name of the node to select directly. If None, prompts user.
+
+    Returns:
+        MeasurementInfo: The selected measurement folder info.
+
+    Raises:
+        FileNotFoundError: If the folder is not a valid run folder, contains no measurement data,
+                           or the specified node name is not found.
+        typer.Abort: If the user chooses to cancel from the CLI prompt.
+    """
     path_to_run_folder = Path(path_to_run_folder)
 
     if not is_run_folder(path_to_run_folder):
@@ -189,6 +254,9 @@ def select_measurement_for_analysis(
 
 
 def get_run_infos(path_to_day_folder: Path | str) -> list[RunInfo]:
+    """
+    Returns all the run folder info in the day folder provided.
+    """
     path_to_day_folder = Path(path_to_day_folder)
     if not is_day_folder(path_to_day_folder):
         raise FileNotFoundError(f"'{path_to_day_folder}' is not a day folder.")
@@ -218,6 +286,9 @@ def get_run_infos(path_to_day_folder: Path | str) -> list[RunInfo]:
 
 
 def get_day_infos(path_to_tergite_data_out_folder: Path | str) -> list[DayInfo]:
+    """
+    Returns all the day folder info in the data folder provided.
+    """
     path_to_tergite_data_out_folder = Path(path_to_tergite_data_out_folder).resolve()
     if (
         not path_to_tergite_data_out_folder.exists()
@@ -249,6 +320,10 @@ def get_day_infos(path_to_tergite_data_out_folder: Path | str) -> list[DayInfo]:
 def search_all_runs_for_measurement(
     path_to_tergite_data_out_folder: Path | str, data_identifier: str
 ) -> MeasurementInfo | None:
+    """
+    Explicitly search for a certain measurement folder name or measurement folder path
+    inside the provided data folder, using the data_identifier.
+    """
     path_to_tergite_data_out_folder = Path(path_to_tergite_data_out_folder)
     day_infos = get_day_infos(path_to_tergite_data_out_folder)
     data_identifier_as_path = Path(data_identifier).resolve()
