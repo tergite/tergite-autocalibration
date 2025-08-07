@@ -15,7 +15,18 @@ from dash import dcc, html
 
 
 def generate_selection_layout(folder_structure, index=""):
+    """
+    Generates the folder structure to select a qubit measurement
 
+    Args:
+        folder_structure: dictionary passing the folder structure
+        index: Variable to toggle between left and right view in the comparison
+
+    Returns:
+
+    """
+
+    # Shows to select the folder of the measurement with the date
     outer_selection_DIV = html.Div(
         [
             html.H2("Select Date:"),
@@ -32,6 +43,7 @@ def generate_selection_layout(folder_structure, index=""):
         style={"marginBottom": "20px"},
     )
 
+    # Shows the folder of a specific calibration run
     intermediate_selection_DIV = html.Div(
         [
             html.H2("Select the calibration chain:"),
@@ -44,6 +56,7 @@ def generate_selection_layout(folder_structure, index=""):
         style={"marginBottom": "20px"},
     )
 
+    # Shows the selection for the specific folder of a single measurement
     inner_selection_DIV = html.Div(
         [
             html.H2("Select a Node Measurement:"),
@@ -56,10 +69,9 @@ def generate_selection_layout(folder_structure, index=""):
         style={"marginBottom": "20px"},
     )
 
+    # A tab view with one tab for the image and another tab for the json object with the qubit definition
     image_display_DIV = html.Div(
         [
-            # html.H2("Image Display"),
-            # html.Div(id={"type": "image-container", "index": index}),
             dcc.Tabs(
                 id={"type": "tabs", "index": index},
                 value="image",
@@ -111,6 +123,7 @@ def generate_selection_layout(folder_structure, index=""):
         style={"marginTop": "20px"},
     )
 
+    # Wrap up the whole page
     selection_layout = html.Div(
         [
             dcc.Store(id={"type": "full-dataset", "index": index}),

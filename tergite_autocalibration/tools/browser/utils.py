@@ -77,7 +77,6 @@ def collect_valid_chains(outer_path) -> dict:
     return valid_intermediates
 
 
-# Scan and store folder structure
 def scan_folders(data_directory: Path) -> dict[str, dict]:
     """
     scan the whole data directory for valid measurements, i.e.

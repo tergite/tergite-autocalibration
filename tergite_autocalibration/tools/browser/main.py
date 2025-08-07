@@ -23,18 +23,17 @@ from dash.dependencies import Input, Output, State
 from dash.dependencies import MATCH
 from dash_renderjson import DashRenderjson
 
-from tergite_autocalibration.tools.browser.utils import scan_folders
+from tergite_autocalibration.config.globals import DATA_DIR
 from tergite_autocalibration.tools.browser.layout import (
     generate_selection_layout,
 )
-
-from tergite_autocalibration.config.globals import DATA_DIR
+from tergite_autocalibration.tools.browser.utils import scan_folders
 
 folder_structure = scan_folders(DATA_DIR)
 
 app = dash.Dash(__name__)
 
-app.title = "Tergite autocalibration data browser"
+app.title = "Data Browser - Tergite Autocalibration"
 
 app.layout = html.Div(
     [
@@ -51,6 +50,16 @@ app.layout = html.Div(
     Output("selection-panel", "children"), Input("compare-button", "n_clicks")
 )
 def toggle_compare(n_clicks):
+    """
+    Callback for the toggle button in the top row
+
+    Args:
+        n_clicks: Number of clicks, used to identify whether to toggle view
+
+    Returns:
+
+    """
+
     if n_clicks % 2 == 1:
         return html.Div(
             [
@@ -67,6 +76,16 @@ def toggle_compare(n_clicks):
     Input("folder-data", "data"),
 )
 def update_intermediate_folders(selected_outer, folder_data):
+    """
+    Callback to update the intermediate folders with the selection for the calibration runs
+
+    Args:
+        selected_outer: Outer folder with the date
+        folder_data: What is inside that folder
+
+    Returns:
+
+    """
     if selected_outer and selected_outer in folder_data:
         return [{"label": f, "value": f} for f in folder_data[selected_outer].keys()]
     return []
@@ -79,6 +98,18 @@ def update_intermediate_folders(selected_outer, folder_data):
     Input("folder-data", "data"),
 )
 def update_inner_folders(selected_intermediate, selected_outer, folder_data):
+    """
+    Callback to update the inner folders with the selection for the measurements
+
+    Args:
+        selected_intermediate: Selected folder for the calibration run
+        selected_outer: Selected outer folder with the calibration date
+        folder_data: What is inside that calibration run folder
+
+    Returns:
+
+    """
+
     if (
         selected_outer
         and selected_intermediate
@@ -98,6 +129,15 @@ def update_inner_folders(selected_intermediate, selected_outer, folder_data):
     prevent_initial_call=True,
 )
 def refresh_folder_structure(n_clicks):
+    """
+    Callback to refresh the outer folder structure
+
+    Args:
+        n_clicks: Unused
+
+    Returns:
+
+    """
     return scan_folders(DATA_DIR)
 
 
@@ -109,6 +149,19 @@ def refresh_folder_structure(n_clicks):
     Input({"type": "inner-selector", "index": MATCH}, "value"),
 )
 def update_tab(tab, outer, inter, inner):
+    """
+    Callback to update the tab content with the calibration image and qubit data
+
+    Args:
+        tab: Whether it is the image or the json tab
+        outer: Outer folder with the measurement date
+        inter: Intermediate folder with the calibration run
+        inner: Inner folder with the qubit measurement
+
+    Returns:
+
+    """
+
     if not (outer and inter and inner):
         return "Please make all selections."
 
@@ -148,7 +201,6 @@ def update_tab(tab, outer, inter, inner):
 
 @app.callback(
     [
-        # Output("hdf5-container", "children"),
         Output({"type": "full-dataset", "index": MATCH}, "data"),
         Output({"type": "element-selector", "index": MATCH}, "options"),
     ],
