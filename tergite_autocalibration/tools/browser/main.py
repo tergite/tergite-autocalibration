@@ -19,7 +19,7 @@ import os
 import dash
 import plotly.express as px
 import xarray as xr
-from dash import dcc, html
+from dash import callback_context, dcc, html
 from dash.dependencies import Input, Output, State
 from dash.dependencies import MATCH
 from dash_renderjson import DashRenderjson
@@ -40,8 +40,43 @@ app.layout = html.Div(
     [
         dcc.Store(id="folder-data", data=folder_structure),
         dcc.Store(id="selected-2d-variable"),
-        html.Button("Refresh Folder Structure", id="refresh-button", n_clicks=0),
-        html.Button("Compare", id="compare-button", n_clicks=0),
+        html.Button(
+            "Refresh Folder Structure",
+            id="refresh-button",
+            n_clicks=0,
+            style={
+                "marginRight": "15px",  # spacing to the right
+                "padding": "10px 20px",  # bigger button
+                "fontSize": "18px",  # bigger text
+                "cursor": "pointer",
+            },
+        ),
+        html.Button(
+            "Compare",
+            id="compare-button",
+            n_clicks=0,
+            style={
+                "padding": "10px 20px",
+                "marginRight": "15px",
+                "fontSize": "18px",
+                "cursor": "pointer",
+            },
+        ),
+        dcc.Input(
+            id="text-input",
+            type="text",
+            debounce=True,  # triggers callback only on blur or Enter
+            placeholder="Enter string for filtering",
+            style={
+                "marginRight": "15px",
+                "padding": "10px",
+                "fontSize": "18px",
+                "width": "250px",
+            },
+        ),
+        html.Div(
+            id="filter-confirmation", style={"marginTop": "10px", "color": "green"}
+        ),
         html.Div(id="selection-panel"),
     ]
 )
@@ -126,20 +161,43 @@ def update_inner_folders(selected_intermediate, selected_outer, folder_data):
 
 @app.callback(
     Output("folder-data", "data"),
+    Output("filter-confirmation", "children"),
     Input("refresh-button", "n_clicks"),
+    Input("text-input", "value"),
     prevent_initial_call=True,
 )
-def refresh_folder_structure(n_clicks):
+def refresh_folder_structure(n_clicks, filter_text):
     """
     Callback to refresh the outer folder structure
 
     Args:
         n_clicks: Unused
+        filter_text: User provided string.
+                     Only measurement folders containing this string are regarded valid.
 
     Returns:
 
     """
-    return scan_folders(DATA_DIR)
+    ctx = callback_context
+    triggered_id = ctx.triggered_id
+
+    # If triggered by folder refresh and no input filter is active
+    if triggered_id == "refresh-button" and not filter_text:
+        return scan_folders(DATA_DIR), ""
+
+    # If triggered by text input and input is not empty
+    if triggered_id == "text-input":
+        # Case 1: Empty text -> reload original structure
+        if not filter_text.strip():
+            return scan_folders(DATA_DIR), "Filter cleared. Showing all folders"
+
+        # Case 2: Text input filters the intermediate folders
+        return (
+            scan_folders(DATA_DIR, filter_text=filter_text),
+            f"Filter applied: showing chains containing measurements with {filter_text}",
+        )
+
+    raise dash.exceptions.PreventUpdate
 
 
 @app.callback(
@@ -299,6 +357,29 @@ def filter_dataset_by_element(selected_elements, dataset_json):
     except Exception as e:
         # return [[]]
         return [[f"Error filtering dataset: {e}"], []]
+
+
+@app.callback(
+    Output({"type": "inner-selector", "index": MATCH}, "value"),
+    Input({"type": "intermediate-selector", "index": MATCH}, "value"),
+    prevent_initial_call=True,
+)
+def reset_inner_on_inter_change(inter_value):
+    return None  # This clears the inner folder selection
+
+
+# @app.callback(
+#     Output("folder-data", "data"),
+#     Input("text-input", "value"),
+#     prevent_initial_call=True,
+# )
+# def update_filtered_folders(text):
+#     print(f"{ text = }")
+#     if not text:
+#         print("NO DASH UPDATE")
+#         return dash.no_update
+#     # return scan_folders(DATA_DIR, filter_text=text)
+#     return None
 
 
 @app.callback(
