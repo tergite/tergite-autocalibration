@@ -85,7 +85,7 @@ app.layout = html.Div(
 @app.callback(
     Output("selection-panel", "children"), Input("compare-button", "n_clicks")
 )
-def toggle_compare(n_clicks):
+def toggle_compare(n_clicks: int):
     """
     Callback for the toggle button in the top row
 
@@ -111,7 +111,7 @@ def toggle_compare(n_clicks):
     Input({"type": "outer-selector", "index": MATCH}, "value"),
     Input("folder-data", "data"),
 )
-def update_intermediate_folders(selected_outer, folder_data):
+def update_intermediate_folders(selected_outer: str, folder_data: dict):
     """
     Callback to update the intermediate folders with the selection for the calibration runs
 
@@ -133,7 +133,9 @@ def update_intermediate_folders(selected_outer, folder_data):
     Input({"type": "outer-selector", "index": MATCH}, "value"),
     Input("folder-data", "data"),
 )
-def update_inner_folders(selected_intermediate, selected_outer, folder_data):
+def update_inner_folders(
+    selected_intermediate: str, selected_outer: str, folder_data: dict
+):
     """
     Callback to update the inner folders with the selection for the measurements
 
@@ -166,7 +168,7 @@ def update_inner_folders(selected_intermediate, selected_outer, folder_data):
     Input("text-input", "value"),
     prevent_initial_call=True,
 )
-def refresh_folder_structure(n_clicks, filter_text):
+def refresh_folder_structure(n_clicks: int, filter_text: str):
     """
     Callback to refresh the outer folder structure
 
@@ -214,7 +216,7 @@ def refresh_folder_structure(n_clicks, filter_text):
     Input({"type": "intermediate-selector", "index": MATCH}, "value"),
     Input({"type": "inner-selector", "index": MATCH}, "value"),
 )
-def update_tab(tab, outer, inter, inner):
+def update_tab(tab: str, outer: str, inter: str, inner: str):
     """
     Callback to update the tab content with the calibration image and qubit data
 
@@ -284,7 +286,9 @@ def update_tab(tab, outer, inter, inner):
     Input({"type": "intermediate-selector", "index": MATCH}, "value"),
     Input({"type": "outer-selector", "index": MATCH}, "value"),
 )
-def display_element_selector(selected_inner, selected_intermediate, selected_outer):
+def display_element_selector(
+    selected_inner: str, selected_intermediate: str, selected_outer: str
+):
     if selected_outer and selected_intermediate and selected_inner:
 
         inner_path = os.path.join(
@@ -330,7 +334,7 @@ def display_element_selector(selected_inner, selected_intermediate, selected_out
     Input({"type": "element-selector", "index": MATCH}, "value"),
     State({"type": "full-dataset", "index": MATCH}, "data"),
 )
-def filter_dataset_by_element(selected_elements, dataset_json):
+def filter_dataset_by_element(selected_elements: list, dataset_json: str):
     if not selected_elements or not dataset_json:
         return ["", []]
     try:
@@ -371,7 +375,7 @@ def filter_dataset_by_element(selected_elements, dataset_json):
     Input({"type": "intermediate-selector", "index": MATCH}, "value"),
     prevent_initial_call=True,
 )
-def reset_inner_on_inter_change(inter_value):
+def reset_inner_on_inter_change(inter_value: str):
     """
     prevents callback errors when the inner (node measurement)
     folder has changed but not the intermediate (calibration chain folder)
@@ -384,7 +388,7 @@ def reset_inner_on_inter_change(inter_value):
     Input({"type": "outer-selector", "index": MATCH}, "value"),
     prevent_initial_call=True,
 )
-def reset_intermediate_on_outer_change(inter_value):
+def reset_intermediate_on_outer_change(inter_value: str):
     """
     prevents callback errors when the intermediate (calibration chain folder)
     folder has changed but not the outer (date folder)
@@ -401,7 +405,7 @@ def reset_intermediate_on_outer_change(inter_value):
     State({"type": "full-dataset", "index": MATCH}, "data"),
     prevent_initial_call=True,
 )
-def plot_y_slice(y_dim_value, selected_elements, dataset_json):
+def plot_y_slice(y_dim_value: str, selected_elements: str, dataset_json: str):
     if not selected_elements or not dataset_json or not y_dim_value:
         return ""
     try:
