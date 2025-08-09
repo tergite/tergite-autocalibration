@@ -14,7 +14,7 @@
 from dash import dcc, html
 
 
-def generate_selection_layout(folder_structure, index=""):
+def generate_selection_layout(folder_structure: dict, index: str = ""):
     """
     Generates the folder structure to select a qubit measurement
 
