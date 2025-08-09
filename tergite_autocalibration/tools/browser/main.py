@@ -192,10 +192,17 @@ def refresh_folder_structure(n_clicks, filter_text):
             return scan_folders(DATA_DIR), "Filter cleared. Showing all folders"
 
         # Case 2: Text input filters the intermediate folders
-        return (
-            scan_folders(DATA_DIR, filter_text=filter_text),
-            f"Filter applied: showing chains containing measurements with {filter_text}",
+        styled_text_span = html.Span(
+            filter_text, style={"color": "blue", "fontWeight": "bold"}
         )
+        confirmation_message = html.Div(
+            [
+                "Filter applied: ",
+                styled_text_span,
+            ],
+            style={"marginTop": "10px"},
+        )
+        return (scan_folders(DATA_DIR, filter_text=filter_text), confirmation_message)
 
     raise dash.exceptions.PreventUpdate
 
@@ -240,9 +247,9 @@ def update_tab(tab, outer, inter, inner):
                 key=lambda s: int(re.match(r".*_(\d+)_preview.png", s).group(1))
             )
         graph_previews = []
-        for image in image_names:
+        for image_local_path in image_names:
             encoded = base64.b64encode(
-                open(os.path.join(folder_path, image), "rb").read()
+                open(os.path.join(folder_path, image_local_path), "rb").read()
             ).decode()
             html_image_element = html.Img(
                 src=f"data:image/png;base64,{encoded}", style={"maxWidth": "100%"}
@@ -365,21 +372,24 @@ def filter_dataset_by_element(selected_elements, dataset_json):
     prevent_initial_call=True,
 )
 def reset_inner_on_inter_change(inter_value):
+    """
+    prevents callback errors when the inner (node measurement)
+    folder has changed but not the intermediate (calibration chain folder)
+    """
     return None  # This clears the inner folder selection
 
 
-# @app.callback(
-#     Output("folder-data", "data"),
-#     Input("text-input", "value"),
-#     prevent_initial_call=True,
-# )
-# def update_filtered_folders(text):
-#     print(f"{ text = }")
-#     if not text:
-#         print("NO DASH UPDATE")
-#         return dash.no_update
-#     # return scan_folders(DATA_DIR, filter_text=text)
-#     return None
+@app.callback(
+    Output({"type": "intermediate-selector", "index": MATCH}, "value"),
+    Input({"type": "outer-selector", "index": MATCH}, "value"),
+    prevent_initial_call=True,
+)
+def reset_intermediate_on_outer_change(inter_value):
+    """
+    prevents callback errors when the intermediate (calibration chain folder)
+    folder has changed but not the outer (date folder)
+    """
+    return None  # This clears the intermediate folder selection
 
 
 @app.callback(
