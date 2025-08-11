@@ -96,6 +96,7 @@ configuration.meta.toml
 !datasets/**/configuration.meta.toml
 !tergite_autocalibration/tests/fixtures/**/configuration.meta.toml
 misc/**
+.browser
 
 # dev-generated artefacts
 tergite_acl/utils/**.csv
