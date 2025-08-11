@@ -138,21 +138,21 @@ application_run:
     # Clear the caches
     - rm -r .venv/lib/python3.12/site-packages/out
     # Run the calibration chain
-    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n resonator_spectroscopy
-    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n qubit_01_spectroscopy
-    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n rabi_oscillations
-    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n ramsey_correction
-    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n motzoi_parameter
-    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n n_rabi_oscillations
-    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n resonator_spectroscopy_1
-    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n qubit_12_spectroscopy
-    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n rabi_oscillations_12
-    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n ramsey_correction_12
-    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n motzoi_parameter_12
-    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n n_rabi_oscillations_12
-    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n resonator_spectroscopy_2
-    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n ro_frequency_three_state_optimization
-    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/standard_run-ro_amplitude_three_state_optimization" -n ro_amplitude_three_state_optimization
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/16-51-33_standard_run_ro_amplitude_three_state_optimization-SUCCESS" -n resonator_spectroscopy
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/16-51-33_standard_run_ro_amplitude_three_state_optimization-SUCCESS" -n qubit_01_spectroscopy
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/16-51-33_standard_run_ro_amplitude_three_state_optimization-SUCCESS" -n rabi_oscillations
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/16-51-33_standard_run_ro_amplitude_three_state_optimization-SUCCESS" -n ramsey_correction
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/16-51-33_standard_run_ro_amplitude_three_state_optimization-SUCCESS" -n motzoi_parameter
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/16-51-33_standard_run_ro_amplitude_three_state_optimization-SUCCESS" -n n_rabi_oscillations
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/16-51-33_standard_run_ro_amplitude_three_state_optimization-SUCCESS" -n resonator_spectroscopy_1
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/16-51-33_standard_run_ro_amplitude_three_state_optimization-SUCCESS" -n qubit_12_spectroscopy
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/16-51-33_standard_run_ro_amplitude_three_state_optimization-SUCCESS" -n rabi_oscillations_12
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/16-51-33_standard_run_ro_amplitude_three_state_optimization-SUCCESS" -n ramsey_correction_12
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/16-51-33_standard_run_ro_amplitude_three_state_optimization-SUCCESS" -n motzoi_parameter_12
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/16-51-33_standard_run_ro_amplitude_three_state_optimization-SUCCESS" -n n_rabi_oscillations_12
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/16-51-33_standard_run_ro_amplitude_three_state_optimization-SUCCESS" -n resonator_spectroscopy_2
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/16-51-33_standard_run_ro_amplitude_three_state_optimization-SUCCESS" -n ro_frequency_three_state_optimization
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/16-51-33_standard_run_ro_amplitude_three_state_optimization-SUCCESS" -n ro_amplitude_three_state_optimization
     # Read
     - ls -lR .venv/lib/python3.12/site-packages/out
     # Delay to encounter for the race condition
@@ -196,8 +196,8 @@ application_run_coupler:
     # Clear the caches
     - rm -r .venv/lib/python3.12/site-packages/out
     # Run the calibration chain
-    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/simple_coupler_run" -n resonator_spectroscopy_vs_current
-    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/simple_coupler_run" -n qubit_spectroscopy_vs_current
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/01-44-14_simple_coupler_run-SUCCESS" -n resonator_spectroscopy_vs_current
+    - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/01-44-14_simple_coupler_run-SUCCESS" -n qubit_spectroscopy_vs_current
     # Read
     - ls .venv/lib/python3.12/site-packages/out
     - echo "Listing all files under 'out':"
