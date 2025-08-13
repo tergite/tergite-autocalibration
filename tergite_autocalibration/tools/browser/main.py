@@ -238,7 +238,7 @@ def update_tab(tab: str, outer: str, inter: str, inner: str):
     if tab == "image":
         image_names = []
         for file in os.listdir(folder_path):
-            if file.endswith(".png"):
+            if file.endswith(".png") and "preview" in file:
                 image_names.append(file)
         if len(image_names) > 1:
             # the regular expression matches the numerical identifier
