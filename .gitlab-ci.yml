@@ -32,8 +32,8 @@ setup:
   image: python:${PYTHON_VERSION}
   script:
     # Create and activate a virtual environment
-    - python -m venv .venv
-    - source .venv/bin/activate
+    - python -m venv venv
+    - source venv/bin/activate
     # Install project dependencies
     - pip install --upgrade pip
     - pip install .
@@ -44,7 +44,7 @@ setup:
         - .cache/pip
     - key: "venv-${CI_COMMIT_REF_NAME}"
       paths:
-        - .venv
+        - venv
 
 tests:
   stage: tests
@@ -58,7 +58,7 @@ tests:
     # Run Redis server
     - redis-server --daemonize yes --port "$REDIS_PORT"
     # Activate the virtual environment
-    - source .venv/bin/activate
+    - source venv/bin/activate
     # Run tests
     - pytest tergite_autocalibration --cov=tergite_autocalibration --cov-report xml --cov-report term-missing --junitxml=report.xml
   coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
@@ -74,7 +74,7 @@ tests:
         - .cache/pip
     - key: "venv-${CI_COMMIT_REF_NAME}"
       paths:
-        - .venv
+        - venv
 
 build_documentation:
   stage: build_documentation
@@ -83,7 +83,7 @@ build_documentation:
     - setup
   script:
     # Activate the virtual environment
-    - source .venv/bin/activate
+    - source venv/bin/activate
     # Install documentation dependencies
     - pip install '.[docs]'
     # Build the documentation with strict mode to catch warnings and errors
@@ -94,7 +94,7 @@ build_documentation:
         - .cache/pip
     - key: "venv-${CI_COMMIT_REF_NAME}"
       paths:
-        - .venv
+        - venv
 
 lint:
   stage: lint
@@ -103,7 +103,7 @@ lint:
     - setup
   script:
     # Activate the virtual environment
-    - source .venv/bin/activate
+    - source venv/bin/activate
     # Run linter and make it fail under 7.0
     - pylint tergite_autocalibration --fail-under=7.0
     # Run formatter
@@ -114,7 +114,7 @@ lint:
         - .cache/pip
     - key: "venv-${CI_COMMIT_REF_NAME}"
       paths:
-        - .venv
+        - venv
 
 application_run:
   stage: application_run
@@ -129,7 +129,7 @@ application_run:
     # Run Redis server
     - redis-server --daemonize yes --port "$REDIS_PORT"
     # Activate the virtual environment
-    - source .venv/bin/activate
+    - source venv/bin/activate
     # Create empty .env file
     - touch .env
     # Load configuration
@@ -137,7 +137,7 @@ application_run:
     # Reset Redis
     - echo "y" | acli node reset -a
     # Clear the caches
-    - rm -r .venv/lib/python3.12/site-packages/out
+    - rm -r venv/lib/python3.12/site-packages/out
     # Run the calibration chain
     - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/16-51-33_standard_run_ro_amplitude_three_state_optimization-SUCCESS" -n resonator_spectroscopy
     - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/16-51-33_standard_run_ro_amplitude_three_state_optimization-SUCCESS" -n qubit_01_spectroscopy
@@ -155,12 +155,12 @@ application_run:
     - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/16-51-33_standard_run_ro_amplitude_three_state_optimization-SUCCESS" -n ro_frequency_three_state_optimization
     - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/16-51-33_standard_run_ro_amplitude_three_state_optimization-SUCCESS" -n ro_amplitude_three_state_optimization
     # Read
-    - ls -lR .venv/lib/python3.12/site-packages/out
+    - ls -lR venv/lib/python3.12/site-packages/out
     # Delay to encounter for the race condition
     - sleep 5
     # Verify output
     - |
-      if find .venv/lib/python3.12/site-packages/out -type f | grep -q "ro_amplitude_three_state_optimization.png"; then
+      if find venv/lib/python3.12/site-packages/out -type f | grep -q "ro_amplitude_three_state_optimization.png"; then
         echo "Output file $OUTPUT_FILE exists. Application ran successfully."
       else
         echo "Error: Output file $OUTPUT_FILE not found."
@@ -172,7 +172,7 @@ application_run:
         - .cache/pip
     - key: "venv-${CI_COMMIT_REF_NAME}"
       paths:
-        - .venv
+        - venv
 
 application_run_coupler:
   stage: application_run_coupler
@@ -187,7 +187,7 @@ application_run_coupler:
     # Run Redis server
     - redis-server --daemonize yes --port "$REDIS_PORT"
     # Activate the virtual environment
-    - source .venv/bin/activate
+    - source venv/bin/activate
     # Create empty .env file
     - touch .env
     # Load configuration
@@ -195,23 +195,23 @@ application_run_coupler:
     # Reset Redis
     - echo "y" | acli node reset -a
     # Clear the caches
-    - rm -r .venv/lib/python3.12/site-packages/out
+    - rm -r venv/lib/python3.12/site-packages/out
     # Run the calibration chain
     - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/01-44-14_simple_coupler_run-SUCCESS" -n resonator_spectroscopy_vs_current
     - echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/01-44-14_simple_coupler_run-SUCCESS" -n qubit_spectroscopy_vs_current
     # Read
-    - ls .venv/lib/python3.12/site-packages/out
+    - ls venv/lib/python3.12/site-packages/out
     - echo "Listing all files under 'out':"
-    - find .venv/lib/python3.12/site-packages/out -type f -name "*.png"
+    - find venv/lib/python3.12/site-packages/out -type f -name "*.png"
     # Verify output
     - |
-      if find .venv/lib/python3.12/site-packages/out -type f | grep -q "qubit_spectroscopy_vs_current.png"; then
+      if find venv/lib/python3.12/site-packages/out -type f | grep -q "qubit_spectroscopy_vs_current.png"; then
         echo "Output file $OUTPUT_FILE exists. Application ran successfully."
       else
         echo "Error: Output file $OUTPUT_FILE not found."
         exit 1
       fi
-      if find .venv/lib/python3.12/site-packages/out -type f | grep -q "qubit_spectroscopy_vs_current_q14_q15_q15_spectroscopies.png"; then
+      if find venv/lib/python3.12/site-packages/out -type f | grep -q "qubit_spectroscopy_vs_current_q14_q15_q15_spectroscopies.png"; then
         echo "Output file $OUTPUT_FILE exists. Application ran successfully."
       else
         echo "Error: Output file $OUTPUT_FILE not found."
@@ -223,7 +223,7 @@ application_run_coupler:
         - .cache/pip
     - key: "venv-${CI_COMMIT_REF_NAME}"
       paths:
-        - .venv
+        - venv
 
 browser_run:
   stage: browser_run
@@ -233,7 +233,7 @@ browser_run:
     - tests
   script:
     # Activate the virtual environment
-    - source .venv/bin/activate
+    - source venv/bin/activate
     # Copy the .env file
     - cp .example.env .env
     # Load configuration
@@ -275,4 +275,4 @@ browser_run:
         - .cache/pip
     - key: "venv-${CI_COMMIT_REF_NAME}"
       paths:
-        - .venv
+        - venv
