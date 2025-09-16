@@ -14,9 +14,7 @@
 
 stages:
   - setup
-  - tests
-  - lint
-  - build_documentation
+  - test_lint_build
   - application_run
   - application_run_coupler
   - browser_run
@@ -41,7 +39,6 @@ setup:
     # Install project dependencies
     - pip install --upgrade pip
     - pip install .
-    - pip install pytest black==24.10.0 requests-mock==1.11.0 pylint pytest-cov
   cache:
     - key: "default"
       paths:
@@ -50,8 +47,8 @@ setup:
       paths:
         - venv
 
-tests:
-  stage: tests
+test_lint_build:
+  stage: test_lint_build
   image: python:${PYTHON_VERSION}
   needs:
     - setup
@@ -63,8 +60,20 @@ tests:
     - redis-server --daemonize yes --port "$REDIS_PORT"
     # Activate the virtual environment
     - source venv/bin/activate
+    # Install test dependencies
+    - pip install ".[test]"
     # Run tests
     - pytest tergite_autocalibration --cov=tergite_autocalibration --cov-report xml --cov-report term-missing --junitxml=report.xml
+    # Install dev dependencies to check for the lint and format
+    - pip install ".[dev]"
+    # Run linter and make it fail under 7.0
+    - pylint tergite_autocalibration --fail-under=7.0
+    # Run formatter
+    - black --check tergite_autocalibration
+    # Install dependencies to build the docs
+    - pip install ".[docs]"
+    # Build the documentation with strict mode to catch warnings and errors
+    - mkdocs build --strict
   coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
     reports:
@@ -80,52 +89,12 @@ tests:
       paths:
         - venv
 
-build_documentation:
-  stage: build_documentation
-  image: python:${PYTHON_VERSION}
-  needs:
-    - setup
-  script:
-    # Activate the virtual environment
-    - source venv/bin/activate
-    # Install documentation dependencies
-    - pip install '.[docs]'
-    # Build the documentation with strict mode to catch warnings and errors
-    - mkdocs build --strict
-  cache:
-    - key: "default"
-      paths:
-        - .cache/pip
-    - key: "venv-${CI_COMMIT_REF_NAME}"
-      paths:
-        - venv
-
-lint:
-  stage: lint
-  image: python:${PYTHON_VERSION}
-  needs:
-    - setup
-  script:
-    # Activate the virtual environment
-    - source venv/bin/activate
-    # Run linter and make it fail under 7.0
-    - pylint tergite_autocalibration --fail-under=7.0
-    # Run formatter
-    - black --check tergite_autocalibration
-  cache:
-    - key: "default"
-      paths:
-        - .cache/pip
-    - key: "venv-${CI_COMMIT_REF_NAME}"
-      paths:
-        - venv
 
 application_run:
   stage: application_run
   image: python:${PYTHON_VERSION}
   needs:
-    - setup
-    - tests
+    - test_lint_build
   script:
     # Install dependencies
     - apt-get update
@@ -182,8 +151,7 @@ application_run_coupler:
   stage: application_run_coupler
   image: python:${PYTHON_VERSION}
   needs:
-    - setup
-    - tests
+    - test_lint_build
   script:
     # Install dependencies
     - apt-get update
@@ -233,8 +201,7 @@ browser_run:
   stage: browser_run
   image: python:${PYTHON_VERSION}
   needs:
-    - setup
-    - tests
+    - test_lint_build
   script:
     # Activate the virtual environment
     - source venv/bin/activate
