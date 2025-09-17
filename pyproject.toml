@@ -28,7 +28,7 @@ authors = [
     { name = "Joel Sandås", email = "sandas@chalmers.se" },
     { name = "Pontus Vikstål", email = "pontus.vikstal@chalmersnextlabs.se" },
     { name = "Michele Faucci Giannelli", email = "faucci@chalmers.se" },
-  { name = "Axel Erik Andersson", email = "axean@chalmers.se" }
+    { name = "Axel Erik Andersson", email = "axean@chalmers.se" }
 ]
 maintainers = [
     { name = "Chalmers Next Labs AB", email = "contact@quantum.chalmersnextlabs.se" }
@@ -75,7 +75,8 @@ dependencies = [
 dev = [
     "jupyter>=1.0.0",
     "black>=24.10.0",
-    "isort>=5.12.0"
+    "isort>=5.12.0",
+    "pylint>=3.3.8"
 ]
 docs = [
     "mkdocs-material==9.6.14",
@@ -87,7 +88,8 @@ docs = [
 ]
 test = [
     "pytest>=8.3.3",
-    "requests-mock>=1.11.0"
+    "requests-mock>=1.11.0",
+    "pytest-cov>=7.0.0"
 ]
 
 [project.scripts]
