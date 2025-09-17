@@ -149,7 +149,7 @@ application_run:
     - |
       for node in \
         resonator_spectroscopy_vs_current \
-        qubit_spectroscopy_vs_current \
+        qubit_spectroscopy_vs_current
       do
         echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/01-44-14_simple_coupler_run-SUCCESS" -n $node
       done
