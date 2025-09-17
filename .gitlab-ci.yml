@@ -135,7 +135,7 @@ application_run:
     - ls -lR venv/lib/python3.12/site-packages/out
     # Verify output
     - |
-      if find venv/lib/python3.12/site-packages/out -type f | grep -q "ro_amplitude_three_state_optimization.png"; then
+      if ls -lR venv/lib/python3.12/site-packages/out | grep -q "ro_amplitude_three_state_optimization.png"; then
         echo "Output file $OUTPUT_FILE exists. Application ran successfully."
       else
         echo "Error: Output file $OUTPUT_FILE not found."
