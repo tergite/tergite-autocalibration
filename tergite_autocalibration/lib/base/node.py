@@ -30,6 +30,7 @@ from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
     CompiledSchedule,
     InstrumentCoordinator,
 )
+from tergite_autocalibration.lib.base.node_interface import NodeInterface
 from tergite_autocalibration.lib.utils.redis import update_redis_trusted_values
 
 
