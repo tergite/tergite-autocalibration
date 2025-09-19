@@ -11,7 +11,6 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import lmfit
 import xarray
 import numpy as np
 from quantify_core.analysis import fitting_models as fm
@@ -37,7 +36,7 @@ class ResonatorSpectroscopyNode(ScheduleQubitNode):
     analysis_obj = ResonatorSpectroscopyNodeAnalysis
     qubit_qois = ["clock_freqs:readout", "Ql", "resonator_minimum"]
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
+    def __init__(self, name: str, all_qubits: list[str], **node_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
 
         self.schedule_samplespace = {

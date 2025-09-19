@@ -327,6 +327,7 @@ class NodeManager:
 
     def _initialize_node(self, node_name: str) -> BaseNode:
         """Initializes a node and updates it with user-defined samplespace if available."""
+        elements = {"qubits": self.config.qubits, "couplers": self.config.couplers}
         node = self.node_factory.create_node(
             node_name,
             self.config.qubits,

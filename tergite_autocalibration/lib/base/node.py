@@ -48,7 +48,7 @@ colorama_init()
 matplotlib.use(PLOTTING_BACKEND)
 
 
-class BaseNode(abc.ABC):
+class Node(NodeInterface):
     measurement_obj: "BaseMeasurement"
     analysis_obj: "BaseNodeAnalysis"
 
@@ -56,7 +56,6 @@ class BaseNode(abc.ABC):
         self.name = name
         self.node_dictionary = node_dictionary
         self.lab_instr_coordinator: InstrumentCoordinator
-        self._results = {}
         self.spi_manager: SpiDAC
         self.schedule_samplespace = {}
         self.external_samplespace = {}
@@ -71,8 +70,8 @@ class BaseNode(abc.ABC):
 
         self.samplespace = self.schedule_samplespace | self.external_samplespace
 
-        self.device_manager: DeviceConfiguration = None
-        self.device: QuantumDevice = None
+        self.device_manager: DeviceConfiguration
+        self.device: QuantumDevice
 
     def measure_node(self, cluster_status) -> xarray.Dataset:
         result_dataset = xarray.Dataset()
@@ -82,55 +81,17 @@ class BaseNode(abc.ABC):
         """
         return result_dataset
 
-    def precompile(self, schedule_samplespace: dict) -> CompiledSchedule:
-        schedule: CompiledSchedule = None
-        """
-        To be implemented by the Classes that define the Node Type:
-        ScheduleNode or ExternalParameterNode
-        """
-        return schedule
-
-    def pre_measurement_operation(self):
-        """
-        To be implemented by the child measurement nodes
-        """
-        pass
-
-    def initial_operation(self):
-        """
-        To be implemented by the child measurement nodes.
-        This is called before the execution of each and every iteration
-        of the samples of the external samplespace.
-        See coupler_spectroscopy for examples.
-        """
-        pass
-
-    def final_operation(self):
-        """
-        To be implemented by the child measurement nodes.
-        This is called after ALL the iteration samples of the
-        external samplespace have been executed.
-        e.g. set back the dc_current to 0 in coupler_spectroscopy.
-        See coupler_spectroscopy for examples.
-        """
-        pass
-
     @property
     def dimensions(self) -> list:
         """
         array of dimensions used for raw dataset reshaping
         """
         schedule_settable_quantities = self.schedule_samplespace.keys()
-
-        # keeping the first element, ASSUMING that all settable elements
-        # have the same dimensions on their samplespace
-
-        # first_settable = list(schedule_settable_quantities)[0]
-        # measured_elements = self.schedule_samplespace[first_settable].keys()
-
         dimensions = []
 
         for quantity in schedule_settable_quantities:
+            # keeping the first element, ASSUMING that all settable elements
+            # have the same dimensions on their samplespace
             first_element = list(self.schedule_samplespace[quantity].keys())[0]
             settable_values = self.schedule_samplespace[quantity][first_element]
             if not isinstance(settable_values, Iterable):
@@ -140,6 +101,16 @@ class BaseNode(abc.ABC):
         if self.loops is not None:
             dimensions.append(self.loops)
         return dimensions
+
+    def calibrate(self, cluster_status):
+        if cluster_status != MeasurementMode.re_analyse:
+            result_dataset = self.measure_node(cluster_status)
+            self.device_manager.save_serial_device(self.name, self.device, data_path)
+            save_dataset(result_dataset, self.name, data_path)
+        # After the measurement free the device resources
+        self.device_manager.close_device()
+        self.post_process(data_path)
+        logger.info("analysis completed")
 
     @staticmethod
     def _print_measurement_info(duration: float, measurement: Tuple[int, int]) -> None:
@@ -199,22 +170,12 @@ class BaseNode(abc.ABC):
             duration *= self.node_dictionary["loop_repetitions"]
         return duration
 
-    def calibrate(self, data_path: Path, cluster_status):
-        if cluster_status != MeasurementMode.re_analyse:
-            result_dataset = self.measure_node(cluster_status)
-            self.device_manager.save_serial_device(self.name, self.device, data_path)
-            save_dataset(result_dataset, self.name, data_path)
-        # After the measurement free the device resources
-        self.device_manager.close_device()
-        self.post_process(data_path)
-        logger.info("analysis completed")
-
     def post_process(self, data_path: Path):
         analysis_kwargs = getattr(self, "analysis_kwargs", dict())
-        node_analysis: BaseNodeAnalysis = self.analysis_obj(
-            self.name, self.redis_fields, **analysis_kwargs
-        )
-        self._results = node_analysis.analyze_node(data_path)
+        # node_analysis: BaseNodeAnalysis = self.analysis_obj(
+        #     self.name, self.redis_fields, **analysis_kwargs
+        # )
+        QOI_dict = self.analyze_node(data_path)
         for element_id_, qois_ in self._results.items():
             update_redis_trusted_values(
                 self.name, element_id_, qoi=qois_, redis_fields=self.redis_fields
@@ -338,7 +299,7 @@ class BaseNode(abc.ABC):
         return dataset
 
 
-class QubitNode(BaseNode, abc.ABC):
+class QubitNode(Node):
     qubit_qois: list[str] | None = None
 
     def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
@@ -391,7 +352,7 @@ class QubitNode(BaseNode, abc.ABC):
         return f"Node({self.name}, {self.all_qubits})"
 
 
-class CouplerNode(BaseNode, abc.ABC):
+class CouplerNode(Node):
     coupler_qois: list[str]
 
     def __init__(self, name: str, couplers: list[str], **node_dictionary):

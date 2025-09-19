@@ -69,30 +69,6 @@ class BaseAnalysis(ABC):
 
         """
 
-    def rotate_to_probability_axis(self, complex_measurement_data):
-        # TODO: THIS DOESNT BELONG HERE
-        """
-        Rotates the S21 IQ points to the real - normalized axis
-        that describes the |0> - |1> axis.
-        !!! It Assumes that complex_measurement_data[-2] corresponds to the |0>
-                        and complex_measurement_data[-1] corresponds to the |1>
-        """
-        measurements = complex_measurement_data.flatten()
-        data = measurements[:-2]
-        calibration_0 = measurements[-2]
-        calibration_1 = measurements[-1]
-        displacement_vector = calibration_1 - calibration_0
-        data_translated_to_zero = data - calibration_0
-
-        rotation_angle = np.angle(displacement_vector)
-        rotated_data = data_translated_to_zero * np.exp(-1j * rotation_angle)
-        rotated_0 = calibration_0 * np.exp(-1j * rotation_angle)
-        rotated_1 = calibration_1 * np.exp(-1j * rotation_angle)
-        normalization = (rotated_1 - rotated_0).real
-        real_rotated_data = rotated_data.real
-        normalized_data = real_rotated_data / normalization
-        return normalized_data
-
 
 class BaseNodeAnalysis(ABC):
     """
