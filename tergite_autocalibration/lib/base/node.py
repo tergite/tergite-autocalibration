@@ -182,6 +182,9 @@ class BaseNode(abc.ABC):
             self.lab_instr_coordinator,
             cluster_status,
         )
+
+        if cluster_status == MeasurementMode.dummy:
+            raw_dataset = self.generate_dummy_dataset()
         result_dataset = self.configure_dataset(raw_dataset)
 
         logger.info("Finished measurement")

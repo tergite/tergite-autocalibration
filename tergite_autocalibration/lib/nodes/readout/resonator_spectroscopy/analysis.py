@@ -117,7 +117,8 @@ class ResonatorSpectroscopyQubitAnalysis(BaseQubitAnalysis):
                 self.minimum_freq,
                 c="blue",
                 ls="solid",
-                label=f"f = {self.minimum_freq:.6E} ± {self.uncertainty:.1E} (Hz)",
+                label=f"f = {self.minimum_freq:.6E}",
+                # label=f"f = {self.minimum_freq:.6E} ± {self.uncertainty:.1E} (Hz)",
             )
         else:
             ax.plot(self.frequencies, np.abs(self.s21_values))

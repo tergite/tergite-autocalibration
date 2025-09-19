@@ -14,6 +14,7 @@
 # that they have been altered from the originals.
 
 import numpy as np
+import xarray
 
 from tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.analysis import (
     NRabi_12_NodeAnalysis,
@@ -26,6 +27,9 @@ from tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.measureme
     RabiOscillationsMeasurement,
 )
 from tergite_autocalibration.lib.nodes.schedule_node import ScheduleQubitNode
+from tergite_autocalibration.lib.utils.analysis_models import RabiModel
+
+rabi = RabiModel()
 
 
 class RabiOscillationsNode(ScheduleQubitNode):
@@ -40,6 +44,24 @@ class RabiOscillationsNode(ScheduleQubitNode):
                 qubit: np.linspace(0.002, 0.90, 61) for qubit in self.all_qubits
             }
         }
+
+    def generate_dummy_dataset(self):
+        dataset = xarray.Dataset()
+        for index, qubit in enumerate(self.all_qubits):
+            samples = self.schedule_samplespace["mw_amplitudes"][qubit]
+            true_params = rabi.make_params(amplitude=0.2, frequency=1, offset=0.2)
+            number_of_samples = len(samples)
+            true_s21 = rabi.eval(params=true_params, drive_amp=samples)
+            noise_scale = 0.005 * index
+            np.random.seed(123)
+            measured_s21 = np.abs(true_s21)
+            measured_s21 = true_s21 + noise_scale * (
+                np.random.randn(number_of_samples)
+                + 1j * np.random.randn(number_of_samples)
+            )
+            data_array = xarray.DataArray(measured_s21)
+            dataset[index] = data_array
+        return dataset
 
 
 class RabiOscillations12Node(ScheduleQubitNode):

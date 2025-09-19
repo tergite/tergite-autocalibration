@@ -72,10 +72,7 @@ class NodeFactory:
             "ro_amplitude_two_state_optimization": "ROAmplitudeTwoStateOptimizationNode",
             "ro_amplitude_three_state_optimization": "ROAmplitudeThreeStateOptimizationNode",
             "randomized_benchmarking_ssro": "RandomizedBenchmarkingSSRONode",
-            "tqg_randomized_benchmarking_ssro": "TQGRandomizedBenchmarkingSSRONode",
-            "tqg_randomized_benchmarking_interleaved_ssro": "TQGRandomizedBenchmarkingInterleavedSSRONode",
             "purity_benchmarking": "PurityBenchmarkingNode",
-            "cz_rb_optimize_ssro": "CZRBOptimizeSSRONode",
         }
         self._node_implementation_paths: Dict[str, Union[str, Path]] = {}
         self._node_classes: Dict[str, type["BaseNode"]] = {}

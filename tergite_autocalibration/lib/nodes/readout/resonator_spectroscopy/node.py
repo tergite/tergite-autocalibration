@@ -11,6 +11,10 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+import lmfit
+import xarray
+import numpy as np
+from quantify_core.analysis import fitting_models as fm
 from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.analysis import (
     ResonatorSpectroscopy1NodeAnalysis,
     ResonatorSpectroscopy2NodeAnalysis,
@@ -21,8 +25,11 @@ from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.measuremen
 )
 from tergite_autocalibration.lib.nodes.schedule_node import ScheduleQubitNode
 
-# TODO: check location
 from tergite_autocalibration.lib.utils.samplespace import resonator_samples
+from tergite_autocalibration.config.legacy import dh
+
+
+resonator = fm.ResonatorModel()
 
 
 class ResonatorSpectroscopyNode(ScheduleQubitNode):
@@ -38,6 +45,34 @@ class ResonatorSpectroscopyNode(ScheduleQubitNode):
                 qubit: resonator_samples(qubit) for qubit in self.all_qubits
             }
         }
+
+    def generate_dummy_dataset(self):
+        dataset = xarray.Dataset()
+        for index, qubit in enumerate(self.all_qubits):
+            ro_freq = dh.get_legacy("VNA_resonator_frequencies")[qubit]
+            true_params = resonator.make_params(
+                fr=ro_freq,
+                Ql=15000,
+                Qe=20000,
+                A=0.01,
+                theta=0.5,
+                phi_v=0,
+                phi_0=0,
+                # f_0=ro_freq, Q=10000, Q_e_real=9000, Q_e_imag=-9000
+            )
+            samples = resonator_samples(qubit)
+            number_of_samples = len(samples)
+            frequncies = np.linspace(samples[0], samples[-1], number_of_samples)
+            true_s21 = resonator.eval(params=true_params, f=frequncies)
+            noise_scale = 0.02
+            np.random.seed(123)
+            measured_s21 = true_s21 + 0 * noise_scale * (
+                np.random.randn(number_of_samples)
+                + 1j * np.random.randn(number_of_samples)
+            )
+            data_array = xarray.DataArray(measured_s21)
+            dataset[index] = data_array
+        return dataset
 
 
 class ResonatorSpectroscopy1Node(ScheduleQubitNode):
