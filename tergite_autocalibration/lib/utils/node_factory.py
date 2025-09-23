@@ -16,37 +16,121 @@
 
 from typing import TYPE_CHECKING
 
-
-if TYPE_CHECKING:
-    from tergite_autocalibration.lib.base.node import QubitNode
+from tergite_autocalibration.lib.nodes.qubit_control.motzoi_parameter.node import (
+    MotzoiParameterNode,
+)
+from tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.node import (
+    NRabiOscillationsNode,
+    RabiOscillations12Node,
+    RabiOscillationsNode,
+)
+from tergite_autocalibration.lib.nodes.qubit_control.ramsey_fringes.node import (
+    RamseyFringes12Node,
+    RamseyFringesNode,
+)
+from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.node import (
+    Qubit01SpectroscopyMultidimNode,
+    Qubit12SpectroscopyMultidimNode,
+)
+from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.node import (
+    ResonatorSpectroscopy1Node,
+    ResonatorSpectroscopy2Node,
+    ResonatorSpectroscopyNode,
+)
+from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.node import (
+    ROAmplitudeThreeStateOptimizationNode,
+    ROAmplitudeTwoStateOptimizationNode,
+)
+from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.node import (
+    ROFrequencyThreeStateOptimizationNode,
+    ROFrequencyTwoStateOptimizationNode,
+)
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 
 
 class NodeFactory:
-
     def select_node(self, node_name: str):
         match node_name:
             case "resonator_spectroscopy":
-                bare_node_obj = "ResonatorSpectroscopyNode"
+                bare_node_obj = ResonatorSpectroscopyNode
                 measurement_type = ScheduleNode
-                element_type = QubitNode
             case "qubit_01_spectroscopy":
-                bare_node_obj = "Qubit01SpectroscopyMultidimNode"
+                bare_node_obj = Qubit01SpectroscopyMultidimNode
                 measurement_type = ScheduleNode
-                element_type = QubitNode
+            case "rabi_oscillations":
+                bare_node_obj = RabiOscillationsNode
+                measurement_type = ScheduleNode
+            case "ramsey_correction":
+                bare_node_obj = RamseyFringesNode
+                measurement_type = ScheduleNode
+            case "motzoi_parameter":
+                bare_node_obj = MotzoiParameterNode
+                measurement_type = ScheduleNode
+            case "n_rabi_oscillations":
+                bare_node_obj = NRabiOscillationsNode
+                measurement_type = ScheduleNode
+            case "resonator_spectroscopy_1":
+                bare_node_obj = ResonatorSpectroscopy1Node
+                measurement_type = ScheduleNode
+            case "qubit_12_spectroscopy":
+                bare_node_obj = Qubit12SpectroscopyMultidimNode
+                measurement_type = ScheduleNode
+            case "rabi_oscillations_12":
+                bare_node_obj = RabiOscillations12Node
+                measurement_type = ScheduleNode
+            case "ramsey_correction_12":
+                bare_node_obj = RamseyFringes12Node
+                measurement_type = ScheduleNode
+            case "resonator_spectroscopy_2":
+                bare_node_obj = ResonatorSpectroscopy2Node
+                measurement_type = ScheduleNode
+            case "ro_frequency_two_state_optimization":
+                bare_node_obj = ROFrequencyTwoStateOptimizationNode
+                measurement_type = ScheduleNode
+            case "ro_amplitude_two_state_optimization":
+                bare_node_obj = ROAmplitudeTwoStateOptimizationNode
+                measurement_type = ScheduleNode
+            case "ro_frequency_three_state_optimization":
+                bare_node_obj = ROFrequencyThreeStateOptimizationNode
+                measurement_type = ScheduleNode
+            case "ro_amplitude_three_state_optimization":
+                bare_node_obj = ROAmplitudeThreeStateOptimizationNode
+                measurement_type = ScheduleNode
 
-        return bare_node_obj, measurement_type, element_type
-
-    def create_node(self, node_name: str, all_qubits: list, couplers: list, **kwargs):
-        bare_node_obj, MeasurementType, ElementType = self.select_node(node_name)
-        breakpoint()
-        bare_node_instance = bare_node_obj(
-            node_name, all_qubits=all_qubits, couplers=couplers, **kwargs
-        )
-        full_node_instance = MeasurementType(ElementType(bare_node_instance))
-        return full_node_instance
+        return bare_node_obj, measurement_type
 
     def all_node_names(self) -> list[str]:
-        return ["resonator_spectroscopy"]
+        return [
+            "resonator_spectroscopy",
+            "qubit_01_spectroscopy",
+            "rabi_oscillations",
+            "ramsey_correction",
+            "motzoi_parameter",
+            "n_rabi_oscillations",
+            "resonator_spectroscopy_1",
+            "qubit_12_spectroscopy",
+            "rabi_oscillations_12",
+            "ramsey_correction_12",
+            "resonator_spectroscopy_2",
+            "ro_frequency_two_state_optimization",
+            "ro_amplitude_two_state_optimization",
+            "ro_frequency_three_state_optimization",
+            "ro_amplitude_three_state_optimization",
+        ]
+
+    def create_node(self, node_name: str, all_qubits: list, couplers: list, **kwargs):
+        NodeObject, MeasurementType = self.select_node(node_name)
+        node_instance = NodeObject(
+            node_name,
+            all_qubits=all_qubits,
+            couplers=couplers,
+            measurement_type=MeasurementType(),
+        )
+        return node_instance
+
+    def get_node_class(self, node_name: str):
+        bare_node_obj, _ = self.select_node(node_name)
+        return bare_node_obj
 
 
 # class NodeFactory:

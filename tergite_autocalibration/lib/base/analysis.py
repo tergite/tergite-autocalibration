@@ -21,7 +21,6 @@ from typing import List
 
 # TODO: we should have a conditional import depending on a feature flag here
 import matplotlib.pyplot as plt
-from matplotlib.axes import Axes
 import numpy as np
 import xarray as xr
 
@@ -96,7 +95,7 @@ class BaseNodeAnalysis(ABC):
         self._qoi = value
 
     @abstractmethod
-    def analyze_node(self, data_path: Path, index: int = 0) -> QOI:
+    def analyze_node(self, data_path: Path, index: int = 0) -> dict[str, QOI]:
         """
         Run the fitting of the analysis function
 
@@ -167,7 +166,7 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         self.column_grid = 5
         self.plots_per_qubit = 1
 
-    def analyze_node(self, data_path: Path, index: int = 0) -> QOI:
+    def analyze_node(self, data_path: Path, index: int = 0) -> dict[str, QOI]:
         """
         Analyze the node and save the results to redis.
         Args:

@@ -15,6 +15,7 @@ import numpy as np
 import xarray
 
 from tergite_autocalibration.config.legacy import dh
+from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis import (
     QubitSpectroscopy12NodeMultidim,
     QubitSpectroscopyNodeMultidim,
@@ -22,15 +23,13 @@ from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis impor
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement import (
     TwoTonesMultidimMeasurement,
 )
-from tergite_autocalibration.lib.nodes.schedule_node import ScheduleQubitNode
 from tergite_autocalibration.lib.utils.samplespace import qubit_samples
-from lmfit.models import LinearModel, LorentzianModel
-from tergite_autocalibration.config.legacy import dh
+from lmfit.models import LorentzianModel
 
 peak = LorentzianModel()
 
 
-class Qubit01SpectroscopyMultidimNode(ScheduleQubitNode):
+class Qubit01SpectroscopyMultidimNode(QubitNode):
     measurement_obj = TwoTonesMultidimMeasurement
     analysis_obj = QubitSpectroscopyNodeMultidim
     qubit_qois = ["clock_freqs:f01", "spec:spec_ampl_optimal"]
@@ -77,7 +76,7 @@ class Qubit01SpectroscopyMultidimNode(ScheduleQubitNode):
         return dataset
 
 
-class Qubit12SpectroscopyMultidimNode(ScheduleQubitNode):
+class Qubit12SpectroscopyMultidimNode(QubitNode):
     measurement_obj = TwoTonesMultidimMeasurement
     analysis_obj = QubitSpectroscopy12NodeMultidim
     qubit_qois = ["clock_freqs:f12", "spec:spec_ampl_12_optimal"]

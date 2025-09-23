@@ -14,6 +14,7 @@
 import xarray
 import numpy as np
 from quantify_core.analysis import fitting_models as fm
+from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.analysis import (
     ResonatorSpectroscopy1NodeAnalysis,
     ResonatorSpectroscopy2NodeAnalysis,
@@ -22,22 +23,23 @@ from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.analysis i
 from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.measurement import (
     ResonatorSpectroscopyMeasurement,
 )
-from tergite_autocalibration.lib.nodes.schedule_node import ScheduleQubitNode
 
 from tergite_autocalibration.lib.utils.samplespace import resonator_samples
 from tergite_autocalibration.config.legacy import dh
+
+import quantify_scheduler
 
 
 resonator = fm.ResonatorModel()
 
 
-class ResonatorSpectroscopyNode(ScheduleQubitNode):
+class ResonatorSpectroscopyNode(QubitNode):
     measurement_obj = ResonatorSpectroscopyMeasurement
     analysis_obj = ResonatorSpectroscopyNodeAnalysis
     qubit_qois = ["clock_freqs:readout", "Ql", "resonator_minimum"]
 
     def __init__(self, name: str, all_qubits: list[str], **node_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+        super().__init__(name, all_qubits, **node_keywords)
 
         self.schedule_samplespace = {
             "ro_frequencies": {
@@ -74,7 +76,7 @@ class ResonatorSpectroscopyNode(ScheduleQubitNode):
         return dataset
 
 
-class ResonatorSpectroscopy1Node(ScheduleQubitNode):
+class ResonatorSpectroscopy1Node(QubitNode):
     measurement_obj = ResonatorSpectroscopyMeasurement
     analysis_obj = ResonatorSpectroscopy1NodeAnalysis
     qubit_qois = [
@@ -95,7 +97,7 @@ class ResonatorSpectroscopy1Node(ScheduleQubitNode):
         }
 
 
-class ResonatorSpectroscopy2Node(ScheduleQubitNode):
+class ResonatorSpectroscopy2Node(QubitNode):
     measurement_obj = ResonatorSpectroscopyMeasurement
     analysis_obj = ResonatorSpectroscopy2NodeAnalysis
     qubit_qois = ["extended_clock_freqs:readout_2"]

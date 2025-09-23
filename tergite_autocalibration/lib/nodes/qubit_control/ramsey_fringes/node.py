@@ -15,6 +15,7 @@
 
 import numpy as np
 
+from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.qubit_control.ramsey_fringes.analysis import (
     RamseyDetunings01NodeAnalysis,
     RamseyDetunings12NodeAnalysis,
@@ -22,10 +23,9 @@ from tergite_autocalibration.lib.nodes.qubit_control.ramsey_fringes.analysis imp
 from tergite_autocalibration.lib.nodes.qubit_control.ramsey_fringes.measurement import (
     RamseyDetuningsMeasurement,
 )
-from tergite_autocalibration.lib.nodes.schedule_node import ScheduleQubitNode
 
 
-class RamseyFringes12Node(ScheduleQubitNode):
+class RamseyFringes12Node(QubitNode):
     measurement_obj = RamseyDetuningsMeasurement
     analysis_obj = RamseyDetunings12NodeAnalysis
     qubit_qois = ["clock_freqs:f12"]
@@ -44,7 +44,7 @@ class RamseyFringes12Node(ScheduleQubitNode):
         }
 
 
-class RamseyFringesNode(ScheduleQubitNode):
+class RamseyFringesNode(QubitNode):
     measurement_obj = RamseyDetuningsMeasurement
     analysis_obj = RamseyDetunings01NodeAnalysis
     qubit_qois = ["clock_freqs:f01"]

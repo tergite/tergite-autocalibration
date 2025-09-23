@@ -13,7 +13,6 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import abc
 from collections.abc import Iterable
 from pathlib import Path
 from typing import Tuple
@@ -34,7 +33,7 @@ from tergite_autocalibration.lib.base.node_interface import NodeInterface
 from tergite_autocalibration.lib.utils.redis import update_redis_trusted_values
 
 
-from tergite_autocalibration.config.globals import PLOTTING_BACKEND, REDIS_CONNECTION
+from tergite_autocalibration.config.globals import PLOTTING_BACKEND
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.lib.utils.device import DeviceConfiguration
@@ -53,9 +52,10 @@ class Node(NodeInterface):
     measurement_obj: "BaseMeasurement"
     analysis_obj: "BaseNodeAnalysis"
 
-    def __init__(self, name: str, **node_dictionary):
+    def __init__(self, name: str, measurement_type, **node_dictionary):
         self.name = name
         self.node_dictionary = node_dictionary
+        self.measurement_type = measurement_type
         self.lab_instr_coordinator: InstrumentCoordinator
         self.spi_manager: SpiDAC
         self.schedule_samplespace = {}
@@ -75,12 +75,12 @@ class Node(NodeInterface):
         self.device: QuantumDevice
 
     def measure_node(self, cluster_status) -> xarray.Dataset:
-        result_dataset = xarray.Dataset()
         """
-        To be implemented by the Classes that define the Node Type:
-        ScheduleNode or ExternalParameterNode
+        Here we attach the measure_node method according to the
+        measurement_type: ScheduleNode or ExternalParameterNode or something else
         """
-        return result_dataset
+        dataset = self.measurement_type.measure_node(cluster_status, self)
+        return dataset
 
     @property
     def dimensions(self) -> list:
@@ -103,9 +103,9 @@ class Node(NodeInterface):
             dimensions.append(self.loops)
         return dimensions
 
-    def calibrate(self, cluster_status):
-        if cluster_status != MeasurementMode.re_analyse:
-            result_dataset = self.measure_node(cluster_status)
+    def calibrate(self, data_path, measurement_mode):
+        if measurement_mode != MeasurementMode.re_analyse:
+            result_dataset = self.measure_node(measurement_mode)
             self.device_manager.save_serial_device(self.name, self.device, data_path)
             save_dataset(result_dataset, self.name, data_path)
         # After the measurement free the device resources
@@ -173,15 +173,15 @@ class Node(NodeInterface):
 
     def post_process(self, data_path: Path):
         analysis_kwargs = getattr(self, "analysis_kwargs", dict())
-        # node_analysis: BaseNodeAnalysis = self.analysis_obj(
-        #     self.name, self.redis_fields, **analysis_kwargs
-        # )
-        QOI_dict = self.analyze_node(data_path)
-        for element_id_, qois_ in self._results.items():
+        node_analysis: BaseNodeAnalysis = self.analysis_obj(
+            self.name, self.redis_fields, **analysis_kwargs
+        )
+        QOI_dict = node_analysis.analyze_node(data_path)
+        for element_id_, qois_ in QOI_dict.items():
             update_redis_trusted_values(
                 self.name, element_id_, qoi=qois_, redis_fields=self.redis_fields
             )
-        return self._results
+        return QOI_dict
 
     def configure_dataset(
         self,
@@ -303,8 +303,8 @@ class Node(NodeInterface):
 class QubitNode(Node):
     qubit_qois: list[str] | None = None
 
-    def __init__(self, name: str, all_qubits: list[str], **node_dictionary):
-        super().__init__(name)
+    def __init__(self, name: str, all_qubits: list[str], **node_keywords):
+        super().__init__(name, **node_keywords)
         self.all_qubits = all_qubits
         self.qubit_state = 0  # can be 0 or 1 or 2
         self.plots_per_qubit = 1  # can be 0 or 1 or 2
