@@ -52,6 +52,7 @@ class NodeFactory:
             "motzoi_parameter_12": "MotzoiParameter12Node",
             "n_rabi_oscillations_12": "NRabiOscillations12Node",
             "qubit_spectroscopy_vs_current": "QubitSpectroscopyVsCurrentNode",
+            "coupler_anticrossing": "QubitSpectroscopyVsCurrentNode",
             "resonator_spectroscopy_vs_current": "ResonatorSpectroscopyVsCurrentNode",
             "T1": "T1Node",
             "T2": "T2Node",
