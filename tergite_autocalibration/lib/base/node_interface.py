@@ -47,14 +47,6 @@ class NodeInterface(ABC):
     def post_process(self) -> None:
         pass
 
-    @property
-    @abstractmethod
-    def dimensions(self) -> list:
-        """
-        array of dimensions used for raw dataset reshaping
-        """
-        pass
-
 
 class MeasurementType(ABC):
     @abstractmethod

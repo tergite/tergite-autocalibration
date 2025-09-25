@@ -16,6 +16,12 @@
 
 from typing import TYPE_CHECKING
 
+from tergite_autocalibration.lib.nodes.coupler.spectroscopy.node import (
+    QubitSpectroscopyVsCurrentNode,
+)
+from tergite_autocalibration.lib.nodes.external_parameter_node import (
+    ExternalParameterNode,
+)
 from tergite_autocalibration.lib.nodes.qubit_control.motzoi_parameter.node import (
     MotzoiParameterNode,
 )
@@ -96,6 +102,9 @@ class NodeFactory:
             case "ro_amplitude_three_state_optimization":
                 bare_node_obj = ROAmplitudeThreeStateOptimizationNode
                 measurement_type = ScheduleNode
+            case "coupler_anticrossing":
+                bare_node_obj = QubitSpectroscopyVsCurrentNode
+                measurement_type = ExternalParameterNode
 
         return bare_node_obj, measurement_type
 
@@ -116,6 +125,7 @@ class NodeFactory:
             "ro_amplitude_two_state_optimization",
             "ro_frequency_three_state_optimization",
             "ro_amplitude_three_state_optimization",
+            "coupler_anticrossing",
         ]
 
     def create_node(self, node_name: str, all_qubits: list, couplers: list, **kwargs):

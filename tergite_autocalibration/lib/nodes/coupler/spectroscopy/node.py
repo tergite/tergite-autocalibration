@@ -13,20 +13,18 @@
 
 from pathlib import Path
 
-import numpy as np
 from lmfit.models import LinearModel, LorentzianModel
+import numpy as np
 from quantify_scheduler import CompiledSchedule
 from quantify_scheduler.backends import SerialCompiler
 import quantify_scheduler.backends.qblox.constants as constants
 import xarray
 
 from tergite_autocalibration.config.legacy import dh
+from tergite_autocalibration.lib.base.node import CouplerNode
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
     QubitSpectroscopyVsCurrentNodeAnalysis,
     ResonatorSpectroscopyVsCurrentNodeAnalysis,
-)
-from tergite_autocalibration.lib.nodes.external_parameter_node import (
-    ExternalParameterFixedScheduleCouplerNode,
 )
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement import (
     TwoTonesMultidimMeasurement,
@@ -38,13 +36,12 @@ from tergite_autocalibration.lib.utils.samplespace import (
     qubit_samples,
     resonator_samples,
 )
-from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.logging import logger
 
 peak = LorentzianModel()
 
 
-class QubitSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNode):
+class QubitSpectroscopyVsCurrentNode(CouplerNode):
     """
     This node performs a qubit spectroscopy measurement while varying the
     current through the coupler to measure the crossing point of the coupler with the qubit.
@@ -73,6 +70,9 @@ class QubitSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNode):
             },
         }
         self.validate()
+
+    def initial_operation(self):
+        pass
 
     def pre_measurement_operation(self, reduced_ext_space):
         first_coupler = self.couplers[0]
@@ -120,7 +120,7 @@ class QubitSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNode):
         return dataset
 
 
-class ResonatorSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNode):
+class ResonatorSpectroscopyVsCurrentNode(CouplerNode):
     """
     This node performs a resonator spectroscopy measurement while varying the
     current through the coupler to measure the crossing point of the coupler with the resonator.

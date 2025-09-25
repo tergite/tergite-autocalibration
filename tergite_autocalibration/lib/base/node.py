@@ -42,6 +42,7 @@ from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
 from tergite_autocalibration.utils.io.dataset import save_dataset
 from tergite_autocalibration.utils.logging import logger
+from tergite_autocalibration.utils.measurement_utils import samplespace_dimensions
 
 colorama_init()
 
@@ -82,26 +83,26 @@ class Node(NodeInterface):
         dataset = self.measurement_type.measure_node(cluster_status, self)
         return dataset
 
-    @property
-    def dimensions(self) -> list:
-        """
-        array of dimensions used for raw dataset reshaping
-        """
-        schedule_settable_quantities = self.schedule_samplespace.keys()
-        dimensions = []
-
-        for quantity in schedule_settable_quantities:
-            # keeping the first element, ASSUMING that all settable elements
-            # have the same dimensions on their samplespace
-            first_element = list(self.schedule_samplespace[quantity].keys())[0]
-            settable_values = self.schedule_samplespace[quantity][first_element]
-            if not isinstance(settable_values, Iterable):
-                settable_values = np.array([settable_values])
-            dimensions.append(len(settable_values))
-
-        if self.loops is not None:
-            dimensions.append(self.loops)
-        return dimensions
+    # @property
+    # def dimensions(self) -> list:
+    #     """
+    #     array of dimensions used for raw dataset reshaping
+    #     """
+    #     schedule_settable_quantities = self.schedule_samplespace.keys()
+    #     dimensions = []
+    #
+    #     for quantity in schedule_settable_quantities:
+    #         # keeping the first element, ASSUMING that all settable elements
+    #         # have the same dimensions on their samplespace
+    #         first_element = list(self.schedule_samplespace[quantity].keys())[0]
+    #         settable_values = self.schedule_samplespace[quantity][first_element]
+    #         if not isinstance(settable_values, Iterable):
+    #             settable_values = np.array([settable_values])
+    #         dimensions.append(len(settable_values))
+    #
+    #     if self.loops is not None:
+    #         dimensions.append(self.loops)
+    #     return dimensions
 
     def calibrate(self, data_path, measurement_mode):
         if measurement_mode != MeasurementMode.re_analyse:
@@ -205,7 +206,7 @@ class Node(NodeInterface):
             key_indx = key % n_qubits  # this is to handle ro_opt_frequencies node where
             coords_dict = {}
             measured_qubit = measurement_qubits[key_indx]
-            dimensions = self.dimensions
+            dimensions = samplespace_dimensions(samplespace, self.loops)
 
             # TODO: this is flagged for removal.
             if "ssro" in self.name and self.name != "randomized_benchmarking_ssro":
@@ -267,11 +268,11 @@ class Node(NodeInterface):
                 reshaping = np.append(reshaping, dimensions)
                 data_values = data_values.reshape(*reshaping)
             elif "cz_parametrization" in self.name:
-                reshaping = reversed(self.dimensions)
+                reshaping = reversed(dimensions)
                 data_values = data_values.reshape(*reshaping)
                 data_values = np.transpose(data_values)
             else:
-                data_values = data_values.reshape(*self.dimensions, order="F")
+                data_values = data_values.reshape(*dimensions, order="F")
 
             # determine if this dataarray examines a qubit or a coupler:
             # TODO: this needs improvement
@@ -356,8 +357,8 @@ class QubitNode(Node):
 class CouplerNode(Node):
     coupler_qois: list[str]
 
-    def __init__(self, name: str, couplers: list[str], **node_dictionary):
-        super().__init__(name)
+    def __init__(self, name: str, couplers: list[str], **node_keywords):
+        super().__init__(name, **node_keywords)
         self.couplers = couplers
         self.edges = couplers
         self.all_qubits = sorted(set(self.get_coupled_qubits()))
@@ -409,3 +410,12 @@ class CouplerNode(Node):
         )
 
         return compiled_schedule
+
+    def __str__(self):
+        return f"Node representation for {self.name} on couplers {self.couplers}"
+
+    def __format__(self, message):
+        return f"Node representation for {self.name} on couplers {self.couplers}"
+
+    def __repr__(self):
+        return f"Node({self.name}, {self.couplers})"

@@ -21,224 +21,66 @@ from quantify_scheduler.instrument_coordinator.utility import xarray
 
 from tergite_autocalibration.lib.base.node import (
     CouplerNode,
-    BaseNode,
+    Node,
     QubitNode,
 )
-from tergite_autocalibration.utils.measurement_utils import reduce_samplespace
+from tergite_autocalibration.lib.base.node_interface import MeasurementType
+from tergite_autocalibration.utils.measurement_utils import (
+    reduce_samplespace,
+    samplespace_dimensions,
+)
 from tergite_autocalibration.utils.logging import logger
 
 
-class ExternalParameterNode(BaseNode, abc.ABC):
-    def pre_measurement_operation(self, reduced_ext_space):
-        """
-        To be implemented by the child measurement nodes
-        """
-        pass
+class ExternalParameterNode(MeasurementType):
+    def validate_external_parameter_node(self, node) -> None:
+        has_initial = callable(getattr(node, "initial_operation", None))
+        has_premeasure = callable(getattr(node, "pre_measurement_operation", None))
+        has_final = callable(getattr(node, "final_operation", None))
+        if not has_initial:
+            raise AttributeError("initial_operation", node)
+        if not has_premeasure:
+            raise AttributeError("pre_measurement_operation", node)
+        if not has_final:
+            raise AttributeError("final_operation", node)
 
-    @property
-    def external_dimensions(self) -> list:
-        """
-        Multidimensional External Samplespace:
-        size of external samplespace E.g. in
-        self.external_samplespace = {
-            'dc_currents': {'q06_q07': np.array([1e-6, 2e-6, 3e-6, 4e-6])}
-            'crosstalk_currents': {'q08_q09': np.array([-3e-3, 0, 3e-3])}
-        }
-        the external_dimensions is [4, 3]
-        """
-        external_settable_quantities = self.external_samplespace.keys()
-        dimensions = []
+    def measure_node(self, cluster_status, node) -> xarray.Dataset:
 
-        for quantity in external_settable_quantities:
-            settable = list(self.external_samplespace[quantity].keys())[0]
-            dimensions.append(len(self.external_samplespace[quantity][settable]))
+        self.validate_external_parameter_node(node)
 
-        return dimensions
+        external_dimensions = samplespace_dimensions(node.external_samplespace)
+        iterations = external_dimensions[0]
 
-
-class ExternalParameterFixedScheduleNode(ExternalParameterNode):
-    def __init__(self, name: str, **schedule_keywords):
-        super().__init__(name, **schedule_keywords)
-
-    def measure_node(self, cluster_status) -> xarray.Dataset:
-        iterations = self.external_dimensions[0]
-        external_dim = list(self.external_samplespace.keys())[0]
+        # this impleentation supports only 1 external parameter
+        external_dim = list(node.external_samplespace.keys())[0]
 
         result_dataset = xarray.Dataset()
 
-        compiled_schedule = self.precompile(self.schedule_samplespace)
+        compiled_schedule = node.precompile(node.schedule_samplespace)
 
-        self.initial_operation()
+        node.initial_operation()
 
-        for current_iteration in range(iterations):
-            self.reduced_external_samplespace = reduce_samplespace(
-                current_iteration, self.external_samplespace
+        for this_iteration in range(iterations):
+            node.reduced_external_samplespace = reduce_samplespace(
+                this_iteration, node.external_samplespace
             )
-            element_dict = list(self.reduced_external_samplespace.values())[0]
+            element_dict = list(node.reduced_external_samplespace.values())[0]
             current_value = list(element_dict.values())[0]
 
-            self.pre_measurement_operation(
-                reduced_ext_space=self.reduced_external_samplespace
+            node.pre_measurement_operation(
+                reduced_ext_space=node.reduced_external_samplespace
             )
 
-            ds = self.measure_compiled_schedule(
+            ds = node.measure_compiled_schedule(
                 compiled_schedule,
                 cluster_status,
-                measurement=(current_iteration, iterations),
+                measurement=(this_iteration, iterations),
             )
 
             ds = ds.expand_dims({external_dim: np.array([current_value])})
             result_dataset = xarray.merge([ds, result_dataset])
 
         # example of final Operation is ramping the current back to 0 in coupler spectroscopy
-        self.final_operation()
+        node.final_operation()
 
         return result_dataset
-
-
-class ExternalParameterDifferentSchedulesNode(ExternalParameterNode):
-    def __init__(self, name: str, **schedule_keywords):
-        super().__init__(name, **schedule_keywords)
-        self.external_keywords = {}
-
-    def measure_node(self, cluster_status) -> xarray.Dataset:
-        iterations = self.external_dimensions[0]
-        external_dim = list(self.external_samplespace.keys())[0]
-
-        result_dataset = xarray.Dataset()
-        result_dataset_per_qubit: List[xarray.Dataset] = {}
-
-        # Track remaining iterations per element (could be couplers, qubits, etc.)
-        element_iterations = {
-            element: len(self.external_samplespace[external_dim][element])
-            for element in self.external_samplespace[external_dim].keys()
-        }
-        logger.info(f"element_iterations: {element_iterations}")
-        self.initial_operation()
-        max_itarations = max(element_iterations.values())
-
-        for current_iteration in range(max_itarations):
-            for external_key in self.external_keywords.keys():
-
-                extracted = self.external_keywords[external_key][current_iteration]
-                dic = {external_key: extracted}
-
-                self.schedule_keywords = self.schedule_keywords | dic
-
-            self.reduced_external_samplespace = reduce_samplespace(
-                current_iteration, self.external_samplespace
-            )
-            logger.info(
-                f"self.reduced_external_samplespace: {self.reduced_external_samplespace}"
-            )
-
-            # Remove elements (e.g., couplers, qubits) that have completed all iterations
-            active_elements = [
-                element
-                for element, remaining in element_iterations.items()
-                if remaining > 0
-            ]
-            logger.info(f"active_elements: {active_elements}")
-
-            # Dynamically update schedule_samplespace with only active elements
-            self.schedule_samplespace = {
-                param: {
-                    qubit: values
-                    for qubit, values in elements_dict.items()
-                    if any(
-                        qubit in active_coupler for active_coupler in active_elements
-                    )
-                }
-                for param, elements_dict in self.schedule_samplespace.items()
-            }
-
-            if not self.reduced_external_samplespace[external_dim]:  # Check if empty
-                continue  # Skip this iteration if no elements have values left
-
-            element_dict = list(self.reduced_external_samplespace.values())[0]
-
-            if not element_dict:  # Check if empty
-                continue  # Skip if no valid values
-
-            # Collect values to expand as coordinates for each active coupler
-            coordinate_expansions = {}
-            for element in active_elements:
-                element_dict = self.reduced_external_samplespace[external_dim]
-                if element in element_dict:
-                    current_value = element_dict[element]
-                    coordinate_expansions[f"{external_dim}_{element}"] = np.array(
-                        [current_value]
-                    )
-                else:
-                    continue  # Skip if no value for the current element
-
-            compiled_schedule = self.precompile(self.schedule_samplespace)
-
-            self.pre_measurement_operation(
-                reduced_ext_space=self.reduced_external_samplespace
-            )
-
-            ds = self.measure_compiled_schedule(
-                compiled_schedule,
-                cluster_status,
-                measurement=(current_iteration, iterations),
-            )
-
-            for var_name in ds.data_vars:
-                qubit = var_name.removeprefix("y")
-                if qubit not in result_dataset_per_qubit:
-                    result_dataset_per_qubit[qubit] = xr.Dataset()
-
-                relevant_coords = {
-                    coord_name: values
-                    for coord_name, values in coordinate_expansions.items()
-                    if qubit
-                    in coord_name  # qubit 'q08' in 'cz_parking_currents_q08_q09'
-                }
-
-                var_data = ds[var_name]
-                if relevant_coords:
-                    for dim, val in relevant_coords.items():
-                        var_data = var_data.expand_dims({dim: val})
-                        var_data = var_data.assign_coords({dim: val})
-
-                # Now package it in its own dataset
-                var_ds = xr.Dataset({var_name: var_data})
-
-                result_dataset_per_qubit[qubit] = xr.merge(
-                    [result_dataset_per_qubit[qubit], var_ds], compat="no_conflicts"
-                )
-
-            for var_ds in result_dataset_per_qubit.values():
-                result_dataset = xr.merge(
-                    [result_dataset, var_ds], compat="no_conflicts"
-                )
-
-            for element in active_elements:
-                element_iterations[element] -= 1  # Track progress
-
-        # example of final Operation is ramping the current back to 0 in coupler spectroscopy
-        self.final_operation()
-
-        return result_dataset
-
-
-class ExternalParameterFixedScheduleQubitNode(
-    ExternalParameterFixedScheduleNode, QubitNode
-):
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits=all_qubits, **schedule_keywords)
-
-
-class ExternalParameterFixedScheduleCouplerNode(
-    ExternalParameterFixedScheduleNode, CouplerNode
-):
-    def __init__(self, name: str, couplers: list[str], **schedule_keywords):
-        super().__init__(name, couplers=couplers, **schedule_keywords)
-
-
-class ExternalParameterDifferentSchedulesCouplerNode(
-    ExternalParameterDifferentSchedulesNode, CouplerNode
-):
-    def __init__(self, name: str, couplers: list[str], **schedule_keywords):
-        super().__init__(name, couplers=couplers, **schedule_keywords)
