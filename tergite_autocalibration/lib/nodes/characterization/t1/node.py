@@ -17,19 +17,17 @@ from time import sleep
 
 import numpy as np
 
+from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.characterization.t1.analysis import (
     T1NodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.characterization.t1.measurement import (
     T1Measurement,
 )
-from tergite_autocalibration.lib.nodes.external_parameter_node import (
-    ExternalParameterFixedScheduleQubitNode,
-)
 from tergite_autocalibration.utils.logging import logger
 
 
-class T1Node(ExternalParameterFixedScheduleQubitNode):
+class T1Node(QubitNode):
     """
     Node for T1 measurement and analysis.
     This node performs T1 measurements on multiple qubits

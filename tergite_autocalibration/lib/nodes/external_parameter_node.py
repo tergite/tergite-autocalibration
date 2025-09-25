@@ -12,24 +12,15 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import abc
-from typing import List
 import numpy as np
-import xarray as xr
 
 from quantify_scheduler.instrument_coordinator.utility import xarray
 
-from tergite_autocalibration.lib.base.node import (
-    CouplerNode,
-    Node,
-    QubitNode,
-)
 from tergite_autocalibration.lib.base.node_interface import MeasurementType
 from tergite_autocalibration.utils.measurement_utils import (
     reduce_samplespace,
     samplespace_dimensions,
 )
-from tergite_autocalibration.utils.logging import logger
 
 
 class ExternalParameterNode(MeasurementType):
@@ -44,14 +35,13 @@ class ExternalParameterNode(MeasurementType):
         if not has_final:
             raise AttributeError("final_operation", node)
 
-    def measure_node(self, cluster_status, node) -> xarray.Dataset:
+    def measure_node(self, measurement_mode, node) -> xarray.Dataset:
 
         self.validate_external_parameter_node(node)
 
         external_dimensions = samplespace_dimensions(node.external_samplespace)
+        # this implementation supports only 1 external parameter
         iterations = external_dimensions[0]
-
-        # this impleentation supports only 1 external parameter
         external_dim = list(node.external_samplespace.keys())[0]
 
         result_dataset = xarray.Dataset()
@@ -65,6 +55,7 @@ class ExternalParameterNode(MeasurementType):
                 this_iteration, node.external_samplespace
             )
             element_dict = list(node.reduced_external_samplespace.values())[0]
+
             current_value = list(element_dict.values())[0]
 
             node.pre_measurement_operation(
@@ -73,7 +64,7 @@ class ExternalParameterNode(MeasurementType):
 
             ds = node.measure_compiled_schedule(
                 compiled_schedule,
-                cluster_status,
+                measurement_mode,
                 measurement=(this_iteration, iterations),
             )
 

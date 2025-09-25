@@ -50,5 +50,5 @@ class NodeInterface(ABC):
 
 class MeasurementType(ABC):
     @abstractmethod
-    def measure_node(self, cluster_status, node: Node) -> xarray.Dataset:
+    def measure_node(self, measurement_mode, node: Node) -> xarray.Dataset:
         pass

@@ -16,6 +16,17 @@
 
 from typing import TYPE_CHECKING
 
+from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.node import (
+    PurityBenchmarkingNode,
+)
+from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.node import (
+    RandomizedBenchmarkingNode,
+)
+from tergite_autocalibration.lib.nodes.characterization.t1.node import T1Node
+from tergite_autocalibration.lib.nodes.characterization.t2.node import (
+    T2EchoNode,
+    T2Node,
+)
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.node import (
     QubitSpectroscopyVsCurrentNode,
 )
@@ -51,7 +62,10 @@ from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.node im
     ROFrequencyThreeStateOptimizationNode,
     ROFrequencyTwoStateOptimizationNode,
 )
-from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
+from tergite_autocalibration.lib.nodes.schedule_node import (
+    OuterScheduleNode,
+    ScheduleNode,
+)
 
 
 class NodeFactory:
@@ -72,6 +86,15 @@ class NodeFactory:
             case "motzoi_parameter":
                 bare_node_obj = MotzoiParameterNode
                 measurement_type = ScheduleNode
+            case "T1":
+                bare_node_obj = T1Node
+                measurement_type = ExternalParameterNode
+            case "T2":
+                bare_node_obj = T2Node
+                measurement_type = ExternalParameterNode
+            case "T2_echo":
+                bare_node_obj = T2EchoNode
+                measurement_type = ExternalParameterNode
             case "n_rabi_oscillations":
                 bare_node_obj = NRabiOscillationsNode
                 measurement_type = ScheduleNode
@@ -102,6 +125,12 @@ class NodeFactory:
             case "ro_amplitude_three_state_optimization":
                 bare_node_obj = ROAmplitudeThreeStateOptimizationNode
                 measurement_type = ScheduleNode
+            case "randomized_benchmarking":
+                bare_node_obj = RandomizedBenchmarkingNode
+                measurement_type = OuterScheduleNode
+            case "purity_benchmarking":
+                bare_node_obj = PurityBenchmarkingNode
+                measurement_type = OuterScheduleNode
             case "coupler_anticrossing":
                 bare_node_obj = QubitSpectroscopyVsCurrentNode
                 measurement_type = ExternalParameterNode
@@ -126,6 +155,9 @@ class NodeFactory:
             "ro_frequency_three_state_optimization",
             "ro_amplitude_three_state_optimization",
             "coupler_anticrossing",
+            "T1",
+            "T2",
+            "T2_echo",
         ]
 
     def create_node(self, node_name: str, all_qubits: list, couplers: list, **kwargs):

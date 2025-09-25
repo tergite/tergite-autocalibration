@@ -10,73 +10,60 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+import numpy
 from quantify_scheduler.instrument_coordinator.utility import xarray
 
 from tergite_autocalibration.lib.base.node_interface import MeasurementType
+from tergite_autocalibration.utils.measurement_utils import (
+    reduce_samplespace,
+    samplespace_dimensions,
+)
 
 
 class ScheduleNode(MeasurementType):
-    def measure_node(self, cluster_status, node) -> xarray.Dataset:
+    def measure_node(self, measurement_mode, node) -> xarray.Dataset:
         """
-        Measurements that involve only schedule parametres
+        Simple measurements that involve only schedule parameteres
         """
         compiled_schedule = node.precompile(node.schedule_samplespace)
         result_dataset = node.measure_compiled_schedule(
             compiled_schedule,
-            cluster_status=cluster_status,
+            measurement_mode=measurement_mode,
         )
         return result_dataset
 
 
 class OuterScheduleNode(MeasurementType):
-    @property
-    def outer_schedule_dimensions(self) -> int:
-        """
-        size of outer samplespace E.g. in
-        self.outer_samplespace = {
-            'cz_amplitudes': {'q06_q07': np.array([1e-6, 2e-6, 3e-6, 4e-6])}
-        }
-        the external_dimensions is 4
-        """
-        outer_settable_quantities = self.outer_schedule_samplespace.keys()
 
-        if len(outer_settable_quantities) > 1:
-            raise NotImplementedError("Multidimensional Outer Samplespace")
-
-        settable = list(outer_settable_quantities)[0]
-        measured_elements = self.outer_schedule_samplespace[settable].keys()
-        first_element = list(measured_elements)[0]
-
-        dimensions = len(self.outer_schedule_samplespace[settable][first_element])
-        return dimensions
-
-    def measure_node(self, cluster_status) -> xarray.Dataset:
+    def measure_node(self, measurement_mode, node) -> xarray.Dataset:
         """
         This correspond to schedules where the measurement points
-        are more than the memory limit of the QRM_RF.
-        For example large single shots measurements
+        exceed the memory limit of the QRM_RF.
+        For example large single shots measurements.
         """
-        iterations = self.outer_schedule_dimensions
-        outer_dim = list(self.outer_schedule_samplespace.keys())[0]
+        outer_dimensions = samplespace_dimensions(node.outer_schedule_samplespace)
+        # this implementation supports only 1 outer parameter
+        iterations = outer_dimensions[0]
+        outer_dim = list(node.outer_schedule_samplespace.keys())[0]
 
         result_dataset = xarray.Dataset()
 
-        for current_iteration in range(iterations):
+        for this_iteration in range(iterations):
             reduced_outer_samplespace = reduce_samplespace(
-                current_iteration, self.outer_schedule_samplespace
+                this_iteration, node.outer_schedule_samplespace
             )
             element_dict = list(reduced_outer_samplespace.values())[0]
             current_value = list(element_dict.values())[0]
 
-            samplespace = self.schedule_samplespace | reduced_outer_samplespace
-            compiled_schedule = self.precompile(samplespace)
+            samplespace = node.schedule_samplespace | reduced_outer_samplespace
+            compiled_schedule = node.precompile(samplespace)
 
-            ds = self.measure_compiled_schedule(
+            ds = node.measure_compiled_schedule(
                 compiled_schedule,
-                cluster_status,
-                measurement=(current_iteration, iterations),
+                measurement_mode,
+                measurement=(this_iteration, iterations),
             )
-            ds = ds.expand_dims({outer_dim: np.array([current_value])})
+            ds = ds.expand_dims({outer_dim: numpy.array([current_value])})
             result_dataset = xarray.merge([ds, result_dataset])
 
         return result_dataset
