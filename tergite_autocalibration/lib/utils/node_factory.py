@@ -39,11 +39,11 @@ class NodeFactory:
             "punchout": "PunchoutNode",
             "resonator_spectroscopy": "ResonatorSpectroscopyNode",
             "resonator_relaxation": "ResonatorRelaxationNode",
-            "qubit_01_spectroscopy": "Qubit01SpectroscopyMultidimNode",
+            "qubit_01_spectroscopy": "Qubit01SpectroscopyNode",
             "rabi_oscillations": "RabiOscillationsNode",
             "ramsey_correction": "RamseyFringesNode",
             "resonator_spectroscopy_1": "ResonatorSpectroscopy1Node",
-            "qubit_12_spectroscopy": "Qubit12SpectroscopyMultidimNode",
+            "qubit_12_spectroscopy": "Qubit12SpectroscopyNode",
             "rabi_oscillations_12": "RabiOscillations12Node",
             "ramsey_correction_12": "RamseyFringes12Node",
             "resonator_spectroscopy_2": "ResonatorSpectroscopy2Node",
@@ -52,6 +52,7 @@ class NodeFactory:
             "motzoi_parameter_12": "MotzoiParameter12Node",
             "n_rabi_oscillations_12": "NRabiOscillations12Node",
             "qubit_spectroscopy_vs_current": "QubitSpectroscopyVsCurrentNode",
+            "coupler_anticrossing": "QubitSpectroscopyVsCurrentNode",
             "resonator_spectroscopy_vs_current": "ResonatorSpectroscopyVsCurrentNode",
             "T1": "T1Node",
             "T2": "T2Node",
@@ -72,10 +73,7 @@ class NodeFactory:
             "ro_amplitude_two_state_optimization": "ROAmplitudeTwoStateOptimizationNode",
             "ro_amplitude_three_state_optimization": "ROAmplitudeThreeStateOptimizationNode",
             "randomized_benchmarking_ssro": "RandomizedBenchmarkingSSRONode",
-            "tqg_randomized_benchmarking_ssro": "TQGRandomizedBenchmarkingSSRONode",
-            "tqg_randomized_benchmarking_interleaved_ssro": "TQGRandomizedBenchmarkingInterleavedSSRONode",
             "purity_benchmarking": "PurityBenchmarkingNode",
-            "cz_rb_optimize_ssro": "CZRBOptimizeSSRONode",
         }
         self._node_implementation_paths: Dict[str, Union[str, Path]] = {}
         self._node_classes: Dict[str, type["BaseNode"]] = {}

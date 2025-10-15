@@ -33,10 +33,9 @@ from tergite_autocalibration.utils.logging import logger
 GRAPH_DEPENDENCIES = [
     ("tof", "resonator_spectroscopy"),
     ("resonator_spectroscopy", "resonator_spectroscopy_vs_current"),
+    ("resonator_spectroscopy", "coupler_anticrossing"),
     ("resonator_spectroscopy", "punchout"),
     ("punchout", "qubit_01_spectroscopy"),
-    ("resonator_spectroscopy", "qubit_01_spectroscopy_AR"),
-    ("qubit_01_spectroscopy_AR", "rabi_oscillations_AR"),
     ("resonator_spectroscopy_vs_current", "qubit_spectroscopy_vs_current"),
     ("qubit_01_spectroscopy", "rabi_oscillations"),
     ("rabi_oscillations", "ramsey_correction"),
@@ -50,9 +49,10 @@ GRAPH_DEPENDENCIES = [
     ("resonator_spectroscopy_1", "qubit_12_spectroscopy"),
     ("qubit_12_spectroscopy", "rabi_oscillations_12"),
     ("rabi_oscillations_12", "ramsey_correction_12"),
+    ("ramsey_correction_12", "resonator_spectroscopy_2"),
     ("ramsey_correction_12", "motzoi_parameter_12"),
     ("motzoi_parameter_12", "n_rabi_oscillations_12"),
-    ("n_rabi_oscillations_12", "resonator_spectroscopy_2"),
+    # ("n_rabi_oscillations_12", "resonator_spectroscopy_2"),
     ("resonator_spectroscopy_2", "ro_frequency_three_state_optimization"),
     ("ro_frequency_three_state_optimization", "ro_amplitude_three_state_optimization"),
     ("punchout", "resonator_spectroscopy"),
@@ -73,11 +73,6 @@ GRAPH_DEPENDENCIES = [
     ("ro_amplitude_three_state_optimization", "process_tomography_ssro"),
     ("cz_calibration_ssro", "cz_dynamic_phase_ssro"),
     ("cz_dynamic_phase_ssro", "cz_dynamic_phase_swap_ssro"),
-    ("resonator_spectroscopy_2", "tqg_randomized_benchmarking_ssro"),
-    (
-        "tqg_randomized_benchmarking_ssro",
-        "tqg_randomized_benchmarking_interleaved_ssro",
-    ),
 ]
 
 # Construct the calibration graph from its dependencies

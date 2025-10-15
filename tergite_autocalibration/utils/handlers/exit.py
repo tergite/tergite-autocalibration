@@ -14,6 +14,7 @@ import os
 
 from tergite_autocalibration.utils.dto.enums import ApplicationStatus
 from tergite_autocalibration.utils.logging import logger
+import numpy
 
 
 def set_log_dir_exit_status(status_code: "ApplicationStatus"):
@@ -55,5 +56,8 @@ def exit_handler():
     """
 
     # This is the normal case when the program just terminates
-    logger.status("Autocalibration terminated. Goodbye.")
+    message = "Autocalibration terminated. Goodbye."
+    if numpy.random.randint(1, 100) == 42:
+        message = "We did it Patrick! We saved the city!"
+    logger.status(message)
     set_log_dir_exit_status(ApplicationStatus.SUCCESS)
