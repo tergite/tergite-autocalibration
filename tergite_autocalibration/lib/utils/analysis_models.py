@@ -27,8 +27,8 @@ class RamseyModel(lmfit.model.Model):
     Model for exponentially decaying sinusoidal data of the form
     amplitude*exp(-tau * t)*sin(frequency * t + phase) + offset
     tau is the characteristic decay constant and omega the frequency of the measured Ramsey Oscillations.
-    The data are collected over a sequence of Ramsey delayes t, i.e. delays between two consecutive
-    Used by measurements that calibrate or characterize the qubit dephasing:
+    The data are collected over a sequence of Ramsey delays t, i.e. delays between two consecutive X90 gates.
+    Used by measurements that calibrate or characterize qubit dephasing:
     Ramsey correction, T2, T2echo
     """
 

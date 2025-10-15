@@ -77,7 +77,10 @@ class SpiDAC:
         elif measurement_mode == MeasurementMode.re_analyse:
             self.spi = SpiRack("loki_rack", self.port, is_dummy=self.is_dummy)
         else:
-            raise ValueError("No serial port for the SPI")
+            if self.is_dummy:
+                self.spi = SpiRack("loki_rack", "dummy_port", is_dummy=self.is_dummy)
+            else:
+                raise ValueError("No serial port for the SPI")
         self.dacs_dictionary = {}
         for coupler in couplers:
             self.dacs_dictionary[coupler] = self.create_spi_dac(coupler)
