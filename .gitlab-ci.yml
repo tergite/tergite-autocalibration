@@ -160,12 +160,14 @@ application_run:
     - sleep 5
     # Verify output
     - |
-      if find .venv/lib/python3.12/site-packages/out -type f | grep -q "ro_amplitude_three_state_optimization.png"; then
+      if find .venv/lib/python3.12/site-packages/out \
+          -type f -name 'ro_amplitude_three_state_optimization.png' -print -quit | grep -q .; then
         echo "Output file $OUTPUT_FILE exists. Application ran successfully."
       else
         echo "Error: Output file $OUTPUT_FILE not found."
         exit 1
       fi
+
   cache:
     - key: "default"
       paths:

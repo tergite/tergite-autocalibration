@@ -13,6 +13,7 @@
 # that they have been altered from the originals.
 
 import numpy as np
+import xarray
 
 from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.analysis import (
@@ -25,8 +26,55 @@ from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.measure
 from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.utils.samplespace import resonator_samples
 
+from quantify_core.analysis import fitting_models as fm
+from tergite_autocalibration.config.legacy import dh
 
-class ROFrequencyTwoStateOptimizationNode(QubitNode):
+resonator = fm.ResonatorModel()
+
+
+class ROFrequencyOptimizationBase(QubitNode):
+    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
+
+    def generate_dummy_dataset(self, noise=False):
+        dataset = xarray.Dataset()
+        frequency_shift = 0.5e6
+
+        for index, qubit in enumerate(self.all_qubits):
+            vna_ro_freq = dh.get_legacy("VNA_resonator_frequencies")[qubit]
+            qubit_states = self.schedule_samplespace["qubit_states"][qubit]
+            data_array = np.array([])
+            for qubit_state in qubit_states:
+                ro_freq = vna_ro_freq - frequency_shift * qubit_state
+                true_params = resonator.make_params(
+                    fr=ro_freq,
+                    Ql=15000,
+                    Qe=20000,
+                    A=0.01,
+                    theta=0.5,
+                    phi_v=0,
+                    phi_0=0,
+                )
+                samples = resonator_samples(qubit)
+                number_of_samples = len(samples)
+                frequncies = np.linspace(samples[0], samples[-1], number_of_samples)
+                true_s21 = resonator.eval(params=true_params, f=frequncies)
+                np.random.seed(123)
+                noise_scale = 0.02
+                noise_s21 = noise_scale * (
+                    np.random.randn(number_of_samples)
+                    + 1j * np.random.randn(number_of_samples)
+                )
+                measured_s21 = true_s21
+                if noise:
+                    measured_s21 += noise_s21
+                data_array = np.concatenate((data_array, measured_s21))
+
+            dataset[index] = xarray.DataArray(data_array)
+        return dataset
+
+
+class ROFrequencyTwoStateOptimizationNode(ROFrequencyOptimizationBase):
     measurement_obj = ROFrequencyOptimizationMeasurement
     analysis_obj = OptimalRO01FrequencyNodeAnalysis
     measurement_type = ScheduleNode
@@ -46,7 +94,7 @@ class ROFrequencyTwoStateOptimizationNode(QubitNode):
         }
 
 
-class ROFrequencyThreeStateOptimizationNode(QubitNode):
+class ROFrequencyThreeStateOptimizationNode(ROFrequencyOptimizationBase):
     measurement_obj = ROFrequencyOptimizationMeasurement
     analysis_obj = OptimalRO012FrequencyNodeAnalysis
     measurement_type = ScheduleNode

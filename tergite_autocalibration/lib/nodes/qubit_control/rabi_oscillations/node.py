@@ -32,16 +32,10 @@ from tergite_autocalibration.lib.utils.analysis_models import RabiModel
 rabi = RabiModel()
 
 
-class RabiOscillationsNode(QubitNode):
-    qubit_qois = ["rxy:amp180"]
+class RabiOscillationsBase(QubitNode):
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
-        self.schedule_samplespace = {
-            "mw_amplitudes": {
-                qubit: np.linspace(0.002, 0.90, 61) for qubit in self.all_qubits
-            }
-        }
 
     def generate_dummy_dataset(self):
         dataset = xarray.Dataset()
@@ -60,6 +54,21 @@ class RabiOscillationsNode(QubitNode):
             data_array = xarray.DataArray(measured_s21)
             dataset[index] = data_array
         return dataset
+
+
+class RabiOscillationsNode(RabiOscillationsBase):
+    measurement_obj = RabiOscillationsMeasurement
+    analysis_obj = RabiNodeAnalysis
+
+    qubit_qois = ["rxy:amp180"]
+
+    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
+        self.schedule_samplespace = {
+            "mw_amplitudes": {
+                qubit: np.linspace(0.002, 0.90, 61) for qubit in self.all_qubits
+            }
+        }
 
 
 class RabiOscillations12Node(QubitNode):
@@ -93,9 +102,9 @@ class NRabiOscillationsNode(QubitNode):
 
         self.schedule_samplespace = {
             "mw_amplitudes_sweep": {
-                qubit: np.linspace(-0.045, 0.045, 40) for qubit in self.all_qubits
+                qubit: np.linspace(-0.045, 0.045, 30) for qubit in self.all_qubits
             },
-            "X_repetitions": {qubit: np.arange(1, 19, 6) for qubit in self.all_qubits},
+            "X_repetitions": {qubit: np.arange(1, 23, 6) for qubit in self.all_qubits},
         }
 
 

@@ -11,9 +11,8 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from pathlib import Path
 
-from lmfit.models import LinearModel, LorentzianModel
+from lmfit.models import LorentzianModel
 import numpy as np
 from quantify_scheduler import CompiledSchedule
 from quantify_scheduler.backends import SerialCompiler
@@ -23,6 +22,8 @@ import xarray
 from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.base.node import CouplerNode
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
+    QubitSpectroscopyVsCurrentNodeAnalysis,
+    ResonatorSpectroscopyVsCurrentNodeAnalysis,
     QubitSpectroscopyVsCurrentNodeAnalysis,
     ResonatorSpectroscopyVsCurrentNodeAnalysis,
 )
