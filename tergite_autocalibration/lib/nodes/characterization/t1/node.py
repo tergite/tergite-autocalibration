@@ -73,6 +73,9 @@ class T1Node(QubitNode):
             }
         }
 
+    def initial_operation(self) -> None:
+        pass
+
     def pre_measurement_operation(self, reduced_ext_space):
         iteration_dict = reduced_ext_space["T1_repetitions"]
         # there is some redundancy that all qubits have the same
@@ -81,3 +84,6 @@ class T1Node(QubitNode):
         if this_iteration > 0:
             logger.info(f"sleeping for {self.sleep_time} seconds")
             sleep(self.sleep_time)
+
+    def final_operation(self) -> None:
+        pass

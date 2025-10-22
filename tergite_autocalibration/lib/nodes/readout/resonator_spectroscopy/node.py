@@ -83,8 +83,8 @@ class ResonatorSpectroscopyBase(QubitNode):
 class ResonatorSpectroscopyNode(ResonatorSpectroscopyBase):
     measurement_obj = ResonatorSpectroscopyMeasurement
     analysis_obj = ResonatorSpectroscopyNodeAnalysis
-    qubit_qois = ["clock_freqs:readout", "Ql", "resonator_minimum"]
     measurement_type = ScheduleNode
+    qubit_qois = ["clock_freqs:readout", "Ql", "resonator_minimum"]
 
     def __init__(self, name: str, all_qubits: list[str], **node_keywords):
         super().__init__(name, all_qubits, **node_keywords)
@@ -99,6 +99,7 @@ class ResonatorSpectroscopyNode(ResonatorSpectroscopyBase):
 class ResonatorSpectroscopy1Node(ResonatorSpectroscopyBase):
     measurement_obj = ResonatorSpectroscopyMeasurement
     analysis_obj = ResonatorSpectroscopy1NodeAnalysis
+    measurement_type = ScheduleNode
     qubit_qois = [
         "extended_clock_freqs:readout_1",
         "Ql_1",
@@ -120,6 +121,7 @@ class ResonatorSpectroscopy1Node(ResonatorSpectroscopyBase):
 class ResonatorSpectroscopy2Node(ResonatorSpectroscopyBase):
     measurement_obj = ResonatorSpectroscopyMeasurement
     analysis_obj = ResonatorSpectroscopy2NodeAnalysis
+    measurement_type = ScheduleNode
     qubit_qois = ["extended_clock_freqs:readout_2"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):

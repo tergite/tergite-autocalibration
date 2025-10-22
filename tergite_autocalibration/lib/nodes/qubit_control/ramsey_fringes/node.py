@@ -32,8 +32,6 @@ ramsey_model = RamseyModel()
 
 
 class RamseyFringesBase(QubitNode):
-    measurement_obj = RamseyDetuningsMeasurement
-    analysis_obj = RamseyDetunings12NodeAnalysis
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
@@ -75,13 +73,14 @@ class RamseyFringesBase(QubitNode):
         return dataset
 
 
-class RamseyFringes12Node(RamseyFringesBase):
-    qubit_qois = ["clock_freqs:f12"]
+class RamseyFringesNode(RamseyFringesBase):
+    measurement_obj = RamseyDetuningsMeasurement
+    analysis_obj = RamseyDetunings01NodeAnalysis
+    measurement_type = ScheduleNode
+    qubit_qois = ["clock_freqs:f01"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
-        self.qubit_state = 1
-        self.schedule_keywords["qubit_state"] = self.qubit_state
         self.schedule_samplespace = {
             "ramsey_delays": {
                 qubit: np.arange(4e-9, 2048e-9, 8 * 8e-9) for qubit in self.all_qubits
@@ -92,14 +91,16 @@ class RamseyFringes12Node(RamseyFringesBase):
         }
 
 
-class RamseyFringesNode(RamseyFringesBase):
+class RamseyFringes12Node(RamseyFringesBase):
     measurement_obj = RamseyDetuningsMeasurement
-    analysis_obj = RamseyDetunings01NodeAnalysis
+    analysis_obj = RamseyDetunings12NodeAnalysis
     measurement_type = ScheduleNode
-    qubit_qois = ["clock_freqs:f01"]
+    qubit_qois = ["clock_freqs:f12"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
+        self.qubit_state = 1
+        self.schedule_keywords["qubit_state"] = self.qubit_state
         self.schedule_samplespace = {
             "ramsey_delays": {
                 qubit: np.arange(4e-9, 2048e-9, 8 * 8e-9) for qubit in self.all_qubits

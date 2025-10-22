@@ -73,7 +73,7 @@ class RabiOscillationsNode(RabiOscillationsBase):
         }
 
 
-class RabiOscillations12Node(QubitNode):
+class RabiOscillations12Node(RabiOscillationsBase):
     measurement_obj = RabiOscillationsMeasurement
     analysis_obj = RabiNode12Analysis
     measurement_type = ScheduleNode
@@ -108,6 +108,41 @@ class NRabiOscillationsNode(QubitNode):
             },
             "X_repetitions": {qubit: np.arange(1, 23, 6) for qubit in self.all_qubits},
         }
+
+    def generate_dummy_dataset(self):
+        dataset = xarray.Dataset()
+        real_correction = -0.01
+        first_qubit = self.all_qubits[0]
+        x_repetitions = self.schedule_samplespace["X_repetitions"][first_qubit]
+        for index, _ in enumerate(self.all_qubits):
+            data_array = np.array([])
+            # TODO: the oscillations frequecny should be no set empirically
+            for number_of_Xs in x_repetitions:
+                this_frequency = 2 * number_of_Xs
+                # find the phase that produces minimum at the real_correction
+                this_phase = np.pi - 2 * np.pi * this_frequency * real_correction
+                true_params = rabi.make_params(
+                    amplitude=0.2,
+                    frequency=this_frequency,
+                    offset=0.2,
+                    phase=this_phase,
+                )
+                samples = self.schedule_samplespace["mw_amplitudes_sweep"][first_qubit]
+                number_of_samples = len(samples)
+                fit_samples = np.linspace(samples[0], samples[-1], number_of_samples)
+                true_s21 = rabi.eval(params=true_params, drive_amp=fit_samples)
+                noise_scale = 0.02
+
+                np.random.seed(123)
+                measured_s21 = true_s21 + 0 * noise_scale * (
+                    np.random.randn(number_of_samples)
+                    + 1j * np.random.randn(number_of_samples)
+                )
+                data_array = np.concatenate((data_array, measured_s21))
+
+            # Add the DataArray to the Dataset with an integer name (converted to string)
+            dataset[index] = xarray.DataArray(data_array)
+        return dataset
 
 
 class NRabiOscillations12Node(QubitNode):

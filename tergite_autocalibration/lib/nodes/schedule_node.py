@@ -37,33 +37,35 @@ class ScheduleNode(MeasurementType):
 
 
 class OuterScheduleNode(MeasurementType):
+    def __init__(self, node) -> None:
+        self.node = node
 
-    def measure_node(self, measurement_mode, node) -> xarray.Dataset:
+    def measure_node(self, measurement_mode) -> xarray.Dataset:
         """
         This correspond to schedules where the measurement points
         exceed the memory limit of the QRM_RF.
         For example large single shots measurements.
         """
-        outer_dimensions = samplespace_dimensions(node.outer_schedule_samplespace)
+        outer_dimensions = samplespace_dimensions(self.node.outer_schedule_samplespace)
         # this implementation supports only 1 outer parameter
         iterations = outer_dimensions[0]
-        outer_dim = list(node.outer_schedule_samplespace.keys())[0]
+        outer_dim = list(self.node.outer_schedule_samplespace.keys())[0]
 
         result_dataset = xarray.Dataset()
 
         for this_iteration in range(iterations):
             reduced_outer_samplespace = reduce_samplespace(
-                this_iteration, node.outer_schedule_samplespace
+                this_iteration, self.node.outer_schedule_samplespace
             )
             element_dict = list(reduced_outer_samplespace.values())[0]
             current_value = list(element_dict.values())[0]
 
-            samplespace = node.schedule_samplespace | reduced_outer_samplespace
-            compiled_schedule = node.precompile(samplespace)
+            samplespace = self.node.schedule_samplespace | reduced_outer_samplespace
+            compiled_schedule = self.node.precompile(samplespace)
 
-            ds = node.measure_compiled_schedule(
+            ds = self.node.measure_compiled_schedule(
                 compiled_schedule,
-                measurement_mode,
+                measurement_mode=measurement_mode,
                 measurement=(this_iteration, iterations),
             )
             ds = ds.expand_dims({outer_dim: numpy.array([current_value])})
