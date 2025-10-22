@@ -21,12 +21,15 @@ from tergite_autocalibration.utils.measurement_utils import (
 
 
 class ScheduleNode(MeasurementType):
-    def measure_node(self, measurement_mode, node) -> xarray.Dataset:
+    def __init__(self, node) -> None:
+        self.node = node
+
+    def measure_node(self, measurement_mode) -> xarray.Dataset:
         """
         Simple measurements that involve only schedule parameteres
         """
-        compiled_schedule = node.precompile(node.schedule_samplespace)
-        result_dataset = node.measure_compiled_schedule(
+        compiled_schedule = self.node.precompile(self.node.schedule_samplespace)
+        result_dataset = self.node.measure_compiled_schedule(
             compiled_schedule,
             measurement_mode=measurement_mode,
         )

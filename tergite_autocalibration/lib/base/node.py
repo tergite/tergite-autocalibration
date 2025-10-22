@@ -29,7 +29,11 @@ from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
     CompiledSchedule,
     InstrumentCoordinator,
 )
-from tergite_autocalibration.lib.base.node_interface import NodeInterface
+from tergite_autocalibration.lib.base import measurement
+from tergite_autocalibration.lib.base.node_interface import (
+    MeasurementType,
+    NodeInterface,
+)
 from tergite_autocalibration.lib.utils.redis import update_redis_trusted_values
 
 
@@ -52,11 +56,11 @@ matplotlib.use(PLOTTING_BACKEND)
 class Node(NodeInterface):
     measurement_obj: "BaseMeasurement"
     analysis_obj: "BaseNodeAnalysis"
+    measurement_type: "MeasurementType"
 
-    def __init__(self, name: str, measurement_type, **node_dictionary):
+    def __init__(self, name: str, **node_dictionary):
         self.name = name
         self.node_dictionary = node_dictionary
-        self.measurement_type = measurement_type
         self.lab_instr_coordinator: InstrumentCoordinator
         self.spi_manager: SpiDAC
         self.schedule_samplespace = {}
@@ -80,7 +84,8 @@ class Node(NodeInterface):
         Here we attach the measure_node method according to the
         measurement_type: ScheduleNode or ExternalParameterNode or something else
         """
-        dataset = self.measurement_type.measure_node(cluster_status, self)
+        measurement_type = self.measurement_type(self)
+        dataset = measurement_type.measure_node(cluster_status)
         return dataset
 
     # @property
@@ -131,7 +136,7 @@ class Node(NodeInterface):
     def measure_compiled_schedule(
         self,
         compiled_schedule: CompiledSchedule,
-        cluster_status=MeasurementMode.real,
+        measurement_mode=MeasurementMode.real,
         measurement: Tuple[int, int] = (1, 1),
     ) -> xarray.Dataset:
         """
@@ -153,10 +158,10 @@ class Node(NodeInterface):
             compiled_schedule,
             schedule_duration,
             self.lab_instr_coordinator,
-            cluster_status,
+            measurement_mode,
         )
 
-        if cluster_status == MeasurementMode.dummy:
+        if measurement_mode == MeasurementMode.dummy:
             raw_dataset = self.generate_dummy_dataset()
         result_dataset = self.configure_dataset(raw_dataset)
 

@@ -44,7 +44,7 @@ from tergite_autocalibration.lib.nodes.qubit_control.ramsey_fringes.node import 
     RamseyFringesNode,
 )
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.node import (
-    Qubit01SpectroscopyMultidimNode,
+    Qubit01SpectroscopyNode,
     Qubit12SpectroscopyMultidimNode,
 )
 from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.node import (
@@ -66,7 +66,7 @@ class NodeFactory:
     def __init__(self):
         self.node_name_mapping: Dict[str, Node] = {
             "resonator_spectroscopy": ResonatorSpectroscopyNode,
-            "qubit_01_spectroscopy": Qubit01SpectroscopyMultidimNode,
+            "qubit_01_spectroscopy": Qubit01SpectroscopyNode,
             "rabi_oscillations": RabiOscillationsNode,
             "ramsey_correction": RamseyFringesNode,
             "motzoi_parameter": MotzoiParameterNode,
@@ -97,13 +97,12 @@ class NodeFactory:
             node_name,
             all_qubits=all_qubits,
             couplers=couplers,
-            # measurement_type=MeasurementType(),
         )
         return node_instance
 
-    # def get_node_class(self, node_name: str):
-    #     bare_node_obj, _ = self.select_node(node_name)
-    #     return bare_node_obj
+    def get_node_class(self, node_name: str):
+        node_obj = self.node_name_mapping[node_name]
+        return node_obj
 
     # def select_node(self, node_name: str):
     #     match node_name:
