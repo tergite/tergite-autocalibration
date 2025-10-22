@@ -27,6 +27,9 @@ from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
     QubitSpectroscopyVsCurrentNodeAnalysis,
     ResonatorSpectroscopyVsCurrentNodeAnalysis,
 )
+from tergite_autocalibration.lib.nodes.external_parameter_node import (
+    ExternalParameterNode,
+)
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement import (
     TwoTonesMultidimMeasurement,
 )
@@ -50,6 +53,7 @@ class QubitSpectroscopyVsCurrentNode(CouplerNode):
 
     measurement_obj = TwoTonesMultidimMeasurement
     analysis_obj = QubitSpectroscopyVsCurrentNodeAnalysis
+    measurement_type = ExternalParameterNode
     # coupler_qois = ["parking_current"]
     coupler_qois = ["qubit_crossing_points"]
 
