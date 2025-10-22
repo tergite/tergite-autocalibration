@@ -14,8 +14,9 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from typing import TYPE_CHECKING
 
+from typing import Dict, List
+from tergite_autocalibration.lib.base.node import Node
 from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.node import (
     PurityBenchmarkingNode,
 )
@@ -29,9 +30,6 @@ from tergite_autocalibration.lib.nodes.characterization.t2.node import (
 )
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.node import (
     QubitSpectroscopyVsCurrentNode,
-)
-from tergite_autocalibration.lib.nodes.external_parameter_node import (
-    ExternalParameterNode,
 )
 from tergite_autocalibration.lib.nodes.qubit_control.motzoi_parameter.node import (
     MotzoiParameterNode,
@@ -62,117 +60,116 @@ from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.node im
     ROFrequencyThreeStateOptimizationNode,
     ROFrequencyTwoStateOptimizationNode,
 )
-from tergite_autocalibration.lib.nodes.schedule_node import (
-    OuterScheduleNode,
-    ScheduleNode,
-)
 
 
 class NodeFactory:
-    def select_node(self, node_name: str):
-        match node_name:
-            case "resonator_spectroscopy":
-                bare_node_obj = ResonatorSpectroscopyNode
-                measurement_type = ScheduleNode
-            case "qubit_01_spectroscopy":
-                bare_node_obj = Qubit01SpectroscopyMultidimNode
-                measurement_type = ScheduleNode
-            case "rabi_oscillations":
-                bare_node_obj = RabiOscillationsNode
-                measurement_type = ScheduleNode
-            case "ramsey_correction":
-                bare_node_obj = RamseyFringesNode
-                measurement_type = ScheduleNode
-            case "motzoi_parameter":
-                bare_node_obj = MotzoiParameterNode
-                measurement_type = ScheduleNode
-            case "T1":
-                bare_node_obj = T1Node
-                measurement_type = ExternalParameterNode
-            case "T2":
-                bare_node_obj = T2Node
-                measurement_type = ExternalParameterNode
-            case "T2_echo":
-                bare_node_obj = T2EchoNode
-                measurement_type = ExternalParameterNode
-            case "n_rabi_oscillations":
-                bare_node_obj = NRabiOscillationsNode
-                measurement_type = ScheduleNode
-            case "resonator_spectroscopy_1":
-                bare_node_obj = ResonatorSpectroscopy1Node
-                measurement_type = ScheduleNode
-            case "qubit_12_spectroscopy":
-                bare_node_obj = Qubit12SpectroscopyMultidimNode
-                measurement_type = ScheduleNode
-            case "rabi_oscillations_12":
-                bare_node_obj = RabiOscillations12Node
-                measurement_type = ScheduleNode
-            case "ramsey_correction_12":
-                bare_node_obj = RamseyFringes12Node
-                measurement_type = ScheduleNode
-            case "resonator_spectroscopy_2":
-                bare_node_obj = ResonatorSpectroscopy2Node
-                measurement_type = ScheduleNode
-            case "ro_frequency_two_state_optimization":
-                bare_node_obj = ROFrequencyTwoStateOptimizationNode
-                measurement_type = ScheduleNode
-            case "ro_amplitude_two_state_optimization":
-                bare_node_obj = ROAmplitudeTwoStateOptimizationNode
-                measurement_type = ScheduleNode
-            case "ro_frequency_three_state_optimization":
-                bare_node_obj = ROFrequencyThreeStateOptimizationNode
-                measurement_type = ScheduleNode
-            case "ro_amplitude_three_state_optimization":
-                bare_node_obj = ROAmplitudeThreeStateOptimizationNode
-                measurement_type = ScheduleNode
-            case "randomized_benchmarking":
-                bare_node_obj = RandomizedBenchmarkingNode
-                measurement_type = OuterScheduleNode
-            case "purity_benchmarking":
-                bare_node_obj = PurityBenchmarkingNode
-                measurement_type = OuterScheduleNode
-            case "coupler_anticrossing":
-                bare_node_obj = QubitSpectroscopyVsCurrentNode
-                measurement_type = ExternalParameterNode
+    def __init__(self):
+        self.node_name_mapping: Dict[str, Node] = {
+            "resonator_spectroscopy": ResonatorSpectroscopyNode,
+            "qubit_01_spectroscopy": Qubit01SpectroscopyMultidimNode,
+            "rabi_oscillations": RabiOscillationsNode,
+            "ramsey_correction": RamseyFringesNode,
+            "motzoi_parameter": MotzoiParameterNode,
+            "T1": T1Node,
+            "T2": T2Node,
+            "T2_echo": T2EchoNode,
+            "n_rabi_oscillations": NRabiOscillationsNode,
+            "resonator_spectroscopy_1": ResonatorSpectroscopy1Node,
+            "qubit_12_spectroscopy": Qubit12SpectroscopyMultidimNode,
+            "rabi_oscillations_12": RabiOscillations12Node,
+            "ramsey_correction_12": RamseyFringes12Node,
+            "resonator_spectroscopy_2": ResonatorSpectroscopy2Node,
+            "ro_frequency_two_state_optimization": ROFrequencyTwoStateOptimizationNode,
+            "ro_amplitude_two_state_optimization": ROAmplitudeTwoStateOptimizationNode,
+            "ro_frequency_three_state_optimization": ROFrequencyThreeStateOptimizationNode,
+            "ro_amplitude_three_state_optimization": ROAmplitudeThreeStateOptimizationNode,
+            "randomized_benchmarking": RandomizedBenchmarkingNode,
+            "purity_benchmarking": PurityBenchmarkingNode,
+            "coupler_anticrossing": QubitSpectroscopyVsCurrentNode,
+        }
 
-        return bare_node_obj, measurement_type
-
-    def all_node_names(self) -> list[str]:
-        return [
-            "resonator_spectroscopy",
-            "qubit_01_spectroscopy",
-            "rabi_oscillations",
-            "ramsey_correction",
-            "motzoi_parameter",
-            "n_rabi_oscillations",
-            "resonator_spectroscopy_1",
-            "qubit_12_spectroscopy",
-            "rabi_oscillations_12",
-            "ramsey_correction_12",
-            "resonator_spectroscopy_2",
-            "ro_frequency_two_state_optimization",
-            "ro_amplitude_two_state_optimization",
-            "ro_frequency_three_state_optimization",
-            "ro_amplitude_three_state_optimization",
-            "coupler_anticrossing",
-            "T1",
-            "T2",
-            "T2_echo",
-        ]
+    def all_node_names(self) -> List[str]:
+        return list(self.node_name_mapping.keys())
 
     def create_node(self, node_name: str, all_qubits: list, couplers: list, **kwargs):
-        NodeObject, MeasurementType = self.select_node(node_name)
+        NodeObject = self.node_name_mapping[node_name]
         node_instance = NodeObject(
             node_name,
             all_qubits=all_qubits,
             couplers=couplers,
-            measurement_type=MeasurementType(),
+            # measurement_type=MeasurementType(),
         )
         return node_instance
 
-    def get_node_class(self, node_name: str):
-        bare_node_obj, _ = self.select_node(node_name)
-        return bare_node_obj
+    # def get_node_class(self, node_name: str):
+    #     bare_node_obj, _ = self.select_node(node_name)
+    #     return bare_node_obj
+
+    # def select_node(self, node_name: str):
+    #     match node_name:
+    #         case "resonator_spectroscopy":
+    #             bare_node_obj = ResonatorSpectroscopyNode
+    #             measurement_type = ScheduleNode
+    #         case "qubit_01_spectroscopy":
+    #             bare_node_obj = Qubit01SpectroscopyMultidimNode
+    #             measurement_type = ScheduleNode
+    #         case "rabi_oscillations":
+    #             bare_node_obj = RabiOscillationsNode
+    #             measurement_type = ScheduleNode
+    #         case "ramsey_correction":
+    #             bare_node_obj = RamseyFringesNode
+    #             measurement_type = ScheduleNode
+    #         case "motzoi_parameter":
+    #             bare_node_obj = MotzoiParameterNode
+    #             measurement_type = ScheduleNode
+    #         case "T1":
+    #             bare_node_obj = T1Node
+    #             measurement_type = ExternalParameterNode
+    #         case "T2":
+    #             bare_node_obj = T2Node
+    #             measurement_type = ExternalParameterNode
+    #         case "T2_echo":
+    #             bare_node_obj = T2EchoNode
+    #             measurement_type = ExternalParameterNode
+    #         case "n_rabi_oscillations":
+    #             bare_node_obj = NRabiOscillationsNode
+    #             measurement_type = ScheduleNode
+    #         case "resonator_spectroscopy_1":
+    #             bare_node_obj = ResonatorSpectroscopy1Node
+    #             measurement_type = ScheduleNode
+    #         case "qubit_12_spectroscopy":
+    #             bare_node_obj = Qubit12SpectroscopyMultidimNode
+    #             measurement_type = ScheduleNode
+    #         case "rabi_oscillations_12":
+    #             bare_node_obj = RabiOscillations12Node
+    #             measurement_type = ScheduleNode
+    #         case "ramsey_correction_12":
+    #             bare_node_obj = RamseyFringes12Node
+    #             measurement_type = ScheduleNode
+    #         case "resonator_spectroscopy_2":
+    #             bare_node_obj = ResonatorSpectroscopy2Node
+    #             measurement_type = ScheduleNode
+    #         case "ro_frequency_two_state_optimization":
+    #             bare_node_obj = ROFrequencyTwoStateOptimizationNode
+    #             measurement_type = ScheduleNode
+    #         case "ro_amplitude_two_state_optimization":
+    #             bare_node_obj = ROAmplitudeTwoStateOptimizationNode
+    #             measurement_type = ScheduleNode
+    #         case "ro_frequency_three_state_optimization":
+    #             bare_node_obj = ROFrequencyThreeStateOptimizationNode
+    #             measurement_type = ScheduleNode
+    #         case "ro_amplitude_three_state_optimization":
+    #             bare_node_obj = ROAmplitudeThreeStateOptimizationNode
+    #             measurement_type = ScheduleNode
+    #         case "randomized_benchmarking":
+    #             bare_node_obj = RandomizedBenchmarkingNode
+    #             measurement_type = OuterScheduleNode
+    #         case "purity_benchmarking":
+    #             bare_node_obj = PurityBenchmarkingNode
+    #             measurement_type = OuterScheduleNode
+    #         case "coupler_anticrossing":
+    #             bare_node_obj = QubitSpectroscopyVsCurrentNode
+    #             measurement_type = ExternalParameterNode
 
 
 # class NodeFactory:

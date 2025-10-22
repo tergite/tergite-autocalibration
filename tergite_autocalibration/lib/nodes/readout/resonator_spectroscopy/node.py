@@ -24,10 +24,9 @@ from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.measuremen
     ResonatorSpectroscopyMeasurement,
 )
 
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.utils.samplespace import resonator_samples
 from tergite_autocalibration.config.legacy import dh
-
-import quantify_scheduler
 
 
 resonator = fm.ResonatorModel()
@@ -37,6 +36,7 @@ class ResonatorSpectroscopyNode(QubitNode):
     measurement_obj = ResonatorSpectroscopyMeasurement
     analysis_obj = ResonatorSpectroscopyNodeAnalysis
     qubit_qois = ["clock_freqs:readout", "Ql", "resonator_minimum"]
+    measurement_type = ScheduleNode
 
     def __init__(self, name: str, all_qubits: list[str], **node_keywords):
         super().__init__(name, all_qubits, **node_keywords)

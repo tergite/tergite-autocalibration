@@ -22,11 +22,13 @@ from tergite_autocalibration.lib.nodes.qubit_control.motzoi_parameter.analysis i
 from tergite_autocalibration.lib.nodes.qubit_control.motzoi_parameter.measurement import (
     MotzoiParameterMeasurement,
 )
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 
 
 class MotzoiParameterNode(QubitNode):
     measurement_obj = MotzoiParameterMeasurement
     analysis_obj = Motzoi01NodeAnalysis
+    measurement_type = ScheduleNode
     qubit_qois = ["rxy:motzoi"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
@@ -45,6 +47,7 @@ class MotzoiParameterNode(QubitNode):
 class MotzoiParameter12Node(QubitNode):
     measurement_obj = MotzoiParameterMeasurement
     analysis_obj = Motzoi12NodeAnalysis
+    measurement_type = ScheduleNode
     qubit_qois = ["r12:ef_motzoi"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):

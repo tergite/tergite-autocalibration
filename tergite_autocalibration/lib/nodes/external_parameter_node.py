@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2024
+# (C) Copyright Eleftherios Moschandreou 2024, 2025
 # (C) Copyright Michele Faucci Giannelli 2025
 # (C) Copyright Abdullah Al Amin
 #

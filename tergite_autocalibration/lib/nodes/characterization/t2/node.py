@@ -27,6 +27,9 @@ from tergite_autocalibration.lib.nodes.characterization.t2.measurement import (
     T2Measurement,
     T2EchoMeasurement,
 )
+from tergite_autocalibration.lib.nodes.external_parameter_node import (
+    ExternalParameterNode,
+)
 from tergite_autocalibration.utils.logging import logger
 
 
@@ -41,6 +44,7 @@ class T2Node(QubitNode):
 
     measurement_obj = T2Measurement
     analysis_obj = T2NodeAnalysis
+    measurement_type = ExternalParameterNode
     qubit_qois = ["t2_time"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
@@ -82,6 +86,7 @@ class T2EchoNode(QubitNode):
 
     measurement_obj = T2EchoMeasurement
     analysis_obj = T2EchoNodeAnalysis
+    measurement_type = ExternalParameterNode
     qubit_qois = ["t2_echo_time"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
