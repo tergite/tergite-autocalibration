@@ -66,20 +66,21 @@ def calculate_net_clifford(
 
 
 def add_interleaved_clifford(
-    clifford_sequence: np.ndarray, interleaved_clifford: int
+    clifford_sequence: np.ndarray, interleaved_clifford_idx: int
 ) -> np.ndarray:
     """
     Adds an interleaved Clifford gate to the sequence.
 
     Args:
         clifford_sequence (np.ndarray): Array of Clifford indices.
+        interleaved_clifford_idx (int): ID for interleaving a specific Clifford gate.
 
     Returns:
         np.ndarray: Array with interleaved Clifford.
     """
     interleaved_sequence = np.empty(clifford_sequence.size * 2, dtype=int)
     interleaved_sequence[0::2] = clifford_sequence
-    interleaved_sequence[1::2] = interleaved_clifford
+    interleaved_sequence[1::2] = interleaved_clifford_idx
     return interleaved_sequence
 
 
@@ -120,7 +121,7 @@ def randomized_benchmarking_sequence(
         apply_inverse (bool): Whether to append the recovery Clifford that inverts the total sequence.
         clifford_group (int): Specifies which Clifford group to use.
                               1 for single-qubit (24 elements), 2 for two-qubit (11,520 elements).
-        interleaving_clifford_idx (Optional[int]): Optional ID for interleaving a specific Clifford gate.
+        interleaved_clifford_idx (Optional[int]): Optional ID for interleaving a specific Clifford gate.
         seed (Optional[int]): Optional seed for reproducibility.
 
     Returns:
