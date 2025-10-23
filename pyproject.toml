@@ -20,72 +20,74 @@ version = "2025.06.0"
 description = "Commandline application to calibrate the WACQT quantum computers automatically"
 readme = "README.md"
 authors = [
-  { name = "Eleftherios Moschandreou", email = "elemos@chalmers.se" },
-  { name = "Liangyu Chen", email = "liangyuc@chalmers.se" },
-  { name = "Stefan Hill", email = "stefanhi@chalmers.se" },
-  { name = "Amr Osman", email = "oarm@chalmers.se" },
-  { name = "Tong Liu", email = "liuto@chalmers.se" },
-  { name = "Joel Sandås", email = "sandas@chalmers.se" },
-  { name = "Pontus Vikstål", email = "pontus.vikstal@chalmersnextlabs.se" },
-  { name = "Michele Faucci Giannelli", email = "faucci@chalmers.se" },
+    { name = "Eleftherios Moschandreou", email = "elemos@chalmers.se" },
+    { name = "Liangyu Chen", email = "liangyuc@chalmers.se" },
+    { name = "Stefan Hill", email = "stefanhi@chalmers.se" },
+    { name = "Amr Osman", email = "oarm@chalmers.se" },
+    { name = "Tong Liu", email = "liuto@chalmers.se" },
+    { name = "Joel Sandås", email = "sandas@chalmers.se" },
+    { name = "Pontus Vikstål", email = "pontus.vikstal@chalmersnextlabs.se" },
+    { name = "Michele Faucci Giannelli", email = "faucci@chalmers.se" },
   { name = "Axel Erik Andersson", email = "axean@chalmers.se" }
 ]
 maintainers = [
-  { name = "Chalmers Next Labs AB", email = "contact@quantum.chalmersnextlabs.se" }
+    { name = "Chalmers Next Labs AB", email = "contact@quantum.chalmersnextlabs.se" }
 ]
 requires-python = ">=3.12, <3.13"
 dependencies = [
-  "pyqt5-qt5==5.15.2; platform_system == 'Linux'",
-  "pyqt5-qt5==5.15.2; platform_system == 'Windows'",
-  "pyqt5-qt5>=5.15.2,<6.0.0; platform_system == 'Darwin'",
-  "colorama==0.4.6",
-  "h5netcdf==1.4.0",
-  "h5py>=3.12.1",
-  "Jinja2==3.1.2",
-  "numpy>=2.0",
-  "qblox-instruments==0.14.2",
-  "qcodes==0.49.0",
-  "quantify-core==0.7.8",
-  "quantify-scheduler==0.21.2",
-  "redis==5.0.0",
-  "scikit-learn==1.5.2",
-  "toml==0.10.2",
-  "python-dotenv==1.0.1",
-  "requests>=2.32.3",
-  "typer>=0.12.5",
-  "jokeapi==1.0.5",
-  "optuna==4.0.0",
-  "netcdf4==1.7.1.post2",
-  "tomlkit>=0.13.2",
-  "rich>=14.0.0",
-  "click<8.2.0",
-  "matplotlib>=3.9.3",
-  "scipy>=1.14.1",
-  "pandas>=2.2.3",
-  "xarray>=2024.11.0",
-  "filelock>=3.16.1",
-  "pyqtgraph>=0.13.7",
-  "pyqt5>=5.15.11",
-  "pydantic==2.9.2"
+    "pyqt5-qt5==5.15.2; platform_system == 'Linux'",
+    "pyqt5-qt5==5.15.2; platform_system == 'Windows'",
+    "pyqt5-qt5>=5.15.2,<6.0.0; platform_system == 'Darwin'",
+    "colorama==0.4.6",
+    "h5netcdf==1.4.0",
+    "h5py>=3.12.1",
+    "Jinja2==3.1.2",
+    "numpy>=2.0",
+    "qblox-instruments==0.14.2",
+    "qcodes==0.49.0",
+    "quantify-core==0.7.8",
+    "quantify-scheduler==0.21.2",
+    "redis==5.0.0",
+    "scikit-learn==1.5.2",
+    "toml==0.10.2",
+    "python-dotenv==1.0.1",
+    "requests>=2.32.3",
+    "typer>=0.12.5",
+    "jokeapi==1.0.5",
+    "optuna==4.0.0",
+    "netcdf4==1.7.1.post2",
+    "tomlkit>=0.13.2",
+    "rich>=14.0.0",
+    "click<8.2.0",
+    "matplotlib>=3.9.3",
+    "scipy>=1.14.1",
+    "pandas>=2.2.3",
+    "xarray>=2024.11.0",
+    "filelock>=3.16.1",
+    "pyqtgraph>=0.13.7",
+    "pyqt5>=5.15.11",
+    "pydantic==2.9.2",
+    "dash>=3.1.1",
+    "dash-renderjson>=0.0.1"
 ]
 
 [project.optional-dependencies]
 dev = [
-  "jupyter>=1.0.0",
-  "black>=24.10.0",
-  "isort>=5.12.0"
+    "jupyter>=1.0.0",
+    "black>=24.10.0",
+    "isort>=5.12.0"
 ]
 docs = [
-  "mkdocs-material==9.6.14",
-  "mkdocstrings[python]~=0.29",
-  "mkdocs-gen-files==0.5.0",
-  "mkdocs-literate-nav==0.6.2",
-  "mkdocs-bibtex==4.2.10",
-  "mkdocs-jupyter==0.25.1",
+    "mkdocs-material==9.6.14",
+    "mkdocstrings[python]~=0.29",
+    "mkdocs-gen-files==0.5.0",
+    "mkdocs-literate-nav==0.6.2",
+    "mkdocs-bibtex==4.2.10",
+    "mkdocs-jupyter==0.25.1",
 ]
 test = [
-  "pytest>=8.3.3",
-  "requests-mock>=1.11.0"
+    "pytest>=8.3.3",
+    "requests-mock>=1.11.0"
 ]
 
 [project.scripts]

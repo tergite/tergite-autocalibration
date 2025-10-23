@@ -1,0 +1,63 @@
+# This file is a configuration template for the initial values on each calibration run
+
+target_node = "ro_frequency_two_state_optimization"
+qubits = ["q06","q07",'q08']
+# qubits = [  "q10"]
+couplers = ["q06_q07"]
+
+#   --------------
+#   Node referencero
+#   --------------
+#
+#   punchout
+#   optimize_node
+#   resonator_spectroscopy
+#   repeated_resonator_spectroscopy
+#   two_state_threshold_verification
+#   qubit_01_spectroscopy
+#   qubit_01_spectroscopy_AR
+#   qubit_01_amplitude_spectroscopy
+#   qubit_01_amplitude_spectroscopy_AR
+#   rabi_oscillations
+#   rabi_oscillations_AR
+#   ramsey_correction
+#   ramsey_correction_AR
+#   resonator_spectroscopy_1
+#   qubit_12_spectroscopy
+#   rabi_oscillations_12
+#   ramsey_correction_12
+#   resonator_spectroscopy_2
+#   ro_frequency_two_state_optimization
+#   ro_frequency_2not2_optimization
+#   ro_frequency_three_state_optimization
+#   ro_amplitude_two_state_optimizationb
+#   ro_amplitude_2not2_optimization
+#   ro_amplitude_three_state_optimization
+#   coupler_spectroscopy
+#   coupler_resonator_spectroscopy
+#   motzoi_parameter
+#   n_rabi_oscillations
+#   randomized_benchmarking_ssro
+#   T1
+#   T2
+#   T2_echo
+#   all_XY
+#   cz_chevron
+#   cz_chevron_after_3_state_discrimination
+#   cz_chevron_amplitude
+#   cz_optimize_chevron
+#   reset_chevron
+#   reset_calibration_ssro
+#   cz_calibration
+#   cz_calibration_ssro
+#   cz_calibration_after_3_state_discrimination
+#   cz_verification_after_3_state_discrimination
+#   cz_dynamic_phase
+#   cz_dynamic_phase_swap
+#   cz_parametrization_after_3_state_discrimination
+#   cz_parametrization_after_3_state_discrimination_ar
+#   cz_dynamic_phase_after_3_state_discrimination
+#   2_qubit_RB_after_3_state_discrimination
+#   process_tomography_ssro
+#   tqg_randomized_benchmarking
+#   tqg_randomized_benchmarking_interleaved

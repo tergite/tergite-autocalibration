@@ -85,6 +85,9 @@ class EnvironmentConfiguration(BaseConfigurationFile):
         self.redis_port: int = 6379
         self.plotting: bool = False
 
+        self.data_browser_host: str = "127.0.0.1"
+        self.data_browser_port: int = 8050
+
         self.mss_machine_root_url: str = "http://localhost:8002"
 
     @staticmethod
