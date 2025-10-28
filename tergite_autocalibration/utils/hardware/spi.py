@@ -22,6 +22,7 @@ from colorama import init as colorama_init
 from qblox_instruments import SpiRack
 from qcodes import validators
 from rich.progress import Progress
+from tomlkit.api import E
 
 from tergite_autocalibration.config.globals import ENV
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
@@ -72,15 +73,16 @@ class SpiDAC:
             measurement_mode == MeasurementMode.dummy
             or measurement_mode == MeasurementMode.re_analyse
         )
+        if self.is_dummy:
+            self.port = 'dummy_port'
+
         if self.port is not None:
-            self.spi = SpiRack("loki_rack", self.port, is_dummy=self.is_dummy)
-        elif measurement_mode == MeasurementMode.re_analyse:
             self.spi = SpiRack("loki_rack", self.port, is_dummy=self.is_dummy)
         else:
             if self.is_dummy:
-                self.spi = SpiRack("loki_rack", "dummy_port", is_dummy=self.is_dummy)
-            else:
-                raise ValueError("No serial port for the SPI")
+                self.spi = SpiRack("loki_rack", self.port, is_dummy=self.is_dummy)
+            # else:
+            #     raise ValueError("No serial port for the SPI")
         self.dacs_dictionary = {}
         for coupler in couplers:
             self.dacs_dictionary[coupler] = self.create_spi_dac(coupler)

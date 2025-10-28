@@ -60,8 +60,10 @@ class RabiQubitAnalysis(BaseQubitAnalysis):
         )
 
         self.pi_amplitude = fit_result.params["amp180"].value
-        self.uncertainty = fit_result.params["amp180"].stderr
-        self.scaled_uncertainty = self.uncertainty / self.pi_amplitude
+        self.uncertainty = 0 # fit_result.params["amp180"].stderr
+        # self.uncertainty = fit_result.params["amp180"].stderr
+        self.scaled_uncertainty = 0  #self.uncertainty / self.pi_amplitude
+        # self.scaled_uncertainty = self.uncertainty / self.pi_amplitude
 
         self.fit_y = model.eval(fit_result.params, drive_amp=self.fit_plot_amplitudes)
         return

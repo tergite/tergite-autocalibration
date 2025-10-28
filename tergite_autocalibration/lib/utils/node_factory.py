@@ -17,6 +17,7 @@
 from pathlib import Path
 from typing import TYPE_CHECKING, Dict, List, Union
 
+from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.node import Qubit01SpectroscopyAmplitudeNode
 from tergite_autocalibration.utils.misc.regex import camel_to_snake
 
 from .reflections import find_inheriting_classes_ast_recursive, import_class_from_file
@@ -39,6 +40,7 @@ class NodeFactory:
             "punchout": "PunchoutNode",
             "resonator_spectroscopy": "ResonatorSpectroscopyNode",
             "resonator_relaxation": "ResonatorRelaxationNode",
+            'qubit_bring_up_spectroscopy': "Qubit01SpectroscopyAmplitudeNode",
             "qubit_01_spectroscopy": "Qubit01SpectroscopyNode",
             "rabi_oscillations": "RabiOscillationsNode",
             "ramsey_correction": "RamseyFringesNode",
