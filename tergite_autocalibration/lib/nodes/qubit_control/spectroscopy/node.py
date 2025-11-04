@@ -117,7 +117,7 @@ class Qubit01SpectroscopyAmplitudeNode(ScheduleQubitNode):
 
         self.outer_schedule_samplespace = {
             "spec_pulse_amplitudes": {
-                qubit: np.linspace(5e-3, 5e-2, 3) for qubit in self.all_qubits
+                qubit: np.linspace(8e-3, 8e-2, 2) for qubit in self.all_qubits
             },
         }
 
@@ -128,9 +128,9 @@ class Qubit01SpectroscopyAmplitudeNode(ScheduleQubitNode):
         }
 
     def qubit_samples(self, qubit: str) -> np.ndarray:
-        qub_spec_samples = 201
-        sweep_range = 50e6
+        qub_spec_samples = 821
+        sweep_range = 500e6
         VNA_frequency = dh.get_legacy("VNA_qubit_frequencies")[qubit]
-        min_freq = VNA_frequency - sweep_range / 2
-        max_freq = VNA_frequency + sweep_range / 2
+        min_freq = VNA_frequency - sweep_range / 2 + 0 * 50e6
+        max_freq = VNA_frequency + sweep_range / 2 + 0 * 50e6
         return np.linspace(min_freq, max_freq, qub_spec_samples)
