@@ -14,18 +14,14 @@
 
 import abc
 from typing import List
+
 import numpy as np
 import xarray as xr
-
 from quantify_scheduler.instrument_coordinator.utility import xarray
 
-from tergite_autocalibration.lib.base.node import (
-    CouplerNode,
-    BaseNode,
-    QubitNode,
-)
-from tergite_autocalibration.utils.measurement_utils import reduce_samplespace
+from tergite_autocalibration.lib.base.node import BaseNode, CouplerNode, QubitNode
 from tergite_autocalibration.utils.logging import logger
+from tergite_autocalibration.utils.measurement_utils import reduce_samplespace
 
 
 class ExternalParameterNode(BaseNode, abc.ABC):

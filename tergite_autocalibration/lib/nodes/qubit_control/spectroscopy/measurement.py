@@ -173,3 +173,82 @@ class TwoTonesMultidimMeasurement(BaseMeasurement):
                     schedule.add(Reset(this_qubit))
 
         return schedule
+
+
+class TwoTonesAmplitudeMeasurement(BaseMeasurement):
+    def __init__(self, transmons: dict[str, ExtendedTransmon]):
+        super().__init__(transmons)
+
+    def schedule_function(
+        self,
+        spec_frequencies: dict[str, np.ndarray],
+        spec_pulse_amplitudes: dict[str, float],
+    ) -> Schedule:
+
+        schedule = Schedule("qubit_spectroscopy", repetitions=1024)
+
+        # Initialize the clock for each qubit
+        # Initialize ClockResource with the first frequency value
+        for this_qubit, spec_array_val in spec_frequencies.items():
+            schedule.add_resource(
+                ClockResource(name=f"{this_qubit}.01", freq=spec_array_val[0])
+            )
+
+        qubits = self.transmons.keys()
+
+        root_relaxation = schedule.add(Reset(*qubits), label="Reset")
+
+        # The outer loop, iterates over all qubits
+        for acq_channel, (this_qubit, spec_pulse_frequency_values) in enumerate(
+            spec_frequencies.items()
+        ):
+            # unpack the static parameters
+            this_transmon = self.transmons[this_qubit]
+            spec_pulse_duration = this_transmon.spec.spec_duration()
+            mw_pulse_port = this_transmon.ports.microwave()
+
+            # long pulses require more efficient memory management
+            if spec_pulse_duration > 6.5e-6:
+                # SpectroscopyPulse = long_square_pulse
+                pass
+            else:
+                SpectroscopyPulse = SoftSquarePulse
+
+            spec_pulse_amplitude = spec_pulse_amplitudes[this_qubit]
+
+            this_clock = f"{this_qubit}.01"
+
+            schedule.add(
+                Reset(*qubits), ref_op=root_relaxation, ref_pt="end"
+            )  # To enforce parallelism we refer to the root relaxation
+
+            # The intermediate loop iterates over all frequency values
+            for this_index, spec_pulse_frequency in enumerate(
+                spec_pulse_frequency_values
+            ):
+                # reset the clock frequency for the qubit pulse
+                schedule.add(
+                    SetClockFrequency(
+                        clock=this_clock, clock_freq_new=spec_pulse_frequency
+                    ),
+                )
+
+                schedule.add(
+                    SpectroscopyPulse(
+                        duration=spec_pulse_duration,
+                        amp=spec_pulse_amplitude,
+                        port=mw_pulse_port,
+                        clock=this_clock,
+                    ),
+                )
+
+                schedule.add(
+                    Measure(
+                        this_qubit,
+                        acq_index=this_index,
+                    ),
+                )
+
+                schedule.add(Reset(this_qubit))
+
+        return schedule
