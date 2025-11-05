@@ -48,7 +48,6 @@ def test_instantiate_calibration_supervisor():
     assert isinstance(calib_sup.lab_ic, InstrumentCoordinator)
     assert calib_sup.config == cfg
     assert isinstance(calib_sup.topo_order, list)
-    print(f"{ calib_sup.topo_order = }")
     assert tuple(calib_sup.topo_order) == (
         "resonator_spectroscopy",
         "qubit_01_spectroscopy",
