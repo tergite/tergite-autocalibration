@@ -252,4 +252,3 @@ class TwoTonesAmplitudeMeasurement(BaseMeasurement):
                 schedule.add(Reset(this_qubit))
 
         return schedule
-

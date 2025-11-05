@@ -74,7 +74,7 @@ class SpiDAC:
             or measurement_mode == MeasurementMode.re_analyse
         )
         if self.is_dummy:
-            self.port = 'dummy_port'
+            self.port = "dummy_port"
 
         if self.port is not None:
             self.spi = SpiRack("loki_rack", self.port, is_dummy=self.is_dummy)
