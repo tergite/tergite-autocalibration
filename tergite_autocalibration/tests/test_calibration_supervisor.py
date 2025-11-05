@@ -10,18 +10,16 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+from qblox_instruments import Cluster
+from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
+
 from tergite_autocalibration.scripts.calibration_supervisor import (
     CalibrationConfig,
     CalibrationSupervisor,
     HardwareManager,
     NodeManager,
 )
-from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
-from qblox_instruments import Cluster
-from tergite_autocalibration.utils.dto.enums import (
-    DataStatus,
-    MeasurementMode,
-)
+from tergite_autocalibration.utils.dto.enums import DataStatus, MeasurementMode
 
 
 def test_instantiate_calibration_config():

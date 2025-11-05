@@ -48,15 +48,15 @@ class T1Node(ExternalParameterFixedScheduleQubitNode):
         self.schedule_keywords = {
             "multiplexing": "parallel"
         }  # 'one_by_one' | 'parallel'
-        number_of_repeated_t1s = 3
-        self.sleep_time = 3
+        number_of_repeated_t1s = 10
+        self.sleep_time = 2
 
         delays = np.concatenate(
             [
                 np.arange(0, 4e-6, 1e-6),  # 4
                 np.arange(4e-6, 10e-6, 2e-6),  # 3
                 np.arange(10e-6, 40e-6, 5e-6),  # 6
-                np.arange(40e-6, 100 - 6, 10e-6),  # 6
+                np.arange(40e-6, 100e-6, 10e-6),  # 6
                 np.arange(100e-6, 200e-6, 20e-6),  # 5
                 np.arange(200e-6, 400e-6, 40e-6),  # 5
             ]
