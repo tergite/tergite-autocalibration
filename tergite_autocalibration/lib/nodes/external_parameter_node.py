@@ -13,8 +13,7 @@
 # that they have been altered from the originals.
 
 import numpy as np
-
-from quantify_scheduler.instrument_coordinator.utility import xarray
+import xarray
 
 from tergite_autocalibration.lib.base.node_interface import MeasurementType
 from tergite_autocalibration.utils.measurement_utils import (

@@ -29,18 +29,16 @@ from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
     CompiledSchedule,
     InstrumentCoordinator,
 )
-from tergite_autocalibration.lib.base import measurement
-from tergite_autocalibration.lib.base.node_interface import (
-    MeasurementType,
-    NodeInterface,
-)
-from tergite_autocalibration.lib.utils.redis import update_redis_trusted_values
-
 
 from tergite_autocalibration.config.globals import PLOTTING_BACKEND
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
+from tergite_autocalibration.lib.base.node_interface import (
+    MeasurementType,
+    NodeInterface,
+)
 from tergite_autocalibration.lib.utils.device import DeviceConfiguration
+from tergite_autocalibration.lib.utils.redis import update_redis_trusted_values
 from tergite_autocalibration.lib.utils.schedule_execution import execute_schedule
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
@@ -87,27 +85,6 @@ class Node(NodeInterface):
         measurement_type = self.measurement_type(self)
         dataset = measurement_type.measure_node(cluster_status)
         return dataset
-
-    # @property
-    # def dimensions(self) -> list:
-    #     """
-    #     array of dimensions used for raw dataset reshaping
-    #     """
-    #     schedule_settable_quantities = self.schedule_samplespace.keys()
-    #     dimensions = []
-    #
-    #     for quantity in schedule_settable_quantities:
-    #         # keeping the first element, ASSUMING that all settable elements
-    #         # have the same dimensions on their samplespace
-    #         first_element = list(self.schedule_samplespace[quantity].keys())[0]
-    #         settable_values = self.schedule_samplespace[quantity][first_element]
-    #         if not isinstance(settable_values, Iterable):
-    #             settable_values = np.array([settable_values])
-    #         dimensions.append(len(settable_values))
-    #
-    #     if self.loops is not None:
-    #         dimensions.append(self.loops)
-    #     return dimensions
 
     def calibrate(self, data_path, measurement_mode):
         if measurement_mode != MeasurementMode.re_analyse:

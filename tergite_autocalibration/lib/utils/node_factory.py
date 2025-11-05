@@ -16,6 +16,7 @@
 
 
 from typing import Dict, List
+
 from tergite_autocalibration.lib.base.node import Node
 from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.node import (
     PurityBenchmarkingNode,
