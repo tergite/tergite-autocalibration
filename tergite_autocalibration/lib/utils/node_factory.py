@@ -1,10 +1,10 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2023, 2024
+# (C) Copyright Eleftherios Moschandreou 2023, 2024, 2025
 # (C) Copyright Liangyu Chen 2023, 2024
 # (C) Copyright Stefan Hill 2024
 # (C) Copyright Michele Faucci Giannelli 2024
-# (C) Copyright Chalmers Next Labs 2024
+# (C) Copyright Chalmers Next Labs 2024, 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -46,7 +46,7 @@ from tergite_autocalibration.lib.nodes.qubit_control.ramsey_fringes.node import 
 )
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.node import (
     Qubit01SpectroscopyNode,
-    Qubit12SpectroscopyMultidimNode,
+    Qubit12SpectroscopyNode,
 )
 from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.node import (
     ResonatorSpectroscopy1Node,
@@ -76,7 +76,7 @@ class NodeFactory:
             "T2_echo": T2EchoNode,
             "n_rabi_oscillations": NRabiOscillationsNode,
             "resonator_spectroscopy_1": ResonatorSpectroscopy1Node,
-            "qubit_12_spectroscopy": Qubit12SpectroscopyMultidimNode,
+            "qubit_12_spectroscopy": Qubit12SpectroscopyNode,
             "rabi_oscillations_12": RabiOscillations12Node,
             "ramsey_correction_12": RamseyFringes12Node,
             "resonator_spectroscopy_2": ResonatorSpectroscopy2Node,

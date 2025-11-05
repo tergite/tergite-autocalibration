@@ -88,7 +88,7 @@ class Qubit01SpectroscopyNode(QubitSpectroscopyBase):
         }
 
 
-class Qubit12SpectroscopyMultidimNode(QubitSpectroscopyBase):
+class Qubit12SpectroscopyNode(QubitSpectroscopyBase):
     measurement_obj = TwoTonesMultidimMeasurement
     analysis_obj = QubitSpectroscopy12NodeAnalysis
     measurement_type = ScheduleNode
@@ -110,9 +110,10 @@ class Qubit12SpectroscopyMultidimNode(QubitSpectroscopyBase):
         }
 
 
-class Qubit01SpectroscopyAmplitudeNode(ScheduleQubitNode):
+class Qubit01SpectroscopyAmplitudeNode(QubitNode):
     measurement_obj = TwoTonesAmplitudeMeasurement
     analysis_obj = QubitSpectroscopyNodeAnalysis
+    measurement_type = ScheduleNode
     qubit_qois = ["clock_freqs:f01", "spec:spec_ampl_optimal"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_kwargs):
