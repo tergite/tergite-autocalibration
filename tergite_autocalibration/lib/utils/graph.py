@@ -36,7 +36,7 @@ GRAPH_DEPENDENCIES = [
     ("resonator_spectroscopy", "coupler_anticrossing"),
     ("resonator_spectroscopy", "qubit_bring_up_spectroscopy"),
     ("resonator_spectroscopy_vs_current", "qubit_spectroscopy_vs_current"),
-    ("qubit_bring_up_spectroscopy", "rabi_oscillations"),
+    ("qubit_spectroscopy", "rabi_oscillations"),
     ("rabi_oscillations", "ramsey_correction"),
     ("rabi_oscillations", "T1"),
     ("ramsey_correction", "motzoi_parameter"),
