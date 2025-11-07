@@ -121,7 +121,7 @@ class BaseNode(NodeInterface):
 
         Args:
             compiled_schedule (CompiledSchedule): The compiled schedule to execute.
-            cluster_status (MeasurementMode.real): The status of the measurement mode.
+            measurement_mode (MeasurementMode.real): The status of the measurement mode.
             measurement (tuple): Tuple of (current_measurement, total_measurements).
 
         Returns:
