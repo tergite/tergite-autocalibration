@@ -25,7 +25,7 @@ from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement im
     TwoTonesAmplitudeMeasurement,
     TwoTonesMultidimMeasurement,
 )
-from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
+from tergite_autocalibration.lib.nodes.schedule_node import OuterScheduleNode, ScheduleNode
 from tergite_autocalibration.lib.utils.samplespace import qubit_samples
 
 peak = LorentzianModel()
@@ -113,7 +113,7 @@ class Qubit12SpectroscopyNode(QubitSpectroscopyBase):
 class Qubit01SpectroscopyAmplitudeNode(QubitNode):
     measurement_obj = TwoTonesAmplitudeMeasurement
     analysis_obj = QubitSpectroscopyNodeAnalysis
-    measurement_type = ScheduleNode
+    measurement_type = OuterScheduleNode
     qubit_qois = ["clock_freqs:f01", "spec:spec_ampl_optimal"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_kwargs):

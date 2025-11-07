@@ -406,7 +406,6 @@ class CalibrationSupervisor:
         ).copy(str(CONFIG.run.log_dir))
 
         for calibration_node in calibration_nodes:
-            print(f"{ calibration_node = }")
             self.node_manager.inspect_node(calibration_node, ignore_spec=ignore_spec)
             logger.info(f"{calibration_node} node is completed")
 

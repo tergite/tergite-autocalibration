@@ -12,6 +12,7 @@
 
 import pytest
 
+from tergite_autocalibration.lib.base.node import CouplerNode
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.analysis import (
     CZParametrizationFixDurationNodeAnalysis,
 )
@@ -20,10 +21,6 @@ from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.measurement im
 )
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.node import (
     CZParametrizationFixDurationNode,
-)
-from tergite_autocalibration.lib.nodes.schedule_node import (
-    ScheduleNode,
-    ScheduleCouplerNode,
 )
 
 
@@ -35,8 +32,7 @@ def test_canCreateCorrectType():
         couplers=["q14_q15"],
     )
     assert isinstance(c, CZParametrizationFixDurationNode)
-    assert isinstance(c, ScheduleCouplerNode)
-    assert isinstance(c, ScheduleNode)
+    assert isinstance(c, CouplerNode)
 
 
 @pytest.mark.skip

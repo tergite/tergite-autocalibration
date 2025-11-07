@@ -13,10 +13,35 @@
 
 from tergite_autocalibration.config.globals import CONFIG
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.node import (
+    Qubit01SpectroscopyAmplitudeNode,
     Qubit01SpectroscopyNode,
     Qubit12SpectroscopyNode,
 )
+from tergite_autocalibration.lib.nodes.schedule_node import (
+    OuterScheduleNode,
+    ScheduleNode,
+)
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
+
+
+def test_measurement_01_type():
+    ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
+    node_01 = Qubit01SpectroscopyNode("qubit_01_spectroscopy", CONFIG.run.qubits)
+    assert issubclass(node_01.measurement_type, ScheduleNode)
+
+
+def test_measurement_12_type():
+    ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
+    node_12 = Qubit12SpectroscopyNode("qubit_01_spectroscopy", CONFIG.run.qubits)
+    assert issubclass(node_12.measurement_type, ScheduleNode)
+
+
+def test_measurement_bring_up_type():
+    ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
+    node_bring_up = Qubit01SpectroscopyAmplitudeNode(
+        "qubit_bring_up_spectroscopy", CONFIG.run.qubits
+    )
+    assert issubclass(node_bring_up.measurement_type, OuterScheduleNode)
 
 
 def test_dummy_01_generation():

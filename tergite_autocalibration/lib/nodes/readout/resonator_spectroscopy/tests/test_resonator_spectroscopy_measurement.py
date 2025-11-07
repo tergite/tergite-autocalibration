@@ -17,7 +17,26 @@ from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.node impor
     ResonatorSpectroscopy2Node,
     ResonatorSpectroscopyNode,
 )
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
+
+
+def test_measurement_0_type():
+    ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
+    node_0 = ResonatorSpectroscopyNode("resonator_spectroscopy", CONFIG.run.qubits)
+    assert issubclass(node_0.measurement_type, ScheduleNode)
+
+
+def test_measurement_1_type():
+    ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
+    node_1 = ResonatorSpectroscopy1Node("resonator_spectroscopy_1", CONFIG.run.qubits)
+    assert issubclass(node_1.measurement_type, ScheduleNode)
+
+
+def test_measurement_2_type():
+    ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
+    node_2 = ResonatorSpectroscopy2Node("resonator_spectroscopy_2", CONFIG.run.qubits)
+    assert issubclass(node_2.measurement_type, ScheduleNode)
 
 
 def test_dummy_0_generation():

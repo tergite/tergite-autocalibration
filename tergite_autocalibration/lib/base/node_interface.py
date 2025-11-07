@@ -21,7 +21,6 @@ from colorama import init as colorama_init
 from tergite_autocalibration.config.globals import PLOTTING_BACKEND
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
-from tergite_autocalibration.lib.base.node import BaseNode
 from tergite_autocalibration.utils.dto.enums import CalibrationResultStatus
 
 colorama_init()
@@ -51,6 +50,7 @@ class NodeInterface(ABC):
 
 
 class MeasurementType(ABC):
+    # TODO: this should be moved elesewhere
     @abstractmethod
-    def measure_node(self, measurement_mode, node: BaseNode) -> xarray.Dataset:
+    def measure_node(self, measurement_mode, node: "BaseNode") -> xarray.Dataset:
         pass

@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2023, 2024
+# (C) Copyright Eleftherios Moschandreou 2023, 2024, 2025
 # (C) Copyright Michele Faucci Giannelli 2024, 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
