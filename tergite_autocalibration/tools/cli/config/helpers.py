@@ -13,37 +13,11 @@
 import getpass
 import os
 import subprocess
-from enum import Enum
-from sys import platform
 from typing import List, Tuple
 
 import typer
 
-
-class OperatingSystem(Enum):
-    LINUX = "LINUX"
-    MAC = "MAC"
-    WINDOWS = "WINDOWS"
-    UNDEFINED = "UNDEFINED"
-
-
-def get_os() -> "OperatingSystem":
-    # Safe way to retrieve a string about the operating system
-    platform_str: str
-    if isinstance(platform, str):
-        platform_str = platform.lower()
-    else:
-        platform_str = platform.system().lower()
-
-    # Return as enum
-    if platform_str == "linux":
-        return OperatingSystem.LINUX
-    elif platform_str == "darwin":
-        return OperatingSystem.MAC
-    elif "win" in platform_str:
-        return OperatingSystem.WINDOWS
-    else:
-        return OperatingSystem.UNDEFINED
+from tergite_autocalibration.utils.misc.os import OperatingSystem, get_os
 
 
 def get_username() -> str:
