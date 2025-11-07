@@ -51,7 +51,7 @@ colorama_init()
 matplotlib.use(PLOTTING_BACKEND)
 
 
-class Node(NodeInterface):
+class BaseNode(NodeInterface):
     measurement_obj: "BaseMeasurement"
     analysis_obj: "BaseNodeAnalysis"
     measurement_type: "MeasurementType"
@@ -283,7 +283,7 @@ class Node(NodeInterface):
         return dataset
 
 
-class QubitNode(Node):
+class QubitNode(BaseNode):
     qubit_qois: list[str] | None = None
 
     def __init__(self, name: str, all_qubits: list[str], **node_keywords):
@@ -336,7 +336,7 @@ class QubitNode(Node):
         return f"Node({self.name}, {self.all_qubits})"
 
 
-class CouplerNode(Node):
+class CouplerNode(BaseNode):
     coupler_qois: list[str]
 
     def __init__(self, name: str, couplers: list[str], **node_keywords):
