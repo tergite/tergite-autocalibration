@@ -37,6 +37,7 @@ class NodeFactory:
     def __init__(self):
         self.node_name_mapping: Dict[str, str] = {
             "resonator_spectroscopy": "ResonatorSpectroscopyNode",
+            "qubit_bring_up_spectroscopy": "Qubit01SpectroscopyAmplitudeNode",
             "qubit_01_spectroscopy": "Qubit01SpectroscopyNode",
             "rabi_oscillations": "RabiOscillationsNode",
             "ramsey_correction": "RamseyFringesNode",

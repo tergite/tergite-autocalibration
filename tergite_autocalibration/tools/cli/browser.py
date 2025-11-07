@@ -55,7 +55,7 @@ def start(
     """
     from tergite_autocalibration.utils.logging import logger
     from tergite_autocalibration.config.globals import ENV
-    from tergite_autocalibration.tools.cli.config.helpers import get_os, OperatingSystem
+    from tergite_autocalibration.utils.misc.os import get_os, OperatingSystem
 
     # Parse host and load from environment configuration if unspecified
     if host is None:
