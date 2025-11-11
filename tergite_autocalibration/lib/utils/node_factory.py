@@ -58,6 +58,8 @@ class NodeFactory:
             "randomized_benchmarking": "RandomizedBenchmarkingNode",
             "purity_benchmarking": "PurityBenchmarkingNode",
             "coupler_anticrossing": "QubitSpectroscopyVsCurrentNode",
+            "resonator_spectroscopy_vs_current": "ResonatorSpectroscopyVsCurrentNode",
+            "qubit_spectroscopy_vs_current": "QubitSpectroscopyVsCurrentNode",
         }
         self._node_implementation_paths: Dict[str, Union[str, Path]] = {}
         self._node_classes: Dict[str, type["BaseNode"]] = {}

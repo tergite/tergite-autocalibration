@@ -133,6 +133,7 @@ class ResonatorSpectroscopyVsCurrentNode(CouplerNode):
 
     measurement_obj = ResonatorSpectroscopyMeasurement
     analysis_obj = ResonatorSpectroscopyVsCurrentNodeAnalysis
+    measurement_type = ExternalParameterNode
     # coupler_qois = ["resonator_flux_quantum"]
     coupler_qois = ["resonator_crossing_points"]
 
