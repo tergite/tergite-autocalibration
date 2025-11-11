@@ -19,12 +19,17 @@ import numpy
 def reduce_samplespace(iteration: int, samplespace: dict) -> dict:
     reduced_samplespace = {}
     element_values = {}
+
+    # To account for empty samplespaces
+    if not samplespace:
+        return reduced_samplespace
+
     """
     example of samplespace:
     samplespace = {
           'frequencies': {
-             'q1': np.array(4.0e9, 4.1e9, 4.2e9),
-             'q2': np.array(4.5e9, 4.6e9, 4.7e9),
+             'q1': np.array([4.0e9, 4.1e9, 4.2e9]),
+             'q2': np.array([4.5e9, 4.6e9, 4.7e9]),
            }
     }
     """
