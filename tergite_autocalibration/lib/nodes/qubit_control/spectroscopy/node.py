@@ -16,6 +16,7 @@ import xarray
 from lmfit.models import LorentzianModel
 
 from tergite_autocalibration.config.legacy import dh
+from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis import (
     QubitSpectroscopy12NodeAnalysis,
     QubitSpectroscopyNodeAnalysis,
@@ -24,13 +25,16 @@ from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement im
     TwoTonesAmplitudeMeasurement,
     TwoTonesMultidimMeasurement,
 )
-from tergite_autocalibration.lib.nodes.schedule_node import ScheduleQubitNode
+from tergite_autocalibration.lib.nodes.schedule_node import (
+    OuterScheduleNode,
+    ScheduleNode,
+)
 from tergite_autocalibration.lib.utils.samplespace import qubit_samples
 
 peak = LorentzianModel()
 
 
-class QubitSpectroscopyBase(ScheduleQubitNode):
+class QubitSpectroscopyBase(QubitNode):
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
@@ -71,6 +75,7 @@ class QubitSpectroscopyBase(ScheduleQubitNode):
 class Qubit01SpectroscopyNode(QubitSpectroscopyBase):
     measurement_obj = TwoTonesMultidimMeasurement
     analysis_obj = QubitSpectroscopyNodeAnalysis
+    measurement_type = ScheduleNode
     qubit_qois = ["clock_freqs:f01", "spec:spec_ampl_optimal"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
@@ -89,6 +94,7 @@ class Qubit01SpectroscopyNode(QubitSpectroscopyBase):
 class Qubit12SpectroscopyNode(QubitSpectroscopyBase):
     measurement_obj = TwoTonesMultidimMeasurement
     analysis_obj = QubitSpectroscopy12NodeAnalysis
+    measurement_type = ScheduleNode
     qubit_qois = ["clock_freqs:f12", "spec:spec_ampl_12_optimal"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
@@ -107,9 +113,10 @@ class Qubit12SpectroscopyNode(QubitSpectroscopyBase):
         }
 
 
-class Qubit01SpectroscopyAmplitudeNode(ScheduleQubitNode):
+class Qubit01SpectroscopyAmplitudeNode(QubitNode):
     measurement_obj = TwoTonesAmplitudeMeasurement
     analysis_obj = QubitSpectroscopyNodeAnalysis
+    measurement_type = OuterScheduleNode
     qubit_qois = ["clock_freqs:f01", "spec:spec_ampl_optimal"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_kwargs):

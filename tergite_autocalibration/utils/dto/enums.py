@@ -26,6 +26,15 @@ class DataStatus(Enum):
     undefined = 4
 
 
+class CalibrationResultStatus(Enum):
+    """
+    Used by check_data to indicate outcome
+    """
+
+    success = 1
+    failed = 2
+
+
 class MeasurementMode(Enum):
     """
     Used to set the cluster mode e.g.  real cluster or re analyse

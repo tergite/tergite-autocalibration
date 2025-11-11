@@ -12,46 +12,44 @@
 
 import numpy as np
 
+from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.analysis import (
     PurityBenchmarkingNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.measurement import (
     PurityBenchmarkingMeasurement,
 )
-from tergite_autocalibration.lib.nodes.schedule_node import ScheduleQubitNode
+from tergite_autocalibration.lib.nodes.external_parameter_node import (
+    ExternalParameterNode,
+)
 
 
-class PurityBenchmarkingNode(ScheduleQubitNode):
+class PurityBenchmarkingNode(QubitNode):
     measurement_obj = PurityBenchmarkingMeasurement
     analysis_obj = PurityBenchmarkingNodeAnalysis
+    measurement_type = ExternalParameterNode
     qubit_qois = ["purity_fidelity"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
         self.name = name
-        self.type = "parameterized_sweep"
         self.all_qubits = all_qubits
         self.schedule_keywords = schedule_keywords
-        self.backup = False
         self.schedule_keywords = {}
+        self.loops = 500
+        self.schedule_keywords["loop_repetitions"] = self.loops
 
-        self.initial_schedule_samplespace = {
+        RB_REPEATS = 4
+        self.outer_schedule_samplespace = {
+            "seeds": {
+                qubit: np.arange(RB_REPEATS, dtype=np.int32)
+                for qubit in self.all_qubits
+            }
+        }
+
+        self.schedule_samplespace = {
             "number_of_cliffords": {
-                # qubit: all_numbers for qubit in self.all_qubits
-                # qubit: np.array([2, 16, 128, 256,512, 768, 1024, 0, 1]) for qubit in self.all_qubits
-                qubit: self.stack_number_of_cliffords([0, 2, 4, 8, 16, 128, 256, 512])
+                qubit: np.array([0, 2, 4, 8, 16, 128, 256, 512])
                 for qubit in self.all_qubits
             },
         }
-
-        self.external_samplespace = {
-            "seeds": {qubit: np.arange(10, dtype=np.int32) for qubit in self.all_qubits}
-        }
-
-    def pre_measurement_operation(self, reduced_ext_space: dict):
-        self.schedule_samplespace = (
-            self.initial_schedule_samplespace | reduced_ext_space
-        )
-
-    def stack_number_of_cliffords(self, number_of_cliffords):
-        return np.array(list(number_of_cliffords) * 3 + [0, 1, 2])

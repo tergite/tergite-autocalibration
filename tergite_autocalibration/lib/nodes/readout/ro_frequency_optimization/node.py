@@ -15,6 +15,7 @@
 import numpy as np
 import xarray
 
+from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.analysis import (
     OptimalRO01FrequencyNodeAnalysis,
     OptimalRO012FrequencyNodeAnalysis,
@@ -22,7 +23,7 @@ from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.analysi
 from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.measurement import (
     ROFrequencyOptimizationMeasurement,
 )
-from tergite_autocalibration.lib.nodes.schedule_node import ScheduleQubitNode
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.utils.samplespace import resonator_samples
 
 from quantify_core.analysis import fitting_models as fm
@@ -31,7 +32,7 @@ from tergite_autocalibration.config.legacy import dh
 resonator = fm.ResonatorModel()
 
 
-class ROFrequencyOptimizationBase(ScheduleQubitNode):
+class ROFrequencyOptimizationBase(QubitNode):
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
 
@@ -76,6 +77,8 @@ class ROFrequencyOptimizationBase(ScheduleQubitNode):
 class ROFrequencyTwoStateOptimizationNode(ROFrequencyOptimizationBase):
     measurement_obj = ROFrequencyOptimizationMeasurement
     analysis_obj = OptimalRO01FrequencyNodeAnalysis
+    measurement_type = ScheduleNode
+
     qubit_qois = ["extended_clock_freqs:readout_2state_opt"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
@@ -94,6 +97,7 @@ class ROFrequencyTwoStateOptimizationNode(ROFrequencyOptimizationBase):
 class ROFrequencyThreeStateOptimizationNode(ROFrequencyOptimizationBase):
     measurement_obj = ROFrequencyOptimizationMeasurement
     analysis_obj = OptimalRO012FrequencyNodeAnalysis
+    measurement_type = ScheduleNode
     qubit_qois = ["extended_clock_freqs:readout_3state_opt"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):

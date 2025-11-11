@@ -22,7 +22,7 @@ from tergite_autocalibration.utils.misc.regex import camel_to_snake
 from .reflections import find_inheriting_classes_ast_recursive, import_class_from_file
 
 if TYPE_CHECKING:
-    from tergite_autocalibration.lib.base.node import BaseNode, CouplerNode, QubitNode
+    from tergite_autocalibration.lib.base.node import BaseNode
 
 
 class NodeFactory:
@@ -36,45 +36,30 @@ class NodeFactory:
 
     def __init__(self):
         self.node_name_mapping: Dict[str, str] = {
-            "punchout": "PunchoutNode",
             "resonator_spectroscopy": "ResonatorSpectroscopyNode",
-            "resonator_relaxation": "ResonatorRelaxationNode",
             "qubit_bring_up_spectroscopy": "Qubit01SpectroscopyAmplitudeNode",
             "qubit_01_spectroscopy": "Qubit01SpectroscopyNode",
             "rabi_oscillations": "RabiOscillationsNode",
             "ramsey_correction": "RamseyFringesNode",
+            "motzoi_parameter": "MotzoiParameterNode",
+            "T1": "T1Node",
+            "T2": "T2Node",
+            "T2_echo": "T2EchoNode",
+            "n_rabi_oscillations": "NRabiOscillationsNode",
             "resonator_spectroscopy_1": "ResonatorSpectroscopy1Node",
             "qubit_12_spectroscopy": "Qubit12SpectroscopyNode",
             "rabi_oscillations_12": "RabiOscillations12Node",
             "ramsey_correction_12": "RamseyFringes12Node",
             "resonator_spectroscopy_2": "ResonatorSpectroscopy2Node",
-            "motzoi_parameter": "MotzoiParameterNode",
-            "n_rabi_oscillations": "NRabiOscillationsNode",
-            "motzoi_parameter_12": "MotzoiParameter12Node",
-            "n_rabi_oscillations_12": "NRabiOscillations12Node",
-            "qubit_spectroscopy_vs_current": "QubitSpectroscopyVsCurrentNode",
+            "ro_frequency_two_state_optimization": "ROFrequencyTwoStateOptimizationNode",
+            "ro_amplitude_two_state_optimization": "ROAmplitudeTwoStateOptimizationNode",
+            "ro_frequency_three_state_optimization": "ROFrequencyThreeStateOptimizationNode",
+            "ro_amplitude_three_state_optimization": "ROAmplitudeThreeStateOptimizationNode",
+            "randomized_benchmarking": "RandomizedBenchmarkingNode",
+            "purity_benchmarking": "PurityBenchmarkingNode",
             "coupler_anticrossing": "QubitSpectroscopyVsCurrentNode",
             "resonator_spectroscopy_vs_current": "ResonatorSpectroscopyVsCurrentNode",
-            "T1": "T1Node",
-            "T2": "T2Node",
-            "T2_echo": "T2EchoNode",
-            "all_XY": "AllXYNode",
-            "reset_chevron": "ResetChevronNode",
-            "reset_calibration_ssro": "ResetCalibrationSSRONode",
-            "cz_parametrisation_fix_duration": "CZParametrizationFixDurationNode",
-            "process_tomography_ssro": "ProcessTomographySSRONode",
-            "cz_chevron": "CZChevronNode",
-            "cz_optimize_chevron": "CZOptimizeChevronNode",
-            "cz_calibration_ssro": "CZCalibrationSSRONode",
-            "cz_calibration_swap_ssro": "CZCalibrationSwapSSRONode",
-            "cz_dynamic_phase_ssro": "CZDynamicPhaseSSRONode",
-            "cz_dynamic_phase_swap_ssro": "CZDynamicPhaseSwapSSRONode",
-            "ro_frequency_two_state_optimization": "ROFrequencyTwoStateOptimizationNode",
-            "ro_frequency_three_state_optimization": "ROFrequencyThreeStateOptimizationNode",
-            "ro_amplitude_two_state_optimization": "ROAmplitudeTwoStateOptimizationNode",
-            "ro_amplitude_three_state_optimization": "ROAmplitudeThreeStateOptimizationNode",
-            "randomized_benchmarking_ssro": "RandomizedBenchmarkingSSRONode",
-            "purity_benchmarking": "PurityBenchmarkingNode",
+            "qubit_spectroscopy_vs_current": "QubitSpectroscopyVsCurrentNode",
         }
         self._node_implementation_paths: Dict[str, Union[str, Path]] = {}
         self._node_classes: Dict[str, type["BaseNode"]] = {}
@@ -130,8 +115,6 @@ class NodeFactory:
     def create_node(
         self, node_name: str, all_qubits: list[str], couplers: list[str], **kwargs
     ) -> "BaseNode":
-        global CouplerNode, QubitNode
-        from tergite_autocalibration.lib.base.node import CouplerNode, QubitNode
 
         # Check whether node class is already inside the dict
         if node_name not in self._node_classes.keys():
@@ -139,14 +122,8 @@ class NodeFactory:
         else:
             node_cls = self._node_classes[node_name]
 
-        # Create an instance of the node class
-        if issubclass(node_cls, QubitNode):
-            node_obj = node_cls(node_name, all_qubits, **kwargs)
-        elif issubclass(node_cls, CouplerNode):
-            node_obj = node_cls(node_name, couplers, **kwargs)
-        else:
-            raise TypeError(
-                f"Node class {node_cls} is not a subclass of neither QubitNode or CouplerNode."
-            )
+        node_obj = node_cls(
+            node_name, all_qubits=all_qubits, couplers=couplers, **kwargs
+        )
 
         return node_obj

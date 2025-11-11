@@ -18,6 +18,7 @@ from time import sleep
 
 import numpy as np
 
+from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.characterization.t2.analysis import (
     T2EchoNodeAnalysis,
     T2NodeAnalysis,
@@ -27,12 +28,12 @@ from tergite_autocalibration.lib.nodes.characterization.t2.measurement import (
     T2EchoMeasurement,
 )
 from tergite_autocalibration.lib.nodes.external_parameter_node import (
-    ExternalParameterFixedScheduleQubitNode,
+    ExternalParameterNode,
 )
 from tergite_autocalibration.utils.logging import logger
 
 
-class T2Node(ExternalParameterFixedScheduleQubitNode):
+class T2Node(QubitNode):
     """
     Node for T2 measurement and analysis.
     This node performs T2 measurements on multiple qubits
@@ -43,6 +44,7 @@ class T2Node(ExternalParameterFixedScheduleQubitNode):
 
     measurement_obj = T2Measurement
     analysis_obj = T2NodeAnalysis
+    measurement_type = ExternalParameterNode
     qubit_qois = ["t2_time"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
@@ -63,6 +65,9 @@ class T2Node(ExternalParameterFixedScheduleQubitNode):
             }
         }
 
+    def initial_operation(self) -> None:
+        pass
+
     def pre_measurement_operation(self, reduced_ext_space):
         iteration_dict = reduced_ext_space["repeat"]
         # there is some redundancy that all qubits have the same
@@ -72,8 +77,11 @@ class T2Node(ExternalParameterFixedScheduleQubitNode):
             logger.info(f"sleeping for {self.sleep_time} seconds")
             sleep(self.sleep_time)
 
+    def final_operation(self) -> None:
+        pass
 
-class T2EchoNode(ExternalParameterFixedScheduleQubitNode):
+
+class T2EchoNode(QubitNode):
     """
     Node for T2 Echo measurement and analysis.
     This node performs T2 Echo measurements on multiple qubits
@@ -84,6 +92,7 @@ class T2EchoNode(ExternalParameterFixedScheduleQubitNode):
 
     measurement_obj = T2EchoMeasurement
     analysis_obj = T2EchoNodeAnalysis
+    measurement_type = ExternalParameterNode
     qubit_qois = ["t2_echo_time"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
@@ -113,6 +122,9 @@ class T2EchoNode(ExternalParameterFixedScheduleQubitNode):
             }
         }
 
+    def initial_operation(self) -> None:
+        pass
+
     def pre_measurement_operation(self, reduced_ext_space):
         iteration_dict = reduced_ext_space["repeat"]
         # there is some redundancy that all qubits have the same
@@ -121,3 +133,6 @@ class T2EchoNode(ExternalParameterFixedScheduleQubitNode):
         if this_iteration > 0:
             logger.info(f"sleeping for {self.sleep_time} seconds")
             sleep(self.sleep_time)
+
+    def final_operation(self) -> None:
+        pass

@@ -16,6 +16,7 @@
 import numpy as np
 import xarray
 
+from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.analysis import (
     NRabi_12_NodeAnalysis,
     NRabiNodeAnalysis,
@@ -26,13 +27,13 @@ from tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.measureme
     NRabiOscillationsMeasurement,
     RabiOscillationsMeasurement,
 )
-from tergite_autocalibration.lib.nodes.schedule_node import ScheduleQubitNode
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.utils.analysis_models import RabiModel
 
 rabi = RabiModel()
 
 
-class RabiOscillationsBase(ScheduleQubitNode):
+class RabiOscillationsBase(QubitNode):
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
@@ -59,6 +60,8 @@ class RabiOscillationsBase(ScheduleQubitNode):
 class RabiOscillationsNode(RabiOscillationsBase):
     measurement_obj = RabiOscillationsMeasurement
     analysis_obj = RabiNodeAnalysis
+    measurement_type = ScheduleNode
+
     qubit_qois = ["rxy:amp180"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
@@ -73,6 +76,7 @@ class RabiOscillationsNode(RabiOscillationsBase):
 class RabiOscillations12Node(RabiOscillationsBase):
     measurement_obj = RabiOscillationsMeasurement
     analysis_obj = RabiNode12Analysis
+    measurement_type = ScheduleNode
     qubit_qois = ["r12:ef_amp180"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
@@ -87,9 +91,10 @@ class RabiOscillations12Node(RabiOscillationsBase):
         }
 
 
-class NRabiOscillationsNode(ScheduleQubitNode):
+class NRabiOscillationsNode(QubitNode):
     measurement_obj = NRabiOscillationsMeasurement
     analysis_obj = NRabiNodeAnalysis
+    measurement_type = ScheduleNode
     qubit_qois = ["rxy:amp180"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
@@ -104,7 +109,7 @@ class NRabiOscillationsNode(ScheduleQubitNode):
             "X_repetitions": {qubit: np.arange(1, 23, 6) for qubit in self.all_qubits},
         }
 
-    def generate_dummy_dataset(self, noise=False):
+    def generate_dummy_dataset(self):
         dataset = xarray.Dataset()
         real_correction = -0.01
         first_qubit = self.all_qubits[0]
@@ -122,21 +127,17 @@ class NRabiOscillationsNode(ScheduleQubitNode):
                     offset=0.2,
                     phase=this_phase,
                 )
-                np.random.seed(123)
                 samples = self.schedule_samplespace["mw_amplitudes_sweep"][first_qubit]
                 number_of_samples = len(samples)
                 fit_samples = np.linspace(samples[0], samples[-1], number_of_samples)
                 true_s21 = rabi.eval(params=true_params, drive_amp=fit_samples)
                 noise_scale = 0.02
 
-                noise_s21 = noise_scale * (
+                np.random.seed(123)
+                measured_s21 = true_s21 + 0 * noise_scale * (
                     np.random.randn(number_of_samples)
                     + 1j * np.random.randn(number_of_samples)
                 )
-                measured_s21 = true_s21
-                if noise:
-                    measured_s21 += noise_s21
-
                 data_array = np.concatenate((data_array, measured_s21))
 
             # Add the DataArray to the Dataset with an integer name (converted to string)
@@ -144,9 +145,10 @@ class NRabiOscillationsNode(ScheduleQubitNode):
         return dataset
 
 
-class NRabiOscillations12Node(ScheduleQubitNode):
+class NRabiOscillations12Node(QubitNode):
     measurement_obj = NRabiOscillationsMeasurement
     analysis_obj = NRabi_12_NodeAnalysis
+    measurement_type = ScheduleNode
     qubit_qois = ["r12:ef_amp180"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):

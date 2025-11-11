@@ -17,6 +17,7 @@ from time import sleep
 
 import numpy as np
 
+from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.characterization.t1.analysis import (
     T1NodeAnalysis,
 )
@@ -24,12 +25,12 @@ from tergite_autocalibration.lib.nodes.characterization.t1.measurement import (
     T1Measurement,
 )
 from tergite_autocalibration.lib.nodes.external_parameter_node import (
-    ExternalParameterFixedScheduleQubitNode,
+    ExternalParameterNode,
 )
 from tergite_autocalibration.utils.logging import logger
 
 
-class T1Node(ExternalParameterFixedScheduleQubitNode):
+class T1Node(QubitNode):
     """
     Node for T1 measurement and analysis.
     This node performs T1 measurements on multiple qubits
@@ -40,6 +41,7 @@ class T1Node(ExternalParameterFixedScheduleQubitNode):
 
     measurement_obj = T1Measurement
     analysis_obj = T1NodeAnalysis
+    measurement_type = ExternalParameterNode
     qubit_qois = ["t1_time"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
@@ -71,6 +73,9 @@ class T1Node(ExternalParameterFixedScheduleQubitNode):
             }
         }
 
+    def initial_operation(self) -> None:
+        pass
+
     def pre_measurement_operation(self, reduced_ext_space):
         iteration_dict = reduced_ext_space["T1_repetitions"]
         # there is some redundancy that all qubits have the same
@@ -79,3 +84,6 @@ class T1Node(ExternalParameterFixedScheduleQubitNode):
         if this_iteration > 0:
             logger.info(f"sleeping for {self.sleep_time} seconds")
             sleep(self.sleep_time)
+
+    def final_operation(self) -> None:
+        pass
