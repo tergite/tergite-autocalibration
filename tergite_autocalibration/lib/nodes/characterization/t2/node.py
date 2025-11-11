@@ -27,6 +27,9 @@ from tergite_autocalibration.lib.nodes.characterization.t2.measurement import (
     T2Measurement,
     T2EchoMeasurement,
 )
+from tergite_autocalibration.lib.nodes.external_parameter_node import (
+    ExternalParameterNode,
+)
 from tergite_autocalibration.utils.logging import logger
 
 
@@ -41,6 +44,7 @@ class T2Node(QubitNode):
 
     measurement_obj = T2Measurement
     analysis_obj = T2NodeAnalysis
+    measurement_type = ExternalParameterNode
     qubit_qois = ["t2_time"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
@@ -61,6 +65,9 @@ class T2Node(QubitNode):
             }
         }
 
+    def initial_operation(self) -> None:
+        pass
+
     def pre_measurement_operation(self, reduced_ext_space):
         iteration_dict = reduced_ext_space["repeat"]
         # there is some redundancy that all qubits have the same
@@ -69,6 +76,9 @@ class T2Node(QubitNode):
         if this_iteration > 0:
             logger.info(f"sleeping for {self.sleep_time} seconds")
             sleep(self.sleep_time)
+
+    def final_operation(self) -> None:
+        pass
 
 
 class T2EchoNode(QubitNode):
@@ -82,6 +92,7 @@ class T2EchoNode(QubitNode):
 
     measurement_obj = T2EchoMeasurement
     analysis_obj = T2EchoNodeAnalysis
+    measurement_type = ExternalParameterNode
     qubit_qois = ["t2_echo_time"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
@@ -111,6 +122,9 @@ class T2EchoNode(QubitNode):
             }
         }
 
+    def initial_operation(self) -> None:
+        pass
+
     def pre_measurement_operation(self, reduced_ext_space):
         iteration_dict = reduced_ext_space["repeat"]
         # there is some redundancy that all qubits have the same
@@ -119,3 +133,6 @@ class T2EchoNode(QubitNode):
         if this_iteration > 0:
             logger.info(f"sleeping for {self.sleep_time} seconds")
             sleep(self.sleep_time)
+
+    def final_operation(self) -> None:
+        pass

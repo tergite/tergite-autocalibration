@@ -29,14 +29,16 @@ from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
     CompiledSchedule,
     InstrumentCoordinator,
 )
-from tergite_autocalibration.lib.base.node_interface import NodeInterface
-from tergite_autocalibration.lib.utils.redis import update_redis_trusted_values
-
 
 from tergite_autocalibration.config.globals import PLOTTING_BACKEND
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
+from tergite_autocalibration.lib.base.node_interface import (
+    MeasurementType,
+    NodeInterface,
+)
 from tergite_autocalibration.lib.utils.device import DeviceConfiguration
+from tergite_autocalibration.lib.utils.redis import update_redis_trusted_values
 from tergite_autocalibration.lib.utils.schedule_execution import execute_schedule
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
@@ -49,14 +51,14 @@ colorama_init()
 matplotlib.use(PLOTTING_BACKEND)
 
 
-class Node(NodeInterface):
+class BaseNode(NodeInterface):
     measurement_obj: "BaseMeasurement"
     analysis_obj: "BaseNodeAnalysis"
+    measurement_type: "MeasurementType"
 
-    def __init__(self, name: str, measurement_type, **node_dictionary):
+    def __init__(self, name: str, **node_dictionary):
         self.name = name
         self.node_dictionary = node_dictionary
-        self.measurement_type = measurement_type
         self.lab_instr_coordinator: InstrumentCoordinator
         self.spi_manager: SpiDAC
         self.schedule_samplespace = {}
@@ -80,29 +82,9 @@ class Node(NodeInterface):
         Here we attach the measure_node method according to the
         measurement_type: ScheduleNode or ExternalParameterNode or something else
         """
-        dataset = self.measurement_type.measure_node(cluster_status, self)
+        measurement_type = self.measurement_type(self)
+        dataset = measurement_type.measure_node(cluster_status)
         return dataset
-
-    # @property
-    # def dimensions(self) -> list:
-    #     """
-    #     array of dimensions used for raw dataset reshaping
-    #     """
-    #     schedule_settable_quantities = self.schedule_samplespace.keys()
-    #     dimensions = []
-    #
-    #     for quantity in schedule_settable_quantities:
-    #         # keeping the first element, ASSUMING that all settable elements
-    #         # have the same dimensions on their samplespace
-    #         first_element = list(self.schedule_samplespace[quantity].keys())[0]
-    #         settable_values = self.schedule_samplespace[quantity][first_element]
-    #         if not isinstance(settable_values, Iterable):
-    #             settable_values = np.array([settable_values])
-    #         dimensions.append(len(settable_values))
-    #
-    #     if self.loops is not None:
-    #         dimensions.append(self.loops)
-    #     return dimensions
 
     def calibrate(self, data_path, measurement_mode):
         if measurement_mode != MeasurementMode.re_analyse:
@@ -131,7 +113,7 @@ class Node(NodeInterface):
     def measure_compiled_schedule(
         self,
         compiled_schedule: CompiledSchedule,
-        cluster_status=MeasurementMode.real,
+        measurement_mode=MeasurementMode.real,
         measurement: Tuple[int, int] = (1, 1),
     ) -> xarray.Dataset:
         """
@@ -139,7 +121,7 @@ class Node(NodeInterface):
 
         Args:
             compiled_schedule (CompiledSchedule): The compiled schedule to execute.
-            cluster_status (MeasurementMode.real): The status of the measurement mode.
+            measurement_mode (MeasurementMode.real): The status of the measurement mode.
             measurement (tuple): Tuple of (current_measurement, total_measurements).
 
         Returns:
@@ -153,10 +135,10 @@ class Node(NodeInterface):
             compiled_schedule,
             schedule_duration,
             self.lab_instr_coordinator,
-            cluster_status,
+            measurement_mode,
         )
 
-        if cluster_status == MeasurementMode.dummy:
+        if measurement_mode == MeasurementMode.dummy:
             raw_dataset = self.generate_dummy_dataset()
         result_dataset = self.configure_dataset(raw_dataset)
 
@@ -301,7 +283,7 @@ class Node(NodeInterface):
         return dataset
 
 
-class QubitNode(Node):
+class QubitNode(BaseNode):
     qubit_qois: list[str] | None = None
 
     def __init__(self, name: str, all_qubits: list[str], **node_keywords):
@@ -354,7 +336,7 @@ class QubitNode(Node):
         return f"Node({self.name}, {self.all_qubits})"
 
 
-class CouplerNode(Node):
+class CouplerNode(BaseNode):
     coupler_qois: list[str]
 
     def __init__(self, name: str, couplers: list[str], **node_keywords):

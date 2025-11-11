@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2023, 2024
+# (C) Copyright Eleftherios Moschandreou 2023, 2024, 2025
 # (C) Copyright Michele Faucci Giannelli 2024, 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
@@ -11,9 +11,8 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from pathlib import Path
 
-from lmfit.models import LinearModel, LorentzianModel
+from lmfit.models import LorentzianModel
 import numpy as np
 from quantify_scheduler import CompiledSchedule
 from quantify_scheduler.backends import SerialCompiler
@@ -25,6 +24,11 @@ from tergite_autocalibration.lib.base.node import CouplerNode
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
     QubitSpectroscopyVsCurrentNodeAnalysis,
     ResonatorSpectroscopyVsCurrentNodeAnalysis,
+    QubitSpectroscopyVsCurrentNodeAnalysis,
+    ResonatorSpectroscopyVsCurrentNodeAnalysis,
+)
+from tergite_autocalibration.lib.nodes.external_parameter_node import (
+    ExternalParameterNode,
 )
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement import (
     TwoTonesMultidimMeasurement,
@@ -49,6 +53,7 @@ class QubitSpectroscopyVsCurrentNode(CouplerNode):
 
     measurement_obj = TwoTonesMultidimMeasurement
     analysis_obj = QubitSpectroscopyVsCurrentNodeAnalysis
+    measurement_type = ExternalParameterNode
     # coupler_qois = ["parking_current"]
     coupler_qois = ["qubit_crossing_points"]
 
@@ -128,6 +133,7 @@ class ResonatorSpectroscopyVsCurrentNode(CouplerNode):
 
     measurement_obj = ResonatorSpectroscopyMeasurement
     analysis_obj = ResonatorSpectroscopyVsCurrentNodeAnalysis
+    measurement_type = ExternalParameterNode
     # coupler_qois = ["resonator_flux_quantum"]
     coupler_qois = ["resonator_crossing_points"]
 

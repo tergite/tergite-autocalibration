@@ -23,13 +23,35 @@ This section provides an overview of the Command Line Interface (CLI) options an
 
 The autocalibration CLI is organized into several main command groups:
 
+- `start`: Run the automatic calibration according to the provided config files
 - `cluster`: Handle operations related to the cluster
 - `node`: Handle operations related to the node
 - `graph`: Handle operations related to the calibration graph
 - `config`: Load and save the configuration files
-- `calibration`: Handle operations related to the calibration supervisor
 - `browser`: Will open the dataset browser, which makes you view the datasets from measurements
 - `joke`: Handle operations related to the well-being of the user
+
+### Calibration Commands
+
+#### `start`
+
+Starts the calibration supervisor.
+
+**Usage:**
+
+```bash
+acli start [OPTIONS]
+```
+
+**Options:**
+
+- `-d TEXT`: Dummy mode. The calibration chain runs as normal but the returned datasets are dummy.
+The generation of each dummy dataset takes into account the existing redis config and the provided samplespaces.
+- `-c TEXT`: Cluster IP address (if not set, it will use CLUSTER_IP from the .env file)
+- `-r TEXT`: Rerun an analysis (specify the path to the dataset folder)
+- `-n, --name TEXT`: Specify the node type to rerun (works only with -r option)
+- `--push`: Push a backend to an MSS specified in MSS_MACHINE_ROOT_URL in the .env file
+- `--browser`: Will open the dataset browser in the background and plot the measurement results live
 
 ### Cluster Commands ###
 
@@ -136,26 +158,6 @@ are missing.
 
 - `-q, --qubits TEXT`: Indicates which qubits should be in the template e.g. `"q00,q01"` or `"q03-q05"`, `"q01-q03, q07"` or an integer e.g. `3` to generate `"q01, q02, q03"`.
 
-
-### Calibration Commands
-
-#### `start`
-
-Starts the calibration supervisor.
-
-**Usage:**
-
-```bash
-acli start [OPTIONS]
-```
-
-**Options:**
-
-- `-c TEXT`: Cluster IP address (if not set, it will use CLUSTER_IP from the .env file)
-- `-r TEXT`: Rerun an analysis (specify the path to the dataset folder)
-- `-n, --name TEXT`: Specify the node type to rerun (works only with -r option)
-- `--push`: Push a backend to an MSS specified in MSS_MACHINE_ROOT_URL in the .env file
-- `--browser`: Will open the dataset browser in the background and plot the measurement results live
 
 ### Dataset browser ###
 

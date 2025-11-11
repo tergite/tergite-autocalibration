@@ -36,7 +36,7 @@ from tergite_autocalibration.config.globals import (
 )
 from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.config.package import ConfigurationPackage
-from tergite_autocalibration.lib.base.node import Node, CouplerNode
+from tergite_autocalibration.lib.base.node import BaseNode, CouplerNode
 from tergite_autocalibration.lib.utils.graph import filtered_topological_order
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.utils.backend.redis_utils import (
@@ -320,7 +320,7 @@ class NodeManager:
             # Perform calibration
             node.calibrate(data_path, self.config.cluster_mode)
 
-    def _initialize_node(self, node_name: str) -> Node:
+    def _initialize_node(self, node_name: str) -> BaseNode:
         """Initializes a node and updates it with user-defined samplespace if available."""
         elements = {"qubits": self.config.qubits, "couplers": self.config.couplers}
         node = self.node_factory.create_node(
@@ -366,7 +366,7 @@ class NodeManager:
         return DataStatus.in_spec
 
     @staticmethod
-    def update_to_user_samplespace(node: Node, user_samplespace: dict) -> None:
+    def update_to_user_samplespace(node: BaseNode, user_samplespace: dict) -> None:
         node_user_samplespace = user_samplespace[node.name]
         for settable, element_samplespace in node_user_samplespace.items():
             if settable in node.schedule_samplespace:
@@ -406,7 +406,6 @@ class CalibrationSupervisor:
         ).copy(str(CONFIG.run.log_dir))
 
         for calibration_node in calibration_nodes:
-            print(f"{ calibration_node = }")
             self.node_manager.inspect_node(calibration_node, ignore_spec=ignore_spec)
             logger.info(f"{calibration_node} node is completed")
 

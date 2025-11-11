@@ -12,6 +12,7 @@
 # that they have been altered from the originals.
 
 import numpy as np
+import xarray
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.lib.base.node import QubitNode
@@ -22,11 +23,14 @@ from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.analysi
 from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.measurement import (
     ROAmplitudeOptimizationMeasurement,
 )
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
+from tergite_autocalibration.lib.utils.functions import isosceles_triangle
 
 
 class ROAmplitudeTwoStateOptimizationNode(QubitNode):
     measurement_obj = ROAmplitudeOptimizationMeasurement
     analysis_obj = OptimalROTwoStateAmplitudeNodeAnalysis
+    measurement_type = ScheduleNode
     qubit_qois = [
         "measure_2state_opt:pulse_amp",
         "measure_2state_opt:acq_rotation",
@@ -62,6 +66,7 @@ class ROAmplitudeTwoStateOptimizationNode(QubitNode):
 class ROAmplitudeThreeStateOptimizationNode(QubitNode):
     measurement_obj = ROAmplitudeOptimizationMeasurement
     analysis_obj = OptimalROThreeStateAmplitudeNodeAnalysis
+    measurement_type = ScheduleNode
     qubit_qois = [
         "measure_3state_opt:pulse_amp",
         "centroid_I",
@@ -85,8 +90,41 @@ class ROAmplitudeThreeStateOptimizationNode(QubitNode):
             },
             "ro_amplitudes": {
                 qubit: np.append(
-                    np.linspace(0.005, 0.025, 10), np.linspace(0.026, 0.06, 7)
+                    np.linspace(0.005, 0.025, 5),
+                    np.linspace(0.026, 0.06, 7),
                 )
                 for qubit in self.all_qubits
             },
         }
+
+    def generate_dummy_dataset(self):
+        dataset = xarray.Dataset()
+
+        first_qubit = self.all_qubits[0]
+        ro_amplitudes = self.schedule_samplespace["ro_amplitudes"][first_qubit]
+
+        def get_shot():
+            data_array = np.array([])
+            for ampl_index, _ in enumerate(ro_amplitudes):
+                triangle_size = ampl_index + 0.05
+                center_0, center_1, center_2 = isosceles_triangle(
+                    base_length=3 * triangle_size, height=5 * triangle_size
+                )
+                iq_point_0 = np.random.normal(loc=center_0, size=(1, 2), scale=0.7)
+                iq_point_1 = np.random.normal(loc=center_1, size=(1, 2), scale=0.7)
+                iq_point_2 = np.random.normal(loc=center_2, size=(1, 2), scale=0.7)
+                shot_0 = iq_point_0[:, 0] + 1j * iq_point_0[:, 1]
+                shot_1 = iq_point_1[:, 0] + 1j * iq_point_1[:, 1]
+                shot_2 = iq_point_2[:, 0] + 1j * iq_point_2[:, 1]
+                shots_array = np.concatenate((shot_0, shot_1, shot_2)).ravel()
+                data_array = np.concatenate((shots_array, data_array))
+            return data_array
+
+        for index, _ in enumerate(self.all_qubits):
+
+            all_shots_array = np.concatenate(
+                [get_shot() for _ in range(self.loops)]
+            ).ravel()
+
+            dataset[index] = xarray.DataArray(all_shots_array)
+        return dataset

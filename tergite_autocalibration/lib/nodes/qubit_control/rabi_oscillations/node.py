@@ -27,23 +27,16 @@ from tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.measureme
     NRabiOscillationsMeasurement,
     RabiOscillationsMeasurement,
 )
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.utils.analysis_models import RabiModel
 
 rabi = RabiModel()
 
 
-class RabiOscillationsNode(QubitNode):
-    measurement_obj = RabiOscillationsMeasurement
-    analysis_obj = RabiNodeAnalysis
-    qubit_qois = ["rxy:amp180"]
+class RabiOscillationsBase(QubitNode):
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
-        self.schedule_samplespace = {
-            "mw_amplitudes": {
-                qubit: np.linspace(0.002, 0.90, 61) for qubit in self.all_qubits
-            }
-        }
 
     def generate_dummy_dataset(self):
         dataset = xarray.Dataset()
@@ -64,9 +57,26 @@ class RabiOscillationsNode(QubitNode):
         return dataset
 
 
-class RabiOscillations12Node(QubitNode):
+class RabiOscillationsNode(RabiOscillationsBase):
+    measurement_obj = RabiOscillationsMeasurement
+    analysis_obj = RabiNodeAnalysis
+    measurement_type = ScheduleNode
+
+    qubit_qois = ["rxy:amp180"]
+
+    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
+        super().__init__(name, all_qubits, **schedule_keywords)
+        self.schedule_samplespace = {
+            "mw_amplitudes": {
+                qubit: np.linspace(0.002, 0.90, 61) for qubit in self.all_qubits
+            }
+        }
+
+
+class RabiOscillations12Node(RabiOscillationsBase):
     measurement_obj = RabiOscillationsMeasurement
     analysis_obj = RabiNode12Analysis
+    measurement_type = ScheduleNode
     qubit_qois = ["r12:ef_amp180"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
@@ -84,6 +94,7 @@ class RabiOscillations12Node(QubitNode):
 class NRabiOscillationsNode(QubitNode):
     measurement_obj = NRabiOscillationsMeasurement
     analysis_obj = NRabiNodeAnalysis
+    measurement_type = ScheduleNode
     qubit_qois = ["rxy:amp180"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
@@ -93,15 +104,51 @@ class NRabiOscillationsNode(QubitNode):
 
         self.schedule_samplespace = {
             "mw_amplitudes_sweep": {
-                qubit: np.linspace(-0.045, 0.045, 40) for qubit in self.all_qubits
+                qubit: np.linspace(-0.045, 0.045, 30) for qubit in self.all_qubits
             },
-            "X_repetitions": {qubit: np.arange(1, 19, 6) for qubit in self.all_qubits},
+            "X_repetitions": {qubit: np.arange(1, 23, 6) for qubit in self.all_qubits},
         }
+
+    def generate_dummy_dataset(self):
+        dataset = xarray.Dataset()
+        real_correction = -0.01
+        first_qubit = self.all_qubits[0]
+        x_repetitions = self.schedule_samplespace["X_repetitions"][first_qubit]
+        for index, _ in enumerate(self.all_qubits):
+            data_array = np.array([])
+            # TODO: the oscillations frequecny should be no set empirically
+            for number_of_Xs in x_repetitions:
+                this_frequency = 2 * number_of_Xs
+                # find the phase that produces minimum at the real_correction
+                this_phase = np.pi - 2 * np.pi * this_frequency * real_correction
+                true_params = rabi.make_params(
+                    amplitude=0.2,
+                    frequency=this_frequency,
+                    offset=0.2,
+                    phase=this_phase,
+                )
+                samples = self.schedule_samplespace["mw_amplitudes_sweep"][first_qubit]
+                number_of_samples = len(samples)
+                fit_samples = np.linspace(samples[0], samples[-1], number_of_samples)
+                true_s21 = rabi.eval(params=true_params, drive_amp=fit_samples)
+                noise_scale = 0.02
+
+                np.random.seed(123)
+                measured_s21 = true_s21 + 0 * noise_scale * (
+                    np.random.randn(number_of_samples)
+                    + 1j * np.random.randn(number_of_samples)
+                )
+                data_array = np.concatenate((data_array, measured_s21))
+
+            # Add the DataArray to the Dataset with an integer name (converted to string)
+            dataset[index] = xarray.DataArray(data_array)
+        return dataset
 
 
 class NRabiOscillations12Node(QubitNode):
     measurement_obj = NRabiOscillationsMeasurement
     analysis_obj = NRabi_12_NodeAnalysis
+    measurement_type = ScheduleNode
     qubit_qois = ["r12:ef_amp180"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):

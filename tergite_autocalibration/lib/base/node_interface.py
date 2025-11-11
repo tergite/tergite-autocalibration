@@ -11,11 +11,12 @@
 # that they have been altered from the originals.
 
 from __future__ import annotations  # for Node type hint
+
 from abc import ABC, abstractmethod
 
-from colorama import init as colorama_init
 import matplotlib
 import xarray
+from colorama import init as colorama_init
 
 from tergite_autocalibration.config.globals import PLOTTING_BACKEND
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
@@ -49,6 +50,7 @@ class NodeInterface(ABC):
 
 
 class MeasurementType(ABC):
+    # TODO: this should be moved elesewhere
     @abstractmethod
-    def measure_node(self, measurement_mode, node: Node) -> xarray.Dataset:
+    def measure_node(self, measurement_mode, node: "BaseNode") -> xarray.Dataset:
         pass

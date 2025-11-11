@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2024
+# (C) Copyright Eleftherios Moschandreou 2024, 2025
 # (C) Copyright Michele Faucci Giannelli 2025
 # (C) Copyright Abdullah Al Amin
 #
@@ -13,8 +13,7 @@
 # that they have been altered from the originals.
 
 import numpy as np
-
-from quantify_scheduler.instrument_coordinator.utility import xarray
+import xarray
 
 from tergite_autocalibration.lib.base.node_interface import MeasurementType
 from tergite_autocalibration.utils.measurement_utils import (
@@ -24,6 +23,9 @@ from tergite_autocalibration.utils.measurement_utils import (
 
 
 class ExternalParameterNode(MeasurementType):
+    def __init__(self, node) -> None:
+        self.node = node
+
     def validate_external_parameter_node(self, node) -> None:
         has_initial = callable(getattr(node, "initial_operation", None))
         has_premeasure = callable(getattr(node, "pre_measurement_operation", None))
@@ -35,34 +37,34 @@ class ExternalParameterNode(MeasurementType):
         if not has_final:
             raise AttributeError("final_operation", node)
 
-    def measure_node(self, measurement_mode, node) -> xarray.Dataset:
+    def measure_node(self, measurement_mode) -> xarray.Dataset:
 
-        self.validate_external_parameter_node(node)
+        self.validate_external_parameter_node(self.node)
 
-        external_dimensions = samplespace_dimensions(node.external_samplespace)
+        external_dimensions = samplespace_dimensions(self.node.external_samplespace)
         # this implementation supports only 1 external parameter
         iterations = external_dimensions[0]
-        external_dim = list(node.external_samplespace.keys())[0]
+        external_dim = list(self.node.external_samplespace.keys())[0]
 
         result_dataset = xarray.Dataset()
 
-        compiled_schedule = node.precompile(node.schedule_samplespace)
+        compiled_schedule = self.node.precompile(self.node.schedule_samplespace)
 
-        node.initial_operation()
+        self.node.initial_operation()
 
         for this_iteration in range(iterations):
-            node.reduced_external_samplespace = reduce_samplespace(
-                this_iteration, node.external_samplespace
+            self.node.reduced_external_samplespace = reduce_samplespace(
+                this_iteration, self.node.external_samplespace
             )
-            element_dict = list(node.reduced_external_samplespace.values())[0]
+            element_dict = list(self.node.reduced_external_samplespace.values())[0]
 
             current_value = list(element_dict.values())[0]
 
-            node.pre_measurement_operation(
-                reduced_ext_space=node.reduced_external_samplespace
+            self.node.pre_measurement_operation(
+                reduced_ext_space=self.node.reduced_external_samplespace
             )
 
-            ds = node.measure_compiled_schedule(
+            ds = self.node.measure_compiled_schedule(
                 compiled_schedule,
                 measurement_mode,
                 measurement=(this_iteration, iterations),
@@ -72,6 +74,6 @@ class ExternalParameterNode(MeasurementType):
             result_dataset = xarray.merge([ds, result_dataset])
 
         # example of final Operation is ramping the current back to 0 in coupler spectroscopy
-        node.final_operation()
+        self.node.final_operation()
 
         return result_dataset

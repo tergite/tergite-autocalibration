@@ -19,11 +19,15 @@ from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.anal
 from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.measurement import (
     PurityBenchmarkingMeasurement,
 )
+from tergite_autocalibration.lib.nodes.external_parameter_node import (
+    ExternalParameterNode,
+)
 
 
 class PurityBenchmarkingNode(QubitNode):
     measurement_obj = PurityBenchmarkingMeasurement
     analysis_obj = PurityBenchmarkingNodeAnalysis
+    measurement_type = ExternalParameterNode
     qubit_qois = ["purity_fidelity"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
