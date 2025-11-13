@@ -97,9 +97,6 @@ plugins:
   - literate-nav:
       nav_file: SUMMARY.md
 
-  # Bibliography support for citations
-  - bibtex:
-      bib_file: "docs/bibliography/references.bib"  # BibTeX file location
   # API documentation generation from Python docstrings
   - mkdocstrings:
       default_handler: python  # Use Python handler for docstring parsing

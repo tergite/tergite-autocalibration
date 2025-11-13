@@ -14,7 +14,7 @@ F(m)= Ap^m + B \label{eq:survival_rate}
 
 where $m$ is the number of Cliffords in the sequence, and $A$ and $B$ are parameters related to state preparation and measurement, and $1-p$ is the depolarization rate.
 
-The two-qubit Clifford group can be divided into **four classes** [@corcolesProcessVerificationTwoqubit2013]:  
+The two-qubit Clifford group can be divided into **four classes** [^corcolesProcessVerificationTwoqubit2013]:  
 
 1. The **Single-qubit Clifford class** that consists of 576 elements ($24^2$) and represents all single-qubit Clifford operations:
 
@@ -82,7 +82,7 @@ Below follows the *decomposition* of the two-qubit gates in terms of the CZ-gate
 
 ### Interleaved Clifford Randomized Benchmarking
 
-*Interleaved Clifford Randomized Benchmarking* allows estimation of the error associated with an individual Clifford gate. The core idea is to perform two benchmarking experiments: one following the standard Clifford Randomized Benchmarking (RB) method and one with the target Clifford gate interleaved [@lallReviewCollectionMetrics2025].
+*Interleaved Clifford Randomized Benchmarking* allows estimation of the error associated with an individual Clifford gate. The core idea is to perform two benchmarking experiments: one following the standard Clifford Randomized Benchmarking (RB) method and one with the target Clifford gate interleaved [^lallReviewCollectionMetrics2025].
 
 If the standard RB sequence is:
 
@@ -107,3 +107,6 @@ r_{C_\mathrm{target}}=\frac{(d-1)(1-\frac{p_\mathrm{interleaved}}{p})}{d}
 $$
 
 where $d$ is the dimension of the system (e.g., $d=2^n$ for an $n$-qubit system).
+
+[^corcolesProcessVerificationTwoqubit2013]: A. D. Córcoles, J. M. Gambetta, J. M. Chow, J. A. Smolin, M. Ware, J. D. Strand, B. L. T. Plourde & M. Steffen. Process verification of two-qubit quantum gates by randomized benchmarking. [Physical Review A, 87, 030301(R) (2013)](https://doi.org/10.1103/PhysRevA.87.030301). 
+[^lallReviewCollectionMetrics2025]: Lall, D., Agarwal, A., Zhang, W., Lindoy, L., Lindström, T., Webster, S., Hall, S., Chancellor, N., Wallden, P., Garcia-Patrón, R., Kashefi, E., Kendon, V., Pritchard, J., Rossi, A., Datta, A., Kapourniotis, T., Georgopoulos, K., & Rungger, I. (2025). A Review and Collection of Metrics and Benchmarks for Quantum Computers: definitions, methodologies and software. [arXiv:2502.06717](https://arxiv.org/abs/2502.06717)
