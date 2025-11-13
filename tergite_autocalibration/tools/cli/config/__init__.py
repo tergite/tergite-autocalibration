@@ -208,6 +208,51 @@ def load(
         shutil.rmtree(clean_temp_folder)
 
 
+@config_cli.command(help="Start an interface to generate cluster configuration.")
+@suppress_logging
+def generate(
+    host: Annotated[
+        str,
+        typer.Option(
+            "--host",
+            "-h",
+            help="Host to start the generator application from.",
+        ),
+    ] = None,
+    port: Annotated[
+        str,
+        typer.Option(
+            "--port",
+            "-p",
+            help="Port for the generator application.",
+        ),
+    ] = None,
+):
+    """
+    CLI endpoint to start an application to generate cluster configuration.
+
+    Args:
+        host: Host to start the generator application from.
+        port: Port for the generator application.
+
+    """
+    from tergite_autocalibration.tools.hardware_config_wizard.wizard import app
+    from tergite_autocalibration.config.globals import ENV
+
+    # Parse host and port
+    if host is None:
+        host = ENV.hw_config_generator_host
+
+    if port is None:
+        port = ENV.hw_config_generator_port
+    else:
+        port = int(port)
+
+    typer.echo(f"Starting generator application on {host}:{port}")
+    typer.echo("Use CTRL+C to exit.")
+    app.run(debug=True, host=host, port=port)
+
+
 @config_cli.command(help="List available configuration values.")
 @suppress_logging
 def show():

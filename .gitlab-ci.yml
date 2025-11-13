@@ -219,6 +219,12 @@ browser_run:
       exit 1
     # Stop the browser again
     - acli browser stop
+    # Check whether the hardware generator starts
+    - acli config generate &
+    - sleep 10
+    - curl --retry 10 --retry-delay 2 --retry-connrefused http://127.0.0.1:8079
+    - if [ $? -ne 0 ]; then exit 1; fi
+    # Please note that the server will be running in the background until the pipeline stage is done
   cache:
     - key: "default"
       paths:

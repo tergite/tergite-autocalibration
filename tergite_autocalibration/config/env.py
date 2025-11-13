@@ -86,7 +86,10 @@ class EnvironmentConfiguration(BaseConfigurationFile):
         self.plotting: bool = False
 
         self.data_browser_host: str = "127.0.0.1"
-        self.data_browser_port: int = 8050
+        self.data_browser_port: int = 8179
+
+        self.hw_config_generator_host: str = "127.0.0.1"
+        self.hw_config_generator_port: int = 8079
 
         self.mss_machine_root_url: str = "http://localhost:8002"
 

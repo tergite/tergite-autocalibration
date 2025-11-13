@@ -46,7 +46,7 @@ acli start [OPTIONS]
 **Options:**
 
 - `-d TEXT`: Dummy mode. The calibration chain runs as normal but the returned datasets are dummy.
-The generation of each dummy dataset takes into account the existing redis config and the provided samplespaces.
+  The generation of each dummy dataset takes into account the existing redis config and the provided samplespaces.
 - `-c TEXT`: Cluster IP address (if not set, it will use CLUSTER_IP from the .env file)
 - `-r TEXT`: Rerun an analysis (specify the path to the dataset folder)
 - `-n, --name TEXT`: Specify the node type to rerun (works only with -r option)
@@ -84,7 +84,6 @@ acli node reset [OPTIONS]
 - `-n, --name TEXT`: Name of the node to be reset in Redis (e.g., resonator_spectroscopy)
 - `-a, --all`: Reset all nodes
 - `-f, --from_node TEXT`: Reset all nodes from the specified node in the chain
-
 
 ### Graph Commands ###
 
@@ -142,6 +141,21 @@ Save the configuration.
   automatically create a zip file and treat it as if you are running with `-z`.
 - `-z/--as-zip`: Will make the configuration file be a zip archive.
 
+#### `config generate`
+
+**Usage:**
+
+```bash
+acli config generate [OPTIONS]
+```
+
+Save the configuration.
+
+**Options:**
+
+- `-h/--host`: Host address where to run the interface of the generator. Default: 127.0.0.1
+- `-p/--port`: Port on which the application will serve the generator. Default: 8079
+
 #### `quickstart`
 
 **Usage:**
@@ -156,8 +170,8 @@ are missing.
 
 **Options:**
 
-- `-q, --qubits TEXT`: Indicates which qubits should be in the template e.g. `"q00,q01"` or `"q03-q05"`, `"q01-q03, q07"` or an integer e.g. `3` to generate `"q01, q02, q03"`.
-
+- `-q, --qubits TEXT`: Indicates which qubits should be in the template e.g. `"q00,q01"` or `"q03-q05"`,
+  `"q01-q03, q07"` or an integer e.g. `3` to generate `"q01, q02, q03"`.
 
 ### Dataset browser ###
 
