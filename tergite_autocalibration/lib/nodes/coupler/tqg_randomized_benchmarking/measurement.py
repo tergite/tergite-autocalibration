@@ -12,18 +12,17 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import numpy as np
 from typing import Optional
+
+import numpy as np
 from numpy.typing import NDArray
 from quantify_scheduler import Schedule
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.control_flow_library import Loop
 from quantify_scheduler.operations.gate_library import (
-    Reset,
     CZ,
     X90,
     Y90,
-    Measure,
     Reset,
     Rxy,
     X,
@@ -31,11 +30,14 @@ from quantify_scheduler.operations.gate_library import (
 )
 from quantify_scheduler.operations.pulse_library import IdlePulse
 from quantify_scheduler.resources import ClockResource
+
+from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.utils.clifford_group import (
     TwoQubitClifford,
 )
-
-from tergite_autocalibration.lib.base.measurement import BaseMeasurement
+from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.utils.randomized_benchmarking import (
+    randomized_benchmarking_sequence,
+)
 from tergite_autocalibration.utils.dto.extended_coupler_edge import (
     ExtendedCompositeSquareEdge,
 )
@@ -45,10 +47,6 @@ from tergite_autocalibration.utils.dto.extended_gates import (
 )
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 from tergite_autocalibration.utils.logging import logger
-from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.utils.randomized_benchmarking import (
-    randomized_benchmarking_sequence,
-)
-
 
 # Constants
 DEFAULT_DOWNCONVERT_FREQ = 4.4e9
