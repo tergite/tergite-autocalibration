@@ -1,11 +1,12 @@
 window.MathJax = {
-    loader: { load: ['[tex]/physics'] },
+    loader: { load: ['[tex]/physics', '[tex]/ams'] },
     tex: {
-        packages: { '[+]': ['physics'] },
+        packages: { '[+]': ['physics', 'ams'] },
         inlineMath: [["\\(", "\\)"]],
         displayMath: [["\\[", "\\]"]],
         processEscapes: true,
-        processEnvironments: true
+        processEnvironments: true,
+        tags: 'ams'  // Enable equation numbering and referencing
     },
     options: {
         ignoreHtmlClass: ".*|",
