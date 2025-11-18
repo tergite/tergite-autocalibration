@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2023, 2024
+# (C) Copyright Eleftherios Moschandreou 2023, 2024, 2025
 # (C) Copyright Liangyu Chen 2023, 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
@@ -13,23 +13,28 @@
 
 import numpy as np
 import xarray
+from lmfit.models import LorentzianModel
 
 from tergite_autocalibration.config.legacy import dh
+from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis import (
     QubitSpectroscopy12NodeAnalysis,
     QubitSpectroscopyNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement import (
+    TwoTonesAmplitudeMeasurement,
     TwoTonesMultidimMeasurement,
 )
-from tergite_autocalibration.lib.nodes.schedule_node import ScheduleQubitNode
+from tergite_autocalibration.lib.nodes.schedule_node import (
+    OuterScheduleNode,
+    ScheduleNode,
+)
 from tergite_autocalibration.lib.utils.samplespace import qubit_samples
-from lmfit.models import LorentzianModel
 
 peak = LorentzianModel()
 
 
-class QubitSpectroscopyBase(ScheduleQubitNode):
+class QubitSpectroscopyBase(QubitNode):
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
         super().__init__(name, all_qubits, **schedule_keywords)
@@ -70,6 +75,7 @@ class QubitSpectroscopyBase(ScheduleQubitNode):
 class Qubit01SpectroscopyNode(QubitSpectroscopyBase):
     measurement_obj = TwoTonesMultidimMeasurement
     analysis_obj = QubitSpectroscopyNodeAnalysis
+    measurement_type = ScheduleNode
     qubit_qois = ["clock_freqs:f01", "spec:spec_ampl_optimal"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
@@ -88,6 +94,7 @@ class Qubit01SpectroscopyNode(QubitSpectroscopyBase):
 class Qubit12SpectroscopyNode(QubitSpectroscopyBase):
     measurement_obj = TwoTonesMultidimMeasurement
     analysis_obj = QubitSpectroscopy12NodeAnalysis
+    measurement_type = ScheduleNode
     qubit_qois = ["clock_freqs:f12", "spec:spec_ampl_12_optimal"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
@@ -104,3 +111,33 @@ class Qubit12SpectroscopyNode(QubitSpectroscopyBase):
                 for qubit in self.all_qubits
             },
         }
+
+
+class Qubit01SpectroscopyAmplitudeNode(QubitNode):
+    measurement_obj = TwoTonesAmplitudeMeasurement
+    analysis_obj = QubitSpectroscopyNodeAnalysis
+    measurement_type = OuterScheduleNode
+    qubit_qois = ["clock_freqs:f01", "spec:spec_ampl_optimal"]
+
+    def __init__(self, name: str, all_qubits: list[str], **schedule_kwargs):
+        super().__init__(name, all_qubits, **schedule_kwargs)
+
+        self.outer_schedule_samplespace = {
+            "spec_pulse_amplitudes": {
+                qubit: np.linspace(8e-3, 8e-2, 2) for qubit in self.all_qubits
+            },
+        }
+
+        self.schedule_samplespace = {
+            "spec_frequencies": {
+                qubit: self.qubit_samples(qubit) for qubit in self.all_qubits
+            },
+        }
+
+    def qubit_samples(self, qubit: str) -> np.ndarray:
+        qub_spec_samples = 821
+        sweep_range = 500e6
+        VNA_frequency = dh.get_legacy("VNA_qubit_frequencies")[qubit]
+        min_freq = VNA_frequency - sweep_range / 2 + 0 * 50e6
+        max_freq = VNA_frequency + sweep_range / 2 + 0 * 50e6
+        return np.linspace(min_freq, max_freq, qub_spec_samples)

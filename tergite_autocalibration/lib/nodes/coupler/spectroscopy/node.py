@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2023, 2024
+# (C) Copyright Eleftherios Moschandreou 2023, 2024, 2025
 # (C) Copyright Michele Faucci Giannelli 2024, 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
@@ -12,20 +12,23 @@
 # that they have been altered from the originals.
 
 
-import numpy as np
 from lmfit.models import LorentzianModel
+import numpy as np
 from quantify_scheduler import CompiledSchedule
 from quantify_scheduler.backends import SerialCompiler
 import quantify_scheduler.backends.qblox.constants as constants
 import xarray
 
 from tergite_autocalibration.config.legacy import dh
+from tergite_autocalibration.lib.base.node import CouplerNode
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
+    QubitSpectroscopyVsCurrentNodeAnalysis,
+    ResonatorSpectroscopyVsCurrentNodeAnalysis,
     QubitSpectroscopyVsCurrentNodeAnalysis,
     ResonatorSpectroscopyVsCurrentNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.external_parameter_node import (
-    ExternalParameterFixedScheduleCouplerNode,
+    ExternalParameterNode,
 )
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement import (
     TwoTonesMultidimMeasurement,
@@ -42,7 +45,7 @@ from tergite_autocalibration.utils.logging import logger
 peak = LorentzianModel()
 
 
-class QubitSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNode):
+class QubitSpectroscopyVsCurrentNode(CouplerNode):
     """
     This node performs a qubit spectroscopy measurement while varying the
     current through the coupler to measure the crossing point of the coupler with the qubit.
@@ -50,6 +53,7 @@ class QubitSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNode):
 
     measurement_obj = TwoTonesMultidimMeasurement
     analysis_obj = QubitSpectroscopyVsCurrentNodeAnalysis
+    measurement_type = ExternalParameterNode
     # coupler_qois = ["parking_current"]
     coupler_qois = ["qubit_crossing_points"]
 
@@ -71,6 +75,9 @@ class QubitSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNode):
             },
         }
         self.validate()
+
+    def initial_operation(self):
+        pass
 
     def pre_measurement_operation(self, reduced_ext_space):
         first_coupler = self.couplers[0]
@@ -102,8 +109,8 @@ class QubitSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNode):
             )
             samples = qubit_samples(qubit)
             number_of_samples = len(samples)
-            frequencies = np.linspace(samples[0], samples[-1], number_of_samples)
-            true_s21 = peak.eval(params=true_params, x=frequencies)
+            frequncies = np.linspace(samples[0], samples[-1], number_of_samples)
+            true_s21 = peak.eval(params=true_params, x=frequncies)
             noise_scale = 0.02
 
             np.random.seed(123)
@@ -118,7 +125,7 @@ class QubitSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNode):
         return dataset
 
 
-class ResonatorSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNode):
+class ResonatorSpectroscopyVsCurrentNode(CouplerNode):
     """
     This node performs a resonator spectroscopy measurement while varying the
     current through the coupler to measure the crossing point of the coupler with the resonator.
@@ -126,6 +133,7 @@ class ResonatorSpectroscopyVsCurrentNode(ExternalParameterFixedScheduleCouplerNo
 
     measurement_obj = ResonatorSpectroscopyMeasurement
     analysis_obj = ResonatorSpectroscopyVsCurrentNodeAnalysis
+    measurement_type = ExternalParameterNode
     # coupler_qois = ["resonator_flux_quantum"]
     coupler_qois = ["resonator_crossing_points"]
 

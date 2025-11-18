@@ -2,8 +2,10 @@
 
 ``` mermaid
 graph TD
-    A[Resonator Spectroscopy] --> A1[Punchout]
-    A1 --> B(Qubit Spectroscopy)
+    A1[Punchout]
+    A[Resonator Spectroscopy]
+    A --> B1(Qubit Bring-Up Spectroscopy)
+    A --> B(Qubit Spectroscopy)
     B --> C[Rabi Oscillations]
     C --> D[Ramsey Correction]
     D --> E[Motzoi Parameter]
@@ -29,6 +31,7 @@ graph TD
     style A fill:#ffe6cc,stroke:#333,stroke-width:2px
     style A1 fill:#ffe6cc,stroke:#333,stroke-width:2px
     style B fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style B1 fill:#ffe6cc,stroke:#333,stroke-width:2px
     style C fill:#ffe6cc,stroke:#333,stroke-width:2px
     style D fill:#ffe6cc,stroke:#333,stroke-width:2px
     style E fill:#ffe6cc,stroke:#333,stroke-width:2px
@@ -59,6 +62,7 @@ graph TD
 ## Qubit Control Nodes
 
 - [qubit_01_spectroscopy](nodes/qubit_spectroscopy_node.md)
+- qubit_bring_up_spectroscopy
 - [rabi_oscillations](nodes/rabi_oscillations_node.md)
 - ramsey_correction
 - [qubit_12_spectroscopy](nodes/qubit_spectroscopy_node.md)

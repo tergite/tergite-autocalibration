@@ -15,6 +15,7 @@ import numpy as np
 import xarray
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
+from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.analysis import (
     OptimalROThreeStateAmplitudeNodeAnalysis,
     OptimalROTwoStateAmplitudeNodeAnalysis,
@@ -22,13 +23,14 @@ from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.analysi
 from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.measurement import (
     ROAmplitudeOptimizationMeasurement,
 )
-from tergite_autocalibration.lib.nodes.schedule_node import ScheduleQubitNode
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.utils.functions import isosceles_triangle
 
 
-class ROAmplitudeTwoStateOptimizationNode(ScheduleQubitNode):
+class ROAmplitudeTwoStateOptimizationNode(QubitNode):
     measurement_obj = ROAmplitudeOptimizationMeasurement
     analysis_obj = OptimalROTwoStateAmplitudeNodeAnalysis
+    measurement_type = ScheduleNode
     qubit_qois = [
         "measure_2state_opt:pulse_amp",
         "measure_2state_opt:acq_rotation",
@@ -61,9 +63,10 @@ class ROAmplitudeTwoStateOptimizationNode(ScheduleQubitNode):
         return float(REDIS_CONNECTION.hget(f"transmons:{qubit}", "measure:pulse_amp"))
 
 
-class ROAmplitudeThreeStateOptimizationNode(ScheduleQubitNode):
+class ROAmplitudeThreeStateOptimizationNode(QubitNode):
     measurement_obj = ROAmplitudeOptimizationMeasurement
     analysis_obj = OptimalROThreeStateAmplitudeNodeAnalysis
+    measurement_type = ScheduleNode
     qubit_qois = [
         "measure_3state_opt:pulse_amp",
         "centroid_I",

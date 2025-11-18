@@ -15,18 +15,20 @@
 
 import numpy as np
 
+from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.analysis import (
     RandomizedBenchmarkingSSRONodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.measurement import (
     RandomizedBenchmarkingSSROMeasurement,
 )
-from tergite_autocalibration.lib.nodes.schedule_node import ScheduleQubitNode
+from tergite_autocalibration.lib.nodes.schedule_node import OuterScheduleNode
 
 
-class RandomizedBenchmarkingSSRONode(ScheduleQubitNode):
+class RandomizedBenchmarkingNode(QubitNode):
     measurement_obj = RandomizedBenchmarkingSSROMeasurement
     analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
+    measurement_type = OuterScheduleNode
     qubit_qois = ["fidelity", "fidelity_error", "leakage", "leakage_error"]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):

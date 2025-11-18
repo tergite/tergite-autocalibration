@@ -320,13 +320,9 @@ class NodeManager:
             # Perform calibration
             node.calibrate(data_path, self.config.cluster_mode)
 
-            # TODO:  develop failure strategies ->
-            # if node_calibration_status == DataStatus.out_of_spec:
-            #     node_expand()
-            #     node_calibration_status = self.calibrate_node(node)
-
     def _initialize_node(self, node_name: str) -> BaseNode:
         """Initializes a node and updates it with user-defined samplespace if available."""
+        elements = {"qubits": self.config.qubits, "couplers": self.config.couplers}
         node = self.node_factory.create_node(
             node_name,
             self.config.qubits,
