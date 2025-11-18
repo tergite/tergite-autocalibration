@@ -36,4 +36,5 @@ def test_plot_empty_graph(caplog):
     with caplog.at_level("INFO"):
         draw_arrow_chart("Nodes:", [])
 
-    assert len(caplog.records) == 3
+    assert len(caplog.records) == 1
+    assert caplog.records[0].message == "Node sequence for the graph is empty."
