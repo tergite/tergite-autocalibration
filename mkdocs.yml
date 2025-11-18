@@ -130,6 +130,9 @@ plugins:
 # Markdown extensions for enhanced functionality
 markdown_extensions:
   - footnotes  # Enable footnote syntax
+
+  - admonition # Enables admonitions
+  - pymdownx.details # Allows admonitions to be collapsible 
   
   # MathJax support for mathematical expressions
   - pymdownx.arithmatex:
