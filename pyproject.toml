@@ -88,7 +88,8 @@ docs = [
 test = [
     "pytest>=8.3.3",
     "requests-mock>=1.11.0",
-    "pytest-cov>=7.0.0"
+    "pytest-cov>=7.0.0",
+    "fakeredis>=2.32.1"
 ]
 
 [project.scripts]

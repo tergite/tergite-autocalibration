@@ -22,7 +22,7 @@ from tergite_autocalibration.tools.cli.config import config_cli
 from tergite_autocalibration.tools.cli.graph import graph_cli
 from tergite_autocalibration.tools.cli.node import node_cli
 from tergite_autocalibration.tools.cli.browser import browser_cli
-from tergite_autocalibration.tools.cli.redis import redis_cli
+from tergite_autocalibration.tools.cli.backend import backend_cli
 from tergite_autocalibration.utils.logging.decorators import suppress_logging
 
 cli_kwargs = {"no_args_is_help": True}
@@ -53,8 +53,10 @@ cli.add_typer(
     name="browser",
     help="Manage the data browser.",
 )
+# Please note that the module is called 'backend' instead of 'redis' to avoid name conflicts while
+# loading the 'redis' library.
 cli.add_typer(
-    redis_cli,
+    backend_cli,
     **cli_kwargs,
     name="redis",
     help="Utilities to handle redis.",

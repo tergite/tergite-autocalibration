@@ -29,6 +29,7 @@ The autocalibration CLI is organized into several main command groups:
 - `graph`: Handle operations related to the calibration graph
 - `config`: Load and save the configuration files
 - `browser`: Will open the dataset browser, which makes you view the datasets from measurements
+- `redis`: Operations to handle redis values
 - `joke`: Handle operations related to the well-being of the user
 
 ### Calibration Commands
@@ -190,6 +191,29 @@ acli browser --datadir [OPTIONS]
 - `--datadir PATH`: Folder to take the plot data from
 - `--liveplotting`: Whether plots should be updated in real time (default: False)
 - `--log-level INT`: Log-level as in the Python `logging` package to be used in the logs (default: 30)
+
+### Redis handling ###
+
+#### `redis` ####
+
+Tools to work with the redis backend.
+
+**Usage:**
+
+```
+acli redis save-file [FILENAME]
+```
+
+Store a backup of redis in .json format.
+
+**Usage:**
+
+```
+acli redis load-file [FILENAME]
+```
+
+Load a backup of redis from a .json format.
+The file must follow the standard from the `acli redis save-file` function.
 
 ### Joke Command ###
 
