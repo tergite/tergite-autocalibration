@@ -43,8 +43,8 @@ class IQMixerChannel:
         nco_freq = self.rf_freq - self.lo_freq
         self.module.sequencer0.nco_freq(nco_freq)
         self.module.sequencer0.sideband_cal()
-        gain_ratio = getattr(self.module.sequencer0, f'mixer_corr_gain_ratio')()
-        phase_offset_degree = getattr(self.module.sequencer0, f'mixer_corr_phase_offset_degree')()
+        gain_ratio = self.module.sequencer0.mixer_corr_gain_ratio()
+        phase_offset_degree = self.module.sequencer0.mixer_corr_phase_offset_degree()
         self.module.arm_sequencer(0)
         self.module.start_sequencer(0)
         self.sideband_offset = (gain_ratio, phase_offset_degree)
@@ -137,7 +137,7 @@ class IQMixerCalibration:
 
     def export_calibration_parameters(self, overwrite=False, save_to_disk=False):
         """
-        Can be overrided by another elegant way
+        Can be overwritten by another elegant way
         """
         mc = dict()
         for qubit, channel in self.rf_channels.items():
