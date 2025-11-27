@@ -68,7 +68,8 @@ dependencies = [
     "pyqt5>=5.15.11",
     "pydantic==2.9.2",
     "dash>=3.1.1",
-    "dash-renderjson>=0.0.1"
+    "dash-renderjson>=0.0.1",
+    "networkx==3.4.2" # TODO: This can be removed when updating to newer versions of quantify scheduler
 ]
 
 [project.optional-dependencies]
