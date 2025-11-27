@@ -9,10 +9,11 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
-
+import copy
 import os
 from functools import wraps
-from typing import Dict, Any
+from pathlib import Path
+from typing import Dict, Any, Union
 
 
 def with_os_env(variables: Dict[str, Any]):
@@ -87,3 +88,46 @@ def preserve_os_env(fn_):
         return result
 
     return wrapper
+
+
+def with_config(path_: Union[Path, str]):
+    """
+    This is a decorator to - during a test - change the global CONFIG variable.
+
+    Args:
+        path_: Path to the configuration package
+
+    Returns:
+
+    """
+
+    def inner_decorator_fn_(fn_):
+        @wraps(fn_)
+        def wrapper(*args, **kwargs):
+            import tergite_autocalibration.config.globals as glb
+            from tergite_autocalibration.config.handler import ConfigurationHandler
+            from tergite_autocalibration.config.package import ConfigurationPackage
+
+            temp_config = copy.deepcopy(glb.CONFIG)
+
+            glb.CONFIG = ConfigurationHandler.from_configuration_package(
+                ConfigurationPackage.from_toml(
+                    os.path.join(path_, "configuration.meta.toml")
+                )
+            )
+
+            # This is in a try finally block to ensure that environmental variables are restored even
+            # if the function raises an exception.
+            try:
+                result = fn_(*args, **kwargs)
+
+            finally:
+                # Reset global config
+                glb.CONFIG = temp_config
+
+            # Return the result of the function
+            return result
+
+        return wrapper
+
+    return inner_decorator_fn_
