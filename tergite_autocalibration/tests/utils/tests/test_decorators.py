@@ -14,7 +14,12 @@ import os
 
 import pytest
 
-from tergite_autocalibration.tests.utils.decorators import with_os_env, preserve_os_env
+from tergite_autocalibration.tests.utils.decorators import (
+    with_os_env,
+    preserve_os_env,
+    with_config,
+)
+from tergite_autocalibration.tests.utils.fixtures import get_fixture_path
 
 
 def test_with_os_env_sets_variables():
@@ -197,3 +202,33 @@ def test_new_variables_cleaned():
 
     # Ensure the environment variable remains unchanged
     assert os.environ["TEMP_VAR"] == "initial_value"
+
+
+def test_load_global_config():
+    """
+    Test whether the decorator overwrites CONFIG
+    """
+    from tergite_autocalibration.config.globals import CONFIG
+
+    # Check whether name is as expected
+    assert CONFIG.run.name == "no_name_for_this_run_set"
+
+    config_path = get_fixture_path("templates", "default_device_under_test_copy")
+
+    @with_config(config_path)
+    def my_function():
+        from tergite_autocalibration.config.globals import CONFIG
+
+        # Check whether the decorator was overwriting the name
+        assert CONFIG.run.name == "no_name_for_this_run_set_copy"
+
+    # Call function with decorator
+    my_function()
+
+    # Check whether name is still the same - the function should not have changed it
+    assert CONFIG.run.name == "no_name_for_this_run_set"
+
+    # Check whether the name is still the same after importing CONFIG again
+    from tergite_autocalibration.config.globals import CONFIG
+
+    assert CONFIG.run.name == "no_name_for_this_run_set"
