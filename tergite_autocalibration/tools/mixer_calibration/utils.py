@@ -28,8 +28,8 @@ class IQMixerChannel:
         
         getattr(self.module, self._lo_commands[0])(self.lo_freq)
         getattr(self.module, self._lo_commands[1])()
-        offset_path0 = getattr(self.module, f'out{self.port}_offset_path0')()
-        offset_path1 = getattr(self.module, f'out{self.port}_offset_path1')()
+        offset_path0 = 1e-3 * getattr(self.module, f'out{self.port}_offset_path0')()
+        offset_path1 = 1e-3 * getattr(self.module, f'out{self.port}_offset_path1')()
         self.lo_offset = (offset_path0, offset_path1)
 
     def sideband_calibration(self):
