@@ -15,7 +15,7 @@ import json
 import toml
 from qblox_instruments import Cluster
 from qblox_instruments.qcodes_drivers.module import Module
-from tergite_autocalibration.config.globals import ENV, logger
+from tergite_autocalibration.config.globals import ENV, logger, CONFIG
 
 
 class IQMixerChannel:
@@ -100,13 +100,9 @@ class IQMixerCalibration:
 
     def parse_cluster_config(self, cluster_config):
         if cluster_config is None:
-            self.cluster_config_path = (
-                str(ENV.config_dir.absolute()) + "/configs/cluster_config.json"
-            )
+            self.cluster_config_path = CONFIG.cluster.filepath
         else:
-            self.cluster_config_path = (
-                str(ENV.config_dir.absolute()) + f"/configs/{cluster_config}"
-            )
+            self.cluster_config_path = cluster_config
 
         with open(self.cluster_config_path, "r") as f:
             self.cluster_config = json.load(f)
@@ -142,13 +138,9 @@ class IQMixerCalibration:
 
     def parse_device_config(self, device_config):
         if device_config is None:
-            self.device_config_path = (
-                str(ENV.config_dir.absolute()) + "/configs/device_config.toml"
-            )
+            self.device_config_path = CONFIG.device.filepath
         else:
-            self.device_config_path = (
-                str(ENV.config_dir.absolute()) + f"/configs/{device_config}"
-            )
+            self.device_config_path = device_config
 
         self.device_config = toml.load(self.device_config_path)
         self.assign_rf_freqs()
