@@ -22,7 +22,6 @@ from quantify_scheduler.json_utils import SchedulerJSONDecoder, SchedulerJSONEnc
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.config.legacy import dh
-from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 from tergite_autocalibration.utils.dto import extended_transmon_element
 from tergite_autocalibration.utils.dto.extended_coupler_edge import (
     ExtendedCompositeSquareEdge,
@@ -158,15 +157,9 @@ def _save_parameters_in_transmon(
                 )
             value = qoi_result["value"]
             REDIS_CONNECTION.hset(f"{name}:{this_element}", qoi_name, value)
-            # Setting the value in the standard redis storage
-            structured_redis_storage(qoi_name, this_element.strip("q"), value)
             # Saving the error to the measured value
             error = qoi_result["error"]
             REDIS_CONNECTION.hset(f"{name}:{this_element}", qoi_name + "_error", error)
-            # Setting the value in the standard redis storage
-            structured_redis_storage(
-                qoi_name + "_error", this_element.strip("q"), error
-            )
 
         REDIS_CONNECTION.hset(f"cs:{this_element}", node, "calibrated")
 

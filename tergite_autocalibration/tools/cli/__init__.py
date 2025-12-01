@@ -102,14 +102,6 @@ def start(
             help="Use --ignore-spec to force recalibration.",
         ),
     ] = False,
-    push: Annotated[
-        bool,
-        typer.Option(
-            "--push",
-            is_flag=True,
-            help="If --push the a backend will pushed to an MSS specified in MSS_MACHINE_ROOT_URL in the .env file.",
-        ),
-    ] = False,
     browser: Annotated[
         bool,
         typer.Option(
@@ -126,7 +118,6 @@ def start(
         CalibrationSupervisor,
         CalibrationConfig,
     )
-    from tergite_autocalibration.scripts.db_backend_update import update_mss
     from tergite_autocalibration.config.globals import CONFIG, ENV
     from tergite_autocalibration.tools.browser import start_browser
     from tergite_autocalibration.utils.backend.reset_redis_node import ResetRedisNode
@@ -210,10 +201,6 @@ def start(
         supervisor.rerun_analysis()
     else:
         supervisor.calibrate_system(node_name=node_name, ignore_spec=ignore_spec)
-
-    # Push the results of the calibration to MSS
-    if push:
-        update_mss()
 
 
 cli.add_typer(

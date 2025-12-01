@@ -1,0 +1,126 @@
+# This code is part of Tergite
+#
+# (C) Copyright Chalmers Next Labs AB 2025
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+
+
+from enum import Enum
+from typing import Tuple, Dict, Any, List
+
+from tergite_autocalibration.config.globals import REDIS_CONNECTION
+
+
+class _DataSource(Enum):
+    REDIS = "REDIS"
+    LITERAL = "LITERAL"
+
+
+_QUBITS = ["q13", "q14"]
+_COUPLERS = ["q13_q14"]
+
+_qubit_parameters = [
+    ("frequency", "clock_freqs:f01", _DataSource.REDIS),
+    ("pi_pulse_amplitude", "rxy:amp180", _DataSource.REDIS),
+    ("pi_pulse_duration", "rxy:duration", _DataSource.REDIS),
+    ("pulse_type", "Gaussian", _DataSource.LITERAL),
+    ("pulse_sigma", "rxy:sigma", _DataSource.REDIS),
+    ("t1_decoherence", "t1_time", _DataSource.REDIS),
+    ("t2_decoherence", "t2_time", _DataSource.REDIS),
+]
+
+_resonator_parameters = [
+    ("acq_delay", "measure:acq_delay", _DataSource.REDIS),
+    ("acq_integration_time", "measure:integration_time", _DataSource.REDIS),
+    ("frequency", "clock_freqs:readout", _DataSource.REDIS),
+    ("pulse_delay", "measure:ro_pulse_delay", _DataSource.REDIS),
+    ("pulse_duration", "measure:pulse_duration", _DataSource.REDIS),
+    ("pulse_type", "Square", _DataSource.LITERAL),
+    ("pulse_amplitude", "measure:pulse_ampl", _DataSource.REDIS),
+]
+
+_lda_parameters = [
+    ("coef_0", "lda_coef_0", _DataSource.REDIS),
+    ("coef_1", "lda_coef_1", _DataSource.REDIS),
+    ("intercept", "lda_intercept", _DataSource.REDIS),
+]
+
+# TODO: Figure out, which parameters will go to the couplers
+_coupler_parameters = [
+    "frequency",
+    "frequency_detuning",
+    "anharmonicity",
+    "coupling_strength_02",
+    "coupling_strength_12",
+    "cz_pulse_amplitude",
+    "cz_pulse_dc_bias",
+    "cz_pulse_phase_offset",
+    "cz_pulse_duration_before",
+    "cz_pulse_duration_rise",
+    "cz_pulse_duration_constant",
+    "control_rz_lambda",
+    "target_rz_lambda",
+    "pulse_type",
+]
+
+
+def _assemble_parameters(
+    parameter_map: List[Tuple[str, str, "_DataSource"]],
+    object_id: str,
+    set_id: bool = True,
+    redis_prefix: str = "transmons",
+) -> Dict[str, Any]:
+
+    # Add object id if necessary
+    if not set_id:
+        parameterized_return_object = {}
+    else:
+        parameterized_return_object = {"id": object_id}
+
+    for parameter_ in parameter_map:
+        if parameter_[2] == _DataSource.REDIS:
+            parameterized_return_object[parameter_[0]] = REDIS_CONNECTION.hget(
+                f"{redis_prefix}:{object_id}", parameter_[1]
+            )
+        if parameter_[2] == _DataSource.LITERAL:
+            parameterized_return_object[parameter_[0]] = parameter_[1]
+    return parameterized_return_object
+
+
+if __name__ == "__main__":
+
+    return_object = {
+        "calibration_config": {
+            "qubit": [],
+            "resonator": [],
+            "coupler": [],
+            "discriminators": {"lda": {}},
+        }
+    }
+
+    for qubit in _QUBITS:
+        # Iterate over qubit parameters
+        return_object["qubit"].append(_assemble_parameters(_qubit_parameters, qubit))
+
+        # Iterate over resonator parameters
+        return_object["resonator"].append(
+            _assemble_parameters(_resonator_parameters, qubit)
+        )
+
+        # Iterate over discriminator parameters
+        return_object["discriminators"]["lda"][qubit] = _assemble_parameters(
+            _lda_parameters, qubit, set_id=False
+        )
+
+    for coupler in _COUPLERS:
+        return_object["coupler"].append(
+            _assemble_parameters(_coupler_parameters, coupler, redis_prefix="couplers")
+        )
+
+    # TODO: Write return_object to toml file

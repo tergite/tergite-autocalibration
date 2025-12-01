@@ -50,7 +50,6 @@ acli start [OPTIONS]
 - `-c TEXT`: Cluster IP address (if not set, it will use CLUSTER_IP from the .env file)
 - `-r TEXT`: Rerun an analysis (specify the path to the dataset folder)
 - `-n, --name TEXT`: Specify the node type to rerun (works only with -r option)
-- `--push`: Push a backend to an MSS specified in MSS_MACHINE_ROOT_URL in the .env file
 - `--browser`: Will open the dataset browser in the background and plot the measurement results live
 
 ### Cluster Commands ###
