@@ -14,12 +14,37 @@
 from enum import Enum
 from typing import Tuple, Dict, Any, List
 
+import tomlkit
+
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
 
 
 class _DataSource(Enum):
     REDIS = "REDIS"
     LITERAL = "LITERAL"
+
+
+def _deep_update(original_map_, update_map_):
+    """
+    Recursive function to deep update a dict. Function is commutative.
+
+    Args:
+        original_map_: Original dict with entries
+        update_map_: Dict to update the entries
+
+    Returns:
+
+    """
+    for key, value in update_map_.items():
+        if (
+            isinstance(value, dict)
+            and key in original_map_
+            and isinstance(original_map_[key], dict)
+        ):
+            _deep_update(original_map_[key], value)
+        else:
+            original_map_[key] = value
+    return original_map_
 
 
 _QUBITS = ["q13", "q14"]
@@ -51,22 +76,14 @@ _lda_parameters = [
     ("intercept", "lda_intercept", _DataSource.REDIS),
 ]
 
-# TODO: Figure out, which parameters will go to the couplers
 _coupler_parameters = [
-    "frequency",
-    "frequency_detuning",
-    "anharmonicity",
-    "coupling_strength_02",
-    "coupling_strength_12",
-    "cz_pulse_amplitude",
-    "cz_pulse_dc_bias",
-    "cz_pulse_phase_offset",
-    "cz_pulse_duration_before",
-    "cz_pulse_duration_rise",
-    "cz_pulse_duration_constant",
-    "control_rz_lambda",
-    "target_rz_lambda",
-    "pulse_type",
+    ("frequency", "cz_pulse_frequency", _DataSource.REDIS),
+    ("cz_pulse_amplitude", "cz_pulse_amplitude", _DataSource.REDIS),
+    ("cz_pulse_dc_bias", "parking_current", _DataSource.REDIS),
+    ("cz_pulse_duration_constant", "cz_pulse_duration", _DataSource.REDIS),
+    ("control_rz_lambda", "cz_dynamic_control", _DataSource.REDIS),
+    ("target_rz_lambda", "cz_dynamic_target", _DataSource.REDIS),
+    ("pulse_type", "wacqt_cz", _DataSource.LITERAL),
 ]
 
 
@@ -85,8 +102,11 @@ def _assemble_parameters(
 
     for parameter_ in parameter_map:
         if parameter_[2] == _DataSource.REDIS:
-            parameterized_return_object[parameter_[0]] = REDIS_CONNECTION.hget(
+            redis_value_ = REDIS_CONNECTION.hget(
                 f"{redis_prefix}:{object_id}", parameter_[1]
+            )
+            parameterized_return_object[parameter_[0]] = (
+                redis_value_ if redis_value_ is not None else 0
             )
         if parameter_[2] == _DataSource.LITERAL:
             parameterized_return_object[parameter_[0]] = parameter_[1]
@@ -106,21 +126,32 @@ if __name__ == "__main__":
 
     for qubit in _QUBITS:
         # Iterate over qubit parameters
-        return_object["qubit"].append(_assemble_parameters(_qubit_parameters, qubit))
+        return_object["calibration_config"]["qubit"].append(
+            _assemble_parameters(_qubit_parameters, qubit)
+        )
 
         # Iterate over resonator parameters
-        return_object["resonator"].append(
+        return_object["calibration_config"]["resonator"].append(
             _assemble_parameters(_resonator_parameters, qubit)
         )
 
         # Iterate over discriminator parameters
-        return_object["discriminators"]["lda"][qubit] = _assemble_parameters(
-            _lda_parameters, qubit, set_id=False
+        return_object["calibration_config"]["discriminators"]["lda"][qubit] = (
+            _assemble_parameters(_lda_parameters, qubit, set_id=False)
         )
 
     for coupler in _COUPLERS:
-        return_object["coupler"].append(
+        return_object["calibration_config"]["coupler"].append(
             _assemble_parameters(_coupler_parameters, coupler, redis_prefix="couplers")
         )
 
-    # TODO: Write return_object to toml file
+    # Load template
+    with open("calibration_seed_template.toml", "r") as f_:
+        calibration_seed = tomlkit.load(f_)
+
+    # Update values
+    calibration_seed = _deep_update(calibration_seed, return_object)  # type: ignore
+
+    # Save file again
+    with open("calibration_seed.toml", "w") as f_:
+        tomlkit.dump(calibration_seed, f_)
