@@ -7,6 +7,10 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 
 ## [Unreleased]
 
+### Added
+
+- Backup functions for redis storage.
+
 ### Changed
 
 - Removed development folder (can still be accessed in the git history)
