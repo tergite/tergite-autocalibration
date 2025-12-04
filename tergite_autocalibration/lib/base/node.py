@@ -182,7 +182,6 @@ class BaseNode(NodeInterface):
                     element = measured_qubit
                     element_type = "qubit"
                 else:
-                    breakpoint()
                     matching = [s for s in settable_elements if measured_qubit in s]
                     # TODO: len(matching) == 1 implies that we operate on only 1 coupler.
                     # To be changed in future
@@ -228,7 +227,7 @@ class BaseNode(NodeInterface):
             # measured_qubit whose resonator populates the raw data-array
             if issubclass(self.__class__, CouplerNode):
                 for coupler in self.couplers:
-                    if element in coupler:
+                    if measured_qubit in coupler:
                         element = coupler
                         break
 
