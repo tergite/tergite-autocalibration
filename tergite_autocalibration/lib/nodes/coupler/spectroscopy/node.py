@@ -12,18 +12,16 @@
 # that they have been altered from the originals.
 
 
-from lmfit.models import LorentzianModel
 import numpy as np
-from quantify_scheduler import CompiledSchedule
-from quantify_scheduler.backends import SerialCompiler
 import quantify_scheduler.backends.qblox.constants as constants
 import xarray
+from lmfit.models import LorentzianModel
+from quantify_scheduler import CompiledSchedule
+from quantify_scheduler.backends import SerialCompiler
 
 from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.base.node import CouplerNode
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
-    QubitSpectroscopyVsCurrentNodeAnalysis,
-    ResonatorSpectroscopyVsCurrentNodeAnalysis,
     QubitSpectroscopyVsCurrentNodeAnalysis,
     ResonatorSpectroscopyVsCurrentNodeAnalysis,
 )
@@ -71,7 +69,7 @@ class QubitSpectroscopyVsCurrentNode(CouplerNode):
 
         self.external_samplespace = {
             "dc_currents": {
-                coupler: np.arange(-2.5e-3, 2.5e-3, 100e-6) for coupler in self.couplers
+                coupler: np.arange(-1.5e-3, 1.5e-3, 800e-6) for coupler in self.couplers
             },
         }
         self.validate()

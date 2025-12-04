@@ -21,8 +21,6 @@ import matplotlib
 import numpy as np
 import quantify_scheduler.backends.qblox.constants as constants
 import xarray
-from colorama import Fore, Style
-from colorama import init as colorama_init
 from quantify_scheduler.backends import SerialCompiler
 from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
 from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
@@ -44,9 +42,8 @@ from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
 from tergite_autocalibration.utils.io.dataset import save_dataset
 from tergite_autocalibration.utils.logging import logger
+from tergite_autocalibration.utils.logging.visuals import print_measurement_info
 from tergite_autocalibration.utils.measurement_utils import samplespace_dimensions
-
-colorama_init()
 
 matplotlib.use(PLOTTING_BACKEND)
 
@@ -96,20 +93,6 @@ class BaseNode(NodeInterface):
         self.post_process(data_path)
         logger.info("analysis completed")
 
-    @staticmethod
-    def _print_measurement_info(duration: float, measurement: Tuple[int, int]) -> None:
-        """Print information about the current measurement."""
-        measurement_message = (
-            f". Measurement {measurement[0] + 1} of {measurement[1]}"
-            if measurement[1] > 1
-            else ""
-        )
-        # Format the message with duration and the measurement message
-        message = f"{duration:.2f} sec{measurement_message}"
-        logger.status(
-            f"schedule_duration = {Fore.CYAN}{Style.BRIGHT}{message}{Style.RESET_ALL}"
-        )
-
     def measure_compiled_schedule(
         self,
         compiled_schedule: CompiledSchedule,
@@ -129,7 +112,7 @@ class BaseNode(NodeInterface):
         """
 
         schedule_duration = self._calculate_schedule_duration(compiled_schedule)
-        self._print_measurement_info(schedule_duration, measurement)
+        print_measurement_info(schedule_duration, measurement)
 
         raw_dataset = execute_schedule(
             compiled_schedule,
@@ -190,15 +173,6 @@ class BaseNode(NodeInterface):
             measured_qubit = measurement_qubits[key_indx]
             dimensions = samplespace_dimensions(samplespace, self.loops)
 
-            # TODO: this is flagged for removal.
-            if "ssro" in self.name and self.name != "randomized_benchmarking_ssro":
-                shots = int(len(raw_ds[key].values[0]) / (np.prod(dimensions)))
-                coords_dict["shot"] = (
-                    "shot",
-                    range(shots),
-                    {"qubit": measured_qubit, "long_name": "shot", "units": "NA"},
-                )
-
             for quantity in sweep_quantities:
                 # eg settable_elements -> ['q1','q2',...] or ['q1_q2','q3_q4',...] :
                 settable_elements = samplespace[quantity].keys()
@@ -208,6 +182,7 @@ class BaseNode(NodeInterface):
                     element = measured_qubit
                     element_type = "qubit"
                 else:
+                    breakpoint()
                     matching = [s for s in settable_elements if measured_qubit in s]
                     # TODO: len(matching) == 1 implies that we operate on only 1 coupler.
                     # To be changed in future
@@ -244,21 +219,13 @@ class BaseNode(NodeInterface):
 
             data_values = raw_ds[key].values
 
-            # TODO: flagged for removal
-            if "ssro" in self.name and self.name != "randomized_benchmarking_ssro":
-                reshaping = np.array([shots])
-                reshaping = np.append(reshaping, dimensions)
-                data_values = data_values.reshape(*reshaping)
-            elif "cz_parametrization" in self.name:
-                reshaping = reversed(dimensions)
-                data_values = data_values.reshape(*reshaping)
-                data_values = np.transpose(data_values)
-            else:
-                data_values = data_values.reshape(*dimensions, order="F")
+            data_values = data_values.reshape(*dimensions, order="F")
 
-            # determine if this dataarray examines a qubit or a coupler:
-            # TODO: this needs improvement
+            # the element under examination ...
+            # ... in single qubit nodes the element is just the measured_qubit
             element = measured_qubit
+            # ... but in coupler nodes the element is the coupler attached to the
+            # measured_qubit whose resonator populates the raw data-array
             if issubclass(self.__class__, CouplerNode):
                 for coupler in self.couplers:
                     if element in coupler:
@@ -279,6 +246,8 @@ class BaseNode(NodeInterface):
 
             dataset = xarray.merge([dataset, partial_ds])
             dataset.attrs["elements"].append(element)
+            # take the set of elements because couplers appear duplicated
+            dataset.attrs["elements"] = set(dataset.attrs["elements"])
 
         return dataset
 
@@ -290,7 +259,6 @@ class QubitNode(BaseNode):
         super().__init__(name, **node_keywords)
         self.all_qubits = all_qubits
         self.qubit_state = 0  # can be 0 or 1 or 2
-        self.plots_per_qubit = 1  # can be 0 or 1 or 2
 
         if self.qubit_qois is not None:
             self.redis_fields = self.qubit_qois
@@ -303,10 +271,6 @@ class QubitNode(BaseNode):
 
     def precompile(self, schedule_samplespace: dict) -> CompiledSchedule:
         constants.GRID_TIME_TOLERANCE_TIME = 5e-2
-
-        # TODO: put 'tof' out of its misery
-        if self.name == "tof":
-            return None, 1
 
         transmons = self.device_manager.transmons
 
@@ -344,7 +308,6 @@ class CouplerNode(BaseNode):
         self.couplers = couplers
         self.edges = couplers
         self.all_qubits = sorted(set(self.get_coupled_qubits()))
-        self.plots_per_qubit = 1  # can be 0 or 1 or 2
 
         if self.coupler_qois is not None:
             self.redis_fields = self.coupler_qois
