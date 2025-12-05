@@ -202,6 +202,7 @@ class BaseNode(NodeInterface):
                     "units": "NA",
                 }
 
+                # This is for measurements of type OuterScheduleNode:
                 if not isinstance(settable_values, Iterable):
                     settable_values = np.array([settable_values])
 
