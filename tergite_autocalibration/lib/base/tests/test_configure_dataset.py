@@ -91,23 +91,26 @@ def test_configure_dataset_couplers():
     assert configured_ds.coords["spec_frequenciesq00"].attrs["element_type"] == "qubit"
 
 
-def test_configure_dataset_qubits_with_outer():
+def test_configure_dataset_qubits_with_loops():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
     node = RandomizedBenchmarkingNode("randomized_benchmarking", CONFIG.run.qubits)
 
-    # raw_ds = node.generate_dummy_dataset()
-    #
-    # qubit_set = set(CONFIG.run.qubits)
-    # samplespace_freqs_00 = node.schedule_samplespace["ro_frequencies"]["q00"]
-    #
-    # configured_ds = node.configure_dataset(raw_ds)
-    #
-    # # check ds properties
-    # assert qubit_set == configured_ds.attrs["elements"]
-    # assert len(configured_ds.data_vars) == 2
-    # # check data_var properties
-    # assert configured_ds["yq00"].attrs["qubit"] == "q00"
-    # assert configured_ds["yq00"].values.shape == samplespace_freqs_00.shape
-    # # check coord properties
-    # assert configured_ds.coords["ro_frequenciesq00"].attrs["element_type"] == "qubit"
-    #
+    raw_ds = node.generate_dummy_dataset()
+
+    qubit_set = set(CONFIG.run.qubits)
+    samplespace_cliffords_00 = node.schedule_samplespace["number_of_cliffords"]["q00"]
+    number_of_cliffords_00 = len(samplespace_cliffords_00)
+
+    configured_ds = node.configure_dataset(raw_ds)
+
+    # check ds properties
+    assert qubit_set == configured_ds.attrs["elements"]
+    assert len(configured_ds.data_vars) == 2
+    # check data_var properties
+    assert configured_ds["yq00"].attrs["qubit"] == "q00"
+    assert configured_ds["yq00"].values.shape == (number_of_cliffords_00, node.loops)
+    # check coord properties
+    ds_coords = configured_ds.coords
+    assert ds_coords["number_of_cliffordsq00"].attrs["element_type"] == "qubit"
+    assert "loops" in configured_ds.coords
+    assert configured_ds.coords["loops"].size == node.loops
