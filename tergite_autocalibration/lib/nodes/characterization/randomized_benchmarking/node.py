@@ -59,7 +59,7 @@ class RandomizedBenchmarkingNode(QubitNode):
         for index, qubit in enumerate(self.all_qubits):
             samples = self.schedule_samplespace["number_of_cliffords"][qubit]
             # true_params = rabi.make_params(amplitude=0.2, frequency=1, offset=0.2)
-            number_of_samples = len(samples) *  self.loops
+            number_of_samples = len(samples) * self.loops
             # true_s21 = rabi.eval(params=true_params, drive_amp=samples)
             noise_scale = 0.005 * index
             np.random.seed(123)
