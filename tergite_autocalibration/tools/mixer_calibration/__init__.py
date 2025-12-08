@@ -15,7 +15,7 @@ import json
 import toml
 from qblox_instruments import Cluster
 from qblox_instruments.qcodes_drivers.module import Module
-from tergite_autocalibration.config.globals import ENV, logger, CONFIG
+from tergite_autocalibration.config.globals import ENV, logger, CONFIG, REDIS_CONNECTION
 
 
 class IQMixerChannel:
@@ -83,7 +83,12 @@ class IQMixerCalibration:
     ):
         self.devices = devices
         self.rf_port = rf_port
-        self.default_clock = "01" if rf_port == "mw" else "ro"
+        if rf_port == "mw":
+            self.default_clock = "01"
+        elif rf_port == "res":
+            self.default_clock = "ro"
+        elif rf_port == "fl":
+            self.default_clock = "cz"
         self.cluster_ip = ENV.cluster_ip if cluster_ip is None else cluster_ip
         Cluster.close_all()
         self.cluster = Cluster("cluster", self.cluster_ip)
@@ -97,6 +102,8 @@ class IQMixerCalibration:
             return ["01", "12"]
         elif self.rf_port == "res":
             return ["ro", "ro1", "ro2", "ro_2st_opt", "ro_3st_opt"]
+        elif self.rf_port == "fl":
+            return ["cz"]
 
     def parse_cluster_config(self, cluster_config):
         if cluster_config is None:
@@ -156,6 +163,13 @@ class IQMixerCalibration:
                 rf_freq = self.device_config["device"]["qubit"][device][
                     "VNA_f01_frequency"
                 ]
+            elif self.rf_port == "fl":
+                cz_pulse_frequency = float(REDIS_CONNECTION.hget(f'couplers:{device}', 'cz_pulse_frequency'))
+                if cz_pulse_frequency is None:
+                    raise AttributeError(f"The cz_pulse_frequency of coupler {device} isn't determined yet.")
+                else:
+                    rf_freq = 4.4e9 - cz_pulse_frequency
+
             self._rf_freqs[device] = float(rf_freq)
 
     def create_rf_channels(self):
@@ -185,7 +199,7 @@ class IQMixerCalibration:
         mc = dict()
         for qubit, channel in self.rf_channels.items():
             for clock in self.all_clocks:
-                key = f"{qubit}:{self.rf_port}-{qubit}:{clock}"
+                key = f"{qubit}:{self.rf_port}-{qubit}.{clock}"
                 mc[key] = dict()
                 mc[key]["dc_offset_i"], mc[key]["dc_offset_q"] = channel.lo_offset
                 mc[key]["amp_ratio"], mc[key]["phase_error"] = channel.sideband_offset
