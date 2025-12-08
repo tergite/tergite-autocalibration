@@ -67,7 +67,7 @@ _resonator_parameters = [
     ("pulse_delay", "measure:ro_pulse_delay", _DataSource.REDIS),
     ("pulse_duration", "measure:pulse_duration", _DataSource.REDIS),
     ("pulse_type", "Square", _DataSource.LITERAL),
-    ("pulse_amplitude", "measure:pulse_ampl", _DataSource.REDIS),
+    ("pulse_amplitude", "measure_2state_opt:pulse_amp", _DataSource.REDIS),
 ]
 
 _lda_parameters = [

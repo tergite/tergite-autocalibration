@@ -35,6 +35,9 @@ class ROAmplitudeTwoStateOptimizationNode(QubitNode):
         "measure_2state_opt:pulse_amp",
         "measure_2state_opt:acq_rotation",
         "measure_2state_opt:acq_threshold",
+        "lda_coef_0",
+        "lda_coef_1",
+        "lda_intercept",
     ]
 
     def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
