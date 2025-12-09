@@ -10,10 +10,15 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
+import json
 
 
 @dataclass(frozen=True)
 class QOI:
     analysis_result: dict
     analysis_successful: bool
+
+    def serialize(self, as_json: bool = False):
+        data = asdict(self)
+        return json.dumps(data) if as_json else data 

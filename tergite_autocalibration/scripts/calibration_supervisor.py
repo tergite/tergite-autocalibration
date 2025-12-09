@@ -19,10 +19,12 @@
 import os
 from dataclasses import dataclass, field
 from ipaddress import IPv4Address
+from pathlib import Path
 from typing import List, Union, FrozenSet
 
 from colorama import Fore, Style
 from colorama import init as colorama_init
+from dash import Patch
 from qblox_instruments import Cluster
 from qblox_instruments.types import ClusterType
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
@@ -306,19 +308,23 @@ class NodeManager:
                 f"\u2691\u2691\u2691 {Fore.RED}{Style.BRIGHT}Calibration required for Node {node_name}{Style.RESET_ALL}"
             )
 
-            # Initialize node and update samplespace
-            node = self._initialize_node(node_name)
-            logger.info(f"Calibrating node {node.name}")
-
             # Determine the data path for calibration
             data_path = (
                 CONFIG.run.log_dir
                 if self.config.cluster_mode == MeasurementMode.re_analyse
-                else create_node_data_path(node.name)
+                else create_node_data_path(node_name)
             )
 
+            # Initialize node and update samplespace
+            node = self._initialize_node(node_name)
+
+            node.update_data_path(data_path)
+
+            logger.info(f"Calibrating node {node.name}")
+
+
             # Perform calibration
-            node.calibrate(data_path, self.config.cluster_mode)
+            node.calibrate( self.config.cluster_mode)
 
     def _initialize_node(self, node_name: str) -> BaseNode:
         """Initializes a node and updates it with user-defined samplespace if available."""

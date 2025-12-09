@@ -13,6 +13,7 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+import json
 import os.path
 import shutil
 from datetime import datetime
@@ -20,10 +21,11 @@ from pathlib import Path
 from typing import Union
 from uuid import uuid4
 
-import numpy as np
+import matplotlib.pyplot as plt
 import xarray
 
 from tergite_autocalibration.config.globals import CONFIG
+from tergite_autocalibration.utils.dto.qoi import QOI
 from tergite_autocalibration.utils.logging import logger
 
 
@@ -79,6 +81,22 @@ def scrape_and_copy_hdf5_files(
     logger.info(f"Copied {len(hdf5_files)} files to {target_directory}.")
 
 
+def open_dataset(name: str, data_path: Path) -> xarray.Dataset:
+    """
+    Open the dataset for the analysis.
+
+    Returns:
+        xarray.Dataset with measurement results
+
+    """
+    dataset_name = f"dataset_{name}.hdf5"
+    dataset_path = os.path.join(data_path, dataset_name)
+    if not os.path.exists(dataset_path):
+        raise FileNotFoundError(f"Dataset file not found: {dataset_path}")
+
+    logger.info("Open dataset " + str(dataset_path))
+    return xarray.open_dataset(dataset_path)
+
 def save_dataset(
     result_dataset: xarray.Dataset, node_name: str, data_path: Path
 ) -> None:
@@ -100,9 +118,37 @@ def save_dataset(
     # to_netcdf doesn't like complex numbers, convert to real/imag to save:
     result_dataset_real = to_real_dataset(result_dataset)
 
-    count = 0
-    dataset_name = f"dataset_{node_name}_{count}.hdf5"
-    while (data_path / dataset_name).is_file():
-        count += 1
-        dataset_name = f"dataset_{node_name}_{count}.hdf5"
+    dataset_name = f"dataset_{node_name}.hdf5"
     result_dataset_real.to_netcdf(data_path / dataset_name)
+
+def save_qoi(
+    QOI_dict: dict[str,QOI], node_name: str, data_path: Path
+) -> None:
+    """
+    Save the node QOI for each element to a file.
+
+    Args:
+        QOI_dict (dict): The QOI dictionary to save.
+        node_name (str): Name of the node being measured.
+        data_path (Path): Path where the dataset will be saved.
+    """
+    data_path.mkdir(parents=True, exist_ok=True)
+    measurement_id = data_path.stem[0:19]
+    serialized_QOI_dict = {element: qoi.serialize() for element, qoi in QOI_dict.items()}
+    file_path = data_path / f"{node_name}_qoi.json"
+    print(f'{ file_path = }')
+    with open(file_path, 'w') as file:
+        json.dump(serialized_QOI_dict, file, indent=2)
+
+
+
+def save_figures(figures_list: list, node_name: str, data_path: Path):
+    logger.info("Saving Plots")
+    for fig_index, fig in enumerate(figures_list):
+        preview_path = data_path / f"{node_name}_{fig_index}_preview.png"
+        full_path = data_path / f"{node_name}_{fig_index}.png"
+        fig.savefig(preview_path, bbox_inches="tight", dpi=100)
+        fig.savefig(full_path, bbox_inches="tight", dpi=400)
+        logger.info(f"Plots saved to {preview_path} and {full_path}")
+    plt.show(block=True)
+    plt.close()

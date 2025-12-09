@@ -53,6 +53,7 @@ class RunConfiguration(TOMLConfigurationFile):
         return self._run_id
 
     @property
+    # TODO: should the type be a Path?
     def log_dir(self) -> str:
         """
         Returns:

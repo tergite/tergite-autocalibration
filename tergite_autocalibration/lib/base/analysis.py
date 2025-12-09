@@ -85,6 +85,7 @@ class BaseNodeAnalysis(ABC):
         self.coords = None
         self.fig = None
         self.axs = None
+        self.figures = []
 
     @property
     def qoi(self) -> "QOI":
@@ -95,7 +96,7 @@ class BaseNodeAnalysis(ABC):
         self._qoi = value
 
     @abstractmethod
-    def analyze_node(self, data_path: Path, index: int = 0) -> dict[str, QOI]:
+    def analyze_node(self, dataset: xr.Dataset) -> dict[str, QOI]:
         """
         Run the fitting of the analysis function
 
@@ -104,24 +105,6 @@ class BaseNodeAnalysis(ABC):
 
         """
 
-    def open_dataset(self, index: int = 0) -> xr.Dataset:
-        """
-        Open the dataset for the analysis.
-
-        Args:
-            index: By default 0 for most of the measurements, can be set to load multiple datasets.
-
-        Returns:
-            xarray.Dataset with measurement results
-
-        """
-        dataset_name = f"dataset_{self.name}_{index}.hdf5"
-        dataset_path = os.path.join(self.data_path, dataset_name)
-        if not os.path.exists(dataset_path):
-            raise FileNotFoundError(f"Dataset file not found: {dataset_path}")
-
-        logger.info("Open dataset " + str(dataset_path))
-        return xr.open_dataset(dataset_path)
 
     def _manage_plots(self, column_grid: int, plots_per_qubit: int):
         n_vars = len(self.data_vars)
@@ -131,19 +114,6 @@ class BaseNodeAnalysis(ABC):
         fig, axs = create_figure_with_top_band(nrows, ncols)
 
         return fig, axs
-
-    def _save_plots(self):
-        preview_path = self.data_path / f"{self.name}_preview.png"
-        full_path = self.data_path / f"{self.name}.png"
-        logger.info("Saving Plots")
-        self.fig.savefig(preview_path, bbox_inches="tight", dpi=100)
-        self.fig.savefig(full_path, bbox_inches="tight", dpi=400)
-        plt.show(block=True)
-        logger.info(f"Plots saved to {preview_path} and {full_path}")
-        plt.close()
-
-    def _save_other_plots(self):
-        pass
 
 
 class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
@@ -166,26 +136,23 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         self.column_grid = 5
         self.plots_per_qubit = 1
 
-    def analyze_node(self, data_path: Path, index: int = 0) -> dict[str, QOI]:
+    def analyze_node(self, dataset: xr.Dataset) -> dict[str, QOI]:
         """
         Analyze the node and save the results to redis.
         Args:
-            data_path: Path to the dataset
-            index: Index of the dataset to be analyzed
+            dataset: the full configured result dataset
 
         Returns:
             analysis_results: Dictionary with the analysis results for each qubit
         """
 
-        self.data_path = Path(data_path)
-        self.dataset = self.open_dataset(index=index)
+        self.dataset = dataset
         self.coords = self.dataset.coords
         self.data_vars = self.dataset.data_vars
         self.fig, self.axs = self._manage_plots(self.column_grid, self.plots_per_qubit)
         analysis_results = self._analyze_all_qubits()
         self._fill_plots()
-        self._save_plots()
-        self._save_other_plots()
+        self.figures = [self.fig]
         return analysis_results
 
     def _analyze_all_qubits(self):
@@ -211,6 +178,7 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
                 # the dataset is loaded by the process_qubit method.
                 # in other words the __init__ of the analysis class is not aware of the
                 # dataset to be analyzed
+
                 analysis_results[this_qubit] = qubit_analysis.process_qubit(
                     ds, this_qubit
                 )
@@ -266,8 +234,8 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
         self.data_var = list(self.dataset.data_vars.keys())[0]
 
     def _compute_magnitudes(self):
-        self.S21 = self.dataset.isel(ReIm=0) + 1j * self.dataset.isel(ReIm=1)
-        self.magnitudes = np.abs(self.S21)
+        self.S21 = self.dataset # TODO: this is redundant
+        self.magnitudes = xr.ufuncs.abs(self.S21)
 
     def plot(self, primary_axis):
         """
@@ -422,8 +390,7 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
         self.fig, self.axs = self._manage_plots(self.column_grid, self.plots_per_qubit)
         analysis_results = self._analyze_all_couplers()
         self._fill_plots()
-        self._save_plots()
-        self._save_other_plots()
+        self.figures = [self.fig]
         return analysis_results
 
     def _analyze_all_couplers(self):

@@ -45,7 +45,7 @@ class NodeInterface(ABC):
         pass
 
     @abstractmethod
-    def post_process(self) -> None:
+    def post_process(self, result_datest) -> None:
         pass
 
 
