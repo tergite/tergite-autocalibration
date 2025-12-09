@@ -12,6 +12,8 @@ After reading this guide, you will know:
 Take a look into the operation manual to
 see [how to load and save configuration packages](operation.md#configuration-commands).
 
+Please also note that for the cluster configuration, there is a tool that you can start with `acli config generate`.
+
 ## Environment variables
 
 Computer systems generally use variables on a system level e.g. to store global variables.
@@ -43,16 +45,16 @@ The reason to have a configuration package is to have all configuration files in
 This is how an example configuration package looks like:
 
 - `configs/`: A folder with the configuration files
-  - `cluster_config.json`: The configuration for the cluster
-  - `device_config.toml`: The configuration with values related to the device/chip
-  - `node_config.toml`: Some device configuration that is overwritten when a certain node is executed
-  - `run_config.toml`: Run-specific parameters such as the qubits and the target node to calibrate
-  - `spi_config.toml`: Defines the spi and groups of couplers
-  - `user_samplespace.py`: Define custom sweeps for the nodes
+    - `cluster_config.json`: The configuration for the cluster
+    - `device_config.toml`: The configuration with values related to the device/chip
+    - `node_config.toml`: Some device configuration that is overwritten when a certain node is executed
+    - `run_config.toml`: Run-specific parameters such as the qubits and the target node to calibrate
+    - `spi_config.toml`: Defines the spi and groups of couplers
+    - `user_samplespace.py`: Define custom sweeps for the nodes
 - `additional_files/`: A folder with other additional files
-  - `mixer_calibration.csv`: E.g. the mixer calibration values
+    - `mixer_calibration.csv`: E.g. the mixer calibration values
 - `wiring_diagrams/`: A folder with even more additional files
-  - `wiring_diagram.png`: E.g. a wiring diagram
+    - `wiring_diagram.png`: E.g. a wiring diagram
 - `configuration.meta.toml`: The configuration file that describes the structure of the configuration package
 
 The templates for a full configuration package can be found in `tergite_autocalibration/config/templates`.
@@ -162,7 +164,7 @@ Example: Part of a cluster definition
       },
       ...
     }
-    },
+  },
   "connectivity": {
     "graph": {
       "directed": false,
@@ -183,11 +185,14 @@ Example: Part of a cluster definition
         ...
       ]
     }
-    }
+  }
 }
 ```
 
 The file in the template package is `cluster_configuration.json`.
+
+If you want to graphically generate a cluster configuration and being guided through the process, you can use the
+hardware configuration generation tool `acli config generate`.
 
 You can find more information about the hardware configuration in
 the [documentation of quantify-scheduler](https://quantify-os.org/docs/quantify-scheduler/tutorials/Compiling%20to%20Hardware.html)
@@ -201,7 +206,6 @@ to migrate it to the new structure.
 ```bash
 python tergite_autocalibration/scripts/migrate_blox_hardware_configuration.py <PATH_TO_HW_CONFIG>
 ```
-
 
 ### Device Configuration file (.toml):
 
@@ -262,7 +266,7 @@ Example: Setting the reset duration for the resonator spectroscopy node.
 
 ```toml
 [resonator_spectroscopy.all]
-reset.duration =  60e-6
+reset.duration = 60e-6
 ```
 
 The file in the template package is `node_config.toml`.
@@ -293,16 +297,16 @@ The file must contain the definition of your samplespace according to the follow
 
 ```python
 user_samplespace = {
-    node1_name : {
-            "settable_of_node1_1": { 'q01': np.ndarray, 'q02': np.ndarray },
-            "settable_of_node1_2": { 'q01': np.ndarray, 'q02': np.ndarray },
-            ...
-        },
-    node2_name : {
-            "settable_of_node2_1": { 'q01': np.ndarray, 'q02': np.ndarray },
-            "settable_of_node2_2": { 'q01': np.ndarray, 'q02': np.ndarray },
-            ...
-        }
+    node1_name: {
+        "settable_of_node1_1": {'q01': np.ndarray, 'q02': np.ndarray},
+        "settable_of_node1_2": {'q01': np.ndarray, 'q02': np.ndarray},
+        ...
+    },
+    node2_name: {
+        "settable_of_node2_1": {'q01': np.ndarray, 'q02': np.ndarray},
+        "settable_of_node2_2": {'q01': np.ndarray, 'q02': np.ndarray},
+        ...
+    }
 }
 ```
 

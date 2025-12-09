@@ -7,9 +7,29 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 
 ## [Unreleased]
 
+### Added
+
+- Backup functions for redis storage.
+
 ### Changed
 
+- Removed development folder (can still be accessed in the git history)
+
+## [2025.09.0] - 2025-09-16
+
+### Added
+
+- Datasets from IQT Nordics
+
+### Changed
+
+- Data browser uses plotly instead of PyQT and integrates better with CLI
+- Run single calibration node in re-analysis
 - Migrated documentation from Quarto to MkDocs Material.
+
+### Fixed
+
+- Simplify GitLab pipeline
 
 ## [2025.06.0] - 2025-06-16
 
@@ -18,6 +38,7 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 - Better labelling for the analysis output plots
 
 ### Added
+
 - Analysis for the punchout node
 
 ### Changed

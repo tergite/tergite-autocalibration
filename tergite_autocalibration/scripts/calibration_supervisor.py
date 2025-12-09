@@ -6,6 +6,7 @@
 # (C) Copyright Stefan Hill 2024
 # (C) Copyright Martin Ahindura 2023
 # (C) Copyright Michele Faucci Giannelli 2024, 2025
+# (C) Copyright Axel Erik Andersson 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -319,13 +320,9 @@ class NodeManager:
             # Perform calibration
             node.calibrate(data_path, self.config.cluster_mode)
 
-            # TODO:  develop failure strategies ->
-            # if node_calibration_status == DataStatus.out_of_spec:
-            #     node_expand()
-            #     node_calibration_status = self.calibrate_node(node)
-
     def _initialize_node(self, node_name: str) -> BaseNode:
         """Initializes a node and updates it with user-defined samplespace if available."""
+        elements = {"qubits": self.config.qubits, "couplers": self.config.couplers}
         node = self.node_factory.create_node(
             node_name,
             self.config.qubits,
@@ -416,7 +413,14 @@ class CalibrationSupervisor:
         """
         Reruns the analysis of the target node.
         """
+        if self.config.cluster_mode != MeasurementMode.re_analyse:
+            raise ValueError(
+                f"Wrong mode for re-analysis: '{self.config.cluster_mode}', should be: {MeasurementMode.re_analyse}"
+            )
 
-        logger.info("Rerun analysis")
-        self.node_manager.inspect_node(self.config.target_node_name)
-        logger.info(f"{self.config.target_node_name} node is completed")
+        node = self.node_manager._initialize_node(self.config.target_node_name)
+        logger.status(
+            f"Analysing '{self.config.target_node_name}' with {node.analysis_obj.__name__}"
+        )
+        node.post_process(CONFIG.run.log_dir)
+        logger.status("Analysis completed.")

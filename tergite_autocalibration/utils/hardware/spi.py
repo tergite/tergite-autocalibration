@@ -1,6 +1,9 @@
 # This code is part of Tergite
 #
 # (C) Copyright Tong Liu 2024
+# (C) Copyright Liangyu Chen 2024
+# (C) Copyright Eleftherios Moschandreou 2024, 2025
+# (C) Copyright Adilet Tuleuov 2025
 # (C) Copyright Chalmers Next Labs 2025
 # (C) Copyright Michele Faucci Giannelli 2025
 #
@@ -22,13 +25,13 @@ from colorama import init as colorama_init
 from qblox_instruments import SpiRack
 from qcodes import validators
 from rich.progress import Progress
+from tomlkit.api import E
 
-from tergite_autocalibration.config.globals import ENV
-from tergite_autocalibration.config.globals import REDIS_CONNECTION
+from tergite_autocalibration.config.globals import ENV, REDIS_CONNECTION
 from tergite_autocalibration.config.legacy import dh
-from tergite_autocalibration.tools.cli.config.helpers import get_os, OperatingSystem
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.logging import logger
+from tergite_autocalibration.utils.misc.os import OperatingSystem, get_os
 
 colorama_init()
 
@@ -72,12 +75,14 @@ class SpiDAC:
             measurement_mode == MeasurementMode.dummy
             or measurement_mode == MeasurementMode.re_analyse
         )
+        if self.is_dummy:
+            self.port = "dummy_port"
+
         if self.port is not None:
-            self.spi = SpiRack("loki_rack", self.port, is_dummy=self.is_dummy)
-        elif measurement_mode == MeasurementMode.re_analyse:
             self.spi = SpiRack("loki_rack", self.port, is_dummy=self.is_dummy)
         else:
             raise ValueError("No serial port for the SPI")
+
         self.dacs_dictionary = {}
         for coupler in couplers:
             self.dacs_dictionary[coupler] = self.create_spi_dac(coupler)

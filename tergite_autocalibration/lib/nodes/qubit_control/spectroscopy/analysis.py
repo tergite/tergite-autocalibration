@@ -345,14 +345,14 @@ class QubitSpectroscopyNodeAnalysis(BaseAllQubitsAnalysis):
         super().__init__(name, redis_fields)
 
 
-class QubitSpectroscopy12NodeMultidim(BaseAllQubitsAnalysis):
+class QubitSpectroscopy12NodeAnalysis(BaseAllQubitsAnalysis):
     single_qubit_analysis_obj = QubitSpectroscopy12MultidimAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
 
 
-class QubitSpectroscopyNodeMultidim(BaseAllQubitsAnalysis):
+class QubitSpectroscopyNodeAnalysis(BaseAllQubitsAnalysis):
     single_qubit_analysis_obj = QubitSpectroscopyMultidimAnalysis
 
     def __init__(self, name, redis_fields):

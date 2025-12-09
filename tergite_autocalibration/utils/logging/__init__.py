@@ -90,3 +90,5 @@ class ExtendedLogger(logging.Logger):
 # To use the logger, you have to add the handlers e.g. in tergite_autocalibration.config.globals
 logging.setLoggerClass(ExtendedLogger)
 logger = logging.getLogger(__name__)
+# The minimum log level is set here, handlers won't be able to log anything below
+logger.setLevel(logging.DEBUG)

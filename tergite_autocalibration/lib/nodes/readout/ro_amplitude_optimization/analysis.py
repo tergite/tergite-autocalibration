@@ -134,7 +134,8 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
         self.iq1_fp = array_iq1_fp
         self.optimal_index = np.argmax(self.fidelities)
         self.optimal_amplitude = self.amplitudes.values[self.optimal_index]
-        self.optimal_inv_cm = inv(self.cms[self.optimal_index])
+        # self.optimal_inv_cm = inv(self.cms[self.optimal_index])
+        self.optimal_inv_cm = 0
 
         return
 
@@ -436,9 +437,9 @@ class OptimalROThreeStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis)
         """
         super().analyse_qubit()
         self.run_initial_fitting()
-        inv_cm_str = ",".join(
-            str(element) for element in list(self.optimal_inv_cm.flatten())
-        )
+        # inv_cm_str = ",".join(
+        #     str(element) for element in list(self.optimal_inv_cm.flatten())
+        # )
 
         y = self.qubit_states
 
@@ -494,7 +495,7 @@ class OptimalROThreeStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis)
                 "error": 0,
             },
             "inv_cm_opt": {
-                "value": inv_cm_str,
+                "value": 0,
                 "error": 0,
             },
         }

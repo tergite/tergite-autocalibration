@@ -2,6 +2,7 @@
 #
 # (C) Copyright Amr Osman 2024
 # (C) Copyright Michele Faucci Giannelli 2024
+# (C) Copyright Chalmers Next Labs 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -33,7 +34,7 @@ from tergite_autocalibration.lib.nodes.coupler.cz_dynamic_phase.node import (
 from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.measurement import (
     TQGRandomizedBenchmarkingSSROMeasurement,
 )
-from tergite_autocalibration.lib.nodes.schedule_node import ScheduleCouplerNode
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNodeCouplerNode
 from tergite_autocalibration.lib.utils import redis
 from tergite_autocalibration.utils.logging import logger
 

@@ -16,7 +16,6 @@ import toml
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION, CONFIG
 from tergite_autocalibration.lib.base.node import CouplerNode, QubitNode
-from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.tools.mss.convert import structured_redis_storage
@@ -164,7 +163,7 @@ def populate_node_parameters(
 
 def populate_quantities_of_interest(
     node_name: str,
-    node_factory: NodeFactory,
+    node_factory: "NodeFactory",
     qubits: list[str],
     couplers: list[str],
     redis_connection,
