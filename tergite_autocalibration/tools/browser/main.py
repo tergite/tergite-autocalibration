@@ -263,7 +263,7 @@ def update_tab(tab: str, outer: str, inter: str, inner: str):
 
     elif tab == "json":
         for file in os.listdir(folder_path):
-            if file.endswith(".json"):
+            if file.endswith(".json") and 'qoi' not in file:
                 with open(os.path.join(folder_path, file)) as f:
                     data = json.load(f)
                 return DashRenderjson(
@@ -301,12 +301,12 @@ def update_qoi_display(outer: str, inter: str, inner: str):
     folder_path = os.path.join(DATA_DIR, outer, inter, inner)
 
     for file in os.listdir(folder_path):
-        if file.endswith(".json"):
+        if file.endswith(".json") and 'qoi' in file:
             with open(os.path.join(folder_path, file)) as f:
                 data = json.load(f)
             return DashRenderjson(
                 data=data,
-                max_depth=-1,
+                max_depth=1,
                 invert_theme=True,
                 # , theme="monokai"
             )

@@ -94,7 +94,11 @@ def generate_selection_layout(folder_structure: dict, index: str = ""):
     )
 
     qoi_display_DIV = html.Div(
-
+        [
+        html.H3("Quantities of Interest"),
+        html.Div(id={"type": "qoi-content", "index": index},)
+    ],
+        style={"marginTop": "20px"},
     )
 
     element_selector_DIV = html.Div(
@@ -135,6 +139,7 @@ def generate_selection_layout(folder_structure: dict, index: str = ""):
             intermediate_selection_DIV,
             inner_selection_DIV,
             image_display_DIV,
+            qoi_display_DIV,
             element_selector_DIV,
             y_dim_selector_DIV,
             slice_display_DIV,
