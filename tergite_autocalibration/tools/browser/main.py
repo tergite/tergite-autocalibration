@@ -304,12 +304,41 @@ def update_qoi_display(outer: str, inter: str, inner: str):
         if file.endswith(".json") and 'qoi' in file:
             with open(os.path.join(folder_path, file)) as f:
                 data = json.load(f)
-            return DashRenderjson(
-                data=data,
-                max_depth=1,
-                invert_theme=True,
-                # , theme="monokai"
-            )
+
+
+
+            columns = []
+            for element in data:
+                print(f'{ data[element] = }')
+                columns.append(
+                    html.Div(
+                        style={
+                            "flex": "1",
+                            "minWidth": "300px",     # responsive: wrap if too narrow
+                            "overflow": "auto",
+                            "padding": "10px",
+                            "border": "1px solid #ddd",
+                            "borderRadius": "6px"
+                        },
+                        children=[
+                            html.H4(element),
+                            DashRenderjson(
+                                id=f"json-view-{element}",
+                                data=data[element]['analysis_result'],
+                                max_depth=1,   # collapse nested content initially
+                                invert_theme=True,
+                            )
+                        ]
+                    )
+                )
+
+            return columns
+            # return DashRenderjson(
+            #     data=data,
+            #     max_depth=1,
+            #     invert_theme=True,
+            #     # , theme="monokai"
+            # )
     return "No JSON file found."
 
 
