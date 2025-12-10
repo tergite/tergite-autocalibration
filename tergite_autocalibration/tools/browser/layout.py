@@ -93,6 +93,10 @@ def generate_selection_layout(folder_structure: dict, index: str = ""):
         style={"marginTop": "20px"},
     )
 
+    qoi_display_DIV = html.Div(
+
+    )
+
     element_selector_DIV = html.Div(
         [
             html.H2("Select Elements:"),

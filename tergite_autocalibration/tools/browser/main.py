@@ -276,6 +276,42 @@ def update_tab(tab: str, outer: str, inter: str, inner: str):
 
     return "Invalid tab."
 
+@app.callback(
+    Output({"type": "qoi-content", "index": MATCH}, "children"),
+    Input({"type": "outer-selector", "index": MATCH}, "value"),
+    Input({"type": "intermediate-selector", "index": MATCH}, "value"),
+    Input({"type": "inner-selector", "index": MATCH}, "value"),
+)
+def update_qoi_display(outer: str, inter: str, inner: str):
+    """
+    Callback to update the qoi display
+
+    Args:
+        outer: Outer folder with the measurement date
+        inter: Intermediate folder with the calibration run
+        inner: Inner folder with the qubit measurement
+
+    Returns:
+
+    """
+
+    if not (outer and inter and inner):
+        return "Please make all selections."
+
+    folder_path = os.path.join(DATA_DIR, outer, inter, inner)
+
+    for file in os.listdir(folder_path):
+        if file.endswith(".json"):
+            with open(os.path.join(folder_path, file)) as f:
+                data = json.load(f)
+            return DashRenderjson(
+                data=data,
+                max_depth=-1,
+                invert_theme=True,
+                # , theme="monokai"
+            )
+    return "No JSON file found."
+
 
 @app.callback(
     [
