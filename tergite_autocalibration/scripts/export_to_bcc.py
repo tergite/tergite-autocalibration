@@ -12,7 +12,7 @@
 
 
 from enum import Enum
-from typing import Tuple, Dict, Any, List
+from typing import Tuple, Dict, Any, List, Type
 
 import tomlkit
 
@@ -51,44 +51,44 @@ _QUBITS = ["q13", "q14"]
 _COUPLERS = ["q13_q14"]
 
 _qubit_parameters = [
-    ("frequency", "clock_freqs:f01", _DataSource.REDIS),
-    ("pi_pulse_amplitude", "rxy:amp180", _DataSource.REDIS),
-    ("pi_pulse_duration", "rxy:duration", _DataSource.REDIS),
-    ("pulse_type", "Gaussian", _DataSource.LITERAL),
-    ("pulse_sigma", "rxy:sigma", _DataSource.REDIS),
-    ("t1_decoherence", "t1_time", _DataSource.REDIS),
-    ("t2_decoherence", "t2_time", _DataSource.REDIS),
+    ("frequency", "clock_freqs:f01", _DataSource.REDIS, float),
+    ("pi_pulse_amplitude", "rxy:amp180", _DataSource.REDIS, float),
+    ("pi_pulse_duration", "rxy:duration", _DataSource.REDIS, float),
+    ("pulse_type", "Gaussian", _DataSource.LITERAL, str),
+    ("pulse_sigma", "rxy:sigma", _DataSource.REDIS, float),
+    ("t1_decoherence", "t1_time", _DataSource.REDIS, float),
+    ("t2_decoherence", "t2_time", _DataSource.REDIS, float),
 ]
 
-_resonator_parameters = [
-    ("acq_delay", "measure:acq_delay", _DataSource.REDIS),
-    ("acq_integration_time", "measure:integration_time", _DataSource.REDIS),
-    ("frequency", "clock_freqs:readout", _DataSource.REDIS),
-    ("pulse_delay", "measure:ro_pulse_delay", _DataSource.REDIS),
-    ("pulse_duration", "measure:pulse_duration", _DataSource.REDIS),
-    ("pulse_type", "Square", _DataSource.LITERAL),
-    ("pulse_amplitude", "measure_2state_opt:pulse_amp", _DataSource.REDIS),
+_readout_resonator_parameters = [
+    ("acq_delay", "measure:acq_delay", _DataSource.REDIS, float),
+    ("acq_integration_time", "measure:integration_time", _DataSource.REDIS, float),
+    ("frequency", "clock_freqs:readout", _DataSource.REDIS, float),
+    ("pulse_delay", "measure:ro_pulse_delay", _DataSource.REDIS, float),
+    ("pulse_duration", "measure:pulse_duration", _DataSource.REDIS, float),
+    ("pulse_type", "Square", _DataSource.LITERAL, str),
+    ("pulse_amplitude", "measure_2state_opt:pulse_amp", _DataSource.REDIS, float),
 ]
 
 _lda_parameters = [
-    ("coef_0", "lda_coef_0", _DataSource.REDIS),
-    ("coef_1", "lda_coef_1", _DataSource.REDIS),
-    ("intercept", "lda_intercept", _DataSource.REDIS),
+    ("coef_0", "lda_coef_0", _DataSource.REDIS, float),
+    ("coef_1", "lda_coef_1", _DataSource.REDIS, float),
+    ("intercept", "lda_intercept", _DataSource.REDIS, float),
 ]
 
 _coupler_parameters = [
-    ("frequency", "cz_pulse_frequency", _DataSource.REDIS),
-    ("cz_pulse_amplitude", "cz_pulse_amplitude", _DataSource.REDIS),
-    ("cz_pulse_dc_bias", "parking_current", _DataSource.REDIS),
-    ("cz_pulse_duration_constant", "cz_pulse_duration", _DataSource.REDIS),
-    ("control_rz_lambda", "cz_dynamic_control", _DataSource.REDIS),
-    ("target_rz_lambda", "cz_dynamic_target", _DataSource.REDIS),
-    ("pulse_type", "wacqt_cz", _DataSource.LITERAL),
+    ("frequency", "cz_pulse_frequency", _DataSource.REDIS, float),
+    ("cz_pulse_amplitude", "cz_pulse_amplitude", _DataSource.REDIS, float),
+    ("cz_pulse_dc_bias", "parking_current", _DataSource.REDIS, float),
+    ("cz_pulse_duration_constant", "cz_pulse_duration", _DataSource.REDIS, float),
+    ("control_rz_lambda", "cz_dynamic_control", _DataSource.REDIS, float),
+    ("target_rz_lambda", "cz_dynamic_target", _DataSource.REDIS, float),
+    ("pulse_type", "wacqt_cz", _DataSource.LITERAL, str),
 ]
 
 
 def _assemble_parameters(
-    parameter_map: List[Tuple[str, str, "_DataSource"]],
+    parameter_map: List[Tuple[str, str, "_DataSource", Type]],
     object_id: str,
     set_id: bool = True,
     redis_prefix: str = "transmons",
@@ -105,11 +105,13 @@ def _assemble_parameters(
             redis_value_ = REDIS_CONNECTION.hget(
                 f"{redis_prefix}:{object_id}", parameter_[1]
             )
-            parameterized_return_object[parameter_[0]] = (
+            # parameter[3] is the type
+            parameterized_return_object[parameter_[0]] = parameter_[3](
                 redis_value_ if redis_value_ is not None else 0
             )
         if parameter_[2] == _DataSource.LITERAL:
-            parameterized_return_object[parameter_[0]] = parameter_[1]
+            # parameter[3] is the type
+            parameterized_return_object[parameter_[0]] = parameter_[3](parameter_[1])
     return parameterized_return_object
 
 
@@ -118,7 +120,7 @@ if __name__ == "__main__":
     return_object = {
         "calibration_config": {
             "qubit": [],
-            "resonator": [],
+            "readout_resonator": [],
             "coupler": [],
             "discriminators": {"lda": {}},
         }
@@ -130,9 +132,9 @@ if __name__ == "__main__":
             _assemble_parameters(_qubit_parameters, qubit)
         )
 
-        # Iterate over resonator parameters
-        return_object["calibration_config"]["resonator"].append(
-            _assemble_parameters(_resonator_parameters, qubit)
+        # Iterate over readout resonator parameters
+        return_object["calibration_config"]["readout_resonator"].append(
+            _assemble_parameters(_readout_resonator_parameters, qubit)
         )
 
         # Iterate over discriminator parameters
