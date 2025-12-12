@@ -15,13 +15,13 @@ import unittest
 from pathlib import Path
 
 import numpy as np
-import xarray as xr
 from lmfit.model import ModelResult
 from matplotlib.figure import Figure
 
 from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.analysis import (
     PurityBenchmarkingQubitAnalysis,
 )
+from tergite_autocalibration.utils.io.dataset import open_dataset
 
 
 class TestPurityBenchmarkingAnalysis(unittest.TestCase):
@@ -29,10 +29,8 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
     def setUpClass(self):
         # Setup the dataset for testing from a file
         test_dir = Path(__file__).parent
-        file_path = (
-            test_dir / "data" / "dataset_purity_benchmarking_0.hdf5"
-        )  # "testdata.hdf5"
-        self.dataset = xr.open_dataset(file_path)
+        file_path = test_dir / "data"  # "testdata.hdf5"
+        self.dataset = open_dataset("purity_benchmarking_0", file_path)
 
     def test_initialization(self):
         self.analysis = PurityBenchmarkingQubitAnalysis("name", ["purity_fidelity"])

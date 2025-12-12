@@ -14,22 +14,20 @@ import os
 from pathlib import Path
 
 import matplotlib
-from matplotlib import pyplot as plt
 import pytest
 import xarray as xr
+from matplotlib import pyplot as plt
 from numpy import ndarray
 
-from tergite_autocalibration.lib.base.analysis import (
-    BaseAnalysis,
-    BaseCouplerAnalysis,
-)
+from tergite_autocalibration.lib.base.analysis import BaseAnalysis, BaseCouplerAnalysis
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
     QubitSpectroscopyVsCurrentCouplerAnalysis,
     ResonatorSpectroscopyVsCurrentCouplerAnalysis,
 )
-from tergite_autocalibration.utils.dto.qoi import QOI
-from tergite_autocalibration.tests.utils.decorators import with_os_env
 from tergite_autocalibration.lib.utils.redis import update_redis_trusted_values
+from tergite_autocalibration.tests.utils.decorators import with_os_env
+from tergite_autocalibration.utils.dto.qoi import QOI
+from tergite_autocalibration.utils.io.dataset import open_dataset
 
 
 def test_CanCreate():
@@ -48,17 +46,13 @@ def setup_q06_q07_data():
 
 def get_dataset_for_coupler(coupler):
     qubits = coupler.split("_")
-    dataset_path = (
-        Path(__file__).parent / "data" / "dataset_coupler_spectroscopy_0.hdf5"
-    )
-    ds_qu = xr.open_dataset(dataset_path)
+    dataset_path = Path(__file__).parent / "data"
+    ds_qu = open_dataset("coupler_spectroscopy_0", dataset_path)
     ds_qu = xr.merge(ds_qu[var] for var in [f"y{qubits[0]}", f"y{qubits[1]}"])
     ds_qu.attrs["coupler"] = coupler
 
-    dataset_path = (
-        Path(__file__).parent / "data" / "dataset_coupler_resonator_spectroscopy_0.hdf5"
-    )
-    ds_res = xr.open_dataset(dataset_path)
+    dataset_path = Path(__file__).parent / "data"
+    ds_res = open_dataset("coupler_resonator_spectroscopy_0", dataset_path)
     ds_res = xr.merge(ds_res[var] for var in [f"y{qubits[0]}", f"y{qubits[1]}"])
     ds_res.attrs["coupler"] = coupler
     return ds_qu, ds_res
@@ -232,12 +226,8 @@ def test_coupler_plot_is_created(setup_q06_q07_data):
 
 @pytest.fixture(autouse=False)
 def setup_q16_q17_data():
-    dataset_path = (
-        Path(__file__).parent
-        / "data"
-        / "dataset_qubit_spectroscopy_vs_current_no_crossings.hdf5"
-    )
-    ds = xr.open_dataset(dataset_path)
+    dataset_path = Path(__file__).parent / "data"
+    ds = open_dataset("qubit_spectroscopy_vs_current_no_crossings", dataset_path)
     coupler = "q16_q17"
     ds = xr.merge(ds[var] for var in ["yq16", "yq17"])
     ds.attrs["coupler"] = coupler

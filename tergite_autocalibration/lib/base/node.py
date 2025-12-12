@@ -107,7 +107,6 @@ class BaseNode(NodeInterface):
         # After the measurement free the device resources
         self.device_manager.close_device()
         QOI_dict = self.post_process(result_dataset)
-        print(f"{ QOI_dict = }")
         if measurement_mode != MeasurementMode.re_analyse:
             save_dataset(result_dataset, self.name, self.data_path)
             save_qoi(QOI_dict, self.name, self.data_path)
