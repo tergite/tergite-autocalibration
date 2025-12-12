@@ -12,8 +12,10 @@
 # that they have been altered from the originals.
 
 from typing import List
-from matplotlib import patches, pyplot as plt
+
 import numpy as np
+from matplotlib import patches
+from matplotlib import pyplot as plt
 
 from tergite_autocalibration.lib.base.analysis import (
     BaseAllQubitsAnalysis,
