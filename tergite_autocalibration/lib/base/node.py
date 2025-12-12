@@ -42,7 +42,12 @@ from tergite_autocalibration.lib.utils.redis import update_redis_trusted_values
 from tergite_autocalibration.lib.utils.schedule_execution import execute_schedule
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
-from tergite_autocalibration.utils.io.dataset import open_dataset, save_dataset, save_figures, save_qoi
+from tergite_autocalibration.utils.io.dataset import (
+    open_dataset,
+    save_dataset,
+    save_figures,
+    save_qoi,
+)
 from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.utils.measurement_utils import samplespace_dimensions
 
@@ -94,12 +99,15 @@ class BaseNode(NodeInterface):
     def calibrate(self, measurement_mode):
         if measurement_mode != MeasurementMode.re_analyse:
             result_dataset = self.measure_node(measurement_mode)
-            self.device_manager.save_serial_device(self.name, self.device, self.data_path)
+            self.device_manager.save_serial_device(
+                self.name, self.device, self.data_path
+            )
         else:
             result_dataset = open_dataset(self.name, self.data_path)
         # After the measurement free the device resources
         self.device_manager.close_device()
         QOI_dict = self.post_process(result_dataset)
+        print(f"{ QOI_dict = }")
         if measurement_mode != MeasurementMode.re_analyse:
             save_dataset(result_dataset, self.name, self.data_path)
             save_qoi(QOI_dict, self.name, self.data_path)

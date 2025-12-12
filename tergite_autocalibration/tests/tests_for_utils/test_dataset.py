@@ -12,13 +12,14 @@
 
 import os.path
 import shutil
-import pytest
-
-from tergite_autocalibration.tests.utils.fixtures import get_fixture_path
-from tergite_autocalibration.utils.io.dataset import scrape_and_copy_hdf5_files
-import tergite_autocalibration.utils.reanalysis_utils as ra_utils
 from datetime import datetime
 from pathlib import Path
+
+import pytest
+
+import tergite_autocalibration.utils.reanalysis_utils as ra_utils
+from tergite_autocalibration.tests.utils.fixtures import get_fixture_path
+from tergite_autocalibration.utils.io.dataset import scrape_and_copy_hdf5_files
 
 
 def test_scrape_and_copy_hdf5_files():
@@ -133,3 +134,9 @@ def test_select_measurement_for_analysis_can_find_measurement():
         info.dataset_path
         == info.measurement_folder_path / "dataset_ramsey_correction_0.hdf5"
     )
+
+
+def test_save_qoi():
+    # QOI_dict = {'q13': QOI(analysis_result={'clock_freqs:readout': {'value': 7180795854.919163, 'error': 0}, 'Ql': {'value': 15000.00004975037, 'error': 0}, 'resonator_minimum': {'value': 7180788888.888889, 'error': 0}}, analysis_successful=True), 'q14': QOI(analysis_result={'clock_freqs:readout': {'value': 6631088516.980714, 'error': 0}, 'Ql': {'value': 15000.000127165331, 'error': 0}, 'resonator_minimum': {'value': 6631088888.888889, 'error': 0}}, analysis_successful=True), 'q15': QOI(analysis_result={'clock_freqs:readout': {'value': 7130595184.808485, 'error': 0}, 'Ql': {'value': 15000.000000021606, 'error': 0}, 'resonator_minimum': {'value': 7130588888.888889, 'error': 0}}, analysis_successful=True)}
+
+    pass

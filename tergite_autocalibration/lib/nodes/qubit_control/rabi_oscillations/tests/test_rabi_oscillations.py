@@ -22,13 +22,14 @@ from tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.analysis 
     RabiQubitAnalysis,
 )
 from tergite_autocalibration.utils.dto.qoi import QOI
+from tergite_autocalibration.utils.io.dataset import open_dataset
 
 
 class TestRabiQubitAnalysis(unittest.TestCase):
     def test_setup_01(self):
         test_dir = Path(__file__).parent
-        file_path = test_dir / "data_rabi_01" / "dataset_rabi_oscillations_0.hdf5"
-        dataset = xr.open_dataset(file_path)
+        file_path = test_dir / "data_rabi_01"
+        dataset = open_dataset("rabi_oscillations_0", file_path)
         analysis = RabiQubitAnalysis("name", ["rxy:amp180"])
 
         qoi = analysis.process_qubit(dataset, "yq06")
@@ -42,8 +43,8 @@ class TestRabiQubitAnalysis(unittest.TestCase):
 
     def test_setup_12(self):
         test_dir = Path(__file__).parent
-        file_path = test_dir / "data_rabi_12" / "dataset_rabi_oscillations_12_0.hdf5"
-        dataset = xr.open_dataset(file_path)
+        file_path = test_dir / "data_rabi_12"
+        dataset = open_dataset("rabi_oscillations_12_0", file_path)
         analysis = Rabi12QubitAnalysis("name", ["r12:ef_amp180"])
 
         qoi = analysis.process_qubit(dataset, "yq06")
@@ -57,8 +58,8 @@ class TestRabiQubitAnalysis(unittest.TestCase):
 
     def test_run_fitting_01(self):
         test_dir = Path(__file__).parent
-        file_path = test_dir / "data_rabi_01" / "dataset_rabi_oscillations_0.hdf5"
-        dataset = xr.open_dataset(file_path)
+        file_path = test_dir / "data_rabi_01"
+        dataset = open_dataset("rabi_oscillations_0", file_path)
         analysis = RabiQubitAnalysis("name", ["rxy:amp180"])
         qoi = analysis.process_qubit(dataset, "yq06")
         amplitude = qoi.analysis_result["rxy:amp180"]["value"]
@@ -67,8 +68,8 @@ class TestRabiQubitAnalysis(unittest.TestCase):
 
     def test_run_fitting_12(self):
         test_dir = Path(__file__).parent
-        file_path = test_dir / "data_rabi_12" / "dataset_rabi_oscillations_12_0.hdf5"
-        dataset = xr.open_dataset(file_path)
+        file_path = test_dir / "data_rabi_12"
+        dataset = open_dataset("rabi_oscillations_12_0", file_path)
         analysis = Rabi12QubitAnalysis("name", ["r12:ef_amp180"])
         qoi = analysis.process_qubit(dataset, "yq06")
         amplitude = qoi.analysis_result["r12:ef_amp180"]["value"]
@@ -78,8 +79,8 @@ class TestRabiQubitAnalysis(unittest.TestCase):
     def test_plotting_01(self):
         os.environ["DATA_DIR"] = str(Path(__file__).parent / "results")
         test_dir = Path(__file__).parent
-        file_path = test_dir / "data_rabi_01" / "dataset_rabi_oscillations_0.hdf5"
-        dataset = xr.open_dataset(file_path)
+        file_path = test_dir / "data_rabi_01"
+        dataset = open_dataset("rabi_oscillations_0", file_path)
         analysis = RabiQubitAnalysis("name", ["rxy:amp180"])
         analysis.process_qubit(dataset, "yq06")
         figure_path = os.environ["DATA_DIR"] + "/Rabi_oscillations_01_q06.png"
@@ -96,8 +97,8 @@ class TestRabiQubitAnalysis(unittest.TestCase):
     def test_plotting_12(self):
         os.environ["DATA_DIR"] = str(Path(__file__).parent / "results")
         test_dir = Path(__file__).parent
-        file_path = test_dir / "data_rabi_12" / "dataset_rabi_oscillations_12_0.hdf5"
-        file = xr.open_dataset(file_path)
+        file_path = test_dir / "data_rabi_12"
+        file = open_dataset("rabi_oscillations_12_0", file_path)
         analysis = Rabi12QubitAnalysis("name", ["r12:ef_amp180"])
         analysis.process_qubit(file, "yq06")
         figure_path = os.environ["DATA_DIR"] + "/Rabi_oscillations_12_q06.png"

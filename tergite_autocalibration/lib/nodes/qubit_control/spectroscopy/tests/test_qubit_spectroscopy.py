@@ -23,13 +23,14 @@ from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis impor
     QubitSpectroscopyMultidimAnalysis,
 )
 from tergite_autocalibration.utils.dto.qoi import QOI
+from tergite_autocalibration.utils.io.dataset import open_dataset
 
 
 class TestQubitFrequencyAnalysis(unittest.TestCase):
     def test_setup_01(self):
         test_dir = Path(__file__).parent
-        file_path = test_dir / "data_01" / "dataset_qubit_01_spectroscopy_0.hdf5"
-        dataset = xr.open_dataset(file_path)
+        file_path = test_dir / "data_01"
+        dataset = open_dataset("qubit_01_spectroscopy_0", file_path)
         analysis = QubitSpectroscopyMultidimAnalysis(
             "name", ["clock_freqs:f01", "spec:spec_ampl_optimal"]
         )
@@ -45,12 +46,12 @@ class TestQubitFrequencyAnalysis(unittest.TestCase):
 
     def test_setup_12(self):
         test_dir = Path(__file__).parent
-        file_path = test_dir / "data_12" / "dataset_qubit_12_spectroscopy_0.hdf5"
-        file = xr.open_dataset(file_path)
+        file_path = test_dir / "data_12"
+        dataset = open_dataset("qubit_12_spectroscopy_0", file_path)
         analysis = QubitSpectroscopy12MultidimAnalysis(
             "name", ["clock_freqs:f12", "spec:spec_ampl_12_optimal"]
         )
-        qoi = analysis.process_qubit(file, "yq06")
+        qoi = analysis.process_qubit(dataset, "yq06")
         result_values = qoi.analysis_result
         self.assertIsInstance(qoi, QOI)
         for quantity in result_values:
@@ -61,12 +62,12 @@ class TestQubitFrequencyAnalysis(unittest.TestCase):
 
     def test_run_fitting_01(self):
         test_dir = Path(__file__).parent
-        file_path = test_dir / "data_01" / "dataset_qubit_01_spectroscopy_0.hdf5"
-        file = xr.open_dataset(file_path)
+        file_path = test_dir / "data_01"
+        dataset = open_dataset("qubit_01_spectroscopy_0", file_path)
         analysis = QubitSpectroscopyMultidimAnalysis(
             "name", ["clock_freqs:f01", "spec:spec_ampl_optimal"]
         )
-        qoi = analysis.process_qubit(file, "yq06")
+        qoi = analysis.process_qubit(dataset, "yq06")
         frequency = qoi.analysis_result["clock_freqs:f01"]["value"]
         amplitude = qoi.analysis_result["spec:spec_ampl_optimal"]["value"]
 
@@ -77,12 +78,12 @@ class TestQubitFrequencyAnalysis(unittest.TestCase):
 
     def test_run_fitting_12(self):
         test_dir = Path(__file__).parent
-        file_path = test_dir / "data_12" / "dataset_qubit_12_spectroscopy_0.hdf5"
-        file = xr.open_dataset(file_path)
+        file_path = test_dir / "data_12"
+        dataset = open_dataset("qubit_12_spectroscopy_0", file_path)
         analysis = QubitSpectroscopy12MultidimAnalysis(
             "name", ["clock_freqs:f12", "spec:spec_ampl_12_optimal"]
         )
-        qoi = analysis.process_qubit(file, "yq06")
+        qoi = analysis.process_qubit(dataset, "yq06")
         frequency = qoi.analysis_result["clock_freqs:f12"]["value"]
         amplitude = qoi.analysis_result["spec:spec_ampl_12_optimal"]["value"]
 
@@ -94,8 +95,8 @@ class TestQubitFrequencyAnalysis(unittest.TestCase):
     def test_plotting_01(self):
         os.environ["DATA_DIR"] = str(Path(__file__).parent / "results")
         test_dir = Path(__file__).parent
-        file_path = test_dir / "data_01" / "dataset_qubit_01_spectroscopy_0.hdf5"
-        dataset = xr.open_dataset(file_path)
+        file_path = test_dir / "data_01"
+        dataset = open_dataset("qubit_01_spectroscopy_0", file_path)
         analysis = QubitSpectroscopyMultidimAnalysis(
             "name", ["clock_freqs:f01", "spec:spec_ampl_optimal"]
         )
@@ -114,8 +115,8 @@ class TestQubitFrequencyAnalysis(unittest.TestCase):
     def test_plotting_12(self):
         os.environ["DATA_DIR"] = str(Path(__file__).parent / "results")
         test_dir = Path(__file__).parent
-        file_path = test_dir / "data_12" / "dataset_qubit_12_spectroscopy_0.hdf5"
-        dataset = xr.open_dataset(file_path)
+        file_path = test_dir / "data_12"
+        dataset = open_dataset("qubit_12_spectroscopy_0", file_path)
         analysis = QubitSpectroscopy12MultidimAnalysis(
             "name", ["clock_freqs:f12", "spec:spec_ampl_12_optimal"]
         )

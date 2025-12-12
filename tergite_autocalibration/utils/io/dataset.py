@@ -86,7 +86,7 @@ def open_dataset(name: str, data_path: Path) -> xarray.Dataset:
     Open the dataset for the analysis.
 
     Returns:
-        xarray.Dataset with measurement results
+        the complex xarray.Dataset with measurement results
 
     """
     dataset_name = f"dataset_{name}.hdf5"
@@ -95,7 +95,9 @@ def open_dataset(name: str, data_path: Path) -> xarray.Dataset:
         raise FileNotFoundError(f"Dataset file not found: {dataset_path}")
 
     logger.info("Open dataset " + str(dataset_path))
-    return xarray.open_dataset(dataset_path)
+    real_ds = xarray.open_dataset(dataset_path)
+    complex_ds = real_ds.isel(ReIm=0) + 1j * real_ds.isel(ReIm=1)
+    return complex_ds
 
 
 def save_dataset(
@@ -150,5 +152,3 @@ def save_figures(figures_list: list, node_name: str, data_path: Path):
         fig.savefig(preview_path, bbox_inches="tight", dpi=100)
         fig.savefig(full_path, bbox_inches="tight", dpi=400)
         logger.info(f"Plots saved to {preview_path} and {full_path}")
-    plt.show(block=True)
-    plt.close()

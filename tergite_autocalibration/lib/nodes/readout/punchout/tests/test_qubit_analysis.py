@@ -19,6 +19,7 @@ from tergite_autocalibration.lib.base.analysis import BaseAnalysis, BaseQubitAna
 from tergite_autocalibration.lib.nodes.readout.punchout.analysis import (
     PunchoutQubitAnalysis,
 )
+from tergite_autocalibration.utils.io.dataset import open_dataset
 
 
 def test_CanCreate():
@@ -30,8 +31,8 @@ def test_CanCreate():
 
 @pytest.fixture(autouse=False)
 def setup_data():
-    dataset_path = Path(__file__).parent / "data" / "dataset_punchout_0.hdf5"
-    ds = xr.open_dataset(dataset_path)
+    dataset_path = Path(__file__).parent / "data"
+    ds = open_dataset("punchout_0", dataset_path)
     return ds
 
 

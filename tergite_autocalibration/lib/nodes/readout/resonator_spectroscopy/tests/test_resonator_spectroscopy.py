@@ -22,13 +22,14 @@ from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.analysis i
     ResonatorSpectroscopyQubitAnalysis,
 )
 from tergite_autocalibration.utils.dto.qoi import QOI
+from tergite_autocalibration.utils.io.dataset import open_dataset
 
 
 class TestResonatorFrequencyAnalysis(unittest.TestCase):
     def test_setup(self):
         test_dir = Path(__file__).parent
-        file_path = test_dir / "data_0" / "dataset_resonator_spectroscopy_0.hdf5"
-        dataset = xr.open_dataset(file_path)
+        file_path = test_dir / "data_0"
+        dataset = open_dataset("resonator_spectroscopy_0", file_path)
         analysis = ResonatorSpectroscopyQubitAnalysis(
             "name", ["clock_freqs:readout", "Ql", "resonator_minimum"]
         )
@@ -44,8 +45,8 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
 
     def test_run_fitting(self):
         test_dir = Path(__file__).parent
-        file_path = test_dir / "data_0" / "dataset_resonator_spectroscopy_0.hdf5"
-        dataset = xr.open_dataset(file_path)
+        file_path = test_dir / "data_0"
+        dataset = open_dataset("resonator_spectroscopy_0", file_path)
         analysis = ResonatorSpectroscopyQubitAnalysis(
             "name", ["clock_freqs:readout", "Ql", "resonator_minimum"]
         )
@@ -65,8 +66,8 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
     def test_plotting(self):
         os.environ["DATA_DIR"] = str(Path(__file__).parent / "results")
         test_dir = Path(__file__).parent
-        file_path = test_dir / "data_0" / "dataset_resonator_spectroscopy_0.hdf5"
-        dataset = xr.open_dataset(file_path)
+        file_path = test_dir / "data_0"
+        dataset = open_dataset("resonator_spectroscopy_0", file_path)
         analysis = ResonatorSpectroscopyQubitAnalysis(
             "name", ["clock_freqs:readout", "Ql", "resonator_minimum"]
         )
