@@ -64,7 +64,7 @@ def test_print_and_logging_statements():
                 logger.info(f"Check file: {file_path}")
                 for line in lines:
                     # Check for print statements
-                    assert "print(" not in line
+                    assert "print(" not in line, f"in file {file_path}"
 
                     # Check for all kind of logging statements
                     assert "logging.debug" not in line

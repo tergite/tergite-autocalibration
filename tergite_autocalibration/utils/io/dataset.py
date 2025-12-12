@@ -97,6 +97,7 @@ def open_dataset(name: str, data_path: Path) -> xarray.Dataset:
     logger.info("Open dataset " + str(dataset_path))
     return xarray.open_dataset(dataset_path)
 
+
 def save_dataset(
     result_dataset: xarray.Dataset, node_name: str, data_path: Path
 ) -> None:
@@ -121,9 +122,8 @@ def save_dataset(
     dataset_name = f"dataset_{node_name}.hdf5"
     result_dataset_real.to_netcdf(data_path / dataset_name)
 
-def save_qoi(
-    QOI_dict: dict[str,QOI], node_name: str, data_path: Path
-) -> None:
+
+def save_qoi(QOI_dict: dict[str, QOI], node_name: str, data_path: Path) -> None:
     """
     Save the node QOI for each element to a file.
 
@@ -134,12 +134,12 @@ def save_qoi(
     """
     data_path.mkdir(parents=True, exist_ok=True)
     measurement_id = data_path.stem[0:19]
-    serialized_QOI_dict = {element: qoi.serialize() for element, qoi in QOI_dict.items()}
+    serialized_QOI_dict = {
+        element: qoi.serialize() for element, qoi in QOI_dict.items()
+    }
     file_path = data_path / f"{node_name}_qoi.json"
-    print(f'{ file_path = }')
-    with open(file_path, 'w') as file:
+    with open(file_path, "w") as file:
         json.dump(serialized_QOI_dict, file, indent=2)
-
 
 
 def save_figures(figures_list: list, node_name: str, data_path: Path):

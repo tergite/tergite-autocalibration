@@ -13,21 +13,18 @@
 
 import base64
 import json
-import re
 import os
+import re
 
 import dash
 import plotly.express as px
 import xarray as xr
 from dash import callback_context, dcc, html
-from dash.dependencies import Input, Output, State
-from dash.dependencies import MATCH
+from dash.dependencies import MATCH, Input, Output, State
 from dash_renderjson import DashRenderjson
 
 from tergite_autocalibration.config.globals import DATA_DIR
-from tergite_autocalibration.tools.browser.layout import (
-    generate_selection_layout,
-)
+from tergite_autocalibration.tools.browser.layout import generate_selection_layout
 from tergite_autocalibration.tools.browser.utils import scan_folders
 
 folder_structure = scan_folders(DATA_DIR)
@@ -263,7 +260,7 @@ def update_tab(tab: str, outer: str, inter: str, inner: str):
 
     elif tab == "json":
         for file in os.listdir(folder_path):
-            if file.endswith(".json") and 'qoi' not in file:
+            if file.endswith(".json") and "qoi" not in file:
                 with open(os.path.join(folder_path, file)) as f:
                     data = json.load(f)
                 return DashRenderjson(
@@ -275,6 +272,7 @@ def update_tab(tab: str, outer: str, inter: str, inner: str):
         return "No JSON file found."
 
     return "Invalid tab."
+
 
 @app.callback(
     Output({"type": "qoi-content", "index": MATCH}, "children"),
@@ -301,34 +299,31 @@ def update_qoi_display(outer: str, inter: str, inner: str):
     folder_path = os.path.join(DATA_DIR, outer, inter, inner)
 
     for file in os.listdir(folder_path):
-        if file.endswith(".json") and 'qoi' in file:
+        if file.endswith(".json") and "qoi" in file:
             with open(os.path.join(folder_path, file)) as f:
                 data = json.load(f)
 
-
-
             columns = []
             for element in data:
-                print(f'{ data[element] = }')
                 columns.append(
                     html.Div(
                         style={
                             "flex": "1",
-                            "minWidth": "300px",     # responsive: wrap if too narrow
+                            "minWidth": "300px",  # responsive: wrap if too narrow
                             "overflow": "auto",
                             "padding": "10px",
                             "border": "1px solid #ddd",
-                            "borderRadius": "6px"
+                            "borderRadius": "6px",
                         },
                         children=[
                             html.H4(element),
                             DashRenderjson(
                                 id=f"json-view-{element}",
-                                data=data[element]['analysis_result'],
-                                max_depth=1,   # collapse nested content initially
+                                data=data[element]["analysis_result"],
+                                max_depth=1,  # collapse nested content initially
                                 invert_theme=True,
-                            )
-                        ]
+                            ),
+                        ],
                     )
                 )
 
