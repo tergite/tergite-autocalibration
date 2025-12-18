@@ -13,21 +13,18 @@
 
 import base64
 import json
-import re
 import os
+import re
 
 import dash
 import plotly.express as px
 import xarray as xr
 from dash import callback_context, dcc, html
-from dash.dependencies import Input, Output, State
-from dash.dependencies import MATCH
+from dash.dependencies import MATCH, Input, Output, State
 from dash_renderjson import DashRenderjson
 
 from tergite_autocalibration.config.globals import DATA_DIR
-from tergite_autocalibration.tools.browser.layout import (
-    generate_selection_layout,
-)
+from tergite_autocalibration.tools.browser.layout import generate_selection_layout
 from tergite_autocalibration.tools.browser.utils import scan_folders
 
 folder_structure = scan_folders(DATA_DIR)
@@ -364,6 +361,7 @@ def filter_dataset_by_element(selected_elements: list, dataset_json: str):
                     for dim in da.dims:
                         y_dim_options.add(dim)
         # return [[{"label": d, "value": d} for d in y_dim_options]]
+        print(f"{ displays = }")
         return [displays, [{"label": d, "value": d} for d in y_dim_options]]
     except Exception as e:
         # return [[]]
