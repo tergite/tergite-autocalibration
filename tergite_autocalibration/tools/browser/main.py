@@ -350,21 +350,23 @@ def filter_dataset_by_element(selected_elements: list, dataset_json: str):
             for var in filtered_ds.data_vars:
                 da = filtered_ds[var]
                 if da.ndim == 1:
-                    fig = px.line(x=da.coords[da.dims[0]], y=abs(da), title=var, markers=True)
-                    fig.update_layout( plot_bgcolor='white')
+                    fig = px.line(
+                        x=da.coords[da.dims[0]], y=abs(da), title=var, markers=True
+                    )
+                    fig.update_layout(plot_bgcolor="white")
                     fig.update_xaxes(
                         mirror=True,
-                        ticks='outside',
+                        ticks="outside",
                         showline=True,
-                        linecolor='black',
-                        gridcolor='lightgrey'
+                        linecolor="black",
+                        gridcolor="lightgrey",
                     )
                     fig.update_yaxes(
                         mirror=True,
-                        ticks='outside',
+                        ticks="outside",
                         showline=True,
-                        linecolor='black',
-                        gridcolor='lightgrey'
+                        linecolor="black",
+                        gridcolor="lightgrey",
                     )
                     displays.append(
                         dcc.Graph(
@@ -373,11 +375,13 @@ def filter_dataset_by_element(selected_elements: list, dataset_json: str):
                         )
                     )
                 elif da.ndim == 2:
-                    if any(['freq' in str(coord) for coord in da.coords]):
+                    if any(["freq" in str(coord) for coord in da.coords]):
                         data = abs(da)
                     else:
                         data = abs(da.T)
-                    fig = px.imshow(data, color_continuous_scale='RdBu_r', origin='lower')
+                    fig = px.imshow(
+                        data, color_continuous_scale="RdBu_r", origin="lower"
+                    )
                     displays.append(
                         dcc.Graph(
                             figure=fig,
@@ -441,7 +445,6 @@ def plot_y_slice(y_dim_value: str, selected_elements: str, dataset_json: str):
                 filtered_ds = filtered_ds.isel(ReIm=0) + 1j * filtered_ds.isel(ReIm=1)
                 filtered_ds.attrs = attrs
 
-
             for var in filtered_ds.data_vars:
                 da = filtered_ds[var]
                 if da.ndim == 2 and y_dim_value in da.dims:
@@ -451,22 +454,22 @@ def plot_y_slice(y_dim_value: str, selected_elements: str, dataset_json: str):
                             x=line.coords[line.dims[0]],
                             y=abs(line),
                             title=f"{var} @ {y_dim_value}={val}",
-                            markers=True
+                            markers=True,
                         )
-                        fig.update_layout( plot_bgcolor='white')
+                        fig.update_layout(plot_bgcolor="white")
                         fig.update_xaxes(
                             mirror=True,
-                            ticks='outside',
+                            ticks="outside",
                             showline=True,
-                            linecolor='black',
-                            gridcolor='lightgrey'
+                            linecolor="black",
+                            gridcolor="lightgrey",
                         )
                         fig.update_yaxes(
                             mirror=True,
-                            ticks='outside',
+                            ticks="outside",
                             showline=True,
-                            linecolor='black',
-                            gridcolor='lightgrey'
+                            linecolor="black",
+                            gridcolor="lightgrey",
                         )
                         displays.append(
                             dcc.Graph(
