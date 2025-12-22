@@ -12,10 +12,12 @@
 
 
 import json
+
 import toml
 from qblox_instruments import Cluster
 from qblox_instruments.qcodes_drivers.module import Module
-from tergite_autocalibration.config.globals import ENV, logger, CONFIG, REDIS_CONNECTION
+
+from tergite_autocalibration.config.globals import CONFIG, ENV, REDIS_CONNECTION, logger
 
 
 class IQMixerChannel:
@@ -164,9 +166,13 @@ class IQMixerCalibration:
                     "VNA_f01_frequency"
                 ]
             elif self.rf_port == "fl":
-                cz_pulse_frequency = float(REDIS_CONNECTION.hget(f'couplers:{device}', 'cz_pulse_frequency'))
+                cz_pulse_frequency = float(
+                    REDIS_CONNECTION.hget(f"couplers:{device}", "cz_pulse_frequency")
+                )
                 if cz_pulse_frequency is None:
-                    raise AttributeError(f"The cz_pulse_frequency of coupler {device} isn't determined yet.")
+                    raise AttributeError(
+                        f"The cz_pulse_frequency of coupler {device} isn't determined yet."
+                    )
                 else:
                     rf_freq = 4.4e9 - cz_pulse_frequency
 
@@ -211,8 +217,7 @@ class IQMixerCalibration:
                 json.dump(self.cluster_config, f, indent=4)
 
         if save_to_disk:
-            with open(
-                f"tergite_autocalibration/tools/mixer_calibration/mc_parameters_{self.rf_port}.json",
-                "w",
-            ) as f:
+            path = f"tergite_autocalibration/tools/mixer_calibration/mc_parameters_{self.rf_port}.json"
+            logger.status(f"Saving calibration for the {self.rf_port} port at {path}")
+            with open(path, "w") as f:
                 json.dump(mc, f, indent=4)

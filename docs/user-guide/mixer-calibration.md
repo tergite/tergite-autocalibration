@@ -41,6 +41,12 @@ if __name__ == "__main__":
     mc.lo_calibration()
     mc.sideband_calibration()
     mc.export_calibration_parameters(overwrite=False, save_to_disk=True)
+
+    # calibration qcm-rf modules for flux ports
+    mc = IQMixerCalibration(["q01_q02"], "fl")
+    mc.lo_calibration()
+    mc.sideband_calibration()
+    mc.export_calibration_parameters(overwrite=False, save_to_disk=True)
 ```
 
 This will run a mixer calibration for the qubits `q01` and `q02` on all drive and readout lines.
