@@ -35,7 +35,7 @@ class DeviceConfiguration:
         self.device: QuantumDevice
 
     def configure_device(self, name: str) -> QuantumDevice:
-        device = QuantumDevice(f"Device_{name}")
+        device = QuantumDevice(name)
         for channel, qubit in enumerate(self.qubits):
             transmon = ExtendedTransmon(qubit)
             transmon = load_redis_config(transmon, channel)
@@ -64,13 +64,20 @@ class DeviceConfiguration:
 
         self.device.close()
 
-    def save_serial_device(self, name: str, device: QuantumDevice, data_path) -> None:
-        # create a transmon with the same name but with updated config
-        # get the transmon template in dictionary form
+    def save_serial_device(self, device: QuantumDevice, data_path) -> None:
+        '''
+        decode the device object and then parse its data element by element
+        to populate the serial device dictionary which is saved as Json
+        '''
+        name = device.name
         serialized_device = json.dumps(device, cls=SchedulerJSONEncoder)
         decoded_device = json.loads(serialized_device)
         serial_device = {}
         for element, element_config in decoded_device["data"]["elements"].items():
+            serial_config = json.loads(element_config)
+            serial_device[element] = serial_config
+
+        for element, element_config in decoded_device["data"]["edges"].items():
             serial_config = json.loads(element_config)
             serial_device[element] = serial_config
 

@@ -89,7 +89,7 @@ class BaseNode(NodeInterface):
     def calibrate(self, data_path, measurement_mode):
         if measurement_mode != MeasurementMode.re_analyse:
             result_dataset = self.measure_node(measurement_mode)
-            self.device_manager.save_serial_device(self.name, self.device, data_path)
+            self.device_manager.save_serial_device(self.device, data_path)
             save_dataset(result_dataset, self.name, data_path)
         # After the measurement free the device resources
         self.device_manager.close_device()
@@ -286,9 +286,10 @@ class BaseNode(NodeInterface):
 class QubitNode(BaseNode):
     qubit_qois: list[str] | None = None
 
-    def __init__(self, name: str, all_qubits: list[str], **node_keywords):
+    def __init__(self, name: str, all_qubits: list[str], couplers: list[str], **node_keywords):
         super().__init__(name, **node_keywords)
         self.all_qubits = all_qubits
+        self.couplers = couplers
         self.qubit_state = 0  # can be 0 or 1 or 2
         self.plots_per_qubit = 1  # can be 0 or 1 or 2
 
@@ -298,7 +299,7 @@ class QubitNode(BaseNode):
         # NOTE: In the future this will be problematic.
         # Having the device creation in the init will prohibit concurrent
         # initialization of two different nodes
-        self.device_manager = DeviceConfiguration(self.all_qubits, None)
+        self.device_manager = DeviceConfiguration(self.all_qubits, self.couplers)
         self.device = self.device_manager.configure_device(self.name)
 
     def precompile(self, schedule_samplespace: dict) -> CompiledSchedule:

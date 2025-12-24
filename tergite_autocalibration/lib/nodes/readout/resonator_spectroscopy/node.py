@@ -34,8 +34,8 @@ resonator = fm.ResonatorModel()
 
 class ResonatorSpectroscopyBase(QubitNode):
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(self, name: str, all_qubits: list[str], couplers: list[str],  **schedule_keywords):
+        super().__init__(name, all_qubits, couplers=couplers,  **schedule_keywords)
         self.name = name
 
     def generate_dummy_dataset(self, noise=False):
