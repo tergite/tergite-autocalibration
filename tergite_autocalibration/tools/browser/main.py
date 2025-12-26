@@ -13,21 +13,18 @@
 
 import base64
 import json
-import re
 import os
+import re
 
 import dash
 import plotly.express as px
 import xarray as xr
 from dash import callback_context, dcc, html
-from dash.dependencies import Input, Output, State
-from dash.dependencies import MATCH
+from dash.dependencies import MATCH, Input, Output, State
 from dash_renderjson import DashRenderjson
 
 from tergite_autocalibration.config.globals import DATA_DIR
-from tergite_autocalibration.tools.browser.layout import (
-    generate_selection_layout,
-)
+from tergite_autocalibration.tools.browser.layout import generate_selection_layout
 from tergite_autocalibration.tools.browser.utils import scan_folders
 
 folder_structure = scan_folders(DATA_DIR)
@@ -272,40 +269,32 @@ def update_tab(tab: str, outer: str, inter: str, inner: str):
                         html.Div(
                             style={
                                 "flex": "1",
-                                "minWidth": "300px",     # responsive: wrap if too narrow
+                                "minWidth": "300px",  # responsive: wrap if too narrow
                                 "overflow": "auto",
                                 "padding": "10px",
                                 "border": "1px solid #ddd",
-                                "borderRadius": "6px"
+                                "borderRadius": "6px",
                             },
                             children=[
                                 html.H4(key),
                                 DashRenderjson(
                                     id=f"json-view-{key}",
-                                    data=data[key],
-                                    max_depth=0   # collapse nested content initially
-                                )
-                            ]
+                                    data=data[key]["data"],
+                                    max_depth=-1,  # collapse nested content initially
+                                    invert_theme=True,
+                                ),
+                            ],
                         )
                     )
-                # json_view = DashRenderjson(
-                #     data=data,
-                #     max_depth=-1,
-                #     invert_theme=True,
-                #     # , theme="monokai"
-                # )
                 json_view = html.Div(
                     columns,
                     style={
                         "display": "flex",
-                        "flexWrap": "wrap",   # wrap when many keys
-                        "gap": "20px"
-                    }
+                        "flexWrap": "wrap",  # wrap when many keys
+                        "gap": "20px",
+                    },
                 )
                 return json_view
-
-
-
 
         return "No JSON file found."
 
