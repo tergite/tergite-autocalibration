@@ -266,12 +266,47 @@ def update_tab(tab: str, outer: str, inter: str, inner: str):
             if file.endswith(".json"):
                 with open(os.path.join(folder_path, file)) as f:
                     data = json.load(f)
-                return DashRenderjson(
-                    data=data,
-                    max_depth=-1,
-                    invert_theme=True,
-                    # , theme="monokai"
+                columns = []
+                for key in data:
+                    columns.append(
+                        html.Div(
+                            style={
+                                "flex": "1",
+                                "minWidth": "300px",     # responsive: wrap if too narrow
+                                "overflow": "auto",
+                                "padding": "10px",
+                                "border": "1px solid #ddd",
+                                "borderRadius": "6px"
+                            },
+                            children=[
+                                html.H4(key),
+                                DashRenderjson(
+                                    id=f"json-view-{key}",
+                                    data=data[key],
+                                    max_depth=0   # collapse nested content initially
+                                )
+                            ]
+                        )
+                    )
+                # json_view = DashRenderjson(
+                #     data=data,
+                #     max_depth=-1,
+                #     invert_theme=True,
+                #     # , theme="monokai"
+                # )
+                json_view = html.Div(
+                    columns,
+                    style={
+                        "display": "flex",
+                        "flexWrap": "wrap",   # wrap when many keys
+                        "gap": "20px"
+                    }
                 )
+                return json_view
+
+
+
+
         return "No JSON file found."
 
     return "Invalid tab."
