@@ -141,6 +141,23 @@ Save the configuration.
   automatically create a zip file and treat it as if you are running with `-z`.
 - `-z/--as-zip`: Will make the configuration file be a zip archive.
 
+#### `bcc-export`
+
+**Usage:**
+
+```bash
+acli bcc-export [OPTIONS]
+```
+
+Create a `calibration_seed.toml` file that can be used from the backend to push calibration values to the database.
+
+**Options:**
+
+- `-q/--qubits`: Qubit input e.g. `"q00,q01,q02,q03,q04"` or `"q01-q05"` or `"q01-q06, q08"`.
+  If the input is an integer e.g. 3, it will generate `"q01,q02,q03"`.
+- `-c/--couplers`: Couplers to export e.g. `"q00_q01"` as comma-separated list
+- `-o/--output-file`: calibration_seed.toml to write.
+
 #### `config generate`
 
 **Usage:**
