@@ -12,7 +12,8 @@
 
 
 from enum import Enum
-from typing import Tuple, Dict, Any, List, Type
+from pathlib import Path
+from typing import Tuple, Dict, Any, List, Type, Union
 
 import tomlkit
 
@@ -46,9 +47,6 @@ def _deep_update(original_map_, update_map_):
             original_map_[key] = value
     return original_map_
 
-
-_QUBITS = ["q13", "q14"]
-_COUPLERS = ["q13_q14"]
 
 _qubit_parameters = [
     ("frequency", "clock_freqs:f01", _DataSource.REDIS, float),
@@ -115,8 +113,19 @@ def _assemble_parameters(
     return parameterized_return_object
 
 
-if __name__ == "__main__":
+def export(
+    qubits: List[str],
+    couplers: List[str],
+    output_path: Union[Path, str] = None,
+) -> Dict[str, Any]:
+    """
+    Export a calibration seed file
 
+    Args:
+        output_path: Path to write the output to
+        qubits: List of qubit ids to export
+        couplers: List of couplers to export
+    """
     return_object = {
         "calibration_config": {
             "qubit": [],
@@ -126,7 +135,7 @@ if __name__ == "__main__":
         }
     }
 
-    for qubit in _QUBITS:
+    for qubit in qubits:
         # Iterate over qubit parameters
         return_object["calibration_config"]["qubit"].append(
             _assemble_parameters(_qubit_parameters, qubit)
@@ -142,18 +151,26 @@ if __name__ == "__main__":
             _assemble_parameters(_lda_parameters, qubit, set_id=False)
         )
 
-    for coupler in _COUPLERS:
+    for coupler in couplers:
         return_object["calibration_config"]["coupler"].append(
             _assemble_parameters(_coupler_parameters, coupler, redis_prefix="couplers")
         )
 
-    # Load template
-    with open("calibration_seed_template.toml", "r") as f_:
-        calibration_seed = tomlkit.load(f_)
+    # Save to output in case
+    if output_path is not None:
 
-    # Update values
-    calibration_seed = _deep_update(calibration_seed, return_object)  # type: ignore
+        # Load template
+        template_path_ = Path(__file__).parent.joinpath(
+            "calibration_seed_template.toml"
+        )
+        with open(template_path_, "r") as f_:
+            calibration_seed = tomlkit.load(f_)
 
-    # Save file again
-    with open("calibration_seed.toml", "w") as f_:
-        tomlkit.dump(calibration_seed, f_)
+        # Update values
+        calibration_seed = _deep_update(calibration_seed, return_object)  # type: ignore
+
+        # Save to output file
+        with open(output_path, "w") as f_:
+            tomlkit.dump(calibration_seed, f_)
+
+    return return_object
