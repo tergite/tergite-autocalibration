@@ -25,6 +25,7 @@ The autocalibration CLI is organized into several main command groups:
 
 - `start`: Run the automatic calibration according to the provided config files
 - `cluster`: Handle operations related to the cluster
+- `spi`: Handle operations related to the spi rack
 - `node`: Handle operations related to the node
 - `graph`: Handle operations related to the calibration graph
 - `config`: Load and save the configuration files
@@ -66,6 +67,20 @@ acli cluster reboot
 ```
 
 This command will prompt for confirmation before rebooting the cluster, as it can interrupt ongoing measurements.
+
+### SPI Rack Commands ###
+
+#### `spi status` ####
+
+Prints information about the current currents on the spi rack.
+Only couplers that are having a DAC in the SPI configuration are considered.
+Please check the [documentation about configuration](./configuration_files.md) about how to change the SPI DACs.
+
+**Usage:**
+
+```
+acli spi status
+```
 
 ### Node Commands ###
 

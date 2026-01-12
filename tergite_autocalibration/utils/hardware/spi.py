@@ -215,7 +215,7 @@ class SpiDAC:
     def print_currents(self):
         for coupler, dac in self.dacs_dictionary.items():
             current = dac.current() * 1000
-            logger.info(f"{coupler}: {current:.4f} mA")
+            logger.status(f"{coupler}: {current:.4f} mA")
 
     def close_spi_rack(self):
         self.spi.close()
