@@ -23,10 +23,6 @@ variables:
   PYTHON_VERSION: "3.12"
   REDIS_PORT: 6378
 
-default:
-  tags:
-    - docker
-
 
 setup:
   stage: setup
