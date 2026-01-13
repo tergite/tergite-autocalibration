@@ -42,7 +42,6 @@ def dump_redis(redis_session: "redis.Redis") -> Dict[str, Any]:
 
     Args:
         redis_session: Session used to access the redis database. Assumes decode_responses=True.
-        output_file: File to write to.
 
     """
     data = {}
