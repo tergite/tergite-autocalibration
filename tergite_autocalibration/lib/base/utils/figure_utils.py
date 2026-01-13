@@ -9,7 +9,7 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
-
+import os.path
 from pathlib import Path
 from datetime import datetime
 from matplotlib import gridspec
@@ -46,7 +46,7 @@ def _add_top_band(axes_tuple):
     ax_center.add_line(line)
 
     # Add left logo, this is hardcoded as it is the Tergite logo.
-    logo_path = "resources/logo.png"
+    logo_path = os.path.join(Path(__file__).parent, "logo.png")
 
     if logo_path:
         try:
