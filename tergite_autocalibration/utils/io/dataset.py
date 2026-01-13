@@ -106,18 +106,3 @@ def save_dataset(
         count += 1
         dataset_name = f"dataset_{node_name}_{count}.hdf5"
     result_dataset_real.to_netcdf(data_path / dataset_name)
-
-
-# TODO: how does this function work?
-def tunneling_qubits(data_values: np.ndarray) -> np.ndarray:
-    if data_values.shape[0] == 1:
-        # Single-qubit demodulation
-        data_values = data_values[0]
-        dims = len(data_values.shape)
-        # Transpose data_values
-        return np.moveaxis(data_values, range(dims), range(dims - 1, -1, -1))
-    else:
-        dims = len(data_values.shape)
-        # Transpose data_values.
-        # The first dimension corresponds to the index of qubits.
-        return np.moveaxis(data_values, range(1, dims), range(dims - 1, 0, -1))

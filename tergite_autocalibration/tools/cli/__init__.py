@@ -17,11 +17,13 @@ from typing import Annotated
 
 import typer
 
+from tergite_autocalibration.tools.cli.backend import backend_cli
+from tergite_autocalibration.tools.cli.browser import browser_cli
 from tergite_autocalibration.tools.cli.cluster import cluster_cli
 from tergite_autocalibration.tools.cli.config import config_cli
 from tergite_autocalibration.tools.cli.graph import graph_cli
 from tergite_autocalibration.tools.cli.node import node_cli
-from tergite_autocalibration.tools.cli.browser import browser_cli
+from tergite_autocalibration.tools.cli.spi import spi_cli
 from tergite_autocalibration.utils.logging.decorators import suppress_logging
 
 cli_kwargs = {"no_args_is_help": True}
@@ -41,6 +43,12 @@ cli.add_typer(
     help="Handle operations related to the cluster.",
 )
 cli.add_typer(
+    spi_cli,
+    **cli_kwargs,
+    name="spi",
+    help="Handle operations related to the spi rack.",
+)
+cli.add_typer(
     graph_cli,
     **cli_kwargs,
     name="graph",
@@ -51,6 +59,14 @@ cli.add_typer(
     **cli_kwargs,
     name="browser",
     help="Manage the data browser.",
+)
+# Please note that the module is called 'backend' instead of 'redis' to avoid name conflicts while
+# loading the 'redis' library.
+cli.add_typer(
+    backend_cli,
+    **cli_kwargs,
+    name="redis",
+    help="Utilities to handle redis.",
 )
 
 

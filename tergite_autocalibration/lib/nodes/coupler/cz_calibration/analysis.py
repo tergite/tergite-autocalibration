@@ -18,7 +18,6 @@ import itertools
 
 import lmfit
 import numpy as np
-import xarray as xr
 from matplotlib import pyplot as plt
 from numpy.linalg import inv
 from quantify_core.analysis.fitting_models import fft_freq_phase_guess

@@ -25,10 +25,12 @@ The autocalibration CLI is organized into several main command groups:
 
 - `start`: Run the automatic calibration according to the provided config files
 - `cluster`: Handle operations related to the cluster
+- `spi`: Handle operations related to the spi rack
 - `node`: Handle operations related to the node
 - `graph`: Handle operations related to the calibration graph
 - `config`: Load and save the configuration files
 - `browser`: Will open the dataset browser, which makes you view the datasets from measurements
+- `redis`: Operations to handle redis values
 - `joke`: Handle operations related to the well-being of the user
 
 ### Calibration Commands
@@ -66,6 +68,20 @@ acli cluster reboot
 ```
 
 This command will prompt for confirmation before rebooting the cluster, as it can interrupt ongoing measurements.
+
+### SPI Rack Commands ###
+
+#### `spi status` ####
+
+Prints information about the current currents on the spi rack.
+Only couplers that are having a DAC in the SPI configuration are considered.
+Please check the [documentation about configuration](./configuration_files.md) about how to change the SPI DACs.
+
+**Usage:**
+
+```
+acli spi status
+```
 
 ### Node Commands ###
 
@@ -190,6 +206,29 @@ acli browser --datadir [OPTIONS]
 - `--datadir PATH`: Folder to take the plot data from
 - `--liveplotting`: Whether plots should be updated in real time (default: False)
 - `--log-level INT`: Log-level as in the Python `logging` package to be used in the logs (default: 30)
+
+### Redis handling ###
+
+#### `redis` ####
+
+Tools to work with the redis backend.
+
+**Usage:**
+
+```
+acli redis save-file [FILENAME]
+```
+
+Store a backup of redis in .json format.
+
+**Usage:**
+
+```
+acli redis load-file [FILENAME]
+```
+
+Load a backup of redis from a .json format.
+The file must follow the standard from the `acli redis save-file` function.
 
 ### Joke Command ###
 

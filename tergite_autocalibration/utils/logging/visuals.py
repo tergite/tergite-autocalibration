@@ -24,6 +24,10 @@ def draw_arrow_chart(header: str, node_list: list[str]):
     Returns:
 
     """
+    if len(node_list) == 0:
+        logger.status("Node sequence for the graph is empty.")
+        return
+
     total_length = sum([6 for _ in node_list]) + max(
         list(map(lambda x_: len(x_), node_list))
     )

@@ -34,7 +34,7 @@ from tergite_autocalibration.lib.nodes.coupler.cz_dynamic_phase.node import (
 from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.measurement import (
     TQGRandomizedBenchmarkingSSROMeasurement,
 )
-from tergite_autocalibration.lib.nodes.schedule_node import ScheduleCouplerNode
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNodeCouplerNode
 from tergite_autocalibration.lib.utils import redis
 from tergite_autocalibration.utils.logging import logger
 
