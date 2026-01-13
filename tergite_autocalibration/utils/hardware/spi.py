@@ -25,7 +25,6 @@ from colorama import init as colorama_init
 from qblox_instruments import SpiRack
 from qcodes import validators
 from rich.progress import Progress
-from tomlkit.api import E
 
 from tergite_autocalibration.config.globals import ENV, REDIS_CONNECTION
 from tergite_autocalibration.config.legacy import dh
