@@ -19,7 +19,8 @@
 import os
 from dataclasses import dataclass, field
 from ipaddress import IPv4Address
-from typing import List, Union, FrozenSet
+from types import MappingProxyType
+from typing import FrozenSet, List, Union
 
 from colorama import Fore, Style
 from colorama import init as colorama_init
@@ -27,7 +28,7 @@ from qblox_instruments import Cluster
 from qblox_instruments.types import ClusterType
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
-from types import MappingProxyType
+
 from tergite_autocalibration.config.globals import (
     CLUSTER_IP,
     CONFIG,
@@ -44,10 +45,7 @@ from tergite_autocalibration.utils.backend.redis_utils import (
     populate_node_parameters,
     populate_quantities_of_interest,
 )
-from tergite_autocalibration.utils.dto.enums import (
-    DataStatus,
-    MeasurementMode,
-)
+from tergite_autocalibration.utils.dto.enums import DataStatus, MeasurementMode
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
 from tergite_autocalibration.utils.io.dataset import create_node_data_path
 from tergite_autocalibration.utils.logging import logger

@@ -1,6 +1,9 @@
 # This code is part of Tergite
 #
-# (C) Copyright Michele Faucci Giannelli 2024
+# (C) Copyright Eleftherios Moschandreou 2023, 2024, 2025
+# (C) Copyright Liangyu Chen 2023, 2024
+# (C) Copyright Amr Osman, 2024
+# (C) Chalmers Next Labs 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -10,339 +13,226 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import warnings
-from typing import List, Tuple
+from abc import ABC
+from typing import Literal
 
-import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
-from matplotlib import pyplot as plt
+from scipy.ndimage import convolve
 
 from tergite_autocalibration.lib.base.analysis import (
     BaseAllCouplersAnalysis,
     BaseCouplerAnalysis,
-    BaseQubitAnalysis,
 )
-from tergite_autocalibration.lib.base.utils.figure_utils import (
-    create_figure_with_top_band,
+from tergite_autocalibration.lib.utils.classification_functions import (
+    calculate_probabilities,
 )
-from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.utils.no_valid_combination_exception import (
-    NoValidCombinationException,
-)
-from tergite_autocalibration.utils.logging import logger
+from tergite_autocalibration.utils.dto.qoi import QOI
 
 
-class CombinedFrequencyVsAmplitudeAnalysis:
-    def __init__(self, res1: list[float], res2: list[float]):
-        super().__init__()
-        self.result_q1 = res1
-        self.result_q2 = res2
-        self.frequency_tollerance = 2.5e6  # Hz
-        self.amplitude_tollerance = 0.06
+class CZParametrizationAnalysis(BaseCouplerAnalysis, ABC):
 
-    def are_two_qubits_compatible(self):
-        return self.are_frequencies_compatible() and self.are_amplitudes_compatible()
-
-    def are_frequencies_compatible(self):
-        return abs(self.result_q1[0] - self.result_q2[0]) < self.frequency_tollerance
-
-    def are_amplitudes_compatible(self):
-        return abs(self.result_q1[1] - self.result_q2[1]) < self.amplitude_tollerance
-
-    def best_parameters(self):
-        freq = (self.result_q1[0] + self.result_q2[0]) / 2
-        amp = (self.result_q1[1] + self.result_q2[1]) / 2
-        return [freq, amp]
-
-
-class FrequencyVsAmplitudeQubitAnalysis(BaseQubitAnalysis):
-    def __init__(self, name, redis_fields, freqs, amps):
+    def __init__(self, name, redis_fields, **kwargs):
         super().__init__(name, redis_fields)
-        self.qubit = -1
-        self.frequencies = freqs
-        self.amplitudes = amps
-        self.opt_freq = -1
-        self.opt_amp = -1
+        self.phase_path: Literal["via_20", "via_02"] = kwargs["phase_path"]
 
-    def process_qubit(self, dataset, qubit_var_name):
-        # Access the specific DataArray for the qubit
-        if qubit_var_name not in dataset.data_vars:
-            raise ValueError(
-                f"Qubit data variable {qubit_var_name} not found in dataset."
+    def calculate_probabilities(self):
+        dataset = self.S21
+        for coord in dataset.coords:
+            coord = str(coord)
+            if "loops" in coord:
+                self.loops_coord = coord
+                self.number_of_loops = dataset[self.loops_coord].size
+            elif "frequencies" in coord:
+                self.frequencies_coord = coord
+                self.frequencies = dataset[self.frequencies_coord].values
+                self.number_of_frequencies = dataset[self.frequencies_coord].size
+            elif "amplitudes" in coord:
+                self.amplitudes_coord = coord
+                self.amplitudes = dataset[self.amplitudes_coord].values
+                self.x_coordinate = coord
+            elif "durations" in coord:
+                self.durations_coord = coord
+                self.durations = dataset[self.durations_coord].values
+                self.x_coordinate = coord
+            elif "dc_currents" in coord:
+                self.dc_currents_coord = coord
+                self.dc_currents = dataset[self.dc_currents_coord].values
+                self.number_of_dc_currents = dataset[self.dc_currents_coord].size
+
+        control_qubit_probabilities = calculate_probabilities(
+            self.control_qubit_data_var
+        )
+        target_qubit_probabilities = calculate_probabilities(self.target_qubit_data_var)
+
+        self.probabilities = xr.concat(
+            [control_qubit_probabilities, target_qubit_probabilities],
+            dim="qubit",
+        )
+        self.probabilities = self.probabilities.rename(self.coupler)
+
+
+class CZParametrizationCouplerAnalysis(CZParametrizationAnalysis):
+
+    def __init__(self, name, redis_fields, **kwargs):
+        super().__init__(name, redis_fields, **kwargs)
+
+    def analyze_coupler(self):
+        self.calculate_probabilities()
+
+        self.optimal_values = xr.DataArray(name=self.coupler)
+        for current_index, _ in enumerate(self.dc_currents):
+            current_probabilities = self.probabilities.isel(
+                {self.dc_currents_coord: current_index}
+            )
+            control_state_2 = current_probabilities.sel(
+                {"qubit": self.control_qubit, "state": 2}
+            )
+            control_state_1 = current_probabilities.sel(
+                {"qubit": self.control_qubit, "state": 1}
+            )
+            control_state_0 = current_probabilities.sel(
+                {"qubit": self.control_qubit, "state": 0}
+            )
+            target_state_0 = current_probabilities.sel(
+                {"qubit": self.target_qubit, "state": 0}
+            )
+            target_state_1 = current_probabilities.sel(
+                {"qubit": self.target_qubit, "state": 1}
+            )
+            target_state_2 = current_probabilities.sel(
+                {"qubit": self.target_qubit, "state": 2}
+            )
+            if self.phase_path == "via_20":
+                control_diffs = control_state_2 - control_state_1 - control_state_0
+                target_diffs = target_state_0 - target_state_1 - target_state_2
+            elif self.phase_path == "via_02":
+                target_diffs = control_state_2 - control_state_1 - control_state_0
+                control_diffs = target_state_0 - target_state_1 - target_state_2
+            else:
+                raise ValueError("Invalid phase path")
+
+            # Compute signed distance including nearest neighbor influence
+            convolution_kernel = np.array(
+                [[0.02, 0.05, 0.01], [0.05, 1.0, 0.05], [0.02, 0.02, 0.02]]
             )
 
-        # Now, self.data_var points to the relevant DataArray for this qubit
-        self.data_var = dataset[qubit_var_name]
-        self.dataset = dataset
-        self.qubit = qubit_var_name[1:]  # dataset.attrs["qubit"]
-        self.coord = dataset.coords
-        self.S21 = dataset.isel(ReIm=0) + 1j * dataset.isel(ReIm=1)
-        self.magnitudes = np.abs(self.S21)
-        self._qoi = self.analyse_qubit()
+            summed_differences = control_diffs + target_diffs
 
-        return self._qoi
-
-    def plotter(self, axis: plt.Axes):
-        datarray = self.magnitudes[f"y{self.qubit}"]
-
-        if not isinstance(datarray, xr.DataArray):
-            raise TypeError("Expected datarray to be an xarray.DataArray")
-        datarray = datarray.fillna(0)
-
-        if datarray.size == 0:
-            raise ValueError(f"Data array for qubit {self.qubit} is empty.")
-
-        # Plot the data array on the single plot
-        for coord in datarray.coords:
-            if "cz_parking_currents" in coord:
-                datarray = datarray.drop(coord)
-
-        for dim in datarray.dims:
-            if "cz_parking_currents" in dim:
-                # If it's not needed, you can drop it
-                datarray = datarray.squeeze(dim, drop=True)
-
-        datarray.plot(ax=axis, cmap="RdBu_r")
-
-        # Scatter plot and lines on the same plot
-        axis.scatter(
-            self.opt_freq,
-            self.opt_amp,
-            c="r",
-            label="CZ Amplitude = {:.3f} V".format(self.opt_amp),
-            marker="X",
-            s=200,
-            edgecolors="k",
-            linewidth=1.5,
-            zorder=10,
-        )
-        axis.vlines(
-            self.opt_freq,
-            self.amplitudes[0],
-            self.amplitudes[-1],
-            label="Frequency Detuning = {:.2f} MHz".format(self.opt_freq / 1e6),
-            colors="k",
-            linestyles="--",
-            linewidth=1.5,
-        )
-        axis.hlines(
-            self.opt_amp,
-            self.frequencies[0],
-            self.frequencies[-1],
-            colors="k",
-            linestyles="--",
-            linewidth=1.5,
-        )
-
-        axis.set_xlim([self.frequencies[0], self.frequencies[-1]])
-        axis.set_ylim([self.amplitudes[0], self.amplitudes[-1]])
-        axis.set_ylabel("Parametric Drive amplitude (V)")
-        axis.set_xlabel("Frequency Detuning (Hz)")
-        axis.set_title(f"CZ - Qubit {self.qubit[1:]}")
-        axis.legend()  # Add legend to the plot
-
-        # Customize plot as needed
-        handles, labels = axis.get_legend_handles_labels()
-        patch = mpatches.Patch(color="red", label=f"{self.qubit}")
-        handles.append(patch)
-        axis.legend(handles=handles, fontsize="small")
-
-
-class FrequencyVsAmplitudeQ1Analysis(FrequencyVsAmplitudeQubitAnalysis):
-    def __init__(self, name, redis_fields, freqs, amps):
-        super().__init__(name, redis_fields, freqs, amps)
-
-    def analyse_qubit(self) -> list[float, float]:
-        logger.info("Running FrequencyVsAmplitudeQ1Analysis")
-        return self.run_fitting_find_max()
-
-    def run_fitting_find_max(self):
-        magnitudes = np.array(
-            [[np.linalg.norm(u) for u in v] for v in self.magnitudes[f"y{self.qubit}"]]
-        )
-        magnitudes = np.transpose(
-            (magnitudes - np.max(magnitudes))
-            / (np.max(magnitudes) - np.max(magnitudes))
-        )
-        max_index = np.argmax(magnitudes)
-        max_index = np.unravel_index(max_index, magnitudes.shape)
-        self.opt_freq = self.frequencies[max_index[0]]
-        self.opt_amp = self.amplitudes[max_index[1]]
-        return [self.opt_freq, self.opt_amp]
-
-
-class FrequencyVsAmplitudeQ2Analysis(FrequencyVsAmplitudeQubitAnalysis):
-    def __init__(self, name, redis_fields, freqs, amps):
-        super().__init__(name, redis_fields, freqs, amps)
-
-    def analyse_qubit(self) -> list[float, float]:
-        logger.info("Running FrequencyVsAmplitudeQ2Analysis")
-        return self.run_fitting_find_min()
-
-    def run_fitting_find_min(self):
-        magnitudes = np.array(
-            [[np.linalg.norm(u) for u in v] for v in self.dataset[f"y{self.qubit}"]]
-        )
-        magnitudes = np.transpose(
-            (magnitudes - np.min(magnitudes))
-            / (np.max(magnitudes) - np.min(magnitudes))
-        )
-        min_index = np.argmin(magnitudes)
-        min_index = np.unravel_index(min_index, magnitudes.shape)
-        self.opt_freq = self.frequencies[min_index[0]]
-        self.opt_amp = self.amplitudes[min_index[1]]
-        return [self.opt_freq, self.opt_amp]
-
-
-class CZParametrisationFixDurationCouplerAnalysis(BaseCouplerAnalysis):
-    def __init__(self, name, redis_fields):
-        super().__init__(name, redis_fields)
-        self.data_path = ""
-        self.opt_freq = -1
-        self.opt_amp = -1
-        self.opt_current = -1
-        self.q1_list = []
-        self.q2_list = []
-        pass
-
-    def get_coordinates(self):
-        for coord in self.dataset[self.data_var].coords:
-            if "cz_parking_currents" in coord:
-                self.current_coord = coord
-                self.current_values = self.dataset[coord].values
-            elif "cz_pulse_frequencies" in coord:
-                self.frequency_coord = coord
-                self.frequency_values = self.dataset[coord].values
-            elif "cz_pulse_amplitude" in coord:
-                self.amplitude_coord = coord
-                self.amplitude_values = self.dataset[coord].values
-
-    def analyze_coupler(self) -> list[float, float, float]:
-        logger.info("Running CZParametrisationFixDurationAnalysis")
-        results = self.run_coupler()
-        return self.run_analysis_on_freq_amp_results(results)
-
-    def run_coupler(
-        self,
-    ) -> List[Tuple[CombinedFrequencyVsAmplitudeAnalysis, float]]:
-        results = []
-        self.fit_results = {}
-        self.get_coordinates()
-
-        for current_index, current in enumerate(self.current_values):
-            logger.info(f"Processing current index: {current_index}, value: {current}")
-
-            q1_data_var = [
-                data_var
-                for data_var in self.dataset.data_vars
-                if self.name_qubit_1 in data_var
-            ]
-            ds1 = self.dataset[q1_data_var]
-            matching_coords = [
-                coord for coord in ds1.coords if self.name_qubit_1 in coord
-            ]
-            if matching_coords:
-                selected_coord_name = matching_coords[0]
-                ds1 = ds1.sel({selected_coord_name: slice(None)})
-                ds1 = ds1.sel({self.current_coord: current})
-
-            q1 = FrequencyVsAmplitudeQ1Analysis(
-                self.name,
-                self.redis_fields,
-                self.frequency_values,
-                self.amplitude_values,
+            weighted_sum = summed_differences.copy(deep=True)
+            weighted_sum.values = convolve(
+                weighted_sum.values,
+                convolution_kernel / np.sum(convolution_kernel),
+                mode="constant",
+                cval=-1,
             )
-            q1Res = q1.process_qubit(ds1, q1_data_var[0])
 
-            q2_data_var = [
-                data_var
-                for data_var in self.dataset.data_vars
-                if self.name_qubit_2 in data_var
-            ]
-            ds2 = self.dataset[q2_data_var]
-            matching_coords = [
-                coord for coord in ds2.coords if self.name_qubit_2 in coord
-            ]
-            if matching_coords:
-                selected_coord_name = matching_coords[0]
-                ds2 = ds2.sel({selected_coord_name: slice(None)})
-                ds2 = ds2.sel({self.current_coord: current})
-
-            q2 = FrequencyVsAmplitudeQ2Analysis(
-                self.name,
-                self.redis_fields,
-                self.frequency_values,
-                self.amplitude_values,
+            # optimal point is the maximum of the combined image
+            weighted_optimal_point = (
+                weighted_sum.where(weighted_sum == weighted_sum.max(), drop=True)
+                .expand_dims(self.dc_currents_coord)  # promote dimension
+                .expand_dims({"index": [current_index]})
             )
-            q2Res = q2.process_qubit(ds2, q2_data_var[0])
-
-            c = CombinedFrequencyVsAmplitudeAnalysis(q1Res, q2Res)
-            results.append([c, current])
-
-            self.q1_list.append(q1)
-            self.q2_list.append(q2)
-
-        return results
-
-    def run_analysis_on_freq_amp_results(
-        self, results: List[Tuple[CombinedFrequencyVsAmplitudeAnalysis, float]]
-    ):
-        minCurrent = 1
-        bestIndex = -1
-        for index, result in enumerate(results):
-            if result[0].are_two_qubits_compatible() and abs(result[1]) < minCurrent:
-                minCurrent = result[1]
-                bestIndex = index
-
-        if bestIndex == -1:
-            logger.info(
-                "Bad data, no combination found, plotting all results to visual inspection. Exiting."
+            weighted_optimal_point = weighted_optimal_point.stack(
+                multi=[
+                    self.frequencies_coord,
+                    self.amplitudes_coord,
+                    self.dc_currents_coord,
+                    "index",
+                ]
             )
-            self.plot_all()
-            raise NoValidCombinationException
+            self.optimal_values = xr.merge(
+                [self.optimal_values, weighted_optimal_point],
+                join="outer",
+                compat="no_conflicts",
+            )
 
-        self.opt_index = bestIndex
-        self.opt_freq = results[bestIndex][0].best_parameters()[0]
-        self.opt_amp = results[bestIndex][0].best_parameters()[1]
-        self.opt_current = minCurrent
+        optimal_coords = self.optimal_values.idxmax()
+        self.optimal_frequency = optimal_coords[self.coupler].values.tolist()[0]
+        self.optimal_amplitude = optimal_coords[self.coupler].values.tolist()[1]
+        self.optimal_dc_current = optimal_coords[self.coupler].values.tolist()[2]
+        self.optimal_current_index = optimal_coords[self.coupler].values.tolist()[3]
 
-        logger.info("Best values are:")
-        logger.info("  - freq: " + str(self.opt_freq))
-        logger.info("  - amp: " + str(self.opt_amp))
-        logger.info("  - current: " + str(self.opt_current))
-        return [self.opt_freq, self.opt_amp, self.opt_current]
+        self.analysis_succesful = any(self.optimal_values[self.coupler] > 1)
+        analysis_result = {
+            "cz_pulse_frequency": {
+                "value": self.optimal_frequency,
+                "error": 0,
+            },
+            "cz_pulse_amplitude": {
+                "value": self.optimal_amplitude,
+                "error": 0,
+            },
+            "parking_current": {
+                "value": self.optimal_dc_current,
+                "error": 0,
+            },
+        }
+        qoi = QOI(analysis_result, self.analysis_succesful)
+        return qoi
 
-    def plotter(self, primary_axis, secondary_axis):
-        self.q1_list[self.opt_index].plotter(primary_axis)
-        self.q2_list[self.opt_index].plotter(secondary_axis)
+    @property
+    def processed_dataset(self):
+        return self.probabilities
 
-    def plot_all(self):
-        for index, e in enumerate(self.q1_list):
-            fig, axs = create_figure_with_top_band(1, 2)
+    def plotter(self, figures_dictionary: dict[str, list]):
+        figures_list = []
+        for current_index, current in enumerate(self.dc_currents):
 
-            self.q1_list[index].plotter(axs[0, 0])
-            self.q2_list[index].plotter(axs[0, 1])
+            marker = "8"
+            if current_index == self.optimal_current_index:
+                marker = "*"
+            current_probabilities = self.probabilities.isel(
+                {self.dc_currents_coord: current_index}
+            )
 
+            current_probabilities.plot(
+                x=self.frequencies_coord,
+                cmap="RdBu_r",
+                row="qubit",
+                col="state",
+            )
+
+            population_exchange_points = self.optimal_values.sel(
+                {"index": current_index}
+            )
+            frequency = population_exchange_points[self.frequencies_coord]
+            amplitude = population_exchange_points[self.amplitudes_coord]
+            score = population_exchange_points[self.coupler].item()
             fig = plt.gcf()
-            name = "CZParametrisationFixDurationAnalysis_" + str(
-                self.current_values[index]
-            )
-            try:
-                fig.savefig(
-                    f"{self.data_path}/{name}.png", bbox_inches="tight", dpi=400
-                )
-            except FileNotFoundError:
-                warnings.warn("File Not existing")
-                pass
+
+            if self.analysis_succesful:
+                title = f"{score = :.3f}   {current = :.6f}"
+                fig.suptitle(title, x=0.55, color="red")
+                for ax in fig.axes:
+                    ax.scatter(
+                        frequency,
+                        amplitude,
+                        s=100,
+                        color="yellow",
+                        marker=marker,
+                    )
+                if current_index == self.optimal_current_index:
+                    fig.suptitle(
+                        f"{current = :.6f}"
+                        f"  score = {score:.3f}"
+                        f"  freq = {self.optimal_frequency:.5e}"
+                        f"  ampl = {self.optimal_amplitude:.5f}",
+                        x=0.5,
+                        size=14,
+                        color="red",
+                    )
+            else:
+                title = f"No good points found, {score = :.3f}   {current = :.6f}"
+                fig.suptitle(title, x=0.55, color="red")
+            figures_list.append(fig)
+
+        figures_dictionary[self.coupler] = figures_list
 
 
-class CZParametrizationFixDurationNodeAnalysis(BaseAllCouplersAnalysis):
-    single_coupler_analysis_obj = CZParametrisationFixDurationCouplerAnalysis
+class CZParametrizationNodeAnalysis(BaseAllCouplersAnalysis):
+    single_coupler_analysis_obj = CZParametrizationCouplerAnalysis
 
-    def __init__(self, name, redis_fields):
-        super().__init__(name, redis_fields)
-
-    def _save_plots(self):
-        super()._save_plots()
-        for analysis in self.coupler_analyses:
-            analysis.plot_all()
+    def __init__(self, name, redis_fields, **kwargs):
+        super().__init__(name, redis_fields, **kwargs)

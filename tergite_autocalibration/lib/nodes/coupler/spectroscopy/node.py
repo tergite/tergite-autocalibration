@@ -12,19 +12,17 @@
 # that they have been altered from the originals.
 
 
-from lmfit.models import LorentzianModel
 import numpy as np
-from quantify_scheduler import CompiledSchedule
-from quantify_scheduler.backends import SerialCompiler
 import quantify_scheduler.backends.qblox.constants as constants
 import xarray
+from lmfit.models import LorentzianModel
+from quantify_scheduler import CompiledSchedule
+from quantify_scheduler.backends import SerialCompiler
 
 from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.base.node import CouplerNode
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
-    QubitSpectroscopyVsCurrentNodeAnalysis,
-    ResonatorSpectroscopyVsCurrentNodeAnalysis,
-    QubitSpectroscopyVsCurrentNodeAnalysis,
+    CouplerAnticrossingNodeAnalysis,
     ResonatorSpectroscopyVsCurrentNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.external_parameter_node import (
@@ -52,10 +50,10 @@ class QubitSpectroscopyVsCurrentNode(CouplerNode):
     """
 
     measurement_obj = TwoTonesMultidimMeasurement
-    analysis_obj = QubitSpectroscopyVsCurrentNodeAnalysis
+    analysis_obj = CouplerAnticrossingNodeAnalysis
     measurement_type = ExternalParameterNode
     # coupler_qois = ["parking_current"]
-    coupler_qois = ["qubit_crossing_points"]
+    coupler_qois = ["control_qubit_crossing_points", "target_qubit_crossing_points"]
 
     def __init__(self, name: str, couplers: list[str], **schedule_keywords):
         super().__init__(name, couplers, **schedule_keywords)
@@ -71,7 +69,7 @@ class QubitSpectroscopyVsCurrentNode(CouplerNode):
 
         self.external_samplespace = {
             "dc_currents": {
-                coupler: np.arange(-2.5e-3, 2.5e-3, 100e-6) for coupler in self.couplers
+                coupler: np.arange(-1.5e-3, 1.5e-3, 100e-6) for coupler in self.couplers
             },
         }
         self.validate()
@@ -135,7 +133,10 @@ class ResonatorSpectroscopyVsCurrentNode(CouplerNode):
     analysis_obj = ResonatorSpectroscopyVsCurrentNodeAnalysis
     measurement_type = ExternalParameterNode
     # coupler_qois = ["resonator_flux_quantum"]
-    coupler_qois = ["resonator_crossing_points"]
+    coupler_qois = [
+        "control_resonator_crossing_points",
+        "target_resonator_crossing_points",
+    ]
 
     def __init__(self, name: str, couplers: list[str], **schedule_keywords):
         super().__init__(name, couplers, **schedule_keywords)

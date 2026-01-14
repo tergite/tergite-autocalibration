@@ -136,32 +136,30 @@ class QubitSpectroscopyAnalysis(BaseQubitAnalysis):
         ax.grid()
 
 
-class QubitSpectroscopyMaxThresholdQubitAnalysis(BaseQubitAnalysis):
+class QubitSpectroscopyMaxThresholdQubitAnalysis:
     """
     Analysis that finds the maximum value in qubit spectroscopy data.
     """
 
     SIGNIFICANCE_THRESHOLD = 2.7
 
-    def __init__(self, name, redis_fields, current):
-        super().__init__(name, redis_fields)
-        self.analysis_results = {}
-        self.is_bad_value = False
-        self.current = current
+    # TODO: this is not necessary. Repace with scipy,find_peaks prominence
 
-    def _analyse_spectroscopy(self):
-        for coord in self.dataset[self.data_var].coords:
+    def __init__(self, qubit_specs_dataarray):
+        self.qubit_specs_dataarray = qubit_specs_dataarray
+
+    def process_qubit(self):
+        for coord in self.qubit_specs_dataarray:
             if "frequencies" in coord:
-                self.frequencies = coord
+                self.frequencies_coord = coord
+                self.frequencies = self.qubit_specs_dataarray[
+                    self.frequencies_coord
+                ].values
 
-        self.frequencies_value = self.dataset[self.frequencies].values
+        self.max_value = self.qubit_specs_dataarray.max()
 
-        magnitudes = self.magnitudes.to_dataarray().values.flatten()
-        self.max_value = np.max(magnitudes)
-        self.max_index = np.argmax(magnitudes)
-
-        mean_value = np.mean(magnitudes)
-        std_value = np.std(magnitudes)
+        mean_value = self.qubit_specs_dataarray.mean().item()
+        std_value = self.qubit_specs_dataarray.std().item()
 
         self.max_significance = abs((self.max_value - mean_value) / std_value)
 
@@ -170,54 +168,12 @@ class QubitSpectroscopyMaxThresholdQubitAnalysis(BaseQubitAnalysis):
             logger.warning(
                 "This spectroscopy doeas not have a proper maximum, it is ok if this is in a transition region in the coupler spectroscopy"
             )
-            self.freq = 0
+            self.freq = np.nan
         else:
-            self.freq = self.frequencies_value[self.max_index]
+            self.freq = self.qubit_specs_dataarray.idxmax().item()
         self.uncertainty = None
 
-    def analyse_qubit(self):
-        self._analyse_spectroscopy()
-        analysis_successful = True
-        analysis_result = {
-            "clock_freqs:f01": {
-                "value": self.freq,
-                "error": self.uncertainty,
-            },
-        }
-        qoi = QOI(analysis_result, analysis_successful)
-        return qoi
-
-    def plotter(self, ax):
-        x_dataarray = self.magnitudes.to_dataarray()
-        x = x_dataarray.values.flatten()
-
-        ax.plot(self.frequencies_value, x, "bo-", ms=1.5, lw=0.8)
-
-        if not self.is_bad_value:
-            ax.axvline(
-                self.freq,
-                color="r",
-                linestyle="--",
-                label=f"Current: {self.current*1000:.2f}[mA]\nMax @ {self.max_significance:.1f}",
-            )
-
-        if self.is_bad_value:
-            ax.scatter(
-                self.frequencies_value[self.max_index],
-                self.max_value,
-                color="red",
-                marker="x",
-                s=100,
-                linewidth=2,
-                label=f"Current: {self.current*1000:.1f}[mA]\nMax @ {self.max_significance:.1f}",
-            )
-
-        ax.set_title(f"Qubit Spectroscopy for {self.qubit}", fontsize=8)
-        ax.set_xlabel("Frequency (Hz)", fontsize=6)
-        ax.set_ylabel("|S21| (V)", fontsize=6)
-
-        ax.legend(fontsize=6, loc="upper right")
-        ax.grid()
+        return self.freq
 
 
 class QubitSpectroscopyMultidimAnalysis(BaseQubitAnalysis):

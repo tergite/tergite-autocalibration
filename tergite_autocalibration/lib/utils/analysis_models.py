@@ -1,9 +1,9 @@
 # This code is part of Tergite
 #
-# (c) Copyright Eleftherios Moschandreou 2024
-# (c) Chalmers Next Labs 2024
+# (c) Copyright Eleftherios Moschandreou 2024, 2025
+# (c) Chalmers Next Labs 2024, 2025
 #
-# This code is licensed under the Apache License, Version 2.0. You may
+# This code is licensed under the ache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
 # of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
 #
@@ -69,55 +69,6 @@ class RamseyModel(lmfit.model.Model):
         return lmfit.models.update_param_vals(params, self.prefix, **kws)
 
 
-class LorentzianModel(lmfit.model.Model):
-    """
-    Generate a Lorentzian model that can be fit to qubit spectroscopy data.
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(lorentzian_function, *args, **kwargs)
-
-        self.set_param_hint("center", vary=True)
-        self.set_param_hint("amplitude", vary=True)
-        self.set_param_hint("offset", vary=True)
-        self.set_param_hint("width", vary=True)
-
-    def guess(self, data, **kws) -> lmfit.parameter.Parameters:
-        x = kws.get("x", None)
-
-        if x is None:
-            return None
-
-        # Guess that the resonance is where the function takes its maximal value
-        x0_guess = x[np.argmax(data)]
-        self.set_param_hint("center", value=x0_guess)
-
-        # assume the user isn't trying to fit just a small part of a resonance curve.
-        xmin = x.min()
-        xmax = x.max()
-        width_max = xmax - xmin
-
-        delta_x = np.diff(x)  # assume f is sorted
-        min_delta_x = delta_x[delta_x > 0].min()
-        # assume data actually samples the resonance reasonably
-        width_min = min_delta_x
-        # TODO this needs to be checked:
-        # width_guess = np.sqrt(width_min * width_max)  # geometric mean, why not?
-        width_guess = 0.5e6
-        self.set_param_hint("width", value=width_guess)
-
-        # The guess for the vertical offset is the mean absolute value of the data
-        c_guess = np.mean(data)
-        self.set_param_hint("offset", value=c_guess)
-
-        # Calculate A_guess from difference between the peak and the backround level
-        A_guess = (np.max(data) - c_guess) / 10
-        self.set_param_hint("amplitude", value=A_guess)
-
-        params = self.make_params()
-        return lmfit.models.update_param_vals(params, self.prefix, **kws)
-
-
 # Cosine function that is fit to Rabi oscillations
 def cos_func(
     drive_amp: float,
@@ -166,11 +117,21 @@ class RabiModel(lmfit.model.Model):
         return lmfit.models.update_param_vals(params, self.prefix, **kws)
 
 
+def sin_func(
+    x: float,
+    frequency: float,
+    amplitude: float,
+    offset: float,
+    phase: float = 0,
+) -> float:
+    return amplitude * np.cos(2 * np.pi * frequency * x + phase) + offset
+
+
 class TwoClassBoundary:
     """
     Converts the boundary encoded in the LDA discriminator.
     The LDA boundary (also called threshold) has the form Ax + By + y_intercept = 0.
-    This boundary is coverted:
+    This boundary is converted:
     i. To the form y = lamda * x + y_intercept, used in plotting
     ii. To the form (theta, threshold) used by the Quantify Scheduler for Thresholded Aqcuisitions
 
@@ -179,7 +140,7 @@ class TwoClassBoundary:
     lamda: float
         the slope coefficient of form (i)
     y_intercept: float
-        the y axis intercept of form (i)
+        the y-axis intercept of form (i)
     theta_rad: float
         the angle of the boundary, used for form (ii)
     threshold: float

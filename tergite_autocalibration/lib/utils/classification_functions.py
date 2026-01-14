@@ -1,7 +1,7 @@
 # This code is part of Tergite
 #
-# (C) Eleftherios Moschandreou 2024
-# (C) Copyright Chalmers Next Labs 2024
+# (C) Eleftherios Moschandreou 2024, 2025
+# (C) Copyright Chalmers Next Labs 2024, 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -17,11 +17,8 @@ import xarray as xr
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
 
 
-def assign_state(qubit: str, iq_values: np.ndarray) -> xr.DataArray:
-    """
-    takes as input the array of iq points. Loads the three boundaries from
-    redis and classifies each iq point to the corresponding state
-    """
+def assign_state(iq_values: xr.DataArray) -> xr.DataArray:
+    qubit = iq_values.attrs["qubit"]
     redis_key = f"transmons:{qubit}"
     centroid_i = float(REDIS_CONNECTION.hget(f"{redis_key}", "centroid_I"))
     centroid_q = float(REDIS_CONNECTION.hget(f"{redis_key}", "centroid_Q"))
@@ -33,14 +30,10 @@ def assign_state(qubit: str, iq_values: np.ndarray) -> xr.DataArray:
         k: v for k, v in sorted(state_boundaries.items(), key=lambda item: item[1])
     }
     sorted_state_boundaries = list(sorted_state_boundaries_dict.keys())
-    # translated iq_values so the their origin is the centroid
-    iq_values_translated = iq_values - (centroid_i + 1j * centroid_q)
-    # covert the translated iq to an array of angles with respect to the centroid
-    iq_values_angles = xr.apply_ufunc(
-        lambda x: (np.angle(x, deg=True) + 360) % 360, iq_values_translated
-    )
+    iq_values = iq_values - (centroid_i + 1j * centroid_q)
+    iq_values = xr.apply_ufunc(lambda x: (np.angle(x, deg=True) + 360) % 360, iq_values)
 
-    def state_filter(angles_array: xr.DataArray) -> xr.DataArray:
+    def state_filter(angles_array) -> xr.DataArray:
         boundary_1 = sorted_state_boundaries[0]  # eg '01'
         boundary_2 = sorted_state_boundaries[1]  # eg '12'
         boundary_3 = sorted_state_boundaries[2]  # eg '20'
@@ -62,5 +55,38 @@ def assign_state(qubit: str, iq_values: np.ndarray) -> xr.DataArray:
         ) * state_between_3_and_1
         return condition_1 + condition_2 + condition_3
 
-    assigned_states = xr.apply_ufunc(state_filter, iq_values_angles)
+    assigned_states = xr.apply_ufunc(state_filter, iq_values)
     return assigned_states
+
+
+def calculate_probabilities(iq_data_var: xr.DataArray):
+    if "loops" not in iq_data_var.coords:
+        raise ValueError("Dataarray does not contain loop coordinate")
+    states_array = assign_state(iq_data_var)
+    qubit = iq_data_var.attrs["qubit"]
+    loops_coord = iq_data_var.loops.name
+    number_of_loops = iq_data_var.loops.size
+
+    zeros = xr.where(states_array == 0, x=1, y=0)  # keep only |0> states
+    ones = xr.where(states_array == 1, x=1, y=0)  # keep only |1> states
+    twos = xr.where(states_array == 2, x=1, y=0)  # keep only |2> states
+
+    ones = ones.reduce(func=np.sum, dim=loops_coord)
+    twos = twos.reduce(func=np.sum, dim=loops_coord)
+    zeros = zeros.reduce(func=np.sum, dim=loops_coord)
+
+    probabilities_state_0 = zeros / number_of_loops
+    probabilities_state_0 = probabilities_state_0.assign_coords(state=0)
+    probabilities_state_0 = probabilities_state_0.assign_coords(qubit=qubit)
+    probabilities_state_1 = ones / number_of_loops
+    probabilities_state_1 = probabilities_state_1.assign_coords(state=1)
+    probabilities_state_1 = probabilities_state_1.assign_coords(qubit=qubit)
+    probabilities_state_2 = twos / number_of_loops
+    probabilities_state_2 = probabilities_state_2.assign_coords(state=2)
+    probabilities_state_2 = probabilities_state_2.assign_coords(qubit=qubit)
+
+    state_probabilities = xr.concat(
+        [probabilities_state_0, probabilities_state_1, probabilities_state_2],
+        dim="state",
+    )
+    return state_probabilities
