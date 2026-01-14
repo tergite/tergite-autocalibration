@@ -22,6 +22,7 @@ from quantify_scheduler.operations.pulse_library import (
     SquarePulse,
 )
 from quantify_scheduler.resources import ClockResource
+from quantify_scheduler.schedules.schedule import LoopOperation
 
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
@@ -155,6 +156,7 @@ class ROAmplitudeOptimizationMeasurement(BaseMeasurement):
         schedule = Schedule("RO_amplitude_optimization", repetitions=1)
         ro_shot_schedule = self.ro_shot(ro_amplitudes, qubit_states, qubit_state)
 
-        schedule.add(ro_shot_schedule, control_flow=Loop(loop_repetitions))
-        schedule.add(IdlePulse(20e-9))
+        schedule.add(IdlePulse(8e-9))
+        schedule.add(LoopOperation(body=ro_shot_schedule, repetitions=loop_repetitions))
+        schedule.add(IdlePulse(8e-9))
         return schedule

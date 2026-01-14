@@ -193,6 +193,8 @@ def _save_parameters_in_coupler(
                     f"The qoi {qoi_name} is not in redis fields: {redis_fields} for {this_element}"
                 )
             value = qoi_result["value"]
+            if isinstance(value, list):
+                value = str(value)
             logger.info(f"Updating redis for {this_element} with {qoi_name}: {value}")
             REDIS_CONNECTION.hset(f"{name}:{this_element}", qoi_name, value)
             error = qoi_result["error"]
