@@ -2,7 +2,8 @@
 #
 # (C) Copyright Eleftherios Moschandreou 2024, 2025
 # (C) Copyright Michele Faucci Giannelli 2025
-# (C) Copyright Abdullah Al Amin
+# (C) Copyright Abdullah Al Amin 2024
+# (C) Chalmers Next Labs 2024, 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -71,7 +72,10 @@ class ExternalParameterNode(MeasurementType):
             )
 
             ds = ds.expand_dims({external_dim: np.array([current_value])})
-            result_dataset = xarray.merge([ds, result_dataset])
+            # we explicitly set join='outer' because we want the union of the old coordinates with the new
+            result_dataset = xarray.merge(
+                [ds, result_dataset], join="outer", compat="no_conflicts"
+            )
 
         # example of final Operation is ramping the current back to 0 in coupler spectroscopy
         self.node.final_operation()

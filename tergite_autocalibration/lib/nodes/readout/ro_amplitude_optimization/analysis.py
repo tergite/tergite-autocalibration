@@ -118,10 +118,18 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
                 name="IQ1_fp",
                 coords={"shots": np.arange(len(IQ1[~tp1])), "re_im": ["re", "im"]},
             ).expand_dims({self.amplitude_coord: [ro_amplitude]})
-            array_iq0_tp = xr.concat([IQ0_tp, array_iq0_tp], dim=self.amplitude_coord)
-            array_iq0_fp = xr.concat([IQ0_fp, array_iq0_fp], dim=self.amplitude_coord)
-            array_iq1_tp = xr.concat([IQ1_tp, array_iq1_tp], dim=self.amplitude_coord)
-            array_iq1_fp = xr.concat([IQ1_fp, array_iq1_fp], dim=self.amplitude_coord)
+            array_iq0_tp = xr.concat(
+                [IQ0_tp, array_iq0_tp], dim=self.amplitude_coord, join="outer"
+            )
+            array_iq0_fp = xr.concat(
+                [IQ0_fp, array_iq0_fp], dim=self.amplitude_coord, join="outer"
+            )
+            array_iq1_tp = xr.concat(
+                [IQ1_tp, array_iq1_tp], dim=self.amplitude_coord, join="outer"
+            )
+            array_iq1_fp = xr.concat(
+                [IQ1_fp, array_iq1_fp], dim=self.amplitude_coord, join="outer"
+            )
 
             cm_norm = confusion_matrix(states_sent, classified_states, normalize="true")
             assignment = np.trace(cm_norm) / len(self.unique_qubit_states)
