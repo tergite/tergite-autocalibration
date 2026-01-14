@@ -9,17 +9,18 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
+
 import os.path
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
+import matplotlib.image as mpimg
+import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib import gridspec
 from matplotlib.lines import Line2D
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-import numpy as np
-from tergite_autocalibration.config.globals import (
-    CONFIG,
-)
+
+from tergite_autocalibration.config.globals import CONFIG
 from tergite_autocalibration.utils.logging import logger
 
 
