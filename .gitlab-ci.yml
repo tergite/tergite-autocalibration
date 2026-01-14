@@ -148,7 +148,7 @@ application_run:
         echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/01-44-14_simple_coupler_run-SUCCESS" -n $node
       done
     # Uncomment for debugging:
-    # - ls -lR venv/lib/python3.12/site-packages/out
+    - ls -lR venv/lib/python3.12/site-packages/out
     # Verify output
     - |
       if ls -lR venv/lib/python3.12/site-packages/out | grep -q "qubit_spectroscopy_vs_current_q06_q07_0_preview.png"; then
