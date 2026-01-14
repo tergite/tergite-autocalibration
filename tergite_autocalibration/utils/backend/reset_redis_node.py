@@ -18,9 +18,8 @@ from typing import TYPE_CHECKING, ClassVar
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION, CONFIG
 from tergite_autocalibration.lib.base.node import CouplerNode, QubitNode
-from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
-from tergite_autocalibration.tools.mss.convert import structured_redis_storage
+from tergite_autocalibration.utils.logging import logger
 
 if TYPE_CHECKING:
     from tergite_autocalibration.lib.base.node import BaseNode
@@ -78,16 +77,12 @@ class ResetRedisNode:
             cs_key = f"cs:{qubit}"
             for field in remove_fields:
                 REDIS_CONNECTION.hset(key, field, "nan")
-                structured_redis_storage(key, qubit.strip("q"), None)
                 if "motzoi" in field:
                     REDIS_CONNECTION.hset(key, field, "0")
-                    structured_redis_storage(key, qubit.strip("q"), 0)
                 if "measure_3state_opt:pulse_amp" in field:
                     REDIS_CONNECTION.hset(key, field, "0")
-                    structured_redis_storage(key, qubit.strip("q"), 0)
                 if "measure_2state_opt:pulse_amp" in field:
                     REDIS_CONNECTION.hset(key, field, "0")
-                    structured_redis_storage(key, qubit.strip("q"), 0)
             REDIS_CONNECTION.hset(cs_key, remove_node, "not_calibrated")
 
     def reset_all_fields_in_qubit_nodes(self):
@@ -97,16 +92,12 @@ class ResetRedisNode:
             fields = REDIS_CONNECTION.hgetall(f"transmons:{qubit}").keys()
             for field in fields:
                 REDIS_CONNECTION.hset(key, field, "nan")
-                structured_redis_storage(key, qubit.strip("q"), None)
                 if "motzoi" in field:
                     REDIS_CONNECTION.hset(key, field, "0")
-                    structured_redis_storage(key, qubit.strip("q"), 0)
                 if "measure_3state_opt:pulse_amp" in field:
                     REDIS_CONNECTION.hset(key, field, "0")
-                    structured_redis_storage(key, qubit.strip("q"), 0)
                 if "measure_2state_opt:pulse_amp" in field:
                     REDIS_CONNECTION.hset(key, field, "0")
-                    structured_redis_storage(key, qubit.strip("q"), 0)
             for node in self.node_names:
                 if issubclass(self.factory_dict[node], QubitNode):
                     REDIS_CONNECTION.hset(cs_key, node, "not_calibrated")
@@ -118,7 +109,6 @@ class ResetRedisNode:
             cs_key = f"cs:{coupler}"
             for field in remove_fields:
                 REDIS_CONNECTION.hset(key, field, "nan")
-                structured_redis_storage(key, coupler, None)
             REDIS_CONNECTION.hset(cs_key, remove_node, "not_calibrated")
 
     def reset_all_fields_in_coupler_nodes(self):
@@ -128,7 +118,6 @@ class ResetRedisNode:
             fields = REDIS_CONNECTION.hgetall(f"couplers:{coupler}").keys()
             for field in fields:
                 REDIS_CONNECTION.hset(key, field, "nan")
-                structured_redis_storage(key, coupler, None)
             for node in self.node_names:
                 if issubclass(self.factory_dict[node], CouplerNode):
                     REDIS_CONNECTION.hset(cs_key, node, "not_calibrated")

@@ -91,8 +91,6 @@ class EnvironmentConfiguration(BaseConfigurationFile):
         self.hw_config_generator_host: str = "127.0.0.1"
         self.hw_config_generator_port: int = 8079
 
-        self.mss_machine_root_url: str = "http://localhost:8002"
-
     @staticmethod
     def from_dot_env(
         filepath: Union[str, Path] = _get_default_env_path(),

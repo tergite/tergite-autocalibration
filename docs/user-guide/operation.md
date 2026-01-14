@@ -52,7 +52,6 @@ acli start [OPTIONS]
 - `-c TEXT`: Cluster IP address (if not set, it will use CLUSTER_IP from the .env file)
 - `-r TEXT`: Rerun an analysis (specify the path to the dataset folder)
 - `-n, --name TEXT`: Specify the node type to rerun (works only with -r option)
-- `--push`: Push a backend to an MSS specified in MSS_MACHINE_ROOT_URL in the .env file
 - `--browser`: Will open the dataset browser in the background and plot the measurement results live
 
 ### Cluster Commands ###
@@ -156,6 +155,23 @@ Save the configuration.
 - `-f/--filepath`: Path to the configuration package to save. If the path name is ending with `.zip`, it will
   automatically create a zip file and treat it as if you are running with `-z`.
 - `-z/--as-zip`: Will make the configuration file be a zip archive.
+
+#### `bcc-export`
+
+**Usage:**
+
+```bash
+acli bcc-export [OPTIONS]
+```
+
+Create a `calibration_seed.toml` file that can be used from the backend to push calibration values to the database.
+
+**Options:**
+
+- `-q/--qubits`: Qubit input e.g. `"q00,q01,q02,q03,q04"` or `"q01-q05"` or `"q01-q06, q08"`.
+  If the input is an integer e.g. 3, it will generate `"q01,q02,q03"`.
+- `-c/--couplers`: Couplers to export e.g. `"q00_q01"` as comma-separated list
+- `-o/--output-file`: calibration_seed.toml to write.
 
 #### `config generate`
 
