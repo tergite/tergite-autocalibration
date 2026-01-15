@@ -288,7 +288,9 @@ class BaseNode(NodeInterface):
 class QubitNode(BaseNode):
     qubit_qois: list[str] | None = None
 
-    def __init__(self, name: str, all_qubits: list[str], couplers: list[str], **node_keywords):
+    def __init__(
+        self, name: str, all_qubits: list[str], couplers: list[str], **node_keywords
+    ):
         super().__init__(name, **node_keywords)
         self.all_qubits = all_qubits
         self.couplers = couplers
