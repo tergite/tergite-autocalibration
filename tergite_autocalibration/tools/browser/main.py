@@ -260,7 +260,7 @@ def update_tab(tab: str, outer: str, inter: str, inner: str):
 
     elif tab == "json":
         for file in os.listdir(folder_path):
-            if file.endswith(".json"):
+            if file.endswith(".json") and "qoi" not in file:
                 with open(os.path.join(folder_path, file)) as f:
                     data = json.load(f)
                 columns = []
@@ -280,7 +280,7 @@ def update_tab(tab: str, outer: str, inter: str, inner: str):
                                 DashRenderjson(
                                     id=f"json-view-{key}",
                                     data=data[key]["data"],
-                                    max_depth=-1,  # collapse nested content initially
+                                    max_depth=1,  # collapse nested content initially
                                     invert_theme=True,
                                 ),
                             ],
