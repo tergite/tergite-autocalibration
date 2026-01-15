@@ -14,7 +14,7 @@
 
 import toml
 
-from tergite_autocalibration.config.globals import REDIS_CONNECTION, CONFIG
+from tergite_autocalibration.config.globals import CONFIG, REDIS_CONNECTION
 from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.base.node import CouplerNode, QubitNode
 from tergite_autocalibration.utils.logging import logger
@@ -81,6 +81,8 @@ def populate_initial_parameters(qubits: list, couplers: list, redis_connection):
 
         if coupler in initial_coupler_parameters:
             for module_key, module_value in initial_coupler_parameters[coupler].items():
+                print(f"{ module_key = }")
+                print(f"{ module_value = }")
                 redis_connection.hset(f"couplers:{coupler}", module_key, module_value)
 
 

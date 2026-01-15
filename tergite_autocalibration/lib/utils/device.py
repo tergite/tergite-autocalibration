@@ -65,10 +65,10 @@ class DeviceConfiguration:
         self.device.close()
 
     def save_serial_device(self, device: QuantumDevice, data_path) -> None:
-        '''
+        """
         decode the device object and then parse its data element by element
         to populate the serial device dictionary which is saved as Json
-        '''
+        """
         name = device.name
         serialized_device = json.dumps(device, cls=SchedulerJSONEncoder)
         decoded_device = json.loads(serialized_device)
