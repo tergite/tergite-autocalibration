@@ -377,7 +377,24 @@ def filter_dataset_by_element(selected_elements: list, dataset_json: str):
             for var in filtered_ds.data_vars:
                 da = filtered_ds[var]
                 if da.ndim == 1:
-                    fig = px.line(x=da.coords[da.dims[0]], y=abs(da), title=var)
+                    fig = px.line(
+                        x=da.coords[da.dims[0]], y=abs(da), title=var, markers=True
+                    )
+                    fig.update_layout(plot_bgcolor="white")
+                    fig.update_xaxes(
+                        mirror=True,
+                        ticks="outside",
+                        showline=True,
+                        linecolor="black",
+                        gridcolor="lightgrey",
+                    )
+                    fig.update_yaxes(
+                        mirror=True,
+                        ticks="outside",
+                        showline=True,
+                        linecolor="black",
+                        gridcolor="lightgrey",
+                    )
                     displays.append(
                         dcc.Graph(
                             figure=fig,
@@ -385,12 +402,23 @@ def filter_dataset_by_element(selected_elements: list, dataset_json: str):
                         )
                     )
                 elif da.ndim == 2:
+                    if any(["freq" in str(coord) for coord in da.coords]):
+                        data = abs(da)
+                    else:
+                        data = abs(da.T)
+                    fig = px.imshow(
+                        data, color_continuous_scale="RdBu_r", origin="lower"
+                    )
+                    displays.append(
+                        dcc.Graph(
+                            figure=fig,
+                            style={"border": "1px solid #ccc", "padding": "10px"},
+                        )
+                    )
                     for dim in da.dims:
                         y_dim_options.add(dim)
-        # return [[{"label": d, "value": d} for d in y_dim_options]]
         return [displays, [{"label": d, "value": d} for d in y_dim_options]]
     except Exception as e:
-        # return [[]]
         return [[f"Error filtering dataset: {e}"], []]
 
 
@@ -453,6 +481,22 @@ def plot_y_slice(y_dim_value: str, selected_elements: str, dataset_json: str):
                             x=line.coords[line.dims[0]],
                             y=abs(line),
                             title=f"{var} @ {y_dim_value}={val}",
+                            markers=True,
+                        )
+                        fig.update_layout(plot_bgcolor="white")
+                        fig.update_xaxes(
+                            mirror=True,
+                            ticks="outside",
+                            showline=True,
+                            linecolor="black",
+                            gridcolor="lightgrey",
+                        )
+                        fig.update_yaxes(
+                            mirror=True,
+                            ticks="outside",
+                            showline=True,
+                            linecolor="black",
+                            gridcolor="lightgrey",
                         )
                         displays.append(
                             dcc.Graph(

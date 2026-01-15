@@ -36,6 +36,7 @@ class NodeFactory:
 
     def __init__(self):
         self.node_name_mapping: Dict[str, str] = {
+            "punchout": "PunchoutNode",
             "resonator_spectroscopy": "ResonatorSpectroscopyNode",
             "qubit_bring_up_spectroscopy": "Qubit01SpectroscopyAmplitudeNode",
             "qubit_01_spectroscopy": "Qubit01SpectroscopyNode",
@@ -58,6 +59,7 @@ class NodeFactory:
             "randomized_benchmarking": "RandomizedBenchmarkingNode",
             "purity_benchmarking": "PurityBenchmarkingNode",
             "coupler_anticrossing": "QubitSpectroscopyVsCurrentNode",
+            "cz_parametrization": "CZParametrizationNode",
             "resonator_spectroscopy_vs_current": "ResonatorSpectroscopyVsCurrentNode",
             "qubit_spectroscopy_vs_current": "QubitSpectroscopyVsCurrentNode",
         }

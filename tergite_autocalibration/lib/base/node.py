@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2023, 2024
+# (C) Copyright Eleftherios Moschandreou 2023, 2024, 2025
 # (C) Copyright Liangyu Chen 2023, 2024
 # (C) Copyright Stefan Hill 2024
 # (C) Copyright Michele Faucci Giannelli 2024, 2025
@@ -15,7 +15,7 @@
 
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Tuple
+from typing import Literal, Tuple
 
 import matplotlib
 import numpy as np
@@ -30,7 +30,8 @@ from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
     InstrumentCoordinator,
 )
 
-from tergite_autocalibration.config.globals import PLOTTING_BACKEND
+from tergite_autocalibration.config.globals import PLOTTING_BACKEND, REDIS_CONNECTION
+from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.lib.base.node_interface import (
@@ -71,6 +72,7 @@ class BaseNode(NodeInterface):
         self.reduced_external_samplespace = {}
         self.loops = None
         self.schedule_keywords = {}
+        self.analysis_keywords = {}
 
         self.samplespace = self.schedule_samplespace | self.external_samplespace
 
@@ -155,7 +157,7 @@ class BaseNode(NodeInterface):
         return duration
 
     def post_process(self, data_path: Path):
-        analysis_kwargs = getattr(self, "analysis_kwargs", dict())
+        analysis_kwargs = getattr(self, "analysis_keywords", dict())
         node_analysis: BaseNodeAnalysis = self.analysis_obj(
             self.name, self.redis_fields, **analysis_kwargs
         )
@@ -365,6 +367,27 @@ class CouplerNode(BaseNode):
             coupled_qubits.append(qubits[1])
         return coupled_qubits
 
+    def gate_qubit_types_dict(self) -> dict[str, dict]:
+        qubit_types_dict = {}
+        for coupler in self.couplers:
+            q1, q2 = coupler.split("_")
+
+            q1_type = dh.get_legacy("qubit_types")[q1]
+            q2_type = dh.get_legacy("qubit_types")[q2]
+            if q1_type == "Control" and q2_type == "Target":
+                control_qubit = q1
+                target_qubit = q2
+            elif q1_type == "Target" and q2_type == "Control":
+                target_qubit = q1
+                control_qubit = q2
+            else:
+                raise ValueError("Invalid qubit types")
+            qubit_types_dict[coupler] = {
+                "control_qubit": control_qubit,
+                "target_qubit": target_qubit,
+            }
+        return qubit_types_dict
+
     def validate(self) -> None:
         all_coupled_qubits = []
         for coupler in self.couplers:
@@ -372,6 +395,27 @@ class CouplerNode(BaseNode):
         if len(all_coupled_qubits) > len(set(all_coupled_qubits)):
             logger.info("Couplers share qubits")
             raise ValueError("Improper Couplers")
+
+    def transition_frequency(
+        self, coupler: str, phase_path: Literal["via_20", "via_02"]
+    ) -> float:
+        q1, q2 = coupler.split(sep="_")
+        q1_f01 = float(REDIS_CONNECTION.hget(f"transmons:{q1}", "clock_freqs:f01"))
+        q2_f01 = float(REDIS_CONNECTION.hget(f"transmons:{q2}", "clock_freqs:f01"))
+        q1_f12 = float(REDIS_CONNECTION.hget(f"transmons:{q1}", "clock_freqs:f12"))
+        q2_f12 = float(REDIS_CONNECTION.hget(f"transmons:{q2}", "clock_freqs:f12"))
+
+        if phase_path == "via_20":
+            ac_frequency = np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12))
+        elif phase_path == "via_02":
+            ac_frequency = np.abs(q1_f01 + q2_f01 - (q2_f01 + q2_f12))
+        else:
+            raise ValueError("Invalid Phase path")
+
+        ac_frequency = int(ac_frequency / 1e4) * 1e4
+        logger.info(f"{ ac_frequency/1e6 = } MHz for coupler: {coupler}")
+
+        return ac_frequency
 
     def precompile(self, schedule_samplespace: dict) -> CompiledSchedule:
         constants.GRID_TIME_TOLERANCE_TIME = 5e-2
