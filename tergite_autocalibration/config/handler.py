@@ -14,7 +14,6 @@ import json
 
 from quantify_scheduler.backends.qblox_backend import QbloxHardwareCompilationConfig
 
-from tergite_autocalibration.config.cluster import ClusterConfiguration
 from tergite_autocalibration.config.device import DeviceConfiguration
 from tergite_autocalibration.config.node import NodeConfiguration
 from tergite_autocalibration.config.package import ConfigurationPackage
@@ -64,11 +63,9 @@ class ConfigurationHandler:
         _cluster_config_filepath = configuration_package.config_files["cluster_config"]
         with open(_cluster_config_filepath, "r") as f_:
             cluster_config_json = json.load(f_)
-            return_obj.cluster = ClusterConfiguration.model_validate(
+            return_obj.cluster = QbloxHardwareCompilationConfig.model_validate(
                 cluster_config_json
             )
-            # Store the filepath in the object, so, that one knows where the content was loaded from
-            return_obj.cluster.filepath = _cluster_config_filepath
 
         return_obj.device = DeviceConfiguration(
             configuration_package.config_files["device_config"]

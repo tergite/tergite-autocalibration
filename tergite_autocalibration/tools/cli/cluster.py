@@ -78,7 +78,7 @@ def mixer_calibration(
         mc = IQMixerCalibration(qubits_, "res")
         mc.lo_calibration()
         mc.sideband_calibration()
-        mc.export_calibration_parameters(overwrite=True, save_to_disk=True)
+        mc.export_calibration_parameters(overwrite=True, save_to_disk=False)
         typer.echo("Mixer calibration for readout lines. Done.")
 
         # calibration qcm-rf modules
@@ -86,7 +86,7 @@ def mixer_calibration(
         mc = IQMixerCalibration(qubits_, "mw")
         mc.lo_calibration()
         mc.sideband_calibration()
-        mc.export_calibration_parameters(overwrite=True, save_to_disk=True)
+        mc.export_calibration_parameters(overwrite=True, save_to_disk=False)
         typer.echo("Mixer calibration for drive lines. Done.")
 
     else:

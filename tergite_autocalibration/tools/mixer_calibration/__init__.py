@@ -17,7 +17,16 @@ import toml
 from qblox_instruments import Cluster
 from qblox_instruments.qcodes_drivers.module import Module
 
-from tergite_autocalibration.config.globals import CONFIG, ENV, REDIS_CONNECTION, logger
+from tergite_autocalibration.config.globals import (
+    CONFIG,
+    ENV,
+    REDIS_CONNECTION,
+    logger,
+    CONFIGURATION_PACKAGE,
+)
+from tergite_autocalibration.tools.mixer_calibration.utils import (
+    replace_mixer_corrected_values,
+)
 
 
 class IQMixerChannel:
@@ -109,7 +118,9 @@ class IQMixerCalibration:
 
     def parse_cluster_config(self, cluster_config):
         if cluster_config is None:
-            self.cluster_config_path = CONFIG.cluster.filepath
+            self.cluster_config_path = CONFIGURATION_PACKAGE.config_files[
+                "cluster_config"
+            ]
         else:
             self.cluster_config_path = cluster_config
 
@@ -212,7 +223,7 @@ class IQMixerCalibration:
 
         if overwrite:
             # Not recommended
-            self.cluster_config["hardware_options"]["mixer_corrections"] = mc
+            replace_mixer_corrected_values(self.cluster_config, mc)
             with open(self.cluster_config_path, "w") as f:
                 json.dump(self.cluster_config, f, indent=4)
 
