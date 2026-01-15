@@ -26,61 +26,61 @@ from tergite_autocalibration.utils.dto.extended_coupler_edge import (
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
-class DeviceConfiguration:
-    def __init__(self, qubits: list[str], couplers: list[str]) -> None:
-        self.qubits = qubits
-        self.couplers = couplers
-        self.transmons: dict[str, ExtendedTransmon] = {}
-        self.edges: dict[str, ExtendedCompositeSquareEdge] = {}
-        self.device: QuantumDevice
+def configure_device(
+    name: str, qubits: list[str], couplers: list[str]
+) -> QuantumDevice:
+    device = QuantumDevice(name)
+    for channel, qubit in enumerate(qubits):
+        transmon = ExtendedTransmon(qubit)
+        transmon = load_redis_config(transmon, channel)
+        device.add_element(transmon)
 
-    def configure_device(self, name: str) -> QuantumDevice:
-        device = QuantumDevice(name)
-        for channel, qubit in enumerate(self.qubits):
-            transmon = ExtendedTransmon(qubit)
-            transmon = load_redis_config(transmon, channel)
-            device.add_element(transmon)
-            self.transmons[qubit] = transmon
+    if couplers is not None:
+        for coupler in couplers:
+            control, target = coupler.split(sep="_")
+            edge = ExtendedCompositeSquareEdge(control, target)
+            edge = load_redis_config_coupler(edge)
+            device.add_edge(edge)
 
-        if self.couplers is not None:
-            for coupler in self.couplers:
-                control, target = coupler.split(sep="_")
-                edge = ExtendedCompositeSquareEdge(control, target)
-                edge = load_redis_config_coupler(edge)
-                device.add_edge(edge)
-                self.edges[coupler] = edge
+    device.hardware_config(CONFIG.cluster)
+    return device
 
-        device.hardware_config(CONFIG.cluster)
-        self.device = device
-        return device
 
-    def close_device(self):
-        # after the compilation_config is acquired, free the transmon resources
-        for transmon in self.transmons.values():
-            transmon.close()
-        if self.couplers is not None:
-            for edge in self.edges.values():
-                edge.close()
+def close_device_resources(device: QuantumDevice):
+    """
+    closes the Quantum Device and all the attached BasicTransmonElement
+    and BasicCompositeEdge objsects so they become available for the next node.
+    Note that closing the QuantumDevice alone is not enough
+    """
+    for qubit in device.elements():
+        transmon = device.get_element(qubit)
+        transmon.close()
+    couplers = device.edges()
+    if couplers is not None:
+        for coupler in couplers:
+            edge = device.get_edge(coupler)
+            edge.close()
 
-        self.device.close()
+    device.close()
 
-    def save_serial_device(self, device: QuantumDevice, data_path) -> None:
-        """
-        decode the device object and then parse its data element by element
-        to populate the serial device dictionary which is saved as Json
-        """
-        name = device.name
-        serialized_device = json.dumps(device, cls=SchedulerJSONEncoder)
-        decoded_device = json.loads(serialized_device)
-        serial_device = {}
-        for element, element_config in decoded_device["data"]["elements"].items():
-            serial_config = json.loads(element_config)
-            serial_device[element] = serial_config
 
-        for element, element_config in decoded_device["data"]["edges"].items():
-            serial_config = json.loads(element_config)
-            serial_device[element] = serial_config
+def save_serial_device(device: QuantumDevice, data_path: str) -> None:
+    """
+    decode the device object and then parse its data element by element
+    to populate the serial device dictionary which is saved as Json
+    """
+    name = device.name
+    serialized_device = json.dumps(device, cls=SchedulerJSONEncoder)
+    decoded_device = json.loads(serialized_device)
+    serial_device = {}
+    for element, element_config in decoded_device["data"]["elements"].items():
+        serial_config = json.loads(element_config)
+        serial_device[element] = serial_config
 
-        data_path.mkdir(parents=True, exist_ok=True)
-        with open(f"{data_path}/{name}.json", "w") as f:
-            json.dump(serial_device, f, indent=4)
+    for element, element_config in decoded_device["data"]["edges"].items():
+        serial_config = json.loads(element_config)
+        serial_device[element] = serial_config
+
+    data_path.mkdir(parents=True, exist_ok=True)
+    with open(f"{data_path}/{name}.json", "w") as f:
+        json.dump(serial_device, f, indent=4)

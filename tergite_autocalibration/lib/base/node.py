@@ -38,7 +38,11 @@ from tergite_autocalibration.lib.base.node_interface import (
     MeasurementType,
     NodeInterface,
 )
-from tergite_autocalibration.lib.utils.device import DeviceConfiguration
+from tergite_autocalibration.lib.utils.device import (
+    close_device_resources,
+    configure_device,
+    save_serial_device,
+)
 from tergite_autocalibration.lib.utils.redis import update_redis_trusted_values
 from tergite_autocalibration.lib.utils.schedule_execution import execute_schedule
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
@@ -91,10 +95,10 @@ class BaseNode(NodeInterface):
     def calibrate(self, data_path, measurement_mode):
         if measurement_mode != MeasurementMode.re_analyse:
             result_dataset = self.measure_node(measurement_mode)
-            self.device_manager.save_serial_device(self.device, data_path)
+            save_serial_device(self.device, data_path)
             save_dataset(result_dataset, self.name, data_path)
         # After the measurement free the device resources
-        self.device_manager.close_device()
+        close_device_resources(self.device)
         self.post_process(data_path)
         logger.info("analysis completed")
 
@@ -300,11 +304,9 @@ class QubitNode(BaseNode):
         if self.qubit_qois is not None:
             self.redis_fields = self.qubit_qois
 
-        # NOTE: In the future this will be problematic.
-        # Having the device creation in the init will prohibit concurrent
-        # initialization of two different nodes
-        self.device_manager = DeviceConfiguration(self.all_qubits, self.couplers)
-        self.device = self.device_manager.configure_device(self.name)
+        self.device = configure_device(
+            self.name, qubits=self.all_qubits, couplers=self.couplers
+        )
 
     def precompile(self, schedule_samplespace: dict) -> CompiledSchedule:
         constants.GRID_TIME_TOLERANCE_TIME = 5e-2
@@ -313,9 +315,10 @@ class QubitNode(BaseNode):
         if self.name == "tof":
             return None, 1
 
-        transmons = self.device_manager.transmons
-
-        measurement_class = self.measurement_obj(transmons)
+        transmons_dict = {
+            qubit: self.device.get_element(qubit) for qubit in self.all_qubits
+        }
+        measurement_class = self.measurement_obj(transmons_dict)
         schedule = measurement_class.schedule_function(
             **schedule_samplespace, **self.schedule_keywords
         )
@@ -354,12 +357,9 @@ class CouplerNode(BaseNode):
         if self.coupler_qois is not None:
             self.redis_fields = self.coupler_qois
 
-        # NOTE: In the future this will be problematic.
-        # Having the device creation in the init will prohibit concurrent
-        # initialization of two different nodes
-
-        self.device_manager = DeviceConfiguration(self.all_qubits, self.couplers)
-        self.device = self.device_manager.configure_device(self.name)
+        self.device = configure_device(
+            self.name, qubits=self.all_qubits, couplers=self.couplers
+        )
 
     def get_coupled_qubits(self) -> list:
         coupled_qubits = []
@@ -422,14 +422,18 @@ class CouplerNode(BaseNode):
     def precompile(self, schedule_samplespace: dict) -> CompiledSchedule:
         constants.GRID_TIME_TOLERANCE_TIME = 5e-2
 
-        transmons = self.device_manager.transmons
-        edges = self.device_manager.edges
-        measurement_class = self.measurement_obj(transmons, edges)
+        transmons_dict = {
+            qubit: self.device.get_element(qubit) for qubit in self.all_qubits
+        }
+        edges_dict = {
+            coupler: self.device.get_edge(coupler) for coupler in self.couplers
+        }
+        measurement_class = self.measurement_obj(transmons_dict, edges_dict)
         schedule = measurement_class.schedule_function(
             **schedule_samplespace, **self.schedule_keywords
         )
 
-        # TODO: Probably the compiler desn't need to be created every time self.precompile() is called.
+        # TODO: Probably the compiler doesn't need to be created every time self.precompile() is called.
         compiler = SerialCompiler(name=f"{self.name}_compiler")
 
         compilation_config = self.device.generate_compilation_config()
