@@ -35,8 +35,10 @@ class MotzoiParameterNode(QubitNode):
     measurement_type = ScheduleNode
     qubit_qois = ["rxy:motzoi"]
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(
+        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
+    ):
+        super().__init__(name, all_qubits, couplers, **schedule_keywords)
         self.motzoi_minima = []  # NOTE: is this needed?
         self.qubit_state = 0
         self.schedule_keywords["qubit_state"] = self.qubit_state
@@ -88,8 +90,10 @@ class MotzoiParameter12Node(QubitNode):
     measurement_type = ScheduleNode
     qubit_qois = ["r12:ef_motzoi"]
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(
+        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
+    ):
+        super().__init__(name, all_qubits, couplers, **schedule_keywords)
         self.motzoi_minima = []  # NOTE: is this needed?
         self.qubit_state = 1
         self.schedule_keywords["qubit_state"] = self.qubit_state
