@@ -12,10 +12,10 @@
 
 
 import json
+from typing import List, TYPE_CHECKING
 
 import toml
 from qblox_instruments import Cluster
-from qblox_instruments.qcodes_drivers.module import Module
 
 from tergite_autocalibration.config.globals import (
     CONFIG,
@@ -28,10 +28,13 @@ from tergite_autocalibration.tools.mixer_calibration.utils import (
     replace_mixer_corrected_values,
 )
 
+if TYPE_CHECKING:
+    from qblox_instruments.qcodes_drivers.module import Module
+
 
 class IQMixerChannel:
 
-    def __init__(self, module: Module, port: int):
+    def __init__(self, module: "Module", port: int):
         assert module.is_rf_type, f"{module} has no mixers."
         self.module = module
         self.port = port
@@ -44,13 +47,17 @@ class IQMixerChannel:
                 f"out{self.port}_in{self.port}_lo_cal",
             ]
 
+        # Initialize offsets with default values
+        self.lo_offset = (0, 0)
+        self.sideband_offset = (1, 0)
+
     def set_lo_freq(self, lo_freq: float):
         self.lo_freq = lo_freq
 
     def set_rf_freq(self, rf_freq: float):
         self.rf_freq = rf_freq
 
-    def lo_calibration(self):
+    def calibrate_lo(self):
         if self.lo_freq is None:
             raise AttributeError(
                 f"The lo_freq for the module {self.module} has not been assigned yet."
@@ -62,7 +69,7 @@ class IQMixerChannel:
         offset_path1 = 1e-3 * getattr(self.module, f"out{self.port}_offset_path1")()
         self.lo_offset = (offset_path0, offset_path1)
 
-    def sideband_calibration(self):
+    def calibrate_sideband(self):
         if self.rf_freq is None:
             raise AttributeError(
                 f"The rf_freq for the module {self.module} has not been assigned yet."
@@ -86,7 +93,7 @@ class IQMixerCalibration:
 
     def __init__(
         self,
-        devices,
+        devices: List[str],
         rf_port: str = "mw",
         cluster_ip=None,
         cluster_config=None,
@@ -94,21 +101,38 @@ class IQMixerCalibration:
     ):
         self.devices = devices
         self.rf_port = rf_port
-        if rf_port == "mw":
-            self.default_clock = "01"
-        elif rf_port == "res":
-            self.default_clock = "ro"
-        elif rf_port == "fl":
-            self.default_clock = "cz"
+
+        # Connect to the cluster
         self.cluster_ip = ENV.cluster_ip if cluster_ip is None else cluster_ip
         Cluster.close_all()
         self.cluster = Cluster("cluster", self.cluster_ip)
-        self.parse_cluster_config(cluster_config)
-        self.parse_device_config(device_config)
-        self.create_rf_channels()
+
+        # Load cluster config
+        self.cluster_config_path = (
+            CONFIGURATION_PACKAGE.config_files["cluster_config"]
+            if cluster_config is None
+            else cluster_config
+        )
+        with open(self.cluster_config_path, "r") as f_:
+            self.cluster_config = json.load(f_)
+
+        # Load device config
+        self.device_config_path = (
+            CONFIG.device.filepath if device_config is None else device_config
+        )
+        self.device_config = toml.load(self.device_config_path)
+
+        # Basic initialization sequence
+        self.connectivity = self._init_connectivity()
+        self._lo_freqs = self._init_lo_freqs()
+        self._rf_freqs = self._init_rf_freqs()
+        self.rf_channels = self._init_rf_channels()
 
     @property
     def all_clocks(self):
+        """
+        First clock should be default clock, see default_clock property below.
+        """
         if self.rf_port == "mw":
             return ["01", "12"]
         elif self.rf_port == "res":
@@ -116,22 +140,12 @@ class IQMixerCalibration:
         elif self.rf_port == "fl":
             return ["cz"]
 
-    def parse_cluster_config(self, cluster_config):
-        if cluster_config is None:
-            self.cluster_config_path = CONFIGURATION_PACKAGE.config_files[
-                "cluster_config"
-            ]
-        else:
-            self.cluster_config_path = cluster_config
+    @property
+    def default_clock(self):
+        return self.all_clocks[0]
 
-        with open(self.cluster_config_path, "r") as f:
-            self.cluster_config = json.load(f)
-
-        self.create_connectivity()
-        self.assign_lo_freqs()
-
-    def create_connectivity(self):
-        self.connectivity = dict()
+    def _init_connectivity(self):
+        connectivity_ = dict()
         for pair in self.cluster_config["connectivity"]["graph"]:
             _, module_name, port_name = pair[0].split(".")
             channel_name = pair[1]
@@ -139,34 +153,27 @@ class IQMixerCalibration:
             if self.rf_port in channel_name:
                 device = channel_name.split(":")[0]
                 if device in self.devices:
-                    self.connectivity[device] = (
+                    connectivity_[device] = (
                         getattr(self.cluster, module_name),
                         port,
                     )
+        return connectivity_
 
-    def assign_lo_freqs(self):
+    def _init_lo_freqs(self):
+        lo_freqs_ = dict()
         modulation_frequencies = self.cluster_config["hardware_options"][
             "modulation_frequencies"
         ]
-        self._lo_freqs = dict()
         for device in self.devices:
-            self._lo_freqs[device] = float(
+            lo_freqs_[device] = float(
                 modulation_frequencies[
                     f"{device}:{self.rf_port}-{device}.{self.default_clock}"
                 ]["lo_freq"]
             )
+        return lo_freqs_
 
-    def parse_device_config(self, device_config):
-        if device_config is None:
-            self.device_config_path = CONFIG.device.filepath
-        else:
-            self.device_config_path = device_config
-
-        self.device_config = toml.load(self.device_config_path)
-        self.assign_rf_freqs()
-
-    def assign_rf_freqs(self):
-        self._rf_freqs = dict()
+    def _init_rf_freqs(self):
+        rf_freqs_ = dict()
         for device in self.devices:
             if self.rf_port == "res":
                 rf_freq = self.device_config["device"]["resonator"][device][
@@ -186,49 +193,50 @@ class IQMixerCalibration:
                     )
                 else:
                     rf_freq = 4.4e9 - cz_pulse_frequency
+            else:
+                raise ValueError(f"Unknown rf_port value: {self.rf_port}")
 
-            self._rf_freqs[device] = float(rf_freq)
+            rf_freqs_[device] = float(rf_freq)
+        return rf_freqs_
 
-    def create_rf_channels(self):
-        self.rf_channels = dict()
+    def _init_rf_channels(self):
+        rf_channels_ = dict()
         for device in self.devices:
             module, port = self.connectivity[device]
-            IQchannel = self.rf_channels[device] = IQMixerChannel(module, port)
-            IQchannel.set_lo_freq(self._lo_freqs[device])
-            IQchannel.set_rf_freq(self._rf_freqs[device])
+            iq_channel = rf_channels_[device] = IQMixerChannel(module, port)
+            iq_channel.set_lo_freq(self._lo_freqs[device])
+            iq_channel.set_rf_freq(self._rf_freqs[device])
+        return rf_channels_
 
-    def lo_calibration(self):
+    def calibrate_lo(self):
         for device, channel in self.rf_channels.items():
             logger.status(f"IQ calibration for the {self.rf_port} port of {device}")
-            channel.lo_calibration()
+            channel.calibrate_lo()
 
-    def sideband_calibration(self):
+    def calibrate_sideband(self):
         for device, channel in self.rf_channels.items():
             logger.status(
                 f"Sideband calibration for the {self.rf_port} port of {device}"
             )
-            channel.sideband_calibration()
+            channel.calibrate_sideband()
 
     def export_calibration_parameters(self, overwrite=False, save_to_disk=False):
-        """
-        Can be overwritten by another elegant way
-        """
-        mc = dict()
+        mc_ = dict()
         for qubit, channel in self.rf_channels.items():
             for clock in self.all_clocks:
                 key = f"{qubit}:{self.rf_port}-{qubit}.{clock}"
-                mc[key] = dict()
-                mc[key]["dc_offset_i"], mc[key]["dc_offset_q"] = channel.lo_offset
-                mc[key]["amp_ratio"], mc[key]["phase_error"] = channel.sideband_offset
+                mc_[key] = dict()
+                mc_[key]["dc_offset_i"], mc_[key]["dc_offset_q"] = channel.lo_offset
+                mc_[key]["amp_ratio"], mc_[key]["phase_error"] = channel.sideband_offset
 
         if overwrite:
             # Not recommended
-            replace_mixer_corrected_values(self.cluster_config, mc)
-            with open(self.cluster_config_path, "w") as f:
-                json.dump(self.cluster_config, f, indent=4)
+            replace_mixer_corrected_values(self.cluster_config, mc_)
+            with open(self.cluster_config_path, "w") as f_:
+                json.dump(self.cluster_config, f_, indent=4)  # type: ignore
 
         if save_to_disk:
             path = f"tergite_autocalibration/tools/mixer_calibration/mc_parameters_{self.rf_port}.json"
             logger.status(f"Saving calibration for the {self.rf_port} port at {path}")
-            with open(path, "w") as f:
-                json.dump(mc, f, indent=4)
+            with open(path, "w") as f_:
+                json.dump(mc_, f_, indent=4)  # type: ignore
