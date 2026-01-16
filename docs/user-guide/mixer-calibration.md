@@ -7,19 +7,38 @@ endpoint.
 
 You can run the mixer calibration by typing:
 
-```
-acli cluster mixer-calibration
+```shell
+acli cluster mc
 ```
 
 This will assume that you want to run a mixer calibration on the readout lines and drive lines for all qubits defined in
 the run configuration.
 You can also specify, which qubits you want to run the mixer calibration on:
 
-```
-acli cluster mixer-calibration -q "q03-q08"
+```shell
+acli cluster mc -q "q03-q08"
 ```
 
 Where the qubit string takes also a list of comma-separated values as input.
+
+If you are not happy with the results of the automatic mixer calibration, you can reset the values to:
+
+```json
+{
+  "dc_offset_i": 0,
+  "dc_offset_q": 0,
+  "amp_ratio": 1,
+  "phase_error": 0
+}
+```
+
+by running:
+
+```shell
+acli cluster reset-mc
+```
+
+And here again you can pass a parameter to specify the qubits.
 
 ## Writing a custom automatic mixer calibration
 
