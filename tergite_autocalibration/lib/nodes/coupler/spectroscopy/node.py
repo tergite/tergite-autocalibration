@@ -22,7 +22,7 @@ from quantify_scheduler.backends import SerialCompiler
 from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.base.node import CouplerNode
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
-    QubitSpectroscopyVsCurrentNodeAnalysis,
+    CouplerAnticrossingNodeAnalysis,
     ResonatorSpectroscopyVsCurrentNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.external_parameter_node import (
@@ -50,10 +50,9 @@ class QubitSpectroscopyVsCurrentNode(CouplerNode):
     """
 
     measurement_obj = TwoTonesMultidimMeasurement
-    analysis_obj = QubitSpectroscopyVsCurrentNodeAnalysis
+    analysis_obj = CouplerAnticrossingNodeAnalysis
     measurement_type = ExternalParameterNode
-    # coupler_qois = ["parking_current"]
-    coupler_qois = ["qubit_crossing_points"]
+    coupler_qois = ["control_qubit_crossing_points", "target_qubit_crossing_points"]
 
     def __init__(self, name: str, couplers: list[str], **schedule_keywords):
         super().__init__(name, couplers, **schedule_keywords)
@@ -69,7 +68,7 @@ class QubitSpectroscopyVsCurrentNode(CouplerNode):
 
         self.external_samplespace = {
             "dc_currents": {
-                coupler: np.arange(-1.5e-3, 1.5e-3, 800e-6) for coupler in self.couplers
+                coupler: np.arange(-1.5e-3, 1.5e-3, 100e-6) for coupler in self.couplers
             },
         }
         self.validate()
@@ -133,7 +132,10 @@ class ResonatorSpectroscopyVsCurrentNode(CouplerNode):
     analysis_obj = ResonatorSpectroscopyVsCurrentNodeAnalysis
     measurement_type = ExternalParameterNode
     # coupler_qois = ["resonator_flux_quantum"]
-    coupler_qois = ["resonator_crossing_points"]
+    coupler_qois = [
+        "control_resonator_crossing_points",
+        "target_resonator_crossing_points",
+    ]
 
     def __init__(self, name: str, couplers: list[str], **schedule_keywords):
         super().__init__(name, couplers, **schedule_keywords)

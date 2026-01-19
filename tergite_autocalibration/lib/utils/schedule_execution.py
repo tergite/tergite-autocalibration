@@ -70,6 +70,6 @@ def display_duration_information(
     if measurement[1] > 1:
         measurement_message = f". Measurement {measurement[0] + 1} of {measurement[1]}"
     message = f"{schedule_duration:.2f} sec" + measurement_message
-    logger.status(
+    logger.info(
         f"schedule_duration = {Fore.CYAN}{Style.BRIGHT}{message}{Style.RESET_ALL}"
     )
