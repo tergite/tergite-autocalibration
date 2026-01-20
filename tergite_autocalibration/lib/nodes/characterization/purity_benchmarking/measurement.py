@@ -13,6 +13,7 @@
 """
 Module containing a schedule class for purity benchmarking measurement.
 """
+
 import numpy as np
 from quantify_scheduler.operations.gate_library import Measure, Reset, X90, H, X, Rxy
 from quantify_scheduler.schedules.schedule import Schedule

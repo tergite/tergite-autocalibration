@@ -28,7 +28,6 @@ from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.utils.samplespace import resonator_samples
 from tergite_autocalibration.config.legacy import dh
 
-
 resonator = fm.ResonatorModel()
 
 
