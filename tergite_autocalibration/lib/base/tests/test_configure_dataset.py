@@ -126,8 +126,12 @@ def test_configure_dataset_qubits_with_3state_discrimination():
         "cz_parametrization", CONFIG.run.qubits, CONFIG.run.couplers
     )
     coupler_set = list(set(CONFIG.run.couplers))
-    samplespace_cz_ampls_00_01 = node.schedule_samplespace["cz_pulse_amplitudes"]['q00_q01']
-    samplespace_cz_freqs_00_01 = node.schedule_samplespace["cz_pulse_frequencies"]['q00_q01']
+    samplespace_cz_ampls_00_01 = node.schedule_samplespace["cz_pulse_amplitudes"][
+        "q00_q01"
+    ]
+    samplespace_cz_freqs_00_01 = node.schedule_samplespace["cz_pulse_frequencies"][
+        "q00_q01"
+    ]
     number_of_cz_ampls_00_01 = len(samplespace_cz_ampls_00_01)
     number_of_cz_freqs_00_01 = len(samplespace_cz_freqs_00_01)
 
