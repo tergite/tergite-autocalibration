@@ -83,6 +83,7 @@ def load_redis_config_coupler(coupler: ExtendedCompositeSquareEdge):
         coupler.clock_freqs.cz_freq(float(redis_config["cz_pulse_frequency"]))
         coupler.cz.square_amp(float(redis_config["cz_pulse_amplitude"]))
         coupler.cz.square_duration(float(redis_config["cz_pulse_duration"]))
+        coupler.cz.phase_path(redis_config["cz_phase_path"])
         coupler.cz.cz_width(float(redis_config["cz_pulse_width"]))
         if dh.get_legacy("qubit_types")[bus_qubits[0]] == "Target":
             coupler.cz.parent_phase_correction(float(redis_config["cz_dynamic_target"]))

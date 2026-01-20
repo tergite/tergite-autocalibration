@@ -419,7 +419,7 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
             ds.attrs["node"] = self.name
 
             coupler_analysis = self.single_coupler_analysis_obj(
-                self.name, self.redis_fields, **self.analysis_keywords
+                self.name, self.redis_fields, **self.analysis_keywords[this_coupler]
             )
             coupler_analysis.data_path = self.data_path
             qoi = coupler_analysis.process_coupler(ds, this_coupler)

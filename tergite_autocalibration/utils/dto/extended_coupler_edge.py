@@ -12,11 +12,12 @@
 # that they have been altered from the originals.
 
 import math
-from typing import Dict, Any
+from typing import Any, Dict
 
 from qcodes.instrument import InstrumentChannel
 from qcodes.instrument.base import InstrumentBase
 from qcodes.instrument.parameter import ManualParameter
+from qcodes.validators import Enum
 from quantify_scheduler.backends.graph_compilation import OperationCompilationConfig
 from quantify_scheduler.device_under_test.edge import Edge
 from quantify_scheduler.device_under_test.transmon_element import pulse_factories
@@ -67,6 +68,15 @@ class CZ(InstrumentChannel):
             unit="s",
             initial_value=200e-9,
             vals=Numbers(min_value=0, max_value=1e12, allow_nan=True),
+            instrument=self,
+        )
+
+        self.phase_path = ManualParameter(
+            "phase_path",
+            docstring=r"""The path outside the compuational space where the sate goes to acqure a controlled phase""",
+            unit="NA",
+            initial_value=None,
+            vals=Enum("via_20", "via_02", None),
             instrument=self,
         )
 
@@ -207,6 +217,7 @@ class ExtendedCompositeSquareEdge(Edge):
                         "square_clock": self.name + ".cz",
                         "square_amp": self.cz.square_amp(),
                         "square_duration": self.cz.square_duration(),
+                        "phase_path": self.cz.phase_path(),
                         "virt_z_parent_qubit_phase": self.cz.parent_phase_correction(),
                         "virt_z_parent_qubit_clock": f"{self.parent_device_element.name}.01",
                         "virt_z_child_qubit_phase": self.cz.child_phase_correction(),

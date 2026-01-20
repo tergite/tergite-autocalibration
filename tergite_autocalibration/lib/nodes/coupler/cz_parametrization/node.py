@@ -13,6 +13,8 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+from typing import Literal
+
 import numpy as np
 import xarray as xr
 
@@ -27,8 +29,6 @@ from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.measurement im
 from tergite_autocalibration.lib.nodes.external_parameter_node import (
     ExternalParameterNode,
 )
-
-PHASE_PATH = "via_20"
 
 
 class CZParametrizationNode(CouplerNode):
@@ -46,14 +46,16 @@ class CZParametrizationNode(CouplerNode):
         self.validate()
 
         self.schedule_keywords["loop_repetitions"] = 512 // 4
-        self.schedule_keywords["cz_duration"] = 156e-9
-        self.analysis_keywords["phase_path"] = PHASE_PATH
         self.loops = self.schedule_keywords["loop_repetitions"]
         self.ramp_back_to_zero = False
+        phase_paths = self.all_phase_paths()
+        self.analysis_keywords = {
+            coupler: {"phase_path": phase_paths[coupler]} for coupler in self.couplers
+        }
 
         self.external_samplespace = {
             "dc_currents": {
-                coupler: self.broad_samplespace_around(self.parking_current(coupler))
+                coupler: self.fine_samplespace_around(self.parking_current(coupler))
                 for coupler in self.couplers
             },
         }
@@ -63,7 +65,7 @@ class CZParametrizationNode(CouplerNode):
             },
             "cz_pulse_frequencies": {
                 coupler: np.linspace(-7e6, 5e6, 20)
-                + self.transition_frequency(coupler, phase_path=PHASE_PATH)
+                + self.transition_frequency(coupler, phase_path=phase_paths[coupler])
                 for coupler in self.couplers
             },
         }
@@ -76,6 +78,13 @@ class CZParametrizationNode(CouplerNode):
 
     def parking_current(self, coupler: str):
         return float(REDIS_CONNECTION.hget(f"couplers:{coupler}", "parking_current"))
+
+    def all_phase_paths(self) -> dict[str, Literal["via_02", "via_20"]]:
+        phase_paths = {}
+        for coupler in self.couplers:
+            path = REDIS_CONNECTION.hget(f"couplers:{coupler}", "cz_phase_path")
+            phase_paths[coupler] = path
+        return phase_paths
 
     def initial_operation(self):
         pass
