@@ -129,5 +129,4 @@ class CZParametrizationNode(CouplerNode):
 
             dataset[2 * index] = data_array
             dataset[2 * index + 1] = data_array
-        print(f"{ dataset = }")
         return dataset
