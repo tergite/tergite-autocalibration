@@ -15,6 +15,7 @@
 """
 Module containing a schedule class for Rabi calibration.
 """
+
 import numpy as np
 from quantify_scheduler import Schedule
 from quantify_scheduler.enums import BinMode

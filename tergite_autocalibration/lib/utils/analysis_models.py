@@ -57,7 +57,7 @@ class RamseyModel(lmfit.model.Model):
         exp_offs_guess = np.mean(data)
         tau_guess = 2 / 3 * np.max(t)
 
-        (freq_guess, phase_guess) = fft_freq_phase_guess(data, t)
+        freq_guess, phase_guess = fft_freq_phase_guess(data, t)
 
         self.set_param_hint("frequency", value=freq_guess, min=0)
         self.set_param_hint("amplitude", value=amp_guess, min=0)
@@ -107,7 +107,7 @@ class RabiModel(lmfit.model.Model):
         offs_guess = np.mean(data)
 
         # Frequency guess is obtained using a fast fourier transform (FFT).
-        (freq_guess, _) = fft_freq_phase_guess(data, drive_amp)
+        freq_guess, _ = fft_freq_phase_guess(data, drive_amp)
 
         self.set_param_hint("frequency", value=freq_guess, min=0)
         self.set_param_hint("amplitude", value=amp_guess, min=0)

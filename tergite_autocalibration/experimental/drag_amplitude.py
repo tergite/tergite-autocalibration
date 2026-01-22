@@ -13,6 +13,7 @@
 """
 Module containing a schedule class for DRAG amplitude calibration.
 """
+
 from quantify_scheduler import Schedule
 from quantify_scheduler.operations.gate_library import Measure, Reset
 from quantify_scheduler.operations.pulse_library import DRAGPulse

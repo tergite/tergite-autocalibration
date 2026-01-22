@@ -13,6 +13,7 @@
 """
 Module containing a schedule class for resonator spectroscopy calibration.
 """
+
 import numpy as np
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.acquisition_library import SSBIntegrationComplex

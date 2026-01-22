@@ -17,6 +17,7 @@
 Module containing classes that model, fit and plot data
 from a qubit (two tone) spectroscopy experiment.
 """
+
 import numpy as np
 import xarray as xr
 from lmfit.models import LorentzianModel

@@ -1,7 +1,7 @@
 # This code is part of Tergite
 #
-# (C) Eleftherios Moschandreou 2024, 2025
-# (C) Copyright Chalmers Next Labs 2024, 2025
+# (C) Eleftherios Moschandreou 2024, 2025, 2026
+# (C) Copyright Chalmers Next Labs 2024, 2025, 2026
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -13,7 +13,6 @@
 
 import numpy as np
 import xarray as xr
-from scipy.stats import truncnorm
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
 
@@ -93,6 +92,11 @@ def calculate_probabilities(iq_data_var: xr.DataArray):
     return state_probabilities
 
 
+import matplotlib.pyplot as plt
+
+fig, ax = plt.subplots(1, 1)
+
+
 def generate_iq_shots(probabilities: np.ndarray, qubit: str, loops: int) -> np.ndarray:
     """
     given the probabilities array, generate an array of IQ points
@@ -113,8 +117,6 @@ def generate_iq_shots(probabilities: np.ndarray, qubit: str, loops: int) -> np.n
         k: v for k, v in sorted(state_boundaries.items(), key=lambda item: item[1])
     }
     sorted_state_boundaries = list(sorted_state_boundaries_dict.keys())
-    # iq_values = iq_values - (centroid_i + 1j * centroid_q)
-    # iq_values = xr.apply_ufunc(lambda x: (np.angle(x, deg=True) + 360) % 360, iq_values)
 
     boundary_1 = sorted_state_boundaries[0]  # eg '01'
     boundary_2 = sorted_state_boundaries[1]  # eg '12'
@@ -124,6 +126,7 @@ def generate_iq_shots(probabilities: np.ndarray, qubit: str, loops: int) -> np.n
     angle_1 = state_boundaries[boundary_1]
     angle_2 = state_boundaries[boundary_2]
     angle_3 = state_boundaries[boundary_3]
+
     # find the common state between the boundaries. eg: '01' & '12' -> 1
     state_between_1_and_2 = int(list(set(boundary_1) & set(boundary_2))[0])
     state_between_2_and_3 = int(list(set(boundary_2) & set(boundary_3))[0])
@@ -133,60 +136,34 @@ def generate_iq_shots(probabilities: np.ndarray, qubit: str, loops: int) -> np.n
     mean_angle_between_2_and_3 = (angle_2 + angle_3) / 2
     mean_angle_between_3_and_1 = (angle_3 + angle_1) / 2 + 180
 
-    shots_between_1_2 = int(probabilities[state_between_1_and_2] * loops)
-    shots_between_2_3 = int(probabilities[state_between_2_and_3] * loops)
-    shots_between_3_1 = loops - shots_between_1_2 - shots_between_2_3
+    mean_angles_dict = {
+        state_between_1_and_2: mean_angle_between_1_and_2,
+        state_between_2_and_3: mean_angle_between_2_and_3,
+        state_between_3_and_1: mean_angle_between_3_and_1,
+    }
 
-    angle_spread_in_deg = 10
+    number_of_pixels = probabilities.size // 3
+    probabilities = probabilities.T.reshape(number_of_pixels, 3)
+
+    angle_spread_in_deg = 1
     radius_spread_in_mV = 0.1
-    mean_radius_in_mV = 1
+    mean_radius_in_mV = 2
     rng = np.random.default_rng()
-    truncated_min_12 = (angle_1 - mean_angle_between_1_and_2) / angle_spread_in_deg
-    truncated_max_12 = (angle_2 - mean_angle_between_1_and_2) / angle_spread_in_deg
-    rv_12 = truncnorm(
-        truncated_min_12,
-        truncated_max_12,
-        loc=mean_angle_between_1_and_2,
-        scale=angle_spread_in_deg,
+    angles = np.array([])
+    for _ in range(loops):
+        for pixel_probs in probabilities:
+            state = np.random.choice([0, 1, 2], p=pixel_probs)
+            # TODO: for more realistic, draw angle from normal distribution
+            angle = mean_angles_dict[state]
+            angles = np.append(angles, angle)
+    magnitudes = rng.normal(
+        mean_radius_in_mV, radius_spread_in_mV, size=number_of_pixels
     )
-    iq_angles_12 = rv_12.rvs(size=shots_between_1_2)
-    iq_angles_12_rad = np.deg2rad(iq_angles_12)
-    iq_magnitudes_12 = rng.normal(
-        mean_radius_in_mV, radius_spread_in_mV, shots_between_1_2
-    )
-    i_12 = iq_magnitudes_12 * np.cos(iq_angles_12_rad)
-    q_12 = iq_magnitudes_12 * np.sin(iq_angles_12_rad)
+    all_angles_rad = np.deg2rad(angles)
+    all_magnitudes = np.tile(magnitudes, loops)
+    i = all_magnitudes * np.cos(all_angles_rad)
+    q = all_magnitudes * np.sin(all_angles_rad)
+    complex_iq = i + 1j * q
+    iq_points = complex_iq + centroid_i + 1j * centroid_q
 
-    truncated_min_23 = (angle_2 - mean_angle_between_2_and_3) / angle_spread_in_deg
-    truncated_max_23 = (angle_3 - mean_angle_between_2_and_3) / angle_spread_in_deg
-    rv_23 = truncnorm(
-        truncated_min_23,
-        truncated_max_23,
-        loc=mean_angle_between_2_and_3,
-        scale=angle_spread_in_deg,
-    )
-    iq_angles_23 = rv_23.rvs(size=shots_between_2_3)
-    iq_angles_23_rad = np.deg2rad(iq_angles_23)
-    iq_magnitudes_23 = rng.normal(
-        mean_radius_in_mV, radius_spread_in_mV, shots_between_2_3
-    )
-    i_23 = iq_magnitudes_23 * np.cos(iq_angles_23_rad)
-    q_23 = iq_magnitudes_23 * np.sin(iq_angles_23_rad)
-
-    truncated_min_31 = (angle_3 - mean_angle_between_3_and_1) / angle_spread_in_deg
-    truncated_max_31 = (angle_1 - mean_angle_between_3_and_1) / angle_spread_in_deg
-    rv_31 = truncnorm(
-        truncated_min_31,
-        truncated_max_31,
-        loc=mean_angle_between_3_and_1,
-        scale=angle_spread_in_deg,
-    )
-    iq_angles_31 = rv_31.rvs(size=shots_between_3_1)
-    iq_angles_31_rad = np.deg2rad(iq_angles_31)
-    iq_magnitudes_31 = rng.normal(
-        mean_radius_in_mV, radius_spread_in_mV, shots_between_3_1
-    )
-    i_31 = iq_magnitudes_31 * np.cos(iq_angles_31_rad)
-    q_31 = iq_magnitudes_31 * np.sin(iq_angles_31_rad)
-
-    return assigned_states
+    return iq_points

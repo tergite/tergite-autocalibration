@@ -14,6 +14,7 @@
 """
 Module containing a function for time of flight calibration.
 """
+
 import json
 
 import numpy as np
