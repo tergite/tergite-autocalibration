@@ -60,9 +60,8 @@ class ConfigurationHandler:
         )
 
         # Loading the QBLOX cluster configuration
-        # This should be wrapped as little as possible to reduce the amount of work if there
-        # are changes on the quantify/qblox side.
-        with open(configuration_package.config_files["cluster_config"], "r") as f_:
+        _cluster_config_filepath = configuration_package.config_files["cluster_config"]
+        with open(_cluster_config_filepath, "r") as f_:
             cluster_config_json = json.load(f_)
             return_obj.cluster = QbloxHardwareCompilationConfig.model_validate(
                 cluster_config_json
