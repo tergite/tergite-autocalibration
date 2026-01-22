@@ -13,6 +13,7 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+from abc import ABC, abstractmethod
 from collections.abc import Iterable
 from pathlib import Path
 from typing import Literal, Tuple
@@ -33,10 +34,9 @@ from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
 from tergite_autocalibration.config.globals import PLOTTING_BACKEND, REDIS_CONNECTION
 from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
-from tergite_autocalibration.lib.base.measurement import BaseMeasurement
-from tergite_autocalibration.lib.base.node_interface import (
+from tergite_autocalibration.lib.base.measurement import (
+    BaseMeasurement,
     MeasurementType,
-    NodeInterface,
 )
 from tergite_autocalibration.lib.utils.device import DeviceConfiguration
 from tergite_autocalibration.lib.utils.redis import update_redis_trusted_values
@@ -52,7 +52,7 @@ colorama_init()
 matplotlib.use(PLOTTING_BACKEND)
 
 
-class BaseNode(NodeInterface):
+class BaseNode(ABC):
     measurement_obj: "BaseMeasurement"
     analysis_obj: "BaseNodeAnalysis"
     measurement_type: "MeasurementType"
@@ -78,6 +78,10 @@ class BaseNode(NodeInterface):
 
         self.device_manager: DeviceConfiguration
         self.device: QuantumDevice
+
+    @abstractmethod
+    def precompile(self, samplespace):
+        pass
 
     def measure_node(self, cluster_status) -> xarray.Dataset:
         """
@@ -426,7 +430,7 @@ class CouplerNode(BaseNode):
             **schedule_samplespace, **self.schedule_keywords
         )
 
-        # TODO: Probably the compiler desn't need to be created every time self.precompile() is called.
+        # TODO: Probably the compiler doesn't need to be created every time self.precompile() is called.
         compiler = SerialCompiler(name=f"{self.name}_compiler")
 
         compilation_config = self.device.generate_compilation_config()
