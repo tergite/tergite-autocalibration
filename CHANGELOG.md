@@ -7,9 +7,15 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 
 ## [Unreleased]
 
+### Added
+
+- Backup functions for redis storage.
+
 ### Changed
 
 - Removed development folder (can still be accessed in the git history)
+- Replaced MSS update script with BCC calibration seed script
+- Refactored CZ Parametrization node
 
 ## [2025.09.0] - 2025-09-16
 

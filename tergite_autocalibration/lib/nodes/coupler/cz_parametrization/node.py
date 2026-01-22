@@ -1,6 +1,9 @@
 # This code is part of Tergite
 #
-# (C) Copyright Michele Faucci Giannelli 2024, 2025
+# (C) Copyright Eleftherios Moschandreou 2023, 2024, 2025
+# (C) Copyright Liangyu Chen 2023, 2024
+# (C) Copyright Amr Osman, 2024
+# (C) Chalmers Next Labs 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -11,112 +14,110 @@
 # that they have been altered from the originals.
 
 import numpy as np
+import xarray as xr
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.lib.base.node import CouplerNode
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.analysis import (
-    CZParametrizationFixDurationNodeAnalysis,
+    CZParametrizationNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.measurement import (
-    CZParametrizationFixDurationMeasurement,
+    CZParametrizationMeasurement,
 )
-from tergite_autocalibration.utils.logging import logger
+from tergite_autocalibration.lib.nodes.external_parameter_node import (
+    ExternalParameterNode,
+)
+
+PHASE_PATH = "via_20"
 
 
-class CZParametrizationFixDurationNode(CouplerNode):
-    measurement_obj = CZParametrizationFixDurationMeasurement
-    analysis_obj = CZParametrizationFixDurationNodeAnalysis
-    coupler_qois = [
-        "cz_pulse_frequency",
-        "cz_pulse_amplitude",
-        "cz_parking_current",
-    ]
+class CZParametrizationNode(CouplerNode):
+    measurement_obj = CZParametrizationMeasurement
+    analysis_obj = CZParametrizationNodeAnalysis
+    measurement_type = ExternalParameterNode
+    coupler_qois = ["cz_pulse_frequency", "cz_pulse_amplitude", "parking_current"]
 
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
-    ):
-        self.all_qubits = all_qubits  # [q for bus in couplers for q in bus.split("_")]
-        super().__init__(name, self.all_qubits, **schedule_keywords)
-        self.type = "parameterized_sweep"
+    def __init__(self, name: str, all_qubits: list[str], couplers: list[str]):
+        super().__init__(name, couplers)
         self.couplers = couplers
-        self.edges = couplers
-        logger.info(couplers)
-        self.coupler = couplers[0]
-        self.schedule_keywords = schedule_keywords
-        self.backup = False
 
-        self.node_dictionary["cz_pulse_duration"] = (
-            120e-9  # Need to make it configurable
-        )
-
-        # Should these sample space move to user defined inputs?
-        self.initial_schedule_samplespace = {
-            "cz_pulse_amplitudes": {
-                coupler: np.linspace(0.01, 0.35, 15) for coupler in self.couplers
-            },
-            "cz_pulse_frequencies": {
-                coupler: np.linspace(-20e6, 20e6, 21)
-                + self.transition_frequency(coupler)
-                for coupler in self.couplers
-            },
-        }
-        self.external_samplespace = {
-            "cz_parking_currents": {
-                coupler: np.array([-0.640, -0.650, -0.660, -0.670, -0.680])
-                for coupler in self.couplers
-            }
-            # np.arange(-0.3, 0.3, 10) * self.coupler_current_range + self.coupler_current for coupler in self.couplers
-        }
-
+        self.coupled_qubits = self.get_coupled_qubits()
+        self.all_qubits = self.coupled_qubits
         self.validate()
 
-    def validate(self) -> None:
-        all_coupled_qubits = []
+        self.schedule_keywords["loop_repetitions"] = 512 // 4
+        self.schedule_keywords["cz_duration"] = 156e-9
+        self.analysis_keywords["phase_path"] = PHASE_PATH
+        self.loops = self.schedule_keywords["loop_repetitions"]
+        self.ramp_back_to_zero = False
+
+        self.external_samplespace = {
+            "dc_currents": {
+                coupler: self.broad_samplespace_around(self.parking_current(coupler))
+                for coupler in self.couplers
+            },
+        }
+        self.schedule_samplespace = {
+            "cz_pulse_amplitudes": {
+                coupler: np.linspace(0.15, 0.35, 30) for coupler in self.couplers
+            },
+            "cz_pulse_frequencies": {
+                coupler: np.linspace(-7e6, 5e6, 20)
+                + self.transition_frequency(coupler, phase_path=PHASE_PATH)
+                for coupler in self.couplers
+            },
+        }
+
+    def fine_samplespace_around(self, central_value: float) -> np.ndarray:
+        return np.arange(central_value - 5e-6, central_value + 4.5e-6, 1e-6)
+
+    def broad_samplespace_around(self, central_value: float) -> np.ndarray:
+        return np.arange(central_value - 50e-6, central_value + 45e-6, 8e-6)
+
+    def parking_current(self, coupler: str):
+        return float(REDIS_CONNECTION.hget(f"couplers:{coupler}", "parking_current"))
+
+    def initial_operation(self):
+        pass
+
+    def pre_measurement_operation(self, reduced_ext_space):
+        iteration_dict = reduced_ext_space["dc_currents"]
+        # there is some redundancy tha all qubits have the same
+        # iteration index, that's why we keep the first value->
+        this_iteration_value = list(iteration_dict.values())[0]
+        dac_values = {}
         for coupler in self.couplers:
-            all_coupled_qubits += coupler.split("_")
-        if len(all_coupled_qubits) > len(set(all_coupled_qubits)):
-            raise ValueError("Couplers with two identical qubits")
-        if not all(element in self.all_qubits for element in all_coupled_qubits):
-            raise ValueError("Cloupler qubits not in all qubits")
+            this_iteration_value = iteration_dict[coupler]
+            dac_values[coupler] = this_iteration_value
+        self.spi_manager.set_dac_current(dac_values)
 
-    def transition_frequency(self, coupler: str):
-        coupled_qubits = coupler.split(sep="_")
-        q1_f01 = float(
-            REDIS_CONNECTION.hget(f"transmons:{coupled_qubits[0]}", "clock_freqs:f01")
-        )
-        q2_f01 = float(
-            REDIS_CONNECTION.hget(f"transmons:{coupled_qubits[1]}", "clock_freqs:f01")
-        )
-        q1_f12 = float(
-            REDIS_CONNECTION.hget(f"transmons:{coupled_qubits[0]}", "clock_freqs:f12")
-        )
-        q2_f12 = float(
-            REDIS_CONNECTION.hget(f"transmons:{coupled_qubits[1]}", "clock_freqs:f12")
-        )
-        # ac_freq = np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12))
-        ac_freq = np.max(
-            [
-                np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12)),
-                np.abs(q1_f01 + q2_f01 - (q2_f01 + q2_f12)),
-            ]
-        )
-        ac_freq = int(ac_freq / 1e4) * 1e4
-        logger.info(f"{ ac_freq/1e6 = } MHz for coupler: {coupler}")
-        return ac_freq
+    def final_operation(self):
+        """
+        bring the current back to zero
+        """
+        if self.ramp_back_to_zero:
+            dac_values = {}
+            for coupler in self.couplers:
+                dac_values[coupler] = 0
+            self.spi_manager.set_dac_current(dac_values)
 
-    def coupler_current(self):
-        current = float(
-            REDIS_CONNECTION.hget(f"couplers:{self.couplers[0]}", "parking_current")
-        )
-        return current
+    def generate_dummy_dataset(self):
+        dataset = xr.Dataset()
+        for index, coupler in enumerate(self.couplers):
+            number_of_amplitudes = len(
+                self.schedule_samplespace["cz_pulse_amplitudes"][coupler]
+            )
+            number_of_frequencies = len(
+                self.schedule_samplespace["cz_pulse_frequencies"][coupler]
+            )
+            number_of_iq_samples = (
+                number_of_amplitudes * number_of_frequencies * self.loops
+            )
+            real_part = np.random.uniform(-1, 1, number_of_iq_samples)
+            imag_part = np.random.uniform(-1, 1, number_of_iq_samples)
+            complex_points = real_part + 1j * imag_part
+            data_array = xr.DataArray(complex_points)
 
-    def coupler_current_range(self):
-        current_range = float(
-            REDIS_CONNECTION.hget(f"couplers:{self.couplers[0]}", "current_range")
-        )
-        return current_range
-
-    def pre_measurement_operation(self, reduced_ext_space: dict):
-        self.schedule_samplespace = (
-            self.initial_schedule_samplespace | reduced_ext_space
-        )
+            dataset[2 * index] = data_array
+            dataset[2 * index + 1] = data_array
+        return dataset

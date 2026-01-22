@@ -10,9 +10,18 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+import copy
+import importlib
 import os
 from functools import wraps
-from typing import Dict, Any
+from pathlib import Path
+from typing import Dict, Any, Union
+
+from tergite_autocalibration.utils.backend.redis_backup import (
+    load_json_to_redis,
+    dump_redis,
+    load_redis,
+)
 
 
 def with_os_env(variables: Dict[str, Any]):
@@ -87,3 +96,85 @@ def preserve_os_env(fn_):
         return result
 
     return wrapper
+
+
+def with_config(path_: Union[Path, str]):
+    """
+    This is a decorator to - during a test - change the global CONFIG variable.
+
+    Args:
+        path_: Path to the configuration package
+
+    Returns:
+
+    """
+
+    def inner_decorator_fn_(fn_):
+        @wraps(fn_)
+        def wrapper(*args, **kwargs):
+            import tergite_autocalibration.config.globals as glb
+            from tergite_autocalibration.config.handler import ConfigurationHandler
+            from tergite_autocalibration.config.package import ConfigurationPackage
+
+            temp_config = copy.deepcopy(glb.CONFIG)
+            importlib.reload(glb)
+
+            glb.CONFIG = ConfigurationHandler.from_configuration_package(
+                ConfigurationPackage.from_toml(
+                    os.path.join(path_, "configuration.meta.toml")
+                )
+            )
+
+            # This is in a try finally block to ensure that environmental variables are restored even
+            # if the function raises an exception.
+            try:
+                result = fn_(*args, **kwargs)
+
+            finally:
+                # Reset global config
+                glb.CONFIG = temp_config
+                importlib.reload(glb)
+
+            # Return the result of the function
+            return result
+
+        return wrapper
+
+    return inner_decorator_fn_
+
+
+def with_redis(path_: Union[Path, str]):
+    """
+    This temporarily replaces the redis instance with a clean redis loaded with a redis backup from the file path given.
+
+    Args:
+        path_: Path to the redis backup
+
+    Returns:
+
+    """
+
+    def inner_decorator_fn_(fn_):
+        @wraps(fn_)
+        def wrapper(*args, **kwargs):
+            from tergite_autocalibration.config.globals import REDIS_CONNECTION
+
+            redis_backup = dump_redis(REDIS_CONNECTION)
+            load_json_to_redis(path_, REDIS_CONNECTION)
+
+            # This is in a try finally block to ensure that redis is restored even
+            # if the function raises an exception.
+            try:
+                result = fn_(*args, **kwargs)
+
+            finally:
+                # Reset global config
+                REDIS_CONNECTION.flushall()
+                load_redis(redis_backup, REDIS_CONNECTION)
+
+            # Return the result of the function
+            return result
+
+        return wrapper
+
+    return inner_decorator_fn_

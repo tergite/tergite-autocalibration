@@ -25,10 +25,12 @@ The autocalibration CLI is organized into several main command groups:
 
 - `start`: Run the automatic calibration according to the provided config files
 - `cluster`: Handle operations related to the cluster
+- `spi`: Handle operations related to the spi rack
 - `node`: Handle operations related to the node
 - `graph`: Handle operations related to the calibration graph
 - `config`: Load and save the configuration files
 - `browser`: Will open the dataset browser, which makes you view the datasets from measurements
+- `redis`: Operations to handle redis values
 - `joke`: Handle operations related to the well-being of the user
 
 ### Calibration Commands
@@ -50,7 +52,6 @@ acli start [OPTIONS]
 - `-c TEXT`: Cluster IP address (if not set, it will use CLUSTER_IP from the .env file)
 - `-r TEXT`: Rerun an analysis (specify the path to the dataset folder)
 - `-n, --name TEXT`: Specify the node type to rerun (works only with -r option)
-- `--push`: Push a backend to an MSS specified in MSS_MACHINE_ROOT_URL in the .env file
 - `--browser`: Will open the dataset browser in the background and plot the measurement results live
 
 ### Cluster Commands ###
@@ -66,6 +67,20 @@ acli cluster reboot
 ```
 
 This command will prompt for confirmation before rebooting the cluster, as it can interrupt ongoing measurements.
+
+### SPI Rack Commands ###
+
+#### `spi status` ####
+
+Prints information about the current currents on the spi rack.
+Only couplers that are having a DAC in the SPI configuration are considered.
+Please check the [documentation about configuration](./configuration_files.md) about how to change the SPI DACs.
+
+**Usage:**
+
+```
+acli spi status
+```
 
 ### Node Commands ###
 
@@ -141,6 +156,23 @@ Save the configuration.
   automatically create a zip file and treat it as if you are running with `-z`.
 - `-z/--as-zip`: Will make the configuration file be a zip archive.
 
+#### `bcc-export`
+
+**Usage:**
+
+```bash
+acli bcc-export [OPTIONS]
+```
+
+Create a `calibration_seed.toml` file that can be used from the backend to push calibration values to the database.
+
+**Options:**
+
+- `-q/--qubits`: Qubit input e.g. `"q00,q01,q02,q03,q04"` or `"q01-q05"` or `"q01-q06, q08"`.
+  If the input is an integer e.g. 3, it will generate `"q01,q02,q03"`.
+- `-c/--couplers`: Couplers to export e.g. `"q00_q01"` as comma-separated list
+- `-o/--output-file`: calibration_seed.toml to write.
+
 #### `config generate`
 
 **Usage:**
@@ -190,6 +222,29 @@ acli browser --datadir [OPTIONS]
 - `--datadir PATH`: Folder to take the plot data from
 - `--liveplotting`: Whether plots should be updated in real time (default: False)
 - `--log-level INT`: Log-level as in the Python `logging` package to be used in the logs (default: 30)
+
+### Redis handling ###
+
+#### `redis` ####
+
+Tools to work with the redis backend.
+
+**Usage:**
+
+```
+acli redis save-file [FILENAME]
+```
+
+Store a backup of redis in .json format.
+
+**Usage:**
+
+```
+acli redis load-file [FILENAME]
+```
+
+Load a backup of redis from a .json format.
+The file must follow the standard from the `acli redis save-file` function.
 
 ### Joke Command ###
 

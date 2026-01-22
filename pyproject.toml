@@ -68,7 +68,8 @@ dependencies = [
     "pyqt5>=5.15.11",
     "pydantic==2.9.2",
     "dash>=3.1.1",
-    "dash-renderjson>=0.0.1"
+    "dash-renderjson>=0.0.1",
+    "networkx==3.4.2" # TODO: This can be removed when updating to newer versions of quantify scheduler
 ]
 
 [project.optional-dependencies]
@@ -88,7 +89,8 @@ docs = [
 test = [
     "pytest>=8.3.3",
     "requests-mock>=1.11.0",
-    "pytest-cov>=7.0.0"
+    "pytest-cov>=7.0.0",
+    "fakeredis>=2.32.1"
 ]
 
 [project.scripts]
