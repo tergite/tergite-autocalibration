@@ -18,13 +18,15 @@ from tergite_autocalibration.tests.utils.decorators import with_redis
 from tergite_autocalibration.tests.utils.fixtures import get_fixture_path
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 from tergite_autocalibration.utils.measurement_utils import (
-    samplespace_dimensions,
     reduce_samplespace,
+    samplespace_dimensions,
 )
 
 _redis_values = get_fixture_path("redis", "standard_redis_mock.json")
 _node_factory = NodeFactory()
 _node_names = _node_factory.all_node_names()
+
+# _node_names = ["qubit_bring_up_spectroscopy"]
 
 
 @pytest.mark.parametrize("node_name", _node_names)
@@ -44,4 +46,5 @@ def test_precompile_all_nodes_without_error(node_name):
             samplespace = node.schedule_samplespace | reduced_outer_samplespace
             node.precompile(samplespace)
 
-    node.precompile(node.schedule_samplespace)
+    else:
+        node.precompile(node.schedule_samplespace)
