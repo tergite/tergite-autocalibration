@@ -13,7 +13,7 @@
 import numpy
 from quantify_scheduler.instrument_coordinator.utility import xarray
 
-from tergite_autocalibration.lib.base.node_interface import MeasurementType
+from tergite_autocalibration.lib.base.measurement import MeasurementType
 from tergite_autocalibration.utils.measurement_utils import (
     reduce_samplespace,
     samplespace_dimensions,
@@ -42,7 +42,7 @@ class OuterScheduleNode(MeasurementType):
 
     def measure_node(self, measurement_mode) -> xarray.Dataset:
         """
-        This correspond to schedules where the measurement points
+        This corresponds to schedules where the measurement points
         exceed the memory limit of the QRM_RF.
         For example large single shots measurements.
         """

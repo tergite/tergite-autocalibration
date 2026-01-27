@@ -63,6 +63,9 @@
       },
       "q01:res-q01.ro_3st_opt": {
         "lo_freq": 6660930000.0
+      },
+      "q00_q01:fl-q00_q01.cz": {
+        "lo_freq": 3900000000.0
       }
     },
     "mixer_corrections": {
@@ -156,14 +159,6 @@
         "amp_ratio": 1.0,
         "phase_error": 0.0
       }
-    },
-    "output_att": {
-      "q00:res-q00.ro": 12,
-      "q01:res-q01.ro": 12
-    },
-    "input_att": {
-      "q00:res-q00.ro": 12,
-      "q01:res-q01.ro": 12
     }
   },
   "connectivity": {
