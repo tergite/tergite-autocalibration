@@ -14,6 +14,7 @@
 """
 Module containing a schedule class for two-tone (qubit) spectroscopy calibration.
 """
+
 import numpy as np
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.gate_library import Measure, Reset, X

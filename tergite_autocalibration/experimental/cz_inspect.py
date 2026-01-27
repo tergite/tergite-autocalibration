@@ -19,7 +19,6 @@ from scipy.optimize import leastsq
 
 from tergite_autocalibration.utils.logging import logger
 
-
 # TODO: Is this an analysis and if not, where to move it?
 
 

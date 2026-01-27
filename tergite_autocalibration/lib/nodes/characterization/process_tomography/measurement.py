@@ -13,6 +13,7 @@
 """
 Module containing a schedule class for Ramsey calibration. (1D parameter sweep, for 2D see ramsey_detunings.py)
 """
+
 import itertools
 
 import numpy as np

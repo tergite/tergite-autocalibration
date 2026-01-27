@@ -16,6 +16,7 @@
 """
 Module containing classes that model, fit and plot data from a Rabi experiment.
 """
+
 import numpy as np
 
 from tergite_autocalibration.lib.base.analysis import (

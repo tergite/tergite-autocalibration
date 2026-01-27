@@ -15,6 +15,7 @@
 """
 Module containing a schedule class for T1 and T2 coherence time measurement.
 """
+
 import numpy as np
 from quantify_scheduler import Schedule
 from quantify_scheduler.enums import BinMode
