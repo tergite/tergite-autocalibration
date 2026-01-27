@@ -16,7 +16,7 @@
 import numpy as np
 import xarray
 
-from tergite_autocalibration.lib.base.node_interface import MeasurementType
+from tergite_autocalibration.lib.base.measurement import MeasurementType
 from tergite_autocalibration.utils.measurement_utils import (
     reduce_samplespace,
     samplespace_dimensions,

@@ -19,6 +19,7 @@ A module containing factory functions for pulses on the quantum-device layer.
 These factories are used to take a parametrized representation of on a operation
 and use that to create an instance of the operation itself.
 """
+
 from __future__ import annotations
 
 from quantify_core.utilities import deprecated

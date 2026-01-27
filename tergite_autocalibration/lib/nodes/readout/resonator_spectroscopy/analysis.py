@@ -14,6 +14,7 @@
 """
 Module containing a class that fits data from a resonator spectroscopy experiment.
 """
+
 import numpy as np
 import xarray as xr
 from quantify_core.analysis import fitting_models as fm

@@ -10,7 +10,14 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+from typing import Tuple
+
+from colorama import Fore, Style
+from colorama import init as colorama_init
+
 from tergite_autocalibration.utils.logging import logger
+
+colorama_init()
 
 
 def draw_arrow_chart(header: str, node_list: list[str]):
@@ -50,3 +57,17 @@ def draw_arrow_chart(header: str, node_list: list[str]):
             )
             length += 6
     logger.status("\u255a" + "\u2550" * total_length + "\u255d")
+
+
+def print_measurement_info(duration: float, measurement: Tuple[int, int]) -> None:
+    """Print information about the current measurement."""
+    measurement_message = (
+        f". Measurement {measurement[0] + 1} of {measurement[1]}"
+        if measurement[1] > 1
+        else ""
+    )
+    # Format the message with duration and the measurement message
+    message = f"{duration:.2f} sec{measurement_message}"
+    logger.status(
+        f"schedule_duration = {Fore.CYAN}{Style.BRIGHT}{message}{Style.RESET_ALL}"
+    )
