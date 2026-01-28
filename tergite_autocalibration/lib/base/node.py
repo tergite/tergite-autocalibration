@@ -77,7 +77,6 @@ class BaseNode(ABC):
 
         self.samplespace = self.schedule_samplespace | self.external_samplespace
 
-        self.device_manager: DeviceConfiguration
         self.device: QuantumDevice
 
     @abstractmethod
