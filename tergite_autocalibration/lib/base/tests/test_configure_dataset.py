@@ -33,7 +33,9 @@ redis_mock = get_fixture_path("redis", "standard_redis_mock.json")
 
 def test_configure_dataset_qubits():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = ResonatorSpectroscopyNode("resonator_spectroscopy", CONFIG.run.qubits)
+    node = ResonatorSpectroscopyNode(
+        "resonator_spectroscopy", CONFIG.run.qubits, CONFIG.run.couplers
+    )
 
     raw_ds = node.generate_dummy_dataset()
 
@@ -52,7 +54,9 @@ def test_configure_dataset_qubits():
     assert configured_ds.coords["ro_frequenciesq00"].attrs["element_type"] == "qubit"
 
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = ResonatorSpectroscopyNode("resonator_spectroscopy", CONFIG.run.qubits)
+    node = ResonatorSpectroscopyNode(
+        "resonator_spectroscopy", CONFIG.run.qubits, CONFIG.run.couplers
+    )
 
     raw_ds = node.generate_dummy_dataset()
 
@@ -96,7 +100,9 @@ def test_configure_dataset_couplers():
 
 def test_configure_dataset_qubits_with_loops():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = RandomizedBenchmarkingNode("randomized_benchmarking", CONFIG.run.qubits)
+    node = RandomizedBenchmarkingNode(
+        "randomized_benchmarking", CONFIG.run.qubits, CONFIG.run.couplers
+    )
 
     raw_ds = node.generate_dummy_dataset()
 
