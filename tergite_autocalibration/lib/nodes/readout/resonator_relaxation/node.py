@@ -24,12 +24,13 @@ from tergite_autocalibration.lib.utils.samplespace import resonator_samples
 
 
 class ResonatorRelaxationNode(ScheduleQubitNode):
+    name: str = "resonator_relaxation"
     measurement_obj = ResonatorRelaxation
     analysis_obj = ResonatorRelaxationNodeAnalysis
     qubit_qois = ["minimum_resonator_relaxation"]
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(self, all_qubits: list[str], **schedule_keywords):
+        super().__init__(all_qubits, **schedule_keywords)
 
         self.schedule_samplespace = {
             "ro_frequencies": {

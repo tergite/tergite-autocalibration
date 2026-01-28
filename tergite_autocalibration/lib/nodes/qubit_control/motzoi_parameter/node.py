@@ -30,13 +30,14 @@ rabi = RabiModel()
 
 
 class MotzoiParameterNode(QubitNode):
+    name: str = "motzoi_parameter"
     measurement_obj = MotzoiParameterMeasurement
     analysis_obj = Motzoi01NodeAnalysis
     measurement_type = ScheduleNode
     qubit_qois = ["rxy:motzoi"]
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(self, all_qubits: list[str], **schedule_keywords):
+        super().__init__(all_qubits, **schedule_keywords)
         self.motzoi_minima = []  # NOTE: is this needed?
         self.qubit_state = 0
         self.schedule_keywords["qubit_state"] = self.qubit_state
@@ -83,13 +84,14 @@ class MotzoiParameterNode(QubitNode):
 
 
 class MotzoiParameter12Node(QubitNode):
+    name: str = "motzoi_parameter_12"
     measurement_obj = MotzoiParameterMeasurement
     analysis_obj = Motzoi12NodeAnalysis
     measurement_type = ScheduleNode
     qubit_qois = ["r12:ef_motzoi"]
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(self, all_qubits: list[str], **schedule_keywords):
+        super().__init__(all_qubits, **schedule_keywords)
         self.motzoi_minima = []  # NOTE: is this needed?
         self.qubit_state = 1
         self.schedule_keywords["qubit_state"] = self.qubit_state

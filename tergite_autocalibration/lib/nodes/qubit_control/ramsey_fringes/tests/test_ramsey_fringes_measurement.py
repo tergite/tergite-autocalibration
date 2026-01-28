@@ -22,7 +22,7 @@ from tergite_autocalibration.utils.dto.extended_transmon_element import Extended
 
 def test_dummy_01_generation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = RamseyFringesNode("ramsey_correction", CONFIG.run.qubits)
+    node = RamseyFringesNode(CONFIG.run.qubits)
     dummy_dataset_01 = node.generate_dummy_dataset()
     first_qubit = CONFIG.run.qubits[0]
     number_of_delays = len(node.schedule_samplespace["ramsey_delays"][first_qubit])
@@ -37,7 +37,7 @@ def test_dummy_01_generation():
 
 def test_dummy_12_generation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = RamseyFringes12Node("ramsey_correction_12", CONFIG.run.qubits)
+    node = RamseyFringes12Node(CONFIG.run.qubits)
     dummy_dataset = node.generate_dummy_dataset()
     first_qubit = CONFIG.run.qubits[0]
     number_of_delays = len(node.schedule_samplespace["ramsey_delays"][first_qubit])

@@ -32,13 +32,14 @@ PHASE_PATH = "via_20"
 
 
 class CZParametrizationNode(CouplerNode):
+    name: str = "cz_parametrization"
     measurement_obj = CZParametrizationMeasurement
     analysis_obj = CZParametrizationNodeAnalysis
     measurement_type = ExternalParameterNode
     coupler_qois = ["cz_pulse_frequency", "cz_pulse_amplitude", "parking_current"]
 
-    def __init__(self, name: str, all_qubits: list[str], couplers: list[str]):
-        super().__init__(name, couplers)
+    def __init__(self, all_qubits: list[str], couplers: list[str]):
+        super().__init__(couplers)
         self.couplers = couplers
 
         self.coupled_qubits = self.get_coupled_qubits()
