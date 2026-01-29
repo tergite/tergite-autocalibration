@@ -13,6 +13,7 @@
 
 import lmfit
 import numpy as np
+from lmfit.model import Model
 from quantify_core.analysis.fitting_models import (
     exp_damp_osc_func,
     fft_freq_phase_guess,
@@ -304,3 +305,112 @@ class ExpDecayModel(lmfit.model.Model):
 
         params = self.make_params()
         return lmfit.models.update_param_vals(params, self.prefix, **kws)
+
+
+def sin_func(
+    x: float,
+    frequency: float,
+    amplitude: float,
+    offset: float,
+    phase: float = 0,
+) -> float:
+    return amplitude * np.cos(2 * np.pi * frequency * x + phase) + offset
+
+
+class SineOscillatingModel(lmfit.model.Model):
+    def __init__(self, *args, **kwargs):
+        # pass in the defining equation so the user doesn't have to later.
+        super().__init__(sin_func, *args, **kwargs)
+
+        # Enforce oscillation frequency is positive
+        self.set_param_hint("frequency", min=0)
+
+    def guess(self, data, **kws) -> lmfit.parameter.Parameters:
+        independent_values = kws.get("x")
+
+        amp_guess = abs(max(data) - min(data)) / 2  # amp is positive by convention
+        offs_guess = np.mean(data)
+
+        (freq_guess, _) = fft_freq_phase_guess(data, independent_values)
+
+        self.set_param_hint("frequency", value=freq_guess, min=freq_guess * 0.8)
+        self.set_param_hint("amplitude", value=amp_guess, min=amp_guess * 0.8)
+        self.set_param_hint("offset", value=offs_guess)
+
+        params = self.make_params()
+        return lmfit.models.update_param_vals(params, self.prefix, **kws)
+
+
+def chevron_func(x, x0, amplitude, curvature, offset):
+    return -np.sqrt(amplitude * (x - x0) ** 2 + curvature) + offset
+
+
+# def chevron_func(x, x0, amplitude, offset):
+#     return -amplitude * np.sqrt((x - x0) ** 2) + offset
+
+
+class CzChevronModel(lmfit.model.Model):
+    def __init__(self, *args, **kwargs):
+        # pass in the defining equation so the user doesn't have to later.
+        super().__init__(chevron_func, *args, **kwargs)
+
+    def guess(self, data, **kws) -> lmfit.parameter.Parameters:
+
+        amp_guess = 1e6
+        offs_guess = np.max(data)
+        curvature_guess = 1
+
+        self.set_param_hint("curvature", value=curvature_guess, min=0)
+        self.set_param_hint("offset", value=offs_guess, min=0)
+        self.set_param_hint("amplitude", value=amp_guess, min=0)
+
+        params = self.make_params()
+        return lmfit.models.update_param_vals(params, self.prefix, **kws)
+
+
+def parabolic(x, x0=0, a=0.0, c=0.0):
+    """Return a parabolic function.
+
+    parabolic(x, a, b, c) = a * x**2 + b * x + c
+
+    """
+    return a * (x - x0) ** 2 + c
+
+
+def update_param_vals(pars, prefix, **kwargs):
+    """Update parameter values with keyword arguments."""
+    for key, val in kwargs.items():
+        pname = f"{prefix}{key}"
+        if pname in pars:
+            pars[pname].value = val
+    pars.update_constraints()
+    return pars
+
+
+class QuadraticModel(Model):
+    """A quadratic model, with three Parameters: `a`, `b`, and `c`.
+
+    Defined as:
+
+    .. math::
+
+        f(x; a, b, c) = a x^2 + b x + c
+
+    """
+
+    def __init__(self, independent_vars=["x"], prefix="", nan_policy="raise", **kwargs):
+        kwargs.update(
+            {
+                "prefix": prefix,
+                "nan_policy": nan_policy,
+                "independent_vars": independent_vars,
+            }
+        )
+        super().__init__(parabolic, **kwargs)
+
+    def guess(self, data, x, **kwargs):
+        """Estimate initial model parameter values from data."""
+        x0, a, c = np.polyfit(x, data, 2)
+        pars = self.make_params(x0=x0, a=a, c=c)
+        self.set_param_hint("x0", min=x.min(), max=x.max())
+        return update_param_vals(pars, self.prefix, **kwargs)

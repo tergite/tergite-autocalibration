@@ -17,12 +17,16 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
+from scipy.stats import spearmanr
 
 from tergite_autocalibration.lib.base.analysis import BaseAllCouplersAnalysis
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.analysis import (
     CZParametrizationAnalysis,
 )
-from tergite_autocalibration.lib.utils.analysis_models import SineOscillatingModel
+from tergite_autocalibration.lib.utils.analysis_models import (
+    QuadraticModel,
+    SineOscillatingModel,
+)
 from tergite_autocalibration.utils.dto.qoi import QOI
 
 
@@ -31,18 +35,10 @@ class CZChevronCouplerAnalysis(CZParametrizationAnalysis):
     def __init__(self, name, redis_fields, **kwargs):
         super().__init__(name, redis_fields, **kwargs)
         self.model = SineOscillatingModel()
-        # # Assume we start from a minimum
-        # self.model.set_param_hint("phase", expr="3.141592653589793", vary=True)
+        self.model.set_param_hint("optimal_duration", expr="1/frequency", vary=False)
+        self.chevron_model = QuadraticModel()
 
-        # Pi-pulse amplitude can be derived from the oscillation frequency
-        self.model.set_param_hint(
-            "optimal_duration",
-            expr="1/frequency",
-            vary=False,
-            # "optimal_duration", expr="1/frequency - phase/(2*pi*frequency)", vary=False
-        )
-
-    def apply_cz_fit(self, data):
+    def apply_sinusoidal_slices_fit(self, data):
         # durations is the independent variable in the cosine definition
         guess = self.model.guess(data, x=self.durations)
         try:
@@ -58,12 +54,11 @@ class CZChevronCouplerAnalysis(CZParametrizationAnalysis):
             fit_data = self.model.eval(fit.params, x=self.fit_plot_durations)
 
             # discard if the oscillations are not strong enough
-            if amplitude < 0.55:
+            if amplitude < 0.30:
                 duration = np.nan
             return np.array([duration]), np.array([fit_data])
         except:
             return np.array([np.nan]), np.array([np.nan])
-            print("error")
 
     def analyze_coupler(self):
         self.calculate_probabilities()
@@ -71,7 +66,6 @@ class CZChevronCouplerAnalysis(CZParametrizationAnalysis):
         self.fit_plot_durations = np.linspace(
             self.durations[0], self.durations[-1], 200
         )  # x-values for plotting
-        self.optimal_values = {}
 
         probabilities = self.probabilities
         control_state_2 = probabilities.sel({"qubit": self.control_qubit, "state": 2})
@@ -90,9 +84,8 @@ class CZChevronCouplerAnalysis(CZParametrizationAnalysis):
             raise ValueError("Invalid phase path")
         self.combined_data = self.control_diffs + self.target_diffs
 
-        print(f"{ self.phase_path = }")
-        cz_optimal_durations, self.fit_plot_probs = xr.apply_ufunc(
-            self.apply_cz_fit,
+        cz_durations, self.fit_plot_probs = xr.apply_ufunc(
+            self.apply_sinusoidal_slices_fit,
             self.combined_data,
             input_core_dims=[[self.durations_coord]],
             output_core_dims=[["cz_pulse_durations"], ["plot_points"]],
@@ -103,34 +96,70 @@ class CZChevronCouplerAnalysis(CZParametrizationAnalysis):
         # cz_optimal_durations = cz_optimal_durations.where(cz_optimal_durations < 500e-9)
 
         # cleanup entries with nan values from rejected fits:
-        self.cz_optimal_durations = cz_optimal_durations.dropna(
-            dim=self.frequencies_coord
-        )
+        cz_durations = cz_durations.dropna(dim=self.frequencies_coord)
 
         integer_gate_durations_in_ns = (
-            (self.cz_optimal_durations // 1e-9).astype(int).values.flatten()
+            (cz_durations // 1e-9).astype(int).values.flatten()
         )
         # ensure durations are in multiples of 4ns:
         cz_working_durations_in_ns = (integer_gate_durations_in_ns // 4) * 4
-        cz_working_durations_in_ns = cz_working_durations_in_ns.tolist()
-        cz_working_frequencies = self.cz_optimal_durations.cz_pulse_frequencies
-        cz_working_frequencies = cz_working_frequencies.astype(int).values.tolist()
+        cz_working_frequencies = cz_durations.cz_pulse_frequencies.values
 
-        cz_working_frequencies_str = str(cz_working_frequencies)
-        cz_working_durations_in_ns_str = str(cz_working_durations_in_ns)
+        # fit the working points to a parabola model to extract the peak of the chevron
+        cz_duration_values = cz_durations.values.flatten()
+        guess_params = self.chevron_model.guess(
+            cz_duration_values, x=cz_working_frequencies
+        )
 
-        # self.plot_frequency_slice(4)
-        # self.plot_frequency_slice(6)
-        # self.plot_frequency_slice(8)
+        self.cz_working_durations = cz_duration_values
+        self.cz_working_frequencies = cz_working_frequencies
 
+        self.chevron_fit_result = self.chevron_model.fit(
+            cz_duration_values, params=guess_params, x=cz_working_frequencies
+        )
+        print(self.chevron_fit_result.fit_report())
+        residuals = cz_duration_values - self.chevron_fit_result.best_fit
+        x0 = self.chevron_fit_result.params["x0"].value
+        distances_from_vertex = np.abs(cz_working_frequencies - x0)
+
+        correlation = spearmanr(distances_from_vertex, residuals)
+
+        fit_is_good = correlation.statistic < 0.3
+        vertex_is_contained = (
+            cz_working_frequencies.min() < x0 and x0 < cz_working_frequencies.max()
+        )
+        print(f"{ fit_is_good = }")
+        print(f"{ vertex_is_contained = }")
+        abs_distances_from_vertex = np.abs(cz_working_frequencies - x0)
+        sorted_distances_from_vertex = np.sort(abs_distances_from_vertex)
+        num_of_working_pairs = 7
+        distance_threshold = sorted_distances_from_vertex[num_of_working_pairs]
+        selected_cz_frequencies = cz_working_frequencies[
+            abs_distances_from_vertex < distance_threshold
+        ]
+
+        selected_cz_duartions_in_ns = cz_working_durations_in_ns[
+            abs_distances_from_vertex < distance_threshold
+        ]
+
+        self.selected_frequencies = selected_cz_frequencies
+        self.selected_durations = selected_cz_duartions_in_ns * 1e-9
+
+        selected_cz_duartions_in_ns = selected_cz_duartions_in_ns.tolist()
+        selected_cz_frequencies = selected_cz_frequencies.astype(int).tolist()
+
+        selected_frequencies_str = str(selected_cz_frequencies)
+        selected_cz_durations_in_ns_str = str(selected_cz_duartions_in_ns)
+        print(f"{ selected_cz_duartions_in_ns = }")
+        print(f"{ selected_cz_frequencies = }")
         analysis_succesful = True
         analysis_result = {
             "cz_working_frequencies": {
-                "value": cz_working_frequencies_str,
+                "value": selected_frequencies_str,
                 "error": 0,
             },
             "cz_working_durations_in_ns": {
-                "value": cz_working_durations_in_ns_str,
+                "value": selected_cz_durations_in_ns_str,
                 "error": 0,
             },
         }
@@ -145,25 +174,42 @@ class CZChevronCouplerAnalysis(CZParametrizationAnalysis):
 
         current_probabilities = self.probabilities
         current_probabilities.plot(
-            x=self.frequencies_coord,
-            cmap="RdBu_r",
-            row="qubit",
-            col="state",
+            x=self.frequencies_coord, cmap="RdBu_r", row="qubit", col="state"
         )
 
         fig = plt.gcf()
+        fit_kws = {"c": "black"}
 
-        if not self.cz_optimal_durations.size == 0:
+        if not self.cz_working_durations.size == 0:
             for ax in fig.axes:
-                self.cz_optimal_durations.plot(
-                    # self.cz_optimal_durations.drop_vars("qubit").plot(
+                breakpoint()
+                self.chevron_fit_result.plot_fit(
                     ax=ax,
+                    numpoints=100,
+                    fit_kws=fit_kws,
+                    title=ax.get_title(),
+                    xlabel=None,
+                    ylabel=None,
+                )
+                # ax.get_legend().remove()
+                ax.plot(
+                    self.cz_working_frequencies,
+                    self.cz_working_durations,
                     marker="8",
                     ls="",
                     color="yellow",
                 )
+                ax.plot(
+                    self.selected_frequencies,
+                    self.selected_durations,
+                    marker="*",
+                    markersize=12,
+                    ls="",
+                    color="green",
+                )
 
         figures_dictionary[self.coupler] = [fig]
+        plt.show()
 
     # def plot_frequency_slice(self, freq_index: int):
     #     fig2, ax = plt.subplots()
@@ -179,3 +225,27 @@ class CZChevronAnalysis(BaseAllCouplersAnalysis):
 
     def __init__(self, name, redis_fields, **kwargs):
         super().__init__(name, redis_fields, **kwargs)
+
+
+# # print(f"x0 = {x0:.3f} ± {x0_err:.3f}")
+#
+#
+# resid = ydata - result.best_fit
+# axs[2].scatter(xdata, resid, s=20)
+# axs[2].axhline(0, color='k')
+# axs[2].set_xlabel("x")
+# axs[2].set_ylabel("residual")
+# axs[2].set_title("Residuals vs x")
+# plt.show()
+#
+# x = xdata
+# from scipy.stats import spearmanr
+#
+# x0 = result.params['x0'].value
+# d = np.abs(x - x0)
+#
+# rho, pval = spearmanr(d, resid)
+#
+# print(f"Spearman(|x-x0|, resid): rho={rho:.3f}, p={pval:.3g}")
+#
+# plt.show()
