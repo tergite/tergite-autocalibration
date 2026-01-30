@@ -52,7 +52,6 @@ class QubitSpectroscopyVsCurrentNode(CouplerNode):
     measurement_obj = TwoTonesMultidimMeasurement
     analysis_obj = CouplerAnticrossingNodeAnalysis
     measurement_type = ExternalParameterNode
-    # coupler_qois = ["parking_current"]
     coupler_qois = ["control_qubit_crossing_points", "target_qubit_crossing_points"]
 
     def __init__(self, name: str, couplers: list[str], **schedule_keywords):

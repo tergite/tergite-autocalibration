@@ -12,15 +12,33 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+
+from __future__ import annotations
+
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
+
+import xarray
 from quantify_scheduler.enums import BinMode
+
+if TYPE_CHECKING:
+    from tergite_autocalibration.lib.base.node import BaseNode
 
 
 class BaseMeasurement:
     downconvert = 4.4e9
 
-    def __init__(self, transmons: dict, couplers: dict = {}):
+    def __init__(self, transmons: dict, couplers=None):
+        if couplers is None:
+            couplers = {}
         self.transmons = transmons
         self.couplers = couplers
         self.qubits = list(self.transmons.keys())
         self.device_configuration = {}
         self.bin_mode = BinMode.AVERAGE
+
+
+class MeasurementType(ABC):
+    @abstractmethod
+    def measure_node(self, measurement_mode, node: "BaseNode") -> xarray.Dataset:
+        pass

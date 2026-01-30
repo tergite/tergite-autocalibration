@@ -56,29 +56,27 @@ PLOTTING_BACKEND = "tkagg" if ENV.plotting else "agg"
 # If there is no configuration package loaded, this would throw an error
 try:
     if is_pytest():
-        # Create the ConfigurationHandler from the default_device_under_test template in the fixtures
-        CONFIG = ConfigurationHandler.from_configuration_package(
-            ConfigurationPackage.from_toml(
-                os.path.join(
-                    str(Path(__file__).parent.parent),
-                    "tests",
-                    "fixtures",
-                    "templates",
-                    "default_device_under_test",
-                    "configuration.meta.toml",
-                )
+        # Create the ConfigurationPackage from the default_device_under_test template in the fixtures
+        CONFIGURATION_PACKAGE = ConfigurationPackage.from_toml(
+            os.path.join(
+                str(Path(__file__).parent.parent),
+                "tests",
+                "fixtures",
+                "templates",
+                "default_device_under_test",
+                "configuration.meta.toml",
             )
         )
     else:
-        # Create the ConfigurationHandler from the meta configuration in the root directory
-        CONFIG = ConfigurationHandler.from_configuration_package(
-            ConfigurationPackage.from_toml(
-                os.path.join(ENV.config_dir, "configuration.meta.toml")
-            )
+        # Create the ConfigurationPackage from the meta configuration in the root directory
+        CONFIGURATION_PACKAGE = ConfigurationPackage.from_toml(
+            os.path.join(ENV.config_dir, "configuration.meta.toml")
         )
+    CONFIG = ConfigurationHandler.from_configuration_package(CONFIGURATION_PACKAGE)
 
 # In the exception case we create an empty configuration package
 except FileNotFoundError:
+    CONFIGURATION_PACKAGE = ConfigurationPackage()
     CONFIG = ConfigurationPackage()
     logger.warning(
         "Default configuration is not yet loaded. "
