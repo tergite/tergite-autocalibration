@@ -44,6 +44,7 @@ class CZChevronCouplerAnalysis(CZParametrizationAnalysis):
         self.model = SineOscillatingModel()
         self.model.set_param_hint("optimal_duration", expr="1/frequency", vary=False)
         self.chevron_model = QuadraticModel()
+        self.number_of_working_points: int = kwargs["number_of_working_points"]
 
     def apply_sinusoidal_slices_fit(self, data):
         # durations is the independent variable in the cosine definition
@@ -77,6 +78,7 @@ class CZChevronCouplerAnalysis(CZParametrizationAnalysis):
             self.chevron_fit_result = self.chevron_model.fit(
                 cz_duration_values, params=guess_params, x=cz_working_frequencies
             )
+            print(self.chevron_fit_result.fit_report())
             # x0 is the frequency at the parabola vertex
             x0 = self.chevron_fit_result.params["x0"].value
 
@@ -85,7 +87,9 @@ class CZChevronCouplerAnalysis(CZParametrizationAnalysis):
             residuals = cz_duration_values - self.chevron_fit_result.best_fit
             distances_from_vertex = np.abs(cz_working_frequencies - x0)
             correlation = spearmanr(distances_from_vertex, residuals)
+            print(f"{ correlation = }")
             fit_is_good = correlation.statistic < 0.3
+            print(f"{ fit_is_good = }")
 
             # if the vertex is contained, return a number of
             # frequency duration pairs around it
@@ -94,12 +98,11 @@ class CZChevronCouplerAnalysis(CZParametrizationAnalysis):
             )
             abs_distances_from_vertex = np.abs(cz_working_frequencies - x0)
             sorted_distances_from_vertex = np.sort(abs_distances_from_vertex)
-            num_of_working_pairs = 7
+            num_of_working_pairs = self.number_of_working_points
             distance_threshold = sorted_distances_from_vertex[num_of_working_pairs]
             selected_cz_frequencies = cz_working_frequencies[
                 abs_distances_from_vertex < distance_threshold
             ]
-
             selected_cz_durations = cz_duration_values[
                 abs_distances_from_vertex < distance_threshold
             ]
@@ -113,7 +116,20 @@ class CZChevronCouplerAnalysis(CZParametrizationAnalysis):
         except:
             return ParabolicFit(np.nan, np.nan)
 
-    def analyze_coupler(self):
+    def analyze_coupler(self) -> QOI:
+        """Analyze the chevron pattern measured while sweeping the flux duration and frequency.
+
+        Analyze the chevron pattern measured while sweeping the flux pulse duration (y-axis)
+        and flux pulse frequency (x-axis).
+        The method assigns value to the attributes
+         - self.cz_working_durations_in_ns
+         - self.cz_working_frequencies
+        which correspond to all the (frequency, duration) points where a return to the |11> is observed
+        The working pairs may be unnesasrily mainy, sothe method assigns value also to the attributes
+         - self.selected_cz_durations_in_ns
+         - self.selected_cz_frequencies
+        which are a subset of the wotking points with array size according to self.number_of_working_points
+        """
         self.calculate_probabilities()
 
         self.fit_plot_durations = np.linspace(
@@ -139,6 +155,7 @@ class CZChevronCouplerAnalysis(CZParametrizationAnalysis):
 
         self.combined_data = self.control_diffs + self.target_diffs
 
+        # apply a sinusoidal fit to each verical slice (column of specific frequency)
         cz_durations, self.fit_plot_probs = xr.apply_ufunc(
             self.apply_sinusoidal_slices_fit,
             self.combined_data,
@@ -165,6 +182,8 @@ class CZChevronCouplerAnalysis(CZParametrizationAnalysis):
 
         self.cz_working_frequencies = cz_working_frequencies
         self.cz_working_durations_in_ns = cz_working_durations_in_ns
+        print(f"{ cz_working_frequencies = }")
+        print(f"{ cz_working_durations_in_ns = }")
 
         self.selected_frequencies = selected_cz_frequencies
         self.selected_durations_in_ns = selected_cz_durations_in_ns
@@ -207,10 +226,16 @@ class CZChevronCouplerAnalysis(CZParametrizationAnalysis):
             self.chevron_fit_result.params, x=parabolic_fit_frequencies
         )
 
+        # if there are no working points return only the faceting plot
         if self.cz_working_durations_in_ns.size == 0:
             figures_dictionary[self.coupler] = [fig]
             return
 
+        print(f"{ self.cz_working_durations_in_ns = }")
+        print(f"{ self.cz_working_frequencies = }")
+
+        # for every one of the six faceting axes, plot the working points and
+        # their parabolic fit
         for ax in fig.axes:
             ax.plot(
                 parabolic_fit_frequencies,

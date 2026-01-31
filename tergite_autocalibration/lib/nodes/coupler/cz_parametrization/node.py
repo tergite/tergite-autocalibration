@@ -124,11 +124,12 @@ class CZParametrizationNode(CouplerNode):
                 number_of_amplitudes * number_of_frequencies * self.loops
             )
 
+            # a simple 2d gaussian
             cov = np.array([[1, 0], [0, 1]])
             distr = multivariate_normal(cov=cov, mean=np.array([0, 0]))
+
             # Create a coordinate grid
             sigma_1, sigma_2 = cov[0, 0], cov[1, 1]
-
             x = np.linspace(-3 * sigma_1, 3 * sigma_1, num=number_of_frequencies)
             y = np.linspace(-3 * sigma_2, 3 * sigma_2, num=number_of_amplitudes)
             X, Y = np.meshgrid(x, y)
@@ -142,9 +143,12 @@ class CZParametrizationNode(CouplerNode):
 
             # normalize
             pdf /= pdf.max()
+
+            # emulate blobs
             peaks = pdf
             dips = 1 - pdf
             zeros = np.zeros((number_of_amplitudes, number_of_frequencies))
+
             complex_points_q1 = generate_iq_shots(
                 np.array([peaks, dips, zeros]), q1, self.loops
             )

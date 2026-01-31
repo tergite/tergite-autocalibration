@@ -48,7 +48,8 @@ class CZChevronNode(CouplerNode):
         self.loops = self.schedule_keywords["loop_repetitions"]
         phase_paths = self.all_phase_paths()
         self.analysis_keywords = {
-            coupler: {"phase_path": phase_paths[coupler]} for coupler in self.couplers
+            coupler: {"phase_path": phase_paths[coupler], "number_of_working_points": 7}
+            for coupler in self.couplers
         }
 
         self.outer_schedule_samplespace = {
@@ -85,10 +86,10 @@ class CZChevronNode(CouplerNode):
     def generate_dummy_dataset(self):
         dataset = xr.Dataset()
         for index, coupler in enumerate(self.couplers):
-            number_of_frequencies = len(
+            number_of_durations = len(
                 self.schedule_samplespace["cz_pulse_durations"][coupler]
             )
-            number_of_iq_samples = number_of_frequencies * self.loops
+            number_of_iq_samples = number_of_durations * self.loops
             real_part = np.random.uniform(-1, 1, number_of_iq_samples)
             imag_part = np.random.uniform(-1, 1, number_of_iq_samples)
             complex_points = real_part + 1j * imag_part

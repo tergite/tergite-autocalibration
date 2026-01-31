@@ -313,7 +313,7 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
                 target_qubit = qubit
         return control_qubit, target_qubit
 
-    def process_coupler(self, dataset: xr.Dataset, coupler_element):
+    def process_coupler(self, dataset: xr.Dataset, coupler_element) -> QOI:
         self.control_qubit, self.target_qubit = self.qubit_types(coupler_element)
         self.dataset = dataset
         self.coupler = coupler_element
@@ -336,12 +336,8 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
             else:
                 raise ValueError
 
-        self._qoi = self._run_coupler_analysis(coupler_element)
-
-        return self._qoi
-
-    def _run_coupler_analysis(self, this_element: str):
         self._qoi = self.analyze_coupler()
+
         return self._qoi
 
     @abstractmethod

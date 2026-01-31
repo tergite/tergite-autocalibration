@@ -1,7 +1,7 @@
 # This code is part of Tergite
 #
 # (C) Copyright Michele Faucci Giannelli 2024
-# (C) Copyright Michele Eleftherios Moschandreou 2025
+# (C) Copyright Michele Eleftherios Moschandreou 2025, 2026
 # (C) Chalmers Next Labs AB 2025, 2026
 #
 # This code is licensed under the Apache License, Version 2.0. You may
