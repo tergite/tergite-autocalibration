@@ -81,9 +81,9 @@ def test_cz_chevron_analysis_bad_data():
 
 
 @with_redis(_redis_values_0)
-def test_plotting(tmp_path):
+def test_plotting():
     """
-    Test whether plotting produces right plots
+    Test that the plotter produces a faceted figure
     """
 
     # Load dataset

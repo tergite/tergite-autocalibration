@@ -57,7 +57,6 @@ class CZChevronCouplerAnalysis(CZParametrizationAnalysis):
             )
             duration = fit.values["optimal_duration"]
             amplitude = fit.values["amplitude"]
-            print(f"{ amplitude = }")
 
             fit_data = self.model.eval(fit.params, x=self.fit_plot_durations)
 
@@ -78,7 +77,6 @@ class CZChevronCouplerAnalysis(CZParametrizationAnalysis):
             self.chevron_fit_result = self.chevron_model.fit(
                 cz_duration_values, params=guess_params, x=cz_working_frequencies
             )
-            print(self.chevron_fit_result.fit_report())
             # x0 is the frequency at the parabola vertex
             x0 = self.chevron_fit_result.params["x0"].value
 
@@ -87,9 +85,7 @@ class CZChevronCouplerAnalysis(CZParametrizationAnalysis):
             residuals = cz_duration_values - self.chevron_fit_result.best_fit
             distances_from_vertex = np.abs(cz_working_frequencies - x0)
             correlation = spearmanr(distances_from_vertex, residuals)
-            print(f"{ correlation = }")
             fit_is_good = correlation.statistic < 0.3
-            print(f"{ fit_is_good = }")
 
             # if the vertex is contained, return a number of
             # frequency duration pairs around it
@@ -182,8 +178,6 @@ class CZChevronCouplerAnalysis(CZParametrizationAnalysis):
 
         self.cz_working_frequencies = cz_working_frequencies
         self.cz_working_durations_in_ns = cz_working_durations_in_ns
-        print(f"{ cz_working_frequencies = }")
-        print(f"{ cz_working_durations_in_ns = }")
 
         self.selected_frequencies = selected_cz_frequencies
         self.selected_durations_in_ns = selected_cz_durations_in_ns
@@ -230,9 +224,6 @@ class CZChevronCouplerAnalysis(CZParametrizationAnalysis):
         if self.cz_working_durations_in_ns.size == 0:
             figures_dictionary[self.coupler] = [fig]
             return
-
-        print(f"{ self.cz_working_durations_in_ns = }")
-        print(f"{ self.cz_working_frequencies = }")
 
         # for every one of the six faceting axes, plot the working points and
         # their parabolic fit
