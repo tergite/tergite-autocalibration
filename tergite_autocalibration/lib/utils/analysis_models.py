@@ -331,7 +331,7 @@ class SineOscillatingModel(lmfit.model.Model):
         amp_guess = abs(max(data) - min(data)) / 2  # amp is positive by convention
         offs_guess = np.mean(data)
 
-        (freq_guess, _) = fft_freq_phase_guess(data, independent_values)
+        freq_guess, _ = fft_freq_phase_guess(data, independent_values)
 
         self.set_param_hint("frequency", value=freq_guess, min=freq_guess * 0.8)
         self.set_param_hint("amplitude", value=amp_guess, min=amp_guess * 0.8)
