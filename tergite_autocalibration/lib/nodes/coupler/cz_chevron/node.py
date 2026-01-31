@@ -70,7 +70,6 @@ class CZChevronNode(CouplerNode):
         known_cz_frequency = float(
             REDIS_CONNECTION.hget(f"couplers:{coupler}", "cz_pulse_frequency")
         )
-        print(f"{ known_cz_frequency = }")
         return known_cz_frequency
 
     def all_phase_paths(self) -> dict[str, Literal["via_02", "via_20"]]:

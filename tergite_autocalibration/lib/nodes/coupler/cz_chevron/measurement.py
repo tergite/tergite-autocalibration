@@ -53,7 +53,6 @@ class CZChevronMeasurement(BaseMeasurement):
         root = cz_schedule.add(IdlePulse(4e-9))
         for coupler, edge in self.couplers.items():
             cz_amplitude = edge.cz.square_amp()
-            print(f"{ cz_amplitude = }")
             cz_durations = cz_duration_values[coupler]
             cz_frequency = cz_frequency_values[coupler]
             qubits = coupler.split(sep="_")
