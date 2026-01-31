@@ -120,9 +120,6 @@ class CZParametrizationNode(CouplerNode):
             frequencies = self.schedule_samplespace["cz_pulse_frequencies"][coupler]
             number_of_amplitudes = len(amplitudes)
             number_of_frequencies = len(frequencies)
-            number_of_iq_samples = (
-                number_of_amplitudes * number_of_frequencies * self.loops
-            )
 
             # a simple 2d gaussian
             cov = np.array([[1, 0], [0, 1]])

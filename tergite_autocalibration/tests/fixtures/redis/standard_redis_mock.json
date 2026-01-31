@@ -321,6 +321,7 @@
       "reset:duration": "6e-05",
       "tqg_fidelity": "nan",
       "cz_dynamic_target_error": "0",
+      "cz_phase_path": "via_20",
       "attenuation": "0"
     }
   }

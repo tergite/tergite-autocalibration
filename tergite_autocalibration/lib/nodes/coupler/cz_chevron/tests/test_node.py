@@ -34,6 +34,7 @@ def test_node_creation():
     REDIS_CONNECTION.hset(f"transmons:{'q13'}", "clock_freqs:f12", "4.0e6")
     REDIS_CONNECTION.hset(f"transmons:{'q14'}", "clock_freqs:f01", "5.2e6")
     REDIS_CONNECTION.hset(f"transmons:{'q14'}", "clock_freqs:f12", "5.0e6")
+    REDIS_CONNECTION.hset(f"couplers:{'q13_q14'}", "cz_pulse_frequency", "7.16e8")
     node = CZChevronNode(
         "cz_chevron",
         all_qubits=["q13", "q14"],
@@ -43,6 +44,7 @@ def test_node_creation():
 
 
 def test_class_attribute_objects():
+    REDIS_CONNECTION.hset(f"couplers:{'q13_q14'}", "cz_pulse_frequency", "7.16e8")
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
     node = CZChevronNode("cz_chevron", all_qubits=["q13", "q14"], couplers=["q13_q14"])
     assert isinstance(node.measurement_obj, type(CZChevronMeasurement))
@@ -54,6 +56,7 @@ def test_dummy_generation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
     for coupler in CONFIG.run.couplers:
         REDIS_CONNECTION.hset(f"couplers:{coupler}", "parking_current", "100e-6")
+        REDIS_CONNECTION.hset(f"couplers:{coupler}", "cz_pulse_frequency", "7.16e8")
     for qubit in CONFIG.run.qubits[::2]:
         REDIS_CONNECTION.hset(f"transmons:{qubit}", "clock_freqs:f01", "4.2e6")
         REDIS_CONNECTION.hset(f"transmons:{qubit}", "clock_freqs:f12", "4.0e6")
@@ -67,16 +70,11 @@ def test_dummy_generation():
     dummy_dataset = node.generate_dummy_dataset()
     first_coupler = CONFIG.run.couplers[0]
 
-    number_of_frequencies = len(
-        node.schedule_samplespace["cz_pulse_frequencies"][first_coupler]
-    )
-    number_of_amplitudes = len(
-        node.schedule_samplespace["cz_pulse_amplitudes"][first_coupler]
+    number_of_durations = len(
+        node.schedule_samplespace["cz_pulse_durations"][first_coupler]
     )
 
     data_vars = dummy_dataset.data_vars
 
     assert len(data_vars) == 2 * len(CONFIG.run.couplers)
-    assert (
-        data_vars[0].size == number_of_frequencies * number_of_amplitudes * node.loops
-    )
+    assert data_vars[0].size == number_of_durations * node.loops

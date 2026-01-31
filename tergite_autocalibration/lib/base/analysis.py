@@ -413,9 +413,10 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
             ds = xr.merge([self.dataset[var] for var in coupler_data_vars])
             ds.attrs["coupler"] = this_coupler
             ds.attrs["node"] = self.name
+            coupler_analysis_keywords = self.analysis_keywords[this_coupler]
 
             coupler_analysis = self.single_coupler_analysis_obj(
-                self.name, self.redis_fields, **self.analysis_keywords[this_coupler]
+                self.name, self.redis_fields, **coupler_analysis_keywords
             )
             coupler_analysis.data_path = self.data_path
             qoi = coupler_analysis.process_coupler(ds, this_coupler)

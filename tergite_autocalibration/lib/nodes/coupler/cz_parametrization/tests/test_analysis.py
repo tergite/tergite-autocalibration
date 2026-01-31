@@ -38,6 +38,7 @@ def test_cz_parametrization_analysis_good_data():
         _test_data_dir, "data_0", "dataset_cz_parametrization_0.hdf5"
     )
     dataset = xr.open_dataset(file_path)
+    coupler = "q14_q15"
 
     # Run the single coupler analysis
     analysis = CZParametrizationCouplerAnalysis(
@@ -45,7 +46,7 @@ def test_cz_parametrization_analysis_good_data():
         ["cz_pulse_frequency", "cz_pulse_amplitude", "parking_current"],
         phase_path="via_20",
     )
-    qoi = analysis.process_coupler(dataset, "q14_q15")
+    qoi = analysis.process_coupler(dataset, coupler)
 
     # Compare the output values
     assert qoi.analysis_result["cz_pulse_frequency"]["value"] == 418162631.57894737
@@ -63,6 +64,7 @@ def test_cz_parametrization_analysis_bad_data():
         _test_data_dir, "data_1", "dataset_cz_parametrization_0.hdf5"
     )
     dataset = xr.open_dataset(file_path)
+    coupler = "q14_q15"
 
     # Run the single coupler analysis
     analysis = CZParametrizationCouplerAnalysis(
@@ -70,7 +72,7 @@ def test_cz_parametrization_analysis_bad_data():
         ["cz_pulse_frequency", "cz_pulse_amplitude", "parking_current"],
         phase_path="via_20",
     )
-    qoi = analysis.process_coupler(dataset, "q14_q15")
+    qoi = analysis.process_coupler(dataset, coupler)
 
     # Make sure that the analysis returns as unsuccessful
     assert qoi.analysis_successful is False
@@ -88,16 +90,17 @@ def test_plotting(tmp_path):
         os.path.join(tmp_path, "dataset_cz_parametrization_0.hdf5"),
     )
 
+    coupler = "q14_q15"
     # Run the node analysis
     analysis = CZParametrizationNodeAnalysis(
         "cz_parametrization",
         ["cz_pulse_frequency", "cz_pulse_amplitude", "parking_current"],
-        phase_path="via_20",
+        **{coupler: {"phase_path": "via_20"}},
     )
     analysis.analyze_node(tmp_path)
 
     # Check whether output images exist
     for i in range(5):
         assert os.path.exists(
-            os.path.join(tmp_path, f"cz_parametrization_q14_q15_{i}_preview.png")
+            os.path.join(tmp_path, f"cz_parametrization_{coupler}_{i}_preview.png")
         )
