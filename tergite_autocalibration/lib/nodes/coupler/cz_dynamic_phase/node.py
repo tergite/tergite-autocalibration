@@ -1,8 +1,9 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2024
+# (C) Copyright Eleftherios Moschandreou 2024, 2025, 2026
 # (C) Copyright Liangyu Chen 2024
 # (C) Copyright Amr Osman 2024
+# (C) Copyright Chalmers Next Labs 2024, 2025, 2026
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -14,68 +15,41 @@
 
 import numpy as np
 
-from tergite_autocalibration.lib.base.node import QubitNode
-from tergite_autocalibration.lib.nodes.coupler.cz_calibration.analysis import (
-    CZCalibrationSSRONodeAnalysis,
+from tergite_autocalibration.lib.base.node import CouplerNode
+from tergite_autocalibration.lib.nodes.coupler.cz_dynamic_phase.analysis import (
+    CZ_DynamicPhaseNodeAnalysis,
 )
-from tergite_autocalibration.lib.nodes.coupler.cz_calibration.measurement import (
-    CZCalibrationSSROMeasurement,
+from tergite_autocalibration.lib.nodes.coupler.cz_dynamic_phase.measurement import (
+    CZ_DynamicPhaseMeasurement,
 )
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 
 
-class CZDynamicPhaseSSRONode(QubitNode):
-    measurement_obj = CZCalibrationSSROMeasurement
-    analysis_obj = CZCalibrationSSRONodeAnalysis
+class CZ_DynamicPhaseNode(CouplerNode):
+    measurement_obj = CZ_DynamicPhaseMeasurement
+    analysis_obj = CZ_DynamicPhaseNodeAnalysis
+    measurement_type = ScheduleNode
+    coupler_qois = ["control_local_phase", "target_local_phase"]
 
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary
-    ):
-        super().__init__(name, all_qubits, **node_dictionary)
-        self.name = name
-        self.all_qubits = all_qubits
+    def __init__(self, name: str, couplers: list[str], **schedule_keywords):
+        super().__init__(name, couplers, **schedule_keywords)
         self.couplers = couplers
-        self.edges = couplers
-        self.coupler = self.couplers[0]
-        self.coupled_qubits = couplers[0].split(sep="_")
-        self.redis_field = ["cz_dynamic_target"]
-        self.qubit_state = 2
-        self.testing_group = 0  # The edge group to be tested. 0 means all edges.
-        self.node_dictionary["dynamic"] = True
-        self.node_dictionary["swap_type"] = False
-        self.node_dictionary["use_edge"] = False
+
+        self.coupled_qubits = self.get_coupled_qubits()
+        # self.all_qubits refers to the qubits that are going to be measured
+        # with the two-tones schedule
+        self.all_qubits = self.coupled_qubits
+
+        self.schedule_keywords["loop_repetitions"] = 512
+        self.loops = self.schedule_keywords["loop_repetitions"]
+        self.schedule_keywords["coupler_dict"] = self.gate_qubit_types_dict()
+
         self.schedule_samplespace = {
-            "ramsey_phases": {
-                qubit: np.append(np.linspace(0, 360, 25), [0, 1])
-                for qubit in self.coupled_qubits
+            "local_phases": {
+                qubit: np.linspace(0, 360, 45) for qubit in self.coupled_qubits
             },
-            "control_ons": {qubit: [False, True] for qubit in self.coupled_qubits},
-        }
-
-
-class CZDynamicPhaseSwapSSRONode(QubitNode):
-    measurement_obj = CZCalibrationSSROMeasurement
-    analysis_obj = CZCalibrationSSRONodeAnalysis
-
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary
-    ):
-        super().__init__(name, all_qubits, **node_dictionary)
-        self.name = name
-        self.all_qubits = all_qubits
-        self.couplers = couplers
-        self.edges = couplers
-        self.coupler = self.couplers[0]
-        self.coupled_qubits = couplers[0].split(sep="_")
-        self.redis_field = ["cz_dynamic_control"]
-        self.qubit_state = 2
-        self.testing_group = 0  # The edge group to be tested. 0 means all edges.
-        self.node_dictionary["dynamic"] = True
-        self.node_dictionary["swap_type"] = True
-        self.node_dictionary["use_edge"] = False
-        self.schedule_samplespace = {
-            "ramsey_phases": {
-                qubit: np.append(np.linspace(0, 360, 25), [0, 1])
-                for qubit in self.coupled_qubits
+            "gate_modes": {
+                coupler: np.array([True, False]) for coupler in self.couplers
             },
-            "control_ons": {qubit: [False, True] for qubit in self.coupled_qubits},
+            "swap": {coupler: np.array([False, True]) for coupler in self.couplers},
         }
