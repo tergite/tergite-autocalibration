@@ -61,6 +61,8 @@ class NodeFactory:
             "coupler_anticrossing": "QubitSpectroscopyVsCurrentNode",
             "cz_parametrization": "CZParametrizationNode",
             "cz_chevron": "CZChevronNode",
+            "cz_calibration": "CZ_CalibrationNode",
+            "CZ_local_phases": "CZ_LocalPhasesNode",
             "resonator_spectroscopy_vs_current": "ResonatorSpectroscopyVsCurrentNode",
             "qubit_spectroscopy_vs_current": "QubitSpectroscopyVsCurrentNode",
         }

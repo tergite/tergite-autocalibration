@@ -216,7 +216,7 @@ class CZDynamicPhaseCouplerAnalysis(BaseCouplerAnalysis):
         figures_dictionary[self.coupler] = [fig, leak_fig]
 
 
-class CZ_DynamicPhaseNodeAnalysis(BaseAllCouplersAnalysis):
+class CZ_LocalPhasesNodeAnalysis(BaseAllCouplersAnalysis):
     single_coupler_analysis_obj = CZDynamicPhaseCouplerAnalysis
 
     def __init__(self, name, redis_fields):

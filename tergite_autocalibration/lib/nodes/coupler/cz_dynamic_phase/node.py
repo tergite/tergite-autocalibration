@@ -17,17 +17,17 @@ import numpy as np
 
 from tergite_autocalibration.lib.base.node import CouplerNode
 from tergite_autocalibration.lib.nodes.coupler.cz_dynamic_phase.analysis import (
-    CZ_DynamicPhaseNodeAnalysis,
+    CZ_LocalPhasesNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.coupler.cz_dynamic_phase.measurement import (
-    CZ_DynamicPhaseMeasurement,
+    CZ_LocalPhasesMeasurement,
 )
 from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 
 
-class CZ_DynamicPhaseNode(CouplerNode):
-    measurement_obj = CZ_DynamicPhaseMeasurement
-    analysis_obj = CZ_DynamicPhaseNodeAnalysis
+class CZ_LocalPhasesNode(CouplerNode):
+    measurement_obj = CZ_LocalPhasesMeasurement
+    analysis_obj = CZ_LocalPhasesNodeAnalysis
     measurement_type = ScheduleNode
     coupler_qois = ["control_local_phase", "target_local_phase"]
 
@@ -36,8 +36,6 @@ class CZ_DynamicPhaseNode(CouplerNode):
         self.couplers = couplers
 
         self.coupled_qubits = self.get_coupled_qubits()
-        # self.all_qubits refers to the qubits that are going to be measured
-        # with the two-tones schedule
         self.all_qubits = self.coupled_qubits
 
         self.schedule_keywords["loop_repetitions"] = 512
