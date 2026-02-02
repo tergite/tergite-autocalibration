@@ -1,6 +1,7 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2024
+# (C) Copyright Eleftherios Moschandreou 2024, 2026
+# (C) Chalmers Next Labs
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -10,26 +11,70 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+import math
+import os
+
 import numpy
 import pytest
 
-# from tergite_autocalibration.lib.utils.device import configure_device
+from tergite_autocalibration.config.globals import CONFIG
+from tergite_autocalibration.lib.utils.device import (
+    close_device_resources,
+    configure_device,
+    save_serial_device,
+)
 from tergite_autocalibration.lib.utils.validators import (
     get_batched_dimensions,
     get_number_of_batches,
     reduce_batch,
 )
+from tergite_autocalibration.tests.utils.decorators import with_redis
+from tergite_autocalibration.tests.utils.fixtures import get_fixture_path
+from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
+
+redis_mock = get_fixture_path("redis", "standard_redis_mock.json")
 
 
-def test_device_configuration():
-    name = "QPU_device"
-    qubits = ["q01", "q02", "q03"]
-    couplers = ["q01_q02"]
-    # TODO: ----------------------------------------------------
-    # TODO: For this to be tested a mock redis setup is required
-    # TODO: ----------------------------------------------------
+@with_redis(redis_mock)
+def test_create_serial_device():
+    # ensure no other transmon objects are instantiated
+    # this is because some other test doesn't close the device properly
+    ExtendedTransmon.close_all()
+    device_name = "test_device"
+    test_device = configure_device(
+        device_name, qubits=CONFIG.run.qubits, couplers=CONFIG.run.couplers
+    )
+
+    q00 = test_device.get_element("q00")
+    pi_amplitude = q00.rxy.amp180()
+    q00_q01 = test_device.get_edge("q00_q01")
+    parking_current = q00_q01.cz.parking_current()
+
+    assert test_device.elements() == CONFIG.run.qubits
+    assert test_device.edges() == CONFIG.run.couplers
+
+    assert math.isclose(pi_amplitude, 0.7308488204080522)
+    assert math.isclose(parking_current, 0.00095)
+
+    close_device_resources(test_device)
 
 
+def test_save_serial_device(tmp_path):
+    # ensure no other transmon objects are instantiated
+    # this is because some other test doesn't close the device properly
+    ExtendedTransmon.close_all()
+    device_name = "test_device"
+    test_device = configure_device(
+        device_name, qubits=CONFIG.run.qubits, couplers=CONFIG.run.couplers
+    )
+    save_serial_device(test_device, data_path=tmp_path)
+
+    assert os.path.exists(os.path.join(tmp_path, f"{device_name}.json"))
+
+    close_device_resources(test_device)
+
+
+# NOTE: batching is not supported anymore, but maybe useful in the future
 def test_batched_samplespaces():
     batched_samplespace = {
         "frequencies": {
