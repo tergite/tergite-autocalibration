@@ -36,8 +36,10 @@ peak = LorentzianModel()
 
 class QubitSpectroscopyBase(QubitNode):
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(
+        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
+    ):
+        super().__init__(name, all_qubits, couplers, **schedule_keywords)
 
     def generate_dummy_dataset(self):
         dataset = xarray.Dataset()
@@ -78,8 +80,10 @@ class Qubit01SpectroscopyNode(QubitSpectroscopyBase):
     measurement_type = ScheduleNode
     qubit_qois = ["clock_freqs:f01", "spec:spec_ampl_optimal"]
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(
+        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
+    ):
+        super().__init__(name, all_qubits, couplers, **schedule_keywords)
 
         self.schedule_samplespace = {
             "spec_pulse_amplitudes": {
@@ -97,8 +101,10 @@ class Qubit12SpectroscopyNode(QubitSpectroscopyBase):
     measurement_type = ScheduleNode
     qubit_qois = ["clock_freqs:f12", "spec:spec_ampl_12_optimal"]
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(
+        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
+    ):
+        super().__init__(name, all_qubits, couplers, **schedule_keywords)
         self.qubit_state = 1
         self.schedule_keywords["qubit_state"] = self.qubit_state
 
@@ -119,8 +125,10 @@ class Qubit01SpectroscopyAmplitudeNode(QubitNode):
     measurement_type = OuterScheduleNode
     qubit_qois = ["clock_freqs:f01", "spec:spec_ampl_optimal"]
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_kwargs):
-        super().__init__(name, all_qubits, **schedule_kwargs)
+    def __init__(
+        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_kwargs
+    ):
+        super().__init__(name, all_qubits, couplers, **schedule_kwargs)
 
         self.outer_schedule_samplespace = {
             "spec_pulse_amplitudes": {
