@@ -12,29 +12,15 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+
 import toml
 
-from tergite_autocalibration.config.globals import REDIS_CONNECTION, CONFIG
+from tergite_autocalibration.config.globals import CONFIG, REDIS_CONNECTION
 from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.base.node import CouplerNode, QubitNode
+from tergite_autocalibration.tools.mss.convert import structured_redis_storage
 from tergite_autocalibration.utils.logging import logger
 
-
-def populate_parking_currents(
-    transmon_configuration: dict, couplers: list, redis_connection
-):
-    initial_device_config = transmon_configuration["initials"]
-
-    initial_coupler_parameters = initial_device_config["couplers"]
-
-    for coupler in couplers:
-        if coupler in initial_coupler_parameters:
-            for parameter_key, parameter_value in initial_coupler_parameters[
-                coupler
-            ].items():
-                redis_connection.hset(
-                    f"couplers:{coupler}", parameter_key, parameter_value
-                )
 
 
 def populate_initial_parameters(qubits: list, couplers: list, redis_connection):
@@ -58,10 +44,14 @@ def populate_initial_parameters(qubits: list, couplers: list, redis_connection):
                         redis_connection.hset(
                             f"transmons:{qubit}", sub_module_key, parameter_value
                         )
+                        structured_redis_storage(
+                            sub_module_key, qubit.strip("q"), parameter_value
+                        )
                 else:
                     redis_connection.hset(
                         f"transmons:{qubit}", module_key, module_value
                     )
+                    structured_redis_storage(module_key, qubit.strip("q"), module_value)
 
         # parameter specific to each qubit:
         for module_key, module_value in initial_qubit_parameters[qubit].items():
@@ -71,17 +61,33 @@ def populate_initial_parameters(qubits: list, couplers: list, redis_connection):
                     redis_connection.hset(
                         f"transmons:{qubit}", sub_module_key, parameter_value
                     )
+                    structured_redis_storage(
+                        sub_module_key, qubit.strip("q"), parameter_value
+                    )
             else:
                 redis_connection.hset(f"transmons:{qubit}", module_key, module_value)
+                structured_redis_storage(module_key, qubit.strip("q"), module_value)
 
     for coupler in couplers:
         if "all" in initial_coupler_parameters.keys():
             for module_key, module_value in initial_coupler_parameters["all"].items():
                 redis_connection.hset(f"couplers:{coupler}", module_key, module_value)
+                structured_redis_storage(module_key, coupler, module_value)
 
         if coupler in initial_coupler_parameters:
             for module_key, module_value in initial_coupler_parameters[coupler].items():
                 redis_connection.hset(f"couplers:{coupler}", module_key, module_value)
+                structured_redis_storage(module_key, coupler, module_value)
+
+
+def populate_parking_currents(couplers: list, redis_connection):
+    initial_device_config = dh.device
+    initial_coupler_parameters = initial_device_config["coupler"]
+    for coupler in couplers:
+        if coupler in initial_coupler_parameters:
+            for module_key, module_value in initial_coupler_parameters[coupler].items():
+                redis_connection.hset(f"couplers:{coupler}", module_key, module_value)
+                structured_redis_storage(module_key, coupler, module_value)
 
 
 def populate_active_reset_parameters(
@@ -103,8 +109,12 @@ def populate_active_reset_parameters(
                     redis_connection.hset(
                         f"transmons:{qubit}", sub_module_key, parameter_value
                     )
+                    structured_redis_storage(
+                        sub_module_key, qubit.strip("q"), parameter_value
+                    )
             else:
                 redis_connection.hset(f"transmons:{qubit}", module_key, module_value)
+                structured_redis_storage(module_key, qubit.strip("q"), module_value)
 
 
 def populate_node_parameters(
@@ -126,15 +136,31 @@ def populate_node_parameters(
                         redis_connection.hset(
                             f"transmons:{qubit}", sub_field_key, sub_field_value
                         )
+                        structured_redis_storage(
+                            sub_field_key, qubit.strip("q"), sub_field_value
+                        )
                     for coupler in couplers:
                         redis_connection.hset(
                             f"couplers:{coupler}", sub_field_key, sub_field_value
                         )
+                        structured_redis_storage(
+                            sub_field_key, coupler, sub_field_value
+                        )
             else:
                 for qubit in qubits:
                     redis_connection.hset(f"transmons:{qubit}", field_key, field_value)
+                    structured_redis_storage(field_key, qubit.strip("q"), field_value)
                 for coupler in couplers:
                     redis_connection.hset(f"couplers:{coupler}", field_key, field_value)
+                    structured_redis_storage(field_key, coupler, field_value)
+
+        # node config for specific couplers:
+        for coupler in couplers:
+            if coupler in transmon_configuration[node_name]:
+                coupler_specific_config = transmon_configuration[node_name][coupler]
+                for field_key, field_value in coupler_specific_config.items():
+                    redis_connection.hset(f"couplers:{coupler}", field_key, field_value)
+                    structured_redis_storage(field_key, coupler, field_value)
 
 
 def populate_quantities_of_interest(
@@ -165,6 +191,7 @@ def populate_quantities_of_interest(
                             redis_connection.hset(f"transmons:{qubit}", qoi, "0")
                         elif qoi == "r12:motzoi":
                             redis_connection.hset(f"transmons:{qubit}", qoi, "0")
+                        structured_redis_storage(qoi, qubit.strip("q"), "nan")
                 # flag for the calibration supervisor
                 if not redis_connection.hexists(calibration_supervisor_key, node_name):
                     redis_connection.hset(f"cs:{qubit}", node_name, "not_calibrated")
@@ -179,6 +206,7 @@ def populate_quantities_of_interest(
                     # check if field already exists
                     if not redis_connection.hexists(redis_key, qoi):
                         redis_connection.hset(f"couplers:{coupler}", qoi, "nan")
+                        structured_redis_storage(qoi, coupler, "nan")
                 # flag for the calibration supervisor
                 if not redis_connection.hexists(calibration_supervisor_key, node_name):
                     redis_connection.hset(f"cs:{coupler}", node_name, "not_calibrated")
@@ -196,6 +224,7 @@ def reset_all_nodes(nodes, qubits: list, couplers: list, redis_connection):
         cs_key = f"cs:{qubit}"
         for field in fields:
             redis_connection.hset(key, field, "nan")
+            structured_redis_storage(key, qubit.strip("q"), None)
         for node in nodes:
             redis_connection.hset(cs_key, node, "not_calibrated")
 
@@ -205,6 +234,7 @@ def reset_all_nodes(nodes, qubits: list, couplers: list, redis_connection):
         cs_key = f"cs:{coupler}"
         for field in fields:
             redis_connection.hset(key, field, "nan")
+            structured_redis_storage(key, coupler, None)
         for node in nodes:
             redis_connection.hset(cs_key, node, "not_calibrated")
 
