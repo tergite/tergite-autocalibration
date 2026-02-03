@@ -211,7 +211,6 @@ class CZDynamicPhaseCouplerAnalysis(BaseCouplerAnalysis):
         leak_target_probabilities.sel({self.swap_coord: True}).plot(
             ax=leak_axs[1][1], hue=self.gate_mode_coord, **styles
         )
-        print("WHAT IF THE TWO FITS GIVE A LITTE DIFFERENT FREQUENCY?")
 
         figures_dictionary[self.coupler] = [fig, leak_fig]
 
@@ -221,4 +220,3 @@ class CZ_LocalPhasesNodeAnalysis(BaseAllCouplersAnalysis):
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-

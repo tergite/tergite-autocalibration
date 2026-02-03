@@ -415,7 +415,8 @@ class CalibrationSupervisor:
                 f"Wrong mode for re-analysis: '{self.config.cluster_mode}', should be: {MeasurementMode.re_analyse}"
             )
 
-        node = self.node_manager._initialize_node(self.config.target_node_name)
+        target_node = self.config.target_node_name
+        node = self.node_manager._initialize_node(target_node)
         logger.status(
             f"Analysing '{self.config.target_node_name}' with {node.analysis_obj.__name__}"
         )
