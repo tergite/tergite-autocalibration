@@ -80,7 +80,8 @@ except FileNotFoundError:
     CONFIG = ConfigurationPackage()
     logger.warning(
         "Default configuration is not yet loaded. "
-        "Please copy configuration files to the root_directory or run `acli config load`."
+        "If you are in the process of setting up the configuration, you can ignore this warning. "
+        "Please copy configuration files to the root_directory or run `acli config load -f <YOUR_CONFIGURATION.zip>`. "
     )
 
 # Adding handlers to the logger

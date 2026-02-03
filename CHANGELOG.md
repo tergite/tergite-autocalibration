@@ -16,6 +16,8 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 - Removed development folder (can still be accessed in the git history)
 - Replaced MSS update script with BCC calibration seed script
 - Refactored CZ Parametrization node
+- Added CZ Chevron node
+- Removed quickstart endpoint
 
 ## [2025.09.0] - 2025-09-16
 
