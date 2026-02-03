@@ -33,8 +33,10 @@ class RandomizedBenchmarkingNode(QubitNode):
     measurement_type = OuterScheduleNode
     qubit_qois = ["fidelity", "fidelity_error", "leakage", "leakage_error"]
 
-    def __init__(self, all_qubits: list[str], **schedule_keywords):
-        super().__init__(all_qubits, **schedule_keywords)
+    def __init__(
+        self, all_qubits: list[str], couplers: list[str], **schedule_keywords
+    ):
+        super().__init__(all_qubits, couplers, **schedule_keywords)
         self.schedule_keywords = schedule_keywords
         self.schedule_keywords = {}
         self.loops = 500

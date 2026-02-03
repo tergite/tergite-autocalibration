@@ -26,25 +26,32 @@ from tergite_autocalibration.utils.dto.extended_transmon_element import Extended
 
 def test_measurement_01_type():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node_01 = Qubit01SpectroscopyNode(CONFIG.run.qubits)
+    node_01 = Qubit01SpectroscopyNode(
+        CONFIG.run.qubits, CONFIG.run.couplers
+    )
     assert issubclass(node_01.measurement_type, ScheduleNode)
 
 
 def test_measurement_12_type():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node_12 = Qubit12SpectroscopyNode(CONFIG.run.qubits)
+    node_12 = Qubit12SpectroscopyNode(
+        CONFIG.run.qubits, CONFIG.run.couplers
+    )
     assert issubclass(node_12.measurement_type, ScheduleNode)
 
 
 def test_measurement_bring_up_type():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node_bring_up = Qubit01SpectroscopyAmplitudeNode(CONFIG.run.qubits)
+    node_bring_up = Qubit01SpectroscopyAmplitudeNode(CONFIG.run.qubits, CONFIG.run.couplers
+    )
     assert issubclass(node_bring_up.measurement_type, OuterScheduleNode)
 
 
 def test_dummy_01_generation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = Qubit01SpectroscopyNode(CONFIG.run.qubits)
+    node = Qubit01SpectroscopyNode(
+        CONFIG.run.qubits, CONFIG.run.couplers
+    )
     dummy_dataset = node.generate_dummy_dataset()
     first_qubit = CONFIG.run.qubits[0]
 
@@ -63,7 +70,9 @@ def test_dummy_01_generation():
 
 def test_dummy_12_generation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = Qubit12SpectroscopyNode(CONFIG.run.qubits)
+    node = Qubit12SpectroscopyNode(
+        CONFIG.run.qubits, CONFIG.run.couplers
+    )
     dummy_dataset = node.generate_dummy_dataset()
     first_qubit = CONFIG.run.qubits[0]
 

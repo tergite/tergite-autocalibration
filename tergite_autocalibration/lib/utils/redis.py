@@ -22,6 +22,7 @@ from quantify_scheduler.json_utils import SchedulerJSONDecoder, SchedulerJSONEnc
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.config.legacy import dh
+from tergite_autocalibration.utils import logging
 from tergite_autocalibration.utils.dto import extended_transmon_element
 from tergite_autocalibration.utils.dto.extended_coupler_edge import (
     ExtendedCompositeSquareEdge,
@@ -79,21 +80,62 @@ def load_redis_config_coupler(coupler: ExtendedCompositeSquareEdge):
     bus = coupler.name
     bus_qubits = bus.split("_")
     redis_config = REDIS_CONNECTION.hgetall(f"couplers:{bus}")
+
+    def redis_value(key: str):
+        return float(redis_config[key])
+
+    key = "cz_pulse_frequency"
     try:
-        coupler.clock_freqs.cz_freq(float(redis_config["cz_pulse_frequency"]))
-        coupler.cz.square_amp(float(redis_config["cz_pulse_amplitude"]))
-        coupler.cz.square_duration(float(redis_config["cz_pulse_duration"]))
-        coupler.cz.cz_width(float(redis_config["cz_pulse_width"]))
-        if dh.get_legacy("qubit_types")[bus_qubits[0]] == "Target":
-            coupler.cz.parent_phase_correction(float(redis_config["cz_dynamic_target"]))
-            coupler.cz.child_phase_correction(float(redis_config["cz_dynamic_control"]))
-        else:
-            coupler.cz.parent_phase_correction(
-                float(redis_config["cz_dynamic_control"])
-            )
-            coupler.cz.child_phase_correction(float(redis_config["cz_dynamic_target"]))
+        coupler.clock_freqs.cz_freq(redis_value(key))
     except:
-        pass
+        logger.warning(
+            f"{key} is not present in redis. Ignore this for single qubit nodes"
+        )
+    key = "cz_pulse_amplitude"
+    try:
+        coupler.cz.square_amp(redis_value(key))
+    except:
+        logger.warning(
+            f"{key} is not present in redis. Ignore this for single qubit nodes"
+        )
+    key = "cz_pulse_duration"
+    try:
+        coupler.cz.square_duration(redis_value(key))
+    except:
+        logger.warning(
+            f"{key} is not present in redis. Ignore this for single qubit nodes"
+        )
+    key = "cz_pulse_width"
+    try:
+        coupler.cz.cz_width(redis_value(key))
+    except:
+        logger.warning(
+            f"{key} is not present in redis. Ignore this for single qubit nodes"
+        )
+    key = "parking_current"
+    try:
+        coupler.cz.parking_current(redis_value(key))
+    except:
+        logger.warning(
+            f"{key} is not present in redis. Ignore this for single qubit nodes"
+        )
+    try:
+        if dh.get_legacy("qubit_types")[bus_qubits[0]] == "Target":
+            coupler.cz.parent_phase_correction(redis_value("cz_dynamic_target"))
+            coupler.cz.child_phase_correction(redis_value("cz_dynamic_control"))
+        else:
+            coupler.cz.parent_phase_correction(redis_value("cz_dynamic_control"))
+            coupler.cz.child_phase_correction(redis_value("cz_dynamic_target"))
+    except:
+        logger.warning("")
+    key = "cz_phase_path"
+    try:
+        coupler.cz.phase_path(redis_config[key])
+    except:
+        logger.warning(
+            f"{key} is not present in redis. Ignore this for single qubit nodes"
+        )
+
     return coupler
 
 

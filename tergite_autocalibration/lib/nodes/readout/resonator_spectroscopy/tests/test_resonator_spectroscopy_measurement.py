@@ -23,25 +23,33 @@ from tergite_autocalibration.utils.dto.extended_transmon_element import Extended
 
 def test_measurement_0_type():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node_0 = ResonatorSpectroscopyNode(CONFIG.run.qubits)
+    node_0 = ResonatorSpectroscopyNode(
+        CONFIG.run.qubits, CONFIG.run.couplers
+    )
     assert issubclass(node_0.measurement_type, ScheduleNode)
 
 
 def test_measurement_1_type():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node_1 = ResonatorSpectroscopy1Node(CONFIG.run.qubits)
+    node_1 = ResonatorSpectroscopy1Node(
+        CONFIG.run.qubits, CONFIG.run.couplers
+    )
     assert issubclass(node_1.measurement_type, ScheduleNode)
 
 
 def test_measurement_2_type():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node_2 = ResonatorSpectroscopy2Node(CONFIG.run.qubits)
+    node_2 = ResonatorSpectroscopy2Node(
+        CONFIG.run.qubits, CONFIG.run.couplers
+    )
     assert issubclass(node_2.measurement_type, ScheduleNode)
 
 
 def test_dummy_0_generation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = ResonatorSpectroscopyNode(CONFIG.run.qubits)
+    node = ResonatorSpectroscopyNode(
+        CONFIG.run.qubits, CONFIG.run.couplers
+    )
     dummy_dataset_0 = node.generate_dummy_dataset()
     first_qubit = CONFIG.run.qubits[0]
     number_of_frequencies = len(
@@ -53,7 +61,9 @@ def test_dummy_0_generation():
 
 def test_dummy_1_generation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = ResonatorSpectroscopy1Node(CONFIG.run.qubits)
+    node = ResonatorSpectroscopy1Node(
+        CONFIG.run.qubits, CONFIG.run.couplers
+    )
     dummy_dataset_1 = node.generate_dummy_dataset()
     first_qubit = CONFIG.run.qubits[0]
     number_of_frequencies = len(
@@ -65,7 +75,9 @@ def test_dummy_1_generation():
 
 def test_dummy_2_generation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = ResonatorSpectroscopy2Node(CONFIG.run.qubits)
+    node = ResonatorSpectroscopy2Node(
+        CONFIG.run.qubits, CONFIG.run.couplers
+    )
     dummy_dataset_2 = node.generate_dummy_dataset()
     first_qubit = CONFIG.run.qubits[0]
     number_of_frequencies = len(

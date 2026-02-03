@@ -59,6 +59,7 @@ class NodeFactory:
             "randomized_benchmarking": "RandomizedBenchmarkingNode",
             "purity_benchmarking": "PurityBenchmarkingNode",
             "cz_parametrization": "CZParametrizationNode",
+            "cz_chevron": "CZChevronNode",
             "resonator_spectroscopy_vs_current": "ResonatorSpectroscopyVsCurrentNode",
             "qubit_spectroscopy_vs_current": "QubitSpectroscopyVsCurrentNode",
         }

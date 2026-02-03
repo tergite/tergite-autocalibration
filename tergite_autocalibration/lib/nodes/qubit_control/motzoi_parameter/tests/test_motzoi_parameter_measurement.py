@@ -21,7 +21,9 @@ from tergite_autocalibration.utils.dto.extended_transmon_element import Extended
 
 def test_dummy_generation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = MotzoiParameterNode(CONFIG.run.qubits)
+    node = MotzoiParameterNode(
+        CONFIG.run.qubits, CONFIG.run.couplers
+    )
     dummy_dataset = node.generate_dummy_dataset()
     first_qubit = CONFIG.run.qubits[0]
     number_of_reps = len(node.schedule_samplespace["X_repetitions"][first_qubit])

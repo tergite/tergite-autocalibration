@@ -12,29 +12,13 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+
 import toml
 
-from tergite_autocalibration.config.globals import REDIS_CONNECTION, CONFIG
+from tergite_autocalibration.config.globals import CONFIG, REDIS_CONNECTION
 from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.base.node import CouplerNode, QubitNode
 from tergite_autocalibration.utils.logging import logger
-
-
-def populate_parking_currents(
-    transmon_configuration: dict, couplers: list, redis_connection
-):
-    initial_device_config = transmon_configuration["initials"]
-
-    initial_coupler_parameters = initial_device_config["couplers"]
-
-    for coupler in couplers:
-        if coupler in initial_coupler_parameters:
-            for parameter_key, parameter_value in initial_coupler_parameters[
-                coupler
-            ].items():
-                redis_connection.hset(
-                    f"couplers:{coupler}", parameter_key, parameter_value
-                )
 
 
 def populate_initial_parameters(qubits: list, couplers: list, redis_connection):
@@ -79,6 +63,15 @@ def populate_initial_parameters(qubits: list, couplers: list, redis_connection):
             for module_key, module_value in initial_coupler_parameters["all"].items():
                 redis_connection.hset(f"couplers:{coupler}", module_key, module_value)
 
+        if coupler in initial_coupler_parameters:
+            for module_key, module_value in initial_coupler_parameters[coupler].items():
+                redis_connection.hset(f"couplers:{coupler}", module_key, module_value)
+
+
+def populate_parking_currents(couplers: list, redis_connection):
+    initial_device_config = dh.device
+    initial_coupler_parameters = initial_device_config["coupler"]
+    for coupler in couplers:
         if coupler in initial_coupler_parameters:
             for module_key, module_value in initial_coupler_parameters[coupler].items():
                 redis_connection.hset(f"couplers:{coupler}", module_key, module_value)
@@ -134,6 +127,13 @@ def populate_node_parameters(
                 for qubit in qubits:
                     redis_connection.hset(f"transmons:{qubit}", field_key, field_value)
                 for coupler in couplers:
+                    redis_connection.hset(f"couplers:{coupler}", field_key, field_value)
+
+        # node config for specific couplers:
+        for coupler in couplers:
+            if coupler in transmon_configuration[node_name]:
+                coupler_specific_config = transmon_configuration[node_name][coupler]
+                for field_key, field_value in coupler_specific_config.items():
                     redis_connection.hset(f"couplers:{coupler}", field_key, field_value)
 
 

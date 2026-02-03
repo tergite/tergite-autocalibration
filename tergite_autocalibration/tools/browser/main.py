@@ -260,15 +260,42 @@ def update_tab(tab: str, outer: str, inter: str, inner: str):
 
     elif tab == "json":
         for file in os.listdir(folder_path):
-            if file.endswith(".json"):
+            if file.endswith(".json") and "qoi" not in file:
                 with open(os.path.join(folder_path, file)) as f:
                     data = json.load(f)
-                return DashRenderjson(
-                    data=data,
-                    max_depth=-1,
-                    invert_theme=True,
-                    # , theme="monokai"
+                columns = []
+                for key in data:
+                    columns.append(
+                        html.Div(
+                            style={
+                                "flex": "1",
+                                "minWidth": "300px",  # responsive: wrap if too narrow
+                                "overflow": "auto",
+                                "padding": "10px",
+                                "border": "1px solid #ddd",
+                                "borderRadius": "6px",
+                            },
+                            children=[
+                                html.H4(key),
+                                DashRenderjson(
+                                    id=f"json-view-{key}",
+                                    data=data[key]["data"],
+                                    max_depth=1,  # collapse nested content initially
+                                    invert_theme=True,
+                                ),
+                            ],
+                        )
+                    )
+                json_view = html.Div(
+                    columns,
+                    style={
+                        "display": "flex",
+                        "flexWrap": "wrap",  # wrap when many keys
+                        "gap": "20px",
+                    },
                 )
+                return json_view
+
         return "No JSON file found."
 
     return "Invalid tab."

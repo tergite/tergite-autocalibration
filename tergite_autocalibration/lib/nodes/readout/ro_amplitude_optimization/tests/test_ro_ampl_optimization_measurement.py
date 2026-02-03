@@ -21,7 +21,8 @@ from tergite_autocalibration.utils.dto.extended_transmon_element import Extended
 
 def test_dummy_generation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node_3 = ROAmplitudeThreeStateOptimizationNode(CONFIG.run.qubits)
+    node_3 = ROAmplitudeThreeStateOptimizationNode(CONFIG.run.qubits, CONFIG.run.couplers
+    )
     dummy_dataset = node_3.generate_dummy_dataset()
     first_qubit = CONFIG.run.qubits[0]
     number_of_ampls = len(node_3.schedule_samplespace["ro_amplitudes"][first_qubit])

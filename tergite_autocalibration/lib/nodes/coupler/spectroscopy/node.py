@@ -163,9 +163,10 @@ class ResonatorSpectroscopyVsCurrentNode(CouplerNode):
     def precompile(self, schedule_samplespace: dict) -> CompiledSchedule:
         constants.GRID_TIME_TOLERANCE_TIME = 5e-2
 
-        transmons = self.device_manager.transmons
-
-        measurement_class = self.measurement_obj(transmons)
+        transmons_dict = {
+            qubit: self.device.get_element(qubit) for qubit in self.all_qubits
+        }
+        measurement_class = self.measurement_obj(transmons_dict)
         schedule = measurement_class.schedule_function(
             **schedule_samplespace, **self.schedule_keywords
         )

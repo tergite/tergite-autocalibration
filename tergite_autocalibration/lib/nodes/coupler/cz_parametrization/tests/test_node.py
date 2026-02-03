@@ -48,6 +48,7 @@ def test_canCreateCorrectType():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
     coupler = "q14_q15"
     REDIS_CONNECTION.hset(f"couplers:{coupler}", "parking_current", "100e-6")
+    REDIS_CONNECTION.hset(f"couplers:{coupler}", "cz_phase_path", "via_20")
     REDIS_CONNECTION.hset(f"transmons:{'q14'}", "clock_freqs:f01", "4.2e6")
     REDIS_CONNECTION.hset(f"transmons:{'q14'}", "clock_freqs:f12", "4.0e6")
     REDIS_CONNECTION.hset(f"transmons:{'q15'}", "clock_freqs:f01", "5.2e6")
@@ -80,16 +81,27 @@ def test_MeasurementClassType():
     assert issubclass(c.measurement_type, ExternalParameterNode)
 
 
-def test_dummy_01_generation():
+def test_dummy_generation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
     for coupler in CONFIG.run.couplers:
         REDIS_CONNECTION.hset(f"couplers:{coupler}", "parking_current", "100e-6")
+        REDIS_CONNECTION.hset(f"couplers:{coupler}", "cz_phase_path", "via_20")
     for qubit in CONFIG.run.qubits[::2]:
         REDIS_CONNECTION.hset(f"transmons:{qubit}", "clock_freqs:f01", "4.2e6")
         REDIS_CONNECTION.hset(f"transmons:{qubit}", "clock_freqs:f12", "4.0e6")
+        REDIS_CONNECTION.hset(f"transmons:{qubit}", "centroid_I", "0")
+        REDIS_CONNECTION.hset(f"transmons:{qubit}", "centroid_Q", "0")
+        REDIS_CONNECTION.hset(f"transmons:{qubit}", "omega_01", "60")
+        REDIS_CONNECTION.hset(f"transmons:{qubit}", "omega_12", "180")
+        REDIS_CONNECTION.hset(f"transmons:{qubit}", "omega_20", "270")
     for qubit in CONFIG.run.qubits[1::2]:
         REDIS_CONNECTION.hset(f"transmons:{qubit}", "clock_freqs:f01", "5.2e6")
         REDIS_CONNECTION.hset(f"transmons:{qubit}", "clock_freqs:f12", "5.0e6")
+        REDIS_CONNECTION.hset(f"transmons:{qubit}", "centroid_I", "0")
+        REDIS_CONNECTION.hset(f"transmons:{qubit}", "centroid_Q", "0")
+        REDIS_CONNECTION.hset(f"transmons:{qubit}", "omega_01", "60")
+        REDIS_CONNECTION.hset(f"transmons:{qubit}", "omega_12", "180")
+        REDIS_CONNECTION.hset(f"transmons:{qubit}", "omega_20", "270")
 
     node = CZParametrizationNode(
         all_qubits=CONFIG.run.qubits, couplers=CONFIG.run.couplers
