@@ -47,7 +47,6 @@ class CZParametrizationMeasurement(BaseMeasurement):
         self,
         cz_pulse_frequencies: dict[str, np.ndarray],
         cz_pulse_amplitudes: dict[str, np.ndarray],
-        cz_duration: float,
     ) -> Schedule:
         cz_schedule = Schedule("CZ_parametrization")
 
@@ -56,6 +55,10 @@ class CZParametrizationMeasurement(BaseMeasurement):
             cz_frequencies = cz_pulse_frequencies[coupler]
             cz_amplitudes = cz_pulse_amplitudes[coupler]
             qubits = coupler.split(sep="_")
+
+            # unpack static parameters
+            this_edge = self.couplers[coupler]
+            cz_duration = this_edge.cz.square_duration()
 
             cz_schedule.add_resource(
                 ClockResource(
@@ -116,13 +119,12 @@ class CZParametrizationMeasurement(BaseMeasurement):
         cz_pulse_frequencies: dict[str, np.ndarray],
         cz_pulse_amplitudes: dict[str, np.ndarray],
         loop_repetitions: int,
-        cz_duration: float,
         repetitions: int = 1,
     ) -> Schedule:
         schedule = Schedule("CZ_parametrization", repetitions)
 
         cz_parametrization = self.cz_parametrization(
-            cz_pulse_frequencies, cz_pulse_amplitudes, cz_duration=cz_duration
+            cz_pulse_frequencies, cz_pulse_amplitudes
         )
 
         schedule.add(IdlePulse(8e-9))

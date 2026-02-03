@@ -313,7 +313,7 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
                 target_qubit = qubit
         return control_qubit, target_qubit
 
-    def process_coupler(self, dataset: xr.Dataset, coupler_element):
+    def process_coupler(self, dataset: xr.Dataset, coupler_element) -> QOI:
         self.control_qubit, self.target_qubit = self.qubit_types(coupler_element)
         self.dataset = dataset
         self.coupler = coupler_element
@@ -336,12 +336,8 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
             else:
                 raise ValueError
 
-        self._qoi = self._run_coupler_analysis(coupler_element)
-
-        return self._qoi
-
-    def _run_coupler_analysis(self, this_element: str):
         self._qoi = self.analyze_coupler()
+
         return self._qoi
 
     @abstractmethod
@@ -417,9 +413,10 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
             ds = xr.merge([self.dataset[var] for var in coupler_data_vars])
             ds.attrs["coupler"] = this_coupler
             ds.attrs["node"] = self.name
+            coupler_analysis_keywords = self.analysis_keywords.get(this_coupler, {})
 
             coupler_analysis = self.single_coupler_analysis_obj(
-                self.name, self.redis_fields, **self.analysis_keywords
+                self.name, self.redis_fields, **coupler_analysis_keywords
             )
             coupler_analysis.data_path = self.data_path
             qoi = coupler_analysis.process_coupler(ds, this_coupler)

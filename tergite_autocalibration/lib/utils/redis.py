@@ -128,6 +128,14 @@ def load_redis_config_coupler(coupler: ExtendedCompositeSquareEdge):
             coupler.cz.child_phase_correction(redis_value("cz_dynamic_target"))
     except:
         logger.warning("")
+    key = "cz_phase_path"
+    try:
+        coupler.cz.phase_path(redis_config[key])
+    except:
+        logger.warning(
+            f"{key} is not present in redis. Ignore this for single qubit nodes"
+        )
+
     return coupler
 
 

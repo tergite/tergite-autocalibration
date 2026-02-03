@@ -1,0 +1,1892 @@
+{
+  "device:qubit:11:motzoi_parameter:value": {
+    "type": "string",
+    "value": "-0.06666666666666671"
+  },
+  "device:readout_resonator:14:pulse_amplitude:value": {
+    "type": "string",
+    "value": "0.015"
+  },
+  "device:readout_resonator:11:acq_integration_time:value": {
+    "type": "string",
+    "value": "2.5e-06"
+  },
+  "device:qubit:12:motzoi_parameter:value": {
+    "type": "string",
+    "value": "0.01025641025641022"
+  },
+  "device:qubit:13:pi_pulse_ef_amplitude:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T11:32:15.831225Z'"
+  },
+  "device:readout_resonator:12:pulse_amplitude:count": {
+    "type": "string",
+    "value": "166"
+  },
+  "device:qubit:13:pi_pulse_amplitude:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:07:01.202124Z'"
+  },
+  "device:readout_resonator:13:pulse_duration:unit": {
+    "type": "string",
+    "value": "'Sec'"
+  },
+  "device:qubit:12:t1_decoherence:timestamp": {
+    "type": "string",
+    "value": "'2025-11-24T14:21:48.598743Z'"
+  },
+  "device:readout_resonator:15:pulse_amplitude:count": {
+    "type": "string",
+    "value": "165"
+  },
+  "device:qubit:14:pi_pulse_amplitude:count": {
+    "type": "string",
+    "value": "69"
+  },
+  "device:qubit:11:pi_pulse_duration:value": {
+    "type": "string",
+    "value": "6e-08"
+  },
+  "cs:q12_q13": {
+    "type": "hash",
+    "value": {
+      "qubit_spectroscopy_vs_current": "calibrated"
+    }
+  },
+  "device:qubit:12:pi_pulse_amplitude:value": {
+    "type": "string",
+    "value": "0.5324776291677201"
+  },
+  "device:discriminator:15:rotation:count": {
+    "type": "string",
+    "value": "2"
+  },
+  "device:readout_resonator:11:frequency_opt:count": {
+    "type": "string",
+    "value": "3"
+  },
+  "couplers:q11_q12:q12": {
+    "type": "hash",
+    "value": {
+      "qubit_crossing_points": "[-0.0010000000000000005, 0.0009499999999999989]"
+    }
+  },
+  "device:qubit:12:frequency:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:05:06.151687Z'"
+  },
+  "device:qubit:13:pi_pulse_ef_amplitude:value": {
+    "type": "string",
+    "value": "0.41969865166303655"
+  },
+  "device:readout_resonator:12:pulse_amplitude:value": {
+    "type": "string",
+    "value": "0.015"
+  },
+  "device:readout_resonator:15:frequency:value": {
+    "type": "string",
+    "value": "7130573004.398576"
+  },
+  "device:qubit:11:frequency_12:value": {
+    "type": "string",
+    "value": "4488072850.988601"
+  },
+  "cs:q14": {
+    "type": "hash",
+    "value": {
+      "resonator_spectroscopy": "calibrated",
+      "qubit_01_spectroscopy": "calibrated",
+      "rabi_oscillations": "calibrated",
+      "ramsey_correction": "calibrated",
+      "motzoi_parameter": "calibrated",
+      "n_rabi_oscillations": "calibrated",
+      "resonator_spectroscopy_1": "calibrated",
+      "qubit_12_spectroscopy": "calibrated",
+      "rabi_oscillations_12": "calibrated",
+      "ramsey_correction_12": "calibrated",
+      "resonator_spectroscopy_2": "calibrated",
+      "ro_frequency_three_state_optimization": "calibrated",
+      "ro_amplitude_three_state_optimization": "calibrated",
+      "qubit_bring_up_spectroscopy": "not_calibrated",
+      "T1": "not_calibrated",
+      "T2": "not_calibrated",
+      "T2_echo": "not_calibrated",
+      "ro_frequency_two_state_optimization": "calibrated",
+      "ro_amplitude_two_state_optimization": "calibrated",
+      "randomized_benchmarking": "not_calibrated",
+      "purity_benchmarking": "not_calibrated",
+      "punchout": "not_calibrated"
+    }
+  },
+  "device:discriminator:15:rotation:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:discriminator:12:threshold:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:13:54.002613Z'"
+  },
+  "device:readout_resonator:12:acq_integration_time:count": {
+    "type": "string",
+    "value": "162"
+  },
+  "device:qubit:15:frequency:unit": {
+    "type": "string",
+    "value": "'Hz'"
+  },
+  "device:discriminator:12:threshold:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:qubit:15:pi_pulse_amplitude:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:07:01.209451Z'"
+  },
+  "device:readout_resonator:11:frequency:unit": {
+    "type": "string",
+    "value": "'Hz'"
+  },
+  "device:readout_resonator:14:pulse_duration:value": {
+    "type": "string",
+    "value": "3e-06"
+  },
+  "device:readout_resonator:14:frequency_opt:unit": {
+    "type": "string",
+    "value": "'Hz'"
+  },
+  "device:discriminator:11:rotation:count": {
+    "type": "string",
+    "value": "2"
+  },
+  "device:readout_resonator:13:frequency_opt:count": {
+    "type": "string",
+    "value": "5"
+  },
+  "device:discriminator:13:rotation:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:qubit:13:pi_pulse_duration:unit": {
+    "type": "string",
+    "value": "'Sec'"
+  },
+  "device:readout_resonator:11:frequency_opt:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:11:26.939954Z'"
+  },
+  "couplers:q11_q12": {
+    "type": "hash",
+    "value": {
+      "attenuation": "10",
+      "parking_current": "0",
+      "reset:duration": "0.00024",
+      "spec:spec_duration": "6e-06",
+      "cz_pulse_frequency": "nan",
+      "cz_pulse_amplitude": "nan",
+      "qubit_crossing_points": "nan",
+      "cz_working_frequencies": "[7.161e8,7.161e8,7.161e8]",
+      "7.161e8.": "7.161e8]"
+    }
+  },
+  "device:qubit:13:frequency_12:count": {
+    "type": "string",
+    "value": "57"
+  },
+  "device:qubit:14:pi_pulse_ef_amplitude:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:readout_resonator:13:acq_delay:count": {
+    "type": "string",
+    "value": "273"
+  },
+  "device:readout_resonator:12:acq_integration_time:unit": {
+    "type": "string",
+    "value": "'Sec'"
+  },
+  "device:qubit:13:motzoi_parameter:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:06:00.729254Z'"
+  },
+  "device:readout_resonator:14:acq_delay:value": {
+    "type": "string",
+    "value": "2.2e-07"
+  },
+  "device:qubit:14:pi_pulse_duration:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:11.289017Z'"
+  },
+  "device:qubit:15:frequency_12:unit": {
+    "type": "string",
+    "value": "'Hz'"
+  },
+  "device:qubit:15:t1_decoherence:value": {
+    "type": "string",
+    "value": "55.18291646671537"
+  },
+  "device:qubit:14:pi_pulse_duration:unit": {
+    "type": "string",
+    "value": "'Sec'"
+  },
+  "device:readout_resonator:13:acq_delay:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:11.283215Z'"
+  },
+  "device:readout_resonator:14:pulse_duration:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:11.287385Z'"
+  },
+  "device:qubit:14:frequency:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:05:06.152751Z'"
+  },
+  "device:qubit:11:frequency:count": {
+    "type": "string",
+    "value": "59"
+  },
+  "device:readout_resonator:15:acq_integration_time:unit": {
+    "type": "string",
+    "value": "'Sec'"
+  },
+  "device:qubit:11:motzoi_parameter:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:readout_resonator:15:acq_integration_time:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:11.291189Z'"
+  },
+  "device:discriminator:15:threshold:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:readout_resonator:15:frequency:count": {
+    "type": "string",
+    "value": "38"
+  },
+  "cs:q15": {
+    "type": "hash",
+    "value": {
+      "resonator_spectroscopy": "calibrated",
+      "qubit_01_spectroscopy": "calibrated",
+      "rabi_oscillations": "calibrated",
+      "ramsey_correction": "calibrated",
+      "motzoi_parameter": "calibrated",
+      "n_rabi_oscillations": "calibrated",
+      "resonator_spectroscopy_1": "calibrated",
+      "qubit_12_spectroscopy": "calibrated",
+      "rabi_oscillations_12": "calibrated",
+      "ramsey_correction_12": "calibrated",
+      "resonator_spectroscopy_2": "calibrated",
+      "ro_frequency_three_state_optimization": "calibrated",
+      "ro_amplitude_three_state_optimization": "calibrated",
+      "qubit_bring_up_spectroscopy": "not_calibrated",
+      "T1": "not_calibrated",
+      "T2": "not_calibrated",
+      "T2_echo": "not_calibrated",
+      "ro_frequency_two_state_optimization": "calibrated",
+      "ro_amplitude_two_state_optimization": "calibrated",
+      "randomized_benchmarking": "not_calibrated",
+      "purity_benchmarking": "not_calibrated",
+      "punchout": "not_calibrated"
+    }
+  },
+  "device:readout_resonator:11:pulse_amplitude:count": {
+    "type": "string",
+    "value": "166"
+  },
+  "device:qubit:13:motzoi_parameter:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:qubit:14:t1_decoherence:value": {
+    "type": "string",
+    "value": "80.7129898052139"
+  },
+  "device:readout_resonator:11:frequency_opt:value": {
+    "type": "string",
+    "value": "6827600000.0"
+  },
+  "device:readout_resonator:14:frequency_opt:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:11:26.944044Z'"
+  },
+  "device:discriminator:15:threshold:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:13:54.029164Z'"
+  },
+  "device:readout_resonator:14:pulse_duration:count": {
+    "type": "string",
+    "value": "274"
+  },
+  "device:readout_resonator:11:pulse_duration:value": {
+    "type": "string",
+    "value": "3e-06"
+  },
+  "device:qubit:11:pi_pulse_ef_amplitude:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:qubit:13:pi_pulse_duration:value": {
+    "type": "string",
+    "value": "6e-08"
+  },
+  "device:qubit:12:pi_pulse_amplitude:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:07:01.198549Z'"
+  },
+  "device:readout_resonator:14:acq_delay:unit": {
+    "type": "string",
+    "value": "'Sec'"
+  },
+  "device:qubit:12:frequency_12:unit": {
+    "type": "string",
+    "value": "'Hz'"
+  },
+  "device:qubit:15:pi_pulse_ef_amplitude:count": {
+    "type": "string",
+    "value": "22"
+  },
+  "device:readout_resonator:12:frequency:count": {
+    "type": "string",
+    "value": "38"
+  },
+  "device:qubit:15:motzoi_parameter:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:06:00.735500Z'"
+  },
+  "device:readout_resonator:15:frequency_opt:value": {
+    "type": "string",
+    "value": "7130544444.444445"
+  },
+  "device:readout_resonator:11:acq_integration_time:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:11.272850Z'"
+  },
+  "device:readout_resonator:12:pulse_duration:count": {
+    "type": "string",
+    "value": "162"
+  },
+  "device:discriminator:14:threshold:value": {
+    "type": "string",
+    "value": "-0.0036510021246633747"
+  },
+  "device:qubit:15:pi_pulse_amplitude:value": {
+    "type": "string",
+    "value": "0.44949801004769113"
+  },
+  "device:readout_resonator:15:pulse_amplitude:value": {
+    "type": "string",
+    "value": "0.015"
+  },
+  "device:qubit:15:t1_decoherence:timestamp": {
+    "type": "string",
+    "value": "'2025-11-24T14:21:48.600073Z'"
+  },
+  "device:qubit:15:frequency_12:timestamp": {
+    "type": "string",
+    "value": "'2025-11-26T14:51:18.998540Z'"
+  },
+  "device:qubit:11:motzoi_parameter:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:06:00.722203Z'"
+  },
+  "device:qubit:15:pi_pulse_ef_amplitude:timestamp": {
+    "type": "string",
+    "value": "'2025-11-26T14:50:24.102227Z'"
+  },
+  "device:readout_resonator:14:frequency:value": {
+    "type": "string",
+    "value": "6631065908.345407"
+  },
+  "device:discriminator:11:rotation:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:readout_resonator:11:acq_delay:unit": {
+    "type": "string",
+    "value": "'Sec'"
+  },
+  "device:qubit:14:motzoi_parameter:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:06:00.732073Z'"
+  },
+  "device:readout_resonator:12:frequency_opt:count": {
+    "type": "string",
+    "value": "3"
+  },
+  "device:discriminator:13:threshold:value": {
+    "type": "string",
+    "value": "0.0013487968979805263"
+  },
+  "device:readout_resonator:13:frequency_opt:unit": {
+    "type": "string",
+    "value": "'Hz'"
+  },
+  "device:qubit:11:pi_pulse_ef_amplitude:timestamp": {
+    "type": "string",
+    "value": "'2025-11-26T14:27:11.630230Z'"
+  },
+  "device:readout_resonator:12:acq_delay:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:11.278635Z'"
+  },
+  "device:qubit:11:t1_decoherence:value": {
+    "type": "string",
+    "value": "48.69411025348044"
+  },
+  "device:readout_resonator:13:acq_delay:unit": {
+    "type": "string",
+    "value": "'Sec'"
+  },
+  "device:readout_resonator:13:pulse_duration:count": {
+    "type": "string",
+    "value": "273"
+  },
+  "device:readout_resonator:11:pulse_amplitude:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:qubit:12:frequency_12:timestamp": {
+    "type": "string",
+    "value": "'2025-11-26T14:51:18.997214Z'"
+  },
+  "device:readout_resonator:15:pulse_duration:value": {
+    "type": "string",
+    "value": "3e-06"
+  },
+  "device:qubit:13:frequency_12:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T11:33:07.696301Z'"
+  },
+  "device:readout_resonator:15:frequency:unit": {
+    "type": "string",
+    "value": "'Hz'"
+  },
+  "device:qubit:11:frequency_12:count": {
+    "type": "string",
+    "value": "43"
+  },
+  "cs:q12": {
+    "type": "hash",
+    "value": {
+      "resonator_spectroscopy": "calibrated",
+      "qubit_01_spectroscopy": "calibrated",
+      "rabi_oscillations": "calibrated",
+      "ramsey_correction": "calibrated",
+      "motzoi_parameter": "calibrated",
+      "n_rabi_oscillations": "calibrated",
+      "resonator_spectroscopy_1": "calibrated",
+      "qubit_12_spectroscopy": "calibrated",
+      "rabi_oscillations_12": "calibrated",
+      "ramsey_correction_12": "calibrated",
+      "resonator_spectroscopy_2": "calibrated",
+      "ro_frequency_three_state_optimization": "calibrated",
+      "ro_amplitude_three_state_optimization": "not_calibrated",
+      "qubit_bring_up_spectroscopy": "not_calibrated",
+      "T1": "not_calibrated",
+      "T2": "not_calibrated",
+      "T2_echo": "not_calibrated",
+      "ro_frequency_two_state_optimization": "calibrated",
+      "ro_amplitude_two_state_optimization": "calibrated",
+      "randomized_benchmarking": "not_calibrated",
+      "purity_benchmarking": "not_calibrated",
+      "punchout": "not_calibrated"
+    }
+  },
+  "device:readout_resonator:12:frequency_opt:unit": {
+    "type": "string",
+    "value": "'Hz'"
+  },
+  "cs:q13": {
+    "type": "hash",
+    "value": {
+      "resonator_spectroscopy": "calibrated",
+      "qubit_01_spectroscopy": "calibrated",
+      "rabi_oscillations": "calibrated",
+      "ramsey_correction": "calibrated",
+      "motzoi_parameter": "calibrated",
+      "n_rabi_oscillations": "calibrated",
+      "resonator_spectroscopy_1": "calibrated",
+      "qubit_12_spectroscopy": "calibrated",
+      "rabi_oscillations_12": "calibrated",
+      "ramsey_correction_12": "calibrated",
+      "resonator_spectroscopy_2": "calibrated",
+      "ro_frequency_three_state_optimization": "calibrated",
+      "ro_amplitude_three_state_optimization": "calibrated",
+      "qubit_bring_up_spectroscopy": "not_calibrated",
+      "T1": "not_calibrated",
+      "T2": "not_calibrated",
+      "T2_echo": "not_calibrated",
+      "ro_frequency_two_state_optimization": "calibrated",
+      "ro_amplitude_two_state_optimization": "calibrated",
+      "randomized_benchmarking": "not_calibrated",
+      "purity_benchmarking": "not_calibrated",
+      "punchout": "not_calibrated"
+    }
+  },
+  "device:readout_resonator:15:acq_delay:count": {
+    "type": "string",
+    "value": "161"
+  },
+  "device:readout_resonator:13:frequency:value": {
+    "type": "string",
+    "value": "7180665715.511508"
+  },
+  "device:readout_resonator:13:acq_delay:value": {
+    "type": "string",
+    "value": "2.2e-07"
+  },
+  "device:qubit:14:motzoi_parameter:value": {
+    "type": "string",
+    "value": "-0.11794871794871797"
+  },
+  "device:qubit:14:t1_decoherence:unit": {
+    "type": "string",
+    "value": "'Sec'"
+  },
+  "device:qubit:12:frequency:count": {
+    "type": "string",
+    "value": "59"
+  },
+  "device:qubit:13:t1_decoherence:value": {
+    "type": "string",
+    "value": "77.66942476152438"
+  },
+  "device:readout_resonator:13:acq_integration_time:count": {
+    "type": "string",
+    "value": "273"
+  },
+  "device:qubit:14:pi_pulse_amplitude:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:07:01.205698Z'"
+  },
+  "device:readout_resonator:15:pulse_amplitude:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:11.289908Z'"
+  },
+  "device:qubit:11:pi_pulse_amplitude:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:readout_resonator:14:acq_integration_time:unit": {
+    "type": "string",
+    "value": "'Sec'"
+  },
+  "device:qubit:14:pi_pulse_duration:value": {
+    "type": "string",
+    "value": "6e-08"
+  },
+  "device:readout_resonator:11:pulse_duration:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:11.271570Z'"
+  },
+  "couplers:q08_q09": {
+    "type": "hash",
+    "value": {
+      "control_qubit_crossing_points": "[-0.002149999999999999, -0.001349999999999997, 0.00132500000000001, 0.002125000000000012]",
+      "control_qubit_crossing_points_error": "0",
+      "target_qubit_crossing_points": "[-0.0023624999999999996, -0.0011374999999999966, 0.0011000000000000094, 0.0022875000000000126]",
+      "target_qubit_crossing_points_error": "0"
+    }
+  },
+  "device:qubit:15:pi_pulse_duration:unit": {
+    "type": "string",
+    "value": "'Sec'"
+  },
+  "device:readout_resonator:11:acq_delay:count": {
+    "type": "string",
+    "value": "162"
+  },
+  "device:discriminator:12:threshold:value": {
+    "type": "string",
+    "value": "0.00022258115604658805"
+  },
+  "device:qubit:12:pi_pulse_amplitude:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:qubit:14:pi_pulse_amplitude:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:qubit:11:frequency_12:timestamp": {
+    "type": "string",
+    "value": "'2025-11-26T14:51:18.996592Z'"
+  },
+  "device:discriminator:14:rotation:value": {
+    "type": "string",
+    "value": "205.1342713830969"
+  },
+  "device:qubit:12:pi_pulse_ef_amplitude:timestamp": {
+    "type": "string",
+    "value": "'2025-11-26T14:50:24.100729Z'"
+  },
+  "device:readout_resonator:14:frequency:count": {
+    "type": "string",
+    "value": "47"
+  },
+  "device:discriminator:15:threshold:count": {
+    "type": "string",
+    "value": "2"
+  },
+  "couplers:q13_q14": {
+    "type": "hash",
+    "value": {
+      "cz_working_frequencies": "nan",
+      "cz_pulse_frequency_error": "nan",
+      "cz_working_durations_in_ns_error": "0",
+      "control_local_phase_error": "nan",
+      "cz_pulse_duration_error": "nan",
+      "target_local_phase_error": "nan",
+      "parking_current": "0",
+      "attenuation": "2",
+      "reset:duration": "0.00024",
+      "cz_working_frequencies_error": "0",
+      "control_qubit_crossing_points": "nan",
+      "cz_pulse_frequency": "nan",
+      "control_qubit_crossing_points_error": "nan",
+      "target_qubit_crossing_points_error": "nan",
+      "cz_phase_path": "via_20",
+      "cz_pulse_duration": "1.56e-07",
+      "target_qubit_crossing_points": "nan",
+      "target_local_phase": "nan",
+      "qubit_crossing_points": "nan",
+      "control_local_phase": "nan",
+      "cz_fidelity": "nan",
+      "cz_pulse_amplitude": "nan",
+      "spec:spec_duration": "6e-06",
+      "cz_working_durations_in_ns": "nan"
+    }
+  },
+  "device:discriminator:14:threshold:count": {
+    "type": "string",
+    "value": "5"
+  },
+  "device:qubit:12:t1_decoherence:count": {
+    "type": "string",
+    "value": "2"
+  },
+  "device:qubit:13:frequency:value": {
+    "type": "string",
+    "value": "5274032978.913045"
+  },
+  "device:readout_resonator:13:pulse_amplitude:count": {
+    "type": "string",
+    "value": "277"
+  },
+  "device:qubit:12:motzoi_parameter:count": {
+    "type": "string",
+    "value": "25"
+  },
+  "device:qubit:15:motzoi_parameter:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:qubit:13:frequency_12:unit": {
+    "type": "string",
+    "value": "'Hz'"
+  },
+  "device:qubit:12:pi_pulse_duration:unit": {
+    "type": "string",
+    "value": "'Sec'"
+  },
+  "device:readout_resonator:12:frequency_opt:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:11:26.941487Z'"
+  },
+  "cs:q11": {
+    "type": "hash",
+    "value": {
+      "resonator_spectroscopy": "calibrated",
+      "qubit_01_spectroscopy": "calibrated",
+      "rabi_oscillations": "not_calibrated",
+      "ramsey_correction": "calibrated",
+      "motzoi_parameter": "calibrated",
+      "n_rabi_oscillations": "calibrated",
+      "resonator_spectroscopy_1": "calibrated",
+      "qubit_12_spectroscopy": "not_calibrated",
+      "rabi_oscillations_12": "not_calibrated",
+      "ramsey_correction_12": "not_calibrated",
+      "resonator_spectroscopy_2": "not_calibrated",
+      "ro_frequency_three_state_optimization": "not_calibrated",
+      "ro_amplitude_three_state_optimization": "not_calibrated",
+      "qubit_bring_up_spectroscopy": "not_calibrated",
+      "T1": "not_calibrated",
+      "T2": "not_calibrated",
+      "T2_echo": "not_calibrated",
+      "ro_frequency_two_state_optimization": "calibrated",
+      "ro_amplitude_two_state_optimization": "calibrated",
+      "randomized_benchmarking": "not_calibrated",
+      "purity_benchmarking": "not_calibrated",
+      "punchout": "not_calibrated"
+    }
+  },
+  "device:readout_resonator:13:acq_integration_time:unit": {
+    "type": "string",
+    "value": "'Sec'"
+  },
+  "device:qubit:11:frequency_12:unit": {
+    "type": "string",
+    "value": "'Hz'"
+  },
+  "device:qubit:14:frequency:value": {
+    "type": "string",
+    "value": "4302646320.651085"
+  },
+  "device:qubit:12:t1_decoherence:value": {
+    "type": "string",
+    "value": "59.358545363142774"
+  },
+  "device:readout_resonator:14:pulse_amplitude:count": {
+    "type": "string",
+    "value": "278"
+  },
+  "couplers:q13_q14:q14": {
+    "type": "hash",
+    "value": {
+      "qubit_crossing_points": "[0.0004749999999999966]"
+    }
+  },
+  "device:readout_resonator:11:frequency:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:46.923053Z'"
+  },
+  "device:readout_resonator:12:acq_delay:value": {
+    "type": "string",
+    "value": "2.2e-07"
+  },
+  "device:qubit:11:pi_pulse_duration:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:11.275870Z'"
+  },
+  "couplers:q12_q13": {
+    "type": "hash",
+    "value": {
+      "control_qubit_crossing_points": "[-0.0018999999999999985, -0.0010499999999999962, 0.0014750000000000104, 0.002375000000000013]",
+      "control_qubit_crossing_points_error": "0",
+      "target_qubit_crossing_points": "[-0.002087499999999999, 0.00137500000000001]",
+      "target_qubit_crossing_points_error": "0"
+    }
+  },
+  "device:readout_resonator:11:frequency:value": {
+    "type": "string",
+    "value": "6826375416.493596"
+  },
+  "device:readout_resonator:14:pulse_amplitude:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:11.286433Z'"
+  },
+  "device:readout_resonator:15:frequency_opt:unit": {
+    "type": "string",
+    "value": "'Hz'"
+  },
+  "device:readout_resonator:13:acq_integration_time:value": {
+    "type": "string",
+    "value": "2.5e-06"
+  },
+  "device:qubit:15:frequency:count": {
+    "type": "string",
+    "value": "59"
+  },
+  "device:readout_resonator:13:pulse_duration:value": {
+    "type": "string",
+    "value": "3e-06"
+  },
+  "device:readout_resonator:14:frequency:unit": {
+    "type": "string",
+    "value": "'Hz'"
+  },
+  "device:readout_resonator:15:pulse_duration:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:11.290777Z'"
+  },
+  "device:discriminator:14:rotation:count": {
+    "type": "string",
+    "value": "5"
+  },
+  "device:readout_resonator:12:frequency:value": {
+    "type": "string",
+    "value": "6411680540.106494"
+  },
+  "device:qubit:13:frequency_12:value": {
+    "type": "string",
+    "value": "5024244498.911764"
+  },
+  "device:qubit:15:pi_pulse_amplitude:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:discriminator:13:threshold:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:13:54.012871Z'"
+  },
+  "device:qubit:14:t1_decoherence:count": {
+    "type": "string",
+    "value": "2"
+  },
+  "device:readout_resonator:15:pulse_duration:count": {
+    "type": "string",
+    "value": "161"
+  },
+  "device:readout_resonator:11:acq_integration_time:count": {
+    "type": "string",
+    "value": "162"
+  },
+  "device:qubit:13:pi_pulse_duration:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:11.285558Z'"
+  },
+  "device:readout_resonator:14:frequency_opt:value": {
+    "type": "string",
+    "value": "6631000000.0"
+  },
+  "device:qubit:13:pi_pulse_amplitude:count": {
+    "type": "string",
+    "value": "68"
+  },
+  "device:qubit:13:frequency:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:05:06.152267Z'"
+  },
+  "device:readout_resonator:14:acq_delay:count": {
+    "type": "string",
+    "value": "274"
+  },
+  "device:readout_resonator:15:acq_integration_time:value": {
+    "type": "string",
+    "value": "2.5e-06"
+  },
+  "device:qubit:12:motzoi_parameter:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:qubit:14:frequency_12:count": {
+    "type": "string",
+    "value": "57"
+  },
+  "device:qubit:11:pi_pulse_duration:count": {
+    "type": "string",
+    "value": "162"
+  },
+  "device:readout_resonator:11:pulse_amplitude:value": {
+    "type": "string",
+    "value": "0.015"
+  },
+  "device:readout_resonator:11:acq_delay:value": {
+    "type": "string",
+    "value": "2.2e-07"
+  },
+  "device:discriminator:14:rotation:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:13:54.017527Z'"
+  },
+  "device:readout_resonator:11:acq_integration_time:unit": {
+    "type": "string",
+    "value": "'Sec'"
+  },
+  "device:readout_resonator:11:pulse_duration:count": {
+    "type": "string",
+    "value": "162"
+  },
+  "device:readout_resonator:13:frequency:unit": {
+    "type": "string",
+    "value": "'Hz'"
+  },
+  "device:qubit:14:frequency:count": {
+    "type": "string",
+    "value": "75"
+  },
+  "cs:q14_q15": {
+    "type": "hash",
+    "value": {
+      "qubit_spectroscopy_vs_current": "calibrated"
+    }
+  },
+  "device:qubit:14:t1_decoherence:timestamp": {
+    "type": "string",
+    "value": "'2025-11-24T14:21:48.599640Z'"
+  },
+  "device:qubit:12:pi_pulse_amplitude:count": {
+    "type": "string",
+    "value": "53"
+  },
+  "device:readout_resonator:11:pulse_amplitude:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:11.268381Z'"
+  },
+  "device:readout_resonator:12:pulse_amplitude:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:qubit:12:t1_decoherence:unit": {
+    "type": "string",
+    "value": "'Sec'"
+  },
+  "couplers:q13_q14:q13": {
+    "type": "hash",
+    "value": {
+      "qubit_crossing_points": "[0.00037499999999999676]"
+    }
+  },
+  "device:qubit:11:frequency:value": {
+    "type": "string",
+    "value": "4740000250.498322"
+  },
+  "device:qubit:11:frequency:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:05:06.150828Z'"
+  },
+  "device:readout_resonator:11:pulse_duration:unit": {
+    "type": "string",
+    "value": "'Sec'"
+  },
+  "device:qubit:13:pi_pulse_amplitude:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:qubit:13:frequency:unit": {
+    "type": "string",
+    "value": "'Hz'"
+  },
+  "device:readout_resonator:12:frequency:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:46.928432Z'"
+  },
+  "cs:q08_q09": {
+    "type": "hash",
+    "value": {
+      "qubit_spectroscopy_vs_current": "calibrated"
+    }
+  },
+  "device:qubit:11:frequency:unit": {
+    "type": "string",
+    "value": "'Hz'"
+  },
+  "device:readout_resonator:15:frequency:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:46.943774Z'"
+  },
+  "device:qubit:11:pi_pulse_amplitude:count": {
+    "type": "string",
+    "value": "50"
+  },
+  "device:discriminator:13:threshold:count": {
+    "type": "string",
+    "value": "6"
+  },
+  "device:readout_resonator:15:acq_integration_time:count": {
+    "type": "string",
+    "value": "161"
+  },
+  "device:qubit:13:motzoi_parameter:value": {
+    "type": "string",
+    "value": "0.03589743589743588"
+  },
+  "device:readout_resonator:15:frequency_opt:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:11:26.945059Z'"
+  },
+  "device:qubit:11:t1_decoherence:unit": {
+    "type": "string",
+    "value": "'Sec'"
+  },
+  "device:qubit:14:frequency_12:value": {
+    "type": "string",
+    "value": "4150793467.3542924"
+  },
+  "device:readout_resonator:12:pulse_duration:unit": {
+    "type": "string",
+    "value": "'Sec'"
+  },
+  "device:qubit:13:pi_pulse_ef_amplitude:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:qubit:13:motzoi_parameter:count": {
+    "type": "string",
+    "value": "33"
+  },
+  "device:qubit:12:frequency:value": {
+    "type": "string",
+    "value": "4266190879.087689"
+  },
+  "transmons:q11": {
+    "type": "hash",
+    "value": {
+      "VNA_f01_frequency": "4742000000.0",
+      "VNA_f12_frequency": "4491000000.0",
+      "measure:pulse_amp": "0.015",
+      "measure:acq_delay": "2.2e-07",
+      "measure:pulse_duration": "3e-06",
+      "measure:integration_time": "2.5e-06",
+      "measure1:pulse_amp": "0.015",
+      "measure2:pulse_amp": "0.005",
+      "attenuation": "8",
+      "measure_1:acq_delay": "2.2e-07",
+      "measure_1:pulse_duration": "3e-06",
+      "measure_1:integration_time": "2.5e-06",
+      "measure_2:acq_delay": "2.2e-07",
+      "measure_2:pulse_duration": "3e-06",
+      "measure_2:integration_time": "2.5e-06",
+      "rxy:duration": "6e-08",
+      "measure_3state_opt:pulse_duration": "3e-06",
+      "measure_3state_opt:acq_delay": "2.2e-07",
+      "measure_3state_opt:integration_time": "2.5e-06",
+      "reset:duration": "0.00024",
+      "clock_freqs:readout": "6826375416.493596",
+      "Ql": "12296.276851128483",
+      "resonator_minimum": "6826355555.555555",
+      "clock_freqs:readout_error": "0",
+      "Ql_error": "0",
+      "resonator_minimum_error": "0",
+      "clock_freqs:f01": "4740000250.498322",
+      "spec:spec_ampl_optimal": "0.0045000000000000005",
+      "spec:spec_duration": "6e-06",
+      "clock_freqs:f01_error": "0",
+      "spec:spec_ampl_optimal_error": "0",
+      "rxy:amp180": "nan",
+      "rxy:amp180_error": "0",
+      "rxy:motzoi": "-0.06666666666666671",
+      "rxy:motzoi_error": "0",
+      "extended_clock_freqs:readout_1": "6826377020.1954",
+      "Ql_1": "6826377020.1954",
+      "resonator_minimum_1": "6826355555.555555",
+      "extended_clock_freqs:readout_1_error": "0",
+      "Ql_1_error": "0",
+      "resonator_minimum_1_error": "0",
+      "clock_freqs:f12": "nan",
+      "spec:spec_ampl_12_optimal": "nan",
+      "clock_freqs:f12_error": "nan",
+      "spec:spec_ampl_12_optimal_error": "nan",
+      "r12:ef_amp180": "nan",
+      "r12:ef_amp180_error": "nan",
+      "extended_clock_freqs:readout_2": "nan",
+      "extended_clock_freqs:readout_2_error": "nan",
+      "extended_clock_freqs:readout_3state_opt": "nan",
+      "extended_clock_freqs:readout_3state_opt_error": "nan",
+      "measure_3state_opt:pulse_amp": "0",
+      "centroid_I": "nan",
+      "centroid_Q": "nan",
+      "omega_01": "nan",
+      "omega_12": "nan",
+      "omega_20": "nan",
+      "inv_cm_opt": "nan",
+      "measure_3state_opt:pulse_amp_error": "0",
+      "centroid_I_error": "nan",
+      "centroid_Q_error": "nan",
+      "omega_01_error": "nan",
+      "omega_12_error": "nan",
+      "omega_20_error": "nan",
+      "inv_cm_opt_error": "nan",
+      "measure:pulse_amp_error": "nan",
+      "t1_time": "nan",
+      "t1_time_error": "nan",
+      "extended_clock_freqs:readout_2state_opt": "6827600000.0",
+      "extended_clock_freqs:readout_2state_opt_error": "0",
+      "measure_2state_opt:pulse_amp": "0.006017045454545454",
+      "measure_2state_opt:acq_rotation": "21.496540633590097",
+      "measure_2state_opt:acq_threshold": "0.015871393876263337",
+      "measure_2state_opt:pulse_amp_error": "0",
+      "measure_2state_opt:acq_rotation_error": "0",
+      "measure_2state_opt:acq_threshold_error": "0"
+    }
+  },
+  "device:qubit:13:t1_decoherence:count": {
+    "type": "string",
+    "value": "2"
+  },
+  "device:qubit:15:motzoi_parameter:value": {
+    "type": "string",
+    "value": "-0.09230769230769231"
+  },
+  "device:discriminator:15:rotation:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:13:54.025715Z'"
+  },
+  "transmons:q15": {
+    "type": "hash",
+    "value": {
+      "VNA_f01_frequency": "4572000000.0",
+      "VNA_f12_frequency": "4320000000.0",
+      "measure:pulse_amp": "0.018",
+      "measure:acq_delay": "2.2e-07",
+      "measure:pulse_duration": "4e-06",
+      "measure:integration_time": "3.5e-06",
+      "measure1:pulse_amp": "0.018",
+      "measure2:pulse_amp": "0.018",
+      "attenuation": "8",
+      "measure_1:acq_delay": "2.2e-07",
+      "measure_1:pulse_duration": "4e-06",
+      "measure_1:integration_time": "3.5e-06",
+      "measure_2:acq_delay": "2.2e-07",
+      "measure_2:pulse_duration": "4e-06",
+      "measure_2:integration_time": "3.5e-06",
+      "rxy:duration": "4.8e-08",
+      "measure_3state_opt:pulse_duration": "4e-06",
+      "measure_3state_opt:acq_delay": "2.2e-07",
+      "measure_3state_opt:integration_time": "3.5e-06",
+      "reset:duration": "0.0004",
+      "clock_freqs:readout": "7130573004.398576",
+      "Ql": "13946.775770940849",
+      "resonator_minimum": "7130588888.888889",
+      "clock_freqs:readout_error": "0",
+      "Ql_error": "0",
+      "resonator_minimum_error": "0",
+      "clock_freqs:f01": "4571728801.803842",
+      "spec:spec_ampl_optimal": "0.0045000000000000005",
+      "spec:spec_duration": "6e-06",
+      "clock_freqs:f01_error": "0",
+      "spec:spec_ampl_optimal_error": "0",
+      "rxy:amp180": "0.44949801004769113",
+      "rxy:amp180_error": "0",
+      "rxy:motzoi": "-0.09230769230769231",
+      "rxy:motzoi_error": "0",
+      "extended_clock_freqs:readout_1": "7130447677.091371",
+      "Ql_1": "7130447677.091371",
+      "resonator_minimum_1": "7130455555.555555",
+      "extended_clock_freqs:readout_1_error": "0",
+      "Ql_1_error": "0",
+      "resonator_minimum_1_error": "0",
+      "clock_freqs:f12": "4320209733.136258",
+      "spec:spec_ampl_12_optimal": "0.006",
+      "clock_freqs:f12_error": "0",
+      "spec:spec_ampl_12_optimal_error": "0",
+      "r12:ef_amp180": "0.504316597299042",
+      "r12:ef_amp180_error": "0",
+      "extended_clock_freqs:readout_2": "7129595171.456918",
+      "extended_clock_freqs:readout_2_error": "0",
+      "extended_clock_freqs:readout_3state_opt": "7130011111.111111",
+      "extended_clock_freqs:readout_3state_opt_error": "0",
+      "measure_3state_opt:pulse_amp": "0.017551724137931032",
+      "centroid_I": "0.00304332684284721",
+      "centroid_Q": "-0.01218776363887684",
+      "omega_01": "90.99726942196372",
+      "omega_12": "18.677248814134146",
+      "omega_20": "256.054770954933",
+      "inv_cm_opt": "0",
+      "measure_3state_opt:pulse_amp_error": "0",
+      "centroid_I_error": "0",
+      "centroid_Q_error": "0",
+      "omega_01_error": "0",
+      "omega_12_error": "0",
+      "omega_20_error": "0",
+      "inv_cm_opt_error": "0",
+      "measure:pulse_amp_error": "nan",
+      "t1_time": "nan",
+      "t1_time_error": "nan",
+      "extended_clock_freqs:readout_2state_opt": "7130544444.444445",
+      "extended_clock_freqs:readout_2state_opt_error": "0",
+      "measure_2state_opt:pulse_amp": "0.017676136363636363",
+      "measure_2state_opt:acq_rotation": "207.18933024909524",
+      "measure_2state_opt:acq_threshold": "0.00790335477873865",
+      "measure_2state_opt:pulse_amp_error": "0",
+      "measure_2state_opt:acq_rotation_error": "0",
+      "measure_2state_opt:acq_threshold_error": "0"
+    }
+  },
+  "device:discriminator:13:threshold:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:discriminator:14:threshold:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:13:54.020591Z'"
+  },
+  "device:discriminator:11:threshold:count": {
+    "type": "string",
+    "value": "2"
+  },
+  "device:qubit:14:frequency:unit": {
+    "type": "string",
+    "value": "'Hz'"
+  },
+  "device:qubit:15:pi_pulse_duration:count": {
+    "type": "string",
+    "value": "161"
+  },
+  "device:qubit:11:pi_pulse_amplitude:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:07:01.195198Z'"
+  },
+  "device:readout_resonator:13:acq_integration_time:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:11.284345Z'"
+  },
+  "device:discriminator:11:rotation:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:13:53.990678Z'"
+  },
+  "device:readout_resonator:12:acq_delay:count": {
+    "type": "string",
+    "value": "162"
+  },
+  "device:discriminator:12:rotation:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:13:53.999779Z'"
+  },
+  "device:qubit:15:pi_pulse_duration:value": {
+    "type": "string",
+    "value": "6e-08"
+  },
+  "device:readout_resonator:13:pulse_amplitude:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:11.282652Z'"
+  },
+  "device:qubit:12:frequency_12:value": {
+    "type": "string",
+    "value": "4111083667.521896"
+  },
+  "device:qubit:11:pi_pulse_duration:unit": {
+    "type": "string",
+    "value": "'Sec'"
+  },
+  "device:discriminator:13:rotation:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:13:54.010004Z'"
+  },
+  "device:qubit:15:motzoi_parameter:count": {
+    "type": "string",
+    "value": "25"
+  },
+  "device:readout_resonator:13:frequency_opt:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:11:26.942790Z'"
+  },
+  "device:qubit:12:pi_pulse_ef_amplitude:count": {
+    "type": "string",
+    "value": "23"
+  },
+  "device:readout_resonator:12:acq_integration_time:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:11.280254Z'"
+  },
+  "device:discriminator:12:threshold:count": {
+    "type": "string",
+    "value": "2"
+  },
+  "device:discriminator:13:rotation:count": {
+    "type": "string",
+    "value": "6"
+  },
+  "device:qubit:15:frequency_12:value": {
+    "type": "string",
+    "value": "4315933379.128722"
+  },
+  "device:qubit:14:pi_pulse_duration:count": {
+    "type": "string",
+    "value": "274"
+  },
+  "device:qubit:14:motzoi_parameter:count": {
+    "type": "string",
+    "value": "33"
+  },
+  "device:qubit:14:pi_pulse_ef_amplitude:count": {
+    "type": "string",
+    "value": "30"
+  },
+  "device:qubit:11:pi_pulse_amplitude:value": {
+    "type": "string",
+    "value": "nan"
+  },
+  "device:readout_resonator:13:pulse_amplitude:value": {
+    "type": "string",
+    "value": "0.015"
+  },
+  "device:discriminator:14:threshold:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:discriminator:15:rotation:value": {
+    "type": "string",
+    "value": "207.18933024909524"
+  },
+  "device:qubit:12:pi_pulse_duration:value": {
+    "type": "string",
+    "value": "6e-08"
+  },
+  "device:qubit:15:pi_pulse_ef_amplitude:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:readout_resonator:12:frequency_opt:value": {
+    "type": "string",
+    "value": "6411600000.0"
+  },
+  "device:qubit:12:frequency:unit": {
+    "type": "string",
+    "value": "'Hz'"
+  },
+  "device:qubit:15:pi_pulse_amplitude:count": {
+    "type": "string",
+    "value": "53"
+  },
+  "couplers:q06_q07": {
+    "type": "hash",
+    "value": {
+      "control_qubit_crossing_points": "[-0.0019249999999999985, -0.0010999999999999964, 0.0013750000000000103, 0.0022000000000000123]",
+      "control_qubit_crossing_points_error": "0",
+      "target_qubit_crossing_points": "[-0.002024999999999999, -0.0009999999999999961, 0.00128750000000001, 0.0023000000000000125]",
+      "target_qubit_crossing_points_error": "0"
+    }
+  },
+  "device:readout_resonator:14:acq_integration_time:count": {
+    "type": "string",
+    "value": "274"
+  },
+  "device:readout_resonator:13:pulse_duration:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:11.283785Z'"
+  },
+  "device:discriminator:11:threshold:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:qubit:12:pi_pulse_duration:count": {
+    "type": "string",
+    "value": "162"
+  },
+  "device:readout_resonator:14:pulse_duration:unit": {
+    "type": "string",
+    "value": "'Sec'"
+  },
+  "device:qubit:11:t1_decoherence:timestamp": {
+    "type": "string",
+    "value": "'2025-11-24T14:21:48.598141Z'"
+  },
+  "device:discriminator:11:threshold:value": {
+    "type": "string",
+    "value": "0.015871393876263337"
+  },
+  "device:discriminator:13:rotation:value": {
+    "type": "string",
+    "value": "298.6949255132462"
+  },
+  "device:qubit:12:pi_pulse_duration:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:11.281596Z'"
+  },
+  "device:qubit:15:pi_pulse_ef_amplitude:value": {
+    "type": "string",
+    "value": "0.20105281436214664"
+  },
+  "device:readout_resonator:14:acq_integration_time:value": {
+    "type": "string",
+    "value": "2.5e-06"
+  },
+  "device:qubit:12:pi_pulse_ef_amplitude:value": {
+    "type": "string",
+    "value": "0.3419968605724735"
+  },
+  "device:discriminator:11:rotation:value": {
+    "type": "string",
+    "value": "21.496540633590097"
+  },
+  "device:qubit:12:motzoi_parameter:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:06:00.725606Z'"
+  },
+  "device:qubit:14:pi_pulse_ef_amplitude:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T11:32:15.831844Z'"
+  },
+  "device:readout_resonator:12:pulse_duration:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:11.279453Z'"
+  },
+  "device:readout_resonator:13:frequency_opt:value": {
+    "type": "string",
+    "value": "7180566666.666667"
+  },
+  "device:readout_resonator:15:frequency_opt:count": {
+    "type": "string",
+    "value": "3"
+  },
+  "device:qubit:13:pi_pulse_amplitude:value": {
+    "type": "string",
+    "value": "0.5871022866615381"
+  },
+  "device:readout_resonator:14:acq_integration_time:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:11.287923Z'"
+  },
+  "device:readout_resonator:14:acq_delay:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:11.286911Z'"
+  },
+  "device:readout_resonator:13:pulse_amplitude:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:readout_resonator:12:pulse_amplitude:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:11.277784Z'"
+  },
+  "device:qubit:11:pi_pulse_ef_amplitude:count": {
+    "type": "string",
+    "value": "12"
+  },
+  "device:qubit:12:frequency_12:count": {
+    "type": "string",
+    "value": "43"
+  },
+  "device:qubit:11:motzoi_parameter:count": {
+    "type": "string",
+    "value": "25"
+  },
+  "device:readout_resonator:15:pulse_amplitude:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:qubit:13:t1_decoherence:timestamp": {
+    "type": "string",
+    "value": "'2025-11-24T14:21:48.599195Z'"
+  },
+  "device:readout_resonator:12:acq_integration_time:value": {
+    "type": "string",
+    "value": "2.5e-06"
+  },
+  "device:readout_resonator:15:pulse_duration:unit": {
+    "type": "string",
+    "value": "'Sec'"
+  },
+  "transmons:q13": {
+    "type": "hash",
+    "value": {
+      "VNA_f01_frequency": "5274000000.0",
+      "VNA_f12_frequency": "5024000000.0",
+      "measure:pulse_amp": "0.018",
+      "measure:acq_delay": "2.2e-07",
+      "measure:pulse_duration": "4e-06",
+      "measure:integration_time": "3.5e-06",
+      "attenuation": "8",
+      "measure_1:acq_delay": "2.2e-07",
+      "measure_1:pulse_duration": "4e-06",
+      "measure_1:integration_time": "3.5e-06",
+      "measure_2:acq_delay": "2.2e-07",
+      "measure_2:pulse_duration": "4e-06",
+      "measure_2:integration_time": "3.5e-06",
+      "rxy:duration": "4.8e-08",
+      "measure_3state_opt:pulse_duration": "4e-06",
+      "measure_3state_opt:acq_delay": "2.2e-07",
+      "measure_3state_opt:integration_time": "3.5e-06",
+      "reset:duration": "0.0004",
+      "clock_freqs:readout": "7180665715.511508",
+      "Ql": "13776.343624540354",
+      "resonator_minimum": "7180700000.0",
+      "clock_freqs:readout_error": "0",
+      "Ql_error": "0",
+      "resonator_minimum_error": "0",
+      "clock_freqs:f01": "5274032978.913045",
+      "spec:spec_ampl_optimal": "0.00625",
+      "spec:spec_duration": "6e-06",
+      "clock_freqs:f01_error": "0",
+      "spec:spec_ampl_optimal_error": "0",
+      "rxy:amp180": "0.5871022866615381",
+      "rxy:amp180_error": "0",
+      "rxy:motzoi": "0.03589743589743588",
+      "rxy:motzoi_error": "0",
+      "extended_clock_freqs:readout_1": "7180460169.226781",
+      "Ql_1": "7180460169.226781",
+      "resonator_minimum_1": "7180477777.777778",
+      "extended_clock_freqs:readout_1_error": "0",
+      "Ql_1_error": "0",
+      "resonator_minimum_1_error": "0",
+      "clock_freqs:f12": "5024209733.136258",
+      "spec:spec_ampl_12_optimal": "0.006",
+      "clock_freqs:f12_error": "0",
+      "spec:spec_ampl_12_optimal_error": "0",
+      "r12:ef_amp180": "0.5014672546299845",
+      "r12:ef_amp180_error": "0",
+      "extended_clock_freqs:readout_2": "7179795841.57504",
+      "extended_clock_freqs:readout_2_error": "0",
+      "extended_clock_freqs:readout_3state_opt": "7180211111.111111",
+      "extended_clock_freqs:readout_3state_opt_error": "0",
+      "measure_3state_opt:pulse_amp": "0.017551724137931032",
+      "centroid_I": "-0.012624946655923447",
+      "centroid_Q": "-0.003466614304425858",
+      "omega_01": "94.1816867715259",
+      "omega_12": "359.8018491905928",
+      "omega_20": "236.8958766021067",
+      "inv_cm_opt": "0",
+      "measure_3state_opt:pulse_amp_error": "0",
+      "centroid_I_error": "0",
+      "centroid_Q_error": "0",
+      "omega_01_error": "0",
+      "omega_12_error": "0",
+      "omega_20_error": "0",
+      "inv_cm_opt_error": "0",
+      "measure:pulse_amp_error": "nan",
+      "measure1:pulse_amp": "0.018",
+      "measure2:pulse_amp": "0.018",
+      "t1_time": "nan",
+      "t1_time_error": "nan",
+      "extended_clock_freqs:readout_2state_opt": "7180566666.666667",
+      "extended_clock_freqs:readout_2state_opt_error": "0",
+      "measure_2state_opt:pulse_amp": "0.017352272727272727",
+      "measure_2state_opt:acq_rotation": "298.6949255132462",
+      "measure_2state_opt:acq_threshold": "0.0013487968979805263",
+      "measure_2state_opt:pulse_amp_error": "0",
+      "measure_2state_opt:acq_rotation_error": "0",
+      "measure_2state_opt:acq_threshold_error": "0"
+    }
+  },
+  "device:discriminator:15:threshold:value": {
+    "type": "string",
+    "value": "0.00790335477873865"
+  },
+  "device:qubit:15:frequency:value": {
+    "type": "string",
+    "value": "4571728801.803842"
+  },
+  "device:discriminator:12:rotation:value": {
+    "type": "string",
+    "value": "182.90934958406868"
+  },
+  "device:readout_resonator:11:frequency_opt:unit": {
+    "type": "string",
+    "value": "'Hz'"
+  },
+  "device:qubit:15:frequency_12:count": {
+    "type": "string",
+    "value": "43"
+  },
+  "device:qubit:13:pi_pulse_ef_amplitude:count": {
+    "type": "string",
+    "value": "28"
+  },
+  "device:qubit:14:frequency_12:unit": {
+    "type": "string",
+    "value": "'Hz'"
+  },
+  "cs:q06_q07": {
+    "type": "hash",
+    "value": {
+      "qubit_spectroscopy_vs_current": "calibrated"
+    }
+  },
+  "couplers:q14_q15": {
+    "type": "hash",
+    "value": {
+      "control_qubit_crossing_points": "[-0.0017999999999999982, -0.000949999999999996, 0.0016500000000000104]",
+      "control_qubit_crossing_points_error": "0",
+      "target_qubit_crossing_points": "[-0.0018499999999999983, -0.0008249999999999957, 0.001550000000000011]",
+      "target_qubit_crossing_points_error": "0"
+    }
+  },
+  "device:readout_resonator:15:acq_delay:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:11.290358Z'"
+  },
+  "device:qubit:13:pi_pulse_duration:count": {
+    "type": "string",
+    "value": "273"
+  },
+  "cs:q13_q14": {
+    "type": "hash",
+    "value": {
+      "cz_parametrization": "calibrated",
+      "coupler_anticrossing": "not_calibrated",
+      "cz_chevron": "not_calibrated",
+      "resonator_spectroscopy_vs_current": "not_calibrated",
+      "qubit_spectroscopy_vs_current": "not_calibrated",
+      "cz_calibration": "not_calibrated",
+      "cz_dynamic_phase": "not_calibrated",
+      "cz_rb": "not_calibrated"
+    }
+  },
+  "device:readout_resonator:14:frequency:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:46.938553Z'"
+  },
+  "device:qubit:15:frequency:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:05:06.153195Z'"
+  },
+  "device:readout_resonator:12:acq_delay:unit": {
+    "type": "string",
+    "value": "'Sec'"
+  },
+  "device:discriminator:12:rotation:count": {
+    "type": "string",
+    "value": "2"
+  },
+  "device:readout_resonator:13:frequency:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:46.933228Z'"
+  },
+  "device:qubit:13:frequency:count": {
+    "type": "string",
+    "value": "75"
+  },
+  "device:discriminator:11:threshold:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:13:53.994953Z'"
+  },
+  "transmons:q14": {
+    "type": "hash",
+    "value": {
+      "VNA_f01_frequency": "4302500000.0",
+      "VNA_f12_frequency": "4150000000.0",
+      "measure:pulse_amp": "0.018",
+      "measure:acq_delay": "2.2e-07",
+      "measure:pulse_duration": "4e-06",
+      "measure:integration_time": "3.5e-06",
+      "measure1:pulse_amp": "0.018",
+      "measure2:pulse_amp": "0.018",
+      "attenuation": "8",
+      "measure_1:acq_delay": "2.2e-07",
+      "measure_1:pulse_duration": "4e-06",
+      "measure_1:integration_time": "3.5e-06",
+      "measure_2:acq_delay": "2.2e-07",
+      "measure_2:pulse_duration": "4e-06",
+      "measure_2:integration_time": "3.5e-06",
+      "rxy:duration": "4.8e-08",
+      "measure_3state_opt:pulse_duration": "4e-06",
+      "measure_3state_opt:acq_delay": "2.2e-07",
+      "measure_3state_opt:integration_time": "3.5e-06",
+      "reset:duration": "0.0004",
+      "clock_freqs:readout": "6631065908.345407",
+      "Ql": "14828.768579350846",
+      "resonator_minimum": "6631044444.444445",
+      "clock_freqs:readout_error": "0",
+      "Ql_error": "0",
+      "resonator_minimum_error": "0",
+      "clock_freqs:f01": "4302646320.651085",
+      "spec:spec_ampl_optimal": "0.00625",
+      "spec:spec_duration": "6e-06",
+      "clock_freqs:f01_error": "0",
+      "spec:spec_ampl_optimal_error": "0",
+      "rxy:amp180": "0.6096873555708262",
+      "rxy:amp180_error": "0",
+      "rxy:motzoi": "-0.11794871794871797",
+      "rxy:motzoi_error": "0",
+      "extended_clock_freqs:readout_1": "6630967574.651754",
+      "Ql_1": "6630967574.651754",
+      "resonator_minimum_1": "6630955555.555555",
+      "extended_clock_freqs:readout_1_error": "0",
+      "Ql_1_error": "0",
+      "resonator_minimum_1_error": "0",
+      "clock_freqs:f12": "4150209733.136258",
+      "spec:spec_ampl_12_optimal": "0.006",
+      "clock_freqs:f12_error": "0",
+      "spec:spec_ampl_12_optimal_error": "0",
+      "r12:ef_amp180": "0.5029229173671139",
+      "r12:ef_amp180_error": "0",
+      "extended_clock_freqs:readout_2": "6630088503.648133",
+      "extended_clock_freqs:readout_2_error": "0",
+      "extended_clock_freqs:readout_3state_opt": "6630511111.111111",
+      "extended_clock_freqs:readout_3state_opt_error": "0",
+      "measure_3state_opt:pulse_amp": "0.017551724137931032",
+      "centroid_I": "-0.008453734675643346",
+      "centroid_Q": "0.0152903365969433",
+      "omega_01": "6.801142960947061",
+      "omega_12": "276.5463073652701",
+      "omega_20": "148.09803430841032",
+      "inv_cm_opt": "0",
+      "measure_3state_opt:pulse_amp_error": "0",
+      "centroid_I_error": "0",
+      "centroid_Q_error": "0",
+      "omega_01_error": "0",
+      "omega_12_error": "0",
+      "omega_20_error": "0",
+      "inv_cm_opt_error": "0",
+      "measure:pulse_amp_error": "nan",
+      "t1_time": "nan",
+      "t1_time_error": "nan",
+      "extended_clock_freqs:readout_2state_opt": "6631000000.0",
+      "extended_clock_freqs:readout_2state_opt_error": "0",
+      "measure_2state_opt:pulse_amp": "0.01702840909090909",
+      "measure_2state_opt:acq_rotation": "205.1342713830969",
+      "measure_2state_opt:acq_threshold": "-0.0036510021246633747",
+      "measure_2state_opt:pulse_amp_error": "0",
+      "measure_2state_opt:acq_rotation_error": "0",
+      "measure_2state_opt:acq_threshold_error": "0"
+    }
+  },
+  "device:qubit:11:pi_pulse_ef_amplitude:value": {
+    "type": "string",
+    "value": "0.6731548285385847"
+  },
+  "device:qubit:14:pi_pulse_ef_amplitude:value": {
+    "type": "string",
+    "value": "0.38673051945667203"
+  },
+  "device:qubit:14:frequency_12:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T11:33:07.696925Z'"
+  },
+  "couplers:q11_q12:q11": {
+    "type": "hash",
+    "value": {
+      "qubit_crossing_points": "[-0.0010000000000000005, 0.0009499999999999989]"
+    }
+  },
+  "device:readout_resonator:14:frequency_opt:count": {
+    "type": "string",
+    "value": "5"
+  },
+  "cs:q11_q12": {
+    "type": "hash",
+    "value": {
+      "cz_parametrization": "not_calibrated",
+      "coupler_anticrossing": "not_calibrated",
+      "cz_chevron": "not_calibrated",
+      "resonator_spectroscopy_vs_current": "not_calibrated",
+      "qubit_spectroscopy_vs_current": "not_calibrated"
+    }
+  },
+  "device:qubit:13:t1_decoherence:unit": {
+    "type": "string",
+    "value": "'Sec'"
+  },
+  "device:readout_resonator:12:frequency:unit": {
+    "type": "string",
+    "value": "'Hz'"
+  },
+  "device:qubit:15:t1_decoherence:count": {
+    "type": "string",
+    "value": "2"
+  },
+  "device:qubit:14:pi_pulse_amplitude:value": {
+    "type": "string",
+    "value": "0.6096873555708262"
+  },
+  "device:readout_resonator:12:pulse_duration:value": {
+    "type": "string",
+    "value": "3e-06"
+  },
+  "device:qubit:14:motzoi_parameter:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:readout_resonator:15:acq_delay:unit": {
+    "type": "string",
+    "value": "'Sec'"
+  },
+  "device:readout_resonator:14:pulse_amplitude:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:qubit:15:t1_decoherence:unit": {
+    "type": "string",
+    "value": "'Sec'"
+  },
+  "device:readout_resonator:11:frequency:count": {
+    "type": "string",
+    "value": "38"
+  },
+  "transmons:q12": {
+    "type": "hash",
+    "value": {
+      "VNA_f01_frequency": "4267000000.0",
+      "VNA_f12_frequency": "4111000000.0",
+      "measure:pulse_amp": "0.018",
+      "measure:acq_delay": "2.2e-07",
+      "measure:pulse_duration": "4e-06",
+      "measure:integration_time": "3.5e-06",
+      "measure1:pulse_amp": "0.018",
+      "measure2:pulse_amp": "0.018",
+      "attenuation": "8",
+      "measure_1:acq_delay": "2.2e-07",
+      "measure_1:pulse_duration": "4e-06",
+      "measure_1:integration_time": "3.5e-06",
+      "measure_2:acq_delay": "2.2e-07",
+      "measure_2:pulse_duration": "4e-06",
+      "measure_2:integration_time": "3.5e-06",
+      "rxy:duration": "4.8e-08",
+      "measure_3state_opt:pulse_duration": "4e-06",
+      "measure_3state_opt:acq_delay": "2.2e-07",
+      "measure_3state_opt:integration_time": "3.5e-06",
+      "reset:duration": "0.0004",
+      "clock_freqs:readout": "6411680540.106494",
+      "Ql": "12306.527357694391",
+      "resonator_minimum": "6411688888.888889",
+      "clock_freqs:readout_error": "0",
+      "Ql_error": "0",
+      "resonator_minimum_error": "0",
+      "clock_freqs:f01": "4266190879.087689",
+      "spec:spec_ampl_optimal": "0.008",
+      "spec:spec_duration": "6e-06",
+      "clock_freqs:f01_error": "0",
+      "spec:spec_ampl_optimal_error": "0",
+      "rxy:amp180": "0.5324776291677201",
+      "rxy:amp180_error": "0",
+      "rxy:motzoi": "0.01025641025641022",
+      "rxy:motzoi_error": "0",
+      "extended_clock_freqs:readout_1": "6411544191.751908",
+      "Ql_1": "6411544191.751908",
+      "resonator_minimum_1": "6411555555.555555",
+      "extended_clock_freqs:readout_1_error": "0",
+      "Ql_1_error": "0",
+      "resonator_minimum_1_error": "0",
+      "clock_freqs:f12": "4111209733.136258",
+      "spec:spec_ampl_12_optimal": "0.006",
+      "clock_freqs:f12_error": "0",
+      "spec:spec_ampl_12_optimal_error": "0",
+      "r12:ef_amp180": "0.4999999999999998",
+      "r12:ef_amp180_error": "0",
+      "extended_clock_freqs:readout_2": "6411085580.2244625",
+      "extended_clock_freqs:readout_2_error": "0",
+      "extended_clock_freqs:readout_3state_opt": "6411511111.111111",
+      "extended_clock_freqs:readout_3state_opt_error": "0",
+      "measure_3state_opt:pulse_amp": "0",
+      "centroid_I": "nan",
+      "centroid_Q": "nan",
+      "omega_01": "nan",
+      "omega_12": "nan",
+      "omega_20": "nan",
+      "inv_cm_opt": "nan",
+      "measure_3state_opt:pulse_amp_error": "0",
+      "centroid_I_error": "nan",
+      "centroid_Q_error": "nan",
+      "omega_01_error": "nan",
+      "omega_12_error": "nan",
+      "omega_20_error": "nan",
+      "inv_cm_opt_error": "nan",
+      "measure:pulse_amp_error": "nan",
+      "t1_time": "nan",
+      "t1_time_error": "nan",
+      "extended_clock_freqs:readout_2state_opt": "6411600000.0",
+      "extended_clock_freqs:readout_2state_opt_error": "0",
+      "measure_2state_opt:pulse_amp": "0.015732954545454543",
+      "measure_2state_opt:acq_rotation": "182.90934958406868",
+      "measure_2state_opt:acq_threshold": "0.00022258115604658805",
+      "measure_2state_opt:pulse_amp_error": "0",
+      "measure_2state_opt:acq_rotation_error": "0",
+      "measure_2state_opt:acq_threshold_error": "0"
+    }
+  },
+  "device:discriminator:14:rotation:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:qubit:15:pi_pulse_duration:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:11.292149Z'"
+  },
+  "device:readout_resonator:15:acq_delay:value": {
+    "type": "string",
+    "value": "2.2e-07"
+  },
+  "device:readout_resonator:11:acq_delay:timestamp": {
+    "type": "string",
+    "value": "'2025-12-01T19:01:11.270183Z'"
+  },
+  "device:readout_resonator:13:frequency:count": {
+    "type": "string",
+    "value": "47"
+  },
+  "device:discriminator:12:rotation:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:qubit:12:pi_pulse_ef_amplitude:unit": {
+    "type": "string",
+    "value": "'V'"
+  },
+  "device:qubit:11:t1_decoherence:count": {
+    "type": "string",
+    "value": "2"
+  }
+}
