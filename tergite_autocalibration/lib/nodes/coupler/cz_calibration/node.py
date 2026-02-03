@@ -1,9 +1,9 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2024
-# (C) Copyright Liangyu Chen 2024
-# (C) Copyright Amr Osman 2024
-# (C) Copyright Michele Faucci Giannelli 2024
+# (C) Copyright Eleftherios Moschandreou 2023, 2024, 2025, 2026
+# (C) Copyright Liangyu Chen 2023, 2024
+# (C) Copyright Amr Osman, 2024
+# (C) Chalmers Next Labs 2025, 2026
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -12,9 +12,11 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
+
 import ast
 
 import numpy as np
+import xarray as xr
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.lib.base.node import CouplerNode
@@ -83,3 +85,19 @@ class CZ_CalibrationNode(CouplerNode):
 
     def initial_operation(self):
         self.spi_manager.set_parking_currents(self.couplers)
+
+    def generate_dummy_dataset(self):
+        dataset = xr.Dataset()
+        for index, coupler in enumerate(self.couplers):
+            qubit_1, qubit_2 = coupler.split('_')
+            number_of_phases = len(self.schedule_samplespace["ramsey_phases"][qubit_1])
+            number_of_modes = len(self.schedule_samplespace["control_ons"][coupler])
+            number_of_iq_samples = number_of_phases * number_of_modes * self.loops
+            real_part = np.random.uniform(-1, 1, number_of_iq_samples)
+            imag_part = np.random.uniform(-1, 1, number_of_iq_samples)
+            complex_points = real_part + 1j * imag_part
+            data_array = xr.DataArray(complex_points)
+
+            dataset[2 * index] = data_array
+            dataset[2 * index + 1] = data_array
+        return dataset

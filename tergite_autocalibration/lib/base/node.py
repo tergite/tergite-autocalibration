@@ -336,18 +336,10 @@ class CouplerNode(BaseNode):
     def gate_qubit_types_dict(self) -> dict[str, dict]:
         qubit_types_dict = {}
         for coupler in self.couplers:
-            q1, q2 = coupler.split("_")
-
-            q1_type = dh.get_legacy("qubit_types")[q1]
-            q2_type = dh.get_legacy("qubit_types")[q2]
-            if q1_type == "Control" and q2_type == "Target":
-                control_qubit = q1
-                target_qubit = q2
-            elif q1_type == "Target" and q2_type == "Control":
-                target_qubit = q1
-                control_qubit = q2
-            else:
-                raise ValueError("Invalid qubit types")
+            control_qubit = REDIS_CONNECTION.hget(
+                f"couplers:{coupler}", "control_qubit"
+            )
+            target_qubit = REDIS_CONNECTION.hget(f"couplers:{coupler}", "target_qubit")
             qubit_types_dict[coupler] = {
                 "control_qubit": control_qubit,
                 "target_qubit": target_qubit,
