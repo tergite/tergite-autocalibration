@@ -228,7 +228,7 @@ cli.add_typer(
 )
 
 
-@cli.command(help="Quickly runs to set reasonable defaults for the configuration.")
+@cli.command(help="Export the calibration results to a calibration seed file for BCC.")
 @suppress_logging
 def bcc_export(
     qubits: Annotated[
