@@ -188,23 +188,6 @@ Save the configuration.
 - `-h/--host`: Host address where to run the interface of the generator. Default: 127.0.0.1
 - `-p/--port`: Port on which the application will serve the generator. Default: 8079
 
-#### `quickstart`
-
-**Usage:**
-
-```bash
-acli quickstart [OPTIONS]
-```
-
-Loads the default configuration package. This configuration package is not supposed to run on any setup, but it will
-just copy configuration files into the application, so, that the application does not crash because configuration files
-are missing.
-
-**Options:**
-
-- `-q, --qubits TEXT`: Indicates which qubits should be in the template e.g. `"q00,q01"` or `"q03-q05"`,
-  `"q01-q03, q07"` or an integer e.g. `3` to generate `"q01, q02, q03"`.
-
 ### Dataset browser ###
 
 #### `browser` ####
