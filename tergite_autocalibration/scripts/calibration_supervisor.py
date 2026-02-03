@@ -49,8 +49,6 @@ from tergite_autocalibration.utils.dto.enums import DataStatus, MeasurementMode
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
 from tergite_autocalibration.utils.io.dataset import create_node_data_path
 from tergite_autocalibration.utils.logging import logger
-
-# from tergite_autocalibration.utils.logger.tac_logger import logger
 from tergite_autocalibration.utils.logging.visuals import draw_arrow_chart
 
 colorama_init()
@@ -80,6 +78,7 @@ class HardwareManager:
         # Store the configuration settings and initialize the instrument coordinator
         self.config = config
         self.lab_ic: InstrumentCoordinator = None
+        logger.info("Initializing Hardware")
 
         # Check if hardware setup is necessary based on measurement mode
         if self.config.cluster_mode == MeasurementMode.re_analyse:

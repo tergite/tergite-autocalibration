@@ -15,13 +15,16 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
+from qutip.wigner import la
 
-from tergite_autocalibration.lib.base.analysis import (BaseAllCouplersAnalysis,
-                                                       BaseCouplerAnalysis)
-from tergite_autocalibration.lib.utils.analysis_models import \
-    SineOscillatingModel
-from tergite_autocalibration.lib.utils.classification_functions import \
-    calculate_probabilities
+from tergite_autocalibration.lib.base.analysis import (
+    BaseAllCouplersAnalysis,
+    BaseCouplerAnalysis,
+)
+from tergite_autocalibration.lib.utils.analysis_models import SineOscillatingModel
+from tergite_autocalibration.lib.utils.classification_functions import (
+    calculate_probabilities,
+)
 from tergite_autocalibration.utils.dto.qoi import QOI
 
 
@@ -31,7 +34,7 @@ class CZCalibrationCouplerAnalysis(BaseCouplerAnalysis):
         self.model = SineOscillatingModel()
         self.model.set_param_hint("phase", min=-360, max=360, vary=True)
 
-    def apply_cz_fit(self, data):
+    def apply_sine_fit(self, data):
         guess = self.model.guess(data, x=self.target_phases)
         fit = self.model.fit(
             data,
@@ -77,19 +80,21 @@ class CZCalibrationCouplerAnalysis(BaseCouplerAnalysis):
             self.target_qubit_data_var
         )
 
+        data_target_0 = self.target_qubit_probabilities.sel({"state": 0})
+
         self.fit_plot_phases = np.linspace(
             self.target_phases[0], self.target_phases[-1], 200
         )  # x-values for plotting
 
-        data_target_0 = self.target_qubit_probabilities.sel({"state": 0})
-
-        self.delta_phi_0, target_plot_points_0 = xr.apply_ufunc(
-            self.apply_cz_fit,
+        # self.phi_0 is the global phase of each for the |0> state of the target qubit
+        self.phi_0, target_plot_points_0 = xr.apply_ufunc(
+            self.apply_sine_fit,
             data_target_0,
             input_core_dims=[[self.target_phase_coord]],
             output_core_dims=[["phases"], ["plot_points"]],
             vectorize=True,
         )
+
         self.target_plot_points_0 = target_plot_points_0.assign_coords(
             {"plot_points": self.fit_plot_phases}
         )
@@ -97,10 +102,14 @@ class CZCalibrationCouplerAnalysis(BaseCouplerAnalysis):
             {"plot_points": self.target_phase_coord}
         )
 
-        phi_on = self.delta_phi_0.sel({self.control_mode_coord: True})
-        phi_off = self.delta_phi_0.sel({self.control_mode_coord: False})
-        deltas = abs((np.rad2deg(phi_on - phi_off) + 360) % 360 - 180)
-        self.optimal_point_index = deltas.argmin().item()
+        phi_with_control_on = self.phi_0.sel({self.control_mode_coord: True})
+        phi_with_control_off = self.phi_0.sel({self.control_mode_coord: False})
+
+        # we subtract 180 because we want the distance of each phase from 180
+        delta_phis = abs(
+            (np.rad2deg(phi_with_control_on - phi_with_control_off) + 360) % 360 - 180
+        )
+        self.optimal_point_index = delta_phis.argmin().item()
         optimal_frequency = self.frequencies[self.optimal_point_index]
         optimal_duration = self.durations[self.optimal_point_index]
 
@@ -128,6 +137,8 @@ class CZCalibrationCouplerAnalysis(BaseCouplerAnalysis):
         number_of_plots = self.number_of_wp + 1
         ncols = 5
         n_rows = max(1, int(np.ceil(number_of_plots / ncols)))
+        display_target_state_1 = False
+        display_target_state_2 = False
 
         fig, axs = plt.subplots(
             ncols=ncols,
@@ -136,28 +147,23 @@ class CZCalibrationCouplerAnalysis(BaseCouplerAnalysis):
             sharey=True,
             squeeze=False,
         )
-        # leak_fig, leak_axs = plt.subplots(
-        #     ncols=ncols,
-        #     nrows=n_rows,
-        #     sharex=True,
-        #     sharey=True,
-        #     # squeeze=False,
-        # )
 
         for i, _ in enumerate(self.cz_working_points):
             title_color = "black"
+            legend_collor = "white"
             if i == self.optimal_point_index:
                 title_color = "red"
+                legend_collor = "red"
 
             col = i % ncols
             row = i // ncols
-            phi_on = self.delta_phi_0.sel({self.control_mode_coord: True}).isel(
+            phi_on = self.phi_0.sel({self.control_mode_coord: True}).isel(
                 {self.cz_working_points_coord: i}
             )
-            phi_off = self.delta_phi_0.sel({self.control_mode_coord: False}).isel(
+            phi_off = self.phi_0.sel({self.control_mode_coord: False}).isel(
                 {self.cz_working_points_coord: i}
             )
-            delta_phi = np.rad2deg((phi_off - phi_on).values[0])
+            delta_phi = np.rad2deg((phi_off - phi_on).values.item())
 
             target_probabilities = self.target_qubit_probabilities.isel(
                 {self.cz_working_points_coord: i}
@@ -166,21 +172,18 @@ class CZCalibrationCouplerAnalysis(BaseCouplerAnalysis):
                 {self.cz_working_points_coord: i}
             )
 
-            self.target_plot_points_0.isel({self.cz_working_points_coord: i}).sel(
-                {self.control_mode_coord: True}
-            ).plot(
-                ax=axs[row][col],
-                x=self.target_phase_coord,
-                color="orange",
+            # plot sinusoidal fits
+            target_fit_points = self.target_plot_points_0.isel(
+                {self.cz_working_points_coord: i}
             )
-            self.target_plot_points_0.isel({self.cz_working_points_coord: i}).sel(
-                {self.control_mode_coord: False}
-            ).plot(
-                ax=axs[row][col],
-                x=self.target_phase_coord,
-                color="black",
+            target_fit_points.sel({self.control_mode_coord: True}).plot(
+                ax=axs[row][col], x=self.target_phase_coord, color="orange"
+            )
+            target_fit_points.sel({self.control_mode_coord: False}).plot(
+                ax=axs[row][col], x=self.target_phase_coord, color="black"
             )
 
+            # plot data points for state |0> for ON and Off Contrnol mode
             target_probabilities.sel({"state": 0, self.control_mode_coord: True}).plot(
                 ax=axs[row][col],
                 x=self.target_phase_coord,
@@ -194,71 +197,82 @@ class CZCalibrationCouplerAnalysis(BaseCouplerAnalysis):
                 marker="o",
                 color="black",
                 ls="",
-                label=f"Phase: {delta_phi:.1f} $^o$",
+                label=rf"$\Delta\Phi$: {delta_phi:.1f} $^o$",
             )
-            target_probabilities.sel({"state": 1, self.control_mode_coord: True}).plot(
-                ax=axs[row][col],
-                x=self.target_phase_coord,
-                marker="o",
-                color="tomato",
-                ls="",
-            )
-            target_probabilities.sel({"state": 1, self.control_mode_coord: False}).plot(
-                ax=axs[row][col],
-                x=self.target_phase_coord,
-                marker="o",
-                color="grey",
-                ls="",
-            )
-            # target_probabilities.sel({"state": 2, self.control_mode_coord: True}).plot(
-            #     ax=leak_axs[row][col],
-            #     x=self.target_phase_coord,
-            #     marker="o",
-            #     color="green",
-            #     ls="",
-            # )
-            # target_probabilities.sel({"state": 2, self.control_mode_coord: False}).plot(
-            #     ax=leak_axs[row][col],
-            #     x=self.target_phase_coord,
-            #     marker="o",
-            #     color="olivedrab",
-            #     ls="",
-            # )
-            # control_probabilities.sel({"state": 2, self.control_mode_coord: True}).plot(
-            #     ax=leak_axs[row][col],
-            #     x=self.control_phase_coord,
-            #     marker="x",
-            #     color="pink",
-            #     ls="",
-            # )
-            # control_probabilities.sel(
-            #     {"state": 2, self.control_mode_coord: False}
-            # ).plot(
-            #     ax=leak_axs[row][col],
-            #     x=self.control_phase_coord,
-            #     marker="x",
-            #     color="purple",
-            #     ls="",
-            # )
+            if display_target_state_1:
+                # plot data points for state |1> for ON and Off Contrnol mode
+                target_probabilities.sel(
+                    {"state": 1, self.control_mode_coord: True}
+                ).plot(
+                    ax=axs[row][col],
+                    x=self.target_phase_coord,
+                    marker="o",
+                    color="tomato",
+                    ls="",
+                )
+                target_probabilities.sel(
+                    {"state": 1, self.control_mode_coord: False}
+                ).plot(
+                    ax=axs[row][col],
+                    x=self.target_phase_coord,
+                    marker="o",
+                    color="grey",
+                    ls="",
+                )
+            if display_target_state_2:
+                # plot data points for state |2> for ON and Off Contrnol mode
+                target_probabilities.sel(
+                    {"state": 2, self.control_mode_coord: True}
+                ).plot(
+                    ax=axs[row][col],
+                    x=self.target_phase_coord,
+                    marker="o",
+                    color="green",
+                    ls="",
+                )
+                target_probabilities.sel(
+                    {"state": 2, self.control_mode_coord: False}
+                ).plot(
+                    ax=axs[row][col],
+                    x=self.target_phase_coord,
+                    marker="o",
+                    color="olivedrab",
+                    ls="",
+                )
+
             axs[row][col].set_title(
-                f"freq: {self.frequencies[i]:.4e} duration: {self.durations[i]:.3e}",
+                f"freq: {self.frequencies[i]:.3e} duration: {self.durations[i]:.3e}",
                 color=title_color,
                 fontsize=10,
             )
-            axs[row][col].legend()
+            axs[row][col].legend(facecolor=legend_collor)
+            axs[row][col].set_xlabel("")
+            axs[row][col].set_ylabel("")
 
-        phis_on = self.delta_phi_0.sel({self.control_mode_coord: True})
-        phis_off = self.delta_phi_0.sel({self.control_mode_coord: False})
+        fig.text(0.5, 0.04, self.target_phase_coord, ha="center")
+        fig.text(
+            0.04,
+            0.5,
+            rf"Target Qubit: {self.target_qubit}, $|0\rangle$ probailities",
+            va="center",
+            rotation="vertical",
+        )
+
+        # plot Delta phi vs flux pulse frequencies
+        col = self.number_of_wp % ncols
+        row = self.number_of_wp // ncols
+
+        phis_on = self.phi_0.sel({self.control_mode_coord: True})
+        phis_off = self.phi_0.sel({self.control_mode_coord: False})
         delta_phis = np.rad2deg((phis_off - phis_on).values)
-        print(f"{ self.frequencies = }")
-        print(f"{ delta_phis.flatten() = }")
-        arc_fig, ax = plt.subplots()
-        ax.plot(self.frequencies, delta_phis, "bo")
+        [axs[row][col]._shared_axes["x"].remove(ax) for ax in axs.ravel()]
+        [axs[row][col]._shared_axes["y"].remove(ax) for ax in axs.ravel()]
+        axs[row][col].plot(self.frequencies, delta_phis, "bo")
 
-        fig.suptitle("State 0: On orange Off black")
+        fig.suptitle(
+            "Target Qubit State 0 Probabilities: \n orange: control is ON - black: control is OFF"
+        )
         figures_list.append(fig)
-        # figures_list.append(leak_fig)
-        figures_list.append(arc_fig)
         figures_dictionary[self.coupler] = figures_list
 
 
@@ -267,6 +281,3 @@ class CZCalibrationNodeAnalysis(BaseAllCouplersAnalysis):
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-
-
-

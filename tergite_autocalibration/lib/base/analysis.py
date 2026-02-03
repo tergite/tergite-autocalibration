@@ -20,6 +20,8 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import List
 
+import cf_xarray as cf
+
 # TODO: we should have a conditional import depending on a feature flag here
 import matplotlib.pyplot as plt
 import numpy as np
@@ -120,7 +122,18 @@ class BaseNodeAnalysis(ABC):
             raise FileNotFoundError(f"Dataset file not found: {dataset_path}")
 
         logger.info("Open dataset " + str(dataset_path))
-        return xr.open_dataset(dataset_path)
+        dataset = xr.open_dataset(dataset_path)
+        if "working_points" in dataset.coords:
+            dataset = cf.decode_compress_to_multi_index(dataset, "working_points")
+        return dataset
+
+    # def save_processed_dataset(self):
+    #     dataset_name = f"dataset_{self.name}_processed.hdf5"
+    #     if "working_points" in self.processed_dataset.coords:
+    #         self.processed_dataset = cf.encode_multi_index_as_compress(
+    #             self.processed_dataset, "working_points"
+    #         )
+    #     self.processed_dataset.to_netcdf(self.data_path / dataset_name)
 
     def _manage_plots(self, column_grid: int, plots_per_qubit: int):
         n_vars = len(self.data_vars)
@@ -399,10 +412,14 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
                 else:
                     nrows = fig.axes[0].get_gridspec().nrows
                     ncols = fig.axes[0].get_gridspec().ncols
-                    fig.set_size_inches(ncols * 5, nrows * 4)
+                    if nrows == 1 and ncols == 1:
+                        fig.set_size_inches(9, 6)
+                    else:
+                        fig.set_size_inches(ncols * 4, nrows * 3)
 
                 fig.savefig(preview_path, bbox_inches="tight", dpi=100)
-        plt.tight_layout()
+                # some slack for the figure x and y labels
+                fig.tight_layout(rect=[0.05, 0.05, 1, 0.98])
 
     def _analyze_all_couplers(self):
         analysis_results = {}

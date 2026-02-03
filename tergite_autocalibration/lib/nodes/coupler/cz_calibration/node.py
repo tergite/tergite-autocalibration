@@ -79,7 +79,6 @@ class CZ_CalibrationNode(CouplerNode):
             self.working_frequencies(coupler), self.working_durations_in_ns(coupler)
         )
         working_points_array = np.array(list(working_points))
-        print(f"{ working_points_array = }")
         return working_points_array
 
     def initial_operation(self):

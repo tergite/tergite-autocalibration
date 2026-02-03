@@ -10,7 +10,10 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+from typing import Iterable
+
 import numpy
+import pandas
 from quantify_scheduler.instrument_coordinator.utility import xarray
 
 from tergite_autocalibration.lib.base.measurement import MeasurementType
@@ -50,6 +53,7 @@ class OuterScheduleNode(MeasurementType):
         # this implementation supports only 1 outer parameter
         iterations = outer_dimensions[0]
         outer_dim = list(self.node.outer_schedule_samplespace.keys())[0]
+        breakpoint()
 
         result_dataset = xarray.Dataset()
 
@@ -68,7 +72,24 @@ class OuterScheduleNode(MeasurementType):
                 measurement_mode=measurement_mode,
                 measurement=(this_iteration, iterations),
             )
-            ds = ds.expand_dims({outer_dim: numpy.array([current_value])})
+
+            if isinstance(current_value, Iterable):  # for cz calibration
+                # This handles multiindex objects.
+                # Example is the cz_calibration node where the outer coordinate
+                # is a multiindex object cosisting of frequency and duartion pairs
+                current_value_multi_index = pandas.MultiIndex.from_tuples(
+                    [current_value], names=["l1", "l2"]
+                )
+                # current_value = xarray.Coordinates.from_pandas_multiindex(
+                #     current_value_multi_index, outer_dim
+                # )
+                ds = ds.expand_dims({outer_dim: current_value_multi_index})
+                ds = ds.assign_coords(
+                    {outer_dim: (outer_dim, current_value_multi_index)}
+                )
+            else:
+                ds = ds.expand_dims({outer_dim: numpy.array([current_value])})
+
             result_dataset = xarray.merge([ds, result_dataset])
 
         return result_dataset
