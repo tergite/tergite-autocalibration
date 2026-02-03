@@ -54,12 +54,12 @@ matplotlib.use(PLOTTING_BACKEND)
 
 
 class BaseNode(ABC):
+    name: str
     measurement_obj: "BaseMeasurement"
     analysis_obj: "BaseNodeAnalysis"
     measurement_type: "MeasurementType"
 
-    def __init__(self, name: str, **node_dictionary):
-        self.name = name
+    def __init__(self, **node_dictionary):
         self.node_dictionary = node_dictionary
         self.lab_instr_coordinator: InstrumentCoordinator
         self.spi_manager: SpiDAC
@@ -262,12 +262,11 @@ class BaseNode(ABC):
 
 
 class QubitNode(BaseNode):
+    name: str
     qubit_qois: list[str] | None = None
 
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **node_keywords
-    ):
-        super().__init__(name, **node_keywords)
+    def __init__(self, all_qubits: list[str], couplers: list[str], **node_keywords):
+        super().__init__(**node_keywords)
         self.all_qubits = all_qubits
         self.couplers = couplers
         self.qubit_state = 0  # can be 0 or 1 or 2
@@ -312,10 +311,11 @@ class QubitNode(BaseNode):
 
 
 class CouplerNode(BaseNode):
+    name: str
     coupler_qois: list[str]
 
-    def __init__(self, name: str, couplers: list[str], **node_keywords):
-        super().__init__(name, **node_keywords)
+    def __init__(self, couplers: list[str], **node_keywords):
+        super().__init__(**node_keywords)
         self.couplers = couplers
         self.edges = couplers
         self.all_qubits = sorted(set(self.get_coupled_qubits()))

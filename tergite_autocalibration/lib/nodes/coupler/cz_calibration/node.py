@@ -27,15 +27,13 @@ from tergite_autocalibration.lib.nodes.coupler.cz_calibration.measurement import
 
 
 class CZCalibrationSSRONode(QubitNode):
+    name: str = "cz_calibration"
     measurement_obj = CZCalibrationSSROMeasurement
     analysis_obj = CZCalibrationSSRONodeAnalysis
     coupler_qois = ["cz_phase", "cz_pop_loss"]
 
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
-    ):
-        super().__init__(name, all_qubits, **schedule_keywords)
-        self.name = name
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(all_qubits, **schedule_keywords)
         self.all_qubits = all_qubits
         self.couplers = couplers
         self.coupler = couplers[0]
@@ -57,15 +55,13 @@ class CZCalibrationSSRONode(QubitNode):
 
 
 class CZCalibrationSwapSSRONode(QubitNode):
+    name: str = "cz_calibration_swap"
     measurement_obj = CZCalibrationSSROMeasurement
     analysis_obj = CZCalibrationSSRONodeAnalysis
     coupler_qois = ["cz_phase", "cz_pop_loss"]
 
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
-    ):
-        super().__init__(name, all_qubits, **schedule_keywords)
-        self.name = name
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(all_qubits, **schedule_keywords)
         self.all_qubits = all_qubits
         self.couplers = couplers
         self.coupler = couplers[0]
@@ -86,6 +82,7 @@ class CZCalibrationSwapSSRONode(QubitNode):
 
 
 class ResetCalibrationSSRONode(QubitNode):
+    name: str = "cz_calibration_reset"
     measurement_obj = ResetCalibrationSSROMeasurement
     analysis_obj = ResetCalibrationSSRONodeAnalysis
     coupler_qois = [
@@ -95,11 +92,8 @@ class ResetCalibrationSSRONode(QubitNode):
         "all_fidelity_f",
     ]
 
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
-    ):
-        super().__init__(name, all_qubits, **schedule_keywords)
-        self.name = name
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(all_qubits, **schedule_keywords)
         self.all_qubits = all_qubits
         self.couplers = couplers
         self.edges = couplers

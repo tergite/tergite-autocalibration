@@ -23,13 +23,13 @@ from tergite_autocalibration.utils.dto.extended_transmon_element import Extended
 
 def test_measurement_01_type():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = QubitSpectroscopyVsCurrentNode("coupler_anticrossing", CONFIG.run.couplers)
+    node = QubitSpectroscopyVsCurrentNode(CONFIG.run.couplers)
     assert issubclass(node.measurement_type, ExternalParameterNode)
 
 
 def test_dummy_generation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = QubitSpectroscopyVsCurrentNode("coupler_anticrossing", CONFIG.run.couplers)
+    node = QubitSpectroscopyVsCurrentNode(CONFIG.run.couplers)
     node.this_current = 0.0001
     dummy_dataset = node.generate_dummy_dataset()
     first_qubit = CONFIG.run.qubits[0]

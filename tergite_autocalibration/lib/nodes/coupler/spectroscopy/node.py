@@ -49,13 +49,14 @@ class QubitSpectroscopyVsCurrentNode(CouplerNode):
     current through the coupler to measure the crossing point of the coupler with the qubit.
     """
 
+    name: str = "qubit_spectroscopy_vs_current"
     measurement_obj = TwoTonesMultidimMeasurement
     analysis_obj = CouplerAnticrossingNodeAnalysis
     measurement_type = ExternalParameterNode
     coupler_qois = ["control_qubit_crossing_points", "target_qubit_crossing_points"]
 
-    def __init__(self, name: str, couplers: list[str], **schedule_keywords):
-        super().__init__(name, couplers, **schedule_keywords)
+    def __init__(self, couplers: list[str], **schedule_keywords):
+        super().__init__(couplers, **schedule_keywords)
         self.qubit_state = 0
         self.dacs = []
         self.schedule_keywords["qubit_state"] = self.qubit_state
@@ -128,6 +129,7 @@ class ResonatorSpectroscopyVsCurrentNode(CouplerNode):
     current through the coupler to measure the crossing point of the coupler with the resonator.
     """
 
+    name: str = "resonator_spectroscopy_vs_current"
     measurement_obj = ResonatorSpectroscopyMeasurement
     analysis_obj = ResonatorSpectroscopyVsCurrentNodeAnalysis
     measurement_type = ExternalParameterNode
@@ -137,8 +139,8 @@ class ResonatorSpectroscopyVsCurrentNode(CouplerNode):
         "target_resonator_crossing_points",
     ]
 
-    def __init__(self, name: str, couplers: list[str], **schedule_keywords):
-        super().__init__(name, couplers, **schedule_keywords)
+    def __init__(self, couplers: list[str], **schedule_keywords):
+        super().__init__(couplers, **schedule_keywords)
         self.qubit_state = 0
         self.dacs = []
 

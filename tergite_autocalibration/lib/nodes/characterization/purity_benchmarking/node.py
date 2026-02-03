@@ -25,14 +25,14 @@ from tergite_autocalibration.lib.nodes.external_parameter_node import (
 
 
 class PurityBenchmarkingNode(QubitNode):
+    name: str = "purity_benchmarking"
     measurement_obj = PurityBenchmarkingMeasurement
     analysis_obj = PurityBenchmarkingNodeAnalysis
     measurement_type = ExternalParameterNode
     qubit_qois = ["purity_fidelity"]
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
-        self.name = name
+    def __init__(self, all_qubits: list[str], **schedule_keywords):
+        super().__init__(all_qubits, **schedule_keywords)
         self.all_qubits = all_qubits
         self.schedule_keywords = schedule_keywords
         self.schedule_keywords = {}

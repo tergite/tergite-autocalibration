@@ -32,10 +32,8 @@ ramsey_model = RamseyModel()
 
 class RamseyFringesBase(QubitNode):
 
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
-    ):
-        super().__init__(name, all_qubits, couplers, **schedule_keywords)
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(all_qubits, couplers, **schedule_keywords)
 
     def generate_dummy_dataset(self, noise=False):
         dataset = xarray.Dataset()
@@ -75,15 +73,14 @@ class RamseyFringesBase(QubitNode):
 
 
 class RamseyFringesNode(RamseyFringesBase):
+    name: str = "ramsey_correction"
     measurement_obj = RamseyDetuningsMeasurement
     analysis_obj = RamseyDetunings01NodeAnalysis
     measurement_type = ScheduleNode
     qubit_qois = ["clock_freqs:f01"]
 
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
-    ):
-        super().__init__(name, all_qubits, couplers, **schedule_keywords)
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(all_qubits, couplers, **schedule_keywords)
         self.schedule_samplespace = {
             "ramsey_delays": {
                 qubit: np.arange(4e-9, 2048e-9, 8 * 8e-9) for qubit in self.all_qubits
@@ -95,15 +92,14 @@ class RamseyFringesNode(RamseyFringesBase):
 
 
 class RamseyFringes12Node(RamseyFringesBase):
+    name: str = "ramsey_correction_12"
     measurement_obj = RamseyDetuningsMeasurement
     analysis_obj = RamseyDetunings12NodeAnalysis
     measurement_type = ScheduleNode
     qubit_qois = ["clock_freqs:f12"]
 
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
-    ):
-        super().__init__(name, all_qubits, couplers, **schedule_keywords)
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(all_qubits, couplers, **schedule_keywords)
         self.qubit_state = 1
         self.schedule_keywords["qubit_state"] = self.qubit_state
         self.schedule_samplespace = {

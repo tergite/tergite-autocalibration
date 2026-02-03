@@ -58,7 +58,6 @@ class NodeFactory:
             "ro_amplitude_three_state_optimization": "ROAmplitudeThreeStateOptimizationNode",
             "randomized_benchmarking": "RandomizedBenchmarkingNode",
             "purity_benchmarking": "PurityBenchmarkingNode",
-            "coupler_anticrossing": "QubitSpectroscopyVsCurrentNode",
             "cz_parametrization": "CZParametrizationNode",
             "cz_chevron": "CZChevronNode",
             "resonator_spectroscopy_vs_current": "ResonatorSpectroscopyVsCurrentNode",
@@ -125,8 +124,6 @@ class NodeFactory:
         else:
             node_cls = self._node_classes[node_name]
 
-        node_obj = node_cls(
-            node_name, all_qubits=all_qubits, couplers=couplers, **kwargs
-        )
+        node_obj = node_cls(all_qubits=all_qubits, couplers=couplers, **kwargs)
 
         return node_obj

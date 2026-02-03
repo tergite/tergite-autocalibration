@@ -24,14 +24,12 @@ from tergite_autocalibration.lib.nodes.coupler.cz_calibration.measurement import
 
 
 class CZDynamicPhaseSSRONode(QubitNode):
+    name: str = "cz_dynamic_phase"
     measurement_obj = CZCalibrationSSROMeasurement
     analysis_obj = CZCalibrationSSRONodeAnalysis
 
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary
-    ):
-        super().__init__(name, all_qubits, **node_dictionary)
-        self.name = name
+    def __init__(self, all_qubits: list[str], couplers: list[str], **node_dictionary):
+        super().__init__(all_qubits, **node_dictionary)
         self.all_qubits = all_qubits
         self.couplers = couplers
         self.edges = couplers
@@ -53,14 +51,12 @@ class CZDynamicPhaseSSRONode(QubitNode):
 
 
 class CZDynamicPhaseSwapSSRONode(QubitNode):
+    name: str = "cz_dynamic_phase_swap"
     measurement_obj = CZCalibrationSSROMeasurement
     analysis_obj = CZCalibrationSSRONodeAnalysis
 
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary
-    ):
-        super().__init__(name, all_qubits, **node_dictionary)
-        self.name = name
+    def __init__(self, all_qubits: list[str], couplers: list[str], **node_dictionary):
+        super().__init__(all_qubits, **node_dictionary)
         self.all_qubits = all_qubits
         self.couplers = couplers
         self.edges = couplers

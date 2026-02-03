@@ -33,9 +33,7 @@ redis_mock = get_fixture_path("redis", "standard_redis_mock.json")
 
 def test_configure_dataset_qubits():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = ResonatorSpectroscopyNode(
-        "resonator_spectroscopy", CONFIG.run.qubits, CONFIG.run.couplers
-    )
+    node = ResonatorSpectroscopyNode(CONFIG.run.qubits, CONFIG.run.couplers)
 
     raw_ds = node.generate_dummy_dataset()
 
@@ -54,9 +52,7 @@ def test_configure_dataset_qubits():
     assert configured_ds.coords["ro_frequenciesq00"].attrs["element_type"] == "qubit"
 
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = ResonatorSpectroscopyNode(
-        "resonator_spectroscopy", CONFIG.run.qubits, CONFIG.run.couplers
-    )
+    node = ResonatorSpectroscopyNode(CONFIG.run.qubits, CONFIG.run.couplers)
 
     raw_ds = node.generate_dummy_dataset()
 
@@ -77,7 +73,7 @@ def test_configure_dataset_qubits():
 
 def test_configure_dataset_couplers():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node_0 = QubitSpectroscopyVsCurrentNode("coupler_anticrossing", CONFIG.run.couplers)
+    node_0 = QubitSpectroscopyVsCurrentNode(CONFIG.run.couplers)
     node_0.this_current = 5e-6
 
     raw_ds = node_0.generate_dummy_dataset()
@@ -100,9 +96,7 @@ def test_configure_dataset_couplers():
 
 def test_configure_dataset_qubits_with_loops():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = RandomizedBenchmarkingNode(
-        "randomized_benchmarking", CONFIG.run.qubits, CONFIG.run.couplers
-    )
+    node = RandomizedBenchmarkingNode(CONFIG.run.qubits, CONFIG.run.couplers)
 
     raw_ds = node.generate_dummy_dataset()
 
@@ -128,9 +122,7 @@ def test_configure_dataset_qubits_with_loops():
 @with_redis(redis_mock)
 def test_configure_dataset_qubits_with_3state_discrimination():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = CZParametrizationNode(
-        "cz_parametrization", CONFIG.run.qubits, CONFIG.run.couplers
-    )
+    node = CZParametrizationNode(CONFIG.run.qubits, CONFIG.run.couplers)
     coupler_set = list(set(CONFIG.run.couplers))
     samplespace_cz_ampls_00_01 = node.schedule_samplespace["cz_pulse_amplitudes"][
         "q00_q01"
