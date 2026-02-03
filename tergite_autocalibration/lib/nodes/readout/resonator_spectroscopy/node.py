@@ -33,9 +33,7 @@ resonator = fm.ResonatorModel()
 
 class ResonatorSpectroscopyBase(QubitNode):
 
-    def __init__(
-        self, all_qubits: list[str], couplers: list[str], **schedule_keywords
-    ):
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
         super().__init__(all_qubits, couplers=couplers, **schedule_keywords)
 
     def generate_dummy_dataset(self, noise=False):
@@ -87,9 +85,7 @@ class ResonatorSpectroscopyNode(ResonatorSpectroscopyBase):
     measurement_type = ScheduleNode
     qubit_qois = ["clock_freqs:readout", "Ql", "resonator_minimum"]
 
-    def __init__(
-        self, all_qubits: list[str], couplers: list[str], **node_keywords
-    ):
+    def __init__(self, all_qubits: list[str], couplers: list[str], **node_keywords):
         super().__init__(all_qubits, couplers=couplers, **node_keywords)
 
         self.schedule_samplespace = {
@@ -110,9 +106,7 @@ class ResonatorSpectroscopy1Node(ResonatorSpectroscopyBase):
         "resonator_minimum_1",
     ]
 
-    def __init__(
-        self, all_qubits: list[str], couplers: list[str], **schedule_keywords
-    ):
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
         super().__init__(all_qubits, couplers=couplers, **schedule_keywords)
         self.qubit_state = 1
         self.schedule_keywords["qubit_state"] = self.qubit_state
@@ -131,9 +125,7 @@ class ResonatorSpectroscopy2Node(ResonatorSpectroscopyBase):
     measurement_type = ScheduleNode
     qubit_qois = ["extended_clock_freqs:readout_2"]
 
-    def __init__(
-        self, all_qubits: list[str], couplers: list[str], **schedule_keywords
-    ):
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
         super().__init__(all_qubits, couplers=couplers, **schedule_keywords)
         self.qubit_state = 2
         self.schedule_keywords["qubit_state"] = self.qubit_state

@@ -41,9 +41,7 @@ class ROAmplitudeTwoStateOptimizationNode(QubitNode):
         "lda_intercept",
     ]
 
-    def __init__(
-        self, all_qubits: list[str], couplers: list[str], **schedule_keywords
-    ):
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
         super().__init__(all_qubits, couplers, **schedule_keywords)
         self.qubit_state = 1
         self.loops = 1000
@@ -84,9 +82,7 @@ class ROAmplitudeThreeStateOptimizationNode(QubitNode):
         "inv_cm_opt",
     ]
 
-    def __init__(
-        self, all_qubits: list[str], couplers: list[str], **schedule_keywords
-    ):
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
         super().__init__(all_qubits, couplers, **schedule_keywords)
         self.qubit_state = 2
         self.loops = 1000

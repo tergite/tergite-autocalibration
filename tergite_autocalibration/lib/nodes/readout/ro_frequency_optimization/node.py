@@ -32,9 +32,7 @@ resonator = fm.ResonatorModel()
 
 
 class ROFrequencyOptimizationBase(QubitNode):
-    def __init__(
-        self, all_qubits: list[str], couplers: list[str], **schedule_keywords
-    ):
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
         super().__init__(all_qubits, couplers, **schedule_keywords)
 
     def generate_dummy_dataset(self, noise=False):
@@ -83,9 +81,7 @@ class ROFrequencyTwoStateOptimizationNode(ROFrequencyOptimizationBase):
 
     qubit_qois = ["extended_clock_freqs:readout_2state_opt"]
 
-    def __init__(
-        self, all_qubits: list[str], couplers: list[str], **schedule_keywords
-    ):
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
         super().__init__(all_qubits, couplers, **schedule_keywords)
 
         self.schedule_samplespace = {
@@ -105,9 +101,7 @@ class ROFrequencyThreeStateOptimizationNode(ROFrequencyOptimizationBase):
     measurement_type = ScheduleNode
     qubit_qois = ["extended_clock_freqs:readout_3state_opt"]
 
-    def __init__(
-        self, all_qubits: list[str], couplers: list[str], **schedule_keywords
-    ):
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
         super().__init__(all_qubits, couplers, **schedule_keywords)
         self.all_qubits = all_qubits
 
