@@ -2,6 +2,7 @@
 #
 # (C) Copyright Chalmers Next Labs 2024
 # (C) Copyright Michele Faucci Giannelli 2025
+# (C) Copyright Axel E. Andersson 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -11,8 +12,11 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+from types import MappingProxyType
+
 from tergite_autocalibration.config.base import TOMLConfigurationFile
 from tergite_autocalibration.utils.logging import logger
+from tergite_autocalibration.utils.misc.helpers import update_nested
 
 
 class DeviceConfiguration(TOMLConfigurationFile):
@@ -23,12 +27,31 @@ class DeviceConfiguration(TOMLConfigurationFile):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Load the device part of the device configuration file
-        self._device = self._dict.get("device", {})
-        if not self._device:
+        # Load the raw content of the device configuration file
+        device_raw_ = self._dict.get("device", {})
+        if not device_raw_:
             logger.warning(
                 "Device configuration empty or not found, please check your device configuration."
             )
+            self._obj = {}
+
+        # Process the contents from the device configuration file to the full device configuration object
+        else:
+            for device_subsection_ in ["resonator", "qubit", "coupler"]:
+                if device_subsection_ in device_raw_.keys():
+                    global_subsection_properties = {}
+                    if "all" in device_raw_[device_subsection_].keys():
+                        global_subsection_properties = device_raw_[device_subsection_][
+                            "all"
+                        ]
+                    for key_, value_ in device_raw_[device_subsection_].items():
+                        if key_.startswith("q"):
+                            update_nested(
+                                device_raw_[device_subsection_][key_],
+                                global_subsection_properties,
+                            )
+                    device_raw_[device_subsection_].pop("all")
+            self._obj = device_raw_
 
     @property
     def name(self) -> str:
@@ -47,3 +70,37 @@ class DeviceConfiguration(TOMLConfigurationFile):
 
         """
         return self._device.get("owner", "no_owner_configured")
+
+    def get_output_attenuations(
+        self,
+    ) -> MappingProxyType[str, MappingProxyType[str, int]]:
+        """
+        This is an intentional bypass of the hardware config method of setting the attenuation.
+        This is because for higher energy levels you almost always want the same attenuation,
+        but Quantify scheduler requires the clocks to be different (since frequency of transition is statefully stored
+        in the clock resource). This causes a lot of repetition in the cluster config.
+
+        NOTE: In QCM-RF, maximum output attenuation is 60 dB (see: https://docs.qblox.com/en/main/cluster/qcm_rf.html#variable-attenuator)
+        NOTE: In QCM-RF-II, maximum output attenuation is 30 dB (see: https://docs.qblox.com/en/main/cluster/qcm_rf.html#variable-attenuator)
+        NOTE: In QRM-RF, maximum output attenuation is 60 dB (see: https://docs.qblox.com/en/main/cluster/qrm_rf.html#variable-attenuator)
+        """
+        xy = MappingProxyType(
+            {
+                qubit_name: data.get("attenuation", 30)
+                for qubit_name, data in self._device["qubit"].items()
+            }
+        )
+        z = MappingProxyType(
+            {
+                qubit_name: data.get("attenuation", 30)
+                for qubit_name, data in self._device["coupler"].items()
+            }
+        )
+        ro = MappingProxyType(
+            {
+                qubit_name: data.get("attenuation", 60)
+                for qubit_name, data in self._device["resonator"].items()
+            }
+        )
+
+        return MappingProxyType({"resonator": ro, "coupler": z, "qubit": xy})

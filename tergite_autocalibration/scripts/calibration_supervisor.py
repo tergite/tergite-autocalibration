@@ -104,7 +104,7 @@ class HardwareManager:
 
             try:
                 # Create a new cluster instance using the specified cluster name and IP address
-                cluster = Cluster(dh.cluster_name, str(self.config.cluster_ip))
+                cluster = Cluster("clusterA", str(self.config.cluster_ip))
             except ConnectionRefusedError:
                 msg = "Cluster is disconnected. Maybe it has crushed? Try flick it off and on"
                 logger.status("-" * len(msg))
@@ -122,7 +122,7 @@ class HardwareManager:
             dummy_setup = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1, 16)}
             dummy_setup["16"] = ClusterType.CLUSTER_QRM_RF
             dummy_setup["17"] = ClusterType.CLUSTER_QRM_RF
-            cluster = Cluster(dh.cluster_name, dummy_cfg=dummy_setup)
+            cluster = Cluster("clusterA", dummy_cfg=dummy_setup)
             return cluster
 
     def _create_instrument_coordinator(
@@ -138,7 +138,7 @@ class HardwareManager:
         clusters = [clusters] if isinstance(clusters, Cluster) else clusters
 
         # Load attenuation settings for entire system (possibly across multiple clusters)
-        output_attenuation_settings = dh.get_output_attenuations()
+        output_attenuation_settings = CONFIG.device.get_output_attenuations()
         connectivity = MappingProxyType(
             {
                 str(n): frozenset(neigh.keys())

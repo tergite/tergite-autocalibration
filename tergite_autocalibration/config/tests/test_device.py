@@ -12,6 +12,7 @@
 
 from tergite_autocalibration.config.device import DeviceConfiguration
 from tergite_autocalibration.config.handler import ConfigurationHandler
+from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.config.package import ConfigurationPackage
 from tergite_autocalibration.tests.utils.fixtures import get_fixture_path
 
@@ -27,3 +28,20 @@ def test_device_configuration():
 
     device_configuration: DeviceConfiguration = configuration_handler.device
     assert device_configuration.name == "25-qubit FC8a #1"
+
+    out_attenuations = device_configuration.get_output_attenuations()
+    assert out_attenuations["qubit"]["q00"] == 4
+    assert out_attenuations["qubit"]["q01"] == 8
+    assert out_attenuations["coupler"]["q00_q01"] == 12
+    assert out_attenuations["resonator"]["q00"] == 18
+    assert out_attenuations["resonator"]["q01"] == 18
+
+
+def test_data_handler():
+    assert "q00" in dh.device["qubit"].keys()
+
+
+def test_data_handler_legacy():
+    assert dh.get_legacy("VNA_resonator_frequencies")["q00"] == 6.48213e9
+    assert dh.get_legacy("VNA_qubit_frequencies")["q00"] == 3.848e9
+    assert dh.get_legacy("VNA_f12_frequencies")["q00"] == 3.592e9

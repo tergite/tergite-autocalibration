@@ -20,13 +20,14 @@ import time
 from pathlib import Path
 
 import numpy as np
+import toml
 from colorama import Fore, Style
 from colorama import init as colorama_init
 from qblox_instruments import SpiRack
 from qcodes import validators
 from rich.progress import Progress
 
-from tergite_autocalibration.config.globals import ENV, REDIS_CONNECTION
+from tergite_autocalibration.config.globals import ENV, REDIS_CONNECTION, CONFIG
 from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.logging import logger
@@ -87,10 +88,13 @@ class SpiDAC:
             self.dacs_dictionary[coupler] = self.create_spi_dac(coupler)
 
     def create_spi_dac(self, coupler: str):
+        spi_config = toml.load(CONFIG.spi)
+
         spi_mod_number, dac_name = (
-            dh.get_legacy("coupler_spi_mapping")[coupler]["spi_module_number"],
-            dh.get_legacy("coupler_spi_mapping")[coupler]["dac_name"],
+            spi_config[coupler]["spi_module_number"],
+            spi_config[coupler]["dac_name"],
         )
+
         spi_mod_name = f"module{spi_mod_number}"
 
         if self.is_dummy:
