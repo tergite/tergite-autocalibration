@@ -12,6 +12,7 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
+
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
@@ -34,7 +35,7 @@ class CZDynamicPhaseCouplerAnalysis(BaseCouplerAnalysis):
         super().__init__(name, redis_fields)
         self.model = SineOscillatingModel()
 
-    def apply_cz_fit(self, data):
+    def sinusoidal_fit(self, data):
         guess = self.model.guess(data, x=self.target_phases)
         fit = self.model.fit(
             data,
@@ -79,22 +80,24 @@ class CZDynamicPhaseCouplerAnalysis(BaseCouplerAnalysis):
             self.target_phases[0], self.target_phases[-1], 400
         )  # x-values for plotting
 
+        # apply sinusoidal fit on the state |1> of the target qubit and...
         data_target_1 = self.target_qubit_probabilities.sel(
             {"state": 1, self.swap_coord: False}
         )
+        # ... the state |1> of the control qubit while we have swaped.
         data_control_swap_1 = self.control_qubit_probabilities.sel(
             {"state": 1, self.swap_coord: True}
         )
 
-        self.phi_fits, target_plot_points_1 = xr.apply_ufunc(
-            self.apply_cz_fit,
+        phi_fits, target_plot_points_1 = xr.apply_ufunc(
+            self.sinusoidal_fit,
             data_target_1,
             input_core_dims=[[self.target_phases_coord]],
             output_core_dims=[["phases"], ["plot_points"]],
             vectorize=True,
         )
-        self.phi_swaped_fits, control_swap_plot_points_1 = xr.apply_ufunc(
-            self.apply_cz_fit,
+        phi_swaped_fits, control_swap_plot_points_1 = xr.apply_ufunc(
+            self.sinusoidal_fit,
             data_control_swap_1,
             input_core_dims=[[self.control_phases_coord]],
             output_core_dims=[["phases"], ["plot_points"]],
@@ -114,18 +117,16 @@ class CZDynamicPhaseCouplerAnalysis(BaseCouplerAnalysis):
         )
 
         # phase 01 correction
-        self.phase_01_rad = self.phi_fits.sel(
-            {self.gate_mode_coord: True}
-        ) - self.phi_fits.sel({self.gate_mode_coord: False})
-        self.phase_01_rad = self.phase_01_rad.item()
-        self.phase_01 = np.rad2deg(self.phase_01_rad)
+        phi_gate_on = phi_fits.sel({self.gate_mode_coord: True})
+        phi_gate_off = phi_fits.sel({self.gate_mode_coord: False})
+        phi_01_rad = (phi_gate_on - phi_gate_off).item()
+        self.phase_01 = np.rad2deg(phi_01_rad)
 
         # phase 10 correction
-        self.phase_10_rad = self.phi_swaped_fits.sel(
-            {self.gate_mode_coord: True}
-        ) - self.phi_swaped_fits.sel({self.gate_mode_coord: False})
-        self.phase_10_rad = self.phase_10_rad.item()
-        self.phase_10 = np.rad2deg(self.phase_10_rad)
+        phi_swaped_gate_on = phi_swaped_fits.sel({self.gate_mode_coord: True})
+        phi_swaped_gate_off = phi_swaped_fits.sel({self.gate_mode_coord: False})
+        phi_10_rad = (phi_swaped_gate_on - phi_swaped_gate_off).item()
+        self.phase_10 = np.rad2deg(phi_10_rad)
 
         analysis_succesful = True
         analysis_result = {
@@ -151,11 +152,8 @@ class CZDynamicPhaseCouplerAnalysis(BaseCouplerAnalysis):
 
     def plotter(self, figures_dictionary):
         fig, axs = plt.subplots(ncols=2, nrows=2, sharey=True, sharex=True)
-        leak_fig, leak_axs = plt.subplots(ncols=2, nrows=2, sharey=True, sharex=True)
         target_probabilities = self.target_qubit_probabilities.sel({"state": 1})
         control_probabilities = self.control_qubit_probabilities.sel({"state": 1})
-        leak_target_probabilities = self.target_qubit_probabilities.sel({"state": 2})
-        leak_control_probabilities = self.control_qubit_probabilities.sel({"state": 2})
 
         styles = {"marker": "o", "ls": ""}
         axs[0][0].set_prop_cycle(cycler("color", ["orange", "black"]))
@@ -190,29 +188,7 @@ class CZDynamicPhaseCouplerAnalysis(BaseCouplerAnalysis):
             ax=axs[1][1], hue=self.gate_mode_coord, **styles
         )
 
-        colors = ["olivedrab", "green"]
-        leak_axs[0][0].set_prop_cycle(cycler("color", colors))
-        leak_control_probabilities.sel({self.swap_coord: False}).plot(
-            ax=leak_axs[0][0], hue=self.gate_mode_coord, **styles
-        )
-        leak_axs[0][1].set_prop_cycle(cycler("color", colors))
-        leak_target_probabilities.sel({self.swap_coord: False}).plot(
-            ax=leak_axs[0][1],
-            hue=self.gate_mode_coord,
-            **styles,
-        )
-        leak_axs[1][0].set_prop_cycle(cycler("color", colors))
-        leak_control_probabilities.sel({self.swap_coord: True}).plot(
-            ax=leak_axs[1][0],
-            hue=self.gate_mode_coord,
-            **styles,
-        )
-        leak_axs[1][1].set_prop_cycle(cycler("color", colors))
-        leak_target_probabilities.sel({self.swap_coord: True}).plot(
-            ax=leak_axs[1][1], hue=self.gate_mode_coord, **styles
-        )
-
-        figures_dictionary[self.coupler] = [fig, leak_fig]
+        figures_dictionary[self.coupler] = [fig]
 
 
 class CZ_LocalPhasesNodeAnalysis(BaseAllCouplersAnalysis):

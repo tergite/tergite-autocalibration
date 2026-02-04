@@ -51,3 +51,6 @@ class CZ_LocalPhasesNode(CouplerNode):
             },
             "swap": {coupler: np.array([False, True]) for coupler in self.couplers},
         }
+
+    def generate_dummy_dataset(self):
+        pass
