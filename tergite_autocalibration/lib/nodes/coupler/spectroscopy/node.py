@@ -19,7 +19,7 @@ from lmfit.models import LorentzianModel
 from quantify_scheduler import CompiledSchedule
 from quantify_scheduler.backends import SerialCompiler
 
-from tergite_autocalibration.config.legacy import dh
+from tergite_autocalibration.config.globals import CONFIG
 from tergite_autocalibration.lib.base.node import CouplerNode
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
     CouplerAnticrossingNodeAnalysis,
@@ -92,7 +92,7 @@ class QubitSpectroscopyVsCurrentNode(CouplerNode):
     def generate_dummy_dataset(self):
         dataset = xarray.Dataset()
         for index, qubit in enumerate(self.all_qubits):
-            qubit_freq = dh.get_legacy("VNA_qubit_frequencies")[qubit]
+            qubit_freq = CONFIG.device.qubits[qubit]["VNA_f01_frequency"]
             epsilon = 3 / 5 * 1e-7  # to avoid divide by zero
             low_asymptote = -0.001 + epsilon
             high_asymptote = 0.001 + epsilon

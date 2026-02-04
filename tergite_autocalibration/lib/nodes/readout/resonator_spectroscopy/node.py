@@ -15,7 +15,7 @@ import numpy as np
 import xarray
 from quantify_core.analysis import fitting_models as fm
 
-from tergite_autocalibration.config.legacy import dh
+from tergite_autocalibration.config.globals import CONFIG
 from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.analysis import (
     ResonatorSpectroscopy1NodeAnalysis,
@@ -51,7 +51,7 @@ class ResonatorSpectroscopyBase(QubitNode):
             raise ValueError("Invalid name")
 
         for index, qubit in enumerate(self.all_qubits):
-            vna_ro_freq = dh.get_legacy("VNA_resonator_frequencies")[qubit]
+            vna_ro_freq = CONFIG.device.resonators[qubit]["VNA_frequency"]
             ro_freq = vna_ro_freq - frequency_shift
             true_params = resonator.make_params(
                 fr=ro_freq,

@@ -16,7 +16,7 @@ import numpy as np
 import xarray
 from quantify_core.analysis import fitting_models as fm
 
-from tergite_autocalibration.config.legacy import dh
+from tergite_autocalibration.config.globals import CONFIG
 from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.analysis import (
     OptimalRO01FrequencyNodeAnalysis,
@@ -42,7 +42,7 @@ class ROFrequencyOptimizationBase(QubitNode):
         frequency_shift = 0.5e6
 
         for index, qubit in enumerate(self.all_qubits):
-            vna_ro_freq = dh.get_legacy("VNA_resonator_frequencies")[qubit]
+            vna_ro_freq = CONFIG.device.resonators[qubit]["VNA_frequency"]
             qubit_states = self.schedule_samplespace["qubit_states"][qubit]
             data_array = np.array([])
             for qubit_state in qubit_states:

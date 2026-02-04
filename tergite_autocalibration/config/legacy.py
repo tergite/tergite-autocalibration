@@ -38,7 +38,6 @@ class DataHandler:
             # TODO: Both layout and device should be fed into a Device object.
             #       Right now we are not using the device configuration.
             device_config = toml.load(CONFIG.device.filepath)
-            cls._layout = device_config["layout"]
 
             # Iterate over the values for the device configuration to detect whether there are values
             # to be set for all qubits/couplers
@@ -78,10 +77,6 @@ class DataHandler:
         # We are leaving the constructor empty, since the singleton is just defined in the __new__()
         pass
 
-    @property
-    def device(self):
-        return self._device
-
     def get_legacy(self, variable_name: str):
         """
         Temporary endpoint to provide data structures in the necessary shape as they are used in the code
@@ -99,22 +94,7 @@ class DataHandler:
 
         """
         # TODO: This method is temporary and to be deprecated as soon as possible
-        if variable_name == "VNA_resonator_frequencies":
-            return {
-                i_: keys_["VNA_frequency"]
-                for i_, keys_ in self._device["resonator"].items()
-            }
-        if variable_name == "VNA_qubit_frequencies":
-            return {
-                i_: keys_["VNA_f01_frequency"]
-                for i_, keys_ in self._device["qubit"].items()
-            }
-        if variable_name == "VNA_f12_frequencies":
-            return {
-                i_: keys_["VNA_f12_frequency"]
-                for i_, keys_ in self._device["qubit"].items()
-            }
-        elif variable_name == "qubit_types":
+        if variable_name == "qubit_types":
             return self._qubit_types
         else:
             logger.warning(

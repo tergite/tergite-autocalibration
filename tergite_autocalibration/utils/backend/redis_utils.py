@@ -12,22 +12,16 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-
 import toml
 
 from tergite_autocalibration.config.globals import CONFIG, REDIS_CONNECTION
-from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.base.node import CouplerNode, QubitNode
 from tergite_autocalibration.utils.logging import logger
 
 
 def populate_initial_parameters(qubits: list, couplers: list, redis_connection):
-    # TODO: This way of loading the device configuration is very simple.
-    #       Making it more robust would require some more engineering on the data handler.
-    initial_device_config = dh.device
-
-    initial_qubit_parameters = initial_device_config["qubit"]
-    initial_coupler_parameters = initial_device_config["coupler"]
+    initial_qubit_parameters = CONFIG.device.qubits
+    initial_coupler_parameters = CONFIG.device.couplers
 
     # Populate the Redis database with the initial 'reasonable'
     # parameter values from the toml file
@@ -69,8 +63,7 @@ def populate_initial_parameters(qubits: list, couplers: list, redis_connection):
 
 
 def populate_parking_currents(couplers: list, redis_connection):
-    initial_device_config = dh.device
-    initial_coupler_parameters = initial_device_config["coupler"]
+    initial_coupler_parameters = CONFIG.device.couplers
     for coupler in couplers:
         if coupler in initial_coupler_parameters:
             for module_key, module_value in initial_coupler_parameters[coupler].items():

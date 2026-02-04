@@ -34,6 +34,9 @@ class DeviceConfiguration(TOMLConfigurationFile):
                 "Device configuration empty or not found, please check your device configuration."
             )
             self._obj = {}
+            self._qubits = {}
+            self._resonators = {}
+            self._couplers = {}
 
         # Process the contents from the device configuration file to the full device configuration object
         else:
@@ -52,15 +55,41 @@ class DeviceConfiguration(TOMLConfigurationFile):
                             )
                     device_raw_[device_subsection_].pop("all")
             self._obj = device_raw_
+            self._qubits = self._obj.get("qubit", {})
+            self._resonators = self._obj.get("resonator", {})
+            self._couplers = self._obj.get("coupler", {})
 
     @property
     def name(self) -> str:
         """
         Returns:
             Name of the device
-
         """
-        return self._device.get("name", "no_device_name_configured")
+        return self._obj.get("name", "no_device_name_configured")
+
+    @property
+    def qubits(self) -> dict:
+        """
+        Returns:
+            Qubit parameters as a dictionary
+        """
+        return self._qubits
+
+    @property
+    def resonators(self) -> dict:
+        """
+        Returns:
+            Resonator parameters as a dictionary
+        """
+        return self._resonators
+
+    @property
+    def couplers(self) -> dict:
+        """
+        Returns:
+            Coupler parameters as a dictionary
+        """
+        return self._couplers
 
     @property
     def owner(self) -> str:
@@ -69,7 +98,7 @@ class DeviceConfiguration(TOMLConfigurationFile):
             Name of the device
 
         """
-        return self._device.get("owner", "no_owner_configured")
+        return self._obj.get("owner", "no_owner_configured")
 
     def get_output_attenuations(
         self,
@@ -87,19 +116,19 @@ class DeviceConfiguration(TOMLConfigurationFile):
         xy = MappingProxyType(
             {
                 qubit_name: data.get("attenuation", 30)
-                for qubit_name, data in self._device["qubit"].items()
+                for qubit_name, data in self.qubits.items()
             }
         )
         z = MappingProxyType(
             {
                 qubit_name: data.get("attenuation", 30)
-                for qubit_name, data in self._device["coupler"].items()
+                for qubit_name, data in self.couplers.items()
             }
         )
         ro = MappingProxyType(
             {
                 qubit_name: data.get("attenuation", 60)
-                for qubit_name, data in self._device["resonator"].items()
+                for qubit_name, data in self.resonators.items()
             }
         )
 
