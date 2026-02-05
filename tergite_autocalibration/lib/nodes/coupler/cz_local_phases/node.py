@@ -14,14 +14,11 @@
 # that they have been altered from the originals.
 
 import numpy as np
+import xarray as xr
 
 from tergite_autocalibration.lib.base.node import CouplerNode
-from tergite_autocalibration.lib.nodes.coupler.cz_dynamic_phase.analysis import (
-    CZ_LocalPhasesNodeAnalysis,
-)
-from tergite_autocalibration.lib.nodes.coupler.cz_dynamic_phase.measurement import (
-    CZ_LocalPhasesMeasurement,
-)
+from tergite_autocalibration.lib.nodes.coupler.cz_local_phases.analysis import CZ_LocalPhasesNodeAnalysis
+from tergite_autocalibration.lib.nodes.coupler.cz_local_phases.measurement import CZ_LocalPhasesMeasurement
 from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 
 
@@ -53,4 +50,26 @@ class CZ_LocalPhasesNode(CouplerNode):
         }
 
     def generate_dummy_dataset(self):
-        pass
+        dataset = xr.Dataset()
+        for index, coupler in enumerate(self.couplers):
+            qubit_1, qubit_2 = coupler.split("_")
+
+            number_of_local_phases = len(
+                self.schedule_samplespace["local_phases"][qubit_1]
+            )
+            number_of_gate_modes = len(self.schedule_samplespace["gate_modes"][coupler])
+            number_of_swap_modes = len(self.schedule_samplespace["swap"][coupler])
+
+            samples = (
+                number_of_local_phases * number_of_gate_modes * number_of_swap_modes
+            )
+
+            number_of_iq_samples = samples * self.loops
+            real_part = np.random.uniform(-1, 1, number_of_iq_samples)
+            imag_part = np.random.uniform(-1, 1, number_of_iq_samples)
+            complex_points = real_part + 1j * imag_part
+            data_array = xr.DataArray(complex_points)
+
+            dataset[2 * index] = data_array
+            dataset[2 * index + 1] = data_array
+        return dataset
