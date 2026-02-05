@@ -24,15 +24,13 @@ from tergite_autocalibration.utils.logging import logger
 
 
 class ResetChevronNode(QubitNode):
+    name: str = "reset_chevron"
     measurement_obj = ResetChevronDCMeasurement
     analysis_obj = ResetChevronNodeAnalysis
     coupler_qois = ["reset_amplitude_qc", "reset_duration_qc"]
 
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
-    ):
-        super().__init__(name, all_qubits, **schedule_keywords)
-        self.name = name
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(all_qubits, **schedule_keywords)
         self.all_qubits = all_qubits
         self.couplers = couplers
         self.edges = couplers

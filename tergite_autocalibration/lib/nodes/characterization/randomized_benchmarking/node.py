@@ -27,13 +27,14 @@ from tergite_autocalibration.lib.nodes.schedule_node import OuterScheduleNode
 
 
 class RandomizedBenchmarkingNode(QubitNode):
+    name: str = "randomized_benchmarking"
     measurement_obj = RandomizedBenchmarkingSSROMeasurement
     analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
     measurement_type = OuterScheduleNode
     qubit_qois = ["fidelity", "fidelity_error", "leakage", "leakage_error"]
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(all_qubits, couplers, **schedule_keywords)
         self.schedule_keywords = schedule_keywords
         self.schedule_keywords = {}
         self.loops = 500

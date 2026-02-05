@@ -107,30 +107,10 @@ class CZ(InstrumentChannel):
             vals=Numbers(min_value=-1e12, max_value=1e12, allow_nan=True),
         )
 
-        # self.add_parameter(
-        #     name=f"parent_phase_correction",
-        #     docstring=r"""The phase correction for the parent qubit after the"""
-        #     r""" square pulse operation has been performed.""",
-        #     unit="degrees",
-        #     parameter_class=ManualParameter,
-        #     initial_value=0,
-        #     vals=Numbers(min_value=-1e12, max_value=1e12, allow_nan=True),
-        # )
-
-        # self.add_parameter(
-        #     name=f"child_phase_correction",
-        #     docstring=r"""The phase correction for the child qubit after the"""
-        #     r""" Square pulse operation has been performed.""",
-        #     unit="degrees",
-        #     parameter_class=ManualParameter,
-        #     initial_value=0,
-        #     vals=Numbers(min_value=-1e12, max_value=1e12, allow_nan=True),
-        # )
-
-        self.dc_flux = ManualParameter(
-            name="dc_flux",
+        self.parking_current = ManualParameter(
+            name="parking_current",
             instrument=self,
-            docstring=r"""DC flux for coupler parking position""",
+            docstring=r"""DC current that creates the flux to bias the coupler""",
             initial_value=0,
             unit="A",
             vals=Numbers(min_value=-3e-3, max_value=3e-3, allow_nan=True),
@@ -139,7 +119,7 @@ class CZ(InstrumentChannel):
         self.dc_flux_0 = ManualParameter(
             name="dc_flux_0",
             instrument=self,
-            docstring=r"""DC flux quanta for the coupler tunability""",
+            docstring=r"""\Phi_{{0}}: DC flux quanta for the coupler tunability""",
             initial_value=0,
             unit="A",
             vals=Numbers(min_value=-3e-3, max_value=3e-3, allow_nan=True),
@@ -215,6 +195,7 @@ class ExtendedCompositeSquareEdge(Edge):
                     factory_kwargs={
                         "square_port": self.name + ":fl",
                         "square_clock": self.name + ".cz",
+                        "parking_current": self.cz.parking_current(),
                         "square_amp": self.cz.square_amp(),
                         "square_duration": self.cz.square_duration(),
                         "phase_path": self.cz.phase_path(),

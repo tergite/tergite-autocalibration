@@ -23,7 +23,7 @@ from tergite_autocalibration.utils.dto.extended_transmon_element import Extended
 
 def test_dummy_01_generation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node_01 = RabiOscillationsNode("rabi_oscillations", CONFIG.run.qubits)
+    node_01 = RabiOscillationsNode(CONFIG.run.qubits, CONFIG.run.couplers)
     dummy_dataset_01 = node_01.generate_dummy_dataset()
     first_qubit = CONFIG.run.qubits[0]
     number_of_amplitudes_01 = len(
@@ -36,7 +36,7 @@ def test_dummy_01_generation():
 
 def test_dummy_12_generation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node_12 = RabiOscillations12Node("rabi_oscillations_12", CONFIG.run.qubits)
+    node_12 = RabiOscillations12Node(CONFIG.run.qubits, CONFIG.run.couplers)
     dummy_dataset_12 = node_12.generate_dummy_dataset()
     first_qubit = CONFIG.run.qubits[0]
     number_of_amplitudes_12 = len(
@@ -49,7 +49,7 @@ def test_dummy_12_generation():
 
 def test_dummy_n_rabi_generation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node_n_rabi = NRabiOscillationsNode("n_rabi_oscillations", CONFIG.run.qubits)
+    node_n_rabi = NRabiOscillationsNode(CONFIG.run.qubits, CONFIG.run.couplers)
     dummy_dataset_n_rabi = node_n_rabi.generate_dummy_dataset()
     first_qubit = CONFIG.run.qubits[0]
     number_of_reps = len(node_n_rabi.schedule_samplespace["X_repetitions"][first_qubit])

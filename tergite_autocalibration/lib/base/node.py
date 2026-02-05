@@ -36,7 +36,11 @@ from tergite_autocalibration.lib.base.measurement import (
     BaseMeasurement,
     MeasurementType,
 )
-from tergite_autocalibration.lib.utils.device import DeviceConfiguration
+from tergite_autocalibration.lib.utils.device import (
+    close_device_resources,
+    configure_device,
+    save_serial_device,
+)
 from tergite_autocalibration.lib.utils.redis import update_redis_trusted_values
 from tergite_autocalibration.lib.utils.schedule_execution import execute_schedule
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
@@ -50,12 +54,12 @@ matplotlib.use(PLOTTING_BACKEND)
 
 
 class BaseNode(ABC):
+    name: str
     measurement_obj: "BaseMeasurement"
     analysis_obj: "BaseNodeAnalysis"
     measurement_type: "MeasurementType"
 
-    def __init__(self, name: str, **node_dictionary):
-        self.name = name
+    def __init__(self, **node_dictionary):
         self.node_dictionary = node_dictionary
         self.lab_instr_coordinator: InstrumentCoordinator
         self.spi_manager: SpiDAC
@@ -73,7 +77,6 @@ class BaseNode(ABC):
 
         self.samplespace = self.schedule_samplespace | self.external_samplespace
 
-        self.device_manager: DeviceConfiguration
         self.device: QuantumDevice
 
     @abstractmethod
@@ -92,10 +95,10 @@ class BaseNode(ABC):
     def calibrate(self, data_path, measurement_mode):
         if measurement_mode != MeasurementMode.re_analyse:
             result_dataset = self.measure_node(measurement_mode)
-            self.device_manager.save_serial_device(self.name, self.device, data_path)
+            save_serial_device(self.device, data_path)
             save_dataset(result_dataset, self.name, data_path)
         # After the measurement free the device resources
-        self.device_manager.close_device()
+        close_device_resources(self.device)
         self.post_process(data_path)
         logger.info("analysis completed")
 
@@ -259,28 +262,29 @@ class BaseNode(ABC):
 
 
 class QubitNode(BaseNode):
+    name: str
     qubit_qois: list[str] | None = None
 
-    def __init__(self, name: str, all_qubits: list[str], **node_keywords):
-        super().__init__(name, **node_keywords)
+    def __init__(self, all_qubits: list[str], couplers: list[str], **node_keywords):
+        super().__init__(**node_keywords)
         self.all_qubits = all_qubits
+        self.couplers = couplers
         self.qubit_state = 0  # can be 0 or 1 or 2
 
         if self.qubit_qois is not None:
             self.redis_fields = self.qubit_qois
 
-        # NOTE: In the future this will be problematic.
-        # Having the device creation in the init will prohibit concurrent
-        # initialization of two different nodes
-        self.device_manager = DeviceConfiguration(self.all_qubits, None)
-        self.device = self.device_manager.configure_device(self.name)
+        self.device = configure_device(
+            self.name, qubits=self.all_qubits, couplers=self.couplers
+        )
 
     def precompile(self, schedule_samplespace: dict) -> CompiledSchedule:
         constants.GRID_TIME_TOLERANCE_TIME = 5e-2
 
-        transmons = self.device_manager.transmons
-
-        measurement_class = self.measurement_obj(transmons)
+        transmons_dict = {
+            qubit: self.device.get_element(qubit) for qubit in self.all_qubits
+        }
+        measurement_class = self.measurement_obj(transmons_dict)
         schedule = measurement_class.schedule_function(
             **schedule_samplespace, **self.schedule_keywords
         )
@@ -307,10 +311,11 @@ class QubitNode(BaseNode):
 
 
 class CouplerNode(BaseNode):
+    name: str
     coupler_qois: list[str]
 
-    def __init__(self, name: str, couplers: list[str], **node_keywords):
-        super().__init__(name, **node_keywords)
+    def __init__(self, couplers: list[str], **node_keywords):
+        super().__init__(**node_keywords)
         self.couplers = couplers
         self.edges = couplers
         self.all_qubits = sorted(set(self.get_coupled_qubits()))
@@ -318,12 +323,9 @@ class CouplerNode(BaseNode):
         if self.coupler_qois is not None:
             self.redis_fields = self.coupler_qois
 
-        # NOTE: In the future this will be problematic.
-        # Having the device creation in the init will prohibit concurrent
-        # initialization of two different nodes
-
-        self.device_manager = DeviceConfiguration(self.all_qubits, self.couplers)
-        self.device = self.device_manager.configure_device(self.name)
+        self.device = configure_device(
+            self.name, qubits=self.all_qubits, couplers=self.couplers
+        )
 
     def get_coupled_qubits(self) -> list:
         coupled_qubits = []
@@ -378,9 +380,13 @@ class CouplerNode(BaseNode):
     def precompile(self, schedule_samplespace: dict) -> CompiledSchedule:
         constants.GRID_TIME_TOLERANCE_TIME = 5e-2
 
-        transmons = self.device_manager.transmons
-        edges = self.device_manager.edges
-        measurement_class = self.measurement_obj(transmons, edges)
+        transmons_dict = {
+            qubit: self.device.get_element(qubit) for qubit in self.all_qubits
+        }
+        edges_dict = {
+            coupler: self.device.get_edge(coupler) for coupler in self.couplers
+        }
+        measurement_class = self.measurement_obj(transmons_dict, edges_dict)
         schedule = measurement_class.schedule_function(
             **schedule_samplespace, **self.schedule_keywords
         )

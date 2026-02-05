@@ -35,8 +35,8 @@ rabi = RabiModel()
 
 class RabiOscillationsBase(QubitNode):
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(all_qubits, couplers, **schedule_keywords)
 
     def generate_dummy_dataset(self):
         dataset = xarray.Dataset()
@@ -58,14 +58,15 @@ class RabiOscillationsBase(QubitNode):
 
 
 class RabiOscillationsNode(RabiOscillationsBase):
+    name: str = "rabi_oscillations"
     measurement_obj = RabiOscillationsMeasurement
     analysis_obj = RabiNodeAnalysis
     measurement_type = ScheduleNode
 
     qubit_qois = ["rxy:amp180"]
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(all_qubits, couplers, **schedule_keywords)
         self.schedule_samplespace = {
             "mw_amplitudes": {
                 qubit: np.linspace(0.002, 0.90, 61) for qubit in self.all_qubits
@@ -74,13 +75,14 @@ class RabiOscillationsNode(RabiOscillationsBase):
 
 
 class RabiOscillations12Node(RabiOscillationsBase):
+    name: str = "rabi_oscillations_12"
     measurement_obj = RabiOscillationsMeasurement
     analysis_obj = RabiNode12Analysis
     measurement_type = ScheduleNode
     qubit_qois = ["r12:ef_amp180"]
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(all_qubits, couplers, **schedule_keywords)
         self.qubit_state = 1
         self.schedule_keywords["qubit_state"] = self.qubit_state
 
@@ -92,13 +94,14 @@ class RabiOscillations12Node(RabiOscillationsBase):
 
 
 class NRabiOscillationsNode(QubitNode):
+    name: str = "n_rabi_oscillations"
     measurement_obj = NRabiOscillationsMeasurement
     analysis_obj = NRabiNodeAnalysis
     measurement_type = ScheduleNode
     qubit_qois = ["rxy:amp180"]
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(all_qubits, couplers, **schedule_keywords)
         self.qubit_state = 0
         self.schedule_keywords["qubit_state"] = self.qubit_state
 
@@ -146,13 +149,14 @@ class NRabiOscillationsNode(QubitNode):
 
 
 class NRabiOscillations12Node(QubitNode):
+    name: str = "n_rabi_oscillations_12"
     measurement_obj = NRabiOscillationsMeasurement
     analysis_obj = NRabi_12_NodeAnalysis
     measurement_type = ScheduleNode
     qubit_qois = ["r12:ef_amp180"]
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(all_qubits, couplers, **schedule_keywords)
         self.qubit_state = 1
         self.schedule_keywords["qubit_state"] = self.qubit_state
 

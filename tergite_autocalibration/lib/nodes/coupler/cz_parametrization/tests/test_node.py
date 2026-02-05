@@ -41,9 +41,7 @@ def test_cannotCreateCorrectType():
         REDIS_CONNECTION.hdel(f"couplers:{coupler}", "parking_current")
 
     with pytest.raises(TypeError):
-        CZParametrizationNode(
-            "cz_parametrization", all_qubits=["q14", "q15"], couplers=["q14_q15"]
-        )
+        CZParametrizationNode(all_qubits=["q14", "q15"], couplers=["q14_q15"])
 
 
 def test_canCreateCorrectType():
@@ -56,7 +54,6 @@ def test_canCreateCorrectType():
     REDIS_CONNECTION.hset(f"transmons:{'q15'}", "clock_freqs:f01", "5.2e6")
     REDIS_CONNECTION.hset(f"transmons:{'q15'}", "clock_freqs:f12", "5.0e6")
     node = CZParametrizationNode(
-        "cz_parametrization",
         all_qubits=["q14", "q15"],
         couplers=[coupler],
     )
@@ -66,25 +63,19 @@ def test_canCreateCorrectType():
 def test_ValidationReturnErrorWithSameQubitCoupler():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
     with pytest.raises(ValueError):
-        CZParametrizationNode(
-            "cz_parametrization", all_qubits=["q14", "q15"], couplers=["q14_q14"]
-        )
+        CZParametrizationNode(all_qubits=["q14", "q15"], couplers=["q14_q14"])
 
 
 @pytest.mark.skip
 def test_ValidationReturnErrorWithQubitsNotMatchingCouplers():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
     with pytest.raises(ValueError):
-        CZParametrizationNode(
-            "cz_parametrization", all_qubits=["q14", "q16"], couplers=["q14_q15"]
-        )
+        CZParametrizationNode(all_qubits=["q14", "q16"], couplers=["q14_q15"])
 
 
 def test_MeasurementClassType():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    c = CZParametrizationNode(
-        "cz_parametrization", all_qubits=["q14", "q15"], couplers=["q14_q15"]
-    )
+    c = CZParametrizationNode(all_qubits=["q14", "q15"], couplers=["q14_q15"])
     assert isinstance(c.measurement_obj, type(CZParametrizationMeasurement))
     assert isinstance(c.analysis_obj, type(CZParametrizationAnalysis))
     assert issubclass(c.measurement_type, ExternalParameterNode)
@@ -113,7 +104,7 @@ def test_dummy_generation():
         REDIS_CONNECTION.hset(f"transmons:{qubit}", "omega_20", "270")
 
     node = CZParametrizationNode(
-        "cz_parametrization", all_qubits=CONFIG.run.qubits, couplers=CONFIG.run.couplers
+        all_qubits=CONFIG.run.qubits, couplers=CONFIG.run.couplers
     )
     dummy_dataset = node.generate_dummy_dataset()
     first_coupler = CONFIG.run.couplers[0]

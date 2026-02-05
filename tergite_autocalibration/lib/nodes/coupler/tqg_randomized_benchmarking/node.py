@@ -231,16 +231,14 @@ class CZRBOptimizeSSRONode(ScheduleCouplerNode):
         for key, value in cz_param.items():
             self.redis_connection.hset(f"couplers:{self.coupler}", key, value)
 
-        node_dynamic_phase = CZDynamicPhaseSSRONode(
-            "cz_dynamic_phase", self.all_qubits, self.couplers
-        )
+        node_dynamic_phase = CZDynamicPhaseSSRONode(self.all_qubits, self.couplers)
 
         dynamic_phase = node_dynamic_phase.calibrate(
             self.data_path, self.lab_ic, self.cluster_status
         )
 
         node_dynamic_phase_swap = CZDynamicPhaseSwapSSRONode(
-            "cz_dynamic_phase_swap", self.all_qubits, self.couplers
+            self.all_qubits, self.couplers
         )
 
         dynamic_phase_swap = node_dynamic_phase_swap.calibrate(
@@ -407,7 +405,7 @@ class CZRBOptimizeSSRONode(ScheduleCouplerNode):
             self.redis_connection.hset(f"couplers:{self.coupler}", key, value)
 
         node_dynamic_phase = CZDynamicPhaseSSRONode(
-            "cz_dynamic_phase", self.all_qubits, self.couplers, **self.schedule_keywords
+            self.all_qubits, self.couplers, **self.schedule_keywords
         )
 
         dynamic_phase = node_dynamic_phase.calibrate(
@@ -415,7 +413,7 @@ class CZRBOptimizeSSRONode(ScheduleCouplerNode):
         )
 
         node_dynamic_phase_swap = CZDynamicPhaseSwapSSRONode(
-            "cz_dynamic_phase_swap", self.all_qubits, self.couplers
+            self.all_qubits, self.couplers
         )
 
         dynamic_phase_swap = node_dynamic_phase_swap.calibrate(
@@ -467,9 +465,7 @@ class CZRBOptimizeSSRONode(ScheduleCouplerNode):
             self.data_path, self.lab_ic, self.cluster_status
         )
 
-        cz_node = CZCalibrationSSRONode(
-            "cz_calibration_ssro", self.all_qubits, self.couplers
-        )
+        cz_node = CZCalibrationSSRONode(self.all_qubits, self.couplers)
 
         cz_results = cz_node.calibrate(self.data_path, self.lab_ic, self.cluster_status)
 

@@ -28,6 +28,7 @@ from tergite_autocalibration.lib.utils.functions import isosceles_triangle
 
 
 class ROAmplitudeTwoStateOptimizationNode(QubitNode):
+    name: str = "ro_amplitude_two_state_optimization"
     measurement_obj = ROAmplitudeOptimizationMeasurement
     analysis_obj = OptimalROTwoStateAmplitudeNodeAnalysis
     measurement_type = ScheduleNode
@@ -40,8 +41,8 @@ class ROAmplitudeTwoStateOptimizationNode(QubitNode):
         "lda_intercept",
     ]
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(all_qubits, couplers, **schedule_keywords)
         self.qubit_state = 1
         self.loops = 1000
         self.schedule_keywords["loop_repetitions"] = self.loops
@@ -67,6 +68,7 @@ class ROAmplitudeTwoStateOptimizationNode(QubitNode):
 
 
 class ROAmplitudeThreeStateOptimizationNode(QubitNode):
+    name: str = "ro_amplitude_three_state_optimization"
     measurement_obj = ROAmplitudeOptimizationMeasurement
     analysis_obj = OptimalROThreeStateAmplitudeNodeAnalysis
     measurement_type = ScheduleNode
@@ -80,8 +82,8 @@ class ROAmplitudeThreeStateOptimizationNode(QubitNode):
         "inv_cm_opt",
     ]
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(all_qubits, couplers, **schedule_keywords)
         self.qubit_state = 2
         self.loops = 1000
         self.schedule_keywords["loop_repetitions"] = self.loops
