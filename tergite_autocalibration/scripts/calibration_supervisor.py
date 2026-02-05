@@ -242,6 +242,7 @@ def _set_output_attenuations(cluster, connectivity, settings):
                 raise KeyError(f"Failed to set attenuation for port: {port_str}")
 
             logger.debug(f"Applied {att}dB attenuation on {port_str}")
+    logger.info("Attenuations are set")
 
 
 class NodeManager:
@@ -382,6 +383,7 @@ class CalibrationSupervisor:
         self.lab_ic = self.hardware_manager.get_instrument_coordinator()
         self.node_manager = NodeManager(self.lab_ic, config=config)
         self.topo_order = self.node_manager.topo_order(self.config.target_node_name)
+        logger.info("Node Manager is initialized")
 
     def calibrate_system(self, node_name: str | None = None, ignore_spec: bool = False):
         logger.info("Starting System Calibration")

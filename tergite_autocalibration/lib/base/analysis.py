@@ -420,7 +420,6 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
                 fig.savefig(preview_path, bbox_inches="tight", dpi=100)
                 # some slack for the figure x and y labels
                 fig.tight_layout(rect=[0.05, 0.05, 1, 0.98])
-        plt.show()
 
     def _analyze_all_couplers(self):
         analysis_results = {}

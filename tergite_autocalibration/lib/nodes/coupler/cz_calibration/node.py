@@ -20,13 +20,15 @@ import xarray as xr
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.lib.base.node import CouplerNode
-from tergite_autocalibration.lib.nodes.coupler.cz_calibration.analysis import \
-    CZCalibrationNodeAnalysis
-from tergite_autocalibration.lib.nodes.coupler.cz_calibration.measurement import \
-    CZ_CalibrationMeasurement
+from tergite_autocalibration.lib.nodes.coupler.cz_calibration.analysis import (
+    CZCalibrationNodeAnalysis,
+)
+from tergite_autocalibration.lib.nodes.coupler.cz_calibration.measurement import (
+    CZ_CalibrationMeasurement,
+)
 from tergite_autocalibration.lib.nodes.schedule_node import OuterScheduleNode
 
-<<<<<<< HEAD
+
 class CZ_CalibrationNode(CouplerNode):
     measurement_obj = CZ_CalibrationMeasurement
     analysis_obj = CZCalibrationNodeAnalysis
@@ -35,17 +37,6 @@ class CZ_CalibrationNode(CouplerNode):
 
     def __init__(self, name: str, couplers: list[str], **schedule_keywords):
         super().__init__(name, couplers, **schedule_keywords)
-=======
-class CZCalibrationSSRONode(QubitNode):
-    name: str = "cz_calibration"
-    measurement_obj = CZCalibrationSSROMeasurement
-    analysis_obj = CZCalibrationSSRONodeAnalysis
-    coupler_qois = ["cz_phase", "cz_pop_loss"]
-
-    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
-        super().__init__(all_qubits, **schedule_keywords)
-        self.all_qubits = all_qubits
->>>>>>> origin/main
         self.couplers = couplers
 
         self.coupled_qubits = self.get_coupled_qubits()
@@ -98,7 +89,7 @@ class CZCalibrationSSRONode(QubitNode):
     def generate_dummy_dataset(self):
         dataset = xr.Dataset()
         for index, coupler in enumerate(self.couplers):
-            qubit_1, qubit_2 = coupler.split('_')
+            qubit_1, qubit_2 = coupler.split("_")
             number_of_phases = len(self.schedule_samplespace["ramsey_phases"][qubit_1])
             number_of_modes = len(self.schedule_samplespace["control_ons"][coupler])
             number_of_iq_samples = number_of_phases * number_of_modes * self.loops
