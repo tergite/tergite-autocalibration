@@ -175,9 +175,9 @@ class ProcessTomographyQubitAnalysis(BaseQubitAnalysis):
         axis.set_xlabel("State")
         axis.set_ylabel("Population")
         axis.set_xticklabels(states)
-        axis.set_title(
-            f"{name} Calibration - {dh.get_legacy('qubit_types')[self.qubit]} Qubit {self.qubit[1:]}"
-        )
+        # FIXME: Ambiguous information about CONTROL/TARGET Qubit, Coupler context missing
+        # Check git history for more information
+        axis.set_title(f"{name} Calibration - CONTROL/TARGET Qubit {self.qubit[1:]}")
 
     def save_plot(self):
         self.fig.tight_layout()

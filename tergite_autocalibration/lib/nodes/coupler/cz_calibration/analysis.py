@@ -186,7 +186,12 @@ class CZCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
         self.fit_results, self.fit_ys = [], []
         try:
             for magnitude in self.magnitudes:
-                if dh.get_legacy("qubit_types")[self.qubit] == qubit_type_list[1]:
+                # FIXME: Ambiguous information about CONTROL/TARGET Qubit, Coupler context missing
+                # Check git history for more information
+                is_qubit_role_target = (
+                    int(self.qubit[1:]) % 2 != 0
+                )  # This is a temporary fix to make odd qubits TARGET
+                if is_qubit_role_target:
                     # Odd qubits are target qubits
                     fit = True
                     model = CZModel()
@@ -306,9 +311,9 @@ class CZCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
         axis.set_ylim(-0.01, 1.01)
         axis.set_xlabel("Phase (deg)")
         axis.set_ylabel("Population")
-        axis.set_title(
-            f"{name} Calibration - {dh.get_legacy('qubit_types')[self.qubit]} Qubit {self.qubit[1:]}"
-        )
+        # FIXME: Ambiguous information about CONTROL/TARGET Qubit, Coupler context missing
+        # Check git history for more information
+        axis.set_title(f"{name} Calibration - CONTROL/TARGET Qubit {self.qubit[1:]}")
 
 
 class ResetCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
@@ -390,7 +395,12 @@ class ResetCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
         self.fit_ys = []
 
         for n, magnitude in enumerate(self.magnitudes):
-            if dh.get_legacy("qubit_types")[self.qubit] == "Target":
+            # FIXME: Ambiguous information about CONTROL/TARGET Qubit, Coupler context missing
+            # Check git history for more information
+            is_qubit_role_target = (
+                int(self.qubit[1:]) % 2 != 0
+            )  # This is a temporary fix to make odd qubits TARGET
+            if is_qubit_role_target:
                 if n == 0:
                     self.fit_ys.append(
                         [0, 0, 0, 1, 1, 1, 0, 0, 0]
@@ -463,9 +473,9 @@ class ResetCalibrationSSROQubitAnalysis(BaseQubitAnalysis):
         axis.set_xlabel("State")
         axis.set_ylabel("Population")
         axis.set_xticklabels(states)
-        axis.set_title(
-            f"{name} Calibration - {dh.get_legacy('qubit_types')[self.qubit]} Qubit {self.qubit[1:]}"
-        )
+        # FIXME: Ambiguous information about CONTROL/TARGET Qubit, Coupler context missing
+        # Check git history for more information
+        axis.set_title(f"{name} Calibration - CONTROL/TARGET Qubit {self.qubit[1:]}")
 
 
 class ResetCalibrationSSRONodeAnalysis(BaseAllQubitsAnalysis):

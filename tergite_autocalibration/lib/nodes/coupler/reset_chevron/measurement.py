@@ -174,7 +174,12 @@ class ResetChevronDCMeasurement(BaseMeasurement):
                 relaxation = schedule.add(Reset(*qubits))
 
                 for this_qubit in qubits:
-                    if dh.get_legacy("qubit_types")[this_qubit] == "Target":
+                    # FIXME: Ambiguous information about CONTROL/TARGET Qubit, Coupler context missing
+                    # Check git history for more information
+                    is_qubit_role_target = (
+                        int(this_qubit[1:]) % 2 != 0
+                    )  # This is a temporary fix to make odd qubits TARGET
+                    if is_qubit_role_target:
                         # schedule.add(Rxy(0,0,this_qubit), ref_op=relaxation, ref_pt='end')
                         # schedule.add(X(this_qubit))
                         schedule.add(X(this_qubit), ref_op=relaxation, ref_pt="end")

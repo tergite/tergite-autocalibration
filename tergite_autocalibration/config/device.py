@@ -15,6 +15,7 @@
 from types import MappingProxyType
 
 from tergite_autocalibration.config.base import TOMLConfigurationFile
+from tergite_autocalibration.utils.dto.enums import QubitRole
 from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.utils.misc.helpers import update_nested
 
@@ -99,6 +100,27 @@ class DeviceConfiguration(TOMLConfigurationFile):
 
         """
         return self._obj.get("owner", "no_owner_configured")
+
+    def get_qubit_role(self, coupler_name: str, qubit_name: str) -> "QubitRole":
+        """
+        Get the role of a qubit in the context of a coupler for the given device.
+
+        Args:
+            coupler_name: Coupler name as str
+            qubit_name: Qubit name as str
+
+        Returns:
+            Qubit role as QubitRole
+
+        """
+        qubit_role_ = QubitRole.NOTSET
+        try:
+            if self.couplers[coupler_name]["target_qubit"] == qubit_name:
+                qubit_role_ = QubitRole.TARGET
+            elif self.couplers[coupler_name]["control_qubit"] == qubit_name:
+                qubit_role_ = QubitRole.CONTROL
+        finally:
+            return qubit_role_
 
     def get_output_attenuations(
         self,

@@ -843,7 +843,12 @@ class ResetCalibrationSSROMeasurement(BaseMeasurement):
         # all_qubits = ['q16','q21']
         state = ["g", "e", "f"]
         states = list(itertools.product(state, state))
-        if dh.get_legacy("qubit_types")[all_qubits[0]] == "Control":
+        # FIXME: Ambiguous information about CONTROL/TARGET Qubit, Coupler context missing
+        # Check git history for more information
+        is_qubit_role_control = (
+            int(self.all_qubits[0][1:]) % 2 == 0
+        )  # This is a temporary fix to make even qubits CONTROL
+        if is_qubit_role_control:
             all_qubits.reverse()
         test_states = [dict(zip(all_qubits, s)) for s in states]
         for cz_index, control_on in enumerate(control_on_values):

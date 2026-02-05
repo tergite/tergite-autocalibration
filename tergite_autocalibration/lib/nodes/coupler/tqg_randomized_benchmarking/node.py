@@ -250,10 +250,12 @@ class CZRBOptimizeSSRONode(ScheduleCouplerNode):
 
         coupler_append = "c" + self.couplers[0].replace("_", "")
 
-        if (
-            dh.get_legacy("qubit_types")[self.coupled_qubits[0]]
-            == self.qubit_type_list[0]
-        ):
+        # FIXME: Ambiguous information about CONTROL/TARGET Qubit, Coupler context missing
+        # Check git history for more information
+        is_qubit_role_target = (
+            int(self.coupled_qubits[0][1:]) % 2 != 0
+        )  # This is a temporary fix to make odd qubits TARGET
+        if is_qubit_role_target:
             cz_param["cz_dynamic_target"] = (
                 -1
                 * dynamic_phase[self.coupled_qubits[1] + coupler_append][
@@ -424,10 +426,12 @@ class CZRBOptimizeSSRONode(ScheduleCouplerNode):
 
         coupler_append = "c" + self.couplers[0].replace("_", "")
 
-        if (
-            dh.get_legacy("qubit_types")[self.coupled_qubits[0]]
-            == self.qubit_type_list[0]
-        ):
+        # FIXME: Ambiguous information about CONTROL/TARGET Qubit, Coupler context missing
+        # Check git history for more information
+        is_qubit_role_target = (
+            int(self.coupled_qubits[0][1:]) % 2 != 0
+        )  # This is a temporary fix to make odd qubits TARGET
+        if is_qubit_role_target:
             cz_param["cz_dynamic_target"] = (
                 -1
                 * dynamic_phase[self.coupled_qubits[1] + coupler_append][
