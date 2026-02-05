@@ -36,9 +36,6 @@ class ROAmplitudeTwoStateOptimizationNode(QubitNode):
         "measure_2state_opt:pulse_amp",
         "measure_2state_opt:acq_rotation",
         "measure_2state_opt:acq_threshold",
-        "lda_coef_0",
-        "lda_coef_1",
-        "lda_intercept",
     ]
 
     def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
@@ -65,6 +62,38 @@ class ROAmplitudeTwoStateOptimizationNode(QubitNode):
 
     def punchout_amplitude(self, qubit: str):
         return float(REDIS_CONNECTION.hget(f"transmons:{qubit}", "measure:pulse_amp"))
+
+    def generate_dummy_dataset(self):
+        dataset = xarray.Dataset()
+
+        first_qubit = self.all_qubits[0]
+        ro_amplitudes = self.schedule_samplespace["ro_amplitudes"][first_qubit]
+
+        def get_shot():
+            data_array = np.array([])
+            for ampl_index, _ in enumerate(ro_amplitudes):
+                triangle_size = ampl_index + 0.05
+                center_0, center_1, center_2 = isosceles_triangle(
+                    base_length=3 * triangle_size, height=5 * triangle_size
+                )
+                iq_point_0 = np.random.normal(loc=center_0, size=(1, 2), scale=0.7)
+                iq_point_1 = np.random.normal(loc=center_1, size=(1, 2), scale=0.7)
+                iq_point_2 = np.random.normal(loc=center_2, size=(1, 2), scale=0.7)
+                shot_0 = iq_point_0[:, 0] + 1j * iq_point_0[:, 1]
+                shot_1 = iq_point_1[:, 0] + 1j * iq_point_1[:, 1]
+                shot_2 = iq_point_2[:, 0] + 1j * iq_point_2[:, 1]
+                shots_array = np.concatenate((shot_0, shot_1)).ravel()
+                data_array = np.concatenate((shots_array, data_array))
+            return data_array
+
+        for index, _ in enumerate(self.all_qubits):
+
+            all_shots_array = np.concatenate(
+                [get_shot() for _ in range(self.loops)]
+            ).ravel()
+
+            dataset[index] = xarray.DataArray(all_shots_array)
+        return dataset
 
 
 class ROAmplitudeThreeStateOptimizationNode(QubitNode):
@@ -94,13 +123,17 @@ class ROAmplitudeThreeStateOptimizationNode(QubitNode):
                 qubit: np.array([0, 1, 2], dtype=np.int16) for qubit in self.all_qubits
             },
             "ro_amplitudes": {
-                qubit: np.append(
-                    np.linspace(0.005, 0.025, 5),
-                    np.linspace(0.026, 0.06, 7),
+                qubit: np.linspace(
+                    self.punchout_amplitude(qubit) / 2.5,
+                    self.punchout_amplitude(qubit) * 1.4,
+                    30,
                 )
                 for qubit in self.all_qubits
             },
         }
+
+    def punchout_amplitude(self, qubit: str):
+        return float(REDIS_CONNECTION.hget(f"transmons:{qubit}", "measure:pulse_amp"))
 
     def generate_dummy_dataset(self):
         dataset = xarray.Dataset()
