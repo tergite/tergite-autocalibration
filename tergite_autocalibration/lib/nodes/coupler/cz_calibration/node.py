@@ -30,13 +30,14 @@ from tergite_autocalibration.lib.nodes.schedule_node import OuterScheduleNode
 
 
 class CZ_CalibrationNode(CouplerNode):
+    name: str = "cz_calibration"
     measurement_obj = CZ_CalibrationMeasurement
     analysis_obj = CZCalibrationNodeAnalysis
     measurement_type = OuterScheduleNode
     coupler_qois = ["cz_pulse_frequency", "cz_pulse_duration"]
 
-    def __init__(self, name: str, couplers: list[str], **schedule_keywords):
-        super().__init__(name, couplers, **schedule_keywords)
+    def __init__(self, couplers: list[str], **schedule_keywords):
+        super().__init__(couplers, **schedule_keywords)
         self.couplers = couplers
 
         self.coupled_qubits = self.get_coupled_qubits()

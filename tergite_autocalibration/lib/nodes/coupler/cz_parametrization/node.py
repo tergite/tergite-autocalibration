@@ -58,23 +58,23 @@ class CZParametrizationNode(CouplerNode):
 
         self.external_samplespace = {
             "dc_currents": {
-                coupler: self.fine_samplespace_around(self.parking_current(coupler))
+                coupler: self.broad_samplespace_around(self.parking_current(coupler))
                 for coupler in self.couplers
             },
         }
         self.schedule_samplespace = {
             "cz_pulse_amplitudes": {
-                coupler: np.linspace(0.15, 0.35, 25) for coupler in self.couplers
+                coupler: np.linspace(0.25, 0.55, 25) for coupler in self.couplers
             },
             "cz_pulse_frequencies": {
-                coupler: np.linspace(-7e6, 5e6, 25)
+                coupler: np.linspace(-11e6, 1e6, 25)
                 + self.transition_frequency(coupler, phase_path=phase_paths[coupler])
                 for coupler in self.couplers
             },
         }
 
     def fine_samplespace_around(self, central_value: float) -> np.ndarray:
-        return np.arange(central_value - 5e-6, central_value + 4.5e-6, 13e-6)
+        return np.arange(central_value - 5e-6, central_value + 4.5e-6, 2e-6)
 
     def broad_samplespace_around(self, central_value: float) -> np.ndarray:
         return np.arange(central_value - 50e-6, central_value + 45e-6, 8e-6)

@@ -17,19 +17,24 @@ import numpy as np
 import xarray as xr
 
 from tergite_autocalibration.lib.base.node import CouplerNode
-from tergite_autocalibration.lib.nodes.coupler.cz_local_phases.analysis import CZ_LocalPhasesNodeAnalysis
-from tergite_autocalibration.lib.nodes.coupler.cz_local_phases.measurement import CZ_LocalPhasesMeasurement
+from tergite_autocalibration.lib.nodes.coupler.cz_local_phases.analysis import (
+    CZ_LocalPhasesNodeAnalysis,
+)
+from tergite_autocalibration.lib.nodes.coupler.cz_local_phases.measurement import (
+    CZ_LocalPhasesMeasurement,
+)
 from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 
 
 class CZ_LocalPhasesNode(CouplerNode):
+    name: str = "cz_local_phases"
     measurement_obj = CZ_LocalPhasesMeasurement
     analysis_obj = CZ_LocalPhasesNodeAnalysis
     measurement_type = ScheduleNode
     coupler_qois = ["control_local_phase", "target_local_phase"]
 
-    def __init__(self, name: str, couplers: list[str], **schedule_keywords):
-        super().__init__(name, couplers, **schedule_keywords)
+    def __init__(self, couplers: list[str], **schedule_keywords):
+        super().__init__(couplers, **schedule_keywords)
         self.couplers = couplers
 
         self.coupled_qubits = self.get_coupled_qubits()
