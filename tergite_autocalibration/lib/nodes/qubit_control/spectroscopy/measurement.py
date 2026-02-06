@@ -149,12 +149,6 @@ class TwoTonesMultidimMeasurement(BaseMeasurement):
                     else:
                         raise ValueError(f"Invalid qubit state: {qubit_state}")
 
-                    # long pulses require more efficient memory managment
-                    if spec_pulse_duration > 6.5e-6:
-                        SpectroscopyPulse = long_square_pulse
-                    else:
-                        SpectroscopyPulse = SoftSquarePulse
-
                     schedule.add(
                         SpectroscopyPulse(
                             duration=spec_pulse_duration,

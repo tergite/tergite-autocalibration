@@ -65,7 +65,7 @@ class MotzoiParameterMeasurement(BaseMeasurement):
             An experiment schedule.
         """
         if qubit_state == 0:
-            schedule_title = "mltplx_motzoi_01"
+            schedule_title = "motzoi_01_parameter"
             measure_function = Measure
         elif qubit_state == 1:
             schedule_title = "mltplx_motzoi_12"
@@ -89,8 +89,7 @@ class MotzoiParameterMeasurement(BaseMeasurement):
                 )
 
         # This is the common reference operation so the qubits can be operated in parallel
-        # FIXME: This should be configurable, quantify-scheduler 0.21.1 does seem to need a duration multiple of 4ns
-        root_relaxation = schedule.add(Reset(*qubits, duration=4e-9), label="Reset")
+        root_relaxation = schedule.add(Reset(*qubits))
 
         # The outer loop, iterates over all qubits
         for this_qubit, X_values in X_repetitions.items():
@@ -148,28 +147,28 @@ class MotzoiParameterMeasurement(BaseMeasurement):
                             ),
                         )
 
-                        if qubit_state == 0:
-                            schedule.add(
-                                DRAGPulse(
-                                    duration=mw_pulse_duration,
-                                    G_amp=mw_amplitude,
-                                    D_amp=mw_motzoi,
-                                    port=mw_pulse_port,
-                                    clock=this_clock,
-                                    phase=90,
-                                ),
-                            )
-                            # inversion pulse requires 180 deg phase
-                            schedule.add(
-                                DRAGPulse(
-                                    duration=mw_pulse_duration,
-                                    G_amp=mw_amplitude,
-                                    D_amp=mw_motzoi,
-                                    port=mw_pulse_port,
-                                    clock=this_clock,
-                                    phase=270,
-                                ),
-                            )
+                        # if qubit_state == 0:
+                        #     schedule.add(
+                        #         DRAGPulse(
+                        #             duration=mw_pulse_duration,
+                        #             G_amp=mw_amplitude,
+                        #             D_amp=mw_motzoi,
+                        #             port=mw_pulse_port,
+                        #             clock=this_clock,
+                        #             phase=90,
+                        #         ),
+                        #     )
+                        #     # inversion pulse requires 180 deg phase
+                        #     schedule.add(
+                        #         DRAGPulse(
+                        #             duration=mw_pulse_duration,
+                        #             G_amp=mw_amplitude,
+                        #             D_amp=mw_motzoi,
+                        #             port=mw_pulse_port,
+                        #             clock=this_clock,
+                        #             phase=270,
+                        #         ),
+                        #     )
 
                     schedule.add(
                         measure_function(

@@ -40,7 +40,7 @@ class RabiQubitAnalysis(BaseQubitAnalysis):
         model = RabiModel()
 
         for coord in self.dataset.coords:
-            if "amplitudes" in coord:
+            if "amplitudes" in str(coord):
                 self.amplitude_coord = coord
                 self.amplitudes = self.dataset[coord].values
             else:
@@ -167,7 +167,6 @@ class NRabiQubitAnalysis(BaseQubitAnalysis):
             self.magnitudes[mw_amplitude_key][index_of_min].values.item()
             + self.previous_amplitude
         )
-        self.index_of_max = index_of_min
         self.shift = self.magnitudes[mw_amplitude_key][index_of_min].values
 
     def analyse_qubit(self):

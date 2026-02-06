@@ -108,7 +108,7 @@ class RabiOscillationsMeasurement(BaseMeasurement):
             # The second for loop iterates over all amplitude values in the amplitudes batch:
             print("WARNING HARDCODING mw_pulse_duration in RABI_12")
             if qubit_state == 1:
-                mw_pulse_duration = 60e-9
+                mw_pulse_duration = 72e-9
             print("WARNING HARDCODING mw_pulse_duration in RABI_12")
             for acq_index, mw_amplitude in enumerate(mw_amp_array_val):
                 if qubit_state == 1:
