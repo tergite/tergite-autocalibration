@@ -15,7 +15,6 @@
 
 import collections
 import os
-import re
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import List
@@ -27,7 +26,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
 
-from tergite_autocalibration.config.legacy import dh
+from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.lib.base.utils.figure_utils import (
     create_figure_with_top_band,
 )
@@ -96,7 +95,7 @@ class BaseNodeAnalysis(ABC):
         self._qoi = value
 
     @abstractmethod
-    def analyze_node(self, data_path: Path, index: int = 0) -> dict[str, QOI]:
+    def analyze_node(self, data_path: Path) -> dict[str, QOI]:
         """
         Run the fitting of the analysis function
 
@@ -105,18 +104,17 @@ class BaseNodeAnalysis(ABC):
 
         """
 
-    def open_dataset(self, index: int = 0) -> xr.Dataset:
+    def open_dataset(self) -> xr.Dataset:
         """
         Open the dataset for the analysis.
 
         Args:
-            index: By default 0 for most of the measurements, can be set to load multiple datasets.
 
         Returns:
             xarray.Dataset with measurement results
 
         """
-        dataset_name = f"dataset_{self.name}_{index}.hdf5"
+        dataset_name = f"dataset_{self.name}.hdf5"
         dataset_path = os.path.join(self.data_path, dataset_name)
         if not os.path.exists(dataset_path):
             raise FileNotFoundError(f"Dataset file not found: {dataset_path}")
@@ -176,19 +174,18 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         self.column_grid = 5
         self.plots_per_qubit = 1
 
-    def analyze_node(self, data_path: Path, index: int = 0) -> dict[str, QOI]:
+    def analyze_node(self, data_path: Path) -> dict[str, QOI]:
         """
         Analyze the node and save the results to redis.
         Args:
             data_path: Path to the dataset
-            index: Index of the dataset to be analyzed
 
         Returns:
             analysis_results: Dictionary with the analysis results for each qubit
         """
 
         self.data_path = Path(data_path)
-        self.dataset = self.open_dataset(index=index)
+        self.dataset = self.open_dataset()
         self.coords = self.dataset.coords
         self.data_vars = self.dataset.data_vars
         self.fig, self.axs = self._manage_plots(self.column_grid, self.plots_per_qubit)
@@ -201,7 +198,6 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
     def _analyze_all_qubits(self):
         analysis_results = {}
         qubit_data_dict = self._group_by_qubit()
-        index = 0
         for this_qubit, qubit_data_vars in qubit_data_dict.items():
             ds = xr.merge([self.dataset[var] for var in qubit_data_vars])
             ds.attrs["qubit"] = this_qubit
@@ -225,8 +221,6 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
                     ds, this_qubit
                 )
                 self.qubit_analyses.append(qubit_analysis)
-
-            index = index + 1
 
         return analysis_results
 
@@ -317,13 +311,8 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
         self.coupler = ""
 
     def qubit_types(self, coupler: str):
-        q1, q2 = coupler.split("_")
-        for qubit in [q1, q2]:
-            qubit_number = int(re.sub("[^0-9]", "", qubit))
-            if qubit_number % 2 == 0:
-                control_qubit = qubit
-            else:
-                target_qubit = qubit
+        control_qubit = REDIS_CONNECTION.hget(f"couplers:{coupler}", "control_qubit")
+        target_qubit = REDIS_CONNECTION.hget(f"couplers:{coupler}", "target_qubit")
         return control_qubit, target_qubit
 
     def process_coupler(self, dataset: xr.Dataset, coupler_element) -> QOI:
@@ -377,7 +366,7 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
         self.processed_dataset = xr.Dataset()
         self.analysis_keywords = kwargs
 
-    def analyze_node(self, data_path: Path, index: int = 0) -> QOI:
+    def analyze_node(self, data_path: Path) -> QOI:
         """
         Analyze the node and save the results to redis.
         Args:
@@ -389,7 +378,7 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
         """
 
         self.data_path = Path(data_path)
-        self.dataset = self.open_dataset(index=index)
+        self.dataset = self.open_dataset()
         self.coords = self.dataset.coords
         self.data_vars = self.dataset.data_vars
         analysis_results = self._analyze_all_couplers()
@@ -415,7 +404,7 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
                     if nrows == 1 and ncols == 1:
                         fig.set_size_inches(9, 6)
                     else:
-                        fig.set_size_inches(ncols * 4, nrows * 3)
+                        fig.set_size_inches(ncols * 6, nrows * 4)
 
                 fig.savefig(preview_path, bbox_inches="tight", dpi=100)
                 # some slack for the figure x and y labels

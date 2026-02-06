@@ -58,6 +58,7 @@ class NodeFactory:
             "ro_amplitude_three_state_optimization": "ROAmplitudeThreeStateOptimizationNode",
             "randomized_benchmarking": "RandomizedBenchmarkingNode",
             "purity_benchmarking": "PurityBenchmarkingNode",
+            "coupler_anticrossing": "QubitSpectroscopyVsCurrentNode",
             "cz_parametrization": "CZParametrizationNode",
             "cz_chevron": "CZChevronNode",
             "cz_calibration": "CZ_CalibrationNode",

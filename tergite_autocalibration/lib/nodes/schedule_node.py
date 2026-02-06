@@ -53,7 +53,6 @@ class OuterScheduleNode(MeasurementType):
         # this implementation supports only 1 outer parameter
         iterations = outer_dimensions[0]
         outer_dim = list(self.node.outer_schedule_samplespace.keys())[0]
-        breakpoint()
 
         result_dataset = xarray.Dataset()
 
