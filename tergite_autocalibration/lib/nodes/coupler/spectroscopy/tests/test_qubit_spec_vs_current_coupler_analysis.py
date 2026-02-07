@@ -20,6 +20,7 @@ import xarray as xr
 from matplotlib import pyplot as plt
 from numpy import ndarray
 
+from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.lib.base.analysis import BaseAnalysis, BaseCouplerAnalysis
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
     CouplerAnticrossingAnalysis,
@@ -66,10 +67,8 @@ def getCrossingForQubit(qoi: QOI, qubit: str = "q06"):
     results = qoi.analysis_result
     qubit_number = int(re.sub("[^0-9]", "", qubit))
     if qubit_number % 2 == 0:
-        qubit_type = "Control"
         crossing_points = "control_qubit_crossing_points"
     elif qubit_number % 2 == 1:
-        qubit_type = "Target"
         crossing_points = "target_qubit_crossing_points"
     else:
         raise ValueError("Invalid qubit number")
@@ -85,12 +84,15 @@ qubit_coupler_qois = ["control_qubit_crossing_points", "target_qubit_crossing_po
 
 
 def test_get_crossings_for_q06_q07(
-    setup_q06_q07_data: tuple[xr.Dataset, str, ndarray, ndarray],
+    setup_q06_q07_data: tuple[xr.Dataset, str, ndarray, str],
 ):
     ds_res, ds_qu, coupler = setup_q06_q07_data
     a = ResonatorSpectroscopyVsCurrentCouplerAnalysis(
         "resonator_spectroscopy_vs_current", res_coupler_qois
     )
+    q1, q2 = coupler.split("_")
+    REDIS_CONNECTION.hset(f"couplers:{coupler}", "control_qubit", q1)
+    REDIS_CONNECTION.hset(f"couplers:{coupler}", "target_qubit", q2)
     qoi = a.process_coupler(ds_res, coupler)
     update_redis_trusted_values(
         "resonator_spectroscopy_vs_current", coupler, qoi, res_coupler_qois
@@ -119,12 +121,15 @@ def setup_q08_q09_data():
 
 
 def test_get_crossings_for_q08_q09(
-    setup_q08_q09_data: tuple[xr.Dataset, str, ndarray, ndarray],
+    setup_q08_q09_data: tuple[xr.Dataset, str, ndarray, str],
 ):
     ds_res, ds_qu, coupler = setup_q08_q09_data
     a = ResonatorSpectroscopyVsCurrentCouplerAnalysis(
         "resonator_spectroscopy_vs_current", res_coupler_qois
     )
+    q1, q2 = coupler.split("_")
+    REDIS_CONNECTION.hset(f"couplers:{coupler}", "control_qubit", q1)
+    REDIS_CONNECTION.hset(f"couplers:{coupler}", "target_qubit", q2)
     qoi = a.process_coupler(ds_res, coupler)
     update_redis_trusted_values(
         "resonator_spectroscopy_vs_current", coupler, qoi, res_coupler_qois
@@ -153,12 +158,15 @@ def setup_q12_q13_data():
 
 
 def test_get_crossings_for_q12_q13(
-    setup_q12_q13_data: tuple[xr.Dataset, str, ndarray, ndarray],
+    setup_q12_q13_data: tuple[xr.Dataset, xr.Dataset, str],
 ):
     ds_res, ds_qu, coupler = setup_q12_q13_data
     a = ResonatorSpectroscopyVsCurrentCouplerAnalysis(
         "resonator_spectroscopy_vs_current", res_coupler_qois
     )
+    q1, q2 = coupler.split("_")
+    REDIS_CONNECTION.hset(f"couplers:{coupler}", "control_qubit", q1)
+    REDIS_CONNECTION.hset(f"couplers:{coupler}", "target_qubit", q2)
     qoi = a.process_coupler(ds_res, coupler)
     update_redis_trusted_values(
         "resonator_spectroscopy_vs_current", coupler, qoi, res_coupler_qois
@@ -186,12 +194,15 @@ def setup_q14_q15_data():
 
 
 def test_get_crossings_for_q14_q15(
-    setup_q14_q15_data: tuple[xr.Dataset, str, ndarray, ndarray],
+    setup_q14_q15_data: tuple[xr.Dataset, xr.Dataset, str],
 ):
     ds_res, ds_qu, coupler = setup_q14_q15_data
     a = ResonatorSpectroscopyVsCurrentCouplerAnalysis(
         "resonator_spectroscopy_vs_current", res_coupler_qois
     )
+    q1, q2 = coupler.split("_")
+    REDIS_CONNECTION.hset(f"couplers:{coupler}", "control_qubit", q1)
+    REDIS_CONNECTION.hset(f"couplers:{coupler}", "target_qubit", q2)
     qoi = a.process_coupler(ds_res, coupler)
     update_redis_trusted_values(
         "resonator_spectroscopy_vs_current", coupler, qoi, res_coupler_qois

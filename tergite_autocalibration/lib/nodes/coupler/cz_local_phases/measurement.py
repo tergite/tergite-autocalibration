@@ -64,9 +64,6 @@ class CZ_LocalPhasesMeasurement(BaseMeasurement):
             cz_frequency = this_edge.clock_freqs.cz_freq()
             cz_amplitude = this_edge.cz.square_amp()
             cz_duration = this_edge.cz.square_duration()
-            print(f"{ cz_duration = }")
-            print(f"{ cz_frequency = }")
-            print(f"{ cz_amplitude = }")
             cz_clock = f"{this_coupler}.cz"
             cz_pulse_port = f"{this_coupler}:fl"
 

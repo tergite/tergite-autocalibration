@@ -20,12 +20,17 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
-from tergite_autocalibration.lib.base.analysis import (BaseAllQubitsAnalysis,
-                                                       BaseQubitAnalysis)
-from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.utils import \
-    align_on_y_axis
+from tergite_autocalibration.lib.base.analysis import (
+    BaseAllQubitsAnalysis,
+    BaseQubitAnalysis,
+)
+from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.utils import (
+    align_on_y_axis,
+)
 from tergite_autocalibration.lib.utils.analysis_models import (
-    ThreeClassBoundary, TwoClassBoundary)
+    ThreeClassBoundary,
+    TwoClassBoundary,
+)
 from tergite_autocalibration.utils.dto.qoi import QOI
 
 
@@ -61,9 +66,7 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
     def IQ(self, index: int) -> np.ndarray:
         """Extracts I/Q components from the dataset at a given index."""
 
-        IQ_complex = self.S21_stacked[self.data_var].isel(
-            {self.amplitude_coord: index}
-        )
+        IQ_complex = self.S21_stacked[self.data_var].isel({self.amplitude_coord: index})
         I = IQ_complex.real.values
         Q = IQ_complex.imag.values
         return np.array([I, Q]).T
@@ -347,7 +350,6 @@ class OptimalROThreeStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis)
         for index, ro_amplitude in enumerate(self.amplitudes):
             iq = self.IQ(index)
             classified_states = self.lda.fit(iq, states_sent).predict(iq)
-
 
             cm_norm = confusion_matrix(states_sent, classified_states, normalize="true")
             assignment = np.trace(cm_norm) / len(self.unique_qubit_states)

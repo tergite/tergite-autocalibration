@@ -69,7 +69,6 @@ class CZ_CalibrationMeasurement(BaseMeasurement):
             # unpack the static parameters:
             this_edge = self.couplers[this_coupler]
             cz_amplitude = this_edge.cz.square_amp()
-            print(f"{ cz_amplitude = }")
             cz_clock = f"{this_coupler}.cz"
             cz_pulse_port = f"{this_coupler}:fl"
 

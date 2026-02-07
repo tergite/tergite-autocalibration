@@ -46,7 +46,7 @@ class QubitSpectroscopyVsCurrentNode(CouplerNode):
     current through the coupler to measure the crossing point of the coupler with the qubit.
     """
 
-    name: str = "qubit_spectroscopy_vs_current"
+    name: str = "coupler_anticrossing"
     measurement_obj = TwoTonesMultidimMeasurement
     analysis_obj = CouplerAnticrossingNodeAnalysis
     measurement_type = ExternalParameterNode

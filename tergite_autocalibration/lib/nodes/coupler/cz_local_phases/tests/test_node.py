@@ -18,6 +18,9 @@ from tergite_autocalibration.lib.base.node import CouplerNode
 from tergite_autocalibration.lib.nodes.coupler.cz_local_phases.analysis import (
     CZ_LocalPhasesNodeAnalysis,
 )
+from tergite_autocalibration.lib.nodes.coupler.cz_local_phases.measurement import (
+    CZ_LocalPhasesMeasurement,
+)
 from tergite_autocalibration.lib.nodes.coupler.cz_local_phases.node import (
     CZ_LocalPhasesNode,
 )
@@ -32,19 +35,15 @@ _redis_values_path = os.path.join(_test_data_dir, "redis-2026-02-06-18.json")
 @with_redis(_redis_values_path)
 def test_node_creation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = CZ_LocalPhasesNode(
-        "cz_local_phases", all_qubits=["q13", "q14"], couplers=["q13_q14"]
-    )
+    node = CZ_LocalPhasesNode(all_qubits=["q13", "q14"], couplers=["q13_q14"])
     assert isinstance(node, CouplerNode)
 
 
 @with_redis(_redis_values_path)
 def test_class_attribute_objects():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = CZ_LocalPhasesNode(
-        "cz_local_phases", all_qubits=["q13", "q14"], couplers=["q13_q14"]
-    )
-    assert isinstance(node.measurement_obj, type(CZ_LocalPhasesNode))
+    node = CZ_LocalPhasesNode(all_qubits=["q13", "q14"], couplers=["q13_q14"])
+    assert isinstance(node.measurement_obj, type(CZ_LocalPhasesMeasurement))
     assert isinstance(node.analysis_obj, type(CZ_LocalPhasesNodeAnalysis))
     assert issubclass(node.measurement_type, ScheduleNode)
 
@@ -55,9 +54,7 @@ def test_dummy_generation():
 
     coupler = "q13_q14"
     couplers = [coupler]
-    node = CZ_LocalPhasesNode(
-        "cz_local_phases", all_qubits=["q13", "q14"], couplers=couplers
-    )
+    node = CZ_LocalPhasesNode(all_qubits=["q13", "q14"], couplers=couplers)
     dummy_dataset = node.generate_dummy_dataset()
 
     number_of_local_phases = len(node.schedule_samplespace["local_phases"]["q13"])
