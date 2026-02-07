@@ -162,7 +162,7 @@ class CZDynamicPhaseCouplerAnalysis(BaseCouplerAnalysis):
             "backgroundcolor": "white",
         }
 
-        #  normal qubits (not swaped) for phi_10
+        ###  normal qubits (not swaped) for phi_10
         swap = False
         axs[0][0].set_prop_cycle(cycler("color", ["orange", "black"]))
         control_probabilities.sel({self.swap_coord: swap}).plot(
@@ -176,6 +176,8 @@ class CZDynamicPhaseCouplerAnalysis(BaseCouplerAnalysis):
             hue=self.gate_mode_coord,
             **styles,
         )
+        # plot sinusoidal fits:
+        self.target_plot_points.plot(ax=axs[0][1], hue=self.gate_mode_coord)
         axs[0][1].text(
             0,
             0,
@@ -183,12 +185,10 @@ class CZDynamicPhaseCouplerAnalysis(BaseCouplerAnalysis):
             bbox=dict(facecolor="white", alpha=0.5, linewidth=0),
             **text_styles,
         )
-        axs[0][1].get_legend().remove()
-        # plot sinusoidal fits:
-        self.target_plot_points.plot(ax=axs[0][1], hue=self.gate_mode_coord)
         axs[0][1].set_title(f"swap: {swap}")
+        axs[0][1].get_legend().remove()
 
-        # swaped qubits for phi_01
+        ### swaped qubits for phi_01
         swap = True
         axs[1][0].set_prop_cycle(cycler("color", ["orange", "black"]))
         control_probabilities.sel({self.swap_coord: swap}).plot(
@@ -205,8 +205,8 @@ class CZDynamicPhaseCouplerAnalysis(BaseCouplerAnalysis):
             bbox=dict(facecolor="white", alpha=0.5, linewidth=0),
             **text_styles,
         )
-        axs[1][0].get_legend().remove()
         axs[1][0].set_title(f"swap: {swap}")
+        axs[1][0].get_legend().remove()
 
         axs[1][1].set_prop_cycle(cycler("color", ["orange", "black"]))
         target_probabilities.sel({self.swap_coord: True}).plot(
