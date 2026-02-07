@@ -320,9 +320,7 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
         self.dataset = dataset
         self.coupler = coupler_element
         self.coord = dataset.coords
-        self.data_var = list(dataset.data_vars.keys())[
-            0
-        ]  # Assume the first data_var is relevant
+        self.data_var = list(dataset.data_vars.keys())[0]
         self.S21 = dataset.isel(ReIm=0) + 1j * dataset.isel(ReIm=1)
         # Restore attributes for each variable
         for var in self.S21.data_vars:
@@ -336,7 +334,7 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
             elif data_var.attrs["qubit"] == self.target_qubit:
                 self.target_qubit_data_var = data_var
             else:
-                raise ValueError("No control or target qubits")
+                logger.warning("No control or target qubit")
 
         self._qoi = self.analyze_coupler()
 
