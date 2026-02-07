@@ -15,7 +15,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
-from qutip.wigner import la
 
 from tergite_autocalibration.lib.base.analysis import (
     BaseAllCouplersAnalysis,
