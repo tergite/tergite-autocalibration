@@ -26,7 +26,7 @@ from tergite_autocalibration.tests.utils.decorators import with_redis
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 _test_data_dir = os.path.join(Path(__file__).parent, "data")
-_redis_values_path = os.path.join(_test_data_dir, "redis-2025-12-25-12-40-59.json")
+_redis_values_path = os.path.join(_test_data_dir, "redis-2026-02-06-18.json")
 
 
 @with_redis(_redis_values_path)
