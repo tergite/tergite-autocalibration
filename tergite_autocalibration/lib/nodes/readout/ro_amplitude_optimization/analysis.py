@@ -32,10 +32,9 @@ from tergite_autocalibration.utils.dto.qoi import QOI
 class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-        self.fit_results = {}
 
     def populate_coords(self):
-        for coord in self.S21[self.data_var].coords:
+        for coord in self.S21.coords:
             if "amplitudes" in str(coord):
                 self.amplitude_coord = coord
                 self.amplitudes = self.S21.coords[coord]
@@ -50,25 +49,13 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
 
         self.S21_stacked = self.S21.stack(shots=[self.loop_coord, self.state_coord])
         self.qubit_states = self.S21_stacked[self.state_coord].values
-        self.fit_results = {}
 
     def classify_iq(self, iq, states_sent, state) -> [np.ndarray, np.ndarray]:
         classified_states = self.lda.fit(iq, states_sent).predict(iq)
         true_positives = states_sent == classified_states
         state_tp = true_positives[states_sent == state]
         IQ = iq[states_sent == state]
-        array_name = f"IQ{state}".replace("-", "not")
-        # IQstate_tp = xr.DataArray(
-        #     IQ[tp],
-        #     name=array_name,
-        #     coords={"shots": np.arange(len(IQ[tp])), "re_im": ["re", "im"]},
-        # )
-        # IQstate_fp = xr.DataArray(
-        #     IQ[~tp],
-        #     name=array_name,
-        #     coords={"shots": np.arange(len(IQ[~tp])), "re_im": ["re", "im"]},
-        # )
-        # return IQstate_tp, IQstate_fp
+
         return IQ[state_tp], IQ[~state_tp]
 
     def IQ(self, index: int) -> np.ndarray:
@@ -76,7 +63,7 @@ class OptimalROAmplitudeQubitAnalysis(BaseQubitAnalysis):
 
         IQ_complex = self.S21_stacked[self.data_var].isel(
             {self.amplitude_coord: index}
-        )  # Use `.isel()` to index correctly
+        )
         I = IQ_complex.real.values
         Q = IQ_complex.imag.values
         return np.array([I, Q]).T
@@ -357,79 +344,16 @@ class OptimalROThreeStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis)
 
         self.lda = LinearDiscriminantAnalysis(solver="svd")
 
-        # array_iq0_tp = xr.DataArray().expand_dims({self.amplitude_coord: []})
-        # array_iq0_fp = xr.DataArray().expand_dims({self.amplitude_coord: []})
-        # array_iq1_tp = xr.DataArray().expand_dims({self.amplitude_coord: []})
-        # array_iq1_fp = xr.DataArray().expand_dims({self.amplitude_coord: []})
-        # array_iq2_tp = xr.DataArray().expand_dims({self.amplitude_coord: []})
-        # array_iq2_fp = xr.DataArray().expand_dims({self.amplitude_coord: []})
         for index, ro_amplitude in enumerate(self.amplitudes):
             iq = self.IQ(index)
             classified_states = self.lda.fit(iq, states_sent).predict(iq)
 
-            true_positives = states_sent == classified_states
-            tp0 = true_positives[states_sent == 0]
-            tp1 = true_positives[states_sent == 1]
-            tp2 = true_positives[states_sent == 2]
-            IQ0 = iq[states_sent == 0]  # IQ when sending 0
-            IQ1 = iq[states_sent == 1]  # IQ when sending 1
-            IQ2 = iq[states_sent == 2]  # IQ when sending 2
-
-            # IQ0_tp = xr.DataArray(
-            #     IQ0[tp0],
-            #     name="IQ0_tp",
-            #     coords={"shots": np.arange(len(IQ0[tp0])), "re_im": ["re", "im"]},
-            # ).expand_dims(
-            #     {self.amplitude_coord: [ro_amplitude]}
-            # )  # True Positive when sending 0
-            # IQ0_fp = xr.DataArray(
-            #     IQ0[~tp0],
-            #     name="IQ0_fp",
-            #     coords={"shots": np.arange(len(IQ0[~tp0])), "re_im": ["re", "im"]},
-            # ).expand_dims({self.amplitude_coord: [ro_amplitude]})
-            # IQ1_tp = xr.DataArray(
-            #     IQ1[tp1],
-            #     name="IQ1_tp",
-            #     coords={"shots": np.arange(len(IQ1[tp1])), "re_im": ["re", "im"]},
-            # ).expand_dims(
-            #     {self.amplitude_coord: [ro_amplitude]}
-            # )  # True Positive when sending 1
-            # IQ1_fp = xr.DataArray(
-            #     IQ1[~tp1],
-            #     name="IQ1_fp",
-            #     coords={"shots": np.arange(len(IQ1[~tp1])), "re_im": ["re", "im"]},
-            # ).expand_dims({self.amplitude_coord: [ro_amplitude]})
-            # IQ2_tp = xr.DataArray(
-            #     IQ2[tp2],
-            #     name="IQ2_tp",
-            #     coords={"shots": np.arange(len(IQ2[tp2])), "re_im": ["re", "im"]},
-            # ).expand_dims(
-            #     {self.amplitude_coord: [ro_amplitude]}
-            # )  # True Positive when sending 2
-            # IQ2_fp = xr.DataArray(
-            #     IQ2[~tp2],
-            #     name="IQ2_fp",
-            #     coords={"shots": np.arange(len(IQ2[~tp2])), "re_im": ["re", "im"]},
-            # ).expand_dims({self.amplitude_coord: [ro_amplitude]})
-            #
-            # array_iq0_tp = xr.concat([IQ0_tp, array_iq0_tp], dim=self.amplitude_coord)
-            # array_iq0_fp = xr.concat([IQ0_fp, array_iq0_fp], dim=self.amplitude_coord)
-            # array_iq1_tp = xr.concat([IQ1_tp, array_iq1_tp], dim=self.amplitude_coord)
-            # array_iq1_fp = xr.concat([IQ1_fp, array_iq1_fp], dim=self.amplitude_coord)
-            # array_iq2_tp = xr.concat([IQ2_tp, array_iq2_tp], dim=self.amplitude_coord)
-            # array_iq2_fp = xr.concat([IQ2_fp, array_iq2_fp], dim=self.amplitude_coord)
 
             cm_norm = confusion_matrix(states_sent, classified_states, normalize="true")
             assignment = np.trace(cm_norm) / len(self.unique_qubit_states)
             self.fidelities.append(assignment)
             self.cms.append(cm_norm)
 
-        # self.iq0_tp = array_iq0_tp
-        # self.iq0_fp = array_iq0_fp
-        # self.iq1_tp = array_iq1_tp
-        # self.iq1_fp = array_iq1_fp
-        # self.iq2_tp = array_iq2_tp
-        # self.iq2_fp = array_iq2_fp
         self.optimal_index = np.argmax(self.fidelities)
         self.optimal_amplitude = self.amplitudes.values[self.optimal_index]
         self.optimal_inv_cm = inv(self.cms[self.optimal_index])
@@ -504,12 +428,6 @@ class OptimalROThreeStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis)
         return qoi
 
     def plot_classified_IQ_points(self, iq_axis, amplitude_index: int):
-        # iq0_tp = self.iq0_tp.isel({self.amplitude_coord: amplitude_index}).values
-        # iq0_fp = self.iq0_fp.isel({self.amplitude_coord: amplitude_index}).values
-        # iq1_tp = self.iq1_tp.isel({self.amplitude_coord: amplitude_index}).values
-        # iq1_fp = self.iq1_fp.isel({self.amplitude_coord: amplitude_index}).values
-        # iq2_tp = self.iq2_tp.isel({self.amplitude_coord: amplitude_index}).values
-        # iq2_fp = self.iq2_fp.isel({self.amplitude_coord: amplitude_index}).values
 
         angle = 0
         rotation_angle_rad = np.deg2rad(angle)
