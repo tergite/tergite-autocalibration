@@ -336,7 +336,7 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
             elif data_var.attrs["qubit"] == self.target_qubit:
                 self.target_qubit_data_var = data_var
             else:
-                raise ValueError
+                raise ValueError("No control or target qubits")
 
         self._qoi = self.analyze_coupler()
 

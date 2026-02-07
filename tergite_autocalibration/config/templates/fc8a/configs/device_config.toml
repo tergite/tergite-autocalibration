@@ -205,6 +205,8 @@ cz_pulse_width = 4e-9
 
 [device.coupler.q06_q07]
 parking_current = 0
+control_qubit = 'q07'
+target_qubit = 'q06'
 
 # --------------------------------------------------------------------------------
 # Device layout configuration section
