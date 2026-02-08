@@ -27,9 +27,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from typing import ClassVar, Dict, List, Tuple
+
 import numpy as np
-from .pauli_transfer_matrices import I, X, Y, Z, S, S2, H, CZ
-from typing import List, Tuple, Dict, ClassVar
+
+from .pauli_transfer_matrices import CZ, S2, H, I, S, X, Y, Z
 
 # The decomposition of the single qubit clifford group as per
 # Epstein et al. Phys. Rev. A 89, 062321 (2014)

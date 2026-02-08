@@ -63,6 +63,7 @@ class NodeFactory:
             "cz_chevron": "CZChevronNode",
             "cz_calibration": "CZ_CalibrationNode",
             "cz_local_phases": "CZ_LocalPhasesNode",
+            "cz_rb": "CZ_RB_Node",
             "resonator_spectroscopy_vs_current": "ResonatorSpectroscopyVsCurrentNode",
         }
         self._node_implementation_paths: Dict[str, Union[str, Path]] = {}

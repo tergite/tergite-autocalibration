@@ -27,9 +27,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from typing import Literal, Optional, Type
+
 import numpy as np
-from typing import Optional, Literal, Type
-from .clifford_group import SingleQubitClifford, TwoQubitClifford, Clifford
+
+from .clifford_group import Clifford, SingleQubitClifford, TwoQubitClifford
 
 
 def calculate_net_clifford(

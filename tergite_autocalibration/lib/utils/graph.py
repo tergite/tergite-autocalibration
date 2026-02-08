@@ -62,6 +62,7 @@ GRAPH_DEPENDENCIES = [
     ("cz_parametrization", "cz_chevron"),
     ("cz_chevron", "cz_calibration"),
     ("cz_calibration", "cz_local_phases"),
+    ("cz_local_phases", "cz_rb"),
     ("ro_amplitude_three_state_optimization", "process_tomography_ssro"),
 ]
 
