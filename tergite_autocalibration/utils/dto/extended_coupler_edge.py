@@ -1,4 +1,4 @@
-# This code is part of Tergite
+#name,rki This code is part of Tergite
 #
 # (C) Copyright Eleftherios Moschandreou 2023, 2024
 # (C) Copyright Liangyu Chen 2023, 2024
@@ -195,10 +195,10 @@ class ExtendedCompositeSquareEdge(Edge):
                     factory_kwargs={
                         "square_port": self.name + ":fl",
                         "square_clock": self.name + ".cz",
-                        "parking_current": self.cz.parking_current(),
+                        # "parking_current": self.cz.parking_current(),
                         "square_amp": self.cz.square_amp(),
                         "square_duration": self.cz.square_duration(),
-                        "phase_path": self.cz.phase_path(),
+                        # "phase_path": self.cz.phase_path(),
                         "virt_z_parent_qubit_phase": self.cz.parent_phase_correction(),
                         "virt_z_parent_qubit_clock": f"{self.parent_device_element.name}.01",
                         "virt_z_child_qubit_phase": self.cz.child_phase_correction(),

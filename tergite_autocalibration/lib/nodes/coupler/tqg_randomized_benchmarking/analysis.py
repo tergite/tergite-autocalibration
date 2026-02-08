@@ -6,10 +6,7 @@ from tergite_autocalibration.lib.base.analysis import (
     BaseAllCouplersAnalysis,
     BaseCouplerAnalysis,
 )
-from tergite_autocalibration.lib.utils.analysis_models import (
-    DoubleExpDecayModel,
-    ExpDecayModel,
-)
+from tergite_autocalibration.lib.utils.analysis_models import ExpDecayModel
 from tergite_autocalibration.lib.utils.classification_functions import (
     calculate_probabilities,
 )
@@ -20,7 +17,6 @@ class TwoQubitRnBAnalysis(BaseCouplerAnalysis):
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-        self.model = DoubleExpDecayModel(inverted=False)
         self.single_model = ExpDecayModel(inverted=False)
 
     def state_probabilities(self, c_qubit_state: int, t_qubit_state: int):

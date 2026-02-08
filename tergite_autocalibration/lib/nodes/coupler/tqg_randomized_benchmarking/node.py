@@ -29,13 +29,14 @@ RB_REPEATS = 7
 
 
 class CZ_RB_Node(CouplerNode):
+    name = "cz_rb"
     measurement_obj = TwoQubitRBMeasurement
     analysis_obj = TwoQubitRBNodeAnalysis
     measurement_type = OuterScheduleNode
     coupler_qois = ["cz_fidelity"]
 
-    def __init__(self, name: str, couplers: list[str], **schedule_keywords):
-        super().__init__(name, couplers, **schedule_keywords)
+    def __init__(self, couplers: list[str], **schedule_keywords):
+        super().__init__(couplers, **schedule_keywords)
         self.couplers = couplers
         self.loops = 500
         self.schedule_keywords["loop_repetitions"] = self.loops
