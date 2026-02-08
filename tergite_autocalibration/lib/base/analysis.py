@@ -313,7 +313,8 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
     def qubit_types(self, coupler: str):
         control_qubit = REDIS_CONNECTION.hget(f"couplers:{coupler}", "control_qubit")
         target_qubit = REDIS_CONNECTION.hget(f"couplers:{coupler}", "target_qubit")
-        keys = REDIS_CONNECTION.keys()
+        breakpoint()
+        keys = REDIS_CONNECTION.hgetall("couplers:q06_q07")
         logger.status(keys)
         return control_qubit, target_qubit
 
