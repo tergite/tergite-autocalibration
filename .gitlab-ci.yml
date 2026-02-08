@@ -151,7 +151,7 @@ application_run:
     - ls -lR venv/lib/python3.12/site-packages/out
     # Verify output
     - |
-      if ls -lR venv/lib/python3.12/site-packages/out | grep -q "coupler_anticrossingt_q06_q07_0_preview.png"; then
+      if ls -lR venv/lib/python3.12/site-packages/out | grep -q "coupler_anticrossing_q06_q07_0_preview.png"; then
         echo "Output file $OUTPUT_FILE exists. Application ran successfully."
       else
         echo "Error: Output file $OUTPUT_FILE not found."
