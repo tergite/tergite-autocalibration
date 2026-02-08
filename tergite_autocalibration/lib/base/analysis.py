@@ -313,6 +313,8 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
     def qubit_types(self, coupler: str):
         control_qubit = REDIS_CONNECTION.hget(f"couplers:{coupler}", "control_qubit")
         target_qubit = REDIS_CONNECTION.hget(f"couplers:{coupler}", "target_qubit")
+        keys = REDIS_CONNECTION.keys()
+        logger.info(keys)
         return control_qubit, target_qubit
 
     def process_coupler(self, dataset: xr.Dataset, coupler_element) -> QOI:
@@ -334,7 +336,7 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
             elif data_var.attrs["qubit"] == self.target_qubit:
                 self.target_qubit_data_var = data_var
             else:
-                logger.warning("No control or target qubit")
+                raise ValueError("No control or target qubits")
 
         self._qoi = self.analyze_coupler()
 
