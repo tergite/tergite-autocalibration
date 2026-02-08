@@ -26,7 +26,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
 
-from tergite_autocalibration.config.globals import CONFIG, REDIS_CONNECTION
+from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.lib.base.utils.figure_utils import (
     create_figure_with_top_band,
 )
@@ -311,16 +311,8 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
         self.coupler = ""
 
     def qubit_types(self, coupler: str):
-        logger.status(f"coupler: {coupler}")
-
-        logger.status("qubits")
-        logger.status(CONFIG.run.qubits)
-        logger.status("couplers")
-        logger.status(CONFIG.run.couplers)
         control_qubit = REDIS_CONNECTION.hget(f"couplers:{coupler}", "control_qubit")
         target_qubit = REDIS_CONNECTION.hget(f"couplers:{coupler}", "target_qubit")
-        keys = REDIS_CONNECTION.hgetall("couplers:q06_q07")
-        logger.status(keys)
         return control_qubit, target_qubit
 
     def process_coupler(self, dataset: xr.Dataset, coupler_element) -> QOI:
