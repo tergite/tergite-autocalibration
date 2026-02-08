@@ -2,7 +2,7 @@
 
 target_node = "ro_amplitude_two_state_optimization"
 qubits = ["q06", "q07", "q08", "q09", "q10"]
-couplers = ["q06_q07", "q08_q09"]
+couplers = ["q06_q07", "q08_q09", "q12_q13", "q14_q15"]
 cooldown = "13/05/2025"
 name = "no_name_for_this_run_set"
 is_internal = true
