@@ -314,7 +314,7 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
         control_qubit = REDIS_CONNECTION.hget(f"couplers:{coupler}", "control_qubit")
         target_qubit = REDIS_CONNECTION.hget(f"couplers:{coupler}", "target_qubit")
         keys = REDIS_CONNECTION.keys()
-        logger.info(keys)
+        logger.status(keys)
         return control_qubit, target_qubit
 
     def process_coupler(self, dataset: xr.Dataset, coupler_element) -> QOI:
