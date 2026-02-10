@@ -84,7 +84,7 @@ class MotzoiParameterNode(QubitNode):
 
 
 class MotzoiParameter12Node(QubitNode):
-    name: str = "motzoi_parameter_12"
+    name: str = "motzoi_12_parameter"
     measurement_obj = MotzoiParameterMeasurement
     analysis_obj = Motzoi12NodeAnalysis
     measurement_type = ScheduleNode
@@ -92,12 +92,11 @@ class MotzoiParameter12Node(QubitNode):
 
     def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
         super().__init__(all_qubits, couplers, **schedule_keywords)
-        self.motzoi_minima = []  # NOTE: is this needed?
         self.qubit_state = 1
         self.schedule_keywords["qubit_state"] = self.qubit_state
         self.schedule_samplespace = {
             "mw_motzois": {
                 qubit: np.linspace(-0.3, 0.3, 51) for qubit in self.all_qubits
             },
-            "X_repetitions": {qubit: np.arange(1, 4, 1) for qubit in self.all_qubits},
+            "X_repetitions": {qubit: np.arange(1, 8, 2) for qubit in self.all_qubits},
         }

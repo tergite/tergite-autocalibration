@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2023, 2024
+# (C) Copyright Eleftherios Moschandreou 2023, 2024, 2026
 # (C) Copyright Liangyu Chen 2023, 2024
 #
 # This code is licensed under the Apache License, Version 2.0. You may
@@ -13,18 +13,18 @@
 
 import numpy as np
 from quantify_scheduler.enums import BinMode
-from quantify_scheduler.operations.acquisition_library import SSBIntegrationComplex
+from quantify_scheduler.operations.acquisition_library import \
+    SSBIntegrationComplex
 from quantify_scheduler.operations.gate_library import Reset, X
-from quantify_scheduler.operations.pulse_library import (
-    DRAGPulse,
-    SetClockFrequency,
-    SquarePulse,
-)
+from quantify_scheduler.operations.pulse_library import (DRAGPulse,
+                                                         SetClockFrequency,
+                                                         SquarePulse)
 from quantify_scheduler.resources import ClockResource
 from quantify_scheduler.schedules.schedule import Schedule
 
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
-from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
+from tergite_autocalibration.utils.dto.extended_transmon_element import \
+    ExtendedTransmon
 
 
 class ROFrequencyOptimizationMeasurement(BaseMeasurement):
@@ -103,7 +103,7 @@ class ROFrequencyOptimizationMeasurement(BaseMeasurement):
             DRAGPulse(
                 duration=transmon.rxy.duration(),
                 G_amp=transmon.r12.ef_amp180(),
-                D_amp=0,
+                D_amp=transmon.r12.ef_motzoi(),
                 port=transmon.ports.microwave(),
                 clock=this_mw_clock,
                 phase=0,

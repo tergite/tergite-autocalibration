@@ -43,6 +43,7 @@ class NodeFactory:
             "rabi_oscillations": "RabiOscillationsNode",
             "ramsey_correction": "RamseyFringesNode",
             "motzoi_parameter": "MotzoiParameterNode",
+            "motzoi_12_parameter": "MotzoiParameter12Node",
             "T1": "T1Node",
             "T2": "T2Node",
             "T2_echo": "T2EchoNode",

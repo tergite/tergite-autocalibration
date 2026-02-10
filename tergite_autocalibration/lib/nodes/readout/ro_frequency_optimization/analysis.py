@@ -159,13 +159,8 @@ class OptimalRO012FrequencyQubitAnalysis(OptimalRO01FrequencyQubitAnalysis):
         ax.plot(self.frequencies, np.abs(self.magnitudes_2), label="2")
         ax.plot(self.frequencies, self.total_distance, "--", label="distance")
 
-        ax.scatter(
-            self.optimal_frequency,
-            self.optimal_distance * 1.5e2,  # factor for visibility in plot
-            marker="*",
-            c="red",
-            s=64,
-        )
+        styles = dict(marker="*", c="red", s=64)
+        ax.scatter(self.optimal_frequency, self.optimal_distance, **styles)
         ax.grid()
 
 

@@ -68,7 +68,7 @@ class MotzoiParameterMeasurement(BaseMeasurement):
             schedule_title = "motzoi_01_parameter"
             measure_function = Measure
         elif qubit_state == 1:
-            schedule_title = "mltplx_motzoi_12"
+            schedule_title = "motzoi_12_parameter"
             measure_function = Measure_RO1
         else:
             raise ValueError(f"Invalid qubit state: {qubit_state}")
@@ -77,15 +77,15 @@ class MotzoiParameterMeasurement(BaseMeasurement):
         qubits = self.transmons.keys()
 
         for this_qubit, this_transmon in self.transmons.items():
-            mw_frequency = this_transmon.clock_freqs.f01()
+            mw_01_frequency = this_transmon.clock_freqs.f01()
             schedule.add_resource(
-                ClockResource(name=f"{this_qubit}.01", freq=mw_frequency)
+                ClockResource(name=f"{this_qubit}.01", freq=mw_01_frequency)
             )
             if qubit_state == 1:
-                mw_frequency_12 = this_transmon.clock_freqs.f12()
+                mw_12_frequency = this_transmon.clock_freqs.f12()
                 this_clock = f"{this_qubit}.12"
                 schedule.add_resource(
-                    ClockResource(name=this_clock, freq=mw_frequency_12)
+                    ClockResource(name=this_clock, freq=mw_12_frequency)
                 )
 
         # This is the common reference operation so the qubits can be operated in parallel
@@ -97,8 +97,6 @@ class MotzoiParameterMeasurement(BaseMeasurement):
             mw_amplitude = this_transmon.rxy.amp180()
             mw_pulse_duration = this_transmon.rxy.duration()
             mw_pulse_port = this_transmon.ports.microwave()
-
-            this_clock = f"{this_qubit}.01"
 
             motzoi_parameter_values = mw_motzois[this_qubit]
             number_of_motzois = len(motzoi_parameter_values)
@@ -124,6 +122,8 @@ class MotzoiParameterMeasurement(BaseMeasurement):
                     this_index = x_index * number_of_motzois + motzoi_index
                     if qubit_state == 1:
                         schedule.add(X(this_qubit))
+                        print("WARN hardcoded duration here and in Rabi")
+                        mw_pulse_duration = 72e-9
                     for _ in range(this_x):
                         schedule.add(
                             DRAGPulse(
@@ -146,29 +146,6 @@ class MotzoiParameterMeasurement(BaseMeasurement):
                                 phase=180,
                             ),
                         )
-
-                        # if qubit_state == 0:
-                        #     schedule.add(
-                        #         DRAGPulse(
-                        #             duration=mw_pulse_duration,
-                        #             G_amp=mw_amplitude,
-                        #             D_amp=mw_motzoi,
-                        #             port=mw_pulse_port,
-                        #             clock=this_clock,
-                        #             phase=90,
-                        #         ),
-                        #     )
-                        #     # inversion pulse requires 180 deg phase
-                        #     schedule.add(
-                        #         DRAGPulse(
-                        #             duration=mw_pulse_duration,
-                        #             G_amp=mw_amplitude,
-                        #             D_amp=mw_motzoi,
-                        #             port=mw_pulse_port,
-                        #             clock=this_clock,
-                        #             phase=270,
-                        #         ),
-                        #     )
 
                     schedule.add(
                         measure_function(

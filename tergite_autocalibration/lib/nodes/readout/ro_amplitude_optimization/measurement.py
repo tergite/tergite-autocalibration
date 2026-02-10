@@ -73,6 +73,8 @@ class ROAmplitudeOptimizationMeasurement(BaseMeasurement):
             this_transmon = self.transmons[this_qubit]
             ro_pulse_duration = this_transmon.measure.pulse_duration()
             mw_ef_amp180 = this_transmon.r12.ef_amp180()
+            mw_ef_motzoi = this_transmon.r12.ef_motzoi()
+            print(f"{ mw_ef_amp180 = }")
             mw_pulse_duration = this_transmon.rxy.duration()
             mw_pulse_port = this_transmon.ports.microwave()
             acquisition_delay = this_transmon.measure.acq_delay()
@@ -103,11 +105,12 @@ class ROAmplitudeOptimizationMeasurement(BaseMeasurement):
                     elif state_level == 2:
                         shot.add(X(this_qubit))
 
+                        print("WARN hardcoded duration here and in Rabi")
                         prep = shot.add(
                             DRAGPulse(
-                                duration=mw_pulse_duration,
+                                duration=72e-9,
                                 G_amp=mw_ef_amp180,
-                                D_amp=0,
+                                D_amp=mw_ef_motzoi,
                                 port=mw_pulse_port,
                                 clock=this_12_clock,
                                 phase=0,
