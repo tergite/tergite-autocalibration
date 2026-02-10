@@ -19,7 +19,7 @@ from typing import List
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION, CONFIG
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
-from tergite_autocalibration.lib.utils.reflections import (
+from tergite_autocalibration.utils.misc.reflections import (
     find_inheriting_classes_ast_recursive,
 )
 from tergite_autocalibration.utils.logging import logger
@@ -27,12 +27,22 @@ from tergite_autocalibration.utils.misc.reflections import get_class_attributes
 
 
 def reset_all_redis_nodes() -> None:
+    """
+    Wraps reset_redis_nodes() and resets all nodes that have an entry in the factory.
+    """
     node_factory = NodeFactory()
     node_names = node_factory.all_node_names()
     reset_redis_nodes(node_names)
 
 
 def reset_redis_nodes(node_names: List[str]) -> None:
+    """
+    Reset the qubit values for given nodes in redis.
+
+    Args:
+        node_names: Names of nodes as list.
+
+    """
     qubits = CONFIG.run.qubits
     couplers = CONFIG.run.couplers
 
