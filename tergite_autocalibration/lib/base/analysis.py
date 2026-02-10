@@ -402,7 +402,7 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
                     if nrows == 1 and ncols == 1:
                         fig.set_size_inches(9, 6)
                     elif nrows == 1 and ncols == 2:
-                        fig.set_size_inches(16, 9)
+                        fig.set_size_inches(12, 8)
                     else:
                         fig.set_size_inches(ncols * 6, nrows * 4)
 

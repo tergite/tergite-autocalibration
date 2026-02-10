@@ -33,7 +33,7 @@ class TwoQubitRnBAnalysis(BaseCouplerAnalysis):
             coord = str(coord)
             if "cliffords" in coord:
                 self.number_cliffords_coord = coord
-                self.number_cliffords = self.S21[coord]
+                self.number_cliffords = self.S21[coord].values
             elif "seed" in coord:
                 self.seed_coord = coord
                 self.seeds = self.S21[coord].values
@@ -54,6 +54,8 @@ class TwoQubitRnBAnalysis(BaseCouplerAnalysis):
             self.target_qubit_data_var
         )
 
+        number_cliffords = self.number_cliffords
+
         self.P00 = self.state_probabilities(0, 0)
         self.P01 = self.state_probabilities(0, 1)
         self.P10 = self.state_probabilities(1, 0)
@@ -63,86 +65,85 @@ class TwoQubitRnBAnalysis(BaseCouplerAnalysis):
         self.P20 = self.state_probabilities(2, 0)
         self.P21 = self.state_probabilities(2, 1)
         self.P22 = self.state_probabilities(2, 2)
-        self.P_leakage = self.P02 + self.P12 + self.P20 + self.P21 + self.P22
 
-        self.mean_probabilities_00 = self.P00.mean(self.seed_coord)
-        self.mean_probabilities_01 = self.P01.mean(self.seed_coord)
-        self.mean_probabilities_10 = self.P10.mean(self.seed_coord)
-        self.mean_probabilities_11 = self.P11.mean(self.seed_coord)
-        self.mean_probabilities_02 = self.P02.mean(self.seed_coord)
-        self.mean_probabilities_20 = self.P20.mean(self.seed_coord)
-        self.mean_probabilities_21 = self.P21.mean(self.seed_coord)
-        self.mean_probabilities_12 = self.P12.mean(self.seed_coord)
-        self.mean_probabilities_22 = self.P22.mean(self.seed_coord)
+        mean_probabilities_00 = self.P00.mean(self.seed_coord)
+        mean_probabilities_01 = self.P01.mean(self.seed_coord)
+        mean_probabilities_10 = self.P10.mean(self.seed_coord)
+        mean_probabilities_11 = self.P11.mean(self.seed_coord)
+        mean_probabilities_02 = self.P02.mean(self.seed_coord)
+        mean_probabilities_20 = self.P20.mean(self.seed_coord)
+        mean_probabilities_21 = self.P21.mean(self.seed_coord)
+        mean_probabilities_12 = self.P12.mean(self.seed_coord)
+        mean_probabilities_22 = self.P22.mean(self.seed_coord)
 
         # probabilities to of states in the computational subspace
-        self.mean_probabilities_chi_1 = (
-            self.mean_probabilities_00
-            + self.mean_probabilities_01
-            + self.mean_probabilities_10
-            + self.mean_probabilities_11
+        mean_probabilities_chi_1 = (
+            mean_probabilities_00
+            + mean_probabilities_01
+            + mean_probabilities_10
+            + mean_probabilities_11
         )
 
-        self.standard_mean_probs_00 = self.mean_probabilities_00.sel(
+        standard_mean_probs_00 = mean_probabilities_00.sel(
             {self.interleave_modes_coord: False}
         )
 
-        self.standard_mean_probs_chi_1 = self.mean_probabilities_chi_1.sel(
+        standard_mean_probs_chi_1 = mean_probabilities_chi_1.sel(
             {self.interleave_modes_coord: False}
         )
 
-        self.standard_reduced_ideal_probabilities = (
-            self.standard_mean_probs_00
-            - self.standard_mean_probs_chi_1 / computational_space_dimension
+        standard_reduced_ideal_probabilities = (
+            standard_mean_probs_00
+            - standard_mean_probs_chi_1 / computational_space_dimension
         )
-        self.interleaved_mean_probs_00 = self.mean_probabilities_00.sel(
+        interleaved_mean_probs_00 = mean_probabilities_00.sel(
             {self.interleave_modes_coord: True}
         )
 
-        self.interleaved_mean_probs_chi_1 = self.mean_probabilities_chi_1.sel(
+        interleaved_mean_probs_chi_1 = mean_probabilities_chi_1.sel(
             {self.interleave_modes_coord: True}
         )
-        self.interleaved_reduced_ideal_probabilities = (
-            self.interleaved_mean_probs_00
-            - self.interleaved_mean_probs_chi_1 / computational_space_dimension
+        interleaved_reduced_ideal_probabilities = (
+            interleaved_mean_probs_00
+            - interleaved_mean_probs_chi_1 / computational_space_dimension
         )
 
+        ## Calculate the CZ Fidelity based on Nakamura's paper
         # Fit 1: fit probabilities of the computational states eq. K14
         standard_guess_Pchi_1 = self.single_model.guess(
-            data=self.standard_mean_probs_chi_1.values, m=self.number_cliffords.values
+            data=standard_mean_probs_chi_1.values, m=number_cliffords
         )
 
         standard_fit_Pchi_1_result = self.single_model.fit(
-            self.standard_mean_probs_chi_1.values,
+            standard_mean_probs_chi_1.values,
             params=standard_guess_Pchi_1,
-            m=self.number_cliffords.values,
+            m=number_cliffords,
         )
-        #################
 
         # Fit 2: fit the reduced ideal probabilities eq. K15
         standard_guess_Pideal = self.single_model.guess(
-            data=self.standard_reduced_ideal_probabilities.values,
-            m=self.number_cliffords.values,
+            data=standard_reduced_ideal_probabilities.values,
+            m=number_cliffords,
         )
 
         standard_fit_Pideal_result = self.single_model.fit(
-            self.standard_reduced_ideal_probabilities.values,
+            standard_reduced_ideal_probabilities.values,
             params=standard_guess_Pideal,
-            m=self.number_cliffords.values,
+            m=number_cliffords,
         )
-        #################
+        ##################################################
 
         standard_guess = self.single_model.guess(
-            data=self.standard_mean_probs_00.values, m=self.number_cliffords.values
+            data=standard_mean_probs_00.values, m=number_cliffords
         )
         standard_fit_result = self.single_model.fit(
-            self.standard_mean_probs_00.values,
+            standard_mean_probs_00.values,
             params=standard_guess,
-            m=self.number_cliffords.values,
+            m=number_cliffords,
         )
 
         self.fit_n_cliffords = np.linspace(
-            self.number_cliffords.values[0], self.number_cliffords.values[-1], 200
+            number_cliffords[0], number_cliffords[-1], 200
         )
         self.standard_fit_y = self.single_model.eval(
             standard_fit_result.params, **{"m": self.fit_n_cliffords}
@@ -154,40 +155,40 @@ class TwoQubitRnBAnalysis(BaseCouplerAnalysis):
             standard_fit_Pideal_result.params, **{"m": self.fit_n_cliffords}
         )
         if True in self.interleave_modes:
-            self.interleaved_mean_probs_00 = self.mean_probabilities_00.sel(
+            interleaved_mean_probs_00 = mean_probabilities_00.sel(
                 {self.interleave_modes_coord: True}
             )
-            self.interleaved_mean_probs_chi_1 = self.mean_probabilities_chi_1.sel(
+            interleaved_mean_probs_chi_1 = mean_probabilities_chi_1.sel(
                 {self.interleave_modes_coord: True}
             )
             interleaved_guess = self.single_model.guess(
-                data=self.interleaved_mean_probs_00.values,
-                m=self.number_cliffords.values,
+                data=interleaved_mean_probs_00.values,
+                m=number_cliffords,
             )
             interleaved_fit_result = self.single_model.fit(
-                self.interleaved_mean_probs_00.values,
+                interleaved_mean_probs_00.values,
                 params=interleaved_guess,
-                m=self.number_cliffords.values,
+                m=number_cliffords,
             )
             interleaved_guess_Pchi_1 = self.single_model.guess(
-                data=self.interleaved_mean_probs_chi_1.values,
-                m=self.number_cliffords.values,
+                data=interleaved_mean_probs_chi_1.values,
+                m=number_cliffords,
             )
 
             interleaved_fit_Pchi_1_result = self.single_model.fit(
-                self.interleaved_mean_probs_chi_1.values,
+                interleaved_mean_probs_chi_1.values,
                 params=interleaved_guess_Pchi_1,
-                m=self.number_cliffords.values,
+                m=number_cliffords,
             )
             interleaved_guess_Pideal = self.single_model.guess(
-                data=self.interleaved_reduced_ideal_probabilities.values,
-                m=self.number_cliffords.values,
+                data=interleaved_reduced_ideal_probabilities.values,
+                m=number_cliffords,
             )
 
             interleaved_fit_Pideal_result = self.single_model.fit(
-                self.interleaved_reduced_ideal_probabilities.values,
+                interleaved_reduced_ideal_probabilities.values,
                 params=interleaved_guess_Pideal,
-                m=self.number_cliffords.values,
+                m=number_cliffords,
             )
             self.interleaved_fit_Pideal_y = self.single_model.eval(
                 interleaved_fit_Pideal_result.params, **{"m": self.fit_n_cliffords}
@@ -218,6 +219,7 @@ class TwoQubitRnBAnalysis(BaseCouplerAnalysis):
         self.one_minus_L1_CZ = (1 - L1_interleaved) / (1 - L1_standard)
         self.lambda_r_CZ = self.interleaved_lambda_r / self.standard_lambda_r
 
+        # Fidelity based on Nakamura's paper
         self.average_fidelity = 3 / 4 * self.lambda_r_CZ + self.one_minus_L1_CZ / 4
 
         analysis_succesful = False
@@ -260,34 +262,19 @@ class TwoQubitRnBAnalysis(BaseCouplerAnalysis):
             - interleaved_probs_chi_1 / computational_space_dimension
         )
         standard_probs_00.plot(
-            ax=axs[0],
-            x=self.number_cliffords_coord,
-            hue=self.seed_coord,
-            alpha=0.2,  # marker="o", ls=""
+            ax=axs[0], x=self.number_cliffords_coord, hue=self.seed_coord, alpha=0.2
         )
         standard_probs_chi_1.plot(
-            ax=axs[1],
-            x=self.number_cliffords_coord,
-            hue=self.seed_coord,
-            alpha=0.2,  # marker="o", ls=""
+            ax=axs[1], x=self.number_cliffords_coord, hue=self.seed_coord, alpha=0.2
         )
         standard_probs_reduced_ideal.plot(
-            ax=axs[1],
-            x=self.number_cliffords_coord,
-            hue=self.seed_coord,
-            alpha=0.2,  # marker="o", ls=""
+            ax=axs[1], x=self.number_cliffords_coord, hue=self.seed_coord, alpha=0.2
         )
         interleaved_probs_chi_1.plot(
-            ax=axs[1],
-            x=self.number_cliffords_coord,
-            hue=self.seed_coord,
-            alpha=0.2,  # marker="o", ls=""
+            ax=axs[1], x=self.number_cliffords_coord, hue=self.seed_coord, alpha=0.2
         )
         interleaved_probs_reduced_ideal.plot(
-            ax=axs[1],
-            x=self.number_cliffords_coord,
-            hue=self.seed_coord,
-            alpha=0.2,  # marker="o", ls=""
+            ax=axs[1], x=self.number_cliffords_coord, hue=self.seed_coord, alpha=0.2
         )
         axs[0].plot(
             self.fit_n_cliffords,
@@ -345,20 +332,16 @@ class TwoQubitRnBAnalysis(BaseCouplerAnalysis):
         )
         axs[1].plot(
             self.fit_n_cliffords,
-            # self.standard_fit_P0_y,
             self.standard_fit_Pideal_y,
             color="orchid",
             lw=3,
-            # label=rf"$\lambda_2$: {self.standard_lambda_2:.4f}",
             label=rf"$\lambda_r^{{SRB}}$: {self.standard_lambda_r:.4f}",
         )
         axs[1].plot(
             self.fit_n_cliffords,
-            # self.interleaved_fit_P0_y,
             self.interleaved_fit_Pideal_y,
             color="aqua",
             lw=3,
-            # label=rf"$\lambda_2$: {self.interleaved_lambda_2:.4f}",
             label=rf"$\lambda_r^{{SRB}}$: {self.interleaved_lambda_r:.3f}",
         )
         if True in self.interleave_modes:
@@ -367,7 +350,7 @@ class TwoQubitRnBAnalysis(BaseCouplerAnalysis):
                 ax=axs[0],
                 x=self.number_cliffords_coord,
                 hue=self.seed_coord,
-                alpha=0.2,  # marker="o", ls=""
+                alpha=0.2,
                 ls=":",
             )
             axs[0].plot(
@@ -377,8 +360,9 @@ class TwoQubitRnBAnalysis(BaseCouplerAnalysis):
                 lw=3,
                 label=f"$p_{{IRB}}$: {self.interleaved_p:.3f}",
             )
+            # fidelity based on simple exponential fits
             fidelity = 0.25 + 0.75 * self.interleaved_p / self.standard_p
-            title = rf"CZ fidelity = {fidelity:.4f}"
+            title = rf"CZ fidelity = {fidelity:.3f}"
         axs[0].set_ylabel(r"State |00$\rangle$ probability")
         axs[0].axhline(0.25, color="black")
         axs[0].legend()
@@ -386,68 +370,6 @@ class TwoQubitRnBAnalysis(BaseCouplerAnalysis):
         axs[0].set_title(title)
         axs[1].set_title(f"CZ fidelity (Nakamura paper): {self.average_fidelity:0.3f}")
 
-        # self.P01.plot(
-        #     ax=axs[0][1],
-        #     x=self.number_cliffords_coord,
-        #     hue=self.seed_coord,
-        #     alpha=0.2,  # marker="o", ls=""
-        # )
-        # axs[0][1].set_title(r"State |01$\rangle$")
-        # self.P02.plot(
-        #     ax=axs[0][2],
-        #     x=self.number_cliffords_coord,
-        #     hue=self.seed_coord,
-        #     alpha=0.2,  # marker="o", ls=""
-        # )
-        # axs[0][2].set_title(r"State |02$\rangle$")
-        # self.P11.plot(
-        #     ax=axs[1][1],
-        #     x=self.number_cliffords_coord,
-        #     hue=self.seed_coord,
-        #     alpha=0.2,  # marker="o", ls=""
-        # )
-        # axs[0][2].plot(
-        #     self.fit_n_cliffords,
-        #     self.inverted_fit_y_02,
-        #     color="green",
-        #     lw=3,
-        #     label=self.leakage_02,
-        # )
-        # axs[0][2].legend()
-        # axs[1][1].set_title(r"State |11$\rangle$")
-        # axs[0][1].set_title(r"Control Leakage |2X$\rangle$")
-        # axs[0][1].plot(
-        #     self.fit_n_cliffords,
-        #     self.inverted_fit_y_control,
-        #     color="green",
-        #     lw=3,
-        #     label=self.control_leakage,
-        # )
-        # axs[0][1].legend()
-        # self.P_leakage.plot(
-        #     ax=axs[0][1],
-        #     x=self.number_cliffords_coord,
-        #     hue=self.seed_coord,
-        #     alpha=0.2,  # marker="o", ls=""
-        # )
-        # axs[1][0].set_title(r"Target Leakage |X2$\rangle$")
-        # axs[1][0].plot(
-        #     self.fit_n_cliffords,
-        #     self.inverted_fit_y_target,
-        #     color="green",
-        #     lw=3,
-        #     label=self.target_leakage,
-        # )
-        # axs[1][0].legend()
-        # axs[1][1].set_title("Leakage States")
-        # axs[1][1].plot(
-        #     self.fit_n_cliffords,
-        #     self.inverted_fit_y_leakage,
-        #     color="green",
-        #     lw=3,
-        #     label=self.leakage,
-        # )
-        # axs[1][1].legend()
         figures_dictionary[self.coupler] = [fig]
 
 

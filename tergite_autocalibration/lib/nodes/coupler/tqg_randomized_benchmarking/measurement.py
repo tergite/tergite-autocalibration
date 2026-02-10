@@ -3,6 +3,7 @@
 # (C) Copyright Amr Osman 2024
 # (C) Copyright Eleftherios Moschandreou 2025, 2026
 # (C) Copyright Chalmers Next Labs 2025, 2026
+# (C) Copyright Pontus Vikstål 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -56,6 +57,21 @@ class TwoQubitRBMeasurement(BaseMeasurement):
         self.couplers = couplers
 
     def allign_cliffords(self, coupler: str, clifford_sequence: list) -> list:
+        """
+        The initial TwoQubitClifford decomposition,
+        returns decompositions of Operations that look like:
+        q0      O1 -- O2                 -- O5
+        q1               -- O3                 -- O6
+        coupler                -- O4=CZ
+
+        i.e. the single qubit Operations are run consequantly for both qubits.
+        This method alligns the single qubit operations, so they are run in parallel
+        while padding with Identity operations where necessary:
+        q0      O1 -- O2         -- O5
+        q1      O3 --  I         -- O6
+        coupler         -- O4=CZ
+        """
+
         def pad_operations(operation_group: dict):
             for qubit, ops in operation_group.items():
                 max_len = max(len(ops) for ops in operation_group.values())
@@ -120,11 +136,10 @@ class TwoQubitRBMeasurement(BaseMeasurement):
         qubit_names = [control_qubit, target_qubit]
         self.rx_duartion = self.transmons[qubit_names[0]].rxy.duration()
 
-        print("WARNING RB SEEDING")
         seed = seeds[coupler_names[0]]
 
         # This is the common reference operation so the qubits can be operated in parallel
-        root_relaxation = shot.add(Reset(*qubit_names), label="Start")
+        shot.add(Reset(*qubit_names), label="Start")
 
         # The first for loop iterates over all qubits:
         clifford_sequence_lengths = list(number_of_cliffords.values())[0]
@@ -159,7 +174,6 @@ class TwoQubitRBMeasurement(BaseMeasurement):
                 gate = pycqed_operation_map[t_op](target_qubit)
                 schedule.add(gate)
 
-        print(f"{ interleaves = }")
         for mode_index, interleave_mode in enumerate(interleaves):
             if interleave_mode:
                 interleaving_clifford_id = 4368
@@ -181,11 +195,9 @@ class TwoQubitRBMeasurement(BaseMeasurement):
                 for clifford_gate_idx in clifford_seq:
                     cl_decomp = TwoQubitClifford(clifford_gate_idx).gate_decomposition
 
-                    # print(f"{ cl_decomp = }")
                     grouped_clifford_decomposition = self.allign_cliffords(
                         coupler_names[0], cl_decomp
                     )
-                    # print(f"{ grouped_clifford_decomposition = }")
 
                     for group in grouped_clifford_decomposition:
                         if coupler_names[0] in group:

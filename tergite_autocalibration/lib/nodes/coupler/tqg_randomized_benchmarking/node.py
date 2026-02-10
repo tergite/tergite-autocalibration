@@ -14,6 +14,7 @@
 # that they have been altered from the originals.
 
 import numpy as np
+import xarray as xr
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.lib.base.node import CouplerNode
@@ -42,12 +43,11 @@ class CZ_RB_Node(CouplerNode):
         self.schedule_keywords["loop_repetitions"] = self.loops
         self.coupled_qubits = self.get_coupled_qubits()
         self.all_qubits = self.coupled_qubits
-        #    self.schedule_keywords["interleaving_clifford_id"] = 4386
+        #    self.schedule_keywords["interleaving_clifford_id"] = 4386 #leaving it as a reminder
         self.schedule_keywords["coupler_dict"] = self.gate_qubit_types_dict()
 
         self.outer_schedule_samplespace = {
             "seeds": {
-                # coupler: np.array([23, 27, 49], dtype=np.int32)
                 coupler: np.arange(RB_REPEATS, dtype=np.int32)
                 for coupler in self.couplers
             }
@@ -55,19 +55,12 @@ class CZ_RB_Node(CouplerNode):
 
         self.schedule_samplespace = {
             "number_of_cliffords": {
-                # coupler: np.array([1])
-                # coupler: np.array([1, 2, 3, 4])
-                # coupler: np.array([0, 1, 2, 3, 4, 8, 10, 16, 22, 32, 64, 128, 256])
                 coupler: np.array([0, 1, 2, 3, 4, 8, 16, 32, 64])
                 for coupler in self.couplers
             },
             "interleave_modes": {
                 coupler: np.array([False, True]) for coupler in self.couplers
             },
-            # "cz_pulse_frequencies": {
-            #     coupler: np.linspace(-0.5e6, 0.5e6, 5) + self.cz_frequency(coupler)
-            #     for coupler in self.couplers
-            # },
         }
 
     def cz_frequency(self, coupler):
@@ -78,3 +71,24 @@ class CZ_RB_Node(CouplerNode):
 
     def initial_operation(self):
         self.spi_manager.set_parking_currents(self.couplers)
+
+    def generate_dummy_dataset(self):
+        dataset = xr.Dataset()
+        for index, coupler in enumerate(self.couplers):
+            number_of_number_of_cliffords = len(
+                self.schedule_samplespace["number_of_cliffords"][coupler]
+            )
+            number_of_modes = len(
+                self.schedule_samplespace["interleave_modes"][coupler]
+            )
+            number_of_iq_samples = (
+                number_of_number_of_cliffords * number_of_modes * self.loops
+            )
+            real_part = np.random.uniform(-1, 1, number_of_iq_samples)
+            imag_part = np.random.uniform(-1, 1, number_of_iq_samples)
+            complex_points = real_part + 1j * imag_part
+            data_array = xr.DataArray(complex_points)
+
+            dataset[2 * index] = data_array
+            dataset[2 * index + 1] = data_array
+        return dataset

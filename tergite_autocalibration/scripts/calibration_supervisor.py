@@ -421,6 +421,8 @@ class CalibrationSupervisor:
         for calibration_node in calibration_nodes:
             if calibration_node == "three_state_discrimination":
                 ignore_spec = True
+            else:
+                ignore_spec = False
             self.node_manager.inspect_node(calibration_node, ignore_spec=ignore_spec)
             logger.info(f"{calibration_node} node is completed")
 
