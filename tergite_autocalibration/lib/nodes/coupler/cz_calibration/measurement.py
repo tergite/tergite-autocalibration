@@ -155,7 +155,7 @@ class CZ_CalibrationMeasurement(BaseMeasurement):
         repetitions: int = 1,
     ) -> Schedule:
 
-        schedule = Schedule("CZ_calibration_ssro", repetitions)
+        schedule = Schedule("cz_calibration", repetitions)
 
         cz_phase_shot = self.ro_shot(
             ramsey_phases,

@@ -58,13 +58,13 @@ class CZParametrizationNode(CouplerNode):
 
         self.external_samplespace = {
             "dc_currents": {
-                coupler: self.broad_samplespace_around(self.parking_current(coupler))
+                coupler: self.fine_samplespace_around(self.parking_current(coupler))
                 for coupler in self.couplers
             },
         }
         self.schedule_samplespace = {
             "cz_pulse_amplitudes": {
-                coupler: np.linspace(0.25, 0.55, 25) for coupler in self.couplers
+                coupler: np.linspace(0.35, 0.65, 25) for coupler in self.couplers
             },
             "cz_pulse_frequencies": {
                 coupler: np.linspace(-11e6, 1e6, 25)

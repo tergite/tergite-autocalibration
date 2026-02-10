@@ -84,6 +84,7 @@ class CZChevronMeasurement(BaseMeasurement):
 
                 # cz_schedule.add(ResetClockPhase(clock=coupler + ".cz"))
 
+                print(f"{ cz_amplitude = }")
                 flux_pulse = cz_schedule.add(
                     SoftSquarePulse(
                         duration=cz_duration,

@@ -59,6 +59,7 @@ class CZParametrizationMeasurement(BaseMeasurement):
             # unpack static parameters
             this_edge = self.couplers[coupler]
             cz_duration = this_edge.cz.square_duration()
+            print(f"{ cz_duration = }")
 
             cz_schedule.add_resource(
                 ClockResource(

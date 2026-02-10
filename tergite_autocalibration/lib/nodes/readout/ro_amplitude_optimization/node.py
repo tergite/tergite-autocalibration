@@ -166,3 +166,73 @@ class ROAmplitudeThreeStateOptimizationNode(QubitNode):
 
             dataset[index] = xarray.DataArray(all_shots_array)
         return dataset
+
+
+class ThreeStateDiscriminationNode(QubitNode):
+    name: str = "ro_amplitude_three_state_optimization"
+    measurement_obj = ROAmplitudeOptimizationMeasurement
+    analysis_obj = OptimalROThreeStateAmplitudeNodeAnalysis
+    measurement_type = ScheduleNode
+    qubit_qois = [
+        "measure_3state_opt:pulse_amp",
+        "centroid_I",
+        "centroid_Q",
+        "omega_01",
+        "omega_12",
+        "omega_20",
+        "inv_cm_opt",
+    ]
+
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(all_qubits, couplers, **schedule_keywords)
+        self.qubit_state = 2
+        self.loops = 1000
+        self.schedule_keywords["loop_repetitions"] = self.loops
+        self.schedule_keywords["qubit_state"] = self.qubit_state
+
+        self.schedule_samplespace = {
+            "qubit_states": {
+                qubit: np.array([0, 1, 2], dtype=np.int16) for qubit in self.all_qubits
+            },
+            "ro_amplitudes": {
+                qubit: np.array([self.optimal_3state_amplitude(qubit)])
+                for qubit in self.all_qubits
+            },
+        }
+
+    def optimal_3state_amplitude(self, qubit: str):
+        return float(
+            REDIS_CONNECTION.hget(f"transmons:{qubit}", "measure_3state_opt:pulse_amp")
+        )
+
+    def generate_dummy_dataset(self):
+        dataset = xarray.Dataset()
+
+        first_qubit = self.all_qubits[0]
+        ro_amplitudes = self.schedule_samplespace["ro_amplitudes"][first_qubit]
+
+        def get_shot():
+            data_array = np.array([])
+            for ampl_index, _ in enumerate(ro_amplitudes):
+                triangle_size = ampl_index + 0.05
+                center_0, center_1, center_2 = isosceles_triangle(
+                    base_length=3 * triangle_size, height=5 * triangle_size
+                )
+                iq_point_0 = np.random.normal(loc=center_0, size=(1, 2), scale=0.7)
+                iq_point_1 = np.random.normal(loc=center_1, size=(1, 2), scale=0.7)
+                iq_point_2 = np.random.normal(loc=center_2, size=(1, 2), scale=0.7)
+                shot_0 = iq_point_0[:, 0] + 1j * iq_point_0[:, 1]
+                shot_1 = iq_point_1[:, 0] + 1j * iq_point_1[:, 1]
+                shot_2 = iq_point_2[:, 0] + 1j * iq_point_2[:, 1]
+                shots_array = np.concatenate((shot_0, shot_1, shot_2)).ravel()
+                data_array = np.concatenate((shots_array, data_array))
+            return data_array
+
+        for index, _ in enumerate(self.all_qubits):
+
+            all_shots_array = np.concatenate(
+                [get_shot() for _ in range(self.loops)]
+            ).ravel()
+
+            dataset[index] = xarray.DataArray(all_shots_array)
+        return dataset

@@ -49,13 +49,16 @@ class CZChevronNode(CouplerNode):
         self.loops = self.schedule_keywords["loop_repetitions"]
         phase_paths = self.all_phase_paths()
         self.analysis_keywords = {
-            coupler: {"phase_path": phase_paths[coupler], "number_of_working_points": 7}
+            coupler: {
+                "phase_path": phase_paths[coupler],
+                "number_of_working_points": 11,
+            }
             for coupler in self.couplers
         }
 
         self.outer_schedule_samplespace = {
             "cz_pulse_frequencies": {
-                coupler: np.linspace(-2.0e6, 1.0e6, 25)
+                coupler: np.linspace(-2.5e6, 1.5e6, 25)
                 + self.known_cz_frequency(coupler)
                 for coupler in self.couplers
             }
@@ -63,7 +66,7 @@ class CZChevronNode(CouplerNode):
 
         self.schedule_samplespace = {
             "cz_pulse_durations": {
-                coupler: np.arange(24e-9, 280e-9, 8e-9) for coupler in self.couplers
+                coupler: np.arange(24e-9, 240e-9, 8e-9) for coupler in self.couplers
             },
         }
 

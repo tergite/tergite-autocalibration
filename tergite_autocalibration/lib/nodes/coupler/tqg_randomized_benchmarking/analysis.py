@@ -202,7 +202,6 @@ class TwoQubitRnBAnalysis(BaseCouplerAnalysis):
             self.interleaved_lambda_L = interleaved_fit_Pchi_1_result.params["p"].value
             self.interleaved_AM = interleaved_fit_Pchi_1_result.params["A"].value
             self.interleaved_BM = interleaved_fit_Pchi_1_result.params["B"].value
-            # print(f"{ interleaved_fit_Pideal_result.params = }")
             self.interleaved_lambda_r = interleaved_fit_Pideal_result.params["p"].value
             self.interleaved_p = interleaved_fit_result.params["p"].value
 
@@ -210,7 +209,6 @@ class TwoQubitRnBAnalysis(BaseCouplerAnalysis):
         self.standard_lambda_L = standard_fit_Pchi_1_result.params["p"].value
         self.standard_AM = standard_fit_Pchi_1_result.params["A"].value
         self.standard_BM = standard_fit_Pchi_1_result.params["B"].value
-        print(f"{ standard_fit_Pideal_result.params = }")
         self.standard_lambda_r = standard_fit_Pideal_result.params["p"].value
 
         L1_standard = (1 - self.standard_lambda_L) * (1 - self.standard_AM)
@@ -246,7 +244,6 @@ class TwoQubitRnBAnalysis(BaseCouplerAnalysis):
 
         computational_space_dimension = 4
 
-        title = r"State |00$\rangle$"
         standard_probs_00 = self.P00.sel({self.interleave_modes_coord: False})
         standard_probs_chi_1 = (self.P00 + self.P01 + self.P10 + self.P11).sel(
             {self.interleave_modes_coord: False}
@@ -297,7 +294,7 @@ class TwoQubitRnBAnalysis(BaseCouplerAnalysis):
             self.standard_fit_y,
             color="red",
             lw=3,
-            label=f"p: {self.standard_p:.3f}",
+            label=rf"$p_{{SRB}}$: {self.standard_p:.3f}",
         )
         lambda_standard_str = rf"$\lambda_L^{{SRB}}$: {self.standard_lambda_L:.3f}"
         A_standard_str = rf"$A_M^{{SRB}}$: {self.standard_AM:.3f}"
@@ -362,7 +359,7 @@ class TwoQubitRnBAnalysis(BaseCouplerAnalysis):
             color="aqua",
             lw=3,
             # label=rf"$\lambda_2$: {self.interleaved_lambda_2:.4f}",
-            label=rf"$\lambda_r^{{SRB}}$: {self.interleaved_lambda_r:.4f}",
+            label=rf"$\lambda_r^{{SRB}}$: {self.interleaved_lambda_r:.3f}",
         )
         if True in self.interleave_modes:
             interleaved_probs_00 = self.P00.sel({self.interleave_modes_coord: True})
@@ -378,16 +375,16 @@ class TwoQubitRnBAnalysis(BaseCouplerAnalysis):
                 self.interleaved_fit_y,
                 color="magenta",
                 lw=3,
-                label=f"p: {self.interleaved_p:.3f}",
+                label=f"$p_{{IRB}}$: {self.interleaved_p:.3f}",
             )
             fidelity = 0.25 + 0.75 * self.interleaved_p / self.standard_p
-            title = r"State |00$\rangle$" + "  " + f"F = {fidelity:.4f}"
+            title = rf"CZ fidelity = {fidelity:.4f}"
+        axs[0].set_ylabel(r"State |00$\rangle$ probability")
         axs[0].axhline(0.25, color="black")
-        # axs[1].axhline(0.75, color="black")
         axs[0].legend()
         axs[1].legend()
         axs[0].set_title(title)
-        axs[1].set_title(f"CZ fidelity: {self.average_fidelity:0.3f}")
+        axs[1].set_title(f"CZ fidelity (Nakamura paper): {self.average_fidelity:0.3f}")
 
         # self.P01.plot(
         #     ax=axs[0][1],

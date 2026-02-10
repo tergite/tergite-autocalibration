@@ -65,6 +65,7 @@ class NodeFactory:
             "cz_local_phases": "CZ_LocalPhasesNode",
             "cz_rb": "CZ_RB_Node",
             "resonator_spectroscopy_vs_current": "ResonatorSpectroscopyVsCurrentNode",
+            "three_state_discrimination": "ThreeStateDiscriminationNode",
         }
         self._node_implementation_paths: Dict[str, Union[str, Path]] = {}
         self._node_classes: Dict[str, type["BaseNode"]] = {}
