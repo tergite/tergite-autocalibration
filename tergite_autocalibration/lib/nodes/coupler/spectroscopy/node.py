@@ -17,7 +17,6 @@ import quantify_scheduler.backends.qblox.constants as constants
 import xarray
 from lmfit.models import LorentzianModel
 from quantify_scheduler import CompiledSchedule
-from quantify_scheduler.backends import SerialCompiler
 
 from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.base.node import CouplerNode
@@ -38,6 +37,7 @@ from tergite_autocalibration.lib.utils.samplespace import (
     qubit_samples,
     resonator_samples,
 )
+from tergite_autocalibration.lib.utils.schedule_execution import get_compiler
 from tergite_autocalibration.utils.logging import logger
 
 peak = LorentzianModel()
@@ -171,8 +171,7 @@ class ResonatorSpectroscopyVsCurrentNode(CouplerNode):
             **schedule_samplespace, **self.schedule_keywords
         )
 
-        # TODO: Probably the compiler desn't need to be created every time self.precompile() is called.
-        compiler = SerialCompiler(name=f"{self.name}_compiler")
+        compiler = get_compiler(prefix=self.name)
 
         compilation_config = self.device.generate_compilation_config()
         logger.info("Starting Compiling")

@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Chalmers Next Labs 2024
+# (C) Copyright Chalmers Next Labs 2024, 2026
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -13,7 +13,8 @@
 import ast
 import inspect
 import textwrap
-from typing import Set, Type, Any
+from pathlib import Path
+from typing import Set, Type, Any, Dict, List, Union
 
 from tergite_autocalibration.utils.logging import logger
 
@@ -111,3 +112,37 @@ class ASTParser:
                                     attributes.add(stmt.target.attr)
                         return attributes
         return set()
+
+
+def get_class_attributes(
+    file_path: Union[str, Path], class_name: str
+) -> Dict[str, List[str]]:
+    """
+    Current implementation only supports to return lists, but can easily be extended.
+
+    Args:
+        file_path: Path to the file that contains the class.
+        class_name: Name of the class to parse.
+
+    Returns:
+        A dictionary that maps the class attribute name to their values.
+
+    """
+    with open(file_path, "r") as file:
+        tree = ast.parse(file.read(), filename=file_path)
+
+    return_obj_: Dict[str, List[str]] = {}
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ClassDef) and node.name == class_name:
+            for item in node.body:
+                if isinstance(item, ast.Assign):
+                    for target in item.targets:
+                        if isinstance(target, ast.Name):
+                            if isinstance(item.value, ast.List):
+                                return_list_: List[str] = []
+                                for list_element in item.value.elts:
+                                    if isinstance(list_element, ast.Constant):
+                                        return_list_.append(list_element.value)
+                                return_obj_[target.id] = return_list_
+    return return_obj_
