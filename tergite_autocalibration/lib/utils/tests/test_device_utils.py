@@ -48,13 +48,15 @@ def test_create_serial_device():
     q00 = test_device.get_element("q00")
     pi_amplitude = q00.rxy.amp180()
     q00_q01 = test_device.get_edge("q00_q01")
-    parking_current = q00_q01.cz.parking_current()
+    parking_current = q00_q01.coupler_parameters.parking_current()
+    cz_phase_path = q00_q01.coupler_parameters.phase_path()
 
     assert test_device.elements() == CONFIG.run.qubits
     assert test_device.edges() == CONFIG.run.couplers
 
     assert math.isclose(pi_amplitude, 0.7308488204080522)
     assert math.isclose(parking_current, 0.00095)
+    assert cz_phase_path == "via_20"
 
     close_device_resources(test_device)
 

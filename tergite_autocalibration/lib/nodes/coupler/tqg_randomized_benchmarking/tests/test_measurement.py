@@ -14,10 +14,6 @@
 import os
 from pathlib import Path
 
-from tergite_autocalibration.lib.base.node import CouplerNode
-from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.analysis import (
-    TwoQubitRBNodeAnalysis,
-)
 from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.measurement import (
     TwoQubitRBMeasurement,
 )
@@ -27,7 +23,6 @@ from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.node 
 from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.utils.two_qubit_clifford_group import (
     TwoQubitClifford,
 )
-from tergite_autocalibration.lib.nodes.schedule_node import OuterScheduleNode
 from tergite_autocalibration.tests.utils.decorators import with_redis
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
@@ -36,7 +31,7 @@ _redis_values_path = os.path.join(_test_data_dir, "redis-2026-02-10-11-23-12.jso
 
 
 @with_redis(_redis_values_path)
-def test_node_creation():
+def test_allign_cliffords():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
     qubits = ["q13", "q14"]
     couplers = ["q13_q14"]

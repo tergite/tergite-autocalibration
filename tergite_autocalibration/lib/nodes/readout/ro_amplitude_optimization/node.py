@@ -169,7 +169,7 @@ class ROAmplitudeThreeStateOptimizationNode(QubitNode):
 
 
 class ThreeStateDiscriminationNode(QubitNode):
-    name: str = "ro_amplitude_three_state_optimization"
+    name: str = "three_state_discrimination"
     measurement_obj = ROAmplitudeOptimizationMeasurement
     analysis_obj = OptimalROThreeStateAmplitudeNodeAnalysis
     measurement_type = ScheduleNode

@@ -112,13 +112,12 @@ def load_redis_config_coupler(coupler: ExtendedCompositeSquareEdge):
             f"{key} is not present in redis. Ignore this for single qubit nodes"
         )
     key = "parking_current"
-    # FIXME: parking_current should not be part of CZ
-    # try:
-    #     coupler.cz.parking_current(redis_value(key))
-    # except:
-    #     logger.warning(
-    #         f"{key} is not present in redis. Ignore this for single qubit nodes"
-    #     )
+    try:
+        coupler.coupler_parameters.parking_current(redis_value(key))
+    except:
+        logger.warning(
+            f"{key} is not present in redis. Ignore this for single qubit nodes"
+        )
     try:
         # if dh.get_legacy("qubit_types")[bus_qubits[0]] == "Target":
         if bus_qubits[0] == str(redis_config["target_qubit"]):
@@ -135,7 +134,7 @@ def load_redis_config_coupler(coupler: ExtendedCompositeSquareEdge):
         logger.warning("Invalid Control and Target")
     key = "cz_phase_path"
     try:
-        coupler.cz.phase_path(redis_config[key])
+        coupler.coupler_parameters.phase_path(redis_config[key])
     except:
         logger.warning(
             f"{key} is not present in redis. Ignore this for single qubit nodes"

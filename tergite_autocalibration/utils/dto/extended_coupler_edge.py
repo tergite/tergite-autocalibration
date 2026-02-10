@@ -1,4 +1,4 @@
-#name,rki This code is part of Tergite
+# This code is part of Tergite
 #
 # (C) Copyright Eleftherios Moschandreou 2023, 2024
 # (C) Copyright Liangyu Chen 2023, 2024
@@ -71,15 +71,6 @@ class CZ(InstrumentChannel):
             instrument=self,
         )
 
-        self.phase_path = ManualParameter(
-            "phase_path",
-            docstring=r"""The path outside the compuational space where the sate goes to acqure a controlled phase""",
-            unit="NA",
-            initial_value=None,
-            vals=Enum("via_20", "via_02", None),
-            instrument=self,
-        )
-
         self.cz_width = ManualParameter(
             name="cz_width",
             docstring=r"""AC flux pulse rising and lowering edge width""",
@@ -107,15 +98,6 @@ class CZ(InstrumentChannel):
             vals=Numbers(min_value=-1e12, max_value=1e12, allow_nan=True),
         )
 
-        self.parking_current = ManualParameter(
-            name="parking_current",
-            instrument=self,
-            docstring=r"""DC current that creates the flux to bias the coupler""",
-            initial_value=0,
-            unit="A",
-            vals=Numbers(min_value=-3e-3, max_value=3e-3, allow_nan=True),
-        )
-
         self.dc_flux_0 = ManualParameter(
             name="dc_flux_0",
             instrument=self,
@@ -141,6 +123,33 @@ class CZ(InstrumentChannel):
             initial_value=0,
             unit="",
             vals=Numbers(min_value=-10, max_value=10, allow_nan=True),
+        )
+
+
+class CouplerParameters(InstrumentChannel):
+    """
+    Submodule containing parameters related to the coupler operation
+    """
+
+    def __init__(self, parent: InstrumentBase, name: str, **kwargs: Any) -> None:
+        super().__init__(parent=parent, name=name)
+
+        self.parking_current = ManualParameter(
+            name="parking_current",
+            instrument=self,
+            docstring=r"""DC current that creates the flux to bias the coupler""",
+            initial_value=0,
+            unit="A",
+            vals=Numbers(min_value=-3e-3, max_value=3e-3, allow_nan=True),
+        )
+
+        self.phase_path = ManualParameter(
+            "phase_path",
+            docstring=r"""The path outside the compuational space where the sate goes to acqure a controlled phase""",
+            unit="NA",
+            initial_value=None,
+            vals=Enum("via_20", "via_02", None),
+            instrument=self,
         )
 
 
@@ -178,6 +187,9 @@ class ExtendedCompositeSquareEdge(Edge):
         )
 
         self.add_submodule("cz", CZ(self, "cz"))
+        self.add_submodule(
+            "coupler_parameters", CouplerParameters(self, "coupler_parameters")
+        )
         self.add_submodule("spec", Spec(self, "spec"))
         self.add_submodule("clock_freqs", EdgeClocksFrequencies(self, "clock_freqs"))
 
