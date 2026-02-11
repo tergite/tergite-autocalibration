@@ -1,9 +1,9 @@
 # This code is part of Tergite
 #
-# (c) Copyright Eleftherios Moschandreou 2024
-# (c) Chalmers Next Labs 2024
+# (c) Copyright Eleftherios Moschandreou 2024, 2025
+# (c) Chalmers Next Labs 2024, 2025
 #
-# This code is licensed under the Apache License, Version 2.0. You may
+# This code is licensed under the ache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
 # of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
 #
@@ -13,6 +13,7 @@
 
 import lmfit
 import numpy as np
+from lmfit.model import Model
 from quantify_core.analysis.fitting_models import (
     exp_damp_osc_func,
     fft_freq_phase_guess,
@@ -57,62 +58,13 @@ class RamseyModel(lmfit.model.Model):
         exp_offs_guess = np.mean(data)
         tau_guess = 2 / 3 * np.max(t)
 
-        (freq_guess, phase_guess) = fft_freq_phase_guess(data, t)
+        freq_guess, phase_guess = fft_freq_phase_guess(data, t)
 
         self.set_param_hint("frequency", value=freq_guess, min=0)
         self.set_param_hint("amplitude", value=amp_guess, min=0)
         self.set_param_hint("offset", value=exp_offs_guess)
         self.set_param_hint("phase", value=phase_guess)
         self.set_param_hint("tau", value=tau_guess, min=0)
-
-        params = self.make_params()
-        return lmfit.models.update_param_vals(params, self.prefix, **kws)
-
-
-class LorentzianModel(lmfit.model.Model):
-    """
-    Generate a Lorentzian model that can be fit to qubit spectroscopy data.
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(lorentzian_function, *args, **kwargs)
-
-        self.set_param_hint("center", vary=True)
-        self.set_param_hint("amplitude", vary=True)
-        self.set_param_hint("offset", vary=True)
-        self.set_param_hint("width", vary=True)
-
-    def guess(self, data, **kws) -> lmfit.parameter.Parameters:
-        x = kws.get("x", None)
-
-        if x is None:
-            return None
-
-        # Guess that the resonance is where the function takes its maximal value
-        x0_guess = x[np.argmax(data)]
-        self.set_param_hint("center", value=x0_guess)
-
-        # assume the user isn't trying to fit just a small part of a resonance curve.
-        xmin = x.min()
-        xmax = x.max()
-        width_max = xmax - xmin
-
-        delta_x = np.diff(x)  # assume f is sorted
-        min_delta_x = delta_x[delta_x > 0].min()
-        # assume data actually samples the resonance reasonably
-        width_min = min_delta_x
-        # TODO this needs to be checked:
-        # width_guess = np.sqrt(width_min * width_max)  # geometric mean, why not?
-        width_guess = 0.5e6
-        self.set_param_hint("width", value=width_guess)
-
-        # The guess for the vertical offset is the mean absolute value of the data
-        c_guess = np.mean(data)
-        self.set_param_hint("offset", value=c_guess)
-
-        # Calculate A_guess from difference between the peak and the backround level
-        A_guess = (np.max(data) - c_guess) / 10
-        self.set_param_hint("amplitude", value=A_guess)
 
         params = self.make_params()
         return lmfit.models.update_param_vals(params, self.prefix, **kws)
@@ -156,7 +108,7 @@ class RabiModel(lmfit.model.Model):
         offs_guess = np.mean(data)
 
         # Frequency guess is obtained using a fast fourier transform (FFT).
-        (freq_guess, _) = fft_freq_phase_guess(data, drive_amp)
+        freq_guess, _ = fft_freq_phase_guess(data, drive_amp)
 
         self.set_param_hint("frequency", value=freq_guess, min=0)
         self.set_param_hint("amplitude", value=amp_guess, min=0)
@@ -166,11 +118,21 @@ class RabiModel(lmfit.model.Model):
         return lmfit.models.update_param_vals(params, self.prefix, **kws)
 
 
+def sin_func(
+    x: float,
+    frequency: float,
+    amplitude: float,
+    offset: float,
+    phase: float = 0,
+) -> float:
+    return amplitude * np.cos(2 * np.pi * frequency * x + phase) + offset
+
+
 class TwoClassBoundary:
     """
     Converts the boundary encoded in the LDA discriminator.
     The LDA boundary (also called threshold) has the form Ax + By + y_intercept = 0.
-    This boundary is coverted:
+    This boundary is converted:
     i. To the form y = lamda * x + y_intercept, used in plotting
     ii. To the form (theta, threshold) used by the Quantify Scheduler for Thresholded Aqcuisitions
 
@@ -179,7 +141,7 @@ class TwoClassBoundary:
     lamda: float
         the slope coefficient of form (i)
     y_intercept: float
-        the y axis intercept of form (i)
+        the y-axis intercept of form (i)
     theta_rad: float
         the angle of the boundary, used for form (ii)
     threshold: float
@@ -343,3 +305,108 @@ class ExpDecayModel(lmfit.model.Model):
 
         params = self.make_params()
         return lmfit.models.update_param_vals(params, self.prefix, **kws)
+
+
+def sin_func(
+    x: float,
+    frequency: float,
+    amplitude: float,
+    offset: float,
+    phase: float = 0,
+) -> float:
+    return amplitude * np.cos(2 * np.pi * frequency * x + phase) + offset
+
+
+class SineOscillatingModel(lmfit.model.Model):
+    def __init__(self, *args, **kwargs):
+        # pass in the defining equation so the user doesn't have to later.
+        super().__init__(sin_func, *args, **kwargs)
+
+        # Enforce oscillation frequency is positive
+        self.set_param_hint("frequency", min=0)
+
+    def guess(self, data, **kws) -> lmfit.parameter.Parameters:
+        independent_values = kws.get("x")
+
+        amp_guess = abs(max(data) - min(data)) / 2  # amp is positive by convention
+        offs_guess = np.mean(data)
+
+        freq_guess, _ = fft_freq_phase_guess(data, independent_values)
+
+        self.set_param_hint("frequency", value=freq_guess, min=freq_guess * 0.8)
+        self.set_param_hint("amplitude", value=amp_guess, min=amp_guess * 0.8)
+        self.set_param_hint("offset", value=offs_guess)
+
+        params = self.make_params()
+        return lmfit.models.update_param_vals(params, self.prefix, **kws)
+
+
+def chevron_func(x, x0, amplitude, curvature, offset):
+    return -np.sqrt(amplitude * (x - x0) ** 2 + curvature) + offset
+
+
+# def chevron_func(x, x0, amplitude, offset):
+#     return -amplitude * np.sqrt((x - x0) ** 2) + offset
+
+
+class CzChevronModel(lmfit.model.Model):
+    def __init__(self, *args, **kwargs):
+        # pass in the defining equation so the user doesn't have to later.
+        super().__init__(chevron_func, *args, **kwargs)
+
+    def guess(self, data, **kws) -> lmfit.parameter.Parameters:
+
+        amp_guess = 1e6
+        offs_guess = np.max(data)
+        curvature_guess = 1
+
+        self.set_param_hint("curvature", value=curvature_guess, min=0)
+        self.set_param_hint("offset", value=offs_guess, min=0)
+        self.set_param_hint("amplitude", value=amp_guess, min=0)
+
+        params = self.make_params()
+        return lmfit.models.update_param_vals(params, self.prefix, **kws)
+
+
+def parabolic(x, x0=0, a=0.0, c=0.0):
+    """Return a parabolic function.
+
+    parabolic(x, x0, a, c) = a * (x-x0)**2  + c
+
+    """
+    return a * (x - x0) ** 2 + c
+
+
+class QuadraticModel(Model):
+    """A quadratic model, with three Parameters: `x0`, `a`, and `c`.
+
+    Defined as:
+
+    .. math::
+
+        f(x; x0, a, c) =  a * (x-x0)**2  + c
+
+    """
+
+    def __init__(self, independent_vars=["x"], prefix="", nan_policy="raise", **kwargs):
+        kwargs.update(
+            {
+                "prefix": prefix,
+                "nan_policy": nan_policy,
+                "independent_vars": independent_vars,
+            }
+        )
+        super().__init__(parabolic, **kwargs)
+
+    def guess(self, data, x, **kwargs):
+        """Estimate initial model parameter values from data."""
+        c_guess = np.max(data)
+        index_max_duration = np.argmax(data)
+        freq_at_max_duration = x[index_max_duration]
+
+        # guess a: assume that a x-x0 = 2MHz -> y-y0 = - 12ns
+        a_guess = -12e-9 / (2e6) ** 2
+
+        pars = self.make_params(x0=freq_at_max_duration, a=a_guess, c=c_guess)
+        self.set_param_hint("x0", min=x.min(), max=x.max())
+        return lmfit.models.update_param_vals(pars, self.prefix, **kwargs)

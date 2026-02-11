@@ -11,9 +11,11 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import xarray
 import numpy as np
+import xarray
 from quantify_core.analysis import fitting_models as fm
+
+from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.analysis import (
     ResonatorSpectroscopy1NodeAnalysis,
@@ -23,20 +25,16 @@ from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.analysis i
 from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.measurement import (
     ResonatorSpectroscopyMeasurement,
 )
-
 from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.utils.samplespace import resonator_samples
-from tergite_autocalibration.config.legacy import dh
-
 
 resonator = fm.ResonatorModel()
 
 
 class ResonatorSpectroscopyBase(QubitNode):
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
-        self.name = name
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(all_qubits, couplers=couplers, **schedule_keywords)
 
     def generate_dummy_dataset(self, noise=False):
         dataset = xarray.Dataset()
@@ -81,13 +79,14 @@ class ResonatorSpectroscopyBase(QubitNode):
 
 
 class ResonatorSpectroscopyNode(ResonatorSpectroscopyBase):
+    name: str = "resonator_spectroscopy"
     measurement_obj = ResonatorSpectroscopyMeasurement
     analysis_obj = ResonatorSpectroscopyNodeAnalysis
     measurement_type = ScheduleNode
     qubit_qois = ["clock_freqs:readout", "Ql", "resonator_minimum"]
 
-    def __init__(self, name: str, all_qubits: list[str], **node_keywords):
-        super().__init__(name, all_qubits, **node_keywords)
+    def __init__(self, all_qubits: list[str], couplers: list[str], **node_keywords):
+        super().__init__(all_qubits, couplers=couplers, **node_keywords)
 
         self.schedule_samplespace = {
             "ro_frequencies": {
@@ -97,6 +96,7 @@ class ResonatorSpectroscopyNode(ResonatorSpectroscopyBase):
 
 
 class ResonatorSpectroscopy1Node(ResonatorSpectroscopyBase):
+    name: str = "resonator_spectroscopy_1"
     measurement_obj = ResonatorSpectroscopyMeasurement
     analysis_obj = ResonatorSpectroscopy1NodeAnalysis
     measurement_type = ScheduleNode
@@ -106,8 +106,8 @@ class ResonatorSpectroscopy1Node(ResonatorSpectroscopyBase):
         "resonator_minimum_1",
     ]
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(all_qubits, couplers=couplers, **schedule_keywords)
         self.qubit_state = 1
         self.schedule_keywords["qubit_state"] = self.qubit_state
 
@@ -119,13 +119,14 @@ class ResonatorSpectroscopy1Node(ResonatorSpectroscopyBase):
 
 
 class ResonatorSpectroscopy2Node(ResonatorSpectroscopyBase):
+    name: str = "resonator_spectroscopy_2"
     measurement_obj = ResonatorSpectroscopyMeasurement
     analysis_obj = ResonatorSpectroscopy2NodeAnalysis
     measurement_type = ScheduleNode
     qubit_qois = ["extended_clock_freqs:readout_2"]
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(all_qubits, couplers=couplers, **schedule_keywords)
         self.qubit_state = 2
         self.schedule_keywords["qubit_state"] = self.qubit_state
 

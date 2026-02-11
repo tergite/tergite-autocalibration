@@ -1,6 +1,8 @@
 # This code is part of Tergite
 #
 # (C) Copyright Michele Faucci Giannelli 2024
+# (C) Copyright Michele Eleftherios Moschandreou 2025
+# (C) Chalmers Next Labs 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -12,65 +14,111 @@
 
 import pytest
 
+from tergite_autocalibration.config.globals import CONFIG, REDIS_CONNECTION
 from tergite_autocalibration.lib.base.node import CouplerNode
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.analysis import (
-    CZParametrizationFixDurationNodeAnalysis,
+    CZParametrizationAnalysis,
 )
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.measurement import (
-    CZParametrizationFixDurationMeasurement,
+    CZParametrizationMeasurement,
 )
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.node import (
-    CZParametrizationFixDurationNode,
+    CZParametrizationNode,
 )
+from tergite_autocalibration.lib.nodes.external_parameter_node import (
+    ExternalParameterNode,
+)
+from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
-@pytest.mark.skip
+def test_cannotCreateCorrectType():
+    """
+    raise error if parking current does not exist on redis
+    """
+    ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
+    coupler = "q14_q15"
+    if REDIS_CONNECTION.hexists(f"couplers:{coupler}", "parking_current"):
+        REDIS_CONNECTION.hdel(f"couplers:{coupler}", "parking_current")
+
+    with pytest.raises(TypeError):
+        CZParametrizationNode(all_qubits=["q14", "q15"], couplers=["q14_q15"])
+
+
 def test_canCreateCorrectType():
-    c = CZParametrizationFixDurationNode(
-        "cz_char_fixCurrent",
+    ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
+    coupler = "q14_q15"
+    REDIS_CONNECTION.hset(f"couplers:{coupler}", "parking_current", "100e-6")
+    REDIS_CONNECTION.hset(f"couplers:{coupler}", "cz_phase_path", "via_20")
+    REDIS_CONNECTION.hset(f"transmons:{'q14'}", "clock_freqs:f01", "4.2e6")
+    REDIS_CONNECTION.hset(f"transmons:{'q14'}", "clock_freqs:f12", "4.0e6")
+    REDIS_CONNECTION.hset(f"transmons:{'q15'}", "clock_freqs:f01", "5.2e6")
+    REDIS_CONNECTION.hset(f"transmons:{'q15'}", "clock_freqs:f12", "5.0e6")
+    node = CZParametrizationNode(
         all_qubits=["q14", "q15"],
-        couplers=["q14_q15"],
+        couplers=[coupler],
     )
-    assert isinstance(c, CZParametrizationFixDurationNode)
-    assert isinstance(c, CouplerNode)
+    assert isinstance(node, CouplerNode)
 
 
-@pytest.mark.skip
-def test_CanGetQubitsFromCouplers():
-    c = CZParametrizationFixDurationNode(
-        "cz_char_fixCurrent", all_qubits=["q14", "q15"], couplers=["q14_q15"]
-    )
-    assert c.all_qubits == ["q14", "q15"]
-    assert c.couplers == ["q14_q15"]
-
-
-@pytest.mark.skip
 def test_ValidationReturnErrorWithSameQubitCoupler():
+    ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
     with pytest.raises(ValueError):
-        CZParametrizationFixDurationNode(
-            "cz_char_fixCurrent", all_qubits=["q14", "q15"], couplers=["q14_q14"]
-        )
+        CZParametrizationNode(all_qubits=["q14", "q15"], couplers=["q14_q14"])
 
 
 @pytest.mark.skip
-def test_ValidationReturnErrorWithQubitsNotMatchingClouples():
+def test_ValidationReturnErrorWithQubitsNotMatchingCouplers():
+    ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
     with pytest.raises(ValueError):
-        CZParametrizationFixDurationNode(
-            "cz_char_fixCurrent", all_qubits=["q14", "q16"], couplers=["q14_q15"]
-        )
+        CZParametrizationNode(all_qubits=["q14", "q16"], couplers=["q14_q15"])
 
 
-@pytest.mark.skip
 def test_MeasurementClassType():
-    c = CZParametrizationFixDurationNode(
-        "cz_char_fixCurrent", all_qubits=["q14", "q15"], couplers=["q14_q15"]
-    )
-    assert isinstance(c.measurement_obj, type(CZParametrizationFixDurationMeasurement))
+    ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
+    c = CZParametrizationNode(all_qubits=["q14", "q15"], couplers=["q14_q15"])
+    assert isinstance(c.measurement_obj, type(CZParametrizationMeasurement))
+    assert isinstance(c.analysis_obj, type(CZParametrizationAnalysis))
+    assert issubclass(c.measurement_type, ExternalParameterNode)
 
 
-@pytest.mark.skip
-def test_AnalysisClassType():
-    c = CZParametrizationFixDurationNode(
-        "cz_char_fixCurrent", all_qubits=["q14", "q15"], couplers=["q14_q15"]
+def test_dummy_generation():
+    ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
+    for coupler in CONFIG.run.couplers:
+        REDIS_CONNECTION.hset(f"couplers:{coupler}", "parking_current", "100e-6")
+        REDIS_CONNECTION.hset(f"couplers:{coupler}", "cz_phase_path", "via_20")
+    for qubit in CONFIG.run.qubits[::2]:
+        REDIS_CONNECTION.hset(f"transmons:{qubit}", "clock_freqs:f01", "4.2e6")
+        REDIS_CONNECTION.hset(f"transmons:{qubit}", "clock_freqs:f12", "4.0e6")
+        REDIS_CONNECTION.hset(f"transmons:{qubit}", "centroid_I", "0")
+        REDIS_CONNECTION.hset(f"transmons:{qubit}", "centroid_Q", "0")
+        REDIS_CONNECTION.hset(f"transmons:{qubit}", "omega_01", "60")
+        REDIS_CONNECTION.hset(f"transmons:{qubit}", "omega_12", "180")
+        REDIS_CONNECTION.hset(f"transmons:{qubit}", "omega_20", "270")
+    for qubit in CONFIG.run.qubits[1::2]:
+        REDIS_CONNECTION.hset(f"transmons:{qubit}", "clock_freqs:f01", "5.2e6")
+        REDIS_CONNECTION.hset(f"transmons:{qubit}", "clock_freqs:f12", "5.0e6")
+        REDIS_CONNECTION.hset(f"transmons:{qubit}", "centroid_I", "0")
+        REDIS_CONNECTION.hset(f"transmons:{qubit}", "centroid_Q", "0")
+        REDIS_CONNECTION.hset(f"transmons:{qubit}", "omega_01", "60")
+        REDIS_CONNECTION.hset(f"transmons:{qubit}", "omega_12", "180")
+        REDIS_CONNECTION.hset(f"transmons:{qubit}", "omega_20", "270")
+
+    node = CZParametrizationNode(
+        all_qubits=CONFIG.run.qubits, couplers=CONFIG.run.couplers
     )
-    assert isinstance(c.analysis_obj, type(CZParametrizationFixDurationNodeAnalysis))
+    dummy_dataset = node.generate_dummy_dataset()
+    first_coupler = CONFIG.run.couplers[0]
+
+    number_of_frequencies = len(
+        node.schedule_samplespace["cz_pulse_frequencies"][first_coupler]
+    )
+    number_of_amplitudes = len(
+        node.schedule_samplespace["cz_pulse_amplitudes"][first_coupler]
+    )
+
+    data_vars = dummy_dataset.data_vars
+
+    assert len(data_vars) == 2 * len(CONFIG.run.couplers)
+    assert (
+        data_vars[0].size == number_of_frequencies * number_of_amplitudes * node.loops
+    )

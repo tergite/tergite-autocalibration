@@ -14,6 +14,7 @@
 """
 Module containing a schedule class for DRAG pulse motzoi parameter calibration.
 """
+
 from __future__ import annotations
 
 import numpy as np

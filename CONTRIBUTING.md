@@ -4,12 +4,13 @@
 
 **It is currently being developed by the core developers only.**
 
-[Chalmers Next Labs AB (CNL)](https://chalmersnextlabs.se) manages and maintains this project on behalf of all contributors.
+[Chalmers Next Labs AB (CNL)](https://chalmersnextlabs.se) manages and maintains this project on behalf of all
+contributors.
 
 ## General information about contributions
 
 Tergite is developed on a separate version control system and mirrored on GitHub.
-If you are reading this on GitHub, then you are looking at a mirror. 
+If you are reading this on GitHub, then you are looking at a mirror.
 
 The following subsections are only relevant for people that are onboarded on the internal version control system.
 
@@ -109,7 +110,7 @@ You can find more information about unit tests in the documentation.
 Each calibration node goes through the following phases in order:
 
 - compilation
-- execution 
+- execution
 - post-processing
 - redis updating
 
@@ -117,13 +118,15 @@ Each calibration node goes through the following phases in order:
 
 Datasets are stored in [`out`](./out).
 They can be browsed with the dataset browser:
+
 ```
 acli browser --datadir PATH_TO_DATA_DIRECTORY
 ```
 
 ### Documentation
 
-We are using [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) to build and render documentation. MkDocs is a static site generator that's easy to use and supports a wide range of features via plugins.
+We are using [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) to build and render documentation. MkDocs
+is a static site generator that's easy to use and supports a wide range of features via plugins.
 
 To install it, use the following command in your terminal:
 
@@ -137,31 +140,11 @@ To render a live preview of the documentation, run:
 mkdocs serve
 ```
 
-This will open a browser window with the rendered documentation (typically [http://localhost:8000/](http://localhost:8000/)) in your browser..
+This will open a browser window with the rendered documentation (
+typically [http://localhost:8000/](http://localhost:8000/)) in your browser..
 
-Now you can edit the files in `docs` and the contents in the browser window would update automatically. One of the documentation pages is also about how to write better documentation.
-
-### Installation of proprietary resources (optional, not recommended)
-We do not recommend to make your code having dependencies to proprietary software.
-If you still need to install proprietary dependencies, please do so by running:
-```
-pip install -r requirements_proprietary.txt
-```
-Make sure you have ssh access to all proprietary repositories, otherwise the installation will fail.
-
-When you are using imports of proprietary resources in the code, please make sure that they are wrapped with a `try` and `catch` statement.
-```
-try:
-    from superconducting_qubit_tools.clifford_module.randomized_benchmarking import *
-except ImportError:
-    logger.warning(
-        "Could not find package: superconducting-qubit-tools.",
-        "This is a proprietary licenced software.",
-        "Please make sure that you are having a correct licence and install the dependency",
-    )
-```
-Please try to use proprietary resources only on experimental features and do not integrate them into the default workflows.
-The scope of the Tergite project is to be as open-source as possible.
+Now you can edit the files in `docs` and the contents in the browser window would update automatically. One of the
+documentation pages is also about how to write better documentation.
 
 ## License
 
@@ -184,7 +167,6 @@ you will also most likely need to sign a [corporate CLA](https://tergite.github.
 
 All signed CLAs are send by email
 to [contact@quantum.chalmersnextlabs.se](mailto://contact@quantum.chalmersnextlabs.se).
-
 
 ## References
 

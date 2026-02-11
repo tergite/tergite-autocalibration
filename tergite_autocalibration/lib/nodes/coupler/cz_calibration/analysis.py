@@ -94,7 +94,7 @@ class CZModel(lmfit.model.Model):
         offs_guess = np.mean(data)
 
         # Frequency guess is obtained using a fast fourier transform (FFT).
-        (freq_guess, _) = fft_freq_phase_guess(data, drive_amp)
+        freq_guess, _ = fft_freq_phase_guess(data, drive_amp)
 
         self.set_param_hint("frequency", value=freq_guess, min=freq_guess * 0.9)
         self.set_param_hint("amplitude", value=amp_guess, min=amp_guess * 0.9)

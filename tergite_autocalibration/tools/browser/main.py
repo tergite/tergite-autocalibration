@@ -13,21 +13,18 @@
 
 import base64
 import json
-import re
 import os
+import re
 
 import dash
 import plotly.express as px
 import xarray as xr
 from dash import callback_context, dcc, html
-from dash.dependencies import Input, Output, State
-from dash.dependencies import MATCH
+from dash.dependencies import MATCH, Input, Output, State
 from dash_renderjson import DashRenderjson
 
 from tergite_autocalibration.config.globals import DATA_DIR
-from tergite_autocalibration.tools.browser.layout import (
-    generate_selection_layout,
-)
+from tergite_autocalibration.tools.browser.layout import generate_selection_layout
 from tergite_autocalibration.tools.browser.utils import scan_folders
 
 folder_structure = scan_folders(DATA_DIR)
@@ -263,15 +260,42 @@ def update_tab(tab: str, outer: str, inter: str, inner: str):
 
     elif tab == "json":
         for file in os.listdir(folder_path):
-            if file.endswith(".json"):
+            if file.endswith(".json") and "qoi" not in file:
                 with open(os.path.join(folder_path, file)) as f:
                     data = json.load(f)
-                return DashRenderjson(
-                    data=data,
-                    max_depth=-1,
-                    invert_theme=True,
-                    # , theme="monokai"
+                columns = []
+                for key in data:
+                    columns.append(
+                        html.Div(
+                            style={
+                                "flex": "1",
+                                "minWidth": "300px",  # responsive: wrap if too narrow
+                                "overflow": "auto",
+                                "padding": "10px",
+                                "border": "1px solid #ddd",
+                                "borderRadius": "6px",
+                            },
+                            children=[
+                                html.H4(key),
+                                DashRenderjson(
+                                    id=f"json-view-{key}",
+                                    data=data[key]["data"],
+                                    max_depth=1,  # collapse nested content initially
+                                    invert_theme=True,
+                                ),
+                            ],
+                        )
+                    )
+                json_view = html.Div(
+                    columns,
+                    style={
+                        "display": "flex",
+                        "flexWrap": "wrap",  # wrap when many keys
+                        "gap": "20px",
+                    },
                 )
+                return json_view
+
         return "No JSON file found."
 
     return "Invalid tab."
@@ -353,7 +377,24 @@ def filter_dataset_by_element(selected_elements: list, dataset_json: str):
             for var in filtered_ds.data_vars:
                 da = filtered_ds[var]
                 if da.ndim == 1:
-                    fig = px.line(x=da.coords[da.dims[0]], y=abs(da), title=var)
+                    fig = px.line(
+                        x=da.coords[da.dims[0]], y=abs(da), title=var, markers=True
+                    )
+                    fig.update_layout(plot_bgcolor="white")
+                    fig.update_xaxes(
+                        mirror=True,
+                        ticks="outside",
+                        showline=True,
+                        linecolor="black",
+                        gridcolor="lightgrey",
+                    )
+                    fig.update_yaxes(
+                        mirror=True,
+                        ticks="outside",
+                        showline=True,
+                        linecolor="black",
+                        gridcolor="lightgrey",
+                    )
                     displays.append(
                         dcc.Graph(
                             figure=fig,
@@ -361,12 +402,23 @@ def filter_dataset_by_element(selected_elements: list, dataset_json: str):
                         )
                     )
                 elif da.ndim == 2:
+                    if any(["freq" in str(coord) for coord in da.coords]):
+                        data = abs(da)
+                    else:
+                        data = abs(da.T)
+                    fig = px.imshow(
+                        data, color_continuous_scale="RdBu_r", origin="lower"
+                    )
+                    displays.append(
+                        dcc.Graph(
+                            figure=fig,
+                            style={"border": "1px solid #ccc", "padding": "10px"},
+                        )
+                    )
                     for dim in da.dims:
                         y_dim_options.add(dim)
-        # return [[{"label": d, "value": d} for d in y_dim_options]]
         return [displays, [{"label": d, "value": d} for d in y_dim_options]]
     except Exception as e:
-        # return [[]]
         return [[f"Error filtering dataset: {e}"], []]
 
 
@@ -429,6 +481,22 @@ def plot_y_slice(y_dim_value: str, selected_elements: str, dataset_json: str):
                             x=line.coords[line.dims[0]],
                             y=abs(line),
                             title=f"{var} @ {y_dim_value}={val}",
+                            markers=True,
+                        )
+                        fig.update_layout(plot_bgcolor="white")
+                        fig.update_xaxes(
+                            mirror=True,
+                            ticks="outside",
+                            showline=True,
+                            linecolor="black",
+                            gridcolor="lightgrey",
+                        )
+                        fig.update_yaxes(
+                            mirror=True,
+                            ticks="outside",
+                            showline=True,
+                            linecolor="black",
+                            gridcolor="lightgrey",
                         )
                         displays.append(
                             dcc.Graph(

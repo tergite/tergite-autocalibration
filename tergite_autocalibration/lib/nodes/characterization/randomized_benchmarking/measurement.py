@@ -16,6 +16,7 @@
 """
 Module containing a schedule class for randomized benchmarking measurement.
 """
+
 import numpy as np
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.control_flow_library import Loop

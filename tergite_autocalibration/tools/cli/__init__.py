@@ -13,16 +13,18 @@
 # that they have been altered from the originals.
 
 import multiprocessing
+from pathlib import Path
 from typing import Annotated
 
 import typer
 
+from tergite_autocalibration.tools.cli.backend import backend_cli
+from tergite_autocalibration.tools.cli.browser import browser_cli
 from tergite_autocalibration.tools.cli.cluster import cluster_cli
 from tergite_autocalibration.tools.cli.config import config_cli
 from tergite_autocalibration.tools.cli.graph import graph_cli
 from tergite_autocalibration.tools.cli.node import node_cli
-from tergite_autocalibration.tools.cli.browser import browser_cli
-from tergite_autocalibration.tools.cli.backend import backend_cli
+from tergite_autocalibration.tools.cli.spi import spi_cli
 from tergite_autocalibration.utils.logging.decorators import suppress_logging
 
 cli_kwargs = {"no_args_is_help": True}
@@ -40,6 +42,12 @@ cli.add_typer(
     **cli_kwargs,
     name="cluster",
     help="Handle operations related to the cluster.",
+)
+cli.add_typer(
+    spi_cli,
+    **cli_kwargs,
+    name="spi",
+    help="Handle operations related to the spi rack.",
 )
 cli.add_typer(
     graph_cli,
@@ -111,14 +119,6 @@ def start(
             help="Use --ignore-spec to force recalibration.",
         ),
     ] = False,
-    push: Annotated[
-        bool,
-        typer.Option(
-            "--push",
-            is_flag=True,
-            help="If --push the a backend will pushed to an MSS specified in MSS_MACHINE_ROOT_URL in the .env file.",
-        ),
-    ] = False,
     browser: Annotated[
         bool,
         typer.Option(
@@ -135,10 +135,9 @@ def start(
         CalibrationSupervisor,
         CalibrationConfig,
     )
-    from tergite_autocalibration.scripts.db_backend_update import update_mss
     from tergite_autocalibration.config.globals import CONFIG, ENV
     from tergite_autocalibration.tools.browser import start_browser
-    from tergite_autocalibration.utils.backend.reset_redis_node import ResetRedisNode
+    from tergite_autocalibration.utils.backend.reset_redis_node import reset_redis_nodes
     from tergite_autocalibration.utils.dto.enums import MeasurementMode
     from tergite_autocalibration.utils.io.dataset import scrape_and_copy_hdf5_files
     from tergite_autocalibration.utils.reanalysis_utils import (
@@ -184,7 +183,7 @@ def start(
         # Comfort functionality to reset the re-analysis node first
         if typer.confirm(f"Do you want to reset node {target_node_name}?"):
             if target_node_name is not None:
-                ResetRedisNode().reset_node(target_node_name)
+                reset_redis_nodes([target_node_name])
 
         scrape_and_copy_hdf5_files(CONFIG.run.data_dir, CONFIG.run.log_dir)
 
@@ -220,10 +219,6 @@ def start(
     else:
         supervisor.calibrate_system(node_name=node_name, ignore_spec=ignore_spec)
 
-    # Push the results of the calibration to MSS
-    if push:
-        update_mss()
-
 
 cli.add_typer(
     config_cli,
@@ -233,9 +228,9 @@ cli.add_typer(
 )
 
 
-@cli.command(help="Quickly runs to set reasonable defaults for the configuration.")
+@cli.command(help="Export the calibration results to a calibration seed file for BCC.")
 @suppress_logging
-def quickstart(
+def bcc_export(
     qubits: Annotated[
         str,
         typer.Option(
@@ -245,83 +240,76 @@ def quickstart(
             'If the input is an integer e.g. 3, it will generate "q01,q02,q03".',
         ),
     ] = None,
+    couplers: Annotated[
+        str,
+        typer.Option(
+            "--couplers",
+            "-c",
+            help='Couplers to export e.g. "q00_q01" as comma-separated list',
+        ),
+    ] = None,
+    output_file: Annotated[
+        Path,
+        typer.Option(
+            "--output-file",
+            "-o",
+            help="calibration_seed.toml file to write the values to",
+        ),
+    ] = None,
 ):
     """
     This is loading the template to the root dir and fills it with the input qubits.
 
     Args:
         qubits: Qubit input e.g. "q00,q01,q02,q03,q04" or "q01-q05" or "q01-q06, q08"
+        couplers: Couplers to export e.g. "q00_q01" as comma-separated list
+        output_file: calibration_seed.toml file to write the values to
     """
-    import os
-
-    from jinja2 import Template
-
-    from tergite_autocalibration.config.globals import ENV
-    from tergite_autocalibration.config.package import ConfigurationPackage
-    from tergite_autocalibration.tools.cli.config import load
+    from tergite_autocalibration.config.globals import CONFIG
+    from tergite_autocalibration.scripts.export_to_bcc import export
     from tergite_autocalibration.utils.io.parsers import parse_input_qubits
-    from tergite_autocalibration.utils.misc.helpers import generate_n_qubit_list
 
-    # This is the case where the qubit input indicates the total number of qubits
-    try:
-        qubits = int(qubits)
-        qubits_ = generate_n_qubit_list(qubits)
-
-    # This is the case where the qubits are specified in a string and then parsed
-    except ValueError:
-        if isinstance(qubits, str):
+    # Parse qubit input
+    if qubits is not None:
+        try:
             qubits_ = parse_input_qubits(qubits)
-        # Or if it is no string at all, it will raise a failure
-        else:
+        except TypeError:
             typer.echo(
-                f"Input qubits {qubits} cannot be parsed. Please provide a valid input for --qubits or -q."
+                "Input qubits empty. Please provide a valid input for --qubits or -q."
             )
             raise typer.Abort()
-    except TypeError:
-        typer.echo(
-            "Input qubits empty. Please provide a valid input for --qubits or -q."
+    else:
+        qubits_ = CONFIG.run.qubits
+
+    # Parse couplers
+    if couplers is not None:
+        try:
+            couplers_ = couplers.split(",") if couplers else []
+        except:
+            typer.echo("Please provide a comma-separated list of couplers.")
+            raise typer.Abort()
+    else:
+        couplers_ = CONFIG.run.couplers
+
+    # Parse file input
+    if output_file is None:
+        filepath = Path("calibration_seed.toml").resolve()
+    else:
+        filepath = Path(output_file).resolve()
+
+    # Do some file checks
+    if filepath.exists():
+        confirm_ = typer.confirm(
+            f"The output file '{filepath}' already exists. Do you want to overwrite it?"
         )
-        raise typer.Abort()
+        if not confirm_:
+            raise typer.Abort()
 
-    # Load the default configuration package
-    load(template=".default")
+    # Add suffix if not exists
+    if not filepath.suffix == ".toml":
+        filepath = filepath.with_suffix(".toml")
 
-    # Create a configuration package object for easier handling
-    configuration_package = ConfigurationPackage.from_toml(
-        os.path.join(ENV.config_dir, "configuration.meta.toml")
-    )
-
-    # Insert the template values for device configuration
-    configs_to_update = ["device_config", "run_config"]
-
-    # Iterate over the configurations to update
-    # Note: This can be looped at the moment, since there is a very simple logic behind updating
-    #       the configurations. It can also be solved in a more advanced way and more specific for
-    #       each single configuration file, but right now the only necessary parameter is the list
-    #       of qubits.
-    for config_name in configs_to_update:
-
-        # Get the path to the configuration template
-        config_template_path = os.path.join(
-            configuration_package.misc_filepaths["j2_templates"],
-            f"{config_name}.j2",
-        )
-        # Read the template file content
-        with open(config_template_path, "r") as file:
-            template_content = file.read()
-
-        # Create a Template object
-        template = Template(template_content)
-
-        # Insert the template values for run configuration
-        output = template.render(qubits=qubits_)
-
-        # Write the configuration values to the .toml files
-        config_output_file_path = configuration_package.config_files[config_name]
-
-        # Write the output to a TOML file
-        with open(config_output_file_path, "w") as toml_file:
-            toml_file.write(output)
+    export(qubits_, couplers_, output_path=filepath)
 
 
 @cli.command(help="Tell a joke.")

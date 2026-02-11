@@ -12,19 +12,16 @@
 # that they have been altered from the originals.
 
 
-from lmfit.models import LorentzianModel
 import numpy as np
-from quantify_scheduler import CompiledSchedule
-from quantify_scheduler.backends import SerialCompiler
 import quantify_scheduler.backends.qblox.constants as constants
 import xarray
+from lmfit.models import LorentzianModel
+from quantify_scheduler import CompiledSchedule
 
 from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.base.node import CouplerNode
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
-    QubitSpectroscopyVsCurrentNodeAnalysis,
-    ResonatorSpectroscopyVsCurrentNodeAnalysis,
-    QubitSpectroscopyVsCurrentNodeAnalysis,
+    CouplerAnticrossingNodeAnalysis,
     ResonatorSpectroscopyVsCurrentNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.external_parameter_node import (
@@ -40,6 +37,7 @@ from tergite_autocalibration.lib.utils.samplespace import (
     qubit_samples,
     resonator_samples,
 )
+from tergite_autocalibration.lib.utils.schedule_execution import get_compiler
 from tergite_autocalibration.utils.logging import logger
 
 peak = LorentzianModel()
@@ -51,14 +49,14 @@ class QubitSpectroscopyVsCurrentNode(CouplerNode):
     current through the coupler to measure the crossing point of the coupler with the qubit.
     """
 
+    name: str = "qubit_spectroscopy_vs_current"
     measurement_obj = TwoTonesMultidimMeasurement
-    analysis_obj = QubitSpectroscopyVsCurrentNodeAnalysis
+    analysis_obj = CouplerAnticrossingNodeAnalysis
     measurement_type = ExternalParameterNode
-    # coupler_qois = ["parking_current"]
-    coupler_qois = ["qubit_crossing_points"]
+    coupler_qois = ["control_qubit_crossing_points", "target_qubit_crossing_points"]
 
-    def __init__(self, name: str, couplers: list[str], **schedule_keywords):
-        super().__init__(name, couplers, **schedule_keywords)
+    def __init__(self, couplers: list[str], **schedule_keywords):
+        super().__init__(couplers, **schedule_keywords)
         self.qubit_state = 0
         self.dacs = []
         self.schedule_keywords["qubit_state"] = self.qubit_state
@@ -71,7 +69,7 @@ class QubitSpectroscopyVsCurrentNode(CouplerNode):
 
         self.external_samplespace = {
             "dc_currents": {
-                coupler: np.arange(-2.5e-3, 2.5e-3, 100e-6) for coupler in self.couplers
+                coupler: np.arange(-1.5e-3, 1.5e-3, 100e-6) for coupler in self.couplers
             },
         }
         self.validate()
@@ -131,14 +129,18 @@ class ResonatorSpectroscopyVsCurrentNode(CouplerNode):
     current through the coupler to measure the crossing point of the coupler with the resonator.
     """
 
+    name: str = "resonator_spectroscopy_vs_current"
     measurement_obj = ResonatorSpectroscopyMeasurement
     analysis_obj = ResonatorSpectroscopyVsCurrentNodeAnalysis
     measurement_type = ExternalParameterNode
     # coupler_qois = ["resonator_flux_quantum"]
-    coupler_qois = ["resonator_crossing_points"]
+    coupler_qois = [
+        "control_resonator_crossing_points",
+        "target_resonator_crossing_points",
+    ]
 
-    def __init__(self, name: str, couplers: list[str], **schedule_keywords):
-        super().__init__(name, couplers, **schedule_keywords)
+    def __init__(self, couplers: list[str], **schedule_keywords):
+        super().__init__(couplers, **schedule_keywords)
         self.qubit_state = 0
         self.dacs = []
 
@@ -161,15 +163,15 @@ class ResonatorSpectroscopyVsCurrentNode(CouplerNode):
     def precompile(self, schedule_samplespace: dict) -> CompiledSchedule:
         constants.GRID_TIME_TOLERANCE_TIME = 5e-2
 
-        transmons = self.device_manager.transmons
-
-        measurement_class = self.measurement_obj(transmons)
+        transmons_dict = {
+            qubit: self.device.get_element(qubit) for qubit in self.all_qubits
+        }
+        measurement_class = self.measurement_obj(transmons_dict)
         schedule = measurement_class.schedule_function(
             **schedule_samplespace, **self.schedule_keywords
         )
 
-        # TODO: Probably the compiler desn't need to be created every time self.precompile() is called.
-        compiler = SerialCompiler(name=f"{self.name}_compiler")
+        compiler = get_compiler(prefix=self.name)
 
         compilation_config = self.device.generate_compilation_config()
         logger.info("Starting Compiling")

@@ -19,7 +19,8 @@
 import os
 from dataclasses import dataclass, field
 from ipaddress import IPv4Address
-from typing import List, Union, FrozenSet
+from types import MappingProxyType
+from typing import FrozenSet, List, Union
 
 from colorama import Fore, Style
 from colorama import init as colorama_init
@@ -27,7 +28,7 @@ from qblox_instruments import Cluster
 from qblox_instruments.types import ClusterType
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
-from types import MappingProxyType
+
 from tergite_autocalibration.config.globals import (
     CLUSTER_IP,
     CONFIG,
@@ -39,20 +40,17 @@ from tergite_autocalibration.config.package import ConfigurationPackage
 from tergite_autocalibration.lib.base.node import BaseNode, CouplerNode
 from tergite_autocalibration.lib.utils.graph import filtered_topological_order
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
+from tergite_autocalibration.services.spi import print_spi_currents
 from tergite_autocalibration.utils.backend.redis_utils import (
     populate_initial_parameters,
     populate_node_parameters,
     populate_quantities_of_interest,
 )
-from tergite_autocalibration.utils.dto.enums import (
-    DataStatus,
-    MeasurementMode,
-)
+from tergite_autocalibration.utils.dto.enums import DataStatus, MeasurementMode
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
 from tergite_autocalibration.utils.io.dataset import create_node_data_path
 from tergite_autocalibration.utils.logging import logger
 
-# from tergite_autocalibration.utils.logger.tac_logger import logger
 from tergite_autocalibration.utils.logging.visuals import draw_arrow_chart
 
 colorama_init()
@@ -398,6 +396,7 @@ class CalibrationSupervisor:
             self.config.couplers
         )
         self.node_manager.spi_manager.set_parking_currents(self.config.couplers)
+        print_spi_currents()
 
         # Create a copy of the configuration inside the log directory
         # This is to be able to replicate errors caused by configuration

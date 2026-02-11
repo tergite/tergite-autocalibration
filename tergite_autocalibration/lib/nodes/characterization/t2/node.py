@@ -42,13 +42,14 @@ class T2Node(QubitNode):
     and T2NodeAnalysis for analysis.
     """
 
+    name: str = "T2"
     measurement_obj = T2Measurement
     analysis_obj = T2NodeAnalysis
     measurement_type = ExternalParameterNode
     qubit_qois = ["t2_time"]
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(self, all_qubits: list[str], **schedule_keywords):
+        super().__init__(all_qubits, **schedule_keywords)
         self.all_qubits = all_qubits  # Is this needed
 
         self.schedule_keywords = {
@@ -93,13 +94,14 @@ class T2EchoNode(QubitNode):
     and T2EchoNodeAnalysis for analysis.
     """
 
+    name: str = "T2_echo"
     measurement_obj = T2EchoMeasurement
     analysis_obj = T2EchoNodeAnalysis
     measurement_type = ExternalParameterNode
     qubit_qois = ["t2_echo_time"]
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(self, all_qubits: list[str], **schedule_keywords):
+        super().__init__(all_qubits, **schedule_keywords)
         self.all_qubits = all_qubits
         self.backup = False
 
