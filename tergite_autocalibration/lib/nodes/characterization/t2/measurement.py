@@ -36,9 +36,7 @@ class T2Measurement(BaseMeasurement):
             ref_pt="end",
             rel_time=tau,
         )
-        schedule.add(
-            Measure(qubit, acq_index=acq_index, bin_mode=BinMode.AVERAGE)
-        )
+        schedule.add(Measure(qubit, acq_index=acq_index, bin_mode=BinMode.AVERAGE))
         schedule.add(Reset(qubit))
 
     def schedule_function(
@@ -109,9 +107,7 @@ class T2EchoMeasurement(BaseMeasurement):
             ref_pt="end",
             rel_time=tau / 2,
         )
-        schedule.add(
-            Measure(qubit, acq_index=acq_index, bin_mode=BinMode.AVERAGE)
-        )
+        schedule.add(Measure(qubit, acq_index=acq_index, bin_mode=BinMode.AVERAGE))
         schedule.add(Reset(qubit))
 
     def schedule_function(
