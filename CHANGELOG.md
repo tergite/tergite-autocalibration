@@ -10,6 +10,7 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 ### Added
 
 - Backup functions for redis storage.
+- Motzoi parameter for DRAG pulse in tergite SDK
 
 ### Changed
 
