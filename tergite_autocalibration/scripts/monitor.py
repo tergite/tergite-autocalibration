@@ -124,7 +124,6 @@ class OptimizeNode:
         optimize_swap=False,
     ):
         self.monitor = Monitor()
-        self.reset_redis = ResetRedisNode()
         self.node = node
         self.qubits = CONFIG.run.qubits
         self.couplers = CONFIG.run.couplers
