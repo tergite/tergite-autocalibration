@@ -82,6 +82,18 @@ Please check the [documentation about configuration](./configuration_files.md) a
 acli spi status
 ```
 
+#### `spi status` ####
+
+Resets all currents on the SPI rack to 0.
+Only couplers that are having a DAC in the SPI configuration are considered.
+Please check the [documentation about configuration](./configuration_files.md) about how to change the SPI DACs.
+
+**Usage:**
+
+```
+acli spi reset
+```
+
 ### Node Commands ###
 
 #### `node reset` ####
