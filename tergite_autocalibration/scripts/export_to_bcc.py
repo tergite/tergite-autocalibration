@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Chalmers Next Labs AB 2025
+# (C) Copyright Chalmers Next Labs AB 2025, 2026
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -52,6 +52,7 @@ _qubit_parameters = [
     ("frequency", "clock_freqs:f01", _DataSource.REDIS, float),
     ("pi_pulse_amplitude", "rxy:amp180", _DataSource.REDIS, float),
     ("pi_pulse_duration", "rxy:duration", _DataSource.REDIS, float),
+    ("pi_pulse_motzoi", "rxy:motzoi", _DataSource.REDIS, float),
     ("pulse_type", "Gaussian", _DataSource.LITERAL, str),
     ("pulse_sigma", "rxy:sigma", _DataSource.REDIS, float),
     ("t1_decoherence", "t1_time", _DataSource.REDIS, float),

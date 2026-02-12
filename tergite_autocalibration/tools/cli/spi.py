@@ -17,17 +17,17 @@ from tergite_autocalibration.utils.logging.decorators import suppress_logging
 spi_cli = typer.Typer()
 
 
-@spi_cli.command(help="Print SPI currents.")
+@spi_cli.command(help="Print SPI currents for all defined couplers.")
 @suppress_logging
 def status():
-    import toml
+    from tergite_autocalibration.services.spi import print_spi_currents
 
-    from tergite_autocalibration.config.globals import CONFIG
-    from tergite_autocalibration.utils.dto.enums import MeasurementMode
-    from tergite_autocalibration.utils.hardware.spi import SpiDAC
+    print_spi_currents()
 
-    spi_config = toml.load(CONFIG.spi)
-    couplers = list(spi_config.keys())
 
-    spi = SpiDAC(couplers, MeasurementMode.real)
-    spi.print_currents()
+@spi_cli.command(help="Reset SPI currents to zero for all defined couplers.")
+@suppress_logging
+def reset():
+    from tergite_autocalibration.services.spi import reset_spi_currents
+
+    reset_spi_currents()

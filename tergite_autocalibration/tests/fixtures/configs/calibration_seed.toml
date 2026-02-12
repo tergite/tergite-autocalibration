@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Chalmers Next Labs AB 2025
+# (C) Copyright Chalmers Next Labs AB 2025, 2026
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -19,6 +19,7 @@
 frequency = "Hz"
 pi_pulse_amplitude = ""
 pi_pulse_duration = "s"
+pi_pulse_motzoi = ""
 pulse_sigma = ""
 t1_decoherence = "s"
 t2_decoherence = "s"
@@ -47,6 +48,7 @@ id = "q11"
 frequency = 4741499559.458488
 pi_pulse_amplitude = 0.7308488204080522
 pi_pulse_duration = 4.4e-08
+pi_pulse_motzoi = -0.05384615384615388
 pulse_type = "Gaussian"
 pulse_sigma = 0.0
 t1_decoherence = 63.39282543781701
@@ -57,6 +59,7 @@ id = "q12"
 frequency = 4266043761.8823304
 pi_pulse_amplitude = 0.3942183215348928
 pi_pulse_duration = 4.4e-08
+pi_pulse_motzoi = 0.02307692307692305
 pulse_type = "Gaussian"
 pulse_sigma = 0.0
 t1_decoherence = 86.61716166660516
