@@ -2,6 +2,7 @@
 #
 # (C) Copyright Eleftherios Moschandreou 2023, 2024, 2026
 # (C) Copyright Liangyu Chen 2023, 2024
+# (C) Copyright Chalmers Next Labs 2026
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -12,19 +13,18 @@
 # that they have been altered from the originals.
 
 import numpy as np
-from quantify_scheduler.enums import BinMode
-from quantify_scheduler.operations.acquisition_library import \
-    SSBIntegrationComplex
+from quantify_scheduler.operations.acquisition_library import SSBIntegrationComplex
 from quantify_scheduler.operations.gate_library import Reset, X
-from quantify_scheduler.operations.pulse_library import (DRAGPulse,
-                                                         SetClockFrequency,
-                                                         SquarePulse)
+from quantify_scheduler.operations.pulse_library import (
+    DRAGPulse,
+    SetClockFrequency,
+    SquarePulse,
+)
 from quantify_scheduler.resources import ClockResource
 from quantify_scheduler.schedules.schedule import Schedule
 
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
-from tergite_autocalibration.utils.dto.extended_transmon_element import \
-    ExtendedTransmon
+from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
 class ROFrequencyOptimizationMeasurement(BaseMeasurement):
@@ -32,18 +32,21 @@ class ROFrequencyOptimizationMeasurement(BaseMeasurement):
         super().__init__(transmons)
         self.transmons = transmons
 
-    def measure(
-        self,
-        schedule: Schedule,
-        transmon: ExtendedTransmon,
-        this_qubit: str,
-        acq_index: int,
-        acq_cha: int,
-        this_ro_clock: str,
-    ):
-        # TODO: some of these arguments are already contained in the transmon
+        # Initialize the clock for each qubit
+        if len(self.transmons) == 2:
+            self.ro_str = "ro_2st_opt"
+        elif len(self.transmons) == 3:
+            self.ro_str = "ro_3st_opt"
+        else:
+            raise ValueError("invalid number of states")
 
+    def measure(self, schedule: Schedule, transmon: ExtendedTransmon, acq_index: int):
+
+        this_qubit = transmon.name
         measure = transmon.measure
+        acq_cha = measure.acq_channel()
+        this_ro_clock = f"{this_qubit}." + self.ro_str
+
         ro_pulse = schedule.add(
             SquarePulse(
                 duration=measure.pulse_duration(),
@@ -59,7 +62,6 @@ class ROFrequencyOptimizationMeasurement(BaseMeasurement):
                 clock=this_ro_clock,
                 acq_index=acq_index,
                 acq_channel=acq_cha,
-                bin_mode=BinMode.AVERAGE,
             ),
             ref_op=ro_pulse,
             ref_pt="start",
@@ -69,39 +71,23 @@ class ROFrequencyOptimizationMeasurement(BaseMeasurement):
         schedule.add(Reset(this_qubit))
 
     def measure_first_excited(
-        self,
-        schedule: Schedule,
-        transmon: ExtendedTransmon,
-        this_qubit: str,
-        acq_index: int,
-        acq_cha: int,
-        this_ro_clock: str,
+        self, schedule: Schedule, transmon: ExtendedTransmon, acq_index: int
     ):
+        this_qubit = transmon.name
         schedule.add(X(this_qubit))
-        self.measure(
-            schedule,
-            transmon,
-            this_qubit,
-            acq_index,
-            acq_cha,
-            this_ro_clock,
-        )
+        self.measure(schedule, transmon, acq_index)
 
     def measure_second_excited(
-        self,
-        schedule: Schedule,
-        transmon: ExtendedTransmon,
-        this_qubit: str,
-        acq_index: int,
-        acq_cha: int,
-        this_ro_clock: str,
-        this_mw_clock: str,
+        self, schedule: Schedule, transmon: ExtendedTransmon, acq_index: int
     ):
         # repeat for when the qubit is at |2>
+        this_qubit = transmon.name
         schedule.add(X(this_qubit))
+        this_mw_clock = f"{this_qubit}.12"
+
         schedule.add(
             DRAGPulse(
-                duration=transmon.rxy.duration(),
+                duration=transmon.r12.ef_duration(),
                 G_amp=transmon.r12.ef_amp180(),
                 D_amp=transmon.r12.ef_motzoi(),
                 port=transmon.ports.microwave(),
@@ -109,14 +95,7 @@ class ROFrequencyOptimizationMeasurement(BaseMeasurement):
                 phase=0,
             ),
         )
-        self.measure(
-            schedule,
-            transmon,
-            this_qubit,
-            acq_index,
-            acq_cha,
-            this_ro_clock,
-        )
+        self.measure(schedule, transmon, acq_index)
 
         schedule.add(Reset(this_qubit))
 
@@ -126,21 +105,13 @@ class ROFrequencyOptimizationMeasurement(BaseMeasurement):
         qubit_states: dict[str, list[int]],
         repetitions: int = 1024,
     ) -> Schedule:
-        schedule = Schedule("multiplexed_ro_frequency_optimization", repetitions)
+        schedule = Schedule("ro_frequency_optimization", repetitions)
 
         qubits = self.transmons.keys()
 
-        # Initialize the clock for each qubit
-        if len(qubit_states[list(qubits)[0]]) == 2:
-            ro_str = "ro_2st_opt"
-        elif len(qubit_states[list(qubits)[0]]) == 3:
-            ro_str = "ro_3st_opt"
-        else:
-            raise ValueError("invalid number of states")
-
         # Initialize ClockResource with the first frequency value
         for this_qubit, ro_array_val in ro_opt_frequencies.items():
-            this_ro_clock = f"{this_qubit}." + ro_str
+            this_ro_clock = f"{this_qubit}." + self.ro_str
             schedule.add_resource(
                 ClockResource(name=this_ro_clock, freq=ro_array_val[0])
             )
@@ -156,18 +127,15 @@ class ROFrequencyOptimizationMeasurement(BaseMeasurement):
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
         # The first for loop iterates over all qubits:
-        for acq_cha, (this_qubit, ro_f_values) in enumerate(ro_opt_frequencies.items()):
+        for this_qubit, ro_f_values in ro_opt_frequencies.items():
             # unpack the static parameters
             this_transmon = self.transmons[this_qubit]
 
             schedule.add(
-                Reset(*qubits), ref_op=root_relaxation, ref_pt_new="end"
+                Reset(*qubits), ref_op=root_relaxation
             )  # To enforce parallelism we refer to the root relaxation
 
-            this_ro_clock = f"{this_qubit}." + ro_str
-
-            if len(qubit_states[list(qubits)[0]]) == 3:
-                this_mw_clock = f"{this_qubit}.12"
+            this_ro_clock = f"{this_qubit}." + self.ro_str
 
             this_qubit_states = qubit_states[this_qubit]
 
@@ -182,36 +150,14 @@ class ROFrequencyOptimizationMeasurement(BaseMeasurement):
                 for qubit_state in this_qubit_states:
                     if qubit_state == 0:
                         this_index = acq_index
-                        self.measure(
-                            schedule,
-                            this_transmon,
-                            this_qubit,
-                            this_index,
-                            acq_cha,
-                            this_ro_clock,
-                        )
+                        self.measure(schedule, this_transmon, this_index)
                     # repeat for when the qubit is at |1>
                     elif qubit_state == 1:
                         this_index = acq_index + number_of_frequencies
-                        self.measure_first_excited(
-                            schedule,
-                            this_transmon,
-                            this_qubit,
-                            this_index,
-                            acq_cha,
-                            this_ro_clock,
-                        )
+                        self.measure_first_excited(schedule, this_transmon, this_index)
                     # repeat for when the qubit is at |2>
                     elif qubit_state == 2:
                         this_index = acq_index + 2 * number_of_frequencies
-                        self.measure_second_excited(
-                            schedule,
-                            this_transmon,
-                            this_qubit,
-                            this_index,
-                            acq_cha,
-                            this_ro_clock,
-                            this_mw_clock,
-                        )
+                        self.measure_second_excited(schedule, this_transmon, this_index)
 
         return schedule

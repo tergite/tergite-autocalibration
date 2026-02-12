@@ -56,6 +56,7 @@ class ROAmplitudeOptimizationMeasurement(BaseMeasurement):
             elif qubit_state == 2:
                 ro_frequency = this_transmon.extended_clock_freqs.readout_3state_opt()
                 mw_frequency_12 = this_transmon.clock_freqs.f12()
+                mw_ef_duration = this_transmon.r12.ef_duration()
                 this_clock = f"{this_qubit}.12"
                 shot.add_resource(ClockResource(name=this_clock, freq=mw_frequency_12))
             else:
@@ -74,7 +75,6 @@ class ROAmplitudeOptimizationMeasurement(BaseMeasurement):
             ro_pulse_duration = this_transmon.measure.pulse_duration()
             mw_ef_amp180 = this_transmon.r12.ef_amp180()
             mw_ef_motzoi = this_transmon.r12.ef_motzoi()
-            print(f"{ mw_ef_amp180 = }")
             mw_pulse_duration = this_transmon.rxy.duration()
             mw_pulse_port = this_transmon.ports.microwave()
             acquisition_delay = this_transmon.measure.acq_delay()
@@ -105,10 +105,9 @@ class ROAmplitudeOptimizationMeasurement(BaseMeasurement):
                     elif state_level == 2:
                         shot.add(X(this_qubit))
 
-                        print("WARN hardcoded duration here and in Rabi")
                         prep = shot.add(
                             DRAGPulse(
-                                duration=72e-9,
+                                duration=mw_ef_duration,
                                 G_amp=mw_ef_amp180,
                                 D_amp=mw_ef_motzoi,
                                 port=mw_pulse_port,
@@ -127,7 +126,6 @@ class ROAmplitudeOptimizationMeasurement(BaseMeasurement):
                             clock=this_ro_clock,
                         ),
                         ref_op=prep,
-                        # rel_time=100e-9,
                     )
 
                     shot.add(
@@ -145,7 +143,6 @@ class ROAmplitudeOptimizationMeasurement(BaseMeasurement):
                     )
 
                     shot.add(Reset(this_qubit))
-        shot.add(IdlePulse(20e-9))
         return shot
 
     def schedule_function(

@@ -92,6 +92,14 @@ class R12(InstrumentChannel):
             vals=validators.Numbers(min_value=-1, max_value=1),
         )
 
+        self.ef_duration = ManualParameter(
+            name="ef_duration",
+            instrument=self,
+            initial_value=kwargs.get("duration", 20e-9),
+            unit="s",
+            vals=validators.Numbers(min_value=0, max_value=1),
+        )
+
 
 class Spec(InstrumentChannel):
     """

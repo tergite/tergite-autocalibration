@@ -97,22 +97,20 @@ class MotzoiParameterMeasurement(BaseMeasurement):
             mw_amplitude = this_transmon.rxy.amp180()
             mw_pulse_duration = this_transmon.rxy.duration()
             mw_pulse_port = this_transmon.ports.microwave()
+            measure_function = Measure
+            this_clock = f"{this_qubit}.01"
 
             motzoi_parameter_values = mw_motzois[this_qubit]
             number_of_motzois = len(motzoi_parameter_values)
 
             if qubit_state == 1:
                 mw_amplitude = this_transmon.r12.ef_amp180()
+                mw_pulse_duration = this_transmon.r12.ef_duration()
                 this_clock = f"{this_qubit}.12"
                 measure_function = Measure_RO1
-            elif qubit_state == 0:
-                measure_function = Measure
-                this_clock = f"{this_qubit}.01"
-            else:
-                raise ValueError(f"Invalid qubit state: {qubit_state}")
 
             schedule.add(
-                Reset(*qubits), ref_op=root_relaxation, ref_pt_new="end"
+                Reset(*qubits), ref_op=root_relaxation
             )  # To enforce parallelism we refer to the root relaxation
 
             # The intermediate loop iterates over all numbers of X pulses
@@ -122,8 +120,6 @@ class MotzoiParameterMeasurement(BaseMeasurement):
                     this_index = x_index * number_of_motzois + motzoi_index
                     if qubit_state == 1:
                         schedule.add(X(this_qubit))
-                        print("WARN hardcoded duration here and in Rabi")
-                        mw_pulse_duration = 72e-9
                     for _ in range(this_x):
                         schedule.add(
                             DRAGPulse(
@@ -148,9 +144,7 @@ class MotzoiParameterMeasurement(BaseMeasurement):
                         )
 
                     schedule.add(
-                        measure_function(
-                            this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE
-                        ),
+                        measure_function(this_qubit, acq_index=this_index),
                     )
 
                     schedule.add(Reset(this_qubit))

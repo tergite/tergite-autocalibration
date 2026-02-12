@@ -210,7 +210,7 @@ class ExtendedTransmon(BasicTransmonElement):
                 "motzoi": self.r12.ef_motzoi(),
                 "port": self.ports.microwave(),
                 "clock": f"{self.name}.12",
-                "duration": self.rxy.duration(),
+                "duration": self.r12.ef_duration(),
             },
             gate_info_factory_kwargs=["theta", "phi"],
         )
