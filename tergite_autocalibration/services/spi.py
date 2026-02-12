@@ -17,27 +17,22 @@ from tergite_autocalibration.config.globals import CONFIG
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
 
+_spi_config = toml.load(CONFIG.spi)
+_couplers = list(_spi_config.keys())
+_spi = SpiDAC(_couplers, MeasurementMode.real, name="spi_service")
+
 
 def print_spi_currents():
     """
     Print the current for all DACs defined in the SPI configuration
     """
-    spi_config = toml.load(CONFIG.spi)
-    couplers = list(spi_config.keys())
-
-    spi = SpiDAC(couplers, MeasurementMode.real)
-    spi.print_currents()
+    _spi.print_currents()
 
 
 def reset_spi_currents():
     """
     Reset the currents for all DACs defined in the SPI configuration to 0
     """
-    spi_config = toml.load(CONFIG.spi)
-    couplers = list(spi_config.keys())
-
-    spi = SpiDAC(couplers, measurement_mode=MeasurementMode.real)
-
-    currents = {coupler: 0 for coupler in couplers}
-    spi.ramp_current_serially(currents)
-    spi.print_currents()
+    currents = {coupler: 0 for coupler in _couplers}
+    _spi.ramp_current_serially(currents)
+    _spi.print_currents()
