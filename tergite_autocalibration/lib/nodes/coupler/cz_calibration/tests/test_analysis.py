@@ -17,7 +17,6 @@ from pathlib import Path
 import cf_xarray as cf
 import pytest
 import xarray as xr
-from quantify_core.analysis import base_analysis
 
 from tergite_autocalibration.lib.base.analysis import BaseAllCouplersAnalysis
 from tergite_autocalibration.lib.nodes.coupler.cz_calibration.analysis import (
