@@ -52,6 +52,9 @@ class T2Node(QubitNode):
         super().__init__(all_qubits, **schedule_keywords)
         self.all_qubits = all_qubits  # Is this needed
 
+        self.schedule_keywords = {
+            "multiplexing": "parallel"
+        }  # 'one_by_one' | 'parallel'
         self.number_or_repeated_t2s = 3
         self.sleep_time = 3
 
@@ -102,6 +105,9 @@ class T2EchoNode(QubitNode):
         self.all_qubits = all_qubits
         self.backup = False
 
+        self.schedule_keywords = {
+            "multiplexing": "parallel"
+        }  # 'one_by_one' | 'parallel'
         self.number_or_repeated_t2s = 3
         self.sleep_time = 3
 
