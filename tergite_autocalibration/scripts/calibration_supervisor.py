@@ -40,7 +40,6 @@ from tergite_autocalibration.config.package import ConfigurationPackage
 from tergite_autocalibration.lib.base.node import BaseNode, CouplerNode
 from tergite_autocalibration.lib.utils.graph import filtered_topological_order
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
-from tergite_autocalibration.services.spi import print_spi_currents
 from tergite_autocalibration.utils.backend.redis_utils import (
     populate_initial_parameters,
     populate_node_parameters,
@@ -399,7 +398,6 @@ class CalibrationSupervisor:
             self.config.couplers
         )
         self.node_manager.spi_manager.set_parking_currents(self.config.couplers)
-        print_spi_currents()
 
         # Create a copy of the configuration inside the log directory
         # This is to be able to replicate errors caused by configuration
