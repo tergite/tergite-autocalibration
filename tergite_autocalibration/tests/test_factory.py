@@ -13,7 +13,7 @@
 from pathlib import Path
 
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
-from tergite_autocalibration.lib.utils.reflections import (
+from tergite_autocalibration.utils.misc.reflections import (
     find_inheriting_classes_ast_recursive,
 )
 

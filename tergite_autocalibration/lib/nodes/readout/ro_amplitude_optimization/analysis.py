@@ -190,9 +190,6 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
     def analyse_qubit(self):
         self.populate_coords()
         self.run_initial_fitting()
-        inv_cm_str = ",".join(
-            str(element) for element in list(self.optimal_inv_cm.flatten())
-        )
 
         states = self.qubit_states
 
