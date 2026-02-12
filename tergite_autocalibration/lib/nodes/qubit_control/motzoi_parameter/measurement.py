@@ -147,29 +147,6 @@ class MotzoiParameterMeasurement(BaseMeasurement):
                             ),
                         )
 
-                        # if qubit_state == 0:
-                        #     schedule.add(
-                        #         DRAGPulse(
-                        #             duration=mw_pulse_duration,
-                        #             G_amp=mw_amplitude,
-                        #             D_amp=mw_motzoi,
-                        #             port=mw_pulse_port,
-                        #             clock=this_clock,
-                        #             phase=90,
-                        #         ),
-                        #     )
-                        #     # inversion pulse requires 180 deg phase
-                        #     schedule.add(
-                        #         DRAGPulse(
-                        #             duration=mw_pulse_duration,
-                        #             G_amp=mw_amplitude,
-                        #             D_amp=mw_motzoi,
-                        #             port=mw_pulse_port,
-                        #             clock=this_clock,
-                        #             phase=270,
-                        #         ),
-                        #     )
-
                     schedule.add(
                         measure_function(
                             this_qubit, acq_index=this_index, bin_mode=BinMode.AVERAGE
