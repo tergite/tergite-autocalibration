@@ -47,7 +47,7 @@ class RabiQubitAnalysis(BaseQubitAnalysis):
                 raise ValueError("Invalid Coordinate")
 
         self.fit_plot_amplitudes = np.linspace(
-            self.amplitudes[0], self.amplitudes[-1], 400
+            self.amplitudes[0], self.amplitudes[-1], 200
         )  # x-values for plotting
 
         # Gives an initial guess for the model parameters and then fits the model to the data.
@@ -154,31 +154,17 @@ class NRabiQubitAnalysis(BaseQubitAnalysis):
             elif "repetitions" in coord:
                 self.x_repetitions_coord = coord
 
-        mw_amplitude_key = self.mw_amplitudes_coord
-        mw_amplitudes = self.magnitudes[mw_amplitude_key].size
-        sums = []
-        for this_amplitude_index in range(mw_amplitudes):
-            this_sum = sum(self.magnitudes[self.data_var][this_amplitude_index].values)
-            sums.append(this_sum)
+        sums = self.magnitudes.sum(self.x_repetitions_coord)
 
-        index_of_min = np.argmin(np.array(sums))
-        self.previous_amplitude = fetch_redis_params("rxy:amp180", self.qubit)
-        self.optimal_amp180 = (
-            self.magnitudes[mw_amplitude_key][index_of_min].values.item()
-            + self.previous_amplitude
-        )
-        self.shift = self.magnitudes[mw_amplitude_key][index_of_min].values
+        self.correction = sums.idxmin()[self.data_var].item()
 
     def analyse_qubit(self):
         self._analyse_n_rabi()
+        previous_amplitude = fetch_redis_params("rxy:amp180", self.qubit)
+        optimal_amp180 = self.correction + previous_amplitude
         analysis_successful = True
 
-        analysis_result = {
-            "rxy:amp180": {
-                "value": self.optimal_amp180,
-                "error": 0,
-            }
-        }
+        analysis_result = {"rxy:amp180": {"value": optimal_amp180, "error": 0}}
 
         qoi = QOI(analysis_result, analysis_successful)
 
@@ -187,33 +173,23 @@ class NRabiQubitAnalysis(BaseQubitAnalysis):
     def plotter(self, axis):
         datarray = self.magnitudes[self.data_var]
 
-        datarray.plot(ax=axis, x=f"mw_amplitudes_sweep{self.qubit}", cmap="RdBu_r")
+        datarray.plot(ax=axis, x=self.mw_amplitudes_coord, cmap="RdBu_r")
         axis.set_xlabel("mw amplitude correction")
-        line = self.shift
 
-        axis.axvline(
-            line,
-            c="k",
-            lw=4,
-            linestyle="--",
-        )
+        axis.axvline(self.correction, c="k", lw=4, linestyle="--")
 
 
 class NRabi_12_QubitAnalysis(NRabiQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-        self.redis_field = "r12:ef_amp180"
 
     def analyse_qubit(self):
         self._analyse_n_rabi()
+        previous_amplitude = fetch_redis_params("r12:ef_amp180", self.qubit)
+        optimal_ef_amp180 = self.correction + previous_amplitude
 
         analysis_successful = True
-        analysis_result = {
-            self.redis_field: {
-                "value": self.optimal_amp180,
-                "error": 0,
-            }
-        }
+        analysis_result = {"r12:ef_amp180": {"value": optimal_ef_amp180, "error": 0}}
 
         qoi = QOI(analysis_result, analysis_successful)
 

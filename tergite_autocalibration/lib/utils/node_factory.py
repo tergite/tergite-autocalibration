@@ -48,6 +48,7 @@ class NodeFactory:
             "T2": "T2Node",
             "T2_echo": "T2EchoNode",
             "n_rabi_oscillations": "NRabiOscillationsNode",
+            "n_rabi_12_oscillations": "NRabiOscillations12Node",
             "resonator_spectroscopy_1": "ResonatorSpectroscopy1Node",
             "qubit_12_spectroscopy": "Qubit12SpectroscopyNode",
             "rabi_oscillations_12": "RabiOscillations12Node",

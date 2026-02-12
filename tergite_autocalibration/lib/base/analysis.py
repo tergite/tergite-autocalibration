@@ -139,7 +139,6 @@ class BaseNodeAnalysis(ABC):
         ncols = min(column_grid, n_vars)
 
         fig, axs = create_figure_with_top_band(nrows, ncols)
-
         return fig, axs
 
     def _save_plots(self):
