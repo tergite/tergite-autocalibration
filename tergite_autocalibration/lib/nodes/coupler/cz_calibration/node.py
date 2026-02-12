@@ -34,7 +34,7 @@ class CZ_CalibrationNode(CouplerNode):
     measurement_obj = CZ_CalibrationMeasurement
     analysis_obj = CZCalibrationNodeAnalysis
     measurement_type = OuterScheduleNode
-    coupler_qois = ["cz_pulse_frequency", "cz_pulse_duration"]
+    coupler_qois = ["cz_pulse_frequency", "cz_pulse_duration", "cz_phase"]
 
     def __init__(self, couplers: list[str], **schedule_keywords):
         super().__init__(couplers, **schedule_keywords)

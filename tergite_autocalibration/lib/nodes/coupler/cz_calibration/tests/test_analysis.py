@@ -17,7 +17,9 @@ from pathlib import Path
 import cf_xarray as cf
 import pytest
 import xarray as xr
+from quantify_core.analysis import base_analysis
 
+from tergite_autocalibration.lib.base.analysis import BaseAllCouplersAnalysis
 from tergite_autocalibration.lib.nodes.coupler.cz_calibration.analysis import (
     CZCalibrationCouplerAnalysis,
 )
@@ -35,66 +37,60 @@ def test_cz_calibration_success():
 
     analysis = CZCalibrationCouplerAnalysis(
         "cz_calibration",
-        ["cz_pulse_frequency", "cz_pulse_duration"],
+        ["cz_pulse_frequency", "cz_pulse_duration", "cz_phase"],
     )
     qoi = analysis.process_coupler(dataset, "q13_q14")
 
     cz_pulse_frequency = qoi.analysis_result["cz_pulse_frequency"]["value"]
     cz_pulse_duration = qoi.analysis_result["cz_pulse_duration"]["value"]
+    cz_phase = qoi.analysis_result["cz_phase"]["value"]
 
     assert qoi.analysis_successful
     assert pytest.approx(cz_pulse_frequency) == 713980000
     assert pytest.approx(cz_pulse_duration) == 192e-9
-    # TODO: check extracted phase
+    assert pytest.approx(cz_phase) == 181.450086
 
 
-# @with_redis(_redis_values)
-# @pytest.mark.skip
-# def test_cz_chevron_analysis_bad_data():
-#     """
-#     Test whether single coupler analysis outputs that the analysis fails on bad data
-#     """
-#     # Load dataset
-#     file_path = os.path.join(_test_data_dir, "data_1", "dataset_cz_chevron_0.hdf5")
-#     dataset = xr.open_dataset(file_path)
-#
-#     # Run the single coupler analysis
-#     analysis = CZChevronCouplerAnalysis(
-#         "cz_chevron",
-#         ["cz_pulse_frequency", "cz_pulse_amplitude", "parking_current"],
-#         phase_path="via_20",
-#     )
-#     qoi = analysis.process_coupler(dataset, "q14_q15")
-#
-#     # Make sure that the analysis returns as unsuccessful
-#     assert qoi.analysis_successful is False
-#
-#
-# @with_redis(_redis_values)
-# def test_plotting():
-#     """
-#     Test that the plotter produces a faceted figure
-#     """
-#
-#     # Load dataset
-#     file_path = os.path.join(_test_data_dir, "data_0", "dataset_cz_chevron_0.hdf5")
-#     dataset = xr.open_dataset(file_path)
-#     number_of_working_points = 3
-#     figures_dictionary = {}
-#
-#     # Run the single coupler analysis
-#     analysis = CZChevronCouplerAnalysis(
-#         "cz_chevron",
-#         ["cz_working_frequencies", "cz_working_durations_in_ns"],
-#         phase_path="via_20",
-#         number_of_working_points=number_of_working_points,
-#     )
-#     analysis.process_coupler(dataset, "q13_q14")
-#     analysis.plotter(figures_dictionary)
-#
-#     assert "q13_q14" in figures_dictionary
-#
-#     faceted_graph_fig = figures_dictionary["q13_q14"][0]
-#
-#     # the faceted graph has 7 axis: 6 for the probabilty heatmaps and one for the colorbar
-#     assert len(faceted_graph_fig.get_axes()) == 7
+@with_redis(_redis_values)
+def test_decode_multi_index():
+    base_analysis = BaseAllCouplersAnalysis(
+        "cz_calibration",
+        ["cz_pulse_frequency", "cz_pulse_duration", "cz_phase"],
+    )
+    base_analysis.name = "cz_calibration"
+    base_analysis.data_path = _test_data_dir
+    dataset = base_analysis.open_dataset()
+
+    assert "l1" in dataset.working_points.coords
+    assert "l2" in dataset.working_points.coords
+    assert "working_points" in dataset.working_points.coords
+    assert dataset.working_points.size == 11
+
+
+@with_redis(_redis_values)
+def test_plotting():
+    """
+    Test that the plotter produces a figure with the right number of axes
+    """
+    file_path = os.path.join(_test_data_dir, "dataset_cz_calibration.hdf5")
+    dataset = xr.open_dataset(file_path)
+    dataset = cf.decode_compress_to_multi_index(dataset, "working_points")
+
+    analysis = CZCalibrationCouplerAnalysis(
+        "cz_calibration",
+        ["cz_pulse_frequency", "cz_pulse_duration", "cz_phase"],
+    )
+
+    figures_dictionary = {}
+
+    analysis.process_coupler(dataset, "q13_q14")
+    analysis.plotter(figures_dictionary)
+
+    assert "q13_q14" in figures_dictionary
+
+    figure = figures_dictionary["q13_q14"][0]
+
+
+    # axes are the (freq, duration) plots + figure title + 
+    # figure x label + figure y label + global trend plo            t
+    assert len(figure.get_axes()) == dataset.working_points.size + 4
