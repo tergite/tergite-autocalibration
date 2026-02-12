@@ -326,6 +326,37 @@ class CouplerNode(BaseNode):
             self.name, qubits=self.all_qubits, couplers=self.couplers
         )
 
+    def measure_node(self, cluster_status) -> xarray.Dataset:
+        """
+        Here we attach the measure_node method according to the
+        measurement_type: ScheduleNode or ExternalParameterNode or something else
+
+        Overwrite the base method, to set the updated SPI currents before the measurement.
+        """
+        self.set_parking_current_from_redis()
+        measurement_type = self.measurement_type(self)
+        dataset = measurement_type.measure_node(cluster_status)
+        return dataset
+
+    def set_parking_current_from_redis(self):
+        """
+        At the beginning of the calibration, the parking current is set by
+        the calibration supervisor from the device_config value. This value
+        can be updated by the cz_parametrization measurement which updates the
+        parking current value on redis.
+
+        This method fetches the redis value and sets the update DC current
+        to the appropriate SPI dacs.
+        """
+        currents_dict = {}
+        for coupler in self.couplers:
+            parking_current = REDIS_CONNECTION.hget(
+                f"couplers:{coupler}", "parking_current"
+            )
+            currents_dict[coupler] = parking_current
+        logger.status("Setting updated DC currents")
+        self.spi_manager.set_dac_current(currents_dict)
+
     def get_coupled_qubits(self) -> list:
         coupled_qubits = []
         for coupler in self.couplers:
