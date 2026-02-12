@@ -20,12 +20,17 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
-from tergite_autocalibration.lib.base.analysis import (BaseAllQubitsAnalysis,
-                                                       BaseQubitAnalysis)
-from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.utils import \
-    align_on_y_axis
+from tergite_autocalibration.lib.base.analysis import (
+    BaseAllQubitsAnalysis,
+    BaseQubitAnalysis,
+)
+from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.utils import (
+    align_on_y_axis,
+)
 from tergite_autocalibration.lib.utils.analysis_models import (
-    ThreeClassBoundary, TwoClassBoundary)
+    ThreeClassBoundary,
+    TwoClassBoundary,
+)
 from tergite_autocalibration.utils.dto.qoi import QOI
 
 
