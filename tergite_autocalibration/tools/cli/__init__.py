@@ -137,7 +137,7 @@ def start(
     )
     from tergite_autocalibration.config.globals import CONFIG, ENV
     from tergite_autocalibration.tools.browser import start_browser
-    from tergite_autocalibration.utils.backend.reset_redis_node import ResetRedisNode
+    from tergite_autocalibration.utils.backend.reset_redis_node import reset_redis_nodes
     from tergite_autocalibration.utils.dto.enums import MeasurementMode
     from tergite_autocalibration.utils.io.dataset import scrape_and_copy_hdf5_files
     from tergite_autocalibration.utils.reanalysis_utils import (
@@ -183,7 +183,7 @@ def start(
         # Comfort functionality to reset the re-analysis node first
         if typer.confirm(f"Do you want to reset node {target_node_name}?"):
             if target_node_name is not None:
-                ResetRedisNode().reset_node(target_node_name)
+                reset_redis_nodes([target_node_name])
 
         scrape_and_copy_hdf5_files(CONFIG.run.data_dir, CONFIG.run.log_dir)
 

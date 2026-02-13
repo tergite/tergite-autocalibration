@@ -190,9 +190,6 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
     def analyse_qubit(self):
         self.populate_coords()
         self.run_initial_fitting()
-        inv_cm_str = ",".join(
-            str(element) for element in list(self.optimal_inv_cm.flatten())
-        )
 
         states = self.qubit_states
 
@@ -265,6 +262,9 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
                 "error": 0,
             },
             "measure_2state_opt:acq_threshold": {"value": self.threshold, "error": 0},
+            "lda_coef_0": {"value": str(float(self.lda.coef_[0][0])), "error": 0},
+            "lda_coef_1": {"value": str(float(self.lda.coef_[0][1])), "error": 0},
+            "lda_intercept": {"value": str(float(self.lda.intercept_[0])), "error": 0},
         }
         qoi = QOI(analysis_result, analysis_successful)
         return qoi

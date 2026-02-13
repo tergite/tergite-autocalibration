@@ -125,14 +125,6 @@ class BaseNodeAnalysis(ABC):
             dataset = cf.decode_compress_to_multi_index(dataset, "working_points")
         return dataset
 
-    # def save_processed_dataset(self):
-    #     dataset_name = f"dataset_{self.name}_processed.hdf5"
-    #     if "working_points" in self.processed_dataset.coords:
-    #         self.processed_dataset = cf.encode_multi_index_as_compress(
-    #             self.processed_dataset, "working_points"
-    #         )
-    #     self.processed_dataset.to_netcdf(self.data_path / dataset_name)
-
     def _manage_plots(self, column_grid: int, plots_per_qubit: int):
         n_vars = len(self.data_vars)
         nrows = int(np.ceil(n_vars / column_grid)) * plots_per_qubit

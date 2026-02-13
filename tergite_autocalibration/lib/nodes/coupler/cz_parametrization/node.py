@@ -92,7 +92,7 @@ class CZParametrizationNode(CouplerNode):
     def initial_operation(self):
         pass
 
-    def pre_measurement_operation(self, reduced_ext_space):
+    def pre_measurement_operation(self, reduced_ext_space: dict[str, dict]):
         iteration_dict = reduced_ext_space["dc_currents"]
         # there is some redundancy tha all qubits have the same
         # iteration index, that's why we keep the first value->

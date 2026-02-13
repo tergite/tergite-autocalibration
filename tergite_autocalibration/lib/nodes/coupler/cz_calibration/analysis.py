@@ -111,6 +111,7 @@ class CZCalibrationCouplerAnalysis(BaseCouplerAnalysis):
         self.optimal_point_index = delta_phis.argmin().item()
         optimal_frequency = self.frequencies[self.optimal_point_index]
         optimal_duration = self.durations[self.optimal_point_index]
+        optimal_phase = delta_phis.min().item() + 180
 
         analysis_succesful = True
         analysis_result = {
@@ -120,6 +121,10 @@ class CZCalibrationCouplerAnalysis(BaseCouplerAnalysis):
             },
             "cz_pulse_duration": {
                 "value": optimal_duration,
+                "error": 0,
+            },
+            "cz_phase": {
+                "value": optimal_phase,
                 "error": 0,
             },
         }
