@@ -640,6 +640,8 @@
       "cz_pulse_duration_error": "nan",
       "target_local_phase_error": "nan",
       "parking_current": "0",
+      "control_qubit": "q13",
+      "target_qubit": "q14",
       "attenuation": "2",
       "reset:duration": "0.00024",
       "cz_working_frequencies_error": "0",

@@ -10,11 +10,10 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+from types import MappingProxyType
 from typing import Dict
 
 import toml
-
-from types import MappingProxyType
 
 from tergite_autocalibration.config.globals import CONFIG
 from tergite_autocalibration.utils.logging import logger
@@ -86,19 +85,6 @@ class DataHandler:
                             )
                     device_raw[device_subsection].pop("all")
             cls._device = device_raw
-
-            # This is creating a variable for the qubit type, whether it is control or target qubit
-            # in a coupler
-            _qubit_types = {}
-            for qubit in cls._device["qubit"]:
-                if int(qubit[1:]) % 2 == 0:
-                    # Even qubits are data/control qubits
-                    qubit_type = "Control"
-                else:
-                    # Odd qubits are ancilla/target qubits
-                    qubit_type = "Target"
-                _qubit_types[qubit] = qubit_type
-            cls._qubit_types = _qubit_types
 
             if CONFIG.cluster is not None:
                 cls.cluster_config = CONFIG.cluster
@@ -191,8 +177,6 @@ class DataHandler:
             }
         if variable_name == "attenuation_setting":
             return self.get_output_attenuations()
-        elif variable_name == "qubit_types":
-            return self._qubit_types
         elif variable_name == "coupler_spi_mapping":
             return self.spi
         else:

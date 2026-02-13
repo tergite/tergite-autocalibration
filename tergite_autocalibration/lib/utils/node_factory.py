@@ -60,10 +60,12 @@ class NodeFactory:
             "ro_amplitude_three_state_optimization": "ROAmplitudeThreeStateOptimizationNode",
             "randomized_benchmarking": "RandomizedBenchmarkingNode",
             "purity_benchmarking": "PurityBenchmarkingNode",
+            "coupler_anticrossing": "QubitSpectroscopyVsCurrentNode",
             "cz_parametrization": "CZParametrizationNode",
             "cz_chevron": "CZChevronNode",
+            "cz_calibration": "CZ_CalibrationNode",
+            "cz_local_phases": "CZ_LocalPhasesNode",
             "resonator_spectroscopy_vs_current": "ResonatorSpectroscopyVsCurrentNode",
-            "qubit_spectroscopy_vs_current": "QubitSpectroscopyVsCurrentNode",
         }
         self._node_implementation_paths: Dict[str, Union[str, Path]] = {}
         self._node_classes: Dict[str, type["BaseNode"]] = {}

@@ -12,13 +12,14 @@
 
 import os.path
 import shutil
-import pytest
-
-from tergite_autocalibration.tests.utils.fixtures import get_fixture_path
-from tergite_autocalibration.utils.io.dataset import scrape_and_copy_hdf5_files
-import tergite_autocalibration.utils.reanalysis_utils as ra_utils
 from datetime import datetime
 from pathlib import Path
+
+import pytest
+
+import tergite_autocalibration.utils.reanalysis_utils as ra_utils
+from tergite_autocalibration.tests.utils.fixtures import get_fixture_path
+from tergite_autocalibration.utils.io.dataset import scrape_and_copy_hdf5_files
 
 
 def test_scrape_and_copy_hdf5_files():
@@ -131,5 +132,5 @@ def test_select_measurement_for_analysis_can_find_measurement():
     assert info.run_folder_path == run_dir
     assert (
         info.dataset_path
-        == info.measurement_folder_path / "dataset_ramsey_correction_0.hdf5"
+        == info.measurement_folder_path / "dataset_ramsey_correction.hdf5"
     )

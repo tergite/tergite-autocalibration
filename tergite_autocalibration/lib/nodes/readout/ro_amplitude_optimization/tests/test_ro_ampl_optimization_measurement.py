@@ -12,7 +12,7 @@
 # that they have been altered from the originals.
 
 
-from tergite_autocalibration.config.globals import CONFIG
+from tergite_autocalibration.config.globals import CONFIG, REDIS_CONNECTION
 from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.node import (
     ROAmplitudeThreeStateOptimizationNode,
 )
@@ -20,6 +20,8 @@ from tergite_autocalibration.utils.dto.extended_transmon_element import Extended
 
 
 def test_dummy_generation():
+    for qubit in CONFIG.run.qubits:
+        REDIS_CONNECTION.hset(f"transmons:{qubit}", "measure:pulse_amp", "0.05")
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
     node_3 = ROAmplitudeThreeStateOptimizationNode(
         CONFIG.run.qubits, CONFIG.run.couplers

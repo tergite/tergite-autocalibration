@@ -1,9 +1,9 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2023, 2024, 2025
+# (C) Copyright Eleftherios Moschandreou 2023, 2024, 2025, 2026
 # (C) Copyright Liangyu Chen 2023, 2024
 # (C) Copyright Amr Osman, 2024
-# (C) Chalmers Next Labs 2025
+# (C) Chalmers Next Labs 2025, 2026
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory

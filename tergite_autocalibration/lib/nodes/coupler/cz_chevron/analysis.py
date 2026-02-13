@@ -251,7 +251,6 @@ class CZChevronCouplerAnalysis(CZParametrizationAnalysis):
             )
 
         figures_dictionary[self.coupler] = [fig]
-        plt.show()
 
     # def plot_frequency_slice(self, freq_index: int):
     #     fig2, ax = plt.subplots()

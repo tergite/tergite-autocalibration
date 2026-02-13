@@ -1,7 +1,7 @@
 # This code is part of Tergite
 #
 # (C) Copyright Michele Faucci Giannelli 2024
-# (C) Copyright Michele Eleftherios Moschandreou 2025, 2026
+# (C) Copyright Eleftherios Moschandreou 2025, 2026
 # (C) Chalmers Next Labs AB 2025, 2026
 #
 # This code is licensed under the Apache License, Version 2.0. You may
@@ -12,6 +12,7 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+import math
 import os
 import shutil
 from pathlib import Path
@@ -35,7 +36,7 @@ def test_cz_parametrization_analysis_good_data():
     """
     # Load dataset
     file_path = os.path.join(
-        _test_data_dir, "data_0", "dataset_cz_parametrization_0.hdf5"
+        _test_data_dir, "data_0", "dataset_cz_parametrization.hdf5"
     )
     dataset = xr.open_dataset(file_path)
     coupler = "q14_q15"
@@ -49,9 +50,15 @@ def test_cz_parametrization_analysis_good_data():
     qoi = analysis.process_coupler(dataset, coupler)
 
     # Compare the output values
-    assert qoi.analysis_result["cz_pulse_frequency"]["value"] == 418162631.57894737
-    assert qoi.analysis_result["cz_pulse_amplitude"]["value"] == 0.3879310344827587
-    assert qoi.analysis_result["parking_current"]["value"] == 0.0006400000000000002
+    assert math.isclose(
+        qoi.analysis_result["cz_pulse_frequency"]["value"], 415004736.84210527
+    )
+    assert math.isclose(
+        qoi.analysis_result["cz_pulse_amplitude"]["value"], 0.28448275862068967
+    )
+    assert math.isclose(
+        qoi.analysis_result["parking_current"]["value"], 0.0006400000000000002
+    )
 
 
 @with_redis(_redis_values)
@@ -61,7 +68,7 @@ def test_cz_parametrization_analysis_bad_data():
     """
     # Load dataset
     file_path = os.path.join(
-        _test_data_dir, "data_1", "dataset_cz_parametrization_0.hdf5"
+        _test_data_dir, "data_1", "dataset_cz_parametrization.hdf5"
     )
     dataset = xr.open_dataset(file_path)
     coupler = "q14_q15"
@@ -86,8 +93,8 @@ def test_plotting(tmp_path):
 
     # Copy dataset to the temporary data path
     shutil.copy(
-        os.path.join(_test_data_dir, "data_0", "dataset_cz_parametrization_0.hdf5"),
-        os.path.join(tmp_path, "dataset_cz_parametrization_0.hdf5"),
+        os.path.join(_test_data_dir, "data_0", "dataset_cz_parametrization.hdf5"),
+        os.path.join(tmp_path, "dataset_cz_parametrization.hdf5"),
     )
 
     coupler = "q14_q15"

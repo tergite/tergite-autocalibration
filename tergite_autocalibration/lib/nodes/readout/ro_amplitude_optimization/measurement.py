@@ -124,7 +124,6 @@ class ROAmplitudeOptimizationMeasurement(BaseMeasurement):
                             clock=this_ro_clock,
                         ),
                         ref_op=prep,
-                        ref_pt="end",
                         # rel_time=100e-9,
                     )
 
