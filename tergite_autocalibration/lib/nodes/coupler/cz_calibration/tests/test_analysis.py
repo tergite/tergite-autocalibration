@@ -90,5 +90,5 @@ def test_plotting():
     figure = figures_dictionary["q13_q14"][0]
 
     # axes are the (freq, duration) plots + figure title +
-    # figure x label + figure y label + global trend plo            t
+    # figure x label + figure y label + global trend plot
     assert len(figure.get_axes()) == dataset.working_points.size + 4

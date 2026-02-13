@@ -36,10 +36,6 @@ class DummySpiManager:
 def test_set_parking_current_from_redis():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
     node = CZChevronNode(couplers=CONFIG.run.couplers, qubits=CONFIG.run.qubits)
-    # cfg = CalibrationConfig(cluster_mode=MeasurementMode.dummy, cluster_ip=None)
-    # calib_sup = CalibrationSupervisor(config=cfg)
-    # hwm = HardwareManager(cfg)
-    # spi_manager = hwm.create_spi(CONFIG.run.couplers)
     node.spi_manager = DummySpiManager()
 
     node.set_parking_current_from_redis()
