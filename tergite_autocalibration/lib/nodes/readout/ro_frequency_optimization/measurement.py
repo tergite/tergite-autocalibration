@@ -32,7 +32,6 @@ class ROFrequencyOptimizationMeasurement(BaseMeasurement):
         super().__init__(transmons)
         self.transmons = transmons
 
-        # Initialize the clock for each qubit
         if len(self.transmons) == 2:
             self.ro_str = "ro_2st_opt"
         elif len(self.transmons) == 3:
@@ -53,7 +52,7 @@ class ROFrequencyOptimizationMeasurement(BaseMeasurement):
                 amp=measure.pulse_amp(),
                 port=transmon.ports.readout(),
                 clock=this_ro_clock,
-            ),
+            )
         )
         schedule.add(
             SSBIntegrationComplex(
@@ -128,7 +127,7 @@ class ROFrequencyOptimizationMeasurement(BaseMeasurement):
 
         # The first for loop iterates over all qubits:
         for this_qubit, ro_f_values in ro_opt_frequencies.items():
-            # unpack the static parameters
+
             this_transmon = self.transmons[this_qubit]
 
             schedule.add(

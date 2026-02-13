@@ -14,7 +14,6 @@ import numpy as np
 from quantify_scheduler import Schedule
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.acquisition_library import SSBIntegrationComplex
-from quantify_scheduler.operations.control_flow_library import Loop
 from quantify_scheduler.operations.gate_library import Reset, X
 from quantify_scheduler.operations.pulse_library import (
     DRAGPulse,

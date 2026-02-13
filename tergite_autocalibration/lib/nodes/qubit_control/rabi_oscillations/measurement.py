@@ -15,7 +15,6 @@
 
 import numpy as np
 from quantify_scheduler import Schedule
-from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.gate_library import Measure, Reset, X
 from quantify_scheduler.operations.pulse_library import DRAGPulse
 from quantify_scheduler.resources import ClockResource
@@ -106,6 +105,7 @@ class RabiOscillationsMeasurement(BaseMeasurement):
                 Reset(*qubits), ref_op=root_relaxation
             )  # To enforce parallelism we refer to the root relaxation
 
+            print(f"{ mw_duration = }")
             # The second for loop iterates over all amplitude values in the amplitudes batch:
             for acq_index, mw_amplitude in enumerate(mw_amp_array_val):
                 if qubit_state == 1:
@@ -194,7 +194,7 @@ class NRabiOscillationsMeasurement(BaseMeasurement):
             this_clock = f"{this_qubit}.01"
 
             if qubit_state == 1:
-                mw_pulse_duration = this_transmon.r12.ed_duration()
+                mw_pulse_duration = this_transmon.r12.ef_duration()
                 mw_amplitude = this_transmon.r12.ef_amp180()
                 mw_motzoi = this_transmon.r12.ef_motzoi()
                 this_clock = f"{this_qubit}.12"

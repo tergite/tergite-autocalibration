@@ -95,7 +95,7 @@ class R12(InstrumentChannel):
         self.ef_duration = ManualParameter(
             name="ef_duration",
             instrument=self,
-            initial_value=kwargs.get("duration", 20e-9),
+            initial_value=kwargs.get("ef_duration", 20e-9),
             unit="s",
             vals=validators.Numbers(min_value=0, max_value=1),
         )
@@ -144,24 +144,24 @@ class Spec(InstrumentChannel):
         )
 
 
-class Rxy_12(Rxy):
-    """
-    A single qubit rotation on the 12 transition.
-    """
-
-    def __init__(self, qubit: str, theta: float = 180, phi: float = 0):
-        super().__init__(theta=theta, phi=phi, qubit=qubit)
-        self.data["name"] = (f"Rxy-12({theta:.8g}, {phi:.8g}, '{qubit}')",)
-        self.data["gate_info"]["unitary"] = None  # this is not a Qubit operation
-        self.data["gate_info"][
-            "operation_type"
-        ] = "r12"  # this key is used in compilation!
-
-        self._update()  # Update the Operation's internals
-
-    def __str__(self) -> str:
-        qubit = self.data["gate_info"]["qubits"][0]
-        return f"{self.__class__.__name__}(qubit='{qubit}')"
+# class Rxy_12(Rxy):
+#     """
+#     A single qubit rotation on the 12 transition.
+#     """
+#
+#     def __init__(self, qubit: str, theta: float = 180, phi: float = 0):
+#         super().__init__(theta=theta, phi=phi, qubit=qubit)
+#         self.data["name"] = (f"Rxy-12({theta:.8g}, {phi:.8g}, '{qubit}')",)
+#         self.data["gate_info"]["unitary"] = None  # this is not a Qubit operation
+#         self.data["gate_info"][
+#             "operation_type"
+#         ] = "r12"  # this key is used in compilation!
+#
+#         self._update()  # Update the Operation's internals
+#
+#     def __str__(self) -> str:
+#         qubit = self.data["gate_info"]["qubits"][0]
+#         return f"{self.__class__.__name__}(qubit='{qubit}')"
 
 
 class Measure_RO1(Measure):
