@@ -39,10 +39,10 @@ class RabiQubitAnalysis(BaseQubitAnalysis):
     def _analyse_rabi(self):
         model = RabiModel()
 
-        for coord in self.dataset.coords:
+        for coord in self.magnitudes.coords:
             if "amplitudes" in str(coord):
                 self.amplitude_coord = coord
-                self.amplitudes = self.dataset[coord].values
+                self.amplitudes = self.magnitudes[coord].values
             else:
                 raise ValueError("Invalid Coordinate")
 
@@ -148,10 +148,10 @@ class NRabiQubitAnalysis(BaseQubitAnalysis):
         super().__init__(name, redis_fields)
 
     def _analyse_n_rabi(self):
-        for coord in self.dataset[self.data_var].coords:
-            if "amplitudes" in coord:
+        for coord in self.magnitudes.coords:
+            if "amplitudes" in str(coord):
                 self.mw_amplitudes_coord = coord
-            elif "repetitions" in coord:
+            elif "repetitions" in str(coord):
                 self.x_repetitions_coord = coord
 
         sums = self.magnitudes.sum(self.x_repetitions_coord)
