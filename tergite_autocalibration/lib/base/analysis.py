@@ -22,11 +22,10 @@ from typing import List
 import cf_xarray as cf
 
 # TODO: we should have a conditional import depending on a feature flag here
-import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
 
-from tergite_autocalibration.config.globals import REDIS_CONNECTION
+from tergite_autocalibration.config.globals import CONFIG
 from tergite_autocalibration.lib.base.utils.figure_utils import (
     create_figure_with_top_band,
 )
@@ -95,7 +94,7 @@ class BaseNodeAnalysis(ABC):
         self._qoi = value
 
     @abstractmethod
-    def analyze_node(self, data_path: Path) -> dict[str, QOI]:
+    def analyze_node(self, data_path: Path) -> dict[str, "QOI"]:
         """
         Run the fitting of the analysis function
 
@@ -166,7 +165,7 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         self.column_grid = 5
         self.plots_per_qubit = 1
 
-    def analyze_node(self, data_path: Path) -> dict[str, QOI]:
+    def analyze_node(self, data_path: Path) -> dict[str, "QOI"]:
         """
         Analyze the node and save the results to redis.
         Args:
@@ -240,7 +239,7 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
         self.name = name
         self.redis_fields = redis_fields
 
-    def process_qubit(self, dataset, qubit_element) -> QOI:
+    def process_qubit(self, dataset, qubit_element) -> "QOI":
         """
         Setup the qubit data and analyze it.
         Args:
@@ -278,7 +277,7 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
         primary_axis.set_title(f"Qubit {self.qubit}")
 
     @abstractmethod
-    def analyse_qubit(self) -> QOI:
+    def analyse_qubit(self) -> "QOI":
         """
         Run the actual analysis function
 
@@ -302,13 +301,10 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
         self.coords = None
         self.coupler = ""
 
-    def qubit_types(self, coupler: str):
-        control_qubit = REDIS_CONNECTION.hget(f"couplers:{coupler}", "control_qubit")
-        target_qubit = REDIS_CONNECTION.hget(f"couplers:{coupler}", "target_qubit")
-        return control_qubit, target_qubit
-
-    def process_coupler(self, dataset: xr.Dataset, coupler_element) -> QOI:
-        self.control_qubit, self.target_qubit = self.qubit_types(coupler_element)
+    def process_coupler(self, dataset: xr.Dataset, coupler_element) -> "QOI":
+        self.control_qubit, self.target_qubit = (
+            CONFIG.device.get_control_target_qubit_pair_by_coupler(coupler_element)
+        )
         self.dataset = dataset
         self.coupler = coupler_element
         self.coord = dataset.coords
@@ -356,7 +352,7 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
         self.processed_dataset = xr.Dataset()
         self.analysis_keywords = kwargs
 
-    def analyze_node(self, data_path: Path) -> QOI:
+    def analyze_node(self, data_path: Path) -> "QOI":
         """
         Analyze the node and save the results to redis.
         Args:

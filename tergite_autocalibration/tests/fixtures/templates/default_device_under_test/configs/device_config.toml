@@ -78,6 +78,8 @@ cz_pulse_width = 4e-9
 
 [device.coupler.q00_q01]
 attenuation = 12
+control_qubit = "q00"
+target_qubit = "q01"
 
 # --------------------------------------------------------------------------------
 # Device layout configuration section

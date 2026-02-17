@@ -14,6 +14,7 @@ from tergite_autocalibration.config.device import DeviceConfiguration
 from tergite_autocalibration.config.handler import ConfigurationHandler
 from tergite_autocalibration.config.package import ConfigurationPackage
 from tergite_autocalibration.tests.utils.fixtures import get_fixture_path
+from tergite_autocalibration.utils.dto.enums import QubitRole
 
 
 def test_device_configuration():
@@ -40,3 +41,11 @@ def test_device_configuration():
     assert device_configuration.resonators["q00"]["VNA_frequency"] == 6.48213e9
     assert device_configuration.qubits["q00"]["VNA_f01_frequency"] == 3.848e9
     assert device_configuration.qubits["q00"]["VNA_f12_frequency"] == 3.592e9
+
+    assert device_configuration.get_control_target_qubit_pair_by_coupler("q00_q01") == (
+        "q00",
+        "q01",
+    )
+    assert device_configuration.get_qubit_role("q00_q01", "q00") == QubitRole.CONTROL
+    assert device_configuration.get_qubit_role("q00_q01", "q01") == QubitRole.TARGET
+    assert device_configuration.get_qubit_role("q00_q01", "q02") == QubitRole.NOTSET

@@ -13,6 +13,7 @@
 # that they have been altered from the originals.
 
 from types import MappingProxyType
+from typing import Tuple
 
 from tergite_autocalibration.config.base import TOMLConfigurationFile
 from tergite_autocalibration.utils.dto.enums import QubitRole
@@ -121,6 +122,24 @@ class DeviceConfiguration(TOMLConfigurationFile):
                 qubit_role_ = QubitRole.CONTROL
         finally:
             return qubit_role_
+
+    def get_control_target_qubit_pair_by_coupler(
+        self, coupler_name: str
+    ) -> Tuple[str, str]:
+        """
+        Get the target qubit in the context of a coupler for the given device.
+
+        Args:
+            coupler_name: Coupler name as str e.g. "q00_q01"
+
+        Returns:
+            Tuple of qubits where the first one is the control and the second one is the target e.g. ("q00", "q01")
+
+        """
+        return (
+            self.couplers[coupler_name]["control_qubit"],
+            self.couplers[coupler_name]["target_qubit"],
+        )
 
     def get_output_attenuations(
         self,
