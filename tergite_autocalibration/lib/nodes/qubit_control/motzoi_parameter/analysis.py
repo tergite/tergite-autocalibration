@@ -47,13 +47,9 @@ class MotzoiBaseQubitAnalysis(BaseQubitAnalysis):
         datarray.plot(ax=axis, x=f"mw_motzois{self.qubit}", cmap="RdBu_r")
 
         # Mark the optimal motzoi on the plot
-        axis.axvline(
-            self.optimal_motzoi,
-            c="k",
-            lw=4,
-            linestyle="--",
-            label=f"Optimal Motzoi: {self.optimal_motzoi:.3f}",
-        )
+        label = f"Optimal Motzoi: {self.optimal_motzoi:.3f}"
+        styles = dict(c="k", lw=4, linestyle="--", label=label)
+        axis.axvline(self.optimal_motzoi, **styles)
         axis.legend()
 
 
