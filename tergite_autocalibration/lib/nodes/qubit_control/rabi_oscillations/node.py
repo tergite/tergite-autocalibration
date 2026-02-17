@@ -164,5 +164,5 @@ class NRabiOscillations12Node(QubitNode):
             "mw_amplitudes_sweep": {
                 qubit: np.linspace(-0.05, 0.05, 51) for qubit in self.all_qubits
             },
-            "X_repetitions": {qubit: np.arange(1, 4, 1) for qubit in self.all_qubits},
+            "X_repetitions": {qubit: np.arange(1, 8, 2) for qubit in self.all_qubits},
         }

@@ -17,7 +17,7 @@ import xarray
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.analysis import (
-    OptimalROThreeStateAmplitudeNodeAnalysis,
+    ROThreeStateAmplitudeNodeAnalysis,
     OptimalROTwoStateAmplitudeNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.measurement import (
@@ -102,7 +102,7 @@ class ROAmplitudeTwoStateOptimizationNode(QubitNode):
 class ROAmplitudeThreeStateOptimizationNode(QubitNode):
     name: str = "ro_amplitude_three_state_optimization"
     measurement_obj = ROAmplitudeOptimizationMeasurement
-    analysis_obj = OptimalROThreeStateAmplitudeNodeAnalysis
+    analysis_obj = ROThreeStateAmplitudeNodeAnalysis
     measurement_type = ScheduleNode
     qubit_qois = [
         "measure_3state_opt:pulse_amp",
@@ -174,7 +174,7 @@ class ROAmplitudeThreeStateOptimizationNode(QubitNode):
 class ThreeStateDiscriminationNode(QubitNode):
     name: str = "three_state_discrimination"
     measurement_obj = ROAmplitudeOptimizationMeasurement
-    analysis_obj = OptimalROThreeStateAmplitudeNodeAnalysis
+    analysis_obj = ROThreeStateAmplitudeNodeAnalysis
     measurement_type = ScheduleNode
     qubit_qois = [
         "measure_3state_opt:pulse_amp",
