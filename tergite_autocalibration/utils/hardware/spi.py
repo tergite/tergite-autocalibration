@@ -69,7 +69,12 @@ def _find_and_validate_spi_port():
 
 
 class SpiDAC:
-    def __init__(self, couplers: list[str], measurement_mode: MeasurementMode):
+    def __init__(
+        self,
+        couplers: list[str],
+        measurement_mode: MeasurementMode,
+        name: str = "no_spi_name_defined",
+    ):
         self.port = _find_and_validate_spi_port()
         self.is_dummy = (
             measurement_mode == MeasurementMode.dummy
@@ -79,7 +84,7 @@ class SpiDAC:
             self.port = "dummy_port"
 
         if self.port is not None:
-            self.spi = SpiRack("loki_rack", self.port, is_dummy=self.is_dummy)
+            self.spi = SpiRack(name, self.port, is_dummy=self.is_dummy)
         else:
             raise ValueError("No serial port for the SPI")
 

@@ -1,9 +1,9 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2024
-# (C) Copyright Liangyu Chen 2024
-# (C) Copyright Amr Osman 2024
-# (C) Copyright Michele Faucci Giannelli 2024
+# (C) Copyright Eleftherios Moschandreou 2023, 2024, 2025, 2026
+# (C) Copyright Liangyu Chen 2023, 2024
+# (C) Copyright Amr Osman, 2024
+# (C) Chalmers Next Labs 2025, 2026
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -13,103 +13,92 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import numpy as np
+import ast
 
-from tergite_autocalibration.lib.base.node import QubitNode
+import numpy as np
+import xarray as xr
+
+from tergite_autocalibration.config.globals import REDIS_CONNECTION
+from tergite_autocalibration.lib.base.node import CouplerNode
 from tergite_autocalibration.lib.nodes.coupler.cz_calibration.analysis import (
-    CZCalibrationSSRONodeAnalysis,
-    ResetCalibrationSSRONodeAnalysis,
+    CZCalibrationNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.coupler.cz_calibration.measurement import (
-    CZCalibrationSSROMeasurement,
-    ResetCalibrationSSROMeasurement,
+    CZ_CalibrationMeasurement,
 )
+from tergite_autocalibration.lib.nodes.schedule_node import OuterScheduleNode
 
 
-class CZCalibrationSSRONode(QubitNode):
-    measurement_obj = CZCalibrationSSROMeasurement
-    analysis_obj = CZCalibrationSSRONodeAnalysis
-    coupler_qois = ["cz_phase", "cz_pop_loss"]
+class CZ_CalibrationNode(CouplerNode):
+    name: str = "cz_calibration"
+    measurement_obj = CZ_CalibrationMeasurement
+    analysis_obj = CZCalibrationNodeAnalysis
+    measurement_type = OuterScheduleNode
+    coupler_qois = ["cz_pulse_frequency", "cz_pulse_duration", "cz_phase"]
 
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
-    ):
-        super().__init__(name, all_qubits, **schedule_keywords)
-        self.name = name
-        self.all_qubits = all_qubits
+    def __init__(self, couplers: list[str], **schedule_keywords):
+        super().__init__(couplers, **schedule_keywords)
         self.couplers = couplers
-        self.coupler = couplers[0]
-        self.coupled_qubits = couplers[0].split(sep="_")
-        self.edges = couplers
-        self.qubit_state = 2
-        self.testing_group = 0  # The edge group to be tested. 0 means all edges.
-        self.schedule_keywords = schedule_keywords
-        self.schedule_keywords["dynamic"] = False
-        self.schedule_keywords["swap_type"] = False
 
+        self.coupled_qubits = self.get_coupled_qubits()
+        self.all_qubits = self.coupled_qubits
+
+        self.schedule_keywords["loop_repetitions"] = 512
+        self.loops = self.schedule_keywords["loop_repetitions"]
+
+        self.schedule_keywords["coupler_dict"] = self.gate_qubit_types_dict()
+        self.validate()
+
+        self.outer_schedule_samplespace = {
+            "working_points": {
+                coupler: self.working_points(coupler) for coupler in self.couplers
+            }
+        }
         self.schedule_samplespace = {
-            "control_ons": {coupler: [False, True] for coupler in self.couplers},
             "ramsey_phases": {
-                coupler: np.append(np.linspace(0, 720, 25), [0, 1, 2])
-                for coupler in self.couplers
+                qubit: np.linspace(0, 420, 30) for qubit in self.coupled_qubits
+            },
+            "control_ons": {
+                coupler: np.array([False, True]) for coupler in self.couplers
             },
         }
 
+    def working_frequencies(self, coupler: str):
+        frequency_list_string_representation = REDIS_CONNECTION.hget(
+            f"couplers:{coupler}", "cz_working_frequencies"
+        )
+        frequency_list = ast.literal_eval(frequency_list_string_representation)
+        return np.array(frequency_list)
 
-class CZCalibrationSwapSSRONode(QubitNode):
-    measurement_obj = CZCalibrationSSROMeasurement
-    analysis_obj = CZCalibrationSSRONodeAnalysis
-    coupler_qois = ["cz_phase", "cz_pop_loss"]
+    def working_durations_in_ns(self, coupler: str):
+        duration_in_ns_string_representation = REDIS_CONNECTION.hget(
+            f"couplers:{coupler}", "cz_working_durations_in_ns"
+        )
+        duration_in_ns_list = ast.literal_eval(duration_in_ns_string_representation)
+        return np.array(duration_in_ns_list) * 1e-9
 
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
-    ):
-        super().__init__(name, all_qubits, **schedule_keywords)
-        self.name = name
-        self.all_qubits = all_qubits
-        self.couplers = couplers
-        self.coupler = couplers[0]
-        self.coupled_qubits = couplers[0].split(sep="_")
-        self.edges = couplers
-        self.qubit_state = 2
-        self.testing_group = 0  # The edge group to be tested. 0 means all edges.
-        self.schedule_keywords["dynamic"] = False
-        self.schedule_keywords["swap_type"] = True
-        self.schedule_samplespace = {
-            "control_ons": {qubit: [False, True] for qubit in self.coupled_qubits},
-            "ramsey_phases": {
-                qubit: np.linspace(0, 360, 25) for qubit in self.coupled_qubits
-            },
-            # 'ramsey_phases': {qubit: np.linspace(0.025, 0.025, 1) for qubit in  self.coupled_qubits},
-        }
-        # self.validate()
+    def working_points(self, coupler: str):
+        working_points = zip(
+            self.working_frequencies(coupler), self.working_durations_in_ns(coupler)
+        )
+        working_points_array = np.array(list(working_points))
+        return working_points_array
 
+    def initial_operation(self):
+        self.spi_manager.set_parking_currents(self.couplers)
 
-class ResetCalibrationSSRONode(QubitNode):
-    measurement_obj = ResetCalibrationSSROMeasurement
-    analysis_obj = ResetCalibrationSSRONodeAnalysis
-    coupler_qois = [
-        "reset_fidelity",
-        "reset_leakage",
-        "all_fidelity",
-        "all_fidelity_f",
-    ]
+    def generate_dummy_dataset(self):
+        dataset = xr.Dataset()
+        for index, coupler in enumerate(self.couplers):
+            qubit_1, qubit_2 = coupler.split("_")
+            number_of_phases = len(self.schedule_samplespace["ramsey_phases"][qubit_1])
+            number_of_modes = len(self.schedule_samplespace["control_ons"][coupler])
+            number_of_iq_samples = number_of_phases * number_of_modes * self.loops
+            real_part = np.random.uniform(-1, 1, number_of_iq_samples)
+            imag_part = np.random.uniform(-1, 1, number_of_iq_samples)
+            complex_points = real_part + 1j * imag_part
+            data_array = xr.DataArray(complex_points)
 
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
-    ):
-        super().__init__(name, all_qubits, **schedule_keywords)
-        self.name = name
-        self.all_qubits = all_qubits
-        self.couplers = couplers
-        self.edges = couplers
-        self.coupler = couplers[0]
-        self.coupled_qubits = couplers[0].split(sep="_")
-        self.qubit_state = 2
-        self.testing_group = 0  # The edge group to be tested. 0 means all edges.
-        self.dynamic = False
-        self.schedule_keywords["swap_type"] = True
-        self.schedule_samplespace = {
-            "control_ons": {qubit: [False, True] for qubit in self.coupled_qubits},
-            "ramsey_phases": {qubit: range(9) for qubit in self.coupled_qubits},
-        }
+            dataset[2 * index] = data_array
+            dataset[2 * index + 1] = data_array
+        return dataset

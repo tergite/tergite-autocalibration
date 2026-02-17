@@ -13,11 +13,8 @@
 
 
 import numpy as np
-import quantify_scheduler.backends.qblox.constants as constants
 import xarray
 from lmfit.models import LorentzianModel
-from quantify_scheduler import CompiledSchedule
-from quantify_scheduler.backends import SerialCompiler
 
 from tergite_autocalibration.config.globals import CONFIG
 from tergite_autocalibration.lib.base.node import CouplerNode
@@ -49,13 +46,14 @@ class QubitSpectroscopyVsCurrentNode(CouplerNode):
     current through the coupler to measure the crossing point of the coupler with the qubit.
     """
 
+    name: str = "coupler_anticrossing"
     measurement_obj = TwoTonesMultidimMeasurement
     analysis_obj = CouplerAnticrossingNodeAnalysis
     measurement_type = ExternalParameterNode
     coupler_qois = ["control_qubit_crossing_points", "target_qubit_crossing_points"]
 
-    def __init__(self, name: str, couplers: list[str], **schedule_keywords):
-        super().__init__(name, couplers, **schedule_keywords)
+    def __init__(self, couplers: list[str], **schedule_keywords):
+        super().__init__(couplers, **schedule_keywords)
         self.qubit_state = 0
         self.dacs = []
         self.schedule_keywords["qubit_state"] = self.qubit_state
@@ -68,7 +66,7 @@ class QubitSpectroscopyVsCurrentNode(CouplerNode):
 
         self.external_samplespace = {
             "dc_currents": {
-                coupler: np.arange(-1.5e-3, 1.5e-3, 100e-6) for coupler in self.couplers
+                coupler: np.arange(-2e-3, 2e-3, 50e-6) for coupler in self.couplers
             },
         }
         self.validate()
@@ -128,17 +126,17 @@ class ResonatorSpectroscopyVsCurrentNode(CouplerNode):
     current through the coupler to measure the crossing point of the coupler with the resonator.
     """
 
+    name: str = "resonator_spectroscopy_vs_current"
     measurement_obj = ResonatorSpectroscopyMeasurement
     analysis_obj = ResonatorSpectroscopyVsCurrentNodeAnalysis
     measurement_type = ExternalParameterNode
-    # coupler_qois = ["resonator_flux_quantum"]
     coupler_qois = [
         "control_resonator_crossing_points",
         "target_resonator_crossing_points",
     ]
 
-    def __init__(self, name: str, couplers: list[str], **schedule_keywords):
-        super().__init__(name, couplers, **schedule_keywords)
+    def __init__(self, couplers: list[str], **schedule_keywords):
+        super().__init__(couplers, **schedule_keywords)
         self.qubit_state = 0
         self.dacs = []
 
@@ -155,30 +153,13 @@ class ResonatorSpectroscopyVsCurrentNode(CouplerNode):
         }
         self.validate()
 
+    def initial_operation(self):
+        pass
+
     def pre_measurement_operation(self, reduced_ext_space):
+        first_coupler = self.couplers[0]
+        self.this_current = reduced_ext_space["dc_currents"][first_coupler]
         self.spi_manager.set_dac_current(reduced_ext_space["dc_currents"])
-
-    def precompile(self, schedule_samplespace: dict) -> CompiledSchedule:
-        constants.GRID_TIME_TOLERANCE_TIME = 5e-2
-
-        transmons_dict = {
-            qubit: self.device.get_element(qubit) for qubit in self.all_qubits
-        }
-        measurement_class = self.measurement_obj(transmons_dict)
-        schedule = measurement_class.schedule_function(
-            **schedule_samplespace, **self.schedule_keywords
-        )
-
-        # TODO: Probably the compiler desn't need to be created every time self.precompile() is called.
-        compiler = SerialCompiler(name=f"{self.name}_compiler")
-
-        compilation_config = self.device.generate_compilation_config()
-        logger.info("Starting Compiling")
-        compiled_schedule = compiler.compile(
-            schedule=schedule, config=compilation_config
-        )
-
-        return compiled_schedule
 
     def final_operation(self):
         logger.info("Final Operation")

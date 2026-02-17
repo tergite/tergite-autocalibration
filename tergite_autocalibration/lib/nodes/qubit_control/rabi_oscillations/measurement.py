@@ -12,9 +12,6 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-"""
-Module containing a schedule class for Rabi calibration.
-"""
 
 import numpy as np
 from quantify_scheduler import Schedule
@@ -58,10 +55,10 @@ class RabiOscillationsMeasurement(BaseMeasurement):
             An experiment schedule.
         """
         if qubit_state == 0:
-            schedule_title = "multiplexed_rabi_01"
+            schedule_title = "rabi_01_oscillations"
             measure_function = Measure
         elif qubit_state == 1:
-            schedule_title = "multiplexed_rabi_12"
+            schedule_title = "rabi_12_oscillations"
             measure_function = Measure_RO1
         else:
             raise ValueError(f"Invalid qubit state: {qubit_state}")
@@ -109,6 +106,8 @@ class RabiOscillationsMeasurement(BaseMeasurement):
             )  # To enforce parallelism we refer to the root relaxation
 
             # The second for loop iterates over all amplitude values in the amplitudes batch:
+            if qubit_state == 1:
+                mw_pulse_duration = 72e-9
             for acq_index, mw_amplitude in enumerate(mw_amp_array_val):
                 if qubit_state == 1:
                     schedule.add(X(this_qubit))
@@ -166,7 +165,7 @@ class NRabiOscillationsMeasurement(BaseMeasurement):
             An experiment schedule.
         """
         if qubit_state == 0:
-            schedule_title = "mltplx_nrabi_01"
+            schedule_title = "n_rabi_oscillations"
             measure_function = Measure
         elif qubit_state == 1:
             schedule_title = "mltplx_nrabi_12"
@@ -177,12 +176,8 @@ class NRabiOscillationsMeasurement(BaseMeasurement):
 
         qubits = self.transmons.keys()
 
-        for this_qubit, this_transmon in self.transmons.items():
-            mw_frequency = this_transmon.clock_freqs.f01()
-            schedule.add_resource(
-                ClockResource(name=f"{this_qubit}.01", freq=mw_frequency)
-            )
-            if qubit_state == 1:
+        if qubit_state == 1:
+            for this_qubit, this_transmon in self.transmons.items():
                 mw_frequency_12 = this_transmon.clock_freqs.f12()
                 this_clock = f"{this_qubit}.12"
                 schedule.add_resource(
@@ -200,21 +195,17 @@ class NRabiOscillationsMeasurement(BaseMeasurement):
             mw_amplitude = this_transmon.rxy.amp180()
             mw_motzoi = this_transmon.rxy.motzoi()
 
-            this_clock = f"{this_qubit}.01"
-
             if qubit_state == 1:
                 mw_amplitude = this_transmon.r12.ef_amp180()
                 mw_motzoi = this_transmon.r12.ef_motzoi()
                 this_clock = f"{this_qubit}.12"
-                measure_function = Measure_RO1
             elif qubit_state == 0:
-                measure_function = Measure
                 this_clock = f"{this_qubit}.01"
             else:
                 raise ValueError(f"Invalid qubit state: {qubit_state}")
 
-            mw_amplitudes_values = mw_amplitudes_sweep[this_qubit]
-            number_of_amplitudes = len(mw_amplitudes_values)
+            mw_amplitudes_corrections = mw_amplitudes_sweep[this_qubit]
+            number_of_corrections = len(mw_amplitudes_corrections)
 
             schedule.add(
                 Reset(*qubits), ref_op=root_relaxation, ref_pt_new="end"
@@ -224,9 +215,9 @@ class NRabiOscillationsMeasurement(BaseMeasurement):
             for x_index, this_x in enumerate(X_values):
                 # The inner for loop iterates over all frequency values in the frequency batch:
                 for mw_amplitude_index, mw_amplitude_correction in enumerate(
-                    mw_amplitudes_values
+                    mw_amplitudes_corrections
                 ):
-                    this_index = x_index * number_of_amplitudes + mw_amplitude_index
+                    this_index = x_index * number_of_corrections + mw_amplitude_index
                     if qubit_state == 1:
                         schedule.add(X(this_qubit))
                     for _ in range(this_x):
@@ -250,27 +241,6 @@ class NRabiOscillationsMeasurement(BaseMeasurement):
                                 phase=0,
                             ),
                         )
-                        if qubit_state == 0:
-                            schedule.add(
-                                DRAGPulse(
-                                    duration=mw_pulse_duration,
-                                    G_amp=mw_amplitude + mw_amplitude_correction,
-                                    D_amp=mw_motzoi,
-                                    port=mw_pulse_port,
-                                    clock=this_clock,
-                                    phase=90,
-                                ),
-                            )
-                            schedule.add(
-                                DRAGPulse(
-                                    duration=mw_pulse_duration,
-                                    G_amp=mw_amplitude + mw_amplitude_correction,
-                                    D_amp=mw_motzoi,
-                                    port=mw_pulse_port,
-                                    clock=this_clock,
-                                    phase=90,
-                                ),
-                            )
 
                     schedule.add(
                         measure_function(

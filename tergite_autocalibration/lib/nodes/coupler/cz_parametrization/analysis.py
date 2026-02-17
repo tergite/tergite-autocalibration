@@ -13,7 +13,6 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from abc import ABC
 from typing import Literal
 
 import matplotlib.pyplot as plt
@@ -31,7 +30,7 @@ from tergite_autocalibration.lib.utils.classification_functions import (
 from tergite_autocalibration.utils.dto.qoi import QOI
 
 
-class CZParametrizationAnalysis(BaseCouplerAnalysis, ABC):
+class CZParametrizationAnalysis(BaseCouplerAnalysis):
 
     def __init__(self, name, redis_fields, **kwargs):
         super().__init__(name, redis_fields)
@@ -108,8 +107,8 @@ class CZParametrizationCouplerAnalysis(CZParametrizationAnalysis):
                 control_diffs = control_state_2 - control_state_1 - control_state_0
                 target_diffs = target_state_0 - target_state_1 - target_state_2
             elif self.phase_path == "via_02":
-                target_diffs = control_state_2 - control_state_1 - control_state_0
-                control_diffs = target_state_0 - target_state_1 - target_state_2
+                control_diffs = control_state_0 - control_state_1 - control_state_2
+                target_diffs = target_state_2 - target_state_1 - target_state_0
             else:
                 raise ValueError("Invalid phase path")
 
@@ -128,7 +127,6 @@ class CZParametrizationCouplerAnalysis(CZParametrizationAnalysis):
                 cval=-1,
             )
 
-            # optimal point is the maximum of the combined image
             weighted_optimal_point = (
                 weighted_sum.where(weighted_sum == weighted_sum.max(), drop=True)
                 .expand_dims(self.dc_currents_coord)  # promote dimension

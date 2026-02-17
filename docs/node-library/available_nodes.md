@@ -17,7 +17,7 @@ graph TD
     A --> I(Resonator spectroscopy vs current)
     B --> J(Qubit spectroscopy vs current)
     I --> J
-    H2 --> K(CZ parametrization) --> K1(CZ Chevron)
+    H2 --> K(CZ Parametrization) --> K1(CZ Chevron) --> K2(CZ Calibration) --> K3(CZ Local Phases)
         
     click A href "../nodes/resonator_spectroscopy_node"
     click F href "../nodes/resonator_spectroscopy_node"
@@ -78,6 +78,8 @@ graph TD
 - [coupler_resonator_spectroscopy](nodes/resonator_spectroscopy_vs_current_node.md)
 - [cz_parametrization](nodes/cz_parametrization.md)
 - [cz_chevron](nodes/cz_chevron.md)
+- [cz_calibration](nodes/cz_calibration.md)
+- [cz_local_phases](nodes/cz_local_phases.md)
 
 ## Characterization Nodes
 

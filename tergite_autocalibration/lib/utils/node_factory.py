@@ -17,9 +17,11 @@
 from pathlib import Path
 from typing import TYPE_CHECKING, Dict, List, Union
 
+from tergite_autocalibration.utils.misc.reflections import (
+    import_class_from_file,
+    find_inheriting_classes_ast_recursive,
+)
 from tergite_autocalibration.utils.misc.regex import camel_to_snake
-
-from .reflections import find_inheriting_classes_ast_recursive, import_class_from_file
 
 if TYPE_CHECKING:
     from tergite_autocalibration.lib.base.node import BaseNode
@@ -61,8 +63,9 @@ class NodeFactory:
             "coupler_anticrossing": "QubitSpectroscopyVsCurrentNode",
             "cz_parametrization": "CZParametrizationNode",
             "cz_chevron": "CZChevronNode",
+            "cz_calibration": "CZ_CalibrationNode",
+            "cz_local_phases": "CZ_LocalPhasesNode",
             "resonator_spectroscopy_vs_current": "ResonatorSpectroscopyVsCurrentNode",
-            "qubit_spectroscopy_vs_current": "QubitSpectroscopyVsCurrentNode",
         }
         self._node_implementation_paths: Dict[str, Union[str, Path]] = {}
         self._node_classes: Dict[str, type["BaseNode"]] = {}
@@ -125,8 +128,6 @@ class NodeFactory:
         else:
             node_cls = self._node_classes[node_name]
 
-        node_obj = node_cls(
-            node_name, all_qubits=all_qubits, couplers=couplers, **kwargs
-        )
+        node_obj = node_cls(all_qubits=all_qubits, couplers=couplers, **kwargs)
 
         return node_obj

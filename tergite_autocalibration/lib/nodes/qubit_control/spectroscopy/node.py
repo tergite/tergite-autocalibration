@@ -36,10 +36,8 @@ peak = LorentzianModel()
 
 class QubitSpectroscopyBase(QubitNode):
 
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
-    ):
-        super().__init__(name, all_qubits, couplers, **schedule_keywords)
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(all_qubits, couplers, **schedule_keywords)
 
     def generate_dummy_dataset(self):
         dataset = xarray.Dataset()
@@ -75,15 +73,14 @@ class QubitSpectroscopyBase(QubitNode):
 
 
 class Qubit01SpectroscopyNode(QubitSpectroscopyBase):
+    name: str = "qubit_01_spectroscopy"
     measurement_obj = TwoTonesMultidimMeasurement
     analysis_obj = QubitSpectroscopyNodeAnalysis
     measurement_type = ScheduleNode
     qubit_qois = ["clock_freqs:f01", "spec:spec_ampl_optimal"]
 
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
-    ):
-        super().__init__(name, all_qubits, couplers, **schedule_keywords)
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(all_qubits, couplers, **schedule_keywords)
 
         self.schedule_samplespace = {
             "spec_pulse_amplitudes": {
@@ -96,15 +93,14 @@ class Qubit01SpectroscopyNode(QubitSpectroscopyBase):
 
 
 class Qubit12SpectroscopyNode(QubitSpectroscopyBase):
+    name: str = "qubit_12_spectroscopy"
     measurement_obj = TwoTonesMultidimMeasurement
     analysis_obj = QubitSpectroscopy12NodeAnalysis
     measurement_type = ScheduleNode
     qubit_qois = ["clock_freqs:f12", "spec:spec_ampl_12_optimal"]
 
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_keywords
-    ):
-        super().__init__(name, all_qubits, couplers, **schedule_keywords)
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(all_qubits, couplers, **schedule_keywords)
         self.qubit_state = 1
         self.schedule_keywords["qubit_state"] = self.qubit_state
 
@@ -120,15 +116,14 @@ class Qubit12SpectroscopyNode(QubitSpectroscopyBase):
 
 
 class Qubit01SpectroscopyAmplitudeNode(QubitNode):
+    name: str = "qubit_bring_up_spectroscopy"
     measurement_obj = TwoTonesAmplitudeMeasurement
     analysis_obj = QubitSpectroscopyNodeAnalysis
     measurement_type = OuterScheduleNode
     qubit_qois = ["clock_freqs:f01", "spec:spec_ampl_optimal"]
 
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **schedule_kwargs
-    ):
-        super().__init__(name, all_qubits, couplers, **schedule_kwargs)
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_kwargs):
+        super().__init__(all_qubits, couplers, **schedule_kwargs)
 
         self.outer_schedule_samplespace = {
             "spec_pulse_amplitudes": {

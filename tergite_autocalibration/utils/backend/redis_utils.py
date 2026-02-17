@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2024
+# (C) Copyright Eleftherios Moschandreou 2024, 2025, 2026
 # (c) Copyright Stefan Hill 2024
 # (C) Copyright Michele Faucci Giannelli 2025
 #
@@ -16,6 +16,7 @@ import toml
 
 from tergite_autocalibration.config.globals import CONFIG, REDIS_CONNECTION
 from tergite_autocalibration.lib.base.node import CouplerNode, QubitNode
+from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.utils.logging import logger
 
 
@@ -103,7 +104,7 @@ def populate_node_parameters(
     # Populate the Redis database with node specific parameter values from the toml file
     transmon_configuration = toml.load(CONFIG.node)
     if node_name in transmon_configuration and not is_node_calibrated:
-        node_specific_dict = transmon_configuration[node_name]["all"]
+        node_specific_dict = transmon_configuration[node_name].get("all", {})
         for field_key, field_value in node_specific_dict.items():
             if isinstance(field_value, dict):
                 for sub_field_key, sub_field_value in field_value.items():
@@ -180,26 +181,6 @@ def populate_quantities_of_interest(
         raise ValueError(
             f"Node {node_name} with base type {node} is not a valid Qubit or Coupler node. Cannot populate quantities of interest."
         )
-
-
-def reset_all_nodes(nodes, qubits: list, couplers: list, redis_connection):
-    for qubit in qubits:
-        fields = redis_connection.hgetall(f"transmons:{qubit}").keys()
-        key = f"transmons:{qubit}"
-        cs_key = f"cs:{qubit}"
-        for field in fields:
-            redis_connection.hset(key, field, "nan")
-        for node in nodes:
-            redis_connection.hset(cs_key, node, "not_calibrated")
-
-    for coupler in couplers:
-        fields = redis_connection.hgetall(f"couplers:{coupler}").keys()
-        key = f"couplers:{coupler}"
-        cs_key = f"cs:{coupler}"
-        for field in fields:
-            redis_connection.hset(key, field, "nan")
-        for node in nodes:
-            redis_connection.hset(cs_key, node, "not_calibrated")
 
 
 def fetch_redis_params(param: str, this_element: str):

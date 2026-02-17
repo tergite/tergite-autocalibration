@@ -50,7 +50,6 @@ from tergite_autocalibration.utils.hardware.spi import SpiDAC
 from tergite_autocalibration.utils.io.dataset import create_node_data_path
 from tergite_autocalibration.utils.logging import logger
 
-# from tergite_autocalibration.utils.logger.tac_logger import logger
 from tergite_autocalibration.utils.logging.visuals import draw_arrow_chart
 
 colorama_init()
@@ -80,6 +79,7 @@ class HardwareManager:
         # Store the configuration settings and initialize the instrument coordinator
         self.config = config
         self.lab_ic: InstrumentCoordinator = None
+        logger.info("Initializing Hardware")
 
         # Check if hardware setup is necessary based on measurement mode
         if self.config.cluster_mode == MeasurementMode.re_analyse:
@@ -243,6 +243,7 @@ def _set_output_attenuations(cluster, connectivity, settings):
                 raise KeyError(f"Failed to set attenuation for port: {port_str}")
 
             logger.debug(f"Applied {att}dB attenuation on {port_str}")
+    logger.info("Attenuations are set")
 
 
 class NodeManager:
@@ -383,6 +384,7 @@ class CalibrationSupervisor:
         self.lab_ic = self.hardware_manager.get_instrument_coordinator()
         self.node_manager = NodeManager(self.lab_ic, config=config)
         self.topo_order = self.node_manager.topo_order(self.config.target_node_name)
+        logger.info("Node Manager is initialized")
 
     def calibrate_system(self, node_name: str | None = None, ignore_spec: bool = False):
         logger.info("Starting System Calibration")
@@ -416,7 +418,8 @@ class CalibrationSupervisor:
                 f"Wrong mode for re-analysis: '{self.config.cluster_mode}', should be: {MeasurementMode.re_analyse}"
             )
 
-        node = self.node_manager._initialize_node(self.config.target_node_name)
+        target_node = self.config.target_node_name
+        node = self.node_manager._initialize_node(target_node)
         logger.status(
             f"Analysing '{self.config.target_node_name}' with {node.analysis_obj.__name__}"
         )

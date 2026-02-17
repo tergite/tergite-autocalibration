@@ -210,6 +210,8 @@
       "control_local_phase_error": "0",
       "cz_working_durations_in_ns": "[360, 356, 364, 368, 368, 376, 364, 368, 380, 372, 364, 368, 356, 368, 360, 360, 352, 348, 368, 344, 292, 336, 332, 292, 292, 292, 292, 292, 288, 284]",
       "parking_current": "0.000639",
+      "control_qubit": "q15",
+      "target_qubit": "q14",
       "target_local_phase_error": "0",
       "cz_pulse_duration_error": "0",
       "cz_pulse_frequency_error": "0",

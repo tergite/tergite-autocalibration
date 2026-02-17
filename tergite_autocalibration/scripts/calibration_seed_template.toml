@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Chalmers Next Labs AB 2025
+# (C) Copyright Chalmers Next Labs AB 2025, 2026
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -19,6 +19,7 @@
 frequency = "Hz"
 pi_pulse_amplitude = ""
 pi_pulse_duration = "s"
+pi_pulse_motzoi = ""
 pulse_sigma = ""
 t1_decoherence = "s"
 t2_decoherence = "s"

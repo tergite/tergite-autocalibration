@@ -31,7 +31,7 @@ from tergite_autocalibration.utils.dto.extended_transmon_element import Extended
 
 
 class ResonatorSpectroscopyMeasurement(BaseMeasurement):
-    def __init__(self, transmons: dict[str, ExtendedTransmon]):
+    def __init__(self, transmons: dict[str, ExtendedTransmon], *args):
         super().__init__(transmons)
         self.transmons = transmons
 

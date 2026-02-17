@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Michele Eleftherios Moschandreou 2026
+# (C) Copyright Eleftherios Moschandreou 2026
 # (C) Chalmers Next Labs 2026
 #
 # This code is licensed under the Apache License, Version 2.0. You may
@@ -36,7 +36,6 @@ def test_node_creation():
     REDIS_CONNECTION.hset(f"transmons:{'q14'}", "clock_freqs:f12", "5.0e6")
     REDIS_CONNECTION.hset(f"couplers:{'q13_q14'}", "cz_pulse_frequency", "7.16e8")
     node = CZChevronNode(
-        "cz_chevron",
         all_qubits=["q13", "q14"],
         couplers=[coupler],
     )
@@ -46,7 +45,7 @@ def test_node_creation():
 def test_class_attribute_objects():
     REDIS_CONNECTION.hset(f"couplers:{'q13_q14'}", "cz_pulse_frequency", "7.16e8")
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = CZChevronNode("cz_chevron", all_qubits=["q13", "q14"], couplers=["q13_q14"])
+    node = CZChevronNode(all_qubits=["q13", "q14"], couplers=["q13_q14"])
     assert isinstance(node.measurement_obj, type(CZChevronMeasurement))
     assert isinstance(node.analysis_obj, type(CZChevronAnalysis))
     assert issubclass(node.measurement_type, OuterScheduleNode)
@@ -64,9 +63,7 @@ def test_dummy_generation():
         REDIS_CONNECTION.hset(f"transmons:{qubit}", "clock_freqs:f01", "5.2e6")
         REDIS_CONNECTION.hset(f"transmons:{qubit}", "clock_freqs:f12", "5.0e6")
 
-    node = CZChevronNode(
-        "cz_chevron", all_qubits=CONFIG.run.qubits, couplers=CONFIG.run.couplers
-    )
+    node = CZChevronNode(CONFIG.run.couplers)
     dummy_dataset = node.generate_dummy_dataset()
     first_coupler = CONFIG.run.couplers[0]
 

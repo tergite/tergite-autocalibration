@@ -39,7 +39,7 @@ GRAPH_DEPENDENCIES = [
     ("resonator_spectroscopy_vs_current", "qubit_spectroscopy_vs_current"),
     ("qubit_01_spectroscopy", "rabi_oscillations"),
     ("rabi_oscillations", "ramsey_correction"),
-    ("rabi_oscillations", "T1"),
+    ("ramsey_correction", "T1"),
     ("ramsey_correction", "motzoi_parameter"),
     ("motzoi_parameter", "n_rabi_oscillations"),
     ("n_rabi_oscillations", "resonator_spectroscopy_1"),
@@ -61,6 +61,7 @@ GRAPH_DEPENDENCIES = [
     ("T2_echo", "purity_benchmarking"),
     ("cz_parametrization", "cz_chevron"),
     ("cz_chevron", "cz_calibration"),
+    ("cz_calibration", "cz_local_phases"),
     ("ro_amplitude_three_state_optimization", "process_tomography_ssro"),
 ]
 

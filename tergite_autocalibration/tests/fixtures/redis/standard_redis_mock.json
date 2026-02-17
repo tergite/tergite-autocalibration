@@ -322,7 +322,9 @@
       "tqg_fidelity": "nan",
       "cz_dynamic_target_error": "0",
       "cz_phase_path": "via_20",
-      "attenuation": "0"
+      "attenuation": "0",
+      "control_qubit": "q01",
+      "target_qubit": "q00"
     }
   }
 }

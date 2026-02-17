@@ -10,9 +10,13 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+from typing import Union, TYPE_CHECKING
+
 import json
 
-from quantify_scheduler.backends.qblox_backend import QbloxHardwareCompilationConfig
+if TYPE_CHECKING:
+    from pathlib import Path
+    from quantify_scheduler.backends.qblox_backend import QbloxHardwareCompilationConfig
 
 from tergite_autocalibration.config.device import DeviceConfiguration
 from tergite_autocalibration.config.node import NodeConfiguration
@@ -30,7 +34,8 @@ class ConfigurationHandler:
     def __init__(self):
         self.run: "RunConfiguration"
         self.samplespace: "SamplespaceConfiguration"
-        self.cluster: "QbloxHardwareCompilationConfig"
+        self._cluster: "QbloxHardwareCompilationConfig"
+        self._cluster_lazy_import_path: Union[str, Path]
 
         # TODO: The format for the configurations below is as of now not yet well-defined on the backend side
         self.device: "DeviceConfiguration"
@@ -59,13 +64,11 @@ class ConfigurationHandler:
             configuration_package.config_files["user_samplespace"]
         )
 
-        # Loading the QBLOX cluster configuration
-        _cluster_config_filepath = configuration_package.config_files["cluster_config"]
-        with open(_cluster_config_filepath, "r") as f_:
-            cluster_config_json = json.load(f_)
-            return_obj.cluster = QbloxHardwareCompilationConfig.model_validate(
-                cluster_config_json
-            )
+        # Loading the path to the QBLOX hardware configuration
+        return_obj._cluster_lazy_import_path = configuration_package.config_files[
+            "cluster_config"
+        ]
+        return_obj._cluster = None
 
         return_obj.device = DeviceConfiguration(
             configuration_package.config_files["device_config"]
@@ -74,3 +77,22 @@ class ConfigurationHandler:
         return_obj.node = configuration_package.config_files["node_config"]
 
         return return_obj
+
+    @property
+    def cluster(self) -> "QbloxHardwareCompilationConfig":
+        """
+        Lazy loading the QBLOX hardware configuration, because it is a big module import
+        """
+        if not self._cluster_lazy_import_path:
+            raise AttributeError("Cannot find cluster configuration.")
+        if not self._cluster:
+            from quantify_scheduler.backends.qblox_backend import (
+                QbloxHardwareCompilationConfig,
+            )
+
+            with open(self._cluster_lazy_import_path, "r") as f_:
+                cluster_config_json = json.load(f_)
+                self._cluster = QbloxHardwareCompilationConfig.model_validate(
+                    cluster_config_json
+                )
+        return self._cluster

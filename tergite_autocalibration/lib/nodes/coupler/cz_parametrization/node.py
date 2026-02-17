@@ -34,13 +34,14 @@ from tergite_autocalibration.lib.utils.classification_functions import generate_
 
 
 class CZParametrizationNode(CouplerNode):
+    name: str = "cz_parametrization"
     measurement_obj = CZParametrizationMeasurement
     analysis_obj = CZParametrizationNodeAnalysis
     measurement_type = ExternalParameterNode
     coupler_qois = ["cz_pulse_frequency", "cz_pulse_amplitude", "parking_current"]
 
-    def __init__(self, name: str, all_qubits: list[str], couplers: list[str]):
-        super().__init__(name, couplers)
+    def __init__(self, all_qubits: list[str], couplers: list[str]):
+        super().__init__(couplers)
         self.couplers = couplers
 
         self.coupled_qubits = self.get_coupled_qubits()
@@ -57,23 +58,23 @@ class CZParametrizationNode(CouplerNode):
 
         self.external_samplespace = {
             "dc_currents": {
-                coupler: self.fine_samplespace_around(self.parking_current(coupler))
+                coupler: self.broad_samplespace_around(self.parking_current(coupler))
                 for coupler in self.couplers
             },
         }
         self.schedule_samplespace = {
             "cz_pulse_amplitudes": {
-                coupler: np.linspace(0.15, 0.35, 25) for coupler in self.couplers
+                coupler: np.linspace(0.25, 0.55, 25) for coupler in self.couplers
             },
             "cz_pulse_frequencies": {
-                coupler: np.linspace(-7e6, 5e6, 25)
+                coupler: np.linspace(-11e6, 1e6, 25)
                 + self.transition_frequency(coupler, phase_path=phase_paths[coupler])
                 for coupler in self.couplers
             },
         }
 
     def fine_samplespace_around(self, central_value: float) -> np.ndarray:
-        return np.arange(central_value - 5e-6, central_value + 4.5e-6, 13e-6)
+        return np.arange(central_value - 5e-6, central_value + 4.5e-6, 2e-6)
 
     def broad_samplespace_around(self, central_value: float) -> np.ndarray:
         return np.arange(central_value - 50e-6, central_value + 45e-6, 8e-6)
@@ -91,7 +92,7 @@ class CZParametrizationNode(CouplerNode):
     def initial_operation(self):
         pass
 
-    def pre_measurement_operation(self, reduced_ext_space):
+    def pre_measurement_operation(self, reduced_ext_space: dict[str, dict]):
         iteration_dict = reduced_ext_space["dc_currents"]
         # there is some redundancy tha all qubits have the same
         # iteration index, that's why we keep the first value->

@@ -16,21 +16,14 @@
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Literal, Tuple
+from typing import Literal, Tuple, TYPE_CHECKING
 
 import matplotlib
 import numpy as np
-import quantify_scheduler.backends.qblox.constants as constants
 import xarray
-from quantify_scheduler.backends import SerialCompiler
-from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
-from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
-    CompiledSchedule,
-    InstrumentCoordinator,
-)
+
 
 from tergite_autocalibration.config.globals import PLOTTING_BACKEND, REDIS_CONNECTION
-from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
 from tergite_autocalibration.lib.base.measurement import (
     BaseMeasurement,
@@ -42,7 +35,10 @@ from tergite_autocalibration.lib.utils.device import (
     save_serial_device,
 )
 from tergite_autocalibration.lib.utils.redis import update_redis_trusted_values
-from tergite_autocalibration.lib.utils.schedule_execution import execute_schedule
+from tergite_autocalibration.lib.utils.schedule_execution import (
+    execute_schedule,
+    get_compiler,
+)
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
 from tergite_autocalibration.utils.io.dataset import save_dataset
@@ -50,18 +46,25 @@ from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.utils.logging.visuals import print_measurement_info
 from tergite_autocalibration.utils.measurement_utils import samplespace_dimensions
 
+if TYPE_CHECKING:
+    from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
+    from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
+        CompiledSchedule,
+        InstrumentCoordinator,
+    )
+
 matplotlib.use(PLOTTING_BACKEND)
 
 
 class BaseNode(ABC):
+    name: str
     measurement_obj: "BaseMeasurement"
     analysis_obj: "BaseNodeAnalysis"
     measurement_type: "MeasurementType"
 
-    def __init__(self, name: str, **node_dictionary):
-        self.name = name
+    def __init__(self, **node_dictionary):
         self.node_dictionary = node_dictionary
-        self.lab_instr_coordinator: InstrumentCoordinator
+        self.lab_instr_coordinator: "InstrumentCoordinator"
         self.spi_manager: SpiDAC
         self.schedule_samplespace = {}
         self.external_samplespace = {}
@@ -77,7 +80,7 @@ class BaseNode(ABC):
 
         self.samplespace = self.schedule_samplespace | self.external_samplespace
 
-        self.device: QuantumDevice
+        self.device: "QuantumDevice"
 
     @abstractmethod
     def precompile(self, samplespace):
@@ -104,7 +107,7 @@ class BaseNode(ABC):
 
     def measure_compiled_schedule(
         self,
-        compiled_schedule: CompiledSchedule,
+        compiled_schedule: "CompiledSchedule",
         measurement_mode=MeasurementMode.real,
         measurement: Tuple[int, int] = (1, 1),
     ) -> xarray.Dataset:
@@ -138,7 +141,7 @@ class BaseNode(ABC):
         return result_dataset
 
     def _calculate_schedule_duration(
-        self, compiled_schedule: CompiledSchedule
+        self, compiled_schedule: "CompiledSchedule"
     ) -> float:
         """Calculate the total duration of the schedule."""
         duration = compiled_schedule.get_schedule_duration()
@@ -262,12 +265,11 @@ class BaseNode(ABC):
 
 
 class QubitNode(BaseNode):
+    name: str
     qubit_qois: list[str] | None = None
 
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **node_keywords
-    ):
-        super().__init__(name, **node_keywords)
+    def __init__(self, all_qubits: list[str], couplers: list[str], **node_keywords):
+        super().__init__(**node_keywords)
         self.all_qubits = all_qubits
         self.couplers = couplers
         self.qubit_state = 0  # can be 0 or 1 or 2
@@ -279,7 +281,9 @@ class QubitNode(BaseNode):
             self.name, qubits=self.all_qubits, couplers=self.couplers
         )
 
-    def precompile(self, schedule_samplespace: dict) -> CompiledSchedule:
+    def precompile(self, schedule_samplespace: dict) -> "CompiledSchedule":
+        import quantify_scheduler.backends.qblox.constants as constants
+
         constants.GRID_TIME_TOLERANCE_TIME = 5e-2
 
         transmons_dict = {
@@ -290,8 +294,7 @@ class QubitNode(BaseNode):
             **schedule_samplespace, **self.schedule_keywords
         )
 
-        # TODO: Probably the compiler desn't need to be created every time self.precompile() is called.
-        compiler = SerialCompiler(name=f"{self.name}_compiler")
+        compiler = get_compiler(prefix=self.name)
 
         compilation_config = self.device.generate_compilation_config()
         logger.info("Starting Compiling")
@@ -312,10 +315,11 @@ class QubitNode(BaseNode):
 
 
 class CouplerNode(BaseNode):
+    name: str
     coupler_qois: list[str]
 
-    def __init__(self, name: str, couplers: list[str], **node_keywords):
-        super().__init__(name, **node_keywords)
+    def __init__(self, couplers: list[str], **node_keywords):
+        super().__init__(**node_keywords)
         self.couplers = couplers
         self.edges = couplers
         self.all_qubits = sorted(set(self.get_coupled_qubits()))
@@ -326,6 +330,37 @@ class CouplerNode(BaseNode):
         self.device = configure_device(
             self.name, qubits=self.all_qubits, couplers=self.couplers
         )
+
+    def measure_node(self, cluster_status) -> xarray.Dataset:
+        """
+        Here we attach the measure_node method according to the
+        measurement_type: ScheduleNode or ExternalParameterNode or something else
+
+        Overwrite the base method, to set the updated SPI currents before the measurement.
+        """
+        self.set_parking_current_from_redis()
+        measurement_type = self.measurement_type(self)
+        dataset = measurement_type.measure_node(cluster_status)
+        return dataset
+
+    def set_parking_current_from_redis(self):
+        """
+        At the beginning of the calibration, the parking current is set by
+        the calibration supervisor from the device_config value. This value
+        can be updated by the cz_parametrization measurement which updates the
+        parking current value on redis.
+
+        This method fetches the redis value and sets the update DC current
+        to the appropriate SPI dacs.
+        """
+        currents_dict = {}
+        for coupler in self.couplers:
+            parking_current = REDIS_CONNECTION.hget(
+                f"couplers:{coupler}", "parking_current"
+            )
+            currents_dict[coupler] = parking_current
+        logger.status("Setting updated DC currents")
+        self.spi_manager.set_dac_current(currents_dict)
 
     def get_coupled_qubits(self) -> list:
         coupled_qubits = []
@@ -338,18 +373,10 @@ class CouplerNode(BaseNode):
     def gate_qubit_types_dict(self) -> dict[str, dict]:
         qubit_types_dict = {}
         for coupler in self.couplers:
-            q1, q2 = coupler.split("_")
-
-            q1_type = dh.get_legacy("qubit_types")[q1]
-            q2_type = dh.get_legacy("qubit_types")[q2]
-            if q1_type == "Control" and q2_type == "Target":
-                control_qubit = q1
-                target_qubit = q2
-            elif q1_type == "Target" and q2_type == "Control":
-                target_qubit = q1
-                control_qubit = q2
-            else:
-                raise ValueError("Invalid qubit types")
+            control_qubit = REDIS_CONNECTION.hget(
+                f"couplers:{coupler}", "control_qubit"
+            )
+            target_qubit = REDIS_CONNECTION.hget(f"couplers:{coupler}", "target_qubit")
             qubit_types_dict[coupler] = {
                 "control_qubit": control_qubit,
                 "target_qubit": target_qubit,
@@ -385,7 +412,9 @@ class CouplerNode(BaseNode):
 
         return ac_frequency
 
-    def precompile(self, schedule_samplespace: dict) -> CompiledSchedule:
+    def precompile(self, schedule_samplespace: dict) -> "CompiledSchedule":
+        import quantify_scheduler.backends.qblox.constants as constants
+
         constants.GRID_TIME_TOLERANCE_TIME = 5e-2
 
         transmons_dict = {
@@ -399,8 +428,7 @@ class CouplerNode(BaseNode):
             **schedule_samplespace, **self.schedule_keywords
         )
 
-        # TODO: Probably the compiler doesn't need to be created every time self.precompile() is called.
-        compiler = SerialCompiler(name=f"{self.name}_compiler")
+        compiler = get_compiler(prefix=self.name)
 
         compilation_config = self.device.generate_compilation_config()
         logger.info("Starting Compiling")
