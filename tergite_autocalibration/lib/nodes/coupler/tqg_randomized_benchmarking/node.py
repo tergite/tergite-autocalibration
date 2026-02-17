@@ -20,7 +20,6 @@ from pathlib import Path
 import numpy as np
 import optuna
 
-from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.analysis import (
     RandomizedBenchmarkingSSRONodeAnalysis,
 )

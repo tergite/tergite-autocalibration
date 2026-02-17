@@ -28,7 +28,6 @@ from qcodes import validators
 from rich.progress import Progress
 
 from tergite_autocalibration.config.globals import ENV, REDIS_CONNECTION, CONFIG
-from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.utils.misc.os import OperatingSystem, get_os

@@ -35,7 +35,6 @@ from tergite_autocalibration.config.globals import (
     ENV,
     REDIS_CONNECTION,
 )
-from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.config.package import ConfigurationPackage
 from tergite_autocalibration.lib.base.node import BaseNode, CouplerNode
 from tergite_autocalibration.lib.utils.graph import filtered_topological_order
