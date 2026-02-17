@@ -43,9 +43,9 @@ def test_device_configuration():
     assert device_configuration.qubits["q00"]["VNA_f12_frequency"] == 3.592e9
 
     assert device_configuration.get_control_target_qubit_pair_by_coupler("q00_q01") == (
-        "q00",
         "q01",
+        "q00",
     )
-    assert device_configuration.get_qubit_role("q00_q01", "q00") == QubitRole.CONTROL
-    assert device_configuration.get_qubit_role("q00_q01", "q01") == QubitRole.TARGET
+    assert device_configuration.get_qubit_role("q00_q01", "q01") == QubitRole.CONTROL
+    assert device_configuration.get_qubit_role("q00_q01", "q00") == QubitRole.TARGET
     assert device_configuration.get_qubit_role("q00_q01", "q02") == QubitRole.NOTSET

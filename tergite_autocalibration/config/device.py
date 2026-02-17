@@ -136,10 +136,20 @@ class DeviceConfiguration(TOMLConfigurationFile):
             Tuple of qubits where the first one is the control and the second one is the target e.g. ("q00", "q01")
 
         """
-        return (
-            self.couplers[coupler_name]["control_qubit"],
-            self.couplers[coupler_name]["target_qubit"],
-        )
+        if coupler_name in self.couplers.keys():
+            try:
+                return (
+                    self.couplers[coupler_name]["control_qubit"],
+                    self.couplers[coupler_name]["target_qubit"],
+                )
+            except KeyError:
+                raise KeyError(
+                    f"Coupler with name {coupler_name} does not defined 'control_qubit' or 'target_qubit'."
+                )
+        else:
+            raise KeyError(
+                f"Coupler name {coupler_name} is not found in the device configuration."
+            )
 
     def get_output_attenuations(
         self,
