@@ -32,13 +32,6 @@ class ROFrequencyOptimizationMeasurement(BaseMeasurement):
         super().__init__(transmons)
         self.transmons = transmons
 
-        if len(self.transmons) == 2:
-            self.ro_str = "ro_2st_opt"
-        elif len(self.transmons) == 3:
-            self.ro_str = "ro_3st_opt"
-        else:
-            raise ValueError("invalid number of states")
-
     def measure(self, schedule: Schedule, transmon: ExtendedTransmon, acq_index: int):
 
         this_qubit = transmon.name
@@ -107,6 +100,12 @@ class ROFrequencyOptimizationMeasurement(BaseMeasurement):
         schedule = Schedule("ro_frequency_optimization", repetitions)
 
         qubits = self.transmons.keys()
+        if len(qubit_states[list(qubits)[0]]) == 2:
+            self.ro_str = "ro_2st_opt"
+        elif len(qubit_states[list(qubits)[0]]) == 3:
+            self.ro_str = "ro_3st_opt"
+        else:
+            raise ValueError("invalid number of states")
 
         # Initialize ClockResource with the first frequency value
         for this_qubit, ro_array_val in ro_opt_frequencies.items():
