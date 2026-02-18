@@ -34,7 +34,6 @@ def qubit_samples(qubit: str, transition: str = "01") -> np.ndarray:
         VNA_frequency = dh.get_legacy("VNA_qubit_frequencies")[qubit]
     elif transition == "12":
         VNA_frequency = dh.get_legacy("VNA_f12_frequencies")[qubit]
-    # FIXME: This is not safe, because VNA_frequency might be undefined
     min_freq = VNA_frequency - sweep_range / 2
     max_freq = VNA_frequency + sweep_range / 2
     return np.linspace(min_freq, max_freq, qub_spec_samples)

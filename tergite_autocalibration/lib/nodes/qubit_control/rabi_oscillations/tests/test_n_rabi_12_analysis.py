@@ -22,8 +22,6 @@ from tergite_autocalibration.lib.base.utils.analysis_utils import filter_ds_by_e
 from tergite_autocalibration.lib.nodes.qubit_control.rabi_oscillations.analysis import (
     NRabi_12_NodeAnalysis,
     NRabi_12_QubitAnalysis,
-    NRabiNodeAnalysis,
-    NRabiQubitAnalysis,
 )
 from tergite_autocalibration.tests.utils.decorators import with_redis
 

@@ -15,11 +15,22 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 
+import pandas
 import pytest
+import xarray as xr
 
 import tergite_autocalibration.utils.reanalysis_utils as ra_utils
+from tergite_autocalibration.config.globals import CONFIG
+from tergite_autocalibration.lib.nodes.coupler.cz_calibration.node import \
+    CZ_CalibrationNode
+from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.node import \
+    ResonatorSpectroscopyNode
+from tergite_autocalibration.tests.utils.decorators import with_redis
 from tergite_autocalibration.tests.utils.fixtures import get_fixture_path
-from tergite_autocalibration.utils.io.dataset import scrape_and_copy_hdf5_files
+from tergite_autocalibration.utils.dto.extended_transmon_element import \
+    ExtendedTransmon
+from tergite_autocalibration.utils.io.dataset import (
+    save_dataset, scrape_and_copy_hdf5_files)
 
 
 def test_scrape_and_copy_hdf5_files():
@@ -134,3 +145,59 @@ def test_select_measurement_for_analysis_can_find_measurement():
         info.dataset_path
         == info.measurement_folder_path / "dataset_ramsey_correction.hdf5"
     )
+
+
+def test_save_dataset(tmp_path):
+    ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
+    node = ResonatorSpectroscopyNode(CONFIG.run.qubits, CONFIG.run.couplers)
+    dummy_raw_dataset = node.generate_dummy_dataset()
+    result_dataset = node.configure_dataset(dummy_raw_dataset)
+    save_dataset(result_dataset, "resonator_spectroscopy", tmp_path)
+
+    assert os.path.exists(os.path.join(tmp_path, "dataset_resonator_spectroscopy.hdf5"))
+
+
+_test_data_dir = os.path.join(
+    Path(__file__).parent.parent.parent, "lib/nodes/coupler/cz_calibration/tests/data"
+)
+_redis_values_path = os.path.join(_test_data_dir, "redis-2025-12-25-12-40-59.json")
+
+
+@with_redis(_redis_values_path)
+def test_save_dataset_with_working_points(tmp_path):
+    """
+    for nodes like cz calibration where two coords are packed into a Multindex object
+    """
+    ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
+    coupler = "q13_q14"
+    couplers = [coupler]
+    node = CZ_CalibrationNode(all_qubits=["q13", "q14"], couplers=couplers)
+
+    dummy_raw_dataset_1 = node.generate_dummy_dataset()
+    result_dataset_1 = node.configure_dataset(dummy_raw_dataset_1)
+    multi_index = pandas.MultiIndex.from_tuples([(7e8, 200e-9)], names=["l1", "l2"])
+    result_dataset_1 = result_dataset_1.expand_dims({"working_points": multi_index})
+    result_dataset_1 = result_dataset_1.assign_coords(
+        {"working_points": ("working_points", multi_index)}
+    )
+
+    dummy_raw_dataset_2 = node.generate_dummy_dataset()
+    result_dataset_2 = node.configure_dataset(dummy_raw_dataset_2)
+    multi_index = pandas.MultiIndex.from_tuples([(8e8, 250e-9)], names=["l1", "l2"])
+    result_dataset_2 = result_dataset_2.expand_dims({"working_points": multi_index})
+    result_dataset_2 = result_dataset_2.assign_coords(
+        {"working_points": ("working_points", multi_index)}
+    )
+
+    result_dataset = xr.merge(
+        [result_dataset_1, result_dataset_2], join="outer", compat="no_conflicts"
+    )
+
+    save_dataset(result_dataset, "cz_calibration", tmp_path)
+    save_path = os.path.join(tmp_path, "dataset_cz_calibration.hdf5")
+    assert os.path.exists(save_path)
+
+    loaded_dataset = xr.open_dataset(save_path)
+    assert "working_points" in loaded_dataset
+    assert "l1" in loaded_dataset
+    assert "l2" in loaded_dataset

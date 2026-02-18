@@ -97,7 +97,7 @@ def save_dataset(
         {"name": node_name, "tuid": measurement_id}
     )
 
-    # to_netcdf doesn't like complex numbers, convert to real/imag to save:
+    # to_netcdf doesn't like complex numbers, convert to real&imag to save:
     result_dataset_real = to_real_dataset(result_dataset)
 
     dataset_name = f"dataset_{node_name}.hdf5"
