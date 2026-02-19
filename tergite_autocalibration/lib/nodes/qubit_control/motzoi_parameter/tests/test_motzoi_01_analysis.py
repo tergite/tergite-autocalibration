@@ -26,7 +26,7 @@ from tergite_autocalibration.lib.nodes.qubit_control.motzoi_parameter.analysis i
 from tergite_autocalibration.tests.utils.decorators import with_redis
 
 _test_data_dir = os.path.join(
-    Path(__file__).parent.parent.parent.parent, "data", "single-qubits-run"
+    Path(__file__).parent.parent.parent.parent, "data", "single_qubits_run"
 )
 _redis_values = os.path.join(_test_data_dir, "redis-single-qubits-run.json")
 

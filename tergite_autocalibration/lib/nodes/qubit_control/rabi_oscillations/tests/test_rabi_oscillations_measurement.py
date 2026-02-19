@@ -56,7 +56,7 @@ def test_dummy_12_generation():
 
 
 _test_data_dir = os.path.join(
-    Path(__file__).parent.parent.parent.parent, "data", "single-qubits-run"
+    Path(__file__).parent.parent.parent.parent, "data", "single_qubits_run"
 )
 _redis_values = os.path.join(_test_data_dir, "redis-single-qubits-run.json")
 
