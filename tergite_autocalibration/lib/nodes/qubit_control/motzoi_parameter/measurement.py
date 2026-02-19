@@ -1,7 +1,8 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2024
+# (C) Copyright Eleftherios Moschandreou 2024, 2026
 # (C) Copyright Liangyu Chen 2024
+# (C) Copyright Abdullah Al Amin 2026
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -19,7 +20,6 @@ from __future__ import annotations
 
 import numpy as np
 from quantify_scheduler import Schedule
-from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.gate_library import Measure, Reset, X
 from quantify_scheduler.operations.pulse_library import DRAGPulse
 from quantify_scheduler.resources import ClockResource
