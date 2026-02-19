@@ -157,7 +157,7 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         super().__init__()
         self.name = name
         self.redis_fields = redis_fields
-        self.dataset = None
+        self.dataset = xr.Dataset()
         self.data_vars = None
         self.coords = None
 
@@ -189,42 +189,21 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
 
     def _analyze_all_qubits(self):
         analysis_results = {}
-        qubit_data_dict = self._group_by_qubit()
-        qubit_analysis: BaseQubitAnalysis = self.single_qubit_analysis_obj(
-            self.name, self.redis_fields
-        )
-        for this_qubit, qubit_data_vars in qubit_data_dict.items():
+        qubits = self.dataset.elements
+        qubits.sort(key=lambda x: int(x[1:]))  # TODO: move this to configure_dataset
+        for this_qubit in qubits:
+            # TODO: this object is created for every single qubit
+            qubit_analysis: BaseQubitAnalysis = self.single_qubit_analysis_obj(
+                self.name, self.redis_fields
+            )
+
             partial_ds = filter_ds_by_element(self.dataset, this_qubit)
-            # ds = xr.merge([self.dataset[var] for var in qubit_data_vars])
             analysis_results[this_qubit] = qubit_analysis.process_qubit(
                 partial_ds, this_qubit
             )
             self.qubit_analyses.append(qubit_analysis)
 
-            # matching_coords = [coord for coord in ds.coords if this_qubit in coord]
-            # if matching_coords:
-            #     # NOTE: probably this does nothing
-            #     # selected_coord_name = matching_coords[0]
-            #     # ds = ds.sel(
-            #     #     {selected_coord_name: slice(None)}
-            #     # )  # Select all data along this coordinate
-            #
-            #     qubit_analysis: BaseQubitAnalysis = self.single_qubit_analysis_obj(
-            #         self.name, self.redis_fields
-            #     )
-            #     analysis_results[this_qubit] = qubit_analysis.process_qubit(
-            #         ds, this_qubit
-            #     )
-            #     self.qubit_analyses.append(qubit_analysis)
-
         return analysis_results
-
-    def _group_by_qubit(self):
-        qubit_data_dict = collections.defaultdict(set)
-        for var in self.dataset.data_vars:
-            this_qubit = self.dataset[var].attrs["qubit"]
-            qubit_data_dict[this_qubit].add(var)
-        return qubit_data_dict
 
     def _fill_plots(self):
         for index, analysis in enumerate(self.qubit_analyses):
@@ -253,7 +232,6 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
             QOI: Quantity of interest as QOI wrapped object
         """
 
-        # analysis.data_var = "yq13"
         self.dataset = dataset
         self.qubit = qubit_element
         self._set_data_variables()
