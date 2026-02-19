@@ -149,7 +149,7 @@ class NRabiOscillationsNode(QubitNode):
 
 
 class NRabiOscillations12Node(QubitNode):
-    name: str = "n_rabi_oscillations_12"
+    name: str = "n_rabi_12_oscillations"
     measurement_obj = NRabiOscillationsMeasurement
     analysis_obj = NRabi_12_NodeAnalysis
     measurement_type = ScheduleNode

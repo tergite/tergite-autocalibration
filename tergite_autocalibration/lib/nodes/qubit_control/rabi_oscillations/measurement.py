@@ -105,7 +105,6 @@ class RabiOscillationsMeasurement(BaseMeasurement):
                 Reset(*qubits), ref_op=root_relaxation
             )  # To enforce parallelism we refer to the root relaxation
 
-            print(f"{ mw_duration = }")
             # The second for loop iterates over all amplitude values in the amplitudes batch:
             for acq_index, mw_amplitude in enumerate(mw_amp_array_val):
                 if qubit_state == 1:
