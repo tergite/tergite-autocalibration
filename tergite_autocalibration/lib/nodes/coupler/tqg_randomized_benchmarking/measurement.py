@@ -106,7 +106,7 @@ class TwoQubitRBMeasurement(BaseMeasurement):
 
         Args:
             schedule: The schedule to add resources to
-            coupler_name: Name identifier for the coupler
+            coupler: Name identifier for the coupler
         """
         downconvert = DOWNCONVERT_FREQ
         cz_frequency = self.couplers[coupler].clock_freqs.cz_freq()
