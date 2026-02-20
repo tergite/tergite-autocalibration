@@ -10,7 +10,7 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from typing import List
+from typing import List, Dict
 
 
 def generate_n_qubit_list(n_qubits: int, starting_from: int = 1) -> List[str]:
@@ -25,3 +25,29 @@ def generate_n_qubit_list(n_qubits: int, starting_from: int = 1) -> List[str]:
         List of qubits ["qXX", ...] starting with "q01" (default, regulated by starting_from parameter).
     """
     return [f"q{i:02}" for i in range(starting_from, starting_from + n_qubits)]
+
+
+def update_nested(target: Dict, updates: Dict) -> None:
+    """
+    Update a nested data structure (usually a dict).
+
+    Args:
+        target: The original data structure
+        updates: The updates that are going to be merged into the data structure
+
+    Returns:
+        None: Does not return anything, but works on the given objects
+
+    """
+    for key, value in updates.items():
+        if key in target:
+            # If the key exists in target, check if both values are dicts
+            if isinstance(value, dict) and isinstance(target[key], dict):
+                # Recursively update nested dictionaries without overwriting
+                update_nested(target[key], value)
+            else:
+                # Skip if the key exists and is not a dictionary
+                continue
+        else:
+            # If the key does not exist in target, add it
+            target[key] = value

@@ -15,7 +15,7 @@ import numpy as np
 import xarray
 from lmfit.models import LorentzianModel
 
-from tergite_autocalibration.config.legacy import dh
+from tergite_autocalibration.config.globals import CONFIG
 from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis import (
     QubitSpectroscopy12NodeAnalysis,
@@ -46,10 +46,10 @@ class QubitSpectroscopyBase(QubitNode):
             self.schedule_samplespace["spec_pulse_amplitudes"][first_qubit]
         )
         for index, qubit in enumerate(self.all_qubits):
-            qubit_freq = dh.get_legacy("VNA_qubit_frequencies")[qubit]
+            qubit_freq = CONFIG.device.qubits[qubit]["VNA_f01_frequency"]
             samples = qubit_samples(qubit)
             if self.name == "qubit_12_spectroscopy":
-                qubit_freq = dh.get_legacy("VNA_f12_frequencies")[qubit]
+                qubit_freq = CONFIG.device.qubits[qubit]["VNA_f12_frequency"]
                 samples = qubit_samples(qubit, transition="12")
             true_params = peak.make_params(
                 amplitude=0.2, center=qubit_freq, sigma=0.1e6
@@ -140,7 +140,7 @@ class Qubit01SpectroscopyAmplitudeNode(QubitNode):
     def qubit_samples(self, qubit: str) -> np.ndarray:
         qub_spec_samples = 821
         sweep_range = 500e6
-        VNA_frequency = dh.get_legacy("VNA_qubit_frequencies")[qubit]
+        VNA_frequency = CONFIG.device.qubits[qubit]["VNA_f01_frequency"]
         min_freq = VNA_frequency - sweep_range / 2 + 0 * 50e6
         max_freq = VNA_frequency + sweep_range / 2 + 0 * 50e6
         return np.linspace(min_freq, max_freq, qub_spec_samples)

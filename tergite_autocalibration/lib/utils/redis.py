@@ -21,7 +21,6 @@ import numpy as np
 from quantify_scheduler.json_utils import SchedulerJSONDecoder, SchedulerJSONEncoder
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
-from tergite_autocalibration.utils import logging
 from tergite_autocalibration.utils.dto import extended_transmon_element
 from tergite_autocalibration.utils.dto.extended_coupler_edge import (
     ExtendedCompositeSquareEdge,
@@ -119,7 +118,6 @@ def load_redis_config_coupler(coupler: ExtendedCompositeSquareEdge):
             f"{key} is not present in redis. Ignore this for single qubit nodes"
         )
     try:
-        # if dh.get_legacy("qubit_types")[bus_qubits[0]] == "Target":
         if bus_qubits[0] == str(redis_config["target_qubit"]):
             logger.info(f"Reading Target Qubit from Redis: {bus_qubits[0]}")
             coupler.cz.parent_phase_correction(redis_value("cz_dynamic_target"))
