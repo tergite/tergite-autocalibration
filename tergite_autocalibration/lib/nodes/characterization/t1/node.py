@@ -51,8 +51,8 @@ class T1Node(QubitNode):
         self.schedule_keywords = {
             "multiplexing": "parallel"
         }  # 'one_by_one' | 'parallel'
-        number_of_repeated_t1s = 10
-        self.sleep_time = 2
+        number_of_repeated_t1s = 5
+        self.sleep_time = 1
 
         delays = np.concatenate(
             [

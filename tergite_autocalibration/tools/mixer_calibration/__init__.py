@@ -12,17 +12,17 @@
 
 
 import json
-from typing import List, TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 import toml
 from qblox_instruments import Cluster
 
 from tergite_autocalibration.config.globals import (
     CONFIG,
+    CONFIGURATION_PACKAGE,
     ENV,
     REDIS_CONNECTION,
     logger,
-    CONFIGURATION_PACKAGE,
 )
 from tergite_autocalibration.tools.mixer_calibration.utils import (
     replace_mixer_corrected_values,
@@ -80,6 +80,7 @@ class IQMixerChannel:
         getattr(self.module, self._lo_commands[0])(self.lo_freq)
         logger.status(f"lo_freq={self.lo_freq}, rf_freq={self.rf_freq}")
         nco_freq = self.rf_freq - self.lo_freq
+        logger.status(f"nco_freq={nco_freq / 1e6} Mhz")
         self.module.sequencer0.nco_freq(nco_freq)
         self.module.sequencer0.sideband_cal()
         gain_ratio = self.module.sequencer0.mixer_corr_gain_ratio()
@@ -184,6 +185,7 @@ class IQMixerCalibration:
                     "VNA_f01_frequency"
                 ]
             elif self.rf_port == "fl":
+                breakpoint()
                 cz_pulse_frequency = float(
                     REDIS_CONNECTION.hget(f"couplers:{device}", "cz_pulse_frequency")
                 )
@@ -196,6 +198,7 @@ class IQMixerCalibration:
             else:
                 raise ValueError(f"Unknown rf_port value: {self.rf_port}")
 
+            breakpoint()
             rf_freqs_[device] = float(rf_freq)
         return rf_freqs_
 

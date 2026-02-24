@@ -49,7 +49,6 @@ from tergite_autocalibration.utils.dto.enums import DataStatus, MeasurementMode
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
 from tergite_autocalibration.utils.io.dataset import create_node_data_path
 from tergite_autocalibration.utils.logging import logger
-
 from tergite_autocalibration.utils.logging.visuals import draw_arrow_chart
 
 colorama_init()
