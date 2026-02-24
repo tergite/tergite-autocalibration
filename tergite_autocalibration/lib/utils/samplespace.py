@@ -15,13 +15,13 @@
 
 import numpy as np
 
-from tergite_autocalibration.config.legacy import dh
+from tergite_autocalibration.config.globals import CONFIG
 
 
 def resonator_samples(qubit: str) -> np.ndarray:
     res_spec_samples = 91
     sweep_range = 4.0e6
-    VNA_frequency = dh.get_legacy("VNA_resonator_frequencies")[qubit]
+    VNA_frequency = CONFIG.device.resonators[qubit]["VNA_frequency"]
     min_freq = VNA_frequency - sweep_range / 2
     max_freq = VNA_frequency + sweep_range / 2
     return np.linspace(min_freq, max_freq, res_spec_samples)
@@ -31,9 +31,10 @@ def qubit_samples(qubit: str, transition: str = "01") -> np.ndarray:
     qub_spec_samples = 91
     sweep_range = 7e6
     if transition == "01":
-        VNA_frequency = dh.get_legacy("VNA_qubit_frequencies")[qubit]
+        VNA_frequency = CONFIG.device.qubits[qubit]["VNA_f01_frequency"]
     elif transition == "12":
-        VNA_frequency = dh.get_legacy("VNA_f12_frequencies")[qubit]
+        VNA_frequency = CONFIG.device.qubits[qubit]["VNA_f12_frequency"]
+    # FIXME: This is not safe, because VNA_frequency might be undefined
     min_freq = VNA_frequency - sweep_range / 2
     max_freq = VNA_frequency + sweep_range / 2
     return np.linspace(min_freq, max_freq, qub_spec_samples)
