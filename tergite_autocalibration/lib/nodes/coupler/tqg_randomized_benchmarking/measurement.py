@@ -56,7 +56,7 @@ class TwoQubitRBMeasurement(BaseMeasurement):
         self.transmons = transmons
         self.couplers = couplers
 
-    def allign_cliffords(self, coupler: str, clifford_sequence: list) -> list:
+    def align_cliffords(self, coupler: str, clifford_sequence: list) -> list:
         """
         The initial TwoQubitClifford decomposition,
         returns decompositions of Operations that look like:
@@ -65,7 +65,7 @@ class TwoQubitRBMeasurement(BaseMeasurement):
         coupler                -- O4=CZ
 
         i.e. the single qubit Operations are run consequantly for both qubits.
-        This method alligns the single qubit operations, so they are run in parallel
+        This method aligns the single qubit operations, so they are run in parallel
         while padding with Identity operations where necessary:
         q0      O1 -- O2         -- O5
         q1      O3 --  I         -- O6
@@ -195,7 +195,7 @@ class TwoQubitRBMeasurement(BaseMeasurement):
                 for clifford_gate_idx in clifford_seq:
                     cl_decomp = TwoQubitClifford(clifford_gate_idx).gate_decomposition
 
-                    grouped_clifford_decomposition = self.allign_cliffords(
+                    grouped_clifford_decomposition = self.align_cliffords(
                         coupler_names[0], cl_decomp
                     )
 

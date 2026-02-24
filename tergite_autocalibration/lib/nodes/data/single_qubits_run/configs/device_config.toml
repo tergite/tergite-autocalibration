@@ -129,7 +129,6 @@ measure_2.pulse_amp = 0.020
 
 [device.qubit.q02]
 VNA_f01_frequency = 3.700e9
-# VNA_f01_frequency = 4.504e9
 VNA_f12_frequency = 3.500e9
 measure.pulse_amp = 0.020
 measure_1.pulse_amp = 0.020
@@ -144,7 +143,6 @@ measure_2.pulse_amp = 0.020
 
 [device.qubit.q04]
 VNA_f01_frequency = 4.337e9
-# VNA_f01_frequency = 4.650e9
 VNA_f12_frequency = 4253600000.0
 measure.pulse_amp = 0.020
 measure_1.pulse_amp = 0.020
@@ -157,129 +155,126 @@ measure.pulse_amp = 0.020
 measure_1.pulse_amp = 0.020
 measure_2.pulse_amp = 0.020
 
-[device.qubit.q06]        
+[device.qubit.q06]
 VNA_f01_frequency = 4.608e9
 VNA_f12_frequency = 4453300000.0
 measure.pulse_amp = 0.005
 measure1.pulse_amp = 0.005
 measure2.pulse_amp = 0.005
 
-[device.qubit.q07]        
+[device.qubit.q07]
 VNA_f01_frequency = 4.997e9
 VNA_f12_frequency = 4735900000.0
 measure.pulse_amp = 0.005
 measure1.pulse_amp = 0.005
 measure2.pulse_amp = 0.005
 
-[device.qubit.q08]        
+[device.qubit.q08]
 VNA_f01_frequency = 4.302e9
 VNA_f12_frequency = 4146300000.0
 measure.pulse_amp = 0.005
 measure1.pulse_amp = 0.005
 measure2.pulse_amp = 0.005
 
-[device.qubit.q09]        
+[device.qubit.q09]
 VNA_f01_frequency = 5.298e9
 VNA_f12_frequency = 5038800000.0
 measure.pulse_amp = 0.005
 measure1.pulse_amp = 0.005
 measure2.pulse_amp = 0.005
 
-[device.qubit.q10]        
+[device.qubit.q10]
 VNA_f01_frequency = 4.608e9
 VNA_f12_frequency = 4403200000.0
 measure.pulse_amp = 0.005
 measure1.pulse_amp = 0.005
 measure2.pulse_amp = 0.005
 
-[device.qubit.q11]        
+[device.qubit.q11]
 VNA_f01_frequency = 4.738e9
 VNA_f12_frequency = 4.487e9
 measure.pulse_amp = 0.024
 measure1.pulse_amp = 0.024
 measure2.pulse_amp = 0.005
 
-[device.qubit.q12]        
+[device.qubit.q12]
 VNA_f01_frequency = 4.266e9
 VNA_f12_frequency = 4.130e9
-# VNA_f12_frequency = 4.111e9
 measure.pulse_amp = 0.024
 measure1.pulse_amp = 0.024
 measure2.pulse_amp = 0.024
 
-[device.qubit.q13]        
+[device.qubit.q13]
 VNA_f01_frequency = 5.271e9
-# VNA_f01_frequency = 5.258e9
 VNA_f12_frequency = 5.027e9
-# VNA_f12_frequency = 5.034e9
 measure.pulse_amp = 0.032
 measure1.pulse_amp = 0.032
 measure2.pulse_amp = 0.032
 
-[device.qubit.q14]        
+[device.qubit.q14]
 VNA_f01_frequency = 4.299e9
 VNA_f12_frequency = 4.145e9
 measure.pulse_amp = 0.032
 measure1.pulse_amp = 0.032
 measure2.pulse_amp = 0.032
 
-[device.qubit.q15]        
+[device.qubit.q15]
 VNA_f01_frequency = 4.571e9
 VNA_f12_frequency = 4.316e9
 measure.pulse_amp = 0.032
 measure1.pulse_amp = 0.032
 measure2.pulse_amp = 0.032
 
-[device.qubit.q16]        
+[device.qubit.q16]
 VNA_f01_frequency = 4.302e9
 VNA_f12_frequency = 4146300000.0
 measure.pulse_amp = 0.02
 measure1.pulse_amp = 0.02
 measure2.pulse_amp = 0.02
 
-[device.qubit.q17]        
+[device.qubit.q17]
 VNA_f01_frequency = 5.297e9
 VNA_f12_frequency = 5037800000.0
 measure.pulse_amp = 0.03
 measure1.pulse_amp = 0.03
 measure2.pulse_amp = 0.03
 
-[device.qubit.q18]        
+[device.qubit.q18]
 VNA_f01_frequency = 4.608e9
 VNA_f12_frequency = 4453200000.0
 measure.pulse_amp = 0.03
 
-[device.qubit.q19]        
+[device.qubit.q19]
 VNA_f01_frequency = 4.997e9
 VNA_f12_frequency = 4735900000.0
 measure.pulse_amp = 0.03
 
-[device.qubit.q20]        
+[device.qubit.q20]
 VNA_f01_frequency = 4.302e9
 VNA_f12_frequency = 4146300000.0
 measure.pulse_amp = 0.03
 
-[device.qubit.q21]        
+[device.qubit.q21]
 VNA_f01_frequency = 5.197e9
 VNA_f12_frequency = 4936600000.0
 measure.pulse_amp = 0.03
 
-[device.qubit.q22]        
+[device.qubit.q22]
 VNA_f01_frequency = 4.502e9
 VNA_f12_frequency = 4347000000.0
 measure.pulse_amp = 0.03
 
-[device.qubit.q23]        
+[device.qubit.q23]
 VNA_f01_frequency = 5.094e9
 VNA_f12_frequency = 4832700000.0
 measure.pulse_amp = 0.03
 
-[device.qubit.q24]        
+[device.qubit.q24]
 VNA_f01_frequency = 4.408e9
 VNA_f12_frequency = 4252700000.0
 measure.pulse_amp = 0.03
 
-[device.qubit.q25]        
+[device.qubit.q25]
 VNA_f01_frequency = 5.198e9
 VNA_f12_frequency = 4937500000.0
 measure.pulse_amp = 0.03
@@ -292,26 +287,8 @@ measure.pulse_amp = 0.03
 attenuation = 4
 
 # Note: Please add the couplers manually for now
-# [device.coupler.q11_q12]
-# parking_current = 0
-#
 [device.coupler.q12_q13]
-# cz_pulse_duration = 4e-9
 cz_phase_path = 'via_20'
-# parking_current = 2250e-6 # nothing
-# parking_current =-1000e-6 #nothing
-# parking_current = 50e-6 #nothing
-# parking_current = 1138e-6 #nothing
-# parking_current = 1200e-6 #nothing
-# parking_current = 500e-6 #nothing
-# parking_current = 670e-6 #maybe one
-# parking_current = 400e-6 #Nothing
-# parking_current = 570e-6 #nothing
-# parking_current = 813e-6 #83%
-# parking_current = -1000e-6 #nothing
-# parking_current = -900e-6 #al,ost nothing
-# parking_current = -800e-6 #al,ost nothing
-# parking_current = -1530e-6 #al,ost nothing
 parking_current = -600e-6
 control_qubit = 'q12'
 target_qubit = 'q13'
@@ -322,21 +299,6 @@ cz_phase_path = 'via_20'
 parking_current = 1134e-6
 control_qubit = 'q13'
 target_qubit = 'q14'
-# parking_current = -100e-6 # No blobs found
-# parking_current = -200e-6 # No blobs found
-# parking_current = -300e-6 # No blobs found
-# parking_current = -400e-6 #  No blobs
-# parking_current = -1000e-6 # no blobs
-# parking_current = 3550e-6
-# parking_current =  45e-6 # p 0.44
-# parking_current =  55e-6 # p 0.48 <---------- this was the last
-# parking_current =  84e-6 # 0.42 p 
-# parking_current = 114e-6 # 0.37 p
-# parking_current = 241e-6 #  bad rb long dueation chevrons
-# parking_current = 1732e-6 # good chevrons bad rb
-# parking_current = -1561e-6 # 0.30 p very bad interleaved
-# parking_current = -1300e-6 # Nothing
-# parking_current = -1400e-6 # blobs start appearat -1470
 
 
 [device.coupler.q14_q15]
@@ -353,153 +315,153 @@ parking_current = 0
 
 
 [layout.resonator.q01]
-position = {}
+position = { }
 
 [layout.resonator.q02]
-position = {}
+position = { }
 
 [layout.resonator.q03]
-position = {}
+position = { }
 
 [layout.resonator.q04]
-position = {}
+position = { }
 
 [layout.resonator.q05]
-position = {}
+position = { }
 
 [layout.resonator.q06]
-position = {}
+position = { }
 
 [layout.resonator.q07]
-position = {}
+position = { }
 
 [layout.resonator.q08]
-position = {}
+position = { }
 
 [layout.resonator.q09]
-position = {}
+position = { }
 
 [layout.resonator.q10]
-position = {}
+position = { }
 
 [layout.resonator.q11]
-position = {}
+position = { }
 
 [layout.resonator.q12]
-position = {}
+position = { }
 
 [layout.resonator.q13]
-position = {}
+position = { }
 
 [layout.resonator.q14]
-position = {}
+position = { }
 
 [layout.resonator.q15]
-position = {}
+position = { }
 
 [layout.resonator.q16]
-position = {}
+position = { }
 
 [layout.resonator.q17]
-position = {}
+position = { }
 
 [layout.resonator.q18]
-position = {}
+position = { }
 
 [layout.resonator.q19]
-position = {}
+position = { }
 
 [layout.resonator.q20]
-position = {}
+position = { }
 
 [layout.resonator.q21]
-position = {}
+position = { }
 
 [layout.resonator.q22]
-position = {}
+position = { }
 
 [layout.resonator.q23]
-position = {}
+position = { }
 
 [layout.resonator.q24]
-position = {}
+position = { }
 
 [layout.resonator.q25]
-position = {}
+position = { }
 
 
 [layout.qubit.q01]
-position = {}
+position = { }
 
 [layout.qubit.q02]
-position = {}
+position = { }
 
 [layout.qubit.q03]
-position = {}
+position = { }
 
 [layout.qubit.q04]
-position = {}
+position = { }
 
 [layout.qubit.q05]
-position = {}
+position = { }
 
 [layout.qubit.q06]
-position = {}
+position = { }
 
 [layout.qubit.q07]
-position = {}
+position = { }
 
 [layout.qubit.q08]
-position = {}
+position = { }
 
 [layout.qubit.q09]
-position = {}
+position = { }
 
 [layout.qubit.q10]
-position = {}
+position = { }
 
 [layout.qubit.q11]
-position = {}
+position = { }
 
 [layout.qubit.q12]
-position = {}
+position = { }
 
 [layout.qubit.q13]
-position = {}
+position = { }
 
 [layout.qubit.q14]
-position = {}
+position = { }
 
 [layout.qubit.q15]
-position = {}
+position = { }
 
 [layout.qubit.q16]
-position = {}
+position = { }
 
 [layout.qubit.q17]
-position = {}
+position = { }
 
 [layout.qubit.q18]
-position = {}
+position = { }
 
 [layout.qubit.q19]
-position = {}
+position = { }
 
 [layout.qubit.q20]
-position = {}
+position = { }
 
 [layout.qubit.q21]
-position = {}
+position = { }
 
 [layout.qubit.q22]
-position = {}
+position = { }
 
 [layout.qubit.q23]
-position = {}
+position = { }
 
 [layout.qubit.q24]
-position = {}
+position = { }
 
 [layout.qubit.q25]
-position = {}
+position = { }
 

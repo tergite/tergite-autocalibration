@@ -31,7 +31,7 @@ _redis_values_path = os.path.join(_test_data_dir, "redis-2026-02-10-11-23-12.jso
 
 
 @with_redis(_redis_values_path)
-def test_allign_cliffords():
+def test_align_cliffords():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
     qubits = ["q13", "q14"]
     couplers = ["q13_q14"]
@@ -59,7 +59,7 @@ def test_allign_cliffords():
         ("mY90", "q1"),
     ]
 
-    grouped_gate_decomposition = cz_rb_measurement.allign_cliffords(
+    grouped_gate_decomposition = cz_rb_measurement.align_cliffords(
         couplers[0], cliff_gate_decomposition
     )
 

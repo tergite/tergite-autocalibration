@@ -1,15 +1,8 @@
 # This file is a configuration template for the initial values on each calibration run
 
 target_node = "ro_amplitude_three_state_optimization"
-# qubits = ['q01', 'q04', 'q05']
-# qubits = ['q06','q07', 'q09']
-# qubits = ['q06','q07', 'q08', 'q09', 'q10']
 qubits = ['q13', 'q14', 'q15']
-# qubits = ['q11', 'q12', 'q13', 'q14', 'q15']
-# couplers = []
-# couplers = ['q12_q13']
 couplers = ['q13_q14']
-# couplers = ['q11_q12','q12_q13','q13_q14','q14_q15']
 
 #   --------------
 #   Node reference

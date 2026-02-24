@@ -31,7 +31,16 @@ from typing import ClassVar, Dict, List, Tuple
 
 import numpy as np
 
-from .pauli_transfer_matrices import CZ, S2, H, I, S, X, Y, Z
+from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.utils.pauli_transfer_matrices import (
+    CZ,
+    S2,
+    H,
+    I,
+    S,
+    X,
+    Y,
+    Z,
+)
 
 # The decomposition of the single qubit clifford group as per
 # Epstein et al. Phys. Rev. A 89, 062321 (2014)

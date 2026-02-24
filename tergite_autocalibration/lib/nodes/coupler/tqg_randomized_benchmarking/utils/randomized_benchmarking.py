@@ -31,7 +31,11 @@ from typing import Literal, Optional, Type
 
 import numpy as np
 
-from .clifford_group import Clifford, SingleQubitClifford, TwoQubitClifford
+from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.utils.clifford_group import (
+    Clifford,
+    SingleQubitClifford,
+    TwoQubitClifford,
+)
 
 
 def calculate_net_clifford(
