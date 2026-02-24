@@ -27,20 +27,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import ClassVar, Dict, List, Tuple
-
 import numpy as np
-
-from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.utils.pauli_transfer_matrices import (
-    CZ,
-    S2,
-    H,
-    I,
-    S,
-    X,
-    Y,
-    Z,
-)
+from .pauli_transfer_matrices import I, X, Y, Z, S, S2, H, CZ
+from typing import List, Tuple, Dict, ClassVar
 
 # The decomposition of the single qubit clifford group as per
 # Epstein et al. Phys. Rev. A 89, 062321 (2014)

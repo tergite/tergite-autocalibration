@@ -27,15 +27,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Literal, Optional, Type
-
 import numpy as np
-
-from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.utils.clifford_group import (
-    Clifford,
-    SingleQubitClifford,
-    TwoQubitClifford,
-)
+from typing import Optional, Literal, Type
+from .clifford_group import SingleQubitClifford, TwoQubitClifford, Clifford
 
 
 def calculate_net_clifford(
