@@ -104,6 +104,13 @@ def load_redis_config_coupler(coupler: ExtendedCompositeSquareEdge):
         logger.warning(
             f"{key} is not present in redis. Ignore this for single qubit nodes"
         )
+    key = "cz_half_duration"
+    try:
+        coupler.cz.half_square_duration(redis_value(key))
+    except:
+        logger.warning(
+            f"{key} is not present in redis. Ignore this for single qubit nodes"
+        )
     key = "cz_pulse_width"
     try:
         coupler.cz.cz_width(redis_value(key))

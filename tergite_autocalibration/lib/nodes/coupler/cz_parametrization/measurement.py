@@ -58,7 +58,7 @@ class CZParametrizationMeasurement(BaseMeasurement):
 
             # unpack static parameters
             this_edge = self.couplers[coupler]
-            cz_duration = this_edge.cz.square_duration()
+            cz_half_duration = this_edge.cz.half_square_duration()
 
             cz_schedule.add_resource(
                 ClockResource(
@@ -93,7 +93,7 @@ class CZParametrizationMeasurement(BaseMeasurement):
 
                     flux_pulse = cz_schedule.add(
                         SoftSquarePulse(
-                            duration=cz_duration,
+                            duration=cz_half_duration,
                             amp=cz_amplitude,
                             port=cz_pulse_port,
                             clock=cz_clock,
