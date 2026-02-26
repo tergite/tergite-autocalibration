@@ -12,7 +12,7 @@
 # The items of this section describe general device properties known
 # after fabrication and first manual characterization steps. The general
 # section should contain relevant metadata
-name = "jalapeno"
+name = "quantum_processing_unit"
 
 # -------------------- Resonator definitions --------------------
 # This section contains all resonator-specific properties

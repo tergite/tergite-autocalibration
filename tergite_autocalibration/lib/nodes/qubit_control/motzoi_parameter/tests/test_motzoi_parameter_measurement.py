@@ -38,6 +38,18 @@ def test_dummy_generation():
     assert dummy_dataset.data_vars[0].size == number_of_reps * number_of_motzois
 
 
+def test_dummy_12_generation():
+    ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
+    node = MotzoiParameter12Node(CONFIG.run.qubits, CONFIG.run.couplers)
+    dummy_dataset = node.generate_dummy_dataset()
+    first_qubit = CONFIG.run.qubits[0]
+    number_of_reps = len(node.schedule_samplespace["X_repetitions"][first_qubit])
+    number_of_motzois = len(node.schedule_samplespace["mw_motzois"][first_qubit])
+
+    assert len(dummy_dataset.data_vars) == len(CONFIG.run.qubits)
+    assert dummy_dataset.data_vars[0].size == number_of_reps * number_of_motzois
+
+
 _test_data_dir = os.path.join(
     Path(__file__).parent.parent.parent.parent, "data", "single_qubits_run"
 )
