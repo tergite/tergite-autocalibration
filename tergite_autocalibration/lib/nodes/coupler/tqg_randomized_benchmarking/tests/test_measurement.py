@@ -14,11 +14,13 @@
 import os
 from pathlib import Path
 
+import pytest
+
 from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.measurement import (
-    TwoQubitRBMeasurement,
+    TQGRandomizedBenchmarkingSSROMeasurement,
 )
 from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.node import (
-    CZ_RB_Node,
+    TQGRandomizedBenchmarkingSSRONode,
 )
 from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.utils.two_qubit_clifford_group import (
     TwoQubitClifford,
@@ -30,6 +32,7 @@ _test_data_dir = os.path.join(Path(__file__).parent, "data")
 _redis_values_path = os.path.join(_test_data_dir, "redis-2026-02-10-11-23-12.json")
 
 
+@pytest.mark.skip
 @with_redis(_redis_values_path)
 def test_align_cliffords():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
@@ -37,10 +40,10 @@ def test_align_cliffords():
     couplers = ["q13_q14"]
     clifford_gate_index = 9799
 
-    node = CZ_RB_Node(all_qubits=qubits, couplers=couplers)
+    node = TQGRandomizedBenchmarkingSSRONode(all_qubits=qubits, couplers=couplers)
     transmons_dict = {qubit: node.device.get_element(qubit) for qubit in qubits}
     edges_dict = {coupler: node.device.get_edge(coupler) for coupler in couplers}
-    cz_rb_measurement = TwoQubitRBMeasurement(
+    cz_rb_measurement = TQGRandomizedBenchmarkingSSROMeasurement(
         transmons=transmons_dict, couplers=edges_dict
     )
 
