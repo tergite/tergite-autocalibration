@@ -29,7 +29,7 @@ from quantify_scheduler.device_under_test.transmon_element import (
 from tergite_autocalibration.utils.dto.extended_gates import (
     R12,
     ExtendedClocksFrequencies,
-    Spec,
+    Spec
 )
 
 

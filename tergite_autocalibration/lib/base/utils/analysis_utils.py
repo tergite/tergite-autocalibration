@@ -14,6 +14,9 @@ import xarray as xr
 
 
 def filter_ds_by_element(dataset: xr.Dataset, element: str):
+    '''
+    Filters the dataset, by keeping only the data arrays 
+    '''
     partial_ds = dataset.filter_by_attrs(element=element)
     partial_ds.attrs["qubit"] = element
     return partial_ds

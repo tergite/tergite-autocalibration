@@ -64,7 +64,7 @@ class CZParametrizationNode(CouplerNode):
         }
         self.schedule_samplespace = {
             "cz_pulse_amplitudes": {
-                coupler: np.linspace(0.25, 0.4, 25) for coupler in self.couplers
+                coupler: np.linspace(0.65, 0.95, 25) for coupler in self.couplers
             },
             "cz_pulse_frequencies": {
                 coupler: np.linspace(-7e6, 7e6, 28)

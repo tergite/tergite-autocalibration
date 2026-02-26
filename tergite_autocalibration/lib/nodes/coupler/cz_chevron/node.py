@@ -66,7 +66,7 @@ class CZChevronNode(CouplerNode):
 
         self.schedule_samplespace = {
             "cz_pulse_durations": {
-                coupler: np.arange(24e-9, 260e-9, 8e-9) for coupler in self.couplers
+                coupler: np.arange(24e-9, 400e-9, 8e-9) for coupler in self.couplers
             },
         }
 

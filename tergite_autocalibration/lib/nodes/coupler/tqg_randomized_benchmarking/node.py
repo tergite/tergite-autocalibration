@@ -55,7 +55,7 @@ class CZ_RB_Node(CouplerNode):
 
         self.schedule_samplespace = {
             "number_of_cliffords": {
-                coupler: np.array([0, 1, 2, 3, 4, 8, 16, 32, 64])
+                coupler: np.array([0, 1, 2, 3, 4, 8, 16, 32, 64, 128])
                 for coupler in self.couplers
             },
             "interleave_modes": {
