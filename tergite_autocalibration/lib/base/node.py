@@ -357,6 +357,9 @@ class CouplerNode(BaseNode):
             parking_current = float(
                 REDIS_CONNECTION.hget(f"couplers:{coupler}", "parking_current")
             )
+            if np.isnan(parking_current):
+                logger.warning(f"nan current for coupler {coupler}")
+                return
             currents_dict[coupler] = parking_current
         logger.status("Setting updated DC currents")
         self.spi_manager.set_dac_current(currents_dict)

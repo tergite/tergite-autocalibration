@@ -80,7 +80,9 @@ class CZParametrizationNode(CouplerNode):
         return np.arange(central_value - 50e-6, central_value + 45e-6, 8e-6)
 
     def parking_current(self, coupler: str):
-        return float(REDIS_CONNECTION.hget(f"couplers:{coupler}", "parking_current"))
+        return float(
+            REDIS_CONNECTION.hget(f"couplers:{coupler}", "initial_parking_current")
+        )
 
     def all_phase_paths(self) -> dict[str, Literal["via_02", "via_20"]]:
         phase_paths = {}
