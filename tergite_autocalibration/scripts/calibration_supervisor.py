@@ -413,7 +413,7 @@ class CalibrationSupervisor:
         self.node_manager.spi_manager = self.hardware_manager.create_spi(
             self.config.couplers
         )
-        self.node_manager.spi_manager.set_parking_currents(self.config.couplers)
+        self.node_manager.spi_manager.set_initial_parking_currents(self.config.couplers)
 
         # Create a copy of the configuration inside the log directory
         # This is to be able to replicate errors caused by configuration

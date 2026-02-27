@@ -125,6 +125,13 @@ def load_redis_config_coupler(coupler: ExtendedCompositeSquareEdge):
         logger.warning(
             f"{key} is not present in redis. Ignore this for single qubit nodes"
         )
+    key = "initial_parking_current"
+    try:
+        coupler.coupler_parameters.parking_current(redis_value(key))
+    except:
+        logger.warning(
+            f"{key} is not present in redis. Ignore this for single qubit nodes"
+        )
     try:
         # if dh.get_legacy("qubit_types")[bus_qubits[0]] == "Target":
         if bus_qubits[0] == str(redis_config["target_qubit"]):

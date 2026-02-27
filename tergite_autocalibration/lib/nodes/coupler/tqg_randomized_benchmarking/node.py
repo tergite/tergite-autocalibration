@@ -70,7 +70,7 @@ class CZ_RB_Node(CouplerNode):
         return cz_freq
 
     def initial_operation(self):
-        self.spi_manager.set_parking_currents(self.couplers)
+        self.spi_manager.set_initial_parking_currents(self.couplers)
 
     def generate_dummy_dataset(self):
         dataset = xr.Dataset()

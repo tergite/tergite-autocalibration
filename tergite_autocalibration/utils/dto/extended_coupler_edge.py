@@ -151,6 +151,15 @@ class CouplerParameters(InstrumentChannel):
             vals=Numbers(min_value=-3e-3, max_value=3e-3, allow_nan=True),
         )
 
+        self.initial_parking_current = ManualParameter(
+            name="initial_parking_current",
+            instrument=self,
+            docstring=r"""helper parameter that holds an initial value for the DC current""",
+            initial_value=0,
+            unit="A",
+            vals=Numbers(min_value=-3e-3, max_value=3e-3, allow_nan=True),
+        )
+
         self.phase_path = ManualParameter(
             "phase_path",
             docstring=r"""The path outside the compuational space where the sate goes to acqure a controlled phase""",

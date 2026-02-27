@@ -134,7 +134,7 @@ class TwoQubitRBMeasurement(BaseMeasurement):
         target_qubit = coupler_dict[this_coupler]["target_qubit"]
 
         qubit_names = [control_qubit, target_qubit]
-        self.rx_duartion = self.transmons[qubit_names[0]].rxy.duration()
+        self.rxy_duration = self.transmons[qubit_names[0]].rxy.duration()
 
         seed = seeds[coupler_names[0]]
 
@@ -152,7 +152,7 @@ class TwoQubitRBMeasurement(BaseMeasurement):
             "X90": lambda q: X90(q),
             "Y180": lambda q: Y(q),
             "Y90": lambda q: Y90(q),
-            "I": lambda q: IdlePulse(duration=self.rx_duartion),
+            "I": lambda q: IdlePulse(duration=self.rxy_duration),
             "mX90": lambda q: Rxy(qubit=q, phi=0.0, theta=-90.0),
             "mY90": lambda q: Rxy(qubit=q, phi=90.0, theta=-90.0),
         }
