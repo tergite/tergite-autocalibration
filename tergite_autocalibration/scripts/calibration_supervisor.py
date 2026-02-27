@@ -96,6 +96,7 @@ class HardwareManager:
         Creates and initializes a Cluster object to represent the hardware cluster
         based on the given IP address in the configuration.
         """
+        cluster_name = list(CONFIG.cluster.hardware_description.keys())[0]
         cluster: "Cluster"
         if self.config.cluster_mode == MeasurementMode.real:
             # Ensure all previous connections are closed before creating a new cluster instance
@@ -103,7 +104,7 @@ class HardwareManager:
 
             try:
                 # Create a new cluster instance using the specified cluster name and IP address
-                cluster = Cluster("clusterA", str(self.config.cluster_ip))
+                cluster = Cluster(cluster_name, str(self.config.cluster_ip))
             except ConnectionRefusedError:
                 msg = "Cluster is disconnected. Maybe it has crushed? Try flick it off and on"
                 logger.status("-" * len(msg))
@@ -121,7 +122,7 @@ class HardwareManager:
             dummy_setup = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1, 16)}
             dummy_setup["16"] = ClusterType.CLUSTER_QRM_RF
             dummy_setup["17"] = ClusterType.CLUSTER_QRM_RF
-            cluster = Cluster("clusterA", dummy_cfg=dummy_setup)
+            cluster = Cluster(cluster_name, dummy_cfg=dummy_setup)
             return cluster
 
     def _create_instrument_coordinator(
