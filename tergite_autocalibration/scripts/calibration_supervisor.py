@@ -1,12 +1,13 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2023, 2024
+# (C) Copyright Eleftherios Moschandreou 2023, 2024, 2026
 # (C) Copyright Liangyu Chen 2023, 2024
 # (C) Copyright Pontus Vikstahl 2024
 # (C) Copyright Stefan Hill 2024
 # (C) Copyright Martin Ahindura 2023
 # (C) Copyright Michele Faucci Giannelli 2024, 2025
 # (C) Copyright Axel Erik Andersson 2025
+# (C) Copyright Abdullah Al Amin 2026
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
