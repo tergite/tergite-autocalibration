@@ -43,12 +43,12 @@ from tergite_autocalibration.utils.backend.redis_utils import (
     populate_initial_parameters,
     populate_node_parameters,
     populate_quantities_of_interest,
+    revert_node_parameters,
 )
 from tergite_autocalibration.utils.dto.enums import DataStatus, MeasurementMode
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
 from tergite_autocalibration.utils.io.dataset import create_node_data_path
 from tergite_autocalibration.utils.logging import logger
-
 from tergite_autocalibration.utils.logging.visuals import draw_arrow_chart
 
 colorama_init()
@@ -318,6 +318,8 @@ class NodeManager:
 
             # Perform calibration
             node.calibrate(data_path, self.config.cluster_mode)
+
+        revert_node_parameters(node_name, self.config.qubits, REDIS_CONNECTION)
 
     def _initialize_node(self, node_name: str) -> BaseNode:
         """Initializes a node and updates it with user-defined samplespace if available."""

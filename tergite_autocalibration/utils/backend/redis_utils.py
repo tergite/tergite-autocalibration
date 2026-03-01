@@ -71,27 +71,16 @@ def populate_parking_currents(couplers: list, redis_connection):
                 redis_connection.hset(f"couplers:{coupler}", module_key, module_value)
 
 
-def populate_active_reset_parameters(
-    active_reset_configuration: dict, qubits: list, redis_connection
-):
-    active_reset_device_config = active_reset_configuration["active_reset"]
-
-    ar_qubit_parameters = active_reset_device_config["qubits"]
-    logger.info("Populating Active Reset")
-
-    # Populate the Redis database with the initial active reset
-    # parameter values from the toml file
+def _qubit_fields_to_redis(qubits: list[str], key: str, value: str, redis_connection):
     for qubit in qubits:
-        # parameter specific to each qubit:
-        for module_key, module_value in ar_qubit_parameters[qubit].items():
-            if isinstance(module_value, dict):
-                for parameter_key, parameter_value in module_value.items():
-                    sub_module_key = module_key + ":" + parameter_key
-                    redis_connection.hset(
-                        f"transmons:{qubit}", sub_module_key, parameter_value
-                    )
-            else:
-                redis_connection.hset(f"transmons:{qubit}", module_key, module_value)
+        redis_connection.hset(f"transmons:{qubit}", key, value)
+
+
+def _coupler_fields_to_redis(
+    couplers: list[str], key: str, value: str, redis_connection
+):
+    for coupler in couplers:
+        redis_connection.hset(f"transmons:{coupler}", key, value)
 
 
 def populate_node_parameters(
@@ -103,32 +92,56 @@ def populate_node_parameters(
 ):
     # Populate the Redis database with node specific parameter values from the toml file
     transmon_configuration = toml.load(CONFIG.node)
-    if node_name in transmon_configuration and not is_node_calibrated:
-        node_specific_dict = transmon_configuration[node_name].get("all", {})
-        for field_key, field_value in node_specific_dict.items():
-            if isinstance(field_value, dict):
-                for sub_field_key, sub_field_value in field_value.items():
-                    sub_field_key = field_key + ":" + sub_field_key
-                    for qubit in qubits:
-                        redis_connection.hset(
-                            f"transmons:{qubit}", sub_field_key, sub_field_value
-                        )
-                    for coupler in couplers:
-                        redis_connection.hset(
-                            f"couplers:{coupler}", sub_field_key, sub_field_value
-                        )
-            else:
-                for qubit in qubits:
-                    redis_connection.hset(f"transmons:{qubit}", field_key, field_value)
-                for coupler in couplers:
-                    redis_connection.hset(f"couplers:{coupler}", field_key, field_value)
+    if not node_name in transmon_configuration:
+        logger.status(f"{node_name} does not have specific node config")
+        return
+    if is_node_calibrated:
+        logger.status(f"{node_name} is already calibrated")
+        return
+    node_specific_dict = transmon_configuration[node_name].get("all", {})
 
-        # node config for specific couplers:
-        for coupler in couplers:
-            if coupler in transmon_configuration[node_name]:
-                coupler_specific_config = transmon_configuration[node_name][coupler]
-                for field_key, field_value in coupler_specific_config.items():
-                    redis_connection.hset(f"couplers:{coupler}", field_key, field_value)
+    for field_key, field_value in node_specific_dict.items():
+        if isinstance(field_value, dict):
+            for sub_field_key, sub_field_value in field_value.items():
+                sub_field_key = field_key + ":" + sub_field_key
+                _qubit_fields_to_redis(
+                    qubits, sub_field_key, sub_field_value, redis_connection
+                )
+                _coupler_fields_to_redis(
+                    couplers, sub_field_key, sub_field_value, redis_connection
+                )
+        else:
+            _qubit_fields_to_redis(qubits, field_key, field_value, redis_connection)
+            _coupler_fields_to_redis(couplers, field_key, field_value, redis_connection)
+
+    # node config for specific couplers:
+    for coupler in couplers:
+        if coupler in transmon_configuration[node_name]:
+            coupler_specific_config = transmon_configuration[node_name][coupler]
+            for field_key, field_value in coupler_specific_config.items():
+                redis_connection.hset(f"couplers:{coupler}", field_key, field_value)
+
+
+def revert_node_parameters(node_name: str, qubits: list, redis_connection):
+
+    node_configuration = toml.load(CONFIG.node)
+    if not node_name in node_configuration:
+        return  # no node specific config found
+
+    initial_qubit_parameters = CONFIG.device.qubits
+
+    node_specific_dict = node_configuration[node_name].get("all", {})
+
+    for field_key, field_value in node_specific_dict.items():
+        if not isinstance(field_value, dict):
+            raise NotImplementedError("Only field modules supported")
+        for sub_field_key in field_value.keys():
+            for qubit in qubits:
+                initial_qubit_field = initial_qubit_parameters[qubit][field_key]
+                initial_value = initial_qubit_field[sub_field_key]
+                key = field_key + ":" + sub_field_key
+                # restore initial parameter value
+                redis_connection.hset(f"transmons:{qubit}", key, initial_value)
 
 
 def populate_quantities_of_interest(
@@ -144,24 +157,26 @@ def populate_quantities_of_interest(
     node = node_factory.get_node_class(node_name)
     if issubclass(node, QubitNode):
         qubit_qois = node.qubit_qois
-        if qubit_qois is not None:
-            for qubit in qubits:
-                redis_key = f"transmons:{qubit}"
-                calibration_supervisor_key = f"cs:{qubit}"
-                for qoi in qubit_qois:
-                    if not redis_connection.hexists(redis_key, qoi):
-                        redis_connection.hset(f"transmons:{qubit}", qoi, "nan")
-                        if qoi == "measure_3state_opt:pulse_amp":
-                            redis_connection.hset(f"transmons:{qubit}", qoi, "0")
-                        elif qoi == "measure_2state_opt:pulse_amp":
-                            redis_connection.hset(f"transmons:{qubit}", qoi, "0")
-                        elif qoi == "rxy:motzoi":
-                            redis_connection.hset(f"transmons:{qubit}", qoi, "0")
-                        elif qoi == "r12:motzoi":
-                            redis_connection.hset(f"transmons:{qubit}", qoi, "0")
-                # flag for the calibration supervisor
-                if not redis_connection.hexists(calibration_supervisor_key, node_name):
-                    redis_connection.hset(f"cs:{qubit}", node_name, "not_calibrated")
+        if qubit_qois is None:
+            logger.warning(f"No qois for node {node_name}")
+            return
+        for qubit in qubits:
+            redis_key = f"transmons:{qubit}"
+            calibration_supervisor_key = f"cs:{qubit}"
+            for qoi in qubit_qois:
+                if not redis_connection.hexists(redis_key, qoi):
+                    redis_connection.hset(f"transmons:{qubit}", qoi, "nan")
+                    if qoi == "measure_3state_opt:pulse_amp":
+                        redis_connection.hset(f"transmons:{qubit}", qoi, "0")
+                    elif qoi == "measure_2state_opt:pulse_amp":
+                        redis_connection.hset(f"transmons:{qubit}", qoi, "0")
+                    elif qoi == "rxy:motzoi":
+                        redis_connection.hset(f"transmons:{qubit}", qoi, "0")
+                    elif qoi == "r12:ef_motzoi":
+                        redis_connection.hset(f"transmons:{qubit}", qoi, "0")
+            # flag for the calibration supervisor
+            if not redis_connection.hexists(calibration_supervisor_key, node_name):
+                redis_connection.hset(f"cs:{qubit}", node_name, "not_calibrated")
 
     elif issubclass(node, CouplerNode):
         coupler_qois = node.coupler_qois
