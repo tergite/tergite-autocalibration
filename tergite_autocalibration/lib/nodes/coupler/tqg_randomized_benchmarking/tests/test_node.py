@@ -21,10 +21,10 @@ from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.analy
     TwoQubitRBNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.measurement import (
-    TQGRandomizedBenchmarkingSSROMeasurement,
+    TwoQubitRBMeasurement,
 )
 from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.node import (
-    TQGRandomizedBenchmarkingSSRONode,
+    CZ_RB_Node,
 )
 from tergite_autocalibration.lib.nodes.schedule_node import OuterScheduleNode
 from tergite_autocalibration.tests.utils.decorators import with_redis
@@ -34,7 +34,6 @@ _test_data_dir = os.path.join(Path(__file__).parent, "data")
 _redis_values_path = os.path.join(_test_data_dir, "redis-2026-02-10-11-23-12.json")
 
 
-@pytest.mark.skip
 @with_redis(_redis_values_path)
 def test_node_creation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
@@ -44,7 +43,6 @@ def test_node_creation():
     assert isinstance(node, CouplerNode)
 
 
-@pytest.mark.skip
 @with_redis(_redis_values_path)
 def test_class_attribute_objects():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
@@ -58,7 +56,6 @@ def test_class_attribute_objects():
     assert issubclass(node.measurement_type, OuterScheduleNode)
 
 
-@pytest.mark.skip
 @with_redis(_redis_values_path)
 def test_dummy_generation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
