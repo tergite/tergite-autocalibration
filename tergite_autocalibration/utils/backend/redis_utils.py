@@ -3,6 +3,7 @@
 # (C) Copyright Eleftherios Moschandreou 2024, 2025, 2026
 # (c) Copyright Stefan Hill 2024
 # (C) Copyright Michele Faucci Giannelli 2025
+# (C) Copyright Abdullah Al Amin 2026
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -128,9 +129,7 @@ def revert_node_parameters(node_name: str, qubits: list, redis_connection):
     if not node_name in node_configuration:
         return  # no node specific config found
 
-    initial_device_config = dh.device
-
-    initial_qubit_parameters = initial_device_config["qubit"]
+    initial_qubit_parameters = CONFIG.device.qubits
 
     node_specific_dict = node_configuration[node_name].get("all", {})
 
@@ -159,24 +158,26 @@ def populate_quantities_of_interest(
     node = node_factory.get_node_class(node_name)
     if issubclass(node, QubitNode):
         qubit_qois = node.qubit_qois
-        if qubit_qois is not None:
-            for qubit in qubits:
-                redis_key = f"transmons:{qubit}"
-                calibration_supervisor_key = f"cs:{qubit}"
-                for qoi in qubit_qois:
-                    if not redis_connection.hexists(redis_key, qoi):
-                        redis_connection.hset(f"transmons:{qubit}", qoi, "nan")
-                        if qoi == "measure_3state_opt:pulse_amp":
-                            redis_connection.hset(f"transmons:{qubit}", qoi, "0")
-                        elif qoi == "measure_2state_opt:pulse_amp":
-                            redis_connection.hset(f"transmons:{qubit}", qoi, "0")
-                        elif qoi == "rxy:motzoi":
-                            redis_connection.hset(f"transmons:{qubit}", qoi, "0")
-                        elif qoi == "r12:ef_motzoi":
-                            redis_connection.hset(f"transmons:{qubit}", qoi, "0")
-                # flag for the calibration supervisor
-                if not redis_connection.hexists(calibration_supervisor_key, node_name):
-                    redis_connection.hset(f"cs:{qubit}", node_name, "not_calibrated")
+        if qubit_qois is None:
+            logger.warning(f"No qois for node {node_name}")
+            return
+        for qubit in qubits:
+            redis_key = f"transmons:{qubit}"
+            calibration_supervisor_key = f"cs:{qubit}"
+            for qoi in qubit_qois:
+                if not redis_connection.hexists(redis_key, qoi):
+                    redis_connection.hset(f"transmons:{qubit}", qoi, "nan")
+                    if qoi == "measure_3state_opt:pulse_amp":
+                        redis_connection.hset(f"transmons:{qubit}", qoi, "0")
+                    elif qoi == "measure_2state_opt:pulse_amp":
+                        redis_connection.hset(f"transmons:{qubit}", qoi, "0")
+                    elif qoi == "rxy:motzoi":
+                        redis_connection.hset(f"transmons:{qubit}", qoi, "0")
+                    elif qoi == "r12:ef_motzoi":
+                        redis_connection.hset(f"transmons:{qubit}", qoi, "0")
+            # flag for the calibration supervisor
+            if not redis_connection.hexists(calibration_supervisor_key, node_name):
+                redis_connection.hset(f"cs:{qubit}", node_name, "not_calibrated")
 
     elif issubclass(node, CouplerNode):
         coupler_qois = node.coupler_qois
