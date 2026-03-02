@@ -330,7 +330,7 @@ class OptimalROTwoStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
         rotated_iq_axis.axvline(0, color="black")
 
 
-class OptimalROThreeStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
+class ROThreeStateAmplitudeQubitAnalysis(OptimalROAmplitudeQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
 
@@ -505,8 +505,8 @@ class OptimalROTwoStateAmplitudeNodeAnalysis(BaseAllQubitsAnalysis):
             analysis.plot(primary_axis, list_of_secondary_axes)
 
 
-class OptimalROThreeStateAmplitudeNodeAnalysis(BaseAllQubitsAnalysis):
-    single_qubit_analysis_obj = OptimalROThreeStateAmplitudeQubitAnalysis
+class ROThreeStateAmplitudeNodeAnalysis(BaseAllQubitsAnalysis):
+    single_qubit_analysis_obj = ROThreeStateAmplitudeQubitAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)

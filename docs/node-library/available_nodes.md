@@ -11,9 +11,9 @@ graph TD
     D --> E[Motzoi Parameter]
     E --> F[Resonator Spectroscopy 1]
     F --> C1[T1] --> C2[T2] --> C3[Randomized Benchmarking]
-    F --> F1(Qubit 12 Spectroscopy) --> G(Rabi 12 Oscillations) --> G1[Resonator Spectroscopy 2]
+    F --> F1(Qubit 12 Spectroscopy) --> G(Motzoi 12 Parameter)--> G1(Rabi 12 Oscillations) --> G2[Resonator Spectroscopy 2]
     F --> H1(2 States Discrimination)
-    G1 --> H2(3 States Discrimination)
+    G1 --> H2(RO frequency optimization - 3states) --> H3(3 States Discrimination)
     A --> I(Resonator spectroscopy vs current)
     B --> J(Qubit spectroscopy vs current)
     I --> J
@@ -43,8 +43,10 @@ graph TD
     style F1 fill:#ffe6cc,stroke:#333,stroke-width:2px
     style G fill:#ffe6cc,stroke:#333,stroke-width:2px
     style G1 fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style G2 fill:#ffe6cc,stroke:#333,stroke-width:2px
     style H1 fill:#ffe6cc,stroke:#333,stroke-width:2px
     style H2 fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style H3 fill:#ffe6cc,stroke:#333,stroke-width:2px
     style I fill:#ff9999,stroke:#333,stroke-width:2px
     style J fill:#ff9999,stroke:#333,stroke-width:2px
 ```

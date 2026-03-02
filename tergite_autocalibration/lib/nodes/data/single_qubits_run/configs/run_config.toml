@@ -1,0 +1,49 @@
+# This file is a configuration template for the initial values on each calibration run
+
+target_node = "ro_amplitude_three_state_optimization"
+qubits = ['q13', 'q14', 'q15']
+couplers = ['q13_q14']
+
+#   --------------
+#   Node reference
+#   --------------
+#
+#   punchout
+#   resonator_spectroscopy
+#   resonator_bring_up_spectroscopy
+#   qubit_01_spectroscopy
+#   qubit_bring_up_spectroscopy
+#   rabi_oscillations
+#   ramsey_correction
+#   resonator_spectroscopy_1
+#   qubit_12_spectroscopy
+#   qubit_12_spectroscopy
+#   rabi_oscillations_12
+#   ramsey_correction_12
+#   resonator_spectroscopy_2
+#   ro_frequency_two_state_optimization
+#   ro_frequency_three_state_optimization
+#   ro_amplitude_two_state_optimization
+#   ro_amplitude_three_state_optimization
+#   coupler_anticrossing
+# resonator_spectroscopy_vs_current
+#   motzoi_parameter
+#   motzoi_12_parameter
+#   n_rabi_oscillations
+#   n_rabi_12_oscillations
+#   randomized_benchmarking
+#   T1
+#   T2
+#   T2_echo
+#   all_XY
+#   check_clifford
+#   cz_chevron
+#   cz_rb
+#   reset_chevron
+#   reset_calibration_ssro
+#   cz_calibration
+#   cz_parametrization
+#   cz_local_phases
+#   process_tomography_ssro
+#   tqg_randomized_benchmarking
+#   tqg_randomized_benchmarking_interleaved

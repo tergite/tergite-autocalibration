@@ -1,7 +1,8 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2023, 2024
+# (C) Copyright Eleftherios Moschandreou 2023, 2026
 # (C) Copyright Liangyu Chen 2023, 2024
+# (C) Copyright Abdullah Al Amin 2026
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -210,7 +211,7 @@ class ExtendedTransmon(BasicTransmonElement):
                 "motzoi": self.r12.ef_motzoi(),
                 "port": self.ports.microwave(),
                 "clock": f"{self.name}.12",
-                "duration": self.rxy.duration(),
+                "duration": self.r12.ef_duration(),
             },
             gate_info_factory_kwargs=["theta", "phi"],
         )

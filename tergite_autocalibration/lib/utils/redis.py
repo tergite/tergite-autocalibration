@@ -112,7 +112,7 @@ def load_redis_config_coupler(coupler: ExtendedCompositeSquareEdge):
         )
     key = "parking_current"
     try:
-        coupler.cz.parking_current(redis_value(key))
+        coupler.coupler_parameters.parking_current(redis_value(key))
     except:
         logger.warning(
             f"{key} is not present in redis. Ignore this for single qubit nodes"
@@ -120,18 +120,19 @@ def load_redis_config_coupler(coupler: ExtendedCompositeSquareEdge):
     try:
         if bus_qubits[0] == str(redis_config["target_qubit"]):
             logger.info(f"Reading Target Qubit from Redis: {bus_qubits[0]}")
-            coupler.cz.parent_phase_correction(redis_value("cz_dynamic_target"))
-            coupler.cz.child_phase_correction(redis_value("cz_dynamic_control"))
+            coupler.cz.parent_phase_correction(redis_value("target_local_phase"))
+            coupler.cz.child_phase_correction(redis_value("control_local_phase"))
         elif bus_qubits[0] == str(redis_config["control_qubit"]):
-            coupler.cz.parent_phase_correction(redis_value("cz_dynamic_control"))
-            coupler.cz.child_phase_correction(redis_value("cz_dynamic_target"))
+            logger.info(f"Reading Control Qubit from Redis: {bus_qubits[0]}")
+            coupler.cz.parent_phase_correction(redis_value("control_local_phase"))
+            coupler.cz.child_phase_correction(redis_value("target_local_phase"))
         else:
             raise ValueError("Control - Target types not defined")
     except:
-        logger.warning("")
+        logger.warning("Invalid Control and Target")
     key = "cz_phase_path"
     try:
-        coupler.cz.phase_path(redis_config[key])
+        coupler.coupler_parameters.phase_path(redis_config[key])
     except:
         logger.warning(
             f"{key} is not present in redis. Ignore this for single qubit nodes"

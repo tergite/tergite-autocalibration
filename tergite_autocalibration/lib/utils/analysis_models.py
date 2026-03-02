@@ -20,7 +20,9 @@ from quantify_core.analysis.fitting_models import (
 )
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
-from tergite_autocalibration.lib.utils.functions import exponential_decay_function
+from tergite_autocalibration.lib.utils.functions import (
+    exponential_decay_function,
+)  # lrb_decay_function,; lrb_exponential_decay_function,
 
 
 class RamseyModel(lmfit.model.Model):

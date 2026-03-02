@@ -20,40 +20,37 @@ from pathlib import Path
 import numpy as np
 import optuna
 
+from tergite_autocalibration.lib.base.node import CouplerNode
 from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.analysis import (
     RandomizedBenchmarkingSSRONodeAnalysis,
-)
-from tergite_autocalibration.lib.nodes.coupler.cz_calibration.node import (
-    CZCalibrationSSRONode,
-)
-from tergite_autocalibration.lib.nodes.coupler.cz_dynamic_phase.node import (
-    CZDynamicPhaseSSRONode,
-    CZDynamicPhaseSwapSSRONode,
 )
 from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.measurement import (
     TQGRandomizedBenchmarkingSSROMeasurement,
 )
-from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNodeCouplerNode
+from tergite_autocalibration.lib.nodes.external_parameter_node import (
+    ExternalParameterNode,
+)
 from tergite_autocalibration.lib.utils import redis
 from tergite_autocalibration.utils.logging import logger
 
 RB_REPEATS = 10
 
 
-class TQGRandomizedBenchmarkingSSRONode(ScheduleCouplerNode):
+class TQGRandomizedBenchmarkingSSRONode(CouplerNode):
+    name = "cz_rb"
     measurement_obj = TQGRandomizedBenchmarkingSSROMeasurement
     analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
+    measurement_type = ExternalParameterNode
     coupler_qois = ["tqg_fidelity"]
 
-    def __init__(self, name: str, couplers: list[str], **schedule_keywords):
-        super().__init__(name, couplers, **schedule_keywords)
-        self.name = name
-        self.schedule_keywords = schedule_keywords
+    def __init__(self, couplers: list[str], **schedule_keywords):
+        super().__init__(couplers, **schedule_keywords)
+        self.schedule_keywords = {}
 
         self.backup = False
         self.qubit_state = 2
         # TODO change it a dictionary like samplespace
-        self.schedule_keywords["qubit_state"] = self.qubit_state
+        # self.schedule_keywords["qubit_state"] = self.qubit_state
 
         self.external_samplespace = {
             "seeds": {
@@ -88,7 +85,7 @@ class TQGRandomizedBenchmarkingSSRONode(ScheduleCouplerNode):
         ]
 
 
-class TQGRandomizedBenchmarkingInterleavedSSRONode(ScheduleCouplerNode):
+class TQGRandomizedBenchmarkingInterleavedSSRONode(CouplerNode):
     measurement_obj = TQGRandomizedBenchmarkingSSROMeasurement
     analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
     coupler_qois = ["tqg_fidelity_interleaved"]
@@ -137,7 +134,7 @@ class TQGRandomizedBenchmarkingInterleavedSSRONode(ScheduleCouplerNode):
         ]
 
 
-class CZRBOptimizeSSRONode(ScheduleCouplerNode):
+class CZRBOptimizeSSRONode(CouplerNode):
     measurement_obj = TQGRandomizedBenchmarkingSSROMeasurement
     analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
     coupler_qois = ["tqg_fidelity_interleaved"]

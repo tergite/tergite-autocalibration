@@ -26,6 +26,7 @@ import numpy as np
 import xarray as xr
 
 from tergite_autocalibration.config.globals import CONFIG
+from tergite_autocalibration.lib.base.utils.analysis_utils import filter_ds_by_element
 from tergite_autocalibration.lib.base.utils.figure_utils import (
     create_figure_with_top_band,
 )
@@ -130,7 +131,6 @@ class BaseNodeAnalysis(ABC):
         ncols = min(column_grid, n_vars)
 
         fig, axs = create_figure_with_top_band(nrows, ncols)
-
         return fig, axs
 
     def _save_plots(self):
@@ -156,7 +156,7 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         super().__init__()
         self.name = name
         self.redis_fields = redis_fields
-        self.dataset = None
+        self.dataset = xr.Dataset()
         self.data_vars = None
         self.coords = None
 
@@ -188,39 +188,21 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
 
     def _analyze_all_qubits(self):
         analysis_results = {}
-        qubit_data_dict = self._group_by_qubit()
-        for this_qubit, qubit_data_vars in qubit_data_dict.items():
-            ds = xr.merge([self.dataset[var] for var in qubit_data_vars])
-            ds.attrs["qubit"] = this_qubit
-            ds.attrs["node"] = self.name
+        qubits = self.dataset.elements
+        qubits.sort(key=lambda x: int(x[1:]))  # TODO: move this to configure_dataset
+        for this_qubit in qubits:
+            # TODO: this object is created for every single qubit
+            qubit_analysis: BaseQubitAnalysis = self.single_qubit_analysis_obj(
+                self.name, self.redis_fields
+            )
 
-            matching_coords = [coord for coord in ds.coords if this_qubit in coord]
-            if matching_coords:
-                selected_coord_name = matching_coords[0]
-                ds = ds.sel(
-                    {selected_coord_name: slice(None)}
-                )  # Select all data along this coordinate
-
-                qubit_analysis: BaseQubitAnalysis = self.single_qubit_analysis_obj(
-                    self.name, self.redis_fields
-                )
-                # NOTE: coord initialization cannot be done in the __init__ because
-                # the dataset is loaded by the process_qubit method.
-                # in other words the __init__ of the analysis class is not aware of the
-                # dataset to be analyzed
-                analysis_results[this_qubit] = qubit_analysis.process_qubit(
-                    ds, this_qubit
-                )
-                self.qubit_analyses.append(qubit_analysis)
+            partial_ds = filter_ds_by_element(self.dataset, this_qubit)
+            analysis_results[this_qubit] = qubit_analysis.process_qubit(
+                partial_ds, this_qubit
+            )
+            self.qubit_analyses.append(qubit_analysis)
 
         return analysis_results
-
-    def _group_by_qubit(self):
-        qubit_data_dict = collections.defaultdict(set)
-        for var in self.dataset.data_vars:
-            this_qubit = self.dataset[var].attrs["qubit"]
-            qubit_data_dict[this_qubit].add(var)
-        return qubit_data_dict
 
     def _fill_plots(self):
         for index, analysis in enumerate(self.qubit_analyses):
@@ -257,7 +239,8 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
         return self._qoi
 
     def _set_data_variables(self):
-        self.coord = self.dataset.coords
+        self.coord = self.dataset.coords  # TODO: is this used anywhere?
+        # TODO: how is this used?
         self.data_var = list(self.dataset.data_vars.keys())[0]
 
     def _compute_magnitudes(self):
@@ -389,6 +372,8 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
                     ncols = fig.axes[0].get_gridspec().ncols
                     if nrows == 1 and ncols == 1:
                         fig.set_size_inches(9, 6)
+                    elif nrows == 1 and ncols == 2:
+                        fig.set_size_inches(12, 8)
                     else:
                         fig.set_size_inches(ncols * 6, nrows * 4)
 

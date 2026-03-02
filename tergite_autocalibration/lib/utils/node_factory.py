@@ -18,8 +18,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Dict, List, Union
 
 from tergite_autocalibration.utils.misc.reflections import (
-    import_class_from_file,
     find_inheriting_classes_ast_recursive,
+    import_class_from_file,
 )
 from tergite_autocalibration.utils.misc.regex import camel_to_snake
 
@@ -45,10 +45,12 @@ class NodeFactory:
             "rabi_oscillations": "RabiOscillationsNode",
             "ramsey_correction": "RamseyFringesNode",
             "motzoi_parameter": "MotzoiParameterNode",
+            "motzoi_12_parameter": "MotzoiParameter12Node",
             "T1": "T1Node",
             "T2": "T2Node",
             "T2_echo": "T2EchoNode",
             "n_rabi_oscillations": "NRabiOscillationsNode",
+            "n_rabi_12_oscillations": "NRabiOscillations12Node",
             "resonator_spectroscopy_1": "ResonatorSpectroscopy1Node",
             "qubit_12_spectroscopy": "Qubit12SpectroscopyNode",
             "rabi_oscillations_12": "RabiOscillations12Node",
@@ -65,7 +67,9 @@ class NodeFactory:
             "cz_chevron": "CZChevronNode",
             "cz_calibration": "CZ_CalibrationNode",
             "cz_local_phases": "CZ_LocalPhasesNode",
+            "cz_rb": "TQGRandomizedBenchmarkingSSRONode",
             "resonator_spectroscopy_vs_current": "ResonatorSpectroscopyVsCurrentNode",
+            "three_state_discrimination": "ThreeStateDiscriminationNode",
         }
         self._node_implementation_paths: Dict[str, Union[str, Path]] = {}
         self._node_classes: Dict[str, type["BaseNode"]] = {}

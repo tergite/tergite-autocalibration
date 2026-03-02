@@ -15,13 +15,13 @@ Module containing a schedule class for purity benchmarking measurement.
 """
 
 import numpy as np
-from quantify_scheduler.operations.gate_library import Measure, Reset, X90, H, X, Rxy
+from quantify_scheduler.operations.gate_library import X90, H, Measure, Reset, Rxy, X
+from quantify_scheduler.operations.pulse_library import DRAGPulse
 from quantify_scheduler.schedules.schedule import Schedule
 
-from tergite_autocalibration.lib.base.measurement import BaseMeasurement
-from tergite_autocalibration.utils.dto.extended_gates import Rxy_12
-from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 import tergite_autocalibration.utils.clifford_elements_decomposition as cliffords
+from tergite_autocalibration.lib.base.measurement import BaseMeasurement
+from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
 class PurityBenchmarkingMeasurement(BaseMeasurement):
@@ -72,6 +72,12 @@ class PurityBenchmarkingMeasurement(BaseMeasurement):
         root_relaxation = schedule.add(Reset(*qubits), label="Start")
 
         for this_qubit, clifford_sequence_lengths in number_of_cliffords.items():
+            this_transmon = self.transmons[this_qubit]
+            mw_ef_amp180 = this_transmon.r12.ef_amp180()
+            mw_ef_motzoi = this_transmon.r12.ef_motzoi()
+            mw_pulse_duration = this_transmon.rxy.duration()
+            mw_pulse_port = this_transmon.ports.microwave()
+            mw_ef_duration = this_transmon.r12.ef_duration()
             # Get the total number of Clifford gate decompositions available
             all_cliffords = len(cliffords.XY_decompositions)
             # Use the seed for reproducibility of random sequences
@@ -120,7 +126,16 @@ class PurityBenchmarkingMeasurement(BaseMeasurement):
             # This is not used so it could perhaps be removed.
             # If removed the "-3" should be changed to "-2"
             schedule.add(X(this_qubit))
-            schedule.add(Rxy_12(this_qubit))
+            schedule.add(
+                DRAGPulse(
+                    duration=mw_ef_duration,
+                    G_amp=mw_ef_amp180,
+                    D_amp=mw_ef_motzoi,
+                    port=mw_pulse_port,
+                    clock=f"{this_qubit}.12",
+                    phase=0,
+                ),
+            )
             schedule.add(Measure(this_qubit, acq_index=acq_index + 2))
             schedule.add(Reset(this_qubit))
 

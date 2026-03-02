@@ -17,7 +17,7 @@ import xarray
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.analysis import (
-    OptimalROThreeStateAmplitudeNodeAnalysis,
+    ROThreeStateAmplitudeNodeAnalysis,
     OptimalROTwoStateAmplitudeNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.measurement import (
@@ -102,7 +102,7 @@ class ROAmplitudeTwoStateOptimizationNode(QubitNode):
 class ROAmplitudeThreeStateOptimizationNode(QubitNode):
     name: str = "ro_amplitude_three_state_optimization"
     measurement_obj = ROAmplitudeOptimizationMeasurement
-    analysis_obj = OptimalROThreeStateAmplitudeNodeAnalysis
+    analysis_obj = ROThreeStateAmplitudeNodeAnalysis
     measurement_type = ScheduleNode
     qubit_qois = [
         "measure_3state_opt:pulse_amp",
@@ -169,3 +169,20 @@ class ROAmplitudeThreeStateOptimizationNode(QubitNode):
 
             dataset[index] = xarray.DataArray(all_shots_array)
         return dataset
+
+
+class ThreeStateDiscriminationNode(ROAmplitudeThreeStateOptimizationNode):
+    name: str = "three_state_discrimination"
+
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(all_qubits, couplers, **schedule_keywords)
+
+        self.schedule_samplespace["ro_amplitudes"] = {
+            qubit: np.array([self.optimal_3state_amplitude(qubit)])
+            for qubit in self.all_qubits
+        }
+
+    def optimal_3state_amplitude(self, qubit: str):
+        return float(
+            REDIS_CONNECTION.hget(f"transmons:{qubit}", "measure_3state_opt:pulse_amp")
+        )

@@ -387,6 +387,20 @@ class CalibrationSupervisor:
         logger.info("Node Manager is initialized")
 
     def calibrate_system(self, node_name: str | None = None, ignore_spec: bool = False):
+        cz_chain = [
+            "cz_parametrization",
+            "cz_chevron",
+            "cz_calibration",
+            "cz_local_phases",
+            "cz_rb",
+        ]
+        is_cz_calibration = self.config.target_node_name in cz_chain
+        if is_cz_calibration:
+            for index, node in enumerate(self.topo_order):
+                if node in cz_chain:
+                    self.topo_order.insert(index, "three_state_discrimination")
+                    break
+
         logger.info("Starting System Calibration")
         number_of_qubits = len(self.config.qubits)
 
@@ -406,6 +420,10 @@ class CalibrationSupervisor:
         ).copy(str(CONFIG.run.log_dir))
 
         for calibration_node in calibration_nodes:
+            if calibration_node == "three_state_discrimination":
+                ignore_spec = True
+            else:
+                ignore_spec = False
             self.node_manager.inspect_node(calibration_node, ignore_spec=ignore_spec)
             logger.info(f"{calibration_node} node is completed")
 

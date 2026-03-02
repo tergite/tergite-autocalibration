@@ -1,6 +1,7 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2023, 2024
+# (C) Copyright Eleftherios Moschandreou 2023, 2024, 2026
+# (C) Copyright Abdullah Al Amin 2026
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -14,7 +15,6 @@ import numpy as np
 from quantify_scheduler import Schedule
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.acquisition_library import SSBIntegrationComplex
-from quantify_scheduler.operations.control_flow_library import Loop
 from quantify_scheduler.operations.gate_library import Reset, X
 from quantify_scheduler.operations.pulse_library import (
     DRAGPulse,
@@ -56,6 +56,7 @@ class ROAmplitudeOptimizationMeasurement(BaseMeasurement):
             elif qubit_state == 2:
                 ro_frequency = this_transmon.extended_clock_freqs.readout_3state_opt()
                 mw_frequency_12 = this_transmon.clock_freqs.f12()
+                mw_ef_duration = this_transmon.r12.ef_duration()
                 this_clock = f"{this_qubit}.12"
                 shot.add_resource(ClockResource(name=this_clock, freq=mw_frequency_12))
             else:
@@ -73,6 +74,7 @@ class ROAmplitudeOptimizationMeasurement(BaseMeasurement):
             this_transmon = self.transmons[this_qubit]
             ro_pulse_duration = this_transmon.measure.pulse_duration()
             mw_ef_amp180 = this_transmon.r12.ef_amp180()
+            mw_ef_motzoi = this_transmon.r12.ef_motzoi()
             mw_pulse_duration = this_transmon.rxy.duration()
             mw_pulse_port = this_transmon.ports.microwave()
             acquisition_delay = this_transmon.measure.acq_delay()
@@ -105,9 +107,9 @@ class ROAmplitudeOptimizationMeasurement(BaseMeasurement):
 
                         prep = shot.add(
                             DRAGPulse(
-                                duration=mw_pulse_duration,
+                                duration=mw_ef_duration,
                                 G_amp=mw_ef_amp180,
-                                D_amp=0,
+                                D_amp=mw_ef_motzoi,
                                 port=mw_pulse_port,
                                 clock=this_12_clock,
                                 phase=0,
@@ -124,7 +126,6 @@ class ROAmplitudeOptimizationMeasurement(BaseMeasurement):
                             clock=this_ro_clock,
                         ),
                         ref_op=prep,
-                        # rel_time=100e-9,
                     )
 
                     shot.add(
@@ -142,7 +143,6 @@ class ROAmplitudeOptimizationMeasurement(BaseMeasurement):
                     )
 
                     shot.add(Reset(this_qubit))
-        shot.add(IdlePulse(20e-9))
         return shot
 
     def schedule_function(

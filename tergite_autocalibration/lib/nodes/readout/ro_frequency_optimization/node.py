@@ -20,7 +20,7 @@ from tergite_autocalibration.config.globals import CONFIG
 from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.analysis import (
     OptimalRO01FrequencyNodeAnalysis,
-    OptimalRO012FrequencyNodeAnalysis,
+    ROFrequencyThreeStateNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.measurement import (
     ROFrequencyOptimizationMeasurement,
@@ -97,7 +97,7 @@ class ROFrequencyTwoStateOptimizationNode(ROFrequencyOptimizationBase):
 class ROFrequencyThreeStateOptimizationNode(ROFrequencyOptimizationBase):
     name: str = "ro_frequency_three_state_optimization"
     measurement_obj = ROFrequencyOptimizationMeasurement
-    analysis_obj = OptimalRO012FrequencyNodeAnalysis
+    analysis_obj = ROFrequencyThreeStateNodeAnalysis
     measurement_type = ScheduleNode
     qubit_qois = ["extended_clock_freqs:readout_3state_opt"]
 

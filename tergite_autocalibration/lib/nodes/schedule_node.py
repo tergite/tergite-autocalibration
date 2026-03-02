@@ -89,6 +89,8 @@ class OuterScheduleNode(MeasurementType):
             else:
                 ds = ds.expand_dims({outer_dim: numpy.array([current_value])})
 
-            result_dataset = xarray.merge([ds, result_dataset])
+            result_dataset = xarray.merge(
+                [ds, result_dataset], join="outer", compat="no_conflicts"
+            )
 
         return result_dataset

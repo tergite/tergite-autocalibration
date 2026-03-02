@@ -1,9 +1,10 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2023, 2024
+# (C) Copyright Eleftherios Moschandreou 2023, 2024, 2026
 # (C) Copyright Liangyu Chen 2023, 2024
 # (C) Copyright Amr Osman 2024
 # (C) Copyright Michele Faucci Giannelli 2024
+# (C) Copyright Abdullah Al Amin 2026
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -149,7 +150,7 @@ class NRabiOscillationsNode(QubitNode):
 
 
 class NRabiOscillations12Node(QubitNode):
-    name: str = "n_rabi_oscillations_12"
+    name: str = "n_rabi_12_oscillations"
     measurement_obj = NRabiOscillationsMeasurement
     analysis_obj = NRabi_12_NodeAnalysis
     measurement_type = ScheduleNode
@@ -164,5 +165,5 @@ class NRabiOscillations12Node(QubitNode):
             "mw_amplitudes_sweep": {
                 qubit: np.linspace(-0.05, 0.05, 51) for qubit in self.all_qubits
             },
-            "X_repetitions": {qubit: np.arange(1, 4, 1) for qubit in self.all_qubits},
+            "X_repetitions": {qubit: np.arange(1, 8, 2) for qubit in self.all_qubits},
         }
