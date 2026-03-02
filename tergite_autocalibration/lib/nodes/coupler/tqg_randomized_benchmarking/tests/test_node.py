@@ -37,21 +37,15 @@ _redis_values_path = os.path.join(_test_data_dir, "redis-2026-02-10-11-23-12.jso
 @with_redis(_redis_values_path)
 def test_node_creation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = TQGRandomizedBenchmarkingSSRONode(
-        all_qubits=["q13", "q14"], couplers=["q13_q14"]
-    )
+    node = CZ_RB_Node(all_qubits=["q13", "q14"], couplers=["q13_q14"])
     assert isinstance(node, CouplerNode)
 
 
 @with_redis(_redis_values_path)
 def test_class_attribute_objects():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = TQGRandomizedBenchmarkingSSRONode(
-        all_qubits=["q13", "q14"], couplers=["q13_q14"]
-    )
-    assert isinstance(
-        node.measurement_obj, type(TQGRandomizedBenchmarkingSSROMeasurement)
-    )
+    node = CZ_RB_Node(all_qubits=["q13", "q14"], couplers=["q13_q14"])
+    assert isinstance(node.measurement_obj, type(TwoQubitRBMeasurement))
     assert isinstance(node.analysis_obj, type(TwoQubitRBNodeAnalysis))
     assert issubclass(node.measurement_type, OuterScheduleNode)
 
@@ -62,9 +56,7 @@ def test_dummy_generation():
 
     coupler = "q13_q14"
     couplers = [coupler]
-    node = TQGRandomizedBenchmarkingSSRONode(
-        all_qubits=["q13", "q14"], couplers=couplers
-    )
+    node = CZ_RB_Node(all_qubits=["q13", "q14"], couplers=couplers)
     dummy_dataset = node.generate_dummy_dataset()
 
     number_of_number_of_cliffords = len(

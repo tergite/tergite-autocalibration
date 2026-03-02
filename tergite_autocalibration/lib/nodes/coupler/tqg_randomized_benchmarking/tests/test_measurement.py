@@ -39,10 +39,10 @@ def test_align_cliffords():
     couplers = ["q13_q14"]
     clifford_gate_index = 9799
 
-    node = TQGRandomizedBenchmarkingSSRONode(all_qubits=qubits, couplers=couplers)
+    node = CZ_RB_Node(all_qubits=qubits, couplers=couplers)
     transmons_dict = {qubit: node.device.get_element(qubit) for qubit in qubits}
     edges_dict = {coupler: node.device.get_edge(coupler) for coupler in couplers}
-    cz_rb_measurement = TQGRandomizedBenchmarkingSSROMeasurement(
+    cz_rb_measurement = TwoQubitRBMeasurement(
         transmons=transmons_dict, couplers=edges_dict
     )
 
@@ -61,7 +61,7 @@ def test_align_cliffords():
         ("mY90", "q1"),
     ]
 
-    grouped_gate_decomposition = cz_rb_measurement.align_cliffords(
+    grouped_gate_decomposition = cz_rb_measurement.allign_cliffords(
         couplers[0], cliff_gate_decomposition
     )
 
