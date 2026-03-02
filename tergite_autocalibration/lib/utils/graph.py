@@ -49,7 +49,6 @@ GRAPH_DEPENDENCIES = [
     ("resonator_spectroscopy_1", "qubit_12_spectroscopy"),
     ("qubit_12_spectroscopy", "rabi_oscillations_12"),
     ("rabi_oscillations_12", "ramsey_correction_12"),
-    # ("ramsey_correction_12", "resonator_spectroscopy_2"),
     ("ramsey_correction_12", "motzoi_12_parameter"),
     ("motzoi_12_parameter", "n_rabi_12_oscillations"),
     ("n_rabi_12_oscillations", "resonator_spectroscopy_2"),

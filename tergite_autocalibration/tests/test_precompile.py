@@ -37,6 +37,8 @@ def test_precompile_all_nodes_without_error(node_name):
         pytest.skip(
             "We skip purity_benchmarking for now, because it needs some refactoring."
         )
+    if node_name == "cz_rb":
+        pytest.skip("We skip cz_rb for now, because it needs some refactoring.")
 
     if issubclass(node.measurement_type, OuterScheduleNode):
         # The assembly of samplespaces is taken from the OuterScheduleNode

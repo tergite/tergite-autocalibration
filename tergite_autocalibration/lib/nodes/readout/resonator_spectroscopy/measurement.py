@@ -116,9 +116,6 @@ class ResonatorSpectroscopyMeasurement(BaseMeasurement):
                     SetClockFrequency(clock=this_ro_clock, clock_freq_new=ro_frequency)
                 )
 
-                print(f"{ this_qubit = }")
-                print(f"{ mw_ef_duration = }")
-                print(f"{ mw_ef_amp180 = }")
                 if qubit_state == 0:
                     pass
                 elif qubit_state == 1:

@@ -152,8 +152,8 @@ def test_get_crossings_for_q14_q15(
 
     q14_crossings = getCrossingForQubit(qoi, "q14")
     q15_crossings = getCrossingForQubit(qoi, "q15")
-    assert q14_crossings == pytest.approx([-0.00025, 0.000925], abs=1e-6)
-    assert not q15_crossings
+    assert not q14_crossings
+    assert q15_crossings == pytest.approx([-0.00025, 0.000925], abs=1e-6)
 
 
 @with_os_env({"DATA_DIR": str(Path(__file__).parent / "results")})

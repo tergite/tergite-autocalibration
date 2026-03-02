@@ -1,7 +1,7 @@
 # This code is part of Tergite
 #
 # (C) Copyright Eleftherios Moschandreou 2025
-# (C) Chalmers Next Labs
+# (C) Chalmers Next Labs AB 2025
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -29,6 +29,18 @@ from tergite_autocalibration.utils.dto.extended_transmon_element import Extended
 def test_dummy_generation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
     node = MotzoiParameterNode(CONFIG.run.qubits, CONFIG.run.couplers)
+    dummy_dataset = node.generate_dummy_dataset()
+    first_qubit = CONFIG.run.qubits[0]
+    number_of_reps = len(node.schedule_samplespace["X_repetitions"][first_qubit])
+    number_of_motzois = len(node.schedule_samplespace["mw_motzois"][first_qubit])
+
+    assert len(dummy_dataset.data_vars) == len(CONFIG.run.qubits)
+    assert dummy_dataset.data_vars[0].size == number_of_reps * number_of_motzois
+
+
+def test_dummy_12_generation():
+    ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
+    node = MotzoiParameter12Node(CONFIG.run.qubits, CONFIG.run.couplers)
     dummy_dataset = node.generate_dummy_dataset()
     first_qubit = CONFIG.run.qubits[0]
     number_of_reps = len(node.schedule_samplespace["X_repetitions"][first_qubit])

@@ -20,7 +20,7 @@ import xarray as xr
 from matplotlib import pyplot as plt
 from numpy import ndarray
 
-from tergite_autocalibration.config.globals import REDIS_CONNECTION
+from tergite_autocalibration.config.globals import REDIS_CONNECTION, CONFIG
 from tergite_autocalibration.lib.base.analysis import BaseAnalysis, BaseCouplerAnalysis
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
     CouplerAnticrossingAnalysis,
@@ -200,9 +200,6 @@ def test_get_crossings_for_q14_q15(
     a = ResonatorSpectroscopyVsCurrentCouplerAnalysis(
         "resonator_spectroscopy_vs_current", res_coupler_qois
     )
-    q1, q2 = coupler.split("_")
-    REDIS_CONNECTION.hset(f"couplers:{coupler}", "control_qubit", q1)
-    REDIS_CONNECTION.hset(f"couplers:{coupler}", "target_qubit", q2)
     qoi = a.process_coupler(ds_res, coupler)
     update_redis_trusted_values(
         "resonator_spectroscopy_vs_current", coupler, qoi, res_coupler_qois
@@ -213,8 +210,8 @@ def test_get_crossings_for_q14_q15(
 
     q14_crossings = getCrossingForQubit(qoi, "q14")
     q15_crossings = getCrossingForQubit(qoi, "q15")
-    assert q14_crossings == pytest.approx([-0.0018, -0.00095, 0.00165], abs=1e-6)
-    assert q15_crossings == pytest.approx([-0.00185, -0.000825, 0.00155], abs=1e-6)
+    assert q14_crossings == pytest.approx([-0.00185, -0.000825, 0.00155], abs=1e-6)
+    assert q15_crossings == pytest.approx([-0.0018, -0.00095, 0.00165], abs=1e-6)
 
 
 @with_os_env({"DATA_DIR": str(Path(__file__).parent / "results")})

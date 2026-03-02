@@ -16,7 +16,7 @@
 # This is an example file on how to create a custom samplespace for your node.
 
 
-from tergite_autocalibration.config.legacy import dh
+from tergite_autocalibration.config.globals import CONFIG
 from tergite_autocalibration.lib.utils.samplespace import resonator_samples
 
 """
@@ -35,7 +35,7 @@ user_samplespace = {
 }
 """
 ####################################################################
-qubits = dh.device["qubit"]
+qubits = CONFIG.device.qubits
 user_samplespace = {
     "resonator_spectroscopy": {
         "ro_frequencies": {qubit: resonator_samples(qubit) for qubit in qubits}

@@ -96,9 +96,10 @@ def test_output_attenuation_is_set_to_value_in_device_config(caplog):
     with caplog.at_level("WARNING"):
         calib_sup = CalibrationSupervisor(config=cfg)
 
-    assert len(caplog.records) == 1
+    # The qubit missing on purpose + all legacy couplers
+    assert len(caplog.records) == 9
 
-    log_records = caplog.records[0]
+    log_records = caplog.records[-1]
     assert log_records.levelname == "WARNING"
     assert (
         log_records.message

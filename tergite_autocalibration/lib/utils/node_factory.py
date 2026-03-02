@@ -18,8 +18,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Dict, List, Union
 
 from tergite_autocalibration.utils.misc.reflections import (
-    import_class_from_file,
     find_inheriting_classes_ast_recursive,
+    import_class_from_file,
 )
 from tergite_autocalibration.utils.misc.regex import camel_to_snake
 
@@ -67,7 +67,7 @@ class NodeFactory:
             "cz_chevron": "CZChevronNode",
             "cz_calibration": "CZ_CalibrationNode",
             "cz_local_phases": "CZ_LocalPhasesNode",
-            "cz_rb": "CZ_RB_Node",
+            "cz_rb": "TQGRandomizedBenchmarkingSSRONode",
             "resonator_spectroscopy_vs_current": "ResonatorSpectroscopyVsCurrentNode",
             "three_state_discrimination": "ThreeStateDiscriminationNode",
         }

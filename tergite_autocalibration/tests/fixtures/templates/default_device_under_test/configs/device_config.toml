@@ -75,9 +75,44 @@ measure_2.pulse_amp = 0.00
 cz_pulse_amplitude = 0.3
 cz_pulse_width = 4e-9
 
-
 [device.coupler.q00_q01]
 attenuation = 12
+control_qubit = "q01"
+target_qubit = "q00"
+
+# Following couplers are defined for legacy to make tests with old datasets pass
+# that need a control/target qubit in the analysis.
+[device.coupler.q06_q07]
+control_qubit = "q06"
+target_qubit = "q07"
+
+[device.coupler.q07_q08]
+control_qubit = "q07"
+target_qubit = "q08"
+
+[device.coupler.q08_q09]
+control_qubit = "q08"
+target_qubit = "q09"
+
+[device.coupler.q10_q11]
+control_qubit = "q10"
+target_qubit = "q11"
+
+[device.coupler.q11_q12]
+control_qubit = "q11"
+target_qubit = "q12"
+
+[device.coupler.q12_q13]
+control_qubit = "q12"
+target_qubit = "q13"
+
+[device.coupler.q13_q14]
+control_qubit = "q13"
+target_qubit = "q14"
+
+[device.coupler.q14_q15]
+control_qubit = "q15"
+target_qubit = "q14"
 
 # --------------------------------------------------------------------------------
 # Device layout configuration section
