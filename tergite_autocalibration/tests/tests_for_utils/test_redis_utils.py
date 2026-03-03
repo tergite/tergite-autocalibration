@@ -11,15 +11,21 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
-
+from typing import Union
 
 import toml
 
+import tergite_autocalibration
 from tergite_autocalibration.config.globals import CONFIG, REDIS_CONNECTION
+from tergite_autocalibration.lib.base.node import BaseNode
+from tergite_autocalibration.lib.base.node import CouplerNode
+from tergite_autocalibration.lib.base.node import QubitNode
+from tergite_autocalibration.lib.utils.node_factory import NodeFactory
 from tergite_autocalibration.utils.backend.redis_utils import (
     populate_initial_parameters,
     populate_node_parameters,
     revert_node_parameters,
+    populate_quantities_of_interest,
 )
 
 
@@ -95,3 +101,33 @@ def test_revert_node_parameters():
     initial_reset_value = initial_qubit_parameters["q00"]["reset"]["duration"]
 
     assert reset_duration_redis == initial_reset_value
+
+
+def test_populate_quantities_of_interest():
+    """
+    Iterate over all nodes in the factory and check whether they correctly push qois to redis
+    """
+
+    REDIS_CONNECTION.flushall()
+    assert not REDIS_CONNECTION.keys()
+
+    node_factory = NodeFactory()
+    for node_name in node_factory.all_node_names():
+        REDIS_CONNECTION.flushall()
+        assert not REDIS_CONNECTION.keys()
+
+        populate_quantities_of_interest(
+            node_name, node_factory, ["q00", "q01"], ["q00_q01"], REDIS_CONNECTION
+        )
+
+        node_cls: Union["QubitNode", "CouplerNode"] = node_factory.get_node_class(
+            node_name
+        )
+
+        if hasattr(node_cls, "qubit_qois"):
+            for qubit_qoi in node_cls.qubit_qois:
+                assert REDIS_CONNECTION.hexists("transmons:q00", qubit_qoi)
+
+        if hasattr(node_cls, "coupler_qois"):
+            for coupler_qoi in node_cls.coupler_qois:
+                assert REDIS_CONNECTION.hexists("couplers:q00_q01", coupler_qoi)
