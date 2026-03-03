@@ -43,6 +43,7 @@ measure.integration_time = 2.5e-6
 measure_1.integration_time = 2.5e-6
 measure_2.integration_time = 2.5e-6
 rxy.duration = 28e-9
+reset.duration = 300e-6
 
 [device.qubit.q00]
 attenuation = 4
