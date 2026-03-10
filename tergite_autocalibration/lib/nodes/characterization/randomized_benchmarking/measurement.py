@@ -81,6 +81,7 @@ class RandomizedBenchmarkingMeasurement(BaseMeasurement):
         for this_qubit, clifford_sequence_lengths in number_of_cliffords.items():
             seed = seeds[this_qubit]  # this is just an integer
             interleaving_gates = interleave_gate[this_qubit]
+            num_clifford_sequence_lengths = len(clifford_sequence_lengths)
 
             rng = np.random.default_rng(seed)  # this is a generator
 
@@ -104,6 +105,7 @@ class RandomizedBenchmarkingMeasurement(BaseMeasurement):
                 for acq_index, this_number_of_cliffords in enumerate(
                     clifford_sequence_lengths
                 ):
+                    this_index = mode_index * num_clifford_sequence_lengths + acq_index
                     clifford_sequence = rng.integers(
                         all_cliffords, size=this_number_of_cliffords
                     )  # for example if this_number_of_cliffords=4, a random_sequence could be [5, 14, 19, 23]
@@ -115,7 +117,7 @@ class RandomizedBenchmarkingMeasurement(BaseMeasurement):
                         interleaved_sequence[1::2] = interleaving_clifford_id
                         clifford_sequence = interleaved_sequence
                     self.single_qubit_rb_shot(
-                        shot, clifford_sequence, this_qubit, acq_index
+                        shot, clifford_sequence, this_qubit, this_index
                     )
 
         return shot

@@ -58,6 +58,9 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
         self.fit_results = {}
 
     def analyse_qubit(self):
+
+        model = ExpDecayModel()
+
         for coord in self.dataset[self.data_var].coords:
             if "cliffords" in coord:
                 self.number_cliffords_coord = coord
@@ -67,32 +70,40 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
                 self.seeds = self.S21[coord].values
             elif "loops" in str(coord):
                 self.loops_coord = coord
-                self.number_of_loops = self.S21[self.loops_coord].size
+                self.number_of_loops = self.S21[coord].size
             elif "interleave" in str(coord):
                 self.interleave_gate_coord = coord
+                self.gates = self.S21[coord].values
+                self.number_of_gates = self.S21[coord].size
                 self.interleaved_gate = None
+
+        if self.number_of_gates == 2:
+            self.interleaved_gate = self.gates[1]
 
         qubit = self.qubit
         iq_array = self.S21[self.data_var].assign_attrs(qubit=qubit)
 
         self.state_probabilities = calculate_probabilities(iq_array)
-        mean_probabilities_state_0 = self.state_probabilities.sel(state=0).mean(
-            self.seed_coord
-        )
-        mean_probabilities_state_1 = self.state_probabilities.sel(state=1).mean(
-            self.seed_coord
-        )
-        mean_probabilities_state_2 = self.state_probabilities.sel(state=2).mean(
-            self.seed_coord
-        )
 
-        model = ExpDecayModel()
+        standard_probabilities = self.state_probabilities.sel(
+            {self.interleave_gate_coord: "Standard"}
+        )
+        standard_mean_probabilities_state_0 = standard_probabilities.sel(state=0).mean(
+            self.seed_coord
+        )
+        standard_mean_probabilities_state_1 = standard_probabilities.sel(state=1).mean(
+            self.seed_coord
+        )
+        standard_mean_probabilities_state_2 = standard_probabilities.sel(state=2).mean(
+            self.seed_coord
+        )
 
         guess = model.guess(
-            data=mean_probabilities_state_0.values, m=self.number_cliffords.values
+            data=standard_mean_probabilities_state_0.values,
+            m=self.number_cliffords.values,
         )
         fit_result = model.fit(
-            mean_probabilities_state_0.values,
+            standard_mean_probabilities_state_0.values,
             params=guess,
             m=self.number_cliffords.values,
         )
@@ -100,26 +111,54 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
         self.fit_n_cliffords = np.linspace(
             self.number_cliffords.values[0], self.number_cliffords.values[-1], 400
         )
-        self.fit_y = model.eval(
+        self.standard_fit_y = model.eval(
             fit_result.params, **{model.independent_vars[0]: self.fit_n_cliffords}
         )
         self.fidelity = fit_result.params["p"].value
 
         # Gives an initial guess for the model parameters and then fits the model to the data.
         guess2 = model.guess(
-            data=mean_probabilities_state_2.values, m=self.number_cliffords
+            data=standard_mean_probabilities_state_2.values, m=self.number_cliffords
         )
 
         # Adjust the parameters for an inverted decaying exponential fit
         guess2["A"].value = -1 / 2  # Force 'A' to be negative
         guess2["p"].value = 0.998
         fit_result2 = model.fit(
-            mean_probabilities_state_2, params=guess2, m=self.number_cliffords
+            standard_mean_probabilities_state_2, params=guess2, m=self.number_cliffords
         )
         self.fit_y2 = model.eval(
             fit_result2.params, **{model.independent_vars[0]: self.fit_n_cliffords}
         )
         self.leakage = 1 - fit_result2.params["p"].value
+
+        if self.interleaved_gate is not None:
+            interleaved_probabilities = self.state_probabilities.sel(
+                {self.interleave_gate_coord: self.interleaved_gate}
+            )
+            interleaved_mean_probabilities_state_0 = interleaved_probabilities.sel(
+                state=0
+            ).mean(self.seed_coord)
+            interleaved_mean_probabilities_state_1 = interleaved_probabilities.sel(
+                state=1
+            ).mean(self.seed_coord)
+            interleaved_mean_probabilities_state_2 = interleaved_probabilities.sel(
+                state=2
+            ).mean(self.seed_coord)
+
+            guess = model.guess(
+                data=interleaved_mean_probabilities_state_0.values,
+                m=self.number_cliffords.values,
+            )
+            fit_result = model.fit(
+                interleaved_mean_probabilities_state_0.values,
+                params=guess,
+                m=self.number_cliffords.values,
+            )
+            self.interleaved_fit_y = model.eval(
+                fit_result.params, **{model.independent_vars[0]: self.fit_n_cliffords}
+            )
+            self.interleaved_fidelity = fit_result.params["p"].value
 
         analysis_successful = True
 
@@ -157,7 +196,7 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
         )
         ax.plot(
             self.fit_n_cliffords,
-            self.fit_y,
+            self.standard_fit_y,
             "b--",
             lw=2,
             # label=f"p = {self.fidelity:.4f} ± {self.fidelity_error:.4f}",
@@ -170,6 +209,14 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
             lw=2,
             label=f"leakage = {self.leakage:.4f}",
         )
+        if self.interleaved_gate is not None:
+            ax.plot(
+                self.fit_n_cliffords,
+                self.interleaved_fit_y,
+                "c--",
+                lw=2,
+                label=f"interleaved fidelity = {self.interleaved_fidelity:.4f}",
+            )
         ax.set_ylabel("population", fontsize=14)
         ax.set_xlabel("number of cliffords", fontsize=14)
         ax.legend()

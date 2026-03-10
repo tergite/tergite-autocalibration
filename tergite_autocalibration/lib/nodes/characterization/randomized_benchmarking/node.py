@@ -53,12 +53,14 @@ class RandomizedBenchmarkingNode(QubitNode):
 
         self.schedule_samplespace = {
             "number_of_cliffords": {
-                qubit: np.array([0, 8, 16, 32, 64, 128, 256, 512, 1024])
+                qubit: np.array([0, 8, 16, 64, 128, 256, 512])
                 for qubit in self.all_qubits
             },
             # available gates for interleaving: 'Standard' -> no interleave
             # 'X', 'Y', 'X90', 'Y90'
-            "interleave_gate": {qubit: np.array(["Standard"]) for qubit in self.all_qubits},
+            "interleave_gate": {
+                qubit: np.array(["Standard", "X"]) for qubit in self.all_qubits
+            },
         }
 
     def generate_dummy_dataset(self):
