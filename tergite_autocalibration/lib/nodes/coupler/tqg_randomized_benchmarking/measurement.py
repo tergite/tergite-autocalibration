@@ -177,6 +177,7 @@ class TwoQubitRBMeasurement(BaseMeasurement):
 
         for mode_index, interleave_mode in enumerate(interleaves):
             if interleave_mode:
+                # 4368 is the CZ clifford id index
                 interleaving_clifford_id = 4368
 
             # Loop over random Clifford sequence lengths

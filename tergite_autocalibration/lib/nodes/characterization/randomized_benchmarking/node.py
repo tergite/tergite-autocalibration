@@ -56,23 +56,17 @@ class RandomizedBenchmarkingNode(QubitNode):
                 qubit: np.array([0, 8, 16, 32, 64, 128, 256, 512, 1024])
                 for qubit in self.all_qubits
             },
+            "interleave_gate": {qubit: np.array([None]) for qubit in self.all_qubits},
         }
 
     def generate_dummy_dataset(self):
         dataset = xarray.Dataset()
         for index, qubit in enumerate(self.all_qubits):
             samples = self.schedule_samplespace["number_of_cliffords"][qubit]
-            # true_params = rabi.make_params(amplitude=0.2, frequency=1, offset=0.2)
             number_of_samples = len(samples) * self.loops
-            # true_s21 = rabi.eval(params=true_params, drive_amp=samples)
             noise_scale = 0.005 * index
             np.random.seed(123)
-            # measured_s21 = np.abs(true_s21)
             measured_s21 = np.random.rand(number_of_samples)
-            # measured_s21 = true_s21 + noise_scale * (
-            #     np.random.randn(number_of_samples)
-            #     + 1j * np.random.randn(number_of_samples)
-            # )
             data_array = xarray.DataArray(measured_s21)
             dataset[index] = data_array
         return dataset
