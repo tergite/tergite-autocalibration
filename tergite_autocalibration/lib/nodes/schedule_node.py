@@ -10,6 +10,8 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+import math
+from itertools import product
 from typing import Iterable
 
 import numpy
@@ -51,12 +53,13 @@ class OuterScheduleNode(MeasurementType):
         """
         outer_dimensions = samplespace_dimensions(self.node.outer_schedule_samplespace)
         # this implementation supports only 1 outer parameter
-        iterations = outer_dimensions[0]
+        iterations = product(*(range(n) for n in outer_dimensions))
+        all_iterations = math.prod(outer_dimensions)
         outer_dim = list(self.node.outer_schedule_samplespace.keys())[0]
 
         result_dataset = xarray.Dataset()
 
-        for this_iteration in range(iterations):
+        for this_interation_index, this_iteration in enumerate(iterations):
             reduced_outer_samplespace = reduce_samplespace(
                 this_iteration, self.node.outer_schedule_samplespace
             )
@@ -69,7 +72,7 @@ class OuterScheduleNode(MeasurementType):
             ds = self.node.measure_compiled_schedule(
                 compiled_schedule,
                 measurement_mode=measurement_mode,
-                measurement=(this_iteration, iterations),
+                measurement=(this_interation_index, all_iterations),
             )
 
             if isinstance(current_value, Iterable):  # for cz calibration

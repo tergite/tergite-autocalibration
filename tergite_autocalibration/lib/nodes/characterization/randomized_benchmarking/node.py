@@ -48,18 +48,18 @@ class RandomizedBenchmarkingNode(QubitNode):
             "seeds": {
                 qubit: np.arange(self.RB_REPEATS, dtype=np.int32)
                 for qubit in self.all_qubits
-            }
+            },
+            # available gates for interleaving: 'Standard' -> no interleave
+            # 'X', 'Y', 'X90', 'Y90'
+            "interleave_gate": {
+                qubit: np.array(["Standard", "X"]) for qubit in self.all_qubits
+            },
         }
 
         self.schedule_samplespace = {
             "number_of_cliffords": {
                 qubit: np.array([0, 8, 16, 64, 128, 256, 512])
                 for qubit in self.all_qubits
-            },
-            # available gates for interleaving: 'Standard' -> no interleave
-            # 'X', 'Y', 'X90', 'Y90'
-            "interleave_gate": {
-                qubit: np.array(["Standard", "X"]) for qubit in self.all_qubits
             },
         }
 

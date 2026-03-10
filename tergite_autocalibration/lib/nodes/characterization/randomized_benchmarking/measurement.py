@@ -62,7 +62,7 @@ class RandomizedBenchmarkingMeasurement(BaseMeasurement):
         self,
         seeds: dict[str, int],
         number_of_cliffords: dict[str, np.ndarray],
-        interleave_gate: dict[str, np.ndarray],
+        interleave_gate: dict[str, str],
         multiplexing: Literal["one_by_one", "parallel"],
     ):
         shot = Schedule("shot")
@@ -80,8 +80,7 @@ class RandomizedBenchmarkingMeasurement(BaseMeasurement):
         # The outer for loop iterates over all qubits:
         for this_qubit, clifford_sequence_lengths in number_of_cliffords.items():
             seed = seeds[this_qubit]  # this is just an integer
-            interleaving_gates = interleave_gate[this_qubit]
-            num_clifford_sequence_lengths = len(clifford_sequence_lengths)
+            interleaving_gate = interleave_gate[this_qubit]
 
             rng = np.random.default_rng(seed)  # this is a generator
 
@@ -93,32 +92,34 @@ class RandomizedBenchmarkingMeasurement(BaseMeasurement):
             elif multiplexing == "one_by_one":
                 pass
 
-            for mode_index, gate in enumerate(interleaving_gates):
-                if gate == "Standard":
-                    interleaving_clifford_id = None
-                else:
-                    if gate not in cliffords.common_gates_indices:
-                        raise NotImplementedError(f"{gate} not currently supported")
-                    interleaving_clifford_id = cliffords.common_gates_indices[gate]
-
-                # The inner for loop iterates over the random clifford sequence lengths
-                for acq_index, this_number_of_cliffords in enumerate(
-                    clifford_sequence_lengths
-                ):
-                    this_index = mode_index * num_clifford_sequence_lengths + acq_index
-                    clifford_sequence = rng.integers(
-                        all_cliffords, size=this_number_of_cliffords
-                    )  # for example if this_number_of_cliffords=4, a random_sequence could be [5, 14, 19, 23]
-                    if interleaving_clifford_id is not None:
-                        interleaved_sequence = np.empty(
-                            clifford_sequence.size * 2, dtype=int
-                        )
-                        interleaved_sequence[0::2] = clifford_sequence
-                        interleaved_sequence[1::2] = interleaving_clifford_id
-                        clifford_sequence = interleaved_sequence
-                    self.single_qubit_rb_shot(
-                        shot, clifford_sequence, this_qubit, this_index
+            if interleaving_gate == "Standard":
+                interleaving_clifford_id = None
+            else:
+                if interleaving_gate not in cliffords.common_gates_indices:
+                    raise NotImplementedError(
+                        f"{interleaving_gate} not currently supported"
                     )
+                interleaving_clifford_id = cliffords.common_gates_indices[
+                    interleaving_gate
+                ]
+
+            # The inner for loop iterates over the random clifford sequence lengths
+            for acq_index, this_number_of_cliffords in enumerate(
+                clifford_sequence_lengths
+            ):
+                clifford_sequence = rng.integers(
+                    all_cliffords, size=this_number_of_cliffords
+                )  # for example if this_number_of_cliffords=4, a random_sequence could be [5, 14, 19, 23]
+                if interleaving_clifford_id is not None:
+                    interleaved_sequence = np.empty(
+                        clifford_sequence.size * 2, dtype=int
+                    )
+                    interleaved_sequence[0::2] = clifford_sequence
+                    interleaved_sequence[1::2] = interleaving_clifford_id
+                    clifford_sequence = interleaved_sequence
+                self.single_qubit_rb_shot(
+                    shot, clifford_sequence, this_qubit, acq_index
+                )
 
         return shot
 
@@ -157,7 +158,7 @@ class RandomizedBenchmarkingMeasurement(BaseMeasurement):
         seeds: dict[str, int],
         number_of_cliffords: dict[str, np.ndarray],
         loop_repetitions: int,
-        interleave_gate: dict[str, np.ndarray],
+        interleave_gate: dict[str, str],
         multiplexing: Literal["parallel", "one_by_one"] = "parallel",
     ) -> Schedule:
         schedule = Schedule("randomized_benchmarking", repetitions=1)
