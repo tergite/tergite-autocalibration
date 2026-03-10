@@ -185,7 +185,7 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         self._fill_plots()
         self._save_plots()
         self._save_other_plots()
-        plt.show()
+        # plt.show()
         return analysis_results
 
     def _analyze_all_qubits(self):

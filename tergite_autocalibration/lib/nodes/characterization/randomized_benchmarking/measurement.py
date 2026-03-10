@@ -93,8 +93,9 @@ class RandomizedBenchmarkingMeasurement(BaseMeasurement):
                 pass
 
             for mode_index, gate in enumerate(interleaving_gates):
-                interleaving_clifford_id = None
-                if gate is not None:
+                if gate == "Standard":
+                    interleaving_clifford_id = None
+                else:
                     if gate not in cliffords.common_gates_indices:
                         raise NotImplementedError(f"{gate} not currently supported")
                     interleaving_clifford_id = cliffords.common_gates_indices[gate]
