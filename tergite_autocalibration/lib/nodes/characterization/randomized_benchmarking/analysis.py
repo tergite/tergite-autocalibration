@@ -17,11 +17,14 @@ from matplotlib.axes import Axes
 from scipy.linalg import norm
 from scipy.optimize import minimize
 
-from tergite_autocalibration.lib.base.analysis import (BaseAllQubitsAnalysis,
-                                                       BaseQubitAnalysis)
+from tergite_autocalibration.lib.base.analysis import (
+    BaseAllQubitsAnalysis,
+    BaseQubitAnalysis,
+)
 from tergite_autocalibration.lib.utils.analysis_models import ExpDecayModel
-from tergite_autocalibration.lib.utils.classification_functions import \
-    calculate_probabilities
+from tergite_autocalibration.lib.utils.classification_functions import (
+    calculate_probabilities,
+)
 from tergite_autocalibration.utils.dto.qoi import QOI
 
 
@@ -67,6 +70,7 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
                 self.number_of_loops = self.S21[self.loops_coord].size
             elif "interleave" in str(coord):
                 self.interleave_gate_coord = coord
+                self.interleaved_gate = None
 
         qubit = self.qubit
         iq_array = self.S21[self.data_var].assign_attrs(qubit=qubit)
@@ -135,22 +139,22 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
         return qoi
 
     def plotter(self, ax: Axes):
-        styles = dict(c="b", lw=0.5)
         standard_probabilities = self.state_probabilities.sel(
             {self.interleave_gate_coord: "Standard"}
         )
+
+        styles = dict(c="b", lw=0.5)
         standard_probabilities.sel(state=0).plot.line(
             ax=ax, x=self.number_cliffords_coord, **styles
         )
-
         styles = dict(c="r", lw=0.5)
-        self.state_probabilities.sel(state=1).sel(
-            {self.interleave_gate_coord: "Standard"}
-        ).plot.line(ax=ax, x=self.number_cliffords_coord, **styles)
+        standard_probabilities.sel(state=1).plot.line(
+            ax=ax, x=self.number_cliffords_coord, **styles
+        )
         styles = dict(c="g", lw=0.5)
-        self.state_probabilities.sel(state=2).sel(
-            {self.interleave_gate_coord: "Standard"}
-        ).plot.line(ax=ax, x=self.number_cliffords_coord, **styles)
+        standard_probabilities.sel(state=2).plot.line(
+            ax=ax, x=self.number_cliffords_coord, **styles
+        )
         ax.plot(
             self.fit_n_cliffords,
             self.fit_y,
