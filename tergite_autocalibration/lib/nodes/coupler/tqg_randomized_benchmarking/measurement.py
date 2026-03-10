@@ -137,6 +137,7 @@ class TwoQubitRBMeasurement(BaseMeasurement):
         self.rxy_duration = self.transmons[qubit_names[0]].rxy.duration()
 
         seed = seeds[coupler_names[0]]
+        print(f"{ seed = }")
 
         # This is the common reference operation so the qubits can be operated in parallel
         shot.add(Reset(*qubit_names), label="Start")

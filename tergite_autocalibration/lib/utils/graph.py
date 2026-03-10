@@ -57,7 +57,7 @@ GRAPH_DEPENDENCIES = [
     ("ro_amplitude_three_state_optimization", "cz_parametrization"),
     ("T1", "T2"),
     ("T2", "T2_echo"),
-    ("ro_amplitude_three_state_optimization", "randomized_benchmarking_ssro"),
+    ("ro_amplitude_three_state_optimization", "randomized_benchmarking"),
     ("T2_echo", "purity_benchmarking"),
     ("cz_parametrization", "cz_chevron"),
     ("cz_chevron", "cz_calibration"),

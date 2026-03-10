@@ -17,6 +17,8 @@
 Module containing a schedule class for randomized benchmarking measurement.
 """
 
+from typing import Literal
+
 import numpy as np
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.control_flow_library import Loop
@@ -30,7 +32,7 @@ from tergite_autocalibration.utils.dto.extended_gates import Measure_RO_3state_O
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
-class RandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
+class RandomizedBenchmarkingMeasurement(BaseMeasurement):
     def __init__(self, transmons: dict[str, ExtendedTransmon]):
         super().__init__(transmons)
         self.transmons = transmons
@@ -60,6 +62,7 @@ class RandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
         self,
         seeds: dict[str, int],
         number_of_cliffords: dict[str, np.ndarray],
+        multiplexing: Literal["one_by_one", "parallel"],
     ):
         shot = Schedule("shot")
         shot.add(IdlePulse(16e-9))
@@ -73,15 +76,22 @@ class RandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
         # for single qubits all_cliffords = 24
         all_cliffords = len(cliffords.XY_decompositions)
 
+        # # Second loop over all tau delay values
+        # for acq_index, tau in enumerate(times_val):
+        #     self.single_qubit_T1(schedule, this_qubit, acq_index, tau)
+
         # The outer for loop iterates over all qubits:
         for this_qubit, clifford_sequence_lengths in number_of_cliffords.items():
             seed = seeds[this_qubit]  # this is just an integer
 
             rng = np.random.default_rng(seed)  # this is a generator
 
-            shot.add(
-                Reset(*qubits), ref_op=root_relaxation, ref_pt="end"
-            )  # To enforce parallelism we refer to the root relaxation
+            if multiplexing == "parallel":
+                shot.add(
+                    Reset(this_qubit), ref_op=root_relaxation
+                )  # To enforce parallelism we refer to the root relaxation
+            elif multiplexing == "one_by_one":
+                pass
 
             # The inner for loop iterates over the random clifford sequence lengths
             for acq_index, this_number_of_cliffords in enumerate(
@@ -122,10 +132,11 @@ class RandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
         seeds: dict[str, int],
         number_of_cliffords: dict[str, np.ndarray],
         loop_repetitions: int,
+        multiplexing: str = "parallel",
     ) -> Schedule:
         schedule = Schedule("multiplexed_randomized_benchmarking", repetitions=1)
 
-        rb_shot_schedule = self.rb_shot(seeds, number_of_cliffords)
+        rb_shot_schedule = self.rb_shot(seeds, number_of_cliffords, multiplexing)
 
         schedule.add(rb_shot_schedule, control_flow=Loop(loop_repetitions))
         schedule.add(IdlePulse(20e-9))

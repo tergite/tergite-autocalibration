@@ -18,18 +18,18 @@ import xarray
 
 from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.analysis import (
-    RandomizedBenchmarkingSSRONodeAnalysis,
+    RandomizedBenchmarkingNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.measurement import (
-    RandomizedBenchmarkingSSROMeasurement,
+    RandomizedBenchmarkingMeasurement,
 )
 from tergite_autocalibration.lib.nodes.schedule_node import OuterScheduleNode
 
 
 class RandomizedBenchmarkingNode(QubitNode):
     name: str = "randomized_benchmarking"
-    measurement_obj = RandomizedBenchmarkingSSROMeasurement
-    analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
+    measurement_obj = RandomizedBenchmarkingMeasurement
+    analysis_obj = RandomizedBenchmarkingNodeAnalysis
     measurement_type = OuterScheduleNode
     qubit_qois = ["fidelity", "fidelity_error", "leakage", "leakage_error"]
 
@@ -39,6 +39,9 @@ class RandomizedBenchmarkingNode(QubitNode):
         self.schedule_keywords = {}
         self.loops = 500
         self.schedule_keywords["loop_repetitions"] = self.loops
+        self.schedule_keywords["multiplexing"] = (
+            "one_by_one"  # 'one_by_one' | 'parallel'
+        )
 
         self.RB_REPEATS = 4
         self.outer_schedule_samplespace = {

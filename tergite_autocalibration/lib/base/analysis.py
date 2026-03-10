@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import List
 
 import cf_xarray as cf
+import matplotlib.pyplot as plt
 
 # TODO: we should have a conditional import depending on a feature flag here
 import numpy as np
@@ -184,6 +185,7 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         self._fill_plots()
         self._save_plots()
         self._save_other_plots()
+        plt.show()
         return analysis_results
 
     def _analyze_all_qubits(self):

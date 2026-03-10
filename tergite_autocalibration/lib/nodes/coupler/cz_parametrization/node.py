@@ -58,7 +58,7 @@ class CZParametrizationNode(CouplerNode):
 
         self.external_samplespace = {
             "dc_currents": {
-                coupler: self.fine_samplespace_around(self.parking_current(coupler))
+                coupler: self.single_point_around(self.parking_current(coupler))
                 for coupler in self.couplers
             },
         }
@@ -72,6 +72,9 @@ class CZParametrizationNode(CouplerNode):
                 for coupler in self.couplers
             },
         }
+
+    def single_point_around(self, central_value: float) -> np.ndarray:
+        return np.array([central_value])
 
     def fine_samplespace_around(self, central_value: float) -> np.ndarray:
         return np.arange(central_value - 5e-6, central_value + 4.5e-6, 2e-6)

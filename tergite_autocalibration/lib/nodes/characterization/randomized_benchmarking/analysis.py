@@ -1,6 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2023, 2024
+# (C) Copyright Eleftherios Moschandreou 2023, 2024, 2026
 # (C) Copyright Amr Osman 2024
 # (C) Copyright Michele Faucci Giannelli 2024
 #
@@ -13,7 +13,6 @@
 # that they have been altered from the originals.
 
 import numpy as np
-import xarray as xr
 from matplotlib.axes import Axes
 from scipy.linalg import norm
 from scipy.optimize import minimize
@@ -23,7 +22,9 @@ from tergite_autocalibration.lib.base.analysis import (
     BaseQubitAnalysis,
 )
 from tergite_autocalibration.lib.utils.analysis_models import ExpDecayModel
-from tergite_autocalibration.lib.utils.classification_functions import assign_state
+from tergite_autocalibration.lib.utils.classification_functions import (
+    calculate_probabilities,
+)
 from tergite_autocalibration.utils.dto.qoi import QOI
 
 
@@ -69,50 +70,26 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
                 self.number_of_loops = self.S21[self.loops_coord].size
 
         qubit = self.qubit
+        iq_array = self.S21[self.data_var].assign_attrs(qubit=qubit)
 
-        states_array = assign_state(qubit, self.S21[self.data_var])
-
-        # filter S21 to produce 3 distict datarrays,
-        # each with 1 at the position where the classification is True
-        # and 0 at the position where the classification is False
-        # eg states_array = [0,0,1,1,0,2] ->
-        # zeros =[1,1,0,0,1,0]
-        # ones = [0,0,1,1,0,0]
-        # twos = [0,0,0,0,0,1]
-        # probably there is a better way to extract the probabilities
-        zeros = xr.where(states_array == 0, x=1, y=0)  # keep only |0> states
-        ones = xr.where(states_array == 1, x=1, y=0)  # keep only |1> states
-        twos = xr.where(states_array == 2, x=1, y=0)  # keep only |2> states
-
-        # sum the filtered arrays, to get the occurancies of each state
-        # when later we divide with the total number, this becomes a probabilities array
-        zeros = zeros.reduce(func=np.sum, dim=self.loops_coord)
-        ones = ones.reduce(func=np.sum, dim=self.loops_coord)
-        twos = twos.reduce(func=np.sum, dim=self.loops_coord)
-
-        probabilities_state_0 = zeros / self.number_of_loops
-        self.probabilities_state_0 = probabilities_state_0.assign_coords(state=0)
-        probabilities_state_1 = ones / self.number_of_loops
-        self.probabilities_state_1 = probabilities_state_1.assign_coords(state=1)
-        probabilities_state_2 = twos / self.number_of_loops
-        self.probabilities_state_2 = probabilities_state_2.assign_coords(state=2)
-
-        self.mean_probabilities_state_0 = probabilities_state_0.mean(self.seed_coord)
-        self.mean_probabilities_state_1 = probabilities_state_1.mean(self.seed_coord)
-        self.mean_probabilities_state_2 = probabilities_state_2.mean(self.seed_coord)
-
-        self.state_probabilities = xr.concat(
-            [probabilities_state_0, probabilities_state_1, probabilities_state_2],
-            dim="state",
+        self.state_probabilities = calculate_probabilities(iq_array)
+        mean_probabilities_state_0 = self.state_probabilities.sel(state=0).mean(
+            self.seed_coord
+        )
+        mean_probabilities_state_1 = self.state_probabilities.sel(state=1).mean(
+            self.seed_coord
+        )
+        mean_probabilities_state_2 = self.state_probabilities.sel(state=2).mean(
+            self.seed_coord
         )
 
         model = ExpDecayModel()
 
         guess = model.guess(
-            data=self.mean_probabilities_state_0.values, m=self.number_cliffords.values
+            data=mean_probabilities_state_0.values, m=self.number_cliffords.values
         )
         fit_result = model.fit(
-            self.mean_probabilities_state_0.values,
+            mean_probabilities_state_0.values,
             params=guess,
             m=self.number_cliffords.values,
         )
@@ -127,7 +104,7 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
 
         # Gives an initial guess for the model parameters and then fits the model to the data.
         guess2 = model.guess(
-            data=self.mean_probabilities_state_2.values, m=self.number_cliffords
+            data=mean_probabilities_state_2.values, m=self.number_cliffords
         )
 
         # Adjust the parameters for an inverted decaying exponential fit
@@ -159,31 +136,18 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
         return qoi
 
     def plotter(self, ax: Axes):
-        for seed in self.seeds:
-            self.probabilities_state_0.sel({self.seed_coord: seed}).plot(
-                ax=ax,
-                c="b",
-                marker="o",
-                ms=0.5,
-                lw=0.5,
-                # label="|0>",
-            )
-            self.probabilities_state_1.sel({self.seed_coord: seed}).plot(
-                ax=ax,
-                c="r",
-                marker="s",
-                ms=0.5,
-                lw=0.5,
-                # label="|1>",
-            )
-            self.probabilities_state_2.sel({self.seed_coord: seed}).plot(
-                ax=ax,
-                c="g",
-                marker="^",
-                ms=0.5,
-                lw=0.5,
-                # label="|2>",
-            )
+        styles = dict(c="b", lw=0.5)
+        self.state_probabilities.sel(state=0).plot.line(
+            ax=ax, x=self.number_cliffords_coord, **styles
+        )
+        styles = dict(c="r", lw=0.5)
+        self.state_probabilities.sel(state=1).plot.line(
+            ax=ax, x=self.number_cliffords_coord, **styles
+        )
+        styles = dict(c="g", lw=0.5)
+        self.state_probabilities.sel(state=2).plot.line(
+            ax=ax, x=self.number_cliffords_coord, **styles
+        )
         ax.plot(
             self.fit_n_cliffords,
             self.fit_y,
@@ -201,12 +165,13 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
         )
         ax.set_ylabel("population", fontsize=14)
         ax.set_xlabel("number of cliffords", fontsize=14)
+        ax.legend()
         ax.tick_params(axis="both", which="major", labelsize=14)
         ax.set_title("")
         ax.grid()
 
 
-class RandomizedBenchmarkingSSRONodeAnalysis(BaseAllQubitsAnalysis):
+class RandomizedBenchmarkingNodeAnalysis(BaseAllQubitsAnalysis):
     single_qubit_analysis_obj = RandomizedBenchmarkingSSROQubitAnalysis
 
     def __init__(self, name, redis_fields):
