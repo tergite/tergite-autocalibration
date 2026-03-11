@@ -200,7 +200,7 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
             "b--",
             lw=2,
             # label=f"p = {self.fidelity:.4f} ± {self.fidelity_error:.4f}",
-            label=f"fidelity = {self.fidelity:.4f}",
+            label=rf"$p_{{SRB}}$ = {self.fidelity:.4f}",
         )
         ax.plot(
             self.fit_n_cliffords,
@@ -215,7 +215,7 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
                 self.interleaved_fit_y,
                 "c--",
                 lw=2,
-                label=f"interleaved fidelity = {self.interleaved_fidelity:.4f}",
+                label=rf"$p_{{IRB}}$ = {self.interleaved_fidelity:.4f}",
             )
         ax.set_ylabel("population", fontsize=14)
         ax.set_xlabel("number of cliffords", fontsize=14)

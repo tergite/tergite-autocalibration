@@ -12,7 +12,7 @@
 
 import math
 from itertools import product
-from typing import Iterable
+from typing import Sequence
 
 import numpy
 import pandas
@@ -52,10 +52,11 @@ class OuterScheduleNode(MeasurementType):
         For example large single shots measurements.
         """
         outer_dimensions = samplespace_dimensions(self.node.outer_schedule_samplespace)
-        # this implementation supports only 1 outer parameter
+
         iterations = product(*(range(n) for n in outer_dimensions))
         all_iterations = math.prod(outer_dimensions)
         outer_dim = list(self.node.outer_schedule_samplespace.keys())[0]
+        outer_settables = self.node.outer_schedule_samplespace.keys()
 
         result_dataset = xarray.Dataset()
 
@@ -63,8 +64,12 @@ class OuterScheduleNode(MeasurementType):
             reduced_outer_samplespace = reduce_samplespace(
                 this_iteration, self.node.outer_schedule_samplespace
             )
-            element_dict = list(reduced_outer_samplespace.values())[0]
-            current_value = list(element_dict.values())[0]
+            reduced_outer_dict = {}
+            for settable in outer_settables:
+                # element_dict = list(reduced_outer_samplespace.values())[0]
+                # WARNING: this assumes that the values for all elements are the same at eact iteration
+                current_value = list(reduced_outer_samplespace[settable].values())[0]
+                reduced_outer_dict[settable] = current_value
 
             samplespace = self.node.schedule_samplespace | reduced_outer_samplespace
             compiled_schedule = self.node.precompile(samplespace)
@@ -75,7 +80,7 @@ class OuterScheduleNode(MeasurementType):
                 measurement=(this_interation_index, all_iterations),
             )
 
-            if isinstance(current_value, Iterable):  # for cz calibration
+            if isinstance(current_value, (list, tuple)):  # for cz calibration
                 # This handles multiindex objects.
                 # Example is the cz_calibration node where the outer coordinate
                 # is a multiindex object cosisting of frequency and duartion pairs
@@ -90,7 +95,9 @@ class OuterScheduleNode(MeasurementType):
                     {outer_dim: (outer_dim, current_value_multi_index)}
                 )
             else:
-                ds = ds.expand_dims({outer_dim: numpy.array([current_value])})
+                for outer_dim in reduced_outer_dict:
+                    outer_value = reduced_outer_dict[outer_dim]
+                    ds = ds.expand_dims({outer_dim: numpy.array([outer_value])})
 
             result_dataset = xarray.merge(
                 [ds, result_dataset], join="outer", compat="no_conflicts"
