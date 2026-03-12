@@ -39,9 +39,7 @@ class RandomizedBenchmarkingNode(QubitNode):
         self.schedule_keywords = {}
         self.loops = 500
         self.schedule_keywords["loop_repetitions"] = self.loops
-        self.schedule_keywords["multiplexing"] = (
-            "parallel"  # 'one_by_one' | 'parallel'
-        )
+        self.schedule_keywords["multiplexing"] = "parallel"  # 'one_by_one' | 'parallel'
 
         self.RB_REPEATS = 6
         self.outer_schedule_samplespace = {

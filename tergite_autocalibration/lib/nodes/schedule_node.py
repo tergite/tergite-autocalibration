@@ -12,7 +12,6 @@
 
 import math
 from itertools import product
-from typing import Sequence
 
 import numpy
 import pandas

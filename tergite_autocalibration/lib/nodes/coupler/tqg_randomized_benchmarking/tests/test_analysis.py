@@ -17,7 +17,9 @@ from pathlib import Path
 import xarray as xr
 import pytest
 
-from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.analysis import TwoQubitRnBCouplerAnalysis
+from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.analysis import (
+    TwoQubitRnBCouplerAnalysis,
+)
 from tergite_autocalibration.tests.utils.decorators import with_redis
 
 _test_data_dir = os.path.join(Path(__file__).parent, "data")
@@ -29,7 +31,7 @@ def test_cz_rb():
     file_path = os.path.join(_test_data_dir, "dataset_cz_rb.hdf5")
     dataset = xr.open_dataset(file_path)
 
-    analysis = TwoQubitRnBCouplerAnalysis( "cz_rb", ["cz_fidelity"])
+    analysis = TwoQubitRnBCouplerAnalysis("cz_rb", ["cz_fidelity"])
     qoi = analysis.process_coupler(dataset, "q12_q13")
 
     cz_fidelity = qoi.analysis_result["cz_fidelity"]["value"]
@@ -46,8 +48,7 @@ def test_plotting():
     file_path = os.path.join(_test_data_dir, "dataset_cz_rb.hdf5")
     dataset = xr.open_dataset(file_path)
 
-    analysis = TwoQubitRnBCouplerAnalysis( "cz_rb", ["cz_fidelity"])
-
+    analysis = TwoQubitRnBCouplerAnalysis("cz_rb", ["cz_fidelity"])
 
     figures_dictionary = {}
 
