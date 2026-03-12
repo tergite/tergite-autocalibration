@@ -78,7 +78,10 @@ class ExternalParameterNode(MeasurementType):
 
             # ds = ds.expand_dims({external_dim: np.array([current_value])})
             for external_dim in self.node.reduced_external_samplespace:
-                ext_value = self.node.reduced_external_samplespace[external_dim]
+                # NOTE: this assumes the external values are the same for all elements
+                ext_value = list(
+                    self.node.reduced_external_samplespace[external_dim].values()
+                )[0]
                 ds = ds.expand_dims({external_dim: np.array([ext_value])})
             # we explicitly set join='outer' because we want the union of the old coordinates with the new
             result_dataset = xarray.merge(
