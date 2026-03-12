@@ -13,6 +13,9 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+import math
+from itertools import product
+
 import numpy as np
 import xarray
 
@@ -44,8 +47,10 @@ class ExternalParameterNode(MeasurementType):
 
         external_dimensions = samplespace_dimensions(self.node.external_samplespace)
         # this implementation supports only 1 external parameter
-        iterations = external_dimensions[0]
+        iterations = product(*(range(n) for n in external_dimensions))
+        all_iterations = math.prod(external_dimensions)
         external_dim = list(self.node.external_samplespace.keys())[0]
+        external_settables = self.node.external_samplespace.keys()
 
         result_dataset = xarray.Dataset()
 
@@ -53,13 +58,13 @@ class ExternalParameterNode(MeasurementType):
 
         self.node.initial_operation()
 
-        for this_iteration in range(iterations):
+        for this_interation_index, this_iteration in enumerate(iterations):
             self.node.reduced_external_samplespace = reduce_samplespace(
                 this_iteration, self.node.external_samplespace
             )
             element_dict = list(self.node.reduced_external_samplespace.values())[0]
 
-            current_value = list(element_dict.values())[0]
+            # current_value = list(element_dict.values())[0]
 
             self.node.pre_measurement_operation(
                 reduced_ext_space=self.node.reduced_external_samplespace
@@ -68,10 +73,13 @@ class ExternalParameterNode(MeasurementType):
             ds = self.node.measure_compiled_schedule(
                 compiled_schedule,
                 measurement_mode,
-                measurement=(this_iteration, iterations),
+                measurement=(this_interation_index, all_iterations),
             )
 
-            ds = ds.expand_dims({external_dim: np.array([current_value])})
+            # ds = ds.expand_dims({external_dim: np.array([current_value])})
+            for external_dim in self.node.reduced_external_samplespace:
+                ext_value = self.node.reduced_external_samplespace[external_dim]
+                ds = ds.expand_dims({external_dim: np.array([ext_value])})
             # we explicitly set join='outer' because we want the union of the old coordinates with the new
             result_dataset = xarray.merge(
                 [ds, result_dataset], join="outer", compat="no_conflicts"
