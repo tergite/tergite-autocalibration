@@ -86,11 +86,15 @@ class RandomizedBenchmarkingMeasurement(BaseMeasurement):
 
             if multiplexing == "parallel":
                 shot.add(
-                    Reset(this_qubit), ref_op=root_relaxation
+                    Reset(this_qubit),
+                    ref_op=root_relaxation,
+                    label=f"root_{this_qubit}",
                 )  # To enforce parallelism we refer to the root relaxation
             # this is redundant, but left here for explicity
             elif multiplexing == "one_by_one":
                 pass
+            else:
+                raise ValueError(f"invalid keyword {multiplexing}")
 
             if interleaving_gate == "Standard":
                 interleaving_clifford_id = None

@@ -28,18 +28,20 @@ def reduce_samplespace(iteration: tuple, samplespace: dict) -> dict:
     """
     example of samplespace:
     samplespace = {
-          'frequencies': {
-             'q1': np.array([4.0e9, 4.1e9, 4.2e9]),
-             'q2': np.array([4.5e9, 4.6e9, 4.7e9]),
-           }
-          'amplitudes': {
-             'q1': np.array([4.0, 4.1, 4.2, 4.1, 4.2]),
-             'q2': np.array([4.5, 4.6, 4.7, 4.6, 4.7]),
-           }
+        "frequencies": {
+            "q1": np.array([4.0e9, 4.1e9, 4.2e9]),
+            "q2": np.array([4.5e9, 4.6e9, 4.7e9]),
+        },
+        "amplitudes": {
+            "q1": np.array([0.1, 0.2, 0.3, 0.4, 0.5]),
+            "q2": np.array([0.2, 0.3, 0.4, 0.5, 0.6]),
+        },
     }
     """
+
     # e.g. 'frequencies':
     settable = list(samplespace.keys())[0]
+    # e.g. ('frequencies', 'amplitudes'):
     settables = samplespace.keys()
 
     # elements may refer to qubits or couplers
@@ -53,12 +55,16 @@ def reduce_samplespace(iteration: tuple, samplespace: dict) -> dict:
         reduced_samplespace[settable] = copy.deepcopy(element_values)
 
     """
-    example of reduced_samplespace at the 3rd iteration:
+    example of reduced_samplespace at the (2,4) iteration:
     reduced_external_samplespace = {
         'frequencies': {
              'q1': np.array(4.2e9),
              'q2': np.array(4.7e9),
-        }
+        },
+        "amplitudes": {
+            "q1": np.array([0.5]),
+            "q2": np.array([0.6]),
+        },
     }
     """
     return reduced_samplespace

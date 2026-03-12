@@ -66,7 +66,6 @@ class OuterScheduleNode(MeasurementType):
             )
             reduced_outer_dict = {}
             for settable in outer_settables:
-                # element_dict = list(reduced_outer_samplespace.values())[0]
                 # WARNING: this assumes that the values for all elements are the same at eact iteration
                 current_value = list(reduced_outer_samplespace[settable].values())[0]
                 reduced_outer_dict[settable] = current_value

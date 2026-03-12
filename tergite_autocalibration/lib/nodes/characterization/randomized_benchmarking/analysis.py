@@ -48,7 +48,7 @@ def mitigate(v, cm_inv):
     return w
 
 
-class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
+class RandomizedBenchmarkingQubitAnalysis(BaseQubitAnalysis):
     """
     Analysis that fits an exponential decay function to randomized benchmarking data.
     """
@@ -226,7 +226,7 @@ class RandomizedBenchmarkingSSROQubitAnalysis(BaseQubitAnalysis):
 
 
 class RandomizedBenchmarkingNodeAnalysis(BaseAllQubitsAnalysis):
-    single_qubit_analysis_obj = RandomizedBenchmarkingSSROQubitAnalysis
+    single_qubit_analysis_obj = RandomizedBenchmarkingQubitAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
