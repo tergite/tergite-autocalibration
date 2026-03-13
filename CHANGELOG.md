@@ -5,12 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project follows versions of format `{year}.{month}.{patch_number}`.
 
-## [Unreleased]
+## [2026.03.0] - 2026-03-16
 
 ### Added
 
-- Backup functions for redis storage.
+- Backup functions for redis storage
 - Motzoi parameter for DRAG pulse in tergite SDK
+- CLI endpoint for automatic mixer calibration
 
 ### Changed
 
@@ -18,7 +19,18 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 - Replaced MSS update script with BCC calibration seed script
 - Refactored CZ Parametrization node
 - Added CZ Chevron node
+- Added CZ local phases node
 - Removed quickstart endpoint
+- Moved scripts that handle SPI operations to the CLI
+- Cleanup of the BaseNode
+- Interface for measurement types
+- Wizard for the hardware configuration
+
+### Fixed
+
+- Fixes in the n_rabi_12_oscillations
+- Improvements in how coupler data is loaded from redis
+- Cleanup unused scripts and modules
 
 ## [2025.09.0] - 2025-09-16
 
