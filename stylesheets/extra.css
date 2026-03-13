@@ -1,0 +1,12 @@
+:root {
+    --inline-code-color: hsla(275, 73%, 41%, 1); /* default (light theme) */
+}
+  
+[data-md-color-scheme="slate"] {
+    --inline-code-color: hsla(275, 100%, 80%, 1); /* lighter variant for dark theme */
+}
+  
+.md-typeset p code,
+.md-typeset li code {
+    color: var(--inline-code-color);
+}
