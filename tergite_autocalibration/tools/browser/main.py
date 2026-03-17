@@ -77,7 +77,7 @@ app.layout = html.Div(
         dbc.Tooltip(
             "For example if the node rabi_12_oscillations is looked for, strings like rabi_12 or 12_osc suffice.",
             target="text-input",
-            placement='right',
+            placement="right",
         ),
         html.Div(
             id="filter-confirmation", style={"marginTop": "10px", "color": "green"}
@@ -115,7 +115,7 @@ def toggle_compare(n_clicks: int):
     Output({"type": "outer-selector", "index": MATCH}, "options"),
     Input("folder-data", "data"),
 )
-def update_outer_folders( folder_data: dict):
+def update_outer_folders(folder_data: dict):
     """
     Callback to update the outer folders in the first dropdown menu
     with the selection for the dates.
@@ -131,6 +131,7 @@ def update_outer_folders( folder_data: dict):
     if folder_data:
         return [{"label": f, "value": f} for f in folder_data.keys()]
     return []
+
 
 @app.callback(
     Output({"type": "intermediate-selector", "index": MATCH}, "options"),
@@ -537,6 +538,7 @@ def filter_dataset_by_element(selected_elements: list, dataset_json: str):
     except Exception as e:
         return [[f"Error filtering dataset: {e}"], []]
 
+
 @app.callback(
     Output({"type": "outer-selector", "index": MATCH}, "value"),
     State({"type": "outer-selector", "index": MATCH}, "value"),
@@ -549,6 +551,7 @@ def reset_outer_on_clicked_starred(inter_value: str, n_clicks):
     """
 
     return None  # This clears the inner folder selection
+
 
 @app.callback(
     Output({"type": "inner-selector", "index": MATCH}, "value"),
