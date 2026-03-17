@@ -1,7 +1,7 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2025
-# (C) Chalmers Next Labs 2025
+# (C) Copyright Eleftherios Moschandreou 2025, 2026
+# (C) Chalmers Next Labs 2025, 2026
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -15,12 +15,14 @@ import base64
 import json
 import os
 import re
+import sys
 
 import dash
 import plotly.express as px
 import xarray as xr
-from dash import callback_context, dcc, html
-from dash.dependencies import MATCH, Input, Output, State
+from dash import ctx, dcc, html
+import dash_bootstrap_components as dbc
+from dash.dependencies import MATCH, Input, Output, State, ALL
 from dash_renderjson import DashRenderjson
 
 from tergite_autocalibration.config.globals import DATA_DIR
@@ -37,13 +39,14 @@ app.layout = html.Div(
     [
         dcc.Store(id="folder-data", data=folder_structure),
         dcc.Store(id="selected-2d-variable"),
+        dcc.Store(id="starred-store", data=[], storage_type="local"),
         html.Button(
             "Refresh Folder Structure",
             id="refresh-button",
             n_clicks=0,
             style={
-                "marginRight": "15px",  # spacing to the right
                 "padding": "10px 20px",  # bigger button
+                "marginRight": "15px",  # spacing to the right
                 "fontSize": "18px",  # bigger text
                 "cursor": "pointer",
             },
@@ -65,11 +68,16 @@ app.layout = html.Div(
             debounce=True,  # triggers callback only on blur or Enter
             placeholder="Enter string for filtering",
             style={
-                "marginRight": "15px",
                 "padding": "10px",
+                "marginRight": "15px",
                 "fontSize": "18px",
                 "width": "250px",
             },
+        ),
+        dbc.Tooltip(
+            "For example if the node rabi_12_oscillations is looked for, strings like rabi_12 or 12_osc suffice.",
+            target="text-input",
+            placement='right',
         ),
         html.Div(
             id="filter-confirmation", style={"marginTop": "10px", "color": "green"}
@@ -104,13 +112,35 @@ def toggle_compare(n_clicks: int):
 
 
 @app.callback(
+    Output({"type": "outer-selector", "index": MATCH}, "options"),
+    Input("folder-data", "data"),
+)
+def update_outer_folders( folder_data: dict):
+    """
+    Callback to update the outer folders in the first dropdown menu
+    with the selection for the dates.
+    It is used particularly when a filter string is applied, to filter out
+    date folders that dont contain measurements containing the filter string.
+
+    Args:
+        folder_data: What is inside that folder
+
+    Returns:
+
+    """
+    if folder_data:
+        return [{"label": f, "value": f} for f in folder_data.keys()]
+    return []
+
+@app.callback(
     Output({"type": "intermediate-selector", "index": MATCH}, "options"),
     Input({"type": "outer-selector", "index": MATCH}, "value"),
     Input("folder-data", "data"),
 )
 def update_intermediate_folders(selected_outer: str, folder_data: dict):
     """
-    Callback to update the intermediate folders with the selection for the calibration runs
+    Callback to update the intermediate folders in the second dropdown menu
+    with the selection for the calibration runs.
 
     Args:
         selected_outer: Outer folder with the date
@@ -158,6 +188,32 @@ def update_inner_folders(
     return []
 
 
+# -----------------------
+# Callback: Star selected items
+# -----------------------
+@app.callback(
+    Output({"type": "starred-store", "index": MATCH}, "data"),
+    Input({"type": "star-btn", "index": MATCH}, "n_clicks"),
+    State({"type": "outer-selector", "index": MATCH}, "value"),
+    State({"type": "intermediate-selector", "index": MATCH}, "value"),
+    State({"type": "inner-selector", "index": MATCH}, "value"),
+    State({"type": "starred-store", "index": MATCH}, "data"),
+    prevent_initial_call=True,
+)
+def star_selected(n_clicks, outer_selected, interm_selected, inner_selected, starred):
+
+    if not (outer_selected and interm_selected and inner_selected):
+        return starred
+
+    selected = os.path.join(outer_selected, interm_selected, inner_selected)
+    starred = starred or []
+    if selected not in starred:
+        starred.append(selected)
+    else:
+        starred.remove(selected)
+    return starred
+
+
 @app.callback(
     Output("folder-data", "data"),
     Output("filter-confirmation", "children"),
@@ -177,7 +233,6 @@ def refresh_folder_structure(n_clicks: int, filter_text: str):
     Returns:
 
     """
-    ctx = callback_context
     triggered_id = ctx.triggered_id
 
     # If triggered by folder refresh and no input filter is active
@@ -195,10 +250,7 @@ def refresh_folder_structure(n_clicks: int, filter_text: str):
             filter_text, style={"color": "blue", "fontWeight": "bold"}
         )
         confirmation_message = html.Div(
-            [
-                "Filter applied: ",
-                styled_text_span,
-            ],
+            ["Filter applied: ", styled_text_span],
             style={"marginTop": "10px"},
         )
         return (scan_folders(DATA_DIR, filter_text=filter_text), confirmation_message)
@@ -207,13 +259,76 @@ def refresh_folder_structure(n_clicks: int, filter_text: str):
 
 
 @app.callback(
+    Output({"type": "starred-item", "label": ALL}, "style"),
+    Input({"type": "starred-item", "label": ALL}, "n_clicks"),
+)
+def update_styles(starred):
+    """
+    Callback to highlight a clicked starred measurement
+
+    Args:
+        starred: Unused, the number of clicks for all items
+
+    Returns:
+
+    """
+
+    triggered_id = ctx.triggered_id
+
+    active_style = {"cursor": "pointer", "backgroundColor": "#fff3b0", "margin": "5px"}
+    base_style = {"cursor": "pointer", "backgroundColor": "#ffffff", "margin": "5px"}
+
+    if not triggered_id:
+        return [base_style for item in ctx.outputs_list]
+
+    if triggered_id.get("type") == "starred-item":
+        active_label = triggered_id["label"]
+
+    style_list = []
+    for item in ctx.outputs_list:
+        label = item["id"]["label"]
+        if label == active_label:
+            style_list.append(active_style)
+        else:
+            style_list.append(base_style)
+
+    return style_list
+
+
+@app.callback(
+    Output({"type": "starred-list", "index": MATCH}, "children"),
+    Input({"type": "starred-store", "index": MATCH}, "data"),
+    prevent_initial_call=True,
+)
+def display_starred(starred):
+    if not starred:
+        return "No starred items yet."
+
+    list_items = []
+    for item in starred:
+        style = {"cursor": "pointer", "margin": "5px"}
+        list_item = html.Li(
+            f"⭐ {item}",
+            id={"type": "starred-item", "label": item},
+            style=style,
+        )
+        list_items.append(list_item)
+
+    u_list = html.Ul(list_items)
+
+    return u_list
+
+
+@app.callback(
     Output({"type": "tab-content", "index": MATCH}, "children"),
     Input({"type": "tabs", "index": MATCH}, "value"),
     Input({"type": "outer-selector", "index": MATCH}, "value"),
     Input({"type": "intermediate-selector", "index": MATCH}, "value"),
     Input({"type": "inner-selector", "index": MATCH}, "value"),
+    Input({"type": "starred-item", "label": ALL}, "n_clicks"),
+    prevent_initial_call=True,
 )
-def update_tab(tab: str, outer: str, inter: str, inner: str):
+def update_tab(tab: str, outer: str, inter: str, inner: str, starred):
     """
     Callback to update the tab content with the calibration image and qubit data
 
@@ -227,10 +342,17 @@ def update_tab(tab: str, outer: str, inter: str, inner: str):
 
     """
 
-    if not (outer and inter and inner):
+    triggered_id = ctx.triggered_id
+    triggered = ctx.triggered
+
+    clicked = triggered_id and "label" in triggered_id
+    if not (outer and inter and inner) and not clicked:
         return "Please make all selections."
 
-    folder_path = os.path.join(DATA_DIR, outer, inter, inner)
+    if triggered_id and triggered_id.get("type") == "starred-item":
+        folder_path = os.path.join(DATA_DIR, triggered_id["label"])
+    else:
+        folder_path = os.path.join(DATA_DIR, outer, inter, inner)
 
     if tab == "image":
         image_names = []
@@ -247,9 +369,8 @@ def update_tab(tab: str, outer: str, inter: str, inner: str):
             )
         graph_previews = []
         for image_local_path in image_names:
-            encoded = base64.b64encode(
-                open(os.path.join(folder_path, image_local_path), "rb").read()
-            ).decode()
+            image_path = os.path.join(folder_path, image_local_path)
+            encoded = base64.b64encode(open(image_path, "rb").read()).decode()
             html_image_element = html.Img(
                 src=f"data:image/png;base64,{encoded}", style={"maxWidth": "100%"}
             )
@@ -259,33 +380,33 @@ def update_tab(tab: str, outer: str, inter: str, inner: str):
         return "No image found."
 
     elif tab == "json":
+        json_box_style = {
+            "flex": "1",
+            "minWidth": "300px",  # responsive: wrap if too narrow
+            "overflow": "auto",
+            "padding": "10px",
+            "border": "1px solid #ddd",
+            "borderRadius": "6px",
+        }
         for file in os.listdir(folder_path):
             if file.endswith(".json") and "qoi" not in file:
                 with open(os.path.join(folder_path, file)) as f:
                     data = json.load(f)
                 columns = []
                 for key in data:
-                    columns.append(
-                        html.Div(
-                            style={
-                                "flex": "1",
-                                "minWidth": "300px",  # responsive: wrap if too narrow
-                                "overflow": "auto",
-                                "padding": "10px",
-                                "border": "1px solid #ddd",
-                                "borderRadius": "6px",
-                            },
-                            children=[
-                                html.H4(key),
-                                DashRenderjson(
-                                    id=f"json-view-{key}",
-                                    data=data[key]["data"],
-                                    max_depth=1,  # collapse nested content initially
-                                    invert_theme=True,
-                                ),
-                            ],
-                        )
+                    element_json_box = html.Div(
+                        style=json_box_style,
+                        children=[
+                            html.H4(key),
+                            DashRenderjson(
+                                id=f"json-view-{key}",
+                                data=data[key]["data"],
+                                max_depth=1,  # collapse nested content initially
+                                invert_theme=True,
+                            ),
+                        ],
                     )
+                    columns.append(element_json_box)
                 json_view = html.Div(
                     columns,
                     style={
@@ -347,14 +468,8 @@ def display_element_selector(
 
 
 @app.callback(
-    [
-        Output(
-            {"type": "dataset-container", "index": MATCH},
-            "children",
-            # allow_duplicate=True,
-        ),
-        Output({"type": "y-dim-selector", "index": MATCH}, "options"),
-    ],
+    Output({"type": "dataset-container", "index": MATCH}, "children"),
+    Output({"type": "y-dim-selector", "index": MATCH}, "options"),
     Input({"type": "element-selector", "index": MATCH}, "value"),
     State({"type": "full-dataset", "index": MATCH}, "data"),
 )
@@ -367,6 +482,13 @@ def filter_dataset_by_element(selected_elements: list, dataset_json: str):
         ds = xr.Dataset.from_dict(json.loads(dataset_json))
         displays = []
         y_dim_options = set()
+        styles = dict(
+            mirror=True,
+            ticks="outside",
+            showline=True,
+            linecolor="black",
+            gridcolor="lightgrey",
+        )
         for el in selected_elements:
             filtered_ds = ds.filter_by_attrs(element=el)
             if "ReIm" in filtered_ds.dims:
@@ -381,13 +503,7 @@ def filter_dataset_by_element(selected_elements: list, dataset_json: str):
                         x=da.coords[da.dims[0]], y=abs(da), title=var, markers=True
                     )
                     fig.update_layout(plot_bgcolor="white")
-                    fig.update_xaxes(
-                        mirror=True,
-                        ticks="outside",
-                        showline=True,
-                        linecolor="black",
-                        gridcolor="lightgrey",
-                    )
+                    fig.update_xaxes(styles)
                     fig.update_yaxes(
                         mirror=True,
                         ticks="outside",
@@ -421,29 +537,46 @@ def filter_dataset_by_element(selected_elements: list, dataset_json: str):
     except Exception as e:
         return [[f"Error filtering dataset: {e}"], []]
 
+@app.callback(
+    Output({"type": "outer-selector", "index": MATCH}, "value"),
+    State({"type": "outer-selector", "index": MATCH}, "value"),
+    Input({"type": "starred-item", "label": ALL}, "n_clicks"),
+    prevent_initial_call=True,
+)
+def reset_outer_on_clicked_starred(inter_value: str, n_clicks):
+    """
+    Clears the outer (date) selection when a starred item is clicked.
+    """
+
+    return None  # This clears the inner folder selection
 
 @app.callback(
     Output({"type": "inner-selector", "index": MATCH}, "value"),
     Input({"type": "intermediate-selector", "index": MATCH}, "value"),
+    Input({"type": "starred-item", "label": ALL}, "n_clicks"),
     prevent_initial_call=True,
 )
-def reset_inner_on_inter_change(inter_value: str):
+def reset_inner_on_inter_change(inter_value: str, n_clicks):
     """
     prevents callback errors when the inner (node measurement)
-    folder has changed but not the intermediate (calibration chain folder)
+    folder has changed but not the intermediate (calibration chain folder).
+    Also clears the selection when a starred item is clicked.
     """
+
     return None  # This clears the inner folder selection
 
 
 @app.callback(
     Output({"type": "intermediate-selector", "index": MATCH}, "value"),
     Input({"type": "outer-selector", "index": MATCH}, "value"),
+    Input({"type": "starred-item", "label": ALL}, "n_clicks"),
     prevent_initial_call=True,
 )
-def reset_intermediate_on_outer_change(inter_value: str):
+def reset_intermediate_on_outer_change(inter_value: str, n_clicks):
     """
     prevents callback errors when the intermediate (calibration chain folder)
-    folder has changed but not the outer (date folder)
+    folder has changed but not the outer (date folder).
+    Also clears the selection when a starred item is clicked.
     """
     return None  # This clears the intermediate folder selection
 
@@ -507,3 +640,8 @@ def plot_y_slice(y_dim_value: str, selected_elements: str, dataset_json: str):
         return displays
     except Exception as e:
         return [f"Error plotting y slice: {e}"]
+
+
+if __name__ == "__main__":
+    port = int(sys.argv[1]) if len(sys.argv) > 1 else 8050
+    app.run(debug=True, port=port)
