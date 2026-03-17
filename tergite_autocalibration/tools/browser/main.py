@@ -263,7 +263,7 @@ def refresh_folder_structure(n_clicks: int, filter_text: str):
     Output({"type": "starred-item", "label": ALL}, "style"),
     Input({"type": "starred-item", "label": ALL}, "n_clicks"),
 )
-def update_styles(starred):
+def update_styles(starred: int):
     """
     Callback to highlight a clicked starred measurement
 
