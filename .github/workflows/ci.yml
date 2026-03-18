@@ -61,11 +61,6 @@ jobs:
           python --version
           pip install .
           pip install build twine
-      - name: Deploy docs
-        if: ${{ vars.SHOULD_PUBLISH_DOCS == 'true' }}
-        run: |
-          source .venv/bin/activate
-          mkdocs gh-deploy --force
       - name: Build
         run: python -m build
       - name: Publish to Test pypi

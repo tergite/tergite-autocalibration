@@ -16,7 +16,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tergite-autocalibration"
-version = "2025.09.0"
+version = "2026.03.0"
 description = "Commandline application to calibrate the WACQT quantum computers automatically"
 readme = "README.md"
 authors = [
@@ -69,6 +69,7 @@ dependencies = [
     "pydantic==2.9.2",
     "dash>=3.1.1",
     "dash-renderjson>=0.0.1",
+    "dash-bootstrap-components==2.0.4",
     "networkx==3.4.2" # TODO: This can be removed when updating to newer versions of quantify scheduler
 ]
 
