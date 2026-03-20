@@ -47,8 +47,8 @@ class QubitSpectroscopyVsCurrentNode(CouplerNode):
     """
 
     name: str = "coupler_anticrossing"
-    measurement_obj = TwoTonesMultidimMeasurement
-    analysis_obj = CouplerAnticrossingNodeAnalysis
+    measurement_obj = CouplerSpectroscopyMeasurement
+    analysis_obj = CouplerSpectroscopyNodeAnalysis
     measurement_type = ExternalParameterNode
     coupler_qois = ["control_qubit_crossing_points", "target_qubit_crossing_points"]
 
@@ -56,7 +56,6 @@ class QubitSpectroscopyVsCurrentNode(CouplerNode):
         super().__init__(couplers, **schedule_keywords)
         self.qubit_state = 0
         self.dacs = []
-        self.schedule_keywords["qubit_state"] = self.qubit_state
 
         self.schedule_samplespace = {
             "spec_frequencies": {
@@ -118,53 +117,3 @@ class QubitSpectroscopyVsCurrentNode(CouplerNode):
             # Add the DataArray to the Dataset with an integer name (converted to string)
             dataset[index] = data_array
         return dataset
-
-
-class ResonatorSpectroscopyVsCurrentNode(CouplerNode):
-    """
-    This node performs a resonator spectroscopy measurement while varying the
-    current through the coupler to measure the crossing point of the coupler with the resonator.
-    """
-
-    name: str = "resonator_spectroscopy_vs_current"
-    measurement_obj = ResonatorSpectroscopyMeasurement
-    analysis_obj = ResonatorSpectroscopyVsCurrentNodeAnalysis
-    measurement_type = ExternalParameterNode
-    coupler_qois = [
-        "control_resonator_crossing_points",
-        "target_resonator_crossing_points",
-    ]
-
-    def __init__(self, couplers: list[str], **schedule_keywords):
-        super().__init__(couplers, **schedule_keywords)
-        self.qubit_state = 0
-        self.dacs = []
-
-        self.schedule_samplespace = {
-            "ro_frequencies": {
-                qubit: resonator_samples(qubit) for qubit in self.all_qubits
-            }
-        }
-
-        self.external_samplespace = {
-            "dc_currents": {
-                coupler: np.arange(-1e-3, 1e-3, 50e-6) for coupler in self.couplers
-            },
-        }
-        self.validate()
-
-    def initial_operation(self):
-        pass
-
-    def pre_measurement_operation(self, reduced_ext_space):
-        first_coupler = self.couplers[0]
-        self.this_current = reduced_ext_space["dc_currents"][first_coupler]
-        self.spi_manager.set_dac_current(reduced_ext_space["dc_currents"])
-
-    def final_operation(self):
-        logger.info("Final Operation")
-        currents = {}
-        for coupler in self.couplers:
-            currents[coupler] = 0
-
-        self.spi_manager.set_dac_current(currents)
