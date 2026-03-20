@@ -345,7 +345,6 @@ def update_tab(tab: str, outer: str, inter: str, inner: str, starred):
     """
 
     triggered_id = ctx.triggered_id
-    triggered = ctx.triggered
 
     clicked = triggered_id and "label" in triggered_id
     if not (outer and inter and inner) and not clicked:
@@ -353,10 +352,11 @@ def update_tab(tab: str, outer: str, inter: str, inner: str, starred):
 
     if triggered_id and triggered_id.get("type") == "starred-item":
         folder_path = os.path.join(DATA_DIR, triggered_id["label"])
-    else:
+    elif outer and inter and inner:
         folder_path = os.path.join(DATA_DIR, outer, inter, inner)
+    else:
+        return "Please make all selections."
 
-    print(f'{ folder_path = }')
     if tab == "image":
         image_names = []
         for file in os.listdir(folder_path):
