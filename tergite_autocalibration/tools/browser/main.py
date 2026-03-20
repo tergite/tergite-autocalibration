@@ -18,15 +18,16 @@ import re
 import sys
 
 import dash
+import dash_bootstrap_components as dbc
 import plotly.express as px
 import xarray as xr
 from dash import ctx, dcc, html
-import dash_bootstrap_components as dbc
-from dash.dependencies import MATCH, Input, Output, State, ALL
+from dash.dependencies import ALL, MATCH, Input, Output, State
 from dash_renderjson import DashRenderjson
 
 from tergite_autocalibration.config.globals import DATA_DIR
-from tergite_autocalibration.tools.browser.layout import generate_selection_layout
+from tergite_autocalibration.tools.browser.layout import \
+    generate_selection_layout
 from tergite_autocalibration.tools.browser.utils import scan_folders
 
 folder_structure = scan_folders(DATA_DIR)
@@ -355,6 +356,7 @@ def update_tab(tab: str, outer: str, inter: str, inner: str, starred):
     else:
         folder_path = os.path.join(DATA_DIR, outer, inter, inner)
 
+    print(f'{ folder_path = }')
     if tab == "image":
         image_names = []
         for file in os.listdir(folder_path):
@@ -393,6 +395,7 @@ def update_tab(tab: str, outer: str, inter: str, inner: str, starred):
             if file.endswith(".json") and "qoi" not in file:
                 with open(os.path.join(folder_path, file)) as f:
                     data = json.load(f)
+                # NOTE: the following should be out of the if scope?
                 columns = []
                 for key in data:
                     element_json_box = html.Div(
@@ -461,11 +464,8 @@ def display_element_selector(
                 # return f"HDF5 File: {hdf5_files[0]}", ds_json, element_options
             except Exception as e:
                 return [json.dumps({"error": str(e)}), []]
-                # return f"HDF5 File: {hdf5_files[0]}", json.dumps({"error": str(e)}), []
         return [{}, []]
-        # return "No HDF5 file found.", "{}", []
     return [{}, []]
-    # return "", "{}", []
 
 
 @app.callback(
@@ -505,13 +505,7 @@ def filter_dataset_by_element(selected_elements: list, dataset_json: str):
                     )
                     fig.update_layout(plot_bgcolor="white")
                     fig.update_xaxes(styles)
-                    fig.update_yaxes(
-                        mirror=True,
-                        ticks="outside",
-                        showline=True,
-                        linecolor="black",
-                        gridcolor="lightgrey",
-                    )
+                    fig.update_yaxes(styles)
                     displays.append(
                         dcc.Graph(
                             figure=fig,
@@ -549,7 +543,6 @@ def reset_outer_on_clicked_starred(inter_value: str, n_clicks):
     """
     Clears the outer (date) selection when a starred item is clicked.
     """
-
     return None  # This clears the inner folder selection
 
 
@@ -565,7 +558,6 @@ def reset_inner_on_inter_change(inter_value: str, n_clicks):
     folder has changed but not the intermediate (calibration chain folder).
     Also clears the selection when a starred item is clicked.
     """
-
     return None  # This clears the inner folder selection
 
 
