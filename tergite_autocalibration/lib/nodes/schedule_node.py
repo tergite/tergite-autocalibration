@@ -78,7 +78,7 @@ class OuterScheduleNode(MeasurementType):
                 measurement=(this_interation_index, all_iterations),
             )
 
-            if isinstance(current_value, (list, tuple)):  # for cz calibration
+            if self.node.name == "cz_calibration":
                 # This handles multiindex objects.
                 # Example is the cz_calibration node where the outer coordinate
                 # is a multiindex object cosisting of frequency and duartion pairs
