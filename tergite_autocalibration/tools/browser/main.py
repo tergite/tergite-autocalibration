@@ -26,8 +26,7 @@ from dash.dependencies import ALL, MATCH, Input, Output, State
 from dash_renderjson import DashRenderjson
 
 from tergite_autocalibration.config.globals import DATA_DIR
-from tergite_autocalibration.tools.browser.layout import \
-    generate_selection_layout
+from tergite_autocalibration.tools.browser.layout import generate_selection_layout
 from tergite_autocalibration.tools.browser.utils import scan_folders
 
 folder_structure = scan_folders(DATA_DIR)
