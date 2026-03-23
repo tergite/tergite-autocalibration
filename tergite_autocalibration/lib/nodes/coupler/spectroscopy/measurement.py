@@ -1,6 +1,7 @@
 # This code is part of Tergite
 #
 # (C) Copyright Eleftherios Moschandreou 2026
+# (C) Copyright Chalmers Next Labs 2026
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -13,17 +14,18 @@
 
 import numpy as np
 from quantify_scheduler.enums import BinMode
-from quantify_scheduler.operations.gate_library import Measure, Reset, X
+from quantify_scheduler.operations.acquisition_library import SSBIntegrationComplex
+from quantify_scheduler.operations.gate_library import Measure, Reset
 from quantify_scheduler.operations.pulse_factories import long_square_pulse
 from quantify_scheduler.operations.pulse_library import (
     SetClockFrequency,
     SoftSquarePulse,
+    SquarePulse,
 )
 from quantify_scheduler.resources import ClockResource
 from quantify_scheduler.schedules.schedule import Schedule
 
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
-from tergite_autocalibration.utils.dto.extended_gates import Measure_RO1
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 from tergite_autocalibration.utils.logging import logger
 
@@ -104,7 +106,22 @@ class CouplerSpectroscopyMeasurement(BaseMeasurement):
                 schedule.add(Reset(this_qubit))
 
         for this_qubit, ro_frequencies in resonator_frequencies_dict.items():
-            for acq_index, ro_frequency in enumerate(ro_frequencies):
+            qubit_frequencies = qubit_frequencies_dict[this_qubit]
+            number_of_frequencies = len(qubit_frequencies)
+
+            # unpack the static parameters
+            this_transmon = self.transmons[this_qubit]
+            ro_pulse_amplitude = this_transmon.measure.pulse_amp()
+            ro_pulse_duration = this_transmon.measure.pulse_duration()
+            acq_channel = this_transmon.measure.acq_channel()
+            mw_pulse_port = this_transmon.ports.microwave()
+            acquisition_delay = this_transmon.measure.acq_delay()
+            integration_time = this_transmon.measure.integration_time()
+            ro_port = this_transmon.ports.readout()
+            this_ro_clock = f"{this_qubit}.ro"
+
+            for ro_index, ro_frequency in enumerate(ro_frequencies):
+                acq_index = number_of_frequencies + ro_index
                 schedule.add(
                     SetClockFrequency(clock=this_ro_clock, clock_freq_new=ro_frequency),
                 )
@@ -124,7 +141,7 @@ class CouplerSpectroscopyMeasurement(BaseMeasurement):
                         port=ro_port,
                         clock=this_ro_clock,
                         acq_index=acq_index,
-                        acq_channel=acq_cha,
+                        acq_channel=acq_channel,
                         bin_mode=BinMode.AVERAGE,
                     ),
                     ref_op=ro_pulse,

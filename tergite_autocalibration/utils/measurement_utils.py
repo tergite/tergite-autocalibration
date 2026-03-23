@@ -56,7 +56,9 @@ def reduce_samplespace(iteration: int, samplespace: dict) -> dict:
     return reduced_samplespace
 
 
-def samplespace_dimensions(samplespace: dict, loops=None) -> list[int]:
+def samplespace_dimensions(
+    samplespace: dict, loops=None, samplespace_structure="orthogonal"
+) -> list[int]:
     """
     example of a samplespace:
     samplespace = {
@@ -82,7 +84,11 @@ def samplespace_dimensions(samplespace: dict, loops=None) -> list[int]:
         settable_values = samplespace[quantity][first_element]
         if not isinstance(settable_values, Iterable):
             settable_values = numpy.array([settable_values])
+
         dimensions.append(len(settable_values))
+
+    if samplespace_structure == "parallel":
+        dimensions = [sum(dimensions)]
 
     if loops is not None:
         dimensions.append(loops)

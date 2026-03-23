@@ -16,12 +16,11 @@
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Literal, Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal, Tuple
 
 import matplotlib
 import numpy as np
 import xarray
-
 
 from tergite_autocalibration.config.globals import PLOTTING_BACKEND, REDIS_CONNECTION
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
@@ -70,6 +69,7 @@ class BaseNode(ABC):
         self.external_samplespace = {}
         self.redis_fields = []
         self.all_qubits = []
+        self.samplespace_structure = "orthogonal"
 
         # These may be modified while the node runs
         self.outer_schedule_samplespace = {}
@@ -183,7 +183,9 @@ class BaseNode(ABC):
             key_indx = key % n_qubits  # this is to handle ro_opt_frequencies node where
             coords_dict = {}
             measured_qubit = measurement_qubits[key_indx]
-            dimensions = samplespace_dimensions(samplespace, self.loops)
+            dimensions = samplespace_dimensions(
+                samplespace, self.loops, self.samplespace_structure
+            )
 
             for quantity in sweep_quantities:
                 # eg settable_elements -> ['q1','q2',...] or ['q1_q2','q3_q4',...] :

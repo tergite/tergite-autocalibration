@@ -19,7 +19,7 @@ from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.node import (
     CZParametrizationNode,
 )
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.node import (
-    QubitSpectroscopyVsCurrentNode,
+    CouplerDCSpectroscopyNode,
 )
 from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.node import (
     ResonatorSpectroscopyNode,
@@ -73,7 +73,7 @@ def test_configure_dataset_qubits():
 
 def test_configure_dataset_couplers():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node_0 = QubitSpectroscopyVsCurrentNode(CONFIG.run.couplers)
+    node_0 = CouplerDCSpectroscopyNode(CONFIG.run.couplers)
     node_0.this_current = 5e-6
 
     raw_ds = node_0.generate_dummy_dataset()
