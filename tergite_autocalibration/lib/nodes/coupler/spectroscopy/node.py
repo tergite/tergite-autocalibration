@@ -18,18 +18,11 @@ from lmfit.models import LorentzianModel
 
 from tergite_autocalibration.config.globals import CONFIG
 from tergite_autocalibration.lib.base.node import CouplerNode
-from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
-    CouplerAnticrossingNodeAnalysis,
-    ResonatorSpectroscopyVsCurrentNodeAnalysis,
+from tergite_autocalibration.lib.nodes.coupler.spectroscopy.measurement import (
+    CouplerSpectroscopyMeasurement,
 )
 from tergite_autocalibration.lib.nodes.external_parameter_node import (
     ExternalParameterNode,
-)
-from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement import (
-    TwoTonesMultidimMeasurement,
-)
-from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.measurement import (
-    ResonatorSpectroscopyMeasurement,
 )
 from tergite_autocalibration.lib.utils.samplespace import (
     qubit_samples,
@@ -54,13 +47,14 @@ class QubitSpectroscopyVsCurrentNode(CouplerNode):
 
     def __init__(self, couplers: list[str], **schedule_keywords):
         super().__init__(couplers, **schedule_keywords)
-        self.qubit_state = 0
-        self.dacs = []
 
         self.schedule_samplespace = {
-            "spec_frequencies": {
+            "qubit_frequencies": {
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
-            }
+            },
+            "resonator_frequencies": {
+                qubit: resonator_samples(qubit) for qubit in self.all_qubits
+            },
         }
 
         self.external_samplespace = {
