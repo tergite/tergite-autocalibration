@@ -185,7 +185,6 @@ class IQMixerCalibration:
                     "VNA_f01_frequency"
                 ]
             elif self.rf_port == "fl":
-                breakpoint()
                 cz_pulse_frequency = float(
                     REDIS_CONNECTION.hget(f"couplers:{device}", "cz_pulse_frequency")
                 )
@@ -198,7 +197,6 @@ class IQMixerCalibration:
             else:
                 raise ValueError(f"Unknown rf_port value: {self.rf_port}")
 
-            breakpoint()
             rf_freqs_[device] = float(rf_freq)
         return rf_freqs_
 

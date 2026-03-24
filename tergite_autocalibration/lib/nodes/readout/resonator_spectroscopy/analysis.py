@@ -154,7 +154,6 @@ class ResonatorSpectroscopy1QubitAnalysis(ResonatorSpectroscopyQubitAnalysis):
         return qoi
 
     def plotter(self, ax):
-        # breakpoint()
         this_qubit = self.dataset.attrs["qubit"]
         ax.set_xlabel("Frequency (Hz)")
         ax.set_ylabel("|S21| (V)")
