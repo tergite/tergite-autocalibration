@@ -61,7 +61,7 @@ def test_align_cliffords():
         ("mY90", "q1"),
     ]
 
-    grouped_gate_decomposition = cz_rb_measurement.allign_cliffords(
+    grouped_gate_decomposition = cz_rb_measurement.align_cliffords(
         couplers[0], cliff_gate_decomposition
     )
 
