@@ -30,7 +30,7 @@ RB_REPEATS = 7
 
 
 class CZRBNode(CouplerNode):
-    name = "two_qubit_rb"
+    name = "cz_rb"
     measurement_obj = CZRBMeasurement
     analysis_obj = CZRBNodeAnalysis
     measurement_type = OuterScheduleNode
