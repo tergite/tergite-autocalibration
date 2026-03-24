@@ -19,20 +19,20 @@ import xarray as xr
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.lib.base.node import CouplerNode
 from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.analysis import (
-    TwoQubitRBNodeAnalysis,
+    CZRBNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.measurement import (
-    TwoQubitRBMeasurement,
+    CZRBMeasurement,
 )
 from tergite_autocalibration.lib.nodes.schedule_node import OuterScheduleNode
 
 RB_REPEATS = 7
 
 
-class Two_Qubit_RB_Node(CouplerNode):
+class CZRBNode(CouplerNode):
     name = "two_qubit_rb"
-    measurement_obj = TwoQubitRBMeasurement
-    analysis_obj = TwoQubitRBNodeAnalysis
+    measurement_obj = CZRBMeasurement
+    analysis_obj = CZRBNodeAnalysis
     measurement_type = OuterScheduleNode
     coupler_qois = ["cz_fidelity"]
 

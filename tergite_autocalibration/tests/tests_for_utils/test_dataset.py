@@ -22,7 +22,7 @@ import xarray as xr
 import tergite_autocalibration.utils.reanalysis_utils as ra_utils
 from tergite_autocalibration.config.globals import CONFIG
 from tergite_autocalibration.lib.nodes.coupler.cz_calibration.node import (
-    CZ_CalibrationNode,
+    CZCalibrationNode,
 )
 from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.node import (
     ResonatorSpectroscopyNode,
@@ -174,7 +174,7 @@ def test_save_dataset_with_working_points(tmp_path):
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
     coupler = "q13_q14"
     couplers = [coupler]
-    node = CZ_CalibrationNode(all_qubits=["q13", "q14"], couplers=couplers)
+    node = CZCalibrationNode(all_qubits=["q13", "q14"], couplers=couplers)
 
     dummy_raw_dataset_1 = node.generate_dummy_dataset()
     result_dataset_1 = node.configure_dataset(dummy_raw_dataset_1)

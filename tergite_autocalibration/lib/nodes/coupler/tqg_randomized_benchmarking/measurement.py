@@ -45,7 +45,7 @@ DOWNCONVERT_FREQ = 4.4e9
 IDLE_TIME = 12e-9
 
 
-class TwoQubitRBMeasurement(BaseMeasurement):
+class CZRBMeasurement(BaseMeasurement):
 
     def __init__(
         self,

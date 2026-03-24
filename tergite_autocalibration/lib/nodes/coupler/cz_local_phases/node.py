@@ -18,18 +18,18 @@ import xarray as xr
 
 from tergite_autocalibration.lib.base.node import CouplerNode
 from tergite_autocalibration.lib.nodes.coupler.cz_local_phases.analysis import (
-    CZ_LocalPhasesNodeAnalysis,
+    CZLocalPhasesNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.coupler.cz_local_phases.measurement import (
-    CZ_LocalPhasesMeasurement,
+    CZLocalPhasesMeasurement,
 )
 from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 
 
-class CZ_LocalPhasesNode(CouplerNode):
+class CZLocalPhasesNode(CouplerNode):
     name: str = "cz_local_phases"
-    measurement_obj = CZ_LocalPhasesMeasurement
-    analysis_obj = CZ_LocalPhasesNodeAnalysis
+    measurement_obj = CZLocalPhasesMeasurement
+    analysis_obj = CZLocalPhasesNodeAnalysis
     measurement_type = ScheduleNode
     coupler_qois = ["control_local_phase", "target_local_phase"]
 

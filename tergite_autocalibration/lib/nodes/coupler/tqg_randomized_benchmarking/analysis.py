@@ -12,6 +12,7 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
+
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
@@ -27,7 +28,7 @@ from tergite_autocalibration.lib.utils.classification_functions import (
 from tergite_autocalibration.utils.dto.qoi import QOI
 
 
-class TwoQubitRBCouplerAnalysis(BaseCouplerAnalysis):
+class CZRBCouplerAnalysis(BaseCouplerAnalysis):
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
@@ -400,8 +401,8 @@ class TwoQubitRBCouplerAnalysis(BaseCouplerAnalysis):
         figures_dictionary[self.coupler] = [fig]
 
 
-class TwoQubitRBNodeAnalysis(BaseAllCouplersAnalysis):
-    single_coupler_analysis_obj = TwoQubitRBCouplerAnalysis
+class CZRBNodeAnalysis(BaseAllCouplersAnalysis):
+    single_coupler_analysis_obj = CZRBCouplerAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)

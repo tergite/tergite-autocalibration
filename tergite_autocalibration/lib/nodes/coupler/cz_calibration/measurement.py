@@ -36,7 +36,7 @@ from tergite_autocalibration.utils.dto.extended_gates import Measure_RO_3state_O
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
-class CZ_CalibrationMeasurement(BaseMeasurement):
+class CZCalibrationMeasurement(BaseMeasurement):
     def __init__(
         self,
         transmons: dict[str, ExtendedTransmon],
