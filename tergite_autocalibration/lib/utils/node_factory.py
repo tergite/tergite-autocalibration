@@ -67,7 +67,7 @@ class NodeFactory:
             "cz_chevron": "CZChevronNode",
             "cz_calibration": "CZ_CalibrationNode",
             "cz_local_phases": "CZ_LocalPhasesNode",
-            "cz_rb": "CZ_RB_Node",
+            "two_qubit_rb": "Two_Qubit_RB_Node",
             "resonator_spectroscopy_vs_current": "ResonatorSpectroscopyVsCurrentNode",
             "three_state_discrimination": "ThreeStateDiscriminationNode",
         }

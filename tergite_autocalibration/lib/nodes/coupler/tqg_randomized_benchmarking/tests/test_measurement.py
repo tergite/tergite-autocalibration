@@ -20,7 +20,7 @@ from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.measu
     TwoQubitRBMeasurement,
 )
 from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.node import (
-    CZ_RB_Node,
+    Two_Qubit_RB_Node,
 )
 from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.utils.two_qubit_clifford_group import (
     TwoQubitClifford,
@@ -39,7 +39,7 @@ def test_align_cliffords():
     couplers = ["q13_q14"]
     clifford_gate_index = 9799
 
-    node = CZ_RB_Node(all_qubits=qubits, couplers=couplers)
+    node = Two_Qubit_RB_Node(all_qubits=qubits, couplers=couplers)
     transmons_dict = {qubit: node.device.get_element(qubit) for qubit in qubits}
     edges_dict = {coupler: node.device.get_edge(coupler) for coupler in couplers}
     cz_rb_measurement = TwoQubitRBMeasurement(

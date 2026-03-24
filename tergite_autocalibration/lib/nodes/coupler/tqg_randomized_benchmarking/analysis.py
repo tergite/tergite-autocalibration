@@ -27,7 +27,7 @@ from tergite_autocalibration.lib.utils.classification_functions import (
 from tergite_autocalibration.utils.dto.qoi import QOI
 
 
-class TwoQubitRnBCouplerAnalysis(BaseCouplerAnalysis):
+class TwoQubitRBCouplerAnalysis(BaseCouplerAnalysis):
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
@@ -401,7 +401,7 @@ class TwoQubitRnBCouplerAnalysis(BaseCouplerAnalysis):
 
 
 class TwoQubitRBNodeAnalysis(BaseAllCouplersAnalysis):
-    single_coupler_analysis_obj = TwoQubitRnBCouplerAnalysis
+    single_coupler_analysis_obj = TwoQubitRBCouplerAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)

@@ -29,7 +29,7 @@ from tergite_autocalibration.lib.nodes.schedule_node import OuterScheduleNode
 RB_REPEATS = 7
 
 
-class CZ_RB_Node(CouplerNode):
+class Two_Qubit_RB_Node(CouplerNode):
     name = "cz_rb"
     measurement_obj = TwoQubitRBMeasurement
     analysis_obj = TwoQubitRBNodeAnalysis
