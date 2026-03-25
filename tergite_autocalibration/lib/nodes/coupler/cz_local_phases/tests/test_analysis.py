@@ -18,7 +18,7 @@ import pytest
 import xarray as xr
 
 from tergite_autocalibration.lib.nodes.coupler.cz_local_phases.analysis import (
-    CZ_LocalPhasesCouplerAnalysis,
+    CZLocalPhasesCouplerAnalysis,
 )
 from tergite_autocalibration.tests.utils.decorators import with_redis
 
@@ -31,7 +31,7 @@ def test_cz_local_phases():
     file_path = os.path.join(_test_data_dir, "dataset_cz_local_phases.hdf5")
     dataset = xr.open_dataset(file_path)
 
-    analysis = CZ_LocalPhasesCouplerAnalysis(
+    analysis = CZLocalPhasesCouplerAnalysis(
         "cz_calibration",
         ["cz_pulse_frequency", "cz_pulse_duration", "cz_phase"],
     )
@@ -53,7 +53,7 @@ def test_plotting():
     file_path = os.path.join(_test_data_dir, "dataset_cz_local_phases.hdf5")
     dataset = xr.open_dataset(file_path)
 
-    analysis = CZ_LocalPhasesCouplerAnalysis(
+    analysis = CZLocalPhasesCouplerAnalysis(
         "cz_calibration",
         ["cz_pulse_frequency", "cz_pulse_duration", "cz_phase"],
     )

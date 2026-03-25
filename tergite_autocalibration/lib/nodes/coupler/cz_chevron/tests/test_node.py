@@ -29,7 +29,10 @@ from tergite_autocalibration.utils.dto.extended_transmon_element import Extended
 def test_node_creation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
     coupler = "q13_q14"
-    REDIS_CONNECTION.hset(f"couplers:{coupler}", "parking_current", "100e-6")
+    REDIS_CONNECTION.hset(f"couplers:{coupler}", "initial_parking_current", "100e-6")
+    REDIS_CONNECTION.hset(f"couplers:{coupler}", "cz_half_duration", "92e-9")
+    REDIS_CONNECTION.hset(f"couplers:{coupler}", "control_qubit", "q13")
+    REDIS_CONNECTION.hset(f"couplers:{coupler}", "target_qubit", "q14")
     REDIS_CONNECTION.hset(f"transmons:{'q13'}", "clock_freqs:f01", "4.2e6")
     REDIS_CONNECTION.hset(f"transmons:{'q13'}", "clock_freqs:f12", "4.0e6")
     REDIS_CONNECTION.hset(f"transmons:{'q14'}", "clock_freqs:f01", "5.2e6")
@@ -44,6 +47,7 @@ def test_node_creation():
 
 def test_class_attribute_objects():
     REDIS_CONNECTION.hset(f"couplers:{'q13_q14'}", "cz_pulse_frequency", "7.16e8")
+    REDIS_CONNECTION.hset(f"couplers:{'q13_q14'}", "cz_half_duration", "92e-9")
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
     node = CZChevronNode(all_qubits=["q13", "q14"], couplers=["q13_q14"])
     assert isinstance(node.measurement_obj, type(CZChevronMeasurement))
@@ -54,7 +58,13 @@ def test_class_attribute_objects():
 def test_dummy_generation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
     for coupler in CONFIG.run.couplers:
-        REDIS_CONNECTION.hset(f"couplers:{coupler}", "parking_current", "100e-6")
+        c_qubit, t_qubit = coupler.split("_")
+        REDIS_CONNECTION.hset(f"couplers:{coupler}", "cz_half_duration", "92e-9")
+        REDIS_CONNECTION.hset(f"couplers:{coupler}", "control_qubit", c_qubit)
+        REDIS_CONNECTION.hset(f"couplers:{coupler}", "target_qubit", t_qubit)
+        REDIS_CONNECTION.hset(
+            f"couplers:{coupler}", "initial_parking_current", "100e-6"
+        )
         REDIS_CONNECTION.hset(f"couplers:{coupler}", "cz_pulse_frequency", "7.16e8")
     for qubit in CONFIG.run.qubits[::2]:
         REDIS_CONNECTION.hset(f"transmons:{qubit}", "clock_freqs:f01", "4.2e6")

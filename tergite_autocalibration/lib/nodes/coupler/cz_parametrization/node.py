@@ -58,20 +58,23 @@ class CZParametrizationNode(CouplerNode):
 
         self.external_samplespace = {
             "dc_currents": {
-                coupler: self.fine_samplespace_around(self.parking_current(coupler))
+                coupler: self.single_point_around(self.parking_current(coupler))
                 for coupler in self.couplers
             },
         }
         self.schedule_samplespace = {
             "cz_pulse_amplitudes": {
-                coupler: np.linspace(0.35, 0.65, 25) for coupler in self.couplers
+                coupler: np.linspace(0.50, 0.95, 25) for coupler in self.couplers
             },
             "cz_pulse_frequencies": {
-                coupler: np.linspace(-11e6, 1e6, 25)
+                coupler: np.linspace(-10e6, 4e6, 28)
                 + self.transition_frequency(coupler, phase_path=phase_paths[coupler])
                 for coupler in self.couplers
             },
         }
+
+    def single_point_around(self, central_value: float) -> np.ndarray:
+        return np.array([central_value])
 
     def fine_samplespace_around(self, central_value: float) -> np.ndarray:
         return np.arange(central_value - 5e-6, central_value + 4.5e-6, 2e-6)
@@ -80,7 +83,9 @@ class CZParametrizationNode(CouplerNode):
         return np.arange(central_value - 50e-6, central_value + 45e-6, 8e-6)
 
     def parking_current(self, coupler: str):
-        return float(REDIS_CONNECTION.hget(f"couplers:{coupler}", "parking_current"))
+        return float(
+            REDIS_CONNECTION.hget(f"couplers:{coupler}", "initial_parking_current")
+        )
 
     def all_phase_paths(self) -> dict[str, Literal["via_02", "via_20"]]:
         phase_paths = {}

@@ -24,8 +24,8 @@ from tergite_autocalibration.lib.nodes.characterization.t2.analysis import (
     T2NodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.characterization.t2.measurement import (
-    T2Measurement,
     T2EchoMeasurement,
+    T2Measurement,
 )
 from tergite_autocalibration.lib.nodes.external_parameter_node import (
     ExternalParameterNode,
@@ -53,7 +53,7 @@ class T2Node(QubitNode):
         self.all_qubits = all_qubits  # Is this needed
 
         self.schedule_keywords = {
-            "multiplexing": "parallel"
+            "multiplexing": "one_by_one"
         }  # 'one_by_one' | 'parallel'
         self.number_or_repeated_t2s = 3
         self.sleep_time = 3
@@ -106,7 +106,7 @@ class T2EchoNode(QubitNode):
         self.backup = False
 
         self.schedule_keywords = {
-            "multiplexing": "parallel"
+            "multiplexing": "one_by_one"
         }  # 'one_by_one' | 'parallel'
         self.number_or_repeated_t2s = 3
         self.sleep_time = 3

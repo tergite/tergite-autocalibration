@@ -16,12 +16,11 @@
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Literal, Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal, Tuple
 
 import matplotlib
 import numpy as np
 import xarray
-
 
 from tergite_autocalibration.config.globals import PLOTTING_BACKEND, REDIS_CONNECTION
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
@@ -355,9 +354,12 @@ class CouplerNode(BaseNode):
         """
         currents_dict = {}
         for coupler in self.couplers:
-            parking_current = REDIS_CONNECTION.hget(
-                f"couplers:{coupler}", "parking_current"
+            parking_current = float(
+                REDIS_CONNECTION.hget(f"couplers:{coupler}", "parking_current")
             )
+            if np.isnan(parking_current):
+                logger.warning(f"nan current for coupler {coupler}")
+                return
             currents_dict[coupler] = parking_current
         logger.status("Setting updated DC currents")
         self.spi_manager.set_dac_current(currents_dict)
@@ -394,16 +396,18 @@ class CouplerNode(BaseNode):
     def transition_frequency(
         self, coupler: str, phase_path: Literal["via_20", "via_02"]
     ) -> float:
-        q1, q2 = coupler.split(sep="_")
-        q1_f01 = float(REDIS_CONNECTION.hget(f"transmons:{q1}", "clock_freqs:f01"))
-        q2_f01 = float(REDIS_CONNECTION.hget(f"transmons:{q2}", "clock_freqs:f01"))
-        q1_f12 = float(REDIS_CONNECTION.hget(f"transmons:{q1}", "clock_freqs:f12"))
-        q2_f12 = float(REDIS_CONNECTION.hget(f"transmons:{q2}", "clock_freqs:f12"))
+        qubit_roles = self.gate_qubit_types_dict()[coupler]
+        c_qubit = qubit_roles["control_qubit"]
+        t_qubit = qubit_roles["target_qubit"]
+        c_f01 = float(REDIS_CONNECTION.hget(f"transmons:{c_qubit}", "clock_freqs:f01"))
+        t_f01 = float(REDIS_CONNECTION.hget(f"transmons:{t_qubit}", "clock_freqs:f01"))
+        c_f12 = float(REDIS_CONNECTION.hget(f"transmons:{c_qubit}", "clock_freqs:f12"))
+        t_f12 = float(REDIS_CONNECTION.hget(f"transmons:{t_qubit}", "clock_freqs:f12"))
 
         if phase_path == "via_20":
-            ac_frequency = np.abs(q1_f01 + q2_f01 - (q1_f01 + q1_f12))
+            ac_frequency = np.abs(c_f01 + t_f01 - (c_f01 + c_f12))
         elif phase_path == "via_02":
-            ac_frequency = np.abs(q1_f01 + q2_f01 - (q2_f01 + q2_f12))
+            ac_frequency = np.abs(c_f01 + t_f01 - (t_f01 + t_f12))
         else:
             raise ValueError("Invalid Phase path")
 

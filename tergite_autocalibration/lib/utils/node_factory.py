@@ -65,9 +65,9 @@ class NodeFactory:
             "coupler_anticrossing": "QubitSpectroscopyVsCurrentNode",
             "cz_parametrization": "CZParametrizationNode",
             "cz_chevron": "CZChevronNode",
-            "cz_calibration": "CZ_CalibrationNode",
-            "cz_local_phases": "CZ_LocalPhasesNode",
-            "cz_rb": "TQGRandomizedBenchmarkingSSRONode",
+            "cz_calibration": "CZCalibrationNode",
+            "cz_local_phases": "CZLocalPhasesNode",
+            "cz_rb": "CZRBNode",
             "resonator_spectroscopy_vs_current": "ResonatorSpectroscopyVsCurrentNode",
             "three_state_discrimination": "ThreeStateDiscriminationNode",
         }

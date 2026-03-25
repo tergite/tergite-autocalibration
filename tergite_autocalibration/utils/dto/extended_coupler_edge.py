@@ -70,6 +70,14 @@ class CZ(InstrumentChannel):
             vals=Numbers(min_value=0, max_value=1e12, allow_nan=True),
             instrument=self,
         )
+        self.half_square_duration = ManualParameter(
+            "half_square_duration",
+            docstring=r"""Half duration of the flux pulse for initial sweeps.""",
+            unit="s",
+            initial_value=200e-9,
+            vals=Numbers(min_value=0, max_value=1e12, allow_nan=True),
+            instrument=self,
+        )
 
         self.cz_width = ManualParameter(
             name="cz_width",
@@ -138,6 +146,15 @@ class CouplerParameters(InstrumentChannel):
             name="parking_current",
             instrument=self,
             docstring=r"""DC current that creates the flux to bias the coupler""",
+            initial_value=0,
+            unit="A",
+            vals=Numbers(min_value=-3e-3, max_value=3e-3, allow_nan=True),
+        )
+
+        self.initial_parking_current = ManualParameter(
+            name="initial_parking_current",
+            instrument=self,
+            docstring=r"""helper parameter that holds an initial value for the DC current""",
             initial_value=0,
             unit="A",
             vals=Numbers(min_value=-3e-3, max_value=3e-3, allow_nan=True),

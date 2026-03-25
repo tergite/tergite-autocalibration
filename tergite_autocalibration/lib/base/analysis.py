@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import List
 
 import cf_xarray as cf
+import matplotlib.pyplot as plt
 
 # TODO: we should have a conditional import depending on a feature flag here
 import numpy as np
@@ -189,7 +190,10 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
     def _analyze_all_qubits(self):
         analysis_results = {}
         qubits = self.dataset.elements
-        qubits.sort(key=lambda x: int(x[1:]))  # TODO: move this to configure_dataset
+        if isinstance(qubits, list):
+            qubits.sort(
+                key=lambda x: int(x[1:])
+            )  # TODO: move this to configure_dataset
         for this_qubit in qubits:
             # TODO: this object is created for every single qubit
             qubit_analysis: BaseQubitAnalysis = self.single_qubit_analysis_obj(
