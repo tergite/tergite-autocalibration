@@ -18,6 +18,9 @@ from lmfit.models import LorentzianModel
 
 from tergite_autocalibration.config.globals import CONFIG
 from tergite_autocalibration.lib.base.node import CouplerNode
+from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
+    CouplerSpectroscopyNodeAnalysis,
+)
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.measurement import (
     CouplerSpectroscopyMeasurement,
 )
@@ -39,7 +42,7 @@ class CouplerDCSpectroscopyNode(CouplerNode):
     current through the coupler to measure the crossing point of the coupler with the qubit.
     """
 
-    name: str = "coupler_anticrossing"
+    name: str = "coupler_dc_spectroscopy"
     measurement_obj = CouplerSpectroscopyMeasurement
     analysis_obj = CouplerSpectroscopyNodeAnalysis
     measurement_type = ExternalParameterNode
@@ -47,6 +50,8 @@ class CouplerDCSpectroscopyNode(CouplerNode):
 
     def __init__(self, couplers: list[str], **schedule_keywords):
         super().__init__(couplers, **schedule_keywords)
+
+        self.samplespace_structure = "parallel"
 
         self.schedule_samplespace = {
             "qubit_frequencies": {
@@ -59,7 +64,7 @@ class CouplerDCSpectroscopyNode(CouplerNode):
 
         self.external_samplespace = {
             "dc_currents": {
-                coupler: np.arange(-2e-3, 2e-3, 50e-6) for coupler in self.couplers
+                coupler: np.arange(-2e-3, 2e-3, 2000e-6) for coupler in self.couplers
             },
         }
         self.validate()
@@ -95,10 +100,11 @@ class CouplerDCSpectroscopyNode(CouplerNode):
             true_params = peak.make_params(
                 amplitude=0.2, center=shifted_frequency, sigma=0.1e6
             )
-            samples = qubit_samples(qubit)
-            number_of_samples = len(samples)
-            frequncies = np.linspace(samples[0], samples[-1], number_of_samples)
-            true_s21 = peak.eval(params=true_params, x=frequncies)
+            qu_samples = qubit_samples(qubit)
+            ro_samples = resonator_samples(qubit)
+            number_of_samples = len(qu_samples) + len(ro_samples)
+            frequencies = np.linspace(qu_samples[0], qu_samples[-1], number_of_samples)
+            true_s21 = peak.eval(params=true_params, x=frequencies)
             noise_scale = 0.02
 
             np.random.seed(123)

@@ -22,35 +22,31 @@ import matplotlib
 import numpy as np
 import xarray
 
-from tergite_autocalibration.config.globals import PLOTTING_BACKEND, REDIS_CONNECTION
+from tergite_autocalibration.config.globals import (PLOTTING_BACKEND,
+                                                    REDIS_CONNECTION)
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
-from tergite_autocalibration.lib.base.measurement import (
-    BaseMeasurement,
-    MeasurementType,
-)
-from tergite_autocalibration.lib.utils.device import (
-    close_device_resources,
-    configure_device,
-    save_serial_device,
-)
+from tergite_autocalibration.lib.base.measurement import (BaseMeasurement,
+                                                          MeasurementType)
+from tergite_autocalibration.lib.utils.device import (close_device_resources,
+                                                      configure_device,
+                                                      save_serial_device)
 from tergite_autocalibration.lib.utils.redis import update_redis_trusted_values
 from tergite_autocalibration.lib.utils.schedule_execution import (
-    execute_schedule,
-    get_compiler,
-)
+    execute_schedule, get_compiler)
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
 from tergite_autocalibration.utils.io.dataset import save_dataset
 from tergite_autocalibration.utils.logging import logger
-from tergite_autocalibration.utils.logging.visuals import print_measurement_info
-from tergite_autocalibration.utils.measurement_utils import samplespace_dimensions
+from tergite_autocalibration.utils.logging.visuals import \
+    print_measurement_info
+from tergite_autocalibration.utils.measurement_utils import (
+    pad_samplespace, samplespace_dimensions)
 
 if TYPE_CHECKING:
-    from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
+    from quantify_scheduler.device_under_test.quantum_device import \
+        QuantumDevice
     from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
-        CompiledSchedule,
-        InstrumentCoordinator,
-    )
+        CompiledSchedule, InstrumentCoordinator)
 
 matplotlib.use(PLOTTING_BACKEND)
 
@@ -173,18 +169,24 @@ class BaseNode(ABC):
 
         raw_ds_keys = raw_ds.data_vars.keys()
         measurement_qubits = self.all_qubits
-        samplespace = self.schedule_samplespace
 
-        sweep_quantities = samplespace.keys()
+        sweep_quantities = self.schedule_samplespace.keys()
 
-        n_qubits = len(measurement_qubits)
+        # n_qubits = len(measurement_qubits)
 
         for key in raw_ds_keys:
-            key_indx = key % n_qubits  # this is to handle ro_opt_frequencies node where
+            # key_indx = key % n_qubits  # this is to handle ro_opt_frequencies node where
             coords_dict = {}
-            measured_qubit = measurement_qubits[key_indx]
+            measured_qubit = measurement_qubits[key]
             dimensions = samplespace_dimensions(
-                samplespace, self.loops, self.samplespace_structure
+                self.schedule_samplespace, self.loops, self.samplespace_structure
+            )
+
+            samplespace = pad_samplespace(
+                self.schedule_samplespace,
+                dimensions,
+                self.loops,
+                self.samplespace_structure,
             )
 
             for quantity in sweep_quantities:
@@ -203,7 +205,7 @@ class BaseNode(ABC):
                         element = matching[0]
                         element_type = "coupler"
                     else:
-                        raise (ValueError)
+                        raise ValueError
 
                 coord_key = quantity + element
 
@@ -220,7 +222,13 @@ class BaseNode(ABC):
                 if not isinstance(settable_values, Iterable):
                     settable_values = np.array([settable_values])
 
-                coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
+                coord_dim = coord_key
+                if self.samplespace_structure == "parallel":
+                    coord_dim = "common_dimension" + measured_qubit
+
+                coords_dict[coord_key] = (coord_dim, settable_values, coord_attrs)
+                print(f"{ coord_key = }")
+                print(f"{ coord_dim = }")
 
             if self.loops is not None:
                 coords_dict["loops"] = (
@@ -252,8 +260,12 @@ class BaseNode(ABC):
                 "long_name": f"y{measured_qubit}",
                 "units": "NA",
             }
+            dimension_names = tuple(coords_dict.keys())
+            if self.samplespace_structure == "parallel":
+                dimension_names = "common_dimension" + measured_qubit
+
             partial_ds[f"y{measured_qubit}"] = (
-                tuple(coords_dict.keys()),
+                dimension_names,
                 data_values,
                 attributes,
             )

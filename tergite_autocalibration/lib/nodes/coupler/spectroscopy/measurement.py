@@ -38,8 +38,8 @@ class CouplerSpectroscopyMeasurement(BaseMeasurement):
 
     def schedule_function(
         self,
-        qubit_frequencies_dict: dict[str, np.ndarray],
-        resonator_frequencies_dict: dict[str, np.ndarray],
+        qubit_frequencies: dict[str, np.ndarray],
+        resonator_frequencies: dict[str, np.ndarray],
         repetitions: int = 1024,
     ) -> Schedule:
 
@@ -49,20 +49,20 @@ class CouplerSpectroscopyMeasurement(BaseMeasurement):
 
         # Initialize ClockResource with the first frequency value
         for this_qubit in qubits:
-            qubit_frequencies = qubit_frequencies_dict[this_qubit]
-            ro_frequencies = resonator_frequencies_dict[this_qubit]
+            qubit_spec_frequencies = qubit_frequencies[this_qubit]
+            ro_spec_frequencies = resonator_frequencies[this_qubit]
             schedule.add_resource(
-                ClockResource(name=f"{this_qubit}.01", freq=qubit_frequencies[0])
+                ClockResource(name=f"{this_qubit}.01", freq=qubit_spec_frequencies[0])
             )
             schedule.add_resource(
-                ClockResource(name=f"{this_qubit}.ro", freq=ro_frequencies[0])
+                ClockResource(name=f"{this_qubit}.ro", freq=ro_spec_frequencies[0])
             )
 
         # This is the common reference operation so the qubits can be operated in parallel
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
         # The outer loop, iterates over all qubits
-        for this_qubit, qubit_frequencies in qubit_frequencies_dict.items():
+        for this_qubit, qubit_spec_frequencies in qubit_frequencies.items():
             # unpack the static parameters
             this_transmon = self.transmons[this_qubit]
             spec_pulse_duration = this_transmon.spec.spec_duration()
@@ -83,7 +83,7 @@ class CouplerSpectroscopyMeasurement(BaseMeasurement):
             )  # To enforce parallelism we refer to the root relaxation
 
             # The intermediate loop iterates over all frequency values in the frequency batch:
-            for this_index, qubit_frequency in enumerate(qubit_frequencies):
+            for this_index, qubit_frequency in enumerate(qubit_spec_frequencies):
                 # reset the clock frequency for the qubit pulse
                 schedule.add(
                     SetClockFrequency(clock=this_clock, clock_freq_new=qubit_frequency),
@@ -105,9 +105,9 @@ class CouplerSpectroscopyMeasurement(BaseMeasurement):
                 # update the relaxation for the next batch point
                 schedule.add(Reset(this_qubit))
 
-        for this_qubit, ro_frequencies in resonator_frequencies_dict.items():
-            qubit_frequencies = qubit_frequencies_dict[this_qubit]
-            number_of_frequencies = len(qubit_frequencies)
+        for this_qubit, ro_spec_frequencies in resonator_frequencies.items():
+            qubit_spec_frequencies = qubit_frequencies[this_qubit]
+            number_of_frequencies = len(qubit_spec_frequencies)
 
             # unpack the static parameters
             this_transmon = self.transmons[this_qubit]
@@ -120,7 +120,7 @@ class CouplerSpectroscopyMeasurement(BaseMeasurement):
             ro_port = this_transmon.ports.readout()
             this_ro_clock = f"{this_qubit}.ro"
 
-            for ro_index, ro_frequency in enumerate(ro_frequencies):
+            for ro_index, ro_frequency in enumerate(ro_spec_frequencies):
                 acq_index = number_of_frequencies + ro_index
                 schedule.add(
                     SetClockFrequency(clock=this_ro_clock, clock_freq_new=ro_frequency),

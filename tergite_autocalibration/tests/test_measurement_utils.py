@@ -14,6 +14,7 @@ import numpy as np
 import pytest
 
 from tergite_autocalibration.utils.measurement_utils import (
+    pad_samplespace,
     reduce_samplespace,
     samplespace_dimensions,
 )
@@ -35,6 +36,22 @@ _samplespace = {
     "amplitudes": {
         "q1": np.array([0.1, 0.2, 0.3, 0.4, 0.5]),
         "q2": np.array([0.2, 0.3, 0.4, 0.5, 0.6]),
+    },
+}
+
+# Samplespace to be used for testing padding
+_triple_samplespace = {
+    "frequencies": {
+        "q1": np.array([4.0e9, 4.1e9, 4.2e9]),
+        "q2": np.array([4.5e9, 4.6e9, 4.7e9]),
+    },
+    "amplitudes": {
+        "q1": np.array([0.1, 0.2, 0.3, 0.4, 0.5]),
+        "q2": np.array([0.2, 0.3, 0.4, 0.5, 0.6]),
+    },
+    "durations": {
+        "q1": np.array([1e-6, 3e-6, 5e-6, 7e-6]),
+        "q2": np.array([2e-6, 4e-6, 6e-6, 8e-6]),
     },
 }
 
@@ -106,3 +123,34 @@ def test_samplespace_dimensions_empty():
     """
     dimensions = samplespace_dimensions({})
     assert dimensions == []
+
+
+def test_pad_parallel_samplespace():
+    """
+    Test whetehr samplespaces with parallel structure are
+    correctly padded with nan values
+    """
+    dimensions = samplespace_dimensions(
+        _triple_samplespace, samplespace_structure="parallel"
+    )
+    padded_space = pad_samplespace(
+        _triple_samplespace, dimensions=dimensions, samplespace_structure="parallel"
+    )
+
+    frequencies_values = padded_space["frequencies"]["q1"]
+    amplitudes_values = padded_space["amplitudes"]["q1"]
+    durations_values = padded_space["durations"]["q1"]
+    frequencies_size = len(frequencies_values)
+    amplitudes_size = len(amplitudes_values)
+    durations_size = len(durations_values)
+
+    assert frequencies_size == 12
+    assert amplitudes_size == 12
+    assert durations_size == 12
+
+    assert all(np.isnan(frequencies_values[3:]))
+    assert all(np.isnan(amplitudes_values[0:2])) and all(
+        np.isnan(amplitudes_values[8:])
+    )
+    assert all(~np.isnan(amplitudes_values[3:7]))
+    assert all(np.isnan(durations_values[0:7]))

@@ -93,3 +93,35 @@ def samplespace_dimensions(
     if loops is not None:
         dimensions.append(loops)
     return dimensions
+
+
+def pad_samplespace(
+    samplespace: dict,
+    dimensions: list[int],
+    loops=None,
+    samplespace_structure="orthogonal",
+) -> dict:
+    if samplespace_structure == "orthogonal":
+        return samplespace
+
+    settable_quantities = samplespace.keys()
+    padded_samplespace = {}
+
+    (full_size,) = dimensions
+
+    already_padded = 0
+    for quantity in settable_quantities:
+        padded_samplespace[quantity] = {}
+        first_element = list(samplespace[quantity].keys())[0]
+        quantity_size = len(samplespace[quantity][first_element])
+        elements = samplespace[quantity].keys()
+        unpadded = full_size - already_padded - quantity_size
+        for element in elements:
+            values = samplespace[quantity][element]
+            padded_values = numpy.pad(
+                values, (already_padded, unpadded), constant_values=numpy.nan
+            )
+            padded_samplespace[quantity][element] = padded_values
+        already_padded += quantity_size
+
+    return padded_samplespace

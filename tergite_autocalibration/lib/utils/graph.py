@@ -34,6 +34,7 @@ GRAPH_DEPENDENCIES = [
     ("tof", "resonator_spectroscopy"),
     ("resonator_spectroscopy", "resonator_spectroscopy_vs_current"),
     ("qubit_01_spectroscopy", "coupler_anticrossing"),
+    ("qubit_01_spectroscopy", "coupler_dc_spectroscopy"),
     ("resonator_spectroscopy", "qubit_bring_up_spectroscopy"),
     ("resonator_spectroscopy", "qubit_01_spectroscopy"),
     ("resonator_spectroscopy_vs_current", "qubit_spectroscopy_vs_current"),
