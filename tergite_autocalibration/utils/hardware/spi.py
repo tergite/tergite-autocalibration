@@ -27,7 +27,7 @@ from qblox_instruments import SpiRack
 from qcodes import validators
 from rich.progress import Progress
 
-from tergite_autocalibration.config.globals import ENV, REDIS_CONNECTION, CONFIG
+from tergite_autocalibration.config.globals import CONFIG, ENV, REDIS_CONNECTION
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.utils.misc.os import OperatingSystem, get_os
@@ -133,9 +133,13 @@ class SpiDAC:
 
         parking_currents = {}
         for coupler in couplers:
-            if REDIS_CONNECTION.hexists(f"couplers:{coupler}", "parking_current"):
+            if REDIS_CONNECTION.hexists(
+                f"couplers:{coupler}", "initial_parking_current"
+            ):
                 parking_current = float(
-                    REDIS_CONNECTION.hget(f"couplers:{coupler}", "parking_current")
+                    REDIS_CONNECTION.hget(
+                        f"couplers:{coupler}", "initial_parking_current"
+                    )
                 )
             else:
                 message = (
