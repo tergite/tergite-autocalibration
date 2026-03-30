@@ -57,14 +57,14 @@ class CouplerDCSpectroscopyNode(CouplerNode):
             "qubit_frequencies": {
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
             },
-            "resonator_frequencies": {
-                qubit: resonator_samples(qubit) for qubit in self.all_qubits
-            },
+            # "resonator_frequencies": {
+            #     qubit: resonator_samples(qubit) for qubit in self.all_qubits
+            # },
         }
 
         self.external_samplespace = {
             "dc_currents": {
-                coupler: np.arange(-2e-3, 2e-3, 2000e-6) for coupler in self.couplers
+                coupler: np.arange(1e-3, 2e-3, 2000e-6) for coupler in self.couplers
             },
         }
         self.validate()
@@ -102,9 +102,18 @@ class CouplerDCSpectroscopyNode(CouplerNode):
             )
             qu_samples = qubit_samples(qubit)
             ro_samples = resonator_samples(qubit)
-            number_of_samples = len(qu_samples) + len(ro_samples)
-            frequencies = np.linspace(qu_samples[0], qu_samples[-1], number_of_samples)
-            true_s21 = peak.eval(params=true_params, x=frequencies)
+            number_of_qu_samples = len(qu_samples)
+            number_of_ro_samples = len(ro_samples)
+            number_of_samples = number_of_qu_samples + number_of_ro_samples
+            qu_frequencies = np.linspace(
+                qu_samples[0], qu_samples[-1], number_of_qu_samples
+            )
+            ro_frequencies = np.linspace(
+                ro_samples[0], ro_samples[-1], number_of_ro_samples
+            )
+            true_s21_qu = peak.eval(params=true_params, x=qu_frequencies)
+            true_s21_ro = peak.eval(params=true_params, x=ro_frequencies)
+            true_s21 = np.concatenate((true_s21_qu, true_s21_ro))
             noise_scale = 0.02
 
             np.random.seed(123)

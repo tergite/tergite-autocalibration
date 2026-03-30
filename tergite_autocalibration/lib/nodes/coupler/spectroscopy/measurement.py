@@ -39,7 +39,7 @@ class CouplerSpectroscopyMeasurement(BaseMeasurement):
     def schedule_function(
         self,
         qubit_frequencies: dict[str, np.ndarray],
-        resonator_frequencies: dict[str, np.ndarray],
+        # resonator_frequencies: dict[str, np.ndarray],
         repetitions: int = 1024,
     ) -> Schedule:
 
@@ -50,23 +50,35 @@ class CouplerSpectroscopyMeasurement(BaseMeasurement):
         # Initialize ClockResource with the first frequency value
         for this_qubit in qubits:
             qubit_spec_frequencies = qubit_frequencies[this_qubit]
-            ro_spec_frequencies = resonator_frequencies[this_qubit]
+            # ro_spec_frequencies = resonator_frequencies[this_qubit]
             schedule.add_resource(
                 ClockResource(name=f"{this_qubit}.01", freq=qubit_spec_frequencies[0])
             )
-            schedule.add_resource(
-                ClockResource(name=f"{this_qubit}.ro", freq=ro_spec_frequencies[0])
-            )
+            # schedule.add_resource(
+            #     ClockResource(name=f"{this_qubit}.ro", freq=ro_spec_frequencies[0])
+            # )
 
         # This is the common reference operation so the qubits can be operated in parallel
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
         # The outer loop, iterates over all qubits
-        for this_qubit, qubit_spec_frequencies in qubit_frequencies.items():
+        for this_qubit in qubits:
+
+            qubit_spec_frequencies = qubit_frequencies[this_qubit]
+            number_of_frequencies = len(qubit_spec_frequencies)
+            # ro_spec_frequencies = resonator_frequencies[this_qubit]
             # unpack the static parameters
             this_transmon = self.transmons[this_qubit]
             spec_pulse_duration = this_transmon.spec.spec_duration()
             mw_pulse_port = this_transmon.ports.microwave()
+
+            ro_pulse_amplitude = this_transmon.measure.pulse_amp()
+            ro_pulse_duration = this_transmon.measure.pulse_duration()
+            acq_channel = this_transmon.measure.acq_channel()
+            acquisition_delay = this_transmon.measure.acq_delay()
+            integration_time = this_transmon.measure.integration_time()
+            ro_port = this_transmon.ports.readout()
+            ro_clock = f"{this_qubit}.ro"
 
             spec_pulse_amplitude = this_transmon.spec.spec_ampl_optimal()
 
@@ -76,7 +88,7 @@ class CouplerSpectroscopyMeasurement(BaseMeasurement):
             else:
                 SpectroscopyPulse = SoftSquarePulse
 
-            this_clock = f"{this_qubit}.01"
+            mw_clock = f"{this_qubit}.01"
 
             schedule.add(
                 Reset(*qubits), ref_op=root_relaxation
@@ -84,9 +96,9 @@ class CouplerSpectroscopyMeasurement(BaseMeasurement):
 
             # The intermediate loop iterates over all frequency values in the frequency batch:
             for this_index, qubit_frequency in enumerate(qubit_spec_frequencies):
-                # reset the clock frequency for the qubit pulse
+
                 schedule.add(
-                    SetClockFrequency(clock=this_clock, clock_freq_new=qubit_frequency),
+                    SetClockFrequency(clock=mw_clock, clock_freq_new=qubit_frequency),
                 )
 
                 schedule.add(
@@ -94,7 +106,7 @@ class CouplerSpectroscopyMeasurement(BaseMeasurement):
                         duration=spec_pulse_duration,
                         amp=spec_pulse_amplitude,
                         port=mw_pulse_port,
-                        clock=this_clock,
+                        clock=mw_clock,
                     ),
                 )
 
@@ -102,52 +114,36 @@ class CouplerSpectroscopyMeasurement(BaseMeasurement):
                     Measure(this_qubit, acq_index=this_index),
                 )
 
-                # update the relaxation for the next batch point
                 schedule.add(Reset(this_qubit))
 
-        for this_qubit, ro_spec_frequencies in resonator_frequencies.items():
-            qubit_spec_frequencies = qubit_frequencies[this_qubit]
-            number_of_frequencies = len(qubit_spec_frequencies)
-
-            # unpack the static parameters
-            this_transmon = self.transmons[this_qubit]
-            ro_pulse_amplitude = this_transmon.measure.pulse_amp()
-            ro_pulse_duration = this_transmon.measure.pulse_duration()
-            acq_channel = this_transmon.measure.acq_channel()
-            mw_pulse_port = this_transmon.ports.microwave()
-            acquisition_delay = this_transmon.measure.acq_delay()
-            integration_time = this_transmon.measure.integration_time()
-            ro_port = this_transmon.ports.readout()
-            this_ro_clock = f"{this_qubit}.ro"
-
-            for ro_index, ro_frequency in enumerate(ro_spec_frequencies):
-                acq_index = number_of_frequencies + ro_index
-                schedule.add(
-                    SetClockFrequency(clock=this_ro_clock, clock_freq_new=ro_frequency),
-                )
-
-                ro_pulse = schedule.add(
-                    SquarePulse(
-                        duration=ro_pulse_duration,
-                        amp=ro_pulse_amplitude,
-                        port=ro_port,
-                        clock=this_ro_clock,
-                    ),
-                )
-
-                schedule.add(
-                    SSBIntegrationComplex(
-                        duration=integration_time,
-                        port=ro_port,
-                        clock=this_ro_clock,
-                        acq_index=acq_index,
-                        acq_channel=acq_channel,
-                        bin_mode=BinMode.AVERAGE,
-                    ),
-                    ref_op=ro_pulse,
-                    ref_pt="start",
-                    rel_time=acquisition_delay,
-                )
-
-                schedule.add(Reset(this_qubit))
+            # for ro_index, ro_frequency in enumerate(ro_spec_frequencies):
+            #     acq_index = number_of_frequencies + ro_index
+            #     schedule.add(
+            #         SetClockFrequency(clock=ro_clock, clock_freq_new=ro_frequency),
+            #     )
+            #
+            #     ro_pulse = schedule.add(
+            #         SquarePulse(
+            #             duration=ro_pulse_duration,
+            #             amp=ro_pulse_amplitude,
+            #             port=ro_port,
+            #             clock=ro_clock,
+            #         ),
+            #     )
+            #
+            #     schedule.add(
+            #         SSBIntegrationComplex(
+            #             duration=integration_time,
+            #             port=ro_port,
+            #             clock=ro_clock,
+            #             acq_index=acq_index,
+            #             acq_channel=acq_channel,
+            #             bin_mode=BinMode.AVERAGE,
+            #         ),
+            #         ref_op=ro_pulse,
+            #         ref_pt="start",
+            #         rel_time=acquisition_delay,
+            #     )
+            #
+            #     schedule.add(Reset(this_qubit))
         return schedule

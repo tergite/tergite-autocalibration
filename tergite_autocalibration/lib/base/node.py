@@ -22,31 +22,38 @@ import matplotlib
 import numpy as np
 import xarray
 
-from tergite_autocalibration.config.globals import (PLOTTING_BACKEND,
-                                                    REDIS_CONNECTION)
+from tergite_autocalibration.config.globals import PLOTTING_BACKEND, REDIS_CONNECTION
 from tergite_autocalibration.lib.base.analysis import BaseNodeAnalysis
-from tergite_autocalibration.lib.base.measurement import (BaseMeasurement,
-                                                          MeasurementType)
-from tergite_autocalibration.lib.utils.device import (close_device_resources,
-                                                      configure_device,
-                                                      save_serial_device)
+from tergite_autocalibration.lib.base.measurement import (
+    BaseMeasurement,
+    MeasurementType,
+)
+from tergite_autocalibration.lib.utils.device import (
+    close_device_resources,
+    configure_device,
+    save_serial_device,
+)
 from tergite_autocalibration.lib.utils.redis import update_redis_trusted_values
 from tergite_autocalibration.lib.utils.schedule_execution import (
-    execute_schedule, get_compiler)
+    execute_schedule,
+    get_compiler,
+)
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
 from tergite_autocalibration.utils.io.dataset import save_dataset
 from tergite_autocalibration.utils.logging import logger
-from tergite_autocalibration.utils.logging.visuals import \
-    print_measurement_info
+from tergite_autocalibration.utils.logging.visuals import print_measurement_info
 from tergite_autocalibration.utils.measurement_utils import (
-    pad_samplespace, samplespace_dimensions)
+    pad_samplespace,
+    samplespace_dimensions,
+)
 
 if TYPE_CHECKING:
-    from quantify_scheduler.device_under_test.quantum_device import \
-        QuantumDevice
+    from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
     from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
-        CompiledSchedule, InstrumentCoordinator)
+        CompiledSchedule,
+        InstrumentCoordinator,
+    )
 
 matplotlib.use(PLOTTING_BACKEND)
 
@@ -369,8 +376,8 @@ class CouplerNode(BaseNode):
         """
         currents_dict = {}
         for coupler in self.couplers:
-            parking_current = REDIS_CONNECTION.hget(
-                f"couplers:{coupler}", "parking_current"
+            parking_current = float(
+                REDIS_CONNECTION.hget(f"couplers:{coupler}", "initial_parking_current")
             )
             currents_dict[coupler] = parking_current
         logger.status("Setting updated DC currents")
