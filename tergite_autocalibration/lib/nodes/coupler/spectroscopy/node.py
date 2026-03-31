@@ -57,14 +57,14 @@ class CouplerDCSpectroscopyNode(CouplerNode):
             "qubit_frequencies": {
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
             },
-            # "resonator_frequencies": {
-            #     qubit: resonator_samples(qubit) for qubit in self.all_qubits
-            # },
+            "resonator_frequencies": {
+                qubit: resonator_samples(qubit) for qubit in self.all_qubits
+            },
         }
 
         self.external_samplespace = {
             "dc_currents": {
-                coupler: np.arange(1e-3, 2e-3, 2000e-6) for coupler in self.couplers
+                coupler: np.arange(-2e-3, 2e-3, 100e-6) for coupler in self.couplers
             },
         }
         self.validate()
@@ -81,7 +81,7 @@ class CouplerDCSpectroscopyNode(CouplerNode):
         logger.info("Final Operation")
         currents = {}
         for coupler in self.couplers:
-            currents[coupler] = 0
+            currents[coupler] = 1140e-6
 
         self.spi_manager.set_dac_current(currents)
 
