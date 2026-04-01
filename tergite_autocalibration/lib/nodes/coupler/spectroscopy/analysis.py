@@ -33,6 +33,7 @@ from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.analysis impor
 from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.analysis import (
     ResonatorSpectroscopyQubitAnalysis,
 )
+from tergite_autocalibration.lib.utils.analysis_models import resonator_hanger_frequency
 from tergite_autocalibration.utils.dto.qoi import QOI
 from tergite_autocalibration.utils.io.dataset import to_real_dataset
 
@@ -54,7 +55,9 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
         threshold=2e6,
     ):
         crossing_currents = []
-        crossing_partitions = [0]
+        partition_boundaries = [0]
+        partition_minima = []
+        partition_maxima = []
 
         frequency_diffs = np.diff(frequencies)
         (frequency_jumps,) = np.where(np.abs(frequency_diffs) > threshold)
@@ -69,16 +72,46 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
             else:
                 sign_after_jump = np.sign(frequency_diffs[jump + 1]).astype(int)
             crossing_current = np.mean((currents[jump], currents[jump + 1]))
-            breakpoint()
             parity = (sign_before_jump, sign_of_jump, sign_after_jump)
             if parity != (+1, -1, +1) and parity != (-1, +1, -1):
                 continue
 
             crossing_currents.append(crossing_current)
-            crossing_partitions.append(jump)
-        crossing_partitions.append(len(currents))
+            partition_boundaries.append(jump + 0.5)
+        partition_boundaries.append(len(currents))
+        crossing_partitions = [
+            partition_boundaries[i : i + 2]
+            for i in range(0, len(partition_boundaries) - 1)
+        ]
+        for partition in crossing_partitions:
+            low_sample = np.ceil(partition[0]).astype(int)
+            # adding one becasue the range in the frequencies excludes the high endpoint
+            high_sample = np.floor(partition[1]).astype(int) + 1
+            partition_frequencies = frequencies[low_sample:high_sample]
+            if len(partition_frequencies) < 4:
+                continue
+            partition_frequencies_diffs = np.diff(partition_frequencies)
+            linear_fit = np.polyfit(
+                np.arange(len(partition_frequencies_diffs)),
+                partition_frequencies_diffs,
+                1,
+            )
+            slope = linear_fit[0]
+            # fig, axs = plt.subplots(2, 1)
+            # axs[0].plot(partition_frequencies, "bo")
+            # axs[1].plot(partition_frequencies_diffs, "ro")
+            # plt.show()
+            if slope > 0:
+                partition_minima.append(min(partition_frequencies))
+            elif slope < 0:
+                partition_maxima.append(max(partition_frequencies))
 
-        return crossing_currents, crossing_partitions
+        return (
+            crossing_currents,
+            partition_boundaries,
+            partition_minima,
+            partition_maxima,
+        )
 
     def find_peaks(self, spectroscopy_dataarray: xarray.DataArray):
         for coord in spectroscopy_dataarray.coords:
@@ -118,17 +151,8 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
             fit_Ql = fit.params["Ql"].value
             fit_Qe = fit.params["Qe"].value
             fit_ph = fit.params["theta"].value
-            resonator_frequency = (
-                fit_fr
-                / (4 * fit_Qe * fit_Ql * np.sin(fit_ph))
-                * (
-                    4 * fit_Qe * fit_Ql * np.sin(fit_ph)
-                    - 2 * fit_Qe * np.cos(fit_ph)
-                    + fit_Ql
-                    + np.sqrt(
-                        4 * fit_Qe**2 - 4 * fit_Qe * fit_Ql * np.cos(fit_ph) + fit_Ql**2
-                    )
-                )
+            resonator_frequency = resonator_hanger_frequency(
+                fit_fr=fit_fr, fit_ph=fit_ph, fit_Qe=fit_Qe, fit_Ql=fit_Ql
             )
             detected_frequencies.append(resonator_frequency)
             detected_currents.append(current)
@@ -214,15 +238,36 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
         # ) = self.find_resonator_dips(self.target_resonator_spectroscopy)
 
         self.resonator_crossing_points = []
-        self.control_crossing_currents, self.control_partitions = self.find_crossings(
+
+        (
+            self.control_crossing_currents,
+            self.control_partitions,
+            self.control_frequency_minima,
+            self.control_frequency_maxima,
+        ) = self.find_crossings(
             self.control_qubit_detected_currents,
             self.control_qubit_detected_frequencies,
         )
-        self.target_crossing_currents, self.target_partitions = self.find_crossings(
+        (
+            self.target_crossing_currents,
+            self.target_partitions,
+            self.target_frequency_minima,
+            self.target_frequency_maxima,
+        ) = self.find_crossings(
             self.target_qubit_detected_currents,
             self.target_qubit_detected_frequencies,
         )
 
+        self.control_frequency_above = min(self.control_frequency_minima)
+        self.control_frequency_below = max(self.control_frequency_maxima)
+        self.target_frequency_above = min(self.target_frequency_minima)
+        self.target_frequency_below = max(self.target_frequency_maxima)
+        self.control_cross_frequency = np.mean(
+            (self.control_frequency_above, self.control_frequency_below)
+        )
+        self.target_cross_frequency = np.mean(
+            (self.target_frequency_above, self.target_frequency_below)
+        )
         # breakpoint()
 
         analysis_succesful = True
@@ -256,7 +301,8 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
         self.target_resonator_spectroscopy.plot(ax=ax4, x=self.current_coord)
 
         peak_styles = {"s": 52, "c": "red"}
-        crossing_styles = {"color": "grey", "linestyle": "dashed", "linewidth": 2}
+        crossing_styles = {"color": "orange", "linestyle": "dashed", "linewidth": 2}
+        edge_styles = {"color": "grey", "linestyle": "dashed", "linewidth": 2}
         ax1.scatter(
             self.control_qubit_detected_currents,
             self.control_qubit_detected_frequencies,
@@ -280,8 +326,15 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
 
         for cross_current in self.control_crossing_currents:
             ax1.axvline(cross_current, **crossing_styles)
+
+        ax1.axhline(self.control_frequency_above, **edge_styles)
+        ax1.axhline(self.control_frequency_below, **edge_styles)
+        ax1.axhline(self.control_cross_frequency, **crossing_styles)
         for cross_current in self.target_crossing_currents:
             ax2.axvline(cross_current, **crossing_styles)
+        ax2.axhline(self.target_frequency_above, **edge_styles)
+        ax2.axhline(self.target_frequency_below, **edge_styles)
+        ax2.axhline(self.target_cross_frequency, **crossing_styles)
 
         figures_list.append(fig)
         figures_dictionary[self.coupler] = figures_list

@@ -25,6 +25,21 @@ from tergite_autocalibration.lib.utils.functions import (
 )  # lrb_decay_function,; lrb_exponential_decay_function,
 
 
+def resonator_hanger_frequency(*, fit_fr, fit_ph, fit_Qe, fit_Ql):
+    fit_Q = 4 * fit_Qe * fit_Ql
+    resonator_frequency = (
+        fit_fr
+        / (fit_Q * np.sin(fit_ph))
+        * (
+            fit_Q * np.sin(fit_ph)
+            - 2 * fit_Qe * np.cos(fit_ph)
+            + fit_Ql
+            + np.sqrt(4 * fit_Qe**2 - fit_Q * np.cos(fit_ph) + fit_Ql**2)
+        )
+    )
+    return resonator_frequency
+
+
 class RamseyModel(lmfit.model.Model):
     """
     Model for exponentially decaying sinusoidal data of the form
