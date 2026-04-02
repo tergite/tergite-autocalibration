@@ -12,10 +12,14 @@
 # that they have been altered from the originals.
 
 import lmfit
+import matplotlib.pyplot as plt
 import numpy as np
 from lmfit.model import Model
 from quantify_core.analysis.fitting_models import (exp_damp_osc_func,
                                                    fft_freq_phase_guess)
+from scipy.ndimage import median
+from scipy.signal import find_peaks
+from scipy.stats import median_abs_deviation
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
 from tergite_autocalibration.lib.utils.functions import \
@@ -36,6 +40,30 @@ def resonator_hanger_frequency(*, fit_fr, fit_ph, fit_Qe, fit_Ql):
     )
     return resonator_frequency
 
+class ResonatorAvoidedCrossings:
+    def __init__(self, currents, frequencies, threshold=2e6):
+        self.currents = currents
+        self.frequencies = frequencies
+
+        self._analyze_crossings()
+
+    def _analyze_crossings(self) -> None:
+        frequency_diffs = np.diff(self.frequencies)
+        noise_level = median_abs_deviation(frequency_diffs)
+        peaks, _ = find_peaks(np.abs(frequency_diffs), prominence=10 * noise_level)
+        self.jumps = peaks
+
+    @property
+    def crossing_currents(self) -> list[float]:
+        crossing_currents = []
+        for jump in self.jumps:
+            current = np.mean((self.currents[jump], self.currents[jump+1]))
+            crossing_currents.append(current)
+        return crossing_currents
+
+    @property
+    def crossing_frequency(self) -> float:
+        return  median(self.frequencies)
 
 class AvoidedCrossings:
     def __init__(self, currents, frequencies, threshold=2e6):
@@ -78,9 +106,6 @@ class AvoidedCrossings:
         for current_boundary in self.partition_indices[1:-1]:
             low_sample = np.floor(current_boundary).astype(int)
             high_sample = np.ceil(current_boundary).astype(int)
-            print(f"{ current_boundary = }")
-            print(f"{ low_sample = }")
-            print(f"{ high_sample = }")
             current = np.mean((self.currents[low_sample], self.currents[high_sample]))
             crossing_currents.append(current)
         return crossing_currents

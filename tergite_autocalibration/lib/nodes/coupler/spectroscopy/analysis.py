@@ -26,6 +26,7 @@ from tergite_autocalibration.lib.base.analysis import (
 from tergite_autocalibration.lib.utils.analysis_models import (
     AvoidedCrossings,
     CouplerModel,
+    ResonatorAvoidedCrossings,
     resonator_hanger_frequency,
 )
 from tergite_autocalibration.utils.dto.qoi import QOI
@@ -176,8 +177,6 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
             self.target_resonator_spectroscopy
         )
 
-        self.resonator_crossing_points = []
-
         control_crossings = AvoidedCrossings(
             self.control_qubit_detected_currents,
             self.control_qubit_detected_frequencies,
@@ -199,6 +198,25 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
             self.target_crossing_frequency_below,
             self.target_crossing_frequency_above,
         ) = target_crossings.crossing_frequency
+
+        target_res_crossings = ResonatorAvoidedCrossings(
+            self.target_resonator_detected_currents,
+            self.target_resonator_detected_frequencies,
+        )
+        self.target_resonator_crossing_currents = target_res_crossings.crossing_currents
+        self.target_resonator_crossing_frequency = (
+            target_res_crossings.crossing_frequency
+        )
+        control_res_crossings = ResonatorAvoidedCrossings(
+            self.control_resonator_detected_currents,
+            self.control_resonator_detected_frequencies,
+        )
+        self.control_resonator_crossing_currents = (
+            control_res_crossings.crossing_currents
+        )
+        self.control_resonator_crossing_frequency = (
+            control_res_crossings.crossing_frequency
+        )
 
         analysis_succesful = True
         analysis_result = {
@@ -231,7 +249,12 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
         self.target_resonator_magnitudes.plot(ax=ax4, x=self.current_coord)
 
         peak_styles = {"s": 52, "c": "red"}
-        crossing_styles = {"color": "orange", "linestyle": "dashed", "linewidth": 2}
+        crossing_styles = {
+            "color": "orange",
+            "gapcolor": "black",
+            "linestyle": "dashed",
+            "linewidth": 2,
+        }
         edge_styles = {"color": "grey", "linestyle": "dashed", "linewidth": 2}
 
         crossing_points = []
@@ -241,8 +264,16 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
         for cross_current in self.target_crossing_currents:
             ax2.axvline(cross_current, **crossing_styles)
             crossing_points.append((cross_current, self.target_crossing_frequency))
-        crossing_points.append((0, 6.63189e9))
-        crossing_points.append((6.83e-4, 6.63189e9))
+        for cross_current in self.control_resonator_crossing_currents:
+            ax3.axvline(cross_current, **crossing_styles)
+            crossing_points.append(
+                (cross_current, self.control_resonator_crossing_frequency)
+            )
+        for cross_current in self.target_resonator_crossing_currents:
+            ax4.axvline(cross_current, **crossing_styles)
+            crossing_points.append(
+                (cross_current, self.target_resonator_crossing_frequency)
+            )
 
         cross_currents, cross_freqs = zip(*crossing_points)
         coupler_model = CouplerModel()
