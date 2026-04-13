@@ -13,7 +13,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-import xarray
+import xarray as xr
 from quantify_core.analysis import fitting_models as fm
 from scipy.ndimage import gaussian_filter1d
 from scipy.signal import find_peaks
@@ -42,7 +42,8 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
 
-    def find_peaks(self, spectroscopy_dataarray: xarray.DataArray):
+    def find_peaks(self, spectroscopy_dataarray: xr.DataArray):
+        qubit = spectroscopy_dataarray.qubit
         for coord in spectroscopy_dataarray.coords:
             coord = str(coord)
             if "frequencies" in coord:
@@ -61,9 +62,26 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
             qubit_frequency = array[frequency_coord].values[peak].item()
             detected_frequencies.append(qubit_frequency)
             detected_currents.append(current)
-        return detected_frequencies, detected_currents
 
-    def find_resonator_dips(self, spectroscopy_dataarray: xarray.DataArray):
+        role = "control" if self.control_qubit == qubit else "target"
+        n_freqs = len(detected_frequencies)
+
+        coords = {
+            "obs": range(n_freqs),
+            "role": ("obs", [role] * n_freqs),
+            "mode": ("obs", ["qubit"] * n_freqs),
+        }
+
+        df = xr.DataArray(detected_frequencies, coords=coords, dims="obs")
+        dc = xr.DataArray(detected_currents, coords=coords, dims="obs")
+
+        ds = xr.Dataset({"frequencies": df, "currents": dc}).set_index(
+            obs=["role", "mode"]
+        )
+        return ds
+
+    def find_resonator_dips(self, spectroscopy_dataarray: xr.DataArray):
+        qubit = spectroscopy_dataarray.qubit
         for coord in spectroscopy_dataarray.coords:
             coord = str(coord)
             if "frequencies" in coord:
@@ -85,7 +103,21 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
             )
             detected_frequencies.append(resonator_frequency)
             detected_currents.append(current)
-        return detected_frequencies, detected_currents
+
+        role = "control" if self.control_qubit == qubit else "target"
+        n_freqs = len(detected_frequencies)
+        coords = {
+            "obs": range(n_freqs),
+            "role": ("obs", [role] * n_freqs),
+            "mode": ("obs", ["qubit"] * n_freqs),
+        }
+        df = xr.DataArray(detected_frequencies, coords=coords, dims="obs")
+        dc = xr.DataArray(detected_currents, coords=coords, dims="obs")
+
+        ds = xr.Dataset({"frequencies": df, "currents": dc}).set_index(
+            obs=["role", "mode"]
+        )
+        return ds
 
     def _prepare_spectroscopy(self, data, freq_coord, common_dim, drop_coord):
         return (
@@ -120,8 +152,14 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
             if "common_dimension" in dim:
                 self.target_common_dim = dim
 
-        control_magnitudes = xarray.ufuncs.abs(self.control_qubit_data_var)
-        target_magnitudes = xarray.ufuncs.abs(self.target_qubit_data_var)
+        control_attrs = self.control_qubit_data_var.attrs
+        target_attrs = self.target_qubit_data_var.attrs
+        control_magnitudes = xr.ufuncs.abs(self.control_qubit_data_var).assign_attrs(
+            control_attrs
+        )
+        target_magnitudes = xr.ufuncs.abs(self.target_qubit_data_var).assign_attrs(
+            target_attrs
+        )
 
         configs = {
             "control_qubit_spectroscopy": (
@@ -153,79 +191,36 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
             setattr(self, attr, self._prepare_spectroscopy(data, freq, dim, drop))
 
         # Collect qubit spectroscopy peaks
-        (
-            self.control_qubit_detected_frequencies,
-            self.control_qubit_detected_currents,
-        ) = self.find_peaks(self.control_qubit_spectroscopy)
-        self.target_qubit_detected_frequencies, self.target_qubit_detected_currents = (
-            self.find_peaks(self.target_qubit_spectroscopy)
-        )
-        # Collect resonator spectroscopy dips
-        (
-            self.control_resonator_detected_frequencies,
-            self.control_resonator_detected_currents,
-        ) = self.find_resonator_dips(self.control_resonator_spectroscopy)
-        (
-            self.target_resonator_detected_frequencies,
-            self.target_resonator_detected_currents,
-        ) = self.find_resonator_dips(self.target_resonator_spectroscopy)
+        self.control_peaks = self.find_peaks(self.control_qubit_spectroscopy)
+        self.target_peaks = self.find_peaks(self.target_qubit_spectroscopy)
 
-        self.control_resonator_magnitudes = xarray.ufuncs.abs(
+        # Collect resonator spectroscopy dips
+        self.control_dips = self.find_resonator_dips(
             self.control_resonator_spectroscopy
         )
-        self.target_resonator_magnitudes = xarray.ufuncs.abs(
-            self.target_resonator_spectroscopy
-        )
+        self.target_dips = self.find_resonator_dips(self.target_resonator_spectroscopy)
 
-        control_crossings = AvoidedCrossings(
-            self.control_qubit_detected_currents,
-            self.control_qubit_detected_frequencies,
+        self.control_crossings = AvoidedCrossings(
+            self.control_peaks.currents, self.control_peaks.frequencies
         )
-        self.control_crossing_currents = control_crossings.crossing_currents
-        (
-            self.control_crossing_frequency,
-            self.control_crossing_frequency_below,
-            self.control_crossing_frequency_above,
-        ) = control_crossings.crossing_frequency
-
-        target_crossings = AvoidedCrossings(
-            self.target_qubit_detected_currents,
-            self.target_qubit_detected_frequencies,
+        self.target_crossings = AvoidedCrossings(
+            self.target_peaks.currents, self.target_peaks.frequencies
         )
-        self.target_crossing_currents = target_crossings.crossing_currents
-        (
-            self.target_crossing_frequency,
-            self.target_crossing_frequency_below,
-            self.target_crossing_frequency_above,
-        ) = target_crossings.crossing_frequency
-
-        target_res_crossings = ResonatorAvoidedCrossings(
-            self.target_resonator_detected_currents,
-            self.target_resonator_detected_frequencies,
+        self.target_res_crossings = ResonatorAvoidedCrossings(
+            self.target_dips.currents, self.target_dips.frequencies
         )
-        self.target_resonator_crossing_currents = target_res_crossings.crossing_currents
-        self.target_resonator_crossing_frequency = (
-            target_res_crossings.crossing_frequency
-        )
-        control_res_crossings = ResonatorAvoidedCrossings(
-            self.control_resonator_detected_currents,
-            self.control_resonator_detected_frequencies,
-        )
-        self.control_resonator_crossing_currents = (
-            control_res_crossings.crossing_currents
-        )
-        self.control_resonator_crossing_frequency = (
-            control_res_crossings.crossing_frequency
+        self.control_res_crossings = ResonatorAvoidedCrossings(
+            self.control_dips.currents, self.control_dips.frequencies
         )
 
         analysis_succesful = True
         analysis_result = {
             "control_qubit_crossing_points": {
-                "value": self.control_crossing_currents,
+                "value": 0,
                 "error": 0,
             },
             "target_qubit_crossing_points": {
-                "value": self.target_crossing_currents,
+                "value": 0,
                 "error": 0,
             },
         }
@@ -241,14 +236,20 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
              analysis plots the key is the coupler labe and the value is a list
              containing the anticrossing figure for that coupler
         """
+
+        control_resonator_magnitudes = xr.ufuncs.abs(
+            self.control_resonator_spectroscopy
+        )
+        target_resonator_magnitudes = xr.ufuncs.abs(self.target_resonator_spectroscopy)
         figures_list = []
         fig, ((ax1, ax2), (ax3, ax4), (ax5, ax6)) = plt.subplots(3, 2)
         self.control_qubit_spectroscopy.plot(ax=ax1, x=self.current_coord)
         self.target_qubit_spectroscopy.plot(ax=ax2, x=self.current_coord)
-        self.control_resonator_magnitudes.plot(ax=ax3, x=self.current_coord)
-        self.target_resonator_magnitudes.plot(ax=ax4, x=self.current_coord)
+        control_resonator_magnitudes.plot(ax=ax3, x=self.current_coord)
+        target_resonator_magnitudes.plot(ax=ax4, x=self.current_coord)
 
         peak_styles = {"s": 52, "c": "red"}
+        coupler_styles = {"s": 52, "c": "red", "edgecolors": "black"}
         crossing_styles = {
             "color": "orange",
             "gapcolor": "black",
@@ -257,72 +258,97 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
         }
         edge_styles = {"color": "grey", "linestyle": "dashed", "linewidth": 2}
 
+        control_cross_currents = self.control_crossings.crossing_currents
+        control_cross_frequency = self.control_crossings.crossing_frequency.value
+        control_cross_freq_above = self.control_crossings.crossing_frequency.above
+        control_cross_freq_below = self.control_crossings.crossing_frequency.below
+        target_cross_currents = self.target_crossings.crossing_currents
+        target_cross_frequency = self.target_crossings.crossing_frequency.value
+        target_cross_freq_above = self.target_crossings.crossing_frequency.above
+        target_cross_freq_below = self.target_crossings.crossing_frequency.below
+        control_res_cross_currents = self.control_res_crossings.crossing_currents
+        control_res_cross_frequency = self.control_res_crossings.crossing_frequency
+        target_res_cross_currents = self.target_res_crossings.crossing_currents
+        target_res_cross_frequency = self.target_res_crossings.crossing_frequency
+        coupler_hint_target = self.target_res_crossings.frequency_hint
+        coupler_hint_control = self.control_res_crossings.frequency_hint
+        coupler_hint_qub_target = self.target_crossings.frequency_hint
+        coupler_hint_qub_control = self.control_crossings.frequency_hint
+
+        if coupler_hint_target and coupler_hint_control:
+            coupler_hint = np.mean([coupler_hint_control, coupler_hint_target])
+        elif any((coupler_hint_control, coupler_hint_target)):
+            for hint in (coupler_hint_control, coupler_hint_target):
+                if hint is not None:
+                    coupler_hint = hint
+        elif coupler_hint_qub_control and coupler_hint_qub_target:
+            coupler_hint = np.mean([coupler_hint_qub_control, coupler_hint_qub_target])
+        elif any((coupler_hint_qub_control, coupler_hint_qub_target)):
+            for hint in (coupler_hint_qub_control, coupler_hint_qub_target):
+                if hint is not None:
+                    coupler_hint = hint
+        else:
+            coupler_hint = None
+
         crossing_points = []
-        for cross_current in self.control_crossing_currents:
+        for cross_current in control_cross_currents:
             ax1.axvline(cross_current, **crossing_styles)
-            crossing_points.append((cross_current, self.control_crossing_frequency))
-        for cross_current in self.target_crossing_currents:
+            crossing_points.append((cross_current, control_cross_frequency))
+        for cross_current in target_cross_currents:
             ax2.axvline(cross_current, **crossing_styles)
-            crossing_points.append((cross_current, self.target_crossing_frequency))
-        for cross_current in self.control_resonator_crossing_currents:
+            crossing_points.append((cross_current, target_cross_frequency))
+        for cross_current in control_res_cross_currents:
             ax3.axvline(cross_current, **crossing_styles)
-            crossing_points.append(
-                (cross_current, self.control_resonator_crossing_frequency)
-            )
-        for cross_current in self.target_resonator_crossing_currents:
+            crossing_points.append((cross_current, control_res_cross_frequency))
+        for cross_current in target_res_cross_currents:
             ax4.axvline(cross_current, **crossing_styles)
-            crossing_points.append(
-                (cross_current, self.target_resonator_crossing_frequency)
-            )
+            crossing_points.append((cross_current, target_res_cross_frequency))
+
+        ax1.set(xlabel=None)
+        ax2.set(xlabel=None)
 
         cross_currents, cross_freqs = zip(*crossing_points)
         coupler_model = CouplerModel()
+        if coupler_hint is not None:
+            coupler_model.set_param_hint("Ic", value=coupler_hint, vary=True)
         coupler_result = coupler_model.fit(cross_freqs, current=cross_currents)
-        coupler_result.plot_fit(ax5, numpoints=200, xlabel=None, title=None)
+        fit_plot_currents = np.linspace(self.dc_currents[0], self.dc_currents[-1], 200)
+        evaluated_freqs = coupler_model.eval(
+            coupler_result.params, current=fit_plot_currents
+        )
+        ax5.plot(fit_plot_currents, evaluated_freqs, "r-")
+        fmax = coupler_result.best_values["fmax"] + coupler_result.best_values["offset"]
 
-        ax5.legend()
+        ax5.scatter(cross_currents, cross_freqs, **coupler_styles)
 
-        plots = [
-            (
-                ax1,
-                self.control_qubit_detected_currents,
-                self.control_qubit_detected_frequencies,
-            ),
-            (
-                ax2,
-                self.target_qubit_detected_currents,
-                self.target_qubit_detected_frequencies,
-            ),
-            (
-                ax3,
-                self.control_resonator_detected_currents,
-                self.control_resonator_detected_frequencies,
-            ),
-            (
-                ax4,
-                self.target_resonator_detected_currents,
-                self.target_resonator_detected_frequencies,
-            ),
-            (ax5, cross_currents, cross_freqs),
+        scatter_plots = [
+            (ax1, self.control_peaks.currents, self.control_peaks.frequencies),
+            (ax2, self.target_peaks.currents, self.target_peaks.frequencies),
+            (ax3, self.control_dips.currents, self.control_dips.frequencies),
+            (ax4, self.target_dips.currents, self.target_dips.frequencies),
         ]
 
-        for ax, x, y in plots:
+        for ax, x, y in scatter_plots:
             if x is not None and y is not None:
                 ax.scatter(x, y, **peak_styles)
 
         horizontal_lines = [
-            (ax1, self.control_crossing_frequency_above, edge_styles),
-            (ax1, self.control_crossing_frequency_below, edge_styles),
-            (ax1, self.control_crossing_frequency, crossing_styles),
-            (ax2, self.target_crossing_frequency_above, edge_styles),
-            (ax2, self.target_crossing_frequency_below, edge_styles),
-            (ax2, self.target_crossing_frequency, crossing_styles),
+            (ax1, control_cross_freq_above, edge_styles),
+            (ax1, control_cross_freq_below, edge_styles),
+            (ax1, control_cross_frequency, crossing_styles),
+            (ax2, target_cross_freq_above, edge_styles),
+            (ax2, target_cross_freq_below, edge_styles),
+            (ax2, target_cross_frequency, crossing_styles),
+            (ax5, fmax, crossing_styles),
         ]
         ax6.axis("off")
 
         for ax, freq, style in horizontal_lines:
             if freq is not None:
                 ax.axhline(freq, **style)
+
+        ax5.axhline(fmax, **crossing_styles, label=f"fmax: {fmax:.4e}")
+        ax5.legend()
 
         figures_list.append(fig)
         figures_dictionary[self.coupler] = figures_list

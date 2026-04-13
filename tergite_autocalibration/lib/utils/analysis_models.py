@@ -11,6 +11,9 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+import typing
+from collections import namedtuple
+
 import lmfit
 import matplotlib.pyplot as plt
 import numpy as np
@@ -65,6 +68,14 @@ class ResonatorAvoidedCrossings:
     def crossing_frequency(self) -> float:
         return  median(self.frequencies)
 
+    @property
+    def frequency_hint(self) -> float | None:
+        if len(self.crossing_currents) != 2:
+            return None
+        return np.mean(self.crossing_currents)
+
+
+
 class AvoidedCrossings:
     def __init__(self, currents, frequencies, threshold=2e6):
         self.currents = currents
@@ -74,7 +85,7 @@ class AvoidedCrossings:
         self._analyze_crossings()
 
     def _analyze_crossings(self) -> None:
-        partition_indeces = [0]
+        partition_indices = [0]
 
         currents = self.currents
         frequencies = self.frequencies
@@ -82,23 +93,30 @@ class AvoidedCrossings:
         frequency_diffs = np.diff(frequencies)
         (frequency_jumps,) = np.where(np.abs(frequency_diffs) > self.threshold)
         for jump in frequency_jumps:
-            sign_of_jump = np.sign(frequency_diffs[jump]).astype(int)
-            if jump == 0:
-                sign_before_jump = -sign_of_jump
-            else:
-                sign_before_jump = np.sign(frequency_diffs[jump - 1]).astype(int)
-            if jump == len(frequency_diffs) - 1:
-                sign_after_jump = -sign_of_jump
-            else:
-                sign_after_jump = np.sign(frequency_diffs[jump + 1]).astype(int)
-
-            parity = (sign_before_jump, sign_of_jump, sign_after_jump)
+            parity = self._parity_of_jump(jump, frequencies)
             if parity != (+1, -1, +1) and parity != (-1, +1, -1):
                 continue
 
-            partition_indeces.append(jump + 0.5)
-        partition_indeces.append(len(currents))
-        self.partition_indices = partition_indeces
+            partition_indices.append(jump + 0.5)
+        partition_indices.append(len(currents))
+        self.partition_indices = partition_indices
+
+    def _parity_of_jump(self, jump: int, frequencies: np.ndarray):
+        frequency_diffs = np.diff(frequencies)
+        sign_of_jump = np.sign(frequency_diffs[jump]).astype(int)
+        if jump == 0:
+            sign_before_jump = -sign_of_jump
+        else:
+            sign_before_jump = np.sign(frequency_diffs[jump - 1]).astype(int)
+        if jump == len(frequency_diffs) - 1:
+            # TODO: the logic is not solid here, may lead to errors
+            sign_after_jump = -sign_of_jump
+        else:
+            sign_after_jump = np.sign(frequency_diffs[jump + 1]).astype(int)
+
+        parity = (sign_before_jump, sign_of_jump, sign_after_jump)
+        return parity
+
 
     @property
     def crossing_currents(self) -> list[float]:
@@ -110,10 +128,9 @@ class AvoidedCrossings:
             crossing_currents.append(current)
         return crossing_currents
 
-    @property
-    def crossing_frequency(self) -> tuple:
-        partition_minima = []
-        partition_maxima = []
+    def _partition_samples(self):
+        partitions_where_coupler_above_qubit = []
+        partitions_where_coupler_below_qubit = []
 
         partition_boundaries = self.partition_indices
         crossing_partitions = [
@@ -133,9 +150,53 @@ class AvoidedCrossings:
             x = np.arange(len(partition_frequencies_diffs))
             (slope, _) = np.polyfit(x, partition_frequencies_diffs, 1)
             if slope > 0:
-                partition_minima.append(min(partition_frequencies))
+                partitions_where_coupler_below_qubit.append(partition)
             elif slope < 0:
-                partition_maxima.append(max(partition_frequencies))
+                partitions_where_coupler_above_qubit.append(partition)
+
+        partitions = {
+            'coupler_above_qubit': partitions_where_coupler_above_qubit,
+            'coupler_below_qubit': partitions_where_coupler_below_qubit,
+        }
+
+        return partitions
+
+    @property
+    def crossing_frequency(self) -> typing.NamedTuple:
+        partition_minima = []
+        partition_maxima = []
+
+        partitions = self._partition_samples()
+
+        if len(partitions['coupler_above_qubit']) == 1:
+            partition,  = partitions['coupler_above_qubit']
+            low_sample = np.ceil(partition[0]).astype(int)
+            high_sample = np.floor(partition[1]).astype(int)
+            low_current = self.currents[low_sample]
+            high_current = self.currents[high_sample]
+            self._delta_I_above = high_current - low_current
+            self._coupler_hint = np.mean((low_current, high_current))
+
+        if len(partitions['coupler_below_qubit']) == 1:
+            partition,  = partitions['coupler_below_qubit']
+            low_sample = np.ceil(partition[0]).astype(int)
+            high_sample = np.floor(partition[1]).astype(int)
+            low_current = self.currents[low_sample]
+            high_current = self.currents[high_sample]
+            self._delta_I_below = high_current - low_current
+            self._coupler_hint = np.mean((low_current, high_current))
+
+        for partition in partitions['coupler_below_qubit']:
+            low_sample = np.ceil(partition[0]).astype(int)
+            high_sample = np.floor(partition[1]).astype(int)
+            partition_frequencies = self.frequencies[low_sample:high_sample]
+            partition_minima.append(min(partition_frequencies))
+        for partition in partitions['coupler_above_qubit']:
+            low_sample = np.ceil(partition[0]).astype(int)
+            high_sample = np.floor(partition[1]).astype(int)
+            partition_frequencies = self.frequencies[low_sample:high_sample]
+            partition_maxima.append(max(partition_frequencies))
+
         if partition_minima:
             frequency_above = min(partition_minima)
         else:
@@ -149,7 +210,18 @@ class AvoidedCrossings:
         else:
             cross_frequency = None
 
-        return (cross_frequency, frequency_below, frequency_above)
+        frequency_values = namedtuple("cross_frequencies", ["value", "below", "above"])
+        return frequency_values(value=cross_frequency, below=frequency_below, above=frequency_above)
+
+    @property
+    def frequency_hint(self) -> float | None:
+        return self._coupler_hint
+
+    @property
+    def I0_hint(self) -> float | None:
+        if self._delta_I_above and self._delta_I_below:
+            return self._delta_I_below + self._delta_I_above
+
 
 def coupler_frequency_function(
     current: float,
@@ -163,7 +235,7 @@ def coupler_frequency_function(
 class CouplerModel(lmfit.model.Model):
     """
     Model for the coupler frequency of the form
-    f = fmax*sqrt(abs(cos(pi * I/I0))) + offset
+    f = fmax*sqrt(abs(cos(pi * (I-Ic)/I0))) + offset
     """
 
     def __init__(self, *args, **kwargs):
@@ -172,31 +244,20 @@ class CouplerModel(lmfit.model.Model):
         # Typically coupler are designed up to 9GHz
         self.set_param_hint("fmax", value=9e9, min=6e9)
         # Expected current at fmax, helps the fitting algorithm
-        self.set_param_hint("Ic", value=0.5*6.83e-4, vary=True)
-        # Typically the period is around 2mAmp
-        self.set_param_hint("I0", value=3e-3, vary=True)
+        self.set_param_hint("Ic", value=1e-3, vary=True)
+        # Typically the period is around 3mAmp
+        # self.set_param_hint("I0", value=3e-3, vary=True)
         # Offset is a typical anharmonicity
-        self.set_param_hint("offset", value=0, max=200e6)
+        self.set_param_hint("offset", value=0, max=300e6)
 
 
     def guess(self, data, **kws) -> lmfit.parameter.Parameters:
         current = kws.get("current", None)
         if current is None:
             raise ValueError(
-                'Cariable "current" must be specified in order to guess parameters'
+                'Variable "current" must be specified in order to guess parameters'
             )
 
-        # amp_guess = abs(max(data) - min(data)) / 2  # amp is positive by convention
-        # exp_offs_guess = np.mean(data)
-        # tau_guess = 2 / 3 * np.max(t)
-        #
-        # freq_guess, phase_guess = fft_freq_phase_guess(data, t)
-        #
-        # self.set_param_hint("frequency", value=freq_guess, min=0)
-        # self.set_param_hint("amplitude", value=amp_guess, min=0)
-        # self.set_param_hint("offset", value=exp_offs_guess)
-        # self.set_param_hint("phase", value=phase_guess)
-        # self.set_param_hint("tau", value=tau_guess, min=0)
 
         params = self.make_params()
         return lmfit.models.update_param_vals(params, self.prefix, **kws)

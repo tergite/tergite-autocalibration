@@ -50,7 +50,6 @@ class RabiQubitAnalysis(BaseQubitAnalysis):
             self.amplitudes[0], self.amplitudes[-1], 200
         )  # x-values for plotting
 
-        # Gives an initial guess for the model parameters and then fits the model to the data.
         guess = model.guess(
             self.magnitudes[self.data_var].values, drive_amp=self.amplitudes
         )
