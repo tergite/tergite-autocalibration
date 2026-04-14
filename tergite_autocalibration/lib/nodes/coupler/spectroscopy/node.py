@@ -64,7 +64,7 @@ class CouplerDCSpectroscopyNode(CouplerNode):
 
         self.external_samplespace = {
             "dc_currents": {
-                coupler: np.arange(-2e-3, 2e-3, 80e-6) for coupler in self.couplers
+                coupler: np.arange(-2e-3, 2e-3, 480e-6) for coupler in self.couplers
             },
         }
         self.validate()

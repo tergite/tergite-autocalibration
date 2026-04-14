@@ -180,6 +180,9 @@ class AvoidedCrossings:
                 self._delta_I_above = high_current - low_current
             else:
                 self._delta_I_above = None
+        else:
+            self._delta_I_above = None
+            self._coupler_hint = None
 
         if len(partitions['coupler_below_qubit']) == 1:
             partition,  = partitions['coupler_below_qubit']
@@ -191,6 +194,8 @@ class AvoidedCrossings:
                 self._delta_I_below = high_current - low_current
             else:
                 self._delta_I_below = None
+        else:
+            self._delta_I_below = None
 
         for partition in partitions['coupler_below_qubit']:
             low_sample = np.ceil(partition[0]).astype(int)
