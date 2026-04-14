@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import List
 
 import cf_xarray as cf
+import matplotlib.pyplot as plt
 
 # TODO: we should have a conditional import depending on a feature flag here
 import numpy as np
@@ -377,9 +378,9 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
                     else:
                         fig.set_size_inches(ncols * 6, nrows * 4)
 
-                fig.savefig(preview_path, bbox_inches="tight", dpi=100)
                 # some slack for the figure x and y labels
                 fig.tight_layout(rect=[0.05, 0.05, 1, 0.98])
+                fig.savefig(preview_path, bbox_inches="tight", dpi=100)
 
     def _analyze_all_couplers(self):
         analysis_results = {}

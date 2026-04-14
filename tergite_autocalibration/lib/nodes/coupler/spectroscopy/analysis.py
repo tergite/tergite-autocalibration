@@ -11,6 +11,8 @@
 # that they have been altered from the originals.
 
 
+from typing import Sequence
+
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
@@ -31,8 +33,6 @@ from tergite_autocalibration.lib.utils.analysis_models import (
 )
 from tergite_autocalibration.utils.dto.qoi import QOI
 
-model = fm.ResonatorModel()
-
 
 class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
     """
@@ -41,6 +41,7 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
+        self.model = fm.ResonatorModel()
 
     def find_peaks(self, spectroscopy_dataarray: xr.DataArray):
         qubit = spectroscopy_dataarray.qubit
@@ -92,8 +93,8 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
         detected_currents = []
         for current in self.dc_currents:
             array = spectroscopy_dataarray.sel({self.current_coord: current})
-            guess = model.guess(array, f=frequencies)
-            fit = model.fit(array, params=guess, f=frequencies)
+            guess = self.model.guess(array, f=frequencies)
+            fit = self.model.fit(array, params=guess, f=frequencies)
             fit_fr = fit.params["fr"].value
             fit_Ql = fit.params["Ql"].value
             fit_Qe = fit.params["Qe"].value
@@ -125,6 +126,10 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
             .swap_dims({common_dim: freq_coord})
             .drop_vars(drop_coord)
         )
+
+    def remove_none(self, seq: Sequence):
+        values = [x for x in seq if x is not None]
+        return values
 
     def analyze_coupler(self):
         for coord_name in self.dataset.coords:
@@ -200,29 +205,86 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
         )
         self.target_dips = self.find_resonator_dips(self.target_resonator_spectroscopy)
 
-        self.control_crossings = AvoidedCrossings(
+        control_crossings = AvoidedCrossings(
             self.control_peaks.currents, self.control_peaks.frequencies
         )
-        self.target_crossings = AvoidedCrossings(
+        target_crossings = AvoidedCrossings(
             self.target_peaks.currents, self.target_peaks.frequencies
         )
-        self.target_res_crossings = ResonatorAvoidedCrossings(
+        target_res_crossings = ResonatorAvoidedCrossings(
             self.target_dips.currents, self.target_dips.frequencies
         )
-        self.control_res_crossings = ResonatorAvoidedCrossings(
+        control_res_crossings = ResonatorAvoidedCrossings(
             self.control_dips.currents, self.control_dips.frequencies
         )
 
+        self.control_cross_currents = control_crossings.crossing_currents
+        self.control_cross_frequency = control_crossings.crossing_frequency.value
+        self.control_cross_freq_above = control_crossings.crossing_frequency.above
+        self.control_cross_freq_below = control_crossings.crossing_frequency.below
+        self.target_cross_currents = target_crossings.crossing_currents
+        self.target_cross_frequency = target_crossings.crossing_frequency.value
+        self.target_cross_freq_above = target_crossings.crossing_frequency.above
+        self.target_cross_freq_below = target_crossings.crossing_frequency.below
+        self.control_res_cross_currents = control_res_crossings.crossing_currents
+        self.control_res_cross_frequency = control_res_crossings.crossing_frequency
+        self.target_res_cross_currents = target_res_crossings.crossing_currents
+        self.target_res_cross_frequency = target_res_crossings.crossing_frequency
+
+        crossing_points = []
+        for cross_current in self.control_cross_currents:
+            crossing_points.append((cross_current, self.control_cross_frequency))
+        for cross_current in self.target_cross_currents:
+            crossing_points.append((cross_current, self.target_cross_frequency))
+        for cross_current in self.control_res_cross_currents:
+            crossing_points.append((cross_current, self.control_res_cross_frequency))
+        for cross_current in self.target_res_cross_currents:
+            crossing_points.append((cross_current, self.target_res_cross_frequency))
+        self.crossing_points = crossing_points
+
+        hint_Ic_res_target = target_res_crossings.frequency_hint
+        hint_Ic_res_control = control_res_crossings.frequency_hint
+        hint_Ic_qub_target = target_crossings.frequency_hint
+        hint_Ic_qub_control = control_crossings.frequency_hint
+        hint_I0_target = target_crossings.I0_hint
+        hint_I0_control = control_crossings.I0_hint
+
+        res_Ic_hints = self.remove_none((hint_Ic_res_control, hint_Ic_res_target))
+        qub_Ic_hints = self.remove_none((hint_Ic_qub_control, hint_Ic_qub_target))
+        qub_I0_hints = self.remove_none((hint_I0_control, hint_I0_target))
+        if res_Ic_hints:
+            Ic_hint = np.mean(res_Ic_hints)
+        elif qub_Ic_hints:
+            Ic_hint = np.mean(qub_Ic_hints)
+        else:
+            Ic_hint = None
+
+        if qub_I0_hints:
+            I0_hint = np.mean(qub_I0_hints)
+        else:
+            I0_hint = None
+
+        cross_currents, cross_freqs = zip(*crossing_points)
+        self.coupler_model = CouplerModel()
+        if Ic_hint:
+            self.coupler_model.set_param_hint("Ic", value=Ic_hint, vary=True)
+        if I0_hint:
+            self.coupler_model.set_param_hint("I0", value=I0_hint, vary=True)
+        self.coupler_result = self.coupler_model.fit(
+            cross_freqs, current=cross_currents
+        )
+        coupler_model_values = self.coupler_result.best_values
+        fmax = coupler_model_values["fmax"]
+        Ic = coupler_model_values["Ic"]
+        I0 = coupler_model_values["I0"]
+        offset = coupler_model_values["offset"]
+
         analysis_succesful = True
         analysis_result = {
-            "control_qubit_crossing_points": {
-                "value": 0,
-                "error": 0,
-            },
-            "target_qubit_crossing_points": {
-                "value": 0,
-                "error": 0,
-            },
+            "fmax": {"value": fmax, "error": 0},
+            "Ic": {"value": Ic, "error": 0},
+            "I0": {"value": I0, "error": 0},
+            "offset": {"value": offset, "error": 0},
         }
 
         qoi = QOI(analysis_result, analysis_succesful)
@@ -258,67 +320,29 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
         }
         edge_styles = {"color": "grey", "linestyle": "dashed", "linewidth": 2}
 
-        control_cross_currents = self.control_crossings.crossing_currents
-        control_cross_frequency = self.control_crossings.crossing_frequency.value
-        control_cross_freq_above = self.control_crossings.crossing_frequency.above
-        control_cross_freq_below = self.control_crossings.crossing_frequency.below
-        target_cross_currents = self.target_crossings.crossing_currents
-        target_cross_frequency = self.target_crossings.crossing_frequency.value
-        target_cross_freq_above = self.target_crossings.crossing_frequency.above
-        target_cross_freq_below = self.target_crossings.crossing_frequency.below
-        control_res_cross_currents = self.control_res_crossings.crossing_currents
-        control_res_cross_frequency = self.control_res_crossings.crossing_frequency
-        target_res_cross_currents = self.target_res_crossings.crossing_currents
-        target_res_cross_frequency = self.target_res_crossings.crossing_frequency
-        coupler_hint_target = self.target_res_crossings.frequency_hint
-        coupler_hint_control = self.control_res_crossings.frequency_hint
-        coupler_hint_qub_target = self.target_crossings.frequency_hint
-        coupler_hint_qub_control = self.control_crossings.frequency_hint
-
-        if coupler_hint_target and coupler_hint_control:
-            coupler_hint = np.mean([coupler_hint_control, coupler_hint_target])
-        elif any((coupler_hint_control, coupler_hint_target)):
-            for hint in (coupler_hint_control, coupler_hint_target):
-                if hint is not None:
-                    coupler_hint = hint
-        elif coupler_hint_qub_control and coupler_hint_qub_target:
-            coupler_hint = np.mean([coupler_hint_qub_control, coupler_hint_qub_target])
-        elif any((coupler_hint_qub_control, coupler_hint_qub_target)):
-            for hint in (coupler_hint_qub_control, coupler_hint_qub_target):
-                if hint is not None:
-                    coupler_hint = hint
-        else:
-            coupler_hint = None
-
-        crossing_points = []
-        for cross_current in control_cross_currents:
+        for cross_current in self.control_cross_currents:
             ax1.axvline(cross_current, **crossing_styles)
-            crossing_points.append((cross_current, control_cross_frequency))
-        for cross_current in target_cross_currents:
+        for cross_current in self.target_cross_currents:
             ax2.axvline(cross_current, **crossing_styles)
-            crossing_points.append((cross_current, target_cross_frequency))
-        for cross_current in control_res_cross_currents:
+        for cross_current in self.control_res_cross_currents:
             ax3.axvline(cross_current, **crossing_styles)
-            crossing_points.append((cross_current, control_res_cross_frequency))
-        for cross_current in target_res_cross_currents:
+        for cross_current in self.target_res_cross_currents:
             ax4.axvline(cross_current, **crossing_styles)
-            crossing_points.append((cross_current, target_res_cross_frequency))
 
         ax1.set(xlabel=None)
         ax2.set(xlabel=None)
 
-        cross_currents, cross_freqs = zip(*crossing_points)
-        coupler_model = CouplerModel()
-        if coupler_hint is not None:
-            coupler_model.set_param_hint("Ic", value=coupler_hint, vary=True)
-        coupler_result = coupler_model.fit(cross_freqs, current=cross_currents)
         fit_plot_currents = np.linspace(self.dc_currents[0], self.dc_currents[-1], 200)
-        evaluated_freqs = coupler_model.eval(
-            coupler_result.params, current=fit_plot_currents
+        evaluated_freqs = self.coupler_model.eval(
+            self.coupler_result.params, current=fit_plot_currents
         )
         ax5.plot(fit_plot_currents, evaluated_freqs, "r-")
-        fmax = coupler_result.best_values["fmax"] + coupler_result.best_values["offset"]
+        fmax = (
+            self.coupler_result.best_values["fmax"]
+            + self.coupler_result.best_values["offset"]
+        )
 
+        cross_currents, cross_freqs = zip(*self.crossing_points)
         ax5.scatter(cross_currents, cross_freqs, **coupler_styles)
 
         scatter_plots = [
@@ -333,26 +357,27 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
                 ax.scatter(x, y, **peak_styles)
 
         horizontal_lines = [
-            (ax1, control_cross_freq_above, edge_styles),
-            (ax1, control_cross_freq_below, edge_styles),
-            (ax1, control_cross_frequency, crossing_styles),
-            (ax2, target_cross_freq_above, edge_styles),
-            (ax2, target_cross_freq_below, edge_styles),
-            (ax2, target_cross_frequency, crossing_styles),
+            (ax1, self.control_cross_freq_above, edge_styles),
+            (ax1, self.control_cross_freq_below, edge_styles),
+            (ax1, self.control_cross_frequency, crossing_styles),
+            (ax2, self.target_cross_freq_above, edge_styles),
+            (ax2, self.target_cross_freq_below, edge_styles),
+            (ax2, self.target_cross_frequency, crossing_styles),
             (ax5, fmax, crossing_styles),
         ]
-        ax6.axis("off")
-
         for ax, freq, style in horizontal_lines:
             if freq is not None:
                 ax.axhline(freq, **style)
-
         ax5.axhline(fmax, **crossing_styles, label=f"fmax: {fmax:.4e}")
+        ax5.set_ylabel('frequencies')
         ax5.legend()
+        for ax in (ax1, ax2, ax3, ax4, ax5):
+            plt.setp(ax.get_xticklabels(), rotation=30, horizontalalignment="center")
+
+        ax6.axis("off")
 
         figures_list.append(fig)
         figures_dictionary[self.coupler] = figures_list
-        plt.show()
         return
 
 

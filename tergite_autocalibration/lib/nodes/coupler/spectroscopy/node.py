@@ -46,7 +46,7 @@ class CouplerDCSpectroscopyNode(CouplerNode):
     measurement_obj = CouplerSpectroscopyMeasurement
     analysis_obj = CouplerSpectroscopyNodeAnalysis
     measurement_type = ExternalParameterNode
-    coupler_qois = ["control_qubit_crossing_points", "target_qubit_crossing_points"]
+    coupler_qois = ["fmax", "Ic", "I0", "offset"]
 
     def __init__(self, couplers: list[str], **schedule_keywords):
         super().__init__(couplers, **schedule_keywords)

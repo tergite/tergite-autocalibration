@@ -154,6 +154,7 @@ class AvoidedCrossings:
             elif slope < 0:
                 partitions_where_coupler_above_qubit.append(partition)
 
+
         partitions = {
             'coupler_above_qubit': partitions_where_coupler_above_qubit,
             'coupler_below_qubit': partitions_where_coupler_below_qubit,
@@ -174,17 +175,22 @@ class AvoidedCrossings:
             high_sample = np.floor(partition[1]).astype(int)
             low_current = self.currents[low_sample]
             high_current = self.currents[high_sample]
-            self._delta_I_above = high_current - low_current
             self._coupler_hint = np.mean((low_current, high_current))
+            if low_sample > 0 and high_sample < len(self.currents)-1:
+                self._delta_I_above = high_current - low_current
+            else:
+                self._delta_I_above = None
 
         if len(partitions['coupler_below_qubit']) == 1:
             partition,  = partitions['coupler_below_qubit']
             low_sample = np.ceil(partition[0]).astype(int)
             high_sample = np.floor(partition[1]).astype(int)
-            low_current = self.currents[low_sample]
-            high_current = self.currents[high_sample]
-            self._delta_I_below = high_current - low_current
-            self._coupler_hint = np.mean((low_current, high_current))
+            if low_sample > 0 and high_sample < len(self.currents)-1:
+                low_current = self.currents[low_sample]
+                high_current = self.currents[high_sample]
+                self._delta_I_below = high_current - low_current
+            else:
+                self._delta_I_below = None
 
         for partition in partitions['coupler_below_qubit']:
             low_sample = np.ceil(partition[0]).astype(int)
@@ -244,12 +250,11 @@ class CouplerModel(lmfit.model.Model):
         # Typically coupler are designed up to 9GHz
         self.set_param_hint("fmax", value=9e9, min=6e9)
         # Expected current at fmax, helps the fitting algorithm
-        self.set_param_hint("Ic", value=1e-3, vary=True)
+        # self.set_param_hint("Ic", value=1e-3, vary=True)
         # Typically the period is around 3mAmp
-        # self.set_param_hint("I0", value=3e-3, vary=True)
+        # self.set_param_hint("I0", value=2.8e-3, vary=True)
         # Offset is a typical anharmonicity
         self.set_param_hint("offset", value=0, max=300e6)
-
 
     def guess(self, data, **kws) -> lmfit.parameter.Parameters:
         current = kws.get("current", None)
@@ -257,7 +262,6 @@ class CouplerModel(lmfit.model.Model):
             raise ValueError(
                 'Variable "current" must be specified in order to guess parameters'
             )
-
 
         params = self.make_params()
         return lmfit.models.update_param_vals(params, self.prefix, **kws)
