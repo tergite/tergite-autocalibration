@@ -17,8 +17,8 @@ import xarray
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.analysis import (
-    ROThreeStateAmplitudeNodeAnalysis,
     OptimalROTwoStateAmplitudeNodeAnalysis,
+    ROThreeStateAmplitudeNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.measurement import (
     ROAmplitudeOptimizationMeasurement,
@@ -47,7 +47,7 @@ class ROAmplitudeTwoStateOptimizationNode(QubitNode):
         self.loops = 1000
         self.schedule_keywords["loop_repetitions"] = self.loops
         self.schedule_keywords["qubit_state"] = self.qubit_state
-        self.plots_per_qubit = 3  #  fidelity plot, IQ shots, confusion matrix
+        self.plots_per_qubit = 3  # fidelity plot, IQ shots, confusion matrix
 
         self.schedule_samplespace = {
             "qubit_states": {
