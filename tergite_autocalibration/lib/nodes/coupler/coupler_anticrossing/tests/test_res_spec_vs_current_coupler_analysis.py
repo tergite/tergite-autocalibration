@@ -21,7 +21,7 @@ from matplotlib import pyplot as plt
 from numpy import ndarray
 
 from tergite_autocalibration.lib.base.analysis import BaseAnalysis, BaseCouplerAnalysis
-from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
+from tergite_autocalibration.lib.nodes.coupler.coupler_anticrossing.analysis import (
     ResonatorSpectroscopyVsCurrentCouplerAnalysis,
 )
 from tergite_autocalibration.tests.utils.decorators import with_os_env

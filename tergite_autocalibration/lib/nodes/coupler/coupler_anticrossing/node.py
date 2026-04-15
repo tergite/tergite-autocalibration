@@ -18,7 +18,7 @@ from lmfit.models import LorentzianModel
 
 from tergite_autocalibration.config.globals import CONFIG
 from tergite_autocalibration.lib.base.node import CouplerNode
-from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
+from tergite_autocalibration.lib.nodes.coupler.coupler_anticrossing.analysis import (
     CouplerAnticrossingNodeAnalysis,
     ResonatorSpectroscopyVsCurrentNodeAnalysis,
 )

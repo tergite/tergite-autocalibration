@@ -20,9 +20,9 @@ import xarray as xr
 from matplotlib import pyplot as plt
 from numpy import ndarray
 
-from tergite_autocalibration.config.globals import REDIS_CONNECTION, CONFIG
+from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.lib.base.analysis import BaseAnalysis, BaseCouplerAnalysis
-from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
+from tergite_autocalibration.lib.nodes.coupler.coupler_anticrossing.analysis import (
     CouplerAnticrossingAnalysis,
     ResonatorSpectroscopyVsCurrentCouplerAnalysis,
 )
