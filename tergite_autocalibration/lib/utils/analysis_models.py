@@ -44,7 +44,7 @@ def resonator_hanger_frequency(*, fit_fr, fit_ph, fit_Qe, fit_Ql):
     return resonator_frequency
 
 class ResonatorAvoidedCrossings:
-    def __init__(self, currents, frequencies, threshold=2e6):
+    def __init__(self, currents, frequencies):
         self.currents = currents
         self.frequencies = frequencies
 
@@ -69,7 +69,7 @@ class ResonatorAvoidedCrossings:
         return  median(self.frequencies)
 
     @property
-    def frequency_hint(self) -> float | None:
+    def I0_hint(self) -> float | None:
         if len(self.crossing_currents) != 2:
             return None
         return np.mean(self.crossing_currents)
@@ -101,6 +101,7 @@ class AvoidedCrossings:
         partition_indices.append(len(currents))
         self.partition_indices = partition_indices
 
+    @classmethod
     def _parity_of_jump(self, jump: int, frequencies: np.ndarray):
         frequency_diffs = np.diff(frequencies)
         sign_of_jump = np.sign(frequency_diffs[jump]).astype(int)
@@ -225,7 +226,7 @@ class AvoidedCrossings:
         return frequency_values(value=cross_frequency, below=frequency_below, above=frequency_above)
 
     @property
-    def frequency_hint(self) -> float | None:
+    def Ic_hint(self) -> float | None:
         return self._coupler_hint
 
     @property

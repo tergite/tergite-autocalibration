@@ -242,10 +242,10 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
             crossing_points.append((cross_current, self.target_res_cross_frequency))
         self.crossing_points = crossing_points
 
-        hint_Ic_res_target = target_res_crossings.frequency_hint
-        hint_Ic_res_control = control_res_crossings.frequency_hint
-        hint_Ic_qub_target = target_crossings.frequency_hint
-        hint_Ic_qub_control = control_crossings.frequency_hint
+        hint_Ic_res_target = target_res_crossings.I0_hint
+        hint_Ic_res_control = control_res_crossings.I0_hint
+        hint_Ic_qub_target = target_crossings.Ic_hint
+        hint_Ic_qub_control = control_crossings.Ic_hint
         hint_I0_target = target_crossings.I0_hint
         hint_I0_control = control_crossings.I0_hint
 
