@@ -37,8 +37,8 @@ def test_cannotCreateCorrectType():
     """
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
     coupler = "q14_q15"
-    if REDIS_CONNECTION.hexists(f"couplers:{coupler}", "parking_current"):
-        REDIS_CONNECTION.hdel(f"couplers:{coupler}", "parking_current")
+    if REDIS_CONNECTION.hexists(f"couplers:{coupler}", "initial_parking_current"):
+        REDIS_CONNECTION.hdel(f"couplers:{coupler}", "initial_parking_current")
 
     with pytest.raises(TypeError):
         CZParametrizationNode(all_qubits=["q14", "q15"], couplers=["q14_q15"])
@@ -47,8 +47,10 @@ def test_cannotCreateCorrectType():
 def test_canCreateCorrectType():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
     coupler = "q14_q15"
-    REDIS_CONNECTION.hset(f"couplers:{coupler}", "parking_current", "100e-6")
+    REDIS_CONNECTION.hset(f"couplers:{coupler}", "initial_parking_current", "100e-6")
     REDIS_CONNECTION.hset(f"couplers:{coupler}", "cz_phase_path", "via_20")
+    REDIS_CONNECTION.hset(f"couplers:{coupler}", "control_qubit", "q15")
+    REDIS_CONNECTION.hset(f"couplers:{coupler}", "target_qubit", "q14")
     REDIS_CONNECTION.hset(f"transmons:{'q14'}", "clock_freqs:f01", "4.2e6")
     REDIS_CONNECTION.hset(f"transmons:{'q14'}", "clock_freqs:f12", "4.0e6")
     REDIS_CONNECTION.hset(f"transmons:{'q15'}", "clock_freqs:f01", "5.2e6")
@@ -75,7 +77,11 @@ def test_ValidationReturnErrorWithQubitsNotMatchingCouplers():
 
 def test_MeasurementClassType():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    c = CZParametrizationNode(all_qubits=["q14", "q15"], couplers=["q14_q15"])
+    coupler = "q14_q15"
+    REDIS_CONNECTION.hset(f"couplers:{coupler}", "initial_parking_current", "100e-6")
+    REDIS_CONNECTION.hset(f"couplers:{coupler}", "control_qubit", "q15")
+    REDIS_CONNECTION.hset(f"couplers:{coupler}", "target_qubit", "q14")
+    c = CZParametrizationNode(all_qubits=["q14", "q15"], couplers=[coupler])
     assert isinstance(c.measurement_obj, type(CZParametrizationMeasurement))
     assert isinstance(c.analysis_obj, type(CZParametrizationAnalysis))
     assert issubclass(c.measurement_type, ExternalParameterNode)
@@ -84,8 +90,14 @@ def test_MeasurementClassType():
 def test_dummy_generation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
     for coupler in CONFIG.run.couplers:
-        REDIS_CONNECTION.hset(f"couplers:{coupler}", "parking_current", "100e-6")
+        c_qubit, t_qubit = coupler.split("_")
+        REDIS_CONNECTION.hset(
+            f"couplers:{coupler}", "initial_parking_current", "100e-6"
+        )
         REDIS_CONNECTION.hset(f"couplers:{coupler}", "cz_phase_path", "via_20")
+        REDIS_CONNECTION.hset(f"couplers:{coupler}", "control_qubit", c_qubit)
+        REDIS_CONNECTION.hset(f"couplers:{coupler}", "target_qubit", t_qubit)
+
     for qubit in CONFIG.run.qubits[::2]:
         REDIS_CONNECTION.hset(f"transmons:{qubit}", "clock_freqs:f01", "4.2e6")
         REDIS_CONNECTION.hset(f"transmons:{qubit}", "clock_freqs:f12", "4.0e6")

@@ -12,10 +12,10 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
+
 import numpy as np
 from quantify_scheduler import Schedule
 from quantify_scheduler.enums import BinMode
-from quantify_scheduler.operations.control_flow_library import Loop
 from quantify_scheduler.operations.gate_library import X90, Reset, Rxy
 from quantify_scheduler.operations.pulse_library import IdlePulse, SoftSquarePulse
 from quantify_scheduler.resources import ClockResource
@@ -29,7 +29,7 @@ from tergite_autocalibration.utils.dto.extended_gates import Measure_RO_3state_O
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
-class CZ_LocalPhasesMeasurement(BaseMeasurement):
+class CZLocalPhasesMeasurement(BaseMeasurement):
     def __init__(
         self,
         transmons: dict[str, ExtendedTransmon],

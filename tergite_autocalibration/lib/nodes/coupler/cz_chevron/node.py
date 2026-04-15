@@ -51,14 +51,14 @@ class CZChevronNode(CouplerNode):
         self.analysis_keywords = {
             coupler: {
                 "phase_path": phase_paths[coupler],
-                "number_of_working_points": 11,
+                "number_of_working_points": 15,
             }
             for coupler in self.couplers
         }
 
         self.outer_schedule_samplespace = {
             "cz_pulse_frequencies": {
-                coupler: np.linspace(-2.5e6, 1.5e6, 25)
+                coupler: np.linspace(-3.0e6, 2.0e6, 25)
                 + self.known_cz_frequency(coupler)
                 for coupler in self.couplers
             }
@@ -66,7 +66,8 @@ class CZChevronNode(CouplerNode):
 
         self.schedule_samplespace = {
             "cz_pulse_durations": {
-                coupler: np.arange(24e-9, 240e-9, 8e-9) for coupler in self.couplers
+                coupler: np.arange(24e-9, self.max_duration(coupler), 8e-9)
+                for coupler in self.couplers
             },
         }
 
@@ -76,6 +77,16 @@ class CZChevronNode(CouplerNode):
         )
         return known_cz_frequency
 
+    def max_duration(self, coupler: str):
+        half_duration = float(
+            REDIS_CONNECTION.hget(f"couplers:{coupler}", "cz_half_duration")
+        )
+        max_duration = 2 * half_duration
+        max_duration_in_ns = round(max_duration / 1e-9)
+        # ensure multiple of 4ns, and add some slack:
+        max_duration_in_ns = (max_duration_in_ns // 4) * 4 + 40
+        return max_duration_in_ns * 1e-9
+
     def all_phase_paths(self) -> dict[str, Literal["via_02", "via_20"]]:
         phase_paths = {}
         for coupler in self.couplers:
@@ -84,7 +95,7 @@ class CZChevronNode(CouplerNode):
         return phase_paths
 
     def initial_operation(self):
-        self.spi_manager.set_parking_currents(self.couplers)
+        self.spi_manager.set_initial_parking_currents(self.couplers)
 
     def generate_dummy_dataset(self):
         dataset = xr.Dataset()

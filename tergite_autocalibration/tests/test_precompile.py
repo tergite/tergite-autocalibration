@@ -10,6 +10,8 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+from itertools import product
+
 import pytest
 
 from tergite_autocalibration.lib.nodes.schedule_node import OuterScheduleNode
@@ -37,14 +39,12 @@ def test_precompile_all_nodes_without_error(node_name):
         pytest.skip(
             "We skip purity_benchmarking for now, because it needs some refactoring."
         )
-    if node_name == "cz_rb":
-        pytest.skip("We skip cz_rb for now, because it needs some refactoring.")
 
     if issubclass(node.measurement_type, OuterScheduleNode):
         # The assembly of samplespaces is taken from the OuterScheduleNode
         outer_dimensions = samplespace_dimensions(node.outer_schedule_samplespace)
-        iterations = outer_dimensions[0]
-        for this_iteration in range(iterations):
+        iterations = product(*(range(n) for n in outer_dimensions))
+        for this_iteration in iterations:
             reduced_outer_samplespace = reduce_samplespace(
                 this_iteration, node.outer_schedule_samplespace
             )

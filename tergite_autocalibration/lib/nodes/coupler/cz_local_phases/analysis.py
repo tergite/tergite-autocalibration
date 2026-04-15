@@ -29,7 +29,7 @@ from tergite_autocalibration.lib.utils.classification_functions import (
 from tergite_autocalibration.utils.dto.qoi import QOI
 
 
-class CZ_LocalPhasesCouplerAnalysis(BaseCouplerAnalysis):
+class CZLocalPhasesCouplerAnalysis(BaseCouplerAnalysis):
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
@@ -217,8 +217,8 @@ class CZ_LocalPhasesCouplerAnalysis(BaseCouplerAnalysis):
         figures_dictionary[self.coupler] = [fig]
 
 
-class CZ_LocalPhasesNodeAnalysis(BaseAllCouplersAnalysis):
-    single_coupler_analysis_obj = CZ_LocalPhasesCouplerAnalysis
+class CZLocalPhasesNodeAnalysis(BaseAllCouplersAnalysis):
+    single_coupler_analysis_obj = CZLocalPhasesCouplerAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)

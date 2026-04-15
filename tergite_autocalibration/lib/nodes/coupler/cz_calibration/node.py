@@ -24,14 +24,14 @@ from tergite_autocalibration.lib.nodes.coupler.cz_calibration.analysis import (
     CZCalibrationNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.coupler.cz_calibration.measurement import (
-    CZ_CalibrationMeasurement,
+    CZCalibrationMeasurement,
 )
 from tergite_autocalibration.lib.nodes.schedule_node import OuterScheduleNode
 
 
-class CZ_CalibrationNode(CouplerNode):
+class CZCalibrationNode(CouplerNode):
     name: str = "cz_calibration"
-    measurement_obj = CZ_CalibrationMeasurement
+    measurement_obj = CZCalibrationMeasurement
     analysis_obj = CZCalibrationNodeAnalysis
     measurement_type = OuterScheduleNode
     coupler_qois = ["cz_pulse_frequency", "cz_pulse_duration", "cz_phase"]
@@ -85,7 +85,7 @@ class CZ_CalibrationNode(CouplerNode):
         return working_points_array
 
     def initial_operation(self):
-        self.spi_manager.set_parking_currents(self.couplers)
+        self.spi_manager.set_initial_parking_currents(self.couplers)
 
     def generate_dummy_dataset(self):
         dataset = xr.Dataset()

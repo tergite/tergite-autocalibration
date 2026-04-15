@@ -378,6 +378,7 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
 
         figures_list.append(fig)
         figures_dictionary[self.coupler] = figures_list
+        plt.show()
         return
 
 

@@ -12,6 +12,7 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
+
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
@@ -27,7 +28,7 @@ from tergite_autocalibration.lib.utils.classification_functions import (
 from tergite_autocalibration.utils.dto.qoi import QOI
 
 
-class TwoQubitRnBAnalysis(BaseCouplerAnalysis):
+class CZRBCouplerAnalysis(BaseCouplerAnalysis):
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
@@ -234,12 +235,16 @@ class TwoQubitRnBAnalysis(BaseCouplerAnalysis):
         self.lambda_r_CZ = self.interleaved_lambda_r / self.standard_lambda_r
 
         # Fidelity based on Nakamura's paper
-        self.average_fidelity = 3 / 4 * self.lambda_r_CZ + self.one_minus_L1_CZ / 4
+        self.average_fidelity_nakamura = (
+            3 / 4 * self.lambda_r_CZ + self.one_minus_L1_CZ / 4
+        )
+        # fidelity based on simple exponential fits
+        self.cz_fidelity = 0.25 + 0.75 * self.interleaved_p / self.standard_p
 
-        analysis_succesful = False
+        analysis_succesful = True
         analysis_result = {
             "cz_fidelity": {
-                "value": 0,
+                "value": self.cz_fidelity,
                 "error": 0,
             },
         }
@@ -261,35 +266,12 @@ class TwoQubitRnBAnalysis(BaseCouplerAnalysis):
         computational_space_dimension = 4
 
         standard_probs_00 = self.P00.sel({self.interleave_modes_coord: False})
-        standard_probs_chi_1 = (self.P00 + self.P01 + self.P10 + self.P11).sel(
-            {self.interleave_modes_coord: False}
-        )
-        standard_probs_reduced_ideal = (
-            standard_probs_00 - standard_probs_chi_1 / computational_space_dimension
-        )
-        interleaved_probs_00 = self.P00.sel({self.interleave_modes_coord: False})
-        interleaved_probs_chi_1 = (self.P00 + self.P01 + self.P10 + self.P11).sel(
-            {self.interleave_modes_coord: False}
-        )
-        interleaved_probs_reduced_ideal = (
-            interleaved_probs_00
-            - interleaved_probs_chi_1 / computational_space_dimension
-        )
-        standard_probs_00.plot(
-            ax=axs[0], x=self.number_cliffords_coord, hue=self.seed_coord, alpha=0.2
-        )
-        standard_probs_chi_1.plot(
-            ax=axs[1], x=self.number_cliffords_coord, hue=self.seed_coord, alpha=0.2
-        )
-        standard_probs_reduced_ideal.plot(
-            ax=axs[1], x=self.number_cliffords_coord, hue=self.seed_coord, alpha=0.2
-        )
-        interleaved_probs_chi_1.plot(
-            ax=axs[1], x=self.number_cliffords_coord, hue=self.seed_coord, alpha=0.2
-        )
-        interleaved_probs_reduced_ideal.plot(
-            ax=axs[1], x=self.number_cliffords_coord, hue=self.seed_coord, alpha=0.2
-        )
+
+        comp_space_probs = self.P00 + self.P01 + self.P10 + self.P11
+
+        # Standard exponential plots
+        ############################
+        title = ""
         axs[0].plot(
             self.fit_n_cliffords,
             self.standard_fit_y,
@@ -297,6 +279,59 @@ class TwoQubitRnBAnalysis(BaseCouplerAnalysis):
             lw=3,
             label=rf"$p_{{SRB}}$: {self.standard_p:.3f}",
         )
+        styles = {"hue": self.seed_coord, "alpha": 0.2}
+        standard_probs_00.plot(ax=axs[0], x=self.number_cliffords_coord, **styles)
+
+        standard_probs_chi_1 = comp_space_probs.sel(
+            {self.interleave_modes_coord: False}
+        )
+        standard_probs_reduced_ideal = (
+            standard_probs_00 - standard_probs_chi_1 / computational_space_dimension
+        )
+        interleaved_probs_00 = self.P00.sel({self.interleave_modes_coord: False})
+        interleaved_probs_chi_1 = comp_space_probs.sel(
+            {self.interleave_modes_coord: False}
+        )
+        interleaved_probs_reduced_ideal = (
+            interleaved_probs_00
+            - interleaved_probs_chi_1 / computational_space_dimension
+        )
+        if True in self.interleave_modes:
+            interleaved_probs_00 = self.P00.sel({self.interleave_modes_coord: True})
+            interleaved_probs_00.plot(
+                ax=axs[0],
+                x=self.number_cliffords_coord,
+                hue=self.seed_coord,
+                alpha=0.2,
+                ls=":",
+            )
+            axs[0].plot(
+                self.fit_n_cliffords,
+                self.interleaved_fit_y,
+                color="magenta",
+                lw=3,
+                label=f"$p_{{IRB}}$: {self.interleaved_p:.3f}",
+            )
+            # fidelity based on simple exponential fits
+            title = rf"CZ fidelity = {self.cz_fidelity:.3f}"
+        axs[0].set_ylabel(r"State |00$\rangle$ probability")
+        axs[0].axhline(0.25, color="black")
+        axs[0].legend()
+        axs[0].set_title(title)
+        ############################
+
+        # Leakage RB plots from Nakamura's paper
+        ########################################
+        styles = {"hue": self.seed_coord, "alpha": 0.2}
+        standard_probs_chi_1.plot(ax=axs[1], x=self.number_cliffords_coord, **styles)
+        standard_probs_reduced_ideal.plot(
+            ax=axs[1], x=self.number_cliffords_coord, **styles
+        )
+        interleaved_probs_chi_1.plot(ax=axs[1], x=self.number_cliffords_coord, **styles)
+        interleaved_probs_reduced_ideal.plot(
+            ax=axs[1], x=self.number_cliffords_coord, **styles
+        )
+
         lambda_standard_str = rf"$\lambda_L^{{SRB}}$: {self.standard_lambda_L:.3f}"
         A_standard_str = rf"$A_M^{{SRB}}$: {self.standard_AM:.3f}"
         L1_standard = (1 - self.standard_lambda_L) * (1 - self.standard_AM)
@@ -358,37 +393,16 @@ class TwoQubitRnBAnalysis(BaseCouplerAnalysis):
             lw=3,
             label=rf"$\lambda_r^{{SRB}}$: {self.interleaved_lambda_r:.3f}",
         )
-        if True in self.interleave_modes:
-            interleaved_probs_00 = self.P00.sel({self.interleave_modes_coord: True})
-            interleaved_probs_00.plot(
-                ax=axs[0],
-                x=self.number_cliffords_coord,
-                hue=self.seed_coord,
-                alpha=0.2,
-                ls=":",
-            )
-            axs[0].plot(
-                self.fit_n_cliffords,
-                self.interleaved_fit_y,
-                color="magenta",
-                lw=3,
-                label=f"$p_{{IRB}}$: {self.interleaved_p:.3f}",
-            )
-            # fidelity based on simple exponential fits
-            fidelity = 0.25 + 0.75 * self.interleaved_p / self.standard_p
-            title = rf"CZ fidelity = {fidelity:.3f}"
-        axs[0].set_ylabel(r"State |00$\rangle$ probability")
-        axs[0].axhline(0.25, color="black")
-        axs[0].legend()
         axs[1].legend()
-        axs[0].set_title(title)
-        axs[1].set_title(f"CZ fidelity (Nakamura paper): {self.average_fidelity:0.3f}")
+        axs[1].set_title(
+            f"CZ fidelity (Nakamura paper): {self.average_fidelity_nakamura:0.3f}"
+        )
 
         figures_dictionary[self.coupler] = [fig]
 
 
-class TwoQubitRBNodeAnalysis(BaseAllCouplersAnalysis):
-    single_coupler_analysis_obj = TwoQubitRnBAnalysis
+class CZRBNodeAnalysis(BaseAllCouplersAnalysis):
+    single_coupler_analysis_obj = CZRBCouplerAnalysis
 
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)

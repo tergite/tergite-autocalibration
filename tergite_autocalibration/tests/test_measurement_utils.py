@@ -60,14 +60,14 @@ def test_reduce_samplespace_base_case():
     """
     Base case with one-dimensional samplespace
     """
-    reduced_external_samplespace_result = reduce_samplespace(2, _simple_samplespace)
-    reduced_external_samplespace = {
+    reduced_samplespace_result = reduce_samplespace((2,), _simple_samplespace)
+    reduced_samplespace = {
         "frequencies": {
             "q1": np.array([4.2e9]),
             "q2": np.array([4.7e9]),
         }
     }
-    assert reduced_external_samplespace == reduced_external_samplespace_result
+    assert reduced_samplespace == reduced_samplespace_result
 
 
 def test_reduce_samplespace_two_dimensions():
@@ -75,14 +75,18 @@ def test_reduce_samplespace_two_dimensions():
     Test whether the function can handle two-dimensional samplespaces.
     The second dimensions will be ignored.
     """
-    reduced_external_samplespace_result = reduce_samplespace(2, _samplespace)
-    reduced_external_samplespace = {
+    reduced_samplespace_result = reduce_samplespace((2, 4), _samplespace)
+    reduced_samplespace = {
         "frequencies": {
             "q1": np.array([4.2e9]),
             "q2": np.array([4.7e9]),
-        }
+        },
+        "amplitudes": {
+            "q1": np.array([0.5]),
+            "q2": np.array([0.6]),
+        },
     }
-    assert reduced_external_samplespace == reduced_external_samplespace_result
+    assert reduced_samplespace == reduced_samplespace_result
 
 
 def test_reduce_samplespace_index_out_of_bounds():
@@ -90,15 +94,15 @@ def test_reduce_samplespace_index_out_of_bounds():
     Test what happens when the index goes ouf ot range
     """
     with pytest.raises(IndexError):
-        reduce_samplespace(4, _simple_samplespace)
+        reduce_samplespace((4,), _simple_samplespace)
 
 
 def test_reduce_samplespace_empty():
     """
     Test with empty samplespace
     """
-    assert reduce_samplespace(0, {}) == {}
-    assert reduce_samplespace(1, {}) == {}
+    assert reduce_samplespace((0,), {}) == {}
+    assert reduce_samplespace((1,), {}) == {}
 
 
 def test_samplespace_dimensions_base_case():

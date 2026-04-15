@@ -16,13 +16,13 @@ from pathlib import Path
 
 from tergite_autocalibration.lib.base.node import CouplerNode
 from tergite_autocalibration.lib.nodes.coupler.cz_local_phases.analysis import (
-    CZ_LocalPhasesNodeAnalysis,
+    CZLocalPhasesNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.coupler.cz_local_phases.measurement import (
-    CZ_LocalPhasesMeasurement,
+    CZLocalPhasesMeasurement,
 )
 from tergite_autocalibration.lib.nodes.coupler.cz_local_phases.node import (
-    CZ_LocalPhasesNode,
+    CZLocalPhasesNode,
 )
 from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 from tergite_autocalibration.tests.utils.decorators import with_redis
@@ -35,16 +35,16 @@ _redis_values_path = os.path.join(_test_data_dir, "redis-2026-02-06-18.json")
 @with_redis(_redis_values_path)
 def test_node_creation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = CZ_LocalPhasesNode(all_qubits=["q13", "q14"], couplers=["q13_q14"])
+    node = CZLocalPhasesNode(all_qubits=["q13", "q14"], couplers=["q13_q14"])
     assert isinstance(node, CouplerNode)
 
 
 @with_redis(_redis_values_path)
 def test_class_attribute_objects():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = CZ_LocalPhasesNode(all_qubits=["q13", "q14"], couplers=["q13_q14"])
-    assert isinstance(node.measurement_obj, type(CZ_LocalPhasesMeasurement))
-    assert isinstance(node.analysis_obj, type(CZ_LocalPhasesNodeAnalysis))
+    node = CZLocalPhasesNode(all_qubits=["q13", "q14"], couplers=["q13_q14"])
+    assert isinstance(node.measurement_obj, type(CZLocalPhasesMeasurement))
+    assert isinstance(node.analysis_obj, type(CZLocalPhasesNodeAnalysis))
     assert issubclass(node.measurement_type, ScheduleNode)
 
 
@@ -54,7 +54,7 @@ def test_dummy_generation():
 
     coupler = "q13_q14"
     couplers = [coupler]
-    node = CZ_LocalPhasesNode(all_qubits=["q13", "q14"], couplers=couplers)
+    node = CZLocalPhasesNode(all_qubits=["q13", "q14"], couplers=couplers)
     dummy_dataset = node.generate_dummy_dataset()
 
     number_of_local_phases = len(node.schedule_samplespace["local_phases"]["q13"])

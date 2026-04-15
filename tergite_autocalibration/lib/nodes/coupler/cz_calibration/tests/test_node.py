@@ -19,10 +19,10 @@ from tergite_autocalibration.lib.nodes.coupler.cz_calibration.analysis import (
     CZCalibrationNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.coupler.cz_calibration.measurement import (
-    CZ_CalibrationMeasurement,
+    CZCalibrationMeasurement,
 )
 from tergite_autocalibration.lib.nodes.coupler.cz_calibration.node import (
-    CZ_CalibrationNode,
+    CZCalibrationNode,
 )
 from tergite_autocalibration.lib.nodes.schedule_node import OuterScheduleNode
 from tergite_autocalibration.tests.utils.decorators import with_redis
@@ -35,15 +35,15 @@ _redis_values_path = os.path.join(_test_data_dir, "redis-2025-12-25-12-40-59.jso
 @with_redis(_redis_values_path)
 def test_node_creation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = CZ_CalibrationNode(all_qubits=["q13", "q14"], couplers=["q13_q14"])
+    node = CZCalibrationNode(all_qubits=["q13", "q14"], couplers=["q13_q14"])
     assert isinstance(node, CouplerNode)
 
 
 @with_redis(_redis_values_path)
 def test_class_attribute_objects():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = CZ_CalibrationNode(all_qubits=["q13", "q14"], couplers=["q13_q14"])
-    assert isinstance(node.measurement_obj, type(CZ_CalibrationMeasurement))
+    node = CZCalibrationNode(all_qubits=["q13", "q14"], couplers=["q13_q14"])
+    assert isinstance(node.measurement_obj, type(CZCalibrationMeasurement))
     assert isinstance(node.analysis_obj, type(CZCalibrationNodeAnalysis))
     assert issubclass(node.measurement_type, OuterScheduleNode)
 
@@ -54,7 +54,7 @@ def test_dummy_generation():
 
     coupler = "q13_q14"
     couplers = [coupler]
-    node = CZ_CalibrationNode(all_qubits=["q13", "q14"], couplers=couplers)
+    node = CZCalibrationNode(all_qubits=["q13", "q14"], couplers=couplers)
     dummy_dataset = node.generate_dummy_dataset()
 
     number_of_phases = len(node.schedule_samplespace["ramsey_phases"]["q13"])

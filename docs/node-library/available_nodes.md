@@ -18,7 +18,8 @@ graph TD
     B --> J(Qubit spectroscopy vs current)
     I --> J
     H2 --> K(CZ Parametrization) --> K1(CZ Chevron) --> K2(CZ Calibration) --> K3(CZ Local Phases)
-        
+    K3 --> L(CZ Randomized Benchmarking)
+    
     click A href "../nodes/resonator_spectroscopy_node"
     click F href "../nodes/resonator_spectroscopy_node"
     click G1 href "../nodes/resonator_spectroscopy_node"
@@ -26,9 +27,15 @@ graph TD
     click B href "../nodes/qubit_spectroscopy_node"
     click F1 href "../nodes/qubit_spectroscopy_node"
     click C href "../nodes/rabi_oscillations_node"
+    click C3 href "../nodes/randomized_benchmarking_node"
     click I href "../nodes/resonator_spectroscopy_vs_current_node"
     click J href "../nodes/qubit_spectroscopy_vs_current_node"
-
+    click K href "../nodes/cz_parametrization"
+    click K1 href "../nodes/cz_chevron"
+    click K2 href "../nodes/cz_calibration"
+    click K3 href "../nodes/cz_local_phases"
+    click L href "../nodes/cz_rb_node"
+    
     style A fill:#ffe6cc,stroke:#333,stroke-width:2px
     style A1 fill:#ffe6cc,stroke:#333,stroke-width:2px
     style B fill:#ffe6cc,stroke:#333,stroke-width:2px
@@ -88,7 +95,8 @@ graph TD
 - T1
 - T2
 - T2_echo
-- randomized_benchmarking
+- [randomized_benchmarking](nodes/randomized_benchmarking_node.md)
 - all_XY
+- [cz_rb](nodes/cz_rb_node.md)
 
 --8<-- "docs/node-library/redis_variable_names.md"

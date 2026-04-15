@@ -17,6 +17,8 @@
 Module containing a schedule class for randomized benchmarking measurement.
 """
 
+from typing import Literal
+
 import numpy as np
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.control_flow_library import Loop
@@ -30,7 +32,7 @@ from tergite_autocalibration.utils.dto.extended_gates import Measure_RO_3state_O
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
-class RandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
+class RandomizedBenchmarkingMeasurement(BaseMeasurement):
     def __init__(self, transmons: dict[str, ExtendedTransmon]):
         super().__init__(transmons)
         self.transmons = transmons
@@ -60,6 +62,8 @@ class RandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
         self,
         seeds: dict[str, int],
         number_of_cliffords: dict[str, np.ndarray],
+        interleave_gate: dict[str, str],
+        multiplexing: Literal["one_by_one", "parallel"],
     ):
         shot = Schedule("shot")
         shot.add(IdlePulse(16e-9))
@@ -76,56 +80,99 @@ class RandomizedBenchmarkingSSROMeasurement(BaseMeasurement):
         # The outer for loop iterates over all qubits:
         for this_qubit, clifford_sequence_lengths in number_of_cliffords.items():
             seed = seeds[this_qubit]  # this is just an integer
+            interleaving_gate = interleave_gate[this_qubit]
 
             rng = np.random.default_rng(seed)  # this is a generator
 
-            shot.add(
-                Reset(*qubits), ref_op=root_relaxation, ref_pt="end"
-            )  # To enforce parallelism we refer to the root relaxation
+            if multiplexing == "parallel":
+                shot.add(
+                    Reset(this_qubit),
+                    ref_op=root_relaxation,
+                    label=f"root_{this_qubit}",
+                )  # To enforce parallelism we refer to the root relaxation
+            # this is redundant, but left here for explicity
+            elif multiplexing == "one_by_one":
+                pass
+            else:
+                raise ValueError(f"invalid keyword {multiplexing}")
+
+            if interleaving_gate == "Standard":
+                interleaving_clifford_id = None
+            else:
+                if interleaving_gate not in cliffords.common_gates_indices:
+                    raise NotImplementedError(
+                        f"{interleaving_gate} not currently supported"
+                    )
+                interleaving_clifford_id = cliffords.common_gates_indices[
+                    interleaving_gate
+                ]
 
             # The inner for loop iterates over the random clifford sequence lengths
             for acq_index, this_number_of_cliffords in enumerate(
                 clifford_sequence_lengths
             ):
-                random_sequence = rng.integers(
+                clifford_sequence = rng.integers(
                     all_cliffords, size=this_number_of_cliffords
-                )  # for example if this_number_of_cliffords=4 , a random_sequence could be [5, 14, 19, 23]
-
-                for sequence_index in random_sequence:
-                    physical_gates = cliffords.XY_decompositions[sequence_index]
-                    for gate_angles in physical_gates.values():
-                        theta = gate_angles["theta"]
-                        phi = gate_angles["phi"]
-                        shot.add(Rxy(qubit=this_qubit, theta=theta, phi=phi))
-
-                _, recovery_XY_operations = cliffords.reversing_XY_matrix(
-                    random_sequence
+                )  # for example if this_number_of_cliffords=4, a random_sequence could be [5, 14, 19, 23]
+                if interleaving_clifford_id is not None:
+                    interleaved_sequence = np.empty(
+                        clifford_sequence.size * 2, dtype=int
+                    )
+                    interleaved_sequence[0::2] = clifford_sequence
+                    interleaved_sequence[1::2] = interleaving_clifford_id
+                    clifford_sequence = interleaved_sequence
+                self.single_qubit_rb_shot(
+                    shot, clifford_sequence, this_qubit, acq_index
                 )
-
-                for gate_angles in recovery_XY_operations.values():
-                    theta = gate_angles["theta"]
-                    phi = gate_angles["phi"]
-                    shot.add(Rxy(qubit=this_qubit, theta=theta, phi=phi))
-
-                shot.add(
-                    Measure_RO_3state_Opt(
-                        this_qubit, acq_index=acq_index, bin_mode=BinMode.APPEND
-                    ),
-                )
-
-                shot.add(Reset(this_qubit))
 
         return shot
+
+    def single_qubit_rb_shot(
+        self,
+        shot: Schedule,
+        clifford_sequence: np.ndarray,
+        this_qubit: str,
+        acq_index: int,
+    ) -> None:
+
+        for sequence_index in clifford_sequence:
+            physical_gates = cliffords.XY_decompositions[sequence_index]
+            for gate_angles in physical_gates.values():
+                theta = gate_angles["theta"]
+                phi = gate_angles["phi"]
+                shot.add(Rxy(qubit=this_qubit, theta=theta, phi=phi))
+
+        _, recovery_XY_operations = cliffords.reversing_XY_matrix(clifford_sequence)
+
+        for gate_angles in recovery_XY_operations.values():
+            theta = gate_angles["theta"]
+            phi = gate_angles["phi"]
+            shot.add(Rxy(qubit=this_qubit, theta=theta, phi=phi))
+
+        shot.add(
+            Measure_RO_3state_Opt(
+                this_qubit, acq_index=acq_index, bin_mode=BinMode.APPEND
+            ),
+        )
+
+        shot.add(Reset(this_qubit))
 
     def schedule_function(
         self,
         seeds: dict[str, int],
         number_of_cliffords: dict[str, np.ndarray],
         loop_repetitions: int,
+        interleave_gate: dict[str, str],
+        multiplexing: Literal["parallel", "one_by_one"] = "parallel",
     ) -> Schedule:
-        schedule = Schedule("multiplexed_randomized_benchmarking", repetitions=1)
+        schedule = Schedule("randomized_benchmarking", repetitions=1)
 
-        rb_shot_schedule = self.rb_shot(seeds, number_of_cliffords)
+        rb_shot_schedule = self.rb_shot(
+            seeds,
+            number_of_cliffords,
+            interleave_gate=interleave_gate,
+            multiplexing=multiplexing,
+        )
 
         schedule.add(rb_shot_schedule, control_flow=Loop(loop_repetitions))
         schedule.add(IdlePulse(20e-9))
