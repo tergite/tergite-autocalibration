@@ -18,15 +18,18 @@ import lmfit
 import matplotlib.pyplot as plt
 import numpy as np
 from lmfit.model import Model
-from quantify_core.analysis.fitting_models import (exp_damp_osc_func,
-                                                   fft_freq_phase_guess)
+from quantify_core.analysis.fitting_models import (
+    exp_damp_osc_func,
+    fft_freq_phase_guess,
+)
 from scipy.ndimage import median
 from scipy.signal import find_peaks
 from scipy.stats import median_abs_deviation
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
-from tergite_autocalibration.lib.utils.functions import \
-    exponential_decay_function  # lrb_decay_function,; lrb_exponential_decay_function,
+from tergite_autocalibration.lib.utils.functions import (
+    exponential_decay_function,
+)  # lrb_decay_function,; lrb_exponential_decay_function,
 
 
 def resonator_hanger_frequency(*, fit_fr, fit_ph, fit_Qe, fit_Ql):
@@ -42,6 +45,7 @@ def resonator_hanger_frequency(*, fit_fr, fit_ph, fit_Qe, fit_Ql):
         )
     )
     return resonator_frequency
+
 
 class ResonatorAvoidedCrossings:
     def __init__(self, currents, frequencies):
@@ -60,20 +64,19 @@ class ResonatorAvoidedCrossings:
     def crossing_currents(self) -> list[float]:
         crossing_currents = []
         for jump in self.jumps:
-            current = np.mean((self.currents[jump], self.currents[jump+1]))
+            current = np.mean((self.currents[jump], self.currents[jump + 1]))
             crossing_currents.append(current)
         return crossing_currents
 
     @property
     def crossing_frequency(self) -> float:
-        return  median(self.frequencies)
+        return median(self.frequencies)
 
     @property
     def I0_hint(self) -> float | None:
         if len(self.crossing_currents) != 2:
             return None
         return np.mean(self.crossing_currents)
-
 
 
 class AvoidedCrossings:
@@ -118,7 +121,6 @@ class AvoidedCrossings:
         parity = (sign_before_jump, sign_of_jump, sign_after_jump)
         return parity
 
-
     @property
     def crossing_currents(self) -> list[float]:
         crossing_currents = []
@@ -149,16 +151,15 @@ class AvoidedCrossings:
 
             # we care only about the slope
             x = np.arange(len(partition_frequencies_diffs))
-            (slope, _) = np.polyfit(x, partition_frequencies_diffs, 1)
+            slope, _ = np.polyfit(x, partition_frequencies_diffs, 1)
             if slope > 0:
                 partitions_where_coupler_below_qubit.append(partition)
             elif slope < 0:
                 partitions_where_coupler_above_qubit.append(partition)
 
-
         partitions = {
-            'coupler_above_qubit': partitions_where_coupler_above_qubit,
-            'coupler_below_qubit': partitions_where_coupler_below_qubit,
+            "coupler_above_qubit": partitions_where_coupler_above_qubit,
+            "coupler_below_qubit": partitions_where_coupler_below_qubit,
         }
 
         return partitions
@@ -170,14 +171,14 @@ class AvoidedCrossings:
 
         partitions = self._partition_samples()
 
-        if len(partitions['coupler_above_qubit']) == 1:
-            partition,  = partitions['coupler_above_qubit']
+        if len(partitions["coupler_above_qubit"]) == 1:
+            (partition,) = partitions["coupler_above_qubit"]
             low_sample = np.ceil(partition[0]).astype(int)
             high_sample = np.floor(partition[1]).astype(int)
             low_current = self.currents[low_sample]
             high_current = self.currents[high_sample]
             self._coupler_hint = np.mean((low_current, high_current))
-            if low_sample > 0 and high_sample < len(self.currents)-1:
+            if low_sample > 0 and high_sample < len(self.currents) - 1:
                 self._delta_I_above = high_current - low_current
             else:
                 self._delta_I_above = None
@@ -185,11 +186,11 @@ class AvoidedCrossings:
             self._delta_I_above = None
             self._coupler_hint = None
 
-        if len(partitions['coupler_below_qubit']) == 1:
-            partition,  = partitions['coupler_below_qubit']
+        if len(partitions["coupler_below_qubit"]) == 1:
+            (partition,) = partitions["coupler_below_qubit"]
             low_sample = np.ceil(partition[0]).astype(int)
             high_sample = np.floor(partition[1]).astype(int)
-            if low_sample > 0 and high_sample < len(self.currents)-1:
+            if low_sample > 0 and high_sample < len(self.currents) - 1:
                 low_current = self.currents[low_sample]
                 high_current = self.currents[high_sample]
                 self._delta_I_below = high_current - low_current
@@ -198,12 +199,12 @@ class AvoidedCrossings:
         else:
             self._delta_I_below = None
 
-        for partition in partitions['coupler_below_qubit']:
+        for partition in partitions["coupler_below_qubit"]:
             low_sample = np.ceil(partition[0]).astype(int)
             high_sample = np.floor(partition[1]).astype(int)
             partition_frequencies = self.frequencies[low_sample:high_sample]
             partition_minima.append(min(partition_frequencies))
-        for partition in partitions['coupler_above_qubit']:
+        for partition in partitions["coupler_above_qubit"]:
             low_sample = np.ceil(partition[0]).astype(int)
             high_sample = np.floor(partition[1]).astype(int)
             partition_frequencies = self.frequencies[low_sample:high_sample]
@@ -223,7 +224,9 @@ class AvoidedCrossings:
             cross_frequency = None
 
         frequency_values = namedtuple("cross_frequencies", ["value", "below", "above"])
-        return frequency_values(value=cross_frequency, below=frequency_below, above=frequency_above)
+        return frequency_values(
+            value=cross_frequency, below=frequency_below, above=frequency_above
+        )
 
     @property
     def Ic_hint(self) -> float | None:
@@ -242,7 +245,8 @@ def coupler_frequency_function(
     I0: float,
     offset: float,
 ) -> float:
-    return fmax * np.sqrt( np.abs(np.cos((current-Ic)/I0 * np.pi)) ) + offset
+    return fmax * np.sqrt(np.abs(np.cos((current - Ic) / I0 * np.pi))) + offset
+
 
 class CouplerModel(lmfit.model.Model):
     """

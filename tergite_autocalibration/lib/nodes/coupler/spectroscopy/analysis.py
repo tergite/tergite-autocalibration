@@ -369,7 +369,7 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
             if freq is not None:
                 ax.axhline(freq, **style)
         ax5.axhline(fmax, **crossing_styles, label=f"fmax: {fmax:.4e}")
-        ax5.set_ylabel('frequencies')
+        ax5.set_ylabel("frequencies")
         ax5.legend()
         for ax in (ax1, ax2, ax3, ax4, ax5):
             plt.setp(ax.get_xticklabels(), rotation=30, horizontalalignment="center")
