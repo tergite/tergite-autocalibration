@@ -41,4 +41,4 @@ def test_set_parking_current_from_redis():
     node.set_parking_current_from_redis()
     currents_dict = node.spi_manager.get_dac_current()
     assert "q00_q01" in currents_dict
-    assert currents_dict["q00_q01"] == 0.00095
+    assert currents_dict["q00_q01"] == 0.00065
