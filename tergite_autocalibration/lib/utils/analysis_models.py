@@ -15,7 +15,6 @@ import typing
 from collections import namedtuple
 
 import lmfit
-import matplotlib.pyplot as plt
 import numpy as np
 from lmfit.model import Model
 from quantify_core.analysis.fitting_models import (
@@ -27,12 +26,12 @@ from scipy.signal import find_peaks
 from scipy.stats import median_abs_deviation
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
-from tergite_autocalibration.lib.utils.functions import (
-    exponential_decay_function,
-)  # lrb_decay_function,; lrb_exponential_decay_function,
+from tergite_autocalibration.lib.utils.functions import exponential_decay_function
 
 
-def resonator_hanger_frequency(*, fit_fr, fit_ph, fit_Qe, fit_Ql):
+def resonator_hanger_frequency(
+    *, fit_fr: float, fit_ph: float, fit_Qe: float, fit_Ql: float
+) -> float:
     fit_Q = 4 * fit_Qe * fit_Ql
     resonator_frequency = (
         fit_fr
@@ -48,6 +47,25 @@ def resonator_hanger_frequency(*, fit_fr, fit_ph, fit_Qe, fit_Ql):
 
 
 class ResonatorAvoidedCrossings:
+    """
+    Extract the avoided crossings from (currents, frequency) data.
+    If the data have a shape like:
+
+            *             *
+           *               *
+    ******       ****        *********
+               *      *
+              *        *
+
+    the crossings of the frequency and current asymptotes are identified:
+
+            *|           | *
+           * |           |  *
+    ******   |    ****   |    *********
+             |  *      * |
+             | *        *|
+    """
+
     def __init__(self, currents, frequencies):
         self.currents = currents
         self.frequencies = frequencies
@@ -74,12 +92,39 @@ class ResonatorAvoidedCrossings:
 
     @property
     def I0_hint(self) -> float | None:
+        """
+        hint for the current where the coupler has maximum frequency
+        """
         if len(self.crossing_currents) != 2:
             return None
         return np.mean(self.crossing_currents)
 
 
 class AvoidedCrossings:
+    """
+    Extract the avoided crossings from (currents, frequency) data.
+    If the data have a shape like:
+
+    *     *           *     *
+    *     *           *     *
+     *   *             *   *
+       *                 *
+               *
+             *   *
+            *     *
+
+    the crossings of the frequency and current asymptotes are identified:
+
+    *     * |       | *     *
+    *     * |       | *     *
+     *   *  |       |  *   *
+       *    |       |    *
+    --------|-------|------------
+            |   *   |
+            | *   * |
+            |*     *|
+    """
+
     def __init__(self, currents, frequencies, threshold=2e6):
         self.currents = currents
         self.frequencies = frequencies
@@ -100,12 +145,17 @@ class AvoidedCrossings:
             if parity != (+1, -1, +1) and parity != (-1, +1, -1):
                 continue
 
+            # NOTE: to avoid confusion the index where the jump occurs in the currents array
+            # is given a 0.5 offset to signal that is 'between' current samples.
+            # this ends up unnecessary and leads to having to cast to int when
+            # asking for the low_sample and high_sample. It should be refactored.
             partition_indices.append(jump + 0.5)
+
         partition_indices.append(len(currents))
         self.partition_indices = partition_indices
 
     @classmethod
-    def _parity_of_jump(self, jump: int, frequencies: np.ndarray):
+    def _parity_of_jump(cls, jump: int, frequencies: np.ndarray):
         frequency_diffs = np.diff(frequencies)
         sign_of_jump = np.sign(frequency_diffs[jump]).astype(int)
         if jump == 0:
@@ -149,7 +199,8 @@ class AvoidedCrossings:
                 continue
             partition_frequencies_diffs = np.diff(partition_frequencies)
 
-            # we care only about the slope
+            # we use the slope of the frequency diffs to distinguish
+            # the U-shaped partitions from the ∩-shaped partitions
             x = np.arange(len(partition_frequencies_diffs))
             slope, _ = np.polyfit(x, partition_frequencies_diffs, 1)
             if slope > 0:
@@ -230,10 +281,16 @@ class AvoidedCrossings:
 
     @property
     def Ic_hint(self) -> float | None:
+        """
+        hint for the current where the coupler has maximum frequency
+        """
         return self._coupler_hint
 
     @property
     def I0_hint(self) -> float | None:
+        """
+        hint for the current corresponding to a quantum of magnetic flux
+        """
         if self._delta_I_above and self._delta_I_below:
             return self._delta_I_below + self._delta_I_above
 
@@ -260,9 +317,9 @@ class CouplerModel(lmfit.model.Model):
         # Typically coupler are designed up to 9GHz
         self.set_param_hint("fmax", value=9e9, min=6e9)
         # Expected current at fmax, helps the fitting algorithm
-        # self.set_param_hint("Ic", value=1e-3, vary=True)
+        self.set_param_hint("Ic", value=1e-3, vary=True)
         # Typically the period is around 3mAmp
-        # self.set_param_hint("I0", value=2.8e-3, vary=True)
+        self.set_param_hint("I0", value=2.8e-3, vary=True)
         # Offset is a typical anharmonicity
         self.set_param_hint("offset", value=0, max=300e6)
 

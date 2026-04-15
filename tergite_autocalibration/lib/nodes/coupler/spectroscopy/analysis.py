@@ -36,7 +36,9 @@ from tergite_autocalibration.utils.dto.qoi import QOI
 
 class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
     """
-    This class analyzes the qubit spectroscopy data as a function of the current for a coupler.
+    This class analyzes the individual qubit and resonator spectroscopies
+    while the dc current is swept. After the crossing points are found,
+    the periodic coupler spectrum is identified.
     """
 
     def __init__(self, name, redis_fields):
@@ -76,6 +78,7 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
         df = xr.DataArray(detected_frequencies, coords=coords, dims="obs")
         dc = xr.DataArray(detected_currents, coords=coords, dims="obs")
 
+        # TODO: packing the data to a dataset is an overkill, a datacless suffices
         ds = xr.Dataset({"frequencies": df, "currents": dc}).set_index(
             obs=["role", "mode"]
         )
@@ -193,6 +196,7 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
             ),
         }
         for attr, (data, freq, dim, drop) in configs.items():
+            # TODO: setting the spectroscopy array attributes implicitly is confusing. Set them explicitly.
             setattr(self, attr, self._prepare_spectroscopy(data, freq, dim, drop))
 
         # Collect qubit spectroscopy peaks
@@ -205,6 +209,7 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
         )
         self.target_dips = self.find_resonator_dips(self.target_resonator_spectroscopy)
 
+        # extract avoided crossings from qubit and resonator spectroscopies
         control_crossings = AvoidedCrossings(
             self.control_peaks.currents, self.control_peaks.frequencies
         )
@@ -218,6 +223,7 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
             self.control_dips.currents, self.control_dips.frequencies
         )
 
+        # unpack crossing values to attributes
         self.control_cross_currents = control_crossings.crossing_currents
         self.control_cross_frequency = control_crossings.crossing_frequency.value
         self.control_cross_freq_above = control_crossings.crossing_frequency.above
@@ -242,6 +248,10 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
             crossing_points.append((cross_current, self.target_res_cross_frequency))
         self.crossing_points = crossing_points
 
+        # the sqrt(abs(cos())) fit for the coupler is very sensitive.
+        # we need to provide accurate hints for the I0: the current corresponding to a flux quantum
+        # and Ic: the current corresponding to the max coupler frequency,
+        # otherwise the fit goes bonkers
         hint_Ic_res_target = target_res_crossings.I0_hint
         hint_Ic_res_control = control_res_crossings.I0_hint
         hint_Ic_qub_target = target_crossings.Ic_hint
@@ -292,7 +302,7 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
 
     def plotter(self, figures_dictionary: dict[str, list]):
         """
-        Create the anticrossing figures and populate the figures dictionary.
+        Create the anticrossing figures and the coupler spectrum and populate the figures dictionary.
         Args:
              figures_dictionary: A reference to the figures dictionary that the base
              analysis plots the key is the coupler labe and the value is a list
@@ -382,9 +392,6 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
 
 
 class CouplerSpectroscopyNodeAnalysis(BaseAllCouplersAnalysis):
-    """
-    This class analyzes the qubit spectroscopy data as a function of the current for all coupler.
-    """
 
     single_coupler_analysis_obj = CouplerSpectroscopyAnalysis
 
