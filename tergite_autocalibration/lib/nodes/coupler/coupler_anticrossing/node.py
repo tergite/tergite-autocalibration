@@ -40,7 +40,7 @@ from tergite_autocalibration.utils.logging import logger
 peak = LorentzianModel()
 
 
-class QubitSpectroscopyVsCurrentNode(CouplerNode):
+class CouplerAnticrossingNode(CouplerNode):
     """
     This node performs a qubit spectroscopy measurement while varying the
     current through the coupler to measure the crossing point of the coupler with the qubit.

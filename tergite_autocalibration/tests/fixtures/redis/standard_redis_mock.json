@@ -319,6 +319,7 @@
       "spec:spec_duration": "4e-06",
       "cz_dynamic_control": "121",
       "cz_working_durations_in_ns_error": "0",
+      "initial_parking_current": "0.00095",
       "parking_current": "0.00095",
       "reset:duration": "6e-05",
       "tqg_fidelity": "nan",
