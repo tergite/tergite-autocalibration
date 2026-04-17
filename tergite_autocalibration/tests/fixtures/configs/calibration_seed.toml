@@ -39,8 +39,8 @@ frequency = "Hz"
 cz_pulse_amplitude = ""
 cz_pulse_dc_bias = ""
 cz_pulse_duration_constant = "s"
-control_rz_lambda = "rad"
-target_rz_lambda = "rad"
+control_rz_lambda = "deg"
+target_rz_lambda = "deg"
 pulse_type = ""
 
 [[calibration_config.qubit]]
@@ -87,7 +87,7 @@ pulse_amplitude = 0.04488636363636364
 
 [[calibration_config.coupler]]
 id = "q11_q12"
-frequency = 223800000.0
+frequency = 4176200000.0
 cz_pulse_amplitude = 0.245
 cz_pulse_dc_bias = 0.00095
 cz_pulse_duration_constant = 3.8e-07
