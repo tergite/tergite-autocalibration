@@ -71,6 +71,3 @@ user_samplespace = 'user_samplespace.py'
 #
 # The reason to have these files is to add unstructured data such as mixer corrections or wiring diagrams
 # to the configuration package as additional information.
-
-miscellaneous_files = "misc"
-j2_templates = "j2_templates"
