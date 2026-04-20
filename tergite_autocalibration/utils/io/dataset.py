@@ -111,7 +111,6 @@ def save_dataset(
         node_name (str): Name of the node being measured.
         data_path (Path): Path where the dataset will be saved.
     """
-    data_path.mkdir(parents=True, exist_ok=True)
     measurement_id = data_path.stem[0:19]
 
     result_dataset = result_dataset.assign_attrs(
@@ -138,7 +137,6 @@ def save_qoi(QOI_dict: dict[str, QOI], node_name: str, data_path: Path) -> None:
         node_name (str): Name of the node being measured.
         data_path (Path): Path where the dataset will be saved.
     """
-    data_path.mkdir(parents=True, exist_ok=True)
     measurement_id = data_path.stem[0:19]
     serialized_QOI_dict = {
         element: qoi.serialize() for element, qoi in QOI_dict.items()
@@ -151,8 +149,11 @@ def save_qoi(QOI_dict: dict[str, QOI], node_name: str, data_path: Path) -> None:
 def save_figures(figures_list: list, node_name: str, data_path: Path):
     logger.info("Saving Plots")
     for fig_index, fig in enumerate(figures_list):
-        preview_path = data_path / f"{node_name}_{fig_index}_preview.png"
-        full_path = data_path / f"{node_name}_{fig_index}.png"
+        node_name_stem = (
+            f"{node_name}" if len(figures_list) == 1 else f"{node_name}_{fig_index}"
+        )
+        preview_path = data_path / f"{node_name_stem}_preview.png"
+        full_path = data_path / f"{node_name_stem}.png"
         fig.savefig(preview_path, bbox_inches="tight", dpi=100)
         fig.savefig(full_path, bbox_inches="tight", dpi=400)
         logger.info(f"Plots saved to {preview_path} and {full_path}")

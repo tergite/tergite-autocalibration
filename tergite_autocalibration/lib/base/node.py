@@ -93,6 +93,9 @@ class BaseNode(ABC):
         self.data_path: Path
 
     def update_data_path(self, data_path: Path):
+        """
+        Used by the calibration supervisor
+        """
         self.data_path = data_path
 
     def measure_node(self, cluster_status) -> xarray.Dataset:
@@ -106,8 +109,10 @@ class BaseNode(ABC):
 
     def calibrate(self, measurement_mode):
         if measurement_mode != MeasurementMode.re_analyse:
+            # explicitly create folder for the measurement.
+            # contains the hdf5 dataset, the QOI json and the png figures
+            self.data_path.mkdir(parents=True, exist_ok=True)
             result_dataset = self.measure_node(measurement_mode)
-
         else:
             result_dataset = open_dataset(self.name, self.data_path)
 
@@ -116,8 +121,7 @@ class BaseNode(ABC):
         if measurement_mode != MeasurementMode.re_analyse:
             save_dataset(result_dataset, self.name, self.data_path)
             save_qoi(QOI_dict, self.name, self.data_path)
-
-            save_serial_device(self.device, data_path)
+            save_serial_device(self.device, self.data_path)
         # After the measurement free the device resources
         close_device_resources(self.device)
         logger.info("analysis completed")
@@ -167,14 +171,13 @@ class BaseNode(ABC):
         return duration
 
     def post_process(self, dataset: xarray.Dataset):
-        analysis_kwargs = getattr(self, "analysis_kwargs", dict())
+        analysis_kwargs = getattr(self, "analysis_keywords", dict())
         node_analysis: BaseNodeAnalysis = self.analysis_obj(
             self.name, self.redis_fields, **analysis_kwargs
         )
         QOI_dict = node_analysis.analyze_node(dataset)
 
         figures = node_analysis.figures
-
         save_figures(figures, self.name, self.data_path)
 
         for element_id_, qois_ in QOI_dict.items():

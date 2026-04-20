@@ -117,16 +117,16 @@ def generate_selection_layout(folder_structure: dict, index: str = ""):
 
     qoi_display_DIV = html.Div(
         [
-        html.H3("Quantities of Interest"),
-        html.Div(
+            html.H3("Quantities of Interest"),
+            html.Div(
                 id={"type": "qoi-content", "index": index},
                 style={
-        "display": "flex",
-        "flexWrap": "wrap",   # wrap when many keys
-        "gap": "20px"
-    }
-            )
-    ],
+                    "display": "flex",
+                    "flexWrap": "wrap",  # wrap when many keys
+                    "gap": "20px",
+                },
+            ),
+        ],
         style={"marginTop": "20px"},
     )
 

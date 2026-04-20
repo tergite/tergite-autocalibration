@@ -21,4 +21,4 @@ class QOI:
 
     def serialize(self, as_json: bool = False):
         data = asdict(self)
-        return json.dumps(data) if as_json else data 
+        return json.dumps(data) if as_json else data

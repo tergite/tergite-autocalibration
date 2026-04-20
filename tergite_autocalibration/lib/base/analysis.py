@@ -264,7 +264,8 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
         self.coupler = coupler_element
         self.coord = dataset.coords
         self.data_var = list(dataset.data_vars.keys())[0]
-        self.S21 = dataset.isel(ReIm=0) + 1j * dataset.isel(ReIm=1)
+        # self.S21 = dataset.isel(ReIm=0) + 1j * dataset.isel(ReIm=1)
+        self.S21 = dataset
         # Restore attributes for each variable
         for var in self.S21.data_vars:
             self.S21[var].attrs = dataset[var].attrs
@@ -307,35 +308,35 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
         self.processed_dataset = xr.Dataset()
         self.analysis_keywords = kwargs
 
-    def analyze_node(self, data_path: Path) -> "QOI":
+    def analyze_node(self, dataset: xr.Dataset) -> dict[str, QOI]:
         """
         Analyze the node and save the results to redis.
         Args:
-            data_path: Path to the dataset
-            index: Index of the dataset to be analyzed
+            dataset: the full configured result dataset
 
         Returns:
             analysis_results: Dictionary with the analysis results for each qubit
         """
 
-        self.data_path = Path(data_path)
-        self.dataset = self.open_dataset()
+        self.dataset = dataset
         self.coords = self.dataset.coords
         self.data_vars = self.dataset.data_vars
         analysis_results = self._analyze_all_couplers()
-        self.display_and_save_plots()
+        self.adjust_figures()
         return analysis_results
 
-    def display_and_save_plots(self):
+    def adjust_figures(self):
+        """
+        modify the figures dictionary attributed of the current analysis
+        so the figures have a more standardized appearance
+        """
         # if the dictionary is empty do nothing
         if not self.figures_dictionary:
             return
 
+        self.figures = []
         for coupler, figure_list in self.figures_dictionary.items():
-            for fig_index, fig in enumerate(figure_list):
-                preview_path = (
-                    self.data_path / f"{self.name}_{coupler}_{fig_index}_preview.png"
-                )
+            for fig in figure_list:
                 # this corresponds to faceted plots
                 if fig.axes[0].get_gridspec().get_geometry() == (2, 3):
                     fig.set_size_inches(14, 9)
@@ -349,9 +350,10 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
                     else:
                         fig.set_size_inches(ncols * 6, nrows * 4)
 
-                fig.savefig(preview_path, bbox_inches="tight", dpi=100)
                 # some slack for the figure x and y labels
                 fig.tight_layout(rect=[0.05, 0.05, 1, 0.98])
+                # fig.savefig(preview_path, bbox_inches="tight", dpi=100)
+            self.figures += figure_list
 
     def _analyze_all_couplers(self):
         analysis_results = {}

@@ -25,6 +25,7 @@ from dash import ctx, dcc, html
 from dash.dependencies import ALL, MATCH, Input, Output, State
 from dash_renderjson import DashRenderjson
 
+import tergite_autocalibration.tools.browser.styles as styles
 from tergite_autocalibration.config.globals import DATA_DIR
 from tergite_autocalibration.tools.browser.layout import \
     generate_selection_layout
@@ -45,35 +46,27 @@ app.layout = html.Div(
             "Refresh Folder Structure",
             id="refresh-button",
             n_clicks=0,
-            style={
-                "padding": "10px 20px",  # bigger button
-                "marginRight": "15px",  # spacing to the right
-                "fontSize": "18px",  # bigger text
-                "cursor": "pointer",
-            },
+            style=styles.refresh_button_style,
         ),
         html.Button(
             "Compare",
             id="compare-button",
             n_clicks=0,
-            style={
-                "padding": "10px 20px",
-                "marginRight": "15px",
-                "fontSize": "18px",
-                "cursor": "pointer",
-            },
+            style=styles.compare_button_style,
         ),
         dcc.Input(
             id="text-input",
             type="text",
             debounce=True,  # triggers callback only on blur or Enter
             placeholder="Enter string for filtering",
-            style={
-                "padding": "10px",
-                "marginRight": "15px",
-                "fontSize": "18px",
-                "width": "250px",
-            },
+            style=styles.node_filter_button_style,
+        ),
+        dcc.Input(
+            id="element-input",
+            type="text",
+            debounce=True,  # triggers callback only on blur or Enter
+            placeholder="Enter element name for filtering",
+            style=styles.node_filter_button_style,
         ),
         dbc.Tooltip(
             "For example if the node rabi_12_oscillations is looked for, strings like rabi_12 or 12_osc suffice.",
@@ -455,37 +448,24 @@ def update_qoi_display(outer: str, inter: str, inner: str):
             with open(os.path.join(folder_path, file)) as f:
                 data = json.load(f)
 
+            # NOTE: the following should be out of the if scope?
             columns = []
             for element in data:
+                json_render = DashRenderjson(
+                    id=f"json-view-{element}",
+                    data=data[element]["analysis_result"],
+                    max_depth=1,  # collapse nested content initially
+                    invert_theme=True,
+                )
                 columns.append(
                     html.Div(
-                        style={
-                            "flex": "1",
-                            "minWidth": "300px",  # responsive: wrap if too narrow
-                            "overflow": "auto",
-                            "padding": "10px",
-                            "border": "1px solid #ddd",
-                            "borderRadius": "6px",
-                        },
-                        children=[
-                            html.H4(element),
-                            DashRenderjson(
-                                id=f"json-view-{element}",
-                                data=data[element]["analysis_result"],
-                                max_depth=1,  # collapse nested content initially
-                                invert_theme=True,
-                            ),
-                        ],
+                        style=styles.json_render_style,
+                        children=[html.H4(element), json_render],
                     )
                 )
 
             return columns
-            # return DashRenderjson(
-            #     data=data,
-            #     max_depth=1,
-            #     invert_theme=True,
-            #     # , theme="monokai"
-            # )
+
     return "No JSON file found."
 
 
@@ -524,7 +504,7 @@ def display_element_selector(
                 ds_json = json.dumps(ds_dict)
 
                 return [ds_json, element_options]
-                # return f"HDF5 File: {hdf5_files[0]}", ds_json, element_options
+
             except Exception as e:
                 return [json.dumps({"error": str(e)}), []]
         return [{}, []]
