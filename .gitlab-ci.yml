@@ -137,21 +137,28 @@ application_run:
       fi
     # Reset Redis
     - echo "y" | acli node reset -a
+    # Load redis fixture
+    - echo "y" | acli redis load-file "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/coupler_run_26-04/redis.json"
     # Clear the caches
     - rm -r venv/lib/python3.12/site-packages/out
+    # Load coupler configuration
+    - echo "y" | acli config load -f "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/coupler_run_26-04"
     # Run the calibration chain
     - |
       for node in \
-        resonator_spectroscopy_vs_current \
-        coupler_anticrossing
+        cz_parametrization \
+        cz_chevron \
+        cz_calibration \
+        cz_local_phases \
+        cz_rb
       do
-        echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/01-44-14_simple_coupler_run-SUCCESS" -n $node
+        echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/coupler_run_26-04" -n $node
       done
     # Uncomment for debugging:
     - ls -lR venv/lib/python3.12/site-packages/out
     # Verify output
     - |
-      if ls -lR venv/lib/python3.12/site-packages/out | grep -q "coupler_anticrossing_q06_q07_0_preview.png"; then
+      if ls -lR venv/lib/python3.12/site-packages/out | grep -q "cz_rb_q13_q14_0_preview.png"; then
         echo "Output file $OUTPUT_FILE exists. Application ran successfully."
       else
         echo "Error: Output file $OUTPUT_FILE not found."
