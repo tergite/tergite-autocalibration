@@ -11,11 +11,13 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+import math
+
 import numpy as np
 
 from tergite_autocalibration.utils.logging import logger
 
-# TODO
+# TODO:
 # ******************************************************
 # This not a good implementation. better create a  *****
 # Clifford object with the physical decompositions *****
@@ -140,6 +142,9 @@ XY_decompositions[23] = {
     "2": {"theta": 90, "phi": 90},
     "3": {"theta": -90, "phi": 0},
 }
+
+
+common_gates_indices = {"X": 3, "Y": 6, "X90": 16, "Y90": 21}
 
 
 def x_PTM(theta: float):

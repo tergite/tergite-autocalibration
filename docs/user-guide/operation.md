@@ -25,6 +25,7 @@ The autocalibration CLI is organized into several main command groups:
 
 - `start`: Run the automatic calibration according to the provided config files
 - `cluster`: Handle operations related to the cluster
+- `spi`: Handle operations related to the spi rack
 - `node`: Handle operations related to the node
 - `graph`: Handle operations related to the calibration graph
 - `config`: Load and save the configuration files
@@ -51,7 +52,6 @@ acli start [OPTIONS]
 - `-c TEXT`: Cluster IP address (if not set, it will use CLUSTER_IP from the .env file)
 - `-r TEXT`: Rerun an analysis (specify the path to the dataset folder)
 - `-n, --name TEXT`: Specify the node type to rerun (works only with -r option)
-- `--push`: Push a backend to an MSS specified in MSS_MACHINE_ROOT_URL in the .env file
 - `--browser`: Will open the dataset browser in the background and plot the measurement results live
 
 ### Cluster Commands ###
@@ -67,6 +67,32 @@ acli cluster reboot
 ```
 
 This command will prompt for confirmation before rebooting the cluster, as it can interrupt ongoing measurements.
+
+### SPI Rack Commands ###
+
+#### `spi status` ####
+
+Prints information about the current currents on the spi rack.
+Only couplers that are having a DAC in the SPI configuration are considered.
+Please check the [documentation about configuration](./configuration_files.md) about how to change the SPI DACs.
+
+**Usage:**
+
+```
+acli spi status
+```
+
+#### `spi status` ####
+
+Resets all currents on the SPI rack to 0.
+Only couplers that are having a DAC in the SPI configuration are considered.
+Please check the [documentation about configuration](./configuration_files.md) about how to change the SPI DACs.
+
+**Usage:**
+
+```
+acli spi reset
+```
 
 ### Node Commands ###
 
@@ -142,6 +168,23 @@ Save the configuration.
   automatically create a zip file and treat it as if you are running with `-z`.
 - `-z/--as-zip`: Will make the configuration file be a zip archive.
 
+#### `bcc-export`
+
+**Usage:**
+
+```bash
+acli bcc-export [OPTIONS]
+```
+
+Create a `calibration_seed.toml` file that can be used from the backend to push calibration values to the database.
+
+**Options:**
+
+- `-q/--qubits`: Qubit input e.g. `"q00,q01,q02,q03,q04"` or `"q01-q05"` or `"q01-q06, q08"`.
+  If the input is an integer e.g. 3, it will generate `"q01,q02,q03"`.
+- `-c/--couplers`: Couplers to export e.g. `"q00_q01"` as comma-separated list
+- `-o/--output-file`: calibration_seed.toml to write.
+
 #### `config generate`
 
 **Usage:**
@@ -156,23 +199,6 @@ Save the configuration.
 
 - `-h/--host`: Host address where to run the interface of the generator. Default: 127.0.0.1
 - `-p/--port`: Port on which the application will serve the generator. Default: 8079
-
-#### `quickstart`
-
-**Usage:**
-
-```bash
-acli quickstart [OPTIONS]
-```
-
-Loads the default configuration package. This configuration package is not supposed to run on any setup, but it will
-just copy configuration files into the application, so, that the application does not crash because configuration files
-are missing.
-
-**Options:**
-
-- `-q, --qubits TEXT`: Indicates which qubits should be in the template e.g. `"q00,q01"` or `"q03-q05"`,
-  `"q01-q03, q07"` or an integer e.g. `3` to generate `"q01, q02, q03"`.
 
 ### Dataset browser ###
 

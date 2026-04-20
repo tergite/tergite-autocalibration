@@ -1,12 +1,13 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2023, 2024
+# (C) Copyright Eleftherios Moschandreou 2023, 2024, 2026
 # (C) Copyright Liangyu Chen 2023, 2024
 # (C) Copyright Pontus Vikstahl 2024
 # (C) Copyright Stefan Hill 2024
 # (C) Copyright Martin Ahindura 2023
 # (C) Copyright Michele Faucci Giannelli 2024, 2025
 # (C) Copyright Axel Erik Andersson 2025
+# (C) Copyright Abdullah Al Amin 2026
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -19,24 +20,22 @@
 import os
 from dataclasses import dataclass, field
 from ipaddress import IPv4Address
-from pathlib import Path
-from typing import List, Union, FrozenSet
+from types import MappingProxyType
+from typing import FrozenSet, List, Union
 
 from colorama import Fore, Style
 from colorama import init as colorama_init
-from dash import Patch
 from qblox_instruments import Cluster
 from qblox_instruments.types import ClusterType
 from quantify_scheduler.instrument_coordinator import InstrumentCoordinator
 from quantify_scheduler.instrument_coordinator.components.qblox import ClusterComponent
-from types import MappingProxyType
+
 from tergite_autocalibration.config.globals import (
     CLUSTER_IP,
     CONFIG,
     ENV,
     REDIS_CONNECTION,
 )
-from tergite_autocalibration.config.legacy import dh
 from tergite_autocalibration.config.package import ConfigurationPackage
 from tergite_autocalibration.lib.base.node import BaseNode, CouplerNode
 from tergite_autocalibration.lib.utils.graph import filtered_topological_order
@@ -45,16 +44,12 @@ from tergite_autocalibration.utils.backend.redis_utils import (
     populate_initial_parameters,
     populate_node_parameters,
     populate_quantities_of_interest,
+    revert_node_parameters,
 )
-from tergite_autocalibration.utils.dto.enums import (
-    DataStatus,
-    MeasurementMode,
-)
+from tergite_autocalibration.utils.dto.enums import DataStatus, MeasurementMode
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
 from tergite_autocalibration.utils.io.dataset import create_node_data_path
 from tergite_autocalibration.utils.logging import logger
-
-# from tergite_autocalibration.utils.logger.tac_logger import logger
 from tergite_autocalibration.utils.logging.visuals import draw_arrow_chart
 
 colorama_init()
@@ -84,6 +79,7 @@ class HardwareManager:
         # Store the configuration settings and initialize the instrument coordinator
         self.config = config
         self.lab_ic: InstrumentCoordinator = None
+        logger.info("Initializing Hardware")
 
         # Check if hardware setup is necessary based on measurement mode
         if self.config.cluster_mode == MeasurementMode.re_analyse:
@@ -101,6 +97,7 @@ class HardwareManager:
         Creates and initializes a Cluster object to represent the hardware cluster
         based on the given IP address in the configuration.
         """
+        cluster_name = list(CONFIG.cluster.hardware_description.keys())[0]
         cluster: "Cluster"
         if self.config.cluster_mode == MeasurementMode.real:
             # Ensure all previous connections are closed before creating a new cluster instance
@@ -108,7 +105,7 @@ class HardwareManager:
 
             try:
                 # Create a new cluster instance using the specified cluster name and IP address
-                cluster = Cluster(dh.cluster_name, str(self.config.cluster_ip))
+                cluster = Cluster(cluster_name, str(self.config.cluster_ip))
             except ConnectionRefusedError:
                 msg = "Cluster is disconnected. Maybe it has crushed? Try flick it off and on"
                 logger.status("-" * len(msg))
@@ -126,7 +123,7 @@ class HardwareManager:
             dummy_setup = {str(mod): ClusterType.CLUSTER_QCM_RF for mod in range(1, 16)}
             dummy_setup["16"] = ClusterType.CLUSTER_QRM_RF
             dummy_setup["17"] = ClusterType.CLUSTER_QRM_RF
-            cluster = Cluster(dh.cluster_name, dummy_cfg=dummy_setup)
+            cluster = Cluster(cluster_name, dummy_cfg=dummy_setup)
             return cluster
 
     def _create_instrument_coordinator(
@@ -142,7 +139,7 @@ class HardwareManager:
         clusters = [clusters] if isinstance(clusters, Cluster) else clusters
 
         # Load attenuation settings for entire system (possibly across multiple clusters)
-        output_attenuation_settings = dh.get_output_attenuations()
+        output_attenuation_settings = CONFIG.device.get_output_attenuations()
         connectivity = MappingProxyType(
             {
                 str(n): frozenset(neigh.keys())
@@ -247,6 +244,7 @@ def _set_output_attenuations(cluster, connectivity, settings):
                 raise KeyError(f"Failed to set attenuation for port: {port_str}")
 
             logger.debug(f"Applied {att}dB attenuation on {port_str}")
+    logger.info("Attenuations are set")
 
 
 class NodeManager:
@@ -322,9 +320,10 @@ class NodeManager:
 
             logger.info(f"Calibrating node {node.name}")
 
-
             # Perform calibration
-            node.calibrate( self.config.cluster_mode)
+            node.calibrate(self.config.cluster_mode)
+
+        revert_node_parameters(node_name, self.config.qubits, REDIS_CONNECTION)
 
     def _initialize_node(self, node_name: str) -> BaseNode:
         """Initializes a node and updates it with user-defined samplespace if available."""
@@ -391,8 +390,23 @@ class CalibrationSupervisor:
         self.lab_ic = self.hardware_manager.get_instrument_coordinator()
         self.node_manager = NodeManager(self.lab_ic, config=config)
         self.topo_order = self.node_manager.topo_order(self.config.target_node_name)
+        logger.info("Node Manager is initialized")
 
     def calibrate_system(self, node_name: str | None = None, ignore_spec: bool = False):
+        cz_chain = [
+            "cz_parametrization",
+            "cz_chevron",
+            "cz_calibration",
+            "cz_local_phases",
+            "cz_rb",
+        ]
+        is_cz_calibration = self.config.target_node_name in cz_chain
+        if is_cz_calibration:
+            for index, node in enumerate(self.topo_order):
+                if node in cz_chain:
+                    self.topo_order.insert(index, "three_state_discrimination")
+                    break
+
         logger.info("Starting System Calibration")
         number_of_qubits = len(self.config.qubits)
 
@@ -403,7 +417,7 @@ class CalibrationSupervisor:
         self.node_manager.spi_manager = self.hardware_manager.create_spi(
             self.config.couplers
         )
-        self.node_manager.spi_manager.set_parking_currents(self.config.couplers)
+        self.node_manager.spi_manager.set_initial_parking_currents(self.config.couplers)
 
         # Create a copy of the configuration inside the log directory
         # This is to be able to replicate errors caused by configuration
@@ -412,6 +426,10 @@ class CalibrationSupervisor:
         ).copy(str(CONFIG.run.log_dir))
 
         for calibration_node in calibration_nodes:
+            if calibration_node == "three_state_discrimination":
+                ignore_spec = True
+            else:
+                ignore_spec = False
             self.node_manager.inspect_node(calibration_node, ignore_spec=ignore_spec)
             logger.info(f"{calibration_node} node is completed")
 
@@ -424,7 +442,8 @@ class CalibrationSupervisor:
                 f"Wrong mode for re-analysis: '{self.config.cluster_mode}', should be: {MeasurementMode.re_analyse}"
             )
 
-        node = self.node_manager._initialize_node(self.config.target_node_name)
+        target_node = self.config.target_node_name
+        node = self.node_manager._initialize_node(target_node)
         logger.status(
             f"Analysing '{self.config.target_node_name}' with {node.analysis_obj.__name__}"
         )

@@ -1,7 +1,7 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2025
-# (C) Chalmers Next Labs 2025
+# (C) Copyright Eleftherios Moschandreou 2025, 2026
+# (C) Chalmers Next Labs 2025, 2026
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -40,7 +40,7 @@ def generate_selection_layout(folder_structure: dict, index: str = ""):
                 clearable=False,
             ),
         ],
-        style={"marginBottom": "20px"},
+        style={"marginBottom": "20px", "width": "15%"},
     )
 
     # Shows the folder of a specific calibration run
@@ -53,7 +53,7 @@ def generate_selection_layout(folder_structure: dict, index: str = ""):
                 clearable=False,
             ),
         ],
-        style={"marginBottom": "20px"},
+        style={"marginBottom": "20px", "width": "39%"},
     )
 
     # Shows the selection for the specific folder of a single measurement
@@ -66,7 +66,29 @@ def generate_selection_layout(folder_structure: dict, index: str = ""):
                 clearable=False,
             ),
         ],
-        style={"marginBottom": "20px"},
+        style={"marginBottom": "20px", "width": "39%"},
+    )
+
+    selectors_DIV = html.Div(
+        [
+            outer_selection_DIV,
+            intermediate_selection_DIV,
+            inner_selection_DIV,
+            html.Button(
+                "star this \u2605",
+                id={"type": "star-btn", "index": index},
+                style={
+                    "backgroundColor": "#F5F5F5",
+                    "color": "#FFD700",  # star color (gold)
+                    "marginBottom": "20px",
+                    "width": "5%",
+                    "fontSize": "2em",
+                    "padding": "0.4em",
+                    "borderRadius": "8px",
+                },
+            ),
+        ],
+        style={"display": "flex", "gap": "10px"},
     )
 
     # A tab view with one tab for the image and another tab for the json object with the qubit definition
@@ -142,14 +164,19 @@ def generate_selection_layout(folder_structure: dict, index: str = ""):
     selection_layout = html.Div(
         [
             dcc.Store(id={"type": "full-dataset", "index": index}),
-            outer_selection_DIV,
-            intermediate_selection_DIV,
-            inner_selection_DIV,
+            html.H4("Starred Items", id={"index": index}),
+            html.Div(id={"type": "starred-list", "index": index}),
+            selectors_DIV,
             image_display_DIV,
             qoi_display_DIV,
             element_selector_DIV,
             y_dim_selector_DIV,
             slice_display_DIV,
+            dcc.Store(
+                id={"type": "starred-store", "index": index},
+                data=[],
+                storage_type="local",
+            ),
         ],
         style={
             "width": "100%" if index == "" else "45%",

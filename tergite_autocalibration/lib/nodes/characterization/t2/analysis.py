@@ -83,7 +83,7 @@ class T2Model(lmfit.model.Model):
         offs_guess = np.mean(data)
 
         # Frequency guess is obtained using a fast fourier transform (FFT).
-        (freq_guess, _) = fft_freq_phase_guess(data, x)
+        freq_guess, _ = fft_freq_phase_guess(data, x)
 
         self.set_param_hint("x0", value=x[-1] / 2, min=0)
         self.set_param_hint("frequency", value=freq_guess, min=0)

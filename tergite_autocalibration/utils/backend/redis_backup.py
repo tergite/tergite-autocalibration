@@ -13,15 +13,13 @@
 
 import json
 from pathlib import Path
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Union, Dict, Any
 
 if TYPE_CHECKING:
     import redis
 
 
-def dump_redis_to_json(
-    redis_session: "redis.Redis", output_file: Union[Path, str]
-) -> None:
+def dump_redis(redis_session: "redis.Redis") -> Dict[str, Any]:
     """
     Dump all values for a redis database into a json file.
 
@@ -44,7 +42,6 @@ def dump_redis_to_json(
 
     Args:
         redis_session: Session used to access the redis database. Assumes decode_responses=True.
-        output_file: File to write to.
 
     """
     data = {}
@@ -79,14 +76,25 @@ def dump_redis_to_json(
                 zset_data[member] = str(score)
             data[key] = {"type": "zset", "value": zset_data}
 
+    return data
+
+
+def dump_redis_to_json(redis_session: "redis.Redis", output_file: Union[Path, str]):
+    """
+    Wraps dump_redis and saves output to a json file.
+
+    Args:
+        redis_session: Redis session to take data from.
+        output_file: JSON file to write to.
+    """
+    data = dump_redis(redis_session)
+
     # Save to json file
     with open(output_file, "w", encoding="utf-8") as f_:
         json.dump(data, f_, indent=2)
 
 
-def load_json_to_redis(
-    input_file: Union[Path, str], redis_session: "redis.Redis"
-) -> None:
+def load_redis(input_values: Dict[str, Any], redis_session: "redis.Redis") -> None:
     """
     Load json formatted redis values into a redis database.
 
@@ -108,15 +116,12 @@ def load_json_to_redis(
     ```
 
     Args:
-        input_file: Input file with data dumped.
-        redis_session: Redis session used to access the redis database. Assumes decode_responses=True.
+        input_values: Values to load to redis as dict.
+        redis_session: Redis session to take data from.
 
     """
-    with open(input_file, "r") as f:
-        data = json.load(f)
-
     # Iterate over json contents
-    for key, value in data.items():
+    for key, value in input_values.items():
         if value["type"] == "string":
             redis_session.set(key, value["value"])
         elif value["type"] == "list":
@@ -131,3 +136,20 @@ def load_json_to_redis(
         elif value["type"] == "zset":
             for member, score in value["value"].items():
                 redis_session.zadd(key, {member: float(score)})
+
+
+def load_json_to_redis(
+    input_file: Union[Path, str], redis_session: "redis.Redis"
+) -> None:
+    """
+    Load json formatted redis values into a redis database.
+
+    Args:
+        input_file: Input file with data dumped.
+        redis_session: Redis session used to access the redis database. Assumes decode_responses=True.
+
+    """
+    with open(input_file, "r") as f:
+        data = json.load(f)
+
+    load_redis(data, redis_session)

@@ -14,41 +14,60 @@
 # that they have been altered from the originals.
 
 import numpy as np
+import xarray
 
 from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.analysis import (
-    RandomizedBenchmarkingSSRONodeAnalysis,
+    RandomizedBenchmarkingNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.measurement import (
-    RandomizedBenchmarkingSSROMeasurement,
+    RandomizedBenchmarkingMeasurement,
 )
 from tergite_autocalibration.lib.nodes.schedule_node import OuterScheduleNode
 
 
 class RandomizedBenchmarkingNode(QubitNode):
-    measurement_obj = RandomizedBenchmarkingSSROMeasurement
-    analysis_obj = RandomizedBenchmarkingSSRONodeAnalysis
+    name: str = "randomized_benchmarking"
+    measurement_obj = RandomizedBenchmarkingMeasurement
+    analysis_obj = RandomizedBenchmarkingNodeAnalysis
     measurement_type = OuterScheduleNode
     qubit_qois = ["fidelity", "fidelity_error", "leakage", "leakage_error"]
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(all_qubits, couplers, **schedule_keywords)
         self.schedule_keywords = schedule_keywords
         self.schedule_keywords = {}
         self.loops = 500
         self.schedule_keywords["loop_repetitions"] = self.loops
+        self.schedule_keywords["multiplexing"] = "parallel"  # 'one_by_one' | 'parallel'
 
-        RB_REPEATS = 4
+        self.RB_REPEATS = 6
         self.outer_schedule_samplespace = {
             "seeds": {
-                qubit: np.arange(RB_REPEATS, dtype=np.int32)
+                qubit: np.arange(self.RB_REPEATS, dtype=np.int32)
                 for qubit in self.all_qubits
-            }
+            },
+            # available gates for interleaving: 'Standard' -> no interleave
+            # 'X', 'Y', 'X90', 'Y90'
+            "interleave_gate": {
+                qubit: np.array(["Standard", "Y90"]) for qubit in self.all_qubits
+            },
         }
 
         self.schedule_samplespace = {
             "number_of_cliffords": {
-                qubit: np.array([0, 8, 16, 32, 64, 128, 256, 512, 1024])
-                for qubit in self.all_qubits
+                qubit: np.array([0, 8, 32, 512, 1200]) for qubit in self.all_qubits
             },
         }
+
+    def generate_dummy_dataset(self):
+        dataset = xarray.Dataset()
+        for index, qubit in enumerate(self.all_qubits):
+            samples = self.schedule_samplespace["number_of_cliffords"][qubit]
+            number_of_samples = len(samples) * self.loops
+            noise_scale = 0.005 * index
+            np.random.seed(123)
+            measured_s21 = np.random.rand(number_of_samples)
+            data_array = xarray.DataArray(measured_s21)
+            dataset[index] = data_array
+        return dataset

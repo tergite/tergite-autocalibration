@@ -1,7 +1,7 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2025
-# (C) Chalmers Next Labs 2025
+# (C) Copyright Eleftherios Moschandreou 2025, 2026
+# (C) Chalmers Next Labs 2025, 2026
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -81,7 +81,7 @@ def collect_valid_chains(outer_path, filter_text: str = "") -> dict:
     return valid_intermediates
 
 
-def scan_folders(data_directory: Path, filter_text="") -> dict[str, dict]:
+def scan_folders(data_directory: Path, filter_text: str = "") -> dict[str, dict]:
     """
     scan the whole data directory for valid measurements, i.e.
     measurements that have produced png images

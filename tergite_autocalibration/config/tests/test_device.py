@@ -14,6 +14,7 @@ from tergite_autocalibration.config.device import DeviceConfiguration
 from tergite_autocalibration.config.handler import ConfigurationHandler
 from tergite_autocalibration.config.package import ConfigurationPackage
 from tergite_autocalibration.tests.utils.fixtures import get_fixture_path
+from tergite_autocalibration.utils.dto.enums import QubitRole
 
 
 def test_device_configuration():
@@ -27,3 +28,24 @@ def test_device_configuration():
 
     device_configuration: DeviceConfiguration = configuration_handler.device
     assert device_configuration.name == "25-qubit FC8a #1"
+
+    out_attenuations = device_configuration.get_output_attenuations()
+    assert out_attenuations["qubit"]["q00"] == 4
+    assert out_attenuations["qubit"]["q01"] == 8
+    assert out_attenuations["coupler"]["q00_q01"] == 12
+    assert out_attenuations["resonator"]["q00"] == 18
+    assert out_attenuations["resonator"]["q01"] == 18
+
+    assert "q00" in device_configuration.qubits.keys()
+
+    assert device_configuration.resonators["q00"]["VNA_frequency"] == 6.48213e9
+    assert device_configuration.qubits["q00"]["VNA_f01_frequency"] == 3.848e9
+    assert device_configuration.qubits["q00"]["VNA_f12_frequency"] == 3.592e9
+
+    assert device_configuration.get_control_target_qubit_pair_by_coupler("q00_q01") == (
+        "q01",
+        "q00",
+    )
+    assert device_configuration.get_qubit_role("q00_q01", "q01") == QubitRole.CONTROL
+    assert device_configuration.get_qubit_role("q00_q01", "q00") == QubitRole.TARGET
+    assert device_configuration.get_qubit_role("q00_q01", "q02") == QubitRole.NOTSET

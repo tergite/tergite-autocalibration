@@ -29,13 +29,14 @@ class PunchoutNode(QubitNode):
     readout amplitude.
     """
 
+    name: str = "punchout"
     measurement_obj = PunchoutMeasurement
     analysis_obj = PunchoutNodeAnalysis
     measurement_type = ScheduleNode
     qubit_qois = ["measure:pulse_amp"]
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(self, all_qubits: list[str], **schedule_keywords):
+        super().__init__(all_qubits, **schedule_keywords)
 
         self.schedule_samplespace = {
             "ro_frequencies": {

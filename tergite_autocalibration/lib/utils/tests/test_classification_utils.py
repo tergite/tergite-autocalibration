@@ -40,6 +40,5 @@ def test_assign_state():
             2 * exp(-1j * 3 * pi / 4),
         ]
     )
-    assert xarray.DataArray([0, 1, 0, 2, 1]).equals(
-        xarray.DataArray(assign_state(qubit, iq_points))
-    )
+    iq_points_array = xarray.DataArray(iq_points).assign_attrs(qubit=qubit)
+    assert xarray.DataArray([0, 1, 0, 2, 1]).equals(assign_state(iq_points_array))

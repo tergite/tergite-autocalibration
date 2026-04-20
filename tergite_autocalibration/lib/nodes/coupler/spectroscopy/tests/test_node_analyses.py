@@ -12,13 +12,13 @@
 
 
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
+    CouplerAnticrossingNodeAnalysis,
     ResonatorSpectroscopyVsCurrentNodeAnalysis,
-    QubitSpectroscopyVsCurrentNodeAnalysis,
 )
 
 
 def test_CS_node_analysis_can_be_initialized():
-    node_analysis = QubitSpectroscopyVsCurrentNodeAnalysis("name", ["redis_field"])
+    node_analysis = CouplerAnticrossingNodeAnalysis("name", ["redis_field"])
 
     assert node_analysis.name == "name"
     assert node_analysis.redis_fields == ["redis_field"]

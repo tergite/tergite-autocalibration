@@ -10,16 +10,17 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from pathlib import Path
+import os.path
 from datetime import datetime
+from pathlib import Path
+
+import matplotlib.image as mpimg
+import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib import gridspec
 from matplotlib.lines import Line2D
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-import numpy as np
-from tergite_autocalibration.config.globals import (
-    CONFIG,
-)
+
+from tergite_autocalibration.config.globals import CONFIG
 from tergite_autocalibration.utils.logging import logger
 
 
@@ -46,7 +47,7 @@ def _add_top_band(axes_tuple):
     ax_center.add_line(line)
 
     # Add left logo, this is hardcoded as it is the Tergite logo.
-    logo_path = "resources/logo.png"
+    logo_path = os.path.join(Path(__file__).parent, "logo.png")
 
     if logo_path:
         try:

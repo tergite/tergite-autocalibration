@@ -13,7 +13,7 @@
 from pathlib import Path
 
 from tergite_autocalibration.lib.utils.node_factory import NodeFactory
-from tergite_autocalibration.lib.utils.reflections import (
+from tergite_autocalibration.utils.misc.reflections import (
     find_inheriting_classes_ast_recursive,
 )
 
@@ -34,3 +34,11 @@ def test_node_classes_exist():
             node_factory.node_name_mapping[node_name]
             in node_implementations_found.keys()
         )
+
+
+def test_node_names_consistent_with_factory():
+
+    node_factory = NodeFactory()
+    for node_name in node_factory.all_node_names():
+        node_cls = node_factory.get_node_class(node_name)
+        assert node_cls.name == node_name

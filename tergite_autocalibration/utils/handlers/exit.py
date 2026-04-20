@@ -12,9 +12,10 @@
 
 import os
 
+import numpy
+
 from tergite_autocalibration.utils.dto.enums import ApplicationStatus
 from tergite_autocalibration.utils.logging import logger
-import numpy
 
 
 def set_log_dir_exit_status(status_code: "ApplicationStatus"):

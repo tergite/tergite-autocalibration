@@ -31,49 +31,37 @@ class MotzoiBaseQubitAnalysis(BaseQubitAnalysis):
         Analyze the magnitudes to determine the optimal Motzoi parameter.
         """
 
-        # Get the relevant motzoi key from the dataset
-        motzoi_key = f"mw_motzois{self.qubit}"
-        motzois = self.dataset[motzoi_key].size
+        for coord in self.magnitudes.coords:
+            coord = str(coord)
+            if "motzois" in coord:
+                self.motzois_coord = coord
+            elif "repetitions" in coord:
+                self.x_repetitions_coord = coord
 
-        # Calculate the sum of the magnitudes for each motzoi index
-        sums = [
-            np.sum(self.magnitudes[self.data_var][i].values) for i in range(motzois)
-        ]
+        sums = self.magnitudes.sum(self.x_repetitions_coord)
 
-        # Find the index with the minimum sum (optimal motzoi)
-        index_of_min = np.argmin(sums)
-        self.optimal_motzoi = float(self.magnitudes[motzoi_key][index_of_min].values)
+        self.optimal_motzoi = sums.idxmin()[self.data_var].item()
 
     def plotter(self, axis):
         datarray = self.magnitudes[self.data_var]
         datarray.plot(ax=axis, x=f"mw_motzois{self.qubit}", cmap="RdBu_r")
 
         # Mark the optimal motzoi on the plot
-        axis.axvline(
-            self.optimal_motzoi,
-            c="k",
-            lw=4,
-            linestyle="--",
-            label=f"Optimal Motzoi: {self.optimal_motzoi}",
-        )
+        label = f"Optimal Motzoi: {self.optimal_motzoi:.3f}"
+        styles = dict(c="k", lw=4, linestyle="--", label=label)
+        axis.axvline(self.optimal_motzoi, **styles)
         axis.legend()
 
 
 class Motzoi01QubitAnalysis(MotzoiBaseQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-        self.redis_field = "rxy:motzoi"
 
     def analyse_qubit(self):
         self._analyse_motzoi()
 
         analysis_successful = True
-        analysis_result = {
-            self.redis_field: {
-                "value": self.optimal_motzoi,
-                "error": 0,
-            }
-        }
+        analysis_result = {"rxy:motzoi": {"value": self.optimal_motzoi, "error": 0}}
 
         qoi = QOI(analysis_result, analysis_successful)
 
@@ -83,18 +71,12 @@ class Motzoi01QubitAnalysis(MotzoiBaseQubitAnalysis):
 class Motzoi12QubitAnalysis(MotzoiBaseQubitAnalysis):
     def __init__(self, name, redis_fields):
         super().__init__(name, redis_fields)
-        self.redis_field = "r12:ef_motzoi"
 
     def analyse_qubit(self):
         self._analyse_motzoi()
 
         analysis_successful = True
-        analysis_result = {
-            self.redis_field: {
-                "value": self.optimal_motzoi,
-                "error": 0,
-            }
-        }
+        analysis_result = {"r12:ef_motzoi": {"value": self.optimal_motzoi, "error": 0}}
 
         qoi = QOI(analysis_result, analysis_successful)
 

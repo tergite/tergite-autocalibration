@@ -18,6 +18,7 @@ from tergite_autocalibration.tests.utils.decorators import (
     with_os_env,
     preserve_os_env,
     with_config,
+    with_redis,
 )
 from tergite_autocalibration.tests.utils.fixtures import get_fixture_path
 
@@ -232,3 +233,27 @@ def test_load_global_config():
     from tergite_autocalibration.config.globals import CONFIG
 
     assert CONFIG.run.name == "no_name_for_this_run_set"
+
+
+def test_with_redis_decorator():
+    """
+    Test whether the decorator works correctly loading and removing values from the redis session
+    """
+    from tergite_autocalibration.config.globals import REDIS_CONNECTION
+
+    # Make sure the redis is empty
+    REDIS_CONNECTION.flushall()
+    assert REDIS_CONNECTION.keys("*") == []
+
+    redis_backup_path = get_fixture_path("redis", "export_bcc_script.json")
+
+    @with_redis(redis_backup_path)
+    def my_function():
+        from tergite_autocalibration.config.globals import REDIS_CONNECTION
+
+        assert REDIS_CONNECTION.hget("cs:q11", "punchout") == "calibrated"
+
+    my_function()
+
+    # Make sure that the redis is replaced with the original redis after the function was running
+    assert REDIS_CONNECTION.keys("*") == []

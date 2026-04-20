@@ -27,25 +27,36 @@ class T2Measurement(BaseMeasurement):
         self.qubit_state = qubit_state
         self.transmons = transmons
 
+    def single_qubit_T2(
+        self, schedule: Schedule, qubit: str, acq_index: int, tau: float
+    ):
+        schedule.add(X90(qubit))
+        schedule.add(
+            X90(qubit),
+            ref_pt="end",
+            rel_time=tau,
+        )
+        schedule.add(Measure(qubit, acq_index=acq_index, bin_mode=BinMode.AVERAGE))
+        schedule.add(Reset(qubit))
+
     def schedule_function(
         self,
         delays: dict[str, np.ndarray],
+        multiplexing: str = "parallel",
         repetitions: int = 1024,
     ) -> Schedule:
         """
         Generate a schedule for performing a T2 experiment measurement to find the coherence time T_2 for multiple qubits.
 
         Schedule sequence
-            Reset -> pi/2 pulse -> Idel(tau) -> pi/2 pulse -> Measure
+            Reset -> pi/2 pulse -> Idle(tau) -> pi/2 pulse -> Measure
 
         Parameters
         ----------
-        self
-            Contains all qubit states.
-        qubits
-            The list of qubits on which to perform the experiment.
         delays
             Array of the sweeping delay times tau between the pi/2-pulse and the other pi/2-pulse for each qubit.
+        multiplexing
+            The multiplexing mode for the schedule. Options are 'parallel' and 'one_by_one'.
         repetitions
             The amount of times the Schedule will be repeated.
 
@@ -63,22 +74,16 @@ class T2Measurement(BaseMeasurement):
 
         # First loop over every qubit with corresponding tau sweeping lists
         for this_qubit, times_val in delays.items():
-            schedule.add(
-                Reset(*qubits), ref_op=root_relaxation, ref_pt="end"
-            )  # To enforce parallelism we refer to the root relaxation
+            if multiplexing == "parallel":
+                schedule.add(
+                    Reset(this_qubit), ref_op=root_relaxation, ref_pt="end"
+                )  # To enforce parallelism we refer to the root relaxation
+            elif multiplexing == "one_by_one":
+                pass
 
             # Second loop over all tau delay values
             for acq_index, tau in enumerate(times_val):
-                schedule.add(X90(this_qubit))
-                schedule.add(
-                    X90(this_qubit),
-                    ref_pt="end",
-                    rel_time=tau,
-                )
-                schedule.add(
-                    Measure(this_qubit, acq_index=acq_index, bin_mode=BinMode.AVERAGE)
-                )
-                schedule.add(Reset(this_qubit))
+                self.single_qubit_T2(schedule, this_qubit, acq_index, tau)
         return schedule
 
 
@@ -88,25 +93,41 @@ class T2EchoMeasurement(BaseMeasurement):
         self.qubit_state = qubit_state
         self.transmons = transmons
 
+    def single_qubit_T2_echo(
+        self, schedule: Schedule, qubit: str, acq_index: int, tau: float
+    ):
+        schedule.add(X90(qubit))
+        schedule.add(
+            X(qubit),
+            ref_pt="end",
+            rel_time=tau / 2,
+        )
+        schedule.add(
+            X90(qubit),
+            ref_pt="end",
+            rel_time=tau / 2,
+        )
+        schedule.add(Measure(qubit, acq_index=acq_index, bin_mode=BinMode.AVERAGE))
+        schedule.add(Reset(qubit))
+
     def schedule_function(
         self,
         delays: dict[str, np.ndarray],
+        multiplexing: str = "parallel",
         repetitions: int = 1024,
     ) -> Schedule:
         """
-        Generate a schedule for performing a T2 experiment measurement to find the coherence time T_2 for multiple qubits.
+        Generate a schedule for performing a T2 Echo experiment measurement to find the coherence time T_2 for multiple qubits.
 
         Schedule sequence
-            Reset -> pi/2 pulse -> Idel(tau) -> pi/2 pulse -> Measure
+            Reset -> pi/2 pulse -> Idle(tau/2) -> pi pulse -> Idle(tau/2) -> pi/2 pulse -> Measure
 
         Parameters
         ----------
-        self
-            Contains all qubit states.
-        qubits
-            The list of qubits on which to perform the experiment.
         delays
             Array of the sweeping delay times tau between the pi/2-pulse and the other pi/2-pulse for each qubit.
+        multiplexing
+            The multiplexing mode for the schedule. Options are 'parallel' and 'one_by_one'.
         repetitions
             The amount of times the Schedule will be repeated.
 
@@ -124,25 +145,14 @@ class T2EchoMeasurement(BaseMeasurement):
 
         # First loop over every qubit with corresponding tau sweeping lists
         for this_qubit, times_val in delays.items():
-            schedule.add(
-                Reset(*qubits), ref_op=root_relaxation, ref_pt="end"
-            )  # To enforce parallelism we refer to the root relaxation
+            if multiplexing == "parallel":
+                schedule.add(
+                    Reset(this_qubit), ref_op=root_relaxation, ref_pt="end"
+                )  # To enforce parallelism we refer to the root relaxation
+            elif multiplexing == "one_by_one":
+                pass
 
             # Second loop over all tau delay values
             for acq_index, tau in enumerate(times_val):
-                schedule.add(X90(this_qubit))
-                schedule.add(
-                    X(this_qubit),
-                    ref_pt="end",
-                    rel_time=tau / 2,
-                )
-                schedule.add(
-                    X90(this_qubit),
-                    ref_pt="end",
-                    rel_time=tau / 2,
-                )
-                schedule.add(
-                    Measure(this_qubit, acq_index=acq_index, bin_mode=BinMode.AVERAGE)
-                )
-                schedule.add(Reset(this_qubit))
+                self.single_qubit_T2_echo(schedule, this_qubit, acq_index, tau)
         return schedule

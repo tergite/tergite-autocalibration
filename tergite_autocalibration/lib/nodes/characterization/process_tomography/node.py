@@ -24,6 +24,7 @@ from tergite_autocalibration.lib.nodes.characterization.process_tomography.measu
 
 
 class ProcessTomographySSRONode(QubitNode):
+    name: str = "process_tomography"
     measurement_obj = ProcessTomographyMeasurement
     analysis_obj = ProcessTomographyNodeAnalysis
     coupler_qois = [
@@ -32,11 +33,8 @@ class ProcessTomographySSRONode(QubitNode):
         "pop_f",
     ]
 
-    def __init__(
-        self, name: str, all_qubits: list[str], couplers: list[str], **node_dictionary
-    ):
-        super().__init__(name, all_qubits, **node_dictionary)
-        self.name = name
+    def __init__(self, all_qubits: list[str], couplers: list[str], **node_dictionary):
+        super().__init__(all_qubits, **node_dictionary)
         self.all_qubits = all_qubits
         self.couplers = couplers
         self.edges = couplers

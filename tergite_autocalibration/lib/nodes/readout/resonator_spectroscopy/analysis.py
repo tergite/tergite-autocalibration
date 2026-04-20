@@ -14,6 +14,7 @@
 """
 Module containing a class that fits data from a resonator spectroscopy experiment.
 """
+
 import numpy as np
 import xarray as xr
 from quantify_core.analysis import fitting_models as fm
@@ -153,7 +154,6 @@ class ResonatorSpectroscopy1QubitAnalysis(ResonatorSpectroscopyQubitAnalysis):
         return qoi
 
     def plotter(self, ax):
-        # breakpoint()
         this_qubit = self.dataset.attrs["qubit"]
         ax.set_xlabel("Frequency (Hz)")
         ax.set_ylabel("|S21| (V)")

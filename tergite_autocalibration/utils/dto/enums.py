@@ -60,3 +60,13 @@ class ApplicationStatus(Enum):
 
     # Some kind of error occurred, the application has stopped.
     FAILED = "FAILED"
+
+
+class QubitRole(Enum):
+    """
+    Defines whether a qubit is target or control for a given coupler
+    """
+
+    TARGET = "TARGET"
+    CONTROL = "CONTROL"
+    NOTSET = "NOTSET"

@@ -1,0 +1,44 @@
+# This code is part of Tergite
+#
+# (C) Copyright Chalmers Next Labs AB 2025, 2026
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+
+
+[calibration_config]
+
+# -- Units --
+
+[calibration_config.units.qubit]
+frequency = "Hz"
+pi_pulse_amplitude = ""
+pi_pulse_duration = "s"
+pi_pulse_motzoi = ""
+pulse_sigma = ""
+t1_decoherence = "s"
+t2_decoherence = "s"
+anharmonicity = "Hz"
+
+[calibration_config.units.readout_resonator]
+acq_delay = "s"
+acq_integration_time = "s"
+frequency = "Hz"
+pulse_delay = "s"
+pulse_duration = "s"
+pulse_amplitude = ""
+pulse_type = ""
+
+[calibration_config.units.coupler]
+frequency = "Hz"
+cz_pulse_amplitude = ""
+cz_pulse_dc_bias = ""
+cz_pulse_duration_constant = "s"
+control_rz_lambda = "rad"
+target_rz_lambda = "rad"
+pulse_type = ""

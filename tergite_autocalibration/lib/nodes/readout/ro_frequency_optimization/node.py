@@ -14,11 +14,13 @@
 
 import numpy as np
 import xarray
+from quantify_core.analysis import fitting_models as fm
 
+from tergite_autocalibration.config.globals import CONFIG
 from tergite_autocalibration.lib.base.node import QubitNode
 from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.analysis import (
     OptimalRO01FrequencyNodeAnalysis,
-    OptimalRO012FrequencyNodeAnalysis,
+    ROFrequencyThreeStateNodeAnalysis,
 )
 from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.measurement import (
     ROFrequencyOptimizationMeasurement,
@@ -26,22 +28,19 @@ from tergite_autocalibration.lib.nodes.readout.ro_frequency_optimization.measure
 from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
 from tergite_autocalibration.lib.utils.samplespace import resonator_samples
 
-from quantify_core.analysis import fitting_models as fm
-from tergite_autocalibration.config.legacy import dh
-
 resonator = fm.ResonatorModel()
 
 
 class ROFrequencyOptimizationBase(QubitNode):
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(all_qubits, couplers, **schedule_keywords)
 
     def generate_dummy_dataset(self, noise=False):
         dataset = xarray.Dataset()
         frequency_shift = 0.5e6
 
         for index, qubit in enumerate(self.all_qubits):
-            vna_ro_freq = dh.get_legacy("VNA_resonator_frequencies")[qubit]
+            vna_ro_freq = CONFIG.device.resonators[qubit]["VNA_frequency"]
             qubit_states = self.schedule_samplespace["qubit_states"][qubit]
             data_array = np.array([])
             for qubit_state in qubit_states:
@@ -75,14 +74,15 @@ class ROFrequencyOptimizationBase(QubitNode):
 
 
 class ROFrequencyTwoStateOptimizationNode(ROFrequencyOptimizationBase):
+    name: str = "ro_frequency_two_state_optimization"
     measurement_obj = ROFrequencyOptimizationMeasurement
     analysis_obj = OptimalRO01FrequencyNodeAnalysis
     measurement_type = ScheduleNode
 
     qubit_qois = ["extended_clock_freqs:readout_2state_opt"]
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(all_qubits, couplers, **schedule_keywords)
 
         self.schedule_samplespace = {
             "ro_opt_frequencies": {
@@ -95,14 +95,14 @@ class ROFrequencyTwoStateOptimizationNode(ROFrequencyOptimizationBase):
 
 
 class ROFrequencyThreeStateOptimizationNode(ROFrequencyOptimizationBase):
+    name: str = "ro_frequency_three_state_optimization"
     measurement_obj = ROFrequencyOptimizationMeasurement
-    analysis_obj = OptimalRO012FrequencyNodeAnalysis
+    analysis_obj = ROFrequencyThreeStateNodeAnalysis
     measurement_type = ScheduleNode
     qubit_qois = ["extended_clock_freqs:readout_3state_opt"]
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
-        self.name = name
+    def __init__(self, all_qubits: list[str], couplers: list[str], **schedule_keywords):
+        super().__init__(all_qubits, couplers, **schedule_keywords)
         self.all_qubits = all_qubits
 
         self.schedule_samplespace = {

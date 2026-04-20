@@ -12,23 +12,27 @@
 
 import threading
 import time
+from typing import TYPE_CHECKING
 
 import tqdm
 import xarray
 from colorama import Fore, Style
-from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
-    CompiledSchedule,
-    InstrumentCoordinator,
-)
 
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.logging import logger
 
+if TYPE_CHECKING:
+    from quantify_scheduler.backends import SerialCompiler
+    from quantify_scheduler.instrument_coordinator.instrument_coordinator import (
+        CompiledSchedule,
+        InstrumentCoordinator,
+    )
+
 
 def execute_schedule(
-    compiled_schedule: CompiledSchedule,
+    compiled_schedule: "CompiledSchedule",
     schedule_duration: float,
-    lab_ic: InstrumentCoordinator,
+    lab_ic: "InstrumentCoordinator",
     cluster_status,
 ) -> xarray.Dataset:
     logger.info("Starting measurement")
@@ -70,6 +74,18 @@ def display_duration_information(
     if measurement[1] > 1:
         measurement_message = f". Measurement {measurement[0] + 1} of {measurement[1]}"
     message = f"{schedule_duration:.2f} sec" + measurement_message
-    logger.status(
+    logger.info(
         f"schedule_duration = {Fore.CYAN}{Style.BRIGHT}{message}{Style.RESET_ALL}"
     )
+
+
+def get_compiler(prefix: str = "default") -> "SerialCompiler":
+    """
+    This is in a function, so, we can have a local import of the quantify module.
+
+    Returns:
+        SerialCompiler with given prefix name
+    """
+    from quantify_scheduler.backends import SerialCompiler
+
+    return SerialCompiler(name=f"{prefix}_compiler")

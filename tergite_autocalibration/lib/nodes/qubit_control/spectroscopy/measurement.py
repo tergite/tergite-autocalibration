@@ -14,6 +14,7 @@
 """
 Module containing a schedule class for two-tone (qubit) spectroscopy calibration.
 """
+
 import numpy as np
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.gate_library import Measure, Reset, X
@@ -148,12 +149,6 @@ class TwoTonesMultidimMeasurement(BaseMeasurement):
                     else:
                         raise ValueError(f"Invalid qubit state: {qubit_state}")
 
-                    # long pulses require more efficient memory managment
-                    if spec_pulse_duration > 6.5e-6:
-                        SpectroscopyPulse = long_square_pulse
-                    else:
-                        SpectroscopyPulse = SoftSquarePulse
-
                     schedule.add(
                         SpectroscopyPulse(
                             duration=spec_pulse_duration,
@@ -188,7 +183,6 @@ class TwoTonesAmplitudeMeasurement(BaseMeasurement):
         schedule = Schedule("qubit_spectroscopy", repetitions=1024)
 
         # Initialize the clock for each qubit
-        # Initialize ClockResource with the first frequency value
         for this_qubit, spec_array_val in spec_frequencies.items():
             schedule.add_resource(
                 ClockResource(name=f"{this_qubit}.01", freq=spec_array_val[0])

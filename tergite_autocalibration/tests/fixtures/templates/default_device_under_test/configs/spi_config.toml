@@ -18,69 +18,69 @@
 # -------------------
 
 [q11_q12]
-spi_module_no = 1
+spi_module_number = 1
 dac_name = "dac0"
 edge_group = 1
 
 [q12_q13]
-spi_module_no = 1
+spi_module_number = 1
 dac_name = "dac1"
 edge_group = 2
 
 [q13_q14]
-spi_module_no = 1
+spi_module_number = 1
 dac_name = "dac2"
 edge_group = 1
 
 [q14_q15]
-spi_module_no = 1
+spi_module_number = 1
 dac_name = "dac3"
 edge_group = 2
 
 [q08_q09]
-spi_module_no = 2
+spi_module_number = 2
 dac_name = "dac0"
 
 [q12_q17]
-spi_module_no = 2
+spi_module_number = 2
 dac_name = "dac1"
 edge_group = 4
 
 [q07_q12]
-spi_module_no = 2
+spi_module_number = 2
 dac_name = "dac2"
 
 [q08_q13]
-spi_module_no = 2
+spi_module_number = 2
 dac_name = "dac3"
 
 [q09_q14]
-spi_module_no = 3
+spi_module_number = 3
 dac_name = "dac0"
 
 [q06_q07]
-spi_module_no = 3
+spi_module_number = 3
 dac_name = "dac1"
 
 [q09_q10]
-spi_module_no = 3
+spi_module_number = 3
 dac_name = "dac2"
 
 [q11_q16]
-spi_module_no = 3
+spi_module_number = 3
 dac_name = "dac3"
 edge_group = 3
 
 [q07_q08]
-spi_module_no = 4
+spi_module_number = 4
 dac_name = "dac0"
 
 [q10_q15]
-spi_module_no = 4
+spi_module_number = 4
 dac_name = "dac1"
 
 [q06_q11]
-spi_module_no = 4
+spi_module_number = 4
 dac_name = "dac2"
 
 
@@ -89,81 +89,81 @@ dac_name = "dac2"
 # -------------------
 
 [q16_q17]
-spi_module_no = 1
+spi_module_number = 1
 dac_name = "dac0"
 edge_group = 2
 
 [q17_q18]
-spi_module_no = 1
+spi_module_number = 1
 dac_name = "dac1"
 edge_group = 1
 
 [q18_q19]
-spi_module_no = 1
+spi_module_number = 1
 dac_name = "dac2"
 edge_group = 2
 
 [q19_q20]
-spi_module_no = 1
+spi_module_number = 1
 dac_name = "dac3"
 edge_group = 1
 
 [q18_q23]
-spi_module_no = 2
+spi_module_number = 2
 dac_name = "dac0"
 edge_group = 4
 
 [q17_q22]
-spi_module_no = 2
+spi_module_number = 2
 dac_name = "dac1"
 edge_group = 3
 
 [q16_q21]
-spi_module_no = 2
+spi_module_number = 2
 dac_name = "dac2"
 edge_group = 4
 
 [q19_q24]
-spi_module_no = 2
+spi_module_number = 2
 dac_name = "dac3"
 edge_group = 3
 
 [q20_q25]
-spi_module_no = 3
+spi_module_number = 3
 dac_name = "dac0"
 edge_group = 4
 
 [q21_q22]
-spi_module_no = 3
+spi_module_number = 3
 dac_name = "dac1"
 edge_group = 1
 
 [q22_q23]
-spi_module_no = 3
+spi_module_number = 3
 dac_name = "dac2"
 edge_group = 2
 
 [q23_q24]
-spi_module_no = 3
+spi_module_number = 3
 dac_name = "dac3"
 edge_group = 1
 
 [q24_q25]
-spi_module_no = 4
+spi_module_number = 4
 dac_name = "dac0"
 edge_group = 2
 
 [q13_q18]
-spi_module_no = 4
+spi_module_number = 4
 dac_name = "dac1"
 edge_group = 3
 
 [q15_q20]
-spi_module_no = 4
+spi_module_number = 4
 dac_name = "dac2"
 edge_group = 3
 
 [q14_q19]
-spi_module_no = 4
+spi_module_number = 4
 dac_name = "dac3"
 edge_group = 4

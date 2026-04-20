@@ -20,15 +20,14 @@ import time
 from pathlib import Path
 
 import numpy as np
+import toml
 from colorama import Fore, Style
 from colorama import init as colorama_init
 from qblox_instruments import SpiRack
 from qcodes import validators
 from rich.progress import Progress
-from tomlkit.api import E
 
-from tergite_autocalibration.config.globals import ENV, REDIS_CONNECTION
-from tergite_autocalibration.config.legacy import dh
+from tergite_autocalibration.config.globals import ENV, REDIS_CONNECTION, CONFIG
 from tergite_autocalibration.utils.dto.enums import MeasurementMode
 from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.utils.misc.os import OperatingSystem, get_os
@@ -69,7 +68,12 @@ def _find_and_validate_spi_port():
 
 
 class SpiDAC:
-    def __init__(self, couplers: list[str], measurement_mode: MeasurementMode):
+    def __init__(
+        self,
+        couplers: list[str],
+        measurement_mode: MeasurementMode,
+        name: str = "no_spi_name_defined",
+    ):
         self.port = _find_and_validate_spi_port()
         self.is_dummy = (
             measurement_mode == MeasurementMode.dummy
@@ -79,7 +83,7 @@ class SpiDAC:
             self.port = "dummy_port"
 
         if self.port is not None:
-            self.spi = SpiRack("loki_rack", self.port, is_dummy=self.is_dummy)
+            self.spi = SpiRack(name, self.port, is_dummy=self.is_dummy)
         else:
             raise ValueError("No serial port for the SPI")
 
@@ -88,10 +92,13 @@ class SpiDAC:
             self.dacs_dictionary[coupler] = self.create_spi_dac(coupler)
 
     def create_spi_dac(self, coupler: str):
+        spi_config = toml.load(CONFIG.spi)
+
         spi_mod_number, dac_name = (
-            dh.get_legacy("coupler_spi_mapping")[coupler]["spi_module_number"],
-            dh.get_legacy("coupler_spi_mapping")[coupler]["dac_name"],
+            spi_config[coupler]["spi_module_number"],
+            spi_config[coupler]["dac_name"],
         )
+
         spi_mod_name = f"module{spi_mod_number}"
 
         if self.is_dummy:
@@ -122,21 +129,21 @@ class SpiDAC:
         self.spi.set_dacs_zero()
         return
 
-    def set_parking_currents(self, couplers: list[str]) -> None:
+    def set_initial_parking_currents(self, couplers: list[str]) -> None:
 
         parking_currents = {}
         for coupler in couplers:
-            if REDIS_CONNECTION.hexists(f"couplers:{coupler}", "parking_current"):
-                parking_current = float(
-                    REDIS_CONNECTION.hget(f"couplers:{coupler}", "parking_current")
-                )
-            else:
+            key = f"couplers:{coupler}"
+            if not REDIS_CONNECTION.hexists(key, "initial_parking_current"):
                 message = (
-                    "parking current is not present on redis."
+                    "initial parking current is not present on redis."
                     "If you intend to operate at zero DC current, set a zero value at your device_config.toml"
                 )
                 logger.warning(f"{Fore.YELLOW}{Style.DIM}{message}{Style.RESET_ALL}")
                 raise ValueError(message)
+            parking_current = float(
+                REDIS_CONNECTION.hget(key, "initial_parking_current")
+            )
 
             parking_currents[coupler] = parking_current
 
@@ -215,7 +222,7 @@ class SpiDAC:
     def print_currents(self):
         for coupler, dac in self.dacs_dictionary.items():
             current = dac.current() * 1000
-            logger.info(f"{coupler}: {current:.4f} mA")
+            logger.status(f"{coupler}: {current:.4f} mA")
 
     def close_spi_rack(self):
         self.spi.close()

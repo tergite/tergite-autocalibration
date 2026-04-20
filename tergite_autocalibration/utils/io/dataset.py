@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import Union
 from uuid import uuid4
 
-import matplotlib.pyplot as plt
+import cf_xarray as cf
 import xarray
 
 from tergite_autocalibration.config.globals import CONFIG
@@ -118,10 +118,14 @@ def save_dataset(
         {"name": node_name, "tuid": measurement_id}
     )
 
-    # to_netcdf doesn't like complex numbers, convert to real/imag to save:
+    # to_netcdf doesn't like complex numbers, convert to real&imag to save:
     result_dataset_real = to_real_dataset(result_dataset)
 
     dataset_name = f"dataset_{node_name}.hdf5"
+    if "working_points" in result_dataset_real.coords:
+        result_dataset_real = cf.encode_multi_index_as_compress(
+            result_dataset_real, "working_points"
+        )
     result_dataset_real.to_netcdf(data_path / dataset_name)
 
 

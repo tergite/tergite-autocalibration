@@ -39,8 +39,6 @@ def test_global_env_configuration():
     assert ENV.redis_port == env_configuration.redis_port
     assert ENV.plotting == env_configuration.plotting
 
-    assert ENV.mss_machine_root_url == env_configuration.mss_machine_root_url
-
 
 def test_global_configuration():
     configuration_handler = ConfigurationHandler.from_configuration_package(

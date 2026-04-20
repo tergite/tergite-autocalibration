@@ -1,6 +1,7 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2023, 2024
+# (C) Copyright Eleftherios Moschandreou 2023, 2024, 2026
+# (C) Copyright Abdullah Al Amin 2026
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -14,7 +15,6 @@ import numpy as np
 from quantify_scheduler import Schedule
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.acquisition_library import SSBIntegrationComplex
-from quantify_scheduler.operations.control_flow_library import Loop
 from quantify_scheduler.operations.gate_library import Reset, X
 from quantify_scheduler.operations.pulse_library import (
     DRAGPulse,
@@ -22,6 +22,7 @@ from quantify_scheduler.operations.pulse_library import (
     SquarePulse,
 )
 from quantify_scheduler.resources import ClockResource
+from quantify_scheduler.schedules.schedule import LoopOperation
 
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
@@ -55,6 +56,7 @@ class ROAmplitudeOptimizationMeasurement(BaseMeasurement):
             elif qubit_state == 2:
                 ro_frequency = this_transmon.extended_clock_freqs.readout_3state_opt()
                 mw_frequency_12 = this_transmon.clock_freqs.f12()
+                mw_ef_duration = this_transmon.r12.ef_duration()
                 this_clock = f"{this_qubit}.12"
                 shot.add_resource(ClockResource(name=this_clock, freq=mw_frequency_12))
             else:
@@ -72,6 +74,7 @@ class ROAmplitudeOptimizationMeasurement(BaseMeasurement):
             this_transmon = self.transmons[this_qubit]
             ro_pulse_duration = this_transmon.measure.pulse_duration()
             mw_ef_amp180 = this_transmon.r12.ef_amp180()
+            mw_ef_motzoi = this_transmon.r12.ef_motzoi()
             mw_pulse_duration = this_transmon.rxy.duration()
             mw_pulse_port = this_transmon.ports.microwave()
             acquisition_delay = this_transmon.measure.acq_delay()
@@ -85,7 +88,7 @@ class ROAmplitudeOptimizationMeasurement(BaseMeasurement):
             number_of_levels = len(qubit_levels)
 
             # To enforce parallelism we refer to the root relaxation
-            shot.add(Reset(*qubits), ref_op=root_relaxation, ref_pt="end")
+            shot.add(Reset(*qubits), ref_op=root_relaxation)
 
             # The intermediate for-loop iterates over all ro_amplitudes:
             for ampl_indx, ro_amplitude in enumerate(ro_amplitude_values):
@@ -104,9 +107,9 @@ class ROAmplitudeOptimizationMeasurement(BaseMeasurement):
 
                         prep = shot.add(
                             DRAGPulse(
-                                duration=mw_pulse_duration,
+                                duration=mw_ef_duration,
                                 G_amp=mw_ef_amp180,
-                                D_amp=0,
+                                D_amp=mw_ef_motzoi,
                                 port=mw_pulse_port,
                                 clock=this_12_clock,
                                 phase=0,
@@ -123,8 +126,6 @@ class ROAmplitudeOptimizationMeasurement(BaseMeasurement):
                             clock=this_ro_clock,
                         ),
                         ref_op=prep,
-                        ref_pt="end",
-                        # rel_time=100e-9,
                     )
 
                     shot.add(
@@ -142,7 +143,6 @@ class ROAmplitudeOptimizationMeasurement(BaseMeasurement):
                     )
 
                     shot.add(Reset(this_qubit))
-        shot.add(IdlePulse(20e-9))
         return shot
 
     def schedule_function(
@@ -155,6 +155,7 @@ class ROAmplitudeOptimizationMeasurement(BaseMeasurement):
         schedule = Schedule("RO_amplitude_optimization", repetitions=1)
         ro_shot_schedule = self.ro_shot(ro_amplitudes, qubit_states, qubit_state)
 
-        schedule.add(ro_shot_schedule, control_flow=Loop(loop_repetitions))
-        schedule.add(IdlePulse(20e-9))
+        schedule.add(IdlePulse(8e-9))
+        schedule.add(LoopOperation(body=ro_shot_schedule, repetitions=loop_repetitions))
+        schedule.add(IdlePulse(8e-9))
         return schedule

@@ -14,6 +14,7 @@
 """
 Module containing classes that model, fit and plot data from the purity benchmarking experiment.
 """
+
 import lmfit
 import numpy as np
 from matplotlib.axes import Axes

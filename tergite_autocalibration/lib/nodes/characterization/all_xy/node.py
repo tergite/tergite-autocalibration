@@ -22,11 +22,12 @@ from tergite_autocalibration.lib.nodes.characterization.all_xy.measurement impor
 
 
 class AllXYNode(QubitNode):
+    name: str = "all_xy"
     measurement_obj = AllXYMeasurement
     analysis_obj = AllXYAnalysis
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(self, all_qubits: list[str], **schedule_keywords):
+        super().__init__(all_qubits, **schedule_keywords)
         self.all_qubits = all_qubits
         self.redis_field = ["error_syndromes"]
         self.backup = False

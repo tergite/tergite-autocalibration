@@ -15,6 +15,7 @@
 """
 Module containing a schedule class for T1 and T2 coherence time measurement.
 """
+
 import numpy as np
 from quantify_scheduler import Schedule
 from quantify_scheduler.enums import BinMode
@@ -76,7 +77,7 @@ class T1Measurement(BaseMeasurement):
         for this_qubit, times_val in delays.items():
             if multiplexing == "parallel":
                 schedule.add(
-                    Reset(this_qubit), ref_op=root_relaxation, ref_pt="end"
+                    Reset(this_qubit), ref_op=root_relaxation
                 )  # To enforce parallelism we refer to the root relaxation
             elif multiplexing == "one_by_one":
                 pass

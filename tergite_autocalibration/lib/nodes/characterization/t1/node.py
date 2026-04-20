@@ -39,19 +39,20 @@ class T1Node(QubitNode):
     and T1NodeAnalysis for analysis.
     """
 
+    name: str = "T1"
     measurement_obj = T1Measurement
     analysis_obj = T1NodeAnalysis
     measurement_type = ExternalParameterNode
     qubit_qois = ["t1_time"]
 
-    def __init__(self, name: str, all_qubits: list[str], **schedule_keywords):
-        super().__init__(name, all_qubits, **schedule_keywords)
+    def __init__(self, all_qubits: list[str], **schedule_keywords):
+        super().__init__(all_qubits, **schedule_keywords)
 
         self.schedule_keywords = {
             "multiplexing": "parallel"
         }  # 'one_by_one' | 'parallel'
-        number_of_repeated_t1s = 10
-        self.sleep_time = 2
+        number_of_repeated_t1s = 5
+        self.sleep_time = 1
 
         delays = np.concatenate(
             [

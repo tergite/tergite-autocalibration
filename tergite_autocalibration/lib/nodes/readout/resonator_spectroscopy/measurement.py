@@ -13,6 +13,7 @@
 """
 Module containing a schedule class for resonator spectroscopy calibration.
 """
+
 import numpy as np
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.acquisition_library import SSBIntegrationComplex
@@ -30,7 +31,7 @@ from tergite_autocalibration.utils.dto.extended_transmon_element import Extended
 
 
 class ResonatorSpectroscopyMeasurement(BaseMeasurement):
-    def __init__(self, transmons: dict[str, ExtendedTransmon]):
+    def __init__(self, transmons: dict[str, ExtendedTransmon], *args):
         super().__init__(transmons)
         self.transmons = transmons
 
@@ -97,15 +98,14 @@ class ResonatorSpectroscopyMeasurement(BaseMeasurement):
             ro_pulse_amplitude = this_transmon.measure.pulse_amp()
             ro_pulse_duration = this_transmon.measure.pulse_duration()
             mw_ef_amp180 = this_transmon.r12.ef_amp180()
-            mw_pulse_duration = this_transmon.rxy.duration()
+            mw_ef_duration = this_transmon.r12.ef_duration()
             mw_pulse_port = this_transmon.ports.microwave()
             acquisition_delay = this_transmon.measure.acq_delay()
             integration_time = this_transmon.measure.integration_time()
             ro_port = this_transmon.ports.readout()
 
-            schedule.add(
-                Reset(*qubits), ref_op=root_relaxation, ref_pt="end"
-            )  # To enforce parallelism we refer to the root relaxation
+            # To enforce parallelism we refer to the root relaxation:
+            schedule.add(Reset(*qubits), ref_op=root_relaxation)
 
             this_ro_clock = f"{this_qubit}." + ro_str
             this_mw_clock = f"{this_qubit}.12"
@@ -113,7 +113,7 @@ class ResonatorSpectroscopyMeasurement(BaseMeasurement):
             # The second for loop iterates over all frequency values in the frequency batch:
             for acq_index, ro_frequency in enumerate(ro_f_values):
                 schedule.add(
-                    SetClockFrequency(clock=this_ro_clock, clock_freq_new=ro_frequency),
+                    SetClockFrequency(clock=this_ro_clock, clock_freq_new=ro_frequency)
                 )
 
                 if qubit_state == 0:
@@ -124,7 +124,7 @@ class ResonatorSpectroscopyMeasurement(BaseMeasurement):
                     schedule.add(X(this_qubit))
                     schedule.add(
                         DRAGPulse(
-                            duration=mw_pulse_duration,
+                            duration=mw_ef_duration,
                             G_amp=mw_ef_amp180,
                             D_amp=0,
                             port=mw_pulse_port,

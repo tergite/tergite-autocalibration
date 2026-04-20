@@ -11,13 +11,15 @@ graph TD
     D --> E[Motzoi Parameter]
     E --> F[Resonator Spectroscopy 1]
     F --> C1[T1] --> C2[T2] --> C3[Randomized Benchmarking]
-    F --> F1(Qubit 12 Spectroscopy) --> G(Rabi 12 Oscillations) --> G1[Resonator Spectroscopy 2]
+    F --> F1(Qubit 12 Spectroscopy) --> G(Motzoi 12 Parameter)--> G1(Rabi 12 Oscillations) --> G2[Resonator Spectroscopy 2]
     F --> H1(2 States Discrimination)
-    G1 --> H2(3 States Discrimination)
+    G1 --> H2(RO frequency optimization - 3states) --> H3(3 States Discrimination)
     A --> I(Resonator spectroscopy vs current)
     B --> J(Qubit spectroscopy vs current)
     I --> J
-        
+    H2 --> K(CZ Parametrization) --> K1(CZ Chevron) --> K2(CZ Calibration) --> K3(CZ Local Phases)
+    K3 --> L(CZ Randomized Benchmarking)
+    
     click A href "../nodes/resonator_spectroscopy_node"
     click F href "../nodes/resonator_spectroscopy_node"
     click G1 href "../nodes/resonator_spectroscopy_node"
@@ -25,9 +27,15 @@ graph TD
     click B href "../nodes/qubit_spectroscopy_node"
     click F1 href "../nodes/qubit_spectroscopy_node"
     click C href "../nodes/rabi_oscillations_node"
+    click C3 href "../nodes/randomized_benchmarking_node"
     click I href "../nodes/resonator_spectroscopy_vs_current_node"
     click J href "../nodes/qubit_spectroscopy_vs_current_node"
-
+    click K href "../nodes/cz_parametrization"
+    click K1 href "../nodes/cz_chevron"
+    click K2 href "../nodes/cz_calibration"
+    click K3 href "../nodes/cz_local_phases"
+    click L href "../nodes/cz_rb_node"
+    
     style A fill:#ffe6cc,stroke:#333,stroke-width:2px
     style A1 fill:#ffe6cc,stroke:#333,stroke-width:2px
     style B fill:#ffe6cc,stroke:#333,stroke-width:2px
@@ -42,8 +50,10 @@ graph TD
     style F1 fill:#ffe6cc,stroke:#333,stroke-width:2px
     style G fill:#ffe6cc,stroke:#333,stroke-width:2px
     style G1 fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style G2 fill:#ffe6cc,stroke:#333,stroke-width:2px
     style H1 fill:#ffe6cc,stroke:#333,stroke-width:2px
     style H2 fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style H3 fill:#ffe6cc,stroke:#333,stroke-width:2px
     style I fill:#ff9999,stroke:#333,stroke-width:2px
     style J fill:#ff9999,stroke:#333,stroke-width:2px
 ```
@@ -73,15 +83,20 @@ graph TD
 
 ## Coupler Nodes
 
-- [coupler_spectroscopy](nodes/qubit_spectroscopy_vs_current_node.md)
+- [coupler_anticrossing](nodes/qubit_spectroscopy_vs_current_node.md)
 - [coupler_resonator_spectroscopy](nodes/resonator_spectroscopy_vs_current_node.md)
+- [cz_parametrization](nodes/cz_parametrization.md)
+- [cz_chevron](nodes/cz_chevron.md)
+- [cz_calibration](nodes/cz_calibration.md)
+- [cz_local_phases](nodes/cz_local_phases.md)
 
 ## Characterization Nodes
 
 - T1
 - T2
 - T2_echo
-- randomized_benchmarking
+- [randomized_benchmarking](nodes/randomized_benchmarking_node.md)
 - all_XY
+- [cz_rb](nodes/cz_rb_node.md)
 
 --8<-- "docs/node-library/redis_variable_names.md"
