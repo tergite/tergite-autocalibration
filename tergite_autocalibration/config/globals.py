@@ -25,6 +25,16 @@ from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.utils.logging.decorators import is_logging_suppressed
 from tergite_autocalibration.utils.misc.tests import is_pytest
 
+### BEGIN Explicit global variables
+# Please note: The variables in this section are meant to move to respective configuration files
+#              as soon as there is found the best position to put them.
+#              E.g. for the case of the downconvert frequency it has to be discussed whether it
+#              can be part of the coupler section in the device config.
+
+DOWNCONVERT_FREQUENCY = 4.4e9
+
+### END Explicit global variables
+
 # Loads the environmental configuration
 #
 # If there is a test going on, load the standard environment configuration.
