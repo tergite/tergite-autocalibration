@@ -183,6 +183,10 @@ def test_save_qoi():
     assert False
 
 
+def test_open_dataset(tmp_path):
+    assert False
+
+
 def test_save_dataset(tmp_path):
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
     node = ResonatorSpectroscopyNode(CONFIG.run.qubits, CONFIG.run.couplers)

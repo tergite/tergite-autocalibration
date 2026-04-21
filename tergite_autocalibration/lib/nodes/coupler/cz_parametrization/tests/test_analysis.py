@@ -16,16 +16,17 @@ import math
 import os
 import shutil
 from pathlib import Path
+from tergite_autocalibration.utils.io.dataset import open_dataset, save_figures
 
-import xarray as xr
 
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.analysis import (
     CZParametrizationCouplerAnalysis,
-    CZParametrizationNodeAnalysis,
 )
 from tergite_autocalibration.tests.utils.decorators import with_redis
 
 _test_data_dir = os.path.join(Path(__file__).parent, "data")
+_test_data_dir_0 = os.path.join(_test_data_dir, "data_0")
+_test_data_dir_1 = os.path.join(_test_data_dir, "data_1")
 _redis_values = os.path.join(_test_data_dir, "redis-export-2025-12-16.json")
 
 
@@ -35,15 +36,13 @@ def test_cz_parametrization_analysis_good_data():
     Test whether single coupler analysis outputs right QOIs
     """
     # Load dataset
-    file_path = os.path.join(
-        _test_data_dir, "data_0", "dataset_cz_parametrization.hdf5"
-    )
-    dataset = xr.open_dataset(file_path)
+    name = "cz_parametrization"
+    dataset = open_dataset(name, _test_data_dir_0)
     coupler = "q14_q15"
 
     # Run the single coupler analysis
     analysis = CZParametrizationCouplerAnalysis(
-        "cz_parametrization",
+        name,
         ["cz_pulse_frequency", "cz_pulse_amplitude", "parking_current"],
         phase_path="via_20",
     )
@@ -67,10 +66,8 @@ def test_cz_parametrization_analysis_bad_data():
     Test whether single coupler analysis outputs that the analysis fails on bad data
     """
     # Load dataset
-    file_path = os.path.join(
-        _test_data_dir, "data_1", "dataset_cz_parametrization.hdf5"
-    )
-    dataset = xr.open_dataset(file_path)
+    name = "cz_parametrization"
+    dataset = open_dataset(name, _test_data_dir_1)
     coupler = "q14_q15"
 
     # Run the single coupler analysis
@@ -98,16 +95,27 @@ def test_plotting(tmp_path):
     )
 
     coupler = "q14_q15"
+    name = "cz_parametrization"
+    dataset = open_dataset(name, _test_data_dir_0)
     # Run the node analysis
-    analysis = CZParametrizationNodeAnalysis(
+    analysis = CZParametrizationCouplerAnalysis(
         "cz_parametrization",
         ["cz_pulse_frequency", "cz_pulse_amplitude", "parking_current"],
-        **{coupler: {"phase_path": "via_20"}},
+        **{"phase_path": "via_20"},
     )
-    analysis.analyze_node(tmp_path)
+
+    figures_dictionary = {}
+
+    analysis.process_coupler(dataset, "q14_q15")
+    analysis.plotter(figures_dictionary)
+
+    assert "q14_q15" in figures_dictionary
+
+    figures_list = figures_dictionary["q14_q15"]
+    save_figures(figures_list, name, tmp_path)
 
     # Check whether output images exist
     for i in range(5):
         assert os.path.exists(
-            os.path.join(tmp_path, f"cz_parametrization_{coupler}_{i}_preview.png")
+            os.path.join(tmp_path, f"cz_parametrization_{i}_preview.png")
         )

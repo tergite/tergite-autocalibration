@@ -14,13 +14,9 @@
 # that they have been altered from the originals.
 
 import collections
-import os
 from abc import ABC, abstractmethod
-from pathlib import Path
 from typing import List
 
-import cf_xarray as cf
-import matplotlib.pyplot as plt
 
 # TODO: we should have a conditional import depending on a feature flag here
 import numpy as np

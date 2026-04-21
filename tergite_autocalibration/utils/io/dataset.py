@@ -81,7 +81,7 @@ def scrape_and_copy_hdf5_files(
     logger.info(f"Copied {len(hdf5_files)} files to {target_directory}.")
 
 
-def open_dataset(name: str, data_path: Path) -> xarray.Dataset:
+def open_dataset(name: str, containing_folder_path: Path) -> xarray.Dataset:
     """
     Open the dataset for the analysis.
 
@@ -90,13 +90,18 @@ def open_dataset(name: str, data_path: Path) -> xarray.Dataset:
 
     """
     dataset_name = f"dataset_{name}.hdf5"
-    dataset_path = os.path.join(data_path, dataset_name)
+    dataset_path = os.path.join(containing_folder_path, dataset_name)
     if not os.path.exists(dataset_path):
         raise FileNotFoundError(f"Dataset file not found: {dataset_path}")
 
     logger.info("Open dataset " + str(dataset_path))
     real_ds = xarray.open_dataset(dataset_path)
     complex_ds = real_ds.isel(ReIm=0) + 1j * real_ds.isel(ReIm=1)
+    for var in real_ds.data_vars:
+        attrs = real_ds.data_vars[var].attrs
+        complex_ds[var].attrs.update(**attrs)
+    ds_attrs = real_ds.attrs
+    complex_ds.attrs.update(**ds_attrs)
     return complex_ds
 
 
@@ -147,6 +152,7 @@ def save_qoi(QOI_dict: dict[str, QOI], node_name: str, data_path: Path) -> None:
 
 
 def save_figures(figures_list: list, node_name: str, data_path: Path):
+    # TODO: as is, it doesn't support multiple couplers
     logger.info("Saving Plots")
     for fig_index, fig in enumerate(figures_list):
         node_name_stem = (
