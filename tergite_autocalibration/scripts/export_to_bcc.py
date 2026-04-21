@@ -17,9 +17,9 @@ from typing import Tuple, Dict, Any, List, Type, Union
 
 import tomlkit
 
-from tergite_autocalibration.config.globals import REDIS_CONNECTION
-from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.measurement import (
-    DOWNCONVERT_FREQ,
+from tergite_autocalibration.config.globals import (
+    REDIS_CONNECTION,
+    DOWNCONVERT_FREQUENCY,
 )
 from tergite_autocalibration.utils.logging import logger
 
@@ -119,10 +119,10 @@ def _assemble_parameters(
         # Special case: Downconverter correction for coupler frequency
         if parameter_[1] == "cz_pulse_frequency":
             logger.info(
-                f"Adjusting coupler frequency about {DOWNCONVERT_FREQ}GHz for {object_id}."
+                f"Adjusting coupler frequency about {DOWNCONVERT_FREQUENCY}GHz for {object_id}."
             )
             parameterized_return_object[parameter_[0]] = (
-                DOWNCONVERT_FREQ - parameterized_return_object[parameter_[0]]
+                DOWNCONVERT_FREQUENCY - parameterized_return_object[parameter_[0]]
             )
     return parameterized_return_object
 
