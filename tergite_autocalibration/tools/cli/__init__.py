@@ -157,7 +157,6 @@ def start(
         parsed_cluster_ip = None
 
         if not is_run_folder(re_analyse):
-            print(DATA_DIR)
             # if it's not a run folder, then maybe it's just a measurement identifier
             # all measurements have unique tags, so we can also find the data this way
             msmt_info: MeasurementInfo | None = search_all_runs_for_measurement(
