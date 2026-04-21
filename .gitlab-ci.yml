@@ -138,11 +138,11 @@ application_run:
     # Reset Redis
     - echo "y" | acli node reset -a
     # Load redis fixture
-    - echo "y" | acli redis load-file "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/coupler_run_26-04/redis.json"
+    - echo "y" | acli redis load-file "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/21-39-55_cz_rb-SUCCESS/redis.json"
     # Clear the caches
     - rm -r venv/lib/python3.12/site-packages/out
     # Load coupler configuration
-    - echo "y" | acli config load -f "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/coupler_run_26-04"
+    - echo "y" | acli config load -f "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/21-39-55_cz_rb-SUCCESS"
     # Run the calibration chain
     - |
       for node in \
@@ -152,7 +152,7 @@ application_run:
         cz_local_phases \
         cz_rb
       do
-        echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/coupler_run_26-04" -n $node
+        echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/21-39-55_cz_rb-SUCCESS" -n $node
       done
     # Uncomment for debugging:
     - ls -lR venv/lib/python3.12/site-packages/out

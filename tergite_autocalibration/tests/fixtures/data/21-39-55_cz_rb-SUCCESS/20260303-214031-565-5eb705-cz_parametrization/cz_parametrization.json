@@ -1,0 +1,354 @@
+{
+    "q13": {
+        "deserialization_type": "tergite_autocalibration.utils.dto.extended_transmon_element.ExtendedTransmon",
+        "mode": "__init__",
+        "data": {
+            "name": "q13",
+            "reset": {
+                "duration": 0.0005
+            },
+            "rxy": {
+                "amp180": 0.7406320652550785,
+                "motzoi": 0.02307692307692305,
+                "duration": 5.6e-08
+            },
+            "measure": {
+                "pulse_type": "SquarePulse",
+                "pulse_amp": 0.024,
+                "pulse_duration": 4e-06,
+                "acq_channel": 0,
+                "acq_delay": 2.2e-07,
+                "integration_time": 3.5e-06,
+                "reset_clock_phase": true,
+                "acq_weights_a": {
+                    "deserialization_type": "ndarray",
+                    "mode": "__init__",
+                    "data": []
+                },
+                "acq_weights_b": {
+                    "deserialization_type": "ndarray",
+                    "mode": "__init__",
+                    "data": []
+                },
+                "acq_weights_sampling_rate": null,
+                "acq_weight_type": "SSB",
+                "acq_rotation": 0,
+                "acq_threshold": 0,
+                "num_points": null
+            },
+            "ports": {
+                "microwave": "q13:mw",
+                "flux": "q13:fl",
+                "readout": "q13:res"
+            },
+            "clock_freqs": {
+                "f01": 5274384436.62565,
+                "f12": 5026357041.311302,
+                "readout": 7181337609.859973
+            },
+            "measure_1": {
+                "pulse_type": "SquarePulse",
+                "pulse_amp": 0.25,
+                "pulse_duration": 4e-06,
+                "acq_channel": 0,
+                "acq_delay": 2.2e-07,
+                "integration_time": 3.5e-06,
+                "reset_clock_phase": true,
+                "acq_weights_a": {
+                    "deserialization_type": "ndarray",
+                    "mode": "__init__",
+                    "data": []
+                },
+                "acq_weights_b": {
+                    "deserialization_type": "ndarray",
+                    "mode": "__init__",
+                    "data": []
+                },
+                "acq_weights_sampling_rate": null,
+                "acq_weight_type": "SSB",
+                "acq_rotation": 0,
+                "acq_threshold": 0,
+                "num_points": null
+            },
+            "measure_2": {
+                "pulse_type": "SquarePulse",
+                "pulse_amp": 0.25,
+                "pulse_duration": 4e-06,
+                "acq_channel": 0,
+                "acq_delay": 2.2e-07,
+                "integration_time": 3.5e-06,
+                "reset_clock_phase": true,
+                "acq_weights_a": {
+                    "deserialization_type": "ndarray",
+                    "mode": "__init__",
+                    "data": []
+                },
+                "acq_weights_b": {
+                    "deserialization_type": "ndarray",
+                    "mode": "__init__",
+                    "data": []
+                },
+                "acq_weights_sampling_rate": null,
+                "acq_weight_type": "SSB",
+                "acq_rotation": 0,
+                "acq_threshold": 0,
+                "num_points": null
+            },
+            "measure_2state_opt": {
+                "pulse_type": "SquarePulse",
+                "pulse_amp": 0.25,
+                "pulse_duration": 3e-07,
+                "acq_channel": 0,
+                "acq_delay": 0,
+                "integration_time": 1e-06,
+                "reset_clock_phase": true,
+                "acq_weights_a": {
+                    "deserialization_type": "ndarray",
+                    "mode": "__init__",
+                    "data": []
+                },
+                "acq_weights_b": {
+                    "deserialization_type": "ndarray",
+                    "mode": "__init__",
+                    "data": []
+                },
+                "acq_weights_sampling_rate": null,
+                "acq_weight_type": "SSB",
+                "acq_rotation": 0,
+                "acq_threshold": 0,
+                "num_points": null
+            },
+            "measure_3state_opt": {
+                "pulse_type": "SquarePulse",
+                "pulse_amp": 0.0319448275862069,
+                "pulse_duration": 4e-06,
+                "acq_channel": 0,
+                "acq_delay": 2.2e-07,
+                "integration_time": 3.5e-06,
+                "reset_clock_phase": true,
+                "acq_weights_a": {
+                    "deserialization_type": "ndarray",
+                    "mode": "__init__",
+                    "data": []
+                },
+                "acq_weights_b": {
+                    "deserialization_type": "ndarray",
+                    "mode": "__init__",
+                    "data": []
+                },
+                "acq_weights_sampling_rate": null,
+                "acq_weight_type": "SSB",
+                "acq_rotation": 0,
+                "acq_threshold": 0,
+                "num_points": null
+            },
+            "r12": {
+                "ef_amp180": 0.7656877970785655,
+                "ef_motzoi": 0.12,
+                "ef_duration": 7.6e-08
+            },
+            "spec": {
+                "spec_amp": NaN,
+                "spec_ampl_optimal": 0.00275,
+                "spec_ampl_12_optimal": NaN,
+                "spec_duration": 6e-06
+            },
+            "extended_clock_freqs": {
+                "readout_1": 7181134217.832637,
+                "readout_2": 7180998005.963545,
+                "readout_2state_opt": NaN,
+                "readout_3state_opt": 7181088888.888889
+            }
+        }
+    },
+    "q14": {
+        "deserialization_type": "tergite_autocalibration.utils.dto.extended_transmon_element.ExtendedTransmon",
+        "mode": "__init__",
+        "data": {
+            "name": "q14",
+            "reset": {
+                "duration": 0.0005
+            },
+            "rxy": {
+                "amp180": 0.6523786508702907,
+                "motzoi": -0.1307692307692308,
+                "duration": 5.6e-08
+            },
+            "measure": {
+                "pulse_type": "SquarePulse",
+                "pulse_amp": 0.026,
+                "pulse_duration": 4e-06,
+                "acq_channel": 1,
+                "acq_delay": 2.2e-07,
+                "integration_time": 3.5e-06,
+                "reset_clock_phase": true,
+                "acq_weights_a": {
+                    "deserialization_type": "ndarray",
+                    "mode": "__init__",
+                    "data": []
+                },
+                "acq_weights_b": {
+                    "deserialization_type": "ndarray",
+                    "mode": "__init__",
+                    "data": []
+                },
+                "acq_weights_sampling_rate": null,
+                "acq_weight_type": "SSB",
+                "acq_rotation": 0,
+                "acq_threshold": 0,
+                "num_points": null
+            },
+            "ports": {
+                "microwave": "q14:mw",
+                "flux": "q14:fl",
+                "readout": "q14:res"
+            },
+            "clock_freqs": {
+                "f01": 4297857741.170496,
+                "f12": 4144618091.361852,
+                "readout": 6631873811.021078
+            },
+            "measure_1": {
+                "pulse_type": "SquarePulse",
+                "pulse_amp": 0.25,
+                "pulse_duration": 4e-06,
+                "acq_channel": 1,
+                "acq_delay": 2.2e-07,
+                "integration_time": 3.5e-06,
+                "reset_clock_phase": true,
+                "acq_weights_a": {
+                    "deserialization_type": "ndarray",
+                    "mode": "__init__",
+                    "data": []
+                },
+                "acq_weights_b": {
+                    "deserialization_type": "ndarray",
+                    "mode": "__init__",
+                    "data": []
+                },
+                "acq_weights_sampling_rate": null,
+                "acq_weight_type": "SSB",
+                "acq_rotation": 0,
+                "acq_threshold": 0,
+                "num_points": null
+            },
+            "measure_2": {
+                "pulse_type": "SquarePulse",
+                "pulse_amp": 0.25,
+                "pulse_duration": 4e-06,
+                "acq_channel": 1,
+                "acq_delay": 2.2e-07,
+                "integration_time": 3.5e-06,
+                "reset_clock_phase": true,
+                "acq_weights_a": {
+                    "deserialization_type": "ndarray",
+                    "mode": "__init__",
+                    "data": []
+                },
+                "acq_weights_b": {
+                    "deserialization_type": "ndarray",
+                    "mode": "__init__",
+                    "data": []
+                },
+                "acq_weights_sampling_rate": null,
+                "acq_weight_type": "SSB",
+                "acq_rotation": 0,
+                "acq_threshold": 0,
+                "num_points": null
+            },
+            "measure_2state_opt": {
+                "pulse_type": "SquarePulse",
+                "pulse_amp": 0.25,
+                "pulse_duration": 3e-07,
+                "acq_channel": 1,
+                "acq_delay": 0,
+                "integration_time": 1e-06,
+                "reset_clock_phase": true,
+                "acq_weights_a": {
+                    "deserialization_type": "ndarray",
+                    "mode": "__init__",
+                    "data": []
+                },
+                "acq_weights_b": {
+                    "deserialization_type": "ndarray",
+                    "mode": "__init__",
+                    "data": []
+                },
+                "acq_weights_sampling_rate": null,
+                "acq_weight_type": "SSB",
+                "acq_rotation": 0,
+                "acq_threshold": 0,
+                "num_points": null
+            },
+            "measure_3state_opt": {
+                "pulse_type": "SquarePulse",
+                "pulse_amp": 0.036399999999999995,
+                "pulse_duration": 4e-06,
+                "acq_channel": 1,
+                "acq_delay": 2.2e-07,
+                "integration_time": 3.5e-06,
+                "reset_clock_phase": true,
+                "acq_weights_a": {
+                    "deserialization_type": "ndarray",
+                    "mode": "__init__",
+                    "data": []
+                },
+                "acq_weights_b": {
+                    "deserialization_type": "ndarray",
+                    "mode": "__init__",
+                    "data": []
+                },
+                "acq_weights_sampling_rate": null,
+                "acq_weight_type": "SSB",
+                "acq_rotation": 0,
+                "acq_threshold": 0,
+                "num_points": null
+            },
+            "r12": {
+                "ef_amp180": 0.2938393759962128,
+                "ef_motzoi": -0.06,
+                "ef_duration": 7.6e-08
+            },
+            "spec": {
+                "spec_amp": NaN,
+                "spec_ampl_optimal": 0.00625,
+                "spec_ampl_12_optimal": NaN,
+                "spec_duration": 6e-06
+            },
+            "extended_clock_freqs": {
+                "readout_1": 6631760132.619592,
+                "readout_2": 6631661344.0166855,
+                "readout_2state_opt": NaN,
+                "readout_3state_opt": 6631733333.333333
+            }
+        }
+    },
+    "q13_q14": {
+        "deserialization_type": "tergite_autocalibration.utils.dto.extended_coupler_edge.ExtendedCompositeSquareEdge",
+        "mode": "__init__",
+        "data": {
+            "parent_element_name": "q13",
+            "child_element_name": "q14",
+            "cz": {
+                "square_amp": NaN,
+                "square_duration": NaN,
+                "half_square_duration": 1e-07,
+                "cz_width": 4e-09,
+                "dc_flux_0": 0,
+                "dc_flux_offset": 0,
+                "edge_group": 0
+            },
+            "coupler_parameters": {
+                "parking_current": 0.00114,
+                "initial_parking_current": 0,
+                "phase_path": "via_20"
+            },
+            "spec": {
+                "coupler_spec_amp": NaN
+            },
+            "clock_freqs": {
+                "cz_freq": NaN
+            }
+        }
+    }
+}

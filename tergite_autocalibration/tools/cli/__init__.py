@@ -135,7 +135,7 @@ def start(
         CalibrationSupervisor,
         CalibrationConfig,
     )
-    from tergite_autocalibration.config.globals import CONFIG, ENV
+    from tergite_autocalibration.config.globals import CONFIG, ENV, DATA_DIR
     from tergite_autocalibration.tools.browser import start_browser
     from tergite_autocalibration.utils.backend.reset_redis_node import reset_redis_nodes
     from tergite_autocalibration.utils.dto.enums import MeasurementMode
@@ -157,6 +157,7 @@ def start(
         parsed_cluster_ip = None
 
         if not is_run_folder(re_analyse):
+            print(DATA_DIR)
             # if it's not a run folder, then maybe it's just a measurement identifier
             # all measurements have unique tags, so we can also find the data this way
             msmt_info: MeasurementInfo | None = search_all_runs_for_measurement(
