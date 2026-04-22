@@ -16,14 +16,13 @@ from pathlib import Path
 
 import pytest
 
-
-from tergite_autocalibration.utils.io.dataset import open_dataset
 from tergite_autocalibration.lib.base.utils.analysis_utils import filter_ds_by_element
 from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.analysis import (
     RandomizedBenchmarkingNodeAnalysis,
     RandomizedBenchmarkingQubitAnalysis,
 )
 from tergite_autocalibration.tests.utils.decorators import with_redis
+from tergite_autocalibration.utils.io.dataset import open_dataset
 
 _test_data_dir = os.path.join(Path(__file__).parent, "data")
 _redis_values = os.path.join(_test_data_dir, "redis-2026-03-10-21-33-32.json")
@@ -38,8 +37,8 @@ def test_randomized_benchmarking_analysis():
     analysis = RandomizedBenchmarkingQubitAnalysis(name, qubit_qois)
     ds_11 = filter_ds_by_element(dataset, "q11")
     ds_15 = filter_ds_by_element(dataset, "q15")
-    qoi_11 = analysis.process_qubit(ds_11, "q11")
-    qoi_15 = analysis.process_qubit(ds_15, "q15")
+    qoi_11 = analysis.process_qubit(ds_11)
+    qoi_15 = analysis.process_qubit(ds_15)
 
     standard_fidelity_11 = qoi_11.analysis_result["fidelity"]["value"]
     standard_leakage_11 = qoi_11.analysis_result["leakage"]["value"]

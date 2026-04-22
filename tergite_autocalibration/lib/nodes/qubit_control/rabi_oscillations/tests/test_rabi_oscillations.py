@@ -98,9 +98,9 @@ class TestRabiQubitAnalysis(unittest.TestCase):
         os.environ["DATA_DIR"] = str(Path(__file__).parent / "results")
         test_dir = Path(__file__).parent
         file_path = test_dir / "data_rabi_12"
-        file = open_dataset("rabi_oscillations_12_0", file_path)
+        dataset = open_dataset("rabi_oscillations_12_0", file_path)
         analysis = Rabi12QubitAnalysis("name", ["r12:ef_amp180"])
-        analysis.process_qubit(file, "yq06")
+        analysis.process_qubit(dataset, "yq06")
         figure_path = os.environ["DATA_DIR"] + "/Rabi_oscillations_12_q06.png"
         if os.path.exists(figure_path):
             os.remove(figure_path)

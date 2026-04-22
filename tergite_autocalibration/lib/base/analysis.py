@@ -17,7 +17,6 @@ import collections
 from abc import ABC, abstractmethod
 from typing import List
 
-
 # TODO: we should have a conditional import depending on a feature flag here
 import numpy as np
 import xarray as xr
@@ -164,9 +163,7 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
             )
 
             partial_ds = filter_ds_by_element(self.dataset, this_qubit)
-            analysis_results[this_qubit] = qubit_analysis.process_qubit(
-                partial_ds, this_qubit
-            )
+            analysis_results[this_qubit] = qubit_analysis.process_qubit(partial_ds)
             self.qubit_analyses.append(qubit_analysis)
 
         return analysis_results
@@ -188,7 +185,7 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
         self.name = name
         self.redis_fields = redis_fields
 
-    def process_qubit(self, dataset, qubit_element) -> "QOI":
+    def process_qubit(self, dataset) -> "QOI":
         """
         Setup the qubit data and analyze it.
         Args:
@@ -199,7 +196,7 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
         """
 
         self.dataset = dataset
-        self.qubit = qubit_element
+        self.qubit = dataset.qubit
         self._set_data_variables()
         self._compute_magnitudes()
         self._qoi = self.analyse_qubit()
