@@ -42,7 +42,7 @@ def amplitude_for_qubit(ds, qubit):
     ds.attrs["qubit"] = qubit
 
     a = PunchoutQubitAnalysis("name", ["measure:pulse_amp"])
-    qoi = a.process_qubit(ds, qubit)
+    qoi = a.process_qubit(ds)
     return qoi.analysis_result["measure:pulse_amp"]["value"]
 
 

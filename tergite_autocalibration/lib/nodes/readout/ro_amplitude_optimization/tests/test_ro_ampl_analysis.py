@@ -15,7 +15,6 @@ import os
 from pathlib import Path
 
 import pytest
-import xarray as xr
 
 from tergite_autocalibration.lib.base.utils.analysis_utils import filter_ds_by_element
 from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.analysis import (
@@ -23,6 +22,7 @@ from tergite_autocalibration.lib.nodes.readout.ro_amplitude_optimization.analysi
     ROThreeStateAmplitudeQubitAnalysis,
 )
 from tergite_autocalibration.tests.utils.decorators import with_redis
+from tergite_autocalibration.utils.io.dataset import open_dataset
 
 _test_data_dir = os.path.join(
     Path(__file__).parent.parent.parent.parent, "data", "single_qubits_run"
@@ -33,8 +33,8 @@ _redis_values = os.path.join(_test_data_dir, "redis-single-qubits-run.json")
 @with_redis(_redis_values)
 def test_ro_ampl_3states():
     name = "ro_amplitude_three_state_optimization"
-    file_path = os.path.join(_test_data_dir, name, f"dataset_{name}.hdf5")
-    full_dataset = xr.open_dataset(file_path)
+    file_path = os.path.join(_test_data_dir, name)
+    full_dataset = open_dataset(name, file_path)
     qubit_qois = [
         "measure_3state_opt:pulse_amp",
         "centroid_I",
@@ -49,9 +49,7 @@ def test_ro_ampl_3states():
     ds_15 = filter_ds_by_element(full_dataset, "q15")
 
     analysis = ROThreeStateAmplitudeQubitAnalysis(name, qubit_qois)
-    analysis.S21 = ds_13.isel(ReIm=0) + 1j * ds_13.isel(ReIm=1)
-    analysis.data_var = "yq13"
-    qoi = analysis.analyse_qubit()
+    qoi = analysis.process_qubit(ds_13)
 
     pulse_amp = qoi.analysis_result["measure_3state_opt:pulse_amp"]["value"]
     centroid_I = qoi.analysis_result["centroid_I"]["value"]
@@ -68,9 +66,7 @@ def test_ro_ampl_3states():
     assert pytest.approx(omega_12) == 289.04966963
     assert pytest.approx(omega_20) == 158.9517810
 
-    analysis.S21 = ds_15.isel(ReIm=0) + 1j * ds_15.isel(ReIm=1)
-    analysis.data_var = "yq15"
-    qoi = analysis.analyse_qubit()
+    qoi = analysis.process_qubit(ds_15)
 
     pulse_amp = qoi.analysis_result["measure_3state_opt:pulse_amp"]["value"]
     centroid_I = qoi.analysis_result["centroid_I"]["value"]
@@ -95,6 +91,7 @@ def test_plotting():
     """
     name = "ro_amplitude_three_state_optimization"
     file_path = os.path.join(_test_data_dir, name)
+    full_dataset = open_dataset(name, file_path)
     qubit_qois = [
         "measure_3state_opt:pulse_amp",
         "centroid_I",
@@ -106,6 +103,6 @@ def test_plotting():
     ]
 
     analysis = ROThreeStateAmplitudeNodeAnalysis(name, qubit_qois)
-    analysis.analyze_node(file_path)
+    analysis.analyze_node(full_dataset)
     number_of_qubits = len(analysis.dataset.attrs["elements"])
     assert analysis.axs.shape == (3, number_of_qubits)
