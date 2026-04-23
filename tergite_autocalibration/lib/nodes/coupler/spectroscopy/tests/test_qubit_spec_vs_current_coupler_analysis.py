@@ -177,10 +177,7 @@ def test_get_crossings_for_q12_q13(
     assert q12_crossings == pytest.approx(
         [-0.00190, -0.00105, 0.001475, 0.002375], abs=1e-6
     )
-    assert q13_crossings == pytest.approx(
-        [-0.0020875, 0.001375],
-        abs=1e-6,
-    )
+    assert q13_crossings == pytest.approx([-0.0020875, 0.001375], abs=1e-6)
 
 
 @pytest.fixture(autouse=False)

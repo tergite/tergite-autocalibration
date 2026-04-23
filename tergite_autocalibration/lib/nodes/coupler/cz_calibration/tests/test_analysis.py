@@ -16,14 +16,14 @@ from pathlib import Path
 
 import cf_xarray as cf
 import pytest
-from tergite_autocalibration.utils.io.dataset import open_dataset
 
 from tergite_autocalibration.lib.nodes.coupler.cz_calibration.analysis import (
     CZCalibrationCouplerAnalysis,
 )
 from tergite_autocalibration.tests.utils.decorators import with_redis
+from tergite_autocalibration.utils.io.dataset import open_dataset
 
-_test_data_dir = os.path.join(Path(__file__).parent, "data")
+_test_data_dir = Path(os.path.join(Path(__file__).parent, "data"))
 _redis_values = os.path.join(_test_data_dir, "redis-coupler-run-2026-02.json")
 
 

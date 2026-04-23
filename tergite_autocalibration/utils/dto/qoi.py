@@ -20,5 +20,6 @@ class QOI:
     analysis_successful: bool
 
     def serialize(self, as_json: bool = False):
+        # TODO: write a unit test for this
         data = asdict(self)
         return json.dumps(data) if as_json else data

@@ -16,16 +16,16 @@ from pathlib import Path
 
 import pytest
 import xarray as xr
-from tergite_autocalibration.utils.io.dataset import open_dataset
 
 from tergite_autocalibration.lib.nodes.coupler.cz_chevron.analysis import (
     CZChevronCouplerAnalysis,
 )
 from tergite_autocalibration.tests.utils.decorators import with_redis
+from tergite_autocalibration.utils.io.dataset import open_dataset
 
-_test_data_dir = os.path.join(Path(__file__).parent, "data")
+_test_data_dir = Path(os.path.join(Path(__file__).parent, "data"))
 _redis_values_0 = os.path.join(_test_data_dir, "data_0", "redis-export-2025-12-21.json")
-_test_data_dir_0 = os.path.join(_test_data_dir, "data_0")
+_test_data_dir_0 = Path(os.path.join(_test_data_dir, "data_0"))
 
 
 @with_redis(_redis_values_0)

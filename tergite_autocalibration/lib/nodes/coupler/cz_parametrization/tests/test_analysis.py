@@ -16,18 +16,17 @@ import math
 import os
 import shutil
 from pathlib import Path
-from tergite_autocalibration.utils.io.dataset import open_dataset, save_figures
-
 
 from tergite_autocalibration.lib.nodes.coupler.cz_parametrization.analysis import (
     CZParametrizationCouplerAnalysis,
 )
 from tergite_autocalibration.tests.utils.decorators import with_redis
+from tergite_autocalibration.utils.io.dataset import open_dataset, save_figures
 
-_test_data_dir = os.path.join(Path(__file__).parent, "data")
-_test_data_dir_0 = os.path.join(_test_data_dir, "data_0")
-_test_data_dir_1 = os.path.join(_test_data_dir, "data_1")
-_redis_values = os.path.join(_test_data_dir, "redis-export-2025-12-16.json")
+_test_data_dir = Path(os.path.join(Path(__file__).parent, "data"))
+_test_data_dir_0 = Path(os.path.join(_test_data_dir, "data_0"))
+_test_data_dir_1 = Path(os.path.join(_test_data_dir, "data_1"))
+_redis_values = Path(os.path.join(_test_data_dir, "redis-export-2025-12-16.json"))
 
 
 @with_redis(_redis_values)
