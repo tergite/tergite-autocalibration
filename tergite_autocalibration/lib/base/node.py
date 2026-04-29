@@ -179,10 +179,7 @@ class BaseNode(ABC):
 
         sweep_quantities = self.schedule_samplespace.keys()
 
-        # n_qubits = len(measurement_qubits)
-
         for key in raw_ds_keys:
-            # key_indx = key % n_qubits  # this is to handle ro_opt_frequencies node where
             coords_dict = {}
             measured_qubit = measurement_qubits[key]
             dimensions = samplespace_dimensions(

@@ -17,16 +17,15 @@ from collections import namedtuple
 import lmfit
 import numpy as np
 from lmfit.model import Model
-from quantify_core.analysis.fitting_models import (
-    exp_damp_osc_func,
-    fft_freq_phase_guess,
-)
+from quantify_core.analysis.fitting_models import (exp_damp_osc_func,
+                                                   fft_freq_phase_guess)
 from scipy.ndimage import median
 from scipy.signal import find_peaks
 from scipy.stats import median_abs_deviation
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
-from tergite_autocalibration.lib.utils.functions import exponential_decay_function
+from tergite_autocalibration.lib.utils.functions import \
+    exponential_decay_function
 
 
 def resonator_hanger_frequency(
@@ -48,22 +47,27 @@ def resonator_hanger_frequency(
 
 class ResonatorAvoidedCrossings:
     """
-    Extract the avoided crossings from (currents, frequency) data.
+    Extract the avoided crossings from (currents, readout frequency) data.
     If the data have a shape like:
 
-            *             *
-           *               *
-    ******       ****        *********
-               *      *
-              *        *
+    ro_frequencies
+    ^
+    |           *             *
+    |          *               *
+    |   ******       ****        *********
+    |              *      *
+    |             *        *
+    |________________________________> currents
 
-    the crossings of the frequency and current asymptotes are identified:
-
-            *|           | *
-           * |           |  *
-    ******   |    ****   |    *********
-             |  *      * |
-             | *        *|
+    the crossings (intersection points X) of the frequency and current asymptotes are identified:
+    ro_frequencies
+    ^
+    |            *|           | *
+    |           * |           |  *
+    |    ******   X    ****   X    *********
+    |             |  *      * |
+    |             | *        *|
+    |_________________________________> currents
     """
 
     def __init__(self, currents, frequencies):
@@ -102,27 +106,32 @@ class ResonatorAvoidedCrossings:
 
 class AvoidedCrossings:
     """
-    Extract the avoided crossings from (currents, frequency) data.
+    Extract the avoided crossings from (currents, qubit frequency) data.
     If the data have a shape like:
 
-    *     *           *     *
-    *     *           *     *
-     *   *             *   *
-       *                 *
-               *
-             *   *
-            *     *
+    qubit frequencies
+    ^
+    | *     *           *     *
+    | *     *           *     *
+    |  *   *             *   *
+    |    *                 *
+    |            *
+    |          *   *
+    |         *     *
+    _________________________________> currents
 
-    the crossings of the frequency and current asymptotes are identified:
+    the crossings (intersection points X) of the frequency and current asymptotes are identified:
 
-    *     * |       | *     *
-    *     * |       | *     *
-     *   *  |       |  *   *
-       *    |       |    *
-    --------|-------|------------
-            |   *   |
-            | *   * |
-            |*     *|
+    qubit frequencies
+    ^*     * |       | *     *
+    |*     * |       | *     *
+    | *   *  |       |  *   *
+    |   *    |       |    *
+    |--------X-------X------------
+    |        |   *   |
+    |        | *   * |
+    |        |*     *|
+    _________________________________> currents
     """
 
     def __init__(self, currents, frequencies, threshold=2e6):
@@ -147,7 +156,7 @@ class AvoidedCrossings:
 
             # NOTE: to avoid confusion the index where the jump occurs in the currents array
             # is given a 0.5 offset to signal that is 'between' current samples.
-            # this ends up unnecessary and leads to having to cast to int when
+            # this ends up being unnecessary and leads to having to cast to int when
             # asking for the low_sample and high_sample. It should be refactored.
             partition_indices.append(jump + 0.5)
 
@@ -314,7 +323,7 @@ class CouplerModel(lmfit.model.Model):
     def __init__(self, *args, **kwargs):
         super().__init__(coupler_frequency_function, *args, **kwargs)
 
-        # Typically coupler are designed up to 9GHz
+        # Typically couplers are designed up to 9GHz
         self.set_param_hint("fmax", value=9e9, min=6e9)
         # Expected current at fmax, helps the fitting algorithm
         self.set_param_hint("Ic", value=1e-3, vary=True)

@@ -81,7 +81,7 @@ class CouplerDCSpectroscopyNode(CouplerNode):
         logger.info("Final Operation")
         currents = {}
         for coupler in self.couplers:
-            currents[coupler] = 1140e-6
+            currents[coupler] = 0
 
         self.spi_manager.set_dac_current(currents)
 
