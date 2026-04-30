@@ -31,6 +31,7 @@ from tergite_autocalibration.lib.utils.samplespace import (
     qubit_samples,
     resonator_samples,
 )
+from tergite_autocalibration.utils.dto.enums import SamplespaceStructure
 from tergite_autocalibration.utils.logging import logger
 
 peak = LorentzianModel()
@@ -51,7 +52,7 @@ class CouplerDCSpectroscopyNode(CouplerNode):
     def __init__(self, couplers: list[str], **schedule_keywords):
         super().__init__(couplers, **schedule_keywords)
 
-        self.samplespace_structure = "parallel"
+        self.samplespace_structure = SamplespaceStructure.PARALLEL
 
         self.schedule_samplespace = {
             "qubit_frequencies": {

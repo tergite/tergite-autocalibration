@@ -16,6 +16,8 @@ from typing import Iterable
 
 import numpy
 
+from tergite_autocalibration.utils.dto.enums import SamplespaceStructure
+
 
 def reduce_samplespace(iteration: tuple, samplespace: dict) -> dict:
     reduced_samplespace = {}
@@ -71,7 +73,7 @@ def reduce_samplespace(iteration: tuple, samplespace: dict) -> dict:
 
 
 def samplespace_dimensions(
-    samplespace: dict, loops=None, samplespace_structure="orthogonal"
+    samplespace: dict, loops=None, samplespace_structure: "SamplespaceStructure" = SamplespaceStructure.ORTHOGONAL
 ) -> list[int]:
     """
     example of a samplespace:
@@ -101,7 +103,7 @@ def samplespace_dimensions(
 
         dimensions.append(len(settable_values))
 
-    if samplespace_structure == "parallel":
+    if samplespace_structure == SamplespaceStructure.PARALLEL:
         dimensions = [sum(dimensions)]
 
     if loops is not None:
@@ -113,9 +115,9 @@ def pad_samplespace(
     samplespace: dict,
     dimensions: list[int],
     loops=None,
-    samplespace_structure="orthogonal",
+    samplespace_structure: "SamplespaceStructure" = SamplespaceStructure.ORTHOGONAL,
 ) -> dict:
-    if samplespace_structure == "orthogonal":
+    if samplespace_structure == SamplespaceStructure.ORTHOGONAL:
         return samplespace
 
     settable_quantities = samplespace.keys()

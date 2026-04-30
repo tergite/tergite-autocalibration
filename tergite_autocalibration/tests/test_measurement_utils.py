@@ -13,6 +13,7 @@
 import numpy as np
 import pytest
 
+from tergite_autocalibration.utils.dto.enums import SamplespaceStructure
 from tergite_autocalibration.utils.measurement_utils import (
     pad_samplespace,
     reduce_samplespace,
@@ -131,14 +132,16 @@ def test_samplespace_dimensions_empty():
 
 def test_pad_parallel_samplespace():
     """
-    Test whetehr samplespaces with parallel structure are
+    Test whether samplespaces with parallel structure are
     correctly padded with nan values
     """
     dimensions = samplespace_dimensions(
-        _triple_samplespace, samplespace_structure="parallel"
+        _triple_samplespace, samplespace_structure=SamplespaceStructure.PARALLEL
     )
     padded_space = pad_samplespace(
-        _triple_samplespace, dimensions=dimensions, samplespace_structure="parallel"
+        _triple_samplespace,
+        dimensions=dimensions,
+        samplespace_structure=SamplespaceStructure.PARALLEL,
     )
 
     frequencies_values = padded_space["frequencies"]["q1"]

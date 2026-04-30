@@ -38,7 +38,10 @@ from tergite_autocalibration.lib.utils.schedule_execution import (
     execute_schedule,
     get_compiler,
 )
-from tergite_autocalibration.utils.dto.enums import MeasurementMode
+from tergite_autocalibration.utils.dto.enums import (
+    MeasurementMode,
+    SamplespaceStructure,
+)
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
 from tergite_autocalibration.utils.io.dataset import save_dataset
 from tergite_autocalibration.utils.logging import logger
@@ -72,7 +75,9 @@ class BaseNode(ABC):
         self.external_samplespace = {}
         self.redis_fields = []
         self.all_qubits = []
-        self.samplespace_structure = "orthogonal"
+        self.samplespace_structure: "SamplespaceStructure" = (
+            SamplespaceStructure.ORTHOGONAL
+        )
 
         # These may be modified while the node runs
         self.outer_schedule_samplespace = {}
@@ -227,7 +232,7 @@ class BaseNode(ABC):
                     settable_values = np.array([settable_values])
 
                 coord_dim = coord_key
-                if self.samplespace_structure == "parallel":
+                if self.samplespace_structure == SamplespaceStructure.PARALLEL:
                     coord_dim = "common_dimension" + measured_qubit
 
                 coords_dict[coord_key] = (coord_dim, settable_values, coord_attrs)
@@ -263,7 +268,7 @@ class BaseNode(ABC):
                 "units": "NA",
             }
             dimension_names = tuple(coords_dict.keys())
-            if self.samplespace_structure == "parallel":
+            if self.samplespace_structure == SamplespaceStructure.PARALLEL:
                 dimension_names = "common_dimension" + measured_qubit
 
             partial_ds[f"y{measured_qubit}"] = (
