@@ -22,6 +22,9 @@ variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   PYTHON_VERSION: "3.12"
   REDIS_PORT: 6378
+  # NOTE: Please make sure that there is exactly one runner with the autocalibration tag.
+  #       Otherwise, it can happen that the cache is shared improperly.
+  RUNNER_TAG: "autocalibration"
 
 
 setup:
@@ -41,6 +44,8 @@ setup:
     - key: "venv-${CI_COMMIT_REF_NAME}"
       paths:
         - venv
+  tags:
+    - ${RUNNER_TAG}
 
 test_lint_build:
   stage: test_lint_build
@@ -83,6 +88,8 @@ test_lint_build:
     - key: "venv-${CI_COMMIT_REF_NAME}"
       paths:
         - venv
+  tags:
+    - ${RUNNER_TAG}
 
 
 application_run:
@@ -171,6 +178,8 @@ application_run:
     - key: "venv-${CI_COMMIT_REF_NAME}"
       paths:
         - venv
+  tags:
+    - ${RUNNER_TAG}
 
 
 browser_run:
@@ -205,3 +214,5 @@ browser_run:
     - key: "venv-${CI_COMMIT_REF_NAME}"
       paths:
         - venv
+  tags:
+    - ${RUNNER_TAG}
