@@ -22,6 +22,9 @@ variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   PYTHON_VERSION: "3.12"
   REDIS_PORT: 6378
+  # NOTE: Please make sure that there is exactly one runner with the autocalibration tag.
+  #       Otherwise, it can happen that the cache is shared improperly.
+  RUNNER_TAG: "autocalibration"
 
 
 setup:
@@ -41,6 +44,8 @@ setup:
     - key: "venv-${CI_COMMIT_REF_NAME}"
       paths:
         - venv
+  tags:
+    - ${RUNNER_TAG}
 
 test_lint_build:
   stage: test_lint_build
@@ -83,6 +88,8 @@ test_lint_build:
     - key: "venv-${CI_COMMIT_REF_NAME}"
       paths:
         - venv
+  tags:
+    - ${RUNNER_TAG}
 
 
 application_run:
@@ -137,21 +144,28 @@ application_run:
       fi
     # Reset Redis
     - echo "y" | acli node reset -a
+    # Load redis fixture
+    - echo "y" | acli redis load-file "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/21-39-55_cz_rb-SUCCESS/redis.json"
     # Clear the caches
     - rm -r venv/lib/python3.12/site-packages/out
+    # Load coupler configuration
+    - echo "y" | acli config load -f "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/21-39-55_cz_rb-SUCCESS"
     # Run the calibration chain
     - |
       for node in \
-        resonator_spectroscopy_vs_current \
-        coupler_anticrossing
+        cz_parametrization \
+        cz_chevron \
+        cz_calibration \
+        cz_local_phases \
+        cz_rb
       do
-        echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/01-44-14_simple_coupler_run-SUCCESS" -n $node
+        echo "n" | acli start -r "$CI_PROJECT_DIR/tergite_autocalibration/tests/fixtures/data/21-39-55_cz_rb-SUCCESS" -n $node
       done
     # Uncomment for debugging:
     - ls -lR venv/lib/python3.12/site-packages/out
     # Verify output
     - |
-      if ls -lR venv/lib/python3.12/site-packages/out | grep -q "coupler_anticrossing_q06_q07_0_preview.png"; then
+      if ls -lR venv/lib/python3.12/site-packages/out | grep -q "cz_rb_q13_q14_0_preview.png"; then
         echo "Output file $OUTPUT_FILE exists. Application ran successfully."
       else
         echo "Error: Output file $OUTPUT_FILE not found."
@@ -164,6 +178,8 @@ application_run:
     - key: "venv-${CI_COMMIT_REF_NAME}"
       paths:
         - venv
+  tags:
+    - ${RUNNER_TAG}
 
 
 browser_run:
@@ -198,3 +214,5 @@ browser_run:
     - key: "venv-${CI_COMMIT_REF_NAME}"
       paths:
         - venv
+  tags:
+    - ${RUNNER_TAG}

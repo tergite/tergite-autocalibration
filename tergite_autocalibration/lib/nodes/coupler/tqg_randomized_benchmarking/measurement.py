@@ -26,6 +26,7 @@ from quantify_scheduler.operations.gate_library import CZ, X90, Y90, Reset, Rxy,
 from quantify_scheduler.operations.pulse_library import IdlePulse
 from quantify_scheduler.resources import ClockResource
 
+from tergite_autocalibration.config.globals import DOWNCONVERT_FREQUENCY
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
 from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.utils.randomized_benchmarking import (
     randomized_benchmarking_sequence,
@@ -41,7 +42,6 @@ from tergite_autocalibration.utils.dto.extended_transmon_element import Extended
 from tergite_autocalibration.utils.logging import logger
 
 # Constants
-DOWNCONVERT_FREQ = 4.4e9
 IDLE_TIME = 12e-9
 
 
@@ -108,7 +108,7 @@ class CZRBMeasurement(BaseMeasurement):
             schedule: The schedule to add resources to
             coupler: Name identifier for the coupler
         """
-        downconvert = DOWNCONVERT_FREQ
+        downconvert = DOWNCONVERT_FREQUENCY
         cz_frequency = self.couplers[coupler].clock_freqs.cz_freq()
         clock_resource = ClockResource(
             name=f"{coupler}.cz", freq=(downconvert - cz_frequency)

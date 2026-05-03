@@ -135,7 +135,7 @@ def start(
         CalibrationSupervisor,
         CalibrationConfig,
     )
-    from tergite_autocalibration.config.globals import CONFIG, ENV
+    from tergite_autocalibration.config.globals import CONFIG, ENV, DATA_DIR
     from tergite_autocalibration.tools.browser import start_browser
     from tergite_autocalibration.utils.backend.reset_redis_node import reset_redis_nodes
     from tergite_autocalibration.utils.dto.enums import MeasurementMode
