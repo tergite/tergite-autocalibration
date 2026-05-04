@@ -17,15 +17,16 @@ from collections import namedtuple
 import lmfit
 import numpy as np
 from lmfit.model import Model
-from quantify_core.analysis.fitting_models import (exp_damp_osc_func,
-                                                   fft_freq_phase_guess)
+from quantify_core.analysis.fitting_models import (
+    exp_damp_osc_func,
+    fft_freq_phase_guess,
+)
 from scipy.ndimage import median
 from scipy.signal import find_peaks
 from scipy.stats import median_abs_deviation
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
-from tergite_autocalibration.lib.utils.functions import \
-    exponential_decay_function
+from tergite_autocalibration.lib.utils.functions import exponential_decay_function
 
 
 def resonator_hanger_frequency(

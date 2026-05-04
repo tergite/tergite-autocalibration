@@ -73,7 +73,9 @@ def reduce_samplespace(iteration: tuple, samplespace: dict) -> dict:
 
 
 def samplespace_dimensions(
-    samplespace: dict, loops=None, samplespace_structure: "SamplespaceStructure" = SamplespaceStructure.ORTHOGONAL
+    samplespace: dict,
+    loops=None,
+    samplespace_structure: "SamplespaceStructure" = SamplespaceStructure.ORTHOGONAL,
 ) -> list[int]:
     """
     example of a samplespace:
