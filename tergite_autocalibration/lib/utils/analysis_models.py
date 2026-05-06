@@ -108,31 +108,35 @@ class ResonatorAvoidedCrossings:
 class AvoidedCrossings:
     """
     Extract the avoided crossings from (currents, qubit frequency) data.
+    This analysis utilizes only the geometric properties of the data, with no assumptions
+    on the underlying physics of the coupler.
     If the data have a shape like:
 
-    qubit frequencies
-    ^
-    | *     *           *     *
-    | *     *           *     *
-    |  *   *             *   *
-    |    *                 *
-    |            *
-    |          *   *
-    |         *     *
-    _________________________________> currents
+    qubit
+    frequencies
+        ^
+        | *     *           *     *
+        | *     *           *     *
+        |  *   *             *   *
+        |    *                 *
+        |            *
+        |          *   *
+        |         *     *
+        _________________________________> currents
 
     the crossings (intersection points X) of the frequency and current asymptotes are identified:
 
-    qubit frequencies
-    ^*     * |       | *     *
-    |*     * |       | *     *
-    | *   *  |       |  *   *
-    |   *    |       |    *
-    |--------X-------X------------
-    |        |   *   |
-    |        | *   * |
-    |        |*     *|
-    _________________________________> currents
+    qubit
+    frequencies
+        ^*     * |       | *     *
+        |*     * |       | *     *
+        | *   *  |       |  *   *
+        |   *    |       |    *
+        |--------X-------X------------
+        |        |   *   |
+        |        | *   * |
+        |        |*     *|
+        _________________________________> currents
     """
 
     def __init__(self, currents, frequencies, threshold=2e6):
@@ -312,6 +316,12 @@ def coupler_frequency_function(
     I0: float,
     offset: float,
 ) -> float:
+    '''
+    the frequency of the coupler in terms of the applied bias current.
+    Args:
+    Ic: the current that gives maximum frequency
+    I0: current corresponding to one quantum of flux
+    '''
     return fmax * np.sqrt(np.abs(np.cos((current - Ic) / I0 * np.pi))) + offset
 
 
@@ -343,6 +353,50 @@ class CouplerModel(lmfit.model.Model):
         params = self.make_params()
         return lmfit.models.update_param_vals(params, self.prefix, **kws)
 
+
+
+# class CouplingModel():
+#     """
+#     Model to find the coupling strength g between a tunable transmon and a 
+#     fixed frequency transmon.
+#     """
+#     def __init__(self,fixed_qubit_frequency:float , coupler_model: lmfit.model.ModelResult):
+#         self.fixed_qubit_frequency = fixed_qubit_frequency
+#         self.coupler_model = coupler_model
+#
+#     def model_frequencies(self, g, dc_currents: np.ndarray, coupler_omegas:np.ndarray):
+#         omega_q = self.fixed_qubit_frequency
+#         anal_freq_plus = (omega_q + coupler_omegas) / 2 + np.sqrt(
+#             ((omega_q - coupler_omegas) / 2) ** 2 + g**2
+#         )
+#         anal_freq_minus = (omega_q + coupler_omegas) / 2 - np.sqrt(
+#             ((omega_q - coupler_omegas) / 2) ** 2 + g**2
+#         )
+#         deltas = omega_q - coupler_omegas
+#         thetas = np.arctan(2 * g / deltas) / 2
+#         qubit_positions_plus = np.logical_and(np.cos(thetas) ** 2 > 0.99, deltas > 0)
+#         qubit_positions_minus = np.logical_and(np.cos(thetas) ** 2 > 0.99, deltas < 0)
+#         qubit_freqs_plus = anal_freq_plus[qubit_positions_plus]
+#         dc_currents_plus = dc_currents[qubit_positions_plus]
+#         qubit_freqs_minus = anal_freq_minus[qubit_positions_minus]
+#         dc_currents_minus = dc_currents[qubit_positions_minus]
+#
+#         plus_values = list(zip(dc_currents_plus, qubit_freqs_plus))
+#         minus_values = list(zip(dc_currents_minus, qubit_freqs_minus))
+#
+#         values = plus_values + minus_values
+#         sorted_values = sorted(values, key=lambda tup: tup[0])
+#         sorted_dc_currents, sorted_frequencies = zip(*sorted_values)
+#         return sorted_frequencies
+#
+#     def cost_function(factor, data_frequencies, array2):
+#         # Minimize Euclidean distance
+#         frequencies_from_model = model_frequencies(factor, omega_q, dc_currents, coupler_omegas)
+#         return np.linalg.norm(data_frequencies - frequencies_from_model)
+#
+#     @property
+#     def coupling_g(self):
+#         return minimize(self.cost_function, x0=1.0, args=(array1, array2))
 
 class RamseyModel(lmfit.model.Model):
     """
