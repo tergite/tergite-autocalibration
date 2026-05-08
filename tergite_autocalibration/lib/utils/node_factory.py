@@ -65,6 +65,7 @@ class NodeFactory:
             "coupler_anticrossing": "CouplerAnticrossingNode",
             "coupler_dc_spectroscopy": "CouplerDCSpectroscopyNode",
             "cz_parametrization": "CZParametrizationNode",
+            "zz_coupling": "ZZCouplingNode",
             "cz_chevron": "CZChevronNode",
             "cz_calibration": "CZCalibrationNode",
             "cz_local_phases": "CZLocalPhasesNode",

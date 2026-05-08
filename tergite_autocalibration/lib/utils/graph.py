@@ -47,6 +47,7 @@ GRAPH_DEPENDENCIES = [
     ("resonator_spectroscopy_1", "ro_frequency_two_state_optimization"),
     ("ro_frequency_two_state_optimization", "ro_amplitude_two_state_optimization"),
     ("n_rabi_oscillations", "all_XY"),
+    ("n_rabi_oscillations", "zz_coupling"),
     ("resonator_spectroscopy_1", "qubit_12_spectroscopy"),
     ("qubit_12_spectroscopy", "rabi_oscillations_12"),
     ("rabi_oscillations_12", "ramsey_correction_12"),
