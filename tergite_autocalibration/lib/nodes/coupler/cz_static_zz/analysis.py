@@ -25,9 +25,10 @@ from tergite_autocalibration.utils.dto.qoi import QOI
 
 
 class ZZCouplingCouplerAnalysis(BaseCouplerAnalysis):
-    def __init__(self, name, redis_fields):
+    def __init__(self, name, redis_fields, **kwargs):
         super().__init__(name, redis_fields)
-        self.redis_field = ""
+        self.active_qubit = kwargs["active_qubit"]
+        self.spectator_qubit = kwargs["spectator_qubit"]
 
     def _analyse_ramsey(self):
         for coord in self.dataset.coords:
@@ -37,8 +38,8 @@ class ZZCouplingCouplerAnalysis(BaseCouplerAnalysis):
             elif "detuning" in coord:
                 self.detuning_coord = coord
                 self.artificial_detunings = self.dataset.coords[coord].values
-        redis_key = f"transmons:{self.qubit}"
-        redis_value = REDIS_CONNECTION.hget(f"{redis_key}", self.redis_field)
+        redis_key = f"transmons:{self.active_qubit}"
+        redis_value = REDIS_CONNECTION.hget(f"{redis_key}", "clock_freqs:f01")
         self.qubit_frequency = float(redis_value)
 
         model = RamseyModel()
@@ -79,6 +80,21 @@ class ZZCouplingCouplerAnalysis(BaseCouplerAnalysis):
             self.qubit_frequency + self.frequency_correction
         )
 
+    def analyze_coupler(self):
+        self._analyse_ramsey()
+
+        analysis_successful = True
+        analysis_result = {
+            self.redis_field: {
+                "value": self.corrected_qubit_frequency,
+                "error": 0,
+            }
+        }
+
+        qoi = QOI(analysis_result, analysis_successful)
+
+        return qoi
+
     def plotter(self, ax):
         ax.plot(self.artificial_detunings, self.fitted_detunings, "bo", ms=5.0)
         ax.axvline(
@@ -100,7 +116,7 @@ class ZZCouplingCouplerAnalysis(BaseCouplerAnalysis):
 
 
 class ZZCouplingNodeAnalysis(BaseAllCouplersAnalysis):
-    single_qubit_analysis_obj = ZZCouplingCouplerAnalysis
+    single_coupler_analysis_obj = ZZCouplingCouplerAnalysis
 
-    def __init__(self, name, redis_fields):
-        super().__init__(name, redis_fields)
+    def __init__(self, name, redis_fields, **kwargs):
+        super().__init__(name, redis_fields, **kwargs)

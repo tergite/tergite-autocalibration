@@ -22,6 +22,9 @@ from tergite_autocalibration.lib.nodes.coupler.cz_static_zz.measurement import (
     ZZCouplingMeasurement,
 )
 from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
+from tergite_autocalibration.lib.utils.analysis_models import RamseyModel
+
+ramsey_model = RamseyModel()
 
 
 class ZZCouplingNode(CouplerNode):
@@ -41,6 +44,7 @@ class ZZCouplingNode(CouplerNode):
         self.validate()
 
         self.schedule_keywords["coupler_dict"] = self.qubit_types()
+        self.analysis_keywords = self.qubit_types() 
 
         self.schedule_samplespace = {
             "ramsey_delays": {
@@ -69,5 +73,41 @@ class ZZCouplingNode(CouplerNode):
     def initial_operation(self):
         self.spi_manager.set_initial_parking_currents(self.couplers)
 
-    def generate_dummy_dataset(self):
-        pass
+    def generate_dummy_dataset(self, noise=False):
+        dataset = xr.Dataset()
+        real_detuning = 200e3
+        first_qubit = self.all_qubits[0]
+        first_coupler = self.couplers[0]
+        detunings = self.schedule_samplespace["artificial_detunings"][first_qubit]
+        spectator_states = self.schedule_samplespace["spectator_states"][first_coupler]
+        for index, _ in enumerate(self.all_qubits):
+            data_array = np.array([])
+            for spectator_state in spectator_states:
+                for detuning in detunings:
+                    measured_detuning = np.abs(detuning - real_detuning)
+                    true_params = ramsey_model.make_params(
+                        amplitude=0.2,
+                        frequency=measured_detuning,
+                        tau=80e-6,
+                        phase=0,
+                        offset=0,
+                    )
+                    np.random.seed(123)
+                    noise_scale = 0.02
+                    samples = self.schedule_samplespace["ramsey_delays"][first_qubit]
+                    number_of_samples = len(samples)
+                    delays = np.linspace(samples[0], samples[-1], number_of_samples)
+                    true_s21 = ramsey_model.eval(params=true_params, t=delays)
+
+                    noise_s21 = noise_scale * (
+                        np.random.randn(number_of_samples)
+                        + 1j * np.random.randn(number_of_samples)
+                    )
+                    measured_s21 = true_s21
+                    if noise:
+                        measured_s21 += noise_s21
+                    data_array = np.concatenate((data_array, measured_s21))
+
+            # Add the DataArray to the Dataset with an integer name (converted to string)
+            dataset[index] = xr.DataArray(data_array)
+        return dataset
