@@ -21,16 +21,11 @@ from scipy.ndimage import gaussian_filter1d
 from scipy.signal import find_peaks
 from scipy.stats import median_abs_deviation
 
-from tergite_autocalibration.lib.base.analysis import (
-    BaseAllCouplersAnalysis,
-    BaseCouplerAnalysis,
-)
+from tergite_autocalibration.lib.base.analysis import (BaseAllCouplersAnalysis,
+                                                       BaseCouplerAnalysis)
 from tergite_autocalibration.lib.utils.analysis_models import (
-    AvoidedCrossings,
-    CouplerModel,
-    ResonatorAvoidedCrossings,
-    resonator_hanger_frequency,
-)
+    AvoidedCrossings, CouplerModel, CouplingModel, ResonatorAvoidedCrossings,
+    resonator_hanger_frequency)
 from tergite_autocalibration.utils.dto.qoi import QOI
 
 
@@ -249,7 +244,8 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
         self.crossing_points = crossing_points
 
         # the sqrt(abs(cos())) fit for the coupler is very sensitive.
-        # we need to provide accurate hints for the I0: the current corresponding to a flux quantum
+        # we need to provide accurate hints for
+        #     I0: the current corresponding to a flux quantum
         # and Ic: the current corresponding to the max coupler frequency,
         # otherwise the fit goes bonkers
         hint_Ic_res_target = target_res_crossings.I0_hint
@@ -288,6 +284,28 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
         Ic = coupler_model_values["Ic"]
         I0 = coupler_model_values["I0"]
         offset = coupler_model_values["offset"]
+
+        g_control_coupling_model = CouplingModel(
+            self.control_cross_frequency,
+            self.coupler_result,
+            self.control_peaks.currents,
+            self.control_peaks.frequencies,
+        )
+        g_target_coupling_model = CouplingModel(
+            self.target_cross_frequency,
+            self.coupler_result,
+            self.target_peaks.currents,
+            self.target_peaks.frequencies,
+        )
+
+        self.control_qubit_g = g_control_coupling_model.coupling_g
+        self.control_model_dc_currents, self.control_model_frequencies, _ = (
+            g_control_coupling_model.model_data(self.control_qubit_g.x)
+        )
+        self.target_qubit_g = g_target_coupling_model.coupling_g
+        self.target_model_dc_currents, self.target_model_frequencies, _ = (
+            g_target_coupling_model.model_data(self.target_qubit_g.x)
+        )
 
         analysis_succesful = True
         analysis_result = {
@@ -339,6 +357,13 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
         for cross_current in self.target_res_cross_currents:
             ax4.axvline(cross_current, **crossing_styles)
 
+        ax1.plot(
+            self.control_model_dc_currents, self.control_model_frequencies, "c-", lw=3
+        )
+        ax2.plot(
+            self.target_model_dc_currents, self.target_model_frequencies, "c-", lw=3
+        )
+
         ax1.set(xlabel=None)
         ax2.set(xlabel=None)
 
@@ -384,11 +409,13 @@ class CouplerSpectroscopyAnalysis(BaseCouplerAnalysis):
         for ax in (ax1, ax2, ax3, ax4, ax5):
             plt.setp(ax.get_xticklabels(), rotation=30, horizontalalignment="center")
 
-        ax6.axis("off")
+        control_g = self.control_qubit_g.x[0]
+        target_g = self.target_qubit_g.x[0]
+        ax6.text(0.1, 0.9, f"g: {self.coupler}-{self.control_qubit}: {control_g:.3e}")
+        ax6.text(0.1, 0.8, f"g: {self.coupler}-{self.target_qubit}: {target_g:.3e}")
 
         figures_list.append(fig)
         figures_dictionary[self.coupler] = figures_list
-        plt.show()
         return
 
 

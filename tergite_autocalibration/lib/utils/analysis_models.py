@@ -17,16 +17,16 @@ from collections import namedtuple
 import lmfit
 import numpy as np
 from lmfit.model import Model
-from quantify_core.analysis.fitting_models import (
-    exp_damp_osc_func,
-    fft_freq_phase_guess,
-)
+from quantify_core.analysis.fitting_models import (exp_damp_osc_func,
+                                                   fft_freq_phase_guess)
 from scipy.ndimage import median
+from scipy.optimize import minimize
 from scipy.signal import find_peaks
 from scipy.stats import median_abs_deviation
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
-from tergite_autocalibration.lib.utils.functions import exponential_decay_function
+from tergite_autocalibration.lib.utils.functions import \
+    exponential_decay_function
 
 
 def resonator_hanger_frequency(
@@ -355,48 +355,58 @@ class CouplerModel(lmfit.model.Model):
 
 
 
-# class CouplingModel():
-#     """
-#     Model to find the coupling strength g between a tunable transmon and a 
-#     fixed frequency transmon.
-#     """
-#     def __init__(self,fixed_qubit_frequency:float , coupler_model: lmfit.model.ModelResult):
-#         self.fixed_qubit_frequency = fixed_qubit_frequency
-#         self.coupler_model = coupler_model
-#
-#     def model_frequencies(self, g, dc_currents: np.ndarray, coupler_omegas:np.ndarray):
-#         omega_q = self.fixed_qubit_frequency
-#         anal_freq_plus = (omega_q + coupler_omegas) / 2 + np.sqrt(
-#             ((omega_q - coupler_omegas) / 2) ** 2 + g**2
-#         )
-#         anal_freq_minus = (omega_q + coupler_omegas) / 2 - np.sqrt(
-#             ((omega_q - coupler_omegas) / 2) ** 2 + g**2
-#         )
-#         deltas = omega_q - coupler_omegas
-#         thetas = np.arctan(2 * g / deltas) / 2
-#         qubit_positions_plus = np.logical_and(np.cos(thetas) ** 2 > 0.99, deltas > 0)
-#         qubit_positions_minus = np.logical_and(np.cos(thetas) ** 2 > 0.99, deltas < 0)
-#         qubit_freqs_plus = anal_freq_plus[qubit_positions_plus]
-#         dc_currents_plus = dc_currents[qubit_positions_plus]
-#         qubit_freqs_minus = anal_freq_minus[qubit_positions_minus]
-#         dc_currents_minus = dc_currents[qubit_positions_minus]
-#
-#         plus_values = list(zip(dc_currents_plus, qubit_freqs_plus))
-#         minus_values = list(zip(dc_currents_minus, qubit_freqs_minus))
-#
-#         values = plus_values + minus_values
-#         sorted_values = sorted(values, key=lambda tup: tup[0])
-#         sorted_dc_currents, sorted_frequencies = zip(*sorted_values)
-#         return sorted_frequencies
-#
-#     def cost_function(factor, data_frequencies, array2):
-#         # Minimize Euclidean distance
-#         frequencies_from_model = model_frequencies(factor, omega_q, dc_currents, coupler_omegas)
-#         return np.linalg.norm(data_frequencies - frequencies_from_model)
-#
-#     @property
-#     def coupling_g(self):
-#         return minimize(self.cost_function, x0=1.0, args=(array1, array2))
+class CouplingModel():
+    """
+    Model to find the coupling strength g between a tunable transmon and a 
+    fixed frequency transmon.
+    """
+    def __init__(self,fixed_qubit_frequency:float , coupler_model: lmfit.model.ModelResult, data_dc_currents, data_frequencies):
+        self.fixed_qubit_frequency = fixed_qubit_frequency
+        self.coupler_model = coupler_model
+        self.data_dc_currents = data_dc_currents
+        self.data_frequencies = data_frequencies
+
+    def model_data(self, g):
+        omega_q = self.fixed_qubit_frequency
+        dc_currents = self.data_dc_currents
+        coupler_omegas = self.coupler_model.eval(
+            self.coupler_model.params, current=self.data_dc_currents
+        )
+        anal_freq_plus = (omega_q + coupler_omegas) / 2 + np.sqrt(
+            ((omega_q - coupler_omegas) / 2) ** 2 + g**2
+        )
+        anal_freq_minus = (omega_q + coupler_omegas) / 2 - np.sqrt(
+            ((omega_q - coupler_omegas) / 2) ** 2 + g**2
+        )
+        deltas = omega_q - coupler_omegas
+        thetas = np.arctan(2 * g / deltas) / 2
+        qubit_positions_plus = np.logical_and(np.cos(thetas) ** 2 > 0.99, deltas > 0)
+        qubit_positions_minus = np.logical_and(np.cos(thetas) ** 2 > 0.99, deltas < 0)
+        qubit_freqs_plus = anal_freq_plus[qubit_positions_plus]
+        dc_currents_plus = dc_currents[qubit_positions_plus]
+        qubit_freqs_minus = anal_freq_minus[qubit_positions_minus]
+        dc_currents_minus = dc_currents[qubit_positions_minus]
+
+        valid_positions = np.logical_or(qubit_positions_plus , qubit_positions_minus)
+        valid_data_frequencies = self.data_frequencies[valid_positions]
+
+        plus_values = list(zip(dc_currents_plus, qubit_freqs_plus))
+        minus_values = list(zip(dc_currents_minus, qubit_freqs_minus))
+
+        values = plus_values + minus_values
+        sorted_values = sorted(values, key=lambda tup: tup[0])
+        sorted_dc_currents, sorted_frequencies = zip(*sorted_values)
+        return sorted_dc_currents, sorted_frequencies, valid_data_frequencies
+
+    def cost_function(self, g: float):
+        _, model_frequencies, data_frequencies = self.model_data(g)
+        # TODO: some of them are xarray datarrays
+        norm = np.sum(np.abs(data_frequencies - model_frequencies))
+        return norm
+
+    @property
+    def coupling_g(self):
+        return minimize(self.cost_function, x0=50e6, method='Nelder-Mead')
 
 class RamseyModel(lmfit.model.Model):
     """
