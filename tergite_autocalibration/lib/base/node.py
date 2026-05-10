@@ -38,7 +38,10 @@ from tergite_autocalibration.lib.utils.schedule_execution import (
     execute_schedule,
     get_compiler,
 )
-from tergite_autocalibration.utils.dto.enums import MeasurementMode
+from tergite_autocalibration.utils.dto.enums import (
+    MeasurementMode,
+    SamplespaceStructure,
+)
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
 from tergite_autocalibration.utils.io.dataset import (
     open_dataset,
@@ -48,7 +51,10 @@ from tergite_autocalibration.utils.io.dataset import (
 )
 from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.utils.logging.visuals import print_measurement_info
-from tergite_autocalibration.utils.measurement_utils import samplespace_dimensions
+from tergite_autocalibration.utils.measurement_utils import (
+    pad_samplespace,
+    samplespace_dimensions,
+)
 
 if TYPE_CHECKING:
     from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
@@ -74,6 +80,9 @@ class BaseNode(ABC):
         self.external_samplespace = {}
         self.redis_fields = []
         self.all_qubits = []
+        self.samplespace_structure: "SamplespaceStructure" = (
+            SamplespaceStructure.ORTHOGONAL
+        )
 
         # These may be modified while the node runs
         self.outer_schedule_samplespace = {}
@@ -198,17 +207,22 @@ class BaseNode(ABC):
 
         raw_ds_keys = raw_ds.data_vars.keys()
         measurement_qubits = self.all_qubits
-        samplespace = self.schedule_samplespace
 
-        sweep_quantities = samplespace.keys()
-
-        n_qubits = len(measurement_qubits)
+        sweep_quantities = self.schedule_samplespace.keys()
 
         for key in raw_ds_keys:
-            key_indx = key % n_qubits  # this is to handle ro_opt_frequencies node where
             coords_dict = {}
-            measured_qubit = measurement_qubits[key_indx]
-            dimensions = samplespace_dimensions(samplespace, self.loops)
+            measured_qubit = measurement_qubits[key]
+            dimensions = samplespace_dimensions(
+                self.schedule_samplespace, self.loops, self.samplespace_structure
+            )
+
+            samplespace = pad_samplespace(
+                self.schedule_samplespace,
+                dimensions,
+                self.loops,
+                self.samplespace_structure,
+            )
 
             for quantity in sweep_quantities:
                 # eg settable_elements -> ['q1','q2',...] or ['q1_q2','q3_q4',...] :
@@ -226,7 +240,7 @@ class BaseNode(ABC):
                         element = matching[0]
                         element_type = "coupler"
                     else:
-                        raise (ValueError)
+                        raise ValueError
 
                 coord_key = quantity + element
 
@@ -243,7 +257,11 @@ class BaseNode(ABC):
                 if not isinstance(settable_values, Iterable):
                     settable_values = np.array([settable_values])
 
-                coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
+                coord_dim = coord_key
+                if self.samplespace_structure == SamplespaceStructure.PARALLEL:
+                    coord_dim = "common_dimension" + measured_qubit
+
+                coords_dict[coord_key] = (coord_dim, settable_values, coord_attrs)
 
             if self.loops is not None:
                 coords_dict["loops"] = (
@@ -275,8 +293,12 @@ class BaseNode(ABC):
                 "long_name": f"y{measured_qubit}",
                 "units": "NA",
             }
+            dimension_names = tuple(coords_dict.keys())
+            if self.samplespace_structure == SamplespaceStructure.PARALLEL:
+                dimension_names = "common_dimension" + measured_qubit
+
             partial_ds[f"y{measured_qubit}"] = (
-                tuple(coords_dict.keys()),
+                dimension_names,
                 data_values,
                 attributes,
             )
@@ -381,7 +403,7 @@ class CouplerNode(BaseNode):
         currents_dict = {}
         for coupler in self.couplers:
             parking_current = float(
-                REDIS_CONNECTION.hget(f"couplers:{coupler}", "parking_current")
+                REDIS_CONNECTION.hget(f"couplers:{coupler}", "initial_parking_current")
             )
             if np.isnan(parking_current):
                 logger.warning(f"nan current for coupler {coupler}")

@@ -16,6 +16,8 @@ from typing import Iterable
 
 import numpy
 
+from tergite_autocalibration.utils.dto.enums import SamplespaceStructure
+
 
 def reduce_samplespace(iteration: tuple, samplespace: dict) -> dict:
     reduced_samplespace = {}
@@ -70,7 +72,11 @@ def reduce_samplespace(iteration: tuple, samplespace: dict) -> dict:
     return reduced_samplespace
 
 
-def samplespace_dimensions(samplespace: dict, loops=None) -> list[int]:
+def samplespace_dimensions(
+    samplespace: dict,
+    loops=None,
+    samplespace_structure: "SamplespaceStructure" = SamplespaceStructure.ORTHOGONAL,
+) -> list[int]:
     """
     example of a samplespace:
     samplespace = {
@@ -96,8 +102,44 @@ def samplespace_dimensions(samplespace: dict, loops=None) -> list[int]:
         settable_values = samplespace[quantity][first_element]
         if not isinstance(settable_values, Iterable):
             settable_values = numpy.array([settable_values])
+
         dimensions.append(len(settable_values))
+
+    if samplespace_structure == SamplespaceStructure.PARALLEL:
+        dimensions = [sum(dimensions)]
 
     if loops is not None:
         dimensions.append(loops)
     return dimensions
+
+
+def pad_samplespace(
+    samplespace: dict,
+    dimensions: list[int],
+    loops=None,
+    samplespace_structure: "SamplespaceStructure" = SamplespaceStructure.ORTHOGONAL,
+) -> dict:
+    if samplespace_structure == SamplespaceStructure.ORTHOGONAL:
+        return samplespace
+
+    settable_quantities = samplespace.keys()
+    padded_samplespace = {}
+
+    (full_size,) = dimensions
+
+    already_padded = 0
+    for quantity in settable_quantities:
+        padded_samplespace[quantity] = {}
+        first_element = list(samplespace[quantity].keys())[0]
+        quantity_size = len(samplespace[quantity][first_element])
+        elements = samplespace[quantity].keys()
+        unpadded = full_size - already_padded - quantity_size
+        for element in elements:
+            values = samplespace[quantity][element]
+            padded_values = numpy.pad(
+                values, (already_padded, unpadded), constant_values=numpy.nan
+            )
+            padded_samplespace[quantity][element] = padded_values
+        already_padded += quantity_size
+
+    return padded_samplespace

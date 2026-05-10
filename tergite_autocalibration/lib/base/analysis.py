@@ -22,10 +22,10 @@ import numpy as np
 import xarray as xr
 
 from tergite_autocalibration.config.globals import CONFIG
-from tergite_autocalibration.lib.base.utils.analysis_utils import filter_ds_by_element
-from tergite_autocalibration.lib.base.utils.figure_utils import (
-    create_figure_with_top_band,
-)
+from tergite_autocalibration.lib.base.utils.analysis_utils import \
+    filter_ds_by_element
+from tergite_autocalibration.lib.base.utils.figure_utils import \
+    create_figure_with_top_band
 from tergite_autocalibration.utils.dto.qoi import QOI
 from tergite_autocalibration.utils.logging import logger
 

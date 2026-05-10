@@ -19,49 +19,48 @@ from lmfit.models import LorentzianModel
 from tergite_autocalibration.config.globals import CONFIG
 from tergite_autocalibration.lib.base.node import CouplerNode
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
-    CouplerAnticrossingNodeAnalysis,
-    ResonatorSpectroscopyVsCurrentNodeAnalysis,
+    CouplerSpectroscopyNodeAnalysis,
+)
+from tergite_autocalibration.lib.nodes.coupler.spectroscopy.measurement import (
+    CouplerSpectroscopyMeasurement,
 )
 from tergite_autocalibration.lib.nodes.external_parameter_node import (
     ExternalParameterNode,
-)
-from tergite_autocalibration.lib.nodes.qubit_control.spectroscopy.measurement import (
-    TwoTonesMultidimMeasurement,
-)
-from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.measurement import (
-    ResonatorSpectroscopyMeasurement,
 )
 from tergite_autocalibration.lib.utils.samplespace import (
     qubit_samples,
     resonator_samples,
 )
+from tergite_autocalibration.utils.dto.enums import SamplespaceStructure
 from tergite_autocalibration.utils.logging import logger
 
 peak = LorentzianModel()
 
 
-class QubitSpectroscopyVsCurrentNode(CouplerNode):
+class CouplerDCSpectroscopyNode(CouplerNode):
     """
     This node performs a qubit spectroscopy measurement while varying the
     current through the coupler to measure the crossing point of the coupler with the qubit.
     """
 
-    name: str = "coupler_anticrossing"
-    measurement_obj = TwoTonesMultidimMeasurement
-    analysis_obj = CouplerAnticrossingNodeAnalysis
+    name: str = "coupler_dc_spectroscopy"
+    measurement_obj = CouplerSpectroscopyMeasurement
+    analysis_obj = CouplerSpectroscopyNodeAnalysis
     measurement_type = ExternalParameterNode
-    coupler_qois = ["control_qubit_crossing_points", "target_qubit_crossing_points"]
+    coupler_qois = ["fmax", "Ic", "I0", "offset"]
 
     def __init__(self, couplers: list[str], **schedule_keywords):
         super().__init__(couplers, **schedule_keywords)
-        self.qubit_state = 0
-        self.dacs = []
-        self.schedule_keywords["qubit_state"] = self.qubit_state
+
+        self.samplespace_structure = SamplespaceStructure.PARALLEL
 
         self.schedule_samplespace = {
-            "spec_frequencies": {
+            "qubit_frequencies": {
                 qubit: qubit_samples(qubit) for qubit in self.all_qubits
-            }
+            },
+            "resonator_frequencies": {
+                qubit: resonator_samples(qubit) for qubit in self.all_qubits
+            },
         }
 
         self.external_samplespace = {
@@ -102,10 +101,20 @@ class QubitSpectroscopyVsCurrentNode(CouplerNode):
             true_params = peak.make_params(
                 amplitude=0.2, center=shifted_frequency, sigma=0.1e6
             )
-            samples = qubit_samples(qubit)
-            number_of_samples = len(samples)
-            frequncies = np.linspace(samples[0], samples[-1], number_of_samples)
-            true_s21 = peak.eval(params=true_params, x=frequncies)
+            qu_samples = qubit_samples(qubit)
+            ro_samples = resonator_samples(qubit)
+            number_of_qu_samples = len(qu_samples)
+            number_of_ro_samples = len(ro_samples)
+            number_of_samples = number_of_qu_samples + number_of_ro_samples
+            qu_frequencies = np.linspace(
+                qu_samples[0], qu_samples[-1], number_of_qu_samples
+            )
+            ro_frequencies = np.linspace(
+                ro_samples[0], ro_samples[-1], number_of_ro_samples
+            )
+            true_s21_qu = peak.eval(params=true_params, x=qu_frequencies)
+            true_s21_ro = peak.eval(params=true_params, x=ro_frequencies)
+            true_s21 = np.concatenate((true_s21_qu, true_s21_ro))
             noise_scale = 0.02
 
             np.random.seed(123)
@@ -118,53 +127,3 @@ class QubitSpectroscopyVsCurrentNode(CouplerNode):
             # Add the DataArray to the Dataset with an integer name (converted to string)
             dataset[index] = data_array
         return dataset
-
-
-class ResonatorSpectroscopyVsCurrentNode(CouplerNode):
-    """
-    This node performs a resonator spectroscopy measurement while varying the
-    current through the coupler to measure the crossing point of the coupler with the resonator.
-    """
-
-    name: str = "resonator_spectroscopy_vs_current"
-    measurement_obj = ResonatorSpectroscopyMeasurement
-    analysis_obj = ResonatorSpectroscopyVsCurrentNodeAnalysis
-    measurement_type = ExternalParameterNode
-    coupler_qois = [
-        "control_resonator_crossing_points",
-        "target_resonator_crossing_points",
-    ]
-
-    def __init__(self, couplers: list[str], **schedule_keywords):
-        super().__init__(couplers, **schedule_keywords)
-        self.qubit_state = 0
-        self.dacs = []
-
-        self.schedule_samplespace = {
-            "ro_frequencies": {
-                qubit: resonator_samples(qubit) for qubit in self.all_qubits
-            }
-        }
-
-        self.external_samplespace = {
-            "dc_currents": {
-                coupler: np.arange(-1e-3, 1e-3, 50e-6) for coupler in self.couplers
-            },
-        }
-        self.validate()
-
-    def initial_operation(self):
-        pass
-
-    def pre_measurement_operation(self, reduced_ext_space):
-        first_coupler = self.couplers[0]
-        self.this_current = reduced_ext_space["dc_currents"][first_coupler]
-        self.spi_manager.set_dac_current(reduced_ext_space["dc_currents"])
-
-    def final_operation(self):
-        logger.info("Final Operation")
-        currents = {}
-        for coupler in self.couplers:
-            currents[coupler] = 0
-
-        self.spi_manager.set_dac_current(currents)

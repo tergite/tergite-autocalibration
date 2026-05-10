@@ -15,8 +15,8 @@ graph TD
     F --> H1(2 States Discrimination)
     G1 --> H2(RO frequency optimization - 3states) --> H3(3 States Discrimination)
     A --> I(Resonator spectroscopy vs current)
-    B --> J(Qubit spectroscopy vs current)
-    I --> J
+    B --> J1(Coupler Anticrossing)
+    B --> J2(Coupler DC Spectroscopy)
     H2 --> K(CZ Parametrization) --> K1(CZ Chevron) --> K2(CZ Calibration) --> K3(CZ Local Phases)
     K3 --> L(CZ Randomized Benchmarking)
     
@@ -29,7 +29,7 @@ graph TD
     click C href "../nodes/rabi_oscillations_node"
     click C3 href "../nodes/randomized_benchmarking_node"
     click I href "../nodes/resonator_spectroscopy_vs_current_node"
-    click J href "../nodes/qubit_spectroscopy_vs_current_node"
+    click J1 href "../nodes/qubit_spectroscopy_vs_current_node"
     click K href "../nodes/cz_parametrization"
     click K1 href "../nodes/cz_chevron"
     click K2 href "../nodes/cz_calibration"
@@ -55,7 +55,8 @@ graph TD
     style H2 fill:#ffe6cc,stroke:#333,stroke-width:2px
     style H3 fill:#ffe6cc,stroke:#333,stroke-width:2px
     style I fill:#ff9999,stroke:#333,stroke-width:2px
-    style J fill:#ff9999,stroke:#333,stroke-width:2px
+    style J1 fill:#ff9999,stroke:#333,stroke-width:2px
+    style J2 fill:#ff9999,stroke:#333,stroke-width:2px
 ```
 
 ## Readout Nodes
@@ -78,12 +79,12 @@ graph TD
 - [qubit_12_spectroscopy](nodes/qubit_spectroscopy_node.md)
 - [rabi_oscillations_12](nodes/rabi_oscillations_node.md)
 - ramsey_correction_12
-- adaptive_motzoi_parameter
 - n_rabi_oscillations
 
 ## Coupler Nodes
 
 - [coupler_anticrossing](nodes/qubit_spectroscopy_vs_current_node.md)
+- coupler_dc_spectroscopy
 - [coupler_resonator_spectroscopy](nodes/resonator_spectroscopy_vs_current_node.md)
 - [cz_parametrization](nodes/cz_parametrization.md)
 - [cz_chevron](nodes/cz_chevron.md)
