@@ -81,7 +81,7 @@ qubit_coupler_qois = ["control_qubit_crossing_points", "target_qubit_crossing_po
 
 
 def test_get_crossings_for_q06_q07(
-    setup_q06_q07_data: tuple[xr.Dataset, str, ndarray, str],
+    setup_q06_q07_data: tuple[xr.Dataset, xr.Dataset, str],
 ):
     ds_res, ds_qu, coupler = setup_q06_q07_data
     a = ResonatorSpectroscopyVsCurrentCouplerAnalysis(
@@ -105,8 +105,7 @@ def test_get_crossings_for_q06_q07(
         [-0.001925, -0.0011, 0.001375, 0.0022], abs=1e-6
     )
     assert q07_crossings == pytest.approx(
-        [-0.002025, -0.001, 0.0012875, 0.0023],
-        abs=1e-6,
+        [-0.002025, -0.001, 0.0012875, 0.0023], abs=1e-6
     )
 
 
