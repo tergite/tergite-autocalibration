@@ -19,7 +19,6 @@ from pathlib import Path
 import pandas
 import pytest
 import xarray as xr
-from qutip import measurement
 
 import tergite_autocalibration.utils.reanalysis_utils as ra_utils
 from tergite_autocalibration.config.globals import CONFIG
@@ -208,9 +207,9 @@ def test_open_dataset():
     full_dataset = open_dataset(name, containing_folder)
     assert full_dataset.elements == ["q06", "q07"]
     assert "ReIm" not in full_dataset.coords
-    assert full_dataset['yq06'].qubit == 'q06'
-    assert full_dataset['yq07'].qubit == 'q07'
-    assert full_dataset['yq07'].size == 51000
+    assert full_dataset["yq06"].qubit == "q06"
+    assert full_dataset["yq07"].qubit == "q07"
+    assert full_dataset["yq07"].size == 51000
 
 
 def test_save_dataset(tmp_path):
