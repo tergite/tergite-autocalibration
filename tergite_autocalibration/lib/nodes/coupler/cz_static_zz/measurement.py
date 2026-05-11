@@ -1,8 +1,6 @@
 # This code is part of Tergite
 #
-# (C) Copyright Eleftherios Moschandreou 2023, 2024
-# (C) Copyright Liangyu Chen 2023, 2024
-# (C) Copyright Amr Osman 2024
+# (C) Copyright Eleftherios Moschandreou 2026
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -16,25 +14,32 @@ import numpy as np
 from quantify_scheduler import Schedule
 from quantify_scheduler.enums import BinMode
 from quantify_scheduler.operations.gate_library import X90, Measure, Reset, Rxy, X
-from quantify_scheduler.operations.pulse_library import DRAGPulse, IdlePulse
-from quantify_scheduler.resources import ClockResource
+from quantify_scheduler.operations.pulse_library import IdlePulse
 
 from tergite_autocalibration.lib.base.measurement import BaseMeasurement
-from tergite_autocalibration.utils.dto.extended_gates import Measure_RO1
+from tergite_autocalibration.utils.dto.extended_coupler_edge import (
+    ExtendedCompositeSquareEdge,
+)
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
 
-class RamseyDetuningsMeasurement(BaseMeasurement):
-    def __init__(self, transmons: dict[str, ExtendedTransmon]):
+class ZZCouplingMeasurement(BaseMeasurement):
+    def __init__(
+        self,
+        transmons: dict[str, ExtendedTransmon],
+        couplers: dict[str, ExtendedCompositeSquareEdge],
+    ):
         super().__init__(transmons)
+        self.transmons = transmons
+        self.couplers = couplers
 
     def schedule_function(
         self,
         artificial_detunings: dict[str, np.ndarray],
         ramsey_delays: dict[str, np.ndarray],
         spectator_states: dict[str, np.ndarray],
+        coupler_dict: dict[str, dict],
         repetitions: int = 1024,
-        qubit_state: int = 0,
     ) -> Schedule:
         """
         Generate a schedule for performing a Ramsey fringe measurement on multiple qubits.
@@ -64,52 +69,59 @@ class RamseyDetuningsMeasurement(BaseMeasurement):
         schedule = Schedule(schedule_title, repetitions)
 
         qubits = self.transmons.keys()
+        couplers = self.couplers.keys()
 
         # This is the common reference operation so the qubits can be operated in parallel
         root_relaxation = schedule.add(Reset(*qubits), label="Reset")
 
-        # The outer loop, iterates over all qubits
-        for this_qubit, artificial_detunings_values in artificial_detunings.items():
-            this_transmon = self.transmons[this_qubit]
+        # The outer loop, iterates over all couplers
+        for this_coupler in couplers:
+            active_qubit = coupler_dict[this_coupler]["active_qubit"]
+            spectator_qubit = coupler_dict[this_coupler]["spectator_qubit"]
+            this_transmon = self.transmons[active_qubit]
             mw_pulse_duration = this_transmon.rxy.duration()
-            mw_pulse_port = this_transmon.ports.microwave()
-            mw_ef_amp180 = this_transmon.r12.ef_amp180()
 
-            this_clock = f"{this_qubit}.01"
+            # To enforce parallelism we refer to the root relaxation
+            schedule.add(Reset(active_qubit), ref_op=root_relaxation)
 
-            schedule.add(
-                Reset(*qubits), ref_op=root_relaxation
-            )  # To enforce parallelism we refer to the root relaxation
+            art_detunings_values = artificial_detunings[active_qubit]
+            ramsey_delays_values = ramsey_delays[active_qubit]
+            number_of_inners = len(ramsey_delays_values)
+            number_of_intermediates = len(art_detunings_values)
 
-            ramsey_delays_values = ramsey_delays[this_qubit]
-            number_of_delays = len(ramsey_delays_values)
-
-            for spectator_index, spectator_state in enumerate(spectator_states):
+            for outer_index, spectator_state in enumerate(spectator_states):
                 # The intermediate loop, iterates over all detunings
-                for detuning_index, detuning in enumerate(artificial_detunings_values):
+                for intermediate_index, detuning in enumerate(art_detunings_values):
                     # The inner for loop iterates over all delays
-                    for acq_index, ramsey_delay in enumerate(ramsey_delays_values):
-                        this_index = detuning_index * number_of_delays + acq_index
+                    for inner_index, ramsey_delay in enumerate(ramsey_delays_values):
+                        this_index = (
+                            outer_index * (number_of_intermediates * number_of_inners)
+                            + intermediate_index * number_of_inners
+                            + inner_index
+                        )
 
                         recovery_phase = np.rad2deg(2 * np.pi * detuning * ramsey_delay)
 
+                        # TODO: this can be parallelized to the following X90
                         if spectator_state == 0:
-                            schedule.add(IdlePulse())
+                            schedule.add(IdlePulse(mw_pulse_duration))
+                        elif spectator_state == 1:
+                            schedule.add(X(spectator_qubit))
 
-                        schedule.add(X90(this_qubit))
+                        schedule.add(X90(active_qubit))
 
                         schedule.add(
-                            Rxy(theta=90, phi=recovery_phase, qubit=this_qubit),
+                            Rxy(theta=90, phi=recovery_phase, qubit=active_qubit),
                             rel_time=ramsey_delay,
                         )
 
                         schedule.add(
                             Measure(
-                                this_qubit,
+                                active_qubit,
                                 acq_index=this_index,
                                 bin_mode=BinMode.AVERAGE,
                             ),
                         )
 
-                        schedule.add(Reset(this_qubit))
+                        schedule.add(Reset(active_qubit))
         return schedule

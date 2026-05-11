@@ -11,22 +11,28 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from typing import Literal
-
 import numpy as np
 import xarray as xr
 
-from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.lib.base.node import CouplerNode
-from tergite_autocalibration.lib.nodes.schedule_node import OuterScheduleNode
+from tergite_autocalibration.lib.nodes.coupler.cz_static_zz.analysis import (
+    ZZCouplingNodeAnalysis,
+)
+from tergite_autocalibration.lib.nodes.coupler.cz_static_zz.measurement import (
+    ZZCouplingMeasurement,
+)
+from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
+from tergite_autocalibration.lib.utils.analysis_models import RamseyModel
+
+ramsey_model = RamseyModel()
 
 
-class CZ_StaticZZNode(CouplerNode):
-    name: str = "cz_static_ZZ"
-    measurement_obj = CZStaticZZMeasurement
-    analysis_obj = CZStaticZZAnalysis
-    measurement_type = OuterScheduleNode
-    coupler_qois = ["cz_static_ZZ"]
+class ZZCouplingNode(CouplerNode):
+    name: str = "zz_coupling"
+    measurement_obj = ZZCouplingMeasurement
+    analysis_obj = ZZCouplingNodeAnalysis
+    measurement_type = ScheduleNode
+    coupler_qois = ["zz_coupling"]
 
     def __init__(self, couplers: list[str], **schedule_keywords):
         super().__init__(couplers, **schedule_keywords)
@@ -37,12 +43,8 @@ class CZ_StaticZZNode(CouplerNode):
         self.all_qubits = self.coupled_qubits
         self.validate()
 
-        self.schedule_keywords["loop_repetitions"] = 512 // 4
-        self.loops = self.schedule_keywords["loop_repetitions"]
-        phase_paths = self.all_phase_paths()
-        self.analysis_keywords = {
-            coupler: {"phase_path": phase_paths[coupler]} for coupler in self.couplers
-        }
+        self.schedule_keywords["coupler_dict"] = self.qubit_types()
+        self.analysis_keywords = self.qubit_types() 
 
         self.schedule_samplespace = {
             "ramsey_delays": {
@@ -52,19 +54,60 @@ class CZ_StaticZZNode(CouplerNode):
                 qubit: np.arange(-2.1, 2.1, 0.8) * 1e6 for qubit in self.all_qubits
             },
             "spectator_states": {
-                coupler: np.arange([0, 1], dtype=np.int8) for coupler in self.couplers
+                coupler: np.array([0, 1], dtype=np.int8) for coupler in self.couplers
             },
         }
 
-    def all_phase_paths(self) -> dict[str, Literal["via_02", "via_20"]]:
-        phase_paths = {}
+    def qubit_types(self) -> dict[str, dict]:
+        qubit_types_dict = {}
         for coupler in self.couplers:
-            path = REDIS_CONNECTION.hget(f"couplers:{coupler}", "cz_phase_path")
-            phase_paths[coupler] = path
-        return phase_paths
+            # NOTE: as is the, the convention is that the first qubit is active
+            # and the second is spectator
+            active_qubit, spectator_qubit = coupler.split("_")
+            qubit_types_dict[coupler] = {
+                "active_qubit": active_qubit,
+                "spectator_qubit": spectator_qubit,
+            }
+        return qubit_types_dict
 
     def initial_operation(self):
         self.spi_manager.set_initial_parking_currents(self.couplers)
 
-    def generate_dummy_dataset(self):
-        pass
+    def generate_dummy_dataset(self, noise=False):
+        dataset = xr.Dataset()
+        real_detuning = 200e3
+        first_qubit = self.all_qubits[0]
+        first_coupler = self.couplers[0]
+        detunings = self.schedule_samplespace["artificial_detunings"][first_qubit]
+        spectator_states = self.schedule_samplespace["spectator_states"][first_coupler]
+        for index, _ in enumerate(self.all_qubits):
+            data_array = np.array([])
+            for spectator_state in spectator_states:
+                for detuning in detunings:
+                    measured_detuning = np.abs(detuning - real_detuning)
+                    true_params = ramsey_model.make_params(
+                        amplitude=0.2,
+                        frequency=measured_detuning,
+                        tau=80e-6,
+                        phase=0,
+                        offset=0,
+                    )
+                    np.random.seed(123)
+                    noise_scale = 0.02
+                    samples = self.schedule_samplespace["ramsey_delays"][first_qubit]
+                    number_of_samples = len(samples)
+                    delays = np.linspace(samples[0], samples[-1], number_of_samples)
+                    true_s21 = ramsey_model.eval(params=true_params, t=delays)
+
+                    noise_s21 = noise_scale * (
+                        np.random.randn(number_of_samples)
+                        + 1j * np.random.randn(number_of_samples)
+                    )
+                    measured_s21 = true_s21
+                    if noise:
+                        measured_s21 += noise_s21
+                    data_array = np.concatenate((data_array, measured_s21))
+
+            # Add the DataArray to the Dataset with an integer name (converted to string)
+            dataset[index] = xr.DataArray(data_array)
+        return dataset
