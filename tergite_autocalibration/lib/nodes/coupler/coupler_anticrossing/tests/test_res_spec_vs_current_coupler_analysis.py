@@ -26,6 +26,7 @@ from tergite_autocalibration.lib.nodes.coupler.coupler_anticrossing.analysis imp
 )
 from tergite_autocalibration.tests.utils.decorators import with_os_env
 from tergite_autocalibration.utils.dto.qoi import QOI
+from tergite_autocalibration.utils.io.dataset import open_dataset
 
 
 def test_CanCreate():
@@ -52,10 +53,8 @@ def getCrossingForQubit(qoi: QOI, qubit: str = "q06"):
 
 @pytest.fixture(autouse=False)
 def setup_q06_q07_data():
-    dataset_path = (
-        Path(__file__).parent / "data" / "dataset_coupler_resonator_spectroscopy_0.hdf5"
-    )
-    ds = xr.open_dataset(dataset_path)
+    dataset_path = Path(__file__).parent / "data"
+    ds = open_dataset("coupler_resonator_spectroscopy_0", dataset_path)
     coupler = "q06_q07"
     ds = xr.merge(ds[var] for var in ["yq06", "yq07"])
     ds.attrs["coupler"] = coupler
@@ -83,10 +82,8 @@ def test_get_crossings_for_q06_q07(
 
 @pytest.fixture(autouse=False)
 def setup_q08_q09_data():
-    dataset_path = (
-        Path(__file__).parent / "data" / "dataset_coupler_resonator_spectroscopy_0.hdf5"
-    )
-    ds = xr.open_dataset(dataset_path)
+    dataset_path = Path(__file__).parent / "data"
+    ds = open_dataset("coupler_resonator_spectroscopy_0", dataset_path)
     coupler = "q08_q09"
     ds = xr.merge(ds[var] for var in ["yq08", "yq09"])
     ds.attrs["coupler"] = coupler
@@ -108,10 +105,8 @@ def test_get_crossings_for_q08_q09(
 
 @pytest.fixture(autouse=False)
 def setup_q12_q13_data():
-    dataset_path = (
-        Path(__file__).parent / "data" / "dataset_coupler_resonator_spectroscopy_0.hdf5"
-    )
-    ds = xr.open_dataset(dataset_path)
+    dataset_path = Path(__file__).parent / "data"
+    ds = open_dataset("coupler_resonator_spectroscopy_0", dataset_path)
     coupler = "q12_q13"
     ds = xr.merge(ds[var] for var in ["yq12", "yq13"])
     ds.attrs["coupler"] = coupler
@@ -133,10 +128,8 @@ def test_get_crossings_for_q12_q13(
 
 @pytest.fixture(autouse=False)
 def setup_q14_q15_data():
-    dataset_path = (
-        Path(__file__).parent / "data" / "dataset_coupler_resonator_spectroscopy_0.hdf5"
-    )
-    ds = xr.open_dataset(dataset_path)
+    dataset_path = Path(__file__).parent / "data"
+    ds = open_dataset("coupler_resonator_spectroscopy_0", dataset_path)
     coupler = "q14_q15"
     ds = xr.merge(ds[var] for var in ["yq14", "yq15"])
     ds.attrs["coupler"] = coupler

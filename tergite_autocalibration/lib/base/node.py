@@ -43,7 +43,12 @@ from tergite_autocalibration.utils.dto.enums import (
     SamplespaceStructure,
 )
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
-from tergite_autocalibration.utils.io.dataset import save_dataset
+from tergite_autocalibration.utils.io.dataset import (
+    open_dataset,
+    save_dataset,
+    save_figures,
+    save_qoi,
+)
 from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.utils.logging.visuals import print_measurement_info
 from tergite_autocalibration.utils.measurement_utils import (
@@ -94,6 +99,14 @@ class BaseNode(ABC):
     def precompile(self, samplespace):
         pass
 
+        self.data_path: Path
+
+    def update_data_path(self, data_path: Path):
+        """
+        Used by the calibration supervisor
+        """
+        self.data_path = data_path
+
     def measure_node(self, cluster_status) -> xarray.Dataset:
         """
         Here we attach the measure_node method according to the
@@ -103,14 +116,23 @@ class BaseNode(ABC):
         dataset = measurement_type.measure_node(cluster_status)
         return dataset
 
-    def calibrate(self, data_path, measurement_mode):
+    def calibrate(self, measurement_mode):
         if measurement_mode != MeasurementMode.re_analyse:
+            # explicitly create folder for the measurement.
+            # contains the hdf5 dataset, the QOI json and the png figures
+            self.data_path.mkdir(parents=True, exist_ok=True)
             result_dataset = self.measure_node(measurement_mode)
-            save_serial_device(self.device, data_path)
-            save_dataset(result_dataset, self.name, data_path)
+        else:
+            result_dataset = open_dataset(self.name, self.data_path)
+
+        QOI_dict = self.post_process(result_dataset)
+        # TODO: do we need to save in re analyze mode?
+        if measurement_mode != MeasurementMode.re_analyse:
+            save_dataset(result_dataset, self.name, self.data_path)
+            save_qoi(QOI_dict, self.name, self.data_path)
+            save_serial_device(self.device, self.data_path)
         # After the measurement free the device resources
         close_device_resources(self.device)
-        self.post_process(data_path)
         logger.info("analysis completed")
 
     def measure_compiled_schedule(
@@ -157,12 +179,16 @@ class BaseNode(ABC):
             duration *= self.node_dictionary["loop_repetitions"]
         return duration
 
-    def post_process(self, data_path: Path):
+    def post_process(self, dataset: xarray.Dataset):
         analysis_kwargs = getattr(self, "analysis_keywords", dict())
         node_analysis: BaseNodeAnalysis = self.analysis_obj(
             self.name, self.redis_fields, **analysis_kwargs
         )
-        QOI_dict = node_analysis.analyze_node(data_path)
+        QOI_dict = node_analysis.analyze_node(dataset)
+
+        figures = node_analysis.figures
+        save_figures(figures, self.name, self.data_path)
+
         for element_id_, qois_ in QOI_dict.items():
             update_redis_trusted_values(
                 self.name, element_id_, qoi=qois_, redis_fields=self.redis_fields

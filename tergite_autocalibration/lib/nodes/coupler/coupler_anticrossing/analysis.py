@@ -259,12 +259,11 @@ class ResonatorSpectroscopyVsCurrentCouplerAnalysis(BaseCouplerAnalysis):
         detected_currents = []
         for current in self.dc_currents:
             darray = res_specs_dataarray.sel({self.current_coord: current})
-            real_ds = to_real_dataset(darray.to_dataset())
-            real_ds = real_ds.drop_vars(self.current_coord)
+            ds = darray.to_dataset(promote_attrs=True).drop_vars(self.current_coord)
             freq_analysis = ResonatorSpectroscopyQubitAnalysis(self.name, "")
-            resonator_frequency = freq_analysis.process_qubit(
-                real_ds, self.data_var[1:]
-            ).analysis_result["clock_freqs:readout"]["value"]
+            resonator_frequency = freq_analysis.process_qubit(ds).analysis_result[
+                "clock_freqs:readout"
+            ]["value"]
             detected_frequencies.append(resonator_frequency)
             detected_currents.append(current)
         return detected_frequencies, detected_currents

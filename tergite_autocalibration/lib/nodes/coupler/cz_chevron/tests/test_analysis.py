@@ -21,9 +21,11 @@ from tergite_autocalibration.lib.nodes.coupler.cz_chevron.analysis import (
     CZChevronCouplerAnalysis,
 )
 from tergite_autocalibration.tests.utils.decorators import with_redis
+from tergite_autocalibration.utils.io.dataset import open_dataset
 
-_test_data_dir = os.path.join(Path(__file__).parent, "data")
+_test_data_dir = Path(os.path.join(Path(__file__).parent, "data"))
 _redis_values_0 = os.path.join(_test_data_dir, "data_0", "redis-export-2025-12-21.json")
+_test_data_dir_0 = Path(os.path.join(_test_data_dir, "data_0"))
 
 
 @with_redis(_redis_values_0)
@@ -31,9 +33,8 @@ def test_cz_chevron_analysis_good_data():
     """
     Test whether single coupler analysis outputs right QOIs
     """
-    # Load dataset
-    file_path = os.path.join(_test_data_dir, "data_0", "dataset_cz_chevron_0.hdf5")
-    dataset = xr.open_dataset(file_path)
+    name = "cz_chevron"
+    dataset = open_dataset(name, _test_data_dir_0)
     number_of_working_points = 3
 
     # Run the single coupler analysis
@@ -85,10 +86,9 @@ def test_plotting():
     """
     Test that the plotter produces a faceted figure
     """
-
+    name = "cz_chevron"
     # Load dataset
-    file_path = os.path.join(_test_data_dir, "data_0", "dataset_cz_chevron_0.hdf5")
-    dataset = xr.open_dataset(file_path)
+    dataset = open_dataset(name, _test_data_dir_0)
     number_of_working_points = 3
     figures_dictionary = {}
 

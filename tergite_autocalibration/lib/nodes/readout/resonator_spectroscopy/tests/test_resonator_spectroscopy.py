@@ -16,23 +16,27 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pytest
-import xarray as xr
 
+from tergite_autocalibration.lib.base.utils.analysis_utils import filter_ds_by_element
 from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.analysis import (
     ResonatorSpectroscopyQubitAnalysis,
 )
 from tergite_autocalibration.utils.dto.qoi import QOI
+from tergite_autocalibration.utils.io.dataset import open_dataset
 
 
 class TestResonatorFrequencyAnalysis(unittest.TestCase):
     def test_setup(self):
         test_dir = Path(__file__).parent
-        file_path = test_dir / "data_0" / "dataset_resonator_spectroscopy_0.hdf5"
-        dataset = xr.open_dataset(file_path)
+        file_path = test_dir / "data_0"
+        full_dataset = open_dataset("resonator_spectroscopy_0", file_path)
+        full_dataset["yq06"].attrs.update(element="q06")
+        ds_06 = filter_ds_by_element(full_dataset, "q06")
+
         analysis = ResonatorSpectroscopyQubitAnalysis(
             "name", ["clock_freqs:readout", "Ql", "resonator_minimum"]
         )
-        qoi = analysis.process_qubit(dataset, "yq06")
+        qoi = analysis.process_qubit(ds_06)
         result_values = qoi.analysis_result
 
         self.assertIsInstance(qoi, QOI)
@@ -40,16 +44,19 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
             self.assertIsInstance(result_values[quantity]["value"], float)
         assert (
             len(result_values) == 3
-        ), f"The dataset should contain three elements {len(dataset)}"
+        ), f"The dataset should contain three elements {len(ds_06)}"
 
     def test_run_fitting(self):
         test_dir = Path(__file__).parent
-        file_path = test_dir / "data_0" / "dataset_resonator_spectroscopy_0.hdf5"
-        dataset = xr.open_dataset(file_path)
+        file_path = test_dir / "data_0"
+        full_dataset = open_dataset("resonator_spectroscopy_0", file_path)
+        full_dataset["yq06"].attrs.update(element="q06")
+        ds_06 = filter_ds_by_element(full_dataset, "q06")
+
         analysis = ResonatorSpectroscopyQubitAnalysis(
             "name", ["clock_freqs:readout", "Ql", "resonator_minimum"]
         )
-        qoi = analysis.process_qubit(dataset, "yq06")
+        qoi = analysis.process_qubit(ds_06)
         minimum_freq = qoi.analysis_result["clock_freqs:readout"]["value"]
         fit_Ql = qoi.analysis_result["Ql"]["value"]
         min_freq_data = qoi.analysis_result["resonator_minimum"]["value"]
@@ -65,12 +72,15 @@ class TestResonatorFrequencyAnalysis(unittest.TestCase):
     def test_plotting(self):
         os.environ["DATA_DIR"] = str(Path(__file__).parent / "results")
         test_dir = Path(__file__).parent
-        file_path = test_dir / "data_0" / "dataset_resonator_spectroscopy_0.hdf5"
-        dataset = xr.open_dataset(file_path)
+        file_path = test_dir / "data_0"
+        full_dataset = open_dataset("resonator_spectroscopy_0", file_path)
+        full_dataset["yq06"].attrs.update(element="q06")
+        ds_06 = filter_ds_by_element(full_dataset, "q06")
+
         analysis = ResonatorSpectroscopyQubitAnalysis(
             "name", ["clock_freqs:readout", "Ql", "resonator_minimum"]
         )
-        dataset = analysis.process_qubit(dataset, "yq06")
+        qoi = analysis.process_qubit(ds_06)
         figure_path = os.environ["DATA_DIR"] + "/Resonator_spectroscopy_q06.png"
         if os.path.exists(figure_path):
             os.remove(figure_path)

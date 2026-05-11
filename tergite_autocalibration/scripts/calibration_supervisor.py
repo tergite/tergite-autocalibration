@@ -306,19 +306,22 @@ class NodeManager:
                 f"\u2691\u2691\u2691 {Fore.RED}{Style.BRIGHT}Calibration required for Node {node_name}{Style.RESET_ALL}"
             )
 
-            # Initialize node and update samplespace
-            node = self._initialize_node(node_name)
-            logger.info(f"Calibrating node {node.name}")
-
             # Determine the data path for calibration
             data_path = (
                 CONFIG.run.log_dir
                 if self.config.cluster_mode == MeasurementMode.re_analyse
-                else create_node_data_path(node.name)
+                else create_node_data_path(node_name)
             )
 
+            # Initialize node and update samplespace
+            node = self._initialize_node(node_name)
+
+            node.update_data_path(data_path)
+
+            logger.info(f"Calibrating node {node.name}")
+
             # Perform calibration
-            node.calibrate(data_path, self.config.cluster_mode)
+            node.calibrate(self.config.cluster_mode)
 
         revert_node_parameters(node_name, self.config.qubits, REDIS_CONNECTION)
 

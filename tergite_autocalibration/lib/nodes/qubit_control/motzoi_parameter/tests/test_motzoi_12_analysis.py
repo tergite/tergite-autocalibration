@@ -16,7 +16,6 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-import xarray as xr
 
 from tergite_autocalibration.lib.base.utils.analysis_utils import filter_ds_by_element
 from tergite_autocalibration.lib.nodes.qubit_control.motzoi_parameter.analysis import (
@@ -24,6 +23,7 @@ from tergite_autocalibration.lib.nodes.qubit_control.motzoi_parameter.analysis i
     Motzoi12QubitAnalysis,
 )
 from tergite_autocalibration.tests.utils.decorators import with_redis
+from tergite_autocalibration.utils.io.dataset import open_dataset
 
 _test_data_dir = os.path.join(
     Path(__file__).parent.parent.parent.parent, "data", "single_qubits_run"
@@ -34,29 +34,22 @@ _redis_values = os.path.join(_test_data_dir, "redis-single-qubits-run.json")
 @with_redis(_redis_values)
 def test_motzoi_parameter():
     name = "motzoi_12_parameter"
-    file_path = os.path.join(_test_data_dir, name, f"dataset_{name}.hdf5")
-    full_dataset = xr.open_dataset(file_path)
+    containing_path = os.path.join(_test_data_dir, name)
+    full_dataset = open_dataset(name, containing_path)
     qubit_qois = ["r12:ef_motzoi"]
 
     ds_13 = filter_ds_by_element(full_dataset, "q13")
     ds_15 = filter_ds_by_element(full_dataset, "q15")
 
     analysis = Motzoi12QubitAnalysis(name, qubit_qois)
-    s21 = ds_13.isel(ReIm=0) + 1j * ds_13.isel(ReIm=1)
-    analysis.magnitudes = np.abs(s21)
-    analysis.data_var = "yq13"
-    qoi = analysis.analyse_qubit()
 
+    qoi = analysis.process_qubit(ds_13)
     motzoi_12 = qoi.analysis_result["r12:ef_motzoi"]["value"]
 
     assert qoi.analysis_successful
     assert pytest.approx(motzoi_12) == 0.12
 
-    s21 = ds_15.isel(ReIm=0) + 1j * ds_15.isel(ReIm=1)
-    analysis.magnitudes = np.abs(s21)
-    analysis.data_var = "yq15"
-    qoi = analysis.analyse_qubit()
-
+    qoi = analysis.process_qubit(ds_15)
     motzoi_12 = qoi.analysis_result["r12:ef_motzoi"]["value"]
 
     assert qoi.analysis_successful
@@ -69,10 +62,11 @@ def test_plotting():
     Test that the plotter produces a figure with the right number of axes
     """
     name = "motzoi_12_parameter"
-    file_path = os.path.join(_test_data_dir, name)
+    containing_path = os.path.join(_test_data_dir, name)
+    full_dataset = open_dataset(name, containing_path)
     qubit_qois = ["r12:ef_motzoi"]
 
     analysis = Motzoi12NodeAnalysis(name, qubit_qois)
-    analysis.analyze_node(file_path)
+    analysis.analyze_node(full_dataset)
     number_of_qubits = len(analysis.dataset.attrs["elements"])
     assert analysis.axs.shape == (1, number_of_qubits)

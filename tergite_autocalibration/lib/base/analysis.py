@@ -14,13 +14,8 @@
 # that they have been altered from the originals.
 
 import collections
-import os
 from abc import ABC, abstractmethod
-from pathlib import Path
 from typing import List
-
-import cf_xarray as cf
-import matplotlib.pyplot as plt
 
 # TODO: we should have a conditional import depending on a feature flag here
 import numpy as np
@@ -86,6 +81,7 @@ class BaseNodeAnalysis(ABC):
         self.coords = None
         self.fig = None
         self.axs = None
+        self.figures = []
 
     @property
     def qoi(self) -> "QOI":
@@ -96,7 +92,7 @@ class BaseNodeAnalysis(ABC):
         self._qoi = value
 
     @abstractmethod
-    def analyze_node(self, data_path: Path) -> dict[str, "QOI"]:
+    def analyze_node(self, dataset: xr.Dataset) -> dict[str, QOI]:
         """
         Run the fitting of the analysis function
 
@@ -105,27 +101,6 @@ class BaseNodeAnalysis(ABC):
 
         """
 
-    def open_dataset(self) -> xr.Dataset:
-        """
-        Open the dataset for the analysis.
-
-        Args:
-
-        Returns:
-            xarray.Dataset with measurement results
-
-        """
-        dataset_name = f"dataset_{self.name}.hdf5"
-        dataset_path = os.path.join(self.data_path, dataset_name)
-        if not os.path.exists(dataset_path):
-            raise FileNotFoundError(f"Dataset file not found: {dataset_path}")
-
-        logger.info("Open dataset " + str(dataset_path))
-        dataset = xr.open_dataset(dataset_path)
-        if "working_points" in dataset.coords:
-            dataset = cf.decode_compress_to_multi_index(dataset, "working_points")
-        return dataset
-
     def _manage_plots(self, column_grid: int, plots_per_qubit: int):
         n_vars = len(self.data_vars)
         nrows = int(np.ceil(n_vars / column_grid)) * plots_per_qubit
@@ -133,17 +108,6 @@ class BaseNodeAnalysis(ABC):
 
         fig, axs = create_figure_with_top_band(nrows, ncols)
         return fig, axs
-
-    def _save_plots(self):
-        preview_path = self.data_path / f"{self.name}_preview.png"
-        full_path = self.data_path / f"{self.name}.png"
-        logger.info("Saving Plots")
-        self.fig.savefig(preview_path, bbox_inches="tight", dpi=100)
-        self.fig.savefig(full_path, bbox_inches="tight", dpi=400)
-        logger.info(f"Plots saved to {preview_path} and {full_path}")
-
-    def _save_other_plots(self):
-        pass
 
 
 class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
@@ -166,25 +130,23 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
         self.column_grid = 5
         self.plots_per_qubit = 1
 
-    def analyze_node(self, data_path: Path) -> dict[str, "QOI"]:
+    def analyze_node(self, dataset: xr.Dataset) -> dict[str, QOI]:
         """
         Analyze the node and save the results to redis.
         Args:
-            data_path: Path to the dataset
+            dataset: the full configured result dataset
 
         Returns:
             analysis_results: Dictionary with the analysis results for each qubit
         """
 
-        self.data_path = Path(data_path)
-        self.dataset = self.open_dataset()
+        self.dataset = dataset
         self.coords = self.dataset.coords
         self.data_vars = self.dataset.data_vars
         self.fig, self.axs = self._manage_plots(self.column_grid, self.plots_per_qubit)
         analysis_results = self._analyze_all_qubits()
         self._fill_plots()
-        self._save_plots()
-        self._save_other_plots()
+        self.figures = [self.fig]
         return analysis_results
 
     def _analyze_all_qubits(self):
@@ -201,9 +163,7 @@ class BaseAllQubitsAnalysis(BaseNodeAnalysis, ABC):
             )
 
             partial_ds = filter_ds_by_element(self.dataset, this_qubit)
-            analysis_results[this_qubit] = qubit_analysis.process_qubit(
-                partial_ds, this_qubit
-            )
+            analysis_results[this_qubit] = qubit_analysis.process_qubit(partial_ds)
             self.qubit_analyses.append(qubit_analysis)
 
         return analysis_results
@@ -225,7 +185,7 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
         self.name = name
         self.redis_fields = redis_fields
 
-    def process_qubit(self, dataset, qubit_element) -> "QOI":
+    def process_qubit(self, dataset) -> "QOI":
         """
         Setup the qubit data and analyze it.
         Args:
@@ -236,7 +196,7 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
         """
 
         self.dataset = dataset
-        self.qubit = qubit_element
+        self.qubit = dataset.qubit
         self._set_data_variables()
         self._compute_magnitudes()
         self._qoi = self.analyse_qubit()
@@ -248,8 +208,9 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
         self.data_var = list(self.dataset.data_vars.keys())[0]
 
     def _compute_magnitudes(self):
-        self.S21 = self.dataset.isel(ReIm=0) + 1j * self.dataset.isel(ReIm=1)
-        self.magnitudes = np.abs(self.S21)
+        self.S21 = self.dataset
+        # self.S21 = self.dataset.isel(ReIm=0) + 1j * self.dataset.isel(ReIm=1)
+        self.magnitudes = xr.ufuncs.abs(self.S21)
 
     def plot(self, primary_axis):
         """
@@ -296,7 +257,8 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
         self.coupler = coupler_element
         self.coord = dataset.coords
         self.data_var = list(dataset.data_vars.keys())[0]
-        self.S21 = dataset.isel(ReIm=0) + 1j * dataset.isel(ReIm=1)
+
+        self.S21 = dataset
         # Restore attributes for each variable
         for var in self.S21.data_vars:
             self.S21[var].attrs = dataset[var].attrs
@@ -339,35 +301,35 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
         self.processed_dataset = xr.Dataset()
         self.analysis_keywords = kwargs
 
-    def analyze_node(self, data_path: Path) -> "QOI":
+    def analyze_node(self, dataset: xr.Dataset) -> dict[str, QOI]:
         """
         Analyze the node and save the results to redis.
         Args:
-            data_path: Path to the dataset
-            index: Index of the dataset to be analyzed
+            dataset: the full configured result dataset
 
         Returns:
             analysis_results: Dictionary with the analysis results for each qubit
         """
 
-        self.data_path = Path(data_path)
-        self.dataset = self.open_dataset()
+        self.dataset = dataset
         self.coords = self.dataset.coords
         self.data_vars = self.dataset.data_vars
         analysis_results = self._analyze_all_couplers()
-        self.display_and_save_plots()
+        self.adjust_figures()
         return analysis_results
 
-    def display_and_save_plots(self):
+    def adjust_figures(self):
+        """
+        modify the figures dictionary attributed of the current analysis
+        so the figures have a more standardized appearance
+        """
         # if the dictionary is empty do nothing
         if not self.figures_dictionary:
             return
 
+        self.figures = []
         for coupler, figure_list in self.figures_dictionary.items():
-            for fig_index, fig in enumerate(figure_list):
-                preview_path = (
-                    self.data_path / f"{self.name}_{coupler}_{fig_index}_preview.png"
-                )
+            for fig in figure_list:
                 # this corresponds to faceted plots
                 if fig.axes[0].get_gridspec().get_geometry() == (2, 3):
                     fig.set_size_inches(14, 9)
@@ -383,7 +345,8 @@ class BaseAllCouplersAnalysis(BaseNodeAnalysis, ABC):
 
                 # some slack for the figure x and y labels
                 fig.tight_layout(rect=[0.05, 0.05, 1, 0.98])
-                fig.savefig(preview_path, bbox_inches="tight", dpi=100)
+                # fig.savefig(preview_path, bbox_inches="tight", dpi=100)
+            self.figures += figure_list
 
     def _analyze_all_couplers(self):
         analysis_results = {}
