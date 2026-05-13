@@ -13,106 +13,165 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+import matplotlib.pyplot as plt
 import numpy as np
+import xarray as xr
 
 from tergite_autocalibration.config.globals import REDIS_CONNECTION
 from tergite_autocalibration.lib.base.analysis import (
     BaseAllCouplersAnalysis,
     BaseCouplerAnalysis,
 )
-from tergite_autocalibration.lib.utils.analysis_models import RamseyModel
+from tergite_autocalibration.lib.utils.analysis_models import (
+    RamseyModel,
+    straighten_ramsey_points,
+)
 from tergite_autocalibration.utils.dto.qoi import QOI
 
 
 class ZZCouplingCouplerAnalysis(BaseCouplerAnalysis):
+    model = RamseyModel()
+
     def __init__(self, name, redis_fields, **kwargs):
         super().__init__(name, redis_fields)
         self.active_qubit = kwargs["active_qubit"]
         self.spectator_qubit = kwargs["spectator_qubit"]
 
+    def apply_ramsey_fit(self, data):
+        guess = self.model.guess(data, t=self.active_ramsey_delays)
+        fit = self.model.fit(data, params=guess, t=self.active_ramsey_delays)
+        fitted_detuning = fit.params["frequency"].value
+        return np.array([fitted_detuning])
+
     def _analyse_ramsey(self):
+        active_qubit = self.active_qubit
+        spectator_qubit = self.spectator_qubit
+        ds_coords = self.dataset.coords
         for coord in self.dataset.coords:
+            coord = str(coord)
             if "delay" in coord:
-                self.delay_coord = coord
-                self.ramsey_delays = self.dataset.coords[coord].values
+                if active_qubit in coord:
+                    self.active_delay_coord = coord
+                    self.active_ramsey_delays = ds_coords[coord].values
+                elif spectator_qubit in coord:
+                    self.spectator_delay_coord = coord
+                    self.spectator_ramsey_delays = ds_coords[coord].values
             elif "detuning" in coord:
-                self.detuning_coord = coord
-                self.artificial_detunings = self.dataset.coords[coord].values
+                if active_qubit in coord:
+                    self.active_detuning_coord = coord
+                    self.active_artificial_detunings = ds_coords[coord].values
+                if spectator_qubit in coord:
+                    self.spectator_detuning_coord = coord
+                    self.spectator_artificial_detunings = ds_coords[coord].values
+            elif "states" in coord:
+                self.spectator_states_coord = coord
+
         redis_key = f"transmons:{self.active_qubit}"
         redis_value = REDIS_CONNECTION.hget(f"{redis_key}", "clock_freqs:f01")
-        self.qubit_frequency = float(redis_value)
+        active_qubit_frequency = float(redis_value)
 
-        model = RamseyModel()
-        ramsey_delays = self.dataset.coords[self.delay_coord].values
-        self.fit_ramsey_delays = np.linspace(ramsey_delays[0], ramsey_delays[-1], 400)
+        if self.active_qubit == self.control_qubit:
+            self.active_data_var = self.control_qubit_data_var
+        elif self.active_qubit == self.target_qubit:
+            self.active_data_var = self.target_qubit_data_var
 
-        fitted_detunings = []
-        for indx, detuning in enumerate(self.dataset.coords[self.detuning_coord]):
-            magnitudes = (
-                self.magnitudes[self.data_var].isel({self.detuning_coord: indx}).values
-            )
-
-            # magnitudes = np.array(np.absolute(complex_values.values).flat)
-            guess = model.guess(magnitudes, t=ramsey_delays)
-            fit_result = model.fit(magnitudes, params=guess, t=ramsey_delays)
-            fit_y = model.eval(
-                fit_result.params, **{model.independent_vars[0]: self.fit_ramsey_delays}
-            )
-            fitted_detuning = fit_result.params["frequency"].value
-            fitted_detunings.append(fitted_detuning)
-
-        fitted_detunings = np.array(fitted_detunings)
-
-        complex_points = self.artificial_detunings + 1j * fitted_detunings
-        directions = np.diff(complex_points)
-        angles_of_diffs = np.angle(directions)
-        sins_of_diffs = np.abs(np.sin(angles_of_diffs))
-        index_of_min = np.argmin(sins_of_diffs) + 1
-        self.fitted_detunings = np.concatenate(
-            (fitted_detunings[:index_of_min] * (-1), fitted_detunings[index_of_min:])
+        fitted_detunings = xr.apply_ufunc(
+            self.apply_ramsey_fit,
+            self.active_data_var,
+            input_core_dims=[[self.active_delay_coord]],
+            # the output is a scalar so we pass an empty array to avoid unnessecary out dimensions:
+            output_core_dims=[[]],
+            vectorize=True,
         )
 
-        m, b = np.polyfit(self.artificial_detunings, self.fitted_detunings, 1)
-        self.poly1d_fn = np.poly1d((m, b))
-        self.frequency_correction = -b / m
+        active_fitted_detunings_spec_0 = fitted_detunings.sel(
+            {self.spectator_states_coord: 0}
+        )
+        active_fitted_detunings_spec_1 = fitted_detunings.sel(
+            {self.spectator_states_coord: 1}
+        )
+        self.fitted_detunings_spec_0 = straighten_ramsey_points(
+            self.active_artificial_detunings, active_fitted_detunings_spec_0
+        )
+        self.fitted_detunings_spec_1 = straighten_ramsey_points(
+            self.active_artificial_detunings, active_fitted_detunings_spec_1
+        )
 
-        self.corrected_qubit_frequency = (
-            self.qubit_frequency + self.frequency_correction
+        m, b = np.polyfit(
+            self.active_artificial_detunings, self.fitted_detunings_spec_0, 1
+        )
+        self.poly1d_fn_spec_0 = np.poly1d((m, b))
+        self.frequency_correction_spec_0 = -b / m
+        corrected_qubit_frequency_spec_0 = (
+            active_qubit_frequency + self.frequency_correction_spec_0
+        )
+        m, b = np.polyfit(
+            self.active_artificial_detunings, self.fitted_detunings_spec_1, 1
+        )
+        self.poly1d_fn_spec_1 = np.poly1d((m, b))
+        self.frequency_correction_spec_1 = -b / m
+        corrected_qubit_frequency_spec_1 = (
+            active_qubit_frequency + self.frequency_correction_spec_1
+        )
+
+        self.zz_coupling = (
+            corrected_qubit_frequency_spec_1 - corrected_qubit_frequency_spec_0
         )
 
     def analyze_coupler(self):
         self._analyse_ramsey()
 
         analysis_successful = True
-        analysis_result = {
-            self.redis_field: {
-                "value": self.corrected_qubit_frequency,
-                "error": 0,
-            }
-        }
+        analysis_result = {"zz_coupling": {"value": self.zz_coupling, "error": 0}}
 
         qoi = QOI(analysis_result, analysis_successful)
 
         return qoi
 
-    def plotter(self, ax):
-        ax.plot(self.artificial_detunings, self.fitted_detunings, "bo", ms=5.0)
-        ax.axvline(
-            self.frequency_correction,
-            color="red",
-            label=f"correction: {int(self.frequency_correction) / 1e3} kHz",
+    def plotter(self, figures_dictionary):
+        fig, axs = plt.subplots(ncols=2)
+        axs[0].plot(
+            self.active_artificial_detunings, self.fitted_detunings_spec_0, "bo", ms=5.0
         )
-        ax.plot(
-            self.artificial_detunings,
-            self.poly1d_fn(self.artificial_detunings),
+        axs[0].axvline(
+            self.frequency_correction_spec_0,
+            color="red",
+            label=f"correction: {int(self.frequency_correction_spec_0) / 1e3} kHz",
+        )
+        axs[0].plot(
+            self.active_artificial_detunings,
+            self.poly1d_fn_spec_0(self.active_artificial_detunings),
             "--b",
             lw=1,
         )
-        ax.axvline(0, color="black", lw=1)
-        ax.set_xlabel("Artificial detuning (Hz)")
-        ax.set_ylabel("Fitted detuning (Hz)")
+        axs[0].axvline(0, color="black", lw=1)
+        axs[0].set_xlabel("Artificial detuning (Hz)")
+        axs[0].set_ylabel("Fitted detuning (Hz)")
 
-        ax.grid()
+        axs[0].grid()
+
+        axs[1].plot(
+            self.active_artificial_detunings, self.fitted_detunings_spec_1, "bo", ms=5.0
+        )
+        axs[1].axvline(
+            self.frequency_correction_spec_1,
+            color="red",
+            label=f"correction: {int(self.frequency_correction_spec_1) / 1e3} kHz",
+        )
+        axs[1].plot(
+            self.active_artificial_detunings,
+            self.poly1d_fn_spec_1(self.active_artificial_detunings),
+            "--b",
+            lw=1,
+        )
+        axs[1].axvline(0, color="black", lw=1)
+        axs[1].set_xlabel("Artificial detuning (Hz)")
+        axs[1].set_ylabel("Fitted detuning (Hz)")
+
+        axs[1].grid()
+
+        figures_dictionary[self.coupler] = [fig]
+        plt.show()
 
 
 class ZZCouplingNodeAnalysis(BaseAllCouplersAnalysis):

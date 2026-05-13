@@ -256,13 +256,12 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
         self.dataset = dataset
         self.coupler = coupler_element
         self.coord = dataset.coords
-        self.data_var = list(dataset.data_vars.keys())[0]
 
         self.S21 = dataset
         # Restore attributes for each variable
         for var in self.S21.data_vars:
             self.S21[var].attrs = dataset[var].attrs
-        self.magnitudes = np.abs(self.S21)
+        # self.magnitudes = np.abs(self.S21)
 
         for var in self.S21.data_vars:
             data_var = self.S21[var]

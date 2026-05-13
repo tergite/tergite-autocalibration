@@ -35,11 +35,7 @@ class CZCalibrationCouplerAnalysis(BaseCouplerAnalysis):
 
     def apply_sine_fit(self, data):
         guess = self.model.guess(data, x=self.target_phases)
-        fit = self.model.fit(
-            data,
-            params=guess,
-            x=self.target_phases,
-        )
+        fit = self.model.fit(data, params=guess, x=self.target_phases)
         phase = fit.values["phase"]
         fit_data = self.model.eval(fit.params, x=self.fit_plot_phases)
         return np.array([phase]), np.array([fit_data])
