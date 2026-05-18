@@ -15,6 +15,8 @@ import os
 from datetime import datetime
 from pathlib import Path
 
+import toml
+
 
 def folders_containing_pngs(inter_path: Path) -> list:
     """
@@ -61,7 +63,9 @@ def date_data_folders(data_directory: Path):
     return date_folders
 
 
-def collect_valid_chains(outer_path, filter_text: str = "") -> dict:
+def collect_valid_chains(
+    outer_path, node_filter_text: str = "", element_filter_text: str = ""
+) -> dict:
     """
     A valid chain is a folder that contains (measurement) folders
     each having at least one png image
@@ -69,11 +73,22 @@ def collect_valid_chains(outer_path, filter_text: str = "") -> dict:
     valid_intermediates = {}
     for inter in os.listdir(outer_path):
         inter_path = Path(os.path.join(outer_path, inter))
+        run_config_path = os.path.join(inter_path, "configs", "run_config.toml")
+        if not os.path.exists(run_config_path):
+            continue
+        run_config = toml.load(run_config_path)
+        qubits = run_config["qubits"]
+        couplers = run_config["couplers"]
+        elements = qubits + couplers
+        if element_filter_text and not element_filter_text in elements:
+            continue
         if os.path.isdir(inter_path):
             valid_inners = folders_containing_pngs(inter_path)
-            # and filter_text.lower() in inner.lower()
+
             filtered_valid_inners = [
-                inner for inner in valid_inners if filter_text.lower() in inner.lower()
+                inner
+                for inner in valid_inners
+                if node_filter_text.lower() in inner.lower()
             ]
             if filtered_valid_inners:
                 valid_intermediates[inter] = valid_inners
@@ -81,7 +96,9 @@ def collect_valid_chains(outer_path, filter_text: str = "") -> dict:
     return valid_intermediates
 
 
-def scan_folders(data_directory: Path, filter_text: str = "") -> dict[str, dict]:
+def scan_folders(
+    data_directory: Path, filter_text: str = "", element_filter_text: str = ""
+) -> dict[str, dict]:
     """
     scan the whole data directory for valid measurements, i.e.
     measurements that have produced png images
@@ -92,7 +109,11 @@ def scan_folders(data_directory: Path, filter_text: str = "") -> dict[str, dict]
     for _, outer in outer_folders:
 
         outer_path = os.path.join(data_directory, outer)
-        valid_intermediates = collect_valid_chains(outer_path, filter_text=filter_text)
+        valid_intermediates = collect_valid_chains(
+            outer_path,
+            node_filter_text=filter_text,
+            element_filter_text=element_filter_text,
+        )
 
         if valid_intermediates:
             sorted_valid_intermediates = {
