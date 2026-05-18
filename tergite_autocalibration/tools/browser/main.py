@@ -71,7 +71,7 @@ app.layout = html.Div(
         dbc.Tooltip(
             "For example if the node rabi_12_oscillations is looked for, strings like rabi_12 or 12_osc suffice.",
             target="text-input",
-            placement="right",
+            placement="bottom",
         ),
         html.Div(
             id="filter-confirmation", style={"marginTop": "10px", "color": "green"}

@@ -84,7 +84,8 @@ def collect_valid_chains(outer_path, filter_text: str = "") -> dict:
 def scan_folders(data_directory: Path, filter_text: str = "") -> dict[str, dict]:
     """
     scan the whole data directory for valid measurements, i.e.
-    measurements that have produced png images
+    measurements that have produced png images. If filter  strings are provided
+    the filtered folders will respect the filters.
     """
     folder_data = {}
     outer_folders = date_data_folders(data_directory)
