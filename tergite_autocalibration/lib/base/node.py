@@ -117,20 +117,16 @@ class BaseNode(ABC):
         return dataset
 
     def calibrate(self, measurement_mode):
-        if measurement_mode != MeasurementMode.re_analyse:
-            # explicitly create folder for the measurement.
-            # contains the hdf5 dataset, the QOI json and the png figures
-            self.data_path.mkdir(parents=True, exist_ok=True)
-            result_dataset = self.measure_node(measurement_mode)
-        else:
-            result_dataset = open_dataset(self.name, self.data_path)
+        # explicitly create folder for the measurement.
+        # contains the hdf5 dataset, the QOI json and the png figures
+        self.data_path.mkdir(parents=True, exist_ok=True)
+        result_dataset = self.measure_node(measurement_mode)
 
         QOI_dict = self.post_process(result_dataset)
         # TODO: do we need to save in re analyze mode?
-        if measurement_mode != MeasurementMode.re_analyse:
-            save_dataset(result_dataset, self.name, self.data_path)
-            save_qoi(QOI_dict, self.name, self.data_path)
-            save_serial_device(self.device, self.data_path)
+        save_dataset(result_dataset, self.name, self.data_path)
+        save_qoi(QOI_dict, self.name, self.data_path)
+        save_serial_device(self.device, self.data_path)
         # After the measurement free the device resources
         close_device_resources(self.device)
         logger.info("analysis completed")

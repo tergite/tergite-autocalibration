@@ -20,6 +20,7 @@
 import os
 from dataclasses import dataclass, field
 from ipaddress import IPv4Address
+from pathlib import Path
 from types import MappingProxyType
 from typing import FrozenSet, List, Union
 
@@ -48,7 +49,7 @@ from tergite_autocalibration.utils.backend.redis_utils import (
 )
 from tergite_autocalibration.utils.dto.enums import DataStatus, MeasurementMode
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
-from tergite_autocalibration.utils.io.dataset import create_node_data_path
+from tergite_autocalibration.utils.io.dataset import create_node_data_path, open_dataset
 from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.utils.logging.visuals import draw_arrow_chart
 
@@ -444,8 +445,11 @@ class CalibrationSupervisor:
 
         target_node = self.config.target_node_name
         node = self.node_manager._initialize_node(target_node)
+        rerun_path = Path(CONFIG.run.log_dir)
+        node.update_data_path(rerun_path)
         logger.status(
             f"Analysing '{self.config.target_node_name}' with {node.analysis_obj.__name__}"
         )
-        node.post_process(CONFIG.run.log_dir)
+        result_dataset = open_dataset(target_node, rerun_path)
+        node.post_process(result_dataset)
         logger.status("Analysis completed.")
