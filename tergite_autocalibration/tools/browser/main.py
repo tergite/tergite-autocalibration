@@ -229,8 +229,11 @@ def refresh_folder_structure(
 
     Args:
         n_clicks: Unused
-        filter_text: User provided string.
+        node_filter_text: User provided string.
                      Only measurement folders containing this string are regarded valid.
+        element_filter_text: User provided string.
+                     Only measurement folders where the device json contains thisi string
+                     are regarded valid.
 
     Returns:
 
