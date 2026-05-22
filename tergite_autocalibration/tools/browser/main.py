@@ -58,7 +58,7 @@ app.layout = html.Div(
             id="text-input",
             type="text",
             debounce=True,  # triggers callback only on blur or Enter
-            placeholder="Enter string for filtering",
+            placeholder="Enter node name for filtering",
             style=styles.node_filter_button_style,
         ),
         dcc.Input(
@@ -71,7 +71,12 @@ app.layout = html.Div(
         dbc.Tooltip(
             "For example if the node rabi_12_oscillations is looked for, strings like rabi_12 or 12_osc suffice.",
             target="text-input",
-            placement="bottom",
+            placement="bottom-end",
+        ),
+        dbc.Tooltip(
+            "For example q05 or q11_q12",
+            target="element-input",
+            placement="bottom-end",
         ),
         html.Div(
             id="filter-confirmation", style={"marginTop": "10px", "color": "green"}
