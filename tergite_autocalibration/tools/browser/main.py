@@ -27,8 +27,7 @@ from dash_renderjson import DashRenderjson
 
 import tergite_autocalibration.tools.browser.styles as styles
 from tergite_autocalibration.config.globals import DATA_DIR
-from tergite_autocalibration.tools.browser.layout import \
-    generate_selection_layout
+from tergite_autocalibration.tools.browser.layout import generate_selection_layout
 from tergite_autocalibration.tools.browser.utils import scan_folders
 
 folder_structure = scan_folders(DATA_DIR)
@@ -222,7 +221,9 @@ def star_selected(n_clicks, outer_selected, interm_selected, inner_selected, sta
     Input("element-input", "value"),
     prevent_initial_call=True,
 )
-def refresh_folder_structure(n_clicks: int, node_filter_text: str, element_filter_text:str):
+def refresh_folder_structure(
+    n_clicks: int, node_filter_text: str, element_filter_text: str
+):
     """
     Callback to refresh the outer folder structure
 
@@ -240,14 +241,13 @@ def refresh_folder_structure(n_clicks: int, node_filter_text: str, element_filte
     if triggered_id == "refresh-button" and not node_filter_text:
         return scan_folders(DATA_DIR), ""
 
-
     # If triggered by text input and input is not empty
     if triggered_id == "text-input" or triggered_id == "element-input":
         # Case 1: Empty text -> reload original structure
         if not node_filter_text.strip() and not element_filter_text.strip():
             return scan_folders(DATA_DIR), "Filter cleared. Showing all folders"
 
-        element_filter_message = ' for element: ' if element_filter_text else ''
+        element_filter_message = " for element: " if element_filter_text else ""
         element_filter_text = str(element_filter_text or "")
         filter_text = str(node_filter_text or "")
         # Case 2: Text input filters the intermediate folders
@@ -258,10 +258,22 @@ def refresh_folder_structure(n_clicks: int, node_filter_text: str, element_filte
             element_filter_text, style={"color": "blue", "fontWeight": "bold"}
         )
         confirmation_message = html.Div(
-            ["Filter applied: ", styled_filter_text, element_filter_message, styled_filter_element],
+            [
+                "Filter applied: ",
+                styled_filter_text,
+                element_filter_message,
+                styled_filter_element,
+            ],
             style={"marginTop": "10px"},
         )
-        return (scan_folders(DATA_DIR, filter_text=node_filter_text, element_filter_text=element_filter_text), confirmation_message)
+        return (
+            scan_folders(
+                DATA_DIR,
+                filter_text=node_filter_text,
+                element_filter_text=element_filter_text,
+            ),
+            confirmation_message,
+        )
 
     raise dash.exceptions.PreventUpdate
 
