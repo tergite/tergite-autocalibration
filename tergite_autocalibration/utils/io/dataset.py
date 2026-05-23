@@ -155,6 +155,7 @@ def save_qoi(QOI_dict: dict[str, QOI], node_name: str, data_path: Path) -> None:
 
 def save_figures(figures_list: list, node_name: str, data_path: Path):
     # TODO: as is, it doesn't support multiple couplers
+    # TODO: pass the figures dict instead
     logger.info("Saving Plots")
     for fig_index, fig in enumerate(figures_list):
         node_name_stem = (
