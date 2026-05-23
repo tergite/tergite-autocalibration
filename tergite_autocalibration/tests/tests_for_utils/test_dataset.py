@@ -212,6 +212,18 @@ def test_open_dataset():
     assert full_dataset["yq07"].size == 51000
 
 
+def test_open_dataset_with_working_points():
+    name = "cz_calibration"
+    run_dir = Path(os.path.join(get_fixture_path(), "data", f"21-39-55_cz_rb-SUCCESS"))
+    measurement_file = f"20260303-214554-517-258f2d-{name}"
+    containing_folder = Path(os.path.join(run_dir, measurement_file))
+    full_dataset = open_dataset(name, containing_folder)
+    assert full_dataset.coords["working_points"].size == 15
+    assert full_dataset.coords["working_points"].values[0] == pytest.approx(
+        (716786296.0, 2.04e-07)
+    )
+
+
 def test_save_dataset(tmp_path):
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
     node = ResonatorSpectroscopyNode(CONFIG.run.qubits, CONFIG.run.couplers)

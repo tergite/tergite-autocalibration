@@ -96,6 +96,8 @@ def open_dataset(name: str, containing_folder_path: Path) -> xarray.Dataset:
 
     logger.info("Open dataset " + str(dataset_path))
     real_ds = xarray.open_dataset(dataset_path)
+    if "working_points" in real_ds.coords:
+        real_ds = cf.decode_compress_to_multi_index(real_ds, "working_points")
     complex_ds = real_ds.isel(ReIm=0) + 1j * real_ds.isel(ReIm=1)
     for var in real_ds.data_vars:
         attrs = real_ds.data_vars[var].attrs
