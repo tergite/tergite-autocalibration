@@ -31,7 +31,6 @@ _redis_values = os.path.join(_test_data_dir, "redis-coupler-run-2026-02.json")
 def test_cz_calibration_success():
     name = "cz_calibration"
     dataset = open_dataset(name, _test_data_dir)
-    dataset = cf.decode_compress_to_multi_index(dataset, "working_points")
 
     analysis = CZCalibrationCouplerAnalysis(
         "cz_calibration",
@@ -53,7 +52,6 @@ def test_cz_calibration_success():
 def test_decode_multi_index():
     name = "cz_calibration"
     dataset = open_dataset(name, _test_data_dir)
-    dataset = cf.decode_compress_to_multi_index(dataset, "working_points")
 
     assert "l1" in dataset.working_points.coords
     assert "l2" in dataset.working_points.coords
@@ -68,7 +66,6 @@ def test_plotting():
     """
     name = "cz_calibration"
     dataset = open_dataset(name, _test_data_dir)
-    dataset = cf.decode_compress_to_multi_index(dataset, "working_points")
 
     analysis = CZCalibrationCouplerAnalysis(
         "cz_calibration",
