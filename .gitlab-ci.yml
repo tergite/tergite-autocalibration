@@ -165,7 +165,7 @@ application_run:
     - ls -lR venv/lib/python3.12/site-packages/out
     # Verify output
     - |
-      if ls -lR venv/lib/python3.12/site-packages/out | grep -q "cz_rb_q13_q14_0_preview.png"; then
+      if ls -lR venv/lib/python3.12/site-packages/out | grep -q "cz_rb_preview.png"; then
         echo "Output file $OUTPUT_FILE exists. Application ran successfully."
       else
         echo "Error: Output file $OUTPUT_FILE not found."

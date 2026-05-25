@@ -17,16 +17,17 @@ from collections import namedtuple
 import lmfit
 import numpy as np
 from lmfit.model import Model
-from quantify_core.analysis.fitting_models import (exp_damp_osc_func,
-                                                   fft_freq_phase_guess)
+from quantify_core.analysis.fitting_models import (
+    exp_damp_osc_func,
+    fft_freq_phase_guess,
+)
 from scipy.ndimage import median
 from scipy.optimize import minimize
 from scipy.signal import find_peaks
 from scipy.stats import median_abs_deviation
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
-from tergite_autocalibration.lib.utils.functions import \
-    exponential_decay_function
+from tergite_autocalibration.lib.utils.functions import exponential_decay_function
 
 
 def resonator_hanger_frequency(
@@ -316,12 +317,12 @@ def coupler_frequency_function(
     I0: float,
     offset: float,
 ) -> float:
-    '''
+    """
     the frequency of the coupler in terms of the applied bias current.
     Args:
     Ic: the current that gives maximum frequency
     I0: current corresponding to one quantum of flux
-    '''
+    """
     return fmax * np.sqrt(np.abs(np.cos((current - Ic) / I0 * np.pi))) + offset
 
 
@@ -354,13 +355,19 @@ class CouplerModel(lmfit.model.Model):
         return lmfit.models.update_param_vals(params, self.prefix, **kws)
 
 
-
-class CouplingModel():
+class CouplingModel:
     """
-    Model to find the coupling strength g between a tunable transmon and a 
+    Model to find the coupling strength g between a tunable transmon and a
     fixed frequency transmon.
     """
-    def __init__(self,fixed_qubit_frequency:float , coupler_model: lmfit.model.ModelResult, data_dc_currents, data_frequencies):
+
+    def __init__(
+        self,
+        fixed_qubit_frequency: float,
+        coupler_model: lmfit.model.ModelResult,
+        data_dc_currents,
+        data_frequencies,
+    ):
         self.fixed_qubit_frequency = fixed_qubit_frequency
         self.coupler_model = coupler_model
         self.data_dc_currents = data_dc_currents
@@ -387,7 +394,7 @@ class CouplingModel():
         qubit_freqs_minus = anal_freq_minus[qubit_positions_minus]
         dc_currents_minus = dc_currents[qubit_positions_minus]
 
-        valid_positions = np.logical_or(qubit_positions_plus , qubit_positions_minus)
+        valid_positions = np.logical_or(qubit_positions_plus, qubit_positions_minus)
         valid_data_frequencies = self.data_frequencies[valid_positions]
 
         plus_values = list(zip(dc_currents_plus, qubit_freqs_plus))
@@ -406,7 +413,8 @@ class CouplingModel():
 
     @property
     def coupling_g(self):
-        return minimize(self.cost_function, x0=50e6, method='Nelder-Mead')
+        return minimize(self.cost_function, x0=50e6, method="Nelder-Mead")
+
 
 
 def straighten_ramsey_points(artificial_detunings: np.ndarray, fitted_detunings: np.ndarray) -> np.ndarray:
