@@ -52,7 +52,7 @@ pi_pulse_motzoi = -0.05384615384615388
 pulse_type = "Gaussian"
 pulse_sigma = 0.0
 t1_decoherence = 63.39282543781701
-t2_decoherence = 7.486213589808061
+t2_decoherence = 11.620495475043516
 
 [[calibration_config.qubit]]
 id = "q12"
@@ -63,7 +63,7 @@ pi_pulse_motzoi = 0.02307692307692305
 pulse_type = "Gaussian"
 pulse_sigma = 0.0
 t1_decoherence = 86.61716166660516
-t2_decoherence = 20.27724290001215
+t2_decoherence = 26.53776031990094
 
 [[calibration_config.readout_resonator]]
 id = "q11"
