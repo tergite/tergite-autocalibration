@@ -127,7 +127,7 @@ class BaseNode(ABC):
         save_dataset(result_dataset, self.name, self.data_path)
         save_qoi(QOI_dict, self.name, self.data_path)
         save_serial_device(self.device, self.data_path)
-        # After the measurement free the device resources
+        # After the measurement free the device resources:
         close_device_resources(self.device)
         logger.info("analysis completed")
 

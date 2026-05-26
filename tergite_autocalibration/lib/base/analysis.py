@@ -261,7 +261,6 @@ class BaseCouplerAnalysis(BaseAnalysis, ABC):
         # Restore attributes for each variable
         for var in self.S21.data_vars:
             self.S21[var].attrs = dataset[var].attrs
-        # self.magnitudes = np.abs(self.S21)
 
         for var in self.S21.data_vars:
             data_var = self.S21[var]

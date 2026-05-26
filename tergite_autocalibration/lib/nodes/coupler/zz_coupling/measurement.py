@@ -86,10 +86,11 @@ class ZZCouplingMeasurement(BaseMeasurement):
 
             art_detunings_values = artificial_detunings[active_qubit]
             ramsey_delays_values = ramsey_delays[active_qubit]
+            spectator_state_values = spectator_states[this_coupler]
             number_of_inners = len(ramsey_delays_values)
             number_of_intermediates = len(art_detunings_values)
 
-            for outer_index, spectator_state in enumerate(spectator_states):
+            for outer_index, spectator_state in enumerate(spectator_state_values):
                 # The intermediate loop, iterates over all detunings
                 for intermediate_index, detuning in enumerate(art_detunings_values):
                     # The inner for loop iterates over all delays
@@ -107,6 +108,10 @@ class ZZCouplingMeasurement(BaseMeasurement):
                             schedule.add(IdlePulse(mw_pulse_duration))
                         elif spectator_state == 1:
                             schedule.add(X(spectator_qubit))
+                        else:
+                            raise ValueError(
+                                f"Spectator state must be 0 or 1. Received {spectator_state}"
+                            )
 
                         schedule.add(X90(active_qubit))
 

@@ -15,10 +15,10 @@ import numpy as np
 import xarray as xr
 
 from tergite_autocalibration.lib.base.node import CouplerNode
-from tergite_autocalibration.lib.nodes.coupler.cz_static_zz.analysis import (
+from tergite_autocalibration.lib.nodes.coupler.zz_coupling.analysis import (
     ZZCouplingNodeAnalysis,
 )
-from tergite_autocalibration.lib.nodes.coupler.cz_static_zz.measurement import (
+from tergite_autocalibration.lib.nodes.coupler.zz_coupling.measurement import (
     ZZCouplingMeasurement,
 )
 from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
@@ -44,7 +44,7 @@ class ZZCouplingNode(CouplerNode):
         self.validate()
 
         self.schedule_keywords["coupler_dict"] = self.qubit_types()
-        self.analysis_keywords = self.qubit_types() 
+        self.analysis_keywords = self.qubit_types()
 
         self.schedule_samplespace = {
             "ramsey_delays": {

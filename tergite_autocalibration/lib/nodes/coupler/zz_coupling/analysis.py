@@ -71,9 +71,9 @@ class ZZCouplingCouplerAnalysis(BaseCouplerAnalysis):
         active_qubit_frequency = float(redis_value)
 
         if self.active_qubit == self.control_qubit:
-            self.active_data_var = self.control_qubit_data_var
+            self.active_data_var = np.abs(self.control_qubit_data_var)
         elif self.active_qubit == self.target_qubit:
-            self.active_data_var = self.target_qubit_data_var
+            self.active_data_var = np.abs(self.target_qubit_data_var)
 
         fitted_detunings = xr.apply_ufunc(
             self.apply_ramsey_fit,
@@ -102,7 +102,7 @@ class ZZCouplingCouplerAnalysis(BaseCouplerAnalysis):
         )
         self.poly1d_fn_spec_0 = np.poly1d((m, b))
         self.frequency_correction_spec_0 = -b / m
-        corrected_qubit_frequency_spec_0 = (
+        self.corrected_qubit_frequency_spec_0 = (
             active_qubit_frequency + self.frequency_correction_spec_0
         )
         m, b = np.polyfit(
@@ -110,13 +110,15 @@ class ZZCouplingCouplerAnalysis(BaseCouplerAnalysis):
         )
         self.poly1d_fn_spec_1 = np.poly1d((m, b))
         self.frequency_correction_spec_1 = -b / m
-        corrected_qubit_frequency_spec_1 = (
+        self.corrected_qubit_frequency_spec_1 = (
             active_qubit_frequency + self.frequency_correction_spec_1
         )
 
         self.zz_coupling = (
-            corrected_qubit_frequency_spec_1 - corrected_qubit_frequency_spec_0
+            self.corrected_qubit_frequency_spec_1
+            - self.corrected_qubit_frequency_spec_0
         )
+        print(f"{ self.zz_coupling = }")
 
     def analyze_coupler(self):
         self._analyse_ramsey()
@@ -136,7 +138,7 @@ class ZZCouplingCouplerAnalysis(BaseCouplerAnalysis):
         axs[0].axvline(
             self.frequency_correction_spec_0,
             color="red",
-            label=f"correction: {int(self.frequency_correction_spec_0) / 1e3} kHz",
+            label=rf"{self.active_qubit} f01: {int(self.corrected_qubit_frequency_spec_0) / 1e6:.4f} MHz",
         )
         axs[0].plot(
             self.active_artificial_detunings,
@@ -148,7 +150,9 @@ class ZZCouplingCouplerAnalysis(BaseCouplerAnalysis):
         axs[0].set_xlabel("Artificial detuning (Hz)")
         axs[0].set_ylabel("Fitted detuning (Hz)")
 
+        axs[0].set_title(rf"spectator {self.spectator_qubit} at $|0\rangle$")
         axs[0].grid()
+        axs[0].legend()
 
         axs[1].plot(
             self.active_artificial_detunings, self.fitted_detunings_spec_1, "bo", ms=5.0
@@ -156,7 +160,7 @@ class ZZCouplingCouplerAnalysis(BaseCouplerAnalysis):
         axs[1].axvline(
             self.frequency_correction_spec_1,
             color="red",
-            label=f"correction: {int(self.frequency_correction_spec_1) / 1e3} kHz",
+            label=rf"{self.active_qubit} f01: {int(self.corrected_qubit_frequency_spec_1) / 1e6:.4f} MHz",
         )
         axs[1].plot(
             self.active_artificial_detunings,
@@ -168,10 +172,11 @@ class ZZCouplingCouplerAnalysis(BaseCouplerAnalysis):
         axs[1].set_xlabel("Artificial detuning (Hz)")
         axs[1].set_ylabel("Fitted detuning (Hz)")
 
+        axs[1].set_title(rf"spectator {self.spectator_qubit} at $|1\rangle$")
         axs[1].grid()
+        axs[1].legend()
 
         figures_dictionary[self.coupler] = [fig]
-        plt.show()
 
 
 class ZZCouplingNodeAnalysis(BaseAllCouplersAnalysis):
