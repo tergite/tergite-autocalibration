@@ -209,7 +209,6 @@ class BaseQubitAnalysis(BaseAnalysis, ABC):
 
     def _compute_magnitudes(self):
         self.S21 = self.dataset
-        # self.S21 = self.dataset.isel(ReIm=0) + 1j * self.dataset.isel(ReIm=1)
         self.magnitudes = xr.ufuncs.abs(self.S21)
 
     def plot(self, primary_axis):
