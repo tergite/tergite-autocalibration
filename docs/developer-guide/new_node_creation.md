@@ -250,9 +250,9 @@ For implementation details, refer to the [Node types section](node_classes.md).
 ### The dataset structure
 
 The configured dataset that each analysis class expects, reflects the structure of the samplespace of the node,
-and contains some important meta information about the measurement
+and contains some important meta information about the measurement.
 
-Assume the measurement samplespace:
+Let's take thi measurement samplespace:
 ```
 samplespace = {
     'frequencies' : {
@@ -269,7 +269,7 @@ samplespace = {
 }
 ```
 
-The configured dataset will have the following structre:
+The configured dataset will have the following structure:
 
 ```
 Dimensions:     ( frequenciesq13: 20, amplitudesq13: 5, frequenciesq14: 20, amplitudesq14: 5, currentsq13_q14: 10)
@@ -289,7 +289,7 @@ Attributes:
 ```
 
 
-* Each settable + element combination (eg 'frequenciesq' + 'q14') creates a unique dimension with coordinates the corresponding values.
+* Each settable + element combination (eg 'frequencies' + 'q14') creates a unique dimension with coordinates the corresponding values.
 * Each measurement channel (defined at each measurement schedule) creates a unique Data variable, prepended with 'y'
 * Each dataset is equiped with the global attributes:
     - elements: the elements (qubits or couplers) that the node examines
