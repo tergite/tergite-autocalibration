@@ -117,7 +117,7 @@ class BaseNode(ABC):
         return dataset
 
     def calibrate(self, measurement_mode):
-        # explicitly create folder for the measurement.
+        # explicitly create the folder for the measurement.
         # contains the hdf5 dataset, the QOI json and the png figures
         self.data_path.mkdir(parents=True, exist_ok=True)
         result_dataset = self.measure_node(measurement_mode)

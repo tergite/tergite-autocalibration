@@ -11,9 +11,6 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import os
-from pathlib import Path
-
 from tergite_autocalibration.lib.base.node import CouplerNode
 from tergite_autocalibration.lib.nodes.coupler.zz_coupling.analysis import (
     ZZCouplingNodeAnalysis,
@@ -23,21 +20,15 @@ from tergite_autocalibration.lib.nodes.coupler.zz_coupling.measurement import (
 )
 from tergite_autocalibration.lib.nodes.coupler.zz_coupling.node import ZZCouplingNode
 from tergite_autocalibration.lib.nodes.schedule_node import ScheduleNode
-from tergite_autocalibration.tests.utils.decorators import with_redis
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
 
-# _test_data_dir = os.path.join(Path(__file__).parent, "data")
-# _redis_values_path = os.path.join(_test_data_dir, "redis-2026-02-06-18.json")
 
-
-@with_redis(_redis_values_path)
 def test_node_creation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
     node = ZZCouplingNode(all_qubits=["q13", "q14"], couplers=["q13_q14"])
     assert isinstance(node, CouplerNode)
 
 
-@with_redis(_redis_values_path)
 def test_class_attribute_objects():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
     node = ZZCouplingNode(all_qubits=["q13", "q14"], couplers=["q13_q14"])
@@ -46,7 +37,19 @@ def test_class_attribute_objects():
     assert issubclass(node.measurement_type, ScheduleNode)
 
 
-@with_redis(_redis_values_path)
+def test_qubit_types():
+    ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
+    node = ZZCouplingNode(
+        all_qubits=["q12", "q13", "q14", "q15"], couplers=["q12_q13", "q14_q15"]
+    )
+
+    qubit_types_dict = node.qubit_types()
+    assert qubit_types_dict["q12_q13"]["active_qubit"] == "q12"
+    assert qubit_types_dict["q12_q13"]["spectator_qubit"] == "q13"
+    assert qubit_types_dict["q14_q15"]["active_qubit"] == "q14"
+    assert qubit_types_dict["q14_q15"]["spectator_qubit"] == "q15"
+
+
 def test_dummy_generation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
 
@@ -64,4 +67,4 @@ def test_dummy_generation():
     data_vars = dummy_dataset.data_vars
 
     assert len(data_vars) == 2 * len(couplers)
-    assert data_vars[0].size == samples * node.loops
+    assert data_vars[0].size == samples

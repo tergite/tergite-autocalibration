@@ -61,7 +61,7 @@ class ZZCouplingNode(CouplerNode):
     def qubit_types(self) -> dict[str, dict]:
         qubit_types_dict = {}
         for coupler in self.couplers:
-            # NOTE: as is the, the convention is that the first qubit is active
+            # NOTE: as is, the convention is that the first qubit is active
             # and the second is spectator
             active_qubit, spectator_qubit = coupler.split("_")
             qubit_types_dict[coupler] = {
@@ -76,10 +76,14 @@ class ZZCouplingNode(CouplerNode):
     def generate_dummy_dataset(self, noise=False):
         dataset = xr.Dataset()
         real_detuning = 200e3
+        noise_scale = 0.02
         first_qubit = self.all_qubits[0]
         first_coupler = self.couplers[0]
         detunings = self.schedule_samplespace["artificial_detunings"][first_qubit]
         spectator_states = self.schedule_samplespace["spectator_states"][first_coupler]
+        samples = self.schedule_samplespace["ramsey_delays"][first_qubit]
+        number_of_samples = len(samples)
+        delays = np.linspace(samples[0], samples[-1], number_of_samples)
         for index, _ in enumerate(self.all_qubits):
             data_array = np.array([])
             for spectator_state in spectator_states:
@@ -93,10 +97,6 @@ class ZZCouplingNode(CouplerNode):
                         offset=0,
                     )
                     np.random.seed(123)
-                    noise_scale = 0.02
-                    samples = self.schedule_samplespace["ramsey_delays"][first_qubit]
-                    number_of_samples = len(samples)
-                    delays = np.linspace(samples[0], samples[-1], number_of_samples)
                     true_s21 = ramsey_model.eval(params=true_params, t=delays)
 
                     noise_s21 = noise_scale * (

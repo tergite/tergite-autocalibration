@@ -15,33 +15,33 @@ import os
 from pathlib import Path
 
 import pytest
-from tergite_autocalibration.utils.io.dataset import open_dataset
 
 from tergite_autocalibration.lib.nodes.coupler.cz_local_phases.analysis import (
     CZLocalPhasesCouplerAnalysis,
 )
+from tergite_autocalibration.lib.nodes.coupler.zz_coupling.analysis import (
+    ZZCouplingCouplerAnalysis,
+)
 from tergite_autocalibration.tests.utils.decorators import with_redis
+from tergite_autocalibration.utils.io.dataset import open_dataset
 
-_test_data_dir = os.path.join(Path(__file__).parent, "data")
-_redis_values = os.path.join(_test_data_dir, "redis-coupler-run-2026-02.json")
+_test_data_dir = Path(os.path.join(Path(__file__).parent, "data"))
+_redis_values = os.path.join(_test_data_dir, "redis-2026-05-27.json")
 
 
 @with_redis(_redis_values)
-def test_cz_local_phases():
-    name = "cz_local_phases"
+def test_zz_coupling():
+    name = "zz_coupling"
     dataset = open_dataset(name, _test_data_dir)
 
-    analysis = CZLocalPhasesCouplerAnalysis(
-        name, ["cz_pulse_frequency", "cz_pulse_duration", "cz_phase"]
+    analysis = ZZCouplingCouplerAnalysis(
+        name, ["zz_coupling"], active_qubit="q12", spectator_qubit="q13"
     )
-    qoi = analysis.process_coupler(dataset, "q13_q14")
-
-    control_local_phase = qoi.analysis_result["control_local_phase"]["value"]
-    target_local_phase = qoi.analysis_result["target_local_phase"]["value"]
+    qoi = analysis.process_coupler(dataset, "q12_q13")
+    zz_coupling = qoi.analysis_result["zz_coupling"]["value"]
 
     assert qoi.analysis_successful
-    assert pytest.approx(control_local_phase) == -135.2184
-    assert pytest.approx(target_local_phase) == 73.0427
+    assert pytest.approx(zz_coupling) == -15775.9096865654
 
 
 @with_redis(_redis_values)
@@ -49,20 +49,21 @@ def test_plotting():
     """
     Test that the plotter produces a figure with the right number of axes
     """
-    name = "cz_local_phases"
+    name = "zz_coupling"
     dataset = open_dataset(name, _test_data_dir)
 
-    analysis = CZLocalPhasesCouplerAnalysis(
-        name, ["cz_pulse_frequency", "cz_pulse_duration", "cz_phase"]
+    analysis = ZZCouplingCouplerAnalysis(
+        name, ["zz_coupling"], active_qubit="q12", spectator_qubit="q13"
     )
 
     figures_dictionary = {}
 
-    analysis.process_coupler(dataset, "q13_q14")
+    analysis.process_coupler(dataset, "q12_q13")
     analysis.plotter(figures_dictionary)
 
-    assert "q13_q14" in figures_dictionary
+    assert "q12_q13" in figures_dictionary
 
-    figure = figures_dictionary["q13_q14"][0]
+    figure = figures_dictionary["q12_q13"][0]
 
-    assert len(figure.get_axes()) == 4
+    # 1 for spectator_qubit at |0> and 1 for spectator_qubit at |1>:
+    assert len(figure.get_axes()) == 2

@@ -118,7 +118,6 @@ class ZZCouplingCouplerAnalysis(BaseCouplerAnalysis):
             self.corrected_qubit_frequency_spec_1
             - self.corrected_qubit_frequency_spec_0
         )
-        print(f"{ self.zz_coupling = }")
 
     def analyze_coupler(self):
         self._analyse_ramsey()
