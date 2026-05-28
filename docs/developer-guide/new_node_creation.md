@@ -245,3 +245,53 @@ performing a 2D scan.
 An example can be found in the punchout node.
 
 For implementation details, refer to the [Node types section](node_classes.md).
+
+
+### The dataset structure
+
+The configured dataset that each analysis class expects, reflects the structure of the samplespace of the node,
+and contains some important meta information about the measurement
+
+Assume the measurement samplespace:
+```
+samplespace = {
+    'frequencies' : {
+        'q13' : np.linspace(500,600, 20)*1e6,
+        'q14' : np.linspace(700,800, 20)*1e6,
+    }
+    'amplitudes' : {
+        'q13' : np.linspace(0.1,0.5, 5),
+        'q14' : np.linspace(0.2,0.6, 5),
+    }
+    'currents' : {
+        'q13_q14' : np.linspace(100,200, 10)*1e-6,
+    }
+}
+```
+
+The configured dataset will have the following structre:
+
+```
+Dimensions:     ( frequenciesq13: 20, amplitudesq13: 5, frequenciesq14: 20, amplitudesq14: 5, currentsq13_q14: 10)
+Coordinates:
+  * frequenciesq13 (frequenciesq13) float64 176B 5e+08 ... 6e+08
+  * frequenciesq14 (frequenciesq14) float64 176B 7e+08 ... 8e+08
+  * amplitudesq13  (amplitudesq13) float64 48B 0.1, 0.2, 0.3, 0.4, 0.5
+  * amplitudesq14  (amplitudesq13) float64 48B 0.2, 0.3, 0.4, 0.5, 0.6
+  * currentsq13_q14  (currentsq13_q14) int8 2B 1e-04, 2e-04 
+Data variables:
+    yq13                     (frequenciesq13, amplitudesq13, currentsq13_q14) complex128 4kB ...
+    yq14                     (frequenciesq14, amplitudesq14, currentsq13_q14) complex128 4kB ...
+Attributes:
+    elements:  q13_q14
+    name:      cz_parametrization
+    tuid:      20260526-124122-746
+```
+
+
+* Each settable + element combination (eg 'frequenciesq' + 'q14') creates a unique dimension with coordinates the corresponding values.
+* Each measurement channel (defined at each measurement schedule) creates a unique Data variable, prepended with 'y'
+* Each dataset is equiped with the global attributes:
+    - elements: the elements (qubits or couplers) that the node examines
+    - name: the string representation of the node as set in node.name
+    - tuid: a time unique id of the measurement
