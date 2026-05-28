@@ -13,6 +13,7 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+import json
 import os.path
 import shutil
 from datetime import datetime
@@ -24,6 +25,7 @@ import cf_xarray as cf
 import xarray
 
 from tergite_autocalibration.config.globals import CONFIG
+from tergite_autocalibration.utils.dto.qoi import QOI
 from tergite_autocalibration.utils.logging import logger
 
 
@@ -79,6 +81,32 @@ def scrape_and_copy_hdf5_files(
     logger.info(f"Copied {len(hdf5_files)} files to {target_directory}.")
 
 
+def open_dataset(name: str, containing_folder_path: Path) -> xarray.Dataset:
+    """
+    Open the dataset for the analysis.
+
+    Returns:
+        the complex xarray.Dataset with measurement results
+
+    """
+    dataset_name = f"dataset_{name}.hdf5"
+    dataset_path = os.path.join(containing_folder_path, dataset_name)
+    if not os.path.exists(dataset_path):
+        raise FileNotFoundError(f"Dataset file not found: {dataset_path}")
+
+    logger.info("Open dataset " + str(dataset_path))
+    real_ds = xarray.open_dataset(dataset_path)
+    if "working_points" in real_ds.coords:
+        real_ds = cf.decode_compress_to_multi_index(real_ds, "working_points")
+    complex_ds = real_ds.isel(ReIm=0) + 1j * real_ds.isel(ReIm=1)
+    for var in real_ds.data_vars:
+        attrs = real_ds.data_vars[var].attrs
+        complex_ds[var].attrs.update(**attrs)
+    ds_attrs = real_ds.attrs
+    complex_ds.attrs.update(**ds_attrs)
+    return complex_ds
+
+
 def save_dataset(
     result_dataset: xarray.Dataset, node_name: str, data_path: Path
 ) -> None:
@@ -90,7 +118,6 @@ def save_dataset(
         node_name (str): Name of the node being measured.
         data_path (Path): Path where the dataset will be saved.
     """
-    data_path.mkdir(parents=True, exist_ok=True)
     measurement_id = data_path.stem[0:19]
 
     result_dataset = result_dataset.assign_attrs(
@@ -106,3 +133,36 @@ def save_dataset(
             result_dataset_real, "working_points"
         )
     result_dataset_real.to_netcdf(data_path / dataset_name)
+
+
+def save_qoi(QOI_dict: dict[str, QOI], node_name: str, data_path: Path) -> None:
+    """
+    Save the node QOI for each element to a file.
+
+    Args:
+        QOI_dict (dict): The QOI dictionary to save.
+        node_name (str): Name of the node being measured.
+        data_path (Path): Path where the dataset will be saved.
+    """
+    measurement_id = data_path.stem[0:19]
+    serialized_QOI_dict = {
+        element: qoi.serialize() for element, qoi in QOI_dict.items()
+    }
+    file_path = data_path / f"{node_name}_qoi.json"
+    with open(file_path, "w") as file:
+        json.dump(serialized_QOI_dict, file, indent=2)
+
+
+def save_figures(figures_list: list, node_name: str, data_path: Path):
+    # TODO: as is, it doesn't support multiple couplers
+    # TODO: pass the figures dict instead
+    logger.info("Saving Plots")
+    for fig_index, fig in enumerate(figures_list):
+        node_name_stem = (
+            f"{node_name}" if len(figures_list) == 1 else f"{node_name}_{fig_index}"
+        )
+        preview_path = data_path / f"{node_name_stem}_preview.png"
+        full_path = data_path / f"{node_name_stem}.png"
+        fig.savefig(preview_path, bbox_inches="tight", dpi=100)
+        fig.savefig(full_path, bbox_inches="tight", dpi=400)
+        logger.info(f"Plots saved to {preview_path} and {full_path}")

@@ -15,13 +15,15 @@ import unittest
 from pathlib import Path
 
 import numpy as np
-import xarray as xr
+import os
 from lmfit.model import ModelResult
 from matplotlib.figure import Figure
 
+from tergite_autocalibration.lib.base.utils.analysis_utils import filter_ds_by_element
 from tergite_autocalibration.lib.nodes.characterization.purity_benchmarking.analysis import (
     PurityBenchmarkingQubitAnalysis,
 )
+from tergite_autocalibration.utils.io.dataset import open_dataset
 
 
 class TestPurityBenchmarkingAnalysis(unittest.TestCase):
@@ -29,24 +31,24 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
     def setUpClass(self):
         # Setup the dataset for testing from a file
         test_dir = Path(__file__).parent
-        file_path = (
-            test_dir / "data" / "dataset_purity_benchmarking_0.hdf5"
-        )  # "testdata.hdf5"
-        self.dataset = xr.open_dataset(file_path)
+        file_path = os.path.join(test_dir, "data")
+        full_dataset = open_dataset("purity_benchmarking", file_path)
+        full_dataset["yq06"].attrs.update(element="q06")
+        self.ds_06 = filter_ds_by_element(full_dataset, "q06")
 
     def test_initialization(self):
         self.analysis = PurityBenchmarkingQubitAnalysis("name", ["purity_fidelity"])
-        self.analysis.process_qubit(self.dataset, "yq06")
+        self.analysis.process_qubit(self.ds_06)
         # Check that the analysis object has the expected attributes
         self.assertTrue(hasattr(self.analysis, "purity_results_dict"))
         self.assertTrue(hasattr(self.analysis, "normalized_data_dict"))
         self.assertEqual(
-            self.analysis.number_of_repetitions, self.dataset.sizes.get("seed", 1)
+            self.analysis.number_of_repetitions, self.ds_06.sizes.get("seed", 1)
         )
 
     def test_run_fitting(self):
         analysis = PurityBenchmarkingQubitAnalysis("name", ["purity_fidelity"])
-        analysis.process_qubit(self.dataset, "yq06")
+        analysis.process_qubit(self.ds_06)
         # Verify the average purity result is within the expected range
         self.assertTrue(
             0.7 < np.average(list(analysis.purity_results_dict.values())) < 0.8
@@ -68,7 +70,7 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
 
     def test_plotter(self):
         analysis = PurityBenchmarkingQubitAnalysis("name", ["purity_fidelity"])
-        analysis.process_qubit(self.dataset, "yq14")
+        analysis.process_qubit(self.ds_06)
 
         # Trim the dataset to only 5 Cliffords before plotting, same reason as above
         analysis.number_of_cliffords = analysis.number_of_cliffords[:5]

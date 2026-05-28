@@ -15,7 +15,7 @@ import os
 from pathlib import Path
 
 import pytest
-import xarray as xr
+from tergite_autocalibration.utils.io.dataset import open_dataset
 
 from tergite_autocalibration.lib.nodes.coupler.cz_local_phases.analysis import (
     CZLocalPhasesCouplerAnalysis,
@@ -28,12 +28,11 @@ _redis_values = os.path.join(_test_data_dir, "redis-coupler-run-2026-02.json")
 
 @with_redis(_redis_values)
 def test_cz_local_phases():
-    file_path = os.path.join(_test_data_dir, "dataset_cz_local_phases.hdf5")
-    dataset = xr.open_dataset(file_path)
+    name = "cz_local_phases"
+    dataset = open_dataset(name, _test_data_dir)
 
     analysis = CZLocalPhasesCouplerAnalysis(
-        "cz_calibration",
-        ["cz_pulse_frequency", "cz_pulse_duration", "cz_phase"],
+        name, ["cz_pulse_frequency", "cz_pulse_duration", "cz_phase"]
     )
     qoi = analysis.process_coupler(dataset, "q13_q14")
 
@@ -50,12 +49,11 @@ def test_plotting():
     """
     Test that the plotter produces a figure with the right number of axes
     """
-    file_path = os.path.join(_test_data_dir, "dataset_cz_local_phases.hdf5")
-    dataset = xr.open_dataset(file_path)
+    name = "cz_local_phases"
+    dataset = open_dataset(name, _test_data_dir)
 
     analysis = CZLocalPhasesCouplerAnalysis(
-        "cz_calibration",
-        ["cz_pulse_frequency", "cz_pulse_duration", "cz_phase"],
+        name, ["cz_pulse_frequency", "cz_pulse_duration", "cz_phase"]
     )
 
     figures_dictionary = {}

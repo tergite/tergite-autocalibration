@@ -20,11 +20,6 @@ from tergite_autocalibration.lib.utils.classification_functions import assign_st
 
 def test_assign_state():
     qubit = "q06"
-    # centroid_I = 1
-    # centroid_Q = 0
-    # omega_01 = 330
-    # omega_12 = 180
-    # omega_20 = 90
     REDIS_CONNECTION.hset(f"transmons:{qubit}", "centroid_I", "1")
     REDIS_CONNECTION.hset(f"transmons:{qubit}", "centroid_Q", "0")
     REDIS_CONNECTION.hset(f"transmons:{qubit}", "omega_01", "330")

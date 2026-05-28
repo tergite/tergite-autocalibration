@@ -35,6 +35,57 @@ class CalibrationResultStatus(Enum):
     failed = 2
 
 
+class SamplespaceStructure(Enum):
+    """
+    In most of the measurements, the settable quantities can be considered 'orthogonal'
+    in the sense that all settable point combinations correspond to a particular measurement.
+    For example in a typical spectroscopy you sweep frequencies and amplitudes. Every measurement
+    M corresponds to a distinct (freq, ampl) pair:
+    ```
+    amplitudes
+    ^
+    |
+    |
+    |     * M(fr,amp)
+    |
+    |
+    |
+    |-------------------> frequencies
+    ```
+
+    In all the schedules this manifests as nested for loops:
+    ```
+    for value_1 in settable_values_1:
+        for value_2 in settable_values_2:
+             do stuff
+             Measure()
+    ```
+
+    However, in some particular nodes such as the `coupler_dc_spectroscopy` you cannot describe the samplespace
+    as 'orthogonal' at least not in a clean way.The main reason is that this consists of two disconnected measurements
+    one after the other. The samplespace looks 'parallel':
+
+    ```
+         * M(qub_f)                                    * M(ro_f)
+    -------------------> qub_frequencies and then -------------------> ro_frequencies
+    ```
+
+    In the schedule this manifests as two decoupled for loops:
+
+    ```
+    for value_1 in settable_values_1:
+        do stuff
+        Measure()
+    for value_2 in settable_values_2:
+        do other stuff
+        Measure()
+    ```
+    """
+
+    ORTHOGONAL = "ORTHOGONAL"
+    PARALLEL = "PARALLEL"
+
+
 class MeasurementMode(Enum):
     """
     Used to set the cluster mode e.g.  real cluster or re analyse

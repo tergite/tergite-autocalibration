@@ -32,6 +32,39 @@ def test_folder_scan():
     assert len(measurements) == 13
 
 
+def test_filter_by_substring():
+    substring = "motzoi"
+    folders = scan_folders(_DATADIR, filter_text=substring)
+    date = "2025-07-23"
+    good_chain = "12-47-07_ro_frequency_two_state_optimization-ACTIVE"
+
+    # Check whether all filtered measurement runs are fetched
+    assert len(folders[date]) == 1
+
+    # Check whether the substring exists in a filtered chain
+    measurements = folders[date][good_chain]
+    assert any(substring in measurement for measurement in measurements)
+
+
+def test_filter_by_element():
+    element = "q06"
+    folders = scan_folders(_DATADIR, element_filter_text=element)
+    date = "2025-07-23"
+    good_chain = "12-47-07_ro_frequency_two_state_optimization-ACTIVE"
+
+    # Check whether all filtered measurement runs are fetched
+    assert len(folders[date]) == 3
+
+    # Check whether all measurements of a specific run are found
+    measurements = folders[date][good_chain]
+    assert len(measurements) == 13
+
+    # Check whether non existent elements filter out all folders
+    non_existent_element = "q26"
+    folders_with_q26 = scan_folders(_DATADIR, element_filter_text=non_existent_element)
+    assert folders_with_q26 == {}
+
+
 # It is in fact not empty, because there is one file inside to commit the directory to git
 _EMPTY_DATADIR = Path(get_fixture_path("data", "browser_empty"))
 

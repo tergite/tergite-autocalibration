@@ -15,7 +15,6 @@ import os
 from pathlib import Path
 
 import pytest
-import xarray as xr
 
 from tergite_autocalibration.lib.base.utils.analysis_utils import filter_ds_by_element
 from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.analysis import (
@@ -23,6 +22,7 @@ from tergite_autocalibration.lib.nodes.characterization.randomized_benchmarking.
     RandomizedBenchmarkingQubitAnalysis,
 )
 from tergite_autocalibration.tests.utils.decorators import with_redis
+from tergite_autocalibration.utils.io.dataset import open_dataset
 
 _test_data_dir = os.path.join(Path(__file__).parent, "data")
 _redis_values = os.path.join(_test_data_dir, "redis-2026-03-10-21-33-32.json")
@@ -30,17 +30,15 @@ _redis_values = os.path.join(_test_data_dir, "redis-2026-03-10-21-33-32.json")
 
 @with_redis(_redis_values)
 def test_randomized_benchmarking_analysis():
-    file_path = os.path.join(_test_data_dir, "dataset_randomized_benchmarking.hdf5")
-    dataset = xr.open_dataset(file_path)
+    name = "randomized_benchmarking"
+    dataset = open_dataset(name, _test_data_dir)
 
     qubit_qois = ["fidelity", "fidelity_error", "leakage", "leakage_error"]
-    analysis = RandomizedBenchmarkingQubitAnalysis(
-        "randomized_benchmarking", qubit_qois
-    )
+    analysis = RandomizedBenchmarkingQubitAnalysis(name, qubit_qois)
     ds_11 = filter_ds_by_element(dataset, "q11")
     ds_15 = filter_ds_by_element(dataset, "q15")
-    qoi_11 = analysis.process_qubit(ds_11, "q11")
-    qoi_15 = analysis.process_qubit(ds_15, "q15")
+    qoi_11 = analysis.process_qubit(ds_11)
+    qoi_15 = analysis.process_qubit(ds_15)
 
     standard_fidelity_11 = qoi_11.analysis_result["fidelity"]["value"]
     standard_leakage_11 = qoi_11.analysis_result["leakage"]["value"]
@@ -60,10 +58,13 @@ def test_plotting():
     """
     Test that the plotter produces a figure with the right number of axes
     """
+    name = "randomized_benchmarking"
+    file_path = os.path.join(_test_data_dir, "dataset_randomized_benchmarking.hdf5")
+    dataset = open_dataset(name, _test_data_dir)
 
     qubit_qois = ["fidelity", "fidelity_error", "leakage", "leakage_error"]
-    analysis = RandomizedBenchmarkingNodeAnalysis("randomized_benchmarking", qubit_qois)
-    analysis.analyze_node(_test_data_dir)
+    analysis = RandomizedBenchmarkingNodeAnalysis(name, qubit_qois)
+    analysis.analyze_node(dataset)
     figure = analysis.fig
     # TODO: this will change when the top band is removed
     assert len(figure.get_axes()) == 8

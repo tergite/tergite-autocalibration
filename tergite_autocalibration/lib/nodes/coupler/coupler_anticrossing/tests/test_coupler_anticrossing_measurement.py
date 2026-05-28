@@ -12,8 +12,8 @@
 # that they have been altered from the originals.
 
 from tergite_autocalibration.config.globals import CONFIG
-from tergite_autocalibration.lib.nodes.coupler.spectroscopy.node import (
-    QubitSpectroscopyVsCurrentNode,
+from tergite_autocalibration.lib.nodes.coupler.coupler_anticrossing.node import (
+    CouplerAnticrossingNode,
 )
 from tergite_autocalibration.lib.nodes.external_parameter_node import (
     ExternalParameterNode,
@@ -23,13 +23,13 @@ from tergite_autocalibration.utils.dto.extended_transmon_element import Extended
 
 def test_measurement_01_type():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = QubitSpectroscopyVsCurrentNode(CONFIG.run.couplers)
+    node = CouplerAnticrossingNode(CONFIG.run.couplers)
     assert issubclass(node.measurement_type, ExternalParameterNode)
 
 
 def test_dummy_generation():
     ExtendedTransmon.close_all()  # ensure no other transmon objects are instantiated
-    node = QubitSpectroscopyVsCurrentNode(CONFIG.run.couplers)
+    node = CouplerAnticrossingNode(CONFIG.run.couplers)
     node.this_current = 0.0001
     dummy_dataset = node.generate_dummy_dataset()
     first_qubit = CONFIG.run.qubits[0]

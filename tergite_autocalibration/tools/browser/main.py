@@ -25,6 +25,7 @@ from dash import ctx, dcc, html
 from dash.dependencies import ALL, MATCH, Input, Output, State
 from dash_renderjson import DashRenderjson
 
+import tergite_autocalibration.tools.browser.styles as styles
 from tergite_autocalibration.config.globals import DATA_DIR
 from tergite_autocalibration.tools.browser.layout import generate_selection_layout
 from tergite_autocalibration.tools.browser.utils import scan_folders
@@ -44,40 +45,37 @@ app.layout = html.Div(
             "Refresh Folder Structure",
             id="refresh-button",
             n_clicks=0,
-            style={
-                "padding": "10px 20px",  # bigger button
-                "marginRight": "15px",  # spacing to the right
-                "fontSize": "18px",  # bigger text
-                "cursor": "pointer",
-            },
+            style=styles.refresh_button_style,
         ),
         html.Button(
             "Compare",
             id="compare-button",
             n_clicks=0,
-            style={
-                "padding": "10px 20px",
-                "marginRight": "15px",
-                "fontSize": "18px",
-                "cursor": "pointer",
-            },
+            style=styles.compare_button_style,
         ),
         dcc.Input(
             id="text-input",
             type="text",
             debounce=True,  # triggers callback only on blur or Enter
-            placeholder="Enter string for filtering",
-            style={
-                "padding": "10px",
-                "marginRight": "15px",
-                "fontSize": "18px",
-                "width": "250px",
-            },
+            placeholder="Enter node name for filtering",
+            style=styles.node_filter_button_style,
+        ),
+        dcc.Input(
+            id="element-input",
+            type="text",
+            debounce=True,  # triggers callback only on blur or Enter
+            placeholder="Enter element name for filtering",
+            style=styles.node_filter_button_style,
         ),
         dbc.Tooltip(
             "For example if the node rabi_12_oscillations is looked for, strings like rabi_12 or 12_osc suffice.",
             target="text-input",
-            placement="right",
+            placement="bottom-end",
+        ),
+        dbc.Tooltip(
+            "For example q05 or q11_q12",
+            target="element-input",
+            placement="bottom-end",
         ),
         html.Div(
             id="filter-confirmation", style={"marginTop": "10px", "color": "green"}
@@ -220,16 +218,22 @@ def star_selected(n_clicks, outer_selected, interm_selected, inner_selected, sta
     Output("filter-confirmation", "children"),
     Input("refresh-button", "n_clicks"),
     Input("text-input", "value"),
+    Input("element-input", "value"),
     prevent_initial_call=True,
 )
-def refresh_folder_structure(n_clicks: int, filter_text: str):
+def refresh_folder_structure(
+    n_clicks: int, node_filter_text: str, element_filter_text: str
+):
     """
     Callback to refresh the outer folder structure
 
     Args:
         n_clicks: Unused
-        filter_text: User provided string.
+        node_filter_text: User provided string.
                      Only measurement folders containing this string are regarded valid.
+        element_filter_text: User provided string.
+                     Only measurement folders where the device json contains thisi string
+                     are regarded valid.
 
     Returns:
 
@@ -237,24 +241,42 @@ def refresh_folder_structure(n_clicks: int, filter_text: str):
     triggered_id = ctx.triggered_id
 
     # If triggered by folder refresh and no input filter is active
-    if triggered_id == "refresh-button" and not filter_text:
+    if triggered_id == "refresh-button" and not node_filter_text:
         return scan_folders(DATA_DIR), ""
 
     # If triggered by text input and input is not empty
-    if triggered_id == "text-input":
+    if triggered_id == "text-input" or triggered_id == "element-input":
         # Case 1: Empty text -> reload original structure
-        if not filter_text.strip():
+        if not node_filter_text and not element_filter_text:
             return scan_folders(DATA_DIR), "Filter cleared. Showing all folders"
 
+        element_filter_message = " for element: " if element_filter_text else ""
+        element_filter_text = str(element_filter_text or "").strip()
+        filter_text = str(node_filter_text or "").strip()
         # Case 2: Text input filters the intermediate folders
-        styled_text_span = html.Span(
+        styled_filter_text = html.Span(
             filter_text, style={"color": "blue", "fontWeight": "bold"}
         )
+        styled_filter_element = html.Span(
+            element_filter_text, style={"color": "blue", "fontWeight": "bold"}
+        )
         confirmation_message = html.Div(
-            ["Filter applied: ", styled_text_span],
+            [
+                "Filter applied: ",
+                styled_filter_text,
+                element_filter_message,
+                styled_filter_element,
+            ],
             style={"marginTop": "10px"},
         )
-        return (scan_folders(DATA_DIR, filter_text=filter_text), confirmation_message)
+        return (
+            scan_folders(
+                DATA_DIR,
+                filter_text=node_filter_text,
+                element_filter_text=element_filter_text,
+            ),
+            confirmation_message,
+        )
 
     raise dash.exceptions.PreventUpdate
 
@@ -426,6 +448,56 @@ def update_tab(tab: str, outer: str, inter: str, inner: str, starred):
 
 
 @app.callback(
+    Output({"type": "qoi-content", "index": MATCH}, "children"),
+    Input({"type": "outer-selector", "index": MATCH}, "value"),
+    Input({"type": "intermediate-selector", "index": MATCH}, "value"),
+    Input({"type": "inner-selector", "index": MATCH}, "value"),
+)
+def update_qoi_display(outer: str, inter: str, inner: str):
+    """
+    Callback to update the qoi display
+
+    Args:
+        outer: Outer folder with the measurement date
+        inter: Intermediate folder with the calibration run
+        inner: Inner folder with the qubit measurement
+
+    Returns:
+
+    """
+
+    if not (outer and inter and inner):
+        return "Please make all selections."
+
+    folder_path = os.path.join(DATA_DIR, outer, inter, inner)
+
+    for file in os.listdir(folder_path):
+        if file.endswith(".json") and "qoi" in file:
+            with open(os.path.join(folder_path, file)) as f:
+                data = json.load(f)
+
+            # NOTE: the following should be out of the if scope?
+            columns = []
+            for element in data:
+                json_render = DashRenderjson(
+                    id=f"json-view-{element}",
+                    data=data[element]["analysis_result"],
+                    max_depth=1,  # collapse nested content initially
+                    invert_theme=True,
+                )
+                columns.append(
+                    html.Div(
+                        style=styles.json_render_style,
+                        children=[html.H4(element), json_render],
+                    )
+                )
+
+            return columns
+
+    return "No JSON file found."
+
+
+@app.callback(
     [
         Output({"type": "full-dataset", "index": MATCH}, "data"),
         Output({"type": "element-selector", "index": MATCH}, "options"),
@@ -460,7 +532,7 @@ def display_element_selector(
                 ds_json = json.dumps(ds_dict)
 
                 return [ds_json, element_options]
-                # return f"HDF5 File: {hdf5_files[0]}", ds_json, element_options
+
             except Exception as e:
                 return [json.dumps({"error": str(e)}), []]
         return [{}, []]

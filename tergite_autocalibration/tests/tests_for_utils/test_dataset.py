@@ -10,6 +10,7 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+import json
 import os.path
 import shutil
 from datetime import datetime
@@ -30,8 +31,11 @@ from tergite_autocalibration.lib.nodes.readout.resonator_spectroscopy.node impor
 from tergite_autocalibration.tests.utils.decorators import with_redis
 from tergite_autocalibration.tests.utils.fixtures import get_fixture_path
 from tergite_autocalibration.utils.dto.extended_transmon_element import ExtendedTransmon
+from tergite_autocalibration.utils.dto.qoi import QOI
 from tergite_autocalibration.utils.io.dataset import (
+    open_dataset,
     save_dataset,
+    save_qoi,
     scrape_and_copy_hdf5_files,
 )
 
@@ -147,6 +151,76 @@ def test_select_measurement_for_analysis_can_find_measurement():
     assert (
         info.dataset_path
         == info.measurement_folder_path / "dataset_ramsey_correction.hdf5"
+    )
+
+
+def test_save_qoi(tmp_path):
+    node_name = "resonator_spectroscopy"
+    QOI_dict = {
+        "q13": QOI(
+            analysis_result={
+                "clock_freqs:readout": {"value": 7180795854, "error": 0},
+                "Ql": {"value": 15000, "error": 0},
+                "resonator_minimum": {"value": 7180788888, "error": 0},
+            },
+            analysis_successful=True,
+        ),
+        "q14": QOI(
+            analysis_result={
+                "clock_freqs:readout": {"value": 6631088516, "error": 0},
+                "Ql": {"value": 15000, "error": 0},
+                "resonator_minimum": {"value": 6631088888, "error": 0},
+            },
+            analysis_successful=True,
+        ),
+        "q15": QOI(
+            analysis_result={
+                "clock_freqs:readout": {"value": 7130595184, "error": 0},
+                "Ql": {"value": 15000, "error": 0},
+                "resonator_minimum": {"value": 7130588888, "error": 0},
+            },
+            analysis_successful=True,
+        ),
+    }
+
+    save_qoi(QOI_dict, node_name, tmp_path)
+    file_path = Path(os.path.join(tmp_path, "resonator_spectroscopy_qoi.json"))
+    assert file_path.exists()
+
+    with open(file_path) as f:
+        qoi_dict_from_file = json.load(f)
+
+    q13_file_result = qoi_dict_from_file["q13"]["analysis_result"]
+    assert all(q in qoi_dict_from_file for q in ["q13", "q14", "q15"])
+    assert q13_file_result["clock_freqs:readout"]["value"] == 7180795854
+
+
+def test_open_dataset():
+    name = "ro_amplitude_three_state_optimization"
+    run_dir = Path(
+        os.path.join(
+            get_fixture_path(), "data", f"16-51-33_standard_run_{name}-SUCCESS"
+        )
+    )
+    measurement_file = f"20250728-170030-376-c25885-{name}"
+    containing_folder = Path(os.path.join(run_dir, measurement_file))
+    full_dataset = open_dataset(name, containing_folder)
+    assert full_dataset.elements == ["q06", "q07"]
+    assert "ReIm" not in full_dataset.coords
+    assert full_dataset["yq06"].qubit == "q06"
+    assert full_dataset["yq07"].qubit == "q07"
+    assert full_dataset["yq07"].size == 51000
+
+
+def test_open_dataset_with_working_points():
+    name = "cz_calibration"
+    run_dir = Path(os.path.join(get_fixture_path(), "data", f"21-39-55_cz_rb-SUCCESS"))
+    measurement_file = f"20260303-214554-517-258f2d-{name}"
+    containing_folder = Path(os.path.join(run_dir, measurement_file))
+    full_dataset = open_dataset(name, containing_folder)
+    assert full_dataset.coords["working_points"].size == 15
+    assert full_dataset.coords["working_points"].values[0] == pytest.approx(
+        (716786296.0, 2.04e-07)
     )
 
 

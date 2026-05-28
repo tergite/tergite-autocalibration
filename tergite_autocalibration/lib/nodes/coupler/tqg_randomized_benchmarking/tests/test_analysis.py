@@ -21,6 +21,7 @@ from tergite_autocalibration.lib.nodes.coupler.tqg_randomized_benchmarking.analy
     CZRBCouplerAnalysis,
 )
 from tergite_autocalibration.tests.utils.decorators import with_redis
+from tergite_autocalibration.utils.io.dataset import open_dataset
 
 _test_data_dir = os.path.join(Path(__file__).parent, "data")
 _redis_values = os.path.join(_test_data_dir, "redis-2026-03-05-10-55-35.json")
@@ -28,10 +29,10 @@ _redis_values = os.path.join(_test_data_dir, "redis-2026-03-05-10-55-35.json")
 
 @with_redis(_redis_values)
 def test_cz_rb():
-    file_path = os.path.join(_test_data_dir, "dataset_cz_rb.hdf5")
-    dataset = xr.open_dataset(file_path)
+    name = "cz_rb"
+    dataset = open_dataset(name, _test_data_dir)
 
-    analysis = CZRBCouplerAnalysis("cz_rb", ["cz_fidelity"])
+    analysis = CZRBCouplerAnalysis(name, ["cz_fidelity"])
     qoi = analysis.process_coupler(dataset, "q12_q13")
 
     cz_fidelity = qoi.analysis_result["cz_fidelity"]["value"]
@@ -45,10 +46,10 @@ def test_plotting():
     """
     Test that the plotter produces a figure with the right number of axes
     """
-    file_path = os.path.join(_test_data_dir, "dataset_cz_rb.hdf5")
-    dataset = xr.open_dataset(file_path)
+    name = "cz_rb"
+    dataset = open_dataset(name, _test_data_dir)
 
-    analysis = CZRBCouplerAnalysis("cz_rb", ["cz_fidelity"])
+    analysis = CZRBCouplerAnalysis(name, ["cz_fidelity"])
 
     figures_dictionary = {}
 

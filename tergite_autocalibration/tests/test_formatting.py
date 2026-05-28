@@ -63,7 +63,7 @@ def test_print_and_logging_statements():
             if line_count > 0:
                 for line in lines:
                     # Check for print statements
-                    assert "print(" not in line, f"in file {file.name}"
+                    assert "print(" not in line, f"in file {file_path}"
 
                     # Check for all kind of logging statements
                     assert "logging.debug" not in line

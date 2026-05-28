@@ -11,6 +11,7 @@
 # that they have been altered from the originals.
 
 import json
+from pathlib import Path
 
 from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
 from quantify_scheduler.json_utils import SchedulerJSONEncoder
@@ -64,7 +65,7 @@ def close_device_resources(device: QuantumDevice):
     device.close()
 
 
-def save_serial_device(device: QuantumDevice, data_path: str) -> None:
+def save_serial_device(device: QuantumDevice, data_path: Path) -> None:
     """
     decode the device object and then parse its data element by element
     to populate the serial device dictionary which is saved as Json
@@ -81,6 +82,5 @@ def save_serial_device(device: QuantumDevice, data_path: str) -> None:
         serial_config = json.loads(element_config)
         serial_device[element] = serial_config
 
-    data_path.mkdir(parents=True, exist_ok=True)
     with open(f"{data_path}/{name}.json", "w") as f:
         json.dump(serial_device, f, indent=4)

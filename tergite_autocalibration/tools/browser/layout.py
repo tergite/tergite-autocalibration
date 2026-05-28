@@ -115,6 +115,21 @@ def generate_selection_layout(folder_structure: dict, index: str = ""):
         style={"marginTop": "20px"},
     )
 
+    qoi_display_DIV = html.Div(
+        [
+            html.H3("Quantities of Interest"),
+            html.Div(
+                id={"type": "qoi-content", "index": index},
+                style={
+                    "display": "flex",
+                    "flexWrap": "wrap",  # wrap when many keys
+                    "gap": "20px",
+                },
+            ),
+        ],
+        style={"marginTop": "20px"},
+    )
+
     element_selector_DIV = html.Div(
         [
             html.H2("Select Elements:"),
@@ -153,6 +168,7 @@ def generate_selection_layout(folder_structure: dict, index: str = ""):
             html.Div(id={"type": "starred-list", "index": index}),
             selectors_DIV,
             image_display_DIV,
+            qoi_display_DIV,
             element_selector_DIV,
             y_dim_selector_DIV,
             slice_display_DIV,

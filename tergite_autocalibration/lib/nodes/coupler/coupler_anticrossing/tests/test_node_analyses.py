@@ -1,6 +1,7 @@
 # This code is part of Tergite
 #
 # (C) Copyright Michele Faucci Giannelli 2025
+# (C) Copyright Eleftherios Moschandreou 2026
 #
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -11,7 +12,7 @@
 # that they have been altered from the originals.
 
 
-from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
+from tergite_autocalibration.lib.nodes.coupler.coupler_anticrossing.analysis import (
     CouplerAnticrossingNodeAnalysis,
     ResonatorSpectroscopyVsCurrentNodeAnalysis,
 )

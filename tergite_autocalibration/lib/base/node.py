@@ -38,12 +38,23 @@ from tergite_autocalibration.lib.utils.schedule_execution import (
     execute_schedule,
     get_compiler,
 )
-from tergite_autocalibration.utils.dto.enums import MeasurementMode
+from tergite_autocalibration.utils.dto.enums import (
+    MeasurementMode,
+    SamplespaceStructure,
+)
 from tergite_autocalibration.utils.hardware.spi import SpiDAC
-from tergite_autocalibration.utils.io.dataset import save_dataset
+from tergite_autocalibration.utils.io.dataset import (
+    open_dataset,
+    save_dataset,
+    save_figures,
+    save_qoi,
+)
 from tergite_autocalibration.utils.logging import logger
 from tergite_autocalibration.utils.logging.visuals import print_measurement_info
-from tergite_autocalibration.utils.measurement_utils import samplespace_dimensions
+from tergite_autocalibration.utils.measurement_utils import (
+    pad_samplespace,
+    samplespace_dimensions,
+)
 
 if TYPE_CHECKING:
     from quantify_scheduler.device_under_test.quantum_device import QuantumDevice
@@ -69,6 +80,9 @@ class BaseNode(ABC):
         self.external_samplespace = {}
         self.redis_fields = []
         self.all_qubits = []
+        self.samplespace_structure: "SamplespaceStructure" = (
+            SamplespaceStructure.ORTHOGONAL
+        )
 
         # These may be modified while the node runs
         self.outer_schedule_samplespace = {}
@@ -85,6 +99,14 @@ class BaseNode(ABC):
     def precompile(self, samplespace):
         pass
 
+        self.data_path: Path
+
+    def update_data_path(self, data_path: Path):
+        """
+        Used by the calibration supervisor
+        """
+        self.data_path = data_path
+
     def measure_node(self, cluster_status) -> xarray.Dataset:
         """
         Here we attach the measure_node method according to the
@@ -94,14 +116,19 @@ class BaseNode(ABC):
         dataset = measurement_type.measure_node(cluster_status)
         return dataset
 
-    def calibrate(self, data_path, measurement_mode):
-        if measurement_mode != MeasurementMode.re_analyse:
-            result_dataset = self.measure_node(measurement_mode)
-            save_serial_device(self.device, data_path)
-            save_dataset(result_dataset, self.name, data_path)
+    def calibrate(self, measurement_mode):
+        # explicitly create folder for the measurement.
+        # contains the hdf5 dataset, the QOI json and the png figures
+        self.data_path.mkdir(parents=True, exist_ok=True)
+        result_dataset = self.measure_node(measurement_mode)
+
+        QOI_dict = self.post_process(result_dataset)
+        # TODO: do we need to save in re analyze mode?
+        save_dataset(result_dataset, self.name, self.data_path)
+        save_qoi(QOI_dict, self.name, self.data_path)
+        save_serial_device(self.device, self.data_path)
         # After the measurement free the device resources
         close_device_resources(self.device)
-        self.post_process(data_path)
         logger.info("analysis completed")
 
     def measure_compiled_schedule(
@@ -148,12 +175,16 @@ class BaseNode(ABC):
             duration *= self.node_dictionary["loop_repetitions"]
         return duration
 
-    def post_process(self, data_path: Path):
+    def post_process(self, dataset: xarray.Dataset):
         analysis_kwargs = getattr(self, "analysis_keywords", dict())
         node_analysis: BaseNodeAnalysis = self.analysis_obj(
             self.name, self.redis_fields, **analysis_kwargs
         )
-        QOI_dict = node_analysis.analyze_node(data_path)
+        QOI_dict = node_analysis.analyze_node(dataset)
+
+        figures = node_analysis.figures
+        save_figures(figures, self.name, self.data_path)
+
         for element_id_, qois_ in QOI_dict.items():
             update_redis_trusted_values(
                 self.name, element_id_, qoi=qois_, redis_fields=self.redis_fields
@@ -172,17 +203,22 @@ class BaseNode(ABC):
 
         raw_ds_keys = raw_ds.data_vars.keys()
         measurement_qubits = self.all_qubits
-        samplespace = self.schedule_samplespace
 
-        sweep_quantities = samplespace.keys()
-
-        n_qubits = len(measurement_qubits)
+        sweep_quantities = self.schedule_samplespace.keys()
 
         for key in raw_ds_keys:
-            key_indx = key % n_qubits  # this is to handle ro_opt_frequencies node where
             coords_dict = {}
-            measured_qubit = measurement_qubits[key_indx]
-            dimensions = samplespace_dimensions(samplespace, self.loops)
+            measured_qubit = measurement_qubits[key]
+            dimensions = samplespace_dimensions(
+                self.schedule_samplespace, self.loops, self.samplespace_structure
+            )
+
+            samplespace = pad_samplespace(
+                self.schedule_samplespace,
+                dimensions,
+                self.loops,
+                self.samplespace_structure,
+            )
 
             for quantity in sweep_quantities:
                 # eg settable_elements -> ['q1','q2',...] or ['q1_q2','q3_q4',...] :
@@ -200,7 +236,7 @@ class BaseNode(ABC):
                         element = matching[0]
                         element_type = "coupler"
                     else:
-                        raise (ValueError)
+                        raise ValueError
 
                 coord_key = quantity + element
 
@@ -217,7 +253,11 @@ class BaseNode(ABC):
                 if not isinstance(settable_values, Iterable):
                     settable_values = np.array([settable_values])
 
-                coords_dict[coord_key] = (coord_key, settable_values, coord_attrs)
+                coord_dim = coord_key
+                if self.samplespace_structure == SamplespaceStructure.PARALLEL:
+                    coord_dim = "common_dimension" + measured_qubit
+
+                coords_dict[coord_key] = (coord_dim, settable_values, coord_attrs)
 
             if self.loops is not None:
                 coords_dict["loops"] = (
@@ -249,8 +289,12 @@ class BaseNode(ABC):
                 "long_name": f"y{measured_qubit}",
                 "units": "NA",
             }
+            dimension_names = tuple(coords_dict.keys())
+            if self.samplespace_structure == SamplespaceStructure.PARALLEL:
+                dimension_names = "common_dimension" + measured_qubit
+
             partial_ds[f"y{measured_qubit}"] = (
-                tuple(coords_dict.keys()),
+                dimension_names,
                 data_values,
                 attributes,
             )
@@ -355,7 +399,7 @@ class CouplerNode(BaseNode):
         currents_dict = {}
         for coupler in self.couplers:
             parking_current = float(
-                REDIS_CONNECTION.hget(f"couplers:{coupler}", "parking_current")
+                REDIS_CONNECTION.hget(f"couplers:{coupler}", "initial_parking_current")
             )
             if np.isnan(parking_current):
                 logger.warning(f"nan current for coupler {coupler}")

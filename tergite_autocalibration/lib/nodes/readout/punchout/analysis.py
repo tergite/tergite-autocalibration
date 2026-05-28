@@ -12,8 +12,10 @@
 # that they have been altered from the originals.
 
 from typing import List
-from matplotlib import patches, pyplot as plt
+
 import numpy as np
+from matplotlib import patches
+from matplotlib import pyplot as plt
 
 from tergite_autocalibration.lib.base.analysis import (
     BaseAllQubitsAnalysis,
@@ -73,9 +75,9 @@ class PunchoutQubitAnalysis(BaseQubitAnalysis):
             ds = self.dataset.sel({self.amplitude_coord: amplitude})
 
             res_spec_analysis = ResonatorSpectroscopyQubitAnalysis(self.name, "")
-            resonator_frequency = res_spec_analysis.process_qubit(
-                ds, self.data_var[1:]
-            ).analysis_result["clock_freqs:readout"]["value"]
+            resonator_frequency = res_spec_analysis.process_qubit(ds).analysis_result[
+                "clock_freqs:readout"
+            ]["value"]
 
             self.detected_frequencies.append(resonator_frequency)
             self.resonator_spectroscopy_analyses.append(res_spec_analysis)

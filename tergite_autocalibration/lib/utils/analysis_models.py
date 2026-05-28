@@ -11,6 +11,9 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+import typing
+from collections import namedtuple
+
 import lmfit
 import numpy as np
 from lmfit.model import Model
@@ -18,11 +21,399 @@ from quantify_core.analysis.fitting_models import (
     exp_damp_osc_func,
     fft_freq_phase_guess,
 )
+from scipy.ndimage import median
+from scipy.optimize import minimize
+from scipy.signal import find_peaks
+from scipy.stats import median_abs_deviation
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
-from tergite_autocalibration.lib.utils.functions import (
-    exponential_decay_function,
-)  # lrb_decay_function,; lrb_exponential_decay_function,
+from tergite_autocalibration.lib.utils.functions import exponential_decay_function
+
+
+def resonator_hanger_frequency(
+    *, fit_fr: float, fit_ph: float, fit_Qe: float, fit_Ql: float
+) -> float:
+    fit_Q = 4 * fit_Qe * fit_Ql
+    resonator_frequency = (
+        fit_fr
+        / (fit_Q * np.sin(fit_ph))
+        * (
+            fit_Q * np.sin(fit_ph)
+            - 2 * fit_Qe * np.cos(fit_ph)
+            + fit_Ql
+            + np.sqrt(4 * fit_Qe**2 - fit_Q * np.cos(fit_ph) + fit_Ql**2)
+        )
+    )
+    return resonator_frequency
+
+
+class ResonatorAvoidedCrossings:
+    """
+    Extract the avoided crossings from (currents, readout frequency) data.
+    If the data have a shape like:
+
+    ro_frequencies
+    ^
+    |           *             *
+    |          *               *
+    |   ******       ****        *********
+    |              *      *
+    |             *        *
+    |________________________________> currents
+
+    the crossings (intersection points X) of the frequency and current asymptotes are identified:
+    ro_frequencies
+    ^
+    |            *|           | *
+    |           * |           |  *
+    |    ******   X    ****   X    *********
+    |             |  *      * |
+    |             | *        *|
+    |_________________________________> currents
+    """
+
+    def __init__(self, currents, frequencies):
+        self.currents = currents
+        self.frequencies = frequencies
+
+        self._analyze_crossings()
+
+    def _analyze_crossings(self) -> None:
+        frequency_diffs = np.diff(self.frequencies)
+        noise_level = median_abs_deviation(frequency_diffs)
+        peaks, _ = find_peaks(np.abs(frequency_diffs), prominence=10 * noise_level)
+        self.jumps = peaks
+
+    @property
+    def crossing_currents(self) -> list[float]:
+        crossing_currents = []
+        for jump in self.jumps:
+            current = np.mean((self.currents[jump], self.currents[jump + 1]))
+            crossing_currents.append(current)
+        return crossing_currents
+
+    @property
+    def crossing_frequency(self) -> float:
+        return median(self.frequencies)
+
+    @property
+    def I0_hint(self) -> float | None:
+        """
+        hint for the current where the coupler has maximum frequency
+        """
+        if len(self.crossing_currents) != 2:
+            return None
+        return np.mean(self.crossing_currents)
+
+
+class AvoidedCrossings:
+    """
+    Extract the avoided crossings from (currents, qubit frequency) data.
+    This analysis utilizes only the geometric properties of the data, with no assumptions
+    on the underlying physics of the coupler.
+    If the data have a shape like:
+
+    qubit
+    frequencies
+        ^
+        | *     *           *     *
+        | *     *           *     *
+        |  *   *             *   *
+        |    *                 *
+        |            *
+        |          *   *
+        |         *     *
+        _________________________________> currents
+
+    the crossings (intersection points X) of the frequency and current asymptotes are identified:
+
+    qubit
+    frequencies
+        ^*     * |       | *     *
+        |*     * |       | *     *
+        | *   *  |       |  *   *
+        |   *    |       |    *
+        |--------X-------X------------
+        |        |   *   |
+        |        | *   * |
+        |        |*     *|
+        _________________________________> currents
+    """
+
+    def __init__(self, currents, frequencies, threshold=2e6):
+        self.currents = currents
+        self.frequencies = frequencies
+        self.threshold = threshold
+
+        self._analyze_crossings()
+
+    def _analyze_crossings(self) -> None:
+        partition_indices = [0]
+
+        currents = self.currents
+        frequencies = self.frequencies
+
+        frequency_diffs = np.diff(frequencies)
+        (frequency_jumps,) = np.where(np.abs(frequency_diffs) > self.threshold)
+        for jump in frequency_jumps:
+            parity = self._parity_of_jump(jump, frequencies)
+            if parity != (+1, -1, +1) and parity != (-1, +1, -1):
+                continue
+
+            # NOTE: to avoid confusion the index where the jump occurs in the currents array
+            # is given a 0.5 offset to signal that is 'between' current samples.
+            # this ends up being unnecessary and leads to having to cast to int when
+            # asking for the low_sample and high_sample. It should be refactored.
+            partition_indices.append(jump + 0.5)
+
+        partition_indices.append(len(currents))
+        self.partition_indices = partition_indices
+
+    @classmethod
+    def _parity_of_jump(cls, jump: int, frequencies: np.ndarray):
+        frequency_diffs = np.diff(frequencies)
+        sign_of_jump = np.sign(frequency_diffs[jump]).astype(int)
+        if jump == 0:
+            sign_before_jump = -sign_of_jump
+        else:
+            sign_before_jump = np.sign(frequency_diffs[jump - 1]).astype(int)
+        if jump == len(frequency_diffs) - 1:
+            # TODO: the logic is not solid here, may lead to errors
+            sign_after_jump = -sign_of_jump
+        else:
+            sign_after_jump = np.sign(frequency_diffs[jump + 1]).astype(int)
+
+        parity = (sign_before_jump, sign_of_jump, sign_after_jump)
+        return parity
+
+    @property
+    def crossing_currents(self) -> list[float]:
+        crossing_currents = []
+        for current_boundary in self.partition_indices[1:-1]:
+            low_sample = np.floor(current_boundary).astype(int)
+            high_sample = np.ceil(current_boundary).astype(int)
+            current = np.mean((self.currents[low_sample], self.currents[high_sample]))
+            crossing_currents.append(current)
+        return crossing_currents
+
+    def _partition_samples(self):
+        partitions_where_coupler_above_qubit = []
+        partitions_where_coupler_below_qubit = []
+
+        partition_boundaries = self.partition_indices
+        crossing_partitions = [
+            partition_boundaries[i : i + 2]
+            for i in range(0, len(partition_boundaries) - 1)
+        ]
+        for partition in crossing_partitions:
+            low_sample = np.ceil(partition[0]).astype(int)
+            high_sample = np.floor(partition[1]).astype(int)
+            partition_frequencies = self.frequencies[low_sample:high_sample]
+            # small partitions may be misleading:
+            if len(partition_frequencies) < 4:
+                continue
+            partition_frequencies_diffs = np.diff(partition_frequencies)
+
+            # we use the slope of the frequency diffs to distinguish
+            # the U-shaped partitions from the ∩-shaped partitions
+            x = np.arange(len(partition_frequencies_diffs))
+            slope, _ = np.polyfit(x, partition_frequencies_diffs, 1)
+            if slope > 0:
+                partitions_where_coupler_below_qubit.append(partition)
+            elif slope < 0:
+                partitions_where_coupler_above_qubit.append(partition)
+
+        partitions = {
+            "coupler_above_qubit": partitions_where_coupler_above_qubit,
+            "coupler_below_qubit": partitions_where_coupler_below_qubit,
+        }
+
+        return partitions
+
+    @property
+    def crossing_frequency(self) -> typing.NamedTuple:
+        partition_minima = []
+        partition_maxima = []
+
+        partitions = self._partition_samples()
+
+        if len(partitions["coupler_above_qubit"]) == 1:
+            (partition,) = partitions["coupler_above_qubit"]
+            low_sample = np.ceil(partition[0]).astype(int)
+            high_sample = np.floor(partition[1]).astype(int)
+            low_current = self.currents[low_sample]
+            high_current = self.currents[high_sample]
+            self._coupler_hint = np.mean((low_current, high_current))
+            if low_sample > 0 and high_sample < len(self.currents) - 1:
+                self._delta_I_above = high_current - low_current
+            else:
+                self._delta_I_above = None
+        else:
+            self._delta_I_above = None
+            self._coupler_hint = None
+
+        if len(partitions["coupler_below_qubit"]) == 1:
+            (partition,) = partitions["coupler_below_qubit"]
+            low_sample = np.ceil(partition[0]).astype(int)
+            high_sample = np.floor(partition[1]).astype(int)
+            if low_sample > 0 and high_sample < len(self.currents) - 1:
+                low_current = self.currents[low_sample]
+                high_current = self.currents[high_sample]
+                self._delta_I_below = high_current - low_current
+            else:
+                self._delta_I_below = None
+        else:
+            self._delta_I_below = None
+
+        for partition in partitions["coupler_below_qubit"]:
+            low_sample = np.ceil(partition[0]).astype(int)
+            high_sample = np.floor(partition[1]).astype(int)
+            partition_frequencies = self.frequencies[low_sample:high_sample]
+            partition_minima.append(min(partition_frequencies))
+        for partition in partitions["coupler_above_qubit"]:
+            low_sample = np.ceil(partition[0]).astype(int)
+            high_sample = np.floor(partition[1]).astype(int)
+            partition_frequencies = self.frequencies[low_sample:high_sample]
+            partition_maxima.append(max(partition_frequencies))
+
+        if partition_minima:
+            frequency_above = min(partition_minima)
+        else:
+            frequency_above = None
+        if partition_maxima:
+            frequency_below = max(partition_maxima)
+        else:
+            frequency_below = None
+        if partition_minima and partition_maxima:
+            cross_frequency = np.mean((frequency_above, frequency_below))
+        else:
+            cross_frequency = None
+
+        frequency_values = namedtuple("cross_frequencies", ["value", "below", "above"])
+        return frequency_values(
+            value=cross_frequency, below=frequency_below, above=frequency_above
+        )
+
+    @property
+    def Ic_hint(self) -> float | None:
+        """
+        hint for the current where the coupler has maximum frequency
+        """
+        return self._coupler_hint
+
+    @property
+    def I0_hint(self) -> float | None:
+        """
+        hint for the current corresponding to a quantum of magnetic flux
+        """
+        if self._delta_I_above and self._delta_I_below:
+            return self._delta_I_below + self._delta_I_above
+
+
+def coupler_frequency_function(
+    current: float,
+    fmax: float,
+    Ic: float,
+    I0: float,
+    offset: float,
+) -> float:
+    """
+    the frequency of the coupler in terms of the applied bias current.
+    Args:
+    Ic: the current that gives maximum frequency
+    I0: current corresponding to one quantum of flux
+    """
+    return fmax * np.sqrt(np.abs(np.cos((current - Ic) / I0 * np.pi))) + offset
+
+
+class CouplerModel(lmfit.model.Model):
+    """
+    Model for the coupler frequency of the form
+    f = fmax*sqrt(abs(cos(pi * (I-Ic)/I0))) + offset
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(coupler_frequency_function, *args, **kwargs)
+
+        # Typically couplers are designed up to 9GHz
+        self.set_param_hint("fmax", value=9e9, min=6e9)
+        # Expected current at fmax, helps the fitting algorithm
+        self.set_param_hint("Ic", value=1e-3, vary=True)
+        # Typically the period is around 3mAmp
+        self.set_param_hint("I0", value=2.8e-3, vary=True)
+        # Offset is a typical anharmonicity
+        self.set_param_hint("offset", value=0, max=300e6)
+
+    def guess(self, data, **kws) -> lmfit.parameter.Parameters:
+        current = kws.get("current", None)
+        if current is None:
+            raise ValueError(
+                'Variable "current" must be specified in order to guess parameters'
+            )
+
+        params = self.make_params()
+        return lmfit.models.update_param_vals(params, self.prefix, **kws)
+
+
+class CouplingModel:
+    """
+    Model to find the coupling strength g between a tunable transmon and a
+    fixed frequency transmon.
+    """
+
+    def __init__(
+        self,
+        fixed_qubit_frequency: float,
+        coupler_model: lmfit.model.ModelResult,
+        data_dc_currents,
+        data_frequencies,
+    ):
+        self.fixed_qubit_frequency = fixed_qubit_frequency
+        self.coupler_model = coupler_model
+        self.data_dc_currents = data_dc_currents
+        self.data_frequencies = data_frequencies
+
+    def model_data(self, g):
+        omega_q = self.fixed_qubit_frequency
+        dc_currents = self.data_dc_currents
+        coupler_omegas = self.coupler_model.eval(
+            self.coupler_model.params, current=self.data_dc_currents
+        )
+        anal_freq_plus = (omega_q + coupler_omegas) / 2 + np.sqrt(
+            ((omega_q - coupler_omegas) / 2) ** 2 + g**2
+        )
+        anal_freq_minus = (omega_q + coupler_omegas) / 2 - np.sqrt(
+            ((omega_q - coupler_omegas) / 2) ** 2 + g**2
+        )
+        deltas = omega_q - coupler_omegas
+        thetas = np.arctan(2 * g / deltas) / 2
+        qubit_positions_plus = np.logical_and(np.cos(thetas) ** 2 > 0.99, deltas > 0)
+        qubit_positions_minus = np.logical_and(np.cos(thetas) ** 2 > 0.99, deltas < 0)
+        qubit_freqs_plus = anal_freq_plus[qubit_positions_plus]
+        dc_currents_plus = dc_currents[qubit_positions_plus]
+        qubit_freqs_minus = anal_freq_minus[qubit_positions_minus]
+        dc_currents_minus = dc_currents[qubit_positions_minus]
+
+        valid_positions = np.logical_or(qubit_positions_plus, qubit_positions_minus)
+        valid_data_frequencies = self.data_frequencies[valid_positions]
+
+        plus_values = list(zip(dc_currents_plus, qubit_freqs_plus))
+        minus_values = list(zip(dc_currents_minus, qubit_freqs_minus))
+
+        values = plus_values + minus_values
+        sorted_values = sorted(values, key=lambda tup: tup[0])
+        sorted_dc_currents, sorted_frequencies = zip(*sorted_values)
+        return sorted_dc_currents, sorted_frequencies, valid_data_frequencies
+
+    def cost_function(self, g: float):
+        _, model_frequencies, data_frequencies = self.model_data(g)
+        # TODO: some of them are xarray datarrays
+        norm = np.sum(np.abs(data_frequencies - model_frequencies))
+        return norm
+
+    @property
+    def coupling_g(self):
+        return minimize(self.cost_function, x0=50e6, method="Nelder-Mead")
 
 
 class RamseyModel(lmfit.model.Model):
