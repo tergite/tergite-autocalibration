@@ -247,12 +247,12 @@ def refresh_folder_structure(
     # If triggered by text input and input is not empty
     if triggered_id == "text-input" or triggered_id == "element-input":
         # Case 1: Empty text -> reload original structure
-        if not node_filter_text.strip() and not element_filter_text.strip():
+        if not node_filter_text and not element_filter_text:
             return scan_folders(DATA_DIR), "Filter cleared. Showing all folders"
 
         element_filter_message = " for element: " if element_filter_text else ""
-        element_filter_text = str(element_filter_text or "")
-        filter_text = str(node_filter_text or "")
+        element_filter_text = str(element_filter_text or "").strip()
+        filter_text = str(node_filter_text or "").strip()
         # Case 2: Text input filters the intermediate folders
         styled_filter_text = html.Span(
             filter_text, style={"color": "blue", "fontWeight": "bold"}

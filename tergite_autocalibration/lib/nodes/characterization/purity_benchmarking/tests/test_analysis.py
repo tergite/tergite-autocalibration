@@ -15,6 +15,7 @@ import unittest
 from pathlib import Path
 
 import numpy as np
+import os
 from lmfit.model import ModelResult
 from matplotlib.figure import Figure
 
@@ -30,7 +31,7 @@ class TestPurityBenchmarkingAnalysis(unittest.TestCase):
     def setUpClass(self):
         # Setup the dataset for testing from a file
         test_dir = Path(__file__).parent
-        file_path = test_dir / "data"
+        file_path = os.path.join(test_dir, "data")
         full_dataset = open_dataset("purity_benchmarking", file_path)
         full_dataset["yq06"].attrs.update(element="q06")
         self.ds_06 = filter_ds_by_element(full_dataset, "q06")
