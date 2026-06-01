@@ -416,11 +416,12 @@ class CouplingModel:
         return minimize(self.cost_function, x0=50e6, method="Nelder-Mead")
 
 
-
-def straighten_ramsey_points(artificial_detunings: np.ndarray, fitted_detunings: np.ndarray) -> np.ndarray:
-    '''
+def straighten_ramsey_points(
+    artificial_detunings: np.ndarray, fitted_detunings: np.ndarray
+) -> np.ndarray:
+    """
     for data corresponding to fitted vs artificial detunings:
-    * | 
+    * |
       |             *
       | *
       |         *
@@ -430,18 +431,18 @@ def straighten_ramsey_points(artificial_detunings: np.ndarray, fitted_detunings:
 
       we find the inflection point and multiply the data before the inflection point by -1
       in order to form a line
-      | 
+      |
       |             *
-      |  
+      |
       |         *
       |      *
       |------------------------->
-      |  
-      |  * 
-      |  
-      |  
-    * |  
-    '''
+      |
+      |  *
+      |
+      |
+    * |
+    """
     complex_points = artificial_detunings + 1j * fitted_detunings
     directions = np.diff(complex_points)
     angles_of_diffs = np.angle(directions)
@@ -451,6 +452,7 @@ def straighten_ramsey_points(artificial_detunings: np.ndarray, fitted_detunings:
         (fitted_detunings[:index_of_min] * (-1), fitted_detunings[index_of_min:])
     )
     return linear_fitted_detunings
+
 
 class RamseyModel(lmfit.model.Model):
     """

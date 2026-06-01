@@ -21,11 +21,17 @@ from scipy.ndimage import gaussian_filter1d
 from scipy.signal import find_peaks
 from scipy.stats import median_abs_deviation
 
-from tergite_autocalibration.lib.base.analysis import (BaseAllCouplersAnalysis,
-                                                       BaseCouplerAnalysis)
+from tergite_autocalibration.lib.base.analysis import (
+    BaseAllCouplersAnalysis,
+    BaseCouplerAnalysis,
+)
 from tergite_autocalibration.lib.utils.analysis_models import (
-    AvoidedCrossings, CouplerModel, CouplingModel, ResonatorAvoidedCrossings,
-    resonator_hanger_frequency)
+    AvoidedCrossings,
+    CouplerModel,
+    CouplingModel,
+    ResonatorAvoidedCrossings,
+    resonator_hanger_frequency,
+)
 from tergite_autocalibration.utils.dto.qoi import QOI
 
 
