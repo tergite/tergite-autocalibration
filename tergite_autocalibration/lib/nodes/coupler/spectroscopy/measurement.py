@@ -18,6 +18,7 @@ from quantify_scheduler.operations.acquisition_library import SSBIntegrationComp
 from quantify_scheduler.operations.gate_library import Measure, Reset
 from quantify_scheduler.operations.pulse_factories import long_square_pulse
 from quantify_scheduler.operations.pulse_library import (
+    IdlePulse,
     SetClockFrequency,
     SoftSquarePulse,
     SquarePulse,
@@ -40,7 +41,7 @@ class CouplerSpectroscopyMeasurement(BaseMeasurement):
         self,
         qubit_frequencies: dict[str, np.ndarray],
         resonator_frequencies: dict[str, np.ndarray],
-        repetitions: int = 1024,
+        repetitions: int = 600,
     ) -> Schedule:
 
         schedule = Schedule("coupler_spectroscopy", repetitions)
@@ -148,6 +149,7 @@ class CouplerSpectroscopyMeasurement(BaseMeasurement):
                     rel_time=acquisition_delay,
                 )
 
-                schedule.add(Reset(this_qubit))
+                # smaller reset for resonator spectroscopies
+                schedule.add(IdlePulse(80e-6))
 
         return schedule

@@ -16,7 +16,7 @@ import numpy as np
 import xarray
 from lmfit.models import LorentzianModel
 
-from tergite_autocalibration.config.globals import CONFIG
+from tergite_autocalibration.config.globals import CONFIG, REDIS_CONNECTION
 from tergite_autocalibration.lib.base.node import CouplerNode
 from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
     CouplerSpectroscopyNodeAnalysis,
@@ -65,7 +65,7 @@ class CouplerDCSpectroscopyNode(CouplerNode):
 
         self.external_samplespace = {
             "dc_currents": {
-                coupler: np.arange(-2e-3, 2e-3, 80e-6) for coupler in self.couplers
+                coupler: np.arange(-2.2e-3, 2.2e-3, 80e-6) for coupler in self.couplers
             },
         }
         self.validate()
@@ -82,7 +82,11 @@ class CouplerDCSpectroscopyNode(CouplerNode):
         logger.info("Final Operation")
         currents = {}
         for coupler in self.couplers:
-            currents[coupler] = 0
+            parking_current = float(
+                REDIS_CONNECTION.hget(f"couplers:{coupler}", "initial_parking_current")
+            )
+            currents[coupler] = parking_current
+            # currents[coupler] = 0
 
         self.spi_manager.set_dac_current(currents)
 

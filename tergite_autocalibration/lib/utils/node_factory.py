@@ -63,6 +63,7 @@ class NodeFactory:
             "randomized_benchmarking": "RandomizedBenchmarkingNode",
             "purity_benchmarking": "PurityBenchmarkingNode",
             "coupler_anticrossing": "CouplerAnticrossingNode",
+            "coupler_dc_spectroscopy": "CouplerDCSpectroscopyNode",
             "cz_parametrization": "CZParametrizationNode",
             "zz_coupling": "ZZCouplingNode",
             "cz_chevron": "CZChevronNode",
