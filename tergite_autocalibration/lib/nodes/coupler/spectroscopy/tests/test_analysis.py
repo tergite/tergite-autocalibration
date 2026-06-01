@@ -22,17 +22,17 @@ from tergite_autocalibration.lib.nodes.coupler.spectroscopy.analysis import (
     CouplerSpectroscopyAnalysis,
 )
 from tergite_autocalibration.tests.utils.decorators import with_redis
+from tergite_autocalibration.utils.io.dataset import open_dataset
 
-_test_data_dir = os.path.join(Path(__file__).parent, "data")
+_test_data_dir = Path(os.path.join(Path(__file__).parent, "data"))
 
 
 def test_coupler_dc_spectroscopy_analysis():
     """
     Test whether single coupler analysis outputs right QOIs
     """
-    # Load dataset
-    file_path = os.path.join(_test_data_dir, "dataset_coupler_dc_spectroscopy.hdf5")
-    dataset = xr.open_dataset(file_path)
+    name = "coupler_dc_spectroscopy"
+    dataset = open_dataset(name, _test_data_dir)
     coupler = "q13_q14"
     coupler_qois = ["fmax", "Ic", "I0", "offset"]
 
@@ -55,8 +55,8 @@ def test_plotting():
     """
     Test that the plotter produces a figure with the right number of axes
     """
-    file_path = os.path.join(_test_data_dir, "dataset_coupler_dc_spectroscopy.hdf5")
-    dataset = xr.open_dataset(file_path)
+    name = "coupler_dc_spectroscopy"
+    dataset = open_dataset(name, _test_data_dir)
 
     coupler_qois = ["fmax", "Ic", "I0", "offset"]
 
