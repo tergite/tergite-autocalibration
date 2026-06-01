@@ -38,7 +38,7 @@ class ZZCouplingCouplerAnalysis(BaseCouplerAnalysis):
         guess = self.model.guess(data, t=self.active_ramsey_delays)
         fit = self.model.fit(data, params=guess, t=self.active_ramsey_delays)
         fitted_detuning = fit.params["frequency"].value
-        return np.array([fitted_detuning])
+        return fitted_detuning
 
     def _analyse_ramsey(self):
         active_qubit = self.active_qubit
