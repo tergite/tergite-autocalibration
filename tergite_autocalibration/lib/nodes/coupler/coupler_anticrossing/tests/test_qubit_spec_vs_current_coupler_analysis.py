@@ -29,6 +29,7 @@ from tergite_autocalibration.lib.nodes.coupler.coupler_anticrossing.analysis imp
 from tergite_autocalibration.lib.utils.redis import update_redis_trusted_values
 from tergite_autocalibration.tests.utils.decorators import with_os_env
 from tergite_autocalibration.utils.dto.qoi import QOI
+from tergite_autocalibration.utils.io.dataset import open_dataset
 
 
 def test_CanCreate():
@@ -47,17 +48,13 @@ def setup_q06_q07_data():
 
 def get_dataset_for_coupler(coupler):
     qubits = coupler.split("_")
-    dataset_path = (
-        Path(__file__).parent / "data" / "dataset_coupler_spectroscopy_0.hdf5"
-    )
-    ds_qu = xr.open_dataset(dataset_path)
+    dataset_path = Path(__file__).parent / "data"
+    ds_qu = open_dataset("coupler_spectroscopy_0", dataset_path)
     ds_qu = xr.merge(ds_qu[var] for var in [f"y{qubits[0]}", f"y{qubits[1]}"])
     ds_qu.attrs["coupler"] = coupler
 
-    dataset_path = (
-        Path(__file__).parent / "data" / "dataset_coupler_resonator_spectroscopy_0.hdf5"
-    )
-    ds_res = xr.open_dataset(dataset_path)
+    dataset_path = Path(__file__).parent / "data"
+    ds_res = open_dataset("coupler_resonator_spectroscopy_0", dataset_path)
     ds_res = xr.merge(ds_res[var] for var in [f"y{qubits[0]}", f"y{qubits[1]}"])
     ds_res.attrs["coupler"] = coupler
     return ds_qu, ds_res
@@ -84,7 +81,7 @@ qubit_coupler_qois = ["control_qubit_crossing_points", "target_qubit_crossing_po
 
 
 def test_get_crossings_for_q06_q07(
-    setup_q06_q07_data: tuple[xr.Dataset, str, ndarray, str],
+    setup_q06_q07_data: tuple[xr.Dataset, xr.Dataset, str],
 ):
     ds_res, ds_qu, coupler = setup_q06_q07_data
     a = ResonatorSpectroscopyVsCurrentCouplerAnalysis(
@@ -108,8 +105,7 @@ def test_get_crossings_for_q06_q07(
         [-0.001925, -0.0011, 0.001375, 0.0022], abs=1e-6
     )
     assert q07_crossings == pytest.approx(
-        [-0.002025, -0.001, 0.0012875, 0.0023],
-        abs=1e-6,
+        [-0.002025, -0.001, 0.0012875, 0.0023], abs=1e-6
     )
 
 
@@ -180,10 +176,7 @@ def test_get_crossings_for_q12_q13(
     assert q12_crossings == pytest.approx(
         [-0.00190, -0.00105, 0.001475, 0.002375], abs=1e-6
     )
-    assert q13_crossings == pytest.approx(
-        [-0.0020875, 0.001375],
-        abs=1e-6,
-    )
+    assert q13_crossings == pytest.approx([-0.0020875, 0.001375], abs=1e-6)
 
 
 @pytest.fixture(autouse=False)
@@ -250,12 +243,8 @@ def test_coupler_plot_is_created(setup_q06_q07_data):
 
 @pytest.fixture(autouse=False)
 def setup_q16_q17_data():
-    dataset_path = (
-        Path(__file__).parent
-        / "data"
-        / "dataset_qubit_spectroscopy_vs_current_no_crossings.hdf5"
-    )
-    ds = xr.open_dataset(dataset_path)
+    dataset_path = Path(__file__).parent / "data"
+    ds = open_dataset("qubit_spectroscopy_vs_current_no_crossings", dataset_path)
     coupler = "q16_q17"
     ds = xr.merge(ds[var] for var in ["yq16", "yq17"])
     ds.attrs["coupler"] = coupler
