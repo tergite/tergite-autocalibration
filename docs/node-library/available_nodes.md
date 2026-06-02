@@ -10,6 +10,7 @@ graph TD
     C --> D[Ramsey Correction]
     D --> E[Motzoi Parameter]
     E --> F[Resonator Spectroscopy 1]
+    E --> J3[Static ZZ coupling]
     F --> C1[T1] --> C2[T2] --> C3[Randomized Benchmarking]
     F --> F1(Qubit 12 Spectroscopy) --> G(Motzoi 12 Parameter)--> G1(Rabi 12 Oscillations) --> G2[Resonator Spectroscopy 2]
     F --> H1(2 States Discrimination)
@@ -85,6 +86,7 @@ graph TD
 
 - [coupler_anticrossing](nodes/qubit_spectroscopy_vs_current_node.md)
 - coupler_dc_spectroscopy
+- [zz_coupling](nodes/static_zz_coupling.md)
 - [coupler_resonator_spectroscopy](nodes/resonator_spectroscopy_vs_current_node.md)
 - [cz_parametrization](nodes/cz_parametrization.md)
 - [cz_chevron](nodes/cz_chevron.md)

@@ -68,7 +68,7 @@ res_coupler_qois = [
 
 
 def test_get_crossings_for_q06_q07(
-    setup_q06_q07_data: tuple[xr.Dataset, str, ndarray, ndarray],
+    setup_q06_q07_data: tuple[xr.Dataset, str],
 ):
     ds, coupler = setup_q06_q07_data
     a = ResonatorSpectroscopyVsCurrentCouplerAnalysis("name", res_coupler_qois)
