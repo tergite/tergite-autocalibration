@@ -27,17 +27,27 @@ from dash_renderjson import DashRenderjson
 
 import tergite_autocalibration.tools.browser.styles as styles
 from tergite_autocalibration.config.globals import DATA_DIR
-from tergite_autocalibration.tools.browser.layout import generate_selection_layout
+from tergite_autocalibration.tools.browser.layout import \
+    generate_selection_layout
 from tergite_autocalibration.tools.browser.utils import scan_folders
 
 folder_structure = scan_folders(DATA_DIR)
 
-app = dash.Dash(__name__)
+app = dash.Dash(__name__, use_pages=True)
 
 app.title = "Data Browser - Tergite Autocalibration"
-
+app.layout = html.Div([
+    
+])
 app.layout = html.Div(
     [
+        html.H1('Multi-page app with Dash Pages'),
+        html.Div([
+            html.Div(
+                dcc.Link(f"{page['name']} - {page['path']}", href=page["relative_path"])
+            ) for page in dash.page_registry.values()
+        ]),
+        dash.page_container,
         dcc.Store(id="folder-data", data=folder_structure),
         dcc.Store(id="selected-2d-variable"),
         dcc.Store(id="starred-store", data=[], storage_type="local"),
