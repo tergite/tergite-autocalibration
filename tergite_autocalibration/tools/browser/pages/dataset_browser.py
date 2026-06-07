@@ -1,21 +1,32 @@
+# This code is part of Tergite
+#
+# (C) Copyright Eleftherios Moschandreou 2026
+# (C) Chalmers Next Labs 2026
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+
 import base64
 import json
 import os
 import re
 
 import dash
-
+import dash_bootstrap_components as dbc
 import plotly.express as px
 import xarray as xr
-from dash import html, Input, Output, callback, dcc, ALL, MATCH, State, ctx
-import dash_bootstrap_components as dbc
-
+from dash import ALL, MATCH, Input, Output, State, callback, ctx, dcc, html
 from dash_renderjson import DashRenderjson
 
 from tergite_autocalibration.config.globals import DATA_DIR
-from tergite_autocalibration.tools.browser.utils import scan_folders
-from tergite_autocalibration.tools.browser.layout import generate_selection_layout
 from tergite_autocalibration.tools.browser import styles
+from tergite_autocalibration.tools.browser.layout import generate_selection_layout
+from tergite_autocalibration.tools.browser.utils import scan_folders
 
 folder_structure = scan_folders(DATA_DIR)
 
