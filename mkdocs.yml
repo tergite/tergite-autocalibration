@@ -88,7 +88,6 @@ plugins:
       execute: false
       include: [ "*.ipynb" ] # Default: ["*.py", "*.ipynb"]
       include_requirejs: true
-      custom_mathjax_url: "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML-full,Safe"
 
   - gen-files:
       scripts:
@@ -168,10 +167,12 @@ extra:
       link: https://github.com/tergite/tergite-autocalibration
 
 # JavaScript files for enhanced functionality
+# The polyfill.io script was removed: it is not needed by MathJax 3 and that
+# domain was compromised in the 2024 supply-chain attack. The MathJax CDN URL
+# is pinned to an exact version (rather than a floating @3) for reproducibility.
 extra_javascript:
   - javascripts/mathjax.js  # Custom MathJax configuration
-  - https://polyfill.io/v3/polyfill.min.js?features=es6  # ES6 polyfills
-  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js  # MathJax library
+  - https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js  # MathJax library (pinned)
 
 extra_css:
   - stylesheets/extra.css
