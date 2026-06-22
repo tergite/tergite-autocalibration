@@ -12,6 +12,7 @@
 # that they have been altered from the originals.
 
 from dash import dcc, html
+import dash_bootstrap_components as dbc
 
 
 def generate_selection_layout(folder_structure: dict, index: str = ""):
@@ -29,7 +30,7 @@ def generate_selection_layout(folder_structure: dict, index: str = ""):
     # Shows to select the folder of the measurement with the date
     outer_selection_DIV = html.Div(
         [
-            html.H2("Select Date:"),
+            html.H2("Date:"),
             dcc.Dropdown(
                 id={"type": "outer-selector", "index": index},
                 options=[
@@ -46,7 +47,7 @@ def generate_selection_layout(folder_structure: dict, index: str = ""):
     # Shows the folder of a specific calibration run
     intermediate_selection_DIV = html.Div(
         [
-            html.H2("Select the calibration chain:"),
+            html.H2("Calibration chain:"),
             dcc.Dropdown(
                 id={"type": "intermediate-selector", "index": index},
                 value=None,
@@ -59,7 +60,7 @@ def generate_selection_layout(folder_structure: dict, index: str = ""):
     # Shows the selection for the specific folder of a single measurement
     inner_selection_DIV = html.Div(
         [
-            html.H2("Select a Node Measurement:"),
+            html.H2("Node Measurement:"),
             dcc.Dropdown(
                 id={"type": "inner-selector", "index": index},
                 value=None,
@@ -74,8 +75,8 @@ def generate_selection_layout(folder_structure: dict, index: str = ""):
             outer_selection_DIV,
             intermediate_selection_DIV,
             inner_selection_DIV,
-            html.Button(
-                "star this \u2605",
+            dbc.Button(
+                "\u2605",
                 id={"type": "star-btn", "index": index},
                 style={
                     "backgroundColor": "#F5F5F5",
@@ -94,19 +95,19 @@ def generate_selection_layout(folder_structure: dict, index: str = ""):
     # A tab view with one tab for the image and another tab for the json object with the qubit definition
     image_display_DIV = html.Div(
         [
-            dcc.Tabs(
+            dbc.Tabs(
                 id={"type": "tabs", "index": index},
-                value="image",
+                active_tab="image",
                 children=[
-                    dcc.Tab(
+                    dbc.Tab(
                         label="Preview Image Display",
-                        value="image",
-                        style={"backgroundColor": "#f0f0f0"},
+                        tab_id="image",
+                        # style={"backgroundColor": "#f0f0f0"},
                     ),
-                    dcc.Tab(
+                    dbc.Tab(
                         label="Device JSON Display",
-                        value="json",
-                        style={"backgroundColor": "#c9c9c9"},
+                        tab_id="json",
+                        # style={"backgroundColor": "#c9c9c9"},
                     ),
                 ],
             ),
