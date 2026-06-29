@@ -7,9 +7,22 @@ and this project follows versions of format `{year}.{month}.{patch_number}`.
 
 ## [Unreleased]
 
-## [2026.03.0] - 2026-03-06
+## [2026.06.0] - 2026-06-29
 
-- No Change
+### Added
+
+- CZ Randomized Benchmarking and Interleaved Randomized Benchmarking
+- Added coupler DC spectroscopy
+- Pipeline tests for two-qubit calibration nodes
+
+### Changed
+
+- Starring measurements in the dataset browser
+- Pages for the dataset browser
+
+### Fixed
+
+- Removed polyfill mathjax
 
 ## [2025.12.0] - 2026-03-16
 

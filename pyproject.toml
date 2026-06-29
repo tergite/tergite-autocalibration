@@ -16,7 +16,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tergite-autocalibration"
-version = "2026.03.0"
+version = "2026.06.0"
 description = "Commandline application to calibrate the WACQT quantum computers automatically"
 readme = "README.md"
 authors = [
@@ -59,7 +59,7 @@ dependencies = [
     "tomlkit>=0.13.2",
     "rich>=14.0.0",
     "click<8.2.0",
-    "matplotlib>=3.9.3,<3.11",  # TODO: <3.11 cap; matplotlib 3.11.0 produces NaN axes bbox in xarray FacetGrid colorbar (tight_layout on Agg), breaking cz_chevron test_plotting. Remove once fixed upstream (>=3.11.1).
+    "matplotlib>=3.9.3,<3.11", # TODO: <3.11 cap; matplotlib 3.11.0 produces NaN axes bbox in xarray FacetGrid colorbar (tight_layout on Agg), breaking cz_chevron test_plotting. Remove once fixed upstream (>=3.11.1).
     "scipy>=1.14.1",
     "pandas>=2.2.3",
     "xarray>=2024.11.0",

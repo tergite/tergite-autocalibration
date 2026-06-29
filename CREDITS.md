@@ -22,7 +22,7 @@ Added demodulation channels
 
 ## Michele Faucci Giannelli
 
-Automated the scan for starting parameters, bias current, amplitude, frequency (and time if not fixed) of CZ gate  
+Automated the scan for starting parameters, bias current, amplitude, frequency (and time if not fixed) of CZ gate
 
 ## Stefan Hill
 
@@ -31,10 +31,6 @@ Added the CLI interface for the tool and infrastructural components.
 ## Amr Osman
 
 Improvements on the CZ gate automatic tune-up.
-
-## Damien Crielaard
-
-Created the dataset browser, which was integrated into this library.
 
 ## Joel Sandås
 
